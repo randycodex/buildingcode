@@ -65,7 +65,11 @@ Response:
 
 The backend owns `appUserID`. Login identity and public identity must stay separate.
 
-`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. The app persists this token in Keychain rather than in the account metadata stored in `UserDefaults`. Production should rotate and expire equivalent tokens server-side.
+`backendSessionToken` is an opaque bearer token returned only to the client. The app persists it in Keychain rather than in the account metadata stored in `UserDefaults`. Postgres stores only its SHA-256 hash in `permitext_account_sessions`; sessions are device-specific, expire after 30 days by default, and can be individually revoked. Existing plaintext sessions migrate to the hashed table on successful use.
+
+### `POST /account/sign-out`
+
+The authenticated request revokes only the supplied session token. Other signed-in devices remain connected.
 
 Passkey support is disabled. `credential.provider = "passkey"` and `POST /account/passkeys/link` return HTTP `410` until the backend implements server-issued challenges and complete WebAuthn registration/assertion verification. Existing passkey storage remains only for administrative cleanup and export compatibility.
 

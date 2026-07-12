@@ -4571,11 +4571,23 @@ function renderSettings() {
       syncAccountState();
     }
   });
-  disconnectButton.addEventListener("click", () => {
-    state.account = null;
-    syncedContent = null;
-    saveWorkspaceState();
-    renderWorkspace();
+  disconnectButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    disconnectButton.disabled = true;
+    try {
+      if (account) {
+        await postJSON("/account/sign-out", {
+          auth: { accountUserID: account.userID }
+        }, { token: account.sessionToken });
+      }
+    } catch {
+      // Clear the local session even if the network is unavailable.
+    } finally {
+      state.account = null;
+      syncedContent = null;
+      saveWorkspaceState();
+      renderWorkspace();
+    }
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();

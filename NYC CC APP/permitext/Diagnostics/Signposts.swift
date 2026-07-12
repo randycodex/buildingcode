@@ -125,6 +125,12 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         try await transport.signIn(BackendSignInRequest(credential: credential))
     }
 
+    func signOut(account: SignedInAccount) async throws {
+        _ = try await transport.signOut(
+            BackendSignOutRequest(auth: authContext(for: account))
+        )
+    }
+
     func health() async throws -> BackendHealthStatus {
         try await transport.health()
     }

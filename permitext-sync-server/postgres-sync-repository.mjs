@@ -38,24 +38,6 @@ function blockID(value) {
 }
 
 export function createPostgresSyncRepository(sql) {
-  async function userContext(userID) {
-    const rows = await sql`
-      SELECT users.account, sessions.session_token, entitlements.entitlement
-      FROM permitext_users AS users
-      LEFT JOIN permitext_sessions AS sessions ON sessions.user_id = users.id
-      LEFT JOIN permitext_entitlements AS entitlements ON entitlements.user_id = users.id
-      WHERE users.id = ${userID}
-      LIMIT 1
-    `;
-    const row = rows[0];
-    if (!row) return null;
-    return {
-      account: safeJSON(row.account, {}),
-      sessionToken: row.session_token || null,
-      entitlement: row.entitlement ? safeJSON(row.entitlement, null) : null
-    };
-  }
-
   function compatibilityQuery(userID, mutation) {
     const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
@@ -386,5 +368,5 @@ export function createPostgresSyncRepository(sql) {
     };
   }
 
-  return { userContext, push, pull };
+  return { push, pull };
 }

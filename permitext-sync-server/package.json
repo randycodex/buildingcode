@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.mjs",
-    "check": "node --check app.mjs && node --check postgres-sync-repository.mjs && node --check server.mjs && node --check tests/auth-policy.mjs && node --check tests/smoke.mjs && node --check tests/postgres-integration.mjs",
+    "check": "node --check app.mjs && node --check postgres-account-repository.mjs && node --check postgres-sync-repository.mjs && node --check public/app.js && node --check server.mjs && node --check tests/auth-policy.mjs && node --check tests/smoke.mjs && node --check tests/postgres-integration.mjs",
     "smoke": "node tests/auth-policy.mjs && node tests/smoke.mjs",
     "verify:postgres": "node tests/postgres-integration.mjs",
     "verify:production": "node tests/production-health.mjs",

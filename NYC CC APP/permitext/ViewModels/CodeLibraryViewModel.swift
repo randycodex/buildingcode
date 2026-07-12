@@ -2060,6 +2060,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func signOut() {
+        let account = signedInAccount
         signedInAccount = nil
         Self.clearSignedInAccount()
         if currentEntitlementSource == .lifetimeGrant {
@@ -2067,6 +2068,11 @@ final class CodeLibraryViewModel: ObservableObject {
         }
         refreshCurrentEntitlement()
         statusMessage = "Signed out."
+        if let account {
+            Task {
+                try? await accountBackendClient.signOut(account: account)
+            }
+        }
     }
 
     @discardableResult

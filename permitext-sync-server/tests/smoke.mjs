@@ -1215,6 +1215,19 @@ async function main() {
     });
     assert(revoke.response.ok, "Lifetime revoke failed.");
     assert(revoke.json.entitlement === null, "Lifetime revoke did not clear the entitlement.");
+
+    const signOut = await request("/account/sign-out", {
+      method: "POST",
+      token: reinstallSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(signOut.response.ok && signOut.json.signedOut === true, "Account sign-out failed.");
+    const pullAfterSignOut = await request("/sync/pull", {
+      method: "POST",
+      token: reinstallSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(pullAfterSignOut.response.status === 401, "A revoked session remained usable.");
   } finally {
     server.kill();
     await rm(tempDir, { recursive: true, force: true });

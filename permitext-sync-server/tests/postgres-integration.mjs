@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { createHash } from "node:crypto";
 import { setTimeout as sleep } from "node:timers/promises";
 
 const databaseURL =
@@ -67,6 +68,7 @@ async function cleanupUser() {
   await sql`DELETE FROM permitext_comments WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_passkey_credentials WHERE user_id = ${userID}`;
+  await sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_entitlements WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_users WHERE id = ${userID}`;
@@ -88,6 +90,10 @@ async function countRows(tableName) {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_user_content_records WHERE user_id = ${userID}`;
   } else if (tableName === "permitext_sync_events") {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_sync_events WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_sessions") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_sessions WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_account_sessions") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_account_sessions WHERE user_id = ${userID}`;
   } else {
     throw new Error(`Unsupported count table: ${tableName}`);
   }
@@ -106,14 +112,15 @@ const server = spawn(process.execPath, ["server.mjs"], {
     STORAGE_URL: "",
     POSTGRES_URL: "",
     NEON_DATABASE_URL: "",
-    PERMITEXT_SYNC_ADMIN_TOKEN: adminToken
+    PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
+    PERMITEXT_SESSION_TTL_SECONDS: "3600"
   },
   stdio: ["ignore", "pipe", "pipe"]
 });
 
 try {
   const health = await waitForServer();
-  assert(health.schema === "normalized-v2", `Expected normalized-v2 schema, received ${health.schema}.`);
+  assert(health.schema === "normalized-v3", `Expected normalized-v3 schema, received ${health.schema}.`);
 
   await cleanupUser();
 
@@ -123,7 +130,7 @@ try {
   const initialSummary = await request("/admin/storage/summary", { token: adminToken });
   assert(initialSummary.response.ok, "Initial storage summary failed.");
   assert(initialSummary.json.storage === "postgres", "Storage summary did not report postgres.");
-  assert(initialSummary.json.schema === "normalized-v2", "Storage summary did not report normalized-v2.");
+  assert(initialSummary.json.schema === "normalized-v3", "Storage summary did not report normalized-v3.");
   assert(Number.isInteger(initialSummary.json.latestEventID), "Storage summary did not return latestEventID.");
 
   const signIn = await request("/account/sign-in", {
@@ -141,6 +148,8 @@ try {
   assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user.");
   const token = signIn.json.account.backendSessionToken;
   assert(token, "Sign-in did not return a session token.");
+  assert(await countRows("permitext_sessions") === 0, "Sign-in stored a plaintext legacy session.");
+  assert(await countRows("permitext_account_sessions") === 1, "Sign-in did not store a hashed account session.");
 
   const savedItem = {
     savedItem: {
@@ -319,6 +328,72 @@ try {
     "The newest concurrent mutation did not win."
   );
 
+  const secondSignIn = await request("/account/sign-in", {
+    method: "POST",
+    body: {
+      credential: {
+        provider: "apple",
+        providerUserID,
+        displayName: "Postgres Integration Smoke",
+        signedInAt: new Date().toISOString()
+      }
+    }
+  });
+  assert(secondSignIn.response.ok, "Second device sign-in failed.");
+  const secondToken = secondSignIn.json.account.backendSessionToken;
+  assert(secondToken && secondToken !== token, "Second device did not receive a distinct session.");
+  const firstDevicePull = await request("/sync/pull", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(firstDevicePull.response.ok, "Second sign-in invalidated the first device session.");
+
+  const signOut = await request("/account/sign-out", {
+    method: "POST",
+    token: secondToken,
+    body: { auth: { accountUserID: userID } }
+  });
+  assert(signOut.response.ok, "Postgres account sign-out failed.");
+  const revokedDevicePull = await request("/sync/pull", {
+    method: "POST",
+    token: secondToken,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(revokedDevicePull.response.status === 401, "Revoked Postgres session remained usable.");
+  const survivingDevicePull = await request("/sync/pull", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(survivingDevicePull.response.ok, "Signing out one device revoked another device session.");
+
+  const expiringSignIn = await request("/account/sign-in", {
+    method: "POST",
+    body: {
+      credential: {
+        provider: "apple",
+        providerUserID,
+        displayName: "Postgres Integration Smoke",
+        signedInAt: new Date().toISOString()
+      }
+    }
+  });
+  assert(expiringSignIn.response.ok, "Expiring-session sign-in failed.");
+  const expiringToken = expiringSignIn.json.account.backendSessionToken;
+  const expiringTokenHash = createHash("sha256").update(expiringToken).digest("hex");
+  await sql`
+    UPDATE permitext_account_sessions
+    SET expires_at = now() - interval '1 second'
+    WHERE token_hash = ${expiringTokenHash}
+  `;
+  const expiredSessionPull = await request("/sync/pull", {
+    method: "POST",
+    token: expiringToken,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(expiredSessionPull.response.status === 401, "Expired session remained usable.");
+
   const finalSummary = await request("/admin/storage/summary", { token: adminToken });
   assert(finalSummary.response.ok, "Final storage summary failed.");
   assert(finalSummary.json.tables.savedItems >= 1, "Storage summary did not include saved item count.");
@@ -326,6 +401,8 @@ try {
   assert(finalSummary.json.tables.projects >= 1, "Storage summary did not include project count.");
   assert(finalSummary.json.tables.projectItems >= 1, "Storage summary did not include project item count.");
   assert(finalSummary.json.tables.syncEvents >= 4, "Storage summary did not include sync event count.");
+  assert(finalSummary.json.tables.accountSessions >= 1, "Storage summary did not include active hashed sessions.");
+  assert(finalSummary.json.tables.legacySessions === 0, "Storage summary reported a plaintext legacy session.");
   assert(finalSummary.json.latestEventID >= push.json.latestEventID, "Storage summary latestEventID is stale.");
 
   console.log("permitext postgres integration passed");

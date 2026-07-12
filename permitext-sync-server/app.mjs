@@ -10,6 +10,7 @@ import {
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -212,6 +213,7 @@ function mutationRecordDeletedAt(record) {
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
+  const accountRepository = createPostgresAccountRepository(sql);
   const syncRepository = createPostgresSyncRepository(sql);
   let initialized = false;
   let migrated = false;
@@ -279,6 +281,20 @@ async function createPostgresStoreAdapter() {
         session_token TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_account_sessions (
+        token_hash TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        expires_at TIMESTAMPTZ NOT NULL,
+        revoked_at TIMESTAMPTZ
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_account_sessions_user_idx
+      ON permitext_account_sessions (user_id, expires_at)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_passkey_credentials (
@@ -763,6 +779,7 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_users)::int AS users,
         (SELECT count(*) FROM permitext_entitlements)::int AS entitlements,
         (SELECT count(*) FROM permitext_sessions)::int AS sessions,
+        (SELECT count(*) FROM permitext_account_sessions WHERE revoked_at IS NULL AND expires_at > now())::int AS account_sessions,
         (SELECT count(*) FROM permitext_passkey_credentials)::int AS passkey_credentials,
         (SELECT count(*) FROM permitext_saved_items)::int AS saved_items,
         (SELECT count(*) FROM permitext_annotations)::int AS annotations,
@@ -776,12 +793,14 @@ async function createPostgresStoreAdapter() {
     const row = rows[0] || {};
     return {
       storage: "postgres",
-      schema: "normalized-v2",
+      schema: "normalized-v3",
       latestEventID: Number(row.latest_event_id || 0),
       tables: {
         users: Number(row.users || 0),
         entitlements: Number(row.entitlements || 0),
-        sessions: Number(row.sessions || 0),
+        sessions: Number(row.sessions || 0) + Number(row.account_sessions || 0),
+        legacySessions: Number(row.sessions || 0),
+        accountSessions: Number(row.account_sessions || 0),
         passkeyCredentials: Number(row.passkey_credentials || 0),
         savedItems: Number(row.saved_items || 0),
         annotations: Number(row.annotations || 0),
@@ -1056,7 +1075,11 @@ async function createPostgresStoreAdapter() {
 
   return {
     kind: "postgres",
-    schema: "normalized-v2",
+    schema: "normalized-v3",
+    async initialize() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+    },
     async read() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1077,10 +1100,30 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return mutationsAfterEventID(userID, sinceEventID);
     },
-    async userContext(userID) {
+    async authenticateUserSession(userID, rawToken) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
-      return syncRepository.userContext(userID);
+      return accountRepository.authenticate(userID, rawToken);
+    },
+    async signInAccount(account) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.signIn(account);
+    },
+    async updateAccount(userID, account) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.updateAccount(userID, account);
+    },
+    async hasActiveUserSession(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.hasActiveSession(userID);
+    },
+    async revokeUserSession(userID, rawToken) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.revoke(userID, rawToken);
     },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
@@ -1259,10 +1302,6 @@ function requireAdmin(request, response) {
   return true;
 }
 
-function requireUserSession(request, response, store, userID, requestAccount) {
-  return requireSessionToken(request, response, store.sessions[userID], requestAccount);
-}
-
 function requireSessionToken(request, response, sessionToken, requestAccount) {
   const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (!suppliedToken) {
@@ -1279,6 +1318,42 @@ function requireSessionToken(request, response, sessionToken, requestAccount) {
     return false;
   }
   return true;
+}
+
+async function authenticatedUserContext(request, response, userID, requestAccount, store = null) {
+  const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
+  if (!suppliedToken) {
+    sendError(response, 401, "Missing session token.");
+    return null;
+  }
+  const adapter = await storeAdapter();
+  if (typeof adapter.authenticateUserSession === "function") {
+    const context = await adapter.authenticateUserSession(userID, suppliedToken);
+    if (!context) {
+      sendError(response, 401, "Unauthorized.");
+      return null;
+    }
+    return { ...context, sessionToken: suppliedToken };
+  }
+
+  const localStore = store || await readStore();
+  if (!requireSessionToken(request, response, localStore.sessions[userID], requestAccount)) {
+    return null;
+  }
+  return {
+    account: localStore.users[userID] || null,
+    entitlement: localStore.entitlements[userID] || null,
+    sessionToken: suppliedToken
+  };
+}
+
+async function userHasActiveSession(userID, store = null) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.hasActiveUserSession === "function") {
+    return adapter.hasActiveUserSession(userID);
+  }
+  const localStore = store || await readStore();
+  return Boolean(localStore.sessions[userID]);
 }
 
 function normalizePath(url) {
@@ -2802,11 +2877,9 @@ async function handleSignIn(request, response) {
     sendError(response, 400, "Unsupported account provider.");
     return;
   }
-  const store = await readStore();
   let account;
   try {
     account = await accountFromCredential(credential);
-    account = await canonicalizeAppleAccountForSignIn(store, account);
   } catch (error) {
     if (error instanceof ClientAuthError) {
       sendError(response, error.statusCode, error.message);
@@ -2818,6 +2891,19 @@ async function handleSignIn(request, response) {
     sendError(response, 400, "Missing account.");
     return;
   }
+  const linkFrom = body.linkFrom || {};
+  const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
+  const adapter = await storeAdapter();
+  if (!sourceUserID && typeof adapter.signInAccount === "function") {
+    const directResult = await adapter.signInAccount(account);
+    if (!directResult.requiresLegacyMerge) {
+      sendJSON(response, 200, directResult);
+      return;
+    }
+  }
+
+  const store = await readStore();
+  account = await canonicalizeAppleAccountForSignIn(store, account);
   const sessionToken = store.sessions[account.appUserID] || randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
@@ -2826,11 +2912,15 @@ async function handleSignIn(request, response) {
     : { ...account, backendSessionToken: sessionToken };
   store.users[account.appUserID] = storedAccount;
   let mergedAccount = null;
-  const linkFrom = body.linkFrom || {};
-  const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
   if (sourceUserID && sourceUserID !== account.appUserID) {
     const sourceSessionToken = linkFrom.sessionToken || linkFrom.backendSessionToken;
-    if (!requireUserSession(request, response, store, sourceUserID, { backendSessionToken: sourceSessionToken })) {
+    if (!await authenticatedUserContext(
+      request,
+      response,
+      sourceUserID,
+      { backendSessionToken: sourceSessionToken },
+      store
+    )) {
       return;
     }
     mergedAccount = await mergeAccountInto(store, sourceUserID, account.appUserID);
@@ -2861,7 +2951,7 @@ async function handleBrowserAccountLink(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, targetUserID)) {
+  if (!await authenticatedUserContext(request, response, targetUserID, undefined, store)) {
     return;
   }
   const targetAccount = store.users[targetUserID];
@@ -2916,10 +3006,27 @@ async function handleAttachLocalData(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, account.appUserID, account)) {
+  const context = await authenticatedUserContext(request, response, account.appUserID, account);
+  if (!context) {
     return;
   }
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateAccount === "function") {
+    const migratedAccount = {
+      ...account,
+      ...(context.account || {}),
+      migrationState: "localDataAttached"
+    };
+    const updatedAccount = await adapter.updateAccount(account.appUserID, migratedAccount);
+    if (!updatedAccount) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+    sendJSON(response, 200, "localDataAttached");
+    return;
+  }
+
+  const store = await readStore();
   const existingAccount = store.users[account.appUserID] || {};
   const migratedAccount = {
     ...account,
@@ -2939,8 +3046,8 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) {
     return;
   }
 
@@ -2954,6 +3061,32 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateAccount === "function") {
+    const existingAccount = context.account;
+    if (!existingAccount) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+    const updatedAccount = {
+      ...existingAccount,
+      publicUsername,
+      displayName: displayName ?? existingAccount.displayName ?? null
+    };
+    try {
+      const savedAccount = await adapter.updateAccount(userID, updatedAccount);
+      sendJSON(response, 200, { account: { ...savedAccount, backendSessionToken: context.sessionToken } });
+    } catch (error) {
+      if (error?.code === "23505") {
+        sendError(response, 409, "Public username is already taken.");
+        return;
+      }
+      throw error;
+    }
+    return;
+  }
+
+  const store = await readStore();
   if (publicUsername) {
     const usernameOwner = Object.values(store.users).find((user) =>
       user.publicUsername === publicUsername && user.appUserID !== userID
@@ -2978,6 +3111,29 @@ async function handleProfileUpdate(request, response) {
   store.users[userID] = updatedAccount;
   await writeStore(store);
   sendJSON(response, 200, { account: updatedAccount });
+}
+
+async function handleSignOut(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID || body.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID, body.auth);
+  if (!context) return;
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.revokeUserSession === "function") {
+    await adapter.revokeUserSession(userID, context.sessionToken);
+    sendJSON(response, 200, { signedOut: true });
+    return;
+  }
+
+  const store = await readStore();
+  delete store.sessions[userID];
+  await writeStore(store);
+  sendJSON(response, 200, { signedOut: true });
 }
 
 async function handlePush(request, response) {
@@ -3009,9 +3165,9 @@ async function handlePush(request, response) {
   }
 
   const adapter = await storeAdapter();
-  if (typeof adapter.pushUserContent === "function" && typeof adapter.userContext === "function") {
-    const context = await adapter.userContext(userID);
-    if (!requireSessionToken(request, response, context?.sessionToken)) {
+  if (typeof adapter.pushUserContent === "function") {
+    const context = await authenticatedUserContext(request, response, userID);
+    if (!context) {
       return;
     }
     const result = await adapter.pushUserContent(userID, incoming);
@@ -3027,7 +3183,7 @@ async function handlePush(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
   store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
@@ -3061,9 +3217,9 @@ async function handlePull(request, response) {
     ? normalizedSinceEventID(body)
     : null;
   const adapter = await storeAdapter();
-  if (typeof adapter.pullUserContent === "function" && typeof adapter.userContext === "function") {
-    const context = await adapter.userContext(userID);
-    if (!requireSessionToken(request, response, context?.sessionToken)) {
+  if (typeof adapter.pullUserContent === "function") {
+    const context = await authenticatedUserContext(request, response, userID);
+    if (!context) {
       return;
     }
     const result = await adapter.pullUserContent(userID, { since, sinceEventID });
@@ -3082,7 +3238,7 @@ async function handlePull(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
   const allMutations = store.mutationsByUserID[userID] || [];
@@ -3116,7 +3272,7 @@ async function handleWebCheckout(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
 
@@ -3190,7 +3346,7 @@ async function handleStripeRestore(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
 
@@ -3325,7 +3481,7 @@ async function handleAppleTransactionVerify(request, response) {
   }
 
   const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
     return;
   }
 
@@ -3470,7 +3626,7 @@ async function handleRestoreChecklist(request, response) {
     publicUsername: account?.publicUsername || null,
     displayName: account?.displayName || null,
     entitlement: store.entitlements[userID] || null,
-    hasSession: Boolean(store.sessions[userID]),
+    hasSession: await userHasActiveSession(userID, store),
     passkeyCredentialCount: passkeyCredentialIDs.length,
     passkeyCredentialIDs,
     mutationCounts: {
@@ -3507,7 +3663,7 @@ async function handleAccountExport(request, response) {
     userID,
     account,
     entitlement: store.entitlements[userID] || null,
-    hasSession: Boolean(store.sessions[userID]),
+    hasSession: await userHasActiveSession(userID, store),
     passkeyCredentialIDs,
     mutations: store.mutationsByUserID[userID] || []
   });
@@ -3585,9 +3741,9 @@ async function handleAppleWebStart(request, response) {
   const store = await readStore();
   const linkFromUserID = body.linkFrom?.accountUserID || body.linkFrom?.userID || null;
   if (linkFromUserID) {
-    if (!requireUserSession(request, response, store, linkFromUserID, {
+    if (!await authenticatedUserContext(request, response, linkFromUserID, {
       backendSessionToken: body.linkFrom?.sessionToken || body.linkFrom?.backendSessionToken
-    })) {
+    }, store)) {
       return;
     }
   }
@@ -3689,7 +3845,6 @@ async function handleAppleWebCallback(request, response) {
       .map((part) => String(part || "").trim())
       .filter(Boolean)
       .join(" ");
-    const store = await readStore();
     let account = await accountFromCredential({
       provider: "apple",
       displayName: displayName || null,
@@ -3697,6 +3852,28 @@ async function handleAppleWebCallback(request, response) {
       identityToken,
       authorizationCode: form.get("code") || undefined
     });
+    const adapter = await storeAdapter();
+    if (!oauthState.linkFrom?.accountUserID && typeof adapter.signInAccount === "function") {
+      const directResult = await adapter.signInAccount(account);
+      if (!directResult.requiresLegacyMerge) {
+        const finalAccount = directResult.account;
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: "Apple sign-in completed. Returning to permitext...",
+          accountState: {
+            userID: finalAccount.appUserID,
+            sessionToken: finalAccount.backendSessionToken,
+            authProvider: finalAccount.authProvider || "apple",
+            displayName: finalAccount.displayName || displayName || "Apple account",
+            entitlement: directResult.entitlement || null
+          },
+          successPath: oauthState.successPath || "/"
+        }));
+        return;
+      }
+    }
+
+    const store = await readStore();
     account = await canonicalizeAppleAccountForSignIn(store, account);
     const sessionToken = store.sessions[account.appUserID] || randomUUID();
     store.sessions[account.appUserID] = sessionToken;
@@ -3734,6 +3911,7 @@ async function handleAppleWebCallback(request, response) {
 
 const handlers = {
   "account/sign-in": handleSignIn,
+  "account/sign-out": handleSignOut,
   "account/apple/start": handleAppleWebStart,
   "account/attach-local-data": handleAttachLocalData,
   "account/link-browser": handleBrowserAccountLink,
@@ -3786,7 +3964,10 @@ export async function handleRequest(request, response) {
       return;
     }
     if (request.method === "GET" && path === "health") {
-      await readStore();
+      const adapter = await storeAdapter();
+      if (typeof adapter.initialize === "function") {
+        await adapter.initialize();
+      }
       sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
       return;
     }

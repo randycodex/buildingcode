@@ -936,6 +936,14 @@ struct BackendSignInRequest: Codable, Hashable, Sendable {
     let credential: AccountSignInCredential
 }
 
+struct BackendSignOutRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+}
+
+struct BackendSignOutResponse: Codable, Hashable, Sendable {
+    let signedOut: Bool
+}
+
 struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
@@ -993,6 +1001,7 @@ protocol PermitextBackendTransport {
     var name: String { get }
     func health() async throws -> BackendHealthStatus
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
@@ -1122,6 +1131,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/sign-in", body: request)
     }
 
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
+        try await post("account/sign-out", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func health() async throws -> BackendHealthStatus {
         try await get("health")
     }
@@ -1212,6 +1225,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         )
         accountsByUserID[account.appUserID] = account
         return BackendAccountRecord(account: account, entitlement: nil)
+    }
+
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
+        BackendSignOutResponse(signedOut: true)
     }
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
@@ -2082,6 +2099,7 @@ protocol AccountBackendClient {
     var name: String { get }
     func health() async throws -> BackendHealthStatus
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
+    func signOut(account: SignedInAccount) async throws
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
@@ -2108,6 +2126,8 @@ struct LocalAccountBackendClient: AccountBackendClient {
         )
         return BackendAccountRecord(account: account, entitlement: nil)
     }
+
+    func signOut(account: SignedInAccount) async throws {}
 
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
         .localDataAttached

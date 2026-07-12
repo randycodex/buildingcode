@@ -54,6 +54,8 @@ If a browser already has a temporary `web:` account from the earlier checkout fl
 
 Passkey registration and sign-in are disabled until the backend implements a complete server-challenge WebAuthn verification ceremony. Existing passkey records remain readable only for administrative cleanup and account export. Older clients receive HTTP `410` from passkey registration and sign-in attempts.
 
+Hosted account sessions are multi-device and store only a SHA-256 token hash. Each sign-in creates a distinct session with a 30-day default expiry; `PERMITEXT_SESSION_TTL_SECONDS` can set a different duration of at least one hour. Existing plaintext sessions are migrated to the hashed table on successful use and removed from the legacy session table. `POST /account/sign-out` revokes only the current device session.
+
 Configure paid entitlement sources with:
 
 ```sh
@@ -87,11 +89,12 @@ When a Neon database is connected through Vercel, the server uses the first avai
 - `POSTGRES_URL`
 - `NEON_DATABASE_URL`
 
-The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v2`:
+The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v3`:
 
 - `permitext_users`
 - `permitext_entitlements`
 - `permitext_sessions`
+- `permitext_account_sessions`
 - `permitext_passkey_credentials`
 - `permitext_saved_items`
 - `permitext_annotations`
@@ -111,6 +114,7 @@ On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instea
 - `GET /health`
 - `GET /.well-known/apple-app-site-association`
 - `POST /account/sign-in`
+- `POST /account/sign-out`
 - `POST /account/attach-local-data`
 - `POST /account/profile`
 - `POST /sync/push`
