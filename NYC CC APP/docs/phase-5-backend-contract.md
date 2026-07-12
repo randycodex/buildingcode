@@ -265,7 +265,7 @@ Web and iPhone use the same canonical section URL:
 https://permitext-sync.vercel.app/open/section/<canonical-section-id>
 ```
 
-The web route serves the workspace and resolves section metadata from the canonical chapter catalog. The iPhone universal-link handler switches to Search and pushes the same canonical ID into `ReaderView`, including when the link arrives while bundled content is still loading. Unknown section API IDs return `404` rather than opening an empty reader.
+The web route serves the workspace and resolves section metadata from the canonical chapter catalog. Reader and section-detail share controls invoke the browser share sheet or copy the canonical URL as a fallback. The iPhone universal-link handler switches to Search and pushes the same canonical ID into `ReaderView`, including when the link arrives while bundled content is still loading. Unknown section API IDs return `404` rather than opening an empty reader.
 
 The web workspace publishes the same `continuity` mutation after reader navigation. It carries the canonical code-section, chapter, and most-recent section identifiers, merges rather than discards values last written by iPhone, and stores recent-entry dates as Swift reference-date seconds. Web restores only a newer remote record and never applies one over a pending local continuity mutation. Selecting the server copy for a continuity conflict clears the web checkpoint before the forced pull so the remote reading position is actually restored.
 

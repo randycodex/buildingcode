@@ -22,7 +22,7 @@
       "id" : "3A08492E-C0C4-455D-9506-CAC386B21721",
       "localizations" : [
         {
-          "description" : "Unlock unlimited saved work, tags, PDF export, continuity, and future cross-device sync.",
+          "description" : "Unlock unlimited saved work, tags, PDF export, continuity, and cross-device sync.",
           "displayName" : "Permitext Pro",
           "locale" : "en_US"
         }
@@ -43,7 +43,7 @@
           "introductoryOffer" : null,
           "localizations" : [
             {
-              "description" : "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and future cross-device sync.",
+              "description" : "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.",
               "displayName" : "Permitext Pro Monthly",
               "locale" : "en_US"
             }

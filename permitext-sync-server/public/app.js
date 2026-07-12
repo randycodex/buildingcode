@@ -245,6 +245,51 @@ function updateBrowserSectionURL(sectionID) {
   window.history.replaceState({}, "", nextPath);
 }
 
+function sharedSectionURL(sectionID) {
+  const normalizedID = String(sectionID || "").trim();
+  if (!/^\d+$/.test(normalizedID)) return "";
+  return `https://permitext-sync.vercel.app/open/section/${normalizedID}`;
+}
+
+function showShareButtonResult(button, message) {
+  if (!button) return;
+  const originalTitle = button.dataset.defaultTitle || button.title || "Share section";
+  button.dataset.defaultTitle = originalTitle;
+  button.title = message;
+  button.setAttribute("aria-label", message);
+  window.setTimeout(() => {
+    if (!button.isConnected) return;
+    button.title = originalTitle;
+    button.setAttribute("aria-label", originalTitle);
+  }, 1600);
+}
+
+async function shareSection(section, button) {
+  const url = sharedSectionURL(section?.sectionID || section?.id);
+  if (!url) return;
+  const title = sectionDisplayTitle(section?.sectionNumber, section?.title) || "Permitext section";
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title, url });
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+  try {
+    await navigator.clipboard.writeText(url);
+    showShareButtonResult(button, "Link copied");
+  } catch {
+    showShareButtonResult(button, "Could not copy link");
+  }
+}
+
+function updateReaderShareButton(panel, reader) {
+  const button = panel?.querySelector(".reader-share");
+  if (!button) return;
+  button.disabled = !sharedSectionURL(reader?.sectionID);
+}
+
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -3287,6 +3332,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
+      updateReaderShareButton(panel, reader);
       scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
@@ -3449,6 +3495,7 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
+  const shareButton = panel.querySelector(".reader-share");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -3471,6 +3518,11 @@ async function renderReader(reader, options = {}) {
   commentsButton.hidden = true;
   internalSearchBox.hidden = true;
   internalSearchInput.value = reader.internalSearchQuery || "";
+  updateReaderShareButton(panel, reader);
+
+  shareButton.addEventListener("click", () => {
+    shareSection(reader, shareButton);
+  });
 
   if (options.isSearchResult) {
     closeButton.hidden = false;
@@ -3486,6 +3538,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
+    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
@@ -3540,6 +3593,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
+    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
@@ -3554,6 +3608,7 @@ async function renderReader(reader, options = {}) {
       reader.title = summary?.title || "Reader";
       updateBrowserSectionURL(reader.sectionID);
     }
+    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await navigateReaderToSection(panel, reader);
@@ -3890,6 +3945,16 @@ function jumpIconSVG() {
   `;
 }
 
+function shareIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12"></path>
+      <path d="m7 8 5-5 5 5"></path>
+      <path d="M5 13v7h14v-7"></path>
+    </svg>
+  `;
+}
+
 function archiveIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -3970,6 +4035,11 @@ async function renderSectionDetail(searchID, detail) {
     label: "Back to search",
     svg: circleXIconSVG()
   });
+  const shareButton = appendDetailIconButton(chrome, {
+    title: "Share section",
+    label: "Share section",
+    svg: shareIconSVG()
+  });
   const saveButton = appendDetailIconButton(chrome, {
     title: saved ? "Remove bookmark" : "Save bookmark",
     label: saved ? "Remove bookmark" : "Save bookmark",
@@ -4046,6 +4116,10 @@ async function renderSectionDetail(searchID, detail) {
     delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
     renderWorkspace();
+  });
+
+  shareButton.addEventListener("click", () => {
+    shareSection(sectionPayload, shareButton);
   });
 
   saveButton.addEventListener("click", async () => {

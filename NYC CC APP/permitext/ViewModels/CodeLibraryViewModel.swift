@@ -1678,7 +1678,7 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = EntitlementRequirement(
             feature: .unlimitedSavedItems,
             requiredPlan: .pro,
-            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and future cross-device sync."
+            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and cross-device sync."
         )
     }
 
