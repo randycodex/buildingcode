@@ -104,6 +104,27 @@ async function main() {
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
 
+    const canonicalOverrideSection = await request("/code/sections/8881");
+    assert(canonicalOverrideSection.response.ok, "Canonical section override did not load.");
+    assert(canonicalOverrideSection.json.section.sectionID === 8881, "Canonical section override returned the wrong ID.");
+    assert(
+      canonicalOverrideSection.json.section.blocks?.some((block) =>
+        block.plainText?.includes("real time enforcement unit")
+      ),
+      "Web reader did not prefer the canonical iPhone section body."
+    );
+
+    const duplicateNumberChapter = await request("/code/chapters/47");
+    assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");
+    const duplicateNumberSections = duplicateNumberChapter.json.chapter.sections.filter((section) =>
+      section.sectionNumber === "8.5"
+    );
+    assert(duplicateNumberSections.length === 2, "Duplicate-number appendix provisions were collapsed.");
+    assert(
+      new Set(duplicateNumberSections.map((section) => section.id)).size === 2,
+      "Duplicate-number appendix provisions did not retain distinct canonical IDs."
+    );
+
     const appleWebConfig = await request("/account/apple-web-config");
     assert(appleWebConfig.response.ok, "Apple web sign-in config failed.");
     assert(appleWebConfig.json.available === true, "Apple web sign-in config did not report availability.");

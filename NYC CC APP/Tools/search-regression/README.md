@@ -9,7 +9,7 @@ cd "NYC CC APP/Tools/search-regression"
 
 # Compare linear haystack (substring terms) vs shipped inverted index (whole tokens)
 python3 search_regression.py \
-  "../../NYCCCApp/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
+  "../../permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
 
 # Lock shipped results as golden (run after intentional search changes)
 python3 search_regression.py <bundle-root> --write-golden

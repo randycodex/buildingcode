@@ -64,6 +64,24 @@ The web workspace stores signed-in mutations in a durable browser outbox before 
 
 After the web workspace has a full baseline, later pulls send the server event cursor and merge only records changed since that cursor. Reloads still begin with a full pull, and a content-map version change forces a full replacement so canonical section-ID repairs cannot be hidden by an old checkpoint.
 
+## Canonical Code Content
+
+The published iPhone content tree is the authority for chapter structure, section IDs, corrected section bodies, search IDs, and assets:
+
+```text
+NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes
+```
+
+The web reader uses that same chapter catalog and always prefers its canonical `prepared/sections/<sectionID>.json` body. The older `NYCCCApp` section tree remains a read-only body fallback while the remaining sections are migrated; it is not allowed to redefine published IDs. Historical web-ID repair is limited to old sync records at the ingestion boundary.
+
+Run the release gate before shipping content or search changes:
+
+```sh
+npm run verify:content
+```
+
+The gate verifies all 118 chapter files, 12,890 unique published section IDs, exact search-index coverage, canonical override ownership, available-body coverage promised by the manifest, and the eight known duplicate display-number cases that must remain distinct records. It also runs as part of `npm run smoke`.
+
 Configure paid entitlement sources with:
 
 ```sh

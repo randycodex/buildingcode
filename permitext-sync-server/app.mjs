@@ -29,7 +29,7 @@ const rateLimitPolicies = new Map([
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }]
 ]);
-const chapterContentPath = join(
+const canonicalCodeContentPath = join(
   __dirname,
   "..",
   "NYC CC APP",
@@ -38,24 +38,13 @@ const chapterContentPath = join(
   "CodeContent",
   "authored",
   "new-york-city",
-  "2022-construction-codes",
-  "prepared",
-  "chapters"
+  "2022-construction-codes"
 );
-const chapterManifestPath = join(
-  __dirname,
-  "..",
-  "NYC CC APP",
-  "permitext",
-  "Resources",
-  "CodeContent",
-  "authored",
-  "new-york-city",
-  "2022-construction-codes",
-  "prepared",
-  "manifest.json"
-);
-const sectionContentPath = join(
+const canonicalPreparedContentPath = join(canonicalCodeContentPath, "prepared");
+const chapterContentPath = join(canonicalPreparedContentPath, "chapters");
+const chapterManifestPath = join(canonicalPreparedContentPath, "manifest.json");
+const canonicalSectionContentPath = join(canonicalPreparedContentPath, "sections");
+const legacySectionContentPath = join(
   __dirname,
   "..",
   "NYC CC APP",
@@ -68,18 +57,7 @@ const sectionContentPath = join(
   "prepared",
   "sections"
 );
-const assetContentPath = join(
-  __dirname,
-  "..",
-  "NYC CC APP",
-  "permitext",
-  "Resources",
-  "CodeContent",
-  "authored",
-  "new-york-city",
-  "2022-construction-codes",
-  "assets"
-);
+const assetContentPath = join(canonicalCodeContentPath, "assets");
 const databaseURL =
   process.env.PERMITEXT_SYNC_DATABASE_URL ||
   process.env.DATABASE_URL ||
@@ -1560,14 +1538,20 @@ async function canonicalBlockIDsForSectionID(sectionID) {
     return cachedCanonicalBlockIDsBySectionID.get(key);
   }
   let blockIDs = [];
-  try {
-    const payload = await readJSONFile(join(sectionContentPath, `${key}.json`));
-    blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      throw error;
-    }
+  const map = await canonicalSectionIDs();
+  const legacyWebSectionID = Object.entries(map.legacyWebSectionID || {})
+    .find(([, canonicalID]) => String(canonicalID) === key)?.[0];
+  let payload = await sectionBody(key, {
+    allowMissing: true,
+    canonicalSectionID: key
+  });
+  if (!payload.blocks?.length && legacyWebSectionID && legacyWebSectionID !== key) {
+    payload = await sectionBody(legacyWebSectionID, {
+      allowMissing: true,
+      canonicalSectionID: key
+    });
   }
+  blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
   cachedCanonicalBlockIDsBySectionID.set(key, blockIDs);
   return blockIDs;
 }
@@ -1611,6 +1595,10 @@ async function canonicalBlockIDFor(sectionID, blockID) {
 }
 
 async function canonicalizeSectionPayload(section, chapterContext) {
+  const publishedID = Number(section.id);
+  if (Number.isSafeInteger(publishedID) && publishedID > 0) {
+    return section;
+  }
   const canonicalID = await canonicalSectionIDFor({
     ...chapterContext,
     sectionNumber: section.sectionNumber,
@@ -1779,7 +1767,10 @@ async function buildSearchIndex() {
     const batch = sectionSummaries.slice(start, start + 150);
     const entries = await Promise.all(
       batch.map(async (section) => {
-        const body = await sectionBody(section.webSectionID || section.id, { allowMissing: true });
+        const body = await sectionBody(section.webSectionID || section.id, {
+          allowMissing: true,
+          canonicalSectionID: section.id
+        });
         const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
         return { ...section, plainText };
       })
@@ -1790,14 +1781,34 @@ async function buildSearchIndex() {
 }
 
 async function sectionBody(sectionID, options = {}) {
-  try {
-    return await readJSONFile(join(sectionContentPath, `${sectionID}.json`));
-  } catch (error) {
-    if (options.allowMissing && error.code === "ENOENT") {
-      return { blocks: [], sectionID };
-    }
-    throw error;
+  const canonicalSectionID = String(options.canonicalSectionID || "").trim();
+  const legacySectionID = String(sectionID || "").trim();
+  const candidates = [];
+  if (canonicalSectionID) {
+    candidates.push(join(canonicalSectionContentPath, `${canonicalSectionID}.json`));
   }
+  if (legacySectionID && legacySectionID !== canonicalSectionID) {
+    candidates.push(join(canonicalSectionContentPath, `${legacySectionID}.json`));
+  }
+  if (legacySectionID) {
+    candidates.push(join(legacySectionContentPath, `${legacySectionID}.json`));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      return await readJSONFile(candidate);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
+  if (options.allowMissing) {
+    return { blocks: [], sectionID: Number(canonicalSectionID || legacySectionID) };
+  }
+  const error = new Error(`Section content is unavailable for ${canonicalSectionID || legacySectionID}.`);
+  error.code = "ENOENT";
+  throw error;
 }
 
 async function sectionSummaryByID(sectionID) {
@@ -1895,16 +1906,19 @@ async function handleCodeChapter(request, path, response) {
   const codePrefix = codePrefixForChapter(chapter, manifestChapter);
   const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
   const sections = flattenChapterSections(chapter);
-  const sectionPayload = includeBody
-    ? await Promise.all(sections.map(async (section) => ({
-        ...section,
-        blocks: (await sectionBody(section.id, { allowMissing: true })).blocks || []
-      })))
-    : sections;
-  const canonicalSections = await canonicalizeChapterSections(sectionPayload, {
+  const canonicalSections = await canonicalizeChapterSections(sections, {
     codePrefix,
     chapterNumber
   });
+  const sectionPayload = includeBody
+    ? await Promise.all(canonicalSections.map(async (section) => ({
+        ...section,
+        blocks: (await sectionBody(section.webSectionID || section.id, {
+          allowMissing: true,
+          canonicalSectionID: section.id
+        })).blocks || []
+      })))
+    : canonicalSections;
 
   sendJSON(response, 200, {
     chapter: {
@@ -1917,7 +1931,7 @@ async function handleCodeChapter(request, path, response) {
         chapterNumber
       }),
       groups: chapter.groups || [],
-      sections: canonicalSections
+      sections: sectionPayload
     }
   });
 }
@@ -1929,7 +1943,10 @@ async function handleCodeSection(path, response) {
     return;
   }
   const summary = await sectionSummaryByID(sectionID);
-  const body = await sectionBody(summary?.webSectionID || sectionID, { allowMissing: true });
+  const body = await sectionBody(summary?.webSectionID || sectionID, {
+    allowMissing: true,
+    canonicalSectionID: summary?.id || sectionID
+  });
   if (!body.blocks?.length) {
     if (summary) {
       sendJSON(response, 200, {
