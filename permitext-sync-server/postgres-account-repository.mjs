@@ -328,6 +328,32 @@ export function createPostgresAccountRepository(sql) {
     };
   }
 
+  async function deleteLegacyPasskeyAccounts() {
+    const rows = await sql`
+      SELECT id FROM permitext_users
+      WHERE id LIKE 'passkey:%'
+      ORDER BY id
+    `;
+    const deletedUserIDs = rows.map((row) => row.id);
+    if (!deletedUserIDs.length) return [];
+
+    await sql.transaction([
+      sql`DELETE FROM permitext_sync_events WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_saved_items WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_annotations WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_projects WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_project_items WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_comments WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_user_content_records WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_account_sessions WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_sessions WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_entitlements WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_passkey_credentials WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_users WHERE id LIKE 'passkey:%'`
+    ]);
+    return deletedUserIDs;
+  }
+
   async function revoke(userID, rawToken) {
     if (!userID || !rawToken) return false;
     const rows = await sql`
@@ -344,6 +370,7 @@ export function createPostgresAccountRepository(sql) {
     authenticate,
     contextForUser,
     deleteEntitlement,
+    deleteLegacyPasskeyAccounts,
     hasActiveSession,
     revoke,
     saveEntitlement,

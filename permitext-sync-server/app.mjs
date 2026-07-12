@@ -1140,6 +1140,11 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.stripeEntitlementOwner(subscriptionID);
     },
+    async deleteLegacyPasskeyAccounts() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.deleteLegacyPasskeyAccounts();
+    },
     async hasActiveUserSession(userID) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -3706,6 +3711,16 @@ async function handleLifetimeGrantDelete(request, response) {
 
 async function handleLegacyPasskeyAccountDelete(request, response) {
   if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteLegacyPasskeyAccounts === "function") {
+    const deletedUserIDs = await adapter.deleteLegacyPasskeyAccounts();
+    sendJSON(response, 200, {
+      deletedCount: deletedUserIDs.length,
+      deletedUserIDs
+    });
     return;
   }
 
