@@ -99,6 +99,8 @@ const server = spawn(process.execPath, ["server.mjs"], {
   env: {
     ...process.env,
     PORT: String(port),
+    VERCEL: "",
+    VERCEL_ENV: "",
     PERMITEXT_SYNC_DATABASE_URL: databaseURL,
     DATABASE_URL: "",
     STORAGE_URL: "",
@@ -221,7 +223,7 @@ try {
   const fullPull = await request("/sync/pull", {
     method: "POST",
     token,
-    body: { auth: { accountUserID: userID }, sinceEventID: 0 }
+    body: { auth: { accountUserID: userID }, sinceEventID: 0, contentMapVersion: 2 }
   });
   assert(fullPull.response.ok, "Full event-cursor pull failed.");
   assert(fullPull.json.mutations.length === 4, "Full event-cursor pull did not return all events.");
@@ -230,10 +232,92 @@ try {
   const emptyPull = await request("/sync/pull", {
     method: "POST",
     token,
-    body: { auth: { accountUserID: userID }, sinceEventID: fullPull.json.latestEventID }
+    body: {
+      auth: { accountUserID: userID },
+      sinceEventID: fullPull.json.latestEventID,
+      contentMapVersion: 2
+    }
   });
   assert(emptyPull.response.ok, "Empty event-cursor pull failed.");
   assert(emptyPull.json.mutations.length === 0, "Event cursor pull returned already-seen mutations.");
+
+  const concurrentSavedItems = [301, 302].map((sectionID) => ({
+    savedItem: {
+      id: `postgres-concurrent-${sectionID}-${runID}`,
+      userID,
+      codeVersion,
+      sectionID,
+      updatedAt: `2026-06-27T00:0${sectionID - 297}:00Z`
+    }
+  }));
+  const concurrentDistinctPushes = await Promise.all(
+    concurrentSavedItems.map((mutation) => request("/sync/push", {
+      method: "POST",
+      token,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: [mutation] }
+      }
+    }))
+  );
+  assert(
+    concurrentDistinctPushes.every(({ response }) => response.ok),
+    "Concurrent distinct-record pushes failed."
+  );
+
+  const sharedRecordID = `postgres-concurrent-shared-${runID}`;
+  const olderSharedMutation = {
+    savedItem: {
+      id: sharedRecordID,
+      userID,
+      codeVersion,
+      sectionID: 401,
+      updatedAt: "2026-06-27T00:06:00Z"
+    }
+  };
+  const newerSharedMutation = {
+    savedItem: {
+      id: sharedRecordID,
+      userID,
+      codeVersion,
+      sectionID: 402,
+      updatedAt: "2026-06-27T00:07:00Z"
+    }
+  };
+  const concurrentSameRecordPushes = await Promise.all(
+    [olderSharedMutation, newerSharedMutation].map((mutation) => request("/sync/push", {
+      method: "POST",
+      token,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: [mutation] }
+      }
+    }))
+  );
+  assert(
+    concurrentSameRecordPushes.every(({ response }) => response.ok),
+    "Concurrent same-record pushes failed."
+  );
+
+  const concurrencyPull = await request("/sync/pull", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(concurrencyPull.response.ok, "Concurrency verification pull failed.");
+  const concurrencySavedItems = concurrencyPull.json.mutations
+    .map((mutation) => mutation.savedItem)
+    .filter(Boolean);
+  assert(
+    concurrentSavedItems.every((mutation) =>
+      concurrencySavedItems.some((record) => record.id === mutation.savedItem.id)
+    ),
+    "A concurrent distinct-record push was lost."
+  );
+  assert(
+    concurrencySavedItems.some((record) => record.id === sharedRecordID && record.sectionID === 402),
+    "The newest concurrent mutation did not win."
+  );
 
   const finalSummary = await request("/admin/storage/summary", { token: adminToken });
   assert(finalSummary.response.ok, "Final storage summary failed.");

@@ -224,7 +224,9 @@ Request:
     "accountUserID": "stable-backend-user-id",
     "bearerToken": null
   },
-  "since": "2026-06-04T00:00:00Z"
+  "since": "2026-06-04T00:00:00Z",
+  "sinceEventID": 123,
+  "contentMapVersion": 2
 }
 ```
 
@@ -234,9 +236,13 @@ Response:
 {
   "userID": "stable-backend-user-id",
   "pulledAt": "2026-06-04T00:00:00Z",
+  "latestEventID": 123,
+  "contentMapVersion": 2,
   "mutations": []
 }
 ```
+
+Hosted Postgres pulls honor `sinceEventID` only when `contentMapVersion` matches the canonical section-ID map. A missing or stale map version receives the full canonical state so server-side identifier repairs are not hidden behind an event checkpoint.
 
 The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten. Preview-only pulls and pulls with skipped or conflicted remote records must not advance the local pull checkpoint, otherwise unapplied server records could be hidden from later sync runs.
 

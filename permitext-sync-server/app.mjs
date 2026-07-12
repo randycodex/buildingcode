@@ -10,12 +10,14 @@ import {
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
 const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+const maxSyncMutationsPerBatch = 100;
 const chapterContentPath = join(
   __dirname,
   "..",
@@ -210,6 +212,7 @@ function mutationRecordDeletedAt(record) {
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
+  const syncRepository = createPostgresSyncRepository(sql);
   let initialized = false;
   let migrated = false;
 
@@ -1074,6 +1077,21 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return mutationsAfterEventID(userID, sinceEventID);
     },
+    async userContext(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.userContext(userID);
+    },
+    async pushUserContent(userID, mutations) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.push(userID, mutations);
+    },
+    async pullUserContent(userID, options) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.pull(userID, options);
+    },
     async summary() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1242,7 +1260,10 @@ function requireAdmin(request, response) {
 }
 
 function requireUserSession(request, response, store, userID, requestAccount) {
-  const sessionToken = store.sessions[userID];
+  return requireSessionToken(request, response, store.sessions[userID], requestAccount);
+}
+
+function requireSessionToken(request, response, sessionToken, requestAccount) {
   const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (!suppliedToken) {
     sendError(response, 401, "Missing session token.");
@@ -2971,14 +2992,12 @@ async function handlePush(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
-    return;
-  }
-  store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
-
   if (body.batch?.mutations !== undefined && !Array.isArray(body.batch.mutations)) {
     sendError(response, 400, "Mutations must be an array.");
+    return;
+  }
+  if ((body.batch?.mutations?.length || 0) > maxSyncMutationsPerBatch) {
+    sendError(response, 413, `Sync batches are limited to ${maxSyncMutationsPerBatch} mutations.`);
     return;
   }
 
@@ -2988,6 +3007,30 @@ async function handlePush(request, response) {
     sendError(response, 400, validation.message);
     return;
   }
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.pushUserContent === "function" && typeof adapter.userContext === "function") {
+    const context = await adapter.userContext(userID);
+    if (!requireSessionToken(request, response, context?.sessionToken)) {
+      return;
+    }
+    const result = await adapter.pushUserContent(userID, incoming);
+    sendJSON(response, 200, {
+      acceptedMutationIDs: result.acceptedMutationIDs,
+      rejectedMutationIDs: result.rejectedMutationIDs,
+      latestEventID: result.latestEventID,
+      syncRevision: result.latestEventID,
+      entitlement: result.entitlement,
+      serverTime: new Date().toISOString()
+    });
+    return;
+  }
+
+  const store = await readStore();
+  if (!requireUserSession(request, response, store, userID)) {
+    return;
+  }
+  store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
 
   const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
   const merge = mergeMutations(existing, incoming);
@@ -3012,11 +3055,36 @@ async function handlePull(request, response) {
     return;
   }
 
+  const since = body.since ? Date.parse(body.since) : null;
+  const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
+  const sinceEventID = Number(body.contentMapVersion) === contentMapVersion
+    ? normalizedSinceEventID(body)
+    : null;
+  const adapter = await storeAdapter();
+  if (typeof adapter.pullUserContent === "function" && typeof adapter.userContext === "function") {
+    const context = await adapter.userContext(userID);
+    if (!requireSessionToken(request, response, context?.sessionToken)) {
+      return;
+    }
+    const result = await adapter.pullUserContent(userID, { since, sinceEventID });
+    const expanded = expandPullMutationsWithDependencies(result.mutations, result.allMutations);
+    const mutations = await canonicalizeMutations(expanded);
+    sendJSON(response, 200, {
+      userID,
+      pulledAt: new Date().toISOString(),
+      latestEventID: result.latestEventID,
+      syncRevision: result.latestEventID,
+      contentMapVersion,
+      entitlement: result.entitlement,
+      mutations
+    });
+    return;
+  }
+
   const store = await readStore();
   if (!requireUserSession(request, response, store, userID)) {
     return;
   }
-  const since = body.since ? Date.parse(body.since) : null;
   const allMutations = store.mutationsByUserID[userID] || [];
   // Return the current canonical state until clients send a content-map version.
   // Otherwise old event checkpoints can hide server-side section ID repairs.
@@ -3028,6 +3096,7 @@ async function handlePull(request, response) {
     pulledAt: new Date().toISOString(),
     latestEventID,
     syncRevision: latestEventID,
+    contentMapVersion,
     entitlement: store.entitlements[userID] || null,
     mutations
   });

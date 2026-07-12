@@ -70,6 +70,8 @@ async function main() {
     env: {
       ...process.env,
       PORT: String(port),
+      VERCEL: "",
+      VERCEL_ENV: "",
       PERMITEXT_SYNC_DATA_PATH: dataPath,
       PERMITEXT_SYNC_DATABASE_URL: "",
       DATABASE_URL: "",
@@ -781,6 +783,16 @@ async function main() {
     });
     assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
 
+    const oversizedPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: Array.from({ length: 101 }, () => ({})) }
+      }
+    });
+    assert(oversizedPush.response.status === 413, "Push accepted an oversized mutation batch.");
+
     const mismatchedUserPush = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -849,6 +861,7 @@ async function main() {
     assert(pull.response.ok, "Sync pull failed.");
     assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
     assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
+    assert(pull.json.contentMapVersion === 2, "Pull did not return the canonical content-map version.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
 
     const webSavedMutation = {

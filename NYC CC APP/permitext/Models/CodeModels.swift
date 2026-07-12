@@ -825,6 +825,7 @@ struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let pulledAt: Date
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
+    var contentMapVersion: Int? = nil
     var entitlement: AppEntitlement? = nil
     let mutations: [ServerUserContentMutation]
 }
@@ -980,6 +981,7 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let since: Date?
     var sinceEventID: Int64? = nil
+    var contentMapVersion: Int? = 2
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {

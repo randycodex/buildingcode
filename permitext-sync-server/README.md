@@ -104,6 +104,8 @@ The Neon schema is created automatically on first request. The current Postgres 
 
 `permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
 
+On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instead of reading and rewriting the global store. A push applies conditional row upserts and sync-event inserts in one Neon HTTP transaction; a pull reads only that user's canonical records. The JSON file adapter intentionally keeps the simpler whole-file behavior for local smoke testing. Account, billing, and admin handlers are being migrated separately and may still use the compatibility store.
+
 ## Endpoints
 
 - `GET /health`
@@ -158,16 +160,19 @@ PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
 
 Entitlements are server-owned. Sync batches can include local user content mutations, but any client-provided `batch.entitlement` value is ignored; paid access should be written only by verified Apple/web payment handlers or admin grant routes.
 
+Each sync push is limited to 100 mutations so one request cannot create an unbounded database transaction. Current iOS automatic sync batches are smaller than this limit.
+
 `POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
 
 ```json
 {
   "auth": { "accountUserID": "apple:USER" },
-  "sinceEventID": 123
+  "sinceEventID": 123,
+  "contentMapVersion": 2
 }
 ```
 
-The response includes `latestEventID`/`syncRevision` and the mutations after that cursor. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
+The response includes `latestEventID`/`syncRevision`, `contentMapVersion`, and the current mutations affected after that cursor. The server honors an event cursor only when the client content-map version matches its canonical section-map schema; older clients receive the full canonical state so identifier repairs are not hidden. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
 
 Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
 
