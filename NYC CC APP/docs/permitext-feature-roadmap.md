@@ -110,7 +110,7 @@ Once the private workflow is solid, introduce the server-backed model required f
 
 - Add account identity with no email requirement as the default:
   - `Sign in with Apple`
-  - passkeys
+  - passkeys only after complete server-challenge WebAuthn verification is implemented
   - guest/local mode for immediate app access
   - public username separate from login identity
 - Defer expanded identity providers until the core sync system is stable:
@@ -239,6 +239,6 @@ The implementation should stabilize around these product concepts even before al
 - Default product strategy is `workflow first, community later`.
 - Default geography/version strategy is `NYC-first` rather than multi-jurisdiction expansion now.
 - Default monetization strategy is `private utility behind paywall`, not paywalled public discussion.
-- Default account strategy is `guest mode + Sign in with Apple + passkeys`, with no email requirement.
+- Default account strategy is `guest mode + Sign in with Apple`; passkeys remain deferred until complete WebAuthn verification is available.
 - Default collaboration strategy is `private shared projects before public forum`.
 - Default web strategy is `backend-first sync architecture`, not a direct port of the iPhone app or a web-only rebuild.

@@ -1,7 +1,7 @@
 const baseURL = process.env.PERMITEXT_PRODUCTION_BASE_URL || "https://permitext-sync.vercel.app";
 const shouldRun = process.env.PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE === "1";
 const providerUserID = process.env.PERMITEXT_PRODUCTION_TEST_USER || "production-identity-restore-smoke";
-const passkeyCredentialID = process.env.PERMITEXT_PRODUCTION_TEST_PASSKEY || "production-identity-restore-passkey";
+const identityToken = process.env.PERMITEXT_PRODUCTION_TEST_APPLE_IDENTITY_TOKEN || "";
 const adminToken = process.env.PERMITEXT_SYNC_ADMIN_TOKEN || null;
 const userID = `apple:${providerUserID}`;
 
@@ -39,6 +39,11 @@ async function main() {
       "Set PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 to run this production-writing test."
     );
   }
+  if (!identityToken) {
+    throw new Error(
+      "Set PERMITEXT_PRODUCTION_TEST_APPLE_IDENTITY_TOKEN to a current Sign in with Apple identity token."
+    );
+  }
 
   const signIn = await request("/account/sign-in", {
     method: "POST",
@@ -47,7 +52,8 @@ async function main() {
         provider: "apple",
         providerUserID,
         displayName: "Production Identity Restore Smoke",
-        signedInAt: new Date().toISOString()
+        signedInAt: new Date().toISOString(),
+        identityToken
       }
     }
   });
@@ -67,18 +73,6 @@ async function main() {
   });
   assert(profile.response.ok, "Profile update failed.");
   assert(profile.json.account.publicUsername === "production-restore-smoke", "Profile did not persist.");
-
-  const passkeyLink = await request("/account/passkeys/link", {
-    method: "POST",
-    token,
-    body: {
-      auth: { accountUserID: userID },
-      credentialID: passkeyCredentialID,
-      account: profile.json.account
-    }
-  });
-  assert(passkeyLink.response.ok, "Passkey link failed.");
-  assert(passkeyLink.json.account.appUserID === userID, "Passkey link returned the wrong account.");
 
   const savedItem = {
     savedItem: {
@@ -146,29 +140,30 @@ async function main() {
   });
   assert(push.response.ok, "Sync push failed.");
 
-  const passkeySignIn = await request("/account/sign-in", {
+  const restoredAppleSignIn = await request("/account/sign-in", {
     method: "POST",
     body: {
       credential: {
-        provider: "passkey",
-        providerUserID: passkeyCredentialID,
-        signedInAt: new Date().toISOString()
+        provider: "apple",
+        providerUserID,
+        signedInAt: new Date().toISOString(),
+        identityToken
       }
     }
   });
-  assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
-  assert(passkeySignIn.json.account.appUserID === userID, "Passkey did not restore the Apple account.");
+  assert(restoredAppleSignIn.response.ok, "Repeated Apple sign-in failed.");
+  assert(restoredAppleSignIn.json.account.appUserID === userID, "Apple sign-in did not restore the account.");
   assert(
-    passkeySignIn.json.account.publicUsername === "production-restore-smoke",
-    "Passkey did not restore the public username."
+    restoredAppleSignIn.json.account.publicUsername === "production-restore-smoke",
+    "Apple sign-in did not restore the public username."
   );
 
   const pull = await request("/sync/pull", {
     method: "POST",
-    token: passkeySignIn.json.account.backendSessionToken,
+    token: restoredAppleSignIn.json.account.backendSessionToken,
     body: { auth: { accountUserID: userID } }
   });
-  assert(pull.response.ok, "Passkey restore pull failed.");
+  assert(pull.response.ok, "Apple restore pull failed.");
   const records = pull.json.mutations.map((mutation) => ({
     kind: mutationKind(mutation),
     record: mutationRecord(mutation)
@@ -188,7 +183,6 @@ async function main() {
     assert(checklist.json.hasAccount === true, "Checklist did not report the account.");
     assert(checklist.json.publicUsername === "production-restore-smoke", "Checklist did not report the profile.");
     assert(checklist.json.hasSession === true, "Checklist did not report the session.");
-    assert(checklist.json.passkeyCredentialCount >= 1, "Checklist did not report the linked passkey.");
     assert(checklist.json.mutationCounts.savedItem >= 1, "Checklist did not count saved items.");
     assert(checklist.json.mutationCounts.annotation >= 1, "Checklist did not count annotations.");
     assert(checklist.json.mutationCounts.project >= 1, "Checklist did not count projects.");

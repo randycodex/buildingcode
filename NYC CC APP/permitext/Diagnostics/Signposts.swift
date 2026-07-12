@@ -144,17 +144,6 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.account
     }
 
-    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount {
-        let response = try await transport.linkPasskey(
-            BackendPasskeyLinkRequest(
-                auth: authContext(for: account),
-                credentialID: credentialID,
-                account: account
-            )
-        )
-        return response.account
-    }
-
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {
         let response = try await transport.verifyAppleTransaction(
             BackendAppleTransactionVerifyRequest(

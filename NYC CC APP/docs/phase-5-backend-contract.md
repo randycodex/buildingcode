@@ -67,7 +67,7 @@ The backend owns `appUserID`. Login identity and public identity must stay separ
 
 `backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. The app persists this token in Keychain rather than in the account metadata stored in `UserDefaults`. Production should rotate and expire equivalent tokens server-side.
 
-Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
+Passkey support is disabled. `credential.provider = "passkey"` and `POST /account/passkeys/link` return HTTP `410` until the backend implements server-issued challenges and complete WebAuthn registration/assertion verification. Existing passkey storage remains only for administrative cleanup and export compatibility.
 
 The local scaffold serves:
 
@@ -78,7 +78,7 @@ Configure it with:
 - `APPLE_TEAM_ID`
 - `APPLE_BUNDLE_ID`
 
-Production requirements:
+Future passkey requirements:
 
 - The public API domain must use HTTPS.
 - The iOS target needs `com.apple.developer.associated-domains`.

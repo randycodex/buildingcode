@@ -31,13 +31,7 @@ Enable internal lifetime grant admin routes with:
 PERMITEXT_SYNC_ADMIN_TOKEN=dev-secret node server.mjs
 ```
 
-Configure passkey web credentials metadata with:
-
-```sh
-APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
-```
-
-Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Set `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1` after production Apple client IDs are configured to reject tokenless Apple sign-ins:
+Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Every Vercel deployment requires a valid identity token automatically. Local development can opt into the same policy with `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1`:
 
 ```sh
 APPLE_BUNDLE_ID=com.randycodex.permitext \
@@ -57,6 +51,8 @@ Return URL: https://permitext-sync.vercel.app/account/apple/callback
 Without `APPLE_SERVICE_ID`, production web sign-in is disabled instead of creating a browser-only account that cannot match iOS. Localhost can still use the browser-local fallback for development, or set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` to allow it explicitly.
 
 If a browser already has a temporary `web:` account from the earlier checkout flow, the web app can link it during Apple sign-in. The backend retargets saved records to the new `apple:` account, transfers the server-owned entitlement, and invalidates the old browser session.
+
+Passkey registration and sign-in are disabled until the backend implements a complete server-challenge WebAuthn verification ceremony. Existing passkey records remain readable only for administrative cleanup and account export. Older clients receive HTTP `410` from passkey registration and sign-in attempts.
 
 Configure paid entitlement sources with:
 
@@ -192,10 +188,13 @@ curl -X POST https://permitext-sync.vercel.app/admin/accounts/restore-checklist 
 Production identity restore can be tested with:
 
 ```sh
-PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 npm run verify:production:identity
+PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 \
+PERMITEXT_PRODUCTION_TEST_USER="$APPLE_USER_ID" \
+PERMITEXT_PRODUCTION_TEST_APPLE_IDENTITY_TOKEN="$APPLE_IDENTITY_TOKEN" \
+npm run verify:production:identity
 ```
 
-That test writes one stable synthetic smoke account to the configured production backend.
+That test requires a current Sign in with Apple identity token and writes one stable smoke account to the configured production backend.
 
 Local mode remains intentionally simple and file-backed for integration testing. Hosted mode is intended to run on Vercel with Neon Postgres for durable storage.
 
@@ -208,15 +207,3 @@ PermitextBackendConfiguration.setDebugHTTPBaseURL("http://localhost:8787")
 ```
 
 For a physical iPhone, replace `localhost` with the Mac's LAN IP address.
-
-For production passkeys, the app also needs the Associated Domains entitlement:
-
-```text
-webcredentials:your-domain.com
-```
-
-That domain must serve the same Apple App Site Association payload over HTTPS at:
-
-```text
-https://your-domain.com/.well-known/apple-app-site-association
-```

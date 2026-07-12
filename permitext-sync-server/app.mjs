@@ -1828,6 +1828,11 @@ function appleAllowedClientIDs() {
     .filter(Boolean);
 }
 
+export function appleIdentityTokenRequired(environment = process.env) {
+  const hostedDeployment = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
+  return hostedDeployment || environment.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1";
+}
+
 function appleWebSignInConfigured() {
   return Boolean(process.env.APPLE_SERVICE_ID?.trim());
 }
@@ -1952,7 +1957,7 @@ async function verifyAppleIdentityToken(identityToken) {
   }
 
   const allowedClientIDs = appleAllowedClientIDs();
-  if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1" && allowedClientIDs.length === 0) {
+  if (appleIdentityTokenRequired() && allowedClientIDs.length === 0) {
     throw new ClientAuthError(500, "Apple client IDs are not configured.");
   }
   if (allowedClientIDs.length > 0) {
@@ -1978,7 +1983,7 @@ async function verifiedCredentialIdentity(credential) {
 
   const identityToken = typeof credential?.identityToken === "string" ? credential.identityToken.trim() : "";
   if (!identityToken) {
-    if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1") {
+    if (appleIdentityTokenRequired()) {
       throw new ClientAuthError(401, "Missing Apple identity token.");
     }
     return {
@@ -2763,24 +2768,23 @@ function normalizedSinceEventID(body) {
 
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
-  const store = await readStore();
   const credential = body.credential || {};
-  const passkeyUserID = credential.provider === "passkey"
-    ? store.passkeyCredentials?.[credential.providerUserID]
-    : null;
-  if (credential.provider === "passkey" && !passkeyUserID) {
-    sendError(response, 404, "Passkey is not linked to an account yet.");
+  if (credential.provider === "passkey") {
+    sendError(response, 410, "Passkey sign-in is unavailable. Use Sign in with Apple.");
     return;
   }
-  if (credential.provider === "passkey" && !store.users[passkeyUserID]) {
-    sendError(response, 404, "Linked passkey account was not found.");
+  if (credential.provider === "web" && !browserFallbackSignInAllowed(request)) {
+    sendError(response, 403, "Browser fallback sign-in is unavailable on this deployment.");
     return;
   }
+  if (credential.provider !== "apple" && credential.provider !== "web") {
+    sendError(response, 400, "Unsupported account provider.");
+    return;
+  }
+  const store = await readStore();
   let account;
   try {
-    account = passkeyUserID
-      ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
-      : await accountFromCredential(credential);
+    account = await accountFromCredential(credential);
     account = await canonicalizeAppleAccountForSignIn(store, account);
   } catch (error) {
     if (error instanceof ClientAuthError) {
@@ -2819,34 +2823,7 @@ async function handleSignIn(request, response) {
 }
 
 async function handlePasskeyLink(request, response) {
-  const body = await readJSON(request);
-  const userID = body.auth?.accountUserID;
-  const credentialID = body.credentialID;
-  if (!userID) {
-    sendError(response, 400, "Missing user ID.");
-    return;
-  }
-  if (!credentialID) {
-    sendError(response, 400, "Missing passkey credential ID.");
-    return;
-  }
-
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID, body.auth)) {
-    return;
-  }
-  const existingAccount = store.users[userID] || body.account;
-  if (!existingAccount) {
-    sendError(response, 404, "User not found.");
-    return;
-  }
-  store.users[userID] = existingAccount;
-  store.passkeyCredentials = {
-    ...(store.passkeyCredentials || {}),
-    [credentialID]: userID
-  };
-  await writeStore(store);
-  sendJSON(response, 200, { account: existingAccount });
+  sendError(response, 410, "Passkey registration is unavailable. Use Sign in with Apple.");
 }
 
 async function handleBrowserAccountLink(request, response) {
@@ -3499,6 +3476,7 @@ function handleAppleWebConfig(request, response) {
     clientID: serviceID || null,
     redirectURI: serviceID ? appleWebRedirectURI(request) : null,
     scope: "name email",
+    identityTokenRequired: appleIdentityTokenRequired(),
     browserFallbackAllowed: browserFallbackSignInAllowed(request)
   });
 }

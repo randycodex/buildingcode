@@ -111,6 +111,10 @@ async function main() {
       appleWebConfig.json.redirectURI === `${baseURL}/account/apple/callback`,
       "Apple web sign-in config returned the wrong redirect URI."
     );
+    assert(
+      appleWebConfig.json.identityTokenRequired === false,
+      "Local smoke configuration unexpectedly required a real Apple identity token."
+    );
 
     const appleWebStart = await request("/account/apple/start", {
       method: "POST",
@@ -269,6 +273,17 @@ async function main() {
       }
     });
     assert(invalidAppleTokenSignIn.response.status === 401, "Invalid Apple identity token was accepted.");
+
+    const unsupportedProviderSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "guest",
+          providerUserID: "unsupported-provider"
+        }
+      }
+    });
+    assert(unsupportedProviderSignIn.response.status === 400, "Unsupported account provider was accepted.");
 
     const attach = await request("/account/attach-local-data", {
       method: "POST",
@@ -664,7 +679,7 @@ async function main() {
         }
       }
     });
-    assert(unlinkedPasskeySignIn.response.status === 404, "Unlinked passkey created a new account.");
+    assert(unlinkedPasskeySignIn.response.status === 410, "Passkey sign-in was not disabled.");
 
     const passkeyCredentialID = "smoke-passkey-credential";
     const passkeyLink = await request("/account/passkeys/link", {
@@ -676,8 +691,7 @@ async function main() {
         account: signIn.json.account
       }
     });
-    assert(passkeyLink.response.ok, "Passkey link failed.");
-    assert(passkeyLink.json.account.appUserID === userID, "Passkey link returned the wrong account.");
+    assert(passkeyLink.response.status === 410, "Passkey registration was not disabled.");
 
     const passkeySignIn = await request("/account/sign-in", {
       method: "POST",
@@ -688,9 +702,7 @@ async function main() {
         }
       }
     });
-    assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
-    assert(passkeySignIn.json.account.appUserID === userID, "Passkey sign-in did not restore the linked account.");
-    assert(passkeySignIn.json.entitlement?.source === "lifetimeGrant", "Passkey sign-in did not restore entitlement.");
+    assert(passkeySignIn.response.status === 410, "A disabled passkey credential was accepted.");
 
     const legacyStore = JSON.parse(await readFile(dataPath, "utf8"));
     legacyStore.users["passkey:legacy-bad-account"] = {
@@ -733,21 +745,6 @@ async function main() {
       "Legacy passkey cleanup did not report the deleted user."
     );
 
-    const linkedPasskeyAfterCleanup = await request("/account/sign-in", {
-      method: "POST",
-      body: {
-        credential: {
-          provider: "passkey",
-          providerUserID: passkeyCredentialID
-        }
-      }
-    });
-    assert(linkedPasskeyAfterCleanup.response.ok, "Legacy cleanup broke the linked Apple passkey.");
-    assert(
-      linkedPasskeyAfterCleanup.json.account.appUserID === userID,
-      "Legacy cleanup changed the linked Apple passkey owner."
-    );
-
     const legacyPasskeyAfterCleanup = await request("/account/sign-in", {
       method: "POST",
       body: {
@@ -757,7 +754,7 @@ async function main() {
         }
       }
     });
-    assert(legacyPasskeyAfterCleanup.response.status === 404, "Legacy passkey credential still signs in after cleanup.");
+    assert(legacyPasskeyAfterCleanup.response.status === 410, "Legacy passkey sign-in was not disabled.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
@@ -1088,7 +1085,7 @@ async function main() {
 
     const projectDependencyPull = await request("/sync/pull", {
       method: "POST",
-      token: passkeySignIn.json.account.backendSessionToken,
+      token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         since: "2026-06-05T00:00:00Z"
@@ -1166,7 +1163,7 @@ async function main() {
     assert(restoreChecklist.json.publicUsername === "smoke-pro", "Restore checklist did not report the profile.");
     assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
-    assert(restoreChecklist.json.passkeyCredentialCount === 1, "Restore checklist did not report the linked passkey.");
+    assert(restoreChecklist.json.passkeyCredentialCount === 0, "Restore checklist reported an active passkey credential.");
     assert(restoreChecklist.json.mutationCounts.savedItem === 2, "Restore checklist did not count saved items and delete tombstones.");
     assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
@@ -1188,7 +1185,7 @@ async function main() {
     assert(accountExport.json.account.appUserID === userID, "Account export did not include the account.");
     assert(accountExport.json.entitlement?.plan === "pro", "Account export did not include the entitlement.");
     assert(accountExport.json.hasSession === true, "Account export did not include session status.");
-    assert(accountExport.json.passkeyCredentialIDs.includes(passkeyCredentialID), "Account export did not include the linked passkey.");
+    assert(accountExport.json.passkeyCredentialIDs.length === 0, "Account export reported an active passkey credential.");
     assert(
       accountExport.json.mutations.some((item) => item.annotation?.tags?.includes("Concrete")),
       "Account export did not include tag mutations."

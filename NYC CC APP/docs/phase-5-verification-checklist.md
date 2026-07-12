@@ -1,6 +1,6 @@
 # Phase 5 Verification Checklist
 
-Use this checklist after backend, account, StoreKit, passkey, or sync changes.
+Use this checklist after backend, account, StoreKit, or sync changes. Passkey registration and sign-in are disabled until complete WebAuthn verification is implemented.
 
 ## Local App Setup
 
@@ -26,10 +26,9 @@ Use this checklist after backend, account, StoreKit, passkey, or sync changes.
 
 1. Sign in with Apple.
 2. Create or confirm a public username.
-3. Create a passkey.
-4. Sign out.
-5. Sign back in with the passkey.
-6. Confirm the same account is restored and the public username remains.
+3. Sign out.
+4. Sign back in with the same Apple account.
+5. Confirm the same account is restored and the public username remains.
 
 ## Content Restore
 
@@ -40,7 +39,7 @@ Use this checklist after backend, account, StoreKit, passkey, or sync changes.
 5. Tap `Sync Now` and wait for `Synced`.
 6. Delete the app.
 7. Reinstall from Xcode.
-8. Sign in with the same Apple account or linked passkey.
+8. Sign in with the same Apple account.
 9. Confirm the project, saved section, tag, note, and username restore.
 10. Confirm Settings still shows Pro if the StoreKit subscription is active.
 
@@ -49,15 +48,15 @@ Use this checklist after backend, account, StoreKit, passkey, or sync changes.
 From `permitext-sync-server`, run:
 
 ```sh
-node --check server.mjs
-node --check tests/smoke.mjs
-node tests/smoke.mjs
-node tests/production-health.mjs
-node tests/production-aasa.mjs
+npm run check
+npm run smoke
+npm run verify:production
+npm run verify:production:aasa
 ```
 
 Expected results:
 
+- `permitext auth policy passed`
 - `permitext-sync smoke passed`
 - `permitext production health passed: https://permitext-sync.vercel.app uses postgres`
 - `permitext production AASA apps: 57BY95X97H.com.randycodex.permitext`
