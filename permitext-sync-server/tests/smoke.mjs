@@ -45,7 +45,7 @@ async function request(path, { method = "GET", body, token, headers = {}, rawBod
   });
   const text = await response.text();
   const json = text && response.headers.get("content-type")?.includes("application/json") ? JSON.parse(text) : null;
-  return { response, json };
+  return { response, json, text };
 }
 
 async function waitForServer() {
@@ -101,6 +101,8 @@ async function main() {
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
+    assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
+    assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
 
     const appleWebConfig = await request("/account/apple-web-config");
     assert(appleWebConfig.response.ok, "Apple web sign-in config failed.");
@@ -146,6 +148,11 @@ async function main() {
       appleWebCallback.response.headers.get("content-type")?.includes("text/html"),
       "Apple web sign-in callback did not return HTML."
     );
+    assert(
+      appleWebCallback.response.headers.get("content-security-policy")?.includes("nonce-"),
+      "Apple web sign-in callback CSP omitted its script nonce."
+    );
+    assert(appleWebCallback.text.includes("<script nonce="), "Apple web sign-in callback script omitted its nonce.");
 
     const webCheckoutFallback = await request("/web/?checkout=success");
     assert(webCheckoutFallback.response.ok, "Legacy checkout return URL did not load.");
@@ -1228,6 +1235,38 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(pullAfterSignOut.response.status === 401, "A revoked session remained usable.");
+
+    const oversizedBody = await request("/account/profile", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "203.0.113.20"
+      },
+      rawBody: JSON.stringify({ padding: "x".repeat(1024 * 1024) })
+    });
+    assert(oversizedBody.response.status === 413, "Oversized request body was not rejected.");
+
+    let rateLimitedResponse = null;
+    for (let attempt = 0; attempt < 31; attempt += 1) {
+      const result = await request("/account/sign-in", {
+        method: "POST",
+        headers: { "x-forwarded-for": "203.0.113.30" },
+        body: {
+          credential: {
+            provider: "apple",
+            providerUserID: `rate-limit-${attempt}`,
+            signedInAt: new Date().toISOString()
+          }
+        }
+      });
+      if (attempt < 30) {
+        assert(result.response.status !== 429, `Rate limiter rejected allowed request ${attempt + 1}.`);
+      } else {
+        rateLimitedResponse = result.response;
+      }
+    }
+    assert(rateLimitedResponse?.status === 429, "Sign-in burst was not rate limited.");
+    assert(rateLimitedResponse.headers.get("retry-after"), "Rate-limited response omitted Retry-After.");
   } finally {
     server.kill();
     await rm(tempDir, { recursive: true, force: true });

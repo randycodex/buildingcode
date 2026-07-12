@@ -56,6 +56,10 @@ Passkey registration and sign-in are disabled until the backend implements a com
 
 Hosted account sessions are multi-device and store only a SHA-256 token hash. Each sign-in creates a distinct session with a 30-day default expiry; `PERMITEXT_SESSION_TTL_SECONDS` can set a different duration of at least one hour. Existing plaintext sessions are migrated to the hashed table on successful use and removed from the legacy session table. `POST /account/sign-out` revokes only the current device session.
 
+The HTTP perimeter rejects request bodies larger than 1 MiB by default. `PERMITEXT_MAX_REQUEST_BODY_BYTES` can set a limit from 64 KiB through 10 MiB. HTML responses use a Content Security Policy, Apple callback scripts use a per-response nonce, and all responses include baseline anti-framing, MIME-sniffing, referrer, and browser-permission headers.
+
+Sensitive write routes also have in-process burst limits and return HTTP `429` with `Retry-After`. These limits protect an individual Node/Vercel instance; production must also use Vercel Firewall rate limiting for enforcement shared across serverless instances.
+
 Configure paid entitlement sources with:
 
 ```sh

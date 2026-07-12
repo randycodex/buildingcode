@@ -155,6 +155,8 @@ Authorization: Bearer <token>
 
 The local scaffold requires this bearer token after a user has signed in.
 
+The backend rejects bodies larger than 1 MiB by default and returns HTTP `413`. Sensitive write endpoints may return HTTP `429` with a `Retry-After` header when a client exceeds the burst limit.
+
 ### `POST /sync/push`
 
 Request:
@@ -204,6 +206,7 @@ Supported mutation kinds:
 
 Backend validation rules:
 
+- A push contains at most 100 mutations.
 - Each mutation must be a single-key object.
 - `auth.accountUserID` and `batch.user.id` must match.
 - The mutation kind must be one of the supported kinds above.

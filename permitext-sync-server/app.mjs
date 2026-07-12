@@ -19,6 +19,16 @@ const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids
 const webPublicPath = join(__dirname, "public");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const maxSyncMutationsPerBatch = 100;
+const defaultRequestBodyLimit = 1024 * 1024;
+const rateLimitBuckets = new Map();
+const rateLimitPolicies = new Map([
+  ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
+  ["account/apple/start", { limit: 30, windowMs: 5 * 60 * 1000 }],
+  ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
+  ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
+  ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["sync/push", { limit: 240, windowMs: 60 * 1000 }]
+]);
 const chapterContentPath = join(
   __dirname,
   "..",
@@ -1201,53 +1211,101 @@ async function storageSummary() {
   };
 }
 
-async function readJSON(request) {
-  const chunks = [];
-  for await (const chunk of request) {
-    chunks.push(chunk);
-  }
-  const raw = Buffer.concat(chunks).toString("utf8");
-  return raw.length ? JSON.parse(raw) : {};
+export function requestBodyLimit(environment = process.env) {
+  const configured = Number(environment.PERMITEXT_MAX_REQUEST_BODY_BYTES);
+  return Number.isSafeInteger(configured) && configured >= 64 * 1024 && configured <= 10 * 1024 * 1024
+    ? configured
+    : defaultRequestBodyLimit;
 }
 
-async function readRawBody(request) {
+class RequestBodyTooLargeError extends Error {}
+
+async function readBody(request, limit = requestBodyLimit()) {
+  const contentLength = Number(request.headers["content-length"] || 0);
+  if (Number.isFinite(contentLength) && contentLength > limit) {
+    throw new RequestBodyTooLargeError();
+  }
   const chunks = [];
+  let byteCount = 0;
   for await (const chunk of request) {
+    byteCount += chunk.length;
+    if (byteCount > limit) {
+      throw new RequestBodyTooLargeError();
+    }
     chunks.push(chunk);
   }
   return Buffer.concat(chunks);
 }
 
-function sendJSON(response, status, body) {
+async function readJSON(request) {
+  const raw = (await readBody(request)).toString("utf8");
+  return raw.length ? JSON.parse(raw) : {};
+}
+
+async function readRawBody(request) {
+  return readBody(request);
+}
+
+function securityHeaders() {
+  return {
+    "cross-origin-opener-policy": "same-origin-allow-popups",
+    "permissions-policy": "camera=(), microphone=(), geolocation=()",
+    "referrer-policy": "no-referrer",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  };
+}
+
+function sendJSON(response, status, body, extraHeaders = {}) {
   response.writeHead(status, {
+    ...securityHeaders(),
     "content-type": "application/json; charset=utf-8",
-    "cache-control": "no-store"
+    "cache-control": "no-store",
+    ...extraHeaders
   });
   response.end(JSON.stringify(body));
 }
 
 function sendRawJSON(response, status, body) {
   response.writeHead(status, {
+    ...securityHeaders(),
     "content-type": "application/json",
     "cache-control": "no-store"
   });
   response.end(JSON.stringify(body, null, 2));
 }
 
-function sendError(response, status, message) {
-  sendJSON(response, status, { error: message });
+function sendError(response, status, message, extraHeaders = {}) {
+  sendJSON(response, status, { error: message }, extraHeaders);
 }
 
-function sendHTML(response, html) {
+function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}) {
+  const scriptPolicy = scriptNonce
+    ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com`
+    : "'self' https://appleid.cdn-apple.com";
   response.writeHead(200, {
+    ...securityHeaders(),
     "content-type": "text/html; charset=utf-8",
-    "cache-control": "no-store"
+    "cache-control": "no-store",
+    "content-security-policy": [
+      "default-src 'self'",
+      `script-src ${scriptPolicy}`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self' https://appleid.apple.com"
+    ].join("; "),
+    ...extraHeaders
   });
   response.end(html);
 }
 
 function sendStatic(response, contentType, body) {
   response.writeHead(200, {
+    ...securityHeaders(),
     "content-type": contentType,
     "cache-control": "no-store"
   });
@@ -1362,6 +1420,39 @@ function normalizePath(url) {
 
 function requestURL(request) {
   return new URL(request.url, "http://localhost");
+}
+
+function requestClientAddress(request) {
+  const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || String(request.headers["x-real-ip"] || request.socket?.remoteAddress || "unknown");
+}
+
+function enforceRateLimit(request, response, path, now = Date.now()) {
+  const policy = rateLimitPolicies.get(path);
+  if (!policy || request.method !== "POST") return true;
+  const key = `${path}:${requestClientAddress(request)}`;
+  const current = rateLimitBuckets.get(key);
+  const bucket = !current || current.resetAt <= now
+    ? { count: 0, resetAt: now + policy.windowMs }
+    : current;
+  bucket.count += 1;
+  rateLimitBuckets.set(key, bucket);
+
+  if (rateLimitBuckets.size > 2_000) {
+    for (const [candidateKey, candidate] of rateLimitBuckets) {
+      if (candidate.resetAt <= now) rateLimitBuckets.delete(candidateKey);
+    }
+    while (rateLimitBuckets.size > 2_000) {
+      rateLimitBuckets.delete(rateLimitBuckets.keys().next().value);
+    }
+  }
+  if (bucket.count <= policy.limit) return true;
+
+  const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+  sendError(response, 429, "Too many requests. Try again later.", {
+    "retry-after": String(retryAfter)
+  });
+  return false;
 }
 
 async function readJSONFile(path) {
@@ -3774,7 +3865,7 @@ async function handleAppleWebStart(request, response) {
   response.end(JSON.stringify({ authorizationURL: authorizeURL.toString() }));
 }
 
-function appleCallbackHTML({ title, message, accountState = null, successPath = "/" }) {
+function appleCallbackHTML({ title, message, accountState = null, successPath = "/", scriptNonce }) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -3784,7 +3875,7 @@ function appleCallbackHTML({ title, message, accountState = null, successPath = 
   </head>
   <body>
     <p>${htmlEscape(message)}</p>
-    <script>
+    <script nonce="${htmlEscape(scriptNonce)}">
       const accountState = ${scriptJSON(accountState)};
       if (accountState) {
         const workspaceKey = "permitext:webWorkspace:v1";
@@ -3799,32 +3890,31 @@ function appleCallbackHTML({ title, message, accountState = null, successPath = 
 }
 
 async function handleAppleWebCallback(request, response) {
+  const scriptNonce = randomUUID();
   if (request.method !== "POST") {
     sendHTML(response, appleCallbackHTML({
       title: "permitext sign in",
       message: "Return to permitext and use Link Apple from Settings.",
-      successPath: "/"
-    }));
+      successPath: "/",
+      scriptNonce
+    }), { scriptNonce });
     return;
   }
 
   const form = new URLSearchParams((await readRawBody(request)).toString("utf8"));
   const oauthState = verifyOAuthStateCookie(decodeURIComponent(cookieValue(request, "permitext_apple_oauth") || ""));
   const clearCookie = appleOAuthCookie(request, "", 0);
-  const sendCallbackHTML = (html) => {
-    response.writeHead(200, {
-      "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store",
-      "set-cookie": clearCookie
-    });
-    response.end(html);
-  };
+  const sendCallbackHTML = (html) => sendHTML(response, html, {
+    scriptNonce,
+    extraHeaders: { "set-cookie": clearCookie }
+  });
 
   if (!oauthState || form.get("state") !== oauthState.state) {
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple sign-in could not be verified. Return to permitext and try again.",
-      successPath: "/?appleSignIn=failed"
+      successPath: "/?appleSignIn=failed",
+      scriptNonce
     }));
     return;
   }
@@ -3834,7 +3924,8 @@ async function handleAppleWebCallback(request, response) {
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple did not return an identity token. Return to permitext and try again.",
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
     return;
   }
@@ -3867,7 +3958,8 @@ async function handleAppleWebCallback(request, response) {
             displayName: finalAccount.displayName || displayName || "Apple account",
             entitlement: directResult.entitlement || null
           },
-          successPath: oauthState.successPath || "/"
+          successPath: oauthState.successPath || "/",
+          scriptNonce
         }));
         return;
       }
@@ -3897,14 +3989,16 @@ async function handleAppleWebCallback(request, response) {
         displayName: finalAccount.displayName || displayName || "Apple account",
         entitlement: store.entitlements[account.appUserID] || null
       },
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
   } catch (error) {
     console.error(error);
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple sign-in failed. Return to permitext and try again.",
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
   }
 }
@@ -3934,6 +4028,9 @@ const handlers = {
 export async function handleRequest(request, response) {
   try {
     const path = normalizePath(request.url);
+    if (!enforceRateLimit(request, response, path)) {
+      return;
+    }
 
     if (request.method === "GET" && (path === "" || path === "web" || path === "web/")) {
       await handleWebIndex(request, response);
@@ -3999,11 +4096,15 @@ export async function handleRequest(request, response) {
     }
     await handler(request, response);
   } catch (error) {
-    console.error(error);
+    if (error instanceof RequestBodyTooLargeError) {
+      sendError(response, 413, "Request body is too large.");
+      return;
+    }
     if (error instanceof SyntaxError) {
       sendError(response, 400, "Invalid JSON.");
       return;
     }
+    console.error(error);
     sendError(response, 500, "Internal server error.");
   }
 }

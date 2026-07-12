@@ -1,4 +1,4 @@
-import { appleIdentityTokenRequired } from "../app.mjs";
+import { appleIdentityTokenRequired, requestBodyLimit } from "../app.mjs";
 import { accountSessionTTLSeconds } from "../postgres-account-repository.mjs";
 
 function assert(condition, message) {
@@ -35,6 +35,15 @@ assert(
 assert(
   accountSessionTTLSeconds({ PERMITEXT_SESSION_TTL_SECONDS: "60" }) === 60 * 60 * 24 * 30,
   "An unsafe session expiry below one hour was accepted."
+);
+assert(requestBodyLimit({}) === 1024 * 1024, "The default request body limit changed unexpectedly.");
+assert(
+  requestBodyLimit({ PERMITEXT_MAX_REQUEST_BODY_BYTES: String(2 * 1024 * 1024) }) === 2 * 1024 * 1024,
+  "The configured request body limit was ignored."
+);
+assert(
+  requestBodyLimit({ PERMITEXT_MAX_REQUEST_BODY_BYTES: "1024" }) === 1024 * 1024,
+  "An unsafe request body limit was accepted."
 );
 
 console.log("permitext auth policy passed");
