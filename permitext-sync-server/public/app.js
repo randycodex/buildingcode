@@ -49,6 +49,7 @@ let syncedContent = null;
 let syncLoadPromise = null;
 let syncFlushPromise = null;
 let syncRetryTimer = null;
+let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
 let activeCustomSelect = null;
@@ -99,6 +100,7 @@ function loadWorkspaceState() {
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
+      continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings)
     };
   } catch {
@@ -127,6 +129,7 @@ function loadWorkspaceState() {
       paneWeights: {},
       paneOrder: [],
       recentChaptersByCode: {},
+      continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings }
     };
   }
@@ -1303,6 +1306,7 @@ function summarizeMutations(mutations = []) {
   const savedItems = [];
   const annotations = [];
   const projectSections = [];
+  let latestContinuity = null;
 
   latestByID.forEach((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
@@ -1311,9 +1315,15 @@ function summarizeMutations(mutations = []) {
     if (kind === "savedItem") savedItems.push(record);
     if (kind === "annotation") annotations.push(record);
     if (kind === "projectSection") projectSections.push(record);
+    if (
+      kind === "continuity" &&
+      (!latestContinuity || mutationUpdatedAt(mutation) > Date.parse(latestContinuity.updatedAt || 0))
+    ) {
+      latestContinuity = record;
+    }
   });
 
-  return { projects, savedItems, annotations, projectSections };
+  return { projects, savedItems, annotations, projectSections, latestContinuity };
 }
 
 function syncCodeVersion(value) {
@@ -1404,6 +1414,7 @@ async function loadSyncedContent(options = {}) {
         mutations,
         summary: summarizeMutations(mutations)
       };
+      await applyRemoteContinuityIfNewer();
       storeAccountEntitlement(entitlement);
       return syncedContent;
     })
@@ -1438,8 +1449,127 @@ async function ensureSyncedContentForRender() {
 }
 
 function syncMutationRecordID(mutation) {
-  const record = mutation && typeof mutation === "object" ? Object.values(mutation)[0] : null;
+  const { kind, record } = mutationKindAndRecord(mutation);
+  if (kind === "continuity") {
+    if (!record?.userID) return null;
+    return [record?.userID, "continuity", syncCodeVersion(record?.codeVersion)].join(":");
+  }
+  if (kind === "codeVersionClear") {
+    if (!record?.userID) return null;
+    return [record?.userID, "code-version-clear", syncCodeVersion(record?.codeVersion)].join(":");
+  }
   return String(record?.id || "").trim();
+}
+
+function swiftReferenceDateSeconds(date = new Date()) {
+  return (date.getTime() - Date.UTC(2001, 0, 1)) / 1000;
+}
+
+function continuityRecentEntries(values = {}) {
+  try {
+    const parsed = JSON.parse(values.recentlyViewedSectionsJSON || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function continuityValuesForReader(reader) {
+  const account = activeAccount();
+  const pendingRecord = [...(state.syncOutbox || [])].reverse()
+    .filter((entry) => !account || entry.accountUserID === account.userID)
+    .map((entry) => mutationKindAndRecord(entry.mutation))
+    .find(({ kind }) => kind === "continuity")?.record;
+  const existing = pendingRecord?.values || syncedContent?.summary?.latestContinuity?.values || {};
+  const chapter = chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
+  const sectionID = Number(reader.sectionID || 0);
+  const recentEntries = continuityRecentEntries(existing);
+  if (Number.isSafeInteger(sectionID) && sectionID > 0) {
+    const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || chapter?.codePrefix));
+    const entry = {
+      sectionID,
+      sectionNumber: reader.sectionNumber || "",
+      title: reader.title || "Section",
+      chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
+      codeSectionID: chapter?.codeSectionID || null,
+      codeSectionName: codeOption?.label || reader.codePrefix || "",
+      previewText: "",
+      viewedAt: swiftReferenceDateSeconds()
+    };
+    recentEntries.splice(0, recentEntries.length, entry, ...recentEntries.filter((item) => Number(item?.sectionID) !== sectionID).slice(0, 19));
+  }
+  return {
+    ...existing,
+    selectedJurisdictionKey: "jurisdiction-1",
+    selectedVersionFileName: defaultSyncCodeVersion,
+    selectedCodeSectionID: chapter?.codeSectionID
+      ? String(chapter.codeSectionID)
+      : existing.selectedCodeSectionID || "",
+    lastOpenedChapterID: reader.chapterID
+      ? String(reader.chapterID)
+      : existing.lastOpenedChapterID || "",
+    recentlyViewedSectionsJSON: JSON.stringify(recentEntries)
+  };
+}
+
+function scheduleContinuitySync(reader) {
+  const account = activeAccount();
+  if (!account || !reader?.chapterID) return;
+  clearTimeout(continuityPushTimer);
+  continuityPushTimer = window.setTimeout(() => {
+    const updatedAt = new Date().toISOString();
+    const mutation = {
+      continuity: {
+        userID: account.userID,
+        codeVersion: defaultSyncCodeVersion,
+        values: continuityValuesForReader(reader),
+        updatedAt
+      }
+    };
+    state.continuityAppliedAt = updatedAt;
+    enqueueSyncMutation(mutation, account);
+    flushSyncOutbox({ refresh: true }).catch(() => {});
+  }, 500);
+}
+
+async function applyRemoteContinuityIfNewer() {
+  const record = syncedContent?.summary?.latestContinuity;
+  const remoteTimestamp = Date.parse(record?.updatedAt || 0);
+  const appliedTimestamp = Date.parse(state.continuityAppliedAt || 0);
+  const hasPendingContinuity = (state.syncOutbox || []).some((entry) =>
+    mutationKindAndRecord(entry.mutation).kind === "continuity"
+  );
+  if (!record || !Number.isFinite(remoteTimestamp) || remoteTimestamp <= appliedTimestamp || hasPendingContinuity) return;
+
+  state.continuityAppliedAt = record.updatedAt;
+  if (deepLinkedSectionIDFromLocation()) {
+    saveWorkspaceState();
+    return;
+  }
+
+  const latestSectionID = Number(continuityRecentEntries(record.values)[0]?.sectionID || 0);
+  const reader = state.readers[0] || newReaderState();
+  if (Number.isSafeInteger(latestSectionID) && latestSectionID > 0) {
+    try {
+      const payload = await api(`/code/sections/${latestSectionID}`);
+      Object.assign(reader, readerFieldsForSectionDetail(payload.section));
+    } catch {
+      // Keep the local reader when a continuity record references unavailable content.
+    }
+  } else if (record.values?.lastOpenedChapterID) {
+    const chapter = chapters.find((item) => String(item.id) === String(record.values.lastOpenedChapterID));
+    if (chapter) {
+      Object.assign(reader, {
+        codePrefix: chapter.codePrefix || "BC",
+        chapterID: chapter.id,
+        sectionID: "",
+        sectionNumber: "",
+        title: "Reader"
+      });
+    }
+  }
+  if (!state.readers.length) state.readers = [reader];
+  saveWorkspaceState();
 }
 
 function enqueueSyncMutation(mutation, account) {
@@ -1465,7 +1595,7 @@ function enqueueSyncMutation(mutation, account) {
 
 function discardLocalMutationOverlay(mutation) {
   const { kind, record } = mutationKindAndRecord(mutation);
-  const recordID = String(record?.id || "");
+  const recordID = syncMutationRecordID(mutation);
   if (!recordID) return;
   if (kind === "savedItem") {
     state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.id || "") !== recordID);
@@ -1477,6 +1607,8 @@ function discardLocalMutationOverlay(mutation) {
     state.localProjects = (state.localProjects || []).filter((item) => String(item.id || "") !== recordID);
   } else if (kind === "projectSection") {
     state.localProjectSections = (state.localProjectSections || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "continuity") {
+    state.continuityAppliedAt = null;
   }
 }
 
@@ -3155,6 +3287,7 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
+      scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
@@ -3354,6 +3487,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
   });
 
@@ -3407,6 +3541,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
   });
 
@@ -3420,6 +3555,7 @@ async function renderReader(reader, options = {}) {
       updateBrowserSectionURL(reader.sectionID);
     }
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await navigateReaderToSection(panel, reader);
   });
 
@@ -3673,6 +3809,7 @@ async function openSectionDetail(searchID, section, options = {}) {
   if (options.updateURL !== false) {
     updateBrowserSectionURL(sectionID);
   }
+  scheduleContinuitySync(newReaderState(readerFieldsForSectionDetail(details[searchID])));
   placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
   updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();

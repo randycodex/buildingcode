@@ -92,6 +92,8 @@ https://permitext-sync.vercel.app/open/section/<canonical-section-id>
 
 The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The AASA response advertises `/open/section/*`, and the iOS target includes both the `applinks:` and `webcredentials:` associated domains. Opening a section on web replaces the current address with its shared URL so it can be copied without serializing private workspace state.
 
+Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
+
 Configure paid entitlement sources with:
 
 ```sh
