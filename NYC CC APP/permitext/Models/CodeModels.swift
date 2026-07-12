@@ -387,6 +387,7 @@ struct SyncQueueItem: Identifiable, Hashable, Sendable {
     let attemptCount: Int
     let createdAt: Date
     let updatedAt: Date
+    let mutationUpdatedAt: Date
     let lastError: String?
 }
 
@@ -554,7 +555,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
 
     init(syncQueueItem item: SyncQueueItem, account: SignedInAccount) throws {
         let payload = item.payload
-        let deletedAt = item.operationType == .delete ? item.updatedAt : nil
+        let deletedAt = item.operationType == .delete ? item.mutationUpdatedAt : nil
         switch item.entityType {
         case .bookmark:
             guard let sectionID = payload.sectionID else {
@@ -566,7 +567,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -589,7 +590,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     blockID: payload.values["blockID"],
                     noteBody: item.operationType == .delete ? nil : payload.values["body"],
                     tags: nil,
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -612,7 +613,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     blockID: payload.values["blockID"],
                     noteBody: nil,
                     tags: item.operationType == .delete ? nil : Self.tags(from: payload.values["tags"]),
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -639,7 +640,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -665,7 +666,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     localFolderID: payload.folderID,
                     sectionID: sectionID,
                     scope: payload.values["scope"],
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -675,7 +676,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     values: payload.values,
-                    updatedAt: item.updatedAt
+                    updatedAt: item.mutationUpdatedAt
                 )
             )
         case .codeVersionUserData:
@@ -684,7 +685,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     values: payload.values,
-                    updatedAt: item.updatedAt
+                    updatedAt: item.mutationUpdatedAt
                 )
             )
         }

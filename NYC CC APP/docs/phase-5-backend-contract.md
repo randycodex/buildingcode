@@ -197,6 +197,8 @@ Response:
 
 The iPhone queue recovers claims left `inFlight` for more than ten minutes and automatically retries transient failures with exponential delays from 5 through 40 seconds. After five failed attempts an item remains visible as failed until the user explicitly retries, preventing an unbounded retry loop.
 
+Queue lifecycle time and mutation version time are stored separately. Claiming, failing, or retrying a request never makes unchanged content appear newer. Once the server accepts a queue item, the matching local bookmark, annotation, project, or project membership is marked synced in the same SQLite transaction.
+
 Supported mutation kinds:
 
 - `savedItem`: bookmarked/saved sections

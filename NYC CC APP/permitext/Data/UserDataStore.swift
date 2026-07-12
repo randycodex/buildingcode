@@ -540,7 +540,8 @@ final class UserDataStore: UserContentRepository {
                 attempt_count INTEGER NOT NULL DEFAULT 0,
                 last_error TEXT,
                 created_at TEXT NOT NULL,
-                updated_at TEXT NOT NULL
+                updated_at TEXT NOT NULL,
+                mutation_updated_at TEXT NOT NULL DEFAULT ''
             );
 
             CREATE INDEX IF NOT EXISTS idx_sync_queue_state_created
@@ -586,6 +587,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folder_sections", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "folder_sections", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "deleted_at", definition: "TEXT")
+        try addColumnIfMissing(table: "sync_queue", column: "mutation_updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try backfillSyncColumns()
     }
 
@@ -756,7 +758,7 @@ final class UserDataStore: UserContentRepository {
             ],
             "sync_queue": [
                 "id", "client_id", "entity_type", "operation_type", "payload_json",
-                "state", "attempt_count", "last_error", "created_at", "updated_at"
+                "state", "attempt_count", "last_error", "created_at", "updated_at", "mutation_updated_at"
             ]
         ]
 
@@ -801,13 +803,14 @@ final class UserDataStore: UserContentRepository {
         try connection.execute("UPDATE folder_sections SET sync_state = '\(localOnlySyncState)' WHERE sync_state = '';")
         try connection.execute("UPDATE folder_sections SET updated_at = CASE WHEN updated_at = '' THEN added_at ELSE updated_at END;")
         try connection.execute("UPDATE notes SET updated_at = '\(now)' WHERE updated_at = '';")
+        try connection.execute("UPDATE sync_queue SET mutation_updated_at = created_at WHERE mutation_updated_at = '';")
     }
 
     @discardableResult
     func pendingSyncQueueItems(limit: Int = 100) throws -> [SyncQueueItem] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error
+            SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error, mutation_updated_at
             FROM sync_queue
             WHERE state = ?
             ORDER BY created_at ASC, id ASC
@@ -840,6 +843,7 @@ final class UserDataStore: UserContentRepository {
                     attemptCount: Int(connection.int64(at: 6, in: statement)),
                     createdAt: isoFormatter.date(from: connection.string(at: 7, in: statement)) ?? Date.distantPast,
                     updatedAt: isoFormatter.date(from: connection.string(at: 8, in: statement)) ?? Date.distantPast,
+                    mutationUpdatedAt: isoFormatter.date(from: connection.string(at: 10, in: statement)) ?? Date.distantPast,
                     lastError: connection.stringOrNil(at: 9, in: statement)
                 )
             )
@@ -936,18 +940,126 @@ final class UserDataStore: UserContentRepository {
     }
 
     func markSyncQueueItemSynced(id: Int64) throws {
+        guard let item = try syncQueueItem(id: id) else { return }
+        try performTransaction {
+            let statement = try connection.prepare(
+                """
+                UPDATE sync_queue
+                SET state = ?, updated_at = ?, last_error = NULL
+                WHERE id = ?;
+                """
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedQueueState, index: 1, to: statement)
+            try connection.bind(text: isoFormatter.string(from: Date()), index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, id)
+            _ = try connection.step(statement)
+            if try !hasUnresolvedQueueItem(matching: item, excludingID: id) {
+                try markLocalEntitySynced(for: item)
+            }
+        }
+    }
+
+    private func hasUnresolvedQueueItem(matching item: SyncQueueItem, excludingID: Int64) throws -> Bool {
         let statement = try connection.prepare(
             """
-            UPDATE sync_queue
-            SET state = ?, updated_at = ?, last_error = NULL
-            WHERE id = ?;
+            SELECT payload_json
+            FROM sync_queue
+            WHERE id <> ? AND entity_type = ? AND state <> ?;
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: syncedQueueState, index: 1, to: statement)
-        try connection.bind(text: isoFormatter.string(from: Date()), index: 2, to: statement)
-        sqlite3_bind_int64(statement, 3, id)
-        _ = try connection.step(statement)
+        sqlite3_bind_int64(statement, 1, excludingID)
+        try connection.bind(text: item.entityType.rawValue, index: 2, to: statement)
+        try connection.bind(text: syncedQueueState, index: 3, to: statement)
+        while try connection.step(statement) == SQLITE_ROW {
+            let data = Data(connection.string(at: 0, in: statement).utf8)
+            guard let payload = try? jsonDecoder.decode(SyncQueuePayload.self, from: data) else { continue }
+            if queuePayload(payload, matches: item.payload, entityType: item.entityType) {
+                return true
+            }
+        }
+        return false
+    }
+
+    private func queuePayload(_ lhs: SyncQueuePayload, matches rhs: SyncQueuePayload, entityType: SyncEntityType) -> Bool {
+        guard lhs.codeVersion == rhs.codeVersion else { return false }
+        switch entityType {
+        case .bookmark:
+            return lhs.sectionID == rhs.sectionID
+        case .note, .tagSet:
+            return lhs.sectionID == rhs.sectionID && lhs.values["blockID", default: ""] == rhs.values["blockID", default: ""]
+        case .folder:
+            if let leftID = lhs.folderID, let rightID = rhs.folderID, leftID == rightID { return true }
+            let leftClientID = lhs.clientID ?? lhs.values["clientID"]
+            let rightClientID = rhs.clientID ?? rhs.values["clientID"]
+            return leftClientID?.isEmpty == false && leftClientID == rightClientID
+        case .folderSection:
+            return lhs.folderID == rhs.folderID && lhs.sectionID == rhs.sectionID
+        case .continuity, .codeVersionUserData:
+            return true
+        }
+    }
+
+    private func markLocalEntitySynced(for item: SyncQueueItem) throws {
+        let payload = item.payload
+        switch item.entityType {
+        case .bookmark:
+            guard let sectionID = payload.sectionID else { return }
+            let statement = try connection.prepare(
+                "UPDATE bookmarks SET sync_state = ? WHERE code_version = ? AND section_id = ?;"
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedContentState, index: 1, to: statement)
+            try connection.bind(text: payload.codeVersion, index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, sectionID)
+            _ = try connection.step(statement)
+        case .note:
+            guard let sectionID = payload.sectionID else { return }
+            let statement = try connection.prepare(
+                "UPDATE notes SET sync_state = ? WHERE code_version = ? AND section_id = ? AND block_id = ?;"
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedContentState, index: 1, to: statement)
+            try connection.bind(text: payload.codeVersion, index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, sectionID)
+            try connection.bind(text: payload.values["blockID"] ?? "", index: 4, to: statement)
+            _ = try connection.step(statement)
+        case .tagSet:
+            guard let sectionID = payload.sectionID else { return }
+            let statement = try connection.prepare(
+                "UPDATE bookmark_tags SET sync_state = ? WHERE code_version = ? AND section_id = ? AND block_id = ?;"
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedContentState, index: 1, to: statement)
+            try connection.bind(text: payload.codeVersion, index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, sectionID)
+            try connection.bind(text: payload.values["blockID"] ?? "", index: 4, to: statement)
+            _ = try connection.step(statement)
+        case .folder:
+            let statement = try connection.prepare(
+                "UPDATE folders SET sync_state = ? WHERE code_version = ? AND (id = ? OR client_id = ?);"
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedContentState, index: 1, to: statement)
+            try connection.bind(text: payload.codeVersion, index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, payload.folderID ?? -1)
+            try connection.bind(text: payload.clientID ?? payload.values["clientID"] ?? "", index: 4, to: statement)
+            _ = try connection.step(statement)
+        case .folderSection:
+            guard let folderID = payload.folderID, let sectionID = payload.sectionID else { return }
+            let statement = try connection.prepare(
+                "UPDATE folder_sections SET sync_state = ? WHERE code_version = ? AND folder_id = ? AND section_id = ?;"
+            )
+            defer { connection.finalize(statement) }
+            try connection.bind(text: syncedContentState, index: 1, to: statement)
+            try connection.bind(text: payload.codeVersion, index: 2, to: statement)
+            sqlite3_bind_int64(statement, 3, folderID)
+            sqlite3_bind_int64(statement, 4, sectionID)
+            _ = try connection.step(statement)
+        case .continuity, .codeVersionUserData:
+            break
+        }
     }
 
     func markSyncQueueItemFailed(id: Int64, errorMessage: String) throws {
@@ -993,12 +1105,15 @@ final class UserDataStore: UserContentRepository {
         )
         defer { try? deleteSyncQueueItem(id: itemID) }
 
-        guard try syncQueueItem(id: itemID)?.state == .pending else {
+        guard let originalItem = try syncQueueItem(id: itemID), originalItem.state == .pending else {
             return ["Sync queue lifecycle validation failed before claim."]
         }
 
         try markSyncQueueItemsInFlight(ids: [itemID])
-        guard try syncQueueItem(id: itemID)?.state == .inFlight else {
+        guard let claimedItem = try syncQueueItem(id: itemID),
+              claimedItem.state == .inFlight,
+              claimedItem.mutationUpdatedAt == originalItem.mutationUpdatedAt
+        else {
             return ["Sync queue lifecycle validation failed to mark in-flight."]
         }
 
@@ -1050,9 +1165,9 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO sync_queue (
                 client_id, entity_type, operation_type, payload_json, state,
-                attempt_count, created_at, updated_at
+                attempt_count, created_at, updated_at, mutation_updated_at
             )
-            VALUES (?, ?, ?, ?, ?, 0, ?, ?);
+            VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?);
             """
         )
         defer { connection.finalize(statement) }
@@ -1064,6 +1179,7 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: pendingQueueState, index: 5, to: statement)
         try connection.bind(text: now, index: 6, to: statement)
         try connection.bind(text: now, index: 7, to: statement)
+        try connection.bind(text: now, index: 8, to: statement)
         _ = try connection.step(statement)
         return connection.lastInsertedRowID()
     }
@@ -1109,7 +1225,7 @@ final class UserDataStore: UserContentRepository {
     private func syncQueueItem(id: Int64) throws -> SyncQueueItem? {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error
+            SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error, mutation_updated_at
             FROM sync_queue
             WHERE id = ?
             LIMIT 1;
@@ -1141,6 +1257,7 @@ final class UserDataStore: UserContentRepository {
             attemptCount: Int(connection.int64(at: 6, in: statement)),
             createdAt: isoFormatter.date(from: connection.string(at: 7, in: statement)) ?? Date.distantPast,
             updatedAt: isoFormatter.date(from: connection.string(at: 8, in: statement)) ?? Date.distantPast,
+            mutationUpdatedAt: isoFormatter.date(from: connection.string(at: 10, in: statement)) ?? Date.distantPast,
             lastError: connection.stringOrNil(at: 9, in: statement)
         )
     }
