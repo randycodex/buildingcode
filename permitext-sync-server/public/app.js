@@ -47,6 +47,8 @@ const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
 let syncLoadPromise = null;
+let syncFlushPromise = null;
+let syncRetryTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
 let activeCustomSelect = null;
@@ -73,6 +75,8 @@ function loadWorkspaceState() {
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
       localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
       localAnnotations: Array.isArray(saved.localAnnotations) ? saved.localAnnotations.filter((item) => item && typeof item === "object") : [],
+      syncOutbox: Array.isArray(saved.syncOutbox) ? saved.syncOutbox.filter((item) => item?.mutation && item?.accountUserID) : [],
+      syncConflicts: Array.isArray(saved.syncConflicts) ? saved.syncConflicts.filter((item) => item?.mutation) : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
@@ -106,6 +110,8 @@ function loadWorkspaceState() {
       localSavedItems: [],
       localProjectSections: [],
       localAnnotations: [],
+      syncOutbox: [],
+      syncConflicts: [],
       archivedProjectIDs: [],
       searchResultReader: null,
       sectionDetail: null,
@@ -1156,10 +1162,44 @@ function accountDisplayName(account = state.account) {
   return account?.displayName || account?.userID || "this browser";
 }
 
+function retargetQueuedMutation(mutation, sourceUserID, targetUserID) {
+  const kind = mutation && typeof mutation === "object" ? Object.keys(mutation)[0] : null;
+  const record = kind ? mutation[kind] : null;
+  if (!kind || !record || typeof record !== "object") return mutation;
+  const sourcePrefix = `${sourceUserID}:`;
+  const recordID = typeof record.id === "string" && record.id.startsWith(sourcePrefix)
+    ? `${targetUserID}:${record.id.slice(sourcePrefix.length)}`
+    : record.id;
+  return { [kind]: { ...record, id: recordID, userID: targetUserID } };
+}
+
+function retargetSyncOutbox(sourceUserID, targetUserID) {
+  if (!sourceUserID || sourceUserID === targetUserID) return;
+  state.syncOutbox = (state.syncOutbox || []).map((item) => {
+    if (item.accountUserID !== sourceUserID) return item;
+    const mutation = retargetQueuedMutation(item.mutation, sourceUserID, targetUserID);
+    const recordID = syncMutationRecordID(mutation);
+    return {
+      ...item,
+      id: `${targetUserID}:${recordID}`,
+      accountUserID: targetUserID,
+      recordID,
+      mutation,
+      queuedAt: new Date().toISOString(),
+      attemptCount: 0,
+      lastError: null
+    };
+  });
+}
+
 function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   const account = payload.account;
   if (!account?.appUserID || !account?.backendSessionToken) {
     throw new Error("Sign in did not return a backend session.");
+  }
+  const previousUserID = state.account?.userID;
+  if (payload.mergedAccount?.sourceUserID === previousUserID) {
+    retargetSyncOutbox(previousUserID, account.appUserID);
   }
   state.account = {
     userID: account.appUserID,
@@ -1170,7 +1210,10 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   };
   syncedContent = null;
   saveWorkspaceState();
-  loadSyncedContent({ force: true }).then(() => renderWorkspace());
+  loadSyncedContent({ force: true })
+    .then(() => flushSyncOutbox({ refresh: true }))
+    .then(() => renderWorkspace())
+    .catch(() => renderWorkspace());
   return state.account;
 }
 
@@ -1357,21 +1400,146 @@ async function ensureSyncedContentForRender() {
   return loadSyncedContent();
 }
 
+function syncMutationRecordID(mutation) {
+  const record = mutation && typeof mutation === "object" ? Object.values(mutation)[0] : null;
+  return String(record?.id || "").trim();
+}
+
+function enqueueSyncMutation(mutation, account) {
+  const recordID = syncMutationRecordID(mutation);
+  if (!recordID) throw new Error("Could not queue a sync record without an ID.");
+  const entry = {
+    id: `${account.userID}:${recordID}`,
+    accountUserID: account.userID,
+    recordID,
+    mutation,
+    queuedAt: new Date().toISOString(),
+    attemptCount: 0,
+    lastError: null
+  };
+  state.syncOutbox = [
+    ...(state.syncOutbox || []).filter((item) => item.id !== entry.id),
+    entry
+  ];
+  state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
+  saveWorkspaceState();
+  return entry;
+}
+
+function scheduleSyncOutboxRetry(attemptCount = 1) {
+  clearTimeout(syncRetryTimer);
+  const exponent = Math.min(Math.max(Number(attemptCount) - 1, 0), 6);
+  const delay = Math.min(5_000 * (2 ** exponent), 5 * 60_000);
+  syncRetryTimer = window.setTimeout(() => {
+    flushSyncOutbox({ refresh: true }).catch(() => {});
+  }, delay);
+}
+
+async function flushSyncOutbox(options = {}) {
+  const account = activeAccount();
+  if (!account) return { acceptedMutationIDs: [], rejectedMutationIDs: [] };
+  if (syncFlushPromise) return syncFlushPromise;
+
+  syncFlushPromise = (async () => {
+    const acceptedMutationIDs = [];
+    const rejectedMutationIDs = [];
+    let latestPayload = null;
+    while (true) {
+      const entries = (state.syncOutbox || [])
+        .filter((item) => item.accountUserID === account.userID)
+        .slice(0, 100);
+      if (!entries.length) break;
+
+      try {
+        const payload = await postJSON("/sync/push", {
+          auth: { accountUserID: account.userID },
+          batch: {
+            user: { id: account.userID },
+            mutations: entries.map((item) => item.mutation)
+          }
+        }, { token: account.sessionToken });
+        latestPayload = payload;
+        const accepted = new Set(payload.acceptedMutationIDs || []);
+        const rejected = new Set(payload.rejectedMutationIDs || []);
+        acceptedMutationIDs.push(...accepted);
+        rejectedMutationIDs.push(...rejected);
+        const completedEntryIDs = new Set(entries
+          .filter((item) => accepted.has(item.recordID) || rejected.has(item.recordID))
+          .map((item) => item.id));
+        const postedEntryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
+        const unknownEntries = entries.filter((item) => !completedEntryIDs.has(item.id));
+        const rejectedEntries = entries.filter((item) =>
+          rejected.has(item.recordID) &&
+          (state.syncOutbox || []).some((current) => current.id === item.id && current.queuedAt === item.queuedAt)
+        );
+
+        state.syncOutbox = (state.syncOutbox || [])
+          .filter((item) =>
+            !completedEntryIDs.has(item.id) || postedEntryVersions.get(item.id) !== item.queuedAt
+          );
+        state.syncConflicts = [
+          ...(state.syncConflicts || []).filter((item) => !rejectedEntries.some((entry) => entry.id === item.id)),
+          ...rejectedEntries.map((item) => ({
+            ...item,
+            conflictedAt: new Date().toISOString(),
+            lastError: "Server has a newer version of this record."
+          }))
+        ];
+        saveWorkspaceState();
+        storeAccountEntitlement(payload.entitlement || null);
+
+        if (unknownEntries.length) {
+          throw new Error("The server did not acknowledge every queued change.");
+        }
+      } catch (error) {
+        const entryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
+        let highestAttemptCount = 1;
+        state.syncOutbox = (state.syncOutbox || []).map((item) => {
+          if (entryVersions.get(item.id) !== item.queuedAt) return item;
+          const attemptCount = Number(item.attemptCount || 0) + 1;
+          highestAttemptCount = Math.max(highestAttemptCount, attemptCount);
+          return { ...item, attemptCount, lastError: error.message || "Sync failed." };
+        });
+        saveWorkspaceState();
+        scheduleSyncOutboxRetry(highestAttemptCount);
+        throw error;
+      }
+    }
+
+    clearTimeout(syncRetryTimer);
+    syncRetryTimer = null;
+    if (options.refresh !== false && latestPayload) {
+      await loadSyncedContent({ force: true, skipOutbox: true });
+    }
+    return { acceptedMutationIDs, rejectedMutationIDs, payload: latestPayload };
+  })().finally(() => {
+    syncFlushPromise = null;
+  });
+  return syncFlushPromise;
+}
+
 async function pushMutation(mutation) {
   const account = activeAccount();
   if (!account) {
     throw new Error("Sign in from Settings before saving from the web.");
   }
-  const payload = await postJSON("/sync/push", {
-    auth: { accountUserID: account.userID },
-    batch: {
-      user: { id: account.userID },
-      mutations: [mutation]
-    }
-  }, { token: account.sessionToken });
-  storeAccountEntitlement(payload.entitlement || null);
-  await loadSyncedContent({ force: true });
-  return payload;
+  const entry = enqueueSyncMutation(mutation, account);
+  let result = await flushSyncOutbox({ refresh: true });
+  if ((state.syncOutbox || []).some((item) => item.id === entry.id && item.queuedAt === entry.queuedAt)) {
+    const followUp = await flushSyncOutbox({ refresh: true });
+    result = {
+      ...followUp,
+      acceptedMutationIDs: [...result.acceptedMutationIDs, ...followUp.acceptedMutationIDs],
+      rejectedMutationIDs: [...result.rejectedMutationIDs, ...followUp.rejectedMutationIDs]
+    };
+  }
+  if (result.rejectedMutationIDs.includes(entry.recordID)) {
+    throw new Error("The server has a newer version of this record. Review the synced copy before retrying.");
+  }
+  if (!result.acceptedMutationIDs.includes(entry.recordID)) {
+    throw new Error("This change remains queued for sync.");
+  }
+  return result.payload;
 }
 
 function savedMutationForReader(reader) {
@@ -1883,19 +2051,22 @@ function annotationMutationForRecord(record) {
 }
 
 function scheduleAnnotationPush(record) {
-  if (!activeAccount()) return;
+  const account = activeAccount();
+  if (!account) return;
+  const mutation = annotationMutationForRecord(record);
+  enqueueSyncMutation(mutation, account);
   const timerKey = String(record.id || "");
   clearTimeout(annotationPushTimers.get(timerKey));
   annotationPushTimers.set(timerKey, window.setTimeout(async () => {
     try {
-      await pushMutation(annotationMutationForRecord(record));
+      await pushMutation(mutation);
       state.localAnnotations = (state.localAnnotations || []).filter((item) =>
         String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
       );
       saveWorkspaceState();
       if (state.utilities.saved) await renderWorkspace();
     } catch {
-      // Keep the local annotation queued in workspace state; the next edit can retry.
+      // The local annotation and durable outbox entry remain available for retry.
     } finally {
       annotationPushTimers.delete(timerKey);
     }
@@ -5135,6 +5306,14 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("online", () => {
+    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    }
+  });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   addReaderButton.addEventListener("click", async () => {
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
@@ -5168,6 +5347,7 @@ async function start() {
     collapseToOneReader();
   });
   await renderWorkspace();
+  flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
   refreshEntitlementAfterCheckoutReturn();
 }
 
