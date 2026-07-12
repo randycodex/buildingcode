@@ -60,7 +60,7 @@ The HTTP perimeter rejects request bodies larger than 1 MiB by default. `PERMITE
 
 Sensitive write routes also have in-process burst limits and return HTTP `429` with `Retry-After`. These limits protect an individual Node/Vercel instance; production must also use Vercel Firewall rate limiting for enforcement shared across serverless instances.
 
-The web workspace stores signed-in mutations in a durable browser outbox before sending them. Entries are coalesced by account and record, replay on reload, reconnect, or tab foregrounding, and retry transient failures with bounded exponential delay. Server-newer records move to a separate conflict list instead of retrying forever. Note and tag edits enter the outbox before their network debounce begins.
+The web workspace stores signed-in mutations in a durable browser outbox before sending them. Entries are coalesced by account and record, replay on reload, reconnect, or tab foregrounding, and retry transient failures with bounded exponential delay. Server-newer records move to a separate conflict list instead of retrying forever. Settings shows waiting/conflict counts and requires an explicit **Use server** or **Keep mine** choice for conflicts. Note and tag edits enter the outbox before their network debounce begins.
 
 After the web workspace has a full baseline, later pulls send the server event cursor and merge only records changed since that cursor. Reloads still begin with a full pull, and a content-map version change forces a full replacement so canonical section-ID repairs cannot be hidden by an old checkpoint.
 

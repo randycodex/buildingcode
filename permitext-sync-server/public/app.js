@@ -1450,6 +1450,42 @@ function enqueueSyncMutation(mutation, account) {
   return entry;
 }
 
+function discardLocalMutationOverlay(mutation) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  const recordID = String(record?.id || "");
+  if (!recordID) return;
+  if (kind === "savedItem") {
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.id || "") !== recordID);
+    state.localSavedSectionIDs = (state.localSavedSectionIDs || [])
+      .filter((sectionID) => String(sectionID) !== String(record.sectionID || ""));
+  } else if (kind === "annotation") {
+    state.localAnnotations = (state.localAnnotations || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "project") {
+    state.localProjects = (state.localProjects || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "projectSection") {
+    state.localProjectSections = (state.localProjectSections || []).filter((item) => String(item.id || "") !== recordID);
+  }
+}
+
+async function resolveSyncConflict(entry, keepLocal) {
+  const account = activeAccount();
+  if (!account || entry.accountUserID !== account.userID) return;
+  if (keepLocal) {
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    if (!kind || !record) return;
+    enqueueSyncMutation({
+      [kind]: { ...record, userID: account.userID, updatedAt: new Date().toISOString() }
+    }, account);
+    await flushSyncOutbox({ refresh: true });
+  } else {
+    discardLocalMutationOverlay(entry.mutation);
+    state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
+    saveWorkspaceState();
+    await loadSyncedContent({ force: true });
+  }
+  await renderWorkspace();
+}
+
 function scheduleSyncOutboxRetry(attemptCount = 1) {
   clearTimeout(syncRetryTimer);
   const exponent = Math.min(Math.max(Number(attemptCount) - 1, 0), 6);
@@ -4706,6 +4742,82 @@ function renderSettings() {
   const disconnectButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
   const status = panel.querySelector(".connector-status");
+  const connector = panel.querySelector(".account-connector");
+  const syncPanel = document.createElement("section");
+  syncPanel.className = "account-sync-summary";
+  connector.append(syncPanel);
+  const renderSyncState = () => {
+    clear(syncPanel);
+    const account = activeAccount();
+    if (!account) return;
+    const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID);
+    const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID);
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = "Sync";
+    const detail = document.createElement("p");
+    detail.className = "connector-status";
+    detail.textContent = conflicts.length
+      ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
+      : pending.length
+        ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
+        : "All browser changes are synced.";
+    syncPanel.append(label, detail);
+
+    if (pending.length) {
+      const retryButton = document.createElement("button");
+      retryButton.className = "ghost-button";
+      retryButton.type = "button";
+      retryButton.textContent = "Retry sync";
+      retryButton.addEventListener("click", async () => {
+        retryButton.disabled = true;
+        try {
+          await flushSyncOutbox({ refresh: true });
+          await renderWorkspace();
+        } catch (error) {
+          detail.textContent = error.message || "Sync retry failed.";
+          retryButton.disabled = false;
+        }
+      });
+      syncPanel.append(retryButton);
+    }
+
+    conflicts.slice(0, 5).forEach((entry) => {
+      const { kind, record } = mutationKindAndRecord(entry.mutation);
+      const row = document.createElement("article");
+      row.className = "saved-row";
+      const heading = document.createElement("strong");
+      heading.textContent = record?.title || record?.name || kind || "Saved change";
+      const message = document.createElement("span");
+      message.textContent = "The server has a newer copy.";
+      const actions = document.createElement("div");
+      actions.className = "connector-actions";
+      const useServerButton = document.createElement("button");
+      useServerButton.className = "ghost-button";
+      useServerButton.type = "button";
+      useServerButton.textContent = "Use server";
+      const keepLocalButton = document.createElement("button");
+      keepLocalButton.className = "ghost-button";
+      keepLocalButton.type = "button";
+      keepLocalButton.textContent = "Keep mine";
+      const resolve = async (keepLocal) => {
+        useServerButton.disabled = true;
+        keepLocalButton.disabled = true;
+        try {
+          await resolveSyncConflict(entry, keepLocal);
+        } catch (error) {
+          detail.textContent = error.message || "Could not resolve this sync conflict.";
+          useServerButton.disabled = false;
+          keepLocalButton.disabled = false;
+        }
+      };
+      useServerButton.addEventListener("click", () => resolve(false));
+      keepLocalButton.addEventListener("click", () => resolve(true));
+      actions.append(useServerButton, keepLocalButton);
+      row.append(heading, message, actions);
+      syncPanel.append(row);
+    });
+  };
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
@@ -4725,6 +4837,7 @@ function renderSettings() {
     planDetail.textContent = pro
       ? `${entitlementSourceLabel()} active. Saved work, PDF export, tags, continuity, and sync are unlocked.`
       : "Free keeps reading and search usable. Pro unlocks saved work, projects, tags, exports, continuity, and sync.";
+    renderSyncState();
   };
   status.textContent = activeAccount()
     ? (isProAccount() ? "Connected. Pro is active for this browser." : "Connected. Sync and checkout are ready for this browser.")
