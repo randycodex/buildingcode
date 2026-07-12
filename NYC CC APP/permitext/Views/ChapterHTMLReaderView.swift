@@ -112,6 +112,16 @@ struct ChapterHTMLReaderView: View {
         openedSection?.id ?? rememberedNativeSectionID.wrappedValue ?? initialSection.id
     }
 
+    private var sharedSectionCitation: String {
+        let sectionNumber = selectedAnchor?.sectionNumber ?? initialSection.sectionNumber
+        let title = (selectedAnchor?.title ?? initialSection.title).displayTitle(for: sectionNumber)
+        return CodeLibraryViewModel.officialSectionCitation(
+            codeName: library.codeSectionName(id: chapter.codeSectionID),
+            sectionNumber: sectionNumber,
+            title: title
+        )
+    }
+
     private var pageBackgroundColor: Color {
         colorScheme == .dark ? .black : Color(uiColor: .systemGroupedBackground)
     }
@@ -344,7 +354,11 @@ struct ChapterHTMLReaderView: View {
             }
 
             ToolbarItemGroup(placement: .topBarTrailing) {
-                ShareLink(item: CodeLibraryViewModel.sharedSectionURL(sectionID: sharedSectionID)) {
+                ShareLink(
+                    item: CodeLibraryViewModel.sharedSectionURL(sectionID: sharedSectionID),
+                    subject: Text(sharedSectionCitation),
+                    message: Text(sharedSectionCitation)
+                ) {
                     Image(systemName: "square.and.arrow.up")
                         .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
                         .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)

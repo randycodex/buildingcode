@@ -493,6 +493,14 @@ final class CodeLibraryViewModel: ObservableObject {
         if validDeepLink != 8881 || invalidDeepLink != nil {
             messages.append("Shared section link parsing failed")
         }
+        let citation = Self.officialSectionCitation(
+            codeName: "Building Code",
+            sectionNumber: "101.2",
+            title: "Scope."
+        )
+        if citation != "New York City Building Code § 101.2 (2022) — Scope." {
+            messages.append("Official section citation formatting failed")
+        }
         if let userDataStore = userContentRepository as? UserDataStore {
             do {
                 messages.append(contentsOf: try userDataStore.debugSchemaValidationMessages())
@@ -1357,6 +1365,24 @@ final class CodeLibraryViewModel: ObservableObject {
 
     static func sharedSectionURL(sectionID: Int64) -> URL {
         URL(string: "https://permitext-sync.vercel.app/open/section/\(sectionID)")!
+    }
+
+    static func officialSectionCitation(
+        codeName: String,
+        sectionNumber: String,
+        title: String
+    ) -> String {
+        let normalizedCodeName = codeName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedSectionNumber = sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let reference = [
+            "New York City \(normalizedCodeName.isEmpty ? "Code" : normalizedCodeName)",
+            normalizedSectionNumber.isEmpty ? "" : "§ \(normalizedSectionNumber)",
+            "(2022)"
+        ]
+        .filter { !$0.isEmpty }
+        .joined(separator: " ")
+        return normalizedTitle.isEmpty ? reference : "\(reference) — \(normalizedTitle)"
     }
 
     func recordRecentSearch(_ query: String) {

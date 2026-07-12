@@ -43,6 +43,15 @@ struct ReaderView: View {
         Color(uiColor: library.accentColor(for: detail?.codeSectionID))
     }
 
+    private var shareCitation: String {
+        guard let detail else { return "New York City Code (2022)" }
+        return CodeLibraryViewModel.officialSectionCitation(
+            codeName: library.codeSectionName(id: detail.codeSectionID),
+            sectionNumber: detail.sectionNumber,
+            title: detail.displayTitle
+        )
+    }
+
     var body: some View {
         ScrollView {
             if let detail {
@@ -119,7 +128,11 @@ struct ReaderView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                ShareLink(item: CodeLibraryViewModel.sharedSectionURL(sectionID: sectionID)) {
+                ShareLink(
+                    item: CodeLibraryViewModel.sharedSectionURL(sectionID: sectionID),
+                    subject: Text(shareCitation),
+                    message: Text(shareCitation)
+                ) {
                     Image(systemName: "square.and.arrow.up")
                 }
                 .accessibilityLabel("Share section")
