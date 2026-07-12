@@ -1,4 +1,4 @@
-import { appleIdentityTokenRequired, requestBodyLimit } from "../app.mjs";
+import { appleIdentityTokenRequired, compatibilityAccountMergeAllowed, requestBodyLimit } from "../app.mjs";
 import { accountSessionTTLSeconds } from "../postgres-account-repository.mjs";
 
 function assert(condition, message) {
@@ -44,6 +44,11 @@ assert(
 assert(
   requestBodyLimit({ PERMITEXT_MAX_REQUEST_BODY_BYTES: "1024" }) === 1024 * 1024,
   "An unsafe request body limit was accepted."
+);
+assert(compatibilityAccountMergeAllowed({ kind: "file" }) === true, "Local account merge was disabled.");
+assert(
+  compatibilityAccountMergeAllowed({ kind: "postgres" }) === false,
+  "Postgres allowed the unsafe compatibility account merge path."
 );
 
 console.log("permitext auth policy passed");

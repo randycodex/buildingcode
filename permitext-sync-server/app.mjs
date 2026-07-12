@@ -2040,6 +2040,10 @@ export function appleIdentityTokenRequired(environment = process.env) {
   return hostedDeployment || environment.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1";
 }
 
+export function compatibilityAccountMergeAllowed(adapter) {
+  return adapter?.kind !== "postgres";
+}
+
 function appleWebSignInConfigured() {
   return Boolean(process.env.APPLE_SERVICE_ID?.trim());
 }
@@ -3046,10 +3050,18 @@ async function handleSignIn(request, response) {
   const linkFrom = body.linkFrom || {};
   const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
   const adapter = await storeAdapter();
+  if (sourceUserID && !compatibilityAccountMergeAllowed(adapter)) {
+    sendError(response, 503, "Account linking is temporarily unavailable while transactional repair is completed.");
+    return;
+  }
   if (!sourceUserID && typeof adapter.signInAccount === "function") {
     const directResult = await adapter.signInAccount(account);
     if (!directResult.requiresLegacyMerge) {
       sendJSON(response, 200, directResult);
+      return;
+    }
+    if (!compatibilityAccountMergeAllowed(adapter)) {
+      sendError(response, 409, "This account requires a transactional identity repair before sign-in can continue.");
       return;
     }
   }
@@ -3099,6 +3111,12 @@ async function handleBrowserAccountLink(request, response) {
   }
   if (!browserCredentialID) {
     sendError(response, 400, "Missing browser credential ID.");
+    return;
+  }
+
+  const adapter = await storeAdapter();
+  if (!compatibilityAccountMergeAllowed(adapter)) {
+    sendError(response, 503, "Browser account repair is temporarily unavailable while transactional repair is completed.");
     return;
   }
 
@@ -4013,6 +4031,15 @@ async function handleAppleWebCallback(request, response) {
       authorizationCode: form.get("code") || undefined
     });
     const adapter = await storeAdapter();
+    if (oauthState.linkFrom?.accountUserID && !compatibilityAccountMergeAllowed(adapter)) {
+      sendCallbackHTML(appleCallbackHTML({
+        title: "permitext sign in",
+        message: "Account linking is temporarily unavailable. Your existing account data was not changed.",
+        successPath: "/?appleSignIn=repairUnavailable",
+        scriptNonce
+      }));
+      return;
+    }
     if (!oauthState.linkFrom?.accountUserID && typeof adapter.signInAccount === "function") {
       const directResult = await adapter.signInAccount(account);
       if (!directResult.requiresLegacyMerge) {
@@ -4028,6 +4055,15 @@ async function handleAppleWebCallback(request, response) {
             entitlement: directResult.entitlement || null
           },
           successPath: oauthState.successPath || "/",
+          scriptNonce
+        }));
+        return;
+      }
+      if (!compatibilityAccountMergeAllowed(adapter)) {
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: "This account needs identity repair before sign-in can continue. Your existing account data was not changed.",
+          successPath: "/?appleSignIn=repairRequired",
           scriptNonce
         }));
         return;
