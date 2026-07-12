@@ -94,6 +94,8 @@ The same URL loads the section-detail workspace in a browser and opens `ReaderVi
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
+The web `Research` pane is deliberately non-AI. It derives a research set from the canonical sections currently open in readers and search details, formats each as a 2022 New York City code citation, and includes the universal link. Private notes are excluded from citation output. Users can copy one citation, copy the set, or download a plain-text citation file when browser clipboard access is unavailable.
+
 Configure paid entitlement sources with:
 
 ```sh

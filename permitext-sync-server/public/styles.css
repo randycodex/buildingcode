@@ -2534,6 +2534,28 @@ mark {
   font-weight: 500;
 }
 
+.research-summary-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+
+.research-evidence-row {
+  gap: var(--space-2);
+}
+
+.research-evidence-row > span {
+  overflow-wrap: anywhere;
+  font-size: 0.78rem;
+}
+
+.research-evidence-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
 .saved-row {
   display: grid;
   gap: var(--space-1);

@@ -264,6 +264,48 @@ function showShareButtonResult(button, message) {
   }, 1600);
 }
 
+function copyTextFallback(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.readOnly = true;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+  document.body.append(textarea);
+  textarea.select();
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } finally {
+    textarea.remove();
+  }
+  return copied;
+}
+
+async function copyTextToClipboard(text) {
+  if (typeof navigator.clipboard?.writeText === "function") {
+    try {
+      await new Promise((resolve, reject) => {
+        const timeout = window.setTimeout(() => reject(new Error("Clipboard timed out.")), 250);
+        navigator.clipboard.writeText(text).then(
+          () => {
+            window.clearTimeout(timeout);
+            resolve();
+          },
+          (error) => {
+            window.clearTimeout(timeout);
+            reject(error);
+          }
+        );
+      });
+      return true;
+    } catch {
+      // Some embedded browsers expose Clipboard API without granting a usable session.
+    }
+  }
+  return copyTextFallback(text);
+}
+
 async function shareSection(section, button) {
   const url = sharedSectionURL(section?.sectionID || section?.id);
   if (!url) return;
@@ -276,12 +318,71 @@ async function shareSection(section, button) {
       if (error?.name === "AbortError") return;
     }
   }
-  try {
-    await navigator.clipboard.writeText(url);
+  if (await copyTextToClipboard(url)) {
     showShareButtonResult(button, "Link copied");
-  } catch {
+  } else {
     showShareButtonResult(button, "Could not copy link");
   }
+}
+
+function officialSectionCitation(section) {
+  const codeName = codeDisplayLabel(section?.codePrefix || "BC");
+  const number = String(section?.sectionNumber || "").trim();
+  const rawTitle = String(section?.title || "").trim();
+  const title = number
+    ? rawTitle.replace(new RegExp(`^(?:§\\s*)?${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i"), "").trim()
+    : rawTitle;
+  const citation = [
+    `New York City ${codeName}`,
+    number ? `§ ${number}` : "",
+    "(2022)"
+  ].filter(Boolean).join(" ");
+  return title ? `${citation} — ${title}` : citation;
+}
+
+async function copyResearchText(text, button, successMessage) {
+  if (await copyTextToClipboard(text)) {
+    showShareButtonResult(button, successMessage);
+  } else {
+    showShareButtonResult(button, "Could not copy");
+  }
+}
+
+function activeResearchSections() {
+  const candidates = [
+    ...(state.readers || []).filter((reader) => reader.sectionID),
+    ...Object.values(sectionDetailsBySearch()).filter((detail) => detail?.sectionID)
+  ];
+  const bySectionID = new Map();
+  candidates.forEach((section) => {
+    const sectionID = String(section.sectionID || section.id || "").trim();
+    if (!sectionID || bySectionID.has(sectionID)) return;
+    const chapter = chapters.find((item) => String(item.id) === String(section.chapterID || ""));
+    bySectionID.set(sectionID, {
+      codePrefix: section.codePrefix || chapter?.codePrefix || "BC",
+      chapterID: section.chapterID || chapter?.id || "",
+      chapterNumber: section.chapterNumber || chapter?.chapterNumber || "",
+      sectionID,
+      sectionNumber: section.sectionNumber || "",
+      title: section.title || "Section"
+    });
+  });
+  return Array.from(bySectionID.values());
+}
+
+function researchCitationText(section) {
+  return `${officialSectionCitation(section)}\n${sharedSectionURL(section.sectionID)}`;
+}
+
+function downloadResearchText(text, fileName = "permitext-citations.txt") {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
 function updateReaderShareButton(panel, reader) {
@@ -4205,6 +4306,76 @@ function wireUtilityInstanceActions(panel, instance) {
   closeButton.addEventListener("click", () => closeUtilityInstance(instance));
 }
 
+function renderResearch(paneID) {
+  const panel = renderUtility(analysisTemplate, paneID);
+  panel.classList.add("analysis-panel");
+  const content = panel.querySelector(".analysis-content");
+  const sections = activeResearchSections();
+
+  const summary = document.createElement("article");
+  summary.className = "analysis-card";
+  const label = document.createElement("p");
+  label.className = "section-label";
+  label.textContent = "Research set";
+  const heading = document.createElement("h3");
+  heading.textContent = sections.length === 1 ? "1 active code section" : `${sections.length} active code sections`;
+  const explanation = document.createElement("p");
+  explanation.textContent = sections.length
+    ? "This set follows the sections open in your readers and search details. Citations contain official code references and canonical links; private notes are excluded."
+    : "Open a specific section in a reader or search detail to start a citation set. Private notes stay separate from official code references.";
+  const copyAllButton = document.createElement("button");
+  copyAllButton.className = "ghost-button research-copy-all";
+  copyAllButton.type = "button";
+  copyAllButton.title = "Copy all citations";
+  copyAllButton.textContent = "Copy citations";
+  copyAllButton.disabled = sections.length === 0;
+  copyAllButton.addEventListener("click", () => {
+    copyResearchText(sections.map(researchCitationText).join("\n\n"), copyAllButton, "Citations copied");
+  });
+  const downloadButton = document.createElement("button");
+  downloadButton.className = "ghost-button";
+  downloadButton.type = "button";
+  downloadButton.textContent = "Download .txt";
+  downloadButton.disabled = sections.length === 0;
+  downloadButton.addEventListener("click", () => {
+    downloadResearchText(sections.map(researchCitationText).join("\n\n"));
+  });
+  const summaryActions = document.createElement("div");
+  summaryActions.className = "research-summary-actions";
+  summaryActions.append(copyAllButton, downloadButton);
+  summary.append(label, heading, explanation, summaryActions);
+  content.append(summary);
+
+  sections.forEach((section) => {
+    const row = document.createElement("article");
+    row.className = "saved-row research-evidence-row";
+    const citation = document.createElement("strong");
+    citation.textContent = officialSectionCitation(section);
+    const link = document.createElement("span");
+    link.textContent = sharedSectionURL(section.sectionID);
+    const actions = document.createElement("div");
+    actions.className = "research-evidence-actions";
+    const openButton = document.createElement("button");
+    openButton.className = "ghost-button";
+    openButton.type = "button";
+    openButton.textContent = "Open";
+    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(section));
+    const copyButton = document.createElement("button");
+    copyButton.className = "ghost-button";
+    copyButton.type = "button";
+    copyButton.title = "Copy citation";
+    copyButton.textContent = "Copy";
+    copyButton.addEventListener("click", () => {
+      copyResearchText(researchCitationText(section), copyButton, "Citation copied");
+    });
+    actions.append(openButton, copyButton);
+    row.append(citation, link, actions);
+    content.append(row);
+  });
+
+  return panel;
+}
+
 async function renderUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   let panel = null;
@@ -4213,8 +4384,7 @@ async function renderUtilityInstance(instance) {
   } else if (instance.key === "saved") {
     panel = await renderSaved(paneID);
   } else if (instance.key === "analysis") {
-    panel = renderUtility(analysisTemplate, paneID);
-    panel.classList.add("analysis-panel");
+    panel = renderResearch(paneID);
   }
   wireUtilityInstanceActions(panel, instance);
   return panel;
