@@ -38,11 +38,13 @@ protocol UserContentRepository {
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
     func pendingSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
+    func failedSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func prepareSyncQueueForProcessing(now: Date) throws
     func markSyncQueueItemsInFlight(ids: [Int64]) throws
     func markSyncQueueItemSynced(id: Int64) throws
     func markSyncQueueItemFailed(id: Int64, errorMessage: String) throws
     func resetFailedSyncQueueItems() throws
+    func retrySyncQueueItems(ids: [Int64], mutationUpdatedAt: Date) throws
     func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate]
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
 }
@@ -808,6 +810,14 @@ final class UserDataStore: UserContentRepository {
 
     @discardableResult
     func pendingSyncQueueItems(limit: Int = 100) throws -> [SyncQueueItem] {
+        try syncQueueItems(state: pendingQueueState, limit: limit)
+    }
+
+    func failedSyncQueueItems(limit: Int = 100) throws -> [SyncQueueItem] {
+        try syncQueueItems(state: failedQueueState, limit: limit)
+    }
+
+    private func syncQueueItems(state: String, limit: Int) throws -> [SyncQueueItem] {
         let statement = try connection.prepare(
             """
             SELECT id, client_id, entity_type, operation_type, payload_json, state, attempt_count, created_at, updated_at, last_error, mutation_updated_at
@@ -818,7 +828,7 @@ final class UserDataStore: UserContentRepository {
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: pendingQueueState, index: 1, to: statement)
+        try connection.bind(text: state, index: 1, to: statement)
         sqlite3_bind_int64(statement, 2, Int64(max(limit, 1)))
 
         var items: [SyncQueueItem] = []
@@ -1091,6 +1101,30 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: isoFormatter.string(from: Date()), index: 2, to: statement)
         try connection.bind(text: failedQueueState, index: 3, to: statement)
         _ = try connection.step(statement)
+    }
+
+    func retrySyncQueueItems(ids: [Int64], mutationUpdatedAt: Date) throws {
+        guard !ids.isEmpty else { return }
+        let statement = try connection.prepare(
+            """
+            UPDATE sync_queue
+            SET state = ?, attempt_count = 0, last_error = NULL,
+                updated_at = ?, mutation_updated_at = ?
+            WHERE id = ? AND state = ?;
+            """
+        )
+        defer { connection.finalize(statement) }
+        let timestamp = isoFormatter.string(from: mutationUpdatedAt)
+        for id in ids {
+            sqlite3_reset(statement)
+            sqlite3_clear_bindings(statement)
+            try connection.bind(text: pendingQueueState, index: 1, to: statement)
+            try connection.bind(text: timestamp, index: 2, to: statement)
+            try connection.bind(text: timestamp, index: 3, to: statement)
+            sqlite3_bind_int64(statement, 4, id)
+            try connection.bind(text: failedQueueState, index: 5, to: statement)
+            _ = try connection.step(statement)
+        }
     }
 
     #if DEBUG

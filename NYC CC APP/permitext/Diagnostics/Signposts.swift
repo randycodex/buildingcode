@@ -54,6 +54,14 @@ struct UserContentSyncBatch: Hashable, Sendable {
     }
 }
 
+struct UserContentSyncConflict: Identifiable, Hashable, Sendable {
+    let recordID: String
+    let entityKind: ServerUserContentEntityKind
+    let message: String
+
+    var id: String { recordID }
+}
+
 protocol UserContentSyncBackend {
     var name: String { get }
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport
@@ -266,6 +274,65 @@ struct UserContentSyncEngine {
 
     func retryFailedItems() throws {
         try repository?.resetFailedSyncQueueItems()
+    }
+
+    func rejectedConflicts(account: SignedInAccount?) throws -> [UserContentSyncConflict] {
+        guard let repository, let account else { return [] }
+        var conflictsByRecordID: [String: UserContentSyncConflict] = [:]
+        for item in try repository.failedSyncQueueItems(limit: 500) {
+            guard item.lastError?.contains("Server has newer data") == true,
+                  let mutation = try? ServerUserContentMutation(syncQueueItem: item, account: account)
+            else { continue }
+            conflictsByRecordID[mutation.recordID] = UserContentSyncConflict(
+                recordID: mutation.recordID,
+                entityKind: mutation.entityKind,
+                message: item.lastError ?? "Server has a newer copy."
+            )
+        }
+        return conflictsByRecordID.values.sorted { $0.recordID < $1.recordID }
+    }
+
+    func resolveRejectedConflict(
+        _ conflict: UserContentSyncConflict,
+        account: SignedInAccount,
+        keepLocal: Bool
+    ) async throws {
+        guard let repository else { return }
+        let matchingItems = try repository.failedSyncQueueItems(limit: 500).filter { item in
+            guard let mutation = try? ServerUserContentMutation(syncQueueItem: item, account: account) else {
+                return false
+            }
+            return mutation.recordID == conflict.recordID
+        }
+        guard !matchingItems.isEmpty else { return }
+
+        if keepLocal {
+            try repository.retrySyncQueueItems(ids: matchingItems.map(\.id), mutationUpdatedAt: Date())
+            _ = try await processPendingWork(account: account)
+            _ = try await pullRemoteChanges(account: account, applySafeChanges: true)
+            return
+        }
+
+        let incoming = try await backend.pull(account: account, since: nil, sinceEventID: nil)
+        guard let mutation = incoming.mutations.first(where: { $0.recordID == conflict.recordID }) else {
+            throw UserContentSyncError.rejectedByServer("The server copy is no longer available. Pull again before resolving this conflict.")
+        }
+        if case .continuity(let record) = mutation {
+            applyServerContinuity(record)
+        } else {
+            try repository.applyServerUserContentMutation(mutation)
+        }
+        for item in matchingItems {
+            try repository.markSyncQueueItemSynced(id: item.id)
+        }
+        if try repository.failedSyncQueueItems(limit: 1).isEmpty {
+            checkpointStore.save(
+                checkpoint(for: account).markingPullSucceeded(
+                    at: incoming.pulledAt,
+                    latestEventID: incoming.latestEventID ?? incoming.syncRevision
+                )
+            )
+        }
     }
 
     func previewMerge(

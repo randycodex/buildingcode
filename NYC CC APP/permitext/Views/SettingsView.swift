@@ -450,6 +450,33 @@ struct SettingsView: View {
                 Spacer(minLength: 0)
             }
 
+            ForEach(Array(library.userContentSyncConflicts.prefix(5))) { conflict in
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(syncConflictLabel(conflict))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    Text("The server has a newer copy. Choose which version to keep.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    HStack(spacing: 10) {
+                        syncConflictButton("Use server") {
+                            await library.resolveUserContentSyncConflict(conflict, keepLocal: false)
+                        }
+                        syncConflictButton("Keep mine") {
+                            await library.resolveUserContentSyncConflict(conflict, keepLocal: true)
+                        }
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.orange.opacity(0.08))
+                )
+            }
+
             Button {
                 Task { await library.syncNow() }
             } label: {
@@ -467,6 +494,34 @@ struct SettingsView: View {
             .disabled(!library.canSyncNow)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func syncConflictButton(_ title: String, action: @escaping () async -> Void) -> some View {
+        Button {
+            Task { await action() }
+        } label: {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(Color.primary.opacity(0.08))
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(library.isAccountBusy)
+    }
+
+    private func syncConflictLabel(_ conflict: UserContentSyncConflict) -> String {
+        switch conflict.entityKind {
+        case .savedItem: return "Saved section conflict"
+        case .annotation: return "Note or tag conflict"
+        case .project: return "Project conflict"
+        case .projectSection: return "Project section conflict"
+        case .continuity: return "Reading position conflict"
+        case .codeVersionClear: return "Cleared data conflict"
+        }
     }
 
     private var syncStatusIconName: String {

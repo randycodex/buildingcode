@@ -54,6 +54,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
     @Published private(set) var pendingUserContentSyncCount = 0
+    @Published private(set) var userContentSyncConflicts: [UserContentSyncConflict] = []
     @Published private(set) var proProductDisplayPrice: String?
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
     @Published private(set) var storeKitDebugSummary: String = "not checked"
@@ -1936,14 +1937,35 @@ final class CodeLibraryViewModel: ObservableObject {
     private func refreshPendingUserContentSyncCount() {
         do {
             pendingUserContentSyncCount = try syncEngine.previewPendingWork(limit: 500).pendingCount
+            userContentSyncConflicts = try syncEngine.rejectedConflicts(account: signedInAccount)
         } catch {
             pendingUserContentSyncCount = 0
+            userContentSyncConflicts = []
+        }
+    }
+
+    func resolveUserContentSyncConflict(_ conflict: UserContentSyncConflict, keepLocal: Bool) async {
+        guard let signedInAccount, !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+        do {
+            try await syncEngine.resolveRejectedConflict(conflict, account: signedInAccount, keepLocal: keepLocal)
+            refreshBookmarks()
+            refreshFolders()
+            refreshPendingUserContentSyncCount()
+            refreshUserContentSyncCheckpoint()
+            statusMessage = keepLocal ? "Kept this device's version and synced it." : "Applied the server version."
+        } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
+            refreshUserContentSyncCheckpoint()
+            statusMessage = "Could not resolve the sync conflict. \(error.localizedDescription)"
         }
     }
 
     var syncStatusTitle: String {
         guard signedInAccount != nil else { return "Not signed in" }
         if isAccountBusy { return "Syncing..." }
+        if !userContentSyncConflicts.isEmpty { return "\(userContentSyncConflicts.count) change\(userContentSyncConflicts.count == 1 ? "" : "s") need review" }
         if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Sync failed" }
         if pendingUserContentSyncCount > 0 { return "\(pendingUserContentSyncCount) change\(pendingUserContentSyncCount == 1 ? "" : "s") waiting" }
         return "Synced"
@@ -1954,6 +1976,9 @@ final class CodeLibraryViewModel: ObservableObject {
             return "Sign in to sync saved work across installs and devices."
         }
         if let error = userContentSyncCheckpoint?.lastErrorMessage {
+            if !userContentSyncConflicts.isEmpty {
+                return "Choose which copy to keep for each server-newer change."
+            }
             if Self.isBackendAuthenticationFailureMessage(error) {
                 return "Your sync session expired. Sign in again to reconnect saved work."
             }
@@ -2081,6 +2106,7 @@ final class CodeLibraryViewModel: ObservableObject {
     func signOut() {
         let account = signedInAccount
         signedInAccount = nil
+        userContentSyncConflicts = []
         Self.clearSignedInAccount()
         if currentEntitlementSource == .lifetimeGrant {
             LocalEntitlementService.clearLifetimeGrant()
@@ -2100,6 +2126,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         Self.clearSignedInAccount()
         userContentSyncCheckpoint = nil
+        userContentSyncConflicts = []
         refreshPendingUserContentSyncCount()
         statusMessage = "Your sync session expired. Sign in again to reconnect saved work."
         return true

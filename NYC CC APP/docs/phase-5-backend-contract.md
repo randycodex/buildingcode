@@ -199,6 +199,8 @@ The iPhone queue recovers claims left `inFlight` for more than ten minutes and a
 
 Queue lifecycle time and mutation version time are stored separately. Claiming, failing, or retrying a request never makes unchanged content appear newer. Once the server accepts a queue item, the matching local bookmark, annotation, project, or project membership is marked synced in the same SQLite transaction.
 
+Server-newer rejections appear in iPhone Settings as explicit conflicts. **Use server** applies the current remote mutation and resolves the failed queue item. **Keep mine** deliberately assigns a new mutation version before uploading the local copy. A generic retry never changes mutation precedence.
+
 Supported mutation kinds:
 
 - `savedItem`: bookmarked/saved sections
