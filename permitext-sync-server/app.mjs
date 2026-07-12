@@ -1837,27 +1837,10 @@ async function sectionBody(sectionID, options = {}) {
 }
 
 async function sectionSummaryByID(sectionID) {
-  const chapters = await chapterIndex();
-  for (const chapterSummary of chapters) {
-    const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
-    const sections = await canonicalizeChapterSections(flattenChapterSections(chapter), {
-      codePrefix: chapterSummary.codePrefix,
-      chapterNumber: chapterSummary.chapterNumber
-    });
-    const section = sections.find((item) =>
-      String(item.id) === String(sectionID) ||
-      String(item.webSectionID || "") === String(sectionID)
-    );
-    if (section) {
-      return {
-        ...section,
-        chapterID: chapterSummary.id,
-        chapterNumber: chapterSummary.chapterNumber,
-        codePrefix: chapterSummary.codePrefix
-      };
-    }
-  }
-  return null;
+  const normalizedID = String(sectionID || "").trim();
+  return (await sectionCatalog()).find((section) =>
+    String(section.id) === normalizedID || String(section.webSectionID || "") === normalizedID
+  ) || null;
 }
 
 function searchSnippet(text, query) {
@@ -2004,6 +1987,30 @@ async function handleCodeSection(path, response) {
       title: summary?.title || body.title || "",
       webSectionID: summary?.webSectionID || body.webSectionID || null
     }
+  });
+}
+
+async function handleCodeSections(request, response) {
+  const rawIDs = requestURL(request).searchParams.get("ids") || "";
+  const ids = rawIDs.split(",").map((value) => value.trim()).filter(Boolean);
+  if (!ids.length || ids.length > 100 || ids.some((id) => !/^\d+$/.test(id))) {
+    sendError(response, 400, "Provide between 1 and 100 numeric section IDs.");
+    return;
+  }
+  const uniqueIDs = Array.from(new Set(ids));
+  const catalog = await sectionCatalog();
+  const byID = new Map();
+  catalog.forEach((section) => {
+    byID.set(String(section.id), section);
+    if (section.webSectionID) byID.set(String(section.webSectionID), section);
+  });
+  sendJSON(response, 200, {
+    sections: uniqueIDs
+      .map((id) => {
+        const section = byID.get(id);
+        return section ? { ...section, requestedID: id } : null;
+      })
+      .filter(Boolean)
   });
 }
 
@@ -4254,6 +4261,10 @@ export async function handleRequest(request, response) {
     }
     if (request.method === "GET" && path.startsWith("code/chapters/")) {
       await handleCodeChapter(request, path, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/sections") {
+      await handleCodeSections(request, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("code/sections/")) {

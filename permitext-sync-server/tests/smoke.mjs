@@ -135,6 +135,19 @@ async function main() {
     const missingSharedSection = await request("/code/sections/999999999");
     assert(missingSharedSection.response.status === 404, "Unknown shared section did not return 404.");
 
+    const sectionBatch = await request("/code/sections?ids=8881,8882,999999999");
+    assert(sectionBatch.response.ok, "Canonical section metadata batch did not load.");
+    assert(
+      sectionBatch.json.sections.map((section) => section.sectionID || section.id).join(",") === "8881,8882",
+      "Canonical section metadata batch returned unexpected sections or order."
+    );
+    assert(
+      sectionBatch.json.sections.map((section) => section.requestedID).join(",") === "8881,8882",
+      "Canonical section metadata batch did not preserve requested IDs."
+    );
+    const oversizedSectionBatch = await request(`/code/sections?ids=${Array.from({ length: 101 }, (_, index) => index + 1).join(",")}`);
+    assert(oversizedSectionBatch.response.status === 400, "Oversized section metadata batch was not rejected.");
+
     const duplicateNumberChapter = await request("/code/chapters/47");
     assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");
     const duplicateNumberSections = duplicateNumberChapter.json.chapter.sections.filter((section) =>

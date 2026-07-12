@@ -269,6 +269,8 @@ The web route serves the workspace and resolves section metadata from the canoni
 
 Both clients format the human-readable share context as `New York City <Code Name> § <section> (2022) — <title>` and attach the canonical section URL. The URL remains the interoperable identifier; the citation is presentation text for research notes, email, and project documentation.
 
+Web project research hydration uses `GET /code/sections?ids=<comma-separated-ids>`. Each request accepts 1 through 100 numeric canonical or legacy IDs and returns ordered canonical metadata under `sections`; `requestedID` preserves the input identifier so legacy project membership can be re-keyed to the canonical `id`. Unknown IDs are omitted and section bodies are not included. Larger project sets are chunked client-side.
+
 The web workspace publishes the same `continuity` mutation after reader navigation. It carries the canonical code-section, chapter, and most-recent section identifiers, merges rather than discards values last written by iPhone, and stores recent-entry dates as Swift reference-date seconds. Web restores only a newer remote record and never applies one over a pending local continuity mutation. Selecting the server copy for a continuity conflict clears the web checkpoint before the forced pull so the remote reading position is actually restored.
 
 The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten. Preview-only pulls and pulls with skipped or conflicted remote records must not advance the local pull checkpoint, otherwise unapplied server records could be hidden from later sync runs.

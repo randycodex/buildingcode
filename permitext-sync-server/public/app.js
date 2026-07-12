@@ -55,6 +55,7 @@ let dragPreviewOrder = [];
 let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
+const sectionSummaryCache = new Map();
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
@@ -348,26 +349,74 @@ async function copyResearchText(text, button, successMessage) {
   }
 }
 
-function activeResearchSections() {
+async function activeResearchSections() {
+  const contentSummary = currentContentSummary();
+  const savedBySectionID = new Map(
+    (contentSummary.savedItems || []).map((item) => [String(item.sectionID || item.id || ""), item])
+  );
+  const openProjects = openProjectDetails();
+  const projectSections = (contentSummary.projectSections || [])
+    .filter((item) => openProjects.some((project) => projectSectionBelongsToProject(item, project)))
+    .map((item) => ({
+      ...item,
+      ...(savedBySectionID.get(String(item.sectionID || item.savedSectionID || item.itemID || "")) || {})
+    }));
   const candidates = [
     ...(state.readers || []).filter((reader) => reader.sectionID),
-    ...Object.values(sectionDetailsBySearch()).filter((detail) => detail?.sectionID)
+    ...Object.values(sectionDetailsBySearch()).filter((detail) => detail?.sectionID),
+    ...projectSections
   ];
   const bySectionID = new Map();
   candidates.forEach((section) => {
     const sectionID = String(section.sectionID || section.id || "").trim();
     if (!sectionID || bySectionID.has(sectionID)) return;
     const chapter = chapters.find((item) => String(item.id) === String(section.chapterID || ""));
-    bySectionID.set(sectionID, {
+    const summary = {
       codePrefix: section.codePrefix || chapter?.codePrefix || "BC",
       chapterID: section.chapterID || chapter?.id || "",
       chapterNumber: section.chapterNumber || chapter?.chapterNumber || "",
       sectionID,
       sectionNumber: section.sectionNumber || "",
       title: section.title || "Section"
-    });
+    };
+    const cached = sectionSummaryCache.get(sectionID);
+    bySectionID.set(sectionID, cached ? { ...summary, ...cached, sectionID } : summary);
   });
-  return Array.from(bySectionID.values());
+  const missingIDs = Array.from(bySectionID.values())
+    .filter((section) => !section.sectionNumber || !section.chapterID || section.title === "Section")
+    .map((section) => section.sectionID);
+  if (missingIDs.length) {
+    try {
+      const batches = [];
+      for (let index = 0; index < missingIDs.length; index += 100) {
+        batches.push(missingIDs.slice(index, index + 100));
+      }
+      const payloads = await Promise.all(
+        batches.map((batch) => api(`/code/sections?ids=${encodeURIComponent(batch.join(","))}`))
+      );
+      payloads.flatMap((payload) => payload.sections || []).forEach((section) => {
+        const sectionID = String(section.id || section.sectionID || "");
+        const requestedID = String(section.requestedID || sectionID);
+        if (!sectionID) return;
+        const normalized = { ...section, sectionID };
+        sectionSummaryCache.set(sectionID, normalized);
+        sectionSummaryCache.set(requestedID, normalized);
+        if (bySectionID.has(requestedID)) {
+          bySectionID.set(requestedID, { ...bySectionID.get(requestedID), ...normalized });
+        } else if (bySectionID.has(sectionID)) {
+          bySectionID.set(sectionID, { ...bySectionID.get(sectionID), ...normalized });
+        }
+      });
+    } catch {
+      // Keep locally available metadata if canonical hydration is temporarily unavailable.
+    }
+  }
+  const canonicalSections = new Map();
+  Array.from(bySectionID.values()).forEach((section) => {
+    const sectionID = String(section.sectionID || section.id || "");
+    if (sectionID && !canonicalSections.has(sectionID)) canonicalSections.set(sectionID, section);
+  });
+  return Array.from(canonicalSections.values());
 }
 
 function researchCitationText(section) {
@@ -4306,11 +4355,11 @@ function wireUtilityInstanceActions(panel, instance) {
   closeButton.addEventListener("click", () => closeUtilityInstance(instance));
 }
 
-function renderResearch(paneID) {
+async function renderResearch(paneID) {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel");
   const content = panel.querySelector(".analysis-content");
-  const sections = activeResearchSections();
+  const sections = await activeResearchSections();
 
   const summary = document.createElement("article");
   summary.className = "analysis-card";
@@ -4321,8 +4370,8 @@ function renderResearch(paneID) {
   heading.textContent = sections.length === 1 ? "1 active code section" : `${sections.length} active code sections`;
   const explanation = document.createElement("p");
   explanation.textContent = sections.length
-    ? "This set follows the sections open in your readers and search details. Citations contain official code references and canonical links; private notes are excluded."
-    : "Open a specific section in a reader or search detail to start a citation set. Private notes stay separate from official code references.";
+    ? "This set follows sections in open readers, search details, and project details. Citations contain official code references and canonical links; private notes are excluded."
+    : "Open a specific section or a project detail to start a citation set. Private notes stay separate from official code references.";
   const copyAllButton = document.createElement("button");
   copyAllButton.className = "ghost-button research-copy-all";
   copyAllButton.type = "button";
@@ -4384,7 +4433,7 @@ async function renderUtilityInstance(instance) {
   } else if (instance.key === "saved") {
     panel = await renderSaved(paneID);
   } else if (instance.key === "analysis") {
-    panel = renderResearch(paneID);
+    panel = await renderResearch(paneID);
   }
   wireUtilityInstanceActions(panel, instance);
   return panel;
