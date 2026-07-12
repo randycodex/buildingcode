@@ -1125,6 +1125,21 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.updateAccount(userID, account);
     },
+    async saveEntitlement(userID, entitlement) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.saveEntitlement(userID, entitlement);
+    },
+    async deleteEntitlement(userID, expected) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.deleteEntitlement(userID, expected);
+    },
+    async stripeEntitlementOwner(subscriptionID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.stripeEntitlementOwner(subscriptionID);
+    },
     async hasActiveUserSession(userID) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -2307,6 +2322,47 @@ function revokeServerEntitlement(store, userID, predicate = () => true) {
   return true;
 }
 
+function entitlementMatchesExpected(entitlement, expected = {}) {
+  if (expected.source && entitlement?.source !== expected.source) return false;
+  if (expected.providerKey && entitlement?.provider?.[expected.providerKey] !== expected.providerValue) return false;
+  return true;
+}
+
+async function persistServerEntitlement(userID, source, details = {}) {
+  const entitlement = entitlementForSource(userID, source, details);
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveEntitlement === "function") {
+    return adapter.saveEntitlement(userID, entitlement);
+  }
+  const store = await readStore();
+  grantServerEntitlement(store, userID, source, details);
+  await writeStore(store);
+  return store.entitlements[userID];
+}
+
+async function deletePersistedEntitlement(userID, expected = {}) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteEntitlement === "function") {
+    return adapter.deleteEntitlement(userID, expected);
+  }
+  const store = await readStore();
+  const changed = revokeServerEntitlement(store, userID, (entitlement) =>
+    entitlementMatchesExpected(entitlement, expected)
+  );
+  if (changed) await writeStore(store);
+  return changed;
+}
+
+async function persistedStripeEntitlementOwner(subscriptionID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.stripeEntitlementOwner === "function") {
+    return adapter.stripeEntitlementOwner(subscriptionID);
+  }
+  const store = await readStore();
+  const userID = findUserIDForStripeSubscription(store, subscriptionID);
+  return userID ? { userID, entitlement: store.entitlements[userID] } : null;
+}
+
 function stripeConfigured() {
   return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRO_PRICE_ID);
 }
@@ -3362,8 +3418,7 @@ async function handleWebCheckout(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
+  if (!await authenticatedUserContext(request, response, userID)) {
     return;
   }
 
@@ -3436,8 +3491,7 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
+  if (!await authenticatedUserContext(request, response, userID)) {
     return;
   }
 
@@ -3456,7 +3510,7 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
-  grantServerEntitlement(store, userID, "webSubscription", {
+  const entitlement = await persistServerEntitlement(userID, "webSubscription", {
     expiresAt: stripeSubscriptionExpiresAt(subscription),
     provider: {
       stripeCustomerID: stripeSubscriptionID(subscription.customer),
@@ -3465,9 +3519,8 @@ async function handleStripeRestore(request, response) {
     }
   });
   await transferStripeSubscriptionMetadata(subscription.id, userID);
-  await writeStore(store);
   sendJSON(response, 200, {
-    entitlement: store.entitlements[userID],
+    entitlement,
     subscription: {
       id: subscription.id,
       status: subscription.status
@@ -3491,14 +3544,13 @@ async function handleStripeWebhook(request, response) {
 
   const event = JSON.parse(rawBody.toString("utf8"));
   const object = event?.data?.object || {};
-  const store = await readStore();
   let changed = false;
 
   switch (event.type) {
   case "checkout.session.completed": {
     const userID = stripeUserIDFromObject(object);
     if (userID && (object.mode === "subscription" || object.payment_status === "paid")) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
           stripeSubscriptionID: stripeSubscriptionID(object.subscription),
@@ -3514,7 +3566,7 @@ async function handleStripeWebhook(request, response) {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionID(object);
     if (userID && ["active", "trialing"].includes(object.status)) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -3523,22 +3575,30 @@ async function handleStripeWebhook(request, response) {
       });
       changed = true;
     } else if (subscriptionID && ["canceled", "incomplete_expired", "unpaid", "paused"].includes(object.status)) {
-      const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
-      changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+      const owner = await persistedStripeEntitlementOwner(subscriptionID);
+      changed = owner ? await deletePersistedEntitlement(owner.userID, {
+        source: "webSubscription",
+        providerKey: "stripeSubscriptionID",
+        providerValue: subscriptionID
+      }) : false;
     }
     break;
   }
   case "customer.subscription.deleted": {
     const subscriptionID = stripeSubscriptionID(object);
-    const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
-    changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+    const owner = await persistedStripeEntitlementOwner(subscriptionID);
+    changed = owner ? await deletePersistedEntitlement(owner.userID, {
+      source: "webSubscription",
+      providerKey: "stripeSubscriptionID",
+      providerValue: subscriptionID
+    }) : false;
     break;
   }
   case "invoice.payment_succeeded": {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionIDFromObject(object);
     if (userID && subscriptionID) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -3551,10 +3611,6 @@ async function handleStripeWebhook(request, response) {
   }
   default:
     break;
-  }
-
-  if (changed) {
-    await writeStore(store);
   }
   sendJSON(response, 200, { received: true, changed });
 }
@@ -3571,8 +3627,8 @@ async function handleAppleTransactionVerify(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
+  const accountContext = await authenticatedUserContext(request, response, userID);
+  if (!accountContext) {
     return;
   }
 
@@ -3597,20 +3653,22 @@ async function handleAppleTransactionVerify(request, response) {
   };
 
   if (!appleTransactionActive(payload)) {
-    revokeServerEntitlement(store, userID, (entitlement) =>
-      entitlement?.source === "appleSubscription" &&
-      entitlement?.provider?.appleOriginalTransactionID === originalTransactionID
-    );
-    await writeStore(store);
-    sendJSON(response, 200, { entitlement: store.entitlements[userID] || null, transaction: { active: false } });
+    const removed = await deletePersistedEntitlement(userID, {
+      source: "appleSubscription",
+      providerKey: "appleOriginalTransactionID",
+      providerValue: originalTransactionID
+    });
+    sendJSON(response, 200, {
+      entitlement: removed ? null : accountContext.entitlement || null,
+      transaction: { active: false }
+    });
     return;
   }
 
-  const entitlement = grantServerEntitlement(store, userID, "appleSubscription", {
+  const entitlement = await persistServerEntitlement(userID, "appleSubscription", {
     expiresAt: appleTransactionExpiration(payload),
     provider
   });
-  await writeStore(store);
   sendJSON(response, 200, { entitlement, transaction: { active: true, productID: payload.productId } });
 }
 
@@ -3626,9 +3684,7 @@ async function handleLifetimeGrant(request, response) {
     return;
   }
 
-  const store = await readStore();
-  const entitlement = grantServerEntitlement(store, userID, "lifetimeGrant");
-  await writeStore(store);
+  const entitlement = await persistServerEntitlement(userID, "lifetimeGrant");
   sendJSON(response, 200, { userID, entitlement });
 }
 
@@ -3644,9 +3700,7 @@ async function handleLifetimeGrantDelete(request, response) {
     return;
   }
 
-  const store = await readStore();
-  delete store.entitlements[userID];
-  await writeStore(store);
+  await deletePersistedEntitlement(userID);
   sendJSON(response, 200, { userID, entitlement: null });
 }
 

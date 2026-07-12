@@ -111,7 +111,7 @@ The Neon schema is created automatically on first request. The current Postgres 
 
 `permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
 
-On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instead of reading and rewriting the global store. A push applies conditional row upserts and sync-event inserts in one Neon HTTP transaction; a pull reads only that user's canonical records. The JSON file adapter intentionally keeps the simpler whole-file behavior for local smoke testing. Account, billing, and admin handlers are being migrated separately and may still use the compatibility store.
+On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instead of reading and rewriting the global store. A push applies conditional row upserts and sync-event inserts in one Neon HTTP transaction; a pull reads only that user's canonical records. Account sessions, profiles, checkout authentication, verified payment entitlements, and lifetime grants also use targeted rows. The JSON file adapter intentionally keeps the simpler whole-file behavior for local smoke testing. Rare legacy-account merge and cleanup operations still use the compatibility store and must be migrated before broad multi-user production use.
 
 ## Endpoints
 

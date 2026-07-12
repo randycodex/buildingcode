@@ -94,6 +94,8 @@ async function countRows(tableName) {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_sessions WHERE user_id = ${userID}`;
   } else if (tableName === "permitext_account_sessions") {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_account_sessions WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_entitlements") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_entitlements WHERE user_id = ${userID}`;
   } else {
     throw new Error(`Unsupported count table: ${tableName}`);
   }
@@ -326,6 +328,31 @@ try {
   assert(
     concurrencySavedItems.some((record) => record.id === sharedRecordID && record.sectionID === 402),
     "The newest concurrent mutation did not win."
+  );
+
+  const savedItemCountBeforeGrant = await countRows("permitext_saved_items");
+  const lifetimeGrant = await request("/admin/lifetime-grants/grant", {
+    method: "POST",
+    token: adminToken,
+    body: { userID }
+  });
+  assert(lifetimeGrant.response.ok, "Direct Postgres lifetime grant failed.");
+  assert(lifetimeGrant.json.entitlement?.source === "lifetimeGrant", "Lifetime grant stored the wrong source.");
+  assert(await countRows("permitext_entitlements") === 1, "Lifetime grant did not write one entitlement row.");
+  assert(
+    await countRows("permitext_saved_items") === savedItemCountBeforeGrant,
+    "Entitlement update changed unrelated saved content."
+  );
+  const lifetimeRevoke = await request("/admin/lifetime-grants/revoke", {
+    method: "POST",
+    token: adminToken,
+    body: { userID }
+  });
+  assert(lifetimeRevoke.response.ok, "Direct Postgres lifetime revoke failed.");
+  assert(await countRows("permitext_entitlements") === 0, "Lifetime revoke left an entitlement row.");
+  assert(
+    await countRows("permitext_saved_items") === savedItemCountBeforeGrant,
+    "Entitlement removal changed unrelated saved content."
   );
 
   const secondSignIn = await request("/account/sign-in", {

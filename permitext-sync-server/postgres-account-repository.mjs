@@ -265,6 +265,69 @@ export function createPostgresAccountRepository(sql) {
     return rows[0]?.account ? safeJSON(rows[0].account, null) : null;
   }
 
+  async function saveEntitlement(userID, entitlement) {
+    const rows = await sql`
+      INSERT INTO permitext_entitlements (
+        user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+      )
+      VALUES (
+        ${userID}, ${entitlement.plan || "free"}, ${entitlement.source || "unknown"},
+        ${entitlement.grantedUserID || null}, ${JSON.stringify(entitlement)}::jsonb,
+        ${entitlement.expiresAt || null}::timestamptz, now()
+      )
+      ON CONFLICT (user_id) DO UPDATE SET
+        plan = EXCLUDED.plan,
+        source = EXCLUDED.source,
+        granted_user_id = EXCLUDED.granted_user_id,
+        entitlement = EXCLUDED.entitlement,
+        expires_at = EXCLUDED.expires_at,
+        updated_at = now()
+      RETURNING entitlement
+    `;
+    return safeJSON(rows[0]?.entitlement, entitlement);
+  }
+
+  async function deleteEntitlement(userID, expected = {}) {
+    let rows;
+    if (expected.source && expected.providerKey && expected.providerValue) {
+      rows = await sql`
+        DELETE FROM permitext_entitlements
+        WHERE user_id = ${userID}
+          AND source = ${expected.source}
+          AND entitlement->'provider'->>${expected.providerKey} = ${expected.providerValue}
+        RETURNING user_id
+      `;
+    } else if (expected.source) {
+      rows = await sql`
+        DELETE FROM permitext_entitlements
+        WHERE user_id = ${userID} AND source = ${expected.source}
+        RETURNING user_id
+      `;
+    } else {
+      rows = await sql`
+        DELETE FROM permitext_entitlements
+        WHERE user_id = ${userID}
+        RETURNING user_id
+      `;
+    }
+    return rows.length > 0;
+  }
+
+  async function stripeEntitlementOwner(subscriptionID) {
+    const rows = await sql`
+      SELECT user_id, entitlement
+      FROM permitext_entitlements
+      WHERE source = 'webSubscription'
+        AND entitlement->'provider'->>'stripeSubscriptionID' = ${subscriptionID}
+      LIMIT 1
+    `;
+    if (!rows[0]) return null;
+    return {
+      userID: rows[0].user_id,
+      entitlement: safeJSON(rows[0].entitlement, null)
+    };
+  }
+
   async function revoke(userID, rawToken) {
     if (!userID || !rawToken) return false;
     const rows = await sql`
@@ -277,5 +340,15 @@ export function createPostgresAccountRepository(sql) {
     return rows.length > 0;
   }
 
-  return { authenticate, contextForUser, hasActiveSession, revoke, signIn, updateAccount };
+  return {
+    authenticate,
+    contextForUser,
+    deleteEntitlement,
+    hasActiveSession,
+    revoke,
+    saveEntitlement,
+    signIn,
+    stripeEntitlementOwner,
+    updateAccount
+  };
 }
