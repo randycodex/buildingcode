@@ -2,6 +2,8 @@
 
 Validates shipped `prepared/searchIndex.json` against the app's token search logic.
 
+Golden results use the production ordering contract: relevance rank, natural chapter number, natural section number, code-section ID, then canonical section ID. The final two tie-breakers keep identical provision numbers deterministic across code books and platforms.
+
 ## Quick start
 
 ```bash

@@ -731,16 +731,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .compactMap { sectionID -> SearchHit? in
                 guard let entry = entriesByID[sectionID] else { return nil }
                 let indexed = entry.indexed
-                let resolvedOfficialText = officialText(for: indexed)
-                guard Self.matchesVisibleSearchContent(
-                    query: trimmed,
-                    queryTokens: queryTokens,
-                    sectionNumber: indexed.section.sectionNumber,
-                    title: indexed.section.title,
-                    officialText: resolvedOfficialText
-                ) else {
-                    return nil
-                }
                 let sectionNumber = indexed.section.sectionNumber.lowercased()
                 let title = indexed.section.title.lowercased()
                 let rank: Int
@@ -763,7 +753,19 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                     return lhs.rank < rhs.rank
                 }
                 if lhs.indexed.chapter.chapterNumber == rhs.indexed.chapter.chapterNumber {
-                    return lhs.indexed.section.sectionNumber.compare(rhs.indexed.section.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+                    let sectionOrder = lhs.indexed.section.sectionNumber.compare(
+                        rhs.indexed.section.sectionNumber,
+                        options: [.numeric, .caseInsensitive]
+                    )
+                    if sectionOrder != .orderedSame {
+                        return sectionOrder == .orderedAscending
+                    }
+                    let lhsCodeSectionID = lhs.indexed.chapter.codeSectionID ?? 0
+                    let rhsCodeSectionID = rhs.indexed.chapter.codeSectionID ?? 0
+                    if lhsCodeSectionID != rhsCodeSectionID {
+                        return lhsCodeSectionID < rhsCodeSectionID
+                    }
+                    return lhs.indexed.section.id < rhs.indexed.section.id
                 }
                 return lhs.indexed.chapter.chapterNumber.compare(rhs.indexed.chapter.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
             }
@@ -1563,32 +1565,6 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return lhsNumeric
         }
         return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
-    }
-
-    private static func matchesVisibleSearchContent(
-        query: String,
-        queryTokens: [String],
-        sectionNumber: String,
-        title: String,
-        officialText: String
-    ) -> Bool {
-        let normalizedQuery = query.lowercased()
-        let normalizedSectionNumber = sectionNumber.lowercased()
-        let normalizedTitle = title.lowercased()
-        let normalizedOfficialText = officialText.lowercased()
-
-        if normalizedSectionNumber == normalizedQuery || normalizedSectionNumber.hasPrefix(normalizedQuery) {
-            return true
-        }
-        if normalizedTitle.contains(normalizedQuery) || normalizedOfficialText.contains(normalizedQuery) {
-            return true
-        }
-
-        return queryTokens.allSatisfy { token in
-            normalizedSectionNumber.contains(token)
-                || normalizedTitle.contains(token)
-                || normalizedOfficialText.contains(token)
-        }
     }
 
     private static func snippet(in text: String, query: String) -> String {

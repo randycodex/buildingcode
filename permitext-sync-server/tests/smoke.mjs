@@ -125,6 +125,23 @@ async function main() {
       "Duplicate-number appendix provisions did not retain distinct canonical IDs."
     );
 
+    const searchGolden = JSON.parse(await readFile(new URL(
+      "../../NYC CC APP/Tools/search-regression/golden-results.json",
+      import.meta.url
+    ), "utf8"));
+    for (const [query, expectedIDs] of Object.entries(searchGolden)) {
+      const search = await request(`/code/search?q=${encodeURIComponent(query)}&limit=200`);
+      assert(search.response.ok, `Canonical web search failed for ${query}.`);
+      const actualIDs = search.json.results.map((result) => result.id);
+      const firstMismatch = expectedIDs.findIndex((id, index) => actualIDs[index] !== id);
+      assert(
+        JSON.stringify(actualIDs) === JSON.stringify(expectedIDs),
+        `Canonical web search drifted from iPhone ordering for ${query}: ` +
+          `expected ${expectedIDs.length}, received ${actualIDs.length}, first mismatch at ${firstMismatch} ` +
+          `(${expectedIDs[firstMismatch]} vs ${actualIDs[firstMismatch]}).`
+      );
+    }
+
     const appleWebConfig = await request("/account/apple-web-config");
     assert(appleWebConfig.response.ok, "Apple web sign-in config failed.");
     assert(appleWebConfig.json.available === true, "Apple web sign-in config did not report availability.");

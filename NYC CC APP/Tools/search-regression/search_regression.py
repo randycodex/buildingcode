@@ -112,11 +112,21 @@ def rank(section: dict[str, Any], query: str) -> int:
     return 3
 
 
+def natural_key(value: str) -> tuple[tuple[int, Any], ...]:
+    return tuple(
+        (0, int(part)) if part.isdigit() else (1, part.lower())
+        for part in re.split(r"(\d+)", value)
+        if part
+    )
+
+
 def sort_key(section: dict[str, Any]) -> tuple[Any, ...]:
     return (
         section.get("_rank", 3),
-        section["chapterNumber"],
-        section["sectionNumber"],
+        natural_key(section["chapterNumber"]),
+        natural_key(section["sectionNumber"]),
+        section.get("codeSectionID") or 0,
+        section["id"],
     )
 
 

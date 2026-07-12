@@ -82,6 +82,8 @@ npm run verify:content
 
 The gate verifies all 118 chapter files, 12,890 unique published section IDs, exact search-index coverage, canonical override ownership, available-body coverage promised by the manifest, and the eight known duplicate display-number cases that must remain distinct records. It also runs as part of `npm run smoke`.
 
+iPhone and web search both use the shipped `prepared/searchIndex.json` token map. Results use the same rank, natural chapter/section ordering, code-section tie-break, and final section-ID tie-break on both platforms. The web server no longer rebuilds an index by opening every section body; both clients trust the validated index and resolve body text only for result snippets. The smoke suite runs every golden query through the web endpoint and compares its ordered IDs with the iPhone regression fixture.
+
 Configure paid entitlement sources with:
 
 ```sh

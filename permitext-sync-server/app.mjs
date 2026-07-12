@@ -43,6 +43,7 @@ const canonicalCodeContentPath = join(
 const canonicalPreparedContentPath = join(canonicalCodeContentPath, "prepared");
 const chapterContentPath = join(canonicalPreparedContentPath, "chapters");
 const chapterManifestPath = join(canonicalPreparedContentPath, "manifest.json");
+const shippedSearchIndexPath = join(canonicalPreparedContentPath, "searchIndex.json");
 const canonicalSectionContentPath = join(canonicalPreparedContentPath, "sections");
 const legacySectionContentPath = join(
   __dirname,
@@ -70,8 +71,9 @@ let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
-let cachedSearchIndex = null;
-let cachedSearchIndexPromise = null;
+let cachedSectionCatalog = null;
+let cachedSectionCatalogPromise = null;
+let cachedShippedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 
@@ -1722,23 +1724,23 @@ function flattenChapterSections(chapter) {
   );
 }
 
-async function searchIndex() {
-  if (cachedSearchIndex) {
-    return cachedSearchIndex;
+async function sectionCatalog() {
+  if (cachedSectionCatalog) {
+    return cachedSectionCatalog;
   }
-  if (cachedSearchIndexPromise) {
-    return cachedSearchIndexPromise;
+  if (cachedSectionCatalogPromise) {
+    return cachedSectionCatalogPromise;
   }
-  cachedSearchIndexPromise = buildSearchIndex();
+  cachedSectionCatalogPromise = buildSectionCatalog();
   try {
-    cachedSearchIndex = await cachedSearchIndexPromise;
-    return cachedSearchIndex;
+    cachedSectionCatalog = await cachedSectionCatalogPromise;
+    return cachedSectionCatalog;
   } finally {
-    cachedSearchIndexPromise = null;
+    cachedSectionCatalogPromise = null;
   }
 }
 
-async function buildSearchIndex() {
+async function buildSectionCatalog() {
   const chapters = await chapterIndex();
   const sectionSummaries = [];
   for (const chapterSummary of chapters) {
@@ -1753,6 +1755,7 @@ async function buildSearchIndex() {
         webSectionID: section.id,
         chapterID: chapterSummary.id,
         codePrefix: chapterSummary.codePrefix,
+        codeSectionID: chapterSummary.codeSectionID,
         chapterNumber: chapterSummary.chapterNumber,
         sectionNumber: section.sectionNumber,
         title: section.title,
@@ -1761,23 +1764,45 @@ async function buildSearchIndex() {
       });
     }
   }
+  return sectionSummaries;
+}
 
-  const index = [];
-  for (let start = 0; start < sectionSummaries.length; start += 150) {
-    const batch = sectionSummaries.slice(start, start + 150);
-    const entries = await Promise.all(
-      batch.map(async (section) => {
-        const body = await sectionBody(section.webSectionID || section.id, {
-          allowMissing: true,
-          canonicalSectionID: section.id
-        });
-        const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
-        return { ...section, plainText };
-      })
+async function shippedSearchIndex() {
+  if (!cachedShippedSearchIndex) {
+    const payload = await readJSONFile(shippedSearchIndexPath);
+    cachedShippedSearchIndex = new Map(
+      Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [token, new Set(sectionIDs)])
     );
-    index.push(...entries);
   }
-  return index;
+  return cachedShippedSearchIndex;
+}
+
+function tokenizeSearchText(text) {
+  const tokens = [];
+  let current = "";
+  const flush = () => {
+    if (current.length >= 2) tokens.push(current);
+    current = "";
+  };
+  for (const character of String(text || "").toLowerCase()) {
+    if (/\s/u.test(character)) {
+      flush();
+    } else if (/[\p{L}\p{N}]/u.test(character) || character === "." || character === "-") {
+      current += character;
+    } else {
+      flush();
+    }
+  }
+  flush();
+  return tokens;
+}
+
+function intersectSets(left, right) {
+  const intersection = new Set();
+  for (const value of left) {
+    if (right.has(value)) intersection.add(value);
+  }
+  return intersection;
 }
 
 async function sectionBody(sectionID, options = {}) {
@@ -1988,20 +2013,61 @@ async function handleCodeSearch(request, response) {
     return;
   }
   const normalizedQuery = query.toLowerCase();
-  const results = [];
-  let totalResults = 0;
-  for (const section of await searchIndex()) {
-    const matchesCode = codeFilter.size === 0 || codeFilter.has(section.codePrefix);
-    const sectionText = section.plainText || "";
-    const matchesQuery =
-      section.title?.toLowerCase().includes(normalizedQuery) ||
-      section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
-      sectionText.toLowerCase().includes(normalizedQuery);
-    if (!matchesCode || !matchesQuery) continue;
+  const queryTokens = tokenizeSearchText(query);
+  if (!queryTokens.length) {
+    sendJSON(response, 200, { query, results: [] });
+    return;
+  }
 
-    totalResults += 1;
-    if (resultLimit && results.length >= resultLimit) continue;
-    results.push({
+  const index = await shippedSearchIndex();
+  let candidateIDs = new Set(index.get(queryTokens[0]) || []);
+  for (const token of queryTokens.slice(1)) {
+    candidateIDs = intersectSets(candidateIDs, index.get(token) || new Set());
+    if (!candidateIDs.size) break;
+  }
+  if (/^[A-Za-z]?\d/.test(query)) {
+    for (const [token, sectionIDs] of index) {
+      if (!token.startsWith(normalizedQuery)) continue;
+      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
+    }
+  }
+
+  const candidates = (await sectionCatalog()).filter((section) =>
+    candidateIDs.has(section.id) &&
+    (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+  );
+  const hits = candidates.map((section) => {
+    const sectionNumber = String(section.sectionNumber || "").toLowerCase();
+    const title = String(section.title || "").toLowerCase();
+    const rank = sectionNumber === normalizedQuery
+      ? 0
+      : sectionNumber.startsWith(normalizedQuery)
+        ? 1
+        : title.includes(normalizedQuery)
+          ? 2
+          : 3;
+    return { section, rank };
+  });
+  hits.sort((left, right) =>
+    left.rank - right.rank ||
+    compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
+    String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
+      numeric: true,
+      sensitivity: "base"
+    }) ||
+    Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
+    Number(left.section.id) - Number(right.section.id)
+  );
+
+  const totalResults = hits.length;
+  const selectedHits = resultLimit ? hits.slice(0, resultLimit) : hits;
+  const results = await Promise.all(selectedHits.map(async ({ section }) => {
+    const body = await sectionBody(section.webSectionID || section.id, {
+      allowMissing: true,
+      canonicalSectionID: section.id
+    });
+    const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
+    return {
       id: section.id,
       chapterID: section.chapterID,
       codePrefix: section.codePrefix,
@@ -2010,9 +2076,9 @@ async function handleCodeSearch(request, response) {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
-      snippet: searchSnippet(sectionText || section.title || "", query)
-    });
-  }
+      snippet: searchSnippet(plainText || section.title || "", query)
+    };
+  }));
   sendJSON(response, 200, {
     query,
     results,
