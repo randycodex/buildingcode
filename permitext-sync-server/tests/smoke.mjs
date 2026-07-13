@@ -110,7 +110,7 @@ async function main() {
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
-    assert(webRoot.text.includes("reader-share"), "Web reader omitted its section share control.");
+    assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
 
     const sharedSectionLink = await request("/open/section/8881");

@@ -434,12 +434,6 @@ function downloadResearchText(text, fileName = "permitext-citations.txt") {
   window.setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
-function updateReaderShareButton(panel, reader) {
-  const button = panel?.querySelector(".reader-share");
-  if (!button) return;
-  button.disabled = !sharedSectionURL(reader?.sectionID);
-}
-
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -3482,7 +3476,6 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
       updateBrowserSectionURL(reader.sectionID);
-      updateReaderShareButton(panel, reader);
       scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
@@ -3645,7 +3638,6 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
-  const shareButton = panel.querySelector(".reader-share");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -3668,12 +3660,6 @@ async function renderReader(reader, options = {}) {
   commentsButton.hidden = true;
   internalSearchBox.hidden = true;
   internalSearchInput.value = reader.internalSearchQuery || "";
-  updateReaderShareButton(panel, reader);
-
-  shareButton.addEventListener("click", () => {
-    shareSection(reader, shareButton);
-  });
-
   if (options.isSearchResult) {
     closeButton.hidden = false;
   } else {
@@ -3688,7 +3674,6 @@ async function renderReader(reader, options = {}) {
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
-    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
@@ -3743,7 +3728,6 @@ async function renderReader(reader, options = {}) {
     reader.sectionID = "";
     reader.sectionNumber = "";
     reader.title = "Reader";
-    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
@@ -3758,7 +3742,6 @@ async function renderReader(reader, options = {}) {
       reader.title = summary?.title || "Reader";
       updateBrowserSectionURL(reader.sectionID);
     }
-    updateReaderShareButton(panel, reader);
     saveWorkspaceState();
     scheduleContinuitySync(reader);
     await navigateReaderToSection(panel, reader);
