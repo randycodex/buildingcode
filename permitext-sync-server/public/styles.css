@@ -785,7 +785,7 @@ textarea:focus-visible {
   margin: 0;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border);
-  border-radius: 0;
+  border-radius: var(--radius-pill);
   background: var(--surface-raised);
 }
 
