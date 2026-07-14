@@ -83,6 +83,7 @@ async function main() {
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
       APPLE_SERVICE_ID: "com.randycodex.permitext.web",
       PERMITEXT_PUBLIC_BASE_URL: baseURL,
+      PERMITEXT_RESEARCH_MOCK: "1",
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },
     stdio: ["ignore", "pipe", "pipe"]
@@ -313,6 +314,64 @@ async function main() {
     assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user ID.");
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
+
+    const unauthorizedResearch = await request("/research/interpret", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required?",
+        sectionIDs: ["8881"]
+      }
+    });
+    assert(unauthorizedResearch.response.status === 401, "Research interpretation allowed an unauthenticated request.");
+
+    const emptyResearchQuestion = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "",
+        sectionIDs: ["8881"]
+      }
+    });
+    assert(emptyResearchQuestion.response.status === 400, "Research interpretation accepted an empty question.");
+
+    const unknownResearchSection = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required?",
+        sectionIDs: ["999999999"]
+      }
+    });
+    assert(unknownResearchSection.response.status === 400, "Research interpretation accepted an unknown section.");
+
+    const researchInterpretation = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required before work begins?",
+        sectionIDs: ["8881"],
+        evidence: "The client must not be allowed to supply model evidence."
+      }
+    });
+    assert(researchInterpretation.response.ok, "Research interpretation failed in mock mode.");
+    assert(researchInterpretation.json.mode === "mock", "Research interpretation did not report mock mode.");
+    assert(researchInterpretation.json.model === "permitext-mock", "Research interpretation reported the wrong mock model.");
+    assert(
+      researchInterpretation.json.evidenceSectionIDs.join(",") === "8881",
+      "Research interpretation did not use the requested canonical evidence."
+    );
+    assert(
+      researchInterpretation.json.citations.length === 1 && researchInterpretation.json.citations[0].sectionID === "8881",
+      "Research interpretation returned an unverified citation."
+    );
+    assert(
+      researchInterpretation.json.disclaimer.includes("not an official code determination"),
+      "Research interpretation omitted its authority disclaimer."
+    );
 
     const browserCredentialID = "smoke-browser";
     const browserSignIn = await request("/account/sign-in", {

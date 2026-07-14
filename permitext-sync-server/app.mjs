@@ -27,6 +27,7 @@ const rateLimitPolicies = new Map([
   ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
   ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }]
 ]);
 const canonicalCodeContentPath = join(
@@ -93,6 +94,30 @@ const allowedMutationKinds = new Set([
   "continuity",
   "codeVersionClear"
 ]);
+
+const researchInterpretationSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    conclusion: { type: "string" },
+    explanation: { type: "string" },
+    assumptions: { type: "array", items: { type: "string" } },
+    missingFacts: { type: "array", items: { type: "string" } },
+    citations: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          sectionID: { type: "string" },
+          relevance: { type: "string" }
+        },
+        required: ["sectionID", "relevance"]
+      }
+    }
+  },
+  required: ["conclusion", "explanation", "assumptions", "missingFacts", "citations"]
+};
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) {
@@ -1847,6 +1872,269 @@ async function sectionSummaryByID(sectionID) {
   return (await sectionCatalog()).find((section) =>
     String(section.id) === normalizedID || String(section.webSectionID || "") === normalizedID
   ) || null;
+}
+
+function normalizedResearchText(value, maxLength) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+async function researchEvidenceForSectionIDs(sectionIDs) {
+  const evidence = [];
+  const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
+  for (const requestedID of sectionIDs) {
+    const summary = await sectionSummaryByID(requestedID);
+    if (!summary) {
+      const error = new Error(`Unknown code section: ${requestedID}.`);
+      error.code = "INVALID_RESEARCH_SECTION";
+      throw error;
+    }
+    const canonicalID = String(summary.id || summary.sectionID || requestedID);
+    const body = await sectionBody(summary.webSectionID || requestedID, {
+      allowMissing: true,
+      canonicalSectionID: canonicalID
+    });
+    const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
+    const text = normalizedResearchText(rawText || summary.title, charactersPerSection);
+    evidence.push({
+      sectionID: canonicalID,
+      sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
+      title: String(summary.title || body.title || "Section"),
+      codePrefix: String(summary.codePrefix || body.codePrefix || ""),
+      chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
+      text
+    });
+  }
+  return evidence;
+}
+
+function researchPrompt(question, evidence) {
+  const sources = evidence.map((section) => [
+    `SECTION_ID: ${section.sectionID}`,
+    `CODE: ${section.codePrefix}`,
+    `SECTION: ${section.sectionNumber}`,
+    `TITLE: ${section.title}`,
+    `TEXT: ${section.text}`
+  ].join("\n")).join("\n\n---\n\n");
+  return `QUESTION\n${question}\n\nSELECTED OFFICIAL CODE EVIDENCE\n${sources}`;
+}
+
+function mockResearchInterpretation(question, evidence) {
+  const subject = evidence.length === 1
+    ? `the selected provision, ${evidence[0].sectionNumber || evidence[0].title}`
+    : `the ${evidence.length} selected provisions`;
+  return {
+    conclusion: `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
+    explanation: "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
+    assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
+    missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
+    citations: evidence.map((section) => ({
+      sectionID: section.sectionID,
+      relevance: `Selected evidence from ${section.sectionNumber || section.title}.`
+    }))
+  };
+}
+
+function outputTextFromResponse(response) {
+  for (const item of response?.output || []) {
+    for (const content of item?.content || []) {
+      if (content?.type === "refusal") {
+        const error = new Error("The model declined this research request.");
+        error.code = "RESEARCH_REFUSAL";
+        throw error;
+      }
+      if (content?.type === "output_text" && content.text) return content.text;
+    }
+  }
+  const error = new Error("The model returned no interpretation.");
+  error.code = "INVALID_RESEARCH_RESPONSE";
+  throw error;
+}
+
+function validateResearchInterpretation(value, evidence) {
+  const allowedSections = new Map(evidence.map((section) => [section.sectionID, section]));
+  if (!value || typeof value !== "object" ||
+      typeof value.conclusion !== "string" || !value.conclusion.trim() ||
+      typeof value.explanation !== "string" || !value.explanation.trim() ||
+      !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
+      !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
+      !Array.isArray(value.citations) || value.citations.length === 0) {
+    const error = new Error("The model returned an invalid interpretation.");
+    error.code = "INVALID_RESEARCH_RESPONSE";
+    throw error;
+  }
+  const citations = [];
+  const seen = new Set();
+  for (const citation of value.citations) {
+    const sectionID = String(citation?.sectionID || "").trim();
+    const relevance = String(citation?.relevance || "").trim();
+    if (!allowedSections.has(sectionID) || !relevance) {
+      const error = new Error("The model cited evidence outside the selected code sections.");
+      error.code = "INVALID_RESEARCH_CITATION";
+      throw error;
+    }
+    if (seen.has(sectionID)) continue;
+    seen.add(sectionID);
+    citations.push({ ...allowedSections.get(sectionID), relevance });
+  }
+  if (!citations.length) {
+    const error = new Error("The model returned no valid citations.");
+    error.code = "INVALID_RESEARCH_CITATION";
+    throw error;
+  }
+  return {
+    conclusion: value.conclusion.trim(),
+    explanation: value.explanation.trim(),
+    assumptions: value.assumptions.map((item) => item.trim()).filter(Boolean),
+    missingFacts: value.missingFacts.map((item) => item.trim()).filter(Boolean),
+    citations
+  };
+}
+
+async function openAIResearchInterpretation(question, evidence, userID) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Research AI is not configured.");
+    error.code = "RESEARCH_NOT_CONFIGURED";
+    throw error;
+  }
+  const model = process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
+  let response;
+  try {
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        reasoning: { effort: process.env.PERMITEXT_RESEARCH_REASONING_EFFORT || "medium" },
+        max_output_tokens: 1_500,
+        safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+        instructions: [
+          "You are a building-code research assistant, not an authority having jurisdiction.",
+          "Interpret only the selected official code evidence supplied in the request.",
+          "Do not use outside knowledge as legal authority and do not invent requirements.",
+          "State when the evidence is insufficient and identify project facts that must be confirmed.",
+          "Every conclusion must cite one or more supplied SECTION_ID values."
+        ].join(" "),
+        input: researchPrompt(question, evidence),
+        text: {
+          format: {
+            type: "json_schema",
+            name: "permitext_code_interpretation",
+            strict: true,
+            schema: researchInterpretationSchema
+          }
+        }
+      }),
+      signal: AbortSignal.timeout(45_000)
+    });
+  } catch (error) {
+    if (error.name === "TimeoutError") throw error;
+    const providerError = new Error("The research model request failed.");
+    providerError.code = "RESEARCH_PROVIDER_ERROR";
+    throw providerError;
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error("The research model request failed.");
+    error.code = "RESEARCH_PROVIDER_ERROR";
+    error.status = response.status;
+    throw error;
+  }
+  let value;
+  try {
+    value = JSON.parse(outputTextFromResponse(payload));
+  } catch (error) {
+    if (error.code === "RESEARCH_REFUSAL") throw error;
+    const invalidResponse = new Error("The model returned invalid structured output.");
+    invalidResponse.code = "INVALID_RESEARCH_RESPONSE";
+    throw invalidResponse;
+  }
+  return {
+    interpretation: validateResearchInterpretation(value, evidence),
+    model,
+    usage: {
+      inputTokens: payload.usage?.input_tokens || 0,
+      outputTokens: payload.usage?.output_tokens || 0,
+      totalTokens: payload.usage?.total_tokens || 0
+    }
+  };
+}
+
+async function handleResearchInterpretation(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+
+  const question = normalizedResearchText(body.question, 2_000);
+  if (question.length < 3) {
+    sendError(response, 400, "Enter a research question.");
+    return;
+  }
+  const requestedIDs = Array.isArray(body.sectionIDs)
+    ? Array.from(new Set(body.sectionIDs.map((value) => String(value).trim()).filter(Boolean)))
+    : [];
+  if (!requestedIDs.length || requestedIDs.length > 12 || requestedIDs.some((id) => !/^\d+$/.test(id))) {
+    sendError(response, 400, "Provide between 1 and 12 numeric section IDs.");
+    return;
+  }
+
+  try {
+    const evidence = await researchEvidenceForSectionIDs(requestedIDs);
+    const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+    const result = mockMode
+      ? {
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, evidence), evidence),
+          model: "permitext-mock",
+          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+        }
+      : await openAIResearchInterpretation(question, evidence, userID);
+    const usage = result.usage;
+    console.info(JSON.stringify({
+      event: "research_interpretation",
+      user: createHash("sha256").update(userID).digest("hex").slice(0, 16),
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      evidenceSections: evidence.length,
+      inputTokens: usage.inputTokens,
+      outputTokens: usage.outputTokens,
+      totalTokens: usage.totalTokens
+    }));
+    sendJSON(response, 200, {
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      ...result.interpretation,
+      evidenceSectionIDs: evidence.map((section) => section.sectionID),
+      usage,
+      disclaimer: "AI-generated research assistance, not an official code determination."
+    });
+  } catch (error) {
+    if (error.code === "INVALID_RESEARCH_SECTION") {
+      sendError(response, 400, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_REFUSAL") {
+      sendError(response, 422, error.message);
+      return;
+    }
+    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "RESEARCH_PROVIDER_ERROR", "TimeoutError"].includes(error.code || error.name)) {
+      sendError(response, 502, "The research model could not return a verified, cited answer.");
+      return;
+    }
+    throw error;
+  }
 }
 
 function searchSnippet(text, query) {
@@ -4233,6 +4521,7 @@ const handlers = {
   "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
+  "research/interpret": handleResearchInterpretation,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

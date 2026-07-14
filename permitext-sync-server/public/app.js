@@ -65,6 +65,8 @@ let appleIDScriptPromise = null;
 let workboardModulePromise = null;
 let unmountWorkboard = null;
 let mountedWorkboardProjectID = "";
+let researchQuestionDraft = "";
+let researchInterpretationResult = null;
 
 applyReaderSettings();
 
@@ -4461,6 +4463,64 @@ function wireUtilityInstanceActions(panel, instance) {
   closeButton.addEventListener("click", () => closeUtilityInstance(instance));
 }
 
+function appendResearchList(container, title, items) {
+  if (!items?.length) return;
+  const heading = document.createElement("strong");
+  heading.className = "research-result-subheading";
+  heading.textContent = title;
+  const list = document.createElement("ul");
+  list.className = "research-result-list";
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    row.textContent = item;
+    list.append(row);
+  });
+  container.append(heading, list);
+}
+
+function renderResearchInterpretation(container, result) {
+  clear(container);
+  if (!result) return;
+
+  const card = document.createElement("article");
+  card.className = "analysis-card research-result-card";
+  const label = document.createElement("p");
+  label.className = "section-label";
+  label.textContent = result.mode === "mock" ? "Prototype response" : "Code interpretation";
+  const heading = document.createElement("h3");
+  heading.textContent = result.conclusion;
+  const explanation = document.createElement("p");
+  explanation.textContent = result.explanation;
+  card.append(label, heading, explanation);
+  appendResearchList(card, "Assumptions", result.assumptions);
+  appendResearchList(card, "Facts to confirm", result.missingFacts);
+
+  const citationsHeading = document.createElement("strong");
+  citationsHeading.className = "research-result-subheading";
+  citationsHeading.textContent = "Cited code sections";
+  card.append(citationsHeading);
+  result.citations.forEach((citation) => {
+    const citationRow = document.createElement("div");
+    citationRow.className = "research-result-citation";
+    const citationText = document.createElement("span");
+    citationText.textContent = officialSectionCitation(citation);
+    const relevance = document.createElement("p");
+    relevance.textContent = citation.relevance;
+    const openButton = document.createElement("button");
+    openButton.className = "ghost-button";
+    openButton.type = "button";
+    openButton.textContent = "Open cited section";
+    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(citation));
+    citationRow.append(citationText, relevance, openButton);
+    card.append(citationRow);
+  });
+  const disclaimer = document.createElement("p");
+  disclaimer.className = "research-disclaimer";
+  disclaimer.textContent = result.disclaimer;
+  card.append(disclaimer);
+  container.append(card);
+}
+
 async function renderResearch(paneID) {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel");
@@ -4500,6 +4560,73 @@ async function renderResearch(paneID) {
   summaryActions.append(copyAllButton, downloadButton);
   summary.append(label, heading, explanation, summaryActions);
   content.append(summary);
+
+  const interpreter = document.createElement("article");
+  interpreter.className = "analysis-card research-interpreter";
+  const interpreterLabel = document.createElement("p");
+  interpreterLabel.className = "section-label";
+  interpreterLabel.textContent = "Code interpretation";
+  const interpreterHeading = document.createElement("h3");
+  interpreterHeading.textContent = "Ask about this research set";
+  const interpreterExplanation = document.createElement("p");
+  interpreterExplanation.textContent = sections.length
+    ? `Uses ${sections.length} selected official code ${sections.length === 1 ? "section" : "sections"}. Private notes and general web content are excluded.`
+    : "Open code sections before asking a research question.";
+  const questionLabel = document.createElement("label");
+  questionLabel.className = "research-question-label";
+  questionLabel.textContent = "Research question";
+  const questionInput = document.createElement("textarea");
+  questionInput.className = "research-question-input";
+  questionInput.rows = 4;
+  questionInput.maxLength = 2000;
+  questionInput.placeholder = "For example: What notice is required before this work begins?";
+  questionInput.value = researchQuestionDraft;
+  questionInput.addEventListener("input", () => {
+    researchQuestionDraft = questionInput.value;
+    askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+  });
+  const askButton = document.createElement("button");
+  askButton.className = "ghost-button research-ask-button";
+  askButton.type = "button";
+  askButton.textContent = "Interpret selected codes";
+  askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+  const status = document.createElement("p");
+  status.className = "research-interpreter-status";
+  if (!activeAccount()) status.textContent = "Sign in from Settings to use code interpretation.";
+  const resultContainer = document.createElement("section");
+  resultContainer.className = "research-interpretation-result";
+  const selectedIDs = sections.map((section) => String(section.sectionID));
+  if (researchInterpretationResult?.evidenceSectionIDs?.join(",") === selectedIDs.join(",")) {
+    renderResearchInterpretation(resultContainer, researchInterpretationResult);
+  }
+  askButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account || !sections.length || researchQuestionDraft.trim().length < 3) return;
+    askButton.disabled = true;
+    questionInput.disabled = true;
+    status.textContent = "Reviewing the selected code sections…";
+    clear(resultContainer);
+    try {
+      const result = await postJSON("/research/interpret", {
+        auth: { accountUserID: account.userID },
+        question: researchQuestionDraft.trim(),
+        sectionIDs: selectedIDs
+      }, { token: account.sessionToken });
+      researchInterpretationResult = result;
+      renderResearchInterpretation(resultContainer, result);
+      status.textContent = result.mode === "mock"
+        ? "Prototype mode is active; no external model was called."
+        : `Answer verified against ${result.citations.length} selected ${result.citations.length === 1 ? "citation" : "citations"}.`;
+    } catch (error) {
+      status.textContent = error.message || "Code interpretation is temporarily unavailable.";
+    } finally {
+      questionInput.disabled = false;
+      askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+    }
+  });
+  questionLabel.append(questionInput);
+  interpreter.append(interpreterLabel, interpreterHeading, interpreterExplanation, questionLabel, askButton, status);
+  content.append(interpreter, resultContainer);
 
   sections.forEach((section) => {
     const row = document.createElement("article");

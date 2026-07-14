@@ -94,7 +94,24 @@ The same URL loads the section-detail workspace in a browser and opens `ReaderVi
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
-The web `Research` pane is deliberately non-AI. It derives a research set from the canonical sections currently open in readers, search details, and open project details, formats each as a 2022 New York City code citation, and includes the universal link. Project membership therefore carries an iPhone-organized research set onto web without a second persistence model. Private notes are excluded from citation output. Users can copy one citation, copy the set, or download a plain-text citation file when browser clipboard access is unavailable.
+The web `Research` pane derives a research set from the canonical sections currently open in readers, search details, and open project details. Users can copy or download that citation set and can ask for a plain-language interpretation grounded only in those selected official sections. The browser sends section IDs rather than code text; the server resolves the canonical bodies, excludes private notes, and rejects any model citation outside the selected evidence. Interpretations are research assistance, not official code determinations, and are not persisted as chat history.
+
+Run the interpretation flow locally without calling an external model:
+
+```sh
+PERMITEXT_RESEARCH_MOCK=1 node server.mjs
+```
+
+Enable live OpenAI Responses API calls with a server-only key:
+
+```sh
+OPENAI_API_KEY=... \
+PERMITEXT_RESEARCH_MODEL=gpt-5.6-terra \
+PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
+node server.mjs
+```
+
+`OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, limits each request to 12 selected sections, and records model/token usage without logging the question or code text. The OpenAI account that owns the API key is responsible for model usage charges.
 
 `GET /code/sections?ids=<comma-separated-ids>` resolves up to 100 canonical or legacy section IDs into ordered canonical metadata without loading section bodies. The Research pane batches larger projects through that endpoint and caches results in the browser. Single-section lookup uses the same cached server catalog, avoiding repeated chapter scans.
 
