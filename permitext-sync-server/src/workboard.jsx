@@ -86,7 +86,7 @@ function preferredTheme() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-function Workboard({ projectID, projectName, onClose }) {
+function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "Detach project and Workboard" }) {
   const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
@@ -184,6 +184,15 @@ function Workboard({ projectID, projectName, onClose }) {
         </div>
         <div className="permitext-workboard-header-actions">
           <span className="permitext-workboard-save-state" role="status">{status}</span>
+          {onDetach ? (
+            <button type="button" onClick={onDetach} aria-label={detachLabel} title={detachLabel}>
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 3h7v7" />
+                <path d="m10 14 11-11" />
+                <path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" />
+              </svg>
+            </button>
+          ) : null}
           <button type="button" onClick={onClose} aria-label="Close workboard" title="Close workboard">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <circle cx="12" cy="12" r="10" />

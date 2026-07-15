@@ -289,72 +289,6 @@ textarea:focus-visible {
   overscroll-behavior-x: contain;
 }
 
-body.has-workboard .panel-track::after {
-  flex: 0 0 var(--workboard-width, 50vw);
-  min-width: var(--workboard-width, 50vw);
-  content: "";
-  pointer-events: none;
-}
-
-.workboard-dock {
-  position: fixed;
-  top: var(--header-height);
-  right: 0;
-  bottom: 0;
-  z-index: 20;
-  display: grid;
-  grid-template-columns: 8px minmax(0, 1fr);
-  width: var(--workboard-width, 50vw);
-  min-width: 0;
-  overflow: hidden;
-  border-left: 1px solid var(--border);
-  background: var(--surface-raised);
-  box-shadow: -18px 0 42px rgba(27, 29, 34, 0.14);
-}
-
-.workboard-dock[hidden] {
-  display: none;
-}
-
-.workboard-root {
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.workboard-resize-handle {
-  position: relative;
-  z-index: 2;
-  width: 8px;
-  min-height: 0;
-  cursor: col-resize;
-  touch-action: none;
-}
-
-.workboard-resize-handle::after {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 3px;
-  width: 1px;
-  content: "";
-  background: var(--border);
-  transition: background-color 150ms ease, width 150ms ease;
-}
-
-.workboard-resize-handle:hover::after,
-.workboard-resize-handle:focus-visible::after,
-body.is-resizing-workboard .workboard-resize-handle::after {
-  width: 2px;
-  background: var(--code-accent, #c96410);
-}
-
-body.is-resizing-workboard,
-body.is-resizing-workboard * {
-  cursor: col-resize !important;
-  user-select: none !important;
-}
-
 .panel-track.is-resizing {
   cursor: col-resize;
   user-select: none;
@@ -391,6 +325,41 @@ body.is-resizing-workboard * {
   box-shadow: none;
   transition: transform 260ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms ease;
   will-change: transform;
+}
+
+.workboard-panel {
+  --pane-min-width: min(420px, 82vw);
+  grid-template-rows: minmax(0, 1fr);
+  padding: 0;
+  background: var(--surface-raised);
+}
+
+.workboard-root {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+body.is-detached-workboard-window .workspace-shell {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+body.is-detached-workboard-window .topbar {
+  display: none;
+}
+
+body.is-detached-workboard-window .panel-track {
+  width: 100%;
+}
+
+body.is-detached-workboard-window .project-detail-panel {
+  flex: 0 0 min(360px, 36vw) !important;
+}
+
+body.is-detached-workboard-window .workboard-panel {
+  flex: 1 1 auto !important;
 }
 
 .workspace-panel.is-dragging {
@@ -2790,6 +2759,21 @@ mark {
   background: color-mix(in srgb, var(--project-color) 32%, transparent);
 }
 
+.projects-content .project-row.is-detached {
+  background: color-mix(in srgb, var(--project-color) 24%, transparent);
+}
+
+.project-detached-label {
+  display: inline-flex;
+  width: fit-content;
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.66) !important;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 @media (prefers-color-scheme: dark) {
   .projects-content .project-row {
     background: color-mix(in srgb, var(--project-color) 24%, transparent);
@@ -2797,6 +2781,10 @@ mark {
 
   .projects-content .project-row.is-open {
     background: color-mix(in srgb, var(--project-color) 42%, transparent);
+  }
+
+  .projects-content .project-row.is-detached {
+    background: color-mix(in srgb, var(--project-color) 34%, transparent);
   }
 }
 

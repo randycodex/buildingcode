@@ -113,7 +113,8 @@ async function main() {
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
-    assert(webRoot.text.includes('id="workboard-dock"'), "Web workspace omitted the project Workboard dock.");
+    assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
+    assert(webRoot.text.includes("paired-workboards"), "Web workspace omitted the paired Workboard assets.");
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");

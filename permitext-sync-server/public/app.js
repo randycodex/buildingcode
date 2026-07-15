@@ -1,8 +1,13 @@
-const workspaceKey = "permitext:webWorkspace:v1";
+const baseWorkspaceKey = "permitext:webWorkspace:v1";
+const detachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
+const detachedProjectSessionKey = detachedProjectParameter
+  ? `permitext:detachedWorkboard:${detachedProjectParameter}`
+  : "";
+const detachedProjectWindow = Boolean(detachedProjectParameter);
+const workspaceKey = detachedProjectWindow
+  ? `${baseWorkspaceKey}:detached:${detachedProjectParameter}`
+  : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
-const workboardDock = document.querySelector("#workboard-dock");
-const workboardRoot = document.querySelector("#workboard-root");
-const workboardResizeHandle = document.querySelector("#workboard-resize-handle");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleProjectsButton = document.querySelector("#toggle-projects");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
@@ -32,11 +37,25 @@ const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}
 const defaultReaderPaneWidth = 520;
 const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
+const defaultWorkboardPaneWidth = 720;
 const defaultSettingsPaneWidth = 340;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
+const sharedWorkspaceStateKeys = [
+  "localProjects",
+  "localSavedItems",
+  "localProjectSections",
+  "localAnnotations",
+  "syncOutbox",
+  "syncConflicts",
+  "archivedProjectIDs",
+  "sectionNotes",
+  "localSavedSectionIDs",
+  "account",
+  "continuityAppliedAt"
+];
 
 const defaultReaderSettings = {
   fontSize: 10,
@@ -46,6 +65,8 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let state = loadWorkspaceState();
+const detachedProject = detachedProjectFromSession();
+if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
 const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
@@ -63,8 +84,7 @@ const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
 let workboardModulePromise = null;
-let unmountWorkboard = null;
-let mountedWorkboardProjectID = "";
+const workboardMounts = new Map();
 let researchQuestionDraft = "";
 let researchInterpretationResult = null;
 
@@ -72,7 +92,7 @@ applyReaderSettings();
 
 function loadWorkspaceState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(workspaceKey) || "{}");
+    const saved = JSON.parse(localStorage.getItem(detachedProjectWindow ? baseWorkspaceKey : workspaceKey) || "{}");
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -111,7 +131,8 @@ function loadWorkspaceState() {
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
-      workboard: normalizeWorkboard(saved.workboard)
+      workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
+      detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
     };
   } catch {
     return {
@@ -141,7 +162,8 @@ function loadWorkspaceState() {
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
-      workboard: null
+      workboards: [],
+      detachedWorkboards: []
     };
   }
 }
@@ -179,118 +201,246 @@ function normalizeUtilityInstances(saved = {}) {
 
 function saveWorkspaceState() {
   localStorage.setItem(workspaceKey, JSON.stringify(state));
+  if (!detachedProjectWindow) return;
+  try {
+    const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
+    sharedWorkspaceStateKeys.forEach((key) => {
+      shared[key] = state[key];
+    });
+    localStorage.setItem(baseWorkspaceKey, JSON.stringify(shared));
+  } catch {
+    // The detached board can keep working from its scoped state if the shared state is unavailable.
+  }
 }
 
-function normalizeWorkboard(value) {
-  if (!value?.project || typeof value.project !== "object") return null;
-  return {
-    project: value.project,
-    width: Number.isFinite(Number(value.width)) ? Number(value.width) : null
-  };
+function applySharedWorkspaceState(serializedState) {
+  try {
+    const shared = JSON.parse(serializedState || "{}");
+    sharedWorkspaceStateKeys.forEach((key) => {
+      if (shared[key] !== undefined) state[key] = shared[key];
+    });
+  } catch {
+    // Ignore malformed cross-window state and keep the current in-memory data.
+  }
+}
+
+function normalizeProjectIdentities(value, legacyWorkboard = null) {
+  const source = Array.isArray(value)
+    ? value
+    : legacyWorkboard?.project && typeof legacyWorkboard.project === "object" ? [legacyWorkboard.project] : [];
+  const unique = new Map();
+  source.filter((project) => project && typeof project === "object").forEach((project) => {
+    const identity = projectIdentity(project);
+    const id = workboardProjectID(identity);
+    if (id) unique.set(id, identity);
+  });
+  return Array.from(unique.values());
 }
 
 function workboardProjectID(project) {
   return String(project?.clientID || project?.id || project?.localFolderID || projectDetailKey(project) || "");
 }
 
-function clampedWorkboardWidth(width = null) {
-  const viewportWidth = Math.max(480, window.innerWidth || 1200);
-  const minimumReaderWidth = Math.max(280, Math.min(420, viewportWidth * 0.38));
-  const maximum = Math.max(280, viewportWidth - minimumReaderWidth);
-  const minimum = Math.min(viewportWidth < 760 ? 280 : 420, maximum);
-  return clampNumber(width, minimum, maximum, Math.round(viewportWidth * 0.5));
-}
-
-function applyWorkboardWidth(width = null) {
-  const nextWidth = clampedWorkboardWidth(width);
-  if (state.workboard) state.workboard.width = nextWidth;
-  document.body.style.setProperty("--workboard-width", `${nextWidth}px`);
-  workboardDock?.style.setProperty("--project-color", state.workboard?.project?.color || "#c96410");
-  return nextWidth;
-}
-
-function closeProjectWorkboard() {
-  state.workboard = null;
-  document.querySelectorAll(".project-workboard-button").forEach((button) => {
-    button.setAttribute("aria-pressed", "false");
-  });
-  saveWorkspaceState();
-  void renderWorkboardDock();
-}
-
-function openProjectWorkboard(project) {
-  const identity = projectIdentity(project);
-  const currentWidth = state.workboard?.width;
-  state.workboard = {
-    project: identity,
-    width: clampedWorkboardWidth(currentWidth)
-  };
-  saveWorkspaceState();
-  void renderWorkboardDock();
-}
-
-async function renderWorkboardDock() {
-  const project = state.workboard?.project;
-  const projectID = workboardProjectID(project);
-  if (!workboardDock || !workboardRoot || !project || !projectID) {
-    document.body.classList.remove("has-workboard");
-    workboardDock?.setAttribute("hidden", "");
-    if (unmountWorkboard) unmountWorkboard();
-    unmountWorkboard = null;
-    mountedWorkboardProjectID = "";
-    workboardRoot?.removeAttribute("data-project-id");
-    return;
+function detachedProjectFromSession() {
+  if (!detachedProjectSessionKey) return null;
+  try {
+    const project = JSON.parse(localStorage.getItem(detachedProjectSessionKey) || "null");
+    return project && typeof project === "object" ? projectIdentity(project) : null;
+  } catch {
+    return null;
   }
+}
 
-  applyWorkboardWidth(state.workboard.width);
-  workboardDock.removeAttribute("hidden");
-  document.body.classList.add("has-workboard");
-  if (mountedWorkboardProjectID === projectID) return;
+function initializeDetachedProjectState(project) {
+  const identity = projectIdentity(project);
+  state.projectDetail = identity;
+  state.projectDetails = [identity];
+  state.workboards = [identity];
+  state.detachedWorkboards = [];
+  state.utilityInstances = [];
+  state.utilities = { projects: true, archive: false, search: false, saved: false, analysis: false, settings: false };
+  state.readers = [];
+  const detailID = paneIDForProjectDetail(identity);
+  const workboardID = paneIDForProjectWorkboard(identity);
+  state.paneOrder = [detailID, workboardID];
+  state.paneWeights = {
+    [detailID]: defaultDetailPaneWidth,
+    [workboardID]: defaultWorkboardPaneWidth
+  };
+  document.body.classList.add("is-detached-workboard-window");
+  document.title = `${identity.name} Workboard`;
+}
 
-  const isFirstMount = !unmountWorkboard;
-  workboardRoot.dataset.projectId = projectID;
-  if (isFirstMount) workboardRoot.textContent = "Loading workboard…";
+function openWorkboards() {
+  state.workboards = normalizeProjectIdentities(state.workboards);
+  return state.workboards;
+}
+
+function detachedWorkboards() {
+  state.detachedWorkboards = normalizeProjectIdentities(state.detachedWorkboards);
+  return state.detachedWorkboards;
+}
+
+function projectHasOpenWorkboard(project) {
+  return openWorkboards().some((item) => projectDetailMatches(project, item));
+}
+
+function projectHasDetachedWorkboard(project) {
+  return detachedWorkboards().some((item) => projectDetailMatches(project, item));
+}
+
+async function closeProjectWorkboard(project) {
+  const workboardID = paneIDForProjectWorkboard(project);
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[workboardID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
+  saveWorkspaceState();
+  await renderWorkspace();
+}
+
+async function openProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    setOpenProjectDetails([...openProjectDetails(), identity]);
+  }
+  if (!projectHasOpenWorkboard(identity)) state.workboards = [...openWorkboards(), identity];
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  const workboardID = paneIDForProjectWorkboard(identity);
+  state.paneWeights[workboardID] ||= defaultWorkboardPaneWidth;
+  placeProjectDetailAfterProjects(identity);
+  saveWorkspaceState();
+  await renderWorkspace();
+  scrollPaneIntoView(workboardID);
+}
+
+async function renderProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  const projectID = workboardProjectID(identity);
+  const paneID = paneIDForProjectWorkboard(identity);
+  let mounted = workboardMounts.get(projectID);
+  if (!mounted) {
+    const panel = document.createElement("article");
+    panel.className = "workspace-panel workboard-panel";
+    panel.dataset.paneId = paneID;
+    panel.style.setProperty("--project-color", identity.color || "#c96410");
+    const root = document.createElement("div");
+    root.className = "workboard-root";
+    root.dataset.projectId = projectID;
+    root.textContent = "Loading workboard…";
+    panel.append(root);
+    mounted = { panel, root, unmount: null, initialized: false };
+    workboardMounts.set(projectID, mounted);
+  }
+  mounted.panel.dataset.paneId = paneID;
+  mounted.panel.style.setProperty("--project-color", identity.color || "#c96410");
+  applyPaneWeight(mounted.panel, paneID);
 
   try {
     window.EXCALIDRAW_ASSET_PATH = "/web/workboard-assets/";
     workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
     const module = await workboardModulePromise;
-    if (workboardProjectID(state.workboard?.project) !== projectID) return;
-    if (isFirstMount) workboardRoot.replaceChildren();
-    unmountWorkboard = module.mountWorkboard(workboardRoot, {
+    if (!mounted.initialized) mounted.root.replaceChildren();
+    mounted.unmount = module.mountWorkboard(mounted.root, {
       projectID,
-      projectName: project.name || project.title || "Project",
-      onClose: closeProjectWorkboard
+      projectName: identity.name || identity.title || "Project",
+      onClose: detachedProjectWindow ? () => window.close() : () => closeProjectWorkboard(identity),
+      onDetach: detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
+      detachLabel: detachedProjectWindow ? "Reattach project and Workboard" : "Detach project and Workboard"
     });
-    mountedWorkboardProjectID = projectID;
+    mounted.initialized = true;
   } catch (error) {
     console.error("Could not load the project workboard.", error);
-    if (isFirstMount) workboardRoot.textContent = "Could not load the project workboard.";
+    mounted.root.textContent = "Could not load the project workboard.";
   }
+  return mounted.panel;
 }
 
-function beginWorkboardResize(event) {
-  if (!state.workboard || !workboardDock) return;
-  event.preventDefault();
-  const pointerID = event.pointerId;
-  const startX = event.clientX;
-  const startWidth = workboardDock.getBoundingClientRect().width;
-  document.body.classList.add("is-resizing-workboard");
-  workboardResizeHandle?.setPointerCapture?.(pointerID);
+function cleanupInactiveWorkboardMounts(panes) {
+  const activeProjectIDs = new Set(panes
+    .filter((pane) => pane.classList.contains("workboard-panel"))
+    .map((pane) => pane.querySelector(".workboard-root")?.dataset.projectId)
+    .filter(Boolean));
+  workboardMounts.forEach((mounted, projectID) => {
+    if (activeProjectIDs.has(projectID)) return;
+    mounted.unmount?.();
+    workboardMounts.delete(projectID);
+  });
+}
 
-  const onMove = (moveEvent) => {
-    const width = applyWorkboardWidth(startWidth + startX - moveEvent.clientX);
-    workboardResizeHandle?.setAttribute("aria-valuenow", String(Math.round(width)));
-  };
-  const onUp = (upEvent) => {
-    window.removeEventListener("pointermove", onMove);
-    window.removeEventListener("pointerup", onUp);
-    workboardResizeHandle?.releasePointerCapture?.(upEvent.pointerId);
-    document.body.classList.remove("is-resizing-workboard");
-    saveWorkspaceState();
-  };
-  window.addEventListener("pointermove", onMove);
-  window.addEventListener("pointerup", onUp, { once: true });
+function detachedWindowName(project) {
+  return `permitext-workboard-${workboardProjectID(project).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function detachedWindowURL(project) {
+  const projectID = workboardProjectID(project);
+  return `/?detachedWorkboard=${encodeURIComponent(projectID)}`;
+}
+
+function openDetachedWindow(project) {
+  const identity = projectIdentity(project);
+  const projectID = workboardProjectID(identity);
+  localStorage.setItem(`permitext:detachedWorkboard:${projectID}`, JSON.stringify(identity));
+  const popup = window.open(
+    detachedWindowURL(identity),
+    detachedWindowName(identity),
+    "popup=yes,width=1240,height=820,resizable=yes,scrollbars=yes"
+  );
+  if (popup) {
+    popup.focus();
+  }
+  return popup;
+}
+
+async function detachProjectWorkboard(project) {
+  if (detachedProjectWindow) return;
+  const identity = projectIdentity(project);
+  const popup = openDetachedWindow(identity);
+  if (!popup) {
+    window.alert("The Workboard window was blocked. Allow pop-ups for permitext and try again.");
+    return;
+  }
+  if (!projectHasDetachedWorkboard(identity)) {
+    state.detachedWorkboards = [...detachedWorkboards(), identity];
+  }
+  closeProjectDetailForProject(identity);
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  const detailID = paneIDForProjectDetail(identity);
+  const workboardID = paneIDForProjectWorkboard(identity);
+  delete state.paneWeights[detailID];
+  delete state.paneWeights[workboardID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
+  saveWorkspaceState();
+  await renderWorkspace();
+  window.setTimeout(() => {
+    if (popup.closed) void reattachProjectWorkboard(identity);
+  }, 250);
+}
+
+function reattachDetachedProject() {
+  if (!detachedProject) return;
+  if (window.opener && !window.opener.closed) {
+    window.opener.postMessage({ type: "permitext:reattachWorkboard", project: detachedProject }, window.location.origin);
+    window.close();
+    return;
+  }
+  localStorage.setItem("permitext:pendingWorkboardReattach", JSON.stringify(detachedProject));
+  window.location.assign("/");
+}
+
+async function reattachProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    setOpenProjectDetails([...openProjectDetails(), identity]);
+  }
+  if (!projectHasOpenWorkboard(identity)) state.workboards = [...openWorkboards(), identity];
+  placeProjectDetailAfterProjects(identity);
+  state.paneWeights[paneIDForProjectDetail(identity)] ||= defaultDetailPaneWidth;
+  state.paneWeights[paneIDForProjectWorkboard(identity)] ||= defaultWorkboardPaneWidth;
+  localStorage.removeItem("permitext:pendingWorkboardReattach");
+  saveWorkspaceState();
+  await renderWorkspace();
+  scrollPaneIntoView(paneIDForProjectWorkboard(identity));
 }
 
 function clampNumber(value, min, max, fallback) {
@@ -570,7 +720,7 @@ function paneIDForSectionDetail(searchID = "legacy") {
 
 function projectDetailKey(detail) {
   if (!detail) return "legacy";
-  return String(detail.id || detail.clientID || detail.localFolderID || detail.name || detail.title || "legacy");
+  return String(detail.clientID || detail.localFolderID || detail.id || detail.name || detail.title || "legacy");
 }
 
 function paneIDForProjectDetail(detail = null) {
@@ -579,6 +729,14 @@ function paneIDForProjectDetail(detail = null) {
 
 function isProjectDetailPaneID(paneID) {
   return String(paneID || "").startsWith("project:detail:");
+}
+
+function paneIDForProjectWorkboard(detail = null) {
+  return `project:workboard:${encodeURIComponent(projectDetailKey(detail))}`;
+}
+
+function isProjectWorkboardPaneID(paneID) {
+  return String(paneID || "").startsWith("project:workboard:");
 }
 
 function openProjectDetails() {
@@ -593,6 +751,7 @@ function setOpenProjectDetails(details) {
 
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
+  if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:settings" || paneID.startsWith("utility:analysis:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
@@ -603,6 +762,7 @@ function defaultPaneWidthForID(paneID) {
 function isFixedWidthPaneID(paneID) {
   return paneID?.startsWith("utility:") ||
     isProjectDetailPaneID(paneID) ||
+    isProjectWorkboardPaneID(paneID) ||
     paneID?.startsWith("section:detail:");
 }
 
@@ -676,9 +836,15 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 function defaultActivePaneIDs() {
+  if (detachedProjectWindow && detachedProject) {
+    return [paneIDForProjectDetail(detachedProject), paneIDForProjectWorkboard(detachedProject)];
+  }
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
-  if (state.utilities.projects) openProjectDetails().forEach((detail) => ids.push(paneIDForProjectDetail(detail)));
+  if (state.utilities.projects) openProjectDetails().forEach((detail) => {
+    ids.push(paneIDForProjectDetail(detail));
+    if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
+  });
   if (state.utilities.projects && state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
@@ -698,10 +864,17 @@ function activePaneIDs() {
   ids.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const paired = ordered.filter((id) => !id.startsWith("section:detail:") && !isProjectDetailPaneID(id));
+  const paired = ordered.filter((id) =>
+    !id.startsWith("section:detail:") &&
+    !isProjectDetailPaneID(id) &&
+    !isProjectWorkboardPaneID(id)
+  );
   if (state.utilities.projects && openProjectDetails().length) {
     const projectsIndex = paired.indexOf("utility:projects");
-    const detailIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+    const detailIDs = openProjectDetails().flatMap((detail) => [
+      paneIDForProjectDetail(detail),
+      ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+    ]);
     if (projectsIndex === -1) {
       paired.push(...detailIDs);
     } else {
@@ -825,7 +998,11 @@ function placeArchiveAfterProjectsStack() {
     if (!ordered.includes(id)) ordered.push(id);
   });
   const projectIndex = ordered.indexOf("utility:projects");
-  const detailIndex = Math.max(...openProjectDetails().map((detail) => ordered.indexOf(paneIDForProjectDetail(detail))).filter((index) => index !== -1), -1);
+  const projectStackIDs = openProjectDetails().flatMap((detail) => [
+    paneIDForProjectDetail(detail),
+    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+  ]);
+  const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
   const insertIndex = detailIndex === -1
     ? projectIndex === -1 ? 0 : projectIndex + 1
     : detailIndex + 1;
@@ -835,7 +1012,10 @@ function placeArchiveAfterProjectsStack() {
 
 function restoreProjectsStackOrder() {
   const projectID = "utility:projects";
-  const detailIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+  const detailIDs = openProjectDetails().flatMap((detail) => [
+    paneIDForProjectDetail(detail),
+    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+  ]);
   const archiveID = "utility:archive";
   const activeIDs = defaultActivePaneIDs();
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && !detailIDs.includes(id) && id !== archiveID);
@@ -4794,13 +4974,15 @@ function projectSectionBelongsToProject(item, project) {
 }
 
 async function openProjectDetail(project) {
+  if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
+    openDetachedWindow(project);
+    return;
+  }
   const identity = projectIdentity(project);
   const detailID = paneIDForProjectDetail(identity);
   const details = openProjectDetails();
   if (details.some((detail) => projectDetailMatches(project, detail))) {
-    setOpenProjectDetails(details.filter((detail) => !projectDetailMatches(project, detail)));
-    delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    closeProjectDetailForProject(identity);
   } else {
     setOpenProjectDetails([...details, identity]);
     placeProjectDetailAfterProjects(identity);
@@ -4823,9 +5005,12 @@ function closeProjectDetailForProject(project) {
   setOpenProjectDetails(openProjectDetails().filter((detail) => !projectDetailMatches(project, detail)));
   matchingDetails.forEach((detail) => {
     const detailID = paneIDForProjectDetail(detail);
+    const workboardID = paneIDForProjectWorkboard(detail);
     delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    delete state.paneWeights[workboardID];
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
   });
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
 
 async function archiveProject(project) {
@@ -4837,7 +5022,7 @@ async function archiveProject(project) {
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);
   closeProjectDetailForProject(project);
-  if (projectDetailMatches(project, state.workboard?.project)) state.workboard = null;
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await renderWorkspace();
@@ -4871,7 +5056,7 @@ async function deleteArchivedProject(project) {
   state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);
-  if (projectDetailMatches(project, state.workboard?.project)) state.workboard = null;
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
   saveWorkspaceState();
   await renderWorkspace();
 }
@@ -4907,13 +5092,14 @@ async function renderProjectDetail(detail) {
   workboardButton.className = "project-workboard-button";
   workboardButton.type = "button";
   workboardButton.textContent = "Workboard";
-  workboardButton.setAttribute("aria-pressed", String(projectDetailMatches(identity, state.workboard?.project)));
+  workboardButton.setAttribute("aria-pressed", String(projectHasOpenWorkboard(identity)));
+  workboardButton.hidden = detachedProjectWindow;
   workboardButton.addEventListener("click", () => {
-    if (projectDetailMatches(identity, state.workboard?.project)) {
-      closeProjectWorkboard();
+    if (projectHasOpenWorkboard(identity)) {
+      void closeProjectWorkboard(identity);
       workboardButton.setAttribute("aria-pressed", "false");
     } else {
-      openProjectWorkboard(identity);
+      void openProjectWorkboard(identity);
       workboardButton.setAttribute("aria-pressed", "true");
     }
   });
@@ -5001,10 +5187,11 @@ async function renderProjectDetail(detail) {
   });
 
   backButton.addEventListener("click", () => {
-    const detailID = paneIDForProjectDetail(identity);
-    setOpenProjectDetails(openProjectDetails().filter((item) => !projectDetailMatches(identity, item)));
-    delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    if (detachedProjectWindow) {
+      window.close();
+      return;
+    }
+    closeProjectDetailForProject(identity);
     saveWorkspaceState();
     renderWorkspace();
   });
@@ -5196,13 +5383,18 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const card = document.createElement("article");
     card.className = "project-card project-row";
     const isOpenProject = openProjectDetails().some((detail) => projectDetailMatches(project, detail));
+    const isDetachedProject = projectHasDetachedWorkboard(project);
     if (isOpenProject) {
       card.classList.add("is-open");
       card.setAttribute("aria-current", "true");
     }
+    if (isDetachedProject) card.classList.add("is-detached");
     card.tabIndex = 0;
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
+    card.setAttribute(
+      "aria-label",
+      `${isDetachedProject ? "Focus detached" : "Open"} ${project.name || project.title || "project"}`
+    );
     card.style.setProperty("--project-color", projectColor(project));
     const actionGroup = document.createElement("div");
     actionGroup.className = "project-card-actions";
@@ -5247,6 +5439,12 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
     body.append(heading);
+    if (isDetachedProject) {
+      const detachedLabel = document.createElement("span");
+      detachedLabel.className = "project-detached-label";
+      detachedLabel.textContent = "Detached";
+      body.append(detachedLabel);
+    }
     const addressText = String(project.address || "").trim();
     if (addressText) {
       const address = document.createElement("p");
@@ -5716,8 +5914,15 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
-  if (paneID === "utility:projects" || isProjectDetailPaneID(paneID)) {
-    return ["utility:projects", ...openProjectDetails().map((detail) => paneIDForProjectDetail(detail)), "utility:archive"].filter((id) => active.has(id));
+  if (paneID === "utility:projects" || isProjectDetailPaneID(paneID) || isProjectWorkboardPaneID(paneID)) {
+    return [
+      "utility:projects",
+      ...openProjectDetails().flatMap((detail) => [
+        paneIDForProjectDetail(detail),
+        ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+      ]),
+      "utility:archive"
+    ].filter((id) => active.has(id));
   }
   if (paneID.startsWith("utility:search:")) {
     const searchID = paneID.replace("utility:search:", "");
@@ -5943,6 +6148,7 @@ function appendPaneSequence(panes) {
   const orderedPanes = orderPanes(panes);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
+  cleanupInactiveWorkboardMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
   orderedPanes.forEach((pane, index) => {
     if (index > 0) {
@@ -5959,8 +6165,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   if (!pane) return;
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
-  const dockRect = !workboardDock?.hidden ? workboardDock.getBoundingClientRect() : null;
-  const visibleRight = dockRect ? Math.min(trackRect.right, dockRect.left) : trackRect.right;
+  const visibleRight = trackRect.right;
   const paneRight = paneRect.right - visibleRight;
   const paneLeft = paneRect.left - trackRect.left;
   if (paneRight > 0) {
@@ -5983,9 +6188,21 @@ async function renderWorkspace() {
   setUtilityButtonStates();
 
   const panes = [];
+  if (detachedProjectWindow && detachedProject) {
+    panes.push(await renderProjectDetail(openProjectDetails()[0] || detachedProject));
+    panes.push(await renderProjectWorkboard(detachedProject));
+    appendPaneSequence(panes);
+    syncAllCommentBoxHeights();
+    bindAllReaderCommentScroll();
+    saveWorkspaceState();
+    return;
+  }
   if (state.utilities.projects) {
     panes.push(await renderProjects());
-    for (const detail of openProjectDetails()) panes.push(await renderProjectDetail(detail));
+    for (const detail of openProjectDetails()) {
+      panes.push(await renderProjectDetail(detail));
+      if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
+    }
   }
   if (state.utilities.projects && state.utilities.archive) {
     panes.push(await renderArchive());
@@ -6009,7 +6226,6 @@ async function renderWorkspace() {
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
   saveWorkspaceState();
-  void renderWorkboardDock();
 }
 
 async function renderUtilityWorkspace() {
@@ -6021,7 +6237,10 @@ async function renderUtilityWorkspace() {
   const existingContentPanes = Array.from(existingPanesByID.values())
     .filter((pane) => {
       const paneID = String(pane.dataset.paneId || "");
-      return !paneID.startsWith("utility:") && !paneID.startsWith("section:detail:") && !isProjectDetailPaneID(paneID);
+      return !paneID.startsWith("utility:") &&
+        !paneID.startsWith("section:detail:") &&
+        !isProjectDetailPaneID(paneID) &&
+        !isProjectWorkboardPaneID(paneID);
     });
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -6030,7 +6249,10 @@ async function renderUtilityWorkspace() {
   const panes = [];
   if (state.utilities.projects) {
     panes.push(await renderProjects());
-    for (const detail of openProjectDetails()) panes.push(await renderProjectDetail(detail));
+    for (const detail of openProjectDetails()) {
+      panes.push(await renderProjectDetail(detail));
+      if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
+    }
   }
   if (state.utilities.projects && state.utilities.archive) {
     panes.push(await renderArchive());
@@ -6070,7 +6292,6 @@ async function renderUtilityWorkspace() {
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
   saveWorkspaceState();
-  void renderWorkboardDock();
 }
 
 async function transitionWorkspace(mode = "default") {
@@ -6107,9 +6328,17 @@ async function toggleUtilityPane(key) {
     }
   } else if (key === "projects") {
     delete state.paneWeights[paneID];
-    openProjectDetails().forEach((detail) => delete state.paneWeights[paneIDForProjectDetail(detail)]);
+    openProjectDetails().forEach((detail) => {
+      delete state.paneWeights[paneIDForProjectDetail(detail)];
+      delete state.paneWeights[paneIDForProjectWorkboard(detail)];
+    });
     delete state.paneWeights["utility:archive"];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID && !isProjectDetailPaneID(id) && id !== "utility:archive");
+    state.paneOrder = (state.paneOrder || []).filter((id) =>
+      id !== paneID &&
+      !isProjectDetailPaneID(id) &&
+      !isProjectWorkboardPaneID(id) &&
+      id !== "utility:archive"
+    );
   } else if (key === "archive") {
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   }
@@ -6143,6 +6372,7 @@ async function collapseToOneReader() {
   state.sectionDetails = {};
   state.searchLinkedReaders = {};
   setOpenProjectDetails([]);
+  state.workboards = [];
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });
@@ -6168,10 +6398,14 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
-  window.addEventListener("resize", () => {
-    if (state.workboard) {
-      applyWorkboardWidth(state.workboard.width);
-      saveWorkspaceState();
+  window.addEventListener("storage", (event) => {
+    if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
+    if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
+      try {
+        void reattachProjectWorkboard(JSON.parse(event.newValue));
+      } catch {
+        localStorage.removeItem("permitext:pendingWorkboardReattach");
+      }
     }
   });
   window.addEventListener("online", () => {
@@ -6183,6 +6417,38 @@ async function start() {
     }
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
+  if (detachedProjectWindow) {
+    if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");
+    window.addEventListener("pagehide", () => {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          { type: "permitext:detachedWorkboardClosed", project: detachedProject },
+          window.location.origin
+        );
+      }
+    }, { once: true });
+    await renderWorkspace();
+    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    return;
+  }
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "permitext:reattachWorkboard") {
+      void reattachProjectWorkboard(event.data.project);
+      return;
+    }
+    if (event.data?.type === "permitext:detachedWorkboardClosed") {
+      state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(event.data.project, item));
+      saveWorkspaceState();
+      void renderWorkspace();
+    }
+  });
+  try {
+    const pendingReattach = JSON.parse(localStorage.getItem("permitext:pendingWorkboardReattach") || "null");
+    if (pendingReattach) await reattachProjectWorkboard(pendingReattach);
+  } catch {
+    localStorage.removeItem("permitext:pendingWorkboardReattach");
+  }
   addReaderButton.addEventListener("click", async () => {
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
     state.readers.push(reader);
@@ -6213,15 +6479,6 @@ async function start() {
   });
   collapseReadersButton.addEventListener("click", () => {
     collapseToOneReader();
-  });
-  workboardResizeHandle?.addEventListener("pointerdown", beginWorkboardResize);
-  workboardResizeHandle?.addEventListener("keydown", (event) => {
-    if (!state.workboard || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
-    event.preventDefault();
-    const direction = event.key === "ArrowLeft" ? 1 : -1;
-    const width = applyWorkboardWidth((state.workboard.width || clampedWorkboardWidth()) + direction * 24);
-    workboardResizeHandle.setAttribute("aria-valuenow", String(Math.round(width)));
-    saveWorkspaceState();
   });
   await renderWorkspace();
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
