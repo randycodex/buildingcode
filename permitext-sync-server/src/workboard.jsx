@@ -87,7 +87,7 @@ function preferredTheme() {
 }
 
 function Workboard({ projectID, projectName, onClose }) {
-  const [initialData, setInitialData] = useState(null);
+  const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
   const saveTimer = useRef(null);
@@ -130,19 +130,23 @@ function Workboard({ projectID, projectName, onClose }) {
           loadedData.files
         );
         setElementCount(loadedData.elements.length);
-        setInitialData(loadedData);
+        setBoardView({ projectID, projectName, initialData: loadedData });
         setStatus(board ? "Saved locally" : "New local board");
       })
       .catch((error) => {
         if (!active) return;
-        const loadedData = { elements: [], appState: { theme: preferredTheme() }, files: {} };
+        const loadedData = {
+          elements: [],
+          appState: { theme: preferredTheme(), name: `${projectName} Workboard` },
+          files: {}
+        };
         lastChangeSignature.current = boardChangeSignature(
           loadedData.elements,
           loadedData.appState,
           loadedData.files
         );
         setElementCount(0);
-        setInitialData(loadedData);
+        setBoardView({ projectID, projectName, initialData: loadedData });
         setStatus(error.message || "Local storage unavailable");
       });
 
@@ -153,14 +157,14 @@ function Workboard({ projectID, projectName, onClose }) {
   }, [flushSave, projectID, projectName]);
 
   const handleChange = useCallback((elements, appState, files) => {
-    if (!initialData) return;
+    if (!boardView || boardView.projectID !== projectID) return;
     const signature = boardChangeSignature(elements, appState, files);
     if (signature === lastChangeSignature.current) return;
     lastChangeSignature.current = signature;
     setElementCount(elements.length);
     pendingBoard.current = {
-      id: projectID,
-      projectName,
+      id: boardView.projectID,
+      projectName: boardView.projectName,
       elements: elements.map((element) => ({ ...element })),
       appState: persistedAppState(appState),
       files: { ...files },
@@ -169,7 +173,7 @@ function Workboard({ projectID, projectName, onClose }) {
     setStatus("Saving…");
     window.clearTimeout(saveTimer.current);
     saveTimer.current = window.setTimeout(() => void flushSave(), saveDelayMS);
-  }, [flushSave, initialData, projectID, projectName]);
+  }, [boardView, flushSave, projectID]);
 
   return (
     <section className="permitext-workboard" data-element-count={elementCount}>
@@ -189,12 +193,13 @@ function Workboard({ projectID, projectName, onClose }) {
         </div>
       </header>
       <div className="permitext-workboard-canvas">
-        {initialData ? (
+        {boardView ? (
           <Excalidraw
-            initialData={initialData}
+            key={boardView.projectID}
+            initialData={boardView.initialData}
             onChange={handleChange}
             theme={preferredTheme()}
-            name={`${projectName} Workboard`}
+            name={`${boardView.projectName} Workboard`}
             autoFocus
             aiEnabled={false}
             UIOptions={{

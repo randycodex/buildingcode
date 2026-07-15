@@ -247,19 +247,16 @@ async function renderWorkboardDock() {
   document.body.classList.add("has-workboard");
   if (mountedWorkboardProjectID === projectID) return;
 
-  if (unmountWorkboard) unmountWorkboard();
-  unmountWorkboard = null;
-  mountedWorkboardProjectID = "";
-  workboardRoot.replaceChildren();
+  const isFirstMount = !unmountWorkboard;
   workboardRoot.dataset.projectId = projectID;
-  workboardRoot.textContent = "Loading workboard…";
+  if (isFirstMount) workboardRoot.textContent = "Loading workboard…";
 
   try {
     window.EXCALIDRAW_ASSET_PATH = "/web/workboard-assets/";
     workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
     const module = await workboardModulePromise;
     if (workboardProjectID(state.workboard?.project) !== projectID) return;
-    workboardRoot.replaceChildren();
+    if (isFirstMount) workboardRoot.replaceChildren();
     unmountWorkboard = module.mountWorkboard(workboardRoot, {
       projectID,
       projectName: project.name || project.title || "Project",
@@ -268,7 +265,7 @@ async function renderWorkboardDock() {
     mountedWorkboardProjectID = projectID;
   } catch (error) {
     console.error("Could not load the project workboard.", error);
-    workboardRoot.textContent = "Could not load the project workboard.";
+    if (isFirstMount) workboardRoot.textContent = "Could not load the project workboard.";
   }
 }
 
