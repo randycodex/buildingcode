@@ -989,7 +989,9 @@ async function postJSON(path, body, options = {}) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.error || `Request failed: ${response.status}`);
+    const error = new Error(payload.error || `Request failed: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return payload;
 }
@@ -1351,6 +1353,19 @@ function activeAccount() {
   const userID = state.account?.userID?.trim();
   const sessionToken = state.account?.sessionToken?.trim();
   return userID && sessionToken ? { userID, sessionToken } : null;
+}
+
+function isSessionAuthenticationError(error) {
+  return Number(error?.status) === 401;
+}
+
+function clearExpiredAccountSession() {
+  if (!activeAccount()) return;
+  state.account = null;
+  syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
+  clearTimeout(syncRetryTimer);
+  syncRetryTimer = null;
+  saveWorkspaceState();
 }
 
 function currentEntitlement() {
@@ -1733,6 +1748,10 @@ async function loadSyncedContent(options = {}) {
       return syncedContent;
     })
     .catch((error) => {
+      if (isSessionAuthenticationError(error)) {
+        clearExpiredAccountSession();
+        return syncedContent;
+      }
       syncedContent = { status: "error", error: error.message, mutations: [], summary: summarizeMutations([]) };
       return syncedContent;
     })
@@ -2310,9 +2329,14 @@ async function createProjectFolder(details = {}) {
   const account = activeAccount();
   if (!account) return;
 
-  await pushMutation(projectMutationForRecord(project, account));
-  state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
-  saveWorkspaceState();
+  try {
+    await pushMutation(projectMutationForRecord(project, account));
+    state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
+    saveWorkspaceState();
+  } catch (error) {
+    if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    // The local project and queued mutation remain available while sync recovers.
+  }
 }
 
 async function updateProjectFolder(project, details = {}) {
