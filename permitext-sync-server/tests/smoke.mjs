@@ -112,6 +112,28 @@ async function main() {
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
+    assert(webRoot.text.includes('id="workboard-dock"'), "Web workspace omitted the project Workboard dock.");
+
+    const workboardScript = await request("/web/workboard-assets/workboard.js");
+    assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
+    assert(
+      workboardScript.response.headers.get("content-type")?.includes("javascript"),
+      "Workboard script asset returned the wrong content type."
+    );
+    const workboardStyles = await request("/web/workboard-assets/workboard.css");
+    assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
+    assert(
+      workboardStyles.response.headers.get("content-type")?.includes("text/css"),
+      "Workboard stylesheet asset returned the wrong content type."
+    );
+    const workboardFont = await request(
+      "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"
+    );
+    assert(workboardFont.response.ok, "Nested Workboard font asset did not load.");
+    assert(
+      workboardFont.response.headers.get("content-type")?.includes("font/woff2"),
+      "Workboard font asset returned the wrong content type."
+    );
 
     const sharedSectionLink = await request("/open/section/8881");
     assert(sharedSectionLink.response.ok, "Shared section URL did not load the web workspace.");

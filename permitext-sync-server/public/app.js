@@ -1,5 +1,8 @@
 const workspaceKey = "permitext:webWorkspace:v1";
 const track = document.querySelector("#panel-track");
+const workboardDock = document.querySelector("#workboard-dock");
+const workboardRoot = document.querySelector("#workboard-root");
+const workboardResizeHandle = document.querySelector("#workboard-resize-handle");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleProjectsButton = document.querySelector("#toggle-projects");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
@@ -59,6 +62,9 @@ const sectionSummaryCache = new Map();
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
+let workboardModulePromise = null;
+let unmountWorkboard = null;
+let mountedWorkboardProjectID = "";
 
 applyReaderSettings();
 
@@ -102,7 +108,8 @@ function loadWorkspaceState() {
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
-      readerSettings: normalizeReaderSettings(saved.readerSettings)
+      readerSettings: normalizeReaderSettings(saved.readerSettings),
+      workboard: normalizeWorkboard(saved.workboard)
     };
   } catch {
     return {
@@ -131,7 +138,8 @@ function loadWorkspaceState() {
       paneOrder: [],
       recentChaptersByCode: {},
       continuityAppliedAt: null,
-      readerSettings: { ...defaultReaderSettings }
+      readerSettings: { ...defaultReaderSettings },
+      workboard: null
     };
   }
 }
@@ -169,6 +177,121 @@ function normalizeUtilityInstances(saved = {}) {
 
 function saveWorkspaceState() {
   localStorage.setItem(workspaceKey, JSON.stringify(state));
+}
+
+function normalizeWorkboard(value) {
+  if (!value?.project || typeof value.project !== "object") return null;
+  return {
+    project: value.project,
+    width: Number.isFinite(Number(value.width)) ? Number(value.width) : null
+  };
+}
+
+function workboardProjectID(project) {
+  return String(project?.clientID || project?.id || project?.localFolderID || projectDetailKey(project) || "");
+}
+
+function clampedWorkboardWidth(width = null) {
+  const viewportWidth = Math.max(480, window.innerWidth || 1200);
+  const minimumReaderWidth = Math.max(280, Math.min(420, viewportWidth * 0.38));
+  const maximum = Math.max(280, viewportWidth - minimumReaderWidth);
+  const minimum = Math.min(viewportWidth < 760 ? 280 : 420, maximum);
+  return clampNumber(width, minimum, maximum, Math.round(viewportWidth * 0.5));
+}
+
+function applyWorkboardWidth(width = null) {
+  const nextWidth = clampedWorkboardWidth(width);
+  if (state.workboard) state.workboard.width = nextWidth;
+  document.body.style.setProperty("--workboard-width", `${nextWidth}px`);
+  workboardDock?.style.setProperty("--project-color", state.workboard?.project?.color || "#c96410");
+  return nextWidth;
+}
+
+function closeProjectWorkboard() {
+  state.workboard = null;
+  document.querySelectorAll(".project-workboard-button").forEach((button) => {
+    button.setAttribute("aria-pressed", "false");
+  });
+  saveWorkspaceState();
+  void renderWorkboardDock();
+}
+
+function openProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  const currentWidth = state.workboard?.width;
+  state.workboard = {
+    project: identity,
+    width: clampedWorkboardWidth(currentWidth)
+  };
+  saveWorkspaceState();
+  void renderWorkboardDock();
+}
+
+async function renderWorkboardDock() {
+  const project = state.workboard?.project;
+  const projectID = workboardProjectID(project);
+  if (!workboardDock || !workboardRoot || !project || !projectID) {
+    document.body.classList.remove("has-workboard");
+    workboardDock?.setAttribute("hidden", "");
+    if (unmountWorkboard) unmountWorkboard();
+    unmountWorkboard = null;
+    mountedWorkboardProjectID = "";
+    workboardRoot?.removeAttribute("data-project-id");
+    return;
+  }
+
+  applyWorkboardWidth(state.workboard.width);
+  workboardDock.removeAttribute("hidden");
+  document.body.classList.add("has-workboard");
+  if (mountedWorkboardProjectID === projectID) return;
+
+  if (unmountWorkboard) unmountWorkboard();
+  unmountWorkboard = null;
+  mountedWorkboardProjectID = "";
+  workboardRoot.replaceChildren();
+  workboardRoot.dataset.projectId = projectID;
+  workboardRoot.textContent = "Loading workboard…";
+
+  try {
+    window.EXCALIDRAW_ASSET_PATH = "/web/workboard-assets/";
+    workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+    const module = await workboardModulePromise;
+    if (workboardProjectID(state.workboard?.project) !== projectID) return;
+    workboardRoot.replaceChildren();
+    unmountWorkboard = module.mountWorkboard(workboardRoot, {
+      projectID,
+      projectName: project.name || project.title || "Project",
+      onClose: closeProjectWorkboard
+    });
+    mountedWorkboardProjectID = projectID;
+  } catch (error) {
+    console.error("Could not load the project workboard.", error);
+    workboardRoot.textContent = "Could not load the project workboard.";
+  }
+}
+
+function beginWorkboardResize(event) {
+  if (!state.workboard || !workboardDock) return;
+  event.preventDefault();
+  const pointerID = event.pointerId;
+  const startX = event.clientX;
+  const startWidth = workboardDock.getBoundingClientRect().width;
+  document.body.classList.add("is-resizing-workboard");
+  workboardResizeHandle?.setPointerCapture?.(pointerID);
+
+  const onMove = (moveEvent) => {
+    const width = applyWorkboardWidth(startWidth + startX - moveEvent.clientX);
+    workboardResizeHandle?.setAttribute("aria-valuenow", String(Math.round(width)));
+  };
+  const onUp = (upEvent) => {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    workboardResizeHandle?.releasePointerCapture?.(upEvent.pointerId);
+    document.body.classList.remove("is-resizing-workboard");
+    saveWorkspaceState();
+  };
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp, { once: true });
 }
 
 function clampNumber(value, min, max, fallback) {
@@ -4566,6 +4689,7 @@ async function archiveProject(project) {
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);
   closeProjectDetailForProject(project);
+  if (projectDetailMatches(project, state.workboard?.project)) state.workboard = null;
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await renderWorkspace();
@@ -4599,6 +4723,7 @@ async function deleteArchivedProject(project) {
   state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);
+  if (projectDetailMatches(project, state.workboard?.project)) state.workboard = null;
   saveWorkspaceState();
   await renderWorkspace();
 }
@@ -4628,12 +4753,29 @@ async function renderProjectDetail(detail) {
 
   const chrome = document.createElement("header");
   chrome.className = "project-detail-chrome";
-  const backButton = appendDetailIconButton(chrome, {
+  const actions = document.createElement("div");
+  actions.className = "project-detail-actions";
+  const workboardButton = document.createElement("button");
+  workboardButton.className = "project-workboard-button";
+  workboardButton.type = "button";
+  workboardButton.textContent = "Workboard";
+  workboardButton.setAttribute("aria-pressed", String(projectDetailMatches(identity, state.workboard?.project)));
+  workboardButton.addEventListener("click", () => {
+    if (projectDetailMatches(identity, state.workboard?.project)) {
+      closeProjectWorkboard();
+      workboardButton.setAttribute("aria-pressed", "false");
+    } else {
+      openProjectWorkboard(identity);
+      workboardButton.setAttribute("aria-pressed", "true");
+    }
+  });
+  const backButton = appendDetailIconButton(actions, {
     title: "Back",
     label: "Back to projects",
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
+  actions.prepend(workboardButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -4651,7 +4793,7 @@ async function renderProjectDetail(detail) {
     description.textContent = descriptionText;
     headingGroup.append(description);
   }
-  chrome.append(headingGroup);
+  chrome.append(headingGroup, actions);
 
   const content = document.createElement("section");
   content.className = "project-detail-content";
@@ -5669,7 +5811,9 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   if (!pane) return;
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
-  const paneRight = paneRect.right - trackRect.right;
+  const dockRect = !workboardDock?.hidden ? workboardDock.getBoundingClientRect() : null;
+  const visibleRight = dockRect ? Math.min(trackRect.right, dockRect.left) : trackRect.right;
+  const paneRight = paneRect.right - visibleRight;
   const paneLeft = paneRect.left - trackRect.left;
   if (paneRight > 0) {
     track.scrollTo({
@@ -5717,6 +5861,7 @@ async function renderWorkspace() {
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
   saveWorkspaceState();
+  void renderWorkboardDock();
 }
 
 async function renderUtilityWorkspace() {
@@ -5777,6 +5922,7 @@ async function renderUtilityWorkspace() {
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
   saveWorkspaceState();
+  void renderWorkboardDock();
 }
 
 async function transitionWorkspace(mode = "default") {
@@ -5874,6 +6020,12 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("resize", () => {
+    if (state.workboard) {
+      applyWorkboardWidth(state.workboard.width);
+      saveWorkspaceState();
+    }
+  });
   window.addEventListener("online", () => {
     flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
   });
@@ -5913,6 +6065,15 @@ async function start() {
   });
   collapseReadersButton.addEventListener("click", () => {
     collapseToOneReader();
+  });
+  workboardResizeHandle?.addEventListener("pointerdown", beginWorkboardResize);
+  workboardResizeHandle?.addEventListener("keydown", (event) => {
+    if (!state.workboard || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+    event.preventDefault();
+    const direction = event.key === "ArrowLeft" ? 1 : -1;
+    const width = applyWorkboardWidth((state.workboard.width || clampedWorkboardWidth()) + direction * 24);
+    workboardResizeHandle.setAttribute("aria-valuenow", String(Math.round(width)));
+    saveWorkspaceState();
   });
   await renderWorkspace();
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();

@@ -1338,6 +1338,12 @@ function contentTypeForPath(path) {
   if (path.endsWith(".webp")) {
     return "image/webp";
   }
+  if (path.endsWith(".woff2")) {
+    return "font/woff2";
+  }
+  if (path.endsWith(".woff")) {
+    return "font/woff";
+  }
   return "application/octet-stream";
 }
 
@@ -1859,13 +1865,17 @@ async function handleWebIndex(_request, response) {
 }
 
 async function handleWebStatic(path, response) {
-  const fileName = path.replace(/^web\//, "");
-  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+  const fileName = decodeURIComponent(path.replace(/^web\//, ""));
+  const segments = fileName.split("/");
+  if (
+    !segments.length ||
+    segments.some((segment) => !segment || segment === "." || segment === ".." || !/^[a-zA-Z0-9._-]+$/.test(segment))
+  ) {
     sendNotFound(response);
     return;
   }
   try {
-    const filePath = join(webPublicPath, fileName);
+    const filePath = join(webPublicPath, ...segments);
     sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
   } catch (error) {
     if (error.code === "ENOENT") {
