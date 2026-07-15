@@ -91,6 +91,10 @@
   font-size: 14px !important;
 }
 
+.excalidraw-modal-container .HelpDialog__header {
+  display: none !important;
+}
+
 .permitext-workboard-loading {
   display: grid;
   height: 100%;
