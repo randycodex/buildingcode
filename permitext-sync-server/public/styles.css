@@ -354,14 +354,6 @@ body.is-detached-workboard-window .panel-track {
   width: 100%;
 }
 
-body.is-detached-workboard-window .project-detail-panel {
-  flex: 0 0 min(360px, 36vw) !important;
-}
-
-body.is-detached-workboard-window .workboard-panel {
-  flex: 1 1 auto !important;
-}
-
 .workspace-panel.is-dragging {
   opacity: 0.82;
 }

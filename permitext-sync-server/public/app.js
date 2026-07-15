@@ -92,7 +92,17 @@ applyReaderSettings();
 
 function loadWorkspaceState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(detachedProjectWindow ? baseWorkspaceKey : workspaceKey) || "{}");
+    const sharedState = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
+    const detachedState = detachedProjectWindow
+      ? JSON.parse(localStorage.getItem(workspaceKey) || "{}")
+      : null;
+    const saved = detachedState
+      ? {
+          ...sharedState,
+          paneWeights: detachedState.paneWeights,
+          paneOrder: detachedState.paneOrder
+        }
+      : sharedState;
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -262,10 +272,16 @@ function initializeDetachedProjectState(project) {
   state.readers = [];
   const detailID = paneIDForProjectDetail(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
+  const savedDetailWidth = Number(state.paneWeights?.[detailID]);
+  const savedWorkboardWidth = Number(state.paneWeights?.[workboardID]);
   state.paneOrder = [detailID, workboardID];
   state.paneWeights = {
-    [detailID]: defaultDetailPaneWidth,
-    [workboardID]: defaultWorkboardPaneWidth
+    [detailID]: Number.isFinite(savedDetailWidth) && savedDetailWidth > 40
+      ? savedDetailWidth
+      : defaultDetailPaneWidth,
+    [workboardID]: Number.isFinite(savedWorkboardWidth) && savedWorkboardWidth > 40
+      ? savedWorkboardWidth
+      : defaultWorkboardPaneWidth
   };
   document.body.classList.add("is-detached-workboard-window");
   document.title = `${identity.name} Workboard`;
@@ -1085,6 +1101,10 @@ function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   const value = Number(state.paneWeights[paneID]);
   const width = Number.isFinite(value) && value > 40 ? value : defaultPaneWidthForID(paneID);
+  if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
+    panel.style.flex = `1 1 ${width}px`;
+    return;
+  }
   if (isFixedWidthPaneID(paneID) || isFixedWidthReaderPaneID(paneID)) {
     panel.style.flex = `0 0 ${width}px`;
     return;
