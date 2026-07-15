@@ -387,6 +387,7 @@ struct SyncQueueItem: Identifiable, Hashable, Sendable {
     let attemptCount: Int
     let createdAt: Date
     let updatedAt: Date
+    let mutationUpdatedAt: Date
     let lastError: String?
 }
 
@@ -554,7 +555,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
 
     init(syncQueueItem item: SyncQueueItem, account: SignedInAccount) throws {
         let payload = item.payload
-        let deletedAt = item.operationType == .delete ? item.updatedAt : nil
+        let deletedAt = item.operationType == .delete ? item.mutationUpdatedAt : nil
         switch item.entityType {
         case .bookmark:
             guard let sectionID = payload.sectionID else {
@@ -566,7 +567,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     sectionID: sectionID,
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -589,7 +590,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     blockID: payload.values["blockID"],
                     noteBody: item.operationType == .delete ? nil : payload.values["body"],
                     tags: nil,
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -612,7 +613,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     blockID: payload.values["blockID"],
                     noteBody: nil,
                     tags: item.operationType == .delete ? nil : Self.tags(from: payload.values["tags"]),
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -639,7 +640,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -665,7 +666,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     localFolderID: payload.folderID,
                     sectionID: sectionID,
                     scope: payload.values["scope"],
-                    updatedAt: item.updatedAt,
+                    updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )
             )
@@ -675,7 +676,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     values: payload.values,
-                    updatedAt: item.updatedAt
+                    updatedAt: item.mutationUpdatedAt
                 )
             )
         case .codeVersionUserData:
@@ -684,7 +685,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: payload.codeVersion,
                     values: payload.values,
-                    updatedAt: item.updatedAt
+                    updatedAt: item.mutationUpdatedAt
                 )
             )
         }
@@ -825,6 +826,7 @@ struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let pulledAt: Date
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
+    var contentMapVersion: Int? = nil
     var entitlement: AppEntitlement? = nil
     let mutations: [ServerUserContentMutation]
 }
@@ -935,6 +937,14 @@ struct BackendSignInRequest: Codable, Hashable, Sendable {
     let credential: AccountSignInCredential
 }
 
+struct BackendSignOutRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+}
+
+struct BackendSignOutResponse: Codable, Hashable, Sendable {
+    let signedOut: Bool
+}
+
 struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
@@ -946,16 +956,6 @@ struct BackendProfileUpdateRequest: Codable, Hashable, Sendable {
 }
 
 struct BackendProfileUpdateResponse: Codable, Hashable, Sendable {
-    let account: SignedInAccount
-}
-
-struct BackendPasskeyLinkRequest: Codable, Hashable, Sendable {
-    let auth: BackendAuthContext
-    let credentialID: String
-    let account: SignedInAccount?
-}
-
-struct BackendPasskeyLinkResponse: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
 
@@ -990,6 +990,7 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let since: Date?
     var sinceEventID: Int64? = nil
+    var contentMapVersion: Int? = 2
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {
@@ -1001,9 +1002,9 @@ protocol PermitextBackendTransport {
     var name: String { get }
     func health() async throws -> BackendHealthStatus
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
-    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
@@ -1131,6 +1132,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("account/sign-in", body: request)
     }
 
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
+        try await post("account/sign-out", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func health() async throws -> BackendHealthStatus {
         try await get("health")
     }
@@ -1141,10 +1146,6 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse {
         try await post("account/profile", body: request, bearerToken: request.auth.bearerToken)
-    }
-
-    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse {
-        try await post("account/passkeys/link", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
@@ -1202,7 +1203,6 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     nonisolated let name = "local-dev-backend"
     private var accountsByUserID: [String: SignedInAccount] = [:]
     private var userContentByUserID: [String: [ServerUserContentMutation]] = [:]
-    private var passkeyCredentialUserIDs: [String: String] = [:]
 
     func health() async throws -> BackendHealthStatus {
         BackendHealthStatus(ok: true, storage: "memory")
@@ -1210,16 +1210,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord {
         let credential = request.credential
-        if credential.provider == .passkey,
-           passkeyCredentialUserIDs[credential.providerUserID] == nil {
-            throw PermitextBackendHTTPError.serverStatus(404, "Passkey is not linked to an account yet.")
+        if credential.provider == .passkey {
+            throw PermitextBackendHTTPError.serverStatus(410, "Passkey sign-in is unavailable. Use Sign in with Apple.")
         }
-        let appUserID = credential.provider == .passkey
-            ? (passkeyCredentialUserIDs[credential.providerUserID] ?? "\(credential.provider.rawValue):\(credential.providerUserID)")
-            : "\(credential.provider.rawValue):\(credential.providerUserID)"
-        if credential.provider == .passkey, let account = accountsByUserID[appUserID] {
-            return BackendAccountRecord(account: account, entitlement: nil)
-        }
+        let appUserID = "\(credential.provider.rawValue):\(credential.providerUserID)"
         let account = SignedInAccount(
             appUserID: appUserID,
             authProvider: credential.provider,
@@ -1232,6 +1226,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         )
         accountsByUserID[account.appUserID] = account
         return BackendAccountRecord(account: account, entitlement: nil)
+    }
+
+    func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
+        BackendSignOutResponse(signedOut: true)
     }
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
@@ -1251,19 +1249,6 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
                 backendSessionToken: request.auth.bearerToken
             )
         )
-    }
-
-    func linkPasskey(_ request: BackendPasskeyLinkRequest) async throws -> BackendPasskeyLinkResponse {
-        passkeyCredentialUserIDs[request.credentialID] = request.auth.accountUserID
-        let account = request.account ?? SignedInAccount(
-                appUserID: request.auth.accountUserID,
-                appleUserID: "",
-                displayName: nil,
-                signedInAt: Date(),
-                backendSessionToken: request.auth.bearerToken
-            )
-        accountsByUserID[request.auth.accountUserID] = account
-        return BackendPasskeyLinkResponse(account: account)
     }
 
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
@@ -2115,9 +2100,9 @@ protocol AccountBackendClient {
     var name: String { get }
     func health() async throws -> BackendHealthStatus
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
+    func signOut(account: SignedInAccount) async throws
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
-    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
 }
 
@@ -2129,6 +2114,9 @@ struct LocalAccountBackendClient: AccountBackendClient {
     }
 
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord {
+        if credential.provider == .passkey {
+            throw PermitextBackendHTTPError.serverStatus(410, "Passkey sign-in is unavailable. Use Sign in with Apple.")
+        }
         let account = SignedInAccount(
             appUserID: "\(credential.provider.rawValue):\(credential.providerUserID)",
             appleUserID: credential.provider == .apple ? credential.providerUserID : "",
@@ -2139,6 +2127,8 @@ struct LocalAccountBackendClient: AccountBackendClient {
         )
         return BackendAccountRecord(account: account, entitlement: nil)
     }
+
+    func signOut(account: SignedInAccount) async throws {}
 
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
         .localDataAttached
@@ -2156,10 +2146,6 @@ struct LocalAccountBackendClient: AccountBackendClient {
             migrationState: account.migrationState,
             backendSessionToken: account.backendSessionToken
         )
-    }
-
-    func linkPasskey(account: SignedInAccount, credentialID: String) async throws -> SignedInAccount {
-        account
     }
 
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {

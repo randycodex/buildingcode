@@ -1,4 +1,12 @@
-const workspaceKey = "permitext:webWorkspace:v1";
+const baseWorkspaceKey = "permitext:webWorkspace:v1";
+const detachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
+const detachedProjectSessionKey = detachedProjectParameter
+  ? `permitext:detachedWorkboard:${detachedProjectParameter}`
+  : "";
+const detachedProjectWindow = Boolean(detachedProjectParameter);
+const workspaceKey = detachedProjectWindow
+  ? `${baseWorkspaceKey}:detached:${detachedProjectParameter}`
+  : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
 const toggleProjectsButton = document.querySelector("#toggle-projects");
@@ -29,11 +37,25 @@ const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}
 const defaultReaderPaneWidth = 520;
 const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
+const defaultWorkboardPaneWidth = 720;
 const defaultSettingsPaneWidth = 340;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
+const sharedWorkspaceStateKeys = [
+  "localProjects",
+  "localSavedItems",
+  "localProjectSections",
+  "localAnnotations",
+  "syncOutbox",
+  "syncConflicts",
+  "archivedProjectIDs",
+  "sectionNotes",
+  "localSavedSectionIDs",
+  "account",
+  "continuityAppliedAt"
+];
 
 const defaultReaderSettings = {
   fontSize: 10,
@@ -43,24 +65,34 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let state = loadWorkspaceState();
+const detachedProject = detachedProjectFromSession();
+if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
 const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
 let syncLoadPromise = null;
+let syncFlushPromise = null;
+let syncRetryTimer = null;
+let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
 let activeCustomSelect = null;
 const chapterListCache = new Map();
 const chapterCache = new Map();
+const sectionSummaryCache = new Map();
 const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
+let workboardModulePromise = null;
+const workboardMounts = new Map();
+let researchQuestionDraft = "";
+let researchInterpretationResult = null;
 
 applyReaderSettings();
 
 function loadWorkspaceState() {
   try {
-    const saved = JSON.parse(localStorage.getItem(workspaceKey) || "{}");
+    const saved = JSON.parse(localStorage.getItem(detachedProjectWindow ? baseWorkspaceKey : workspaceKey) || "{}");
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -73,6 +105,8 @@ function loadWorkspaceState() {
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
       localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
       localAnnotations: Array.isArray(saved.localAnnotations) ? saved.localAnnotations.filter((item) => item && typeof item === "object") : [],
+      syncOutbox: Array.isArray(saved.syncOutbox) ? saved.syncOutbox.filter((item) => item?.mutation && item?.accountUserID) : [],
+      syncConflicts: Array.isArray(saved.syncConflicts) ? saved.syncConflicts.filter((item) => item?.mutation) : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: saved.searchResultReader || null,
       sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
@@ -95,7 +129,10 @@ function loadWorkspaceState() {
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
-      readerSettings: normalizeReaderSettings(saved.readerSettings)
+      continuityAppliedAt: saved.continuityAppliedAt || null,
+      readerSettings: normalizeReaderSettings(saved.readerSettings),
+      workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
+      detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
     };
   } catch {
     return {
@@ -106,6 +143,8 @@ function loadWorkspaceState() {
       localSavedItems: [],
       localProjectSections: [],
       localAnnotations: [],
+      syncOutbox: [],
+      syncConflicts: [],
       archivedProjectIDs: [],
       searchResultReader: null,
       sectionDetail: null,
@@ -121,7 +160,10 @@ function loadWorkspaceState() {
       paneWeights: {},
       paneOrder: [],
       recentChaptersByCode: {},
-      readerSettings: { ...defaultReaderSettings }
+      continuityAppliedAt: null,
+      readerSettings: { ...defaultReaderSettings },
+      workboards: [],
+      detachedWorkboards: []
     };
   }
 }
@@ -159,6 +201,246 @@ function normalizeUtilityInstances(saved = {}) {
 
 function saveWorkspaceState() {
   localStorage.setItem(workspaceKey, JSON.stringify(state));
+  if (!detachedProjectWindow) return;
+  try {
+    const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
+    sharedWorkspaceStateKeys.forEach((key) => {
+      shared[key] = state[key];
+    });
+    localStorage.setItem(baseWorkspaceKey, JSON.stringify(shared));
+  } catch {
+    // The detached board can keep working from its scoped state if the shared state is unavailable.
+  }
+}
+
+function applySharedWorkspaceState(serializedState) {
+  try {
+    const shared = JSON.parse(serializedState || "{}");
+    sharedWorkspaceStateKeys.forEach((key) => {
+      if (shared[key] !== undefined) state[key] = shared[key];
+    });
+  } catch {
+    // Ignore malformed cross-window state and keep the current in-memory data.
+  }
+}
+
+function normalizeProjectIdentities(value, legacyWorkboard = null) {
+  const source = Array.isArray(value)
+    ? value
+    : legacyWorkboard?.project && typeof legacyWorkboard.project === "object" ? [legacyWorkboard.project] : [];
+  const unique = new Map();
+  source.filter((project) => project && typeof project === "object").forEach((project) => {
+    const identity = projectIdentity(project);
+    const id = workboardProjectID(identity);
+    if (id) unique.set(id, identity);
+  });
+  return Array.from(unique.values());
+}
+
+function workboardProjectID(project) {
+  return String(project?.clientID || project?.id || project?.localFolderID || projectDetailKey(project) || "");
+}
+
+function detachedProjectFromSession() {
+  if (!detachedProjectSessionKey) return null;
+  try {
+    const project = JSON.parse(localStorage.getItem(detachedProjectSessionKey) || "null");
+    return project && typeof project === "object" ? projectIdentity(project) : null;
+  } catch {
+    return null;
+  }
+}
+
+function initializeDetachedProjectState(project) {
+  const identity = projectIdentity(project);
+  state.projectDetail = identity;
+  state.projectDetails = [identity];
+  state.workboards = [identity];
+  state.detachedWorkboards = [];
+  state.utilityInstances = [];
+  state.utilities = { projects: true, archive: false, search: false, saved: false, analysis: false, settings: false };
+  state.readers = [];
+  const detailID = paneIDForProjectDetail(identity);
+  const workboardID = paneIDForProjectWorkboard(identity);
+  state.paneOrder = [detailID, workboardID];
+  state.paneWeights = {
+    [detailID]: defaultDetailPaneWidth,
+    [workboardID]: defaultWorkboardPaneWidth
+  };
+  document.body.classList.add("is-detached-workboard-window");
+  document.title = `${identity.name} Workboard`;
+}
+
+function openWorkboards() {
+  state.workboards = normalizeProjectIdentities(state.workboards);
+  return state.workboards;
+}
+
+function detachedWorkboards() {
+  state.detachedWorkboards = normalizeProjectIdentities(state.detachedWorkboards);
+  return state.detachedWorkboards;
+}
+
+function projectHasOpenWorkboard(project) {
+  return openWorkboards().some((item) => projectDetailMatches(project, item));
+}
+
+function projectHasDetachedWorkboard(project) {
+  return detachedWorkboards().some((item) => projectDetailMatches(project, item));
+}
+
+async function closeProjectWorkboard(project) {
+  const workboardID = paneIDForProjectWorkboard(project);
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[workboardID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
+  saveWorkspaceState();
+  await renderWorkspace();
+}
+
+async function openProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    setOpenProjectDetails([...openProjectDetails(), identity]);
+  }
+  if (!projectHasOpenWorkboard(identity)) state.workboards = [...openWorkboards(), identity];
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  const workboardID = paneIDForProjectWorkboard(identity);
+  state.paneWeights[workboardID] ||= defaultWorkboardPaneWidth;
+  placeProjectDetailAfterProjects(identity);
+  saveWorkspaceState();
+  await renderWorkspace();
+  scrollPaneIntoView(workboardID);
+}
+
+async function renderProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  const projectID = workboardProjectID(identity);
+  const paneID = paneIDForProjectWorkboard(identity);
+  let mounted = workboardMounts.get(projectID);
+  if (!mounted) {
+    const panel = document.createElement("article");
+    panel.className = "workspace-panel workboard-panel";
+    panel.dataset.paneId = paneID;
+    panel.style.setProperty("--project-color", identity.color || "#c96410");
+    const root = document.createElement("div");
+    root.className = "workboard-root";
+    root.dataset.projectId = projectID;
+    root.textContent = "Loading workboard…";
+    panel.append(root);
+    mounted = { panel, root, unmount: null, initialized: false };
+    workboardMounts.set(projectID, mounted);
+  }
+  mounted.panel.dataset.paneId = paneID;
+  mounted.panel.style.setProperty("--project-color", identity.color || "#c96410");
+  applyPaneWeight(mounted.panel, paneID);
+
+  try {
+    window.EXCALIDRAW_ASSET_PATH = "/web/workboard-assets/";
+    workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+    const module = await workboardModulePromise;
+    if (!mounted.initialized) mounted.root.replaceChildren();
+    mounted.unmount = module.mountWorkboard(mounted.root, {
+      projectID,
+      projectName: identity.name || identity.title || "Project",
+      onClose: detachedProjectWindow ? () => window.close() : () => closeProjectWorkboard(identity),
+      onDetach: detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
+      detachLabel: detachedProjectWindow ? "Reattach project and Workboard" : "Detach project and Workboard"
+    });
+    mounted.initialized = true;
+  } catch (error) {
+    console.error("Could not load the project workboard.", error);
+    mounted.root.textContent = "Could not load the project workboard.";
+  }
+  return mounted.panel;
+}
+
+function cleanupInactiveWorkboardMounts(panes) {
+  const activeProjectIDs = new Set(panes
+    .filter((pane) => pane.classList.contains("workboard-panel"))
+    .map((pane) => pane.querySelector(".workboard-root")?.dataset.projectId)
+    .filter(Boolean));
+  workboardMounts.forEach((mounted, projectID) => {
+    if (activeProjectIDs.has(projectID)) return;
+    mounted.unmount?.();
+    workboardMounts.delete(projectID);
+  });
+}
+
+function detachedWindowName(project) {
+  return `permitext-workboard-${workboardProjectID(project).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+}
+
+function detachedWindowURL(project) {
+  const projectID = workboardProjectID(project);
+  return `/?detachedWorkboard=${encodeURIComponent(projectID)}`;
+}
+
+function openDetachedWindow(project) {
+  const identity = projectIdentity(project);
+  const projectID = workboardProjectID(identity);
+  localStorage.setItem(`permitext:detachedWorkboard:${projectID}`, JSON.stringify(identity));
+  const popup = window.open(
+    detachedWindowURL(identity),
+    detachedWindowName(identity),
+    "popup=yes,width=1240,height=820,resizable=yes,scrollbars=yes"
+  );
+  if (popup) {
+    popup.focus();
+  }
+  return popup;
+}
+
+async function detachProjectWorkboard(project) {
+  if (detachedProjectWindow) return;
+  const identity = projectIdentity(project);
+  const popup = openDetachedWindow(identity);
+  if (!popup) {
+    window.alert("The Workboard window was blocked. Allow pop-ups for permitext and try again.");
+    return;
+  }
+  if (!projectHasDetachedWorkboard(identity)) {
+    state.detachedWorkboards = [...detachedWorkboards(), identity];
+  }
+  closeProjectDetailForProject(identity);
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  const detailID = paneIDForProjectDetail(identity);
+  const workboardID = paneIDForProjectWorkboard(identity);
+  delete state.paneWeights[detailID];
+  delete state.paneWeights[workboardID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
+  saveWorkspaceState();
+  await renderWorkspace();
+  window.setTimeout(() => {
+    if (popup.closed) void reattachProjectWorkboard(identity);
+  }, 250);
+}
+
+function reattachDetachedProject() {
+  if (!detachedProject) return;
+  if (window.opener && !window.opener.closed) {
+    window.opener.postMessage({ type: "permitext:reattachWorkboard", project: detachedProject }, window.location.origin);
+    window.close();
+    return;
+  }
+  localStorage.setItem("permitext:pendingWorkboardReattach", JSON.stringify(detachedProject));
+  window.location.assign("/");
+}
+
+async function reattachProjectWorkboard(project) {
+  const identity = projectIdentity(project);
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    setOpenProjectDetails([...openProjectDetails(), identity]);
+  }
+  if (!projectHasOpenWorkboard(identity)) state.workboards = [...openWorkboards(), identity];
+  placeProjectDetailAfterProjects(identity);
+  state.paneWeights[paneIDForProjectDetail(identity)] ||= defaultDetailPaneWidth;
+  state.paneWeights[paneIDForProjectWorkboard(identity)] ||= defaultWorkboardPaneWidth;
+  localStorage.removeItem("permitext:pendingWorkboardReattach");
+  saveWorkspaceState();
+  await renderWorkspace();
+  scrollPaneIntoView(paneIDForProjectWorkboard(identity));
 }
 
 function clampNumber(value, min, max, fallback) {
@@ -223,6 +505,207 @@ function newReaderState(overrides = {}) {
   };
 }
 
+function deepLinkedSectionIDFromLocation() {
+  const match = window.location.pathname.match(/^\/open\/section\/(\d+)\/?$/);
+  return match?.[1] || "";
+}
+
+function updateBrowserSectionURL(sectionID) {
+  const normalizedID = String(sectionID || "").trim();
+  if (!/^\d+$/.test(normalizedID)) return;
+  const nextPath = `/open/section/${normalizedID}`;
+  if (window.location.pathname === nextPath && !window.location.search && !window.location.hash) return;
+  window.history.replaceState({}, "", nextPath);
+}
+
+function sharedSectionURL(sectionID) {
+  const normalizedID = String(sectionID || "").trim();
+  if (!/^\d+$/.test(normalizedID)) return "";
+  return `https://permitext-sync.vercel.app/open/section/${normalizedID}`;
+}
+
+function showShareButtonResult(button, message) {
+  if (!button) return;
+  const originalTitle = button.dataset.defaultTitle || button.title || "Share section";
+  button.dataset.defaultTitle = originalTitle;
+  button.title = message;
+  button.setAttribute("aria-label", message);
+  window.setTimeout(() => {
+    if (!button.isConnected) return;
+    button.title = originalTitle;
+    button.setAttribute("aria-label", originalTitle);
+  }, 1600);
+}
+
+function copyTextFallback(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.readOnly = true;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  textarea.style.pointerEvents = "none";
+  document.body.append(textarea);
+  textarea.select();
+  let copied = false;
+  try {
+    copied = document.execCommand("copy");
+  } finally {
+    textarea.remove();
+  }
+  return copied;
+}
+
+async function copyTextToClipboard(text) {
+  if (typeof navigator.clipboard?.writeText === "function") {
+    try {
+      await new Promise((resolve, reject) => {
+        const timeout = window.setTimeout(() => reject(new Error("Clipboard timed out.")), 250);
+        navigator.clipboard.writeText(text).then(
+          () => {
+            window.clearTimeout(timeout);
+            resolve();
+          },
+          (error) => {
+            window.clearTimeout(timeout);
+            reject(error);
+          }
+        );
+      });
+      return true;
+    } catch {
+      // Some embedded browsers expose Clipboard API without granting a usable session.
+    }
+  }
+  return copyTextFallback(text);
+}
+
+async function shareSection(section, button) {
+  const url = sharedSectionURL(section?.sectionID || section?.id);
+  if (!url) return;
+  const title = sectionDisplayTitle(section?.sectionNumber, section?.title) || "Permitext section";
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title, url });
+      return;
+    } catch (error) {
+      if (error?.name === "AbortError") return;
+    }
+  }
+  if (await copyTextToClipboard(url)) {
+    showShareButtonResult(button, "Link copied");
+  } else {
+    showShareButtonResult(button, "Could not copy link");
+  }
+}
+
+function officialSectionCitation(section) {
+  const codeName = codeDisplayLabel(section?.codePrefix || "BC");
+  const number = String(section?.sectionNumber || "").trim();
+  const rawTitle = String(section?.title || "").trim();
+  const title = number
+    ? rawTitle.replace(new RegExp(`^(?:§\\s*)?${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i"), "").trim()
+    : rawTitle;
+  const citation = [
+    `New York City ${codeName}`,
+    number ? `§ ${number}` : "",
+    "(2022)"
+  ].filter(Boolean).join(" ");
+  return title ? `${citation} — ${title}` : citation;
+}
+
+async function copyResearchText(text, button, successMessage) {
+  if (await copyTextToClipboard(text)) {
+    showShareButtonResult(button, successMessage);
+  } else {
+    showShareButtonResult(button, "Could not copy");
+  }
+}
+
+async function activeResearchSections() {
+  const contentSummary = currentContentSummary();
+  const savedBySectionID = new Map(
+    (contentSummary.savedItems || []).map((item) => [String(item.sectionID || item.id || ""), item])
+  );
+  const openProjects = openProjectDetails();
+  const projectSections = (contentSummary.projectSections || [])
+    .filter((item) => openProjects.some((project) => projectSectionBelongsToProject(item, project)))
+    .map((item) => ({
+      ...item,
+      ...(savedBySectionID.get(String(item.sectionID || item.savedSectionID || item.itemID || "")) || {})
+    }));
+  const candidates = [
+    ...(state.readers || []).filter((reader) => reader.sectionID),
+    ...Object.values(sectionDetailsBySearch()).filter((detail) => detail?.sectionID),
+    ...projectSections
+  ];
+  const bySectionID = new Map();
+  candidates.forEach((section) => {
+    const sectionID = String(section.sectionID || section.id || "").trim();
+    if (!sectionID || bySectionID.has(sectionID)) return;
+    const chapter = chapters.find((item) => String(item.id) === String(section.chapterID || ""));
+    const summary = {
+      codePrefix: section.codePrefix || chapter?.codePrefix || "BC",
+      chapterID: section.chapterID || chapter?.id || "",
+      chapterNumber: section.chapterNumber || chapter?.chapterNumber || "",
+      sectionID,
+      sectionNumber: section.sectionNumber || "",
+      title: section.title || "Section"
+    };
+    const cached = sectionSummaryCache.get(sectionID);
+    bySectionID.set(sectionID, cached ? { ...summary, ...cached, sectionID } : summary);
+  });
+  const missingIDs = Array.from(bySectionID.values())
+    .filter((section) => !section.sectionNumber || !section.chapterID || section.title === "Section")
+    .map((section) => section.sectionID);
+  if (missingIDs.length) {
+    try {
+      const batches = [];
+      for (let index = 0; index < missingIDs.length; index += 100) {
+        batches.push(missingIDs.slice(index, index + 100));
+      }
+      const payloads = await Promise.all(
+        batches.map((batch) => api(`/code/sections?ids=${encodeURIComponent(batch.join(","))}`))
+      );
+      payloads.flatMap((payload) => payload.sections || []).forEach((section) => {
+        const sectionID = String(section.id || section.sectionID || "");
+        const requestedID = String(section.requestedID || sectionID);
+        if (!sectionID) return;
+        const normalized = { ...section, sectionID };
+        sectionSummaryCache.set(sectionID, normalized);
+        sectionSummaryCache.set(requestedID, normalized);
+        if (bySectionID.has(requestedID)) {
+          bySectionID.set(requestedID, { ...bySectionID.get(requestedID), ...normalized });
+        } else if (bySectionID.has(sectionID)) {
+          bySectionID.set(sectionID, { ...bySectionID.get(sectionID), ...normalized });
+        }
+      });
+    } catch {
+      // Keep locally available metadata if canonical hydration is temporarily unavailable.
+    }
+  }
+  const canonicalSections = new Map();
+  Array.from(bySectionID.values()).forEach((section) => {
+    const sectionID = String(section.sectionID || section.id || "");
+    if (sectionID && !canonicalSections.has(sectionID)) canonicalSections.set(sectionID, section);
+  });
+  return Array.from(canonicalSections.values());
+}
+
+function researchCitationText(section) {
+  return `${officialSectionCitation(section)}\n${sharedSectionURL(section.sectionID)}`;
+}
+
+function downloadResearchText(text, fileName = "permitext-citations.txt") {
+  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = fileName;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -237,7 +720,7 @@ function paneIDForSectionDetail(searchID = "legacy") {
 
 function projectDetailKey(detail) {
   if (!detail) return "legacy";
-  return String(detail.id || detail.clientID || detail.localFolderID || detail.name || detail.title || "legacy");
+  return String(detail.clientID || detail.localFolderID || detail.id || detail.name || detail.title || "legacy");
 }
 
 function paneIDForProjectDetail(detail = null) {
@@ -246,6 +729,14 @@ function paneIDForProjectDetail(detail = null) {
 
 function isProjectDetailPaneID(paneID) {
   return String(paneID || "").startsWith("project:detail:");
+}
+
+function paneIDForProjectWorkboard(detail = null) {
+  return `project:workboard:${encodeURIComponent(projectDetailKey(detail))}`;
+}
+
+function isProjectWorkboardPaneID(paneID) {
+  return String(paneID || "").startsWith("project:workboard:");
 }
 
 function openProjectDetails() {
@@ -260,6 +751,7 @@ function setOpenProjectDetails(details) {
 
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
+  if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:settings" || paneID.startsWith("utility:analysis:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
@@ -270,6 +762,7 @@ function defaultPaneWidthForID(paneID) {
 function isFixedWidthPaneID(paneID) {
   return paneID?.startsWith("utility:") ||
     isProjectDetailPaneID(paneID) ||
+    isProjectWorkboardPaneID(paneID) ||
     paneID?.startsWith("section:detail:");
 }
 
@@ -343,9 +836,15 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 }
 
 function defaultActivePaneIDs() {
+  if (detachedProjectWindow && detachedProject) {
+    return [paneIDForProjectDetail(detachedProject), paneIDForProjectWorkboard(detachedProject)];
+  }
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
-  if (state.utilities.projects) openProjectDetails().forEach((detail) => ids.push(paneIDForProjectDetail(detail)));
+  if (state.utilities.projects) openProjectDetails().forEach((detail) => {
+    ids.push(paneIDForProjectDetail(detail));
+    if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
+  });
   if (state.utilities.projects && state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
@@ -365,10 +864,17 @@ function activePaneIDs() {
   ids.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const paired = ordered.filter((id) => !id.startsWith("section:detail:") && !isProjectDetailPaneID(id));
+  const paired = ordered.filter((id) =>
+    !id.startsWith("section:detail:") &&
+    !isProjectDetailPaneID(id) &&
+    !isProjectWorkboardPaneID(id)
+  );
   if (state.utilities.projects && openProjectDetails().length) {
     const projectsIndex = paired.indexOf("utility:projects");
-    const detailIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+    const detailIDs = openProjectDetails().flatMap((detail) => [
+      paneIDForProjectDetail(detail),
+      ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+    ]);
     if (projectsIndex === -1) {
       paired.push(...detailIDs);
     } else {
@@ -492,7 +998,11 @@ function placeArchiveAfterProjectsStack() {
     if (!ordered.includes(id)) ordered.push(id);
   });
   const projectIndex = ordered.indexOf("utility:projects");
-  const detailIndex = Math.max(...openProjectDetails().map((detail) => ordered.indexOf(paneIDForProjectDetail(detail))).filter((index) => index !== -1), -1);
+  const projectStackIDs = openProjectDetails().flatMap((detail) => [
+    paneIDForProjectDetail(detail),
+    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+  ]);
+  const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
   const insertIndex = detailIndex === -1
     ? projectIndex === -1 ? 0 : projectIndex + 1
     : detailIndex + 1;
@@ -502,7 +1012,10 @@ function placeArchiveAfterProjectsStack() {
 
 function restoreProjectsStackOrder() {
   const projectID = "utility:projects";
-  const detailIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+  const detailIDs = openProjectDetails().flatMap((detail) => [
+    paneIDForProjectDetail(detail),
+    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+  ]);
   const archiveID = "utility:archive";
   const activeIDs = defaultActivePaneIDs();
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && !detailIDs.includes(id) && id !== archiveID);
@@ -653,7 +1166,9 @@ async function postJSON(path, body, options = {}) {
   });
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(payload.error || `Request failed: ${response.status}`);
+    const error = new Error(payload.error || `Request failed: ${response.status}`);
+    error.status = response.status;
+    throw error;
   }
   return payload;
 }
@@ -1017,6 +1532,19 @@ function activeAccount() {
   return userID && sessionToken ? { userID, sessionToken } : null;
 }
 
+function isSessionAuthenticationError(error) {
+  return Number(error?.status) === 401;
+}
+
+function clearExpiredAccountSession() {
+  if (!activeAccount()) return;
+  state.account = null;
+  syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
+  clearTimeout(syncRetryTimer);
+  syncRetryTimer = null;
+  saveWorkspaceState();
+}
+
 function currentEntitlement() {
   return state.account?.entitlement || syncedContent?.entitlement || null;
 }
@@ -1156,10 +1684,44 @@ function accountDisplayName(account = state.account) {
   return account?.displayName || account?.userID || "this browser";
 }
 
+function retargetQueuedMutation(mutation, sourceUserID, targetUserID) {
+  const kind = mutation && typeof mutation === "object" ? Object.keys(mutation)[0] : null;
+  const record = kind ? mutation[kind] : null;
+  if (!kind || !record || typeof record !== "object") return mutation;
+  const sourcePrefix = `${sourceUserID}:`;
+  const recordID = typeof record.id === "string" && record.id.startsWith(sourcePrefix)
+    ? `${targetUserID}:${record.id.slice(sourcePrefix.length)}`
+    : record.id;
+  return { [kind]: { ...record, id: recordID, userID: targetUserID } };
+}
+
+function retargetSyncOutbox(sourceUserID, targetUserID) {
+  if (!sourceUserID || sourceUserID === targetUserID) return;
+  state.syncOutbox = (state.syncOutbox || []).map((item) => {
+    if (item.accountUserID !== sourceUserID) return item;
+    const mutation = retargetQueuedMutation(item.mutation, sourceUserID, targetUserID);
+    const recordID = syncMutationRecordID(mutation);
+    return {
+      ...item,
+      id: `${targetUserID}:${recordID}`,
+      accountUserID: targetUserID,
+      recordID,
+      mutation,
+      queuedAt: new Date().toISOString(),
+      attemptCount: 0,
+      lastError: null
+    };
+  });
+}
+
 function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   const account = payload.account;
   if (!account?.appUserID || !account?.backendSessionToken) {
     throw new Error("Sign in did not return a backend session.");
+  }
+  const previousUserID = state.account?.userID;
+  if (payload.mergedAccount?.sourceUserID === previousUserID) {
+    retargetSyncOutbox(previousUserID, account.appUserID);
   }
   state.account = {
     userID: account.appUserID,
@@ -1170,7 +1732,10 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   };
   syncedContent = null;
   saveWorkspaceState();
-  loadSyncedContent({ force: true }).then(() => renderWorkspace());
+  loadSyncedContent({ force: true })
+    .then(() => flushSyncOutbox({ refresh: true }))
+    .then(() => renderWorkspace())
+    .catch(() => renderWorkspace());
   return state.account;
 }
 
@@ -1247,6 +1812,7 @@ function summarizeMutations(mutations = []) {
   const savedItems = [];
   const annotations = [];
   const projectSections = [];
+  let latestContinuity = null;
 
   latestByID.forEach((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
@@ -1255,9 +1821,15 @@ function summarizeMutations(mutations = []) {
     if (kind === "savedItem") savedItems.push(record);
     if (kind === "annotation") annotations.push(record);
     if (kind === "projectSection") projectSections.push(record);
+    if (
+      kind === "continuity" &&
+      (!latestContinuity || mutationUpdatedAt(mutation) > Date.parse(latestContinuity.updatedAt || 0))
+    ) {
+      latestContinuity = record;
+    }
   });
 
-  return { projects, savedItems, annotations, projectSections };
+  return { projects, savedItems, annotations, projectSections, latestContinuity };
 }
 
 function syncCodeVersion(value) {
@@ -1317,8 +1889,14 @@ async function loadSyncedContent(options = {}) {
   if (syncLoadPromise && !options.force) {
     return syncLoadPromise;
   }
+  const baseline = syncedContent?.status === "connected" && syncedContent?.userID === account.userID
+    ? syncedContent
+    : null;
+  const requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
   syncLoadPromise = postJSON("/sync/pull", {
-    auth: { accountUserID: account.userID }
+    auth: { accountUserID: account.userID },
+    sinceEventID: requestedEventID,
+    contentMapVersion: Number(baseline?.contentMapVersion || 2)
   }, { token: account.sessionToken })
     .then(async (payload) => {
       let entitlement = payload.entitlement || null;
@@ -1326,17 +1904,31 @@ async function loadSyncedContent(options = {}) {
       if (repaired?.entitlement) {
         entitlement = repaired.entitlement;
       }
+      const contentMapVersion = Number(payload.contentMapVersion || 0);
+      const canMergeIncrementally = baseline && requestedEventID !== null &&
+        contentMapVersion === Number(baseline.contentMapVersion || 0);
+      const mutations = canMergeIncrementally
+        ? mergeSyncedMutations(baseline.mutations || [], payload.mutations || [])
+        : payload.mutations || [];
       syncedContent = {
         status: "connected",
+        userID: account.userID,
         pulledAt: payload.pulledAt,
+        latestEventID: payload.latestEventID ?? payload.syncRevision ?? requestedEventID,
+        contentMapVersion,
         entitlement,
-        mutations: payload.mutations || [],
-        summary: summarizeMutations(payload.mutations || [])
+        mutations,
+        summary: summarizeMutations(mutations)
       };
+      await applyRemoteContinuityIfNewer();
       storeAccountEntitlement(entitlement);
       return syncedContent;
     })
     .catch((error) => {
+      if (isSessionAuthenticationError(error)) {
+        clearExpiredAccountSession();
+        return syncedContent;
+      }
       syncedContent = { status: "error", error: error.message, mutations: [], summary: summarizeMutations([]) };
       return syncedContent;
     })
@@ -1344,6 +1936,15 @@ async function loadSyncedContent(options = {}) {
       syncLoadPromise = null;
     });
   return syncLoadPromise;
+}
+
+function mergeSyncedMutations(existing, incoming) {
+  const byRecordID = new Map();
+  [...existing, ...incoming].forEach((mutation) => {
+    const recordID = syncMutationRecordID(mutation);
+    if (recordID) byRecordID.set(recordID, mutation);
+  });
+  return Array.from(byRecordID.values());
 }
 
 async function ensureSyncedContentForRender() {
@@ -1357,21 +1958,303 @@ async function ensureSyncedContentForRender() {
   return loadSyncedContent();
 }
 
+function syncMutationRecordID(mutation) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  if (kind === "continuity") {
+    if (!record?.userID) return null;
+    return [record?.userID, "continuity", syncCodeVersion(record?.codeVersion)].join(":");
+  }
+  if (kind === "codeVersionClear") {
+    if (!record?.userID) return null;
+    return [record?.userID, "code-version-clear", syncCodeVersion(record?.codeVersion)].join(":");
+  }
+  return String(record?.id || "").trim();
+}
+
+function swiftReferenceDateSeconds(date = new Date()) {
+  return (date.getTime() - Date.UTC(2001, 0, 1)) / 1000;
+}
+
+function continuityRecentEntries(values = {}) {
+  try {
+    const parsed = JSON.parse(values.recentlyViewedSectionsJSON || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function continuityValuesForReader(reader) {
+  const account = activeAccount();
+  const pendingRecord = [...(state.syncOutbox || [])].reverse()
+    .filter((entry) => !account || entry.accountUserID === account.userID)
+    .map((entry) => mutationKindAndRecord(entry.mutation))
+    .find(({ kind }) => kind === "continuity")?.record;
+  const existing = pendingRecord?.values || syncedContent?.summary?.latestContinuity?.values || {};
+  const chapter = chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
+  const sectionID = Number(reader.sectionID || 0);
+  const recentEntries = continuityRecentEntries(existing);
+  if (Number.isSafeInteger(sectionID) && sectionID > 0) {
+    const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || chapter?.codePrefix));
+    const entry = {
+      sectionID,
+      sectionNumber: reader.sectionNumber || "",
+      title: reader.title || "Section",
+      chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
+      codeSectionID: chapter?.codeSectionID || null,
+      codeSectionName: codeOption?.label || reader.codePrefix || "",
+      previewText: "",
+      viewedAt: swiftReferenceDateSeconds()
+    };
+    recentEntries.splice(0, recentEntries.length, entry, ...recentEntries.filter((item) => Number(item?.sectionID) !== sectionID).slice(0, 19));
+  }
+  return {
+    ...existing,
+    selectedJurisdictionKey: "jurisdiction-1",
+    selectedVersionFileName: defaultSyncCodeVersion,
+    selectedCodeSectionID: chapter?.codeSectionID
+      ? String(chapter.codeSectionID)
+      : existing.selectedCodeSectionID || "",
+    lastOpenedChapterID: reader.chapterID
+      ? String(reader.chapterID)
+      : existing.lastOpenedChapterID || "",
+    recentlyViewedSectionsJSON: JSON.stringify(recentEntries)
+  };
+}
+
+function scheduleContinuitySync(reader) {
+  const account = activeAccount();
+  if (!account || !reader?.chapterID) return;
+  clearTimeout(continuityPushTimer);
+  continuityPushTimer = window.setTimeout(() => {
+    const updatedAt = new Date().toISOString();
+    const mutation = {
+      continuity: {
+        userID: account.userID,
+        codeVersion: defaultSyncCodeVersion,
+        values: continuityValuesForReader(reader),
+        updatedAt
+      }
+    };
+    state.continuityAppliedAt = updatedAt;
+    enqueueSyncMutation(mutation, account);
+    flushSyncOutbox({ refresh: true }).catch(() => {});
+  }, 500);
+}
+
+async function applyRemoteContinuityIfNewer() {
+  const record = syncedContent?.summary?.latestContinuity;
+  const remoteTimestamp = Date.parse(record?.updatedAt || 0);
+  const appliedTimestamp = Date.parse(state.continuityAppliedAt || 0);
+  const hasPendingContinuity = (state.syncOutbox || []).some((entry) =>
+    mutationKindAndRecord(entry.mutation).kind === "continuity"
+  );
+  if (!record || !Number.isFinite(remoteTimestamp) || remoteTimestamp <= appliedTimestamp || hasPendingContinuity) return;
+
+  state.continuityAppliedAt = record.updatedAt;
+  if (deepLinkedSectionIDFromLocation()) {
+    saveWorkspaceState();
+    return;
+  }
+
+  const latestSectionID = Number(continuityRecentEntries(record.values)[0]?.sectionID || 0);
+  const reader = state.readers[0] || newReaderState();
+  if (Number.isSafeInteger(latestSectionID) && latestSectionID > 0) {
+    try {
+      const payload = await api(`/code/sections/${latestSectionID}`);
+      Object.assign(reader, readerFieldsForSectionDetail(payload.section));
+    } catch {
+      // Keep the local reader when a continuity record references unavailable content.
+    }
+  } else if (record.values?.lastOpenedChapterID) {
+    const chapter = chapters.find((item) => String(item.id) === String(record.values.lastOpenedChapterID));
+    if (chapter) {
+      Object.assign(reader, {
+        codePrefix: chapter.codePrefix || "BC",
+        chapterID: chapter.id,
+        sectionID: "",
+        sectionNumber: "",
+        title: "Reader"
+      });
+    }
+  }
+  if (!state.readers.length) state.readers = [reader];
+  saveWorkspaceState();
+}
+
+function enqueueSyncMutation(mutation, account) {
+  const recordID = syncMutationRecordID(mutation);
+  if (!recordID) throw new Error("Could not queue a sync record without an ID.");
+  const entry = {
+    id: `${account.userID}:${recordID}`,
+    accountUserID: account.userID,
+    recordID,
+    mutation,
+    queuedAt: new Date().toISOString(),
+    attemptCount: 0,
+    lastError: null
+  };
+  state.syncOutbox = [
+    ...(state.syncOutbox || []).filter((item) => item.id !== entry.id),
+    entry
+  ];
+  state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
+  saveWorkspaceState();
+  return entry;
+}
+
+function discardLocalMutationOverlay(mutation) {
+  const { kind, record } = mutationKindAndRecord(mutation);
+  const recordID = syncMutationRecordID(mutation);
+  if (!recordID) return;
+  if (kind === "savedItem") {
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.id || "") !== recordID);
+    state.localSavedSectionIDs = (state.localSavedSectionIDs || [])
+      .filter((sectionID) => String(sectionID) !== String(record.sectionID || ""));
+  } else if (kind === "annotation") {
+    state.localAnnotations = (state.localAnnotations || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "project") {
+    state.localProjects = (state.localProjects || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "projectSection") {
+    state.localProjectSections = (state.localProjectSections || []).filter((item) => String(item.id || "") !== recordID);
+  } else if (kind === "continuity") {
+    state.continuityAppliedAt = null;
+  }
+}
+
+async function resolveSyncConflict(entry, keepLocal) {
+  const account = activeAccount();
+  if (!account || entry.accountUserID !== account.userID) return;
+  if (keepLocal) {
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    if (!kind || !record) return;
+    enqueueSyncMutation({
+      [kind]: { ...record, userID: account.userID, updatedAt: new Date().toISOString() }
+    }, account);
+    await flushSyncOutbox({ refresh: true });
+  } else {
+    discardLocalMutationOverlay(entry.mutation);
+    state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
+    saveWorkspaceState();
+    await loadSyncedContent({ force: true });
+  }
+  await renderWorkspace();
+}
+
+function scheduleSyncOutboxRetry(attemptCount = 1) {
+  clearTimeout(syncRetryTimer);
+  const exponent = Math.min(Math.max(Number(attemptCount) - 1, 0), 6);
+  const delay = Math.min(5_000 * (2 ** exponent), 5 * 60_000);
+  syncRetryTimer = window.setTimeout(() => {
+    flushSyncOutbox({ refresh: true }).catch(() => {});
+  }, delay);
+}
+
+async function flushSyncOutbox(options = {}) {
+  const account = activeAccount();
+  if (!account) return { acceptedMutationIDs: [], rejectedMutationIDs: [] };
+  if (syncFlushPromise) return syncFlushPromise;
+
+  syncFlushPromise = (async () => {
+    const acceptedMutationIDs = [];
+    const rejectedMutationIDs = [];
+    let latestPayload = null;
+    while (true) {
+      const entries = (state.syncOutbox || [])
+        .filter((item) => item.accountUserID === account.userID)
+        .slice(0, 100);
+      if (!entries.length) break;
+
+      try {
+        const payload = await postJSON("/sync/push", {
+          auth: { accountUserID: account.userID },
+          batch: {
+            user: { id: account.userID },
+            mutations: entries.map((item) => item.mutation)
+          }
+        }, { token: account.sessionToken });
+        latestPayload = payload;
+        const accepted = new Set(payload.acceptedMutationIDs || []);
+        const rejected = new Set(payload.rejectedMutationIDs || []);
+        acceptedMutationIDs.push(...accepted);
+        rejectedMutationIDs.push(...rejected);
+        const completedEntryIDs = new Set(entries
+          .filter((item) => accepted.has(item.recordID) || rejected.has(item.recordID))
+          .map((item) => item.id));
+        const postedEntryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
+        const unknownEntries = entries.filter((item) => !completedEntryIDs.has(item.id));
+        const rejectedEntries = entries.filter((item) =>
+          rejected.has(item.recordID) &&
+          (state.syncOutbox || []).some((current) => current.id === item.id && current.queuedAt === item.queuedAt)
+        );
+
+        state.syncOutbox = (state.syncOutbox || [])
+          .filter((item) =>
+            !completedEntryIDs.has(item.id) || postedEntryVersions.get(item.id) !== item.queuedAt
+          );
+        state.syncConflicts = [
+          ...(state.syncConflicts || []).filter((item) => !rejectedEntries.some((entry) => entry.id === item.id)),
+          ...rejectedEntries.map((item) => ({
+            ...item,
+            conflictedAt: new Date().toISOString(),
+            lastError: "Server has a newer version of this record."
+          }))
+        ];
+        saveWorkspaceState();
+        storeAccountEntitlement(payload.entitlement || null);
+
+        if (unknownEntries.length) {
+          throw new Error("The server did not acknowledge every queued change.");
+        }
+      } catch (error) {
+        const entryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
+        let highestAttemptCount = 1;
+        state.syncOutbox = (state.syncOutbox || []).map((item) => {
+          if (entryVersions.get(item.id) !== item.queuedAt) return item;
+          const attemptCount = Number(item.attemptCount || 0) + 1;
+          highestAttemptCount = Math.max(highestAttemptCount, attemptCount);
+          return { ...item, attemptCount, lastError: error.message || "Sync failed." };
+        });
+        saveWorkspaceState();
+        scheduleSyncOutboxRetry(highestAttemptCount);
+        throw error;
+      }
+    }
+
+    clearTimeout(syncRetryTimer);
+    syncRetryTimer = null;
+    if (options.refresh !== false && latestPayload) {
+      await loadSyncedContent({ force: true, skipOutbox: true });
+    }
+    return { acceptedMutationIDs, rejectedMutationIDs, payload: latestPayload };
+  })().finally(() => {
+    syncFlushPromise = null;
+  });
+  return syncFlushPromise;
+}
+
 async function pushMutation(mutation) {
   const account = activeAccount();
   if (!account) {
     throw new Error("Sign in from Settings before saving from the web.");
   }
-  const payload = await postJSON("/sync/push", {
-    auth: { accountUserID: account.userID },
-    batch: {
-      user: { id: account.userID },
-      mutations: [mutation]
-    }
-  }, { token: account.sessionToken });
-  storeAccountEntitlement(payload.entitlement || null);
-  await loadSyncedContent({ force: true });
-  return payload;
+  const entry = enqueueSyncMutation(mutation, account);
+  let result = await flushSyncOutbox({ refresh: true });
+  if ((state.syncOutbox || []).some((item) => item.id === entry.id && item.queuedAt === entry.queuedAt)) {
+    const followUp = await flushSyncOutbox({ refresh: true });
+    result = {
+      ...followUp,
+      acceptedMutationIDs: [...result.acceptedMutationIDs, ...followUp.acceptedMutationIDs],
+      rejectedMutationIDs: [...result.rejectedMutationIDs, ...followUp.rejectedMutationIDs]
+    };
+  }
+  if (result.rejectedMutationIDs.includes(entry.recordID)) {
+    throw new Error("The server has a newer version of this record. Review the synced copy before retrying.");
+  }
+  if (!result.acceptedMutationIDs.includes(entry.recordID)) {
+    throw new Error("This change remains queued for sync.");
+  }
+  return result.payload;
 }
 
 function savedMutationForReader(reader) {
@@ -1623,9 +2506,14 @@ async function createProjectFolder(details = {}) {
   const account = activeAccount();
   if (!account) return;
 
-  await pushMutation(projectMutationForRecord(project, account));
-  state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
-  saveWorkspaceState();
+  try {
+    await pushMutation(projectMutationForRecord(project, account));
+    state.localProjects = (state.localProjects || []).filter((item) => item.id !== project.id);
+    saveWorkspaceState();
+  } catch (error) {
+    if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    // The local project and queued mutation remain available while sync recovers.
+  }
 }
 
 async function updateProjectFolder(project, details = {}) {
@@ -1883,19 +2771,22 @@ function annotationMutationForRecord(record) {
 }
 
 function scheduleAnnotationPush(record) {
-  if (!activeAccount()) return;
+  const account = activeAccount();
+  if (!account) return;
+  const mutation = annotationMutationForRecord(record);
+  enqueueSyncMutation(mutation, account);
   const timerKey = String(record.id || "");
   clearTimeout(annotationPushTimers.get(timerKey));
   annotationPushTimers.set(timerKey, window.setTimeout(async () => {
     try {
-      await pushMutation(annotationMutationForRecord(record));
+      await pushMutation(mutation);
       state.localAnnotations = (state.localAnnotations || []).filter((item) =>
         String(item.id || "") !== timerKey || String(item.updatedAt || "") !== String(record.updatedAt || "")
       );
       saveWorkspaceState();
       if (state.utilities.saved) await renderWorkspace();
     } catch {
-      // Keep the local annotation queued in workspace state; the next edit can retry.
+      // The local annotation and durable outbox entry remain available for retry.
     } finally {
       annotationPushTimers.delete(timerKey);
     }
@@ -2910,6 +3801,8 @@ async function renderReaderInternalSearchResults(panel, reader, query) {
       reader.pendingSearchHighlightQuery = query;
       panel.dataset.pendingSearchHighlightQuery = query;
       reader.shouldSmoothScrollToSection = true;
+      updateBrowserSectionURL(reader.sectionID);
+      scheduleContinuitySync(reader);
       if (searchBox) searchBox.hidden = true;
       searchButton?.setAttribute("aria-pressed", "false");
       saveWorkspaceState();
@@ -3093,7 +3986,6 @@ async function renderReader(reader, options = {}) {
   commentsButton.hidden = true;
   internalSearchBox.hidden = true;
   internalSearchInput.value = reader.internalSearchQuery || "";
-
   if (options.isSearchResult) {
     closeButton.hidden = false;
   } else {
@@ -3109,6 +4001,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
   });
 
@@ -3162,6 +4055,7 @@ async function renderReader(reader, options = {}) {
     reader.sectionNumber = "";
     reader.title = "Reader";
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await refreshReaderContent(panel, reader);
   });
 
@@ -3172,8 +4066,10 @@ async function renderReader(reader, options = {}) {
       const summary = sectionTitleFromID(reader.sectionID, chapter);
       reader.sectionNumber = summary?.sectionNumber || "";
       reader.title = summary?.title || "Reader";
+      updateBrowserSectionURL(reader.sectionID);
     }
     saveWorkspaceState();
+    scheduleContinuitySync(reader);
     await navigateReaderToSection(panel, reader);
   });
 
@@ -3424,6 +4320,10 @@ async function openSectionDetail(searchID, section, options = {}) {
     delete anchors[searchID];
   }
   state.searchResultReader = null;
+  if (options.updateURL !== false) {
+    updateBrowserSectionURL(sectionID);
+  }
+  scheduleContinuitySync(newReaderState(readerFieldsForSectionDetail(details[searchID])));
   placeSectionDetailAfterPane(searchID, anchors[searchID] || paneIDForUtilityInstance({ key: "search", id: searchID }));
   updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
@@ -3500,6 +4400,16 @@ function jumpIconSVG() {
       <path d="M15 3h6v6"></path>
       <path d="M10 14 21 3"></path>
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+    </svg>
+  `;
+}
+
+function shareIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3v12"></path>
+      <path d="m7 8 5-5 5 5"></path>
+      <path d="M5 13v7h14v-7"></path>
     </svg>
   `;
 }
@@ -3584,6 +4494,11 @@ async function renderSectionDetail(searchID, detail) {
     label: "Back to search",
     svg: circleXIconSVG()
   });
+  const shareButton = appendDetailIconButton(chrome, {
+    title: "Share section",
+    label: "Share section",
+    svg: shareIconSVG()
+  });
   const saveButton = appendDetailIconButton(chrome, {
     title: saved ? "Remove bookmark" : "Save bookmark",
     label: saved ? "Remove bookmark" : "Save bookmark",
@@ -3660,6 +4575,10 @@ async function renderSectionDetail(searchID, detail) {
     delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
     renderWorkspace();
+  });
+
+  shareButton.addEventListener("click", () => {
+    shareSection(sectionPayload, shareButton);
   });
 
   saveButton.addEventListener("click", async () => {
@@ -3745,6 +4664,201 @@ function wireUtilityInstanceActions(panel, instance) {
   closeButton.addEventListener("click", () => closeUtilityInstance(instance));
 }
 
+function appendResearchList(container, title, items) {
+  if (!items?.length) return;
+  const heading = document.createElement("strong");
+  heading.className = "research-result-subheading";
+  heading.textContent = title;
+  const list = document.createElement("ul");
+  list.className = "research-result-list";
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    row.textContent = item;
+    list.append(row);
+  });
+  container.append(heading, list);
+}
+
+function renderResearchInterpretation(container, result) {
+  clear(container);
+  if (!result) return;
+
+  const card = document.createElement("article");
+  card.className = "analysis-card research-result-card";
+  const label = document.createElement("p");
+  label.className = "section-label";
+  label.textContent = result.mode === "mock" ? "Prototype response" : "Code interpretation";
+  const heading = document.createElement("h3");
+  heading.textContent = result.conclusion;
+  const explanation = document.createElement("p");
+  explanation.textContent = result.explanation;
+  card.append(label, heading, explanation);
+  appendResearchList(card, "Assumptions", result.assumptions);
+  appendResearchList(card, "Facts to confirm", result.missingFacts);
+
+  const citationsHeading = document.createElement("strong");
+  citationsHeading.className = "research-result-subheading";
+  citationsHeading.textContent = "Cited code sections";
+  card.append(citationsHeading);
+  result.citations.forEach((citation) => {
+    const citationRow = document.createElement("div");
+    citationRow.className = "research-result-citation";
+    const citationText = document.createElement("span");
+    citationText.textContent = officialSectionCitation(citation);
+    const relevance = document.createElement("p");
+    relevance.textContent = citation.relevance;
+    const openButton = document.createElement("button");
+    openButton.className = "ghost-button";
+    openButton.type = "button";
+    openButton.textContent = "Open cited section";
+    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(citation));
+    citationRow.append(citationText, relevance, openButton);
+    card.append(citationRow);
+  });
+  const disclaimer = document.createElement("p");
+  disclaimer.className = "research-disclaimer";
+  disclaimer.textContent = result.disclaimer;
+  card.append(disclaimer);
+  container.append(card);
+}
+
+async function renderResearch(paneID) {
+  const panel = renderUtility(analysisTemplate, paneID);
+  panel.classList.add("analysis-panel");
+  const content = panel.querySelector(".analysis-content");
+  const sections = await activeResearchSections();
+
+  const summary = document.createElement("article");
+  summary.className = "analysis-card";
+  const label = document.createElement("p");
+  label.className = "section-label";
+  label.textContent = "Research set";
+  const heading = document.createElement("h3");
+  heading.textContent = sections.length === 1 ? "1 active code section" : `${sections.length} active code sections`;
+  const explanation = document.createElement("p");
+  explanation.textContent = sections.length
+    ? "This set follows sections in open readers, search details, and project details. Citations contain official code references and canonical links; private notes are excluded."
+    : "Open a specific section or a project detail to start a citation set. Private notes stay separate from official code references.";
+  const copyAllButton = document.createElement("button");
+  copyAllButton.className = "ghost-button research-copy-all";
+  copyAllButton.type = "button";
+  copyAllButton.title = "Copy all citations";
+  copyAllButton.textContent = "Copy citations";
+  copyAllButton.disabled = sections.length === 0;
+  copyAllButton.addEventListener("click", () => {
+    copyResearchText(sections.map(researchCitationText).join("\n\n"), copyAllButton, "Citations copied");
+  });
+  const downloadButton = document.createElement("button");
+  downloadButton.className = "ghost-button";
+  downloadButton.type = "button";
+  downloadButton.textContent = "Download .txt";
+  downloadButton.disabled = sections.length === 0;
+  downloadButton.addEventListener("click", () => {
+    downloadResearchText(sections.map(researchCitationText).join("\n\n"));
+  });
+  const summaryActions = document.createElement("div");
+  summaryActions.className = "research-summary-actions";
+  summaryActions.append(copyAllButton, downloadButton);
+  summary.append(label, heading, explanation, summaryActions);
+  content.append(summary);
+
+  const interpreter = document.createElement("article");
+  interpreter.className = "analysis-card research-interpreter";
+  const interpreterLabel = document.createElement("p");
+  interpreterLabel.className = "section-label";
+  interpreterLabel.textContent = "Code interpretation";
+  const interpreterHeading = document.createElement("h3");
+  interpreterHeading.textContent = "Ask about this research set";
+  const interpreterExplanation = document.createElement("p");
+  interpreterExplanation.textContent = sections.length
+    ? `Uses ${sections.length} selected official code ${sections.length === 1 ? "section" : "sections"}. Private notes and general web content are excluded.`
+    : "Open code sections before asking a research question.";
+  const questionLabel = document.createElement("label");
+  questionLabel.className = "research-question-label";
+  questionLabel.textContent = "Research question";
+  const questionInput = document.createElement("textarea");
+  questionInput.className = "research-question-input";
+  questionInput.rows = 4;
+  questionInput.maxLength = 2000;
+  questionInput.placeholder = "For example: What notice is required before this work begins?";
+  questionInput.value = researchQuestionDraft;
+  questionInput.addEventListener("input", () => {
+    researchQuestionDraft = questionInput.value;
+    askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+  });
+  const askButton = document.createElement("button");
+  askButton.className = "ghost-button research-ask-button";
+  askButton.type = "button";
+  askButton.textContent = "Interpret selected codes";
+  askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+  const status = document.createElement("p");
+  status.className = "research-interpreter-status";
+  if (!activeAccount()) status.textContent = "Sign in from Settings to use code interpretation.";
+  const resultContainer = document.createElement("section");
+  resultContainer.className = "research-interpretation-result";
+  const selectedIDs = sections.map((section) => String(section.sectionID));
+  if (researchInterpretationResult?.evidenceSectionIDs?.join(",") === selectedIDs.join(",")) {
+    renderResearchInterpretation(resultContainer, researchInterpretationResult);
+  }
+  askButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account || !sections.length || researchQuestionDraft.trim().length < 3) return;
+    askButton.disabled = true;
+    questionInput.disabled = true;
+    status.textContent = "Reviewing the selected code sections…";
+    clear(resultContainer);
+    try {
+      const result = await postJSON("/research/interpret", {
+        auth: { accountUserID: account.userID },
+        question: researchQuestionDraft.trim(),
+        sectionIDs: selectedIDs
+      }, { token: account.sessionToken });
+      researchInterpretationResult = result;
+      renderResearchInterpretation(resultContainer, result);
+      status.textContent = result.mode === "mock"
+        ? "Prototype mode is active; no external model was called."
+        : `Answer verified against ${result.citations.length} selected ${result.citations.length === 1 ? "citation" : "citations"}.`;
+    } catch (error) {
+      status.textContent = error.message || "Code interpretation is temporarily unavailable.";
+    } finally {
+      questionInput.disabled = false;
+      askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
+    }
+  });
+  questionLabel.append(questionInput);
+  interpreter.append(interpreterLabel, interpreterHeading, interpreterExplanation, questionLabel, askButton, status);
+  content.append(interpreter, resultContainer);
+
+  sections.forEach((section) => {
+    const row = document.createElement("article");
+    row.className = "saved-row research-evidence-row";
+    const citation = document.createElement("strong");
+    citation.textContent = officialSectionCitation(section);
+    const link = document.createElement("span");
+    link.textContent = sharedSectionURL(section.sectionID);
+    const actions = document.createElement("div");
+    actions.className = "research-evidence-actions";
+    const openButton = document.createElement("button");
+    openButton.className = "ghost-button";
+    openButton.type = "button";
+    openButton.textContent = "Open";
+    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(section));
+    const copyButton = document.createElement("button");
+    copyButton.className = "ghost-button";
+    copyButton.type = "button";
+    copyButton.title = "Copy citation";
+    copyButton.textContent = "Copy";
+    copyButton.addEventListener("click", () => {
+      copyResearchText(researchCitationText(section), copyButton, "Citation copied");
+    });
+    actions.append(openButton, copyButton);
+    row.append(citation, link, actions);
+    content.append(row);
+  });
+
+  return panel;
+}
+
 async function renderUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   let panel = null;
@@ -3753,8 +4867,7 @@ async function renderUtilityInstance(instance) {
   } else if (instance.key === "saved") {
     panel = await renderSaved(paneID);
   } else if (instance.key === "analysis") {
-    panel = renderUtility(analysisTemplate, paneID);
-    panel.classList.add("analysis-panel");
+    panel = await renderResearch(paneID);
   }
   wireUtilityInstanceActions(panel, instance);
   return panel;
@@ -3861,13 +4974,15 @@ function projectSectionBelongsToProject(item, project) {
 }
 
 async function openProjectDetail(project) {
+  if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
+    openDetachedWindow(project);
+    return;
+  }
   const identity = projectIdentity(project);
   const detailID = paneIDForProjectDetail(identity);
   const details = openProjectDetails();
   if (details.some((detail) => projectDetailMatches(project, detail))) {
-    setOpenProjectDetails(details.filter((detail) => !projectDetailMatches(project, detail)));
-    delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    closeProjectDetailForProject(identity);
   } else {
     setOpenProjectDetails([...details, identity]);
     placeProjectDetailAfterProjects(identity);
@@ -3890,9 +5005,12 @@ function closeProjectDetailForProject(project) {
   setOpenProjectDetails(openProjectDetails().filter((detail) => !projectDetailMatches(project, detail)));
   matchingDetails.forEach((detail) => {
     const detailID = paneIDForProjectDetail(detail);
+    const workboardID = paneIDForProjectWorkboard(detail);
     delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    delete state.paneWeights[workboardID];
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
   });
+  state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
 
 async function archiveProject(project) {
@@ -3904,6 +5022,7 @@ async function archiveProject(project) {
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);
   closeProjectDetailForProject(project);
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await renderWorkspace();
@@ -3937,6 +5056,7 @@ async function deleteArchivedProject(project) {
   state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);
+  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
   saveWorkspaceState();
   await renderWorkspace();
 }
@@ -3966,12 +5086,30 @@ async function renderProjectDetail(detail) {
 
   const chrome = document.createElement("header");
   chrome.className = "project-detail-chrome";
-  const backButton = appendDetailIconButton(chrome, {
+  const actions = document.createElement("div");
+  actions.className = "project-detail-actions";
+  const workboardButton = document.createElement("button");
+  workboardButton.className = "project-workboard-button";
+  workboardButton.type = "button";
+  workboardButton.textContent = "Workboard";
+  workboardButton.setAttribute("aria-pressed", String(projectHasOpenWorkboard(identity)));
+  workboardButton.hidden = detachedProjectWindow;
+  workboardButton.addEventListener("click", () => {
+    if (projectHasOpenWorkboard(identity)) {
+      void closeProjectWorkboard(identity);
+      workboardButton.setAttribute("aria-pressed", "false");
+    } else {
+      void openProjectWorkboard(identity);
+      workboardButton.setAttribute("aria-pressed", "true");
+    }
+  });
+  const backButton = appendDetailIconButton(actions, {
     title: "Back",
     label: "Back to projects",
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
+  actions.prepend(workboardButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -3989,7 +5127,7 @@ async function renderProjectDetail(detail) {
     description.textContent = descriptionText;
     headingGroup.append(description);
   }
-  chrome.append(headingGroup);
+  chrome.append(headingGroup, actions);
 
   const content = document.createElement("section");
   content.className = "project-detail-content";
@@ -4049,10 +5187,11 @@ async function renderProjectDetail(detail) {
   });
 
   backButton.addEventListener("click", () => {
-    const detailID = paneIDForProjectDetail(identity);
-    setOpenProjectDetails(openProjectDetails().filter((item) => !projectDetailMatches(identity, item)));
-    delete state.paneWeights[detailID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID);
+    if (detachedProjectWindow) {
+      window.close();
+      return;
+    }
+    closeProjectDetailForProject(identity);
     saveWorkspaceState();
     renderWorkspace();
   });
@@ -4244,13 +5383,18 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const card = document.createElement("article");
     card.className = "project-card project-row";
     const isOpenProject = openProjectDetails().some((detail) => projectDetailMatches(project, detail));
+    const isDetachedProject = projectHasDetachedWorkboard(project);
     if (isOpenProject) {
       card.classList.add("is-open");
       card.setAttribute("aria-current", "true");
     }
+    if (isDetachedProject) card.classList.add("is-detached");
     card.tabIndex = 0;
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
+    card.setAttribute(
+      "aria-label",
+      `${isDetachedProject ? "Focus detached" : "Open"} ${project.name || project.title || "project"}`
+    );
     card.style.setProperty("--project-color", projectColor(project));
     const actionGroup = document.createElement("div");
     actionGroup.className = "project-card-actions";
@@ -4295,6 +5439,12 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     const heading = document.createElement("h3");
     heading.textContent = project.name || project.title || "Project";
     body.append(heading);
+    if (isDetachedProject) {
+      const detachedLabel = document.createElement("span");
+      detachedLabel.className = "project-detached-label";
+      detachedLabel.textContent = "Detached";
+      body.append(detachedLabel);
+    }
     const addressText = String(project.address || "").trim();
     if (addressText) {
       const address = document.createElement("p");
@@ -4511,6 +5661,82 @@ function renderSettings() {
   const disconnectButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
   const status = panel.querySelector(".connector-status");
+  const connector = panel.querySelector(".account-connector");
+  const syncPanel = document.createElement("section");
+  syncPanel.className = "account-sync-summary";
+  connector.append(syncPanel);
+  const renderSyncState = () => {
+    clear(syncPanel);
+    const account = activeAccount();
+    if (!account) return;
+    const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID);
+    const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID);
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = "Sync";
+    const detail = document.createElement("p");
+    detail.className = "connector-status";
+    detail.textContent = conflicts.length
+      ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
+      : pending.length
+        ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
+        : "All browser changes are synced.";
+    syncPanel.append(label, detail);
+
+    if (pending.length) {
+      const retryButton = document.createElement("button");
+      retryButton.className = "ghost-button";
+      retryButton.type = "button";
+      retryButton.textContent = "Retry sync";
+      retryButton.addEventListener("click", async () => {
+        retryButton.disabled = true;
+        try {
+          await flushSyncOutbox({ refresh: true });
+          await renderWorkspace();
+        } catch (error) {
+          detail.textContent = error.message || "Sync retry failed.";
+          retryButton.disabled = false;
+        }
+      });
+      syncPanel.append(retryButton);
+    }
+
+    conflicts.slice(0, 5).forEach((entry) => {
+      const { kind, record } = mutationKindAndRecord(entry.mutation);
+      const row = document.createElement("article");
+      row.className = "saved-row";
+      const heading = document.createElement("strong");
+      heading.textContent = record?.title || record?.name || kind || "Saved change";
+      const message = document.createElement("span");
+      message.textContent = "The server has a newer copy.";
+      const actions = document.createElement("div");
+      actions.className = "connector-actions";
+      const useServerButton = document.createElement("button");
+      useServerButton.className = "ghost-button";
+      useServerButton.type = "button";
+      useServerButton.textContent = "Use server";
+      const keepLocalButton = document.createElement("button");
+      keepLocalButton.className = "ghost-button";
+      keepLocalButton.type = "button";
+      keepLocalButton.textContent = "Keep mine";
+      const resolve = async (keepLocal) => {
+        useServerButton.disabled = true;
+        keepLocalButton.disabled = true;
+        try {
+          await resolveSyncConflict(entry, keepLocal);
+        } catch (error) {
+          detail.textContent = error.message || "Could not resolve this sync conflict.";
+          useServerButton.disabled = false;
+          keepLocalButton.disabled = false;
+        }
+      };
+      useServerButton.addEventListener("click", () => resolve(false));
+      keepLocalButton.addEventListener("click", () => resolve(true));
+      actions.append(useServerButton, keepLocalButton);
+      row.append(heading, message, actions);
+      syncPanel.append(row);
+    });
+  };
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
@@ -4530,6 +5756,7 @@ function renderSettings() {
     planDetail.textContent = pro
       ? `${entitlementSourceLabel()} active. Saved work, PDF export, tags, continuity, and sync are unlocked.`
       : "Free keeps reading and search usable. Pro unlocks saved work, projects, tags, exports, continuity, and sync.";
+    renderSyncState();
   };
   status.textContent = activeAccount()
     ? (isProAccount() ? "Connected. Pro is active for this browser." : "Connected. Sync and checkout are ready for this browser.")
@@ -4571,11 +5798,23 @@ function renderSettings() {
       syncAccountState();
     }
   });
-  disconnectButton.addEventListener("click", () => {
-    state.account = null;
-    syncedContent = null;
-    saveWorkspaceState();
-    renderWorkspace();
+  disconnectButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    disconnectButton.disabled = true;
+    try {
+      if (account) {
+        await postJSON("/account/sign-out", {
+          auth: { accountUserID: account.userID }
+        }, { token: account.sessionToken });
+      }
+    } catch {
+      // Clear the local session even if the network is unavailable.
+    } finally {
+      state.account = null;
+      syncedContent = null;
+      saveWorkspaceState();
+      renderWorkspace();
+    }
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();
@@ -4675,8 +5914,15 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
-  if (paneID === "utility:projects" || isProjectDetailPaneID(paneID)) {
-    return ["utility:projects", ...openProjectDetails().map((detail) => paneIDForProjectDetail(detail)), "utility:archive"].filter((id) => active.has(id));
+  if (paneID === "utility:projects" || isProjectDetailPaneID(paneID) || isProjectWorkboardPaneID(paneID)) {
+    return [
+      "utility:projects",
+      ...openProjectDetails().flatMap((detail) => [
+        paneIDForProjectDetail(detail),
+        ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+      ]),
+      "utility:archive"
+    ].filter((id) => active.has(id));
   }
   if (paneID.startsWith("utility:search:")) {
     const searchID = paneID.replace("utility:search:", "");
@@ -4902,6 +6148,7 @@ function appendPaneSequence(panes) {
   const orderedPanes = orderPanes(panes);
   const previousScrollLeft = track.scrollLeft;
   const nodes = [];
+  cleanupInactiveWorkboardMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
   orderedPanes.forEach((pane, index) => {
     if (index > 0) {
@@ -4918,7 +6165,8 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   if (!pane) return;
   const paneRect = pane.getBoundingClientRect();
   const trackRect = track.getBoundingClientRect();
-  const paneRight = paneRect.right - trackRect.right;
+  const visibleRight = trackRect.right;
+  const paneRight = paneRect.right - visibleRight;
   const paneLeft = paneRect.left - trackRect.left;
   if (paneRight > 0) {
     track.scrollTo({
@@ -4940,9 +6188,21 @@ async function renderWorkspace() {
   setUtilityButtonStates();
 
   const panes = [];
+  if (detachedProjectWindow && detachedProject) {
+    panes.push(await renderProjectDetail(openProjectDetails()[0] || detachedProject));
+    panes.push(await renderProjectWorkboard(detachedProject));
+    appendPaneSequence(panes);
+    syncAllCommentBoxHeights();
+    bindAllReaderCommentScroll();
+    saveWorkspaceState();
+    return;
+  }
   if (state.utilities.projects) {
     panes.push(await renderProjects());
-    for (const detail of openProjectDetails()) panes.push(await renderProjectDetail(detail));
+    for (const detail of openProjectDetails()) {
+      panes.push(await renderProjectDetail(detail));
+      if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
+    }
   }
   if (state.utilities.projects && state.utilities.archive) {
     panes.push(await renderArchive());
@@ -4977,7 +6237,10 @@ async function renderUtilityWorkspace() {
   const existingContentPanes = Array.from(existingPanesByID.values())
     .filter((pane) => {
       const paneID = String(pane.dataset.paneId || "");
-      return !paneID.startsWith("utility:") && !paneID.startsWith("section:detail:") && !isProjectDetailPaneID(paneID);
+      return !paneID.startsWith("utility:") &&
+        !paneID.startsWith("section:detail:") &&
+        !isProjectDetailPaneID(paneID) &&
+        !isProjectWorkboardPaneID(paneID);
     });
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -4986,7 +6249,10 @@ async function renderUtilityWorkspace() {
   const panes = [];
   if (state.utilities.projects) {
     panes.push(await renderProjects());
-    for (const detail of openProjectDetails()) panes.push(await renderProjectDetail(detail));
+    for (const detail of openProjectDetails()) {
+      panes.push(await renderProjectDetail(detail));
+      if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
+    }
   }
   if (state.utilities.projects && state.utilities.archive) {
     panes.push(await renderArchive());
@@ -5062,9 +6328,17 @@ async function toggleUtilityPane(key) {
     }
   } else if (key === "projects") {
     delete state.paneWeights[paneID];
-    openProjectDetails().forEach((detail) => delete state.paneWeights[paneIDForProjectDetail(detail)]);
+    openProjectDetails().forEach((detail) => {
+      delete state.paneWeights[paneIDForProjectDetail(detail)];
+      delete state.paneWeights[paneIDForProjectWorkboard(detail)];
+    });
     delete state.paneWeights["utility:archive"];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID && !isProjectDetailPaneID(id) && id !== "utility:archive");
+    state.paneOrder = (state.paneOrder || []).filter((id) =>
+      id !== paneID &&
+      !isProjectDetailPaneID(id) &&
+      !isProjectWorkboardPaneID(id) &&
+      id !== "utility:archive"
+    );
   } else if (key === "archive") {
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   }
@@ -5098,6 +6372,7 @@ async function collapseToOneReader() {
   state.sectionDetails = {};
   state.searchLinkedReaders = {};
   setOpenProjectDetails([]);
+  state.workboards = [];
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });
@@ -5123,7 +6398,57 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("storage", (event) => {
+    if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
+    if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
+      try {
+        void reattachProjectWorkboard(JSON.parse(event.newValue));
+      } catch {
+        localStorage.removeItem("permitext:pendingWorkboardReattach");
+      }
+    }
+  });
+  window.addEventListener("online", () => {
+    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+      flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    }
+  });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
+  if (detachedProjectWindow) {
+    if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");
+    window.addEventListener("pagehide", () => {
+      if (window.opener && !window.opener.closed) {
+        window.opener.postMessage(
+          { type: "permitext:detachedWorkboardClosed", project: detachedProject },
+          window.location.origin
+        );
+      }
+    }, { once: true });
+    await renderWorkspace();
+    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    return;
+  }
+  window.addEventListener("message", (event) => {
+    if (event.origin !== window.location.origin) return;
+    if (event.data?.type === "permitext:reattachWorkboard") {
+      void reattachProjectWorkboard(event.data.project);
+      return;
+    }
+    if (event.data?.type === "permitext:detachedWorkboardClosed") {
+      state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(event.data.project, item));
+      saveWorkspaceState();
+      void renderWorkspace();
+    }
+  });
+  try {
+    const pendingReattach = JSON.parse(localStorage.getItem("permitext:pendingWorkboardReattach") || "null");
+    if (pendingReattach) await reattachProjectWorkboard(pendingReattach);
+  } catch {
+    localStorage.removeItem("permitext:pendingWorkboardReattach");
+  }
   addReaderButton.addEventListener("click", async () => {
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
     state.readers.push(reader);
@@ -5156,6 +6481,17 @@ async function start() {
     collapseToOneReader();
   });
   await renderWorkspace();
+  const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
+  if (deepLinkedSectionID) {
+    try {
+      const payload = await api(`/code/sections/${deepLinkedSectionID}`);
+      await openSectionDetailForExistingSearch(payload.section, { updateURL: false });
+    } catch (error) {
+      console.warn("Could not open shared section link.", error);
+      window.history.replaceState({}, "", "/");
+    }
+  }
+  flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
   refreshEntitlementAfterCheckoutReturn();
 }
 

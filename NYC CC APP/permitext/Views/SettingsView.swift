@@ -1,5 +1,4 @@
 import AuthenticationServices
-import Security
 import SwiftUI
 import UIKit
 
@@ -25,7 +24,6 @@ struct SettingsView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var publicUsernameDraft = ""
-    @StateObject private var passkeyCoordinator = SettingsPasskeyAuthorizationCoordinator()
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
 
@@ -250,7 +248,7 @@ struct SettingsView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, and 10 notes.")
-                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and future cross-device sync.")
+                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.")
             }
 
             Button {
@@ -358,52 +356,8 @@ struct SettingsView: View {
                 .disabled(library.isAccountBusy)
                 .opacity(library.isAccountBusy ? 0.55 : 1)
 
-                Button {
-                    passkeyCoordinator.signIn { result in
-                        Task {
-                            await library.handlePasskeySignIn(result: result)
-                        }
-                    }
-                } label: {
-                    Label("Sign in with Passkey", systemImage: "key.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .foregroundStyle(.primary)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.primary.opacity(0.08))
-                        )
-                }
-                .buttonStyle(.plain)
-                .disabled(library.isAccountBusy)
-                .opacity(library.isAccountBusy ? 0.55 : 1)
             } else {
                 accountProfileEditor
-
-                Button {
-                    passkeyCoordinator.createPasskey(
-                        userName: passkeyUserName,
-                        displayName: passkeyDisplayName
-                    ) { result in
-                        Task {
-                            await library.handlePasskeyRegistration(result: result)
-                        }
-                    }
-                } label: {
-                    Label("Create Passkey", systemImage: "key.radiowaves.forward.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .foregroundStyle(.primary)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.primary.opacity(0.08))
-                        )
-                }
-                .buttonStyle(.plain)
-                .disabled(library.isAccountBusy)
-                .opacity(library.isAccountBusy ? 0.55 : 1)
 
                 Button {
                     library.signOut()
@@ -496,6 +450,33 @@ struct SettingsView: View {
                 Spacer(minLength: 0)
             }
 
+            ForEach(Array(library.userContentSyncConflicts.prefix(5))) { conflict in
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(syncConflictLabel(conflict))
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    Text("The server has a newer copy. Choose which version to keep.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    HStack(spacing: 10) {
+                        syncConflictButton("Use server") {
+                            await library.resolveUserContentSyncConflict(conflict, keepLocal: false)
+                        }
+                        syncConflictButton("Keep mine") {
+                            await library.resolveUserContentSyncConflict(conflict, keepLocal: true)
+                        }
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.orange.opacity(0.08))
+                )
+            }
+
             Button {
                 Task { await library.syncNow() }
             } label: {
@@ -513,6 +494,34 @@ struct SettingsView: View {
             .disabled(!library.canSyncNow)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func syncConflictButton(_ title: String, action: @escaping () async -> Void) -> some View {
+        Button {
+            Task { await action() }
+        } label: {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 9)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(Color.primary.opacity(0.08))
+                )
+        }
+        .buttonStyle(.plain)
+        .disabled(library.isAccountBusy)
+    }
+
+    private func syncConflictLabel(_ conflict: UserContentSyncConflict) -> String {
+        switch conflict.entityKind {
+        case .savedItem: return "Saved section conflict"
+        case .annotation: return "Note or tag conflict"
+        case .project: return "Project conflict"
+        case .projectSection: return "Project section conflict"
+        case .continuity: return "Reading position conflict"
+        case .codeVersionClear: return "Cleared data conflict"
+        }
     }
 
     private var syncStatusIconName: String {
@@ -535,7 +544,7 @@ struct SettingsView: View {
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
             }
-            return "Pro is active. The same saved work, PDF export, tags, continuity, and future cross-device sync are unlocked across iOS and web."
+            return "Pro is active. The same saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
         }
         return "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity."
     }
@@ -548,15 +557,6 @@ struct SettingsView: View {
             return "Signed in as \(displayName). Saved work can sync through the connected backend."
         }
         return "Signed in with \(account.authProvider.rawValue). Saved work can sync through the connected backend."
-    }
-
-    private var passkeyUserName: String {
-        guard let account = library.signedInAccount else { return "permitext" }
-        return account.publicUsername ?? account.displayName ?? account.appUserID
-    }
-
-    private var passkeyDisplayName: String {
-        library.signedInAccount?.displayName ?? "permitext"
     }
 
     private var accountProfileValidationMessage: String? {
@@ -966,91 +966,6 @@ private struct SettingsSwitchToggleStyle: ToggleStyle {
             .accessibilityLabel("Comparison Mode")
             .accessibilityValue(configuration.isOn ? "On" : "Off")
         }
-    }
-}
-
-private final class SettingsPasskeyAuthorizationCoordinator: NSObject, ObservableObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
-    private let relyingPartyIdentifier = "permitext-sync.vercel.app"
-    private var completion: ((Result<ASAuthorization, Error>) -> Void)?
-
-    func signIn(completion: @escaping (Result<ASAuthorization, Error>) -> Void) {
-        guard #available(iOS 16.0, *) else {
-            completion(.failure(SettingsPasskeyAuthorizationError.unsupported))
-            return
-        }
-        self.completion = completion
-        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyIdentifier)
-        let request = provider.createCredentialAssertionRequest(challenge: randomChallenge())
-        perform(request)
-    }
-
-    func createPasskey(
-        userName: String,
-        displayName: String,
-        completion: @escaping (Result<ASAuthorization, Error>) -> Void
-    ) {
-        guard #available(iOS 16.0, *) else {
-            completion(.failure(SettingsPasskeyAuthorizationError.unsupported))
-            return
-        }
-        self.completion = completion
-        let provider = ASAuthorizationPlatformPublicKeyCredentialProvider(relyingPartyIdentifier: relyingPartyIdentifier)
-        let request = provider.createCredentialRegistrationRequest(
-            challenge: randomChallenge(),
-            name: displayName.isEmpty ? userName : displayName,
-            userID: Data(userName.utf8)
-        )
-        perform(request)
-    }
-
-    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        UIApplication.shared.connectedScenes
-            .compactMap { $0 as? UIWindowScene }
-            .flatMap(\.windows)
-            .first { $0.isKeyWindow } ?? UIWindow()
-    }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        completion?(.success(authorization))
-        completion = nil
-    }
-
-    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
-        completion?(.failure(error))
-        completion = nil
-    }
-
-    @available(iOS 16.0, *)
-    private func perform(_ request: ASAuthorizationPlatformPublicKeyCredentialAssertionRequest) {
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = self
-        controller.performRequests()
-    }
-
-    @available(iOS 16.0, *)
-    private func perform(_ request: ASAuthorizationPlatformPublicKeyCredentialRegistrationRequest) {
-        let controller = ASAuthorizationController(authorizationRequests: [request])
-        controller.delegate = self
-        controller.presentationContextProvider = self
-        controller.performRequests()
-    }
-
-    private func randomChallenge() -> Data {
-        var bytes = [UInt8](repeating: 0, count: 32)
-        let result = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
-        if result == errSecSuccess {
-            return Data(bytes)
-        }
-        return UUID().uuidString.data(using: .utf8) ?? Data()
-    }
-}
-
-private enum SettingsPasskeyAuthorizationError: LocalizedError {
-    case unsupported
-
-    var errorDescription: String? {
-        "Passkeys require iOS 16 or later."
     }
 }
 

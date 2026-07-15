@@ -54,6 +54,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
     @Published private(set) var pendingUserContentSyncCount = 0
+    @Published private(set) var userContentSyncConflicts: [UserContentSyncConflict] = []
     @Published private(set) var proProductDisplayPrice: String?
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
     @Published private(set) var storeKitDebugSummary: String = "not checked"
@@ -72,6 +73,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var comparisonModeEnabled: Bool
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
+    @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
 
     private let locator: BundleDatabaseLocator
     private let formattingEngine: FormattingEngine
@@ -134,6 +136,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private let foregroundAccountSyncInterval: TimeInterval = 45
+    private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
     private var pendingTabAssertionToken: Int = 0
@@ -483,6 +486,21 @@ final class CodeLibraryViewModel: ObservableObject {
     #if DEBUG
     private func runStartupDiagnostics() {
         var messages = continuityStore.debugValidationMessages()
+        let validDeepLink = URL(string: "https://permitext-sync.vercel.app/open/section/8881")
+            .flatMap(Self.deepLinkedSectionID(from:))
+        let invalidDeepLink = URL(string: "https://example.com/open/section/8881")
+            .flatMap(Self.deepLinkedSectionID(from:))
+        if validDeepLink != 8881 || invalidDeepLink != nil {
+            messages.append("Shared section link parsing failed")
+        }
+        let citation = Self.officialSectionCitation(
+            codeName: "Building Code",
+            sectionNumber: "101.2",
+            title: "Scope."
+        )
+        if citation != "New York City Building Code § 101.2 (2022) — Scope." {
+            messages.append("Official section citation formatting failed")
+        }
         if let userDataStore = userContentRepository as? UserDataStore {
             do {
                 messages.append(contentsOf: try userDataStore.debugSchemaValidationMessages())
@@ -1318,6 +1336,55 @@ final class CodeLibraryViewModel: ObservableObject {
         searchTabRetapCount &+= 1
     }
 
+    func handleOpenURL(_ url: URL) {
+        guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
+        pendingDeepLinkedSectionID = sectionID
+        selectedTab = .search
+    }
+
+    func consumePendingDeepLinkedSectionID() -> Int64? {
+        defer { pendingDeepLinkedSectionID = nil }
+        return pendingDeepLinkedSectionID
+    }
+
+    static func deepLinkedSectionID(from url: URL) -> Int64? {
+        guard url.scheme?.lowercased() == "https",
+              url.host?.lowercased() == "permitext-sync.vercel.app" else {
+            return nil
+        }
+        let components = url.pathComponents.filter { $0 != "/" }
+        guard components.count == 3,
+              components[0] == "open",
+              components[1] == "section",
+              let sectionID = Int64(components[2]),
+              sectionID > 0 else {
+            return nil
+        }
+        return sectionID
+    }
+
+    static func sharedSectionURL(sectionID: Int64) -> URL {
+        URL(string: "https://permitext-sync.vercel.app/open/section/\(sectionID)")!
+    }
+
+    static func officialSectionCitation(
+        codeName: String,
+        sectionNumber: String,
+        title: String
+    ) -> String {
+        let normalizedCodeName = codeName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedSectionNumber = sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        let normalizedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        let reference = [
+            "New York City \(normalizedCodeName.isEmpty ? "Code" : normalizedCodeName)",
+            normalizedSectionNumber.isEmpty ? "" : "§ \(normalizedSectionNumber)",
+            "(2022)"
+        ]
+        .filter { !$0.isEmpty }
+        .joined(separator: " ")
+        return normalizedTitle.isEmpty ? reference : "\(reference) — \(normalizedTitle)"
+    }
+
     func recordRecentSearch(_ query: String) {
         let trimmed = query.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
@@ -1637,7 +1704,7 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = EntitlementRequirement(
             feature: .unlimitedSavedItems,
             requiredPlan: .pro,
-            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and future cross-device sync."
+            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and cross-device sync."
         )
     }
 
@@ -1723,70 +1790,6 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func handlePasskeySignIn(result: Result<ASAuthorization, Error>) async {
-        switch result {
-        case .success(let authorization):
-            guard #available(iOS 16.0, *),
-                  let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialAssertion
-            else {
-                statusMessage = "Passkey sign-in did not return a passkey credential."
-                return
-            }
-            do {
-                let backendRecord = try await accountBackendClient.signIn(
-                    credential: AccountSignInCredential(
-                        provider: .passkey,
-                        providerUserID: credential.credentialID.base64EncodedString(),
-                        displayName: nil,
-                        signedInAt: Date()
-                    )
-                )
-                guard backendRecord.account.authProvider != .passkey else {
-                    statusMessage = "This passkey is not linked to your Apple account yet. Sign in with Apple, then create the passkey again."
-                    return
-                }
-                await completeBackendSignIn(backendRecord)
-            } catch {
-                statusMessage = error.localizedDescription
-            }
-        case .failure(let error):
-            statusMessage = error.localizedDescription
-        }
-    }
-
-    func handlePasskeyRegistration(result: Result<ASAuthorization, Error>) async {
-        guard let account = signedInAccount else {
-            statusMessage = "Sign in with Apple before creating a passkey."
-            return
-        }
-        switch result {
-        case .success(let authorization):
-            guard #available(iOS 16.0, *),
-                  let credential = authorization.credential as? ASAuthorizationPlatformPublicKeyCredentialRegistration
-            else {
-                statusMessage = "Passkey creation did not return a passkey credential."
-                return
-            }
-            guard !isAccountBusy else { return }
-            isAccountBusy = true
-            defer { isAccountBusy = false }
-            do {
-                let linkedAccount = try await accountBackendClient.linkPasskey(
-                    account: account,
-                    credentialID: credential.credentialID.base64EncodedString()
-                )
-                signedInAccount = linkedAccount
-                Self.saveSignedInAccount(linkedAccount)
-                statusMessage = "Passkey saved for this account."
-            } catch {
-                if handleBackendSessionFailureIfNeeded(error) { return }
-                statusMessage = error.localizedDescription
-            }
-        case .failure(let error):
-            statusMessage = error.localizedDescription
-        }
-    }
-
     private func completeBackendSignIn(_ backendRecord: BackendAccountRecord) async {
         let account = backendRecord.account
         signedInAccount = account
@@ -1854,6 +1857,7 @@ final class CodeLibraryViewModel: ObservableObject {
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
             refreshPendingUserContentSyncCount()
+            scheduleUserContentRetry()
         }
     }
 
@@ -1880,6 +1884,23 @@ final class CodeLibraryViewModel: ObservableObject {
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
+    }
+
+    private func scheduleUserContentRetry() {
+        guard signedInAccount != nil else { return }
+        userContentAutoSyncTask?.cancel()
+        userContentAutoSyncTask = Task { [weak self] in
+            guard let self else { return }
+            for delay in self.automaticSyncRetryDelays {
+                try? await Task.sleep(nanoseconds: UInt64(delay * 1_000_000_000))
+                guard !Task.isCancelled, self.signedInAccount != nil else { return }
+                guard !self.isAccountBusy else { continue }
+                await self.performAutomaticUserContentSync()
+                if self.userContentSyncCheckpoint?.lastErrorMessage == nil {
+                    return
+                }
+            }
+        }
     }
 
     private static func syncDurationText(_ interval: TimeInterval) -> String {
@@ -1981,14 +2002,35 @@ final class CodeLibraryViewModel: ObservableObject {
     private func refreshPendingUserContentSyncCount() {
         do {
             pendingUserContentSyncCount = try syncEngine.previewPendingWork(limit: 500).pendingCount
+            userContentSyncConflicts = try syncEngine.rejectedConflicts(account: signedInAccount)
         } catch {
             pendingUserContentSyncCount = 0
+            userContentSyncConflicts = []
+        }
+    }
+
+    func resolveUserContentSyncConflict(_ conflict: UserContentSyncConflict, keepLocal: Bool) async {
+        guard let signedInAccount, !isAccountBusy else { return }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+        do {
+            try await syncEngine.resolveRejectedConflict(conflict, account: signedInAccount, keepLocal: keepLocal)
+            refreshBookmarks()
+            refreshFolders()
+            refreshPendingUserContentSyncCount()
+            refreshUserContentSyncCheckpoint()
+            statusMessage = keepLocal ? "Kept this device's version and synced it." : "Applied the server version."
+        } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
+            refreshUserContentSyncCheckpoint()
+            statusMessage = "Could not resolve the sync conflict. \(error.localizedDescription)"
         }
     }
 
     var syncStatusTitle: String {
         guard signedInAccount != nil else { return "Not signed in" }
         if isAccountBusy { return "Syncing..." }
+        if !userContentSyncConflicts.isEmpty { return "\(userContentSyncConflicts.count) change\(userContentSyncConflicts.count == 1 ? "" : "s") need review" }
         if userContentSyncCheckpoint?.lastErrorMessage != nil { return "Sync failed" }
         if pendingUserContentSyncCount > 0 { return "\(pendingUserContentSyncCount) change\(pendingUserContentSyncCount == 1 ? "" : "s") waiting" }
         return "Synced"
@@ -1999,6 +2041,9 @@ final class CodeLibraryViewModel: ObservableObject {
             return "Sign in to sync saved work across installs and devices."
         }
         if let error = userContentSyncCheckpoint?.lastErrorMessage {
+            if !userContentSyncConflicts.isEmpty {
+                return "Choose which copy to keep for each server-newer change."
+            }
             if Self.isBackendAuthenticationFailureMessage(error) {
                 return "Your sync session expired. Sign in again to reconnect saved work."
             }
@@ -2124,13 +2169,20 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func signOut() {
+        let account = signedInAccount
         signedInAccount = nil
+        userContentSyncConflicts = []
         Self.clearSignedInAccount()
         if currentEntitlementSource == .lifetimeGrant {
             LocalEntitlementService.clearLifetimeGrant()
         }
         refreshCurrentEntitlement()
         statusMessage = "Signed out."
+        if let account {
+            Task {
+                try? await accountBackendClient.signOut(account: account)
+            }
+        }
     }
 
     @discardableResult
@@ -2139,6 +2191,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         Self.clearSignedInAccount()
         userContentSyncCheckpoint = nil
+        userContentSyncConflicts = []
         refreshPendingUserContentSyncCount()
         statusMessage = "Your sync session expired. Sign in again to reconnect saved work."
         return true

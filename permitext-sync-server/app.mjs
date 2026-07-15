@@ -10,13 +10,27 @@ import {
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
 const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
-const chapterContentPath = join(
+const maxSyncMutationsPerBatch = 100;
+const defaultRequestBodyLimit = 1024 * 1024;
+const rateLimitBuckets = new Map();
+const rateLimitPolicies = new Map([
+  ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
+  ["account/apple/start", { limit: 30, windowMs: 5 * 60 * 1000 }],
+  ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
+  ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
+  ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["sync/push", { limit: 240, windowMs: 60 * 1000 }]
+]);
+const canonicalCodeContentPath = join(
   __dirname,
   "..",
   "NYC CC APP",
@@ -25,24 +39,14 @@ const chapterContentPath = join(
   "CodeContent",
   "authored",
   "new-york-city",
-  "2022-construction-codes",
-  "prepared",
-  "chapters"
+  "2022-construction-codes"
 );
-const chapterManifestPath = join(
-  __dirname,
-  "..",
-  "NYC CC APP",
-  "permitext",
-  "Resources",
-  "CodeContent",
-  "authored",
-  "new-york-city",
-  "2022-construction-codes",
-  "prepared",
-  "manifest.json"
-);
-const sectionContentPath = join(
+const canonicalPreparedContentPath = join(canonicalCodeContentPath, "prepared");
+const chapterContentPath = join(canonicalPreparedContentPath, "chapters");
+const chapterManifestPath = join(canonicalPreparedContentPath, "manifest.json");
+const shippedSearchIndexPath = join(canonicalPreparedContentPath, "searchIndex.json");
+const canonicalSectionContentPath = join(canonicalPreparedContentPath, "sections");
+const legacySectionContentPath = join(
   __dirname,
   "..",
   "NYC CC APP",
@@ -55,18 +59,7 @@ const sectionContentPath = join(
   "prepared",
   "sections"
 );
-const assetContentPath = join(
-  __dirname,
-  "..",
-  "NYC CC APP",
-  "permitext",
-  "Resources",
-  "CodeContent",
-  "authored",
-  "new-york-city",
-  "2022-construction-codes",
-  "assets"
-);
+const assetContentPath = join(canonicalCodeContentPath, "assets");
 const databaseURL =
   process.env.PERMITEXT_SYNC_DATABASE_URL ||
   process.env.DATABASE_URL ||
@@ -79,8 +72,9 @@ let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
 const cachedCanonicalBlockIDsBySectionID = new Map();
-let cachedSearchIndex = null;
-let cachedSearchIndexPromise = null;
+let cachedSectionCatalog = null;
+let cachedSectionCatalogPromise = null;
+let cachedShippedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 
@@ -100,6 +94,30 @@ const allowedMutationKinds = new Set([
   "continuity",
   "codeVersionClear"
 ]);
+
+const researchInterpretationSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    conclusion: { type: "string" },
+    explanation: { type: "string" },
+    assumptions: { type: "array", items: { type: "string" } },
+    missingFacts: { type: "array", items: { type: "string" } },
+    citations: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          sectionID: { type: "string" },
+          relevance: { type: "string" }
+        },
+        required: ["sectionID", "relevance"]
+      }
+    }
+  },
+  required: ["conclusion", "explanation", "assumptions", "missingFacts", "citations"]
+};
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) {
@@ -210,6 +228,8 @@ function mutationRecordDeletedAt(record) {
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
+  const accountRepository = createPostgresAccountRepository(sql);
+  const syncRepository = createPostgresSyncRepository(sql);
   let initialized = false;
   let migrated = false;
 
@@ -276,6 +296,20 @@ async function createPostgresStoreAdapter() {
         session_token TEXT NOT NULL,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_account_sessions (
+        token_hash TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        expires_at TIMESTAMPTZ NOT NULL,
+        revoked_at TIMESTAMPTZ
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_account_sessions_user_idx
+      ON permitext_account_sessions (user_id, expires_at)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_passkey_credentials (
@@ -760,6 +794,7 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_users)::int AS users,
         (SELECT count(*) FROM permitext_entitlements)::int AS entitlements,
         (SELECT count(*) FROM permitext_sessions)::int AS sessions,
+        (SELECT count(*) FROM permitext_account_sessions WHERE revoked_at IS NULL AND expires_at > now())::int AS account_sessions,
         (SELECT count(*) FROM permitext_passkey_credentials)::int AS passkey_credentials,
         (SELECT count(*) FROM permitext_saved_items)::int AS saved_items,
         (SELECT count(*) FROM permitext_annotations)::int AS annotations,
@@ -773,12 +808,14 @@ async function createPostgresStoreAdapter() {
     const row = rows[0] || {};
     return {
       storage: "postgres",
-      schema: "normalized-v2",
+      schema: "normalized-v3",
       latestEventID: Number(row.latest_event_id || 0),
       tables: {
         users: Number(row.users || 0),
         entitlements: Number(row.entitlements || 0),
-        sessions: Number(row.sessions || 0),
+        sessions: Number(row.sessions || 0) + Number(row.account_sessions || 0),
+        legacySessions: Number(row.sessions || 0),
+        accountSessions: Number(row.account_sessions || 0),
         passkeyCredentials: Number(row.passkey_credentials || 0),
         savedItems: Number(row.saved_items || 0),
         annotations: Number(row.annotations || 0),
@@ -1053,7 +1090,11 @@ async function createPostgresStoreAdapter() {
 
   return {
     kind: "postgres",
-    schema: "normalized-v2",
+    schema: "normalized-v3",
+    async initialize() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+    },
     async read() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1073,6 +1114,61 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return mutationsAfterEventID(userID, sinceEventID);
+    },
+    async authenticateUserSession(userID, rawToken) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.authenticate(userID, rawToken);
+    },
+    async signInAccount(account) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.signIn(account);
+    },
+    async updateAccount(userID, account) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.updateAccount(userID, account);
+    },
+    async saveEntitlement(userID, entitlement) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.saveEntitlement(userID, entitlement);
+    },
+    async deleteEntitlement(userID, expected) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.deleteEntitlement(userID, expected);
+    },
+    async stripeEntitlementOwner(subscriptionID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.stripeEntitlementOwner(subscriptionID);
+    },
+    async deleteLegacyPasskeyAccounts() {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.deleteLegacyPasskeyAccounts();
+    },
+    async hasActiveUserSession(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.hasActiveSession(userID);
+    },
+    async revokeUserSession(userID, rawToken) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.revoke(userID, rawToken);
+    },
+    async pushUserContent(userID, mutations) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.push(userID, mutations);
+    },
+    async pullUserContent(userID, options) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return syncRepository.pull(userID, options);
     },
     async summary() {
       await ensureSchema();
@@ -1140,53 +1236,101 @@ async function storageSummary() {
   };
 }
 
-async function readJSON(request) {
-  const chunks = [];
-  for await (const chunk of request) {
-    chunks.push(chunk);
-  }
-  const raw = Buffer.concat(chunks).toString("utf8");
-  return raw.length ? JSON.parse(raw) : {};
+export function requestBodyLimit(environment = process.env) {
+  const configured = Number(environment.PERMITEXT_MAX_REQUEST_BODY_BYTES);
+  return Number.isSafeInteger(configured) && configured >= 64 * 1024 && configured <= 10 * 1024 * 1024
+    ? configured
+    : defaultRequestBodyLimit;
 }
 
-async function readRawBody(request) {
+class RequestBodyTooLargeError extends Error {}
+
+async function readBody(request, limit = requestBodyLimit()) {
+  const contentLength = Number(request.headers["content-length"] || 0);
+  if (Number.isFinite(contentLength) && contentLength > limit) {
+    throw new RequestBodyTooLargeError();
+  }
   const chunks = [];
+  let byteCount = 0;
   for await (const chunk of request) {
+    byteCount += chunk.length;
+    if (byteCount > limit) {
+      throw new RequestBodyTooLargeError();
+    }
     chunks.push(chunk);
   }
   return Buffer.concat(chunks);
 }
 
-function sendJSON(response, status, body) {
+async function readJSON(request) {
+  const raw = (await readBody(request)).toString("utf8");
+  return raw.length ? JSON.parse(raw) : {};
+}
+
+async function readRawBody(request) {
+  return readBody(request);
+}
+
+function securityHeaders() {
+  return {
+    "cross-origin-opener-policy": "same-origin-allow-popups",
+    "permissions-policy": "camera=(), microphone=(), geolocation=()",
+    "referrer-policy": "no-referrer",
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY"
+  };
+}
+
+function sendJSON(response, status, body, extraHeaders = {}) {
   response.writeHead(status, {
+    ...securityHeaders(),
     "content-type": "application/json; charset=utf-8",
-    "cache-control": "no-store"
+    "cache-control": "no-store",
+    ...extraHeaders
   });
   response.end(JSON.stringify(body));
 }
 
 function sendRawJSON(response, status, body) {
   response.writeHead(status, {
+    ...securityHeaders(),
     "content-type": "application/json",
     "cache-control": "no-store"
   });
   response.end(JSON.stringify(body, null, 2));
 }
 
-function sendError(response, status, message) {
-  sendJSON(response, status, { error: message });
+function sendError(response, status, message, extraHeaders = {}) {
+  sendJSON(response, status, { error: message }, extraHeaders);
 }
 
-function sendHTML(response, html) {
+function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}) {
+  const scriptPolicy = scriptNonce
+    ? `'self' 'nonce-${scriptNonce}' https://appleid.cdn-apple.com`
+    : "'self' https://appleid.cdn-apple.com";
   response.writeHead(200, {
+    ...securityHeaders(),
     "content-type": "text/html; charset=utf-8",
-    "cache-control": "no-store"
+    "cache-control": "no-store",
+    "content-security-policy": [
+      "default-src 'self'",
+      `script-src ${scriptPolicy}`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data:",
+      "connect-src 'self'",
+      "object-src 'none'",
+      "base-uri 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self' https://appleid.apple.com"
+    ].join("; "),
+    ...extraHeaders
   });
   response.end(html);
 }
 
 function sendStatic(response, contentType, body) {
   response.writeHead(200, {
+    ...securityHeaders(),
     "content-type": contentType,
     "cache-control": "no-store"
   });
@@ -1219,6 +1363,12 @@ function contentTypeForPath(path) {
   if (path.endsWith(".webp")) {
     return "image/webp";
   }
+  if (path.endsWith(".woff2")) {
+    return "font/woff2";
+  }
+  if (path.endsWith(".woff")) {
+    return "font/woff";
+  }
   return "application/octet-stream";
 }
 
@@ -1241,8 +1391,7 @@ function requireAdmin(request, response) {
   return true;
 }
 
-function requireUserSession(request, response, store, userID, requestAccount) {
-  const sessionToken = store.sessions[userID];
+function requireSessionToken(request, response, sessionToken, requestAccount) {
   const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (!suppliedToken) {
     sendError(response, 401, "Missing session token.");
@@ -1260,12 +1409,81 @@ function requireUserSession(request, response, store, userID, requestAccount) {
   return true;
 }
 
+async function authenticatedUserContext(request, response, userID, requestAccount, store = null) {
+  const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
+  if (!suppliedToken) {
+    sendError(response, 401, "Missing session token.");
+    return null;
+  }
+  const adapter = await storeAdapter();
+  if (typeof adapter.authenticateUserSession === "function") {
+    const context = await adapter.authenticateUserSession(userID, suppliedToken);
+    if (!context) {
+      sendError(response, 401, "Unauthorized.");
+      return null;
+    }
+    return { ...context, sessionToken: suppliedToken };
+  }
+
+  const localStore = store || await readStore();
+  if (!requireSessionToken(request, response, localStore.sessions[userID], requestAccount)) {
+    return null;
+  }
+  return {
+    account: localStore.users[userID] || null,
+    entitlement: localStore.entitlements[userID] || null,
+    sessionToken: suppliedToken
+  };
+}
+
+async function userHasActiveSession(userID, store = null) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.hasActiveUserSession === "function") {
+    return adapter.hasActiveUserSession(userID);
+  }
+  const localStore = store || await readStore();
+  return Boolean(localStore.sessions[userID]);
+}
+
 function normalizePath(url) {
   return new URL(url, "http://localhost").pathname.replace(/^\/+/, "");
 }
 
 function requestURL(request) {
   return new URL(request.url, "http://localhost");
+}
+
+function requestClientAddress(request) {
+  const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return forwarded || String(request.headers["x-real-ip"] || request.socket?.remoteAddress || "unknown");
+}
+
+function enforceRateLimit(request, response, path, now = Date.now()) {
+  const policy = rateLimitPolicies.get(path);
+  if (!policy || request.method !== "POST") return true;
+  const key = `${path}:${requestClientAddress(request)}`;
+  const current = rateLimitBuckets.get(key);
+  const bucket = !current || current.resetAt <= now
+    ? { count: 0, resetAt: now + policy.windowMs }
+    : current;
+  bucket.count += 1;
+  rateLimitBuckets.set(key, bucket);
+
+  if (rateLimitBuckets.size > 2_000) {
+    for (const [candidateKey, candidate] of rateLimitBuckets) {
+      if (candidate.resetAt <= now) rateLimitBuckets.delete(candidateKey);
+    }
+    while (rateLimitBuckets.size > 2_000) {
+      rateLimitBuckets.delete(rateLimitBuckets.keys().next().value);
+    }
+  }
+  if (bucket.count <= policy.limit) return true;
+
+  const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
+  sendError(response, 429, "Too many requests. Try again later.", {
+    "retry-after": String(retryAfter)
+  });
+  return false;
 }
 
 async function readJSONFile(path) {
@@ -1353,14 +1571,20 @@ async function canonicalBlockIDsForSectionID(sectionID) {
     return cachedCanonicalBlockIDsBySectionID.get(key);
   }
   let blockIDs = [];
-  try {
-    const payload = await readJSONFile(join(sectionContentPath, `${key}.json`));
-    blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      throw error;
-    }
+  const map = await canonicalSectionIDs();
+  const legacyWebSectionID = Object.entries(map.legacyWebSectionID || {})
+    .find(([, canonicalID]) => String(canonicalID) === key)?.[0];
+  let payload = await sectionBody(key, {
+    allowMissing: true,
+    canonicalSectionID: key
+  });
+  if (!payload.blocks?.length && legacyWebSectionID && legacyWebSectionID !== key) {
+    payload = await sectionBody(legacyWebSectionID, {
+      allowMissing: true,
+      canonicalSectionID: key
+    });
   }
+  blockIDs = (payload.blocks || []).flatMap(htmlParagraphBlockIDs);
   cachedCanonicalBlockIDsBySectionID.set(key, blockIDs);
   return blockIDs;
 }
@@ -1404,6 +1628,10 @@ async function canonicalBlockIDFor(sectionID, blockID) {
 }
 
 async function canonicalizeSectionPayload(section, chapterContext) {
+  const publishedID = Number(section.id);
+  if (Number.isSafeInteger(publishedID) && publishedID > 0) {
+    return section;
+  }
   const canonicalID = await canonicalSectionIDFor({
     ...chapterContext,
     sectionNumber: section.sectionNumber,
@@ -1527,23 +1755,23 @@ function flattenChapterSections(chapter) {
   );
 }
 
-async function searchIndex() {
-  if (cachedSearchIndex) {
-    return cachedSearchIndex;
+async function sectionCatalog() {
+  if (cachedSectionCatalog) {
+    return cachedSectionCatalog;
   }
-  if (cachedSearchIndexPromise) {
-    return cachedSearchIndexPromise;
+  if (cachedSectionCatalogPromise) {
+    return cachedSectionCatalogPromise;
   }
-  cachedSearchIndexPromise = buildSearchIndex();
+  cachedSectionCatalogPromise = buildSectionCatalog();
   try {
-    cachedSearchIndex = await cachedSearchIndexPromise;
-    return cachedSearchIndex;
+    cachedSectionCatalog = await cachedSectionCatalogPromise;
+    return cachedSectionCatalog;
   } finally {
-    cachedSearchIndexPromise = null;
+    cachedSectionCatalogPromise = null;
   }
 }
 
-async function buildSearchIndex() {
+async function buildSectionCatalog() {
   const chapters = await chapterIndex();
   const sectionSummaries = [];
   for (const chapterSummary of chapters) {
@@ -1558,6 +1786,7 @@ async function buildSearchIndex() {
         webSectionID: section.id,
         chapterID: chapterSummary.id,
         codePrefix: chapterSummary.codePrefix,
+        codeSectionID: chapterSummary.codeSectionID,
         chapterNumber: chapterSummary.chapterNumber,
         sectionNumber: section.sectionNumber,
         title: section.title,
@@ -1566,54 +1795,346 @@ async function buildSearchIndex() {
       });
     }
   }
+  return sectionSummaries;
+}
 
-  const index = [];
-  for (let start = 0; start < sectionSummaries.length; start += 150) {
-    const batch = sectionSummaries.slice(start, start + 150);
-    const entries = await Promise.all(
-      batch.map(async (section) => {
-        const body = await sectionBody(section.webSectionID || section.id, { allowMissing: true });
-        const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
-        return { ...section, plainText };
-      })
+async function shippedSearchIndex() {
+  if (!cachedShippedSearchIndex) {
+    const payload = await readJSONFile(shippedSearchIndexPath);
+    cachedShippedSearchIndex = new Map(
+      Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [token, new Set(sectionIDs)])
     );
-    index.push(...entries);
   }
-  return index;
+  return cachedShippedSearchIndex;
+}
+
+function tokenizeSearchText(text) {
+  const tokens = [];
+  let current = "";
+  const flush = () => {
+    if (current.length >= 2) tokens.push(current);
+    current = "";
+  };
+  for (const character of String(text || "").toLowerCase()) {
+    if (/\s/u.test(character)) {
+      flush();
+    } else if (/[\p{L}\p{N}]/u.test(character) || character === "." || character === "-") {
+      current += character;
+    } else {
+      flush();
+    }
+  }
+  flush();
+  return tokens;
+}
+
+function intersectSets(left, right) {
+  const intersection = new Set();
+  for (const value of left) {
+    if (right.has(value)) intersection.add(value);
+  }
+  return intersection;
 }
 
 async function sectionBody(sectionID, options = {}) {
-  try {
-    return await readJSONFile(join(sectionContentPath, `${sectionID}.json`));
-  } catch (error) {
-    if (options.allowMissing && error.code === "ENOENT") {
-      return { blocks: [], sectionID };
-    }
-    throw error;
+  const canonicalSectionID = String(options.canonicalSectionID || "").trim();
+  const legacySectionID = String(sectionID || "").trim();
+  const candidates = [];
+  if (canonicalSectionID) {
+    candidates.push(join(canonicalSectionContentPath, `${canonicalSectionID}.json`));
   }
+  if (legacySectionID && legacySectionID !== canonicalSectionID) {
+    candidates.push(join(canonicalSectionContentPath, `${legacySectionID}.json`));
+  }
+  if (legacySectionID) {
+    candidates.push(join(legacySectionContentPath, `${legacySectionID}.json`));
+  }
+
+  for (const candidate of candidates) {
+    try {
+      return await readJSONFile(candidate);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+  }
+  if (options.allowMissing) {
+    return { blocks: [], sectionID: Number(canonicalSectionID || legacySectionID) };
+  }
+  const error = new Error(`Section content is unavailable for ${canonicalSectionID || legacySectionID}.`);
+  error.code = "ENOENT";
+  throw error;
 }
 
 async function sectionSummaryByID(sectionID) {
-  const chapters = await chapterIndex();
-  for (const chapterSummary of chapters) {
-    const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
-    const sections = await canonicalizeChapterSections(flattenChapterSections(chapter), {
-      codePrefix: chapterSummary.codePrefix,
-      chapterNumber: chapterSummary.chapterNumber
+  const normalizedID = String(sectionID || "").trim();
+  return (await sectionCatalog()).find((section) =>
+    String(section.id) === normalizedID || String(section.webSectionID || "") === normalizedID
+  ) || null;
+}
+
+function normalizedResearchText(value, maxLength) {
+  return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
+}
+
+async function researchEvidenceForSectionIDs(sectionIDs) {
+  const evidence = [];
+  const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
+  for (const requestedID of sectionIDs) {
+    const summary = await sectionSummaryByID(requestedID);
+    if (!summary) {
+      const error = new Error(`Unknown code section: ${requestedID}.`);
+      error.code = "INVALID_RESEARCH_SECTION";
+      throw error;
+    }
+    const canonicalID = String(summary.id || summary.sectionID || requestedID);
+    const body = await sectionBody(summary.webSectionID || requestedID, {
+      allowMissing: true,
+      canonicalSectionID: canonicalID
     });
-    const section = sections.find((item) =>
-      String(item.id) === String(sectionID) ||
-      String(item.webSectionID || "") === String(sectionID)
-    );
-    if (section) {
-      return {
-        ...section,
-        chapterID: chapterSummary.id,
-        chapterNumber: chapterSummary.chapterNumber
-      };
+    const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
+    const text = normalizedResearchText(rawText || summary.title, charactersPerSection);
+    evidence.push({
+      sectionID: canonicalID,
+      sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
+      title: String(summary.title || body.title || "Section"),
+      codePrefix: String(summary.codePrefix || body.codePrefix || ""),
+      chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
+      text
+    });
+  }
+  return evidence;
+}
+
+function researchPrompt(question, evidence) {
+  const sources = evidence.map((section) => [
+    `SECTION_ID: ${section.sectionID}`,
+    `CODE: ${section.codePrefix}`,
+    `SECTION: ${section.sectionNumber}`,
+    `TITLE: ${section.title}`,
+    `TEXT: ${section.text}`
+  ].join("\n")).join("\n\n---\n\n");
+  return `QUESTION\n${question}\n\nSELECTED OFFICIAL CODE EVIDENCE\n${sources}`;
+}
+
+function mockResearchInterpretation(question, evidence) {
+  const subject = evidence.length === 1
+    ? `the selected provision, ${evidence[0].sectionNumber || evidence[0].title}`
+    : `the ${evidence.length} selected provisions`;
+  return {
+    conclusion: `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
+    explanation: "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
+    assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
+    missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
+    citations: evidence.map((section) => ({
+      sectionID: section.sectionID,
+      relevance: `Selected evidence from ${section.sectionNumber || section.title}.`
+    }))
+  };
+}
+
+function outputTextFromResponse(response) {
+  for (const item of response?.output || []) {
+    for (const content of item?.content || []) {
+      if (content?.type === "refusal") {
+        const error = new Error("The model declined this research request.");
+        error.code = "RESEARCH_REFUSAL";
+        throw error;
+      }
+      if (content?.type === "output_text" && content.text) return content.text;
     }
   }
-  return null;
+  const error = new Error("The model returned no interpretation.");
+  error.code = "INVALID_RESEARCH_RESPONSE";
+  throw error;
+}
+
+function validateResearchInterpretation(value, evidence) {
+  const allowedSections = new Map(evidence.map((section) => [section.sectionID, section]));
+  if (!value || typeof value !== "object" ||
+      typeof value.conclusion !== "string" || !value.conclusion.trim() ||
+      typeof value.explanation !== "string" || !value.explanation.trim() ||
+      !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
+      !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
+      !Array.isArray(value.citations) || value.citations.length === 0) {
+    const error = new Error("The model returned an invalid interpretation.");
+    error.code = "INVALID_RESEARCH_RESPONSE";
+    throw error;
+  }
+  const citations = [];
+  const seen = new Set();
+  for (const citation of value.citations) {
+    const sectionID = String(citation?.sectionID || "").trim();
+    const relevance = String(citation?.relevance || "").trim();
+    if (!allowedSections.has(sectionID) || !relevance) {
+      const error = new Error("The model cited evidence outside the selected code sections.");
+      error.code = "INVALID_RESEARCH_CITATION";
+      throw error;
+    }
+    if (seen.has(sectionID)) continue;
+    seen.add(sectionID);
+    citations.push({ ...allowedSections.get(sectionID), relevance });
+  }
+  if (!citations.length) {
+    const error = new Error("The model returned no valid citations.");
+    error.code = "INVALID_RESEARCH_CITATION";
+    throw error;
+  }
+  return {
+    conclusion: value.conclusion.trim(),
+    explanation: value.explanation.trim(),
+    assumptions: value.assumptions.map((item) => item.trim()).filter(Boolean),
+    missingFacts: value.missingFacts.map((item) => item.trim()).filter(Boolean),
+    citations
+  };
+}
+
+async function openAIResearchInterpretation(question, evidence, userID) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    const error = new Error("Research AI is not configured.");
+    error.code = "RESEARCH_NOT_CONFIGURED";
+    throw error;
+  }
+  const model = process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
+  let response;
+  try {
+    response = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${apiKey}`,
+        "content-type": "application/json"
+      },
+      body: JSON.stringify({
+        model,
+        store: false,
+        reasoning: { effort: process.env.PERMITEXT_RESEARCH_REASONING_EFFORT || "medium" },
+        max_output_tokens: 1_500,
+        safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+        instructions: [
+          "You are a building-code research assistant, not an authority having jurisdiction.",
+          "Interpret only the selected official code evidence supplied in the request.",
+          "Do not use outside knowledge as legal authority and do not invent requirements.",
+          "State when the evidence is insufficient and identify project facts that must be confirmed.",
+          "Every conclusion must cite one or more supplied SECTION_ID values."
+        ].join(" "),
+        input: researchPrompt(question, evidence),
+        text: {
+          format: {
+            type: "json_schema",
+            name: "permitext_code_interpretation",
+            strict: true,
+            schema: researchInterpretationSchema
+          }
+        }
+      }),
+      signal: AbortSignal.timeout(45_000)
+    });
+  } catch (error) {
+    if (error.name === "TimeoutError") throw error;
+    const providerError = new Error("The research model request failed.");
+    providerError.code = "RESEARCH_PROVIDER_ERROR";
+    throw providerError;
+  }
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error("The research model request failed.");
+    error.code = "RESEARCH_PROVIDER_ERROR";
+    error.status = response.status;
+    throw error;
+  }
+  let value;
+  try {
+    value = JSON.parse(outputTextFromResponse(payload));
+  } catch (error) {
+    if (error.code === "RESEARCH_REFUSAL") throw error;
+    const invalidResponse = new Error("The model returned invalid structured output.");
+    invalidResponse.code = "INVALID_RESEARCH_RESPONSE";
+    throw invalidResponse;
+  }
+  return {
+    interpretation: validateResearchInterpretation(value, evidence),
+    model,
+    usage: {
+      inputTokens: payload.usage?.input_tokens || 0,
+      outputTokens: payload.usage?.output_tokens || 0,
+      totalTokens: payload.usage?.total_tokens || 0
+    }
+  };
+}
+
+async function handleResearchInterpretation(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+
+  const question = normalizedResearchText(body.question, 2_000);
+  if (question.length < 3) {
+    sendError(response, 400, "Enter a research question.");
+    return;
+  }
+  const requestedIDs = Array.isArray(body.sectionIDs)
+    ? Array.from(new Set(body.sectionIDs.map((value) => String(value).trim()).filter(Boolean)))
+    : [];
+  if (!requestedIDs.length || requestedIDs.length > 12 || requestedIDs.some((id) => !/^\d+$/.test(id))) {
+    sendError(response, 400, "Provide between 1 and 12 numeric section IDs.");
+    return;
+  }
+
+  try {
+    const evidence = await researchEvidenceForSectionIDs(requestedIDs);
+    const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+    const result = mockMode
+      ? {
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, evidence), evidence),
+          model: "permitext-mock",
+          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+        }
+      : await openAIResearchInterpretation(question, evidence, userID);
+    const usage = result.usage;
+    console.info(JSON.stringify({
+      event: "research_interpretation",
+      user: createHash("sha256").update(userID).digest("hex").slice(0, 16),
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      evidenceSections: evidence.length,
+      inputTokens: usage.inputTokens,
+      outputTokens: usage.outputTokens,
+      totalTokens: usage.totalTokens
+    }));
+    sendJSON(response, 200, {
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      ...result.interpretation,
+      evidenceSectionIDs: evidence.map((section) => section.sectionID),
+      usage,
+      disclaimer: "AI-generated research assistance, not an official code determination."
+    });
+  } catch (error) {
+    if (error.code === "INVALID_RESEARCH_SECTION") {
+      sendError(response, 400, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_REFUSAL") {
+      sendError(response, 422, error.message);
+      return;
+    }
+    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "RESEARCH_PROVIDER_ERROR", "TimeoutError"].includes(error.code || error.name)) {
+      sendError(response, 502, "The research model could not return a verified, cited answer.");
+      return;
+    }
+    throw error;
+  }
 }
 
 function searchSnippet(text, query) {
@@ -1632,13 +2153,17 @@ async function handleWebIndex(_request, response) {
 }
 
 async function handleWebStatic(path, response) {
-  const fileName = path.replace(/^web\//, "");
-  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+  const fileName = decodeURIComponent(path.replace(/^web\//, ""));
+  const segments = fileName.split("/");
+  if (
+    !segments.length ||
+    segments.some((segment) => !segment || segment === "." || segment === ".." || !/^[a-zA-Z0-9._-]+$/.test(segment))
+  ) {
     sendNotFound(response);
     return;
   }
   try {
-    const filePath = join(webPublicPath, fileName);
+    const filePath = join(webPublicPath, ...segments);
     sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -1688,16 +2213,19 @@ async function handleCodeChapter(request, path, response) {
   const codePrefix = codePrefixForChapter(chapter, manifestChapter);
   const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
   const sections = flattenChapterSections(chapter);
-  const sectionPayload = includeBody
-    ? await Promise.all(sections.map(async (section) => ({
-        ...section,
-        blocks: (await sectionBody(section.id, { allowMissing: true })).blocks || []
-      })))
-    : sections;
-  const canonicalSections = await canonicalizeChapterSections(sectionPayload, {
+  const canonicalSections = await canonicalizeChapterSections(sections, {
     codePrefix,
     chapterNumber
   });
+  const sectionPayload = includeBody
+    ? await Promise.all(canonicalSections.map(async (section) => ({
+        ...section,
+        blocks: (await sectionBody(section.webSectionID || section.id, {
+          allowMissing: true,
+          canonicalSectionID: section.id
+        })).blocks || []
+      })))
+    : canonicalSections;
 
   sendJSON(response, 200, {
     chapter: {
@@ -1710,7 +2238,7 @@ async function handleCodeChapter(request, path, response) {
         chapterNumber
       }),
       groups: chapter.groups || [],
-      sections: canonicalSections
+      sections: sectionPayload
     }
   });
 }
@@ -1722,27 +2250,65 @@ async function handleCodeSection(path, response) {
     return;
   }
   const summary = await sectionSummaryByID(sectionID);
-  const body = await sectionBody(summary?.webSectionID || sectionID, { allowMissing: true });
+  const body = await sectionBody(summary?.webSectionID || sectionID, {
+    allowMissing: true,
+    canonicalSectionID: summary?.id || sectionID
+  });
   if (!body.blocks?.length) {
-    if (summary) {
-      sendJSON(response, 200, {
-        section: {
-          blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
-          chapterNumber: summary.chapterNumber,
-          schemaVersion: 1,
-          sectionID: Number(summary.id || sectionID),
-          webSectionID: summary.webSectionID || null
-        }
-      });
+    if (!summary) {
+      sendNotFound(response);
       return;
     }
+    sendJSON(response, 200, {
+      section: {
+        blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
+        chapterNumber: summary.chapterNumber,
+        chapterID: summary.chapterID,
+        codePrefix: summary.codePrefix,
+        schemaVersion: 1,
+        sectionID: Number(summary.id || sectionID),
+        sectionNumber: summary.sectionNumber,
+        title: summary.title,
+        webSectionID: summary.webSectionID || null
+      }
+    });
+    return;
   }
   sendJSON(response, 200, {
     section: {
       ...body,
+      chapterID: summary?.chapterID || body.chapterID || null,
+      chapterNumber: summary?.chapterNumber || body.chapterNumber || "",
+      codePrefix: summary?.codePrefix || body.codePrefix || "",
       sectionID: Number(summary?.id || body.sectionID || sectionID),
+      sectionNumber: summary?.sectionNumber || body.sectionNumber || "",
+      title: summary?.title || body.title || "",
       webSectionID: summary?.webSectionID || body.webSectionID || null
     }
+  });
+}
+
+async function handleCodeSections(request, response) {
+  const rawIDs = requestURL(request).searchParams.get("ids") || "";
+  const ids = rawIDs.split(",").map((value) => value.trim()).filter(Boolean);
+  if (!ids.length || ids.length > 100 || ids.some((id) => !/^\d+$/.test(id))) {
+    sendError(response, 400, "Provide between 1 and 100 numeric section IDs.");
+    return;
+  }
+  const uniqueIDs = Array.from(new Set(ids));
+  const catalog = await sectionCatalog();
+  const byID = new Map();
+  catalog.forEach((section) => {
+    byID.set(String(section.id), section);
+    if (section.webSectionID) byID.set(String(section.webSectionID), section);
+  });
+  sendJSON(response, 200, {
+    sections: uniqueIDs
+      .map((id) => {
+        const section = byID.get(id);
+        return section ? { ...section, requestedID: id } : null;
+      })
+      .filter(Boolean)
   });
 }
 
@@ -1764,20 +2330,61 @@ async function handleCodeSearch(request, response) {
     return;
   }
   const normalizedQuery = query.toLowerCase();
-  const results = [];
-  let totalResults = 0;
-  for (const section of await searchIndex()) {
-    const matchesCode = codeFilter.size === 0 || codeFilter.has(section.codePrefix);
-    const sectionText = section.plainText || "";
-    const matchesQuery =
-      section.title?.toLowerCase().includes(normalizedQuery) ||
-      section.sectionNumber?.toLowerCase().includes(normalizedQuery) ||
-      sectionText.toLowerCase().includes(normalizedQuery);
-    if (!matchesCode || !matchesQuery) continue;
+  const queryTokens = tokenizeSearchText(query);
+  if (!queryTokens.length) {
+    sendJSON(response, 200, { query, results: [] });
+    return;
+  }
 
-    totalResults += 1;
-    if (resultLimit && results.length >= resultLimit) continue;
-    results.push({
+  const index = await shippedSearchIndex();
+  let candidateIDs = new Set(index.get(queryTokens[0]) || []);
+  for (const token of queryTokens.slice(1)) {
+    candidateIDs = intersectSets(candidateIDs, index.get(token) || new Set());
+    if (!candidateIDs.size) break;
+  }
+  if (/^[A-Za-z]?\d/.test(query)) {
+    for (const [token, sectionIDs] of index) {
+      if (!token.startsWith(normalizedQuery)) continue;
+      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
+    }
+  }
+
+  const candidates = (await sectionCatalog()).filter((section) =>
+    candidateIDs.has(section.id) &&
+    (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+  );
+  const hits = candidates.map((section) => {
+    const sectionNumber = String(section.sectionNumber || "").toLowerCase();
+    const title = String(section.title || "").toLowerCase();
+    const rank = sectionNumber === normalizedQuery
+      ? 0
+      : sectionNumber.startsWith(normalizedQuery)
+        ? 1
+        : title.includes(normalizedQuery)
+          ? 2
+          : 3;
+    return { section, rank };
+  });
+  hits.sort((left, right) =>
+    left.rank - right.rank ||
+    compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
+    String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
+      numeric: true,
+      sensitivity: "base"
+    }) ||
+    Number(left.section.codeSectionID || 0) - Number(right.section.codeSectionID || 0) ||
+    Number(left.section.id) - Number(right.section.id)
+  );
+
+  const totalResults = hits.length;
+  const selectedHits = resultLimit ? hits.slice(0, resultLimit) : hits;
+  const results = await Promise.all(selectedHits.map(async ({ section }) => {
+    const body = await sectionBody(section.webSectionID || section.id, {
+      allowMissing: true,
+      canonicalSectionID: section.id
+    });
+    const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
+    return {
       id: section.id,
       chapterID: section.chapterID,
       codePrefix: section.codePrefix,
@@ -1786,9 +2393,9 @@ async function handleCodeSearch(request, response) {
       title: section.title,
       headerLine: section.headerLine,
       headingLine: section.headingLine,
-      snippet: searchSnippet(sectionText || section.title || "", query)
-    });
-  }
+      snippet: searchSnippet(plainText || section.title || "", query)
+    };
+  }));
   sendJSON(response, 200, {
     query,
     results,
@@ -1826,6 +2433,15 @@ function appleAllowedClientIDs() {
   ]
     .map((value) => value?.trim())
     .filter(Boolean);
+}
+
+export function appleIdentityTokenRequired(environment = process.env) {
+  const hostedDeployment = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
+  return hostedDeployment || environment.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1";
+}
+
+export function compatibilityAccountMergeAllowed(adapter) {
+  return adapter?.kind !== "postgres";
 }
 
 function appleWebSignInConfigured() {
@@ -1952,7 +2568,7 @@ async function verifyAppleIdentityToken(identityToken) {
   }
 
   const allowedClientIDs = appleAllowedClientIDs();
-  if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1" && allowedClientIDs.length === 0) {
+  if (appleIdentityTokenRequired() && allowedClientIDs.length === 0) {
     throw new ClientAuthError(500, "Apple client IDs are not configured.");
   }
   if (allowedClientIDs.length > 0) {
@@ -1978,7 +2594,7 @@ async function verifiedCredentialIdentity(credential) {
 
   const identityToken = typeof credential?.identityToken === "string" ? credential.identityToken.trim() : "";
   if (!identityToken) {
-    if (process.env.PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN === "1") {
+    if (appleIdentityTokenRequired()) {
       throw new ClientAuthError(401, "Missing Apple identity token.");
     }
     return {
@@ -2113,6 +2729,47 @@ function revokeServerEntitlement(store, userID, predicate = () => true) {
   }
   delete store.entitlements[userID];
   return true;
+}
+
+function entitlementMatchesExpected(entitlement, expected = {}) {
+  if (expected.source && entitlement?.source !== expected.source) return false;
+  if (expected.providerKey && entitlement?.provider?.[expected.providerKey] !== expected.providerValue) return false;
+  return true;
+}
+
+async function persistServerEntitlement(userID, source, details = {}) {
+  const entitlement = entitlementForSource(userID, source, details);
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveEntitlement === "function") {
+    return adapter.saveEntitlement(userID, entitlement);
+  }
+  const store = await readStore();
+  grantServerEntitlement(store, userID, source, details);
+  await writeStore(store);
+  return store.entitlements[userID];
+}
+
+async function deletePersistedEntitlement(userID, expected = {}) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteEntitlement === "function") {
+    return adapter.deleteEntitlement(userID, expected);
+  }
+  const store = await readStore();
+  const changed = revokeServerEntitlement(store, userID, (entitlement) =>
+    entitlementMatchesExpected(entitlement, expected)
+  );
+  if (changed) await writeStore(store);
+  return changed;
+}
+
+async function persistedStripeEntitlementOwner(subscriptionID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.stripeEntitlementOwner === "function") {
+    return adapter.stripeEntitlementOwner(subscriptionID);
+  }
+  const store = await readStore();
+  const userID = findUserIDForStripeSubscription(store, subscriptionID);
+  return userID ? { userID, entitlement: store.entitlements[userID] } : null;
 }
 
 function stripeConfigured() {
@@ -2763,25 +3420,22 @@ function normalizedSinceEventID(body) {
 
 async function handleSignIn(request, response) {
   const body = await readJSON(request);
-  const store = await readStore();
   const credential = body.credential || {};
-  const passkeyUserID = credential.provider === "passkey"
-    ? store.passkeyCredentials?.[credential.providerUserID]
-    : null;
-  if (credential.provider === "passkey" && !passkeyUserID) {
-    sendError(response, 404, "Passkey is not linked to an account yet.");
+  if (credential.provider === "passkey") {
+    sendError(response, 410, "Passkey sign-in is unavailable. Use Sign in with Apple.");
     return;
   }
-  if (credential.provider === "passkey" && !store.users[passkeyUserID]) {
-    sendError(response, 404, "Linked passkey account was not found.");
+  if (credential.provider === "web" && !browserFallbackSignInAllowed(request)) {
+    sendError(response, 403, "Browser fallback sign-in is unavailable on this deployment.");
+    return;
+  }
+  if (credential.provider !== "apple" && credential.provider !== "web") {
+    sendError(response, 400, "Unsupported account provider.");
     return;
   }
   let account;
   try {
-    account = passkeyUserID
-      ? { ...store.users[passkeyUserID], signedInAt: credential.signedInAt || new Date().toISOString() }
-      : await accountFromCredential(credential);
-    account = await canonicalizeAppleAccountForSignIn(store, account);
+    account = await accountFromCredential(credential);
   } catch (error) {
     if (error instanceof ClientAuthError) {
       sendError(response, error.statusCode, error.message);
@@ -2793,6 +3447,27 @@ async function handleSignIn(request, response) {
     sendError(response, 400, "Missing account.");
     return;
   }
+  const linkFrom = body.linkFrom || {};
+  const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
+  const adapter = await storeAdapter();
+  if (sourceUserID && !compatibilityAccountMergeAllowed(adapter)) {
+    sendError(response, 503, "Account linking is temporarily unavailable while transactional repair is completed.");
+    return;
+  }
+  if (!sourceUserID && typeof adapter.signInAccount === "function") {
+    const directResult = await adapter.signInAccount(account);
+    if (!directResult.requiresLegacyMerge) {
+      sendJSON(response, 200, directResult);
+      return;
+    }
+    if (!compatibilityAccountMergeAllowed(adapter)) {
+      sendError(response, 409, "This account requires a transactional identity repair before sign-in can continue.");
+      return;
+    }
+  }
+
+  const store = await readStore();
+  account = await canonicalizeAppleAccountForSignIn(store, account);
   const sessionToken = store.sessions[account.appUserID] || randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
@@ -2801,11 +3476,15 @@ async function handleSignIn(request, response) {
     : { ...account, backendSessionToken: sessionToken };
   store.users[account.appUserID] = storedAccount;
   let mergedAccount = null;
-  const linkFrom = body.linkFrom || {};
-  const sourceUserID = linkFrom.accountUserID || linkFrom.userID;
   if (sourceUserID && sourceUserID !== account.appUserID) {
     const sourceSessionToken = linkFrom.sessionToken || linkFrom.backendSessionToken;
-    if (!requireUserSession(request, response, store, sourceUserID, { backendSessionToken: sourceSessionToken })) {
+    if (!await authenticatedUserContext(
+      request,
+      response,
+      sourceUserID,
+      { backendSessionToken: sourceSessionToken },
+      store
+    )) {
       return;
     }
     mergedAccount = await mergeAccountInto(store, sourceUserID, account.appUserID);
@@ -2819,34 +3498,7 @@ async function handleSignIn(request, response) {
 }
 
 async function handlePasskeyLink(request, response) {
-  const body = await readJSON(request);
-  const userID = body.auth?.accountUserID;
-  const credentialID = body.credentialID;
-  if (!userID) {
-    sendError(response, 400, "Missing user ID.");
-    return;
-  }
-  if (!credentialID) {
-    sendError(response, 400, "Missing passkey credential ID.");
-    return;
-  }
-
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID, body.auth)) {
-    return;
-  }
-  const existingAccount = store.users[userID] || body.account;
-  if (!existingAccount) {
-    sendError(response, 404, "User not found.");
-    return;
-  }
-  store.users[userID] = existingAccount;
-  store.passkeyCredentials = {
-    ...(store.passkeyCredentials || {}),
-    [credentialID]: userID
-  };
-  await writeStore(store);
-  sendJSON(response, 200, { account: existingAccount });
+  sendError(response, 410, "Passkey registration is unavailable. Use Sign in with Apple.");
 }
 
 async function handleBrowserAccountLink(request, response) {
@@ -2862,8 +3514,14 @@ async function handleBrowserAccountLink(request, response) {
     return;
   }
 
+  const adapter = await storeAdapter();
+  if (!compatibilityAccountMergeAllowed(adapter)) {
+    sendError(response, 503, "Browser account repair is temporarily unavailable while transactional repair is completed.");
+    return;
+  }
+
   const store = await readStore();
-  if (!requireUserSession(request, response, store, targetUserID)) {
+  if (!await authenticatedUserContext(request, response, targetUserID, undefined, store)) {
     return;
   }
   const targetAccount = store.users[targetUserID];
@@ -2918,10 +3576,27 @@ async function handleAttachLocalData(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, account.appUserID, account)) {
+  const context = await authenticatedUserContext(request, response, account.appUserID, account);
+  if (!context) {
     return;
   }
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateAccount === "function") {
+    const migratedAccount = {
+      ...account,
+      ...(context.account || {}),
+      migrationState: "localDataAttached"
+    };
+    const updatedAccount = await adapter.updateAccount(account.appUserID, migratedAccount);
+    if (!updatedAccount) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+    sendJSON(response, 200, "localDataAttached");
+    return;
+  }
+
+  const store = await readStore();
   const existingAccount = store.users[account.appUserID] || {};
   const migratedAccount = {
     ...account,
@@ -2941,8 +3616,8 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) {
     return;
   }
 
@@ -2956,6 +3631,32 @@ async function handleProfileUpdate(request, response) {
     return;
   }
 
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateAccount === "function") {
+    const existingAccount = context.account;
+    if (!existingAccount) {
+      sendError(response, 404, "User not found.");
+      return;
+    }
+    const updatedAccount = {
+      ...existingAccount,
+      publicUsername,
+      displayName: displayName ?? existingAccount.displayName ?? null
+    };
+    try {
+      const savedAccount = await adapter.updateAccount(userID, updatedAccount);
+      sendJSON(response, 200, { account: { ...savedAccount, backendSessionToken: context.sessionToken } });
+    } catch (error) {
+      if (error?.code === "23505") {
+        sendError(response, 409, "Public username is already taken.");
+        return;
+      }
+      throw error;
+    }
+    return;
+  }
+
+  const store = await readStore();
   if (publicUsername) {
     const usernameOwner = Object.values(store.users).find((user) =>
       user.publicUsername === publicUsername && user.appUserID !== userID
@@ -2982,6 +3683,29 @@ async function handleProfileUpdate(request, response) {
   sendJSON(response, 200, { account: updatedAccount });
 }
 
+async function handleSignOut(request, response) {
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID || body.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID, body.auth);
+  if (!context) return;
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.revokeUserSession === "function") {
+    await adapter.revokeUserSession(userID, context.sessionToken);
+    sendJSON(response, 200, { signedOut: true });
+    return;
+  }
+
+  const store = await readStore();
+  delete store.sessions[userID];
+  await writeStore(store);
+  sendJSON(response, 200, { signedOut: true });
+}
+
 async function handlePush(request, response) {
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID || body.batch?.user?.id;
@@ -2994,14 +3718,12 @@ async function handlePush(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
-    return;
-  }
-  store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
-
   if (body.batch?.mutations !== undefined && !Array.isArray(body.batch.mutations)) {
     sendError(response, 400, "Mutations must be an array.");
+    return;
+  }
+  if ((body.batch?.mutations?.length || 0) > maxSyncMutationsPerBatch) {
+    sendError(response, 413, `Sync batches are limited to ${maxSyncMutationsPerBatch} mutations.`);
     return;
   }
 
@@ -3011,6 +3733,30 @@ async function handlePush(request, response) {
     sendError(response, 400, validation.message);
     return;
   }
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.pushUserContent === "function") {
+    const context = await authenticatedUserContext(request, response, userID);
+    if (!context) {
+      return;
+    }
+    const result = await adapter.pushUserContent(userID, incoming);
+    sendJSON(response, 200, {
+      acceptedMutationIDs: result.acceptedMutationIDs,
+      rejectedMutationIDs: result.rejectedMutationIDs,
+      latestEventID: result.latestEventID,
+      syncRevision: result.latestEventID,
+      entitlement: result.entitlement,
+      serverTime: new Date().toISOString()
+    });
+    return;
+  }
+
+  const store = await readStore();
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
+    return;
+  }
+  store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
 
   const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
   const merge = mergeMutations(existing, incoming);
@@ -3035,11 +3781,36 @@ async function handlePull(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  const since = body.since ? Date.parse(body.since) : null;
+  const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
+  const sinceEventID = Number(body.contentMapVersion) === contentMapVersion
+    ? normalizedSinceEventID(body)
+    : null;
+  const adapter = await storeAdapter();
+  if (typeof adapter.pullUserContent === "function") {
+    const context = await authenticatedUserContext(request, response, userID);
+    if (!context) {
+      return;
+    }
+    const result = await adapter.pullUserContent(userID, { since, sinceEventID });
+    const expanded = expandPullMutationsWithDependencies(result.mutations, result.allMutations);
+    const mutations = await canonicalizeMutations(expanded);
+    sendJSON(response, 200, {
+      userID,
+      pulledAt: new Date().toISOString(),
+      latestEventID: result.latestEventID,
+      syncRevision: result.latestEventID,
+      contentMapVersion,
+      entitlement: result.entitlement,
+      mutations
+    });
     return;
   }
-  const since = body.since ? Date.parse(body.since) : null;
+
+  const store = await readStore();
+  if (!await authenticatedUserContext(request, response, userID, undefined, store)) {
+    return;
+  }
   const allMutations = store.mutationsByUserID[userID] || [];
   // Return the current canonical state until clients send a content-map version.
   // Otherwise old event checkpoints can hide server-side section ID repairs.
@@ -3051,6 +3822,7 @@ async function handlePull(request, response) {
     pulledAt: new Date().toISOString(),
     latestEventID,
     syncRevision: latestEventID,
+    contentMapVersion,
     entitlement: store.entitlements[userID] || null,
     mutations
   });
@@ -3069,8 +3841,7 @@ async function handleWebCheckout(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID)) {
     return;
   }
 
@@ -3143,8 +3914,7 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  if (!await authenticatedUserContext(request, response, userID)) {
     return;
   }
 
@@ -3163,7 +3933,7 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
-  grantServerEntitlement(store, userID, "webSubscription", {
+  const entitlement = await persistServerEntitlement(userID, "webSubscription", {
     expiresAt: stripeSubscriptionExpiresAt(subscription),
     provider: {
       stripeCustomerID: stripeSubscriptionID(subscription.customer),
@@ -3172,9 +3942,8 @@ async function handleStripeRestore(request, response) {
     }
   });
   await transferStripeSubscriptionMetadata(subscription.id, userID);
-  await writeStore(store);
   sendJSON(response, 200, {
-    entitlement: store.entitlements[userID],
+    entitlement,
     subscription: {
       id: subscription.id,
       status: subscription.status
@@ -3198,14 +3967,13 @@ async function handleStripeWebhook(request, response) {
 
   const event = JSON.parse(rawBody.toString("utf8"));
   const object = event?.data?.object || {};
-  const store = await readStore();
   let changed = false;
 
   switch (event.type) {
   case "checkout.session.completed": {
     const userID = stripeUserIDFromObject(object);
     if (userID && (object.mode === "subscription" || object.payment_status === "paid")) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
           stripeSubscriptionID: stripeSubscriptionID(object.subscription),
@@ -3221,7 +3989,7 @@ async function handleStripeWebhook(request, response) {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionID(object);
     if (userID && ["active", "trialing"].includes(object.status)) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -3230,22 +3998,30 @@ async function handleStripeWebhook(request, response) {
       });
       changed = true;
     } else if (subscriptionID && ["canceled", "incomplete_expired", "unpaid", "paused"].includes(object.status)) {
-      const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
-      changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+      const owner = await persistedStripeEntitlementOwner(subscriptionID);
+      changed = owner ? await deletePersistedEntitlement(owner.userID, {
+        source: "webSubscription",
+        providerKey: "stripeSubscriptionID",
+        providerValue: subscriptionID
+      }) : false;
     }
     break;
   }
   case "customer.subscription.deleted": {
     const subscriptionID = stripeSubscriptionID(object);
-    const ownerUserID = findUserIDForStripeSubscription(store, subscriptionID);
-    changed = ownerUserID ? revokeServerEntitlement(store, ownerUserID, entitlementMatchesStripeSubscription(subscriptionID)) : false;
+    const owner = await persistedStripeEntitlementOwner(subscriptionID);
+    changed = owner ? await deletePersistedEntitlement(owner.userID, {
+      source: "webSubscription",
+      providerKey: "stripeSubscriptionID",
+      providerValue: subscriptionID
+    }) : false;
     break;
   }
   case "invoice.payment_succeeded": {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionIDFromObject(object);
     if (userID && subscriptionID) {
-      grantServerEntitlement(store, userID, "webSubscription", {
+      await persistServerEntitlement(userID, "webSubscription", {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -3258,10 +4034,6 @@ async function handleStripeWebhook(request, response) {
   }
   default:
     break;
-  }
-
-  if (changed) {
-    await writeStore(store);
   }
   sendJSON(response, 200, { received: true, changed });
 }
@@ -3278,8 +4050,8 @@ async function handleAppleTransactionVerify(request, response) {
     return;
   }
 
-  const store = await readStore();
-  if (!requireUserSession(request, response, store, userID)) {
+  const accountContext = await authenticatedUserContext(request, response, userID);
+  if (!accountContext) {
     return;
   }
 
@@ -3304,20 +4076,22 @@ async function handleAppleTransactionVerify(request, response) {
   };
 
   if (!appleTransactionActive(payload)) {
-    revokeServerEntitlement(store, userID, (entitlement) =>
-      entitlement?.source === "appleSubscription" &&
-      entitlement?.provider?.appleOriginalTransactionID === originalTransactionID
-    );
-    await writeStore(store);
-    sendJSON(response, 200, { entitlement: store.entitlements[userID] || null, transaction: { active: false } });
+    const removed = await deletePersistedEntitlement(userID, {
+      source: "appleSubscription",
+      providerKey: "appleOriginalTransactionID",
+      providerValue: originalTransactionID
+    });
+    sendJSON(response, 200, {
+      entitlement: removed ? null : accountContext.entitlement || null,
+      transaction: { active: false }
+    });
     return;
   }
 
-  const entitlement = grantServerEntitlement(store, userID, "appleSubscription", {
+  const entitlement = await persistServerEntitlement(userID, "appleSubscription", {
     expiresAt: appleTransactionExpiration(payload),
     provider
   });
-  await writeStore(store);
   sendJSON(response, 200, { entitlement, transaction: { active: true, productID: payload.productId } });
 }
 
@@ -3333,9 +4107,7 @@ async function handleLifetimeGrant(request, response) {
     return;
   }
 
-  const store = await readStore();
-  const entitlement = grantServerEntitlement(store, userID, "lifetimeGrant");
-  await writeStore(store);
+  const entitlement = await persistServerEntitlement(userID, "lifetimeGrant");
   sendJSON(response, 200, { userID, entitlement });
 }
 
@@ -3351,14 +4123,22 @@ async function handleLifetimeGrantDelete(request, response) {
     return;
   }
 
-  const store = await readStore();
-  delete store.entitlements[userID];
-  await writeStore(store);
+  await deletePersistedEntitlement(userID);
   sendJSON(response, 200, { userID, entitlement: null });
 }
 
 async function handleLegacyPasskeyAccountDelete(request, response) {
   if (!requireAdmin(request, response)) {
+    return;
+  }
+
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteLegacyPasskeyAccounts === "function") {
+    const deletedUserIDs = await adapter.deleteLegacyPasskeyAccounts();
+    sendJSON(response, 200, {
+      deletedCount: deletedUserIDs.length,
+      deletedUserIDs
+    });
     return;
   }
 
@@ -3424,7 +4204,7 @@ async function handleRestoreChecklist(request, response) {
     publicUsername: account?.publicUsername || null,
     displayName: account?.displayName || null,
     entitlement: store.entitlements[userID] || null,
-    hasSession: Boolean(store.sessions[userID]),
+    hasSession: await userHasActiveSession(userID, store),
     passkeyCredentialCount: passkeyCredentialIDs.length,
     passkeyCredentialIDs,
     mutationCounts: {
@@ -3461,7 +4241,7 @@ async function handleAccountExport(request, response) {
     userID,
     account,
     entitlement: store.entitlements[userID] || null,
-    hasSession: Boolean(store.sessions[userID]),
+    hasSession: await userHasActiveSession(userID, store),
     passkeyCredentialIDs,
     mutations: store.mutationsByUserID[userID] || []
   });
@@ -3477,13 +4257,14 @@ async function handleStorageSummary(request, response) {
 function handleAppleAppSiteAssociation(_request, response) {
   const teamID = process.env.APPLE_TEAM_ID || "TEAMID";
   const bundleID = process.env.APPLE_BUNDLE_ID || "com.randycodex.permitext";
+  const appID = `${teamID}.${bundleID}`;
   sendRawJSON(response, 200, {
     webcredentials: {
-      apps: [`${teamID}.${bundleID}`]
+      apps: [appID]
     },
     applinks: {
       apps: [],
-      details: []
+      details: [{ appID, paths: ["/open/section/*"] }]
     }
   });
 }
@@ -3499,6 +4280,7 @@ function handleAppleWebConfig(request, response) {
     clientID: serviceID || null,
     redirectURI: serviceID ? appleWebRedirectURI(request) : null,
     scope: "name email",
+    identityTokenRequired: appleIdentityTokenRequired(),
     browserFallbackAllowed: browserFallbackSignInAllowed(request)
   });
 }
@@ -3538,9 +4320,9 @@ async function handleAppleWebStart(request, response) {
   const store = await readStore();
   const linkFromUserID = body.linkFrom?.accountUserID || body.linkFrom?.userID || null;
   if (linkFromUserID) {
-    if (!requireUserSession(request, response, store, linkFromUserID, {
+    if (!await authenticatedUserContext(request, response, linkFromUserID, {
       backendSessionToken: body.linkFrom?.sessionToken || body.linkFrom?.backendSessionToken
-    })) {
+    }, store)) {
       return;
     }
   }
@@ -3571,7 +4353,7 @@ async function handleAppleWebStart(request, response) {
   response.end(JSON.stringify({ authorizationURL: authorizeURL.toString() }));
 }
 
-function appleCallbackHTML({ title, message, accountState = null, successPath = "/" }) {
+function appleCallbackHTML({ title, message, accountState = null, successPath = "/", scriptNonce }) {
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -3581,7 +4363,7 @@ function appleCallbackHTML({ title, message, accountState = null, successPath = 
   </head>
   <body>
     <p>${htmlEscape(message)}</p>
-    <script>
+    <script nonce="${htmlEscape(scriptNonce)}">
       const accountState = ${scriptJSON(accountState)};
       if (accountState) {
         const workspaceKey = "permitext:webWorkspace:v1";
@@ -3596,32 +4378,31 @@ function appleCallbackHTML({ title, message, accountState = null, successPath = 
 }
 
 async function handleAppleWebCallback(request, response) {
+  const scriptNonce = randomUUID();
   if (request.method !== "POST") {
     sendHTML(response, appleCallbackHTML({
       title: "permitext sign in",
       message: "Return to permitext and use Link Apple from Settings.",
-      successPath: "/"
-    }));
+      successPath: "/",
+      scriptNonce
+    }), { scriptNonce });
     return;
   }
 
   const form = new URLSearchParams((await readRawBody(request)).toString("utf8"));
   const oauthState = verifyOAuthStateCookie(decodeURIComponent(cookieValue(request, "permitext_apple_oauth") || ""));
   const clearCookie = appleOAuthCookie(request, "", 0);
-  const sendCallbackHTML = (html) => {
-    response.writeHead(200, {
-      "content-type": "text/html; charset=utf-8",
-      "cache-control": "no-store",
-      "set-cookie": clearCookie
-    });
-    response.end(html);
-  };
+  const sendCallbackHTML = (html) => sendHTML(response, html, {
+    scriptNonce,
+    extraHeaders: { "set-cookie": clearCookie }
+  });
 
   if (!oauthState || form.get("state") !== oauthState.state) {
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple sign-in could not be verified. Return to permitext and try again.",
-      successPath: "/?appleSignIn=failed"
+      successPath: "/?appleSignIn=failed",
+      scriptNonce
     }));
     return;
   }
@@ -3631,7 +4412,8 @@ async function handleAppleWebCallback(request, response) {
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple did not return an identity token. Return to permitext and try again.",
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
     return;
   }
@@ -3642,7 +4424,6 @@ async function handleAppleWebCallback(request, response) {
       .map((part) => String(part || "").trim())
       .filter(Boolean)
       .join(" ");
-    const store = await readStore();
     let account = await accountFromCredential({
       provider: "apple",
       displayName: displayName || null,
@@ -3650,6 +4431,47 @@ async function handleAppleWebCallback(request, response) {
       identityToken,
       authorizationCode: form.get("code") || undefined
     });
+    const adapter = await storeAdapter();
+    if (oauthState.linkFrom?.accountUserID && !compatibilityAccountMergeAllowed(adapter)) {
+      sendCallbackHTML(appleCallbackHTML({
+        title: "permitext sign in",
+        message: "Account linking is temporarily unavailable. Your existing account data was not changed.",
+        successPath: "/?appleSignIn=repairUnavailable",
+        scriptNonce
+      }));
+      return;
+    }
+    if (!oauthState.linkFrom?.accountUserID && typeof adapter.signInAccount === "function") {
+      const directResult = await adapter.signInAccount(account);
+      if (!directResult.requiresLegacyMerge) {
+        const finalAccount = directResult.account;
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: "Apple sign-in completed. Returning to permitext...",
+          accountState: {
+            userID: finalAccount.appUserID,
+            sessionToken: finalAccount.backendSessionToken,
+            authProvider: finalAccount.authProvider || "apple",
+            displayName: finalAccount.displayName || displayName || "Apple account",
+            entitlement: directResult.entitlement || null
+          },
+          successPath: oauthState.successPath || "/",
+          scriptNonce
+        }));
+        return;
+      }
+      if (!compatibilityAccountMergeAllowed(adapter)) {
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: "This account needs identity repair before sign-in can continue. Your existing account data was not changed.",
+          successPath: "/?appleSignIn=repairRequired",
+          scriptNonce
+        }));
+        return;
+      }
+    }
+
+    const store = await readStore();
     account = await canonicalizeAppleAccountForSignIn(store, account);
     const sessionToken = store.sessions[account.appUserID] || randomUUID();
     store.sessions[account.appUserID] = sessionToken;
@@ -3673,20 +4495,23 @@ async function handleAppleWebCallback(request, response) {
         displayName: finalAccount.displayName || displayName || "Apple account",
         entitlement: store.entitlements[account.appUserID] || null
       },
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
   } catch (error) {
     console.error(error);
     sendCallbackHTML(appleCallbackHTML({
       title: "permitext sign in",
       message: "Apple sign-in failed. Return to permitext and try again.",
-      successPath: oauthState.successPath || "/"
+      successPath: oauthState.successPath || "/",
+      scriptNonce
     }));
   }
 }
 
 const handlers = {
   "account/sign-in": handleSignIn,
+  "account/sign-out": handleSignOut,
   "account/apple/start": handleAppleWebStart,
   "account/attach-local-data": handleAttachLocalData,
   "account/link-browser": handleBrowserAccountLink,
@@ -3696,6 +4521,7 @@ const handlers = {
   "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
+  "research/interpret": handleResearchInterpretation,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
@@ -3709,8 +4535,14 @@ const handlers = {
 export async function handleRequest(request, response) {
   try {
     const path = normalizePath(request.url);
+    if (!enforceRateLimit(request, response, path)) {
+      return;
+    }
 
-    if (request.method === "GET" && (path === "" || path === "web" || path === "web/")) {
+    if (
+      request.method === "GET" &&
+      (path === "" || path === "web" || path === "web/" || path.startsWith("open/section/"))
+    ) {
       await handleWebIndex(request, response);
       return;
     }
@@ -3730,6 +4562,10 @@ export async function handleRequest(request, response) {
       await handleCodeChapter(request, path, response);
       return;
     }
+    if (request.method === "GET" && path === "code/sections") {
+      await handleCodeSections(request, response);
+      return;
+    }
     if (request.method === "GET" && path.startsWith("code/sections/")) {
       await handleCodeSection(path, response);
       return;
@@ -3739,7 +4575,10 @@ export async function handleRequest(request, response) {
       return;
     }
     if (request.method === "GET" && path === "health") {
-      await readStore();
+      const adapter = await storeAdapter();
+      if (typeof adapter.initialize === "function") {
+        await adapter.initialize();
+      }
       sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
       return;
     }
@@ -3771,11 +4610,15 @@ export async function handleRequest(request, response) {
     }
     await handler(request, response);
   } catch (error) {
-    console.error(error);
+    if (error instanceof RequestBodyTooLargeError) {
+      sendError(response, 413, "Request body is too large.");
+      return;
+    }
     if (error instanceof SyntaxError) {
       sendError(response, 400, "Invalid JSON.");
       return;
     }
+    console.error(error);
     sendError(response, 500, "Internal server error.");
   }
 }

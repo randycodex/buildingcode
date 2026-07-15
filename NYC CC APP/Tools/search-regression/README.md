@@ -2,6 +2,8 @@
 
 Validates shipped `prepared/searchIndex.json` against the app's token search logic.
 
+Golden results use the production ordering contract: relevance rank, natural chapter number, natural section number, code-section ID, then canonical section ID. The final two tie-breakers keep identical provision numbers deterministic across code books and platforms.
+
 ## Quick start
 
 ```bash
@@ -9,7 +11,7 @@ cd "NYC CC APP/Tools/search-regression"
 
 # Compare linear haystack (substring terms) vs shipped inverted index (whole tokens)
 python3 search_regression.py \
-  "../../NYCCCApp/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
+  "../../permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
 
 # Lock shipped results as golden (run after intentional search changes)
 python3 search_regression.py <bundle-root> --write-golden

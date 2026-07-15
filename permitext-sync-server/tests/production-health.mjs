@@ -1,6 +1,6 @@
 const baseURL = process.env.PERMITEXT_SYNC_PRODUCTION_URL || "https://permitext-sync.vercel.app";
 const expectedStorage = process.env.PERMITEXT_SYNC_EXPECTED_STORAGE || "postgres";
-const expectedSchema = process.env.PERMITEXT_SYNC_EXPECTED_SCHEMA || "normalized-v2";
+const expectedSchema = process.env.PERMITEXT_SYNC_EXPECTED_SCHEMA || "normalized-v3";
 
 function assert(condition, message) {
   if (!condition) {

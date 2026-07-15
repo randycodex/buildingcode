@@ -130,6 +130,9 @@ struct PermitextApp: App {
                     break
                 }
             }
+            .onOpenURL { url in
+                library.handleOpenURL(url)
+            }
             .onAppear {
                 library.startStoreKitTransactionObservation()
                 Task {

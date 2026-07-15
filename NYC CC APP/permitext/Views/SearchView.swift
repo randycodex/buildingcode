@@ -116,6 +116,10 @@ struct SearchView: View {
             .onAppear {
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()
+                if library.pendingDeepLinkedSectionID != nil {
+                    openPendingDeepLinkedSectionIfNeeded()
+                    return
+                }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     isSearchFieldFocused = true
                 }
@@ -137,6 +141,9 @@ struct SearchView: View {
             }
             .onChange(of: library.searchTabRetapCount) { _, _ in
                 handleSearchTabRetap()
+            }
+            .onChange(of: library.pendingDeepLinkedSectionID) { _, _ in
+                openPendingDeepLinkedSectionIfNeeded()
             }
             .task(id: query) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -240,6 +247,14 @@ struct SearchView: View {
         guard !trimmedQuery.isEmpty else { return }
         query = ""
         library.search(query: "")
+    }
+
+    private func openPendingDeepLinkedSectionIfNeeded() {
+        guard library.selectedTab == .search,
+              let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
+        isSearchFieldFocused = false
+        searchNavigationPath = NavigationPath()
+        searchNavigationPath.append(sectionID)
     }
 
     private var bottomSearchDock: some View {

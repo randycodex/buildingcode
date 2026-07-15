@@ -339,7 +339,7 @@ struct ChapterHTMLReaderView: View {
                 .multilineTextAlignment(.center)
             }
 
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
                 chapterSearchToolbarButton
             }
         }

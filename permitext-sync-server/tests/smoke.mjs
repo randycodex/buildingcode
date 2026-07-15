@@ -45,7 +45,7 @@ async function request(path, { method = "GET", body, token, headers = {}, rawBod
   });
   const text = await response.text();
   const json = text && response.headers.get("content-type")?.includes("application/json") ? JSON.parse(text) : null;
-  return { response, json };
+  return { response, json, text };
 }
 
 async function waitForServer() {
@@ -70,6 +70,8 @@ async function main() {
     env: {
       ...process.env,
       PORT: String(port),
+      VERCEL: "",
+      VERCEL_ENV: "",
       PERMITEXT_SYNC_DATA_PATH: dataPath,
       PERMITEXT_SYNC_DATABASE_URL: "",
       DATABASE_URL: "",
@@ -81,6 +83,7 @@ async function main() {
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
       APPLE_SERVICE_ID: "com.randycodex.permitext.web",
       PERMITEXT_PUBLIC_BASE_URL: baseURL,
+      PERMITEXT_RESEARCH_MOCK: "1",
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },
     stdio: ["ignore", "pipe", "pipe"]
@@ -95,10 +98,107 @@ async function main() {
       aasa.json.webcredentials.apps.includes("ABCDE12345.com.randycodex.permitext"),
       "AASA payload did not include the configured app identifier."
     );
+    assert(
+      aasa.json.applinks.details.some((detail) =>
+        detail.appID === "ABCDE12345.com.randycodex.permitext" &&
+        detail.paths?.includes("/open/section/*")
+      ),
+      "AASA payload did not advertise section universal links."
+    );
 
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
+    assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
+    assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
+    assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
+    assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
+    assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
+    assert(webRoot.text.includes("paired-workboards"), "Web workspace omitted the paired Workboard assets.");
+
+    const workboardScript = await request("/web/workboard-assets/workboard.js");
+    assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
+    assert(
+      workboardScript.response.headers.get("content-type")?.includes("javascript"),
+      "Workboard script asset returned the wrong content type."
+    );
+    const workboardStyles = await request("/web/workboard-assets/workboard.css");
+    assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
+    assert(
+      workboardStyles.response.headers.get("content-type")?.includes("text/css"),
+      "Workboard stylesheet asset returned the wrong content type."
+    );
+    const workboardFont = await request(
+      "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"
+    );
+    assert(workboardFont.response.ok, "Nested Workboard font asset did not load.");
+    assert(
+      workboardFont.response.headers.get("content-type")?.includes("font/woff2"),
+      "Workboard font asset returned the wrong content type."
+    );
+
+    const sharedSectionLink = await request("/open/section/8881");
+    assert(sharedSectionLink.response.ok, "Shared section URL did not load the web workspace.");
+    assert(
+      sharedSectionLink.response.headers.get("content-type")?.includes("text/html"),
+      "Shared section URL did not return the web workspace HTML."
+    );
+
+    const canonicalOverrideSection = await request("/code/sections/8881");
+    assert(canonicalOverrideSection.response.ok, "Canonical section override did not load.");
+    assert(canonicalOverrideSection.json.section.sectionID === 8881, "Canonical section override returned the wrong ID.");
+    assert(canonicalOverrideSection.json.section.chapterID, "Canonical section response omitted its chapter ID.");
+    assert(canonicalOverrideSection.json.section.codePrefix, "Canonical section response omitted its code prefix.");
+    assert(canonicalOverrideSection.json.section.sectionNumber, "Canonical section response omitted its section number.");
+    assert(
+      canonicalOverrideSection.json.section.blocks?.some((block) =>
+        block.plainText?.includes("real time enforcement unit")
+      ),
+      "Web reader did not prefer the canonical iPhone section body."
+    );
+    const missingSharedSection = await request("/code/sections/999999999");
+    assert(missingSharedSection.response.status === 404, "Unknown shared section did not return 404.");
+
+    const sectionBatch = await request("/code/sections?ids=8881,8882,999999999");
+    assert(sectionBatch.response.ok, "Canonical section metadata batch did not load.");
+    assert(
+      sectionBatch.json.sections.map((section) => section.sectionID || section.id).join(",") === "8881,8882",
+      "Canonical section metadata batch returned unexpected sections or order."
+    );
+    assert(
+      sectionBatch.json.sections.map((section) => section.requestedID).join(",") === "8881,8882",
+      "Canonical section metadata batch did not preserve requested IDs."
+    );
+    const oversizedSectionBatch = await request(`/code/sections?ids=${Array.from({ length: 101 }, (_, index) => index + 1).join(",")}`);
+    assert(oversizedSectionBatch.response.status === 400, "Oversized section metadata batch was not rejected.");
+
+    const duplicateNumberChapter = await request("/code/chapters/47");
+    assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");
+    const duplicateNumberSections = duplicateNumberChapter.json.chapter.sections.filter((section) =>
+      section.sectionNumber === "8.5"
+    );
+    assert(duplicateNumberSections.length === 2, "Duplicate-number appendix provisions were collapsed.");
+    assert(
+      new Set(duplicateNumberSections.map((section) => section.id)).size === 2,
+      "Duplicate-number appendix provisions did not retain distinct canonical IDs."
+    );
+
+    const searchGolden = JSON.parse(await readFile(new URL(
+      "../../NYC CC APP/Tools/search-regression/golden-results.json",
+      import.meta.url
+    ), "utf8"));
+    for (const [query, expectedIDs] of Object.entries(searchGolden)) {
+      const search = await request(`/code/search?q=${encodeURIComponent(query)}&limit=200`);
+      assert(search.response.ok, `Canonical web search failed for ${query}.`);
+      const actualIDs = search.json.results.map((result) => result.id);
+      const firstMismatch = expectedIDs.findIndex((id, index) => actualIDs[index] !== id);
+      assert(
+        JSON.stringify(actualIDs) === JSON.stringify(expectedIDs),
+        `Canonical web search drifted from iPhone ordering for ${query}: ` +
+          `expected ${expectedIDs.length}, received ${actualIDs.length}, first mismatch at ${firstMismatch} ` +
+          `(${expectedIDs[firstMismatch]} vs ${actualIDs[firstMismatch]}).`
+      );
+    }
 
     const appleWebConfig = await request("/account/apple-web-config");
     assert(appleWebConfig.response.ok, "Apple web sign-in config failed.");
@@ -110,6 +210,10 @@ async function main() {
     assert(
       appleWebConfig.json.redirectURI === `${baseURL}/account/apple/callback`,
       "Apple web sign-in config returned the wrong redirect URI."
+    );
+    assert(
+      appleWebConfig.json.identityTokenRequired === false,
+      "Local smoke configuration unexpectedly required a real Apple identity token."
     );
 
     const appleWebStart = await request("/account/apple/start", {
@@ -140,6 +244,11 @@ async function main() {
       appleWebCallback.response.headers.get("content-type")?.includes("text/html"),
       "Apple web sign-in callback did not return HTML."
     );
+    assert(
+      appleWebCallback.response.headers.get("content-security-policy")?.includes("nonce-"),
+      "Apple web sign-in callback CSP omitted its script nonce."
+    );
+    assert(appleWebCallback.text.includes("<script nonce="), "Apple web sign-in callback script omitted its nonce.");
 
     const webCheckoutFallback = await request("/web/?checkout=success");
     assert(webCheckoutFallback.response.ok, "Legacy checkout return URL did not load.");
@@ -207,6 +316,64 @@ async function main() {
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
 
+    const unauthorizedResearch = await request("/research/interpret", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required?",
+        sectionIDs: ["8881"]
+      }
+    });
+    assert(unauthorizedResearch.response.status === 401, "Research interpretation allowed an unauthenticated request.");
+
+    const emptyResearchQuestion = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "",
+        sectionIDs: ["8881"]
+      }
+    });
+    assert(emptyResearchQuestion.response.status === 400, "Research interpretation accepted an empty question.");
+
+    const unknownResearchSection = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required?",
+        sectionIDs: ["999999999"]
+      }
+    });
+    assert(unknownResearchSection.response.status === 400, "Research interpretation accepted an unknown section.");
+
+    const researchInterpretation = await request("/research/interpret", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "What notice is required before work begins?",
+        sectionIDs: ["8881"],
+        evidence: "The client must not be allowed to supply model evidence."
+      }
+    });
+    assert(researchInterpretation.response.ok, "Research interpretation failed in mock mode.");
+    assert(researchInterpretation.json.mode === "mock", "Research interpretation did not report mock mode.");
+    assert(researchInterpretation.json.model === "permitext-mock", "Research interpretation reported the wrong mock model.");
+    assert(
+      researchInterpretation.json.evidenceSectionIDs.join(",") === "8881",
+      "Research interpretation did not use the requested canonical evidence."
+    );
+    assert(
+      researchInterpretation.json.citations.length === 1 && researchInterpretation.json.citations[0].sectionID === "8881",
+      "Research interpretation returned an unverified citation."
+    );
+    assert(
+      researchInterpretation.json.disclaimer.includes("not an official code determination"),
+      "Research interpretation omitted its authority disclaimer."
+    );
+
     const browserCredentialID = "smoke-browser";
     const browserSignIn = await request("/account/sign-in", {
       method: "POST",
@@ -269,6 +436,17 @@ async function main() {
       }
     });
     assert(invalidAppleTokenSignIn.response.status === 401, "Invalid Apple identity token was accepted.");
+
+    const unsupportedProviderSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "guest",
+          providerUserID: "unsupported-provider"
+        }
+      }
+    });
+    assert(unsupportedProviderSignIn.response.status === 400, "Unsupported account provider was accepted.");
 
     const attach = await request("/account/attach-local-data", {
       method: "POST",
@@ -664,7 +842,7 @@ async function main() {
         }
       }
     });
-    assert(unlinkedPasskeySignIn.response.status === 404, "Unlinked passkey created a new account.");
+    assert(unlinkedPasskeySignIn.response.status === 410, "Passkey sign-in was not disabled.");
 
     const passkeyCredentialID = "smoke-passkey-credential";
     const passkeyLink = await request("/account/passkeys/link", {
@@ -676,8 +854,7 @@ async function main() {
         account: signIn.json.account
       }
     });
-    assert(passkeyLink.response.ok, "Passkey link failed.");
-    assert(passkeyLink.json.account.appUserID === userID, "Passkey link returned the wrong account.");
+    assert(passkeyLink.response.status === 410, "Passkey registration was not disabled.");
 
     const passkeySignIn = await request("/account/sign-in", {
       method: "POST",
@@ -688,9 +865,7 @@ async function main() {
         }
       }
     });
-    assert(passkeySignIn.response.ok, "Linked passkey sign-in failed.");
-    assert(passkeySignIn.json.account.appUserID === userID, "Passkey sign-in did not restore the linked account.");
-    assert(passkeySignIn.json.entitlement?.source === "lifetimeGrant", "Passkey sign-in did not restore entitlement.");
+    assert(passkeySignIn.response.status === 410, "A disabled passkey credential was accepted.");
 
     const legacyStore = JSON.parse(await readFile(dataPath, "utf8"));
     legacyStore.users["passkey:legacy-bad-account"] = {
@@ -733,21 +908,6 @@ async function main() {
       "Legacy passkey cleanup did not report the deleted user."
     );
 
-    const linkedPasskeyAfterCleanup = await request("/account/sign-in", {
-      method: "POST",
-      body: {
-        credential: {
-          provider: "passkey",
-          providerUserID: passkeyCredentialID
-        }
-      }
-    });
-    assert(linkedPasskeyAfterCleanup.response.ok, "Legacy cleanup broke the linked Apple passkey.");
-    assert(
-      linkedPasskeyAfterCleanup.json.account.appUserID === userID,
-      "Legacy cleanup changed the linked Apple passkey owner."
-    );
-
     const legacyPasskeyAfterCleanup = await request("/account/sign-in", {
       method: "POST",
       body: {
@@ -757,7 +917,7 @@ async function main() {
         }
       }
     });
-    assert(legacyPasskeyAfterCleanup.response.status === 404, "Legacy passkey credential still signs in after cleanup.");
+    assert(legacyPasskeyAfterCleanup.response.status === 410, "Legacy passkey sign-in was not disabled.");
 
     const unauthorizedPush = await request("/sync/push", {
       method: "POST",
@@ -783,6 +943,16 @@ async function main() {
       }
     });
     assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
+
+    const oversizedPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: Array.from({ length: 101 }, () => ({})) }
+      }
+    });
+    assert(oversizedPush.response.status === 413, "Push accepted an oversized mutation batch.");
 
     const mismatchedUserPush = await request("/sync/push", {
       method: "POST",
@@ -852,6 +1022,7 @@ async function main() {
     assert(pull.response.ok, "Sync pull failed.");
     assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
     assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
+    assert(pull.json.contentMapVersion === 2, "Pull did not return the canonical content-map version.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
 
     const webSavedMutation = {
@@ -1088,7 +1259,7 @@ async function main() {
 
     const projectDependencyPull = await request("/sync/pull", {
       method: "POST",
-      token: passkeySignIn.json.account.backendSessionToken,
+      token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
         since: "2026-06-05T00:00:00Z"
@@ -1166,7 +1337,7 @@ async function main() {
     assert(restoreChecklist.json.publicUsername === "smoke-pro", "Restore checklist did not report the profile.");
     assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
-    assert(restoreChecklist.json.passkeyCredentialCount === 1, "Restore checklist did not report the linked passkey.");
+    assert(restoreChecklist.json.passkeyCredentialCount === 0, "Restore checklist reported an active passkey credential.");
     assert(restoreChecklist.json.mutationCounts.savedItem === 2, "Restore checklist did not count saved items and delete tombstones.");
     assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
@@ -1188,7 +1359,7 @@ async function main() {
     assert(accountExport.json.account.appUserID === userID, "Account export did not include the account.");
     assert(accountExport.json.entitlement?.plan === "pro", "Account export did not include the entitlement.");
     assert(accountExport.json.hasSession === true, "Account export did not include session status.");
-    assert(accountExport.json.passkeyCredentialIDs.includes(passkeyCredentialID), "Account export did not include the linked passkey.");
+    assert(accountExport.json.passkeyCredentialIDs.length === 0, "Account export reported an active passkey credential.");
     assert(
       accountExport.json.mutations.some((item) => item.annotation?.tags?.includes("Concrete")),
       "Account export did not include tag mutations."
@@ -1205,6 +1376,51 @@ async function main() {
     });
     assert(revoke.response.ok, "Lifetime revoke failed.");
     assert(revoke.json.entitlement === null, "Lifetime revoke did not clear the entitlement.");
+
+    const signOut = await request("/account/sign-out", {
+      method: "POST",
+      token: reinstallSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(signOut.response.ok && signOut.json.signedOut === true, "Account sign-out failed.");
+    const pullAfterSignOut = await request("/sync/pull", {
+      method: "POST",
+      token: reinstallSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(pullAfterSignOut.response.status === 401, "A revoked session remained usable.");
+
+    const oversizedBody = await request("/account/profile", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-forwarded-for": "203.0.113.20"
+      },
+      rawBody: JSON.stringify({ padding: "x".repeat(1024 * 1024) })
+    });
+    assert(oversizedBody.response.status === 413, "Oversized request body was not rejected.");
+
+    let rateLimitedResponse = null;
+    for (let attempt = 0; attempt < 31; attempt += 1) {
+      const result = await request("/account/sign-in", {
+        method: "POST",
+        headers: { "x-forwarded-for": "203.0.113.30" },
+        body: {
+          credential: {
+            provider: "apple",
+            providerUserID: `rate-limit-${attempt}`,
+            signedInAt: new Date().toISOString()
+          }
+        }
+      });
+      if (attempt < 30) {
+        assert(result.response.status !== 429, `Rate limiter rejected allowed request ${attempt + 1}.`);
+      } else {
+        rateLimitedResponse = result.response;
+      }
+    }
+    assert(rateLimitedResponse?.status === 429, "Sign-in burst was not rate limited.");
+    assert(rateLimitedResponse.headers.get("retry-after"), "Rate-limited response omitted Retry-After.");
   } finally {
     server.kill();
     await rm(tempDir, { recursive: true, force: true });

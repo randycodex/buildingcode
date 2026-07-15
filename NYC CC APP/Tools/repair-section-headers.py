@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-BUNDLE = ROOT / "NYC CC APP/NYCCCApp/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
+BUNDLE = ROOT / "NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes"
 CHAPTERS_DIR = BUNDLE / "prepared/chapters"
 
 KNOWN_PREFIXES = ("BC", "FGC", "MC", "PC")

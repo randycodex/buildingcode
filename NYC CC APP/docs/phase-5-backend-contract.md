@@ -65,9 +65,13 @@ Response:
 
 The backend owns `appUserID`. Login identity and public identity must stay separate.
 
-`backendSessionToken` is an opaque local-scaffold session token used as the bearer token for sync calls. The app persists this token in Keychain rather than in the account metadata stored in `UserDefaults`. Production should rotate and expire equivalent tokens server-side.
+`backendSessionToken` is an opaque bearer token returned only to the client. The app persists it in Keychain rather than in the account metadata stored in `UserDefaults`. Postgres stores only its SHA-256 hash in `permitext_account_sessions`; sessions are device-specific, expire after 30 days by default, and can be individually revoked. Existing plaintext sessions migrate to the hashed table on successful use.
 
-Passkey support uses the same endpoint with `credential.provider = "passkey"`. A production passkey flow also requires the app's Associated Domains entitlement and a valid `apple-app-site-association` file on the relying-party domain before the UI can be enabled.
+### `POST /account/sign-out`
+
+The authenticated request revokes only the supplied session token. Other signed-in devices remain connected.
+
+Passkey support is disabled. `credential.provider = "passkey"` and `POST /account/passkeys/link` return HTTP `410` until the backend implements server-issued challenges and complete WebAuthn registration/assertion verification. Existing passkey storage remains only for administrative cleanup and export compatibility.
 
 The local scaffold serves:
 
@@ -78,7 +82,7 @@ Configure it with:
 - `APPLE_TEAM_ID`
 - `APPLE_BUNDLE_ID`
 
-Production requirements:
+Future passkey requirements:
 
 - The public API domain must use HTTPS.
 - The iOS target needs `com.apple.developer.associated-domains`.
@@ -151,6 +155,8 @@ Authorization: Bearer <token>
 
 The local scaffold requires this bearer token after a user has signed in.
 
+The backend rejects bodies larger than 1 MiB by default and returns HTTP `413`. Sensitive write endpoints may return HTTP `429` with a `Retry-After` header when a client exceeds the burst limit.
+
 ### `POST /sync/push`
 
 Request:
@@ -189,6 +195,12 @@ Response:
 `acceptedMutationIDs` confirms which local queue items can be marked synced.
 `rejectedMutationIDs` confirms which local queue items must stay unresolved because the server has newer data or refused the write.
 
+The iPhone queue recovers claims left `inFlight` for more than ten minutes and automatically retries transient failures with exponential delays from 5 through 40 seconds. After five failed attempts an item remains visible as failed until the user explicitly retries, preventing an unbounded retry loop.
+
+Queue lifecycle time and mutation version time are stored separately. Claiming, failing, or retrying a request never makes unchanged content appear newer. Once the server accepts a queue item, the matching local bookmark, annotation, project, or project membership is marked synced in the same SQLite transaction.
+
+Server-newer rejections appear in iPhone Settings as explicit conflicts. **Use server** applies the current remote mutation and resolves the failed queue item. **Keep mine** deliberately assigns a new mutation version before uploading the local copy. A generic retry never changes mutation precedence.
+
 Supported mutation kinds:
 
 - `savedItem`: bookmarked/saved sections
@@ -200,6 +212,7 @@ Supported mutation kinds:
 
 Backend validation rules:
 
+- A push contains at most 100 mutations.
 - Each mutation must be a single-key object.
 - `auth.accountUserID` and `batch.user.id` must match.
 - The mutation kind must be one of the supported kinds above.
@@ -224,7 +237,9 @@ Request:
     "accountUserID": "stable-backend-user-id",
     "bearerToken": null
   },
-  "since": "2026-06-04T00:00:00Z"
+  "since": "2026-06-04T00:00:00Z",
+  "sinceEventID": 123,
+  "contentMapVersion": 2
 }
 ```
 
@@ -234,9 +249,29 @@ Response:
 {
   "userID": "stable-backend-user-id",
   "pulledAt": "2026-06-04T00:00:00Z",
+  "latestEventID": 123,
+  "contentMapVersion": 2,
   "mutations": []
 }
 ```
+
+Hosted Postgres pulls honor `sinceEventID` only when `contentMapVersion` matches the canonical section-ID map. A missing or stale map version receives the full canonical state so server-side identifier repairs are not hidden behind an event checkpoint.
+
+## Shared section links
+
+Web and iPhone use the same canonical section URL:
+
+```text
+https://permitext-sync.vercel.app/open/section/<canonical-section-id>
+```
+
+The web route serves the workspace and resolves section metadata from the canonical chapter catalog. Reader and section-detail share controls invoke the browser share sheet or copy the canonical URL as a fallback. The iPhone universal-link handler switches to Search and pushes the same canonical ID into `ReaderView`, including when the link arrives while bundled content is still loading. Unknown section API IDs return `404` rather than opening an empty reader.
+
+Both clients format the human-readable share context as `New York City <Code Name> § <section> (2022) — <title>` and attach the canonical section URL. The URL remains the interoperable identifier; the citation is presentation text for research notes, email, and project documentation.
+
+Web project research hydration uses `GET /code/sections?ids=<comma-separated-ids>`. Each request accepts 1 through 100 numeric canonical or legacy IDs and returns ordered canonical metadata under `sections`; `requestedID` preserves the input identifier so legacy project membership can be re-keyed to the canonical `id`. Unknown IDs are omitted and section bodies are not included. Larger project sets are chunked client-side.
+
+The web workspace publishes the same `continuity` mutation after reader navigation. It carries the canonical code-section, chapter, and most-recent section identifiers, merges rather than discards values last written by iPhone, and stores recent-entry dates as Swift reference-date seconds. Web restores only a newer remote record and never applies one over a pending local continuity mutation. Selecting the server copy for a continuity conflict clears the web checkpoint before the forced pull so the remote reading position is actually restored.
 
 The app applies only safe server changes. Local pending edits are protected and reported as conflicts instead of being overwritten. Preview-only pulls and pulls with skipped or conflicted remote records must not advance the local pull checkpoint, otherwise unapplied server records could be hidden from later sync runs.
 

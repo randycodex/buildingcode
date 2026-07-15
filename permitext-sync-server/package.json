@@ -4,18 +4,29 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prestart": "npm run build:workboard",
     "start": "node server.mjs",
-    "check": "node --check server.mjs && node --check tests/smoke.mjs && node --check tests/postgres-integration.mjs",
-    "smoke": "node tests/smoke.mjs",
+    "build:workboard": "vite build --config vite.workboard.config.js && node scripts/copy-excalidraw-assets.mjs",
+    "check": "node --check app.mjs && node --check postgres-account-repository.mjs && node --check postgres-sync-repository.mjs && node --check public/app.js && node --check server.mjs && node --check tests/auth-policy.mjs && node --check tests/content-integrity.mjs && node --check tests/smoke.mjs && node --check tests/postgres-integration.mjs",
+    "presmoke": "npm run build:workboard",
+    "smoke": "node tests/auth-policy.mjs && node tests/content-integrity.mjs && node tests/smoke.mjs",
+    "verify:content": "node tests/content-integrity.mjs",
     "verify:postgres": "node tests/postgres-integration.mjs",
     "verify:production": "node tests/production-health.mjs",
     "verify:production:aasa": "node tests/production-aasa.mjs",
     "verify:production:identity": "node tests/production-identity-restore.mjs"
   },
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.0"
+    "@excalidraw/excalidraw": "^0.18.1",
+    "@neondatabase/serverless": "^1.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "engines": {
     "node": ">=20"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "vite": "^7.0.6"
   }
 }

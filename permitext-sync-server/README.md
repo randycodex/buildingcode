@@ -31,13 +31,7 @@ Enable internal lifetime grant admin routes with:
 PERMITEXT_SYNC_ADMIN_TOKEN=dev-secret node server.mjs
 ```
 
-Configure passkey web credentials metadata with:
-
-```sh
-APPLE_TEAM_ID=YOURTEAMID APPLE_BUNDLE_ID=com.randycodex.permitext node server.mjs
-```
-
-Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Set `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1` after production Apple client IDs are configured to reject tokenless Apple sign-ins:
+Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Every Vercel deployment requires a valid identity token automatically. Local development can opt into the same policy with `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1`:
 
 ```sh
 APPLE_BUNDLE_ID=com.randycodex.permitext \
@@ -57,6 +51,69 @@ Return URL: https://permitext-sync.vercel.app/account/apple/callback
 Without `APPLE_SERVICE_ID`, production web sign-in is disabled instead of creating a browser-only account that cannot match iOS. Localhost can still use the browser-local fallback for development, or set `PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN=1` to allow it explicitly.
 
 If a browser already has a temporary `web:` account from the earlier checkout flow, the web app can link it during Apple sign-in. The backend retargets saved records to the new `apple:` account, transfers the server-owned entitlement, and invalidates the old browser session.
+
+Passkey registration and sign-in are disabled until the backend implements a complete server-challenge WebAuthn verification ceremony. Existing passkey records remain readable only for administrative cleanup and account export. Older clients receive HTTP `410` from passkey registration and sign-in attempts.
+
+Hosted account sessions are multi-device and store only a SHA-256 token hash. Each sign-in creates a distinct session with a 30-day default expiry; `PERMITEXT_SESSION_TTL_SECONDS` can set a different duration of at least one hour. Existing plaintext sessions are migrated to the hashed table on successful use and removed from the legacy session table. `POST /account/sign-out` revokes only the current device session.
+
+The HTTP perimeter rejects request bodies larger than 1 MiB by default. `PERMITEXT_MAX_REQUEST_BODY_BYTES` can set a limit from 64 KiB through 10 MiB. HTML responses use a Content Security Policy, Apple callback scripts use a per-response nonce, and all responses include baseline anti-framing, MIME-sniffing, referrer, and browser-permission headers.
+
+Sensitive write routes also have in-process burst limits and return HTTP `429` with `Retry-After`. These limits protect an individual Node/Vercel instance; production must also use Vercel Firewall rate limiting for enforcement shared across serverless instances.
+
+The web workspace stores signed-in mutations in a durable browser outbox before sending them. Entries are coalesced by account and record, replay on reload, reconnect, or tab foregrounding, and retry transient failures with bounded exponential delay. Server-newer records move to a separate conflict list instead of retrying forever. Settings shows waiting/conflict counts and requires an explicit **Use server** or **Keep mine** choice for conflicts. Note and tag edits enter the outbox before their network debounce begins.
+
+After the web workspace has a full baseline, later pulls send the server event cursor and merge only records changed since that cursor. Reloads still begin with a full pull, and a content-map version change forces a full replacement so canonical section-ID repairs cannot be hidden by an old checkpoint.
+
+## Canonical Code Content
+
+The published iPhone content tree is the authority for chapter structure, section IDs, corrected section bodies, search IDs, and assets:
+
+```text
+NYC CC APP/permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes
+```
+
+The web reader uses that same chapter catalog and always prefers its canonical `prepared/sections/<sectionID>.json` body. The older `NYCCCApp` section tree remains a read-only body fallback while the remaining sections are migrated; it is not allowed to redefine published IDs. Historical web-ID repair is limited to old sync records at the ingestion boundary.
+
+Run the release gate before shipping content or search changes:
+
+```sh
+npm run verify:content
+```
+
+The gate verifies all 118 chapter files, 12,890 unique published section IDs, exact search-index coverage, canonical override ownership, available-body coverage promised by the manifest, and the eight known duplicate display-number cases that must remain distinct records. It also runs as part of `npm run smoke`.
+
+iPhone and web search both use the shipped `prepared/searchIndex.json` token map. Results use the same rank, natural chapter/section ordering, code-section tie-break, and final section-ID tie-break on both platforms. The web server no longer rebuilds an index by opening every section body; both clients trust the validated index and resolve body text only for result snippets. The smoke suite runs every golden query through the web endpoint and compares its ordered IDs with the iPhone regression fixture.
+
+Canonical sections have a shared URL contract:
+
+```text
+https://permitext-sync.vercel.app/open/section/<canonical-section-id>
+```
+
+The same URL loads the section-detail workspace in a browser and opens `ReaderView` in the installed iPhone app. The AASA response advertises `/open/section/*`, and the iOS target includes both the `applinks:` and `webcredentials:` associated domains. Opening a section on web replaces the current address with its shared URL, and reader/detail share controls use the native share sheet when available with clipboard fallback. Private workspace state is never serialized into the link.
+
+Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
+
+The web `Research` pane derives a research set from the canonical sections currently open in readers, search details, and open project details. Users can copy or download that citation set and can ask for a plain-language interpretation grounded only in those selected official sections. The browser sends section IDs rather than code text; the server resolves the canonical bodies, excludes private notes, and rejects any model citation outside the selected evidence. Interpretations are research assistance, not official code determinations, and are not persisted as chat history.
+
+Run the interpretation flow locally without calling an external model:
+
+```sh
+PERMITEXT_RESEARCH_MOCK=1 node server.mjs
+```
+
+Enable live OpenAI Responses API calls with a server-only key:
+
+```sh
+OPENAI_API_KEY=... \
+PERMITEXT_RESEARCH_MODEL=gpt-5.6-terra \
+PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
+node server.mjs
+```
+
+`OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, limits each request to 12 selected sections, and records model/token usage without logging the question or code text. The OpenAI account that owns the API key is responsible for model usage charges.
+
+`GET /code/sections?ids=<comma-separated-ids>` resolves up to 100 canonical or legacy section IDs into ordered canonical metadata without loading section bodies. The Research pane batches larger projects through that endpoint and caches results in the browser. Single-section lookup uses the same cached server catalog, avoiding repeated chapter scans.
 
 Configure paid entitlement sources with:
 
@@ -91,11 +148,12 @@ When a Neon database is connected through Vercel, the server uses the first avai
 - `POSTGRES_URL`
 - `NEON_DATABASE_URL`
 
-The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v2`:
+The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v3`:
 
 - `permitext_users`
 - `permitext_entitlements`
 - `permitext_sessions`
+- `permitext_account_sessions`
 - `permitext_passkey_credentials`
 - `permitext_saved_items`
 - `permitext_annotations`
@@ -108,11 +166,14 @@ The Neon schema is created automatically on first request. The current Postgres 
 
 `permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
 
+On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instead of reading and rewriting the global store. A push applies conditional row upserts and sync-event inserts in one Neon HTTP transaction; a pull reads only that user's canonical records. Account sessions, profiles, checkout authentication, verified payment entitlements, lifetime grants, and legacy passkey cleanup also use targeted or transactional rows. The JSON file adapter intentionally keeps the simpler whole-file behavior for local smoke testing. Hosted legacy-account merge/repair requests fail safely without changing data until a fully transactional cross-account migration is implemented and verified against Postgres.
+
 ## Endpoints
 
 - `GET /health`
 - `GET /.well-known/apple-app-site-association`
 - `POST /account/sign-in`
+- `POST /account/sign-out`
 - `POST /account/attach-local-data`
 - `POST /account/profile`
 - `POST /sync/push`
@@ -162,16 +223,19 @@ PERMITEXT_SYNC_DATABASE_URL="$DATABASE_URL" npm run verify:postgres
 
 Entitlements are server-owned. Sync batches can include local user content mutations, but any client-provided `batch.entitlement` value is ignored; paid access should be written only by verified Apple/web payment handlers or admin grant routes.
 
+Each sync push is limited to 100 mutations so one request cannot create an unbounded database transaction. Current iOS automatic sync batches are smaller than this limit.
+
 `POST /sync/pull` still accepts the original timestamp `since` field, but hosted Postgres deployments can also use the event cursor:
 
 ```json
 {
   "auth": { "accountUserID": "apple:USER" },
-  "sinceEventID": 123
+  "sinceEventID": 123,
+  "contentMapVersion": 2
 }
 ```
 
-The response includes `latestEventID`/`syncRevision` and the mutations after that cursor. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
+The response includes `latestEventID`/`syncRevision`, `contentMapVersion`, and the current mutations affected after that cursor. The server honors an event cursor only when the client content-map version matches its canonical section-map schema; older clients receive the full canonical state so identifier repairs are not hidden. File-backed local development returns `0` for the cursor and keeps the timestamp-compatible behavior.
 
 Legacy passkey cleanup removes only accounts whose stored user ID starts with `passkey:`. It exists to clean records created before unlinked passkey sign-in was blocked:
 
@@ -192,10 +256,13 @@ curl -X POST https://permitext-sync.vercel.app/admin/accounts/restore-checklist 
 Production identity restore can be tested with:
 
 ```sh
-PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 npm run verify:production:identity
+PERMITEXT_RUN_PRODUCTION_IDENTITY_RESTORE=1 \
+PERMITEXT_PRODUCTION_TEST_USER="$APPLE_USER_ID" \
+PERMITEXT_PRODUCTION_TEST_APPLE_IDENTITY_TOKEN="$APPLE_IDENTITY_TOKEN" \
+npm run verify:production:identity
 ```
 
-That test writes one stable synthetic smoke account to the configured production backend.
+That test requires a current Sign in with Apple identity token and writes one stable smoke account to the configured production backend.
 
 Local mode remains intentionally simple and file-backed for integration testing. Hosted mode is intended to run on Vercel with Neon Postgres for durable storage.
 
@@ -208,15 +275,3 @@ PermitextBackendConfiguration.setDebugHTTPBaseURL("http://localhost:8787")
 ```
 
 For a physical iPhone, replace `localhost` with the Mac's LAN IP address.
-
-For production passkeys, the app also needs the Associated Domains entitlement:
-
-```text
-webcredentials:your-domain.com
-```
-
-That domain must serve the same Apple App Site Association payload over HTTPS at:
-
-```text
-https://your-domain.com/.well-known/apple-app-site-association
-```

@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260626-comment-box-dark-color">
+    <link rel="stylesheet" href="/web/styles.css?v=20260715-paired-workboards">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260715-paired-workboards">
   </head>
   <body>
     <main class="workspace-shell">
@@ -16,7 +17,7 @@
           <button class="toolbar-button" id="toggle-projects" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>
           <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false">Search</button>
           <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Saved" title="Saved" aria-pressed="false">Saved</button>
-          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Analysis" title="Analysis" aria-pressed="false">Analysis</button>
+          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false">Research</button>
           <button class="toolbar-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
         </nav>
         <div class="topbar-workspace-controls" aria-label="Workspace layout">
@@ -209,8 +210,8 @@
       <article class="workspace-panel utility-panel">
         <header class="panel-header">
           <div>
-            <p class="eyebrow panel-kind">AI</p>
-            <h2 class="panel-title">Analysis</h2>
+            <p class="eyebrow panel-kind">Workspace</p>
+            <h2 class="panel-title">Research</h2>
           </div>
           <div class="panel-actions">
             <button class="icon-button pane-drag-handle" type="button" title="Drag column" aria-label="Drag column" draggable="true">
@@ -232,22 +233,7 @@
             </button>
           </div>
         </header>
-        <section class="analysis-content">
-          <article class="analysis-card">
-            <p class="section-label">Placeholder</p>
-            <h3>Bring your own AI account later</h3>
-            <p>This pane is reserved for chapter and section analysis. The planned setup will let users connect their own OpenAI, Claude, Gemini, or similar provider key so usage is billed to their account, not yours.</p>
-            <div class="project-meta">
-              <span>No API calls yet</span>
-              <span>Active reader aware later</span>
-              <span>Private by default</span>
-            </div>
-          </article>
-          <article class="saved-row">
-            <strong>Future behavior</strong>
-            <span>Select a reader, choose a section, then ask for summaries, conflicts, checklists, or design-review notes against that exact code text.</span>
-          </article>
-        </section>
+        <section class="analysis-content"></section>
       </article>
     </template>
 
@@ -322,6 +308,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260627-apple-web-sign-in" type="module"></script>
+    <script src="/web/app.js?v=20260715-paired-workboards" type="module"></script>
   </body>
 </html>
