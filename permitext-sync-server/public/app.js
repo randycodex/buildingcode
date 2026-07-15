@@ -1,16 +1,12 @@
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
+const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
+const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
-const detachedProjectSessionID = legacyDetachedProjectParameter || (
-  window.location.pathname === detachedWorkboardPath && window.name.startsWith(detachedWindowNamePrefix)
-    ? window.name
-    : ""
-);
-const detachedProjectSessionKey = detachedProjectSessionID
-  ? `permitext:detachedWorkboard:${detachedProjectSessionID}`
-  : "";
-const detachedProjectWindow = Boolean(detachedProjectSessionID);
+const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
+const detachedProjectSessionID = String(detachedProjectSession?.id || "");
+const detachedProjectWindow = Boolean(detachedProjectSession?.project);
 const workspaceKey = detachedProjectWindow
   ? `${baseWorkspaceKey}:detached:${detachedProjectSessionID}`
   : baseWorkspaceKey;
@@ -31,6 +27,8 @@ const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+
+if (detachedWorkboardRoute) document.body.classList.add("is-detached-workboard-window");
 
 const codeOptions = [
   { prefix: "BC", label: "Building Code", theme: "building" },
@@ -258,34 +256,53 @@ function workboardProjectID(project) {
   return String(project?.clientID || project?.id || project?.localFolderID || projectDetailKey(project) || "");
 }
 
-function detachedProjectFromSession() {
-  if (!detachedProjectSessionKey) return null;
+function detachedProjectSessionFromWindow() {
   try {
-    const project = JSON.parse(localStorage.getItem(detachedProjectSessionKey) || "null");
-    return project && typeof project === "object" ? projectIdentity(project) : null;
+    const stored = JSON.parse(window.sessionStorage.getItem(detachedWindowSessionStorageKey) || "null");
+    if (stored?.project && typeof stored.project === "object") {
+      return {
+        id: String(stored.id || window.name || `${detachedWindowNamePrefix}session`),
+        project: stored.project
+      };
+    }
+  } catch {
+    // Fall through to the legacy handoff used by already-open detached windows.
+  }
+
+  const legacyID = legacyDetachedProjectParameter || (
+    window.name.startsWith(detachedWindowNamePrefix) ? window.name : ""
+  );
+  if (!legacyID) return null;
+  try {
+    const project = JSON.parse(localStorage.getItem(`permitext:detachedWorkboard:${legacyID}`) || "null");
+    if (!project || typeof project !== "object") return null;
+    const session = { id: legacyID, project };
+    window.sessionStorage.setItem(detachedWindowSessionStorageKey, JSON.stringify(session));
+    return session;
   } catch {
     return null;
   }
 }
 
+function detachedProjectFromSession() {
+  const project = detachedProjectSession?.project;
+  return project && typeof project === "object" ? projectIdentity(project) : null;
+}
+
 function initializeDetachedProjectState(project) {
   const identity = projectIdentity(project);
-  state.projectDetail = identity;
-  state.projectDetails = [identity];
+  document.body.dataset.detachedProjectId = workboardProjectID(identity);
+  state.projectDetail = null;
+  state.projectDetails = [];
   state.workboards = [identity];
   state.detachedWorkboards = [];
   state.utilityInstances = [];
-  state.utilities = { projects: true, archive: false, search: false, saved: false, analysis: false, settings: false };
+  state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false };
   state.readers = [];
-  const detailID = paneIDForProjectDetail(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
-  const savedDetailWidth = Number(state.paneWeights?.[detailID]);
   const savedWorkboardWidth = Number(state.paneWeights?.[workboardID]);
-  state.paneOrder = [detailID, workboardID];
+  state.paneOrder = [workboardID];
   state.paneWeights = {
-    [detailID]: Number.isFinite(savedDetailWidth) && savedDetailWidth > 40
-      ? savedDetailWidth
-      : defaultDetailPaneWidth,
     [workboardID]: Number.isFinite(savedWorkboardWidth) && savedWorkboardWidth > 40
       ? savedWorkboardWidth
       : defaultWorkboardPaneWidth
@@ -374,7 +391,7 @@ async function renderProjectWorkboard(project) {
       projectName: identity.name || identity.title || "Project",
       onClose: detachedProjectWindow ? () => window.close() : () => closeProjectWorkboard(identity),
       onDetach: detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
-      detachLabel: detachedProjectWindow ? "Reattach project and Workboard" : "Detach project and Workboard",
+      detachLabel: detachedProjectWindow ? "Reattach Workboard" : "Detach Workboard",
       syncEnabled: Boolean(activeAccount()),
       loadSyncedBoard: loadSyncedWorkboard,
       saveSyncedBoard: saveSyncedWorkboard,
@@ -413,14 +430,25 @@ function detachedWindowURL() {
 function openDetachedWindow(project) {
   const identity = projectIdentity(project);
   const windowName = detachedWindowName(identity);
-  localStorage.setItem(`permitext:detachedWorkboard:${windowName}`, JSON.stringify(identity));
   const popup = window.open(
-    detachedWindowURL(),
+    "",
     windowName,
     "popup=yes,width=1240,height=820,resizable=yes,scrollbars=yes"
   );
-  if (popup) {
+  if (!popup) return null;
+  try {
+    popup.sessionStorage.setItem(detachedWindowSessionStorageKey, JSON.stringify({
+      id: windowName,
+      project: identity
+    }));
+    const isReadyDetachedWindow = popup.location.pathname === detachedWindowURL()
+      && popup.document.body?.dataset.detachedProjectId === workboardProjectID(identity);
+    if (!isReadyDetachedWindow) popup.location.replace(detachedWindowURL());
     popup.focus();
+  } catch (error) {
+    console.error("Could not initialize the detached Workboard window.", error);
+    popup.close();
+    return null;
   }
   return popup;
 }
@@ -436,13 +464,10 @@ async function detachProjectWorkboard(project) {
   if (!projectHasDetachedWorkboard(identity)) {
     state.detachedWorkboards = [...detachedWorkboards(), identity];
   }
-  closeProjectDetailForProject(identity);
   state.workboards = openWorkboards().filter((item) => !projectDetailMatches(identity, item));
-  const detailID = paneIDForProjectDetail(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
-  delete state.paneWeights[detailID];
   delete state.paneWeights[workboardID];
-  state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
   saveWorkspaceState();
   await renderWorkspace();
   window.setTimeout(() => {
@@ -871,7 +896,7 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
 
 function defaultActivePaneIDs() {
   if (detachedProjectWindow && detachedProject) {
-    return [paneIDForProjectDetail(detachedProject), paneIDForProjectWorkboard(detachedProject)];
+    return [paneIDForProjectWorkboard(detachedProject)];
   }
   const ids = [];
   if (state.utilities.projects) ids.push("utility:projects");
@@ -6421,7 +6446,6 @@ async function renderWorkspace() {
 
   const panes = [];
   if (detachedProjectWindow && detachedProject) {
-    panes.push(await renderProjectDetail(openProjectDetails()[0] || detachedProject));
     panes.push(await renderProjectWorkboard(detachedProject));
     appendPaneSequence(panes);
     syncAllCommentBoxHeights();
@@ -6618,6 +6642,9 @@ async function collapseToOneReader() {
 }
 
 async function start() {
+  if (detachedWorkboardRoute && !detachedProjectWindow) {
+    throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
+  }
   const payload = await api("/code/chapters");
   chapters = payload.chapters || [];
   document.addEventListener("click", (event) => {
@@ -6730,6 +6757,17 @@ async function start() {
 start().catch((error) => {
   console.error(error);
   clear(track);
+  if (detachedWorkboardRoute) {
+    const panel = document.createElement("article");
+    panel.className = "workspace-panel detached-workboard-error";
+    const title = document.createElement("h1");
+    title.textContent = "Workboard unavailable";
+    const message = document.createElement("p");
+    message.textContent = error.message;
+    panel.append(title, message);
+    track.append(panel);
+    return;
+  }
   const panel = renderTemplate(settingsTemplate);
   panel.querySelector(".panel-title").textContent = "Load error";
   const list = panel.querySelector(".settings-list");
