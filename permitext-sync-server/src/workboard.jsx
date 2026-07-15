@@ -164,6 +164,22 @@ function Workboard({
   const ignoreInitialChange = useRef(true);
   const remoteUpdatedAt = useRef(null);
   const assets = useRef({});
+  const canvasHost = useRef(null);
+  const excalidrawAPI = useRef(null);
+  const refreshFrame = useRef(null);
+
+  const refreshCanvasOrigin = useCallback(() => {
+    window.cancelAnimationFrame(refreshFrame.current);
+    refreshFrame.current = window.requestAnimationFrame(() => {
+      excalidrawAPI.current?.refresh();
+    });
+  }, []);
+
+  const captureExcalidrawAPI = useCallback((api) => {
+    excalidrawAPI.current = api;
+    api.toggleSidebar({ name: null, force: false });
+    refreshCanvasOrigin();
+  }, [refreshCanvasOrigin]);
 
   const flushSave = useCallback(async () => {
     window.clearTimeout(saveTimer.current);
@@ -256,6 +272,43 @@ function Workboard({
     };
   }, [flushSave, loadAsset, loadSyncedBoard, projectID, projectName, remoteRevision, saveSyncedBoard, syncEnabled]);
 
+  useEffect(() => {
+    const host = canvasHost.current;
+    if (!host || !boardView) return undefined;
+    const panelTrack = host.closest(".panel-track");
+    const resizeObserver = typeof ResizeObserver === "undefined"
+      ? null
+      : new ResizeObserver(refreshCanvasOrigin);
+    const observeWorkspacePanels = () => {
+      resizeObserver?.observe(host);
+      if (!panelTrack) return;
+      resizeObserver?.observe(panelTrack);
+      panelTrack.querySelectorAll(":scope > .workspace-panel").forEach((panel) => resizeObserver?.observe(panel));
+    };
+    const mutationObserver = panelTrack && typeof MutationObserver !== "undefined"
+      ? new MutationObserver(() => {
+        observeWorkspacePanels();
+        refreshCanvasOrigin();
+      })
+      : null;
+
+    observeWorkspacePanels();
+    mutationObserver?.observe(panelTrack, { childList: true });
+    panelTrack?.addEventListener("scroll", refreshCanvasOrigin, { passive: true });
+    panelTrack?.addEventListener("transitionend", refreshCanvasOrigin, true);
+    window.addEventListener("resize", refreshCanvasOrigin, { passive: true });
+    refreshCanvasOrigin();
+
+    return () => {
+      window.cancelAnimationFrame(refreshFrame.current);
+      resizeObserver?.disconnect();
+      mutationObserver?.disconnect();
+      panelTrack?.removeEventListener("scroll", refreshCanvasOrigin);
+      panelTrack?.removeEventListener("transitionend", refreshCanvasOrigin, true);
+      window.removeEventListener("resize", refreshCanvasOrigin);
+    };
+  }, [boardView, refreshCanvasOrigin]);
+
   const handleChange = useCallback((elements, appState, files) => {
     if (!boardView || boardView.projectID !== projectID) return;
     const signature = boardChangeSignature(elements, appState, files);
@@ -308,11 +361,12 @@ function Workboard({
           </button>
         </div>
       </header>
-      <div className="permitext-workboard-canvas">
+      <div className="permitext-workboard-canvas" ref={canvasHost}>
         {boardView ? (
           <Excalidraw
             key={boardView.projectID}
             initialData={boardView.initialData}
+            excalidrawAPI={captureExcalidrawAPI}
             onChange={handleChange}
             theme={preferredTheme()}
             name={`${boardView.projectName} Workboard`}
@@ -350,6 +404,9 @@ function Workboard({
 }
 
 export function mountWorkboard(container, options) {
+  if (window.location.hash.startsWith("#addLibrary=")) {
+    window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+  }
   let root = roots.get(container);
   if (!root) {
     root = createRoot(container);

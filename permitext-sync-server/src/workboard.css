@@ -92,6 +92,12 @@
   font-size: 14px !important;
 }
 
+.permitext-workboard-canvas .default-sidebar-trigger,
+.permitext-workboard-canvas .sidebar-trigger__label-element:has(.default-sidebar-trigger),
+.permitext-workboard-canvas .sidebar {
+  display: none !important;
+}
+
 .excalidraw-modal-container .HelpDialog__header {
   display: none !important;
 }
