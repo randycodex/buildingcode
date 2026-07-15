@@ -62,6 +62,10 @@ Sensitive write routes also have in-process burst limits and return HTTP `429` w
 
 The web workspace stores signed-in mutations in a durable browser outbox before sending them. Entries are coalesced by account and record, replay on reload, reconnect, or tab foregrounding, and retry transient failures with bounded exponential delay. Server-newer records move to a separate conflict list instead of retrying forever. Settings shows waiting/conflict counts and requires an explicit **Use server** or **Keep mine** choice for conflicts. Note and tag edits enter the outbox before their network debounce begins.
 
+Project Workboards remain local-first. Signed-out drawings are saved only in that browser's IndexedDB. After sign-in, the web app migrates the newer local scene into the account sync stream and restores that scene anywhere the same account signs in. Drawing JSON is stored as a `workboard` user-content record in Postgres; embedded images are optimized in the browser and stored separately as private Vercel Blob objects. Inline image data is rejected by the sync API so large drawings cannot silently inflate the database or sync payloads. Permanent project deletion writes a Workboard tombstone, removes its local IndexedDB copy, and requests deletion of its private Blob images.
+
+Workboard scene syncing works without Blob storage for drawings that contain no images. To synchronize image-bearing drawings in hosted environments, connect a Vercel Blob store to the project. The server accepts either the marketplace-provided `BLOB_READ_WRITE_TOKEN`, or both `VERCEL_OIDC_TOKEN` and `BLOB_STORE_ID`. Blob access remains private and every upload, read, and deletion is checked against the authenticated account and project. The server accepts PNG, JPEG, WebP, and GIF images up to 8 MiB each; the browser reduces large non-GIF images to a maximum 2048-pixel dimension before upload.
+
 After the web workspace has a full baseline, later pulls send the server event cursor and merge only records changed since that cursor. Reloads still begin with a full pull, and a content-map version change forces a full replacement so canonical section-ID repairs cannot be hidden by an old checkpoint.
 
 ## Canonical Code Content
@@ -148,6 +152,8 @@ When a Neon database is connected through Vercel, the server uses the first avai
 - `POSTGRES_URL`
 - `NEON_DATABASE_URL`
 
+Connect a private Vercel Blob store in the same Vercel project for synchronized Workboard images. Keep the generated Blob credentials server-only; the browser always reads and writes through Permitext's authenticated endpoints.
+
 The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v3`:
 
 - `permitext_users`
@@ -178,6 +184,9 @@ On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instea
 - `POST /account/profile`
 - `POST /sync/push`
 - `POST /sync/pull`
+- `POST /workboards/assets/upload`
+- `POST /workboards/assets/read`
+- `POST /workboards/assets/delete`
 - `POST /billing/web/checkout`
 - `POST /billing/stripe/webhook`
 - `POST /billing/apple/transactions/verify`

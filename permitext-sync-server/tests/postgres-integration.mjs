@@ -202,6 +202,20 @@ try {
       updatedAt: "2026-06-27T00:03:00Z"
     }
   };
+  const workboard = {
+    workboard: {
+      id: `postgres-workboard-${runID}`,
+      userID,
+      codeVersion,
+      projectID: `postgres-project-client-${runID}`,
+      projectName: "Postgres Integration Project",
+      elements: [{ id: `postgres-rectangle-${runID}`, type: "rectangle" }],
+      appState: { viewBackgroundColor: "#ffffff" },
+      files: {},
+      assets: {},
+      updatedAt: "2026-06-27T00:04:00Z"
+    }
+  };
 
   const push = await request("/sync/push", {
     method: "POST",
@@ -215,12 +229,12 @@ try {
           authProviderUserID: providerUserID,
           displayName: "Postgres Integration Smoke"
         },
-        mutations: [savedItem, annotation, project, projectSection]
+        mutations: [savedItem, annotation, project, projectSection, workboard]
       }
     }
   });
   assert(push.response.ok, "Sync push failed.");
-  assert(push.json.acceptedMutationIDs.length === 4, "Sync push did not accept all mutations.");
+  assert(push.json.acceptedMutationIDs.length === 5, "Sync push did not accept all mutations.");
   assert(push.json.latestEventID > 0, "Sync push did not return a positive latestEventID.");
 
   assert(await countRows("permitext_users") === 1, "User row was not written.");
@@ -228,8 +242,8 @@ try {
   assert(await countRows("permitext_annotations") === 1, "Annotation row was not written.");
   assert(await countRows("permitext_projects") === 1, "Project row was not written.");
   assert(await countRows("permitext_project_items") === 1, "Project item row was not written.");
-  assert(await countRows("permitext_user_content_records") === 4, "Compatibility mutation rows were not written.");
-  assert(await countRows("permitext_sync_events") === 4, "Sync event rows were not written.");
+  assert(await countRows("permitext_user_content_records") === 5, "Compatibility mutation rows were not written.");
+  assert(await countRows("permitext_sync_events") === 5, "Sync event rows were not written.");
 
   const fullPull = await request("/sync/pull", {
     method: "POST",
@@ -237,7 +251,14 @@ try {
     body: { auth: { accountUserID: userID }, sinceEventID: 0, contentMapVersion: 2 }
   });
   assert(fullPull.response.ok, "Full event-cursor pull failed.");
-  assert(fullPull.json.mutations.length === 4, "Full event-cursor pull did not return all events.");
+  assert(fullPull.json.mutations.length === 5, "Full event-cursor pull did not return all events.");
+  assert(
+    fullPull.json.mutations.some((mutation) =>
+      mutation.workboard?.projectID === `postgres-project-client-${runID}` &&
+      mutation.workboard?.elements?.[0]?.id === `postgres-rectangle-${runID}`
+    ),
+    "Postgres pull did not restore the Workboard."
+  );
   assert(fullPull.json.latestEventID === push.json.latestEventID, "Pull latestEventID did not match push latestEventID.");
 
   const emptyPull = await request("/sync/pull", {

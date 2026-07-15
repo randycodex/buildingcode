@@ -51,6 +51,21 @@ async function writeBoard(board) {
   }
 }
 
+async function deleteBoard(id) {
+  const database = await openDatabase();
+  try {
+    await new Promise((resolve, reject) => {
+      const transaction = database.transaction(storeName, "readwrite");
+      transaction.objectStore(storeName).delete(id);
+      transaction.oncomplete = () => resolve();
+      transaction.onerror = () => reject(transaction.error || new Error("Could not delete this workboard."));
+      transaction.onabort = () => reject(transaction.error || new Error("Workboard deletion was interrupted."));
+    });
+  } finally {
+    database.close();
+  }
+}
+
 function persistedAppState(appState) {
   const keys = [
     "currentItemBackgroundColor",
@@ -86,13 +101,69 @@ function preferredTheme() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
-function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "Detach project and Workboard" }) {
+function updatedAtTime(board) {
+  const timestamp = Date.parse(board?.updatedAt || "");
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function filesWithoutInlineData(files = {}) {
+  return Object.fromEntries(Object.entries(files).map(([id, file]) => {
+    const { dataURL: _dataURL, ...metadata } = file || {};
+    return [id, metadata];
+  }));
+}
+
+async function hydrateRemoteFiles(board, loadAsset) {
+  if (!board || !loadAsset) return board;
+  const files = { ...(board.files || {}) };
+  await Promise.all(Object.entries(board.assets || {}).map(async ([fileID, asset]) => {
+    try {
+      const dataURL = await loadAsset(asset);
+      if (dataURL) files[fileID] = { ...(files[fileID] || {}), dataURL };
+    } catch {
+      // Keep the rest of the drawing usable if one remote image is unavailable.
+    }
+  }));
+  return { ...board, files };
+}
+
+async function prepareBoardForSync(board, uploadAsset) {
+  const assets = { ...(board.assets || {}) };
+  if (uploadAsset) {
+    for (const [fileID, file] of Object.entries(board.files || {})) {
+      if (assets[fileID] || typeof file?.dataURL !== "string" || !file.dataURL.startsWith("data:")) continue;
+      assets[fileID] = await uploadAsset(fileID, file);
+    }
+  }
+  return {
+    ...board,
+    files: filesWithoutInlineData(board.files),
+    assets
+  };
+}
+
+function Workboard({
+  projectID,
+  projectName,
+  onClose,
+  onDetach,
+  detachLabel = "Detach project and Workboard",
+  syncEnabled = false,
+  loadSyncedBoard,
+  saveSyncedBoard,
+  uploadAsset,
+  loadAsset,
+  remoteRevision = ""
+}) {
   const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
   const saveTimer = useRef(null);
   const pendingBoard = useRef(null);
   const lastChangeSignature = useRef("");
+  const ignoreInitialChange = useRef(true);
+  const remoteUpdatedAt = useRef(null);
+  const assets = useRef({});
 
   const flushSave = useCallback(async () => {
     window.clearTimeout(saveTimer.current);
@@ -102,19 +173,36 @@ function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "D
     pendingBoard.current = null;
     try {
       await writeBoard(board);
-      setStatus("Saved locally");
+      if (!syncEnabled || !saveSyncedBoard) {
+        setStatus("Saved locally");
+        return;
+      }
+      setStatus("Syncing…");
+      const syncBoard = await prepareBoardForSync(board, uploadAsset);
+      const savedBoard = await saveSyncedBoard(syncBoard, { baseUpdatedAt: remoteUpdatedAt.current });
+      remoteUpdatedAt.current = savedBoard?.updatedAt || syncBoard.updatedAt;
+      assets.current = syncBoard.assets;
+      await writeBoard({ ...board, assets: syncBoard.assets, syncedAt: remoteUpdatedAt.current });
+      setStatus("Synced");
     } catch (error) {
       pendingBoard.current = board;
-      setStatus(error.message || "Could not save");
+      setStatus(syncEnabled ? "Saved locally · Sync pending" : error.message || "Could not save");
     }
-  }, []);
+  }, [saveSyncedBoard, syncEnabled, uploadAsset]);
 
   useEffect(() => {
     let active = true;
     setStatus("Loading…");
-    readBoard(projectID)
-      .then((board) => {
+    Promise.all([
+      readBoard(projectID),
+      syncEnabled && loadSyncedBoard ? loadSyncedBoard(projectID).catch(() => null) : Promise.resolve(null)
+    ])
+      .then(async ([localBoard, remoteBoard]) => {
         if (!active) return;
+        remoteUpdatedAt.current = remoteBoard?.updatedAt || null;
+        const useRemote = remoteBoard && (!localBoard || updatedAtTime(remoteBoard) >= updatedAtTime(localBoard));
+        const board = useRemote ? await hydrateRemoteFiles(remoteBoard, loadAsset) : localBoard;
+        assets.current = { ...(board?.assets || {}) };
         const loadedData = {
           elements: board?.elements || [],
           appState: {
@@ -122,16 +210,27 @@ function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "D
             theme: preferredTheme(),
             name: `${projectName} Workboard`
           },
-          files: board?.files || {}
+          files: board?.files || {},
+          assets: assets.current
         };
         lastChangeSignature.current = boardChangeSignature(
           loadedData.elements,
           loadedData.appState,
           loadedData.files
         );
+        ignoreInitialChange.current = true;
         setElementCount(loadedData.elements.length);
         setBoardView({ projectID, projectName, initialData: loadedData });
-        setStatus(board ? "Saved locally" : "New local board");
+        if (useRemote) {
+          await writeBoard({ ...remoteBoard, files: loadedData.files, syncedAt: remoteBoard.updatedAt });
+          setStatus("Synced");
+        } else if (board && syncEnabled && saveSyncedBoard && updatedAtTime(board) > updatedAtTime(remoteBoard)) {
+          pendingBoard.current = board;
+          setStatus("Syncing…");
+          void flushSave();
+        } else {
+          setStatus(board ? "Saved locally" : "New local board");
+        }
       })
       .catch((error) => {
         if (!active) return;
@@ -145,6 +244,7 @@ function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "D
           loadedData.appState,
           loadedData.files
         );
+        ignoreInitialChange.current = true;
         setElementCount(0);
         setBoardView({ projectID, projectName, initialData: loadedData });
         setStatus(error.message || "Local storage unavailable");
@@ -154,11 +254,17 @@ function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "D
       active = false;
       if (pendingBoard.current) void flushSave();
     };
-  }, [flushSave, projectID, projectName]);
+  }, [flushSave, loadAsset, loadSyncedBoard, projectID, projectName, remoteRevision, saveSyncedBoard, syncEnabled]);
 
   const handleChange = useCallback((elements, appState, files) => {
     if (!boardView || boardView.projectID !== projectID) return;
     const signature = boardChangeSignature(elements, appState, files);
+    if (ignoreInitialChange.current) {
+      ignoreInitialChange.current = false;
+      lastChangeSignature.current = signature;
+      setElementCount(elements.length);
+      return;
+    }
     if (signature === lastChangeSignature.current) return;
     lastChangeSignature.current = signature;
     setElementCount(elements.length);
@@ -168,6 +274,7 @@ function Workboard({ projectID, projectName, onClose, onDetach, detachLabel = "D
       elements: elements.map((element) => ({ ...element })),
       appState: persistedAppState(appState),
       files: { ...files },
+      assets: { ...assets.current },
       updatedAt: new Date().toISOString()
     };
     setStatus("Saving…");
@@ -253,4 +360,19 @@ export function mountWorkboard(container, options) {
     root.unmount();
     roots.delete(container);
   };
+}
+
+export async function replaceLocalWorkboard(projectID, board) {
+  const id = String(projectID || "").trim();
+  if (!id) return;
+  if (!board || board.deletedAt) {
+    await deleteBoard(id);
+    return;
+  }
+  await writeBoard({ ...board, id });
+}
+
+export async function deleteLocalWorkboard(projectID) {
+  const id = String(projectID || "").trim();
+  if (id) await deleteBoard(id);
 }

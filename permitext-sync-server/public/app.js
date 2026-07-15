@@ -328,7 +328,13 @@ async function renderProjectWorkboard(project) {
     root.dataset.projectId = projectID;
     root.textContent = "Loading workboard…";
     panel.append(root);
-    mounted = { panel, root, unmount: null, initialized: false };
+    mounted = {
+      panel,
+      root,
+      unmount: null,
+      initialized: false,
+      uploadAsset: (fileID, file) => uploadWorkboardAsset(projectID, fileID, file)
+    };
     workboardMounts.set(projectID, mounted);
   }
   mounted.panel.dataset.paneId = paneID;
@@ -345,7 +351,13 @@ async function renderProjectWorkboard(project) {
       projectName: identity.name || identity.title || "Project",
       onClose: detachedProjectWindow ? () => window.close() : () => closeProjectWorkboard(identity),
       onDetach: detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
-      detachLabel: detachedProjectWindow ? "Reattach project and Workboard" : "Detach project and Workboard"
+      detachLabel: detachedProjectWindow ? "Reattach project and Workboard" : "Detach project and Workboard",
+      syncEnabled: Boolean(activeAccount()),
+      loadSyncedBoard: loadSyncedWorkboard,
+      saveSyncedBoard: saveSyncedWorkboard,
+      uploadAsset: mounted.uploadAsset,
+      loadAsset: loadWorkboardAsset,
+      remoteRevision: syncedWorkboardForProject(projectID)?.updatedAt || ""
     });
     mounted.initialized = true;
   } catch (error) {
@@ -1812,6 +1824,7 @@ function summarizeMutations(mutations = []) {
   const savedItems = [];
   const annotations = [];
   const projectSections = [];
+  const workboards = [];
   let latestContinuity = null;
 
   latestByID.forEach((mutation) => {
@@ -1821,6 +1834,7 @@ function summarizeMutations(mutations = []) {
     if (kind === "savedItem") savedItems.push(record);
     if (kind === "annotation") annotations.push(record);
     if (kind === "projectSection") projectSections.push(record);
+    if (kind === "workboard") workboards.push(record);
     if (
       kind === "continuity" &&
       (!latestContinuity || mutationUpdatedAt(mutation) > Date.parse(latestContinuity.updatedAt || 0))
@@ -1829,7 +1843,7 @@ function summarizeMutations(mutations = []) {
     }
   });
 
-  return { projects, savedItems, annotations, projectSections, latestContinuity };
+  return { projects, savedItems, annotations, projectSections, workboards, latestContinuity };
 }
 
 function syncCodeVersion(value) {
@@ -1969,6 +1983,183 @@ function syncMutationRecordID(mutation) {
     return [record?.userID, "code-version-clear", syncCodeVersion(record?.codeVersion)].join(":");
   }
   return String(record?.id || "").trim();
+}
+
+function syncedWorkboardForProject(projectID) {
+  return (syncedContent?.summary?.workboards || []).find((board) =>
+    String(board.projectID || "") === String(projectID || "")
+  ) || null;
+}
+
+async function loadSyncedWorkboard(projectID) {
+  if (!activeAccount()) return null;
+  await loadSyncedContent();
+  return syncedWorkboardForProject(projectID);
+}
+
+async function saveSyncedWorkboard(board, options = {}) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to synchronize this Workboard.");
+  const projectID = String(board?.id || board?.projectID || "").trim();
+  if (!projectID) throw new Error("This Workboard is missing its project ID.");
+  const updatedAt = board.updatedAt || new Date().toISOString();
+  const record = {
+    id: `${account.userID}:workboard:${projectID}`,
+    userID: account.userID,
+    codeVersion: defaultSyncCodeVersion,
+    projectID,
+    projectName: board.projectName || "Project",
+    elements: board.elements || [],
+    appState: board.appState || {},
+    files: board.files || {},
+    assets: board.assets || {},
+    baseUpdatedAt: options.baseUpdatedAt || null,
+    updatedAt
+  };
+  await pushMutation({ workboard: record });
+  return syncedWorkboardForProject(projectID) || record;
+}
+
+async function deleteSyncedWorkboard(projectID) {
+  const account = activeAccount();
+  if (!account) return;
+  const board = syncedWorkboardForProject(projectID);
+  const now = new Date().toISOString();
+  await pushMutation({
+    workboard: {
+      id: `${account.userID}:workboard:${projectID}`,
+      userID: account.userID,
+      codeVersion: defaultSyncCodeVersion,
+      projectID,
+      projectName: board?.projectName || "Project",
+      updatedAt: now,
+      deletedAt: now
+    }
+  });
+  const pathnames = Object.values(board?.assets || {}).map((asset) => asset?.pathname).filter(Boolean);
+  if (!pathnames.length) return;
+  const response = await fetch("/workboards/assets/delete", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      auth: { accountUserID: account.userID },
+      projectID,
+      pathnames
+    })
+  });
+  if (!response.ok && response.status !== 503) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(responseErrorMessage(payload, "Could not remove this Workboard's stored images."));
+  }
+}
+
+async function replaceLocalWorkboard(projectID, board) {
+  workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+  const module = await workboardModulePromise;
+  await module.replaceLocalWorkboard(projectID, board);
+  const mounted = workboardMounts.get(projectID);
+  mounted?.unmount?.();
+  workboardMounts.delete(projectID);
+}
+
+async function deleteLocalWorkboard(projectID) {
+  workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+  const module = await workboardModulePromise;
+  await module.deleteLocalWorkboard(projectID);
+  const mounted = workboardMounts.get(projectID);
+  mounted?.unmount?.();
+  workboardMounts.delete(projectID);
+}
+
+function responseErrorMessage(payload, fallback) {
+  return payload?.error?.message || payload?.message || payload?.error || fallback;
+}
+
+function canvasBlob(canvas, type, quality) {
+  return new Promise((resolve, reject) => {
+    canvas.toBlob((blob) => {
+      if (blob) resolve(blob);
+      else reject(new Error("Could not optimize this Workboard image."));
+    }, type, quality);
+  });
+}
+
+async function optimizedWorkboardImageBlob(blob) {
+  if (blob.type === "image/gif" || typeof createImageBitmap !== "function") return blob;
+  const image = await createImageBitmap(blob);
+  try {
+    const maxDimension = 2048;
+    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    if (scale === 1 && blob.size <= 1.5 * 1024 * 1024) return blob;
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.width * scale));
+    canvas.height = Math.max(1, Math.round(image.height * scale));
+    const context = canvas.getContext("2d", { alpha: true });
+    if (!context) return blob;
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    return canvasBlob(canvas, "image/webp", 0.84);
+  } finally {
+    image.close();
+  }
+}
+
+async function uploadWorkboardAsset(projectID, fileID, file) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to synchronize Workboard images.");
+  if (typeof file?.dataURL !== "string" || !file.dataURL.startsWith("data:")) {
+    throw new Error("This Workboard image has no uploadable data.");
+  }
+  const sourceBlob = await fetch(file.dataURL).then((response) => response.blob());
+  const blob = await optimizedWorkboardImageBlob(sourceBlob);
+  const url = new URL("/workboards/assets/upload", window.location.origin);
+  url.searchParams.set("projectID", projectID);
+  url.searchParams.set("fileID", fileID);
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": blob.type || file.mimeType || "application/octet-stream",
+      "x-permitext-user-id": account.userID
+    },
+    body: blob
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Workboard image."));
+  return payload.asset;
+}
+
+function blobDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(reader.error || new Error("Could not read this Workboard image."));
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function loadWorkboardAsset(asset) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to load synchronized Workboard images.");
+  const response = await fetch("/workboards/assets/read", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      auth: { accountUserID: account.userID },
+      pathname: asset?.pathname,
+      projectID: asset?.projectID
+    })
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(responseErrorMessage(payload, "Could not load this Workboard image."));
+  }
+  return blobDataURL(await response.blob());
 }
 
 function swiftReferenceDateSeconds(date = new Date()) {
@@ -2133,10 +2324,15 @@ async function resolveSyncConflict(entry, keepLocal) {
     }, account);
     await flushSyncOutbox({ refresh: true });
   } else {
-    discardLocalMutationOverlay(entry.mutation);
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    if (kind !== "workboard") discardLocalMutationOverlay(entry.mutation);
     state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
     saveWorkspaceState();
     await loadSyncedContent({ force: true });
+    if (kind === "workboard") {
+      const projectID = String(record?.projectID || "");
+      await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID));
+    }
   }
   await renderWorkspace();
 }
@@ -5045,6 +5241,15 @@ async function deleteArchivedProject(project) {
   const name = project.name || project.title || "this project";
   if (!window.confirm(`Delete ${name} permanently?`)) return;
   const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
+  const workboardID = workboardProjectID(projectIdentity(project));
+  if (activeAccount()) {
+    try {
+      await deleteSyncedWorkboard(workboardID);
+    } catch (error) {
+      window.alert(error.message || "Could not delete the project's Workboard.");
+      return;
+    }
+  }
   if (!isLocal && activeAccount()) {
     try {
       await pushMutation(deletedProjectMutationForRecord(project));
@@ -5053,6 +5258,7 @@ async function deleteArchivedProject(project) {
       return;
     }
   }
+  await deleteLocalWorkboard(workboardID);
   state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);

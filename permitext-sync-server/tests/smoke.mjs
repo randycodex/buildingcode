@@ -78,6 +78,9 @@ async function main() {
       STORAGE_URL: "",
       POSTGRES_URL: "",
       NEON_DATABASE_URL: "",
+      BLOB_READ_WRITE_TOKEN: "",
+      VERCEL_OIDC_TOKEN: "",
+      BLOB_STORE_ID: "",
       PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
       APPLE_TEAM_ID: "ABCDE12345",
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
@@ -1025,6 +1028,103 @@ async function main() {
     assert(pull.json.contentMapVersion === 2, "Pull did not return the canonical content-map version.");
     assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
 
+    const invalidInlineWorkboardPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            workboard: {
+              id: "invalid-inline-workboard",
+              userID,
+              codeVersion: "nyc-2022",
+              projectID: "project-client-smoke",
+              elements: [],
+              appState: {},
+              files: { image: { dataURL: "data:image/png;base64,AA==" } },
+              assets: {},
+              updatedAt: "2026-06-04T00:10:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(invalidInlineWorkboardPush.response.status === 400, "Workboard push accepted inline image data.");
+
+    const workboardMutation = {
+      workboard: {
+        id: "local-workboard-id",
+        userID,
+        codeVersion: "nyc-2022",
+        projectID: "project-client-smoke",
+        projectName: "Smoke Project",
+        elements: [{ id: "rectangle-smoke", type: "rectangle" }],
+        appState: { viewBackgroundColor: "#ffffff" },
+        files: {},
+        assets: {},
+        updatedAt: "2026-06-04T00:20:00Z"
+      }
+    };
+    const canonicalWorkboardRecordID = `${userID}:workboard:project-client-smoke`;
+    const workboardPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: [workboardMutation] }
+      }
+    });
+    assert(workboardPush.response.ok, "Workboard sync push failed.");
+    assert(
+      workboardPush.json.acceptedMutationIDs.includes(canonicalWorkboardRecordID),
+      "Workboard sync did not use its canonical project-scoped ID."
+    );
+
+    const workboardPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const pulledWorkboard = workboardPull.json.mutations.find((item) =>
+      item.workboard?.id === canonicalWorkboardRecordID
+    )?.workboard;
+    assert(pulledWorkboard?.elements?.[0]?.id === "rectangle-smoke", "Workboard pull omitted drawing elements.");
+    assert(!Object.values(pulledWorkboard.files || {}).some((file) => file.dataURL), "Workboard pull exposed inline image data.");
+
+    const unauthorizedAssetUpload = await request("/workboards/assets/upload?projectID=project-client-smoke&fileID=image-smoke", {
+      method: "POST",
+      headers: {
+        "content-type": "image/png",
+        "x-permitext-user-id": userID
+      },
+      rawBody: Buffer.from([0x89, 0x50, 0x4e, 0x47])
+    });
+    assert(unauthorizedAssetUpload.response.status === 401, "Workboard asset upload allowed a missing session token.");
+
+    const unconfiguredAssetUpload = await request("/workboards/assets/upload?projectID=project-client-smoke&fileID=image-smoke", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      headers: {
+        "content-type": "image/png",
+        "x-permitext-user-id": userID
+      },
+      rawBody: Buffer.from([0x89, 0x50, 0x4e, 0x47])
+    });
+    assert(unconfiguredAssetUpload.response.status === 503, "Workboard asset upload did not report missing private Blob storage.");
+
+    const forgedAssetDelete = await request("/workboards/assets/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        pathnames: ["workboards/another-user/another-project/image.png"]
+      }
+    });
+    assert(forgedAssetDelete.response.status === 403, "Workboard asset deletion accepted another project's pathname.");
+
     const webSavedMutation = {
       savedItem: {
         id: "web-saved-202",
@@ -1317,6 +1417,10 @@ async function main() {
       "Reinstall pull did not restore the project membership."
     );
     assert(
+      reinstallRecords.some((item) => item.kind === "workboard" && item.record.projectID === "project-client-smoke"),
+      "Reinstall pull did not restore the Workboard."
+    );
+    assert(
       reinstallRecords.some((item) => item.kind === "continuity" && item.record.values.activeProjectID === "42"),
       "Reinstall pull did not restore continuity."
     );
@@ -1342,6 +1446,7 @@ async function main() {
     assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
+    assert(restoreChecklist.json.mutationCounts.workboard === 1, "Restore checklist did not count Workboards.");
     assert(restoreChecklist.json.mutationCounts.continuity === 1, "Restore checklist did not count continuity.");
 
     const unauthorizedExport = await request("/admin/accounts/export", {

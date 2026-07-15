@@ -19,6 +19,10 @@ const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids
 const webPublicPath = join(__dirname, "public");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const maxSyncMutationsPerBatch = 100;
+const maxWorkboardElements = 5_000;
+const maxWorkboardAssets = 250;
+const maxWorkboardRecordBytes = 768 * 1024;
+const maxWorkboardAssetBytes = 8 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
 const rateLimitBuckets = new Map();
 const rateLimitPolicies = new Map([
@@ -28,7 +32,10 @@ const rateLimitPolicies = new Map([
   ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["sync/push", { limit: 240, windowMs: 60 * 1000 }]
+  ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
+  ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
+  ["workboards/assets/delete", { limit: 60, windowMs: 60 * 60 * 1000 }]
 ]);
 const canonicalCodeContentPath = join(
   __dirname,
@@ -77,6 +84,7 @@ let cachedSectionCatalogPromise = null;
 let cachedShippedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
+let blobModulePromise = null;
 
 const emptyStore = () => ({
   users: {},
@@ -91,6 +99,7 @@ const allowedMutationKinds = new Set([
   "annotation",
   "project",
   "projectSection",
+  "workboard",
   "continuity",
   "codeVersionClear"
 ]);
@@ -1451,6 +1460,40 @@ function normalizePath(url) {
 
 function requestURL(request) {
   return new URL(request.url, "http://localhost");
+}
+
+function blobStorageConfigured(environment = process.env) {
+  return Boolean(
+    environment.BLOB_READ_WRITE_TOKEN ||
+    (environment.VERCEL_OIDC_TOKEN && environment.BLOB_STORE_ID)
+  );
+}
+
+function safeWorkboardPathHash(value) {
+  return createHash("sha256").update(String(value || "")).digest("hex").slice(0, 32);
+}
+
+function workboardAssetPrefix(userID, projectID) {
+  return `workboards/${safeWorkboardPathHash(userID)}/${safeWorkboardPathHash(projectID)}/`;
+}
+
+function workboardAssetExtension(contentType) {
+  return {
+    "image/gif": "gif",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+  }[contentType] || "";
+}
+
+function workboardAssetPathname(userID, projectID, fileID, contentType) {
+  const extension = workboardAssetExtension(contentType);
+  return `${workboardAssetPrefix(userID, projectID)}${safeWorkboardPathHash(fileID)}.${extension}`;
+}
+
+async function vercelBlob() {
+  blobModulePromise ||= import("@vercel/blob");
+  return blobModulePromise;
 }
 
 function requestClientAddress(request) {
@@ -3102,10 +3145,22 @@ function canonicalMutationRecordID(kind, record) {
       record.scope || null
     ].filter(Boolean).join(":");
   }
+  if (kind === "workboard") {
+    return [userID, "workboard", record.projectID || null].filter(Boolean).join(":");
+  }
   return record.id || null;
 }
 
 async function canonicalizeSectionRecord(kind, record) {
+  if (kind === "workboard") {
+    const normalized = {
+      ...record,
+      codeVersion: canonicalCodeVersion(record.codeVersion),
+      projectID: String(record.projectID || "").trim()
+    };
+    const nextID = canonicalMutationRecordID(kind, normalized);
+    return nextID ? { ...normalized, id: nextID } : normalized;
+  }
   if (!["savedItem", "annotation", "project", "projectSection"].includes(kind)) {
     return record;
   }
@@ -3194,6 +3249,39 @@ function validatePublicUsername(value) {
   return null;
 }
 
+function validateWorkboardRecord(record) {
+  const projectID = String(record.projectID || "").trim();
+  if (!projectID || projectID.length > 200) {
+    return validationError("Workboard projectID must contain 1 through 200 characters.");
+  }
+  if (record.deletedAt) return { ok: true };
+  if (!Array.isArray(record.elements) || record.elements.length > maxWorkboardElements) {
+    return validationError(`Workboards are limited to ${maxWorkboardElements} drawing elements.`);
+  }
+  if (!record.appState || typeof record.appState !== "object" || Array.isArray(record.appState)) {
+    return validationError("Workboard appState must be an object.");
+  }
+  if (!record.files || typeof record.files !== "object" || Array.isArray(record.files)) {
+    return validationError("Workboard files must be an object.");
+  }
+  if (!record.assets || typeof record.assets !== "object" || Array.isArray(record.assets)) {
+    return validationError("Workboard assets must be an object.");
+  }
+  if (Object.keys(record.assets).length > maxWorkboardAssets) {
+    return validationError(`Workboards are limited to ${maxWorkboardAssets} uploaded assets.`);
+  }
+  const hasInlineFile = Object.values(record.files).some((file) =>
+    typeof file?.dataURL === "string" && file.dataURL.startsWith("data:")
+  );
+  if (hasInlineFile) {
+    return validationError("Workboard image data must be stored as private assets, not inline JSON.");
+  }
+  if (Buffer.byteLength(JSON.stringify(record), "utf8") > maxWorkboardRecordBytes) {
+    return validationError("Workboard drawing data is too large to synchronize.");
+  }
+  return { ok: true };
+}
+
 function validateMutation(mutation, userID) {
   if (!mutation || typeof mutation !== "object" || Array.isArray(mutation)) {
     return validationError("Mutation must be an object.");
@@ -3219,6 +3307,9 @@ function validateMutation(mutation, userID) {
   }
   if (!Number.isFinite(mutationUpdatedAt(mutation))) {
     return validationError("Mutation record is missing a valid updatedAt timestamp.");
+  }
+  if (kind === "workboard") {
+    return validateWorkboardRecord(record);
   }
 
   return { ok: true };
@@ -3704,6 +3795,113 @@ async function handleSignOut(request, response) {
   delete store.sessions[userID];
   await writeStore(store);
   sendJSON(response, 200, { signedOut: true });
+}
+
+async function handleWorkboardAssetUpload(request, response) {
+  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
+  const url = requestURL(request);
+  const projectID = String(url.searchParams.get("projectID") || "").trim();
+  const fileID = String(url.searchParams.get("fileID") || "").trim();
+  if (!userID || !projectID || !fileID || projectID.length > 200 || fileID.length > 200) {
+    sendError(response, 400, "Missing or invalid Workboard asset identity.");
+    return;
+  }
+  if (!await authenticatedUserContext(request, response, userID)) return;
+  if (!blobStorageConfigured()) {
+    sendError(response, 503, "Private Workboard image storage is not configured.");
+    return;
+  }
+  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
+  if (!workboardAssetExtension(contentType)) {
+    sendError(response, 415, "Workboard images must be PNG, JPEG, WebP, or GIF files.");
+    return;
+  }
+  const body = await readBody(request, maxWorkboardAssetBytes);
+  if (!body.length) {
+    sendError(response, 400, "Workboard image is empty.");
+    return;
+  }
+  const pathname = workboardAssetPathname(userID, projectID, fileID, contentType);
+  const { put } = await vercelBlob();
+  const blob = await put(pathname, body, {
+    access: "private",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+    contentType
+  });
+  sendJSON(response, 200, {
+    asset: {
+      projectID,
+      fileID,
+      pathname: blob.pathname || pathname,
+      contentType,
+      size: body.length,
+      uploadedAt: new Date().toISOString()
+    }
+  });
+}
+
+async function handleWorkboardAssetRead(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  const projectID = String(body.projectID || "").trim();
+  const pathname = String(body.pathname || "").trim();
+  if (!userID || !projectID || !pathname) {
+    sendError(response, 400, "Missing Workboard asset identity.");
+    return;
+  }
+  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
+  if (!pathname.startsWith(workboardAssetPrefix(userID, projectID))) {
+    sendError(response, 403, "This Workboard image does not belong to the authenticated project.");
+    return;
+  }
+  if (!blobStorageConfigured()) {
+    sendError(response, 503, "Private Workboard image storage is not configured.");
+    return;
+  }
+  const { get } = await vercelBlob();
+  const result = await get(pathname, { access: "private" });
+  if (!result || !result.stream) {
+    sendError(response, 404, "Workboard image was not found.");
+    return;
+  }
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, max-age=3600",
+    "content-type": result.blob.contentType || "application/octet-stream",
+    ...(Number.isFinite(result.blob.size) ? { "content-length": String(result.blob.size) } : {})
+  });
+  const reader = result.stream.getReader();
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    response.write(Buffer.from(value));
+  }
+  response.end();
+}
+
+async function handleWorkboardAssetDelete(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  const projectID = String(body.projectID || "").trim();
+  const pathnames = Array.isArray(body.pathnames) ? body.pathnames.map((value) => String(value || "").trim()) : [];
+  if (!userID || !projectID || !pathnames.length || pathnames.length > maxWorkboardAssets) {
+    sendError(response, 400, "Missing or invalid Workboard asset deletion request.");
+    return;
+  }
+  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
+  const prefix = workboardAssetPrefix(userID, projectID);
+  if (pathnames.some((pathname) => !pathname.startsWith(prefix))) {
+    sendError(response, 403, "One or more Workboard images do not belong to the authenticated project.");
+    return;
+  }
+  if (!blobStorageConfigured()) {
+    sendError(response, 503, "Private Workboard image storage is not configured.");
+    return;
+  }
+  const { del } = await vercelBlob();
+  await del(pathnames);
+  sendJSON(response, 200, { deletedCount: pathnames.length });
 }
 
 async function handlePush(request, response) {
@@ -4212,6 +4410,7 @@ async function handleRestoreChecklist(request, response) {
       annotation: counts.annotation || 0,
       project: counts.project || 0,
       projectSection: counts.projectSection || 0,
+      workboard: counts.workboard || 0,
       continuity: counts.continuity || 0,
       codeVersionClear: counts.codeVersionClear || 0
     },
@@ -4522,6 +4721,9 @@ const handlers = {
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
   "research/interpret": handleResearchInterpretation,
+  "workboards/assets/upload": handleWorkboardAssetUpload,
+  "workboards/assets/read": handleWorkboardAssetRead,
+  "workboards/assets/delete": handleWorkboardAssetDelete,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
