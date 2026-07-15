@@ -1,11 +1,18 @@
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
-const detachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
-const detachedProjectSessionKey = detachedProjectParameter
-  ? `permitext:detachedWorkboard:${detachedProjectParameter}`
+const detachedWorkboardPath = "/detached-workboard";
+const detachedWindowNamePrefix = "permitext-workboard-";
+const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
+const detachedProjectSessionID = legacyDetachedProjectParameter || (
+  window.location.pathname === detachedWorkboardPath && window.name.startsWith(detachedWindowNamePrefix)
+    ? window.name
+    : ""
+);
+const detachedProjectSessionKey = detachedProjectSessionID
+  ? `permitext:detachedWorkboard:${detachedProjectSessionID}`
   : "";
-const detachedProjectWindow = Boolean(detachedProjectParameter);
+const detachedProjectWindow = Boolean(detachedProjectSessionID);
 const workspaceKey = detachedProjectWindow
-  ? `${baseWorkspaceKey}:detached:${detachedProjectParameter}`
+  ? `${baseWorkspaceKey}:detached:${detachedProjectSessionID}`
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
@@ -396,21 +403,20 @@ function cleanupInactiveWorkboardMounts(panes) {
 }
 
 function detachedWindowName(project) {
-  return `permitext-workboard-${workboardProjectID(project).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+  return `${detachedWindowNamePrefix}${workboardProjectID(project).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
 }
 
-function detachedWindowURL(project) {
-  const projectID = workboardProjectID(project);
-  return `/?detachedWorkboard=${encodeURIComponent(projectID)}`;
+function detachedWindowURL() {
+  return detachedWorkboardPath;
 }
 
 function openDetachedWindow(project) {
   const identity = projectIdentity(project);
-  const projectID = workboardProjectID(identity);
-  localStorage.setItem(`permitext:detachedWorkboard:${projectID}`, JSON.stringify(identity));
+  const windowName = detachedWindowName(identity);
+  localStorage.setItem(`permitext:detachedWorkboard:${windowName}`, JSON.stringify(identity));
   const popup = window.open(
-    detachedWindowURL(identity),
-    detachedWindowName(identity),
+    detachedWindowURL(),
+    windowName,
     "popup=yes,width=1240,height=820,resizable=yes,scrollbars=yes"
   );
   if (popup) {

@@ -147,6 +147,13 @@ async function main() {
       "Shared section URL did not return the web workspace HTML."
     );
 
+    const detachedWorkboard = await request("/detached-workboard");
+    assert(detachedWorkboard.response.ok, "Detached Workboard URL did not load the web workspace.");
+    assert(
+      detachedWorkboard.response.headers.get("content-type")?.includes("text/html"),
+      "Detached Workboard URL did not return the web workspace HTML."
+    );
+
     const canonicalOverrideSection = await request("/code/sections/8881");
     assert(canonicalOverrideSection.response.ok, "Canonical section override did not load.");
     assert(canonicalOverrideSection.json.section.sectionID === 8881, "Canonical section override returned the wrong ID.");

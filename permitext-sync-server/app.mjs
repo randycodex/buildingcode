@@ -4743,7 +4743,13 @@ export async function handleRequest(request, response) {
 
     if (
       request.method === "GET" &&
-      (path === "" || path === "web" || path === "web/" || path.startsWith("open/section/"))
+      (
+        path === "" ||
+        path === "web" ||
+        path === "web/" ||
+        path === "detached-workboard" ||
+        path.startsWith("open/section/")
+      )
     ) {
       await handleWebIndex(request, response);
       return;
