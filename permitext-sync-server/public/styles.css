@@ -352,6 +352,29 @@ body.is-detached-workboard-window .topbar {
 
 body.is-detached-workboard-window .panel-track {
   width: 100%;
+  overflow: hidden;
+}
+
+body.is-detached-workboard-window .workboard-panel {
+  --pane-min-width: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+body.is-detached-workboard-window .detached-workboard-error {
+  display: grid;
+  place-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  padding: 32px;
+  text-align: center;
+}
+
+body.is-detached-workboard-window .detached-workboard-error h1,
+body.is-detached-workboard-window .detached-workboard-error p {
+  margin: 0;
 }
 
 .workspace-panel.is-dragging {
