@@ -314,32 +314,19 @@ function Workboard({
     const resizeObserver = typeof ResizeObserver === "undefined"
       ? null
       : new ResizeObserver(refreshCanvasOrigin);
-    const observeWorkspacePanels = () => {
-      resizeObserver?.observe(host);
-      if (!panelTrack) return;
-      resizeObserver?.observe(panelTrack);
-      panelTrack.querySelectorAll(":scope > .workspace-panel").forEach((panel) => resizeObserver?.observe(panel));
-    };
-    const mutationObserver = panelTrack && typeof MutationObserver !== "undefined"
-      ? new MutationObserver(() => {
-        observeWorkspacePanels();
-        refreshCanvasOrigin();
-      })
-      : null;
-
-    observeWorkspacePanels();
-    mutationObserver?.observe(panelTrack, { childList: true });
+    resizeObserver?.observe(host);
     panelTrack?.addEventListener("scroll", refreshCanvasOrigin, { passive: true });
     panelTrack?.addEventListener("transitionend", refreshCanvasOrigin, true);
+    panelTrack?.addEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);
     window.addEventListener("resize", refreshCanvasOrigin, { passive: true });
     refreshCanvasOrigin();
 
     return () => {
       window.cancelAnimationFrame(refreshFrame.current);
       resizeObserver?.disconnect();
-      mutationObserver?.disconnect();
       panelTrack?.removeEventListener("scroll", refreshCanvasOrigin);
       panelTrack?.removeEventListener("transitionend", refreshCanvasOrigin, true);
+      panelTrack?.removeEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);
       window.removeEventListener("resize", refreshCanvasOrigin);
     };
   }, [boardView, refreshCanvasOrigin]);

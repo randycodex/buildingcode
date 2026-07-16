@@ -117,7 +117,7 @@ async function main() {
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
-    assert(webRoot.text.includes("paired-workboards"), "Web workspace omitted the paired Workboard assets.");
+    assert(webRoot.text.includes("column-performance"), "Web workspace omitted the column-performance assets.");
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
@@ -132,6 +132,21 @@ async function main() {
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
       "Detached Workboards still auto-reattached from an unreliable popup.closed check."
+    );
+    assert(
+      !workspaceScript.text.includes("track.replaceChildren(...nodes)"),
+      "Column transitions still detach and reattach the complete workspace."
+    );
+    assert(
+      workspaceScript.text.includes("window.requestAnimationFrame(applyPendingResize)"),
+      "Divider resizing is no longer coalesced to animation frames."
+    );
+
+    const workspaceStyles = await request("/web/styles.css");
+    assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      !workspaceStyles.text.includes(".panel-track.is-resizing *"),
+      "Divider resizing still invalidates cursor styles across every workspace descendant."
     );
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");
