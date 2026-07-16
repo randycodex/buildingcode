@@ -24,6 +24,8 @@ const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
 const maxWorkboardAssetBytes = 8 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
+const immutableStaticCacheControl = "public, max-age=31536000, s-maxage=31536000, immutable";
+const codeAssetCacheControl = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=3600";
 const rateLimitBuckets = new Map();
 const rateLimitPolicies = new Map([
   ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
@@ -1337,11 +1339,12 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
   response.end(html);
 }
 
-function sendStatic(response, contentType, body) {
+function sendStatic(response, contentType, body, cacheControl = "no-store") {
   response.writeHead(200, {
     ...securityHeaders(),
     "content-type": contentType,
-    "cache-control": "no-store"
+    "cache-control": cacheControl,
+    "vercel-cdn-cache-control": cacheControl
   });
   response.end(body);
 }
@@ -2207,7 +2210,7 @@ async function handleWebStatic(path, response) {
   }
   try {
     const filePath = join(webPublicPath, ...segments);
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), immutableStaticCacheControl);
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);
@@ -2225,7 +2228,7 @@ async function handleCodeAsset(path, response) {
   }
   try {
     const filePath = join(assetContentPath, fileName);
-    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath));
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), codeAssetCacheControl);
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);

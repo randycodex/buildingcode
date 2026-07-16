@@ -2,6 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
+const workboardClientVersion = "20260716-windows-performance";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -383,7 +384,7 @@ async function renderProjectWorkboard(project) {
 
   try {
     window.EXCALIDRAW_ASSET_PATH = "/web/workboard-assets/";
-    workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+    workboardModulePromise ||= import(`/web/workboard-assets/workboard.js?v=${workboardClientVersion}`);
     const module = await workboardModulePromise;
     if (!mounted.initialized) mounted.root.replaceChildren();
     mounted.unmount = module.mountWorkboard(mounted.root, {
@@ -2123,7 +2124,7 @@ async function deleteSyncedWorkboard(projectID) {
 }
 
 async function replaceLocalWorkboard(projectID, board) {
-  workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+  workboardModulePromise ||= import(`/web/workboard-assets/workboard.js?v=${workboardClientVersion}`);
   const module = await workboardModulePromise;
   await module.replaceLocalWorkboard(projectID, board);
   const mounted = workboardMounts.get(projectID);
@@ -2132,7 +2133,7 @@ async function replaceLocalWorkboard(projectID, board) {
 }
 
 async function deleteLocalWorkboard(projectID) {
-  workboardModulePromise ||= import("/web/workboard-assets/workboard.js");
+  workboardModulePromise ||= import(`/web/workboard-assets/workboard.js?v=${workboardClientVersion}`);
   const module = await workboardModulePromise;
   await module.deleteLocalWorkboard(projectID);
   const mounted = workboardMounts.get(projectID);
@@ -2493,6 +2494,19 @@ async function flushSyncOutbox(options = {}) {
     syncFlushPromise = null;
   });
   return syncFlushPromise;
+}
+
+function syncResultChangesWorkspace(result) {
+  return Boolean(
+    result?.payload ||
+    result?.acceptedMutationIDs?.length ||
+    result?.rejectedMutationIDs?.length
+  );
+}
+
+async function flushPendingSyncAndRender() {
+  const result = await flushSyncOutbox({ refresh: true });
+  if (syncResultChangesWorkspace(result)) await renderWorkspace();
 }
 
 async function pushMutation(mutation) {
@@ -6660,8 +6674,10 @@ async function start() {
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
-  const payload = await api("/code/chapters");
-  chapters = payload.chapters || [];
+  if (!detachedProjectWindow) {
+    const payload = await api("/code/chapters");
+    chapters = payload.chapters || [];
+  }
   document.addEventListener("click", (event) => {
     if (
       activeCustomSelect &&
@@ -6683,11 +6699,11 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
-    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    void flushPendingSyncAndRender().catch(() => {});
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
-      flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+      void flushPendingSyncAndRender().catch(() => {});
     }
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
@@ -6702,7 +6718,7 @@ async function start() {
       }
     }, { once: true });
     await renderWorkspace();
-    flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+    void flushPendingSyncAndRender().catch(() => {});
     return;
   }
   window.addEventListener("message", (event) => {
@@ -6765,7 +6781,7 @@ async function start() {
       window.history.replaceState({}, "", "/");
     }
   }
-  flushSyncOutbox({ refresh: true }).then(() => renderWorkspace()).catch(() => {});
+  void flushPendingSyncAndRender().catch(() => {});
   refreshEntitlementAfterCheckoutReturn();
 }
 
