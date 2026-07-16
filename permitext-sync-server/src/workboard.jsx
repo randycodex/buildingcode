@@ -6,6 +6,7 @@ import "./workboard.css";
 
 const databaseName = "permitext-workboards";
 const storeName = "boards";
+const changeCaptureDelayMS = 120;
 const saveDelayMS = 500;
 const roots = new WeakMap();
 
@@ -158,8 +159,11 @@ function Workboard({
   const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
+  const changeTimer = useRef(null);
   const saveTimer = useRef(null);
+  const pendingScene = useRef(null);
   const pendingBoard = useRef(null);
+  const boardIdentity = useRef(null);
   const lastChangeSignature = useRef("");
   const ignoreInitialChange = useRef(true);
   const remoteUpdatedAt = useRef(null);
@@ -206,8 +210,38 @@ function Workboard({
     }
   }, [saveSyncedBoard, syncEnabled, uploadAsset]);
 
+  const capturePendingScene = useCallback((options = {}) => {
+    window.clearTimeout(changeTimer.current);
+    changeTimer.current = null;
+    const scene = pendingScene.current;
+    pendingScene.current = null;
+    const identity = boardIdentity.current;
+    if (!scene || !identity) return false;
+
+    const signature = boardChangeSignature(scene.elements, scene.appState, scene.files);
+    if (signature === lastChangeSignature.current) return false;
+    lastChangeSignature.current = signature;
+    pendingBoard.current = {
+      id: identity.projectID,
+      projectName: identity.projectName,
+      elements: scene.elements.map((element) => ({ ...element })),
+      appState: persistedAppState(scene.appState),
+      files: { ...scene.files },
+      assets: { ...assets.current },
+      updatedAt: new Date().toISOString()
+    };
+    if (options.updateUI !== false) {
+      setElementCount(scene.elements.length);
+      setStatus("Saving…");
+    }
+    window.clearTimeout(saveTimer.current);
+    saveTimer.current = window.setTimeout(() => void flushSave(), saveDelayMS);
+    return true;
+  }, [flushSave]);
+
   useEffect(() => {
     let active = true;
+    boardIdentity.current = { projectID, projectName };
     setStatus("Loading…");
     Promise.all([
       readBoard(projectID),
@@ -268,9 +302,10 @@ function Workboard({
 
     return () => {
       active = false;
+      if (pendingScene.current) capturePendingScene({ updateUI: false });
       if (pendingBoard.current) void flushSave();
     };
-  }, [flushSave, loadAsset, loadSyncedBoard, projectID, projectName, remoteRevision, saveSyncedBoard, syncEnabled]);
+  }, [capturePendingScene, flushSave, loadAsset, loadSyncedBoard, projectID, projectName, remoteRevision, saveSyncedBoard, syncEnabled]);
 
   useEffect(() => {
     const host = canvasHost.current;
@@ -311,29 +346,16 @@ function Workboard({
 
   const handleChange = useCallback((elements, appState, files) => {
     if (!boardView || boardView.projectID !== projectID) return;
-    const signature = boardChangeSignature(elements, appState, files);
     if (ignoreInitialChange.current) {
       ignoreInitialChange.current = false;
-      lastChangeSignature.current = signature;
+      lastChangeSignature.current = boardChangeSignature(elements, appState, files);
       setElementCount(elements.length);
       return;
     }
-    if (signature === lastChangeSignature.current) return;
-    lastChangeSignature.current = signature;
-    setElementCount(elements.length);
-    pendingBoard.current = {
-      id: boardView.projectID,
-      projectName: boardView.projectName,
-      elements: elements.map((element) => ({ ...element })),
-      appState: persistedAppState(appState),
-      files: { ...files },
-      assets: { ...assets.current },
-      updatedAt: new Date().toISOString()
-    };
-    setStatus("Saving…");
-    window.clearTimeout(saveTimer.current);
-    saveTimer.current = window.setTimeout(() => void flushSave(), saveDelayMS);
-  }, [boardView, flushSave, projectID]);
+    pendingScene.current = { elements, appState, files };
+    window.clearTimeout(changeTimer.current);
+    changeTimer.current = window.setTimeout(() => capturePendingScene(), changeCaptureDelayMS);
+  }, [boardView, capturePendingScene, projectID]);
 
   return (
     <section className="permitext-workboard" data-element-count={elementCount}>

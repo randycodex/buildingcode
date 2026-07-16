@@ -126,6 +126,10 @@ async function main() {
       "Web workspace script returned the wrong content type."
     );
     assert(
+      workspaceScript.response.headers.get("cache-control")?.includes("immutable"),
+      "Versioned web workspace assets were not browser-cacheable."
+    );
+    assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
       "Detached Workboards still auto-reattached from an unreliable popup.closed check."
     );
@@ -135,6 +139,10 @@ async function main() {
     assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),
       "Workboard script asset returned the wrong content type."
+    );
+    assert(
+      workboardScript.response.headers.get("cache-control")?.includes("immutable"),
+      "Versioned Workboard assets were not browser-cacheable."
     );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
