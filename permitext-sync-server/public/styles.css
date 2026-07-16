@@ -141,16 +141,12 @@ button {
 body.is-resizing-comments,
 body.is-resizing-comments *,
 body.is-resizing-notes,
-body.is-resizing-notes *,
-.panel-track.is-resizing,
-.panel-track.is-resizing * {
+body.is-resizing-notes * {
   user-select: none;
 }
 
 body.is-resizing-comments,
-body.is-resizing-comments *,
-.panel-track.is-resizing,
-.panel-track.is-resizing * {
+body.is-resizing-comments * {
   cursor: col-resize !important;
 }
 
@@ -294,7 +290,12 @@ textarea:focus-visible {
   user-select: none;
 }
 
+.panel-track.is-resizing .pane-divider {
+  cursor: col-resize;
+}
+
 .panel-track.is-resizing .workspace-panel {
+  pointer-events: none;
   transition: none;
 }
 
@@ -324,7 +325,6 @@ textarea:focus-visible {
   background: var(--surface-raised);
   box-shadow: none;
   transition: transform 260ms cubic-bezier(0.2, 0, 0, 1), opacity 180ms ease;
-  will-change: transform;
 }
 
 .workboard-panel {
