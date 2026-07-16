@@ -119,6 +119,17 @@ async function main() {
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(webRoot.text.includes("paired-workboards"), "Web workspace omitted the paired Workboard assets.");
 
+    const workspaceScript = await request("/web/app.js");
+    assert(workspaceScript.response.ok, "Web workspace script did not load.");
+    assert(
+      workspaceScript.response.headers.get("content-type")?.includes("javascript"),
+      "Web workspace script returned the wrong content type."
+    );
+    assert(
+      !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
+      "Detached Workboards still auto-reattached from an unreliable popup.closed check."
+    );
+
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(

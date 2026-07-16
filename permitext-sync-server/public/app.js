@@ -470,9 +470,6 @@ async function detachProjectWorkboard(project) {
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
   saveWorkspaceState();
   await renderWorkspace();
-  window.setTimeout(() => {
-    if (popup.closed) void reattachProjectWorkboard(identity);
-  }, 250);
 }
 
 function closeDetachedWorkboardWindow(detachedWindow) {
