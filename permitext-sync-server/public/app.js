@@ -475,18 +475,36 @@ async function detachProjectWorkboard(project) {
   }, 250);
 }
 
-function reattachDetachedProject() {
-  if (!detachedProject) return;
-  if (window.opener && !window.opener.closed) {
-    window.opener.postMessage({ type: "permitext:reattachWorkboard", project: detachedProject }, window.location.origin);
-    window.close();
-    return;
+function closeDetachedWorkboardWindow(detachedWindow) {
+  try {
+    if (detachedWindow && !detachedWindow.closed) detachedWindow.close();
+  } catch (error) {
+    console.error("Could not close the detached Workboard window.", error);
   }
-  localStorage.setItem("permitext:pendingWorkboardReattach", JSON.stringify(detachedProject));
-  window.location.assign("/");
 }
 
-async function reattachProjectWorkboard(project) {
+function reattachDetachedProject() {
+  if (!detachedProject) return;
+  let notifiedOpener = false;
+  try {
+    if (window.opener && !window.opener.closed) {
+      window.opener.postMessage(
+        { type: "permitext:reattachWorkboard", project: detachedProject },
+        window.location.origin
+      );
+      notifiedOpener = true;
+    }
+  } catch (error) {
+    console.error("Could not notify the original Workboard window.", error);
+  }
+  if (!notifiedOpener) {
+    localStorage.setItem("permitext:pendingWorkboardReattach", JSON.stringify(detachedProject));
+  }
+  closeDetachedWorkboardWindow(window);
+}
+
+async function reattachProjectWorkboard(project, detachedWindow = null) {
+  closeDetachedWorkboardWindow(detachedWindow);
   const identity = projectIdentity(project);
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
@@ -6693,7 +6711,7 @@ async function start() {
   window.addEventListener("message", (event) => {
     if (event.origin !== window.location.origin) return;
     if (event.data?.type === "permitext:reattachWorkboard") {
-      void reattachProjectWorkboard(event.data.project);
+      void reattachProjectWorkboard(event.data.project, event.source);
       return;
     }
     if (event.data?.type === "permitext:detachedWorkboardClosed") {
