@@ -317,10 +317,22 @@ function Workboard({
     const host = canvasHost.current;
     if (!host || !boardView) return undefined;
     const panelTrack = host.closest(".panel-track");
+    // Excalidraw captures wheel events, so reserve Shift+wheel for workspace column navigation first.
+    const routeShiftWheelToWorkspace = (event) => {
+      if (!event.shiftKey || event.ctrlKey || event.metaKey || !panelTrack) return;
+      const maxScrollLeft = panelTrack.scrollWidth - panelTrack.clientWidth;
+      if (maxScrollLeft <= 0) return;
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      if (!delta) return;
+      event.preventDefault();
+      event.stopPropagation();
+      panelTrack.scrollLeft = Math.max(0, Math.min(maxScrollLeft, panelTrack.scrollLeft + delta));
+    };
     const resizeObserver = typeof ResizeObserver === "undefined"
       ? null
       : new ResizeObserver(refreshCanvasOrigin);
     resizeObserver?.observe(host);
+    host.addEventListener("wheel", routeShiftWheelToWorkspace, { capture: true, passive: false });
     panelTrack?.addEventListener("scroll", refreshCanvasOrigin, { passive: true });
     panelTrack?.addEventListener("transitionend", refreshCanvasOrigin, true);
     panelTrack?.addEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);
@@ -330,6 +342,7 @@ function Workboard({
     return () => {
       window.cancelAnimationFrame(refreshFrame.current);
       resizeObserver?.disconnect();
+      host.removeEventListener("wheel", routeShiftWheelToWorkspace, { capture: true });
       panelTrack?.removeEventListener("scroll", refreshCanvasOrigin);
       panelTrack?.removeEventListener("transitionend", refreshCanvasOrigin, true);
       panelTrack?.removeEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);
