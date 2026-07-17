@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
+import { Excalidraw, MainMenu, hashElementsVersion } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import "./workboard.css";
 
@@ -91,11 +91,17 @@ function persistedAppState(appState) {
 }
 
 function boardChangeSignature(elements, appState, files) {
+  const sceneElements = elements || [];
   const fileMetadata = Object.keys(files || {}).sort().map((id) => {
     const file = files[id] || {};
     return [id, file.mimeType, file.created, file.lastRetrieved];
   });
-  return JSON.stringify({ elements, appState: persistedAppState(appState), fileMetadata });
+  return JSON.stringify({
+    sceneVersion: hashElementsVersion(sceneElements),
+    elementCount: sceneElements.length,
+    appState: persistedAppState(appState),
+    fileMetadata
+  });
 }
 
 function preferredTheme() {

@@ -117,7 +117,10 @@ async function main() {
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
-    assert(webRoot.text.includes("column-performance"), "Web workspace omitted the column-performance assets.");
+    assert(
+      webRoot.text.includes("reader-workboard-performance"),
+      "Web workspace omitted the reader and Workboard performance assets."
+    );
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");

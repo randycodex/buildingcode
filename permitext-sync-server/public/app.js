@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260716-column-performance";
+const workboardClientVersion = "20260716-reader-workboard-performance";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3316,7 +3316,7 @@ async function renderSectionContent(panel, reader) {
   content?.classList.remove("is-searching-reader");
   if (!reader.chapterID) {
     blankReader(content);
-    renderSectionComments(commentsList, []);
+    clear(commentsList);
     return;
   }
 
@@ -3353,16 +3353,9 @@ async function renderSectionContent(panel, reader) {
 
     content.append(sectionWrapper);
   });
-  renderSectionComments(commentsList, Array.from(content.querySelectorAll(".annotated-code-block")).map((node) => ({
-    sectionID: node.dataset.sectionId,
-    sectionNumber: node.dataset.sectionNumber,
-    title: node.dataset.sectionTitle,
-    blockID: node.dataset.blockId,
-    blockLabel: node.dataset.blockLabel,
-    codePrefix: reader.codePrefix || "BC",
-    chapterID: reader.chapterID || "",
-    chapterNumber: reader.chapterNumber || ""
-  })));
+  // Notes now open from each block in the reader notes sheet. Do not build the
+  // retired, permanently hidden sidebar editor for every block in the chapter.
+  clear(commentsList);
   restoreReaderNotesSheet(panel, reader, sections);
 
   if (reader.sectionID) {
@@ -3814,8 +3807,9 @@ function sectionElementForInlineComment(commentWrapper) {
 
 function syncCommentBoxHeights(content, commentsList) {
   if (!content || !commentsList) return;
-  const sections = Array.from(content.querySelectorAll(".chapter-section"));
   const boxes = Array.from(commentsList.querySelectorAll(".section-comment-box"));
+  if (!boxes.length) return;
+  const sections = Array.from(content.querySelectorAll(".chapter-section"));
   sections.forEach((section, index) => {
     const box = boxes[index];
     if (!box) return;
@@ -3950,6 +3944,10 @@ function bindReaderCommentScroll(panel) {
 }
 
 function updateReaderScrollIndicator(panel) {
+  if (!readerPanelIntersectsTrack(panel)) {
+    panel?.classList.remove("is-scrolling");
+    return;
+  }
   const content = panel.querySelector(".reader-content");
   const indicator = panel.querySelector(".reader-scroll-indicator");
   const thumb = panel.querySelector(".reader-scroll-thumb");
@@ -3982,8 +3980,26 @@ function bindReaderScrollIndicator(panel) {
     hideTimer = window.setTimeout(() => panel.classList.remove("is-scrolling"), 700);
   };
   content.addEventListener("scroll", reveal, { passive: true });
-  window.addEventListener("resize", update, { passive: true });
   requestAnimationFrame(update);
+}
+
+function readerPanelIntersectsTrack(panel) {
+  if (!panel?.isConnected) return false;
+  const panelBounds = panel.getBoundingClientRect();
+  const trackBounds = track.getBoundingClientRect();
+  return panelBounds.width > 0
+    && panelBounds.right > trackBounds.left
+    && panelBounds.left < trackBounds.right;
+}
+
+let visibleReaderMetricsFrame = null;
+
+function scheduleVisibleReaderScrollIndicatorUpdates() {
+  if (visibleReaderMetricsFrame !== null) return;
+  visibleReaderMetricsFrame = requestAnimationFrame(() => {
+    visibleReaderMetricsFrame = null;
+    track.querySelectorAll(".reader-panel").forEach(updateReaderScrollIndicator);
+  });
 }
 
 function bindAllReaderCommentScroll() {
@@ -6498,16 +6514,13 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
         widths[nextIndex] += trackStartRect.right - rightGroupEdgeWithoutFill;
       }
     }
-    let layoutChanged = false;
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
       state.paneWeights[pane.id] = widths[index];
       applyPaneWeight(pane.pane, pane.id);
       lastAppliedWidths[index] = widths[index];
-      layoutChanged = true;
     });
-    if (layoutChanged) notifyWorkspaceLayoutChange();
   };
 
   const applyPendingResize = () => {
@@ -6531,6 +6544,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
     }
     track.classList.remove("is-resizing");
+    notifyWorkspaceLayoutChange();
     saveWorkspaceState();
   };
 
@@ -6828,6 +6842,7 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   window.addEventListener("storage", (event) => {
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
     if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
@@ -6847,6 +6862,7 @@ async function start() {
     }
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
+  track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");
     window.addEventListener("pagehide", () => {
