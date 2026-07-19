@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-text-controls"),
-      "Web workspace omitted the Reader text-control assets."
+      webRoot.text.includes("reader-notes-tag-pill"),
+      "Web workspace omitted the Reader notes tag-pill assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -201,6 +201,11 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),
       "Section-detail tag inputs omitted their pill treatment."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-notes-tags .annotation-tag-input") &&
+        workspaceStyles.text.includes("calc(var(--space-5) + var(--space-4))"),
+      "Reader notes tag inputs omitted their pill treatment or bottom clearance."
     );
     assert(
       workspaceStyles.text.includes("*::-webkit-scrollbar") &&
