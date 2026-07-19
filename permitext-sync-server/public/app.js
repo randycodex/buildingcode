@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-hidden-scrollbars";
+const workboardClientVersion = "20260719-section-detail-controls";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -728,25 +728,6 @@ async function copyTextToClipboard(text) {
     }
   }
   return copyTextFallback(text);
-}
-
-async function shareSection(section, button) {
-  const url = sharedSectionURL(section?.sectionID || section?.id);
-  if (!url) return;
-  const title = sectionDisplayTitle(section?.sectionNumber, section?.title) || "Permitext section";
-  if (typeof navigator.share === "function") {
-    try {
-      await navigator.share({ title, url });
-      return;
-    } catch (error) {
-      if (error?.name === "AbortError") return;
-    }
-  }
-  if (await copyTextToClipboard(url)) {
-    showShareButtonResult(button, "Link copied");
-  } else {
-    showShareButtonResult(button, "Could not copy link");
-  }
 }
 
 function officialSectionCitation(section) {
@@ -4776,16 +4757,6 @@ function jumpIconSVG() {
   `;
 }
 
-function shareIconSVG() {
-  return `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3v12"></path>
-      <path d="m7 8 5-5 5 5"></path>
-      <path d="M5 13v7h14v-7"></path>
-    </svg>
-  `;
-}
-
 function archiveIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -4866,11 +4837,6 @@ async function renderSectionDetail(searchID, detail) {
     label: "Back to search",
     svg: circleXIconSVG()
   });
-  const shareButton = appendDetailIconButton(chrome, {
-    title: "Share section",
-    label: "Share section",
-    svg: shareIconSVG()
-  });
   const saveButton = appendDetailIconButton(chrome, {
     title: saved ? "Remove bookmark" : "Save bookmark",
     label: saved ? "Remove bookmark" : "Save bookmark",
@@ -4945,10 +4911,6 @@ async function renderSectionDetail(searchID, detail) {
     delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
     void transitionWorkspace("utility");
-  });
-
-  shareButton.addEventListener("click", () => {
-    shareSection(sectionPayload, shareButton);
   });
 
   saveButton.addEventListener("click", async () => {
