@@ -117,7 +117,10 @@ async function main() {
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
-    assert(webRoot.text.includes("column-performance"), "Web workspace omitted the column-performance assets.");
+    assert(
+      webRoot.text.includes("center-reader-controls-v2"),
+      "Web workspace omitted the center-reader-controls-v2 assets."
+    );
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
@@ -128,6 +131,15 @@ async function main() {
     assert(
       workspaceScript.response.headers.get("cache-control")?.includes("immutable"),
       "Versioned web workspace assets were not browser-cacheable."
+    );
+    assert(
+      !workspaceScript.text.includes('appendSectionLabel(content, "Saved sections")'),
+      "Saved pane still included its retired Saved sections heading."
+    );
+    assert(
+      !workspaceScript.text.includes("No saved sections") &&
+        !workspaceScript.text.includes("Saved sections synced from iOS or saved in this web workspace"),
+      "Saved pane still included its retired empty bookmark state."
     );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
@@ -141,12 +153,104 @@ async function main() {
       workspaceScript.text.includes("window.requestAnimationFrame(applyPendingResize)"),
       "Divider resizing is no longer coalesced to animation frames."
     );
+    assert(
+      workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
+      "Search result changes no longer refresh their existing section-detail column."
+    );
+    assert(
+      !workspaceScript.text.includes('notesTitle.textContent = "Notes"'),
+      "Section details still render the retired Notes heading."
+    );
+    assert(
+      workspaceScript.text.includes("const identity = projectDetailKey(project);"),
+      "Project cards no longer deduplicate local and synced records by their stable identity."
+    );
+    assert(
+      !workspaceScript.text.includes('title: "Share section"') &&
+        !workspaceScript.text.includes("function shareIconSVG()"),
+      "Section details still include their retired share control."
+    );
+    assert(
+      workspaceScript.text.includes("alignReaderSectionAfterLayout(reader);") &&
+        workspaceScript.text.includes("const anchorRect = panel?.getBoundingClientRect() || contentRect;"),
+      "Linked Readers no longer align selected sections below their headers after layout."
+    );
+    assert(
+      !workspaceScript.text.includes("search-result-limit") &&
+        !workspaceScript.text.includes("Narrow the search for more specific results."),
+      "Search results still include the retired capped-results notice."
+    );
+    assert(
+      !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
+      "Project archiving still requires confirmation."
+    );
+    assert(
+      workspaceScript.text.includes("await refreshOpenSavedPanes();") &&
+        workspaceScript.text.includes("refreshOpenSavedPanes().catch(() => {});") &&
+        workspaceScript.text.includes('instance.key === "saved"'),
+      "Bookmark and tag changes no longer refresh open Saved columns immediately."
+    );
+    assert(
+      workspaceScript.text.includes("changeReaderTextSize(panel, reader, -1)") &&
+        workspaceScript.text.includes('panel.style.setProperty("--reader-font-size"') &&
+        webRoot.text.includes('aria-label="Reader text size"'),
+      "Reader headers omitted their per-Reader text resize controls."
+    );
+    assert(
+      workspaceScript.text.includes("function setReaderNotesActiveTarget") &&
+        workspaceScript.text.includes('annotated-code-block[data-block-id='),
+      "Reader notes no longer retain the active paragraph target."
+    );
+    assert(
+      !workspaceScript.text.includes("reader-notes-title"),
+      "Reader notes still repeat the active paragraph title in the note sheet."
+    );
+    assert(
+      workspaceScript.text.match(/codeSelect\.addEventListener\("change"[\s\S]*?closeReaderNotesSheet\(panel, reader, \{ instant: true \}\)/) &&
+        workspaceScript.text.match(/chapterSelect\.addEventListener\("change"[\s\S]*?closeReaderNotesSheet\(panel, reader, \{ instant: true \}\)/),
+      "Reader notes no longer close immediately when the code or chapter changes."
+    );
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
       "Divider resizing still invalidates cursor styles across every workspace descendant."
+    );
+    assert(
+      !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),
+      "Static Reader section titles still use pointer styling."
+    );
+    assert(
+      workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),
+      "Section-detail tag inputs omitted their pill treatment."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-notes-tags .annotation-tag-input") &&
+        workspaceStyles.text.includes("calc(var(--space-5) + var(--space-4))"),
+      "Reader notes tag inputs omitted their pill treatment or bottom clearance."
+    );
+    assert(
+      workspaceStyles.text.includes("--reader-notes-active-text: #00636d") &&
+        workspaceStyles.text.includes("--reader-notes-active-text: #91e8ef") &&
+        workspaceStyles.text.includes(".annotated-code-block.is-notes-active"),
+      "Reader note targets omitted their theme-aware paragraph highlight."
+    );
+    assert(
+      workspaceStyles.text.includes("*::-webkit-scrollbar") &&
+        workspaceStyles.text.includes("scrollbar-width: none !important"),
+      "Web workspace no longer hides native scrollbars globally."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-scroll-indicator") &&
+        workspaceStyles.text.includes("display: none;"),
+      "Reader workspace still renders its custom scroll indicator."
+    );
+    assert(
+      workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-controls \{[\s\S]*?grid-template-columns: repeat\(2, var\(--panel-title-control-size\)\);[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-button \{[\s\S]*?place-items: center;/),
+      "Reader header controls are no longer equally spaced and center-aligned."
     );
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");

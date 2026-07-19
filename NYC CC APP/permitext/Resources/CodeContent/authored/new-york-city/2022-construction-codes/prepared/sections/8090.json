@@ -1,0 +1,49 @@
+{
+    "blocks": [
+        {
+            "id": "8090-text-1",
+            "kind": "text",
+            "plainText": "Where the air infiltration rate of a structure is known, the minimum required volume shall be determined as follows:"
+        },
+        {
+            "id": "8090-text-2",
+            "kind": "text",
+            "plainText": "For appliances other than fan-assisted, calculate volume using Equation 3-1."
+        },
+        {
+            "html": "<span class=\"img\"><img border=\"0\" src=\"../../../assets/fuel-gas-code-303-3-1-7-chapter-3-image-1.jpg\" width=\"375\" height=\"53\"></span>",
+            "id": "8090-image-3",
+            "imageID": "fuel-gas-code-303-3-1-7-chapter-3-image-1.jpg",
+            "kind": "image"
+        },
+        {
+            "id": "8090-text-4",
+            "kind": "text",
+            "plainText": "(Equation 3-1)"
+        },
+        {
+            "id": "8090-text-5",
+            "kind": "text",
+            "plainText": "For fan-assisted appliances, calculate volume using Equation 3-2."
+        },
+        {
+            "html": "<span class=\"img\"><img border=\"0\" src=\"../../../assets/fuel-gas-code-303-3-1-7-chapter-3-image-2.jpg\" width=\"360\" height=\"51\"></span>",
+            "id": "8090-image-6",
+            "imageID": "fuel-gas-code-303-3-1-7-chapter-3-image-2.jpg",
+            "kind": "image"
+        },
+        {
+            "id": "8090-text-7",
+            "kind": "text",
+            "plainText": "(Equation 3-2)"
+        },
+        {
+            "id": "8090-text-8",
+            "kind": "text",
+            "plainText": "where:\n\nIother = All appliances other than fan assisted (input in Btu/h).\n\nIfan = Fan-assisted appliance (input in Btu/h).\n\nACH = Air change per hour (percent of volume of space exchanged per hour, expressed as a decimal).\n\nFor purposes of this calculation, an infiltration rate greater than 0.60 ACH shall not be used in Equations 3-1 and 3-2."
+        }
+    ],
+    "chapterNumber": "3",
+    "schemaVersion": 1,
+    "sectionID": 8090
+}

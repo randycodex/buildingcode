@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Excalidraw, MainMenu } from "@excalidraw/excalidraw";
+import { Excalidraw, MainMenu, hashElementsVersion } from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import "./workboard.css";
 
@@ -91,11 +91,17 @@ function persistedAppState(appState) {
 }
 
 function boardChangeSignature(elements, appState, files) {
+  const sceneElements = elements || [];
   const fileMetadata = Object.keys(files || {}).sort().map((id) => {
     const file = files[id] || {};
     return [id, file.mimeType, file.created, file.lastRetrieved];
   });
-  return JSON.stringify({ elements, appState: persistedAppState(appState), fileMetadata });
+  return JSON.stringify({
+    sceneVersion: hashElementsVersion(sceneElements),
+    elementCount: sceneElements.length,
+    appState: persistedAppState(appState),
+    fileMetadata
+  });
 }
 
 function preferredTheme() {
@@ -311,10 +317,22 @@ function Workboard({
     const host = canvasHost.current;
     if (!host || !boardView) return undefined;
     const panelTrack = host.closest(".panel-track");
+    // Excalidraw captures wheel events, so reserve Shift+wheel for workspace column navigation first.
+    const routeShiftWheelToWorkspace = (event) => {
+      if (!event.shiftKey || event.ctrlKey || event.metaKey || !panelTrack) return;
+      const maxScrollLeft = panelTrack.scrollWidth - panelTrack.clientWidth;
+      if (maxScrollLeft <= 0) return;
+      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      if (!delta) return;
+      event.preventDefault();
+      event.stopPropagation();
+      panelTrack.scrollLeft = Math.max(0, Math.min(maxScrollLeft, panelTrack.scrollLeft + delta));
+    };
     const resizeObserver = typeof ResizeObserver === "undefined"
       ? null
       : new ResizeObserver(refreshCanvasOrigin);
     resizeObserver?.observe(host);
+    host.addEventListener("wheel", routeShiftWheelToWorkspace, { capture: true, passive: false });
     panelTrack?.addEventListener("scroll", refreshCanvasOrigin, { passive: true });
     panelTrack?.addEventListener("transitionend", refreshCanvasOrigin, true);
     panelTrack?.addEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);
@@ -324,6 +342,7 @@ function Workboard({
     return () => {
       window.cancelAnimationFrame(refreshFrame.current);
       resizeObserver?.disconnect();
+      host.removeEventListener("wheel", routeShiftWheelToWorkspace, { capture: true });
       panelTrack?.removeEventListener("scroll", refreshCanvasOrigin);
       panelTrack?.removeEventListener("transitionend", refreshCanvasOrigin, true);
       panelTrack?.removeEventListener("permitext:workspace-layout-change", refreshCanvasOrigin);

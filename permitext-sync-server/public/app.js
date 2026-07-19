@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260716-column-performance";
+const workboardClientVersion = "20260719-center-reader-controls-v2";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -638,6 +638,43 @@ function applyReaderSettings() {
   document.documentElement.style.setProperty("--reader-font-family", readerFontFamilyValue());
 }
 
+function readerTextSizeValue(reader) {
+  return clampNumber(reader?.textSize, 10, 18, state.readerSettings.fontSize);
+}
+
+function syncReaderTextSizeControls(panel, reader) {
+  const size = readerTextSizeValue(reader);
+  const decreaseButton = panel.querySelector(".reader-text-decrease");
+  const increaseButton = panel.querySelector(".reader-text-increase");
+  if (decreaseButton) {
+    decreaseButton.disabled = size <= 10;
+    decreaseButton.title = `Decrease Reader text size (${size} pt)`;
+  }
+  if (increaseButton) {
+    increaseButton.disabled = size >= 18;
+    increaseButton.title = `Increase Reader text size (${size} pt)`;
+  }
+}
+
+function applyReaderTextSize(panel, reader) {
+  if (Number.isFinite(Number(reader?.textSize))) {
+    panel.style.setProperty("--reader-font-size", `${readerTextSizeValue(reader)}pt`);
+  } else {
+    panel.style.removeProperty("--reader-font-size");
+  }
+  syncReaderTextSizeControls(panel, reader);
+}
+
+function changeReaderTextSize(panel, reader, delta) {
+  reader.textSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 18, state.readerSettings.fontSize);
+  applyReaderTextSize(panel, reader);
+  saveWorkspaceState();
+  requestAnimationFrame(() => {
+    syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
+    updateReaderScrollIndicator(panel);
+  });
+}
+
 function newReaderState(overrides = {}) {
   const codePrefix = overrides.codePrefix || "BC";
   return {
@@ -728,25 +765,6 @@ async function copyTextToClipboard(text) {
     }
   }
   return copyTextFallback(text);
-}
-
-async function shareSection(section, button) {
-  const url = sharedSectionURL(section?.sectionID || section?.id);
-  if (!url) return;
-  const title = sectionDisplayTitle(section?.sectionNumber, section?.title) || "Permitext section";
-  if (typeof navigator.share === "function") {
-    try {
-      await navigator.share({ title, url });
-      return;
-    } catch (error) {
-      if (error?.name === "AbortError") return;
-    }
-  }
-  if (await copyTextToClipboard(url)) {
-    showShareButtonResult(button, "Link copied");
-  } else {
-    showShareButtonResult(button, "Could not copy link");
-  }
 }
 
 function officialSectionCitation(section) {
@@ -896,7 +914,11 @@ function openProjectDetails() {
 }
 
 function setOpenProjectDetails(details) {
-  state.projectDetails = (details || []).filter(Boolean);
+  const uniqueDetails = new Map();
+  (details || []).filter(Boolean).forEach((detail) => {
+    uniqueDetails.set(projectDetailKey(detail), detail);
+  });
+  state.projectDetails = Array.from(uniqueDetails.values());
   state.projectDetail = state.projectDetails[0] || null;
 }
 
@@ -1406,9 +1428,10 @@ function scrollReaderContentToNode(content, target, behavior = "auto") {
   const contentRect = content.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const panel = content.closest(".reader-panel");
+  const anchorRect = panel?.getBoundingClientRect() || contentRect;
   const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
   const offset = Number.isFinite(headerOffset) ? headerOffset : 0;
-  const targetTop = content.scrollTop + targetRect.top - contentRect.top - offset;
+  const targetTop = content.scrollTop + targetRect.top - anchorRect.top - offset;
   content.scrollTo({
     top: Math.max(0, targetTop),
     behavior
@@ -2014,22 +2037,22 @@ function currentContentSummary() {
       updatedAt: item.updatedAt || new Date().toISOString()
     }));
   const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems];
-  const localAnnotations = (state.localAnnotations || []).filter((item) => item && !item.deletedAt);
+  const savedItemsBySection = new Map(
+    summarySavedItems.map((item) => [String(item.sectionID || ""), item])
+  );
+  localSavedItems.forEach((item) => {
+    if (item?.sectionID) savedItemsBySection.set(String(item.sectionID), item);
+  });
+  const annotationsByID = new Map(
+    summaryAnnotations.map((item) => [String(item.id || ""), item])
+  );
+  (state.localAnnotations || []).forEach((item) => {
+    if (item?.id) annotationsByID.set(String(item.id), item);
+  });
   return {
     ...summary,
-    savedItems: [
-      ...summarySavedItems,
-      ...localSavedItems.filter((localItem, index, items) =>
-        items.findIndex((item) => String(item.sectionID) === String(localItem.sectionID)) === index &&
-        !summarySavedItems.some((item) => String(item.sectionID) === String(localItem.sectionID))
-      )
-    ],
-    annotations: [
-      ...summaryAnnotations,
-      ...localAnnotations.filter((localAnnotation) =>
-        !summaryAnnotations.some((annotation) => String(annotation.id || "") === String(localAnnotation.id || ""))
-      )
-    ],
+    savedItems: Array.from(savedItemsBySection.values()).filter((item) => !item.deletedAt),
+    annotations: Array.from(annotationsByID.values()).filter((item) => !item.deletedAt),
     projectSections: [
       ...(summary.projectSections || []),
       ...(state.localProjectSections || [])
@@ -2789,16 +2812,16 @@ function archivedProjectIDSet() {
 }
 
 function visibleProjectRecords(syncedProjects = []) {
-  const byID = new Map();
+  const byIdentity = new Map();
   syncedProjects.forEach((project) => {
-    const id = projectRecordID(project);
-    if (id) byID.set(id, project);
+    const identity = projectDetailKey(project);
+    if (identity) byIdentity.set(identity, project);
   });
   (state.localProjects || []).forEach((project) => {
-    const id = projectRecordID(project);
-    if (id && !byID.has(id)) byID.set(id, project);
+    const identity = projectDetailKey(project);
+    if (identity && !byIdentity.has(identity)) byIdentity.set(identity, project);
   });
-  return Array.from(byID.values()).sort((left, right) =>
+  return Array.from(byIdentity.values()).sort((left, right) =>
     String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
       numeric: true,
       sensitivity: "base"
@@ -2911,6 +2934,9 @@ async function updateProjectFolder(project, details = {}) {
 
 function isSectionSaved(sectionID) {
   const sectionKey = String(sectionID);
+  const localRecord = [...(state.localSavedItems || [])].reverse()
+    .find((item) => String(item.sectionID || "") === sectionKey);
+  if (localRecord) return !localRecord.deletedAt;
   if ((state.localSavedSectionIDs || []).map(String).includes(sectionKey)) return true;
   const savedItems = syncedContent?.summary?.savedItems || [];
   return savedItems.some((item) => String(item.sectionID) === sectionKey);
@@ -2929,22 +2955,18 @@ function setLocalSectionSaved(sectionID, saved) {
 async function persistSectionBookmark(sectionPayload, saved) {
   setLocalSectionSaved(sectionPayload.sectionID, saved);
   const sectionKey = String(sectionPayload.sectionID || "");
-  if (saved) {
-    const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
-    state.localSavedItems = [
-      ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
-      record
-    ];
-  } else {
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
-  }
+  const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
+  const localRecord = saved ? record : { ...record, deletedAt: record.updatedAt };
+  state.localSavedItems = [
+    ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
+    localRecord
+  ];
   saveWorkspaceState();
+  await refreshOpenSavedPanes();
   if (!activeAccount()) return;
   await pushMutation(saved ? savedMutationForSection(sectionPayload) : deletedSavedMutationForSection(sectionPayload));
-  if (saved) {
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
-    saveWorkspaceState();
-  }
+  state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+  saveWorkspaceState();
 }
 
 async function persistSectionInProject(project, sectionPayload) {
@@ -3165,6 +3187,7 @@ function setAnnotationTags(target, tags) {
     syncFields: ["tags"]
   });
   upsertLocalAnnotation(record);
+  refreshOpenSavedPanes().catch(() => {});
   scheduleAnnotationPush(record);
 }
 
@@ -3316,7 +3339,7 @@ async function renderSectionContent(panel, reader) {
   content?.classList.remove("is-searching-reader");
   if (!reader.chapterID) {
     blankReader(content);
-    renderSectionComments(commentsList, []);
+    clear(commentsList);
     return;
   }
 
@@ -3353,16 +3376,9 @@ async function renderSectionContent(panel, reader) {
 
     content.append(sectionWrapper);
   });
-  renderSectionComments(commentsList, Array.from(content.querySelectorAll(".annotated-code-block")).map((node) => ({
-    sectionID: node.dataset.sectionId,
-    sectionNumber: node.dataset.sectionNumber,
-    title: node.dataset.sectionTitle,
-    blockID: node.dataset.blockId,
-    blockLabel: node.dataset.blockLabel,
-    codePrefix: reader.codePrefix || "BC",
-    chapterID: reader.chapterID || "",
-    chapterNumber: reader.chapterNumber || ""
-  })));
+  // Notes now open from each block in the reader notes sheet. Do not build the
+  // retired, permanently hidden sidebar editor for every block in the chapter.
+  clear(commentsList);
   restoreReaderNotesSheet(panel, reader, sections);
 
   if (reader.sectionID) {
@@ -3388,6 +3404,19 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   const target = (idSelector ? content?.querySelector(idSelector) : null) || (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
   scrollReaderContentToNode(content, target, behavior);
+}
+
+function alignReaderSectionAfterLayout(reader) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const panel = track.querySelector(
+        `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`
+      );
+      const content = panel?.querySelector(".reader-content");
+      if (!content) return;
+      scrollReaderContentToSection(content, reader.sectionID, "auto", reader.sectionNumber);
+    });
+  });
 }
 
 async function navigateReaderToSection(panel, reader, behavior = "auto") {
@@ -3540,9 +3569,6 @@ function ensureReaderNotesSheet(panel, reader) {
   bookmarkButton.className = "reader-notes-bookmark";
   bookmarkButton.type = "button";
 
-  const title = document.createElement("h2");
-  title.className = "reader-notes-title";
-
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
   doneButton.type = "button";
@@ -3553,7 +3579,7 @@ function ensureReaderNotesSheet(panel, reader) {
   actions.className = "reader-notes-actions";
   actions.append(doneButton);
 
-  header.append(bookmarkButton, title, actions);
+  header.append(bookmarkButton, actions);
 
   const input = document.createElement("textarea");
   input.className = "reader-notes-input";
@@ -3662,6 +3688,22 @@ function toggleReaderNotesSheet(panel, section, reader) {
   openReaderNotesSheet(panel, section, reader);
 }
 
+function setReaderNotesActiveTarget(panel, sectionID = "", blockID = "") {
+  if (!panel) return;
+  panel.querySelectorAll(".chapter-section.is-notes-active, .annotated-code-block.is-notes-active").forEach((element) => {
+    element.classList.remove("is-notes-active");
+  });
+  const sectionKey = sectionNoteKey(sectionID);
+  if (!sectionKey) return;
+  const sectionElement = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`);
+  sectionElement?.classList.add("is-notes-active");
+  const blockKey = normalizeAnnotationBlockID(blockID);
+  if (!blockKey) return;
+  sectionElement
+    ?.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(blockKey)}"]`)
+    ?.classList.add("is-notes-active");
+}
+
 function openReaderNotesSheet(panel, section, reader, options = {}) {
   if (!panel || !section) return;
   const sheet = ensureReaderNotesSheet(panel, reader);
@@ -3674,10 +3716,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     reader.activeNotesBlockID = blockID;
     saveWorkspaceState();
   }
-  panel.querySelectorAll(".chapter-section.is-notes-active").forEach((activeSection) => {
-    activeSection.classList.remove("is-notes-active");
-  });
-  panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`)?.classList.add("is-notes-active");
+  setReaderNotesActiveTarget(panel, sectionID, blockID);
 
   const saved = isSectionSaved(section.id);
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
@@ -3726,7 +3765,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     };
   }
 
-  const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
   const tagsHost = sheet.querySelector(".reader-notes-tags");
   sheet.dataset.sectionId = sectionID;
@@ -3734,7 +3772,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   sheet.__annotationTarget = target;
   if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
   removeReaderNotesProjectPicker(sheet);
-  title.textContent = blockID && target.blockLabel ? target.blockLabel : sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
   renderAnnotationTagEditor(tagsHost, target, {
@@ -3776,18 +3813,20 @@ function restoreReaderNotesSheet(panel, reader, sections) {
   openReaderNotesSheet(panel, section, reader, { instant: true, target });
 }
 
-function closeReaderNotesSheet(panel, reader = null) {
-  const sheet = panel?.querySelector(".reader-notes-sheet");
-  if (!sheet) return;
+function closeReaderNotesSheet(panel, reader = null, options = {}) {
   if (reader) {
     reader.activeNotesSectionID = "";
     reader.activeNotesBlockID = "";
     saveWorkspaceState();
   }
+  const sheet = panel?.querySelector(".reader-notes-sheet");
+  if (!sheet) return;
   sheet.classList.remove("is-open");
-  panel.querySelectorAll(".chapter-section.is-notes-active").forEach((section) => {
-    section.classList.remove("is-notes-active");
-  });
+  setReaderNotesActiveTarget(panel);
+  if (options.instant) {
+    sheet.hidden = true;
+    return;
+  }
   window.setTimeout(() => {
     if (!sheet.classList.contains("is-open")) sheet.hidden = true;
   }, 220);
@@ -3814,8 +3853,9 @@ function sectionElementForInlineComment(commentWrapper) {
 
 function syncCommentBoxHeights(content, commentsList) {
   if (!content || !commentsList) return;
-  const sections = Array.from(content.querySelectorAll(".chapter-section"));
   const boxes = Array.from(commentsList.querySelectorAll(".section-comment-box"));
+  if (!boxes.length) return;
+  const sections = Array.from(content.querySelectorAll(".chapter-section"));
   sections.forEach((section, index) => {
     const box = boxes[index];
     if (!box) return;
@@ -3950,6 +3990,10 @@ function bindReaderCommentScroll(panel) {
 }
 
 function updateReaderScrollIndicator(panel) {
+  if (!readerPanelIntersectsTrack(panel)) {
+    panel?.classList.remove("is-scrolling");
+    return;
+  }
   const content = panel.querySelector(".reader-content");
   const indicator = panel.querySelector(".reader-scroll-indicator");
   const thumb = panel.querySelector(".reader-scroll-thumb");
@@ -3982,8 +4026,26 @@ function bindReaderScrollIndicator(panel) {
     hideTimer = window.setTimeout(() => panel.classList.remove("is-scrolling"), 700);
   };
   content.addEventListener("scroll", reveal, { passive: true });
-  window.addEventListener("resize", update, { passive: true });
   requestAnimationFrame(update);
+}
+
+function readerPanelIntersectsTrack(panel) {
+  if (!panel?.isConnected) return false;
+  const panelBounds = panel.getBoundingClientRect();
+  const trackBounds = track.getBoundingClientRect();
+  return panelBounds.width > 0
+    && panelBounds.right > trackBounds.left
+    && panelBounds.left < trackBounds.right;
+}
+
+let visibleReaderMetricsFrame = null;
+
+function scheduleVisibleReaderScrollIndicatorUpdates() {
+  if (visibleReaderMetricsFrame !== null) return;
+  visibleReaderMetricsFrame = requestAnimationFrame(() => {
+    visibleReaderMetricsFrame = null;
+    track.querySelectorAll(".reader-panel").forEach(updateReaderScrollIndicator);
+  });
 }
 
 function bindAllReaderCommentScroll() {
@@ -4314,6 +4376,8 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
+  const decreaseTextButton = panel.querySelector(".reader-text-decrease");
+  const increaseTextButton = panel.querySelector(".reader-text-increase");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -4327,6 +4391,7 @@ async function renderReader(reader, options = {}) {
   reader.codePrefix = reader.codePrefix || "BC";
   applyCodeTheme(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
+  applyReaderTextSize(panel, reader);
   selector.hidden = false;
   setTitle(panel, reader);
   reader.commentsOpen = false;
@@ -4343,7 +4408,10 @@ async function renderReader(reader, options = {}) {
   }
 
   populateCodeSelect(panel, reader);
+  decreaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, -1));
+  increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
   codeSelect.addEventListener("change", async () => {
+    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";
     applyCodeTheme(panel, reader);
     reader.chapterID = await firstChapterIDForCode(reader.codePrefix);
@@ -4396,6 +4464,7 @@ async function renderReader(reader, options = {}) {
   });
 
   chapterSelect.addEventListener("change", async () => {
+    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.chapterID = chapterSelect.value;
     state.recentChaptersByCode = state.recentChaptersByCode || {};
     if (reader.chapterID) {
@@ -4594,14 +4663,6 @@ async function renderSearchResults(panel, instance) {
     groups.get(prefix).push(result);
   });
 
-  const totalResults = Number.isFinite(payload.totalResults) ? payload.totalResults : filteredResults.length;
-  if (payload.limited || totalResults > filteredResults.length) {
-    const notice = document.createElement("p");
-    notice.className = "search-result-limit";
-    notice.textContent = `Showing ${filteredResults.length.toLocaleString()} of ${totalResults.toLocaleString()} matches. Narrow the search for more specific results.`;
-    results.append(notice);
-  }
-
   Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
     const group = document.createElement("section");
     group.className = "search-result-group";
@@ -4675,7 +4736,10 @@ async function openSectionDetail(searchID, section, options = {}) {
   const linkedReader = updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: linkedReader ? [paneIDForReader(linkedReader)] : []
+    refreshPaneIDs: [
+      paneIDForSectionDetail(searchID),
+      ...(linkedReader ? [paneIDForReader(linkedReader)] : [])
+    ]
   });
 }
 
@@ -4749,16 +4813,6 @@ function jumpIconSVG() {
       <path d="M15 3h6v6"></path>
       <path d="M10 14 21 3"></path>
       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-    </svg>
-  `;
-}
-
-function shareIconSVG() {
-  return `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 3v12"></path>
-      <path d="m7 8 5-5 5 5"></path>
-      <path d="M5 13v7h14v-7"></path>
     </svg>
   `;
 }
@@ -4843,11 +4897,6 @@ async function renderSectionDetail(searchID, detail) {
     label: "Back to search",
     svg: circleXIconSVG()
   });
-  const shareButton = appendDetailIconButton(chrome, {
-    title: "Share section",
-    label: "Share section",
-    svg: shareIconSVG()
-  });
   const saveButton = appendDetailIconButton(chrome, {
     title: saved ? "Remove bookmark" : "Save bookmark",
     label: saved ? "Remove bookmark" : "Save bookmark",
@@ -4898,11 +4947,9 @@ async function renderSectionDetail(searchID, detail) {
   notes.className = "section-detail-notes";
   const notesHeader = document.createElement("div");
   notesHeader.className = "section-detail-notes-header";
-  const notesTitle = document.createElement("h3");
-  notesTitle.textContent = "Notes";
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
-  notesHeader.append(notesTitle, saveState);
+  notesHeader.append(saveState);
   const textareaWrap = document.createElement("label");
   textareaWrap.className = "section-detail-note-box";
   const textarea = document.createElement("textarea");
@@ -4924,10 +4971,6 @@ async function renderSectionDetail(searchID, detail) {
     delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
     void transitionWorkspace("utility");
-  });
-
-  shareButton.addEventListener("click", () => {
-    shareSection(sectionPayload, shareButton);
   });
 
   saveButton.addEventListener("click", async () => {
@@ -4958,10 +5001,12 @@ async function renderSectionDetail(searchID, detail) {
     const reader = openOrUpdateLinkedReaderForSearch(searchID, detail, {
       chapterID: detail.chapterID || chapter?.id || "",
       sectionNumber: sectionPayload.sectionNumber,
-      title: sectionPayload.title
+      title: sectionPayload.title,
+      shouldSmoothScrollToSection: false
     });
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+    alignReaderSectionAfterLayout(reader);
   });
 
   let noteTimer = null;
@@ -5365,8 +5410,6 @@ function closeProjectDetailForProject(project) {
 async function archiveProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
-  const name = project.name || project.title || "this project";
-  if (!window.confirm(`Archive ${name}?`)) return;
   const archived = archivedProjectIDSet();
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);
@@ -5855,10 +5898,7 @@ async function renderSaved(paneID = "utility:saved") {
     (String(annotation.noteBody || "").trim() || normalizeAnnotationTags(annotation.tags || []).length)
   );
 
-  appendSectionLabel(content, "Saved sections");
-  if (savedItems.length === 0) {
-    appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
-  } else {
+  if (savedItems.length > 0) {
     renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID, { removableSavedItems: true });
   }
 
@@ -5870,6 +5910,14 @@ async function renderSaved(paneID = "utility:saved") {
   }
 
   return panel;
+}
+
+async function refreshOpenSavedPanes() {
+  const paneIDs = (state.utilityInstances || [])
+    .filter((instance) => instance.key === "saved")
+    .map((instance) => paneIDForUtilityInstance(instance));
+  if (!paneIDs.length) return;
+  await transitionWorkspace("utility", { refreshPaneIDs: paneIDs });
 }
 
 function removeIconSVG() {
@@ -6498,16 +6546,13 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
         widths[nextIndex] += trackStartRect.right - rightGroupEdgeWithoutFill;
       }
     }
-    let layoutChanged = false;
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];
       state.paneWeights[pane.id] = widths[index];
       applyPaneWeight(pane.pane, pane.id);
       lastAppliedWidths[index] = widths[index];
-      layoutChanged = true;
     });
-    if (layoutChanged) notifyWorkspaceLayoutChange();
   };
 
   const applyPendingResize = () => {
@@ -6531,6 +6576,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
     }
     track.classList.remove("is-resizing");
+    notifyWorkspaceLayoutChange();
     saveWorkspaceState();
   };
 
@@ -6828,6 +6874,7 @@ async function start() {
     }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
+  window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   window.addEventListener("storage", (event) => {
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
     if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
@@ -6847,6 +6894,7 @@ async function start() {
     }
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
+  track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");
     window.addEventListener("pagehide", () => {
