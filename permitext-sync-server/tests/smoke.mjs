@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("remove-saved-empty-state"),
-      "Web workspace omitted the remove-saved-empty-state assets."
+      webRoot.text.includes("center-reader-controls-v2"),
+      "Web workspace omitted the center-reader-controls-v2 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -245,6 +245,12 @@ async function main() {
       workspaceStyles.text.includes(".reader-scroll-indicator") &&
         workspaceStyles.text.includes("display: none;"),
       "Reader workspace still renders its custom scroll indicator."
+    );
+    assert(
+      workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-controls \{[\s\S]*?grid-template-columns: repeat\(2, var\(--panel-title-control-size\)\);[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-button \{[\s\S]*?place-items: center;/),
+      "Reader header controls are no longer equally spaced and center-aligned."
     );
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");

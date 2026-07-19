@@ -614,21 +614,27 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .reader-panel .panel-actions {
+  align-items: center;
   justify-content: end;
+  gap: var(--space-1);
   min-width: 0;
   position: relative;
   z-index: 2;
 }
 
 .reader-text-size-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, var(--panel-title-control-size));
   align-items: center;
+  gap: var(--space-1);
   height: var(--panel-title-control-size);
 }
 
 .reader-text-size-button {
-  min-width: var(--panel-title-control-size);
+  display: grid;
+  width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
+  place-items: center;
   padding: 0 2px;
   border: 0;
   border-radius: 0;
