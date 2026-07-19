@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-search-results-cleanup";
+const workboardClientVersion = "20260719-direct-project-archive";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -5356,8 +5356,6 @@ function closeProjectDetailForProject(project) {
 async function archiveProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
-  const name = project.name || project.title || "this project";
-  if (!window.confirm(`Archive ${name}?`)) return;
   const archived = archivedProjectIDSet();
   archived.add(id);
   state.archivedProjectIDs = Array.from(archived);

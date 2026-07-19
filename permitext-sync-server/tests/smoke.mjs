@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-results-cleanup"),
-      "Web workspace omitted the search-results cleanup assets."
+      webRoot.text.includes("direct-project-archive"),
+      "Web workspace omitted the direct-project archive assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -170,6 +170,10 @@ async function main() {
       !workspaceScript.text.includes("search-result-limit") &&
         !workspaceScript.text.includes("Narrow the search for more specific results."),
       "Search results still include the retired capped-results notice."
+    );
+    assert(
+      !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
+      "Project archiving still requires confirmation."
     );
 
     const workspaceStyles = await request("/web/styles.css");
