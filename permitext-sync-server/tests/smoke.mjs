@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-section-anchor"),
-      "Web workspace omitted the reader section anchor assets."
+      webRoot.text.includes("search-results-cleanup"),
+      "Web workspace omitted the search-results cleanup assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -165,6 +165,11 @@ async function main() {
       workspaceScript.text.includes("alignReaderSectionAfterLayout(reader);") &&
         workspaceScript.text.includes("const anchorRect = panel?.getBoundingClientRect() || contentRect;"),
       "Linked Readers no longer align selected sections below their headers after layout."
+    );
+    assert(
+      !workspaceScript.text.includes("search-result-limit") &&
+        !workspaceScript.text.includes("Narrow the search for more specific results."),
+      "Search results still include the retired capped-results notice."
     );
 
     const workspaceStyles = await request("/web/styles.css");

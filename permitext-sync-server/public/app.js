@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-reader-section-anchor";
+const workboardClientVersion = "20260719-search-results-cleanup";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -4608,14 +4608,6 @@ async function renderSearchResults(panel, instance) {
     if (!groups.has(prefix)) groups.set(prefix, []);
     groups.get(prefix).push(result);
   });
-
-  const totalResults = Number.isFinite(payload.totalResults) ? payload.totalResults : filteredResults.length;
-  if (payload.limited || totalResults > filteredResults.length) {
-    const notice = document.createElement("p");
-    notice.className = "search-result-limit";
-    notice.textContent = `Showing ${filteredResults.length.toLocaleString()} of ${totalResults.toLocaleString()} matches. Narrow the search for more specific results.`;
-    results.append(notice);
-  }
 
   Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
     const group = document.createElement("section");
