@@ -1769,8 +1769,24 @@ select option:checked {
   white-space: nowrap;
 }
 
-.reader-notes-project-picker button:not(.reader-notes-new-project) {
-  border-left: 3px solid var(--project-color, var(--code-accent));
+.reader-notes-project-picker .reader-notes-project-option {
+  background: color-mix(in srgb, var(--project-color) 16%, transparent);
+}
+
+.reader-notes-project-picker .reader-notes-project-option:hover,
+.reader-notes-project-picker .reader-notes-project-option:focus-visible {
+  background: color-mix(in srgb, var(--project-color) 32%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  .reader-notes-project-picker .reader-notes-project-option {
+    background: color-mix(in srgb, var(--project-color) 24%, transparent);
+  }
+
+  .reader-notes-project-picker .reader-notes-project-option:hover,
+  .reader-notes-project-picker .reader-notes-project-option:focus-visible {
+    background: color-mix(in srgb, var(--project-color) 42%, transparent);
+  }
 }
 
 .reader-notes-new-project-form {

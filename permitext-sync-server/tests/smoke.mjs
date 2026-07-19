@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v7"),
-      "Web workspace omitted the web-notes-v7 assets."
+      webRoot.text.includes("web-notes-v9"),
+      "Web workspace omitted the web-notes-v9 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -249,7 +249,8 @@ async function main() {
     assert(
       workspaceScript.text.includes("function createSavedBulkSelectionController") &&
         workspaceScript.text.includes("function createProjectSectionSelectionController") &&
-        workspaceScript.text.includes('newProjectButton.textContent = "New project…"'),
+        workspaceScript.text.includes('newProjectButton.textContent = "New project…"') &&
+        workspaceScript.text.includes('button.className = "reader-notes-project-option"'),
       "Saved and project panes omitted selection removal or new-project saving controls."
     );
     assert(
@@ -294,6 +295,12 @@ async function main() {
     assert(
       workspaceStyles.text.includes("min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));"),
       "Pane CSS no longer enforces the default-width floor for multi-column workspaces."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-notes-project-picker .reader-notes-project-option") &&
+        workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 16%, transparent);") &&
+        workspaceStyles.text.includes("border-radius: var(--radius-pill);"),
+      "Reader project-picker buttons no longer use pill-shaped project-card color treatments."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),
