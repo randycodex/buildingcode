@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v3";
+const workboardClientVersion = "20260719-web-notes-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -7166,10 +7166,16 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     const delta = clientX - startX;
     const widths = paneData.map((pane) => pane.startWidth);
     const minimumDelta = paneData[previousIndex].minWidth - paneData[previousIndex].startWidth;
-    const maximumDelta = paneData[nextIndex].startWidth - paneData[nextIndex].minWidth;
+    const canGrowWorkspace = paneData.length >= 4;
+    const maximumDelta = canGrowWorkspace
+      ? Number.POSITIVE_INFINITY
+      : paneData[nextIndex].startWidth - paneData[nextIndex].minWidth;
     const appliedDelta = Math.min(maximumDelta, Math.max(minimumDelta, delta));
     widths[previousIndex] += appliedDelta;
-    widths[nextIndex] -= appliedDelta;
+    widths[nextIndex] = Math.max(
+      paneData[nextIndex].minWidth,
+      paneData[nextIndex].startWidth - appliedDelta
+    );
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];

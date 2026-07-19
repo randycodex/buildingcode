@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v3"),
-      "Web workspace omitted the web-notes-v3 assets."
+      webRoot.text.includes("web-notes-v4"),
+      "Web workspace omitted the web-notes-v4 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -172,6 +172,12 @@ async function main() {
       workspaceScript.text.includes('panel.style.setProperty("--pane-resized-min-width"') &&
         workspaceScript.text.includes('pane.classList.contains("workboard-panel") ? 320 : 160'),
       "Manual pane resizing no longer relaxes responsive minimum widths to keep the divider under the pointer."
+    );
+    assert(
+      workspaceScript.text.includes("const canGrowWorkspace = paneData.length >= 4") &&
+        workspaceScript.text.includes("Number.POSITIVE_INFINITY") &&
+        workspaceScript.text.includes("paneData[nextIndex].startWidth - appliedDelta"),
+      "Four-or-more-column workspaces can no longer grow after the adjacent pane reaches its minimum."
     );
     assert(
       workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
