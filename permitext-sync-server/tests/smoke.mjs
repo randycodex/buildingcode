@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("live-saved-pane"),
-      "Web workspace omitted the live Saved-pane assets."
+      webRoot.text.includes("static-reader-headings"),
+      "Web workspace omitted the static Reader-heading assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -187,6 +187,10 @@ async function main() {
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
       "Divider resizing still invalidates cursor styles across every workspace descendant."
+    );
+    assert(
+      !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),
+      "Static Reader section titles still use pointer styling."
     );
     assert(
       workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),

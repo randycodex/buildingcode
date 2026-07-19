@@ -2056,7 +2056,6 @@ select option:checked {
 }
 
 .reader-section-title {
-  cursor: pointer;
   border-radius: 0;
 }
 
