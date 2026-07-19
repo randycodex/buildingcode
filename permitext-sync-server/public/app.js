@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v11";
+const workboardClientVersion = "20260719-web-notes-v15";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -2108,14 +2108,21 @@ function currentContentSummary() {
   (state.localAnnotations || []).forEach((item) => {
     if (item?.id) annotationsByID.set(String(item.id), item);
   });
+  const projectSectionIdentity = (item) => [
+    item.folderClientID || item.projectID || item.localFolderID || "project",
+    item.sectionID || item.savedSectionID || item.itemID || item.id || "section"
+  ].map(String).join(":");
+  const projectSectionsByID = new Map(
+    (summary.projectSections || []).map((item) => [projectSectionIdentity(item), item])
+  );
+  (state.localProjectSections || []).forEach((item) => {
+    if (item) projectSectionsByID.set(projectSectionIdentity(item), item);
+  });
   return {
     ...summary,
     savedItems: Array.from(savedItemsBySection.values()).filter((item) => !item.deletedAt),
     annotations: Array.from(annotationsByID.values()).filter((item) => !item.deletedAt),
-    projectSections: [
-      ...(summary.projectSections || []),
-      ...(state.localProjectSections || [])
-    ]
+    projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)
   };
 }
 
@@ -2952,9 +2959,9 @@ function visibleProjectRecords(syncedProjects = []) {
   });
   (state.localProjects || []).forEach((project) => {
     const identity = projectDetailKey(project);
-    if (identity && !byIdentity.has(identity)) byIdentity.set(identity, project);
+    if (identity) byIdentity.set(identity, project);
   });
-  return Array.from(byIdentity.values()).sort((left, right) =>
+  return Array.from(byIdentity.values()).filter((project) => !project.deletedAt).sort((left, right) =>
     String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
       numeric: true,
       sensitivity: "base"
@@ -3105,11 +3112,16 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   saveWorkspaceState();
   if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
   if (!activeAccount()) return;
-  await pushMutation(saved
-    ? savedMutationForSection(sectionPayload)
-    : deletedSavedMutationForSection(sectionPayload, existingRecord));
-  state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
-  saveWorkspaceState();
+  try {
+    await pushMutation(saved
+      ? savedMutationForSection(sectionPayload)
+      : deletedSavedMutationForSection(sectionPayload, existingRecord));
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+    saveWorkspaceState();
+  } catch (error) {
+    if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    // Keep the local record and queued mutation available while sync recovers.
+  }
 }
 
 async function persistSectionInProject(project, sectionPayload) {
@@ -3118,9 +3130,14 @@ async function persistSectionInProject(project, sectionPayload) {
   state.localProjectSections = [...current, record];
   saveWorkspaceState();
   if (!activeAccount()) return;
-  await pushMutation(projectSectionMutationForSection(project, sectionPayload));
-  state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
-  saveWorkspaceState();
+  try {
+    await pushMutation(projectSectionMutationForSection(project, sectionPayload));
+    state.localProjectSections = (state.localProjectSections || []).filter((item) => item.id !== record.id);
+    saveWorkspaceState();
+  } catch (error) {
+    if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    // Keep the local project link and queued mutation available while sync recovers.
+  }
 }
 
 async function removeSectionFromProject(project, item, options = {}) {
@@ -3666,6 +3683,7 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
     bookmarkButton.classList.toggle("is-saved", !shouldRemove);
     wrapper.classList.toggle("has-saved-section", !shouldRemove);
     bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
+    bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save subsection" : "Remove bookmark");
     bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
     bookmarkButton.innerHTML = `${bookmarkIconSVG(!shouldRemove)}<span class="sr-only">${shouldRemove ? "Save subsection" : "Remove bookmark"}</span>`;
     try {
@@ -5888,11 +5906,21 @@ async function deleteArchivedProjectData(project) {
   const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
   const isSynced = (syncedContent?.summary?.projects || []).some((item) => projectRecordID(item) === id);
   const workboardID = workboardProjectID(projectIdentity(project));
+  const deletedAt = new Date().toISOString();
+  state.localProjects = [
+    ...(state.localProjects || []).filter((item) => projectRecordID(item) !== id),
+    { ...project, updatedAt: deletedAt, deletedAt }
+  ];
+  state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
+  state.localProjectSections = (state.localProjectSections || [])
+    .filter((item) => !projectSectionBelongsToProject(item, project));
+  saveWorkspaceState();
   if (activeAccount() && (!isLocal || isSynced)) {
     try {
       await pushMutation(deletedProjectMutationForRecord(project));
     } catch (error) {
-      throw new Error(error.message || "Could not delete the project.");
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+      // Keep the local deletion tombstone while sync recovers.
     }
   }
   if (activeAccount()) {
@@ -5903,8 +5931,6 @@ async function deleteArchivedProjectData(project) {
     }
   }
   await deleteLocalWorkboard(workboardID);
-  state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
-  state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
 }

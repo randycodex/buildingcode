@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v11"),
-      "Web workspace omitted the web-notes-v11 assets."
+      webRoot.text.includes("web-notes-v15"),
+      "Web workspace omitted the web-notes-v15 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -264,6 +264,23 @@ async function main() {
         workspaceScript.text.includes("await persistSectionBookmark(item, false, { refreshSavedPanes: false })") &&
         workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false)"),
       "Removing a project item no longer clears its saved bookmark state in open Readers."
+    );
+    assert(
+      workspaceScript.text.includes("// Keep the local record and queued mutation available while sync recovers.") &&
+        workspaceScript.text.includes("// Keep the local project link and queued mutation available while sync recovers."),
+      "Reader save destinations no longer complete locally while account sync is pending."
+    );
+    assert(
+      workspaceScript.text.includes("const projectSectionsByID = new Map(") &&
+        workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save subsection" : "Remove bookmark")'),
+      "Local-first project saves can render duplicate items or leave stale Reader bookmark labels."
+    );
+    assert(
+      workspaceScript.text.includes("{ ...project, updatedAt: deletedAt, deletedAt }") &&
+        workspaceScript.text.includes("// Keep the local deletion tombstone while sync recovers.") &&
+        workspaceScript.text.includes("filter((project) => !project.deletedAt).sort"),
+      "Project deletion no longer completes locally while account sync is pending."
     );
     assert(
       workspaceScript.text.includes('options.sourcePaneID === "utility:archive"') &&
