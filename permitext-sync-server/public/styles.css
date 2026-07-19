@@ -86,6 +86,15 @@
 
 * {
   box-sizing: border-box;
+  -ms-overflow-style: none;
+  scrollbar-gutter: auto !important;
+  scrollbar-width: none !important;
+}
+
+*::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 html,
@@ -461,7 +470,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .reader-panel {
   --pane-min-width: clamp(380px, 30vw, 560px);
   --reader-header-overlay-height: clamp(76px, 7vh, 96px);
-  --reader-scrollbar-rail-width: 12px;
+  --reader-scrollbar-rail-width: 0px;
   --reader-scrollbar-track-top: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   --reader-internal-search-height: 56px;
   position: relative;
@@ -1153,13 +1162,7 @@ select option:checked {
 }
 
 .reader-scroll-indicator {
-  position: absolute;
-  top: var(--reader-scrollbar-track-top);
-  right: calc(var(--panel-padding) + 3px);
-  bottom: var(--space-3);
-  z-index: 8;
-  width: 3px;
-  pointer-events: none;
+  display: none;
 }
 
 .reader-scroll-thumb {

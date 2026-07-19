@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-identity"),
-      "Web workspace omitted the project-identity assets."
+      webRoot.text.includes("hidden-scrollbars"),
+      "Web workspace omitted the hidden-scrollbar assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -166,6 +166,16 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),
       "Section-detail tag inputs omitted their pill treatment."
+    );
+    assert(
+      workspaceStyles.text.includes("*::-webkit-scrollbar") &&
+        workspaceStyles.text.includes("scrollbar-width: none !important"),
+      "Web workspace no longer hides native scrollbars globally."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-scroll-indicator") &&
+        workspaceStyles.text.includes("display: none;"),
+      "Reader workspace still renders its custom scroll indicator."
     );
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");
