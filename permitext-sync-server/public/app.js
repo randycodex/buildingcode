@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-direct-project-archive";
+const workboardClientVersion = "20260719-live-saved-pane";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -2000,22 +2000,22 @@ function currentContentSummary() {
       updatedAt: item.updatedAt || new Date().toISOString()
     }));
   const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems];
-  const localAnnotations = (state.localAnnotations || []).filter((item) => item && !item.deletedAt);
+  const savedItemsBySection = new Map(
+    summarySavedItems.map((item) => [String(item.sectionID || ""), item])
+  );
+  localSavedItems.forEach((item) => {
+    if (item?.sectionID) savedItemsBySection.set(String(item.sectionID), item);
+  });
+  const annotationsByID = new Map(
+    summaryAnnotations.map((item) => [String(item.id || ""), item])
+  );
+  (state.localAnnotations || []).forEach((item) => {
+    if (item?.id) annotationsByID.set(String(item.id), item);
+  });
   return {
     ...summary,
-    savedItems: [
-      ...summarySavedItems,
-      ...localSavedItems.filter((localItem, index, items) =>
-        items.findIndex((item) => String(item.sectionID) === String(localItem.sectionID)) === index &&
-        !summarySavedItems.some((item) => String(item.sectionID) === String(localItem.sectionID))
-      )
-    ],
-    annotations: [
-      ...summaryAnnotations,
-      ...localAnnotations.filter((localAnnotation) =>
-        !summaryAnnotations.some((annotation) => String(annotation.id || "") === String(localAnnotation.id || ""))
-      )
-    ],
+    savedItems: Array.from(savedItemsBySection.values()).filter((item) => !item.deletedAt),
+    annotations: Array.from(annotationsByID.values()).filter((item) => !item.deletedAt),
     projectSections: [
       ...(summary.projectSections || []),
       ...(state.localProjectSections || [])
@@ -2897,6 +2897,9 @@ async function updateProjectFolder(project, details = {}) {
 
 function isSectionSaved(sectionID) {
   const sectionKey = String(sectionID);
+  const localRecord = [...(state.localSavedItems || [])].reverse()
+    .find((item) => String(item.sectionID || "") === sectionKey);
+  if (localRecord) return !localRecord.deletedAt;
   if ((state.localSavedSectionIDs || []).map(String).includes(sectionKey)) return true;
   const savedItems = syncedContent?.summary?.savedItems || [];
   return savedItems.some((item) => String(item.sectionID) === sectionKey);
@@ -2915,22 +2918,18 @@ function setLocalSectionSaved(sectionID, saved) {
 async function persistSectionBookmark(sectionPayload, saved) {
   setLocalSectionSaved(sectionPayload.sectionID, saved);
   const sectionKey = String(sectionPayload.sectionID || "");
-  if (saved) {
-    const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
-    state.localSavedItems = [
-      ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
-      record
-    ];
-  } else {
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
-  }
+  const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
+  const localRecord = saved ? record : { ...record, deletedAt: record.updatedAt };
+  state.localSavedItems = [
+    ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
+    localRecord
+  ];
   saveWorkspaceState();
+  await refreshOpenSavedPanes();
   if (!activeAccount()) return;
   await pushMutation(saved ? savedMutationForSection(sectionPayload) : deletedSavedMutationForSection(sectionPayload));
-  if (saved) {
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
-    saveWorkspaceState();
-  }
+  state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+  saveWorkspaceState();
 }
 
 async function persistSectionInProject(project, sectionPayload) {
@@ -3151,6 +3150,7 @@ function setAnnotationTags(target, tags) {
     syncFields: ["tags"]
   });
   upsertLocalAnnotation(record);
+  refreshOpenSavedPanes().catch(() => {});
   scheduleAnnotationPush(record);
 }
 
@@ -5859,6 +5859,14 @@ async function renderSaved(paneID = "utility:saved") {
   }
 
   return panel;
+}
+
+async function refreshOpenSavedPanes() {
+  const paneIDs = (state.utilityInstances || [])
+    .filter((instance) => instance.key === "saved")
+    .map((instance) => paneIDForUtilityInstance(instance));
+  if (!paneIDs.length) return;
+  await transitionWorkspace("utility", { refreshPaneIDs: paneIDs });
 }
 
 function removeIconSVG() {

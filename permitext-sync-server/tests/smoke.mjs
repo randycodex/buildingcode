@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("direct-project-archive"),
-      "Web workspace omitted the direct-project archive assets."
+      webRoot.text.includes("live-saved-pane"),
+      "Web workspace omitted the live Saved-pane assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -174,6 +174,12 @@ async function main() {
     assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
       "Project archiving still requires confirmation."
+    );
+    assert(
+      workspaceScript.text.includes("await refreshOpenSavedPanes();") &&
+        workspaceScript.text.includes("refreshOpenSavedPanes().catch(() => {});") &&
+        workspaceScript.text.includes('instance.key === "saved"'),
+      "Bookmark and tag changes no longer refresh open Saved columns immediately."
     );
 
     const workspaceStyles = await request("/web/styles.css");
