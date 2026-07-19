@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v4"),
-      "Web workspace omitted the web-notes-v4 assets."
+      webRoot.text.includes("web-notes-v6"),
+      "Web workspace omitted the web-notes-v6 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -155,10 +155,18 @@ async function main() {
       workspaceScript.text.includes("createProjectBulkSelectionController") &&
         workspaceScript.text.includes("await archiveProjects(selectedProjects)") &&
         workspaceScript.text.includes("await deleteArchivedProjects(selectedProjects)") &&
+        workspaceScript.text.includes('deleteButton.textContent = `Delete ${selectedCount}`') &&
         workspaceScript.text.includes("activeAccount() && (!isLocal || isSynced)") &&
         workspaceScript.text.includes("const deletedIDs = new Set()") &&
         workspaceScript.text.includes("This cannot be undone."),
       "Project panes omitted their shared bulk archive/delete selection flow."
+    );
+    assert(
+      workspaceScript.text.includes("function recoverQueuedWorkboardProjectID") &&
+        workspaceScript.text.includes("function prepareSyncOutboxForFlush") &&
+        workspaceScript.text.includes("prepareSyncOutboxForFlush(account);") &&
+        workspaceScript.text.includes("Workboard sync paused because its project identity is missing."),
+      "Invalid legacy Workboard mutations can still block unrelated project-item deletions."
     );
     assert(
       !workspaceScript.text.includes("track.replaceChildren(...nodes)"),
@@ -242,6 +250,24 @@ async function main() {
         workspaceScript.text.includes("function createProjectSectionSelectionController") &&
         workspaceScript.text.includes('newProjectButton.textContent = "New project…"'),
       "Saved and project panes omitted selection removal or new-project saving controls."
+    );
+    assert(
+      workspaceScript.text.includes("projectSavedSourceKey: projectKey") &&
+        workspaceScript.text.includes("candidate.projectSavedSourceKey === projectKey") &&
+        workspaceScript.text.includes("Object.assign(reader, readerFields)"),
+      "Project saved-item clicks no longer reuse one project-linked Reader column."
+    );
+    assert(
+      workspaceScript.text.includes("await pushMutation(deletedProjectSectionMutationForItem(project, item))") &&
+        workspaceScript.text.includes("await persistSectionBookmark(item, false, { refreshSavedPanes: false })") &&
+        workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false)"),
+      "Removing a project item no longer clears its saved bookmark state in open Readers."
+    );
+    assert(
+      workspaceScript.text.includes('options.sourcePaneID === "utility:archive"') &&
+        workspaceScript.text.includes('placePaneBefore("utility:archive", detailID)') &&
+        workspaceScript.text.includes("placeArchiveAfterProjectsStack();"),
+      "Archived project details no longer open immediately to the archive column's left."
     );
     assert(
       workspaceScript.text.includes("function setReaderNotesActiveTarget") &&

@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v4";
+const workboardClientVersion = "20260719-web-notes-v6";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1144,6 +1144,17 @@ function placePaneAfter(anchorPaneID, paneID) {
   });
   const anchorIndex = ordered.indexOf(anchorPaneID);
   ordered.splice(anchorIndex === -1 ? ordered.length : anchorIndex + 1, 0, paneID);
+  state.paneOrder = ordered;
+}
+
+function placePaneBefore(anchorPaneID, paneID) {
+  const activeIDs = defaultActivePaneIDs().filter((id) => id !== paneID);
+  const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== paneID);
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  const anchorIndex = ordered.indexOf(anchorPaneID);
+  ordered.splice(anchorIndex === -1 ? 0 : anchorIndex, 0, paneID);
   state.paneOrder = ordered;
 }
 
@@ -2499,6 +2510,70 @@ function enqueueSyncMutation(mutation, account) {
   return entry;
 }
 
+function recoverQueuedWorkboardProjectID(record = {}) {
+  const direct = String(record.projectID || "").trim();
+  if (direct && direct.length <= 200) return direct;
+  const recordID = String(record.id || "");
+  const markerIndex = recordID.lastIndexOf(":workboard:");
+  const embedded = markerIndex === -1 ? "" : recordID.slice(markerIndex + ":workboard:".length).trim();
+  if (embedded && embedded.length <= 200) return embedded;
+  const matchingProject = visibleProjectRecords(syncedContent?.summary?.projects || []).find((project) =>
+    String(project.name || project.title || "").trim() === String(record.projectName || "").trim()
+  );
+  const matchedID = workboardProjectID(matchingProject);
+  return matchedID && matchedID.length <= 200 ? matchedID : "";
+}
+
+function prepareSyncOutboxForFlush(account) {
+  const repairedEntries = [];
+  const quarantinedEntries = [];
+  let changed = false;
+  (state.syncOutbox || []).forEach((entry) => {
+    if (entry.accountUserID !== account.userID) {
+      repairedEntries.push(entry);
+      return;
+    }
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    if (kind !== "workboard") {
+      repairedEntries.push(entry);
+      return;
+    }
+    const projectID = recoverQueuedWorkboardProjectID(record);
+    if (!projectID) {
+      changed = true;
+      quarantinedEntries.push({
+        ...entry,
+        conflictedAt: new Date().toISOString(),
+        lastError: "Workboard sync paused because its project identity is missing."
+      });
+      return;
+    }
+    const canonicalID = `${account.userID}:workboard:${projectID}`;
+    const repaired = {
+      ...entry,
+      id: `${account.userID}:${canonicalID}`,
+      recordID: canonicalID,
+      mutation: {
+        workboard: {
+          ...record,
+          id: canonicalID,
+          userID: account.userID,
+          projectID
+        }
+      }
+    };
+    if (projectID !== String(record.projectID || "") || canonicalID !== String(record.id || "")) changed = true;
+    repairedEntries.push(repaired);
+  });
+  if (!changed) return;
+  state.syncOutbox = Array.from(new Map(repairedEntries.map((entry) => [entry.id, entry])).values());
+  state.syncConflicts = [
+    ...(state.syncConflicts || []).filter((entry) => !quarantinedEntries.some((invalid) => invalid.id === entry.id)),
+    ...quarantinedEntries
+  ];
+  saveWorkspaceState();
+}
+
 function discardLocalMutationOverlay(mutation) {
   const { kind, record } = mutationKindAndRecord(mutation);
   const recordID = syncMutationRecordID(mutation);
@@ -2557,6 +2632,7 @@ async function flushSyncOutbox(options = {}) {
   if (syncFlushPromise) return syncFlushPromise;
 
   syncFlushPromise = (async () => {
+    prepareSyncOutboxForFlush(account);
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];
     let latestPayload = null;
@@ -3039,7 +3115,7 @@ async function persistSectionInProject(project, sectionPayload) {
   saveWorkspaceState();
 }
 
-async function removeSectionFromProject(project, item) {
+async function removeSectionFromProject(project, item, options = {}) {
   const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
   const projectID = projectRecordID(project);
   if (!sectionID || !projectID) return;
@@ -3055,10 +3131,15 @@ async function removeSectionFromProject(project, item) {
   state.localProjectSections = (state.localProjectSections || []).filter((candidate) => !matches(candidate));
   saveWorkspaceState();
 
-  if (!wasLocal && activeAccount()) {
+  if (activeAccount()) {
     await pushMutation(deletedProjectSectionMutationForItem(project, item));
   } else if (!activeAccount() && !wasLocal) {
-    window.alert("Sign in from Settings before removing a synced project section.");
+    throw new Error("Sign in from Settings before removing a synced project section.");
+  }
+
+  if (options.removeBookmark !== false) {
+    await persistSectionBookmark(item, false, { refreshSavedPanes: false });
+    syncReaderNoteBookmarkButtons(sectionID, false);
   }
 }
 
@@ -5439,11 +5520,18 @@ function createProjectBulkSelectionController(panel, projects, mode) {
   const actionButton = document.createElement("button");
   actionButton.className = `project-bulk-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
   actionButton.type = "button";
+  const deleteButton = mode === "projects" ? document.createElement("button") : null;
+  if (deleteButton) {
+    deleteButton.className = "project-bulk-action is-delete";
+    deleteButton.type = "button";
+  }
   const cancelButton = document.createElement("button");
   cancelButton.className = "project-bulk-link";
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
-  bulkBar.append(countLabel, selectAllButton, actionButton, cancelButton);
+  bulkBar.append(countLabel, selectAllButton, actionButton);
+  if (deleteButton) bulkBar.append(deleteButton);
+  bulkBar.append(cancelButton);
   panel.append(bulkBar);
 
   function update() {
@@ -5458,6 +5546,10 @@ function createProjectBulkSelectionController(panel, projects, mode) {
     selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
     actionButton.textContent = `${mode === "archive" ? "Delete" : "Archive"} ${selectedCount}`;
     actionButton.disabled = selectedCount === 0 || busy;
+    if (deleteButton) {
+      deleteButton.textContent = `Delete ${selectedCount}`;
+      deleteButton.disabled = selectedCount === 0 || busy;
+    }
     selectAllButton.disabled = busy;
     cancelButton.disabled = busy;
     selectButton.disabled = busy;
@@ -5534,6 +5626,17 @@ function createProjectBulkSelectionController(panel, projects, mode) {
     const completed = mode === "projects"
       ? await archiveProjects(selectedProjects)
       : await deleteArchivedProjects(selectedProjects);
+    if (!completed) {
+      busy = false;
+      update();
+    }
+  });
+  deleteButton?.addEventListener("click", async () => {
+    const selectedProjects = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
+    if (!selectedProjects.length) return;
+    busy = true;
+    update();
+    const completed = await deleteArchivedProjects(selectedProjects);
     if (!completed) {
       busy = false;
       update();
@@ -5646,7 +5749,7 @@ function projectSectionBelongsToProject(item, project) {
   return itemIDs.some((id) => projectIDs.includes(id));
 }
 
-async function openProjectDetail(project) {
+async function openProjectDetail(project, options = {}) {
   if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
     openDetachedWindow(project);
     return;
@@ -5658,7 +5761,12 @@ async function openProjectDetail(project) {
     closeProjectDetailForProject(identity);
   } else {
     setOpenProjectDetails([...details, identity]);
-    placeProjectDetailAfterProjects(identity);
+    if (options.sourcePaneID === "utility:archive") {
+      placePaneBefore("utility:archive", detailID);
+      placeArchiveAfterProjectsStack();
+    } else {
+      placeProjectDetailAfterProjects(identity);
+    }
   }
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
@@ -6149,15 +6257,23 @@ async function renderProjectSectionText(content, project, item) {
 async function openProjectSavedSection(project, item) {
   const detail = { ...item };
   const { chapter, section } = await resolveSectionDetail(detail);
-  const reader = newReaderState({
+  const projectKey = projectDetailKey(project);
+  const readerFields = {
     codePrefix: detail.codePrefix || "BC",
     chapterID: detail.chapterID || chapter?.id || "",
     sectionID: String(detail.sectionID || detail.savedSectionID || detail.itemID || ""),
     sectionNumber: section?.sectionNumber || detail.sectionNumber || "",
     title: section?.title || detail.title || "Section",
-    shouldSmoothScrollToSection: false
-  });
-  state.readers.push(reader);
+    shouldSmoothScrollToSection: false,
+    projectSavedSourceKey: projectKey
+  };
+  let reader = (state.readers || []).find((candidate) => candidate.projectSavedSourceKey === projectKey);
+  if (reader) {
+    Object.assign(reader, readerFields);
+  } else {
+    reader = newReaderState(readerFields);
+    state.readers.push(reader);
+  }
   placePaneAfter(paneIDForProjectDetail(project), paneIDForReader(reader));
   updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
@@ -6377,13 +6493,13 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
     selectionController?.register(card, project);
     card.addEventListener("click", (event) => {
       if (selectionController?.isActive()) selectionController.toggle(project, event);
-      else openProjectDetail(project);
+      else openProjectDetail(project, { sourcePaneID: mode === "archive" ? "utility:archive" : "utility:projects" });
     });
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
       if (selectionController?.isActive()) selectionController.toggle(project, event);
-      else openProjectDetail(project);
+      else openProjectDetail(project, { sourcePaneID: mode === "archive" ? "utility:archive" : "utility:projects" });
     });
     content.append(card);
   });
