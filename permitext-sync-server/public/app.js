@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-close-notes-on-chapter-change";
+const workboardClientVersion = "20260719-remove-saved-empty-state";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -5898,10 +5898,7 @@ async function renderSaved(paneID = "utility:saved") {
     (String(annotation.noteBody || "").trim() || normalizeAnnotationTags(annotation.tags || []).length)
   );
 
-  appendSectionLabel(content, "Saved sections");
-  if (savedItems.length === 0) {
-    appendMutedRow(content, "No saved sections", "Saved sections synced from iOS or saved in this web workspace will appear here.");
-  } else {
+  if (savedItems.length > 0) {
     renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID, { removableSavedItems: true });
   }
 

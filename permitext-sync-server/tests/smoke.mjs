@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("close-notes-on-chapter-change"),
-      "Web workspace omitted the close-notes-on-chapter-change assets."
+      webRoot.text.includes("remove-saved-empty-state"),
+      "Web workspace omitted the remove-saved-empty-state assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -131,6 +131,15 @@ async function main() {
     assert(
       workspaceScript.response.headers.get("cache-control")?.includes("immutable"),
       "Versioned web workspace assets were not browser-cacheable."
+    );
+    assert(
+      !workspaceScript.text.includes('appendSectionLabel(content, "Saved sections")'),
+      "Saved pane still included its retired Saved sections heading."
+    );
+    assert(
+      !workspaceScript.text.includes("No saved sections") &&
+        !workspaceScript.text.includes("Saved sections synced from iOS or saved in this web workspace"),
+      "Saved pane still included its retired empty bookmark state."
     );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
