@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-reader-notes-header-cleanup";
+const workboardClientVersion = "20260719-close-notes-on-chapter-change";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3813,16 +3813,20 @@ function restoreReaderNotesSheet(panel, reader, sections) {
   openReaderNotesSheet(panel, section, reader, { instant: true, target });
 }
 
-function closeReaderNotesSheet(panel, reader = null) {
-  const sheet = panel?.querySelector(".reader-notes-sheet");
-  if (!sheet) return;
+function closeReaderNotesSheet(panel, reader = null, options = {}) {
   if (reader) {
     reader.activeNotesSectionID = "";
     reader.activeNotesBlockID = "";
     saveWorkspaceState();
   }
+  const sheet = panel?.querySelector(".reader-notes-sheet");
+  if (!sheet) return;
   sheet.classList.remove("is-open");
   setReaderNotesActiveTarget(panel);
+  if (options.instant) {
+    sheet.hidden = true;
+    return;
+  }
   window.setTimeout(() => {
     if (!sheet.classList.contains("is-open")) sheet.hidden = true;
   }, 220);
@@ -4407,6 +4411,7 @@ async function renderReader(reader, options = {}) {
   decreaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, -1));
   increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
   codeSelect.addEventListener("change", async () => {
+    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";
     applyCodeTheme(panel, reader);
     reader.chapterID = await firstChapterIDForCode(reader.codePrefix);
@@ -4459,6 +4464,7 @@ async function renderReader(reader, options = {}) {
   });
 
   chapterSelect.addEventListener("change", async () => {
+    closeReaderNotesSheet(panel, reader, { instant: true });
     reader.chapterID = chapterSelect.value;
     state.recentChaptersByCode = state.recentChaptersByCode || {};
     if (reader.chapterID) {

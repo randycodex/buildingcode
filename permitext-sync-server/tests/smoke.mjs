@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-notes-header-cleanup"),
-      "Web workspace omitted the Reader notes header-cleanup assets."
+      webRoot.text.includes("close-notes-on-chapter-change"),
+      "Web workspace omitted the close-notes-on-chapter-change assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -195,6 +195,11 @@ async function main() {
     assert(
       !workspaceScript.text.includes("reader-notes-title"),
       "Reader notes still repeat the active paragraph title in the note sheet."
+    );
+    assert(
+      workspaceScript.text.match(/codeSelect\.addEventListener\("change"[\s\S]*?closeReaderNotesSheet\(panel, reader, \{ instant: true \}\)/) &&
+        workspaceScript.text.match(/chapterSelect\.addEventListener\("change"[\s\S]*?closeReaderNotesSheet\(panel, reader, \{ instant: true \}\)/),
+      "Reader notes no longer close immediately when the code or chapter changes."
     );
 
     const workspaceStyles = await request("/web/styles.css");
