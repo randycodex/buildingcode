@@ -65,6 +65,7 @@ async function waitForServer() {
 async function main() {
   const tempDir = await mkdtemp(join(tmpdir(), "permitext-sync-smoke-"));
   const dataPath = join(tempDir, "sync-store.json");
+  const workboardSource = await readFile(new URL("../src/workboard.jsx", import.meta.url), "utf8");
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
@@ -118,8 +119,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-bulk-actions-v8"),
-      "Web workspace omitted the project-bulk-actions-v8 assets."
+      webRoot.text.includes("workboard-system-theme-v1"),
+      "Web workspace omitted the workboard-system-theme-v1 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -288,6 +289,12 @@ async function main() {
     assert(
       workboardScript.response.headers.get("cache-control")?.includes("immutable"),
       "Versioned Workboard assets were not browser-cacheable."
+    );
+    assert(
+      workboardSource.includes("function usePreferredTheme()") &&
+        workboardSource.includes('mediaQuery.addEventListener("change", updateTheme)') &&
+        workboardSource.includes("theme={theme}"),
+      "Workboard no longer follows live system appearance changes."
     );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");

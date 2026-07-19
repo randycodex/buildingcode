@@ -108,6 +108,25 @@ function preferredTheme() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
 
+function usePreferredTheme() {
+  const [theme, setTheme] = useState(preferredTheme);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia?.("(prefers-color-scheme: dark)");
+    if (!mediaQuery) return undefined;
+    const updateTheme = () => setTheme(mediaQuery.matches ? "dark" : "light");
+    updateTheme();
+    if (mediaQuery.addEventListener) {
+      mediaQuery.addEventListener("change", updateTheme);
+      return () => mediaQuery.removeEventListener("change", updateTheme);
+    }
+    mediaQuery.addListener?.(updateTheme);
+    return () => mediaQuery.removeListener?.(updateTheme);
+  }, []);
+
+  return theme;
+}
+
 function updatedAtTime(board) {
   const timestamp = Date.parse(board?.updatedAt || "");
   return Number.isFinite(timestamp) ? timestamp : 0;
@@ -162,6 +181,7 @@ function Workboard({
   loadAsset,
   remoteRevision = ""
 }) {
+  const theme = usePreferredTheme();
   const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
@@ -396,7 +416,7 @@ function Workboard({
             initialData={boardView.initialData}
             excalidrawAPI={captureExcalidrawAPI}
             onChange={handleChange}
-            theme={preferredTheme()}
+            theme={theme}
             name={`${boardView.projectName} Workboard`}
             autoFocus
             aiEnabled={false}
