@@ -556,7 +556,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .reader-panel .panel-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 92px;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: var(--space-2);
   position: absolute;
@@ -613,9 +613,39 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .reader-panel .panel-actions {
   justify-content: end;
-  min-width: 92px;
+  min-width: 0;
   position: relative;
   z-index: 2;
+}
+
+.reader-text-size-controls {
+  display: flex;
+  align-items: center;
+  height: var(--panel-title-control-size);
+}
+
+.reader-text-size-button {
+  min-width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  padding: 0 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.reader-text-size-button:hover,
+.reader-text-size-button:focus-visible {
+  color: var(--text-primary);
+}
+
+.reader-text-size-button:disabled {
+  color: var(--text-tertiary);
+  opacity: 0.42;
 }
 
 .icon-button,

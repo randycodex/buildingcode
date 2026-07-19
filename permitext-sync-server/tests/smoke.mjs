@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("static-reader-headings"),
-      "Web workspace omitted the static Reader-heading assets."
+      webRoot.text.includes("reader-text-controls"),
+      "Web workspace omitted the Reader text-control assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -180,6 +180,12 @@ async function main() {
         workspaceScript.text.includes("refreshOpenSavedPanes().catch(() => {});") &&
         workspaceScript.text.includes('instance.key === "saved"'),
       "Bookmark and tag changes no longer refresh open Saved columns immediately."
+    );
+    assert(
+      workspaceScript.text.includes("changeReaderTextSize(panel, reader, -1)") &&
+        workspaceScript.text.includes('panel.style.setProperty("--reader-font-size"') &&
+        webRoot.text.includes('aria-label="Reader text size"'),
+      "Reader headers omitted their per-Reader text resize controls."
     );
 
     const workspaceStyles = await request("/web/styles.css");

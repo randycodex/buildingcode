@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-static-reader-headings";
+const workboardClientVersion = "20260719-reader-text-controls";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -636,6 +636,43 @@ function applyReaderSettings() {
   document.documentElement.style.setProperty("--reader-font-size", `${state.readerSettings.fontSize}pt`);
   document.documentElement.style.setProperty("--reader-line-height", String(readerLineHeightValue(state.readerSettings.lineSpacing)));
   document.documentElement.style.setProperty("--reader-font-family", readerFontFamilyValue());
+}
+
+function readerTextSizeValue(reader) {
+  return clampNumber(reader?.textSize, 10, 18, state.readerSettings.fontSize);
+}
+
+function syncReaderTextSizeControls(panel, reader) {
+  const size = readerTextSizeValue(reader);
+  const decreaseButton = panel.querySelector(".reader-text-decrease");
+  const increaseButton = panel.querySelector(".reader-text-increase");
+  if (decreaseButton) {
+    decreaseButton.disabled = size <= 10;
+    decreaseButton.title = `Decrease Reader text size (${size} pt)`;
+  }
+  if (increaseButton) {
+    increaseButton.disabled = size >= 18;
+    increaseButton.title = `Increase Reader text size (${size} pt)`;
+  }
+}
+
+function applyReaderTextSize(panel, reader) {
+  if (Number.isFinite(Number(reader?.textSize))) {
+    panel.style.setProperty("--reader-font-size", `${readerTextSizeValue(reader)}pt`);
+  } else {
+    panel.style.removeProperty("--reader-font-size");
+  }
+  syncReaderTextSizeControls(panel, reader);
+}
+
+function changeReaderTextSize(panel, reader, delta) {
+  reader.textSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 18, state.readerSettings.fontSize);
+  applyReaderTextSize(panel, reader);
+  saveWorkspaceState();
+  requestAnimationFrame(() => {
+    syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
+    updateReaderScrollIndicator(panel);
+  });
 }
 
 function newReaderState(overrides = {}) {
@@ -4329,6 +4366,8 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
+  const decreaseTextButton = panel.querySelector(".reader-text-decrease");
+  const increaseTextButton = panel.querySelector(".reader-text-increase");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -4342,6 +4381,7 @@ async function renderReader(reader, options = {}) {
   reader.codePrefix = reader.codePrefix || "BC";
   applyCodeTheme(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
+  applyReaderTextSize(panel, reader);
   selector.hidden = false;
   setTitle(panel, reader);
   reader.commentsOpen = false;
@@ -4358,6 +4398,8 @@ async function renderReader(reader, options = {}) {
   }
 
   populateCodeSelect(panel, reader);
+  decreaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, -1));
+  increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
   codeSelect.addEventListener("change", async () => {
     reader.codePrefix = codeSelect.value || "BC";
     applyCodeTheme(panel, reader);
