@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("workboard-wheel-routing"),
-      "Web workspace omitted the Workboard wheel-routing assets."
+      webRoot.text.includes("search-detail-notes"),
+      "Web workspace omitted the search-detail and note-control assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -144,12 +144,24 @@ async function main() {
       workspaceScript.text.includes("window.requestAnimationFrame(applyPendingResize)"),
       "Divider resizing is no longer coalesced to animation frames."
     );
+    assert(
+      workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
+      "Search result changes no longer refresh their existing section-detail column."
+    );
+    assert(
+      !workspaceScript.text.includes('notesTitle.textContent = "Notes"'),
+      "Section details still render the retired Notes heading."
+    );
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
       "Divider resizing still invalidates cursor styles across every workspace descendant."
+    );
+    assert(
+      workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),
+      "Section-detail tag inputs omitted their pill treatment."
     );
 
     const workboardScript = await request("/web/workboard-assets/workboard.js");

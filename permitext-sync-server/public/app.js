@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260716-workboard-wheel-routing";
+const workboardClientVersion = "20260719-search-detail-notes";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -4691,7 +4691,10 @@ async function openSectionDetail(searchID, section, options = {}) {
   const linkedReader = updateLinkedReaderForSearch(searchID, details[searchID]);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: linkedReader ? [paneIDForReader(linkedReader)] : []
+    refreshPaneIDs: [
+      paneIDForSectionDetail(searchID),
+      ...(linkedReader ? [paneIDForReader(linkedReader)] : [])
+    ]
   });
 }
 
@@ -4914,11 +4917,9 @@ async function renderSectionDetail(searchID, detail) {
   notes.className = "section-detail-notes";
   const notesHeader = document.createElement("div");
   notesHeader.className = "section-detail-notes-header";
-  const notesTitle = document.createElement("h3");
-  notesTitle.textContent = "Notes";
   const saveState = document.createElement("span");
   saveState.className = "section-detail-note-state";
-  notesHeader.append(notesTitle, saveState);
+  notesHeader.append(saveState);
   const textareaWrap = document.createElement("label");
   textareaWrap.className = "section-detail-note-box";
   const textarea = document.createElement("textarea");
