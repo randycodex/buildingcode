@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("section-detail-controls"),
-      "Web workspace omitted the section-detail control assets."
+      webRoot.text.includes("reader-section-anchor"),
+      "Web workspace omitted the reader section anchor assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -160,6 +160,11 @@ async function main() {
       !workspaceScript.text.includes('title: "Share section"') &&
         !workspaceScript.text.includes("function shareIconSVG()"),
       "Section details still include their retired share control."
+    );
+    assert(
+      workspaceScript.text.includes("alignReaderSectionAfterLayout(reader);") &&
+        workspaceScript.text.includes("const anchorRect = panel?.getBoundingClientRect() || contentRect;"),
+      "Linked Readers no longer align selected sections below their headers after layout."
     );
 
     const workspaceStyles = await request("/web/styles.css");

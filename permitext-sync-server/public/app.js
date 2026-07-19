@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-section-detail-controls";
+const workboardClientVersion = "20260719-reader-section-anchor";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1391,9 +1391,10 @@ function scrollReaderContentToNode(content, target, behavior = "auto") {
   const contentRect = content.getBoundingClientRect();
   const targetRect = target.getBoundingClientRect();
   const panel = content.closest(".reader-panel");
+  const anchorRect = panel?.getBoundingClientRect() || contentRect;
   const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
   const offset = Number.isFinite(headerOffset) ? headerOffset : 0;
-  const targetTop = content.scrollTop + targetRect.top - contentRect.top - offset;
+  const targetTop = content.scrollTop + targetRect.top - anchorRect.top - offset;
   content.scrollTo({
     top: Math.max(0, targetTop),
     behavior
@@ -3368,6 +3369,19 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   scrollReaderContentToNode(content, target, behavior);
 }
 
+function alignReaderSectionAfterLayout(reader) {
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const panel = track.querySelector(
+        `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(reader))}"]`
+      );
+      const content = panel?.querySelector(".reader-content");
+      if (!content) return;
+      scrollReaderContentToSection(content, reader.sectionID, "auto", reader.sectionNumber);
+    });
+  });
+}
+
 async function navigateReaderToSection(panel, reader, behavior = "auto") {
   setTitle(panel, reader);
   const sectionSelect = panel.querySelector(".section-select");
@@ -4941,10 +4955,12 @@ async function renderSectionDetail(searchID, detail) {
     const reader = openOrUpdateLinkedReaderForSearch(searchID, detail, {
       chapterID: detail.chapterID || chapter?.id || "",
       sectionNumber: sectionPayload.sectionNumber,
-      title: sectionPayload.title
+      title: sectionPayload.title,
+      shouldSmoothScrollToSection: false
     });
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+    alignReaderSectionAfterLayout(reader);
   });
 
   let noteTimer = null;
