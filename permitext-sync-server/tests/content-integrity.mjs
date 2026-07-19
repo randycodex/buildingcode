@@ -149,6 +149,32 @@ async function main() {
     assert(canonicalSectionIDs.has(expectedID), `Canonical section file ${file} is not referenced by chapter content.`);
   }
 
+  const fuelGasTerms = await readJSON(join(canonicalSectionRoot, "8021.json"));
+  const fuelGasTermsText = fuelGasTerms.blocks.map((block) => block.plainText || "").join("\n");
+  assert(
+    fuelGasTerms.chapterNumber === "2" &&
+      fuelGasTermsText.includes("ordinarily accepted meanings") &&
+      !fuelGasTermsText.includes("air infiltration rate"),
+    "FGC 201.4 is not using its canonical Terms not defined body."
+  );
+
+  const fuelGasInfiltration = await readJSON(join(canonicalSectionRoot, "8090.json"));
+  const fuelGasInfiltrationText = fuelGasInfiltration.blocks.map((block) => block.plainText || "").join("\n");
+  const fuelGasEquationAssets = fuelGasInfiltration.blocks
+    .map((block) => block.imageID)
+    .filter(Boolean);
+  assert(
+    fuelGasInfiltration.chapterNumber === "3" &&
+      fuelGasInfiltrationText.includes("air infiltration rate") &&
+      fuelGasInfiltrationText.includes("Equation 3-1") &&
+      fuelGasInfiltrationText.includes("Equation 3-2"),
+    "FGC 304.5.2 is not using its canonical known-air-infiltration body."
+  );
+  assert(fuelGasEquationAssets.length === 2, "FGC 304.5.2 must reference both equation images.");
+  for (const asset of fuelGasEquationAssets) {
+    assert(await exists(join(canonicalRoot, "assets", asset)), `FGC 304.5.2 equation asset ${asset} is missing.`);
+  }
+
   let availableBodyCount = 0;
   for (const row of rows) {
     if (
