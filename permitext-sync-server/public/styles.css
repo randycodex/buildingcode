@@ -7,6 +7,7 @@
   --comment-surface: color-mix(in srgb, #fff2c2 24%, var(--surface));
   --reader-notes-surface: #eeeeee;
   --reader-notes-input-surface: #ffffff;
+  --reader-notes-active-text: #00636d;
   --reader-notes-default-height: 250px;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
@@ -61,6 +62,7 @@
     --comment-surface: #22190a;
     --reader-notes-surface: #1c1c1d;
     --reader-notes-input-surface: #3c3e40;
+    --reader-notes-active-text: #91e8ef;
     --text-primary: #f6f4f1;
     --text-secondary: #a09fa7;
     --text-tertiary: #6f6f78;
@@ -1499,6 +1501,25 @@ select option:checked {
 
 .annotated-code-block > :where(.section-block, .section-html, .code-table, .code-media) {
   grid-column: 1;
+}
+
+.annotated-code-block.is-notes-active :where(
+  .section-block,
+  .section-html,
+  .code-table,
+  p,
+  div,
+  span,
+  strong,
+  em,
+  b,
+  i,
+  li,
+  td,
+  th
+) {
+  color: var(--reader-notes-active-text) !important;
+  -webkit-text-fill-color: var(--reader-notes-active-text);
 }
 
 .inline-comment {

@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-notes-tag-pill"),
-      "Web workspace omitted the Reader notes tag-pill assets."
+      webRoot.text.includes("reader-note-paragraph-highlight"),
+      "Web workspace omitted the Reader note paragraph-highlight assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -187,6 +187,11 @@ async function main() {
         webRoot.text.includes('aria-label="Reader text size"'),
       "Reader headers omitted their per-Reader text resize controls."
     );
+    assert(
+      workspaceScript.text.includes("function setReaderNotesActiveTarget") &&
+        workspaceScript.text.includes('annotated-code-block[data-block-id='),
+      "Reader notes no longer retain the active paragraph target."
+    );
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
@@ -206,6 +211,12 @@ async function main() {
       workspaceStyles.text.includes(".reader-notes-tags .annotation-tag-input") &&
         workspaceStyles.text.includes("calc(var(--space-5) + var(--space-4))"),
       "Reader notes tag inputs omitted their pill treatment or bottom clearance."
+    );
+    assert(
+      workspaceStyles.text.includes("--reader-notes-active-text: #00636d") &&
+        workspaceStyles.text.includes("--reader-notes-active-text: #91e8ef") &&
+        workspaceStyles.text.includes(".annotated-code-block.is-notes-active"),
+      "Reader note targets omitted their theme-aware paragraph highlight."
     );
     assert(
       workspaceStyles.text.includes("*::-webkit-scrollbar") &&

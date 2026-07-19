@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-reader-notes-tag-pill";
+const workboardClientVersion = "20260719-reader-note-paragraph-highlight";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3691,6 +3691,22 @@ function toggleReaderNotesSheet(panel, section, reader) {
   openReaderNotesSheet(panel, section, reader);
 }
 
+function setReaderNotesActiveTarget(panel, sectionID = "", blockID = "") {
+  if (!panel) return;
+  panel.querySelectorAll(".chapter-section.is-notes-active, .annotated-code-block.is-notes-active").forEach((element) => {
+    element.classList.remove("is-notes-active");
+  });
+  const sectionKey = sectionNoteKey(sectionID);
+  if (!sectionKey) return;
+  const sectionElement = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`);
+  sectionElement?.classList.add("is-notes-active");
+  const blockKey = normalizeAnnotationBlockID(blockID);
+  if (!blockKey) return;
+  sectionElement
+    ?.querySelector(`.annotated-code-block[data-block-id="${CSS.escape(blockKey)}"]`)
+    ?.classList.add("is-notes-active");
+}
+
 function openReaderNotesSheet(panel, section, reader, options = {}) {
   if (!panel || !section) return;
   const sheet = ensureReaderNotesSheet(panel, reader);
@@ -3703,10 +3719,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     reader.activeNotesBlockID = blockID;
     saveWorkspaceState();
   }
-  panel.querySelectorAll(".chapter-section.is-notes-active").forEach((activeSection) => {
-    activeSection.classList.remove("is-notes-active");
-  });
-  panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`)?.classList.add("is-notes-active");
+  setReaderNotesActiveTarget(panel, sectionID, blockID);
 
   const saved = isSectionSaved(section.id);
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
@@ -3814,9 +3827,7 @@ function closeReaderNotesSheet(panel, reader = null) {
     saveWorkspaceState();
   }
   sheet.classList.remove("is-open");
-  panel.querySelectorAll(".chapter-section.is-notes-active").forEach((section) => {
-    section.classList.remove("is-notes-active");
-  });
+  setReaderNotesActiveTarget(panel);
   window.setTimeout(() => {
     if (!sheet.classList.contains("is-open")) sheet.hidden = true;
   }, 220);
