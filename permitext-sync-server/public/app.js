@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v6";
+const workboardClientVersion = "20260719-web-notes-v7";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -949,6 +949,7 @@ function isFixedWidthPaneID(paneID) {
 
 function isFixedWidthReaderPaneID(paneID) {
   if (!paneID?.startsWith("reader:")) return false;
+  if (activePaneIDs().length >= 4) return true;
   const readerCount = (state.readers || []).length;
   if (readerCount > 3) return true;
   const hasSideColumns = activePaneIDs().some((id) => !id.startsWith("reader:"));
@@ -1263,20 +1264,27 @@ async function closeArchiveColumn() {
 
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
+  const hasManyColumns = ids.length >= 4;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = Number(current[id]);
+    const defaultWidth = defaultPaneWidthForID(id);
     weights[id] = Number.isFinite(value) && value > 40
-      ? value
-      : defaultPaneWidthForID(id);
+      ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
+      : defaultWidth;
     return weights;
   }, {});
 }
 
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
+  const defaultWidth = defaultPaneWidthForID(paneID);
   const value = Number(state.paneWeights[paneID]);
-  const width = Number.isFinite(value) && value > 40 ? value : defaultPaneWidthForID(paneID);
+  const hasManyColumns = activePaneIDs().length >= 4;
+  const width = Number.isFinite(value) && value > 40
+    ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
+    : defaultWidth;
   panel.style.setProperty("--pane-resized-min-width", `${width}px`);
+  panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
     return;
@@ -7257,16 +7265,12 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   resizeHandle?.setPointerCapture?.(event.pointerId);
   track.classList.add("is-resizing");
   const startX = event.clientX;
-  const minimumWidthFor = (pane) => {
-    const responsiveMinimum = Number.parseFloat(getComputedStyle(pane).getPropertyValue("--pane-min-width"));
-    const manualMinimum = pane.classList.contains("workboard-panel") ? 320 : 160;
-    return Number.isFinite(responsiveMinimum) ? Math.min(responsiveMinimum, manualMinimum) : manualMinimum;
-  };
+  const startScrollLeft = track.scrollLeft;
   const paneData = panes.map((pane) => ({
     id: pane.dataset.paneId,
     pane,
     startWidth: pane.getBoundingClientRect().width,
-    minWidth: minimumWidthFor(pane)
+    minWidth: defaultPaneWidthForID(pane.dataset.paneId)
   }));
   const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
   const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
@@ -7281,16 +7285,13 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
     const widths = paneData.map((pane) => pane.startWidth);
-    const minimumDelta = paneData[previousIndex].minWidth - paneData[previousIndex].startWidth;
-    const canGrowWorkspace = paneData.length >= 4;
-    const maximumDelta = canGrowWorkspace
-      ? Number.POSITIVE_INFINITY
-      : paneData[nextIndex].startWidth - paneData[nextIndex].minWidth;
-    const appliedDelta = Math.min(maximumDelta, Math.max(minimumDelta, delta));
-    widths[previousIndex] += appliedDelta;
+    widths[previousIndex] = Math.max(
+      paneData[previousIndex].minWidth,
+      paneData[previousIndex].startWidth + delta
+    );
     widths[nextIndex] = Math.max(
       paneData[nextIndex].minWidth,
-      paneData[nextIndex].startWidth - appliedDelta
+      paneData[nextIndex].startWidth - delta
     );
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
@@ -7299,6 +7300,9 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
       applyPaneWeight(pane.pane, pane.id);
       lastAppliedWidths[index] = widths[index];
     });
+    const appliedPreviousDelta = widths[previousIndex] - paneData[previousIndex].startWidth;
+    const pushedScrollDelta = appliedPreviousDelta - delta;
+    track.scrollLeft = Math.max(0, startScrollLeft + pushedScrollDelta);
   };
 
   const applyPendingResize = () => {

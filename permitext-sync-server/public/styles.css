@@ -325,6 +325,7 @@ textarea:focus-visible {
   --code-accent-soft: rgba(201, 100, 16, 0.105);
   --pane-min-width: clamp(260px, 22vw, 420px);
   --pane-resized-min-width: var(--pane-min-width);
+  --pane-default-min-width: 0px;
   --panel-padding: clamp(16px, 1.8vw, 24px);
   --panel-title-row-height: calc(var(--chrome-font-size) * var(--code-title-scale) * 1.2);
   --panel-title-control-size: var(--panel-title-row-height);
@@ -334,7 +335,7 @@ textarea:focus-visible {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   flex: 1 1 0;
-  min-width: min(var(--pane-min-width), var(--pane-resized-min-width));
+  min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));
   min-height: 0;
   height: calc(100% + var(--space-3));
   max-height: none;
