@@ -2194,6 +2194,11 @@ select option:checked {
   line-height: var(--reader-line-height);
 }
 
+.code-table :where(table, thead, tbody, tfoot, tr, td, th, p, div, span, strong, em, b, i, li) {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor;
+}
+
 .section-html table {
   width: 100%;
   max-width: 100%;
@@ -2221,6 +2226,14 @@ select option:checked {
   .section-html td,
   .section-html th {
     border: 1px solid rgba(255, 255, 255, 0.36) !important;
+  }
+
+  .code-table [style*="background-color:#C0C0C0" i] {
+    background-color: rgba(255, 255, 255, 0.16) !important;
+  }
+
+  .code-table [style*="background-color:#808080" i] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
   }
 }
 

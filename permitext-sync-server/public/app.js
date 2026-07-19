@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-center-reader-controls-v2";
+const workboardClientVersion = "20260719-dark-reader-tables-images-v2";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -4095,7 +4095,7 @@ function renderSectionComments(commentsList, targets) {
 function rewriteCodeHTML(html) {
   return String(html || "")
     .replace(/src=(["'])(?:\.\.\/)+assets\/([^"']+)\1/gi, (_match, quote, fileName) => {
-      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}${quote}`;
+      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${workboardClientVersion}${quote}`;
     })
     .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
 }
@@ -4108,7 +4108,7 @@ function renderCodeBlock(block) {
       figure.innerHTML = rewriteCodeHTML(block.html);
     } else if (block.imageID) {
       const image = document.createElement("img");
-      image.src = `/code/assets/${encodeURIComponent(block.imageID)}`;
+      image.src = `/code/assets/${encodeURIComponent(block.imageID)}?v=${workboardClientVersion}`;
       figure.append(image);
     }
     decorateCodeHTML(figure);

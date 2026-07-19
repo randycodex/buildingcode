@@ -1,5 +1,5 @@
-import { access, readFile, readdir } from "node:fs/promises";
-import { dirname, join } from "node:path";
+import { access, open, readFile, readdir, stat } from "node:fs/promises";
+import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)));
@@ -17,6 +17,7 @@ const canonicalRoot = join(
 const canonicalPreparedRoot = join(canonicalRoot, "prepared");
 const chapterRoot = join(canonicalPreparedRoot, "chapters");
 const canonicalSectionRoot = join(canonicalPreparedRoot, "sections");
+const canonicalAssetRoot = join(canonicalRoot, "assets");
 const legacySectionRoot = join(
   workspaceRoot,
   "NYC CC APP",
@@ -65,6 +66,36 @@ function canonicalKey(prefix, chapterNumber, sectionNumber) {
 function resolveCanonicalID(row, canonicalMap) {
   if (Number.isSafeInteger(row.webSectionID) && row.webSectionID > 0) return row.webSectionID;
   return canonicalMap.byCodeChapterSection?.[row.canonicalKey] ?? null;
+}
+
+function imageAssetNames(blocks) {
+  const names = new Set();
+  for (const block of blocks || []) {
+    if (block.imageID) names.add(basename(String(block.imageID)));
+    for (const match of String(block.html || "").matchAll(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) {
+      const source = match[1].split(/[?#]/, 1)[0];
+      if (!source || source.startsWith("data:")) continue;
+      try {
+        names.add(basename(decodeURIComponent(source)));
+      } catch {
+        names.add(basename(source));
+      }
+    }
+  }
+  return [...names].filter(Boolean);
+}
+
+async function pngDimensions(path) {
+  const handle = await open(path, "r");
+  try {
+    const header = Buffer.alloc(24);
+    const { bytesRead } = await handle.read(header, 0, header.length, 0);
+    const pngSignature = "89504e470d0a1a0a";
+    if (bytesRead < header.length || header.subarray(0, 8).toString("hex") !== pngSignature) return null;
+    return { width: header.readUInt32BE(16), height: header.readUInt32BE(20) };
+  } finally {
+    await handle.close();
+  }
 }
 
 async function main() {
@@ -176,12 +207,38 @@ async function main() {
   }
 
   let availableBodyCount = 0;
+  let referencedImageCount = 0;
+  const missingImageAssets = [];
+  const emptyImageAssets = [];
+  const placeholderImageAssets = [];
   for (const row of rows) {
-    if (
-      canonicalOverrideIDs.has(row.canonicalSectionID) ||
-      await exists(join(legacySectionRoot, `${row.webSectionID}.json`))
-    ) {
-      availableBodyCount += 1;
+    const candidates = [
+      join(canonicalSectionRoot, `${row.canonicalSectionID}.json`),
+      join(canonicalSectionRoot, `${row.webSectionID}.json`),
+      join(legacySectionRoot, `${row.webSectionID}.json`)
+    ];
+    const bodyPath = (await Promise.all(candidates.map(async (path) => ((await exists(path)) ? path : null))))
+      .find(Boolean);
+    if (!bodyPath) continue;
+
+    availableBodyCount += 1;
+    const body = await readJSON(bodyPath);
+    for (const assetName of imageAssetNames(body.blocks)) {
+      referencedImageCount += 1;
+      const assetPath = join(canonicalAssetRoot, assetName);
+      if (!(await exists(assetPath))) {
+        missingImageAssets.push(`${assetName} (section ${row.canonicalSectionID})`);
+        continue;
+      }
+      const assetStats = await stat(assetPath);
+      if (assetStats.size === 0) {
+        emptyImageAssets.push(`${assetName} (section ${row.canonicalSectionID})`);
+        continue;
+      }
+      const dimensions = await pngDimensions(assetPath);
+      if (assetStats.size <= 100 || (dimensions?.width === 1 && dimensions?.height === 1)) {
+        placeholderImageAssets.push(`${assetName} (section ${row.canonicalSectionID})`);
+      }
     }
   }
   const expectedPreparedCount = manifest.chapters.reduce(
@@ -192,6 +249,18 @@ async function main() {
     availableBodyCount >= expectedPreparedCount,
     `Only ${availableBodyCount} section bodies are available; the manifest promises ${expectedPreparedCount}.`
   );
+  assert(
+    missingImageAssets.length === 0,
+    `Published section bodies reference ${missingImageAssets.length} missing image assets:\n${missingImageAssets.join("\n")}`
+  );
+  assert(
+    emptyImageAssets.length === 0,
+    `Published section bodies reference ${emptyImageAssets.length} empty image assets:\n${emptyImageAssets.join("\n")}`
+  );
+  assert(
+    placeholderImageAssets.length === 0,
+    `Published section bodies reference ${placeholderImageAssets.length} placeholder image assets:\n${placeholderImageAssets.join("\n")}`
+  );
 
   const duplicateDisplayKeys = [...rowsByCanonicalKey.values()].filter((matchingRows) => matchingRows.length > 1);
   console.log("permitext content integrity passed", {
@@ -200,6 +269,7 @@ async function main() {
     indexedSections: indexedSectionIDs.size,
     canonicalOverrides: canonicalOverrideIDs.size,
     availableBodies: availableBodyCount,
+    referencedImages: referencedImageCount,
     duplicateDisplayKeys: duplicateDisplayKeys.length
   });
 }

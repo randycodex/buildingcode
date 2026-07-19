@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("center-reader-controls-v2"),
-      "Web workspace omitted the center-reader-controls-v2 assets."
+      webRoot.text.includes("dark-reader-tables-images-v2"),
+      "Web workspace omitted the dark-reader-tables-images-v2 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -144,6 +144,10 @@ async function main() {
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
       "Detached Workboards still auto-reattached from an unreliable popup.closed check."
+    );
+    assert(
+      workspaceScript.text.includes("?v=${workboardClientVersion}"),
+      "Published code images no longer receive a content-version cache key."
     );
     assert(
       !workspaceScript.text.includes("track.replaceChildren(...nodes)"),
@@ -235,6 +239,13 @@ async function main() {
         workspaceStyles.text.includes("--reader-notes-active-text: #91e8ef") &&
         workspaceStyles.text.includes(".annotated-code-block.is-notes-active"),
       "Reader note targets omitted their theme-aware paragraph highlight."
+    );
+    assert(
+      workspaceStyles.text.includes(".code-table :where(table, thead, tbody, tfoot, tr, td, th") &&
+        workspaceStyles.text.includes("color: inherit !important;") &&
+        workspaceStyles.text.includes('[style*="background-color:#C0C0C0" i]') &&
+        workspaceStyles.text.includes('[style*="background-color:#808080" i]'),
+      "Reader tables no longer override legacy light-theme colors in dark mode."
     );
     assert(
       workspaceStyles.text.includes("*::-webkit-scrollbar") &&
