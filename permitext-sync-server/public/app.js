@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-workboard-system-theme-v1";
+const workboardClientVersion = "20260719-web-notes-v2";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -666,12 +666,20 @@ function applyReaderTextSize(panel, reader) {
 }
 
 function changeReaderTextSize(panel, reader, delta) {
-  reader.textSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 18, state.readerSettings.fontSize);
-  applyReaderTextSize(panel, reader);
+  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 18, state.readerSettings.fontSize);
+  (state.readers || []).forEach((openReader) => {
+    openReader.textSize = nextSize;
+    const openPanel = track.querySelector(
+      `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(openReader))}"]`
+    );
+    if (openPanel) applyReaderTextSize(openPanel, openReader);
+  });
   saveWorkspaceState();
   requestAnimationFrame(() => {
-    syncCommentBoxHeights(panel.querySelector(".reader-content"), panel.querySelector(".comments-list"));
-    updateReaderScrollIndicator(panel);
+    track.querySelectorAll(".reader-panel").forEach((openPanel) => {
+      syncCommentBoxHeights(openPanel.querySelector(".reader-content"), openPanel.querySelector(".comments-list"));
+      updateReaderScrollIndicator(openPanel);
+    });
   });
 }
 
@@ -1128,6 +1136,17 @@ function placeLinkedReaderAfterSectionDetail(searchID, readerID) {
   state.paneOrder = ordered;
 }
 
+function placePaneAfter(anchorPaneID, paneID) {
+  const activeIDs = defaultActivePaneIDs().filter((id) => id !== paneID);
+  const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== paneID);
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  const anchorIndex = ordered.indexOf(anchorPaneID);
+  ordered.splice(anchorIndex === -1 ? ordered.length : anchorIndex + 1, 0, paneID);
+  state.paneOrder = ordered;
+}
+
 function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const linkedReaders = searchLinkedReadersBySearch();
   const readerID = linkedReaders[searchID];
@@ -1438,6 +1457,21 @@ function scrollReaderContentToNode(content, target, behavior = "auto") {
   });
 }
 
+function readerSectionTitleNode(section) {
+  return section?.querySelector(".reader-section-title") || section;
+}
+
+function stabilizeReaderSectionAtHeader(content, section, behavior = "auto") {
+  const title = readerSectionTitleNode(section);
+  if (!content || !title) return;
+  (content.__sectionAlignmentTimers || []).forEach((timer) => window.clearTimeout(timer));
+  scrollReaderContentToNode(content, title, behavior);
+  const delays = behavior === "smooth" ? [380, 620] : [0, 80, 220];
+  content.__sectionAlignmentTimers = delays.map((delay) => window.setTimeout(() => {
+    if (content.isConnected && title.isConnected) scrollReaderContentToNode(content, title, "auto");
+  }, delay));
+}
+
 function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
   const needle = String(query || "").trim();
   if (!content || needle.length < 2) return;
@@ -1461,15 +1495,6 @@ function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
       mark.className = "reader-search-match reader-search-flash";
       mark.dataset.flashCreatedAt = String(Date.now());
       range.surroundContents(mark);
-
-      const contentRect = content.getBoundingClientRect();
-      const markRect = mark.getBoundingClientRect();
-      const panel = content.closest(".reader-panel");
-      const headerOffset = panel ? Number.parseFloat(getComputedStyle(panel, "::before").height) : 0;
-      const visibleTop = contentRect.top + (Number.isFinite(headerOffset) ? headerOffset : 0);
-      if (markRect.top < visibleTop || markRect.bottom > contentRect.bottom) {
-        scrollReaderContentToNode(content, mark, "smooth");
-      }
 
       window.setTimeout(() => {
         mark.replaceWith(textNode(mark.textContent || ""));
@@ -1500,6 +1525,20 @@ function snippetWithoutDuplicateTitle(result) {
     snippet = snippet.replace(pattern, (match) => match.startsWith("...") ? "..." : "").trim();
   });
   return snippet;
+}
+
+function searchResultMatchesExactQuery(result, query) {
+  const needle = String(query || "").trim().replace(/\s+/g, " ");
+  if (!needle) return false;
+  const searchableText = [result?.sectionNumber, result?.title, result?.headingLine, result?.snippet]
+    .filter(Boolean)
+    .join(" ")
+    .replace(/\s+/g, " ");
+  const escapedNeedle = needle.split(" ").map(escapeRegExp).join("\\s+");
+  const startsWithWord = /^[\p{L}\p{N}_]/u.test(needle);
+  const endsWithWord = /[\p{L}\p{N}_]$/u.test(needle);
+  return new RegExp(`${startsWithWord ? "(?<![\\p{L}\\p{N}_])" : ""}${escapedNeedle}${endsWithWord ? "(?![\\p{L}\\p{N}_])" : ""}`, "iu")
+    .test(searchableText);
 }
 
 function emptyReader(content, title = "Choose a chapter", message = "Pick a chapter to load the full text. Section is optional and only jumps within the chapter.") {
@@ -2705,7 +2744,7 @@ function deletedProjectSectionMutationForItem(project, item) {
   const record = projectSectionRecordForSection(project, item);
   return {
     projectSection: {
-      id: item.id || record.id,
+      id: item.projectSectionID || item.id || record.id,
       userID: activeAccount()?.userID || item.userID || "local-web",
       codeVersion: syncCodeVersion(item.codeVersion),
       folderClientID: item.folderClientID || record.folderClientID,
@@ -2718,17 +2757,25 @@ function deletedProjectSectionMutationForItem(project, item) {
   };
 }
 
-function deletedSavedMutationForSection(section) {
+function savedItemForSection(sectionID) {
+  const sectionKey = String(sectionID || "");
+  return [...(state.localSavedItems || []), ...(syncedContent?.summary?.savedItems || [])]
+    .filter((item) => String(item?.sectionID || "") === sectionKey)
+    .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0))[0] || null;
+}
+
+function deletedSavedMutationForSection(section, existingRecord = null) {
   const account = activeAccount();
   const now = new Date().toISOString();
+  const existing = existingRecord || savedItemForSection(section.sectionID) || {};
   return {
     savedItem: {
-      id: `web-saved-${section.sectionID}`,
+      id: existing.id || `web-saved-${section.sectionID}`,
       userID: account.userID,
-      codeVersion: defaultSyncCodeVersion,
+      codeVersion: syncCodeVersion(existing.codeVersion || section.codeVersion),
       sectionID: Number(section.sectionID),
-      sectionNumber: section.sectionNumber,
-      title: section.title,
+      sectionNumber: section.sectionNumber || existing.sectionNumber || "",
+      title: section.title || existing.title || "Section",
       updatedAt: now,
       deletedAt: now
     }
@@ -2878,7 +2925,7 @@ async function createProjectFolder(details = {}) {
   saveWorkspaceState();
 
   const account = activeAccount();
-  if (!account) return;
+  if (!account) return project;
 
   try {
     await pushMutation(projectMutationForRecord(project, account));
@@ -2888,6 +2935,7 @@ async function createProjectFolder(details = {}) {
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // The local project and queued mutation remain available while sync recovers.
   }
+  return project;
 }
 
 async function updateProjectFolder(project, details = {}) {
@@ -2953,19 +3001,28 @@ function setLocalSectionSaved(sectionID, saved) {
   saveWorkspaceState();
 }
 
-async function persistSectionBookmark(sectionPayload, saved) {
+async function persistSectionBookmark(sectionPayload, saved, options = {}) {
+  const existingRecord = savedItemForSection(sectionPayload.sectionID);
   setLocalSectionSaved(sectionPayload.sectionID, saved);
   const sectionKey = String(sectionPayload.sectionID || "");
-  const record = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
+  const record = saved
+    ? savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web")
+    : {
+        ...savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web"),
+        ...(existingRecord || {}),
+        updatedAt: new Date().toISOString()
+      };
   const localRecord = saved ? record : { ...record, deletedAt: record.updatedAt };
   state.localSavedItems = [
     ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
     localRecord
   ];
   saveWorkspaceState();
-  await refreshOpenSavedPanes();
+  if (options.refreshSavedPanes !== false) await refreshOpenSavedPanes();
   if (!activeAccount()) return;
-  await pushMutation(saved ? savedMutationForSection(sectionPayload) : deletedSavedMutationForSection(sectionPayload));
+  await pushMutation(saved
+    ? savedMutationForSection(sectionPayload)
+    : deletedSavedMutationForSection(sectionPayload, existingRecord));
   state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
   saveWorkspaceState();
 }
@@ -2987,7 +3044,7 @@ async function removeSectionFromProject(project, item) {
   if (!sectionID || !projectID) return;
 
   const matches = (candidate) =>
-    String(candidate.id || "") === String(item.id || "") ||
+    String(candidate.id || "") === String(item.projectSectionID || item.id || "") ||
     (
       String(candidate.sectionID || candidate.savedSectionID || candidate.itemID || "") === sectionID &&
       projectSectionBelongsToProject(candidate, project)
@@ -3404,7 +3461,7 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
   const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
   const target = (idSelector ? content?.querySelector(idSelector) : null) || (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
-  scrollReaderContentToNode(content, target, behavior);
+  stabilizeReaderSectionAtHeader(content, target, behavior);
 }
 
 function alignReaderSectionAfterLayout(reader) {
@@ -3474,7 +3531,18 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   button.setAttribute("aria-label", "Comments");
   button.title = "Open notes";
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
-  button.addEventListener("click", () => openReaderNotesSheet(sectionElementForInlineComment(wrapper)?.closest(".reader-panel"), section, reader, { target }));
+  button.addEventListener("click", () => {
+    const panel = sectionElementForInlineComment(wrapper)?.closest(".reader-panel");
+    const sheet = panel?.querySelector(".reader-notes-sheet.is-open");
+    if (
+      sheet?.dataset.sectionId === String(section.id) &&
+      sheet?.dataset.blockId === normalizeAnnotationBlockID(target.blockID)
+    ) {
+      closeReaderNotesSheet(panel, reader);
+      return;
+    }
+    openReaderNotesSheet(panel, section, reader, { target });
+  });
 
   const bookmarkButton = document.createElement("button");
   bookmarkButton.className = "inline-bookmark-toggle";
@@ -3486,20 +3554,31 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   bookmarkButton.title = saved ? "Saved" : "Save subsection";
 
   bookmarkButton.addEventListener("click", async () => {
+    const panel = sectionElementForInlineComment(wrapper)?.closest(".reader-panel");
     bookmarkButton.disabled = true;
     bookmarkButton.classList.remove("has-error");
     const shouldRemove = bookmarkButton.classList.contains("is-saved");
+    const sectionPayload = {
+      sectionID: section.id,
+      sectionNumber: section.sectionNumber,
+      title: section.title,
+      codePrefix: reader?.codePrefix || "BC",
+      chapterID: reader?.chapterID || "",
+      chapterNumber: section.chapterNumber || ""
+    };
+    if (!shouldRemove) {
+      openReaderNotesSheet(panel, section, reader, { target });
+      const sheet = panel?.querySelector(".reader-notes-sheet");
+      if (sheet) showReaderNotesProjectPicker(sheet, sectionPayload);
+      bookmarkButton.disabled = false;
+      return;
+    }
     bookmarkButton.classList.toggle("is-saved", !shouldRemove);
     wrapper.classList.toggle("has-saved-section", !shouldRemove);
     bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
     bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
     bookmarkButton.innerHTML = `${bookmarkIconSVG(!shouldRemove)}<span class="sr-only">${shouldRemove ? "Save subsection" : "Remove bookmark"}</span>`;
     try {
-      const sectionPayload = {
-        sectionID: section.id,
-        sectionNumber: section.sectionNumber,
-        title: section.title
-      };
       await persistSectionBookmark(sectionPayload, !shouldRemove);
       if (state.utilities.saved) {
         await renderWorkspace();
@@ -3613,31 +3692,71 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   picker.className = "reader-notes-project-picker";
   picker.setAttribute("aria-label", "Choose project folder");
 
-  if (!projects.length) {
-    const empty = document.createElement("p");
-    empty.textContent = "Create a project folder first.";
-    picker.append(empty);
-  } else {
-    projects.forEach((project) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = project.name || project.title || "Project";
-      button.addEventListener("click", async () => {
-        button.disabled = true;
-        try {
-          await persistSectionBookmark(sectionPayload, true);
-          await persistSectionInProject(project, sectionPayload);
-          syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
-          removeReaderNotesProjectPicker(sheet);
-          await renderWorkspace();
-        } catch (error) {
-          button.disabled = false;
-          button.title = error.message || "Could not save to project.";
-        }
-      });
-      picker.append(button);
+  const label = document.createElement("strong");
+  label.textContent = "Save to";
+  picker.append(label);
+
+  const saveTo = async (button, project = null) => {
+    button.disabled = true;
+    try {
+      await persistSectionBookmark(sectionPayload, true);
+      if (project) await persistSectionInProject(project, sectionPayload);
+      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+      removeReaderNotesProjectPicker(sheet);
+      await renderWorkspace();
+    } catch (error) {
+      button.disabled = false;
+      button.title = error.message || "Could not save this section.";
+    }
+  };
+
+  const savedOnlyButton = document.createElement("button");
+  savedOnlyButton.type = "button";
+  savedOnlyButton.textContent = "Saved items";
+  savedOnlyButton.addEventListener("click", () => saveTo(savedOnlyButton));
+  picker.append(savedOnlyButton);
+
+  projects.forEach((project) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = project.name || project.title || "Project";
+    button.style.setProperty("--project-color", projectColor(project));
+    button.addEventListener("click", () => saveTo(button, project));
+    picker.append(button);
+  });
+
+  const newProjectButton = document.createElement("button");
+  newProjectButton.type = "button";
+  newProjectButton.className = "reader-notes-new-project";
+  newProjectButton.textContent = "New project…";
+  newProjectButton.addEventListener("click", () => {
+    newProjectButton.hidden = true;
+    const form = document.createElement("form");
+    form.className = "reader-notes-new-project-form";
+    const input = document.createElement("input");
+    input.type = "text";
+    input.placeholder = "Project name";
+    input.setAttribute("aria-label", "New project name");
+    const createButton = document.createElement("button");
+    createButton.type = "submit";
+    createButton.textContent = "Create and save";
+    form.append(input, createButton);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!input.value.trim()) return;
+      createButton.disabled = true;
+      try {
+        const project = await createProjectFolder({ name: input.value.trim() });
+        await saveTo(createButton, project);
+      } catch (error) {
+        createButton.disabled = false;
+        createButton.title = error.message || "Could not create the project.";
+      }
     });
-  }
+    picker.append(form);
+    input.focus();
+  });
+  picker.append(newProjectButton);
 
   const header = sheet.querySelector(".reader-notes-header");
   header?.insertAdjacentElement("afterend", picker);
@@ -3738,7 +3857,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
       bookmarkButton.disabled = true;
       bookmarkButton.classList.remove("has-error");
       const shouldRemove = bookmarkButton.classList.contains("is-saved");
-      if (!shouldRemove && visibleProjectRecords(projectRecordsFromMutations(syncedContent?.mutations || [])).length) {
+      if (!shouldRemove) {
         bookmarkButton.disabled = false;
         showReaderNotesProjectPicker(sheet, sectionPayload);
         return;
@@ -4648,9 +4767,10 @@ async function renderSearchResults(panel, instance) {
   }
   clear(results);
 
-  const filteredResults = (payload.results || []).filter((result) => {
-    return selectedPrefixes.length === 0 || selectedPrefixes.includes(result.codePrefix || "BC");
-  });
+  const filteredResults = (payload.results || []).filter((result) =>
+    (selectedPrefixes.length === 0 || selectedPrefixes.includes(result.codePrefix || "BC")) &&
+    searchResultMatchesExactQuery(result, query)
+  );
 
   if (filteredResults.length === 0) {
     renderSearchPlaceholder(results, { title: "No results", body: "Try a shorter phrase or a section number." });
@@ -4742,6 +4862,7 @@ async function openSectionDetail(searchID, section, options = {}) {
       ...(linkedReader ? [paneIDForReader(linkedReader)] : [])
     ]
   });
+  if (linkedReader) alignReaderSectionAfterLayout(linkedReader);
 }
 
 function annotationForSection(sectionID) {
@@ -5515,13 +5636,13 @@ function projectIdentity(project) {
 }
 
 function projectSectionBelongsToProject(item, project) {
-  return (
-    item.folderClientID === project.clientID ||
-    item.folderClientID === project.id ||
-    item.localFolderID === project.localFolderID ||
-    item.folderID === project.id ||
-    item.folderID === project.clientID
-  );
+  const itemIDs = [item?.folderClientID, item?.localFolderID, item?.folderID]
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .map(String);
+  const projectIDs = [project?.clientID, project?.id, project?.localFolderID]
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .map(String);
+  return itemIDs.some((id) => projectIDs.includes(id));
 }
 
 async function openProjectDetail(project) {
@@ -5670,6 +5791,115 @@ async function deleteArchivedProjectData(project) {
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
 
+function createProjectSectionSelectionController(panel, actions, content, project, items) {
+  const recordByID = new Map(items.map((item) => [savedItemSelectionID(item), item]));
+  const orderedIDs = [...recordByID.keys()];
+  const selectedIDs = new Set();
+  const rows = new Map();
+  let active = false;
+  let busy = false;
+
+  const selectButton = document.createElement("button");
+  selectButton.className = "project-detail-select";
+  selectButton.type = "button";
+  selectButton.title = "Select saved project items";
+  selectButton.setAttribute("aria-label", selectButton.title);
+  selectButton.setAttribute("aria-pressed", "false");
+  selectButton.innerHTML = selectionModeIconSVG();
+  actions.prepend(selectButton);
+
+  const bulkBar = document.createElement("section");
+  bulkBar.className = "project-bulk-bar project-section-bulk-bar";
+  bulkBar.hidden = true;
+  const countLabel = document.createElement("span");
+  countLabel.className = "project-bulk-count";
+  const selectAllButton = document.createElement("button");
+  selectAllButton.className = "project-bulk-link";
+  selectAllButton.type = "button";
+  const removeButton = document.createElement("button");
+  removeButton.className = "project-bulk-action is-delete";
+  removeButton.type = "button";
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "project-bulk-link";
+  cancelButton.type = "button";
+  cancelButton.textContent = "Cancel";
+  bulkBar.append(countLabel, selectAllButton, removeButton, cancelButton);
+  content.prepend(bulkBar);
+
+  const update = () => {
+    panel.classList.toggle("is-project-section-selecting", active);
+    selectButton.setAttribute("aria-pressed", String(active));
+    bulkBar.hidden = !active;
+    const count = selectedIDs.size;
+    countLabel.textContent = `${count} selected`;
+    selectAllButton.textContent = count === orderedIDs.length ? "Clear all" : "Select all";
+    removeButton.textContent = `Remove ${count}`;
+    removeButton.disabled = count === 0 || busy;
+    selectAllButton.disabled = busy;
+    cancelButton.disabled = busy;
+    selectButton.disabled = busy;
+    rows.forEach((row, id) => {
+      const selected = selectedIDs.has(id);
+      row.classList.toggle("is-selected", selected);
+      row.setAttribute("aria-selected", String(active && selected));
+    });
+  };
+  const setActive = (nextActive) => {
+    active = nextActive;
+    selectedIDs.clear();
+    update();
+  };
+  const controller = {
+    isActive: () => active,
+    register(row, item) {
+      const id = savedItemSelectionID(item);
+      rows.set(id, row);
+      const indicator = document.createElement("span");
+      indicator.className = "saved-selection-check";
+      indicator.setAttribute("aria-hidden", "true");
+      indicator.innerHTML = selectionIndicatorIconSVG();
+      row.prepend(indicator);
+      update();
+    },
+    toggle(item) {
+      if (!active || busy) return;
+      const id = savedItemSelectionID(item);
+      if (selectedIDs.has(id)) selectedIDs.delete(id);
+      else selectedIDs.add(id);
+      update();
+    }
+  };
+  selectButton.addEventListener("click", () => setActive(!active));
+  selectAllButton.addEventListener("click", () => {
+    if (selectedIDs.size === orderedIDs.length) selectedIDs.clear();
+    else orderedIDs.forEach((id) => selectedIDs.add(id));
+    update();
+  });
+  cancelButton.addEventListener("click", () => setActive(false));
+  removeButton.addEventListener("click", async () => {
+    const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
+    const count = selectedItems.length;
+    if (!count || !window.confirm(`Remove ${count} saved ${count === 1 ? "item" : "items"} from ${project.name}?`)) return;
+    busy = true;
+    update();
+    let removedCount = 0;
+    try {
+      for (const item of selectedItems) {
+        await removeSectionFromProject(project, item);
+        removedCount += 1;
+      }
+      window.alert(`${removedCount} ${removedCount === 1 ? "item was" : "items were"} removed from ${project.name}.`);
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+    } catch (error) {
+      window.alert(`${error.message || "Could not remove the selected project items."} Removed ${removedCount} of ${count}.`);
+      busy = false;
+      update();
+    }
+  });
+  update();
+  return controller;
+}
+
 async function renderProjectDetail(detail) {
   const data = await loadSyncedContent();
   const projects = visibleProjectRecords(data.summary?.projects || []);
@@ -5681,11 +5911,41 @@ async function renderProjectDetail(detail) {
   const sectionLinks = projectSections.filter((item) => projectSectionBelongsToProject(item, identity));
   const savedBySectionID = new Map(savedItems.map((item) => [String(item.sectionID || item.id || ""), item]));
   const linkedSavedItems = sectionLinks
-    .map((link) => ({
-      ...link,
-      ...(savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || {})
-    }))
+    .map((link) => {
+      const savedItem = savedBySectionID.get(String(link.sectionID || link.savedSectionID || link.itemID || "")) || {};
+      return {
+        ...link,
+        ...savedItem,
+        id: link.id,
+        projectSectionID: link.id,
+        folderClientID: link.folderClientID,
+        localFolderID: link.localFolderID
+      };
+    })
     .filter(Boolean);
+  const previewItems = await Promise.all(linkedSavedItems.map(async (item) => {
+    const resolvedDetail = {
+      codePrefix: item.codePrefix || "BC",
+      chapterID: item.chapterID || "",
+      chapterNumber: item.chapterNumber || "",
+      sectionID: String(item.sectionID || item.savedSectionID || item.itemID || ""),
+      sectionNumber: item.sectionNumber || "",
+      title: item.title || "Section"
+    };
+    try {
+      const { chapter, section } = await resolveSectionDetail(resolvedDetail);
+      return {
+        ...item,
+        ...resolvedDetail,
+        chapterID: resolvedDetail.chapterID || chapter?.id || "",
+        sectionNumber: section?.sectionNumber || resolvedDetail.sectionNumber,
+        title: section?.title || resolvedDetail.title,
+        previewText: sectionPlainText(section).replace(/\s+/g, " ").trim().slice(0, 260)
+      };
+    } catch {
+      return { ...item, ...resolvedDetail, previewText: "" };
+    }
+  }));
 
   const panel = document.createElement("article");
   panel.className = "workspace-panel project-detail-panel";
@@ -5762,42 +6022,69 @@ async function renderProjectDetail(detail) {
 
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section";
+  const selectionController = previewItems.length
+    ? createProjectSectionSelectionController(panel, actions, content, identity, previewItems)
+    : null;
+  const codeGroups = new Map();
+  previewItems.forEach((item) => {
+    const prefix = item.codePrefix || "BC";
+    if (!codeGroups.has(prefix)) codeGroups.set(prefix, []);
+    codeGroups.get(prefix).push(item);
+  });
 
-  linkedSavedItems.forEach((item) => {
-    const row = document.createElement("article");
-    row.className = "saved-row project-detail-saved-row";
-    const openButton = document.createElement("button");
-    openButton.className = "project-detail-section-open";
-    openButton.type = "button";
-    const rowTitle = document.createElement("strong");
-    rowTitle.textContent = item.sectionNumber || item.sectionID || "Saved";
-    const rowBody = document.createElement("span");
-    rowBody.textContent = [
-      codeDisplayLabel(item.codePrefix || "BC"),
-      item.chapterNumber ? `Chapter ${item.chapterNumber}` : "",
-      item.sectionNumber || item.sectionID || "",
-      item.title || item.subtitle || "Saved section"
-    ].filter(Boolean).join(" · ");
-    openButton.append(rowTitle, rowBody);
-    openButton.addEventListener("click", () => openProjectSavedSection(identity, item));
-    const removeButton = document.createElement("button");
-    removeButton.className = "project-detail-section-remove";
-    removeButton.type = "button";
-    removeButton.title = "Remove from project";
-    removeButton.setAttribute("aria-label", `Remove ${rowTitle.textContent} from ${identity.name}`);
-    removeButton.innerHTML = trashIconSVG();
-    removeButton.addEventListener("click", async () => {
-      removeButton.disabled = true;
-      try {
-        await removeSectionFromProject(identity, item);
-        await renderWorkspace();
-      } catch (error) {
-        removeButton.disabled = false;
-        window.alert(error.message || "Could not remove the section.");
+  codeGroups.forEach((items, prefix) => {
+    const codeGroup = document.createElement("section");
+    codeGroup.className = `project-saved-code-group code-theme-${codeTheme(prefix)}`;
+    const codeLabel = document.createElement("p");
+    codeLabel.className = "section-label saved-code-label";
+    codeLabel.textContent = codeDisplayLabel(prefix);
+    codeGroup.append(codeLabel);
+    items.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = "saved-row project-detail-saved-row";
+      const openButton = document.createElement("button");
+      openButton.className = "project-detail-section-open";
+      openButton.type = "button";
+      const rowTitle = document.createElement("strong");
+      rowTitle.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "Saved section");
+      const rowBody = document.createElement("span");
+      rowBody.textContent = [
+        item.chapterNumber ? `Chapter ${item.chapterNumber}` : "",
+        item.sectionNumber || item.sectionID || ""
+      ].filter(Boolean).join(" · ");
+      openButton.append(rowTitle);
+      if (rowBody.textContent) openButton.append(rowBody);
+      if (item.previewText) {
+        const preview = document.createElement("p");
+        preview.className = "project-detail-section-preview";
+        preview.textContent = item.previewText;
+        openButton.append(preview);
       }
+      openButton.addEventListener("click", () => {
+        if (selectionController?.isActive()) selectionController.toggle(item);
+        else void openProjectSavedSection(identity, item);
+      });
+      const removeButton = document.createElement("button");
+      removeButton.className = "project-detail-section-remove";
+      removeButton.type = "button";
+      removeButton.title = "Remove from project";
+      removeButton.setAttribute("aria-label", `Remove ${rowTitle.textContent} from ${identity.name}`);
+      removeButton.innerHTML = trashIconSVG();
+      removeButton.addEventListener("click", async () => {
+        removeButton.disabled = true;
+        try {
+          await removeSectionFromProject(identity, item);
+          await renderWorkspace();
+        } catch (error) {
+          removeButton.disabled = false;
+          window.alert(error.message || "Could not remove the section.");
+        }
+      });
+      row.append(openButton, removeButton);
+      selectionController?.register(row, item);
+      codeGroup.append(row);
     });
-    row.append(openButton, removeButton);
-    savedSection.append(row);
+    savedSection.append(codeGroup);
   });
 
   backButton.addEventListener("click", () => {
@@ -5858,12 +6145,25 @@ async function renderProjectSectionText(content, project, item) {
   content.append(wrapper);
 }
 
-function openProjectSavedSection(project, item) {
-  setOpenProjectDetails(openProjectDetails().map((detail) =>
-    projectDetailMatches(project, detail) ? { ...detail, selectedSection: item } : detail
-  ));
+async function openProjectSavedSection(project, item) {
+  const detail = { ...item };
+  const { chapter, section } = await resolveSectionDetail(detail);
+  const reader = newReaderState({
+    codePrefix: detail.codePrefix || "BC",
+    chapterID: detail.chapterID || chapter?.id || "",
+    sectionID: String(detail.sectionID || detail.savedSectionID || detail.itemID || ""),
+    sectionNumber: section?.sectionNumber || detail.sectionNumber || "",
+    title: section?.title || detail.title || "Section",
+    shouldSmoothScrollToSection: false
+  });
+  state.readers.push(reader);
+  placePaneAfter(paneIDForProjectDetail(project), paneIDForReader(reader));
+  updateBrowserSectionURL(reader.sectionID);
+  scheduleContinuitySync(reader);
   saveWorkspaceState();
-  void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+  scrollPaneIntoView(paneIDForReader(reader));
+  alignReaderSectionAfterLayout(reader);
 }
 
 function showProjectCreateSheet(panel, project = null) {
@@ -6090,6 +6390,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
 
 async function renderSaved(paneID = "utility:saved") {
   const panel = renderTemplate(savedTemplate);
+  panel.classList.add("saved-panel");
   applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
   clear(content);
@@ -6112,7 +6413,13 @@ async function renderSaved(paneID = "utility:saved") {
   );
 
   if (savedItems.length > 0) {
-    renderSavedItemsByCode(content, savedItems.slice(0, 48), paneID, { removableSavedItems: true });
+    const visibleSavedItems = savedItems.slice(0, 48);
+    const selectionController = createSavedBulkSelectionController(panel, visibleSavedItems);
+    appendSectionLabel(content, "Saved items");
+    renderSavedItemsByCode(content, visibleSavedItems, paneID, {
+      removableSavedItems: true,
+      selectionController
+    });
   }
 
   appendSectionLabel(content, "Notes and tags");
@@ -6143,6 +6450,122 @@ function removeIconSVG() {
       <path d="M14 11v5"></path>
     </svg>
   `;
+}
+
+function savedItemSelectionID(item) {
+  return String(item?.id || `${item?.sectionID || "section"}:${item?.blockID || ""}`);
+}
+
+function createSavedBulkSelectionController(panel, savedItems) {
+  const records = savedItems.filter((item) => item?.sectionID);
+  const recordByID = new Map(records.map((item) => [savedItemSelectionID(item), item]));
+  const orderedIDs = [...recordByID.keys()];
+  const selectedIDs = new Set();
+  const rows = new Map();
+  let active = false;
+  let busy = false;
+
+  const selectButton = document.createElement("button");
+  selectButton.className = "icon-button saved-select-button";
+  selectButton.type = "button";
+  selectButton.title = "Select saved items";
+  selectButton.setAttribute("aria-label", selectButton.title);
+  selectButton.setAttribute("aria-pressed", "false");
+  selectButton.innerHTML = selectionModeIconSVG();
+  panel.querySelector(".panel-actions")?.prepend(selectButton);
+
+  const bulkBar = document.createElement("section");
+  bulkBar.className = "project-bulk-bar saved-bulk-bar";
+  bulkBar.hidden = true;
+  const countLabel = document.createElement("span");
+  countLabel.className = "project-bulk-count";
+  const selectAllButton = document.createElement("button");
+  selectAllButton.className = "project-bulk-link";
+  selectAllButton.type = "button";
+  const removeButton = document.createElement("button");
+  removeButton.className = "project-bulk-action is-delete";
+  removeButton.type = "button";
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "project-bulk-link";
+  cancelButton.type = "button";
+  cancelButton.textContent = "Cancel";
+  bulkBar.append(countLabel, selectAllButton, removeButton, cancelButton);
+  panel.append(bulkBar);
+
+  const update = () => {
+    panel.classList.toggle("is-saved-selecting", active);
+    selectButton.setAttribute("aria-pressed", String(active));
+    bulkBar.hidden = !active;
+    const selectedCount = selectedIDs.size;
+    countLabel.textContent = `${selectedCount} selected`;
+    selectAllButton.textContent = selectedCount === orderedIDs.length ? "Clear all" : "Select all";
+    removeButton.textContent = `Remove ${selectedCount}`;
+    removeButton.disabled = selectedCount === 0 || busy;
+    selectAllButton.disabled = busy;
+    cancelButton.disabled = busy;
+    selectButton.disabled = busy;
+    rows.forEach((row, id) => {
+      const selected = selectedIDs.has(id);
+      row.classList.toggle("is-selected", selected);
+      row.setAttribute("aria-selected", String(active && selected));
+    });
+  };
+
+  const setActive = (nextActive) => {
+    active = nextActive;
+    selectedIDs.clear();
+    update();
+  };
+  const controller = {
+    isActive: () => active,
+    register(row, item) {
+      const id = savedItemSelectionID(item);
+      rows.set(id, row);
+      const indicator = document.createElement("span");
+      indicator.className = "saved-selection-check";
+      indicator.setAttribute("aria-hidden", "true");
+      indicator.innerHTML = selectionIndicatorIconSVG();
+      row.prepend(indicator);
+      update();
+    },
+    toggle(item) {
+      if (!active || busy) return;
+      const id = savedItemSelectionID(item);
+      if (selectedIDs.has(id)) selectedIDs.delete(id);
+      else selectedIDs.add(id);
+      update();
+    }
+  };
+
+  selectButton.addEventListener("click", () => setActive(!active));
+  selectAllButton.addEventListener("click", () => {
+    if (selectedIDs.size === orderedIDs.length) selectedIDs.clear();
+    else orderedIDs.forEach((id) => selectedIDs.add(id));
+    update();
+  });
+  cancelButton.addEventListener("click", () => setActive(false));
+  removeButton.addEventListener("click", async () => {
+    const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
+    const count = selectedItems.length;
+    if (!count || !window.confirm(`Remove the save from ${count} ${count === 1 ? "item" : "items"}?`)) return;
+    busy = true;
+    update();
+    let removedCount = 0;
+    try {
+      for (const item of selectedItems) {
+        await persistSectionBookmark(item, false, { refreshSavedPanes: false });
+        removedCount += 1;
+      }
+      window.alert(`${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} removed.`);
+      await renderWorkspace();
+    } catch (error) {
+      window.alert(`${error.message || "Could not remove the selected saved items."} Removed ${removedCount} of ${count}.`);
+      busy = false;
+      update();
+    }
+  });
+  update();
+  return controller;
 }
 
 function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", options = {}) {
@@ -6190,6 +6613,13 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         heading.append(title);
         openButton.append(heading);
         const annotation = annotationForTarget(item.sectionID, item.blockID || "");
+        const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
+        if (notePreview) {
+          const note = document.createElement("span");
+          note.className = "saved-note-preview";
+          note.textContent = notePreview;
+          openButton.append(note);
+        }
         if (annotation.tags.length) {
           const tags = document.createElement("span");
           tags.className = "saved-row-tags";
@@ -6201,8 +6631,15 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           });
           openButton.append(tags);
         }
-        openButton.addEventListener("click", () => openSectionDetailForExistingSearch(item, { anchorPaneID: paneID }));
+        openButton.addEventListener("click", () => {
+          if (options.selectionController?.isActive()) {
+            options.selectionController.toggle(item);
+          } else {
+            openSectionDetailForExistingSearch(item, { anchorPaneID: paneID });
+          }
+        });
         row.append(openButton);
+        options.selectionController?.register(row, item);
         if (options.removableSavedItems) {
           const removeButton = document.createElement("button");
           removeButton.className = "saved-row-remove";
@@ -6713,52 +7150,24 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     startWidth: pane.getBoundingClientRect().width,
     minWidth: minimumWidthFor(pane)
   }));
-  const startScrollLeft = track.scrollLeft;
-  const trackStartRect = track.getBoundingClientRect();
   const previousIndex = paneData.findIndex((pane) => pane.id === previousPaneID);
   const nextIndex = paneData.findIndex((pane) => pane.id === nextPaneID);
   if (previousIndex === -1 || nextIndex === -1) {
     track.classList.remove("is-resizing");
     return;
   }
-  const rightEdgePane = paneData[paneData.length - 1]?.pane;
-  const rightEdgeStartRect = rightEdgePane?.getBoundingClientRect();
   const lastAppliedWidths = paneData.map((pane) => pane.startWidth);
   let pendingClientX = startX;
   let resizeFrame = null;
 
-  const shrinkFrom = (widths, indexes, requested) => {
-    let remaining = requested;
-    for (const index of indexes) {
-      if (remaining <= 0) break;
-      const available = Math.max(0, widths[index] - paneData[index].minWidth);
-      const taken = Math.min(available, remaining);
-      widths[index] -= taken;
-      remaining -= taken;
-    }
-    return requested - remaining;
-  };
-
   const applyResizeAt = (clientX) => {
     const delta = clientX - startX;
     const widths = paneData.map((pane) => pane.startWidth);
-    if (delta > 0) {
-      const applied = shrinkFrom(widths, [nextIndex], delta);
-      widths[previousIndex] += delta;
-      if (delta > applied) {
-        track.scrollLeft = startScrollLeft;
-      }
-    } else if (delta < 0) {
-      const requested = Math.abs(delta);
-      const applied = shrinkFrom(widths, [previousIndex], requested);
-      if (Math.abs(delta) > applied) {
-        track.scrollLeft = Math.max(0, startScrollLeft - (requested - applied));
-      }
-      const rightGroupEdgeWithoutFill = (rightEdgeStartRect?.right ?? trackStartRect.right) - applied;
-      if (rightGroupEdgeWithoutFill < trackStartRect.right) {
-        widths[nextIndex] += trackStartRect.right - rightGroupEdgeWithoutFill;
-      }
-    }
+    const minimumDelta = paneData[previousIndex].minWidth - paneData[previousIndex].startWidth;
+    const maximumDelta = paneData[nextIndex].startWidth - paneData[nextIndex].minWidth;
+    const appliedDelta = Math.min(maximumDelta, Math.max(minimumDelta, delta));
+    widths[previousIndex] += appliedDelta;
+    widths[nextIndex] -= appliedDelta;
     [previousIndex, nextIndex].forEach((index) => {
       if (Math.abs(widths[index] - lastAppliedWidths[index]) < 0.25) return;
       const pane = paneData[index];

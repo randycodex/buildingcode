@@ -89,6 +89,10 @@
   --color-primary: var(--project-color, #c96410);
   --color-primary-darker: color-mix(in srgb, var(--project-color, #c96410) 82%, #000);
   --color-primary-darkest: color-mix(in srgb, var(--project-color, #c96410) 68%, #000);
+  --color-surface-primary-container: color-mix(in srgb, var(--project-color, #c96410) 18%, transparent);
+  --color-on-primary-container: color-mix(in srgb, var(--project-color, #c96410) 72%, #000);
+  --color-brand-active: var(--project-color, #c96410);
+  --focus-highlight-color: color-mix(in srgb, var(--project-color, #c96410) 58%, transparent);
   font-size: 14px !important;
 }
 

@@ -66,6 +66,7 @@ async function main() {
   const tempDir = await mkdtemp(join(tmpdir(), "permitext-sync-smoke-"));
   const dataPath = join(tempDir, "sync-store.json");
   const workboardSource = await readFile(new URL("../src/workboard.jsx", import.meta.url), "utf8");
+  const workboardStyleSource = await readFile(new URL("../src/workboard.css", import.meta.url), "utf8");
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
@@ -119,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("workboard-system-theme-v1"),
-      "Web workspace omitted the workboard-system-theme-v1 assets."
+      webRoot.text.includes("web-notes-v2"),
+      "Web workspace omitted the web-notes-v2 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -206,9 +207,30 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("changeReaderTextSize(panel, reader, -1)") &&
+        workspaceScript.text.includes("(state.readers || []).forEach((openReader)") &&
+        workspaceScript.text.includes("if (openPanel) applyReaderTextSize(openPanel, openReader)") &&
         workspaceScript.text.includes('panel.style.setProperty("--reader-font-size"') &&
         webRoot.text.includes('aria-label="Reader text size"'),
-      "Reader headers omitted their per-Reader text resize controls."
+      "Reader text resize controls no longer update every open Reader."
+    );
+    assert(
+      workspaceScript.text.includes("function stabilizeReaderSectionAtHeader") &&
+        workspaceScript.text.includes('section?.querySelector(".reader-section-title")') &&
+        workspaceScript.text.includes("content.__sectionAlignmentTimers"),
+      "Reader navigation no longer stabilizes section titles below the header."
+    );
+    assert(
+      workspaceScript.text.includes("function searchResultMatchesExactQuery") &&
+        workspaceScript.text.includes("const filteredResults = (payload.results || []).filter((result) =>") &&
+        workspaceScript.text.includes("selectedPrefixes.includes(result.codePrefix || \"BC\")") &&
+        workspaceScript.text.includes("searchResultMatchesExactQuery(result, query)"),
+      "Search results no longer require an exact whole-word or phrase match."
+    );
+    assert(
+      workspaceScript.text.includes("function createSavedBulkSelectionController") &&
+        workspaceScript.text.includes("function createProjectSectionSelectionController") &&
+        workspaceScript.text.includes('newProjectButton.textContent = "New project…"'),
+      "Saved and project panes omitted selection removal or new-project saving controls."
     );
     assert(
       workspaceScript.text.includes("function setReaderNotesActiveTarget") &&
@@ -264,6 +286,17 @@ async function main() {
       "Project bulk selection omitted its toolbar, selection indicators, or selected-card treatment."
     );
     assert(
+      workspaceStyles.text.includes(".saved-note-preview") &&
+        workspaceStyles.text.includes(".project-saved-code-group") &&
+        workspaceStyles.text.includes(".project-detail-section-preview"),
+      "Saved and project cards omitted note previews, code grouping, or section previews."
+    );
+    assert(
+      workspaceStyles.text.includes(".panel-kind {\n  color: #000;") &&
+        workspaceStyles.text.includes(".panel-kind {\n    color: #fff;"),
+      "Column labels no longer maintain high contrast across light and dark appearance."
+    );
+    assert(
       workspaceStyles.text.includes("*::-webkit-scrollbar") &&
         workspaceStyles.text.includes("scrollbar-width: none !important"),
       "Web workspace no longer hides native scrollbars globally."
@@ -296,11 +329,22 @@ async function main() {
         workboardSource.includes("theme={theme}"),
       "Workboard no longer follows live system appearance changes."
     );
+    assert(
+      workboardSource.includes("const preventWheelPanning = (event) =>") &&
+        workboardSource.includes("event.stopImmediatePropagation();") &&
+        workboardSource.includes('host.addEventListener("wheel", preventWheelPanning, { capture: true, passive: false })'),
+      "Workboard wheel panning is no longer blocked at capture phase."
+    );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
     assert(
       workboardStyles.response.headers.get("content-type")?.includes("text/css"),
       "Workboard stylesheet asset returned the wrong content type."
+    );
+    assert(
+      workboardStyleSource.includes("--color-surface-primary-container:") &&
+        workboardStyleSource.includes("--color-brand-active: var(--project-color"),
+      "Workboard active tools no longer inherit the project color."
     );
     const workboardFont = await request(
       "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"
