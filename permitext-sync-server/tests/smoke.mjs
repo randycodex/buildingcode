@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-bulk-actions-v6"),
-      "Web workspace omitted the project-bulk-actions-v6 assets."
+      webRoot.text.includes("project-bulk-actions-v8"),
+      "Web workspace omitted the project-bulk-actions-v8 assets."
     );
 
     const workspaceScript = await request("/web/app.js");

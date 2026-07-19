@@ -2894,7 +2894,7 @@ mark {
 .project-selection-check {
   position: absolute;
   top: 50%;
-  left: var(--space-3);
+  right: var(--space-3);
   display: none;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
@@ -2916,9 +2916,9 @@ mark {
   display: grid;
 }
 
-.is-project-selecting .project-row {
-  padding-right: var(--space-4);
-  padding-left: calc(var(--space-4) + var(--panel-title-control-size) + var(--space-2));
+.is-project-selecting .projects-content .project-row {
+  padding-right: calc(var(--space-4) + var(--panel-title-control-size) + var(--space-2));
+  padding-left: var(--space-4);
 }
 
 .is-project-selecting .project-card-actions {
