@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-reader-note-paragraph-highlight";
+const workboardClientVersion = "20260719-reader-notes-header-cleanup";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3569,9 +3569,6 @@ function ensureReaderNotesSheet(panel, reader) {
   bookmarkButton.className = "reader-notes-bookmark";
   bookmarkButton.type = "button";
 
-  const title = document.createElement("h2");
-  title.className = "reader-notes-title";
-
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
   doneButton.type = "button";
@@ -3582,7 +3579,7 @@ function ensureReaderNotesSheet(panel, reader) {
   actions.className = "reader-notes-actions";
   actions.append(doneButton);
 
-  header.append(bookmarkButton, title, actions);
+  header.append(bookmarkButton, actions);
 
   const input = document.createElement("textarea");
   input.className = "reader-notes-input";
@@ -3768,7 +3765,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     };
   }
 
-  const title = sheet.querySelector(".reader-notes-title");
   const input = sheet.querySelector(".reader-notes-input");
   const tagsHost = sheet.querySelector(".reader-notes-tags");
   sheet.dataset.sectionId = sectionID;
@@ -3776,7 +3772,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   sheet.__annotationTarget = target;
   if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
   removeReaderNotesProjectPicker(sheet);
-  title.textContent = blockID && target.blockLabel ? target.blockLabel : sectionDisplayTitle(section.sectionNumber, section.title);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
   renderAnnotationTagEditor(tagsHost, target, {

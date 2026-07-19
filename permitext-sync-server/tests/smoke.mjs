@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-note-paragraph-highlight"),
-      "Web workspace omitted the Reader note paragraph-highlight assets."
+      webRoot.text.includes("reader-notes-header-cleanup"),
+      "Web workspace omitted the Reader notes header-cleanup assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -191,6 +191,10 @@ async function main() {
       workspaceScript.text.includes("function setReaderNotesActiveTarget") &&
         workspaceScript.text.includes('annotated-code-block[data-block-id='),
       "Reader notes no longer retain the active paragraph target."
+    );
+    assert(
+      !workspaceScript.text.includes("reader-notes-title"),
+      "Reader notes still repeat the active paragraph title in the note sheet."
     );
 
     const workspaceStyles = await request("/web/styles.css");
