@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-search-detail-notes";
+const workboardClientVersion = "20260719-project-identity";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -896,7 +896,11 @@ function openProjectDetails() {
 }
 
 function setOpenProjectDetails(details) {
-  state.projectDetails = (details || []).filter(Boolean);
+  const uniqueDetails = new Map();
+  (details || []).filter(Boolean).forEach((detail) => {
+    uniqueDetails.set(projectDetailKey(detail), detail);
+  });
+  state.projectDetails = Array.from(uniqueDetails.values());
   state.projectDetail = state.projectDetails[0] || null;
 }
 
@@ -2789,16 +2793,16 @@ function archivedProjectIDSet() {
 }
 
 function visibleProjectRecords(syncedProjects = []) {
-  const byID = new Map();
+  const byIdentity = new Map();
   syncedProjects.forEach((project) => {
-    const id = projectRecordID(project);
-    if (id) byID.set(id, project);
+    const identity = projectDetailKey(project);
+    if (identity) byIdentity.set(identity, project);
   });
   (state.localProjects || []).forEach((project) => {
-    const id = projectRecordID(project);
-    if (id && !byID.has(id)) byID.set(id, project);
+    const identity = projectDetailKey(project);
+    if (identity && !byIdentity.has(identity)) byIdentity.set(identity, project);
   });
-  return Array.from(byID.values()).sort((left, right) =>
+  return Array.from(byIdentity.values()).sort((left, right) =>
     String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
       numeric: true,
       sensitivity: "base"

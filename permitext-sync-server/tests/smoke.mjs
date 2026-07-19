@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-detail-notes"),
-      "Web workspace omitted the search-detail and note-control assets."
+      webRoot.text.includes("project-identity"),
+      "Web workspace omitted the project-identity assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -151,6 +151,10 @@ async function main() {
     assert(
       !workspaceScript.text.includes('notesTitle.textContent = "Notes"'),
       "Section details still render the retired Notes heading."
+    );
+    assert(
+      workspaceScript.text.includes("const identity = projectDetailKey(project);"),
+      "Project cards no longer deduplicate local and synced records by their stable identity."
     );
 
     const workspaceStyles = await request("/web/styles.css");
