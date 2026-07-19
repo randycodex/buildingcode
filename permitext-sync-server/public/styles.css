@@ -1798,7 +1798,19 @@ select option:checked {
 .reader-notes-new-project-form input {
   flex: 1 1 auto;
   min-width: 0;
+  border: 0;
+  outline: 0;
   background: var(--reader-notes-input-surface);
+  box-shadow: none;
+  appearance: none;
+}
+
+.reader-notes-new-project-form input:focus,
+.reader-notes-new-project-form input:focus-visible {
+  outline: 0;
+  outline-offset: 0;
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--reader-notes-input-surface));
+  box-shadow: none;
 }
 
 .reader-notes-bookmark,

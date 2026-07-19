@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v9"),
-      "Web workspace omitted the web-notes-v9 assets."
+      webRoot.text.includes("web-notes-v10"),
+      "Web workspace omitted the web-notes-v10 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -301,6 +301,12 @@ async function main() {
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 16%, transparent);") &&
         workspaceStyles.text.includes("border-radius: var(--radius-pill);"),
       "Reader project-picker buttons no longer use pill-shaped project-card color treatments."
+    );
+    assert(
+      workspaceStyles.text.includes(".reader-notes-new-project-form input:focus-visible") &&
+        workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-primary) 6%, var(--reader-notes-input-surface));") &&
+        workspaceStyles.text.match(/\.reader-notes-new-project-form input \{[\s\S]*?border: 0;[\s\S]*?outline: 0;[\s\S]*?box-shadow: none;/),
+      "The inline new-project field regained a visible edge treatment."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),
