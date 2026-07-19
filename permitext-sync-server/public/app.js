@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-dark-reader-tables-images-v2";
+const workboardClientVersion = "20260719-project-bulk-actions-v6";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -2190,6 +2190,7 @@ async function deleteSyncedWorkboard(projectID) {
   const account = activeAccount();
   if (!account) return;
   const board = syncedWorkboardForProject(projectID);
+  if (!board) return;
   const now = new Date().toISOString();
   await pushMutation({
     workboard: {
@@ -4801,6 +4802,24 @@ function circleXIconSVG() {
   `;
 }
 
+function selectionModeIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+      <path d="m8 12 3 3 5-6"></path>
+    </svg>
+  `;
+}
+
+function selectionIndicatorIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"></circle>
+      <path class="project-selection-checkmark" d="m8 12 3 3 5-6"></path>
+    </svg>
+  `;
+}
+
 function bookmarkIconSVG(saved) {
   return saved
     ? `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path></svg>`
@@ -5267,6 +5286,141 @@ async function renderUtilityInstance(instance) {
   return panel;
 }
 
+function createProjectBulkSelectionController(panel, projects, mode) {
+  const records = projects.slice(0, 24).filter((project) => projectRecordID(project));
+  const recordByID = new Map(records.map((project) => [projectRecordID(project), project]));
+  const orderedIDs = [...recordByID.keys()];
+  const selectedIDs = new Set();
+  const cards = new Map();
+  let active = false;
+  let busy = false;
+  let lastSelectedIndex = -1;
+
+  const selectButton = document.createElement("button");
+  selectButton.className = "icon-button projects-select-button";
+  selectButton.type = "button";
+  selectButton.title = "Select projects";
+  selectButton.setAttribute("aria-label", "Select projects");
+  selectButton.setAttribute("aria-pressed", "false");
+  selectButton.innerHTML = selectionModeIconSVG();
+  panel.querySelector(".panel-actions")?.prepend(selectButton);
+
+  const bulkBar = document.createElement("section");
+  bulkBar.className = "project-bulk-bar";
+  bulkBar.hidden = true;
+  bulkBar.setAttribute("aria-label", mode === "archive" ? "Archived project selection" : "Project selection");
+  const countLabel = document.createElement("span");
+  countLabel.className = "project-bulk-count";
+  const selectAllButton = document.createElement("button");
+  selectAllButton.className = "project-bulk-link";
+  selectAllButton.type = "button";
+  const actionButton = document.createElement("button");
+  actionButton.className = `project-bulk-action ${mode === "archive" ? "is-delete" : "is-archive"}`;
+  actionButton.type = "button";
+  const cancelButton = document.createElement("button");
+  cancelButton.className = "project-bulk-link";
+  cancelButton.type = "button";
+  cancelButton.textContent = "Cancel";
+  bulkBar.append(countLabel, selectAllButton, actionButton, cancelButton);
+  panel.append(bulkBar);
+
+  function update() {
+    panel.classList.toggle("is-project-selecting", active);
+    selectButton.setAttribute("aria-pressed", String(active));
+    selectButton.title = active ? "Cancel project selection" : "Select projects";
+    selectButton.setAttribute("aria-label", selectButton.title);
+    bulkBar.hidden = !active;
+    const selectedCount = selectedIDs.size;
+    countLabel.textContent = `${selectedCount} selected`;
+    const allSelected = orderedIDs.length > 0 && selectedCount === orderedIDs.length;
+    selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
+    actionButton.textContent = `${mode === "archive" ? "Delete" : "Archive"} ${selectedCount}`;
+    actionButton.disabled = selectedCount === 0 || busy;
+    selectAllButton.disabled = busy;
+    cancelButton.disabled = busy;
+    selectButton.disabled = busy;
+    cards.forEach((card, id) => {
+      const selected = selectedIDs.has(id);
+      card.classList.toggle("is-selected", selected);
+      if (active) card.setAttribute("aria-pressed", String(selected));
+      else card.removeAttribute("aria-pressed");
+      card.setAttribute(
+        "aria-label",
+        active ? `${selected ? "Deselect" : "Select"} ${card.dataset.projectName || "project"}` : card.dataset.defaultAriaLabel
+      );
+    });
+  }
+
+  function setActive(nextActive) {
+    active = nextActive;
+    selectedIDs.clear();
+    lastSelectedIndex = -1;
+    update();
+  }
+
+  const controller = {
+    isActive: () => active,
+    register(card, project) {
+      const id = projectRecordID(project);
+      if (!id || !recordByID.has(id)) return;
+      cards.set(id, card);
+      card.dataset.projectRecordId = id;
+      card.dataset.projectName = project.name || project.title || "project";
+      card.dataset.defaultAriaLabel = card.getAttribute("aria-label") || "Open project";
+      const indicator = document.createElement("span");
+      indicator.className = "project-selection-check";
+      indicator.setAttribute("aria-hidden", "true");
+      indicator.innerHTML = selectionIndicatorIconSVG();
+      card.prepend(indicator);
+      update();
+    },
+    toggle(project, event = null) {
+      const id = projectRecordID(project);
+      const index = orderedIDs.indexOf(id);
+      if (!active || index < 0 || busy) return;
+      const shouldSelect = !selectedIDs.has(id);
+      if (event?.shiftKey && lastSelectedIndex >= 0) {
+        const start = Math.min(lastSelectedIndex, index);
+        const end = Math.max(lastSelectedIndex, index);
+        orderedIDs.slice(start, end + 1).forEach((rangeID) => {
+          if (shouldSelect) selectedIDs.add(rangeID);
+          else selectedIDs.delete(rangeID);
+        });
+      } else if (shouldSelect) {
+        selectedIDs.add(id);
+      } else {
+        selectedIDs.delete(id);
+      }
+      lastSelectedIndex = index;
+      update();
+    }
+  };
+
+  selectButton.addEventListener("click", () => setActive(!active));
+  selectAllButton.addEventListener("click", () => {
+    if (selectedIDs.size === orderedIDs.length) selectedIDs.clear();
+    else orderedIDs.forEach((id) => selectedIDs.add(id));
+    lastSelectedIndex = -1;
+    update();
+  });
+  cancelButton.addEventListener("click", () => setActive(false));
+  actionButton.addEventListener("click", async () => {
+    const selectedProjects = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
+    if (!selectedProjects.length) return;
+    busy = true;
+    update();
+    const completed = mode === "projects"
+      ? await archiveProjects(selectedProjects)
+      : await deleteArchivedProjects(selectedProjects);
+    if (!completed) {
+      busy = false;
+      update();
+    }
+  });
+  update();
+  return controller;
+}
+
 async function renderProjects() {
   const panel = renderTemplate(projectsTemplate);
   applyPaneWeight(panel, "utility:projects");
@@ -5284,7 +5438,8 @@ async function renderProjects() {
     if (projects.length === 0) {
       appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
     } else {
-      renderProjectRows(content, projects, currentContentSummary().projectSections, { mode: "projects" });
+      const selectionController = createProjectBulkSelectionController(panel, projects, "projects");
+      renderProjectRows(content, projects, currentContentSummary().projectSections, { mode: "projects", selectionController });
     }
     return panel;
   }
@@ -5298,7 +5453,8 @@ async function renderProjects() {
   if (visibleProjects.length === 0) {
     appendProjectEmptyCard(content, "No projects", "Use the add button to create a project folder.");
   } else {
-    renderProjectRows(content, visibleProjects, projectSections, { mode: "projects" });
+    const selectionController = createProjectBulkSelectionController(panel, visibleProjects, "projects");
+    renderProjectRows(content, visibleProjects, projectSections, { mode: "projects", selectionController });
   }
 
   return panel;
@@ -5339,7 +5495,8 @@ async function renderArchive() {
   if (projects.length === 0) {
     appendProjectEmptyCard(content, "No archived projects", "Archived project folders will appear here.");
   } else {
-    renderProjectRows(content, projects, currentContentSummary().projectSections || [], { mode: "archive" });
+    const selectionController = createProjectBulkSelectionController(panel, projects, "archive");
+    renderProjectRows(content, projects, currentContentSummary().projectSections || [], { mode: "archive", selectionController });
   }
   return panel;
 }
@@ -5408,17 +5565,26 @@ function closeProjectDetailForProject(project) {
 }
 
 async function archiveProject(project) {
-  const id = projectRecordID(project);
-  if (!id) return;
+  return archiveProjects([project]);
+}
+
+async function archiveProjects(projects) {
   const archived = archivedProjectIDSet();
-  archived.add(id);
+  const eligibleProjects = projects.filter((project) => projectRecordID(project));
+  if (!eligibleProjects.length) return false;
+  eligibleProjects.forEach((project) => archived.add(projectRecordID(project)));
   state.archivedProjectIDs = Array.from(archived);
-  closeProjectDetailForProject(project);
-  state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
+  eligibleProjects.forEach((project) => closeProjectDetailForProject(project));
+  state.detachedWorkboards = detachedWorkboards().filter((item) =>
+    !eligibleProjects.some((project) => projectDetailMatches(project, item))
+  );
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
-  await renderWorkspace();
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: ["utility:projects", ...(state.utilities.archive ? ["utility:archive"] : [])]
+  });
   track.scrollLeft = currentLeft;
+  return true;
 }
 
 async function restoreArchivedProject(project) {
@@ -5427,7 +5593,7 @@ async function restoreArchivedProject(project) {
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
-  await renderWorkspace();
+  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
   track.scrollLeft = currentLeft;
 }
 
@@ -5436,22 +5602,65 @@ async function deleteArchivedProject(project) {
   if (!id) return;
   const name = project.name || project.title || "this project";
   if (!window.confirm(`Delete ${name} permanently?`)) return;
-  const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
-  const workboardID = workboardProjectID(projectIdentity(project));
-  if (activeAccount()) {
+  const currentLeft = track.scrollLeft;
+  try {
+    await deleteArchivedProjectData(project);
+  } catch (error) {
+    window.alert(error.message || "Could not delete the project.");
+    return;
+  }
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
+  track.scrollLeft = currentLeft;
+}
+
+async function deleteArchivedProjects(projects) {
+  const eligibleProjects = projects.filter((project) => projectRecordID(project));
+  if (!eligibleProjects.length) return false;
+  const count = eligibleProjects.length;
+  if (!window.confirm(`Delete ${count} ${count === 1 ? "project" : "projects"} permanently? This cannot be undone.`)) {
+    return false;
+  }
+  const currentLeft = track.scrollLeft;
+  let deletedCount = 0;
+  const deletedIDs = new Set();
+  for (const project of eligibleProjects) {
     try {
-      await deleteSyncedWorkboard(workboardID);
+      await deleteArchivedProjectData(project);
+      deletedCount += 1;
+      deletedIDs.add(projectRecordID(project));
     } catch (error) {
-      window.alert(error.message || "Could not delete the project's Workboard.");
-      return;
+      const progress = deletedCount > 0 ? ` Deleted ${deletedCount} of ${count}.` : "";
+      window.alert(`${error.message || "Could not delete the selected projects."}${progress}`);
+      break;
     }
   }
-  if (!isLocal && activeAccount()) {
+  state.localProjects = (state.localProjects || []).filter((item) => !deletedIDs.has(projectRecordID(item)));
+  state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((id) => !deletedIDs.has(id));
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
+  track.scrollLeft = currentLeft;
+  return deletedCount > 0;
+}
+
+async function deleteArchivedProjectData(project) {
+  const id = projectRecordID(project);
+  if (!id) return;
+  const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
+  const isSynced = (syncedContent?.summary?.projects || []).some((item) => projectRecordID(item) === id);
+  const workboardID = workboardProjectID(projectIdentity(project));
+  if (activeAccount() && (!isLocal || isSynced)) {
     try {
       await pushMutation(deletedProjectMutationForRecord(project));
     } catch (error) {
-      window.alert(error.message || "Could not delete the project.");
-      return;
+      throw new Error(error.message || "Could not delete the project.");
+    }
+  }
+  if (activeAccount()) {
+    try {
+      await deleteSyncedWorkboard(workboardID);
+    } catch {
+      // The project deletion must survive a missing or stale Workboard record.
     }
   }
   await deleteLocalWorkboard(workboardID);
@@ -5459,8 +5668,6 @@ async function deleteArchivedProject(project) {
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   closeProjectDetailForProject(project);
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
-  saveWorkspaceState();
-  await renderWorkspace();
 }
 
 async function renderProjectDetail(detail) {
@@ -5781,6 +5988,7 @@ function appendProjectEmptyCard(content, title, message) {
 
 function renderProjectRows(content, projects, projectSections, options = {}) {
   const mode = options.mode || "projects";
+  const selectionController = options.selectionController || null;
   projects.slice(0, 24).forEach((project) => {
     const count = projectSections.filter((item) =>
       item.folderClientID === project.clientID ||
@@ -5865,11 +6073,16 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
       body.append(description);
     }
     card.append(actionGroup, body);
-    card.addEventListener("click", () => openProjectDetail(project));
+    selectionController?.register(card, project);
+    card.addEventListener("click", (event) => {
+      if (selectionController?.isActive()) selectionController.toggle(project, event);
+      else openProjectDetail(project);
+    });
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       event.preventDefault();
-      openProjectDetail(project);
+      if (selectionController?.isActive()) selectionController.toggle(project, event);
+      else openProjectDetail(project);
     });
     content.append(card);
   });

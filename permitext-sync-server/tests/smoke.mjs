@@ -118,8 +118,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("dark-reader-tables-images-v2"),
-      "Web workspace omitted the dark-reader-tables-images-v2 assets."
+      webRoot.text.includes("project-bulk-actions-v6"),
+      "Web workspace omitted the project-bulk-actions-v6 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -148,6 +148,15 @@ async function main() {
     assert(
       workspaceScript.text.includes("?v=${workboardClientVersion}"),
       "Published code images no longer receive a content-version cache key."
+    );
+    assert(
+      workspaceScript.text.includes("createProjectBulkSelectionController") &&
+        workspaceScript.text.includes("await archiveProjects(selectedProjects)") &&
+        workspaceScript.text.includes("await deleteArchivedProjects(selectedProjects)") &&
+        workspaceScript.text.includes("activeAccount() && (!isLocal || isSynced)") &&
+        workspaceScript.text.includes("const deletedIDs = new Set()") &&
+        workspaceScript.text.includes("This cannot be undone."),
+      "Project panes omitted their shared bulk archive/delete selection flow."
     );
     assert(
       !workspaceScript.text.includes("track.replaceChildren(...nodes)"),
@@ -246,6 +255,12 @@ async function main() {
         workspaceStyles.text.includes('[style*="background-color:#C0C0C0" i]') &&
         workspaceStyles.text.includes('[style*="background-color:#808080" i]'),
       "Reader tables no longer override legacy light-theme colors in dark mode."
+    );
+    assert(
+      workspaceStyles.text.includes(".project-bulk-bar") &&
+        workspaceStyles.text.includes(".is-project-selecting .project-selection-check") &&
+        workspaceStyles.text.includes(".project-row.is-selected"),
+      "Project bulk selection omitted its toolbar, selection indicators, or selected-card treatment."
     );
     assert(
       workspaceStyles.text.includes("*::-webkit-scrollbar") &&

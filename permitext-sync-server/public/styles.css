@@ -783,6 +783,8 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .projects-panel .projects-archive-button,
 .projects-panel .projects-add-button,
+.projects-panel .projects-select-button,
+.archive-panel .projects-select-button,
 .archive-panel .archive-close-button {
   display: grid;
   width: var(--panel-title-control-size);
@@ -801,6 +803,12 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .projects-panel .projects-archive-button[aria-pressed="true"],
 .projects-panel .projects-add-button:hover,
 .projects-panel .projects-add-button:focus-visible,
+.projects-panel .projects-select-button:hover,
+.projects-panel .projects-select-button:focus-visible,
+.projects-panel .projects-select-button[aria-pressed="true"],
+.archive-panel .projects-select-button:hover,
+.archive-panel .projects-select-button:focus-visible,
+.archive-panel .projects-select-button[aria-pressed="true"],
 .archive-panel .archive-close-button:hover,
 .archive-panel .archive-close-button:focus-visible {
   border-color: transparent;
@@ -812,6 +820,8 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .projects-panel .projects-archive-button svg,
 .projects-panel .projects-add-button svg,
+.projects-panel .projects-select-button svg,
+.archive-panel .projects-select-button svg,
 .archive-panel .archive-close-button svg {
   width: var(--panel-title-icon-size);
   height: var(--panel-title-icon-size);
@@ -2591,6 +2601,82 @@ mark {
   padding-top: var(--reader-header-overlay-height);
 }
 
+.projects-panel.is-project-selecting .projects-content,
+.archive-panel.is-project-selecting .projects-content {
+  padding-bottom: calc(var(--panel-padding) + 118px);
+}
+
+.project-bulk-bar {
+  position: absolute;
+  right: var(--panel-padding);
+  bottom: var(--panel-padding);
+  left: var(--panel-padding);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--text-primary) 18%, var(--border));
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+.project-bulk-bar[hidden] {
+  display: none;
+}
+
+.project-bulk-count {
+  flex: 1 1 100%;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  font-weight: 650;
+}
+
+.project-bulk-link,
+.project-bulk-action {
+  min-height: 32px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: calc(var(--chrome-font-size) * 0.7) !important;
+  font-weight: 650;
+}
+
+.project-bulk-link {
+  padding-right: 0;
+  padding-left: 0;
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.project-bulk-link:hover,
+.project-bulk-link:focus-visible {
+  color: var(--text-primary);
+}
+
+.project-bulk-action {
+  margin-left: auto;
+  border: 1px solid var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+}
+
+.project-bulk-action.is-delete {
+  border-color: #b42318;
+  background: #b42318;
+  color: #fff;
+}
+
+.project-bulk-action:disabled,
+.project-bulk-link:disabled {
+  cursor: default;
+  opacity: 0.42;
+}
+
 .section-label {
   margin: 0;
   color: var(--text-secondary);
@@ -2803,6 +2889,54 @@ mark {
   right: var(--space-3);
   display: flex;
   gap: var(--space-1);
+}
+
+.project-selection-check {
+  position: absolute;
+  top: 50%;
+  left: var(--space-3);
+  display: none;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  place-items: center;
+  color: var(--text-secondary);
+  transform: translateY(-50%);
+}
+
+.project-selection-check svg {
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+}
+
+.project-selection-checkmark {
+  opacity: 0;
+}
+
+.is-project-selecting .project-selection-check {
+  display: grid;
+}
+
+.is-project-selecting .project-row {
+  padding-right: var(--space-4);
+  padding-left: calc(var(--space-4) + var(--panel-title-control-size) + var(--space-2));
+}
+
+.is-project-selecting .project-card-actions {
+  display: none;
+}
+
+.is-project-selecting .project-row.is-selected {
+  outline: 2px solid color-mix(in srgb, var(--project-color) 66%, var(--text-primary));
+  outline-offset: -2px;
+  background: color-mix(in srgb, var(--project-color) 42%, transparent);
+}
+
+.is-project-selecting .project-row.is-selected .project-selection-check {
+  color: var(--text-primary);
+}
+
+.is-project-selecting .project-row.is-selected .project-selection-checkmark {
+  opacity: 1;
 }
 
 .project-count-badge {
