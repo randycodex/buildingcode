@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v2"),
-      "Web workspace omitted the web-notes-v2 assets."
+      webRoot.text.includes("web-notes-v3"),
+      "Web workspace omitted the web-notes-v3 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -167,6 +167,11 @@ async function main() {
     assert(
       workspaceScript.text.includes("window.requestAnimationFrame(applyPendingResize)"),
       "Divider resizing is no longer coalesced to animation frames."
+    );
+    assert(
+      workspaceScript.text.includes('panel.style.setProperty("--pane-resized-min-width"') &&
+        workspaceScript.text.includes('pane.classList.contains("workboard-panel") ? 320 : 160'),
+      "Manual pane resizing no longer relaxes responsive minimum widths to keep the divider under the pointer."
     );
     assert(
       workspaceScript.text.includes("paneIDForSectionDetail(searchID),"),
@@ -252,6 +257,10 @@ async function main() {
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
       "Divider resizing still invalidates cursor styles across every workspace descendant."
+    );
+    assert(
+      workspaceStyles.text.includes("min-width: min(var(--pane-min-width), var(--pane-resized-min-width));"),
+      "Pane CSS no longer honors manually resized widths below the responsive minimum."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),

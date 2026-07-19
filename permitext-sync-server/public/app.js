@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v2";
+const workboardClientVersion = "20260719-web-notes-v3";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1265,6 +1265,7 @@ function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   const value = Number(state.paneWeights[paneID]);
   const width = Number.isFinite(value) && value > 40 ? value : defaultPaneWidthForID(paneID);
+  panel.style.setProperty("--pane-resized-min-width", `${width}px`);
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
     return;
@@ -7141,8 +7142,9 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   track.classList.add("is-resizing");
   const startX = event.clientX;
   const minimumWidthFor = (pane) => {
-    const value = Number.parseFloat(getComputedStyle(pane).minWidth);
-    return Number.isFinite(value) ? value : 220;
+    const responsiveMinimum = Number.parseFloat(getComputedStyle(pane).getPropertyValue("--pane-min-width"));
+    const manualMinimum = pane.classList.contains("workboard-panel") ? 320 : 160;
+    return Number.isFinite(responsiveMinimum) ? Math.min(responsiveMinimum, manualMinimum) : manualMinimum;
   };
   const paneData = panes.map((pane) => ({
     id: pane.dataset.paneId,
