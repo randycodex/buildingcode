@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("compact-saved-v9"),
-      "Web workspace omitted the compact-saved-v9 assets."
+      webRoot.text.includes("flat-project-saves-v10"),
+      "Web workspace omitted the flat-project-saves-v10 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -292,6 +292,13 @@ async function main() {
       "Project saved-item clicks no longer reuse one project-linked Reader column."
     );
     assert(
+      workspaceScript.text.includes('heading.className = "project-detail-section-heading"') &&
+        workspaceScript.text.includes('rowNumber.className = "project-detail-section-number"') &&
+        workspaceScript.text.includes('rowTitle.className = "project-detail-section-title"') &&
+        !workspaceScript.text.includes('const rowBody = document.createElement("span")'),
+      "Project saved rows no longer keep one inline section number and title."
+    );
+    assert(
       workspaceScript.text.includes("const deletion = deletedProjectSectionMutationForItem(project, item)") &&
         workspaceScript.text.includes("await pushMutation(deletion)") &&
         workspaceScript.text.includes("await removeSectionFromAllProjects(sectionPayload)") &&
@@ -412,7 +419,9 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&
         workspaceStyles.text.includes(".project-saved-code-group") &&
-        workspaceStyles.text.includes(".project-detail-section-preview"),
+        workspaceStyles.text.includes(".project-detail-section-preview") &&
+        workspaceStyles.text.includes(".project-detail-section-heading") &&
+        workspaceStyles.text.match(/\.project-detail-saved-row \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;/),
       "Saved and project cards omitted note previews, code grouping, or section previews."
     );
     assert(

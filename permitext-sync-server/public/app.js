@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-compact-saved-v9";
+const workboardClientVersion = "20260719-flat-project-saves-v10";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -6262,21 +6262,33 @@ async function renderProjectDetail(detail) {
     codeLabel.className = "section-label saved-code-label";
     codeLabel.textContent = codeDisplayLabel(prefix);
     codeGroup.append(codeLabel);
-    items.forEach((item) => {
+    const orderedItems = [...items].sort((left, right) =>
+      String(left.sectionNumber || left.sectionID || "").localeCompare(
+        String(right.sectionNumber || right.sectionID || ""),
+        undefined,
+        { numeric: true, sensitivity: "base" }
+      )
+    );
+    orderedItems.forEach((item) => {
       const row = document.createElement("article");
       row.className = "saved-row project-detail-saved-row";
       const openButton = document.createElement("button");
       openButton.className = "project-detail-section-open";
       openButton.type = "button";
+      const sectionNumber = String(item.sectionNumber || item.sectionID || "").trim();
+      const heading = document.createElement("span");
+      heading.className = "project-detail-section-heading";
+      const rowNumber = document.createElement("span");
+      rowNumber.className = "project-detail-section-number";
+      rowNumber.textContent = sectionNumber;
       const rowTitle = document.createElement("strong");
-      rowTitle.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "Saved section");
-      const rowBody = document.createElement("span");
-      rowBody.textContent = [
-        item.chapterNumber ? `Chapter ${item.chapterNumber}` : "",
-        item.sectionNumber || item.sectionID || ""
-      ].filter(Boolean).join(" · ");
-      openButton.append(rowTitle);
-      if (rowBody.textContent) openButton.append(rowBody);
+      rowTitle.className = "project-detail-section-title";
+      rowTitle.textContent = sectionTitleWithoutNumber({
+        sectionNumber,
+        title: item.title || "Saved section"
+      }) || "Saved section";
+      heading.append(rowNumber, rowTitle);
+      openButton.append(heading);
       if (item.previewText) {
         const preview = document.createElement("p");
         preview.className = "project-detail-section-preview";
@@ -6291,7 +6303,7 @@ async function renderProjectDetail(detail) {
       removeButton.className = "project-detail-section-remove";
       removeButton.type = "button";
       removeButton.title = "Remove from project";
-      removeButton.setAttribute("aria-label", `Remove ${rowTitle.textContent} from ${identity.name}`);
+      removeButton.setAttribute("aria-label", `Remove ${sectionDisplayTitle(sectionNumber, item.title || rowTitle.textContent)} from ${identity.name}`);
       removeButton.innerHTML = trashIconSVG();
       removeButton.addEventListener("click", async () => {
         removeButton.disabled = true;

@@ -3286,7 +3286,7 @@ mark {
 
 .project-detail-section {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
   margin-top: var(--space-2);
 }
 
@@ -3297,13 +3297,17 @@ mark {
   align-items: center;
   gap: var(--space-2);
   width: 100%;
+  padding: var(--space-2) 0;
   border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
   text-align: left;
 }
 
 .project-saved-code-group {
   display: grid;
-  gap: var(--space-1);
+  gap: 0;
 }
 
 .project-saved-code-group + .project-saved-code-group {
@@ -3312,13 +3316,13 @@ mark {
 
 .project-detail-section-preview {
   display: -webkit-box;
-  margin: var(--space-1) 0 0;
+  margin: 3px 0 0;
   overflow: hidden;
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.78) !important;
-  line-height: 1.4;
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+  line-height: 1.35;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
 }
 
 .project-detail-select {
@@ -3343,10 +3347,33 @@ mark {
 
 .project-detail-section-open {
   display: grid;
-  gap: var(--space-1);
+  gap: 3px;
   min-width: 0;
   padding: 0;
   text-align: left;
+}
+
+.project-detail-section-heading {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.project-detail-section-number {
+  flex: 0 0 auto;
+  color: var(--project-color);
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.project-detail-section-title {
+  min-width: 0;
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+  font-weight: 650;
+  line-height: 1.25;
 }
 
 .project-detail-section-remove {
