@@ -3213,7 +3213,11 @@ async function canonicalizeMutations(mutations) {
 
 function canonicalCodeVersion(value) {
   const candidate = String(value || "").trim();
-  if (!candidate || candidate === "nyc-2022") return defaultSyncCodeVersion;
+  if (
+    !candidate ||
+    candidate === "nyc-2022" ||
+    candidate === "2022 Construction Codes"
+  ) return defaultSyncCodeVersion;
   return candidate;
 }
 

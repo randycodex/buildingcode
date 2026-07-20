@@ -505,6 +505,10 @@ struct UserContentSyncEngine {
         return checkpoint(for: account)
     }
 
+    func resetCheckpoint(account: SignedInAccount) {
+        checkpointStore.clear(accountUserID: account.appUserID, backendName: backend.name)
+    }
+
     private func checkpoint(for account: SignedInAccount) -> UserContentSyncCheckpoint {
         checkpointStore.load(accountUserID: account.appUserID, backendName: backend.name)
     }
@@ -530,6 +534,13 @@ struct UserContentSyncEngine {
                 try repository.applyServerUserContentMutation(mutation)
                 appliedCount += 1
             case .noChange:
+                // Reapply idempotently so records written under an older code-version
+                // alias are moved into the current local version bucket.
+                if case .continuity(let record) = mutation {
+                    applyServerContinuity(record)
+                } else {
+                    try repository.applyServerUserContentMutation(mutation)
+                }
                 continue
             case .keepLocal, .uploadLocal, .flagConflict:
                 continue

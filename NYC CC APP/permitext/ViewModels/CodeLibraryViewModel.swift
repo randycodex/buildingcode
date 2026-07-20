@@ -185,6 +185,7 @@ final class CodeLibraryViewModel: ObservableObject {
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
         self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
+        prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
         refreshPendingUserContentSyncCount()
         networkMonitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor [weak self] in
@@ -1807,6 +1808,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let account = backendRecord.account
         signedInAccount = account
         Self.saveSignedInAccount(account)
+        prepareCanonicalCodeVersionMigration(for: account)
         refreshUserContentSyncCheckpoint()
         applyBackendEntitlementIfPresent(backendRecord.entitlement)
         await refreshStoreKitEntitlements()
@@ -1978,6 +1980,9 @@ final class CodeLibraryViewModel: ObservableObject {
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
+            if report.appliedCount > 0 {
+                refreshBookmarks()
+            }
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
@@ -2034,6 +2039,14 @@ final class CodeLibraryViewModel: ObservableObject {
     private func refreshUserContentSyncCheckpoint() {
         userContentSyncCheckpoint = syncEngine.checkpoint(account: signedInAccount)
         refreshPendingUserContentSyncCount()
+    }
+
+    private func prepareCanonicalCodeVersionMigration(for account: SignedInAccount?) {
+        guard let account else { return }
+        let key = "permitext.sync.canonical-code-version.v1.\(account.appUserID)"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        syncEngine.resetCheckpoint(account: account)
+        UserDefaults.standard.set(true, forKey: key)
     }
 
     private func refreshPendingUserContentSyncCount() {

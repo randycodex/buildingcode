@@ -2137,7 +2137,7 @@ final class UserDataStore: UserContentRepository {
     }
 
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws {
-        switch mutation {
+        switch localizedServerMutation(mutation) {
         case .savedItem(let record):
             if record.deletedAt != nil {
                 try deleteServerBookmark(sectionID: record.sectionID, codeVersion: record.codeVersion)
@@ -2166,6 +2166,77 @@ final class UserDataStore: UserContentRepository {
             break
         case .codeVersionClear(let record):
             try applyServerCodeVersionClear(record)
+        }
+    }
+
+    private func localizedServerMutation(_ mutation: ServerUserContentMutation) -> ServerUserContentMutation {
+        switch mutation {
+        case .savedItem(let record):
+            return .savedItem(ServerSavedItemRecord(
+                id: record.id,
+                userID: record.userID,
+                codeVersion: localCodeVersion(record.codeVersion),
+                sectionID: record.sectionID,
+                updatedAt: record.updatedAt,
+                deletedAt: record.deletedAt
+            ))
+        case .annotation(let record):
+            return .annotation(ServerAnnotationRecord(
+                id: record.id,
+                userID: record.userID,
+                codeVersion: localCodeVersion(record.codeVersion),
+                sectionID: record.sectionID,
+                blockID: record.blockID,
+                noteBody: record.noteBody,
+                tags: record.tags,
+                updatedAt: record.updatedAt,
+                deletedAt: record.deletedAt
+            ))
+        case .project(let record):
+            return .project(ServerProjectRecord(
+                id: record.id,
+                userID: record.userID,
+                codeVersion: localCodeVersion(record.codeVersion),
+                clientID: record.clientID,
+                localFolderID: record.localFolderID,
+                name: record.name,
+                address: record.address,
+                description: record.description,
+                colorHex: record.colorHex,
+                sortOrder: record.sortOrder,
+                updatedAt: record.updatedAt,
+                deletedAt: record.deletedAt
+            ))
+        case .projectSection(let record):
+            return .projectSection(ServerProjectSectionRecord(
+                id: record.id,
+                userID: record.userID,
+                codeVersion: localCodeVersion(record.codeVersion),
+                folderClientID: record.folderClientID,
+                localFolderID: record.localFolderID,
+                sectionID: record.sectionID,
+                scope: record.scope,
+                updatedAt: record.updatedAt,
+                deletedAt: record.deletedAt
+            ))
+        case .continuity:
+            return mutation
+        case .codeVersionClear(let record):
+            return .codeVersionClear(ServerContinuityRecord(
+                userID: record.userID,
+                codeVersion: localCodeVersion(record.codeVersion),
+                values: record.values,
+                updatedAt: record.updatedAt
+            ))
+        }
+    }
+
+    private func localCodeVersion(_ codeVersion: String) -> String {
+        switch codeVersion.trimmingCharacters(in: .whitespacesAndNewlines) {
+        case "nyc-2022", "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1":
+            return "2022 Construction Codes"
+        default:
+            return codeVersion
         }
     }
 

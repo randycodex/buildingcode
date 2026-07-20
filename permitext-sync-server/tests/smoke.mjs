@@ -1452,7 +1452,7 @@ async function main() {
       savedItem: {
         id: "saved-smoke",
         userID,
-        codeVersion: "nyc-2022",
+        codeVersion: "2022 Construction Codes",
         sectionID: 900001,
         createdAt: "2026-06-04T00:00:00Z",
         updatedAt: "2026-06-04T00:00:00Z"
@@ -1471,7 +1471,10 @@ async function main() {
       }
     });
     assert(push.response.ok, "Sync push failed.");
-    assert(push.json.acceptedMutationIDs.includes(savedSmokeRecordID), "Push did not accept the saved item mutation.");
+    assert(
+      push.json.acceptedMutationIDs.includes(savedSmokeRecordID),
+      "Push did not canonicalize the iOS code-version name."
+    );
     assert(Number.isInteger(push.json.latestEventID), "Push did not return a latest event ID.");
     assert(push.json.syncRevision === push.json.latestEventID, "Push sync revision did not match latest event ID.");
 
