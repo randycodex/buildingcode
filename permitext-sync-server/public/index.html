@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260719-saved-flat-list-v14">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260719-saved-flat-list-v14">
+    <link rel="stylesheet" href="/web/styles.css?v=20260720-settings-parity-v15">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-settings-parity-v15">
   </head>
   <body>
     <main class="workspace-shell">
@@ -265,17 +265,74 @@
             </button>
           </div>
         </header>
-        <section class="settings-list">
-          <div class="settings-row">
+        <section class="settings-list settings-library-card" aria-label="Code library settings">
+          <label class="settings-row">
             <span>Jurisdiction</span>
-            <strong>New York City</strong>
-          </div>
-          <div class="settings-row">
+            <select class="settings-jurisdiction-select" aria-label="Jurisdiction">
+              <option value="jurisdiction-1">New York City</option>
+            </select>
+          </label>
+          <label class="settings-row">
             <span>Version</span>
-            <strong>2022 Construction Codes</strong>
-          </div>
+            <select class="settings-version-select" aria-label="Version">
+              <option value="CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1">2022 Construction Codes</option>
+            </select>
+          </label>
+          <label class="settings-row">
+            <span>Code Section</span>
+            <select class="settings-code-section-select" aria-label="Code section"></select>
+          </label>
+          <label class="settings-row settings-toggle-row">
+            <span>Comparison Mode</span>
+            <input class="settings-comparison-toggle" type="checkbox" role="switch" aria-label="Comparison Mode">
+          </label>
         </section>
-        <section class="reader-preview-card">
+        <section class="settings-card settings-plan-card">
+          <p class="section-label">Plan</p>
+          <p class="settings-card-copy account-plan-detail"></p>
+          <p class="settings-billing-line">Billing: <strong class="account-plan-label">Free</strong></p>
+          <div class="settings-plan-features">
+            <div class="settings-feature-row">
+              <span class="settings-feature-icon" aria-hidden="true">&#10003;</span>
+              <p><strong>Free</strong><span>Read codes, search, recent history, 25 saved sections, and 10 notes.</span></p>
+            </div>
+            <div class="settings-feature-row">
+              <span class="settings-feature-icon is-pro" aria-hidden="true">&#10003;</span>
+              <p><strong>Pro</strong><span>Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.</span></p>
+            </div>
+          </div>
+          <button class="settings-primary-button account-checkout" type="button">Upgrade to Pro</button>
+          <button class="settings-link-button account-plan-secondary" type="button">Restore Purchases</button>
+        </section>
+        <section class="settings-card account-connector">
+          <p class="section-label">Account</p>
+          <p class="settings-card-copy account-status-copy"></p>
+          <div class="account-summary" hidden>
+            <span>Signed in as</span>
+            <strong class="account-display-name"></strong>
+          </div>
+          <div class="account-profile-editor" hidden>
+            <label for="settings-public-username">Public username</label>
+            <input id="settings-public-username" class="account-public-username" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username">
+            <p class="account-profile-helper">Used later for public and collaboration features. This stays separate from your Apple identity.</p>
+            <button class="settings-secondary-button account-profile-save" type="button">Save Public Username</button>
+          </div>
+          <button class="settings-primary-button account-sign-in" type="button">Sign in</button>
+          <button class="settings-secondary-button account-clear" type="button">Sign Out</button>
+        </section>
+        <section class="settings-card account-sync-card">
+          <p class="section-label">Sync</p>
+          <div class="account-sync-status">
+            <span class="account-sync-icon" aria-hidden="true">&#8635;</span>
+            <div>
+              <strong class="account-sync-title">Not signed in</strong>
+              <p class="connector-status">Sign in to sync saved work across iOS and web.</p>
+            </div>
+          </div>
+          <div class="account-sync-conflicts"></div>
+          <button class="settings-secondary-button account-sync-now" type="button">Sync Now</button>
+        </section>
+        <section class="reader-preview-card settings-card">
           <p class="section-label">Reader Preview</p>
           <p class="preview-code-title">Section BC 101: General</p>
           <h3>101.2 Scope.</h3>
@@ -283,39 +340,49 @@
           <label class="preview-setting-row preview-font-family-row">
             <span>Font</span>
             <select class="preview-font-family-select" aria-label="Reader font">
-              <option value="helvetica">Helvetica</option>
+              <option value="system">System</option>
+              <option value="rounded">Rounded</option>
+              <option value="serif">Serif</option>
+              <option value="monospaced">Monospaced</option>
             </select>
           </label>
           <div class="preview-setting-row">
             <span>Font Size</span>
             <strong class="preview-font-value">10 pt</strong>
           </div>
-          <input class="preview-slider preview-font-slider" type="range" min="10" max="18" value="10" aria-label="Preview font size">
+          <input class="preview-slider preview-font-slider" type="range" min="10" max="26" value="10" aria-label="Preview font size">
           <div class="preview-setting-row">
             <span>Line Spacing</span>
             <strong class="preview-spacing-value">0</strong>
           </div>
           <input class="preview-slider preview-spacing-slider" type="range" min="0" max="4" value="0" aria-label="Preview line spacing">
         </section>
-        <section class="account-connector">
-          <div class="account-summary" hidden>
-            <span>Signed in as</span>
-            <strong class="account-display-name"></strong>
+        <section class="settings-card settings-saved-data-card">
+          <p class="section-label">Saved Data</p>
+          <div class="settings-danger-list">
+            <button class="settings-danger-button" type="button" data-clear-action="searches">
+              <span aria-hidden="true">&#8981;</span>
+              Clear Recent Searches
+            </button>
+            <button class="settings-danger-button" type="button" data-clear-action="bookmarks">
+              <span aria-hidden="true">&#9734;</span>
+              Clear All Bookmarks
+            </button>
+            <button class="settings-danger-button" type="button" data-clear-action="notes">
+              <span aria-hidden="true">&#9998;</span>
+              Clear All Notes
+            </button>
+            <button class="settings-danger-button" type="button" data-clear-action="tags">
+              <span aria-hidden="true">&#9671;</span>
+              Clear All Tags
+            </button>
           </div>
-          <div class="account-plan-summary" hidden>
-            <span class="account-plan-label"></span>
-            <strong class="account-plan-detail"></strong>
-          </div>
-          <div class="connector-actions">
-            <button class="ghost-button account-sign-in" type="button">Sign in</button>
-            <button class="ghost-button account-clear" type="button">Disconnect</button>
-            <button class="ghost-button account-checkout" type="button">Upgrade to Pro</button>
-          </div>
-          <p class="connector-status"></p>
         </section>
+        <p class="settings-disclaimer">permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.</p>
+        <p class="settings-status-message" role="status"></p>
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260719-saved-flat-list-v14" type="module"></script>
+    <script src="/web/app.js?v=20260720-settings-parity-v15" type="module"></script>
   </body>
 </html>

@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-saved-flat-list-v14";
+const workboardClientVersion = "20260720-settings-parity-v15";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -66,7 +66,7 @@ const sharedWorkspaceStateKeys = [
 const defaultReaderSettings = {
   fontSize: 10,
   lineSpacing: 0,
-  fontFamily: "helvetica"
+  fontFamily: "system"
 };
 
 let chapters = [];
@@ -151,6 +151,9 @@ function loadWorkspaceState() {
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
+      settingsCodePrefix: typeof saved.settingsCodePrefix === "string" ? saved.settingsCodePrefix : "",
+      comparisonModeEnabled: Boolean(saved.comparisonModeEnabled),
+      comparisonReaderID: typeof saved.comparisonReaderID === "string" ? saved.comparisonReaderID : "",
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
@@ -183,6 +186,9 @@ function loadWorkspaceState() {
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
+      settingsCodePrefix: "",
+      comparisonModeEnabled: false,
+      comparisonReaderID: "",
       savedTextSize: 10,
       workboards: [],
       detachedWorkboards: []
@@ -606,10 +612,11 @@ function clampNumber(value, min, max, fallback) {
 }
 
 function normalizeReaderSettings(settings = {}) {
+  const fontFamily = settings.fontFamily === "helvetica" ? "system" : String(settings.fontFamily || "system");
   return {
-    fontSize: clampNumber(settings.fontSize, 10, 18, defaultReaderSettings.fontSize),
+    fontSize: clampNumber(settings.fontSize, 10, 26, defaultReaderSettings.fontSize),
     lineSpacing: clampNumber(settings.lineSpacing, 0, 4, defaultReaderSettings.lineSpacing),
-    fontFamily: "helvetica"
+    fontFamily: ["system", "rounded", "serif", "monospaced"].includes(fontFamily) ? fontFamily : "system"
   };
 }
 
@@ -633,7 +640,10 @@ function readerLineHeightValue(lineSpacing) {
 }
 
 function readerFontFamilyValue() {
-  return "Helvetica, Arial, sans-serif";
+  if (state.readerSettings.fontFamily === "rounded") return "ui-rounded, -apple-system, BlinkMacSystemFont, sans-serif";
+  if (state.readerSettings.fontFamily === "serif") return "New York, Iowan Old Style, Georgia, serif";
+  if (state.readerSettings.fontFamily === "monospaced") return "SFMono-Regular, Menlo, Monaco, monospace";
+  return "-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif";
 }
 
 function applyReaderSettings() {
@@ -644,7 +654,7 @@ function applyReaderSettings() {
 }
 
 function readerTextSizeValue(reader) {
-  return clampNumber(reader?.textSize, 10, 18, state.readerSettings.fontSize);
+  return clampNumber(reader?.textSize, 10, 26, state.readerSettings.fontSize);
 }
 
 function syncReaderTextSizeControls(panel, reader) {
@@ -656,7 +666,7 @@ function syncReaderTextSizeControls(panel, reader) {
     decreaseButton.title = `Decrease Reader text size (${size} pt)`;
   }
   if (increaseButton) {
-    increaseButton.disabled = size >= 18;
+    increaseButton.disabled = size >= 26;
     increaseButton.title = `Increase Reader text size (${size} pt)`;
   }
 }
@@ -671,7 +681,7 @@ function applyReaderTextSize(panel, reader) {
 }
 
 function changeReaderTextSize(panel, reader, delta) {
-  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 18, state.readerSettings.fontSize);
+  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 26, state.readerSettings.fontSize);
   (state.readers || []).forEach((openReader) => {
     openReader.textSize = nextSize;
     const openPanel = track.querySelector(
@@ -1996,6 +2006,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
     sessionToken: account.backendSessionToken,
     authProvider: account.authProvider || "web",
     displayName: account.displayName || fallbackDisplayName,
+    publicUsername: account.publicUsername || null,
     entitlement: payload.entitlement || null
   };
   syncedContent = null;
@@ -2465,9 +2476,12 @@ function continuityValuesForReader(reader) {
     ...existing,
     selectedJurisdictionKey: "jurisdiction-1",
     selectedVersionFileName: defaultSyncCodeVersion,
-    selectedCodeSectionID: chapter?.codeSectionID
-      ? String(chapter.codeSectionID)
-      : existing.selectedCodeSectionID || "",
+    selectedCodeSectionID: state.settingsCodePrefix === "ALL"
+      ? ""
+      : chapter?.codeSectionID
+        ? String(chapter.codeSectionID)
+        : existing.selectedCodeSectionID || "",
+    comparisonModeEnabled: state.comparisonModeEnabled ? "true" : "false",
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
@@ -2505,6 +2519,23 @@ async function applyRemoteContinuityIfNewer() {
   if (!record || !Number.isFinite(remoteTimestamp) || remoteTimestamp <= appliedTimestamp || hasPendingContinuity) return;
 
   state.continuityAppliedAt = record.updatedAt;
+  state.comparisonModeEnabled = record.values?.comparisonModeEnabled === "true";
+  const remoteCodeSectionID = String(record.values?.selectedCodeSectionID || "");
+  const remoteCodeSectionChapter = chapters.find((item) => String(item.codeSectionID || "") === remoteCodeSectionID);
+  state.settingsCodePrefix = remoteCodeSectionID ? remoteCodeSectionChapter?.codePrefix || "" : "ALL";
+  const comparisonReader = (state.readers || []).find((reader) => reader.id === state.comparisonReaderID);
+  if (state.comparisonModeEnabled && !comparisonReader) {
+    const primaryPrefix = state.readers?.[0]?.codePrefix || "BC";
+    const alternatePrefix = searchCodeFilterOptions()
+      .map((option) => option.prefix)
+      .find((prefix) => prefix !== "ALL" && prefix !== primaryPrefix) || primaryPrefix;
+    const addedReader = newReaderState({ codePrefix: alternatePrefix, comparisonManaged: true });
+    state.readers = [...(state.readers || []), addedReader];
+    state.comparisonReaderID = addedReader.id;
+  } else if (!state.comparisonModeEnabled && comparisonReader) {
+    state.readers = state.readers.filter((reader) => reader.id !== comparisonReader.id);
+    state.comparisonReaderID = "";
+  }
   if (deepLinkedSectionIDFromLocation()) {
     saveWorkspaceState();
     return;
@@ -7152,119 +7183,270 @@ async function openSectionDetailForExistingSearch(item, options = {}) {
   await openSectionDetail(searchInstance.id, item, options);
 }
 
+function settingsCodeSectionOptions() {
+  return searchCodeFilterOptions();
+}
+
+function selectedSettingsCodePrefix() {
+  const available = new Set(settingsCodeSectionOptions().map((option) => option.prefix));
+  if (available.has(state.settingsCodePrefix)) return state.settingsCodePrefix;
+  return state.readers?.[0]?.codePrefix || "ALL";
+}
+
+async function updateSettingsCodeSection(prefix) {
+  state.settingsCodePrefix = settingsCodeSectionOptions().some((option) => option.prefix === prefix) ? prefix : "ALL";
+  const primaryReader = state.readers?.[0];
+  if (primaryReader && state.settingsCodePrefix !== "ALL" && primaryReader.codePrefix !== state.settingsCodePrefix) {
+    primaryReader.codePrefix = state.settingsCodePrefix;
+    primaryReader.chapterID = await firstChapterIDForCode(primaryReader.codePrefix);
+    primaryReader.sectionID = "";
+    primaryReader.sectionNumber = "";
+    primaryReader.title = "Reader";
+  }
+  saveWorkspaceState();
+  if (primaryReader?.chapterID) scheduleContinuitySync(primaryReader);
+  await renderWorkspace();
+}
+
+async function synchronizeComparisonReaders(enabled) {
+  state.comparisonModeEnabled = Boolean(enabled);
+  const existingComparisonReader = (state.readers || []).find((reader) => reader.id === state.comparisonReaderID);
+  if (state.comparisonModeEnabled && !existingComparisonReader) {
+    const primaryPrefix = state.readers?.[0]?.codePrefix || "BC";
+    const comparisonPrefix = settingsCodeSectionOptions()
+      .map((option) => option.prefix)
+      .find((prefix) => prefix !== "ALL" && prefix !== primaryPrefix) || primaryPrefix;
+    const comparisonReader = newReaderState({ codePrefix: comparisonPrefix, comparisonManaged: true });
+    state.readers = [...(state.readers || []), comparisonReader];
+    state.comparisonReaderID = comparisonReader.id;
+  } else if (!state.comparisonModeEnabled && existingComparisonReader) {
+    state.readers = state.readers.filter((reader) => reader.id !== existingComparisonReader.id);
+    state.comparisonReaderID = "";
+  }
+  saveWorkspaceState();
+  const primaryReader = state.readers?.[0];
+  if (primaryReader?.chapterID) scheduleContinuitySync(primaryReader);
+  await renderWorkspace();
+}
+
+function normalizedPublicUsername(value) {
+  const trimmed = String(value || "").trim().replace(/^@/, "").toLowerCase();
+  return trimmed || null;
+}
+
+function publicUsernameValidationMessage(value) {
+  const username = normalizedPublicUsername(value);
+  if (!username) return "";
+  if (username.length < 3) return "Use at least 3 characters.";
+  if (username.length > 30) return "Use 30 characters or fewer.";
+  if (!/^[a-z0-9_-]+$/.test(username)) return "Use letters, numbers, hyphens, or underscores.";
+  return "";
+}
+
+function bookmarkRecordsForSettings() {
+  const bySectionID = new Map(
+    (syncedContent?.summary?.savedItems || []).map((item) => [String(item.sectionID || ""), item])
+  );
+  (state.localSavedItems || []).forEach((item) => {
+    if (item?.sectionID) bySectionID.set(String(item.sectionID), item);
+  });
+  return Array.from(bySectionID.values()).filter((item) => item?.sectionID && !item.deletedAt);
+}
+
+async function clearSettingsBookmarks() {
+  const records = bookmarkRecordsForSettings();
+  const account = activeAccount();
+  const clearedIDs = new Set(records.map((item) => String(item.sectionID)));
+  records.forEach((item) => {
+    const updatedAt = new Date().toISOString();
+    const tombstone = {
+      ...item,
+      id: item.id || `web-saved-${item.sectionID}`,
+      userID: account?.userID || item.userID || "local-web",
+      updatedAt,
+      deletedAt: updatedAt
+    };
+    state.localSavedItems = [
+      ...(state.localSavedItems || []).filter((candidate) => String(candidate.sectionID) !== String(item.sectionID)),
+      tombstone
+    ];
+    if (account) enqueueSyncMutation({ savedItem: tombstone }, account);
+  });
+  state.localSavedSectionIDs = (state.localSavedSectionIDs || []).filter((id) => !clearedIDs.has(String(id)));
+  saveWorkspaceState();
+  if (account && records.length) await flushSyncOutbox({ refresh: true });
+  return records.length;
+}
+
+async function clearSettingsAnnotations(field) {
+  const records = currentContentSummary().annotations || [];
+  const uniqueTargets = new Map();
+  records.forEach((record) => {
+    const key = `${record.sectionID || ""}:${normalizeAnnotationBlockID(record.blockID)}`;
+    if (!uniqueTargets.has(key)) uniqueTargets.set(key, record);
+  });
+  uniqueTargets.forEach((record) => {
+    const target = annotationTargetForSection({ ...record, id: record.sectionID }, null, { blockID: record.blockID || "" });
+    if (field === "noteBody") setAnnotationNoteValue(target, "");
+    else setAnnotationTags(target, []);
+  });
+  if (field === "noteBody") state.sectionNotes = {};
+  saveWorkspaceState();
+  if (activeAccount() && uniqueTargets.size) await flushSyncOutbox({ refresh: true });
+  return uniqueTargets.size;
+}
+
+async function performSettingsClearAction(action) {
+  if (action === "searches") {
+    state.searchQuery = "";
+    state.searchCodeFilters = [];
+    (state.utilityInstances || []).filter((instance) => instance.key === "search").forEach((instance) => {
+      instance.query = "";
+      instance.codeFilters = [];
+    });
+    saveWorkspaceState();
+    return 0;
+  }
+  if (action === "bookmarks") return clearSettingsBookmarks();
+  if (action === "notes") return clearSettingsAnnotations("noteBody");
+  if (action === "tags") return clearSettingsAnnotations("tags");
+  return 0;
+}
+
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   wireReaderSettingsControls(panel);
-  const summary = panel.querySelector(".account-summary");
+
+  const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
+  const versionSelect = panel.querySelector(".settings-version-select");
+  const codeSectionSelect = panel.querySelector(".settings-code-section-select");
+  const comparisonToggle = panel.querySelector(".settings-comparison-toggle");
+  const accountSummary = panel.querySelector(".account-summary");
+  const accountCopy = panel.querySelector(".account-status-copy");
   const displayName = panel.querySelector(".account-display-name");
-  const planSummary = panel.querySelector(".account-plan-summary");
+  const profileEditor = panel.querySelector(".account-profile-editor");
+  const usernameInput = panel.querySelector(".account-public-username");
+  const profileHelper = panel.querySelector(".account-profile-helper");
+  const profileSaveButton = panel.querySelector(".account-profile-save");
   const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
   const signInButton = panel.querySelector(".account-sign-in");
-  const disconnectButton = panel.querySelector(".account-clear");
+  const signOutButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
-  const status = panel.querySelector(".connector-status");
-  const connector = panel.querySelector(".account-connector");
-  const syncPanel = document.createElement("section");
-  syncPanel.className = "account-sync-summary";
-  connector.append(syncPanel);
+  const planSecondaryButton = panel.querySelector(".account-plan-secondary");
+  const syncTitle = panel.querySelector(".account-sync-title");
+  const syncDetail = panel.querySelector(".connector-status");
+  const syncIcon = panel.querySelector(".account-sync-icon");
+  const syncButton = panel.querySelector(".account-sync-now");
+  const syncConflicts = panel.querySelector(".account-sync-conflicts");
+  const status = panel.querySelector(".settings-status-message");
+
+  const setStatus = (message, isError = false) => {
+    status.textContent = message || "";
+    status.classList.toggle("has-error", isError);
+  };
+
+  jurisdictionSelect.value = "jurisdiction-1";
+  versionSelect.value = defaultSyncCodeVersion;
+  settingsCodeSectionOptions().forEach((option) => {
+    const element = document.createElement("option");
+    element.value = option.prefix;
+    element.textContent = option.label;
+    codeSectionSelect.append(element);
+  });
+  codeSectionSelect.value = selectedSettingsCodePrefix();
+  comparisonToggle.checked = Boolean(state.comparisonModeEnabled);
+  codeSectionSelect.addEventListener("change", () => updateSettingsCodeSection(codeSectionSelect.value));
+  comparisonToggle.addEventListener("change", () => synchronizeComparisonReaders(comparisonToggle.checked));
+
   const renderSyncState = () => {
-    clear(syncPanel);
     const account = activeAccount();
-    if (!account) return;
-    const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID);
-    const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID);
-    const label = document.createElement("p");
-    label.className = "section-label";
-    label.textContent = "Sync";
-    const detail = document.createElement("p");
-    detail.className = "connector-status";
-    detail.textContent = conflicts.length
-      ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
-      : pending.length
-        ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
-        : "All browser changes are synced.";
-    syncPanel.append(label, detail);
-
-    if (pending.length) {
-      const retryButton = document.createElement("button");
-      retryButton.className = "ghost-button";
-      retryButton.type = "button";
-      retryButton.textContent = "Retry sync";
-      retryButton.addEventListener("click", async () => {
-        retryButton.disabled = true;
-        try {
-          await flushSyncOutbox({ refresh: true });
-          await renderWorkspace();
-        } catch (error) {
-          detail.textContent = error.message || "Sync retry failed.";
-          retryButton.disabled = false;
-        }
-      });
-      syncPanel.append(retryButton);
-    }
-
+    const pending = account ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID) : [];
+    const conflicts = account ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID) : [];
+    syncButton.disabled = !account;
+    syncIcon.textContent = !account ? "!" : conflicts.length || pending.length ? "↻" : "✓";
+    syncTitle.textContent = !account ? "Not signed in" : conflicts.length ? "Review needed" : pending.length ? "Changes waiting" : "Up to date";
+    syncDetail.textContent = !account
+      ? "Sign in to sync saved work across iOS and web."
+      : conflicts.length
+        ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
+        : pending.length
+          ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
+          : "All browser changes are synced.";
+    clear(syncConflicts);
     conflicts.slice(0, 5).forEach((entry) => {
       const { kind, record } = mutationKindAndRecord(entry.mutation);
       const row = document.createElement("article");
-      row.className = "saved-row";
+      row.className = "settings-conflict-row";
       const heading = document.createElement("strong");
       heading.textContent = record?.title || record?.name || kind || "Saved change";
       const message = document.createElement("span");
       message.textContent = "The server has a newer copy.";
       const actions = document.createElement("div");
       actions.className = "connector-actions";
-      const useServerButton = document.createElement("button");
-      useServerButton.className = "ghost-button";
-      useServerButton.type = "button";
-      useServerButton.textContent = "Use server";
-      const keepLocalButton = document.createElement("button");
-      keepLocalButton.className = "ghost-button";
-      keepLocalButton.type = "button";
-      keepLocalButton.textContent = "Keep mine";
-      const resolve = async (keepLocal) => {
-        useServerButton.disabled = true;
-        keepLocalButton.disabled = true;
-        try {
-          await resolveSyncConflict(entry, keepLocal);
-        } catch (error) {
-          detail.textContent = error.message || "Could not resolve this sync conflict.";
-          useServerButton.disabled = false;
-          keepLocalButton.disabled = false;
-        }
-      };
-      useServerButton.addEventListener("click", () => resolve(false));
-      keepLocalButton.addEventListener("click", () => resolve(true));
-      actions.append(useServerButton, keepLocalButton);
+      [
+        ["Use server", false],
+        ["Keep mine", true]
+      ].forEach(([label, keepLocal]) => {
+        const button = document.createElement("button");
+        button.className = "settings-mini-button";
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", async () => {
+          button.disabled = true;
+          try {
+            await resolveSyncConflict(entry, keepLocal);
+          } catch (error) {
+            setStatus(error.message || "Could not resolve this sync conflict.", true);
+            button.disabled = false;
+          }
+        });
+        actions.append(button);
+      });
       row.append(heading, message, actions);
-      syncPanel.append(row);
+      syncConflicts.append(row);
     });
   };
+
+  const syncProfileEditor = () => {
+    const error = publicUsernameValidationMessage(usernameInput.value);
+    const current = state.account?.publicUsername || "";
+    const draft = normalizedPublicUsername(usernameInput.value) || "";
+    profileHelper.textContent = error || "Used later for public and collaboration features. This stays separate from your Apple identity.";
+    profileHelper.classList.toggle("has-error", Boolean(error));
+    profileSaveButton.disabled = Boolean(error) || draft === current;
+  };
+
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
+    const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
-    checkoutButton.disabled = !account || pro;
-    checkoutButton.textContent = pro ? "Pro active" : "Upgrade to Pro";
-    disconnectButton.disabled = !account;
-    signInButton.hidden = Boolean(account) && !canLinkApple;
-    if (canLinkApple) {
-      signInButton.textContent = "Link Apple";
-    }
-    disconnectButton.hidden = !account;
-    summary.hidden = !account;
-    planSummary.hidden = !account;
-    displayName.textContent = account ? accountDisplayName() : "";
-    planLabel.textContent = pro ? "Pro" : "Free";
+    planLabel.textContent = entitlementSourceLabel();
     planDetail.textContent = pro
-      ? `${entitlementSourceLabel()} active. Saved work, PDF export, tags, continuity, and sync are unlocked.`
-      : "Free keeps reading and search usable. Pro unlocks saved work, projects, tags, exports, continuity, and sync.";
+      ? source === "lifetimeGrant"
+        ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."
+        : "Pro is active. Saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
+      : "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity.";
+    checkoutButton.disabled = !account || pro;
+    checkoutButton.textContent = pro ? "Pro Active" : "Upgrade to Pro";
+    planSecondaryButton.hidden = !account || source === "lifetimeGrant";
+    planSecondaryButton.textContent = pro ? "Manage Subscription" : "Restore Purchases";
+    accountSummary.hidden = !account;
+    profileEditor.hidden = !account;
+    signOutButton.hidden = !account;
+    signInButton.hidden = Boolean(account) && !canLinkApple;
+    signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
+    displayName.textContent = account ? accountDisplayName() : "";
+    accountCopy.textContent = account
+      ? `Signed in as ${accountDisplayName()}. Saved work can sync through the connected backend.`
+      : "Sign in to attach local saved work to your account and use cross-device sync.";
+    usernameInput.value = state.account?.publicUsername || "";
+    syncProfileEditor();
     renderSyncState();
   };
-  status.textContent = activeAccount()
-    ? (isProAccount() ? "Connected. Pro is active for this browser." : "Connected. Sync and checkout are ready for this browser.")
-    : "Not signed in on this browser.";
+
   syncAccountState();
   appleWebSignInConfig().then((config) => {
     const account = activeAccount();
@@ -7272,45 +7454,59 @@ function renderSettings() {
       signInButton.hidden = !config.available;
       signInButton.disabled = !config.available;
       signInButton.textContent = "Link Apple";
-      if (config.available) {
-        status.textContent = isProAccount()
-          ? "Pro is active for this browser. Link Apple to use the same account on iOS and web."
-          : "Link Apple to use the same saved work on iOS and web.";
-      }
       return;
     }
     if (account) return;
     signInButton.textContent = config.available ? "Sign in with Apple" : "Sign in";
     signInButton.disabled = !config.available && !config.browserFallbackAllowed;
-    if (!config.available && !config.browserFallbackAllowed) {
-      status.textContent = "Apple web sign-in is not configured yet.";
-    }
+    if (!config.available && !config.browserFallbackAllowed) accountCopy.textContent = "Apple web sign-in is not configured yet.";
   }).catch(() => {
-    if (!activeAccount()) {
-      status.textContent = "Could not check sign-in configuration.";
+    if (!activeAccount()) accountCopy.textContent = "Could not check sign-in configuration.";
+  });
+
+  usernameInput.addEventListener("input", syncProfileEditor);
+  profileSaveButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account || profileSaveButton.disabled) return;
+    profileSaveButton.disabled = true;
+    profileSaveButton.textContent = "Saving...";
+    try {
+      const payload = await postJSON("/account/profile", {
+        auth: { accountUserID: account.userID },
+        publicUsername: normalizedPublicUsername(usernameInput.value)
+      }, { token: account.sessionToken });
+      state.account.publicUsername = payload.account?.publicUsername || null;
+      state.account.displayName = payload.account?.displayName || state.account.displayName;
+      saveWorkspaceState();
+      setStatus("Public username saved.");
+      profileSaveButton.textContent = "Save Public Username";
+      syncProfileEditor();
+    } catch (error) {
+      profileSaveButton.textContent = "Save Public Username";
+      setStatus(error.message || "Could not save the public username.", true);
+      syncProfileEditor();
     }
   });
+
   signInButton.addEventListener("click", async () => {
     signInButton.disabled = true;
-    status.textContent = "Signing in...";
+    setStatus("Signing in...");
     try {
       await signInCurrentBrowser();
       await renderWorkspace();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
-      status.textContent = error.message || "Could not sign in.";
+      setStatus(error.message || "Could not sign in.", true);
       signInButton.disabled = false;
       syncAccountState();
     }
   });
-  disconnectButton.addEventListener("click", async () => {
+  signOutButton.addEventListener("click", async () => {
     const account = activeAccount();
-    disconnectButton.disabled = true;
+    signOutButton.disabled = true;
     try {
       if (account) {
-        await postJSON("/account/sign-out", {
-          auth: { accountUserID: account.userID }
-        }, { token: account.sessionToken });
+        await postJSON("/account/sign-out", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
       }
     } catch {
       // Clear the local session even if the network is unavailable.
@@ -7324,28 +7520,88 @@ function renderSettings() {
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account) {
-      status.textContent = "Sign in before opening checkout.";
-      syncAccountState();
-      return;
-    }
-    if (isProAccount()) {
-      status.textContent = "Pro is already active for this account.";
-      syncAccountState();
-      return;
-    }
+    if (!account || isProAccount()) return;
     checkoutButton.disabled = true;
-    status.textContent = "Opening checkout...";
+    setStatus("Opening checkout...");
     try {
-      const payload = await postJSON("/billing/web/checkout", {
-        auth: { accountUserID: account.userID }
-      }, { token: account.sessionToken });
+      const payload = await postJSON("/billing/web/checkout", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
       if (!payload.url) throw new Error("Checkout did not return a URL.");
       window.location.href = payload.url;
     } catch (error) {
-      status.textContent = error.message || "Could not open checkout.";
-      syncAccountState();
+      setStatus(error.message || "Could not open checkout.", true);
+      checkoutButton.disabled = false;
     }
+  });
+  planSecondaryButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account) return;
+    if (isProAccount()) {
+      if (currentEntitlement()?.source === "appleSubscription") {
+        window.location.href = "https://apps.apple.com/account/subscriptions";
+        return;
+      }
+      planSecondaryButton.disabled = true;
+      setStatus("Opening subscription management...");
+      try {
+        const payload = await postJSON("/billing/web/portal", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+        if (!payload.url) throw new Error("Subscription management did not return a URL.");
+        window.location.href = payload.url;
+      } catch (error) {
+        setStatus(error.message || "Could not open subscription management.", true);
+        planSecondaryButton.disabled = false;
+      }
+      return;
+    }
+    const restoreID = window.prompt("Enter the Stripe checkout session or subscription ID from your purchase receipt.");
+    if (!restoreID) return;
+    planSecondaryButton.disabled = true;
+    try {
+      const payload = await postJSON("/billing/stripe/restore", {
+        auth: { accountUserID: account.userID },
+        restoreID
+      }, { token: account.sessionToken });
+      storeAccountEntitlement(payload.entitlement || null);
+      await renderWorkspace();
+    } catch (error) {
+      setStatus(error.message || "Could not restore this purchase.", true);
+      planSecondaryButton.disabled = false;
+    }
+  });
+  syncButton.addEventListener("click", async () => {
+    syncButton.disabled = true;
+    syncButton.textContent = "Syncing...";
+    try {
+      await flushSyncOutbox({ refresh: true });
+      await loadSyncedContent({ force: true });
+      await renderWorkspace();
+    } catch (error) {
+      setStatus(error.message || "Sync failed.", true);
+      syncButton.disabled = false;
+      syncButton.textContent = "Sync Now";
+    }
+  });
+
+  const clearActionCopy = {
+    searches: ["Clear recent searches?", "This removes recent search text and filters from this browser."],
+    bookmarks: ["Clear all bookmarks?", "This removes every bookmark saved for the current code version."],
+    notes: ["Clear all notes?", "This removes every note saved for the current code version."],
+    tags: ["Clear all tags?", "This removes every tag from saved sections. Bookmarks and notes are not affected."]
+  };
+  panel.querySelectorAll("[data-clear-action]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const action = button.dataset.clearAction;
+      const [title, message] = clearActionCopy[action];
+      if (!window.confirm(`${title}\n\n${message}`)) return;
+      button.disabled = true;
+      try {
+        const count = await performSettingsClearAction(action);
+        setStatus(action === "searches" ? "Recent searches cleared." : `${count} ${action} cleared.`);
+        await renderWorkspace();
+      } catch (error) {
+        setStatus(error.message || `Could not clear ${action}.`, true);
+        button.disabled = false;
+      }
+    });
   });
   return panel;
 }
@@ -7374,7 +7630,7 @@ function wireReaderSettingsControls(panel) {
   syncControls();
 
   fontSlider?.addEventListener("input", () => {
-    state.readerSettings.fontSize = clampNumber(fontSlider.value, 10, 18, defaultReaderSettings.fontSize);
+    state.readerSettings.fontSize = clampNumber(fontSlider.value, 10, 26, defaultReaderSettings.fontSize);
     syncControls();
     saveWorkspaceState();
   });
@@ -7384,7 +7640,7 @@ function wireReaderSettingsControls(panel) {
     saveWorkspaceState();
   });
   fontSelect?.addEventListener("change", () => {
-    state.readerSettings.fontFamily = "helvetica";
+    state.readerSettings.fontFamily = fontSelect.value;
     syncControls();
     saveWorkspaceState();
   });

@@ -31,6 +31,7 @@
   --shadow-panel: 0 20px 54px rgba(27, 29, 34, 0.08);
   --radius-panel: 28px;
   --radius-card: 14px;
+  --radius-control: 12px;
   --radius-pill: 999px;
   --space-1: 6px;
   --space-2: 10px;
@@ -1268,8 +1269,7 @@ select option:checked {
   margin-top: var(--space-3);
 }
 
-.settings-panel > .reader-preview-card,
-.settings-panel > .account-connector {
+.settings-panel > .settings-card {
   margin-top: var(--card-stack-gap);
 }
 
@@ -3832,6 +3832,290 @@ mark {
   overflow-wrap: break-word;
 }
 
+.settings-row select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: 34px;
+  padding: 0 24px 0 0;
+  border: 0;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-weight: 400;
+  text-align: right;
+  text-overflow: ellipsis;
+}
+
+.settings-toggle-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.settings-comparison-toggle {
+  appearance: none;
+  width: 52px;
+  height: 30px;
+  margin: 0;
+  padding: 3px;
+  border: 1px solid color-mix(in srgb, var(--text-secondary) 38%, transparent);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-secondary) 22%, transparent);
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.settings-comparison-toggle::after {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--surface-raised);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  content: "";
+  transition: transform 160ms ease;
+}
+
+.settings-comparison-toggle:checked {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+}
+
+.settings-comparison-toggle:checked::after {
+  transform: translateX(22px);
+}
+
+.settings-card {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.settings-card-copy,
+.settings-billing-line,
+.settings-disclaimer,
+.settings-status-message,
+.account-profile-helper,
+.account-sync-status p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.settings-billing-line {
+  font-size: 10pt !important;
+  font-weight: 600;
+}
+
+.settings-billing-line strong {
+  color: inherit;
+  font-size: inherit !important;
+}
+
+.settings-plan-features {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-feature-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-2);
+}
+
+.settings-feature-icon {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid var(--text-tertiary);
+  border-radius: 50%;
+  color: var(--text-secondary);
+  font-size: 9pt !important;
+  font-weight: 700;
+}
+
+.settings-feature-icon.is-pro {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+}
+
+.settings-feature-row p {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.settings-feature-row strong {
+  font-weight: 600;
+}
+
+.settings-feature-row span:not(.settings-feature-icon) {
+  color: var(--text-secondary);
+  font-size: 10pt !important;
+  line-height: 1.35;
+}
+
+.settings-primary-button,
+.settings-secondary-button,
+.settings-link-button,
+.settings-mini-button {
+  min-height: 42px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+}
+
+.settings-primary-button {
+  background: var(--text-primary);
+  color: var(--surface-raised);
+}
+
+.settings-secondary-button,
+.settings-mini-button {
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  color: var(--text-primary);
+}
+
+.settings-link-button {
+  min-height: 28px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.settings-primary-button:disabled,
+.settings-secondary-button:disabled,
+.settings-link-button:disabled,
+.settings-mini-button:disabled {
+  cursor: default;
+  opacity: 0.48;
+}
+
+.account-profile-editor {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.account-profile-editor[hidden] {
+  display: none;
+}
+
+.account-profile-editor label {
+  color: var(--text-primary);
+  font-size: 10pt !important;
+  font-weight: 600;
+}
+
+.account-profile-editor input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  color: var(--text-primary);
+}
+
+.account-profile-helper {
+  font-size: 9.5pt !important;
+}
+
+.account-profile-helper.has-error,
+.settings-status-message.has-error {
+  color: #b54708;
+}
+
+.account-sync-status {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-2);
+}
+
+.account-sync-status > div {
+  display: grid;
+  gap: 3px;
+}
+
+.account-sync-icon {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  color: var(--text-secondary);
+  font-weight: 700;
+}
+
+.account-sync-title {
+  font-weight: 600;
+}
+
+.account-sync-conflicts {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-conflict-row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, #f79009 9%, transparent);
+}
+
+.settings-conflict-row > span {
+  color: var(--text-secondary);
+  font-size: 10pt !important;
+}
+
+.settings-mini-button {
+  min-height: 32px;
+  font-size: 10pt !important;
+}
+
+.settings-danger-list {
+  display: grid;
+}
+
+.settings-danger-button {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 46px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+  text-align: left;
+  font-weight: 600;
+}
+
+.settings-danger-button:last-child {
+  border-bottom: 0;
+}
+
+.settings-danger-button > span {
+  color: #d92d20;
+  font-weight: 700;
+  text-align: center;
+}
+
+.settings-disclaimer,
+.settings-status-message {
+  padding: 0 var(--space-1);
+  font-size: 9.5pt !important;
+}
+
+.settings-status-message:empty {
+  display: none;
+}
+
 .reader-preview-card {
   display: grid;
   gap: var(--space-3);
@@ -3948,7 +4232,7 @@ mark {
 
 .account-connector {
   display: grid;
-  gap: var(--card-stack-gap);
+  gap: var(--space-3);
   padding: var(--space-4);
 }
 

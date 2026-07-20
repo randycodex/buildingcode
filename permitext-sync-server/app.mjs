@@ -33,6 +33,7 @@ const rateLimitPolicies = new Map([
   ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
   ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["billing/web/portal", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
   ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -4087,6 +4088,42 @@ async function handleWebCheckout(request, response) {
   });
 }
 
+async function handleWebPortal(request, response) {
+  if (!stripeConfigured()) {
+    sendError(response, 503, "Stripe subscription management is not configured.");
+    return;
+  }
+
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+
+  let customerID = stripeSubscriptionID(context.entitlement?.provider?.stripeCustomerID);
+  if (!customerID) {
+    const subscription = await activeStripeSubscriptionForUserID(userID);
+    customerID = stripeSubscriptionID(subscription?.customer);
+  }
+  if (!customerID) {
+    sendError(response, 404, "No Stripe subscription was found for this account.");
+    return;
+  }
+
+  const portal = await stripeAPI("/v1/billing_portal/sessions", {
+    method: "POST",
+    body: encodedFormBody({
+      customer: customerID,
+      return_url: `${configuredPublicBaseURL(request)}/`
+    })
+  });
+  sendJSON(response, 200, { url: portal.url });
+}
+
 async function stripeSubscriptionFromRestoreID(restoreID) {
   const trimmed = String(restoreID || "").trim();
   if (!trimmed) {
@@ -4659,6 +4696,7 @@ async function handleAppleWebCallback(request, response) {
             sessionToken: finalAccount.backendSessionToken,
             authProvider: finalAccount.authProvider || "apple",
             displayName: finalAccount.displayName || displayName || "Apple account",
+            publicUsername: finalAccount.publicUsername || null,
             entitlement: directResult.entitlement || null
           },
           successPath: oauthState.successPath || "/",
@@ -4699,6 +4737,7 @@ async function handleAppleWebCallback(request, response) {
         sessionToken,
         authProvider: finalAccount.authProvider || "apple",
         displayName: finalAccount.displayName || displayName || "Apple account",
+        publicUsername: finalAccount.publicUsername || null,
         entitlement: store.entitlements[account.appUserID] || null
       },
       successPath: oauthState.successPath || "/",
@@ -4724,6 +4763,7 @@ const handlers = {
   "account/profile": handleProfileUpdate,
   "account/passkeys/link": handlePasskeyLink,
   "billing/web/checkout": handleWebCheckout,
+  "billing/web/portal": handleWebPortal,
   "billing/stripe/restore": handleStripeRestore,
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,

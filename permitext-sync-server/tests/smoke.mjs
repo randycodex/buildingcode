@@ -120,9 +120,28 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("saved-flat-list-v14"),
-      "Web workspace omitted the saved-flat-list-v14 assets."
+      webRoot.text.includes("settings-parity-v15"),
+      "Web workspace omitted the settings-parity-v15 assets."
     );
+    const settingsTemplateSource = webRoot.text.slice(
+      webRoot.text.indexOf('<template id="settings-template"'),
+      webRoot.text.indexOf('<script src="/web/app.js')
+    );
+    const settingsSectionOrder = [
+      'aria-label="Code library settings"',
+      '>Plan</p>',
+      '>Account</p>',
+      '>Sync</p>',
+      '>Reader Preview</p>',
+      '>Saved Data</p>'
+    ].map((marker) => settingsTemplateSource.indexOf(marker));
+    assert(
+      settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
+      "Web Settings groups do not match the iOS Settings order."
+    );
+    ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
+      assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
+    });
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
@@ -814,6 +833,13 @@ async function main() {
       }
     });
     assert(restoreWithoutStripe.response.status === 503, "Stripe restore should be disabled without Stripe checkout configuration.");
+
+    const portalWithoutStripe = await request("/billing/web/portal", {
+      method: "POST",
+      token: appleRepairSignIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: appleRepairSignIn.json.account.appUserID } }
+    });
+    assert(portalWithoutStripe.response.status === 503, "Stripe portal should be disabled without Stripe checkout configuration.");
 
     const invalidAppleTokenSignIn = await request("/account/sign-in", {
       method: "POST",
