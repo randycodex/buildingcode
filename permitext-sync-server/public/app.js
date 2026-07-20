@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-foreground-sync-v11";
+const workboardClientVersion = "20260719-saved-heading-v12";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -6729,7 +6729,6 @@ async function renderSaved(paneID = "utility:saved") {
     const selectionController = visibleSavedItems.length
       ? createSavedBulkSelectionController(panel, visibleSavedItems)
       : null;
-    appendSectionLabel(content, "Saved items");
     renderSavedItemsByCode(content, resolvedItems, paneID, {
       removableSavedItems: (item) => item.savedColumnKind === "bookmark",
       selectionController
