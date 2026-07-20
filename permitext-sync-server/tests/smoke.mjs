@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-row-only-v32"),
+      webRoot.text.includes("search-size-v33"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
@@ -316,7 +316,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-search-row-only-v32'),
+        webRoot.text.includes('/web/app.js?v=20260720-search-size-v33'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -483,6 +483,10 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 254px;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
+      "Search field no longer renders at 254 by 42 pixels."
+    );
     assert(
       !workspaceStyles.text.includes(".result-row-actions") &&
         !workspaceStyles.text.includes(".result-reader-action"),
