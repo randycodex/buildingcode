@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v15";
+const workboardClientVersion = "20260719-web-notes-v16";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -6574,7 +6574,6 @@ async function renderSaved(paneID = "utility:saved") {
     });
   }
 
-  appendSectionLabel(content, "Notes and tags");
   if (annotatedItems.length === 0) {
     appendMutedRow(content, "No notes or tags", "Paragraph notes and tags from this web workspace will appear here.");
   } else {

@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v15"),
-      "Web workspace omitted the web-notes-v15 assets."
+      webRoot.text.includes("web-notes-v16"),
+      "Web workspace omitted the web-notes-v16 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -137,6 +137,10 @@ async function main() {
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Saved sections")'),
       "Saved pane still included its retired Saved sections heading."
+    );
+    assert(
+      !workspaceScript.text.includes('appendSectionLabel(content, "Notes and tags")'),
+      "Saved column still renders the removed Notes and tags label."
     );
     assert(
       !workspaceScript.text.includes("No saved sections") &&
