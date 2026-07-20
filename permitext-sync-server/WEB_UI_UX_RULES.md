@@ -72,7 +72,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Do not use gradients.
 - Avoid oversized rounded UI.
 - Keep contrast clear in light and dark themes.
-- Keep native thin scrollbars on independently scrollable reading and utility regions; never hide every scrollbar globally.
+- Keep every scrollbar visually hidden. Wheel, trackpad, touch, keyboard, and programmatic scrolling must continue to work without visible rails or thumbs.
 - Main panes should feel like workspace columns, not floating cards.
 - Internal controls can stay lightly rounded only when it helps usability.
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.

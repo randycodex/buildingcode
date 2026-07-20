@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("ux-workspace-v16"),
-      "Web workspace omitted the UX workspace assets."
+      webRoot.text.includes("no-scrollbars-v17"),
+      "Web workspace omitted the no-scrollbars workspace assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -428,10 +428,10 @@ async function main() {
       "Divider resizing still invalidates cursor styles across every workspace descendant."
     );
     assert(
-      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
+      workspaceStyles.text.includes("scrollbar-width: none !important") &&
         workspaceStyles.text.includes("scroll-snap-type: x mandatory") &&
         workspaceStyles.text.includes("flex: 0 0 100% !important"),
-      "Web scrolling affordances or one-pane mobile behavior regressed."
+      "Hidden scrollbars or one-pane mobile behavior regressed."
     );
     assert(
       workspaceStyles.text.includes("min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));"),
@@ -510,10 +510,11 @@ async function main() {
       "Column labels no longer maintain high contrast across light and dark appearance."
     );
     assert(
-      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
-        workspaceStyles.text.includes("scrollbar-width: thin") &&
-        workspaceStyles.text.includes(".search-results::-webkit-scrollbar"),
-      "Web workspace no longer exposes usable native scrollbars."
+      workspaceStyles.text.includes("*::-webkit-scrollbar") &&
+        workspaceStyles.text.includes("display: none !important") &&
+        workspaceStyles.text.includes("width: 0 !important") &&
+        workspaceStyles.text.includes("height: 0 !important"),
+      "Web workspace no longer hides scrollbars globally."
     );
     assert(
       workspaceStyles.text.includes(".reader-scroll-indicator") &&
