@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("web-notes-v16"),
-      "Web workspace omitted the web-notes-v16 assets."
+      webRoot.text.includes("ios-note-parity-v4"),
+      "Web workspace omitted the ios-note-parity-v4 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -258,16 +258,34 @@ async function main() {
       "Saved and project panes omitted selection removal or new-project saving controls."
     );
     assert(
+      workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
+        workspaceScript.text.includes("await persistSectionBookmark(sectionPayload, true)") &&
+        workspaceScript.text.includes('label.textContent = "Save to project"') &&
+        workspaceScript.text.includes("await removeSectionFromProject(project, existingLink, { removeBookmark: false })") &&
+        workspaceScript.text.includes('doneButton.textContent = "Done"') &&
+        !workspaceScript.text.includes('savedOnlyButton.textContent = "Saved items"'),
+      "Reader bookmark and project selection no longer follow the iOS save-then-manage flow."
+    );
+    assert(
+      workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
+        workspaceScript.text.includes('openReaderNotesSheet(panel, section, reader, { target });') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved projects")'),
+      "Paragraph taps or saved bookmark controls no longer match the iOS note-sheet behavior."
+    );
+    assert(
       workspaceScript.text.includes("projectSavedSourceKey: projectKey") &&
         workspaceScript.text.includes("candidate.projectSavedSourceKey === projectKey") &&
         workspaceScript.text.includes("Object.assign(reader, readerFields)"),
       "Project saved-item clicks no longer reuse one project-linked Reader column."
     );
     assert(
-      workspaceScript.text.includes("await pushMutation(deletedProjectSectionMutationForItem(project, item))") &&
+      workspaceScript.text.includes("const deletion = deletedProjectSectionMutationForItem(project, item)") &&
+        workspaceScript.text.includes("await pushMutation(deletion)") &&
+        workspaceScript.text.includes("await removeSectionFromAllProjects(sectionPayload)") &&
+        workspaceScript.text.includes("await removeSectionFromProject(project, link, { removeBookmark: false })") &&
         workspaceScript.text.includes("await persistSectionBookmark(item, false, { refreshSavedPanes: false })") &&
         workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false)"),
-      "Removing a project item no longer clears its saved bookmark state in open Readers."
+      "Removing a saved item no longer clears its bookmark and every project membership like iOS."
     );
     assert(
       workspaceScript.text.includes("// Keep the local record and queued mutation available while sync recovers.") &&
@@ -277,8 +295,10 @@ async function main() {
     assert(
       workspaceScript.text.includes("const projectSectionsByID = new Map(") &&
         workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save subsection" : "Remove bookmark")'),
-      "Local-first project saves can render duplicate items or leave stale Reader bookmark labels."
+        workspaceScript.text.includes("return currentContentSummary().annotations") &&
+        workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
+        workspaceScript.text.includes('button.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection")'),
+      "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(
       workspaceScript.text.includes("{ ...project, updatedAt: deletedAt, deletedAt }") &&
@@ -320,6 +340,8 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".reader-notes-project-picker .reader-notes-project-option") &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 16%, transparent);") &&
+        workspaceStyles.text.includes(".reader-notes-project-picker .reader-notes-project-option.is-selected") &&
+        workspaceStyles.text.includes(".reader-notes-project-check") &&
         workspaceStyles.text.includes("border-radius: var(--radius-pill);"),
       "Reader project-picker buttons no longer use pill-shaped project-card color treatments."
     );
@@ -959,6 +981,114 @@ async function main() {
       "Web Apple account did not pull the native Apple annotation."
     );
 
+    const webAnnotationUpdatePush = await request("/sync/push", {
+      method: "POST",
+      token: webAppleSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: nativeAppleUserID },
+        batch: {
+          user: { id: nativeAppleUserID },
+          mutations: [{
+            annotation: {
+              id: "web-annotation-shared-note",
+              userID: nativeAppleUserID,
+              codeVersion: "nyc-2022",
+              sectionID: 545,
+              blockID: "rid-0-0-0-164259",
+              noteBody: "Web note",
+              updatedAt: new Date(Date.now() + 1_000).toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(webAnnotationUpdatePush.response.ok, "Web Apple annotation update failed.");
+    assert(
+      webAnnotationUpdatePush.json.acceptedMutationIDs.includes(nativeAnnotationID),
+      "Web annotation update did not target the native canonical note record."
+    );
+    const nativeAfterWebAnnotationPull = await request("/sync/pull", {
+      method: "POST",
+      token: nativeAppleToken,
+      body: { auth: { accountUserID: nativeAppleUserID } }
+    });
+    assert(
+      nativeAfterWebAnnotationPull.json.mutations.some((mutation) =>
+        mutation.annotation?.id === nativeAnnotationID && mutation.annotation?.noteBody === "Web note"
+      ),
+      "Native Apple pull did not receive the web note update."
+    );
+
+    const webAnnotationClearPush = await request("/sync/push", {
+      method: "POST",
+      token: webAppleSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: nativeAppleUserID },
+        batch: {
+          user: { id: nativeAppleUserID },
+          mutations: [{
+            annotation: {
+              id: "web-annotation-shared-note",
+              userID: nativeAppleUserID,
+              codeVersion: "nyc-2022",
+              sectionID: 545,
+              blockID: "rid-0-0-0-164259",
+              noteBody: "",
+              updatedAt: new Date(Date.now() + 2_000).toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(webAnnotationClearPush.response.ok, "Web Apple annotation clear failed.");
+    const nativeAfterWebClearPull = await request("/sync/pull", {
+      method: "POST",
+      token: nativeAppleToken,
+      body: { auth: { accountUserID: nativeAppleUserID } }
+    });
+    assert(
+      nativeAfterWebClearPull.json.mutations.some((mutation) =>
+        mutation.annotation?.id === nativeAnnotationID && mutation.annotation?.noteBody === ""
+      ),
+      "Native Apple pull did not receive the web note removal."
+    );
+
+    const nativeTagID = `${nativeAppleUserID}:tags:${defaultSyncCodeVersion}:545:rid-0-0-0-164259`;
+    const webTagPush = await request("/sync/push", {
+      method: "POST",
+      token: webAppleSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: nativeAppleUserID },
+        batch: {
+          user: { id: nativeAppleUserID },
+          mutations: [{
+            annotation: {
+              id: "web-annotation-shared-tags",
+              userID: nativeAppleUserID,
+              codeVersion: "nyc-2022",
+              sectionID: 545,
+              blockID: "rid-0-0-0-164259",
+              tags: ["Cross Device"],
+              updatedAt: new Date(Date.now() + 3_000).toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(webTagPush.response.ok, "Web Apple tag update failed.");
+    assert(webTagPush.json.acceptedMutationIDs.includes(nativeTagID), "Web tags did not use the native canonical tag record.");
+    const nativeAfterWebTagPull = await request("/sync/pull", {
+      method: "POST",
+      token: nativeAppleToken,
+      body: { auth: { accountUserID: nativeAppleUserID } }
+    });
+    assert(
+      nativeAfterWebTagPull.json.mutations.some((mutation) =>
+        mutation.annotation?.id === nativeTagID && mutation.annotation?.tags?.includes("Cross Device")
+      ),
+      "Native Apple pull did not receive the web tag update."
+    );
+
     const clientEntitlementPush = await request("/sync/push", {
       method: "POST",
       token: secondSignIn.json.account.backendSessionToken,
@@ -1512,6 +1642,61 @@ async function main() {
     )?.savedItem;
     assert(deletedSavedRecord?.deletedAt, "Web pull did not receive the iOS delete tombstone.");
 
+    const iosRestorePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            savedItem: {
+              id: canonicalSavedRecordID,
+              userID,
+              codeVersion: defaultSyncCodeVersion,
+              sectionID: 113,
+              updatedAt: "2026-06-04T04:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(iosRestorePush.response.ok, "iOS restore push failed.");
+    const webDeletePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            savedItem: {
+              id: "web-saved-113",
+              userID,
+              codeVersion: "nyc-2022",
+              sectionID: 113,
+              updatedAt: "2026-06-04T05:00:00Z",
+              deletedAt: "2026-06-04T05:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(webDeletePush.response.ok, "Web delete push failed.");
+    assert(
+      webDeletePush.json.acceptedMutationIDs.includes(canonicalSavedRecordID),
+      "Web delete did not target the iOS canonical saved record."
+    );
+    const iosAfterWebDeletePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const webDeletedSavedRecord = iosAfterWebDeletePull.json.mutations.find((item) =>
+      item.savedItem?.id === canonicalSavedRecordID
+    )?.savedItem;
+    assert(webDeletedSavedRecord?.deletedAt, "iOS pull did not receive the web delete tombstone.");
+
     const legacyWebAnnotationPush = await request("/sync/push", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -1612,6 +1797,59 @@ async function main() {
     assert(projectPush.response.ok, "Project sync push failed.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectRecordID), "Project mutation was not accepted.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
+
+    const webProjectSectionDeletePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            projectSection: {
+              ...projectSectionMutation.projectSection,
+              id: "web-project-section-project-client-smoke-900001",
+              updatedAt: "2026-06-06T01:00:00Z",
+              deletedAt: "2026-06-06T01:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(webProjectSectionDeletePush.response.ok, "Web project membership delete failed.");
+    assert(
+      webProjectSectionDeletePush.json.acceptedMutationIDs.includes(projectSectionRecordID),
+      "Web project membership delete did not target the native canonical record."
+    );
+    const iosAfterProjectSectionDeletePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      iosAfterProjectSectionDeletePull.json.mutations.some((mutation) =>
+        mutation.projectSection?.id === projectSectionRecordID && mutation.projectSection?.deletedAt
+      ),
+      "iOS pull did not receive the web project membership tombstone."
+    );
+    const iosProjectSectionRestorePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            projectSection: {
+              ...projectSectionMutation.projectSection,
+              id: projectSectionRecordID,
+              updatedAt: "2026-06-06T02:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(iosProjectSectionRestorePush.response.ok, "iOS project membership restore failed.");
 
     const tagMutation = {
       annotation: {

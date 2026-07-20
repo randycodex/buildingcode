@@ -1541,6 +1541,10 @@ select option:checked {
   grid-column: 1;
 }
 
+.annotated-code-block > :where(.section-block, .section-html) {
+  cursor: pointer;
+}
+
 .annotated-code-block.is-notes-active :where(
   .section-block,
   .section-html,
@@ -1750,8 +1754,15 @@ select option:checked {
   overflow-x: visible;
 }
 
-.reader-notes-project-picker > strong {
+.reader-notes-project-picker-header {
+  display: flex;
   flex: 1 1 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.reader-notes-project-picker-header > strong {
   font-size: calc(var(--reader-font-size) * 0.9) !important;
 }
 
@@ -1770,7 +1781,28 @@ select option:checked {
 }
 
 .reader-notes-project-picker .reader-notes-project-option {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
   background: color-mix(in srgb, var(--project-color) 16%, transparent);
+}
+
+.reader-notes-project-picker .reader-notes-project-option.is-selected {
+  background: color-mix(in srgb, var(--project-color) 34%, transparent);
+}
+
+.reader-notes-project-check {
+  display: inline-grid;
+  width: 14px;
+  height: 14px;
+  place-items: center;
+  font-size: 11px !important;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.reader-notes-project-empty {
+  color: var(--text-secondary) !important;
 }
 
 .reader-notes-project-picker .reader-notes-project-option:hover,
@@ -1781,6 +1813,10 @@ select option:checked {
 @media (prefers-color-scheme: dark) {
   .reader-notes-project-picker .reader-notes-project-option {
     background: color-mix(in srgb, var(--project-color) 24%, transparent);
+  }
+
+  .reader-notes-project-picker .reader-notes-project-option.is-selected {
+    background: color-mix(in srgb, var(--project-color) 46%, transparent);
   }
 
   .reader-notes-project-picker .reader-notes-project-option:hover,

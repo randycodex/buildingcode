@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-web-notes-v16";
+const workboardClientVersion = "20260719-ios-note-parity-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3095,6 +3095,9 @@ function setLocalSectionSaved(sectionID, saved) {
 
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   const existingRecord = savedItemForSection(sectionPayload.sectionID);
+  if (!saved && options.removeProjectLinks !== false) {
+    await removeSectionFromAllProjects(sectionPayload);
+  }
   setLocalSectionSaved(sectionPayload.sectionID, saved);
   const sectionKey = String(sectionPayload.sectionID || "");
   const record = saved
@@ -3140,6 +3143,24 @@ async function persistSectionInProject(project, sectionPayload) {
   }
 }
 
+async function removeSectionFromAllProjects(sectionPayload) {
+  const sectionID = String(sectionPayload.sectionID || sectionPayload.savedSectionID || sectionPayload.itemID || "");
+  if (!sectionID) return;
+  const summary = currentContentSummary();
+  const projects = summary.projects || [];
+  const links = (summary.projectSections || []).filter((item) =>
+    String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID
+  );
+
+  for (const link of links) {
+    const project = projects.find((candidate) => projectSectionBelongsToProject(link, candidate)) || {
+      clientID: link.folderClientID || "",
+      localFolderID: link.localFolderID || ""
+    };
+    await removeSectionFromProject(project, link, { removeBookmark: false });
+  }
+}
+
 async function removeSectionFromProject(project, item, options = {}) {
   const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
   const projectID = projectRecordID(project);
@@ -3152,14 +3173,22 @@ async function removeSectionFromProject(project, item, options = {}) {
       projectSectionBelongsToProject(candidate, project)
     );
 
-  const wasLocal = (state.localProjectSections || []).some(matches);
-  state.localProjectSections = (state.localProjectSections || []).filter((candidate) => !matches(candidate));
+  const deletion = deletedProjectSectionMutationForItem(project, item);
+  state.localProjectSections = [
+    ...(state.localProjectSections || []).filter((candidate) => !matches(candidate)),
+    deletion.projectSection
+  ];
   saveWorkspaceState();
 
   if (activeAccount()) {
-    await pushMutation(deletedProjectSectionMutationForItem(project, item));
-  } else if (!activeAccount() && !wasLocal) {
-    throw new Error("Sign in from Settings before removing a synced project section.");
+    try {
+      await pushMutation(deletion);
+      state.localProjectSections = (state.localProjectSections || []).filter((candidate) => !matches(candidate));
+      saveWorkspaceState();
+    } catch (error) {
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+      // Keep the local project-membership tombstone while sync recovers.
+    }
   }
 
   if (options.removeBookmark !== false) {
@@ -3202,16 +3231,19 @@ function normalizeAnnotationTags(tags = []) {
 function annotationRecordsForTarget(sectionID, blockID = "") {
   const sectionKey = String(sectionID || "");
   const blockKey = normalizeAnnotationBlockID(blockID);
-  const allAnnotations = [
-    ...(syncedContent?.summary?.annotations || []),
-    ...(state.localAnnotations || [])
-  ];
-  return allAnnotations
+  const localIDs = new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
+  return currentContentSummary().annotations
     .filter((annotation) =>
       String(annotation?.sectionID || "") === sectionKey &&
       normalizeAnnotationBlockID(annotation?.blockID || annotation?.anchorID || annotation?.contentBlockID) === blockKey
     )
-    .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0));
+    .sort((left, right) => {
+      const timestampDifference = Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0);
+      if (timestampDifference) return timestampDifference;
+      const leftIsLocal = localIDs.has(String(left.id || ""));
+      const rightIsLocal = localIDs.has(String(right.id || ""));
+      return leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1;
+    });
 }
 
 function annotationForTarget(sectionID, blockID = "") {
@@ -3613,6 +3645,12 @@ function renderAnnotatedCodeBlock(block, section, reader, target) {
   wrapper.dataset.blockId = target.blockID || "";
   wrapper.dataset.blockLabel = target.blockLabel || "";
   wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target));
+  wrapper.addEventListener("click", (event) => {
+    if (event.target.closest("a, button, input, textarea, select")) return;
+    if (window.getSelection && String(window.getSelection()).trim()) return;
+    const panel = wrapper.closest(".reader-panel");
+    openReaderNotesSheet(panel, section, reader, { target });
+  });
   return wrapper;
 }
 
@@ -3654,17 +3692,16 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   const bookmarkButton = document.createElement("button");
   bookmarkButton.className = "inline-bookmark-toggle";
   bookmarkButton.type = "button";
-  bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Remove bookmark" : "Save subsection"}</span>`;
-  bookmarkButton.setAttribute("aria-label", saved ? "Remove bookmark" : "Save subsection");
+  bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save subsection"}</span>`;
+  bookmarkButton.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection");
   bookmarkButton.classList.toggle("is-saved", saved);
   bookmarkButton.setAttribute("aria-pressed", String(saved));
-  bookmarkButton.title = saved ? "Saved" : "Save subsection";
+  bookmarkButton.title = saved ? "Manage saved projects" : "Save subsection";
 
   bookmarkButton.addEventListener("click", async () => {
     const panel = sectionElementForInlineComment(wrapper)?.closest(".reader-panel");
     bookmarkButton.disabled = true;
     bookmarkButton.classList.remove("has-error");
-    const shouldRemove = bookmarkButton.classList.contains("is-saved");
     const sectionPayload = {
       sectionID: section.id,
       sectionNumber: section.sectionNumber,
@@ -3673,30 +3710,12 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
       chapterID: reader?.chapterID || "",
       chapterNumber: section.chapterNumber || ""
     };
-    if (!shouldRemove) {
+    try {
       openReaderNotesSheet(panel, section, reader, { target });
       const sheet = panel?.querySelector(".reader-notes-sheet");
-      if (sheet) showReaderNotesProjectPicker(sheet, sectionPayload);
-      bookmarkButton.disabled = false;
-      return;
-    }
-    bookmarkButton.classList.toggle("is-saved", !shouldRemove);
-    wrapper.classList.toggle("has-saved-section", !shouldRemove);
-    bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
-    bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save subsection" : "Remove bookmark");
-    bookmarkButton.title = shouldRemove ? "Save subsection" : "Saved";
-    bookmarkButton.innerHTML = `${bookmarkIconSVG(!shouldRemove)}<span class="sr-only">${shouldRemove ? "Save subsection" : "Remove bookmark"}</span>`;
-    try {
-      await persistSectionBookmark(sectionPayload, !shouldRemove);
-      if (state.utilities.saved) {
-        await renderWorkspace();
-      }
+      if (sheet) await openReaderNotesProjectPicker(sheet, sectionPayload);
     } catch (error) {
-      bookmarkButton.classList.toggle("is-saved", shouldRemove);
-      wrapper.classList.toggle("has-saved-section", shouldRemove);
-      bookmarkButton.setAttribute("aria-pressed", String(shouldRemove));
       bookmarkButton.title = error.message;
-      bookmarkButton.innerHTML = `${bookmarkIconSVG(shouldRemove)}<span class="sr-only">${shouldRemove ? "Remove bookmark" : "Save subsection"}</span>`;
       bookmarkButton.classList.add("has-error");
     } finally {
       bookmarkButton.disabled = false;
@@ -3793,44 +3812,83 @@ function removeReaderNotesProjectPicker(sheet) {
   sheet?.querySelector(".reader-notes-project-picker")?.remove();
 }
 
+async function openReaderNotesProjectPicker(sheet, sectionPayload) {
+  if (!isSectionSaved(sectionPayload.sectionID)) {
+    await persistSectionBookmark(sectionPayload, true);
+    syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+  }
+  showReaderNotesProjectPicker(sheet, sectionPayload);
+}
+
 function showReaderNotesProjectPicker(sheet, sectionPayload) {
   removeReaderNotesProjectPicker(sheet);
-  const projects = activeProjectRecords(projectRecordsFromMutations(syncedContent?.mutations || []));
+  const projects = activeProjectRecords(currentContentSummary().projects || []);
   const picker = document.createElement("section");
   picker.className = "reader-notes-project-picker";
   picker.setAttribute("aria-label", "Choose project folder");
 
+  const pickerHeader = document.createElement("header");
+  pickerHeader.className = "reader-notes-project-picker-header";
   const label = document.createElement("strong");
-  label.textContent = "Save to";
-  picker.append(label);
+  label.textContent = "Save to project";
+  const doneButton = document.createElement("button");
+  doneButton.type = "button";
+  doneButton.className = "reader-notes-project-done";
+  doneButton.textContent = "Done";
+  doneButton.addEventListener("click", () => removeReaderNotesProjectPicker(sheet));
+  pickerHeader.append(label, doneButton);
+  picker.append(pickerHeader);
 
-  const saveTo = async (button, project = null) => {
-    button.disabled = true;
-    try {
-      await persistSectionBookmark(sectionPayload, true);
-      if (project) await persistSectionInProject(project, sectionPayload);
-      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
-      removeReaderNotesProjectPicker(sheet);
-      await renderWorkspace();
-    } catch (error) {
-      button.disabled = false;
-      button.title = error.message || "Could not save this section.";
-    }
+  const projectLink = (project) => currentContentSummary().projectSections.find((item) =>
+    String(item.sectionID || item.savedSectionID || item.itemID || "") === String(sectionPayload.sectionID || "") &&
+    projectSectionBelongsToProject(item, project)
+  );
+
+  const setProjectButtonState = (button, selected) => {
+    button.classList.toggle("is-selected", selected);
+    button.setAttribute("aria-pressed", String(selected));
+    const check = button.querySelector(".reader-notes-project-check");
+    if (check) check.textContent = selected ? "✓" : "";
   };
 
-  const savedOnlyButton = document.createElement("button");
-  savedOnlyButton.type = "button";
-  savedOnlyButton.textContent = "Saved items";
-  savedOnlyButton.addEventListener("click", () => saveTo(savedOnlyButton));
-  picker.append(savedOnlyButton);
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.className = "reader-notes-project-empty";
+    empty.textContent = "No projects yet.";
+    picker.append(empty);
+  }
 
   projects.forEach((project) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reader-notes-project-option";
-    button.textContent = project.name || project.title || "Project";
     button.style.setProperty("--project-color", projectColor(project));
-    button.addEventListener("click", () => saveTo(button, project));
+    const name = document.createElement("span");
+    name.textContent = project.name || project.title || "Project";
+    const check = document.createElement("span");
+    check.className = "reader-notes-project-check";
+    check.setAttribute("aria-hidden", "true");
+    button.append(name, check);
+    setProjectButtonState(button, Boolean(projectLink(project)));
+    button.addEventListener("click", async () => {
+      button.disabled = true;
+      button.classList.remove("has-error");
+      const existingLink = projectLink(project);
+      try {
+        if (existingLink) {
+          await removeSectionFromProject(project, existingLink, { removeBookmark: false });
+          setProjectButtonState(button, false);
+        } else {
+          await persistSectionInProject(project, sectionPayload);
+          setProjectButtonState(button, true);
+        }
+      } catch (error) {
+        button.classList.add("has-error");
+        button.title = error.message || "Could not update this project.";
+      } finally {
+        button.disabled = false;
+      }
+    });
     picker.append(button);
   });
 
@@ -3856,7 +3914,8 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
       createButton.disabled = true;
       try {
         const project = await createProjectFolder({ name: input.value.trim() });
-        await saveTo(createButton, project);
+        await persistSectionInProject(project, sectionPayload);
+        showReaderNotesProjectPicker(sheet, sectionPayload);
       } catch (error) {
         createButton.disabled = false;
         createButton.title = error.message || "Could not create the project.";
@@ -3958,35 +4017,22 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     chapterNumber: section.chapterNumber || ""
   };
   if (bookmarkButton) {
-    bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Remove bookmark" : "Save bookmark"}</span>`;
+    bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save bookmark"}</span>`;
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.setAttribute("aria-pressed", String(saved));
-    bookmarkButton.setAttribute("aria-label", saved ? "Remove bookmark" : "Save bookmark");
+    bookmarkButton.setAttribute("aria-label", saved ? "Manage saved projects" : "Save bookmark");
     bookmarkButton.onclick = async () => {
       bookmarkButton.disabled = true;
       bookmarkButton.classList.remove("has-error");
-      const shouldRemove = bookmarkButton.classList.contains("is-saved");
-      if (!shouldRemove) {
-        bookmarkButton.disabled = false;
-        showReaderNotesProjectPicker(sheet, sectionPayload);
-        return;
-      }
-      bookmarkButton.classList.toggle("is-saved", !shouldRemove);
-      bookmarkButton.setAttribute("aria-pressed", String(!shouldRemove));
-      bookmarkButton.setAttribute("aria-label", shouldRemove ? "Save bookmark" : "Remove bookmark");
-      bookmarkButton.title = shouldRemove ? "Save bookmark" : "Saved";
-      bookmarkButton.innerHTML = `${bookmarkIconSVG(!shouldRemove)}<span class="sr-only">${shouldRemove ? "Save bookmark" : "Remove bookmark"}</span>`;
-      syncReaderNoteBookmarkButtons(section.id, !shouldRemove);
       try {
-        await persistSectionBookmark(sectionPayload, !shouldRemove);
-        if (state.utilities.saved) await renderWorkspace();
+        await openReaderNotesProjectPicker(sheet, sectionPayload);
+        bookmarkButton.classList.add("is-saved");
+        bookmarkButton.setAttribute("aria-pressed", "true");
+        bookmarkButton.setAttribute("aria-label", "Manage saved projects");
+        bookmarkButton.title = "Manage saved projects";
+        bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Manage saved projects</span>`;
       } catch (error) {
-        bookmarkButton.classList.toggle("is-saved", shouldRemove);
-        bookmarkButton.setAttribute("aria-pressed", String(shouldRemove));
-        bookmarkButton.setAttribute("aria-label", shouldRemove ? "Remove bookmark" : "Save bookmark");
         bookmarkButton.title = error.message;
-        bookmarkButton.innerHTML = `${bookmarkIconSVG(shouldRemove)}<span class="sr-only">${shouldRemove ? "Remove bookmark" : "Save bookmark"}</span>`;
-        syncReaderNoteBookmarkButtons(section.id, shouldRemove);
         bookmarkButton.classList.add("has-error");
       } finally {
         bookmarkButton.disabled = false;
@@ -4070,9 +4116,9 @@ function syncReaderNoteBookmarkButtons(sectionID, saved) {
     if (!button) return;
     button.classList.toggle("is-saved", saved);
     button.setAttribute("aria-pressed", String(saved));
-    button.setAttribute("aria-label", saved ? "Remove bookmark" : "Save subsection");
-    button.title = saved ? "Saved" : "Save subsection";
-    button.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Remove bookmark" : "Save subsection"}</span>`;
+    button.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection");
+    button.title = saved ? "Manage saved projects" : "Save subsection";
+    button.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save subsection"}</span>`;
   });
 }
 
