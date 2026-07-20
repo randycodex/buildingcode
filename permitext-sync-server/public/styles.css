@@ -368,16 +368,17 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
-.topbar-brand strong {
+.topbar-brand-name {
+  color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 1.08);
-  font-weight: 700;
+  font-weight: 300;
   letter-spacing: -0.03em;
 }
 
-.topbar-brand span {
-  color: var(--text-secondary);
+.topbar-brand-plan {
+  color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 0.78);
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
