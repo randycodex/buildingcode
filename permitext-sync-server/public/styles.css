@@ -4810,11 +4810,6 @@ mark {
   font-weight: 500;
 }
 
-.preview-setting-row strong {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
 .preview-setting-row select {
   min-height: auto;
   width: auto;
@@ -4824,47 +4819,6 @@ mark {
   color: var(--text-secondary);
   font-weight: 500;
   text-align: right;
-}
-
-.preview-slider {
-  appearance: none;
-  -webkit-appearance: none;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  accent-color: var(--text-primary);
-}
-
-.preview-slider::-webkit-slider-runnable-track {
-  height: 1px;
-  border: 0;
-  background: color-mix(in srgb, var(--text-secondary) 46%, transparent);
-}
-
-.preview-slider::-webkit-slider-thumb {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  margin-top: -5.5px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--text-primary);
-}
-
-.preview-slider::-moz-range-track {
-  height: 1px;
-  border: 0;
-  background: color-mix(in srgb, var(--text-secondary) 46%, transparent);
-}
-
-.preview-slider::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--text-primary);
 }
 
 .account-connector {
@@ -5088,7 +5042,6 @@ mark {
     align-items: start;
   }
 
-  .preview-setting-row strong,
   .preview-setting-row select {
     width: 100%;
     text-align: left;

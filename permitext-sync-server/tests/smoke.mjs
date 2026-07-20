@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("topbar-groups-v35"),
+      webRoot.text.includes("remove-preview-sliders-v36"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -162,6 +162,13 @@ async function main() {
         !settingsTemplateSource.includes("settings-comparison-toggle"),
       "Web Settings still includes the retired Comparison Mode control."
     );
+    assert(
+      !settingsTemplateSource.includes("preview-font-slider") &&
+        !settingsTemplateSource.includes("preview-spacing-slider") &&
+        !settingsTemplateSource.includes("Font Size") &&
+        !settingsTemplateSource.includes("Line Spacing"),
+      "Web Settings still includes the retired Reader Preview sliders."
+    );
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
@@ -183,6 +190,14 @@ async function main() {
         !workspaceScript.text.includes("comparisonReaderID") &&
         workspaceScript.text.includes("!reader.comparisonManaged"),
       "Web workspace still includes retired Comparison Mode behavior."
+    );
+    assert(
+      !workspaceScript.text.includes("wireReaderSettingsControls") &&
+        !workspaceScript.text.includes("readerLineHeightValue") &&
+        !workspaceScript.text.includes("readerSettings.fontSize") &&
+        !workspaceScript.text.includes("readerSettings.lineSpacing") &&
+        workspaceScript.text.includes("function wireReaderFontFamilyControl"),
+      "Web workspace still includes retired Reader Preview slider behavior."
     );
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Notes and tags")'),
@@ -338,7 +353,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-topbar-groups-v35'),
+        webRoot.text.includes('/web/app.js?v=20260720-remove-preview-sliders-v36'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

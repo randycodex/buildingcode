@@ -71,8 +71,6 @@ const sharedWorkspaceStateKeys = [
 ];
 
 const defaultReaderSettings = {
-  fontSize: 10,
-  lineSpacing: 0,
   fontFamily: "system"
 };
 
@@ -652,8 +650,6 @@ function clampNumber(value, min, max, fallback) {
 function normalizeReaderSettings(settings = {}) {
   const fontFamily = settings.fontFamily === "helvetica" ? "system" : String(settings.fontFamily || "system");
   return {
-    fontSize: clampNumber(settings.fontSize, 10, 26, defaultReaderSettings.fontSize),
-    lineSpacing: clampNumber(settings.lineSpacing, 0, 4, defaultReaderSettings.lineSpacing),
     fontFamily: ["system", "rounded", "serif", "monospaced"].includes(fontFamily) ? fontFamily : "system"
   };
 }
@@ -701,10 +697,6 @@ function normalizeSearchInstance(instance) {
   return instance;
 }
 
-function readerLineHeightValue(lineSpacing) {
-  return 1.2 + Number(lineSpacing) * 0.15;
-}
-
 function readerFontFamilyValue() {
   if (state.readerSettings.fontFamily === "rounded") return "ui-rounded, -apple-system, BlinkMacSystemFont, sans-serif";
   if (state.readerSettings.fontFamily === "serif") return "New York, Iowan Old Style, Georgia, serif";
@@ -714,13 +706,11 @@ function readerFontFamilyValue() {
 
 function applyReaderSettings() {
   state.readerSettings = normalizeReaderSettings(state.readerSettings);
-  document.documentElement.style.setProperty("--reader-font-size", `${state.readerSettings.fontSize}pt`);
-  document.documentElement.style.setProperty("--reader-line-height", String(readerLineHeightValue(state.readerSettings.lineSpacing)));
   document.documentElement.style.setProperty("--reader-font-family", readerFontFamilyValue());
 }
 
 function readerTextSizeValue(reader) {
-  return clampNumber(reader?.textSize, 10, 26, state.readerSettings.fontSize);
+  return clampNumber(reader?.textSize, 10, 26, 10);
 }
 
 function syncReaderTextSizeControls(panel, reader) {
@@ -747,7 +737,7 @@ function applyReaderTextSize(panel, reader) {
 }
 
 function changeReaderTextSize(panel, reader, delta) {
-  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 26, state.readerSettings.fontSize);
+  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 26, 10);
   (state.readers || []).forEach((openReader) => {
     openReader.textSize = nextSize;
     const openPanel = track.querySelector(
@@ -8294,7 +8284,7 @@ async function performSettingsClearAction(action) {
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
-  wireReaderSettingsControls(panel);
+  wireReaderFontFamilyControl(panel);
 
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
@@ -8582,42 +8572,20 @@ function renderSettings() {
   return panel;
 }
 
-function wireReaderSettingsControls(panel) {
-  const fontSlider = panel.querySelector(".preview-font-slider");
-  const spacingSlider = panel.querySelector(".preview-spacing-slider");
+function wireReaderFontFamilyControl(panel) {
   const fontSelect = panel.querySelector(".preview-font-family-select");
-  const fontLabels = panel.querySelectorAll(".preview-font-value");
-  const spacingLabels = panel.querySelectorAll(".preview-spacing-value");
 
-  const syncControls = () => {
+  const syncControl = () => {
     state.readerSettings = normalizeReaderSettings(state.readerSettings);
-    fontLabels.forEach((label) => {
-      label.textContent = `${state.readerSettings.fontSize} pt`;
-    });
-    spacingLabels.forEach((label) => {
-      label.textContent = String(state.readerSettings.lineSpacing);
-    });
-    if (fontSlider) fontSlider.value = String(state.readerSettings.fontSize);
-    if (spacingSlider) spacingSlider.value = String(state.readerSettings.lineSpacing);
     if (fontSelect) fontSelect.value = state.readerSettings.fontFamily;
     applyReaderSettings();
   };
 
-  syncControls();
+  syncControl();
 
-  fontSlider?.addEventListener("input", () => {
-    state.readerSettings.fontSize = clampNumber(fontSlider.value, 10, 26, defaultReaderSettings.fontSize);
-    syncControls();
-    saveWorkspaceState();
-  });
-  spacingSlider?.addEventListener("input", () => {
-    state.readerSettings.lineSpacing = clampNumber(spacingSlider.value, 0, 4, defaultReaderSettings.lineSpacing);
-    syncControls();
-    saveWorkspaceState();
-  });
   fontSelect?.addEventListener("change", () => {
     state.readerSettings.fontFamily = fontSelect.value;
-    syncControls();
+    syncControl();
     saveWorkspaceState();
   });
 }
