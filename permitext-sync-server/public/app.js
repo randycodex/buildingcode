@@ -125,8 +125,11 @@ function loadWorkspaceState() {
     const projectDetails = Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
       : saved.projectDetail && typeof saved.projectDetail === "object" ? [saved.projectDetail] : [];
+    const savedReaders = Array.isArray(saved.readers)
+      ? saved.readers.filter((reader) => reader && typeof reader === "object" && !reader.comparisonManaged)
+      : [];
     return {
-      readers: Array.isArray(saved.readers) && saved.readers.length > 0 ? saved.readers : [newReaderState()],
+      readers: savedReaders.length > 0 ? savedReaders : [newReaderState()],
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       recentSearches: normalizeSearchHistory(saved.recentSearches, 10),
@@ -166,8 +169,6 @@ function loadWorkspaceState() {
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
       settingsCodePrefix: typeof saved.settingsCodePrefix === "string" ? saved.settingsCodePrefix : "",
-      comparisonModeEnabled: Boolean(saved.comparisonModeEnabled),
-      comparisonReaderID: typeof saved.comparisonReaderID === "string" ? saved.comparisonReaderID : "",
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
@@ -205,8 +206,6 @@ function loadWorkspaceState() {
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
       settingsCodePrefix: "",
-      comparisonModeEnabled: false,
-      comparisonReaderID: "",
       savedTextSize: 10,
       workboards: [],
       detachedWorkboards: []
@@ -2716,7 +2715,6 @@ function continuityValuesForReader(reader) {
       : chapter?.codeSectionID
         ? String(chapter.codeSectionID)
         : existing.selectedCodeSectionID || "",
-    comparisonModeEnabled: state.comparisonModeEnabled ? "true" : "false",
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
@@ -2755,23 +2753,9 @@ async function applyRemoteContinuityIfNewer() {
   if (!record || !Number.isFinite(remoteTimestamp) || remoteTimestamp <= appliedTimestamp || hasPendingContinuity) return;
 
   state.continuityAppliedAt = record.updatedAt;
-  state.comparisonModeEnabled = record.values?.comparisonModeEnabled === "true";
   const remoteCodeSectionID = String(record.values?.selectedCodeSectionID || "");
   const remoteCodeSectionChapter = chapters.find((item) => String(item.codeSectionID || "") === remoteCodeSectionID);
   state.settingsCodePrefix = remoteCodeSectionID ? remoteCodeSectionChapter?.codePrefix || "" : "ALL";
-  const comparisonReader = (state.readers || []).find((reader) => reader.id === state.comparisonReaderID);
-  if (state.comparisonModeEnabled && !comparisonReader) {
-    const primaryPrefix = state.readers?.[0]?.codePrefix || "BC";
-    const alternatePrefix = searchCodeFilterOptions()
-      .map((option) => option.prefix)
-      .find((prefix) => prefix !== "ALL" && prefix !== primaryPrefix) || primaryPrefix;
-    const addedReader = newReaderState({ codePrefix: alternatePrefix, comparisonManaged: true });
-    state.readers = [...(state.readers || []), addedReader];
-    state.comparisonReaderID = addedReader.id;
-  } else if (!state.comparisonModeEnabled && comparisonReader) {
-    state.readers = state.readers.filter((reader) => reader.id !== comparisonReader.id);
-    state.comparisonReaderID = "";
-  }
   if (deepLinkedSectionIDFromLocation()) {
     saveWorkspaceState();
     return;
@@ -8227,27 +8211,6 @@ async function updateSettingsCodeSection(prefix) {
   await renderWorkspace();
 }
 
-async function synchronizeComparisonReaders(enabled) {
-  state.comparisonModeEnabled = Boolean(enabled);
-  const existingComparisonReader = (state.readers || []).find((reader) => reader.id === state.comparisonReaderID);
-  if (state.comparisonModeEnabled && !existingComparisonReader) {
-    const primaryPrefix = state.readers?.[0]?.codePrefix || "BC";
-    const comparisonPrefix = settingsCodeSectionOptions()
-      .map((option) => option.prefix)
-      .find((prefix) => prefix !== "ALL" && prefix !== primaryPrefix) || primaryPrefix;
-    const comparisonReader = newReaderState({ codePrefix: comparisonPrefix, comparisonManaged: true });
-    state.readers = [...(state.readers || []), comparisonReader];
-    state.comparisonReaderID = comparisonReader.id;
-  } else if (!state.comparisonModeEnabled && existingComparisonReader) {
-    state.readers = state.readers.filter((reader) => reader.id !== existingComparisonReader.id);
-    state.comparisonReaderID = "";
-  }
-  saveWorkspaceState();
-  const primaryReader = state.readers?.[0];
-  if (primaryReader?.chapterID) scheduleContinuitySync(primaryReader);
-  await renderWorkspace();
-}
-
 function normalizedPublicUsername(value) {
   const trimmed = String(value || "").trim().replace(/^@/, "").toLowerCase();
   return trimmed || null;
@@ -8362,7 +8325,6 @@ function renderSettings() {
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
   const codeSectionSelect = panel.querySelector(".settings-code-section-select");
-  const comparisonToggle = panel.querySelector(".settings-comparison-toggle");
   const accountSummary = panel.querySelector(".account-summary");
   const accountCopy = panel.querySelector(".account-status-copy");
   const displayName = panel.querySelector(".account-display-name");
@@ -8397,9 +8359,7 @@ function renderSettings() {
     codeSectionSelect.append(element);
   });
   codeSectionSelect.value = selectedSettingsCodePrefix();
-  comparisonToggle.checked = Boolean(state.comparisonModeEnabled);
   codeSectionSelect.addEventListener("change", () => updateSettingsCodeSection(codeSectionSelect.value));
-  comparisonToggle.addEventListener("change", () => synchronizeComparisonReaders(comparisonToggle.checked));
 
   const renderSyncState = () => {
     const account = activeAccount();
@@ -9252,7 +9212,7 @@ function workspaceCommandDefinitions() {
     { label: "Open Saved Inbox", hint: "Review items before organizing them", run: () => focusUtility("saved") },
     { label: "Open Projects", hint: "Organized job and research work", run: () => focusUtility("projects") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
-    { label: "Open Settings", hint: "Reading, comparison, account, and privacy", run: () => focusUtility("settings") },
+    { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Column Widths", hint: "Fit the current workspace", run: () => fitVisibleColumns() },
     { label: "Keep One Reader", hint: "Close every other workspace column", run: () => collapseToOneReader() }
   ];

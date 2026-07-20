@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-field-top-v28"),
-      "Web workspace omitted the top-positioned Search field assets."
+      webRoot.text.includes("text-field-focus-v30"),
+      "Web workspace omitted the current text-field and Settings assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -142,6 +142,11 @@ async function main() {
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
+    assert(
+      !settingsTemplateSource.includes("Comparison Mode") &&
+        !settingsTemplateSource.includes("settings-comparison-toggle"),
+      "Web Settings still includes the retired Comparison Mode control."
+    );
 
     const workspaceScript = await request("/web/app.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
@@ -156,6 +161,13 @@ async function main() {
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Saved sections")'),
       "Saved pane still included its retired Saved sections heading."
+    );
+    assert(
+      !workspaceScript.text.includes("synchronizeComparisonReaders") &&
+        !workspaceScript.text.includes("comparisonModeEnabled") &&
+        !workspaceScript.text.includes("comparisonReaderID") &&
+        workspaceScript.text.includes("!reader.comparisonManaged"),
+      "Web workspace still includes retired Comparison Mode behavior."
     );
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Notes and tags")'),
@@ -298,7 +310,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-search-field-top-v28'),
+        webRoot.text.includes('/web/app.js?v=20260720-text-field-focus-v30'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -465,6 +477,10 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      workspaceStyles.text.match(/input:focus,[\s\S]*?input:focus-visible,[\s\S]*?textarea:focus,[\s\S]*?textarea:focus-visible \{[\s\S]*?outline: 0;[\s\S]*?outline-offset: 0;/),
+      "Text fields can still render the browser's rectangular focus outline."
+    );
     assert(
       !workspaceStyles.text.includes(".panel-track.is-resizing *"),
       "Divider resizing still invalidates cursor styles across every workspace descendant."

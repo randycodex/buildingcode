@@ -330,10 +330,17 @@ body.is-resizing-notes * {
 
 button:focus-visible,
 select:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
+input[type="range"]:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--text-secondary) 46%, transparent);
   outline-offset: 3px;
+}
+
+input:focus,
+input:focus-visible,
+textarea:focus,
+textarea:focus-visible {
+  outline: 0;
+  outline-offset: 0;
 }
 
 .workspace-shell {
@@ -4534,42 +4541,6 @@ mark {
   font-weight: 400;
   text-align: right;
   text-overflow: ellipsis;
-}
-
-.settings-toggle-row {
-  grid-template-columns: minmax(0, 1fr) auto;
-}
-
-.settings-comparison-toggle {
-  appearance: none;
-  width: 52px;
-  height: 30px;
-  margin: 0;
-  padding: 3px;
-  border: 1px solid color-mix(in srgb, var(--text-secondary) 38%, transparent);
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-secondary) 22%, transparent);
-  transition: background 160ms ease, border-color 160ms ease;
-}
-
-.settings-comparison-toggle::after {
-  display: block;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--surface-raised);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  content: "";
-  transition: transform 160ms ease;
-}
-
-.settings-comparison-toggle:checked {
-  border-color: var(--text-primary);
-  background: var(--text-primary);
-}
-
-.settings-comparison-toggle:checked::after {
-  transform: translateX(22px);
 }
 
 .settings-card {
