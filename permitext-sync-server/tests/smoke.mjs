@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("warning-dialog-v26"),
-      "Web workspace omitted the shared warning-dialog assets."
+      webRoot.text.includes("transient-section-detail-v27"),
+      "Web workspace omitted the transient section-detail assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -292,7 +292,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-warning-dialog-v26'),
+        webRoot.text.includes('/web/app.js?v=20260720-transient-section-detail-v27'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -300,6 +300,17 @@ async function main() {
         workspaceScript.text.includes('event.key.toLowerCase() === "k"') &&
         workspaceScript.text.includes('event.key.toLowerCase() === "f"'),
       "Web workspace keyboard navigation or command palette is missing."
+    );
+    assert(
+      workspaceScript.text.includes('const internalSectionHistoryStateKey = "permitextInternalSectionNavigation"') &&
+        workspaceScript.text.includes("function sectionRouteIDFromLocation") &&
+        workspaceScript.text.includes("function pageLoadedFromRefresh") &&
+        workspaceScript.text.includes("function consumeBrowserSectionURL") &&
+        workspaceScript.text.includes("const persistableState = {") &&
+        workspaceScript.text.includes("sectionDetails: {},") &&
+        workspaceScript.text.includes('!paneID.startsWith("section:detail:")') &&
+        workspaceScript.text.includes("const deepLinkedSectionID = deepLinkedSectionIDFromLocation();\n  consumeBrowserSectionURL();\n  await renderWorkspace();"),
+      "Search-result detail columns can persist or replay after a browser refresh."
     );
     assert(
       workspaceScript.text.includes("function openWebWarning") &&

@@ -8,6 +8,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
+const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260720-settings-parity-v15";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -140,9 +141,10 @@ function loadWorkspaceState() {
       syncOutbox: Array.isArray(saved.syncOutbox) ? saved.syncOutbox.filter((item) => item?.mutation && item?.accountUserID) : [],
       syncConflicts: Array.isArray(saved.syncConflicts) ? saved.syncConflicts.filter((item) => item?.mutation) : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
-      searchResultReader: saved.searchResultReader || null,
-      sectionDetail: saved.sectionDetail || saved.searchResultReader || null,
-      sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
+      searchResultReader: null,
+      sectionDetail: null,
+      sectionDetails: {},
+      sectionDetailAnchors: {},
       searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
       projectDetail: projectDetails[0] || null,
       projectDetails,
@@ -188,6 +190,7 @@ function loadWorkspaceState() {
       searchResultReader: null,
       sectionDetail: null,
       sectionDetails: {},
+      sectionDetailAnchors: {},
       searchLinkedReaders: {},
       projectDetail: null,
       projectDetails: [],
@@ -249,7 +252,18 @@ function normalizeUtilityInstances(saved = {}) {
 }
 
 function saveWorkspaceState() {
-  localStorage.setItem(workspaceKey, JSON.stringify(state));
+  const persistableState = {
+    ...state,
+    searchResultReader: null,
+    sectionDetail: null,
+    sectionDetails: {},
+    sectionDetailAnchors: {},
+    paneOrder: (state.paneOrder || []).filter((paneID) => !paneID.startsWith("section:detail:")),
+    paneWeights: Object.fromEntries(
+      Object.entries(state.paneWeights || {}).filter(([paneID]) => !paneID.startsWith("section:detail:"))
+    )
+  };
+  localStorage.setItem(workspaceKey, JSON.stringify(persistableState));
   if (!detachedProjectWindow) return;
   try {
     const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
@@ -793,17 +807,36 @@ function newReaderState(overrides = {}) {
   };
 }
 
-function deepLinkedSectionIDFromLocation() {
+function sectionRouteIDFromLocation() {
   const match = window.location.pathname.match(/^\/open\/section\/(\d+)\/?$/);
   return match?.[1] || "";
+}
+
+function pageLoadedFromRefresh() {
+  const navigationEntry = performance.getEntriesByType?.("navigation")?.[0];
+  if (navigationEntry?.type) return navigationEntry.type === "reload";
+  return performance.navigation?.type === 1;
+}
+
+function deepLinkedSectionIDFromLocation() {
+  const sectionID = sectionRouteIDFromLocation();
+  if (!sectionID || window.history.state?.[internalSectionHistoryStateKey] || pageLoadedFromRefresh()) return "";
+  return sectionID;
+}
+
+function consumeBrowserSectionURL() {
+  if (!sectionRouteIDFromLocation()) return;
+  const url = new URL(window.location.href);
+  url.pathname = "/";
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
 }
 
 function updateBrowserSectionURL(sectionID) {
   const normalizedID = String(sectionID || "").trim();
   if (!/^\d+$/.test(normalizedID)) return;
   const nextPath = `/open/section/${normalizedID}`;
-  if (window.location.pathname === nextPath && !window.location.search && !window.location.hash) return;
-  window.history.replaceState({}, "", nextPath);
+  const currentState = window.history.state && typeof window.history.state === "object" ? window.history.state : {};
+  window.history.replaceState({ ...currentState, [internalSectionHistoryStateKey]: true }, "", nextPath);
 }
 
 function sharedSectionURL(sectionID) {
@@ -9442,9 +9475,10 @@ async function start() {
   collapseReadersButton.addEventListener("click", () => {
     collapseToOneReader();
   });
+  const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
+  consumeBrowserSectionURL();
   await renderWorkspace();
   scheduleWorkboardModulePreload();
-  const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
   if (deepLinkedSectionID) {
     try {
       const payload = await api(`/code/sections/${deepLinkedSectionID}`);

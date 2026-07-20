@@ -48,6 +48,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - With no query, keep the iOS menu order: `Jump Back In`, `Pinned`, then `Recent Searches`.
 - Keep the populated Search dock in the iOS order: result summary, code-book filters, then the search field.
 - Preserve the iOS history actions: pin or unpin searches, remove recent searches, reopen recently viewed sections, and toggle their saved state.
+- Search-result detail columns are transient. A shared `/open/section/:id` link may open one once, but it must consume that route and must not persist or reopen the detail column after a browser refresh.
 - Code-section filters should support every available code section, not only Building Code, and should be generated from the available code data where practical.
 - Search results should show the count and offer explicit `Open in reader` and `New reader` destinations.
 - Search text should be highlighted in results when practical.
