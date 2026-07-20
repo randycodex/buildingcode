@@ -1219,6 +1219,45 @@ function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   return reader;
 }
 
+function searchResultDetail(result) {
+  return {
+    codePrefix: result.codePrefix || "BC",
+    chapterID: result.chapterID || "",
+    chapterNumber: result.chapterNumber || "",
+    sectionID: result.id || result.sectionID,
+    sectionNumber: result.sectionNumber || "",
+    title: result.title || result.headingLine || "Section",
+    headerLine: result.headerLine || "",
+    headingLine: result.headingLine || ""
+  };
+}
+
+async function openSearchResultInReader(searchID, detail, mode = "active") {
+  let reader = null;
+  if (mode === "new") {
+    reader = newReaderState(readerFieldsForSectionDetail(detail));
+    state.readers.push(reader);
+  } else {
+    const linkedID = searchLinkedReadersBySearch()[searchID];
+    reader = state.readers.find((item) => item.id === linkedID) || state.readers[0] || null;
+    if (reader) {
+      Object.assign(reader, readerFieldsForSectionDetail(detail));
+    } else {
+      reader = newReaderState(readerFieldsForSectionDetail(detail));
+      state.readers.push(reader);
+    }
+  }
+  searchLinkedReadersBySearch()[searchID] = reader.id;
+  const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
+  placePaneAfter(searchPaneID, paneIDForReader(reader));
+  updateBrowserSectionURL(detail.sectionID);
+  scheduleContinuitySync(reader);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
+  alignReaderSectionAfterLayout(reader);
+  scrollPaneIntoView(paneIDForReader(reader));
+}
+
 function placeProjectDetailAfterProjects(detail) {
   const detailID = paneIDForProjectDetail(detail);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
@@ -3699,6 +3738,8 @@ async function renderSectionContent(panel, reader) {
       sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target));
     });
 
+    linkInlineCodeReferences(sectionWrapper, panel, reader);
+
     content.append(sectionWrapper);
   });
   // Notes now open from each block in the reader notes sheet. Do not build the
@@ -3914,7 +3955,11 @@ function ensureReaderNotesSheet(panel, reader) {
   actions.className = "reader-notes-actions";
   actions.append(doneButton);
 
-  header.append(bookmarkButton, actions);
+  const noteLabel = document.createElement("strong");
+  noteLabel.className = "reader-notes-trust-label";
+  noteLabel.textContent = "Private note · not code text";
+
+  header.append(bookmarkButton, noteLabel, actions);
 
   const input = document.createElement("textarea");
   input.className = "reader-notes-input";
@@ -4544,6 +4589,79 @@ function renderCodeBlock(block) {
   return paragraph;
 }
 
+function linkInlineCodeReferences(root, panel, reader) {
+  if (!root || root.dataset.inlineReferencesLinked === "true") return;
+  root.dataset.inlineReferencesLinked = "true";
+  const pattern = /\b(?:(BC|PC|MC|FGC|AC)\s+)?(Sections?|§)\s+(\d+(?:\.\d+){1,5}(?:\([^)]+\))*)/gi;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node) {
+      if (!node.nodeValue?.trim() || !pattern.test(node.nodeValue)) {
+        pattern.lastIndex = 0;
+        return NodeFilter.FILTER_REJECT;
+      }
+      pattern.lastIndex = 0;
+      if (node.parentElement?.closest("a, button, input, textarea, select, script, style, .reader-note-control")) {
+        return NodeFilter.FILTER_REJECT;
+      }
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const textNodes = [];
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+  textNodes.forEach((textNode) => {
+    const text = textNode.nodeValue || "";
+    pattern.lastIndex = 0;
+    let cursor = 0;
+    let match = pattern.exec(text);
+    if (!match) return;
+    const fragment = document.createDocumentFragment();
+    do {
+      if (match.index > cursor) fragment.append(document.createTextNode(text.slice(cursor, match.index)));
+      const reference = document.createElement("button");
+      reference.type = "button";
+      reference.className = "inline-code-reference";
+      reference.textContent = match[0];
+      const codePrefix = (match[1] || reader.codePrefix || "BC").toUpperCase();
+      const sectionNumber = match[3].replace(/\([^)]+\)/g, "");
+      reference.setAttribute("aria-label", `Open ${codePrefix} Section ${sectionNumber}`);
+      reference.addEventListener("click", () => openInlineCodeReference(panel, reader, codePrefix, sectionNumber, reference));
+      fragment.append(reference);
+      cursor = match.index + match[0].length;
+      match = pattern.exec(text);
+    } while (match);
+    if (cursor < text.length) fragment.append(document.createTextNode(text.slice(cursor)));
+    textNode.replaceWith(fragment);
+  });
+}
+
+async function openInlineCodeReference(panel, reader, codePrefix, sectionNumber, trigger) {
+  if (!sectionNumber) return;
+  trigger.disabled = true;
+  trigger.setAttribute("aria-busy", "true");
+  try {
+    const payload = await api(`/code/search?q=${encodeURIComponent(sectionNumber)}&code=${encodeURIComponent(codePrefix)}&limit=25`);
+    const normalizeNumber = (value) => String(value || "").replace(/^Section\s+/i, "").trim().toLowerCase();
+    const result = (payload.results || []).find((item) =>
+      (item.codePrefix || "BC").toUpperCase() === codePrefix && normalizeNumber(item.sectionNumber) === normalizeNumber(sectionNumber)
+    );
+    if (!result) {
+      trigger.title = `Section ${sectionNumber} was not found in ${codePrefix}.`;
+      return;
+    }
+    Object.assign(reader, readerFieldsForSectionDetail(searchResultDetail(result)));
+    updateBrowserSectionURL(reader.sectionID);
+    scheduleContinuitySync(reader);
+    saveWorkspaceState();
+    await refreshReaderContent(panel, reader);
+  } finally {
+    if (trigger.isConnected) {
+      trigger.disabled = false;
+      trigger.removeAttribute("aria-busy");
+    }
+  }
+}
+
 function plainTextFromHTML(html) {
   const wrapper = document.createElement("div");
   wrapper.innerHTML = rewriteCodeHTML(html || "");
@@ -5056,9 +5174,32 @@ async function renderSearchResults(panel, instance) {
   );
 
   if (filteredResults.length === 0) {
-    renderSearchPlaceholder(results, { title: "No results", body: "Try a shorter phrase or a section number." });
+    const scope = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
+    renderSearchPlaceholder(results, { title: "No results", body: `Nothing matched in ${scope}. Try a shorter phrase or an exact section number.` });
+    if (selectedPrefixes.length) {
+      const showAllButton = document.createElement("button");
+      showAllButton.type = "button";
+      showAllButton.className = "ghost-button search-empty-action";
+      showAllButton.textContent = "Search all codes";
+      showAllButton.addEventListener("click", () => {
+        searchInstance.codeFilters = [];
+        saveWorkspaceState();
+        updateSearchCodeFilterStates(panel.querySelector(".search-code-filter"), searchInstance);
+        renderSearchResults(panel, searchInstance);
+      });
+      results.querySelector(".reader-empty")?.append(showAllButton);
+    }
     return;
   }
+
+  const resultSummary = document.createElement("p");
+  resultSummary.className = "search-result-summary";
+  const reportedTotal = Number(payload.totalResults);
+  const resultCount = Number.isFinite(reportedTotal) ? reportedTotal : filteredResults.length;
+  const scopeLabel = selectedPrefixes.length ? selectedPrefixes.join(", ") : "all codes";
+  resultSummary.textContent = `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scopeLabel}`;
+  resultSummary.setAttribute("aria-live", "polite");
+  results.append(resultSummary);
 
   const groups = new Map();
   filteredResults.forEach((result) => {
@@ -5076,9 +5217,12 @@ async function renderSearchResults(panel, instance) {
     label.textContent = codeDisplayLabel(prefix);
     group.append(label);
     groupResults.forEach((result) => {
-    const row = document.createElement("button");
-    row.className = "result-row";
-    row.type = "button";
+      const detail = searchResultDetail(result);
+      const row = document.createElement("article");
+      row.className = "result-row";
+      const mainButton = document.createElement("button");
+      mainButton.className = "result-row-main";
+      mainButton.type = "button";
       const heading = document.createElement("strong");
       heading.className = "result-heading";
       const number = document.createElement("span");
@@ -5091,20 +5235,26 @@ async function renderSearchResults(panel, instance) {
       const snippetText = snippetWithoutDuplicateTitle(result);
       const snippet = document.createElement("p");
       appendHighlighted(snippet, snippetText, query);
-      row.append(heading);
-      if (snippetText) row.append(snippet);
-    row.addEventListener("click", () => {
-      openSectionDetail(searchInstance.id, {
-        codePrefix: result.codePrefix || "BC",
-        chapterID: result.chapterID,
-        chapterNumber: result.chapterNumber || "",
-        sectionID: result.id,
-        sectionNumber: result.sectionNumber,
-        title: result.title || result.headingLine || "Section",
-        headerLine: result.headerLine || "",
-        headingLine: result.headingLine || ""
-      });
-    });
+      mainButton.append(heading);
+      if (snippetText) mainButton.append(snippet);
+      mainButton.addEventListener("click", () => openSectionDetail(searchInstance.id, detail));
+
+      const actions = document.createElement("div");
+      actions.className = "result-row-actions";
+      const activeReaderButton = document.createElement("button");
+      activeReaderButton.type = "button";
+      activeReaderButton.className = "result-reader-action";
+      activeReaderButton.textContent = "Open in reader";
+      activeReaderButton.setAttribute("aria-label", `Open Section ${detail.sectionNumber} in active reader`);
+      activeReaderButton.addEventListener("click", () => openSearchResultInReader(searchInstance.id, detail, "active"));
+      const newReaderButton = document.createElement("button");
+      newReaderButton.type = "button";
+      newReaderButton.className = "result-reader-action";
+      newReaderButton.textContent = "New reader";
+      newReaderButton.setAttribute("aria-label", `Open Section ${detail.sectionNumber} in a new reader`);
+      newReaderButton.addEventListener("click", () => openSearchResultInReader(searchInstance.id, detail, "new"));
+      actions.append(activeReaderButton, newReaderButton);
+      row.append(mainButton, actions);
       group.append(row);
     });
     results.append(group);
@@ -5530,7 +5680,7 @@ function renderResearchInterpretation(container, result) {
   card.className = "analysis-card research-result-card";
   const label = document.createElement("p");
   label.className = "section-label";
-  label.textContent = result.mode === "mock" ? "Prototype response" : "Code interpretation";
+  label.textContent = result.mode === "mock" ? "Prototype response" : "AI-assisted research";
   const heading = document.createElement("h3");
   heading.textContent = result.conclusion;
   const explanation = document.createElement("p");
@@ -5571,6 +5721,16 @@ async function renderResearch(paneID) {
   const content = panel.querySelector(".analysis-content");
   const sections = await activeResearchSections();
 
+  const trustBanner = document.createElement("aside");
+  trustBanner.className = "research-trust-banner";
+  trustBanner.setAttribute("role", "note");
+  const trustHeading = document.createElement("strong");
+  trustHeading.textContent = "AI-assisted research — not an official interpretation";
+  const trustCopy = document.createElement("p");
+  trustCopy.textContent = "Verify conclusions against the enacted text and applicable agency guidance. Canonical code text and your private notes remain separate from generated analysis.";
+  trustBanner.append(trustHeading, trustCopy);
+  content.append(trustBanner);
+
   const summary = document.createElement("article");
   summary.className = "analysis-card";
   const label = document.createElement("p");
@@ -5609,7 +5769,7 @@ async function renderResearch(paneID) {
   interpreter.className = "analysis-card research-interpreter";
   const interpreterLabel = document.createElement("p");
   interpreterLabel.className = "section-label";
-  interpreterLabel.textContent = "Code interpretation";
+  interpreterLabel.textContent = "AI-assisted research";
   const interpreterHeading = document.createElement("h3");
   interpreterHeading.textContent = "Ask about this research set";
   const interpreterExplanation = document.createElement("p");
@@ -5632,11 +5792,11 @@ async function renderResearch(paneID) {
   const askButton = document.createElement("button");
   askButton.className = "ghost-button research-ask-button";
   askButton.type = "button";
-  askButton.textContent = "Interpret selected codes";
+  askButton.textContent = "Analyze selected codes";
   askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
   const status = document.createElement("p");
   status.className = "research-interpreter-status";
-  if (!activeAccount()) status.textContent = "Sign in from Settings to use code interpretation.";
+  if (!activeAccount()) status.textContent = "Sign in from Settings to use AI-assisted research.";
   const resultContainer = document.createElement("section");
   resultContainer.className = "research-interpretation-result";
   const selectedIDs = sections.map((section) => String(section.sectionID));
@@ -5873,6 +6033,13 @@ function createProjectBulkSelectionController(panel, projects, mode) {
   return controller;
 }
 
+function appendWorkspaceColumnIntro(content, text) {
+  const intro = document.createElement("p");
+  intro.className = "workspace-column-intro";
+  intro.textContent = text;
+  content.append(intro);
+}
+
 async function renderProjects() {
   const panel = renderTemplate(projectsTemplate);
   applyPaneWeight(panel, "utility:projects");
@@ -5880,6 +6047,7 @@ async function renderProjects() {
   const addButton = panel.querySelector(".projects-add-button");
   const archiveButton = panel.querySelector(".projects-archive-button");
   clear(content);
+  appendWorkspaceColumnIntro(content, "Projects organize saved sections, notes, and Workboards around a specific job or research topic.");
   addButton?.addEventListener("click", () => showProjectCreateSheet(panel));
   archiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   archiveButton?.addEventListener("click", toggleArchiveAfterProjectsStack);
@@ -6761,6 +6929,7 @@ async function renderSaved(paneID = "utility:saved") {
   panel.querySelector(".saved-text-increase")?.addEventListener("click", () => changeSavedTextSize(1));
   const content = panel.querySelector(".saved-content");
   clear(content);
+  appendWorkspaceColumnIntro(content, "Saved is your inbox for bookmarks, paragraph notes, and tags. Move job-specific work into a Project when it needs structure.");
   const data = await loadSyncedContent();
   const summary = currentContentSummary();
 
@@ -8181,6 +8350,150 @@ async function collapseToOneReader() {
   track.scrollTo({ left: 0, behavior: "smooth" });
 }
 
+async function focusUtility(key, selector = "") {
+  let paneID = "";
+  if (repeatableUtilityKeys.has(key)) {
+    let instance = (state.utilityInstances || []).find((item) => item.key === key);
+    if (!instance) {
+      await toggleUtilityPane(key);
+      instance = (state.utilityInstances || []).find((item) => item.key === key);
+    }
+    paneID = instance ? paneIDForUtilityInstance(instance) : "";
+  } else {
+    if (!state.utilities[key]) await toggleUtilityPane(key);
+    paneID = `utility:${key}`;
+  }
+  if (!paneID) return;
+  scrollPaneIntoView(paneID);
+  requestAnimationFrame(() => {
+    const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    const focusTarget = selector ? pane?.querySelector(selector) : pane?.querySelector("button, input, select, textarea");
+    focusTarget?.focus({ preventScroll: true });
+  });
+}
+
+function workspaceCommandDefinitions() {
+  return [
+    { label: "Open Search", hint: "Find sections across all codes", run: () => focusUtility("search", ".search-input") },
+    { label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() },
+    { label: "Open Saved Inbox", hint: "Review items before organizing them", run: () => focusUtility("saved") },
+    { label: "Open Projects", hint: "Organized job and research work", run: () => focusUtility("projects") },
+    { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
+    { label: "Open Settings", hint: "Reading, comparison, account, and privacy", run: () => focusUtility("settings") },
+    { label: "Reset Column Widths", hint: "Fit the current workspace", run: () => fitVisibleColumns() },
+    { label: "Keep One Reader", hint: "Close every other workspace column", run: () => collapseToOneReader() }
+  ];
+}
+
+function openWorkspaceCommandPalette() {
+  document.querySelector(".command-palette-backdrop")?.remove();
+  const commands = workspaceCommandDefinitions();
+  const backdrop = document.createElement("div");
+  backdrop.className = "command-palette-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "command-palette";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Workspace commands");
+  const input = document.createElement("input");
+  input.type = "search";
+  input.className = "command-palette-input";
+  input.placeholder = "Type a command";
+  input.setAttribute("aria-label", "Filter workspace commands");
+  const list = document.createElement("div");
+  list.className = "command-palette-list";
+  let visibleCommands = commands;
+  let selectedIndex = 0;
+
+  const closePalette = () => backdrop.remove();
+  const executeCommand = (command) => {
+    closePalette();
+    void Promise.resolve(command.run());
+  };
+  const renderCommands = () => {
+    clear(list);
+    const needle = input.value.trim().toLowerCase();
+    visibleCommands = commands.filter((command) => `${command.label} ${command.hint}`.toLowerCase().includes(needle));
+    selectedIndex = Math.min(selectedIndex, Math.max(0, visibleCommands.length - 1));
+    visibleCommands.forEach((command, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "command-palette-item";
+      button.classList.toggle("is-selected", index === selectedIndex);
+      const label = document.createElement("strong");
+      label.textContent = command.label;
+      const hint = document.createElement("span");
+      hint.textContent = command.hint;
+      button.append(label, hint);
+      button.addEventListener("click", () => executeCommand(command));
+      list.append(button);
+    });
+  };
+  input.addEventListener("input", () => {
+    selectedIndex = 0;
+    renderCommands();
+  });
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      closePalette();
+    } else if (event.key === "ArrowDown" && visibleCommands.length) {
+      event.preventDefault();
+      selectedIndex = (selectedIndex + 1) % visibleCommands.length;
+      renderCommands();
+    } else if (event.key === "ArrowUp" && visibleCommands.length) {
+      event.preventDefault();
+      selectedIndex = (selectedIndex - 1 + visibleCommands.length) % visibleCommands.length;
+      renderCommands();
+    } else if (event.key === "Enter" && visibleCommands[selectedIndex]) {
+      event.preventDefault();
+      executeCommand(visibleCommands[selectedIndex]);
+    }
+  });
+  backdrop.addEventListener("mousedown", (event) => {
+    if (event.target === backdrop) closePalette();
+  });
+  dialog.append(input, list);
+  backdrop.append(dialog);
+  document.body.append(backdrop);
+  renderCommands();
+  input.focus();
+}
+
+function bindWorkspaceKeyboardNavigation() {
+  document.addEventListener("keydown", (event) => {
+    const commandModifier = event.metaKey || event.ctrlKey;
+    if (commandModifier && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      openWorkspaceCommandPalette();
+      return;
+    }
+    if (commandModifier && event.key.toLowerCase() === "f" && !event.target.closest("input, textarea, [contenteditable='true']")) {
+      const readerPanel = track.querySelector(".reader-panel");
+      const searchToggle = readerPanel?.querySelector(".reader-internal-search-toggle");
+      if (searchToggle) {
+        event.preventDefault();
+        if (searchToggle.getAttribute("aria-pressed") !== "true") searchToggle.click();
+        requestAnimationFrame(() => readerPanel.querySelector(".reader-internal-search-input")?.focus());
+      }
+      return;
+    }
+    if (commandModifier && /^[1-5]$/.test(event.key)) {
+      const pane = track.querySelectorAll(":scope > .workspace-panel")[Number(event.key) - 1];
+      if (pane?.dataset.paneId) {
+        event.preventDefault();
+        scrollPaneIntoView(pane.dataset.paneId);
+        pane.querySelector("button, input, select, textarea")?.focus({ preventScroll: true });
+      }
+      return;
+    }
+    if (event.key === "Escape" && !document.querySelector(".command-palette-backdrop")) {
+      const focusedPanel = document.activeElement?.closest?.(".workspace-panel");
+      focusedPanel?.querySelector(".utility-close")?.click();
+    }
+  });
+}
+
 async function start() {
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
@@ -8200,6 +8513,7 @@ async function start() {
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
+  bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
     if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {

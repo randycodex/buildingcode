@@ -6,6 +6,7 @@ struct BrowseView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Namespace private var chapterTileNamespace
     @State private var scrollOffset: CGFloat = 0
     @State private var browseCodeSectionID: Int64?
@@ -96,6 +97,17 @@ struct BrowseView: View {
                     .padding(.top, 18)
                     .padding(.bottom, 12)
 
+                if let entry = continueReadingEntry,
+                   let chapter = library.chapter(for: entry),
+                   let section = library.sectionSummary(
+                    sectionNumber: entry.sectionNumber,
+                    codeSectionID: entry.codeSectionID
+                   ) {
+                    continueReadingLink(entry: entry, chapter: chapter, section: section)
+                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+                        .padding(.bottom, 18)
+                }
+
                 if chapters.isEmpty {
                     CodeEmptyStateCard(
                         title: "No Chapters",
@@ -136,11 +148,12 @@ struct BrowseView: View {
                                             ChapterTile(
                                                 chapter: chapter,
                                                 palette: tilePalette(for: chapter),
-                                                kind: .chapter
+                                                kind: .chapter,
+                                                hasReadingProgress: library.hasReadingProgress(in: chapter)
                                             )
                                         }
                                         .buttonStyle(.plain)
-                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
                                         .simultaneousGesture(TapGesture().onEnded {
                                             library.prewarmChapterForOpening(chapter)
                                         })
@@ -165,11 +178,12 @@ struct BrowseView: View {
                                             ChapterTile(
                                                 chapter: chapter,
                                                 palette: tilePalette(for: chapter),
-                                                kind: .appendix
+                                                kind: .appendix,
+                                                hasReadingProgress: library.hasReadingProgress(in: chapter)
                                             )
                                         }
                                         .buttonStyle(.plain)
-                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace)
+                                        .chapterZoomSource(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
                                         .simultaneousGesture(TapGesture().onEnded {
                                             library.prewarmChapterForOpening(chapter)
                                         })
@@ -213,20 +227,29 @@ struct BrowseView: View {
                 rememberedAnchorID: rememberedAnchorID,
                 rememberedScrollOffset: rememberedScrollOffset
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         } else {
             ChapterLaunchView(
                 chapter: chapter,
                 rememberedSectionID: rememberedSectionID
             )
-            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace)
+            .chapterZoomDestination(id: chapter.id, in: chapterTileNamespace, reduceMotion: reduceMotion)
         }
     }
 
     private var libraryHeader: some View {
         VStack(alignment: .leading, spacing: 14) {
-            if library.comparisonModeEnabled {
+            HStack(alignment: .top, spacing: 12) {
                 Menu {
+                    Button {
+                        updateCodeSection(nil)
+                    } label: {
+                        codeSectionPickerLabel(
+                            "All Sections",
+                            isSelected: browseCodeSectionID == nil
+                        )
+                    }
+
                     ForEach(library.codeSections) { codeSection in
                         Button {
                             updateCodeSection(codeSection.id)
@@ -241,8 +264,10 @@ struct BrowseView: View {
                     headerTitle(showPicker: true)
                 }
                 .buttonStyle(.plain)
-            } else {
-                headerTitle(showPicker: false)
+
+                Spacer(minLength: 0)
+
+                comparisonButton
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -261,6 +286,75 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
+    }
+
+    private var comparisonButton: some View {
+        Button {
+            if library.comparisonModeEnabled {
+                library.setComparisonMode(enabled: false, keeping: .browse)
+            } else {
+                library.setComparisonMode(enabled: true, keeping: .browse)
+            }
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: library.comparisonModeEnabled ? "rectangle.split.1x2.fill" : "rectangle.split.1x2")
+                    .font(.system(size: 17, weight: .semibold))
+                Text(library.comparisonModeEnabled ? "End" : "Compare")
+                    .font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(accentColor)
+            .frame(minWidth: 52, minHeight: 44)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(library.comparisonModeEnabled ? "End comparison" : "Compare code books")
+        .accessibilityHint(library.comparisonModeEnabled ? "Returns to one Browse tab" : "Adds a second Browse tab")
+    }
+
+    private var continueReadingEntry: RecentlyViewedEntry? {
+        library.recentEntry(for: browseCodeSectionID)
+    }
+
+    private func continueReadingLink(
+        entry: RecentlyViewedEntry,
+        chapter: CodeChapter,
+        section: CodeSectionSummary
+    ) -> some View {
+        NavigationLink {
+            chapterDestination(
+                chapter: chapter,
+                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
+                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
+                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id),
+                initialSection: section
+            )
+        } label: {
+            CodeSurface(accent: accentColor, padding: 14, showsBorder: false) {
+                HStack(alignment: .center, spacing: 12) {
+                    VStack(alignment: .leading, spacing: 5) {
+                        CodeEyebrow(text: "Continue Reading", accent: accentColor)
+
+                        Text("Section \(entry.sectionNumber)")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+
+                        Text(entry.title)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                    }
+
+                    Spacer(minLength: 8)
+
+                    Image(systemName: "arrow.right.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(accentColor)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Continue reading Section \(entry.sectionNumber), \(entry.title)")
     }
 
     private func headerTitle(showPicker: Bool) -> some View {
@@ -962,8 +1056,8 @@ private extension UIColor {
 
 private extension View {
     @ViewBuilder
-    func chapterZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
-        if #available(iOS 18.0, *) {
+    func chapterZoomSource<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
+        if #available(iOS 18.0, *), !reduceMotion {
             self.matchedTransitionSource(id: id, in: namespace)
         } else {
             self
@@ -971,8 +1065,8 @@ private extension View {
     }
 
     @ViewBuilder
-    func chapterZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID) -> some View {
-        if #available(iOS 18.0, *) {
+    func chapterZoomDestination<ID: Hashable>(id: ID, in namespace: Namespace.ID, reduceMotion: Bool) -> some View {
+        if #available(iOS 18.0, *), !reduceMotion {
             self.navigationTransition(.zoom(sourceID: id, in: namespace))
         } else {
             self
@@ -984,6 +1078,7 @@ private struct ChapterTile: View {
     let chapter: CodeChapter
     let palette: ChapterTilePalette
     let kind: ChapterTileKind
+    let hasReadingProgress: Bool
 
     var body: some View {
         ZStack {
@@ -992,6 +1087,12 @@ private struct ChapterTile: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 HStack(alignment: .top) {
+                    if hasReadingProgress {
+                        Image(systemName: "circle.inset.filled")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(tileNumberColor)
+                            .accessibilityHidden(true)
+                    }
                     Spacer()
                     Text("\(chapter.chapterNumber)")
                         .font(.system(size: 28, weight: .bold))
@@ -1014,7 +1115,7 @@ private struct ChapterTile: View {
         .frame(minHeight: 110)
         .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)"))
+        .accessibilityLabel(Text("Chapter \(chapter.displayLabel): \(chapter.title)\(hasReadingProgress ? ", reading started" : "")"))
     }
 
     private var tileFill: Color {

@@ -11,6 +11,7 @@ struct SearchView: View {
     @State private var cachedGroupedResults: [SearchResultGroup] = []
     @State private var cachedJumpBackInPages: [JumpBackInPage] = []
     @State private var jumpBackInPageIndex: Int = 0
+    @State private var didSeedCurrentCodeFilter = false
     @FocusState private var isSearchFieldFocused: Bool
 
     private static let filterCodeSectionIDsDefaultsKey = "SearchView.filterCodeSectionIDs"
@@ -51,11 +52,7 @@ struct SearchView: View {
                     if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                         emptyQueryHistorySection
                     } else if cachedFilteredResults.isEmpty {
-                        Text("No results")
-                            .font(.subheadline)
-                            .foregroundStyle(Color.secondary.opacity(0.7))
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .padding(.top, 120)
+                        noResultsState
                     } else if showsGroupedSearchResults {
                         LazyVStack(alignment: .leading, spacing: 0) {
                             ForEach(cachedGroupedResults) { group in
@@ -90,6 +87,7 @@ struct SearchView: View {
                 VStack(spacing: CodeScreenMetrics.sectionSpacingBelowEyebrow) {
                     if !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
                        !library.codeSections.isEmpty {
+                        searchResultSummary
                         searchCodeSectionFilter
                     }
                     searchField
@@ -114,6 +112,7 @@ struct SearchView: View {
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
+                seedCurrentCodeFilterIfNeeded()
                 rebuildSearchCaches()
                 rebuildJumpBackInCache()
                 if library.pendingDeepLinkedSectionID != nil {
@@ -127,11 +126,6 @@ struct SearchView: View {
             .onChange(of: searchFilterCodeSectionIDs) { _, newValue in
                 FilterIDsStorage.persist(newValue, key: Self.filterCodeSectionIDsDefaultsKey)
                 rebuildSearchCaches()
-            }
-            .onChange(of: isSearchFieldFocused) { _, isFocused in
-                if !isFocused, !searchFilterCodeSectionIDs.isEmpty {
-                    searchFilterCodeSectionIDs.removeAll()
-                }
             }
             .onChange(of: library.searchResults) { _, _ in
                 rebuildSearchCaches()
@@ -235,6 +229,81 @@ struct SearchView: View {
             selectedIDs: $searchFilterCodeSectionIDs,
             accentForSection: { Color(uiColor: library.accentColor(for: $0)) }
         )
+    }
+
+    private var searchResultSummary: some View {
+        HStack(spacing: 10) {
+            Text(resultCountLabel)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .accessibilityLabel(resultCountLabel)
+
+            Spacer(minLength: 8)
+
+            if !searchFilterCodeSectionIDs.isEmpty {
+                Button("All Codes") {
+                    searchFilterCodeSectionIDs.removeAll()
+                }
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(accentColor)
+                .buttonStyle(.plain)
+                .accessibilityHint("Clears code-book filters")
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var noResultsState: some View {
+        VStack(spacing: 12) {
+            Image(systemName: "magnifyingglass")
+                .font(.title2)
+                .foregroundStyle(.secondary)
+
+            Text("No results for “\(query.trimmingCharacters(in: .whitespacesAndNewlines))”")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .multilineTextAlignment(.center)
+
+            Text("Nothing matched in \(activeSearchScopeName). Try a shorter phrase, a section number, or search all codes.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if !searchFilterCodeSectionIDs.isEmpty {
+                Button("Search All Codes") {
+                    searchFilterCodeSectionIDs.removeAll()
+                }
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(accentColor)
+                .buttonStyle(.bordered)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 28)
+        .padding(.top, 96)
+    }
+
+    private var resultCountLabel: String {
+        let count = cachedFilteredResults.count
+        return "\(count) \(count == 1 ? "result" : "results") in \(activeSearchScopeName)"
+    }
+
+    private var activeSearchScopeName: String {
+        guard !searchFilterCodeSectionIDs.isEmpty else { return "All Codes" }
+        let names = library.codeSections
+            .filter { searchFilterCodeSectionIDs.contains($0.id) }
+            .map { CodeLibraryViewModel.displayName(forCodeSectionName: $0.name) }
+        if names.count == 1 { return names[0] }
+        return "\(names.count) code books"
+    }
+
+    private func seedCurrentCodeFilterIfNeeded() {
+        guard !didSeedCurrentCodeFilter else { return }
+        didSeedCurrentCodeFilter = true
+        guard searchFilterCodeSectionIDs.isEmpty,
+              let selectedCodeSectionID = library.selectedCodeSectionID else { return }
+        searchFilterCodeSectionIDs = [selectedCodeSectionID]
     }
 
     private func handleSearchTabRetap() {

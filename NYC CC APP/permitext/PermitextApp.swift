@@ -27,16 +27,14 @@ struct PermitextApp: App {
         let stacked = appearance.stackedLayoutAppearance
         stacked.normal.iconColor = UIColor.secondaryLabel
         stacked.normal.titleTextAttributes = [
-            .foregroundColor: UIColor.clear,
+            .foregroundColor: UIColor.secondaryLabel,
             .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
         stacked.selected.iconColor = UIColor.appChrome
         stacked.selected.titleTextAttributes = [
-            .foregroundColor: UIColor.clear,
+            .foregroundColor: UIColor.appChrome,
             .font: UIFont.systemFont(ofSize: 10, weight: .semibold)
         ]
-        stacked.normal.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)
-        stacked.selected.titlePositionAdjustment = UIOffset(horizontal: 0, vertical: 20)
 
         UITabBar.appearance().standardAppearance = appearance
         UITabBar.appearance().scrollEdgeAppearance = appearance
@@ -197,8 +195,9 @@ private struct PermitextTabNavigation: View {
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                 .tabItem {
                     Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                    Text("")
+                    Text("Browse")
                 }
+                .accessibilityLabel("Browse")
                 .tag(AppTab.browse)
 
             if library.comparisonModeEnabled {
@@ -206,30 +205,34 @@ private struct PermitextTabNavigation: View {
                     .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
                     .tabItem {
                         Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                        Text("")
+                        Text("Compare")
                     }
+                    .accessibilityLabel("Comparison reader")
                     .tag(AppTab.browseSecondary)
             }
 
             SearchView()
                 .tabItem {
                     Image(systemName: "sparkle.magnifyingglass")
-                    Text("")
+                    Text("Search")
                 }
+                .accessibilityLabel("Search")
                 .tag(AppTab.search)
 
             BookmarksView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                    Text("")
+                    Text("Saved")
                 }
+                .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
 
             SettingsView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                    Text("")
+                    Text("Settings")
                 }
+                .accessibilityLabel("Settings")
                 .tag(AppTab.settings)
         }
     }

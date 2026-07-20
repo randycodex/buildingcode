@@ -1234,13 +1234,21 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func recentEntry(for codeSectionID: Int64?) -> RecentlyViewedEntry? {
-        recentlyViewedSections.first { entry in
+        guard let codeSectionID else { return recentlyViewedSections.first }
+        return recentlyViewedSections.first { entry in
             entry.codeSectionID == codeSectionID
-        } ?? recentlyViewedSections.first
+        }
     }
 
     func chapter(for entry: RecentlyViewedEntry) -> CodeChapter? {
         chapter(forSectionID: entry.sectionID)
+    }
+
+    func hasReadingProgress(in chapter: CodeChapter) -> Bool {
+        recentlyViewedSections.contains { entry in
+            entry.codeSectionID == chapter.codeSectionID &&
+                entry.chapterTitle.localizedCaseInsensitiveCompare(chapter.title) == .orderedSame
+        }
     }
 
     func chapter(forSectionID sectionID: Int64) -> CodeChapter? {

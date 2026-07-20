@@ -14,6 +14,7 @@ struct BookmarksView: View {
     @State private var cachedAvailableTags: [String] = []
     @State private var cachedBookmarkCodeGroups: [BookmarkCodeGroup] = []
     @State private var cachedBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
+    @State private var pendingExport: BookmarkExportRequest?
 
     private static let filterCodeSectionIDsDefaultsKey = "BookmarksView.filterCodeSectionIDs"
     private static let filterFolderIDsDefaultsKey = "BookmarksView.filterFolderIDs"
@@ -195,6 +196,14 @@ struct BookmarksView: View {
                     }
                 )
             }
+            .sheet(item: $pendingExport) { request in
+                BookmarkExportPreviewSheet(request: request) {
+                    pendingExport = nil
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                        library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                    }
+                }
+            }
             .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         }
         .coordinateSpace(name: "savedScroll")
@@ -303,17 +312,19 @@ private var savedBookmarkList: some View {
 
         if isFiltered {
             Button("Export current filter (\(filteredCount))") {
-                library.startBookmarkExport(
+                pendingExport = BookmarkExportRequest(
                     bookmarks: cachedFilteredBookmarks,
-                    contextLabel: currentFilterContextLabel
+                    contextLabel: currentFilterContextLabel,
+                    scopeLabel: "Current filter"
                 )
             }
         }
 
         Button("Export all saved (\(totalCount))") {
-            library.startBookmarkExport(
+            pendingExport = BookmarkExportRequest(
                 bookmarks: library.bookmarks,
-                contextLabel: nil
+                contextLabel: nil,
+                scopeLabel: "All saved sections"
             )
         }
 
@@ -321,9 +332,10 @@ private var savedBookmarkList: some View {
         // empty folders aren't useful as export targets.
         ForEach(library.folders.filter { folderHasBookmarks($0) }) { folder in
             Button("Export “\(folder.name)”") {
-                library.startBookmarkExport(
+                pendingExport = BookmarkExportRequest(
                     bookmarks: bookmarks(inFolder: folder),
-                    contextLabel: folder.name
+                    contextLabel: folder.name,
+                    scopeLabel: folder.name
                 )
             }
         }
@@ -929,6 +941,75 @@ struct BookmarkExportModifier<Progress: View>: ViewModifier {
     }
 }
 
+private struct BookmarkExportRequest: Identifiable {
+    let id = UUID()
+    let bookmarks: [BookmarkedSection]
+    let contextLabel: String?
+    let scopeLabel: String
+}
+
+private struct BookmarkExportPreviewSheet: View {
+    let request: BookmarkExportRequest
+    let onConfirm: () -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 18) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(request.scopeLabel)
+                            .font(.title2.weight(.bold))
+                        Text("\(request.bookmarks.count) \(request.bookmarks.count == 1 ? "section" : "sections") will be included in the PDF.")
+                            .foregroundStyle(.secondary)
+                    }
+
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(request.bookmarks.prefix(12).enumerated()), id: \.element.rowID) { index, bookmark in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(bookmark.sectionNumber)
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundStyle(.secondary)
+                                Text(bookmark.title)
+                                    .font(.body.weight(.semibold))
+                                    .lineLimit(2)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.vertical, 10)
+                            if index < min(request.bookmarks.count, 12) - 1 {
+                                Divider()
+                            }
+                        }
+                    }
+
+                    if request.bookmarks.count > 12 {
+                        Text("And \(request.bookmarks.count - 12) more sections")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+
+                    Text("The export uses the canonical code text and clearly separates your private notes. Review the finished PDF before relying on or sharing it.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(20)
+            }
+            .navigationTitle("Export Preview")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Build PDF", action: onConfirm)
+                        .fontWeight(.semibold)
+                }
+            }
+        }
+        .presentationDetents([.medium, .large])
+    }
+}
+
 struct ProjectView: View {
     let folderID: Int64
 
@@ -938,6 +1019,7 @@ struct ProjectView: View {
     @State private var isSelecting = false
     @State private var selectedBookmarkRowIDs: Set<String> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
+    @State private var pendingExport: BookmarkExportRequest?
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1005,6 +1087,14 @@ struct ProjectView: View {
                     }
                 }
             )
+        }
+        .sheet(item: $pendingExport) { request in
+            BookmarkExportPreviewSheet(request: request) {
+                pendingExport = nil
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    library.startBookmarkExport(bookmarks: request.bookmarks, contextLabel: request.contextLabel)
+                }
+            }
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .onAppear {
@@ -1189,7 +1279,11 @@ struct ProjectView: View {
     private var projectExportMenuContent: some View {
         if isSelecting && !selectedBookmarkRowIDs.isEmpty {
             Button("Export selected (\(selectedBookmarkRowIDs.count))") {
-                library.startBookmarkExport(bookmarks: selectedBookmarks, contextLabel: folder?.name)
+                pendingExport = BookmarkExportRequest(
+                    bookmarks: selectedBookmarks,
+                    contextLabel: folder?.name,
+                    scopeLabel: "Selected in \(folder?.name ?? "Project")"
+                )
             }
             Button("Remove selected from project", role: .destructive) {
                 library.removeSections(Set(selectedBookmarks.map(\.id)), fromFolder: folderID)
@@ -1199,7 +1293,11 @@ struct ProjectView: View {
         }
 
         Button("Export project (\(projectBookmarks.count))") {
-            library.startBookmarkExport(bookmarks: projectBookmarks, contextLabel: folder?.name)
+            pendingExport = BookmarkExportRequest(
+                bookmarks: projectBookmarks,
+                contextLabel: folder?.name,
+                scopeLabel: folder?.name ?? "Project"
+            )
         }
     }
 

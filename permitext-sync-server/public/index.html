@@ -4,27 +4,36 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260720-settings-parity-v15">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-settings-parity-v15">
+    <link rel="stylesheet" href="/web/styles.css?v=20260720-ux-workspace-v16">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-ux-workspace-v16">
   </head>
   <body>
     <main class="workspace-shell">
       <header class="topbar">
+        <div class="topbar-brand" aria-label="permitext workspace">
+          <strong>permitext</strong>
+          <span>Workspace</span>
+        </div>
         <nav class="topbar-actions" aria-label="Workspace tools">
-          <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader">
-            <span>Reader</span>
-          </button>
-          <button class="toolbar-button" id="toggle-projects" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>
-          <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false">Search</button>
-          <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Saved" title="Saved" aria-pressed="false">Saved</button>
-          <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="Research" title="Research" aria-pressed="false">Research</button>
-          <button class="toolbar-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
+          <div class="topbar-action-group" aria-label="Read and find">
+            <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader">
+              <span>Reader</span>
+            </button>
+            <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false">Search</button>
+          </div>
+          <div class="topbar-action-group" aria-label="Your workspace">
+            <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Saved inbox" title="Saved inbox" aria-pressed="false">Saved</button>
+            <button class="toolbar-button" id="toggle-projects" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>
+          </div>
+          <div class="topbar-action-group" aria-label="Research and preferences">
+            <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="AI-assisted research" title="AI-assisted research" aria-pressed="false">Research</button>
+            <button class="toolbar-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
+          </div>
         </nav>
         <div class="topbar-workspace-controls" aria-label="Workspace layout">
           <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset columns" title="Reset columns">Reset</button>
           <button class="toolbar-button" id="collapse-readers" type="button" aria-label="One reader" title="One reader">One Reader</button>
         </div>
-        <div class="topbar-spacer" aria-hidden="true"></div>
       </header>
 
       <section class="panel-track" id="panel-track" aria-label="permitext web workspace"></section>
@@ -107,7 +116,7 @@
       <article class="workspace-panel utility-panel projects-panel">
         <header class="panel-header">
           <div>
-            <p class="eyebrow panel-kind">Projects</p>
+            <p class="eyebrow panel-kind">Your workspace</p>
             <h2 class="panel-title">Projects</h2>
           </div>
           <div class="panel-actions">
@@ -182,8 +191,8 @@
       <article class="workspace-panel utility-panel">
         <header class="panel-header">
           <div>
-            <p class="eyebrow panel-kind">Saved</p>
-            <h2 class="panel-title">Saved</h2>
+            <p class="eyebrow panel-kind">Your workspace</p>
+            <h2 class="panel-title">Saved Inbox</h2>
           </div>
           <div class="panel-actions">
             <div class="reader-text-size-controls saved-text-size-controls" role="group" aria-label="Saved text size">
@@ -383,6 +392,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260720-settings-parity-v15" type="module"></script>
+    <script src="/web/app.js?v=20260720-ux-workspace-v16" type="module"></script>
   </body>
 </html>

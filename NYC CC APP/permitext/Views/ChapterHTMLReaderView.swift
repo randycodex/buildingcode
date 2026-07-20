@@ -103,6 +103,7 @@ struct ChapterHTMLReaderView: View {
     @State private var chapterSearchScrollQuery: String?
     @State private var chapterSearchScrollRequestID = 0
     @State private var htmlChapterSearchEntries: [ChapterSearchSourceEntry] = []
+    @State private var inlineReferenceDestination: CodeSectionSummary?
 
     private var accentColor: Color {
         Color(uiColor: library.accentColor(for: chapter.codeSectionID))
@@ -315,6 +316,9 @@ struct ChapterHTMLReaderView: View {
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .navigationDestination(item: $inlineReferenceDestination) { section in
+            ReaderView(sectionID: section.id)
+        }
         .toolbarBackground(.hidden, for: .navigationBar)
         .disablesInteractivePopGesture()
         .toolbar {
@@ -536,7 +540,11 @@ struct ChapterHTMLReaderView: View {
                 rememberedScrollOffset.wrappedValue = Double(offset)
             },
             onOpenSectionForAnchor: { target in
-                openNotes(for: target)
+                if target.action == "openReference" {
+                    openInlineReference(target)
+                } else {
+                    openNotes(for: target)
+                }
             }
         )
         .safeAreaInset(edge: .bottom, spacing: 0) {
@@ -725,6 +733,31 @@ struct ChapterHTMLReaderView: View {
                 blockLabel: target.blockLabel
             )
         }
+    }
+
+    private func openInlineReference(_ target: ChapterHTMLSectionTarget) {
+        let targetCodeSectionID = target.codePrefix.flatMap(codeSectionID(for:)) ?? chapter.codeSectionID
+        guard let sectionNumber = target.sectionNumber,
+              let section = library.sectionSummary(
+                sectionNumber: sectionNumber,
+                codeSectionID: targetCodeSectionID
+              ) else { return }
+        inlineReferenceDestination = section
+    }
+
+    private func codeSectionID(for prefix: String) -> Int64? {
+        let normalizedPrefix = prefix.uppercased()
+        return library.codeSections.first { codeSection in
+            let name = codeSection.name.lowercased()
+            switch normalizedPrefix {
+            case "BC": return name.contains("building")
+            case "PC": return name.contains("plumbing")
+            case "MC": return name.contains("mechanical")
+            case "FGC": return name.contains("fuel gas")
+            case "AC": return name.contains("administrative")
+            default: return false
+            }
+        }?.id
     }
 
     private func sectionNumber(from headerLine: String) -> String {

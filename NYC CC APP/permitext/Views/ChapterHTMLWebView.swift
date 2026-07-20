@@ -100,14 +100,25 @@ enum PreparedChapterHTMLCache {
 struct ChapterHTMLSectionTarget: Hashable {
     let anchorID: String
     let sectionNumber: String?
+    let codePrefix: String?
     let blockID: String?
     let blockLabel: String?
+    let action: String?
 
-    init(anchorID: String, sectionNumber: String?, blockID: String? = nil, blockLabel: String? = nil) {
+    init(
+        anchorID: String,
+        sectionNumber: String?,
+        codePrefix: String? = nil,
+        blockID: String? = nil,
+        blockLabel: String? = nil,
+        action: String? = nil
+    ) {
         self.anchorID = anchorID
         self.sectionNumber = sectionNumber
+        self.codePrefix = codePrefix
         self.blockID = blockID
         self.blockLabel = blockLabel
+        self.action = action
     }
 }
 
@@ -470,6 +481,73 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 } catch (error) {}
               }
 
+              function openInlineReference(sectionNumber, codePrefix) {
+                if (!sectionNumber) { return; }
+                try {
+                  window.webkit.messageHandlers.\(Coordinator.openSectionMessageName).postMessage({
+                    action: 'openReference',
+                    anchorID: '',
+                    sectionNumber: String(sectionNumber).toUpperCase(),
+                    codePrefix: codePrefix ? String(codePrefix).toUpperCase() : ''
+                  });
+                } catch (error) {}
+              }
+
+              function linkInlineSectionReferences() {
+                var root = document.body;
+                if (!root || root.dataset.nycccInlineReferencesReady === 'true') { return; }
+                root.dataset.nycccInlineReferencesReady = 'true';
+                var pattern = /\\b(?:(Sections?)\\s+|((?:BC|PC|MC|FGC|AC))\\s+)([0-9]{3}(?:\\.[0-9A-Za-z-]+)+)\\b/gi;
+                var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+                var textNodes = [];
+                var node;
+                while ((node = walker.nextNode())) {
+                  var parent = node.parentElement;
+                  if (!parent || !node.nodeValue || !pattern.test(node.nodeValue)) {
+                    pattern.lastIndex = 0;
+                    continue;
+                  }
+                  pattern.lastIndex = 0;
+                  if (parent.closest('a, button, script, style, textarea, select, .Section, .Subsection, .nyccc-block-actions')) {
+                    continue;
+                  }
+                  textNodes.push(node);
+                }
+
+                textNodes.forEach(function(textNode) {
+                  var text = textNode.nodeValue || '';
+                  var fragment = document.createDocumentFragment();
+                  var lastIndex = 0;
+                  pattern.lastIndex = 0;
+                  var match;
+                  while ((match = pattern.exec(text))) {
+                    if (match.index > lastIndex) {
+                      fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+                    }
+                    var link = document.createElement('button');
+                    link.type = 'button';
+                    link.className = 'nyccc-inline-reference';
+                    link.textContent = match[0];
+                    link.dataset.sectionNumber = match[3].toUpperCase();
+                    link.dataset.codePrefix = (match[2] || '').toUpperCase();
+                    link.setAttribute('aria-label', 'Open ' + match[0]);
+                    link.addEventListener('click', function(event) {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      openInlineReference(link.dataset.sectionNumber, link.dataset.codePrefix);
+                    });
+                    fragment.appendChild(link);
+                    lastIndex = pattern.lastIndex;
+                  }
+                  if (lastIndex < text.length) {
+                    fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+                  }
+                  if (lastIndex > 0) {
+                    textNode.parentNode.replaceChild(fragment, textNode);
+                  }
+                });
+              }
+
               function collapseStorageKey(heading) {
                 var id = heading.id || '';
                 if (!id) {
@@ -572,6 +650,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 });
               }
               setupImageErrorFallback();
+              linkInlineSectionReferences();
 
               function depthFromHeading(heading) {
                 if (!heading || !heading.classList) { return 1; }
@@ -1112,16 +1191,22 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                 .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             let sectionNumber = (payload["sectionNumber"] as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
+            let codePrefix = (payload["codePrefix"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
             let blockID = (payload["blockID"] as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             let blockLabel = (payload["blockLabel"] as? String)?
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let action = (payload["action"] as? String)?
                 .trimmingCharacters(in: .whitespacesAndNewlines)
             guard !anchorID.isEmpty || !(sectionNumber?.isEmpty ?? true) else { return nil }
             return ChapterHTMLSectionTarget(
                 anchorID: anchorID,
                 sectionNumber: sectionNumber?.isEmpty == false ? sectionNumber : nil,
+                codePrefix: codePrefix?.isEmpty == false ? codePrefix : nil,
                 blockID: blockID?.isEmpty == false ? blockID : nil,
-                blockLabel: blockLabel?.isEmpty == false ? blockLabel : nil
+                blockLabel: blockLabel?.isEmpty == false ? blockLabel : nil,
+                action: action?.isEmpty == false ? action : nil
             )
         }
 
@@ -1392,6 +1477,26 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
             .nyccc-section-open-target {
               cursor: pointer;
+            }
+            .nyccc-inline-reference {
+              display: inline !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              border: 0 !important;
+              border-bottom: 1px solid currentColor !important;
+              border-radius: 0 !important;
+              background: transparent !important;
+              color: \(accentHex) !important;
+              font: inherit !important;
+              line-height: inherit !important;
+              text-align: inherit !important;
+              text-decoration: none !important;
+              -webkit-appearance: none !important;
+              appearance: none !important;
+            }
+            .nyccc-inline-reference:focus-visible {
+              outline: 2px solid \(accentHex) !important;
+              outline-offset: 2px !important;
             }
             .nyccc-note-block {
               position: relative !important;

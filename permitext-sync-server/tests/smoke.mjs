@@ -117,11 +117,11 @@ async function main() {
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
-    assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
+    assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("settings-parity-v15"),
-      "Web workspace omitted the settings-parity-v15 assets."
+      webRoot.text.includes("ux-workspace-v16"),
+      "Web workspace omitted the UX workspace assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -272,6 +272,29 @@ async function main() {
       "Search results still include the retired capped-results notice."
     );
     assert(
+      workspaceScript.text.includes('activeReaderButton.textContent = "Open in reader"') &&
+        workspaceScript.text.includes('newReaderButton.textContent = "New reader"') &&
+        workspaceScript.text.includes('resultSummary.className = "search-result-summary"'),
+      "Search results omitted their count or explicit Reader destinations."
+    );
+    assert(
+      workspaceScript.text.includes("function linkInlineCodeReferences") &&
+        workspaceScript.text.includes("function openInlineCodeReference") &&
+        workspaceScript.text.includes('reference.textContent = match[0]'),
+      "Reader citations no longer become text-preserving inline references."
+    );
+    assert(
+      workspaceScript.text.includes("function openWorkspaceCommandPalette") &&
+        workspaceScript.text.includes('event.key.toLowerCase() === "k"') &&
+        workspaceScript.text.includes('event.key.toLowerCase() === "f"'),
+      "Web workspace keyboard navigation or command palette is missing."
+    );
+    assert(
+      workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
+        workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
+      "Research or private-note authority labeling is missing."
+    );
+    assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
       "Project archiving still requires confirmation."
     );
@@ -405,6 +428,12 @@ async function main() {
       "Divider resizing still invalidates cursor styles across every workspace descendant."
     );
     assert(
+      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
+        workspaceStyles.text.includes("scroll-snap-type: x mandatory") &&
+        workspaceStyles.text.includes("flex: 0 0 100% !important"),
+      "Web scrolling affordances or one-pane mobile behavior regressed."
+    );
+    assert(
       workspaceStyles.text.includes("min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));"),
       "Pane CSS no longer enforces the default-width floor for multi-column workspaces."
     );
@@ -481,9 +510,10 @@ async function main() {
       "Column labels no longer maintain high contrast across light and dark appearance."
     );
     assert(
-      workspaceStyles.text.includes("*::-webkit-scrollbar") &&
-        workspaceStyles.text.includes("scrollbar-width: none !important"),
-      "Web workspace no longer hides native scrollbars globally."
+      !workspaceStyles.text.includes("scrollbar-width: none !important") &&
+        workspaceStyles.text.includes("scrollbar-width: thin") &&
+        workspaceStyles.text.includes(".search-results::-webkit-scrollbar"),
+      "Web workspace no longer exposes usable native scrollbars."
     );
     assert(
       workspaceStyles.text.includes(".reader-scroll-indicator") &&
