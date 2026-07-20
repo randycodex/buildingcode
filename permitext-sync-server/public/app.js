@@ -1316,21 +1316,9 @@ function searchResultDetail(result) {
   };
 }
 
-async function openSearchResultInReader(searchID, detail, mode = "active") {
-  let reader = null;
-  if (mode === "new") {
-    reader = newReaderState(readerFieldsForSectionDetail(detail));
-    state.readers.push(reader);
-  } else {
-    const linkedID = searchLinkedReadersBySearch()[searchID];
-    reader = state.readers.find((item) => item.id === linkedID) || state.readers[0] || null;
-    if (reader) {
-      Object.assign(reader, readerFieldsForSectionDetail(detail));
-    } else {
-      reader = newReaderState(readerFieldsForSectionDetail(detail));
-      state.readers.push(reader);
-    }
-  }
+async function openSearchResultInNewReader(searchID, detail) {
+  const reader = newReaderState(readerFieldsForSectionDetail(detail));
+  state.readers.push(reader);
   searchLinkedReadersBySearch()[searchID] = reader.id;
   const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
   placePaneAfter(searchPaneID, paneIDForReader(reader));
@@ -5746,15 +5734,6 @@ async function renderSearchResults(panel, instance) {
 
       const actions = document.createElement("div");
       actions.className = "result-row-actions";
-      const activeReaderButton = document.createElement("button");
-      activeReaderButton.type = "button";
-      activeReaderButton.className = "result-reader-action";
-      activeReaderButton.textContent = "Open in reader";
-      activeReaderButton.setAttribute("aria-label", `Open Section ${detail.sectionNumber} in active reader`);
-      activeReaderButton.addEventListener("click", () => {
-        recordRecentSearch(query);
-        openSearchResultInReader(searchInstance.id, detail, "active");
-      });
       const newReaderButton = document.createElement("button");
       newReaderButton.type = "button";
       newReaderButton.className = "result-reader-action";
@@ -5762,9 +5741,9 @@ async function renderSearchResults(panel, instance) {
       newReaderButton.setAttribute("aria-label", `Open Section ${detail.sectionNumber} in a new reader`);
       newReaderButton.addEventListener("click", () => {
         recordRecentSearch(query);
-        openSearchResultInReader(searchInstance.id, detail, "new");
+        openSearchResultInNewReader(searchInstance.id, detail);
       });
-      actions.append(activeReaderButton, newReaderButton);
+      actions.append(newReaderButton);
       row.append(mainButton, actions);
       group.append(row);
     });
