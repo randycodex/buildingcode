@@ -352,7 +352,7 @@ textarea:focus-visible {
 
 .topbar {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-3);
   padding: 0 clamp(22px, 3vw, 46px);
@@ -363,6 +363,7 @@ textarea:focus-visible {
   display: grid;
   grid-template-columns: auto auto;
   align-items: baseline;
+  justify-self: end;
   gap: var(--space-2);
   white-space: nowrap;
 }
@@ -399,13 +400,6 @@ textarea:focus-visible {
 .topbar-action-group + .topbar-action-group {
   padding-left: var(--space-3);
   border-left: 1px solid var(--border);
-}
-
-.topbar-workspace-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  justify-self: end;
 }
 
 .topbar h1 {
@@ -4976,8 +4970,7 @@ mark {
     background: var(--surface-raised);
   }
 
-  .topbar-brand,
-  .topbar-workspace-controls {
+  .topbar-brand {
     display: none;
   }
 

@@ -4,16 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260720-saved-filter-scroll-v34">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-saved-filter-scroll-v34">
+    <link rel="stylesheet" href="/web/styles.css?v=20260720-topbar-groups-v35">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-topbar-groups-v35">
   </head>
   <body>
     <main class="workspace-shell">
       <header class="topbar">
-        <div class="topbar-brand" aria-label="permitext workspace">
-          <strong>permitext</strong>
-          <span>Workspace</span>
-        </div>
         <nav class="topbar-actions" aria-label="Workspace tools">
           <div class="topbar-action-group" aria-label="Read and find">
             <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader">
@@ -29,10 +25,14 @@
             <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="AI-assisted research" title="AI-assisted research" aria-pressed="false">Research</button>
             <button class="toolbar-button" id="toggle-settings" type="button" aria-label="Settings" title="Settings" aria-pressed="false">Settings</button>
           </div>
+          <div class="topbar-action-group" aria-label="Workspace layout">
+            <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset columns" title="Reset columns">Reset</button>
+            <button class="toolbar-button" id="collapse-readers" type="button" aria-label="One reader" title="One reader">One Reader</button>
+          </div>
         </nav>
-        <div class="topbar-workspace-controls" aria-label="Workspace layout">
-          <button class="toolbar-button" id="fit-columns" type="button" aria-label="Reset columns" title="Reset columns">Reset</button>
-          <button class="toolbar-button" id="collapse-readers" type="button" aria-label="One reader" title="One reader">One Reader</button>
+        <div class="topbar-brand" aria-label="permitext workspace">
+          <strong>permitext</strong>
+          <span>Workspace</span>
         </div>
       </header>
 
@@ -414,6 +414,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260720-saved-filter-scroll-v34" type="module"></script>
+    <script src="/web/app.js?v=20260720-topbar-groups-v35" type="module"></script>
   </body>
 </html>

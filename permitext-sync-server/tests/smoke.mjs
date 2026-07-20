@@ -120,8 +120,23 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("saved-filter-scroll-v34"),
+      webRoot.text.includes("topbar-groups-v35"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
+    );
+    const topbarSource = webRoot.text.slice(
+      webRoot.text.indexOf('<header class="topbar">'),
+      webRoot.text.indexOf("</header>")
+    );
+    const topbarGroupOrder = [
+      'aria-label="Read and find"',
+      'aria-label="Your workspace"',
+      'aria-label="Research and preferences"',
+      'aria-label="Workspace layout"',
+      'class="topbar-brand"'
+    ].map((marker) => topbarSource.indexOf(marker));
+    assert(
+      topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
+      "Web topbar tools are no longer logically grouped on the left with the brand on the right."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -323,7 +338,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-saved-filter-scroll-v34'),
+        webRoot.text.includes('/web/app.js?v=20260720-topbar-groups-v35'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
