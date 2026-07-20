@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-saved-parity-v24"),
-      "Web workspace omitted the Search and Saved parity assets."
+      webRoot.text.includes("warning-dialog-v26"),
+      "Web workspace omitted the shared warning-dialog assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -292,7 +292,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-search-saved-parity-v24'),
+        webRoot.text.includes('/web/app.js?v=20260720-warning-dialog-v26'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -300,6 +300,17 @@ async function main() {
         workspaceScript.text.includes('event.key.toLowerCase() === "k"') &&
         workspaceScript.text.includes('event.key.toLowerCase() === "f"'),
       "Web workspace keyboard navigation or command palette is missing."
+    );
+    assert(
+      workspaceScript.text.includes("function openWebWarning") &&
+        workspaceScript.text.includes("function confirmWebWarning") &&
+        workspaceScript.text.includes("function showWebNotice") &&
+        workspaceScript.text.includes('dialog.setAttribute("role", "alertdialog")') &&
+        workspaceScript.text.includes('dialog.setAttribute("aria-modal", "true")') &&
+        workspaceScript.text.includes('confirmButton.className = "web-warning-button web-warning-confirm"') &&
+        !workspaceScript.text.includes("window.confirm(") &&
+        !workspaceScript.text.includes("window.alert("),
+      "Web warnings no longer share the Clear canvas confirmation-dialog pattern."
     );
     assert(
       workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
@@ -446,6 +457,17 @@ async function main() {
         workspaceStyles.text.includes("scroll-snap-type: x mandatory") &&
         workspaceStyles.text.includes("flex: 0 0 100% !important"),
       "Hidden scrollbars or one-pane mobile behavior regressed."
+    );
+    assert(
+      workspaceStyles.text.includes(".web-warning-backdrop") &&
+        workspaceStyles.text.includes(".web-warning-dialog") &&
+        workspaceStyles.text.includes("width: min(550px, 100%);") &&
+        workspaceStyles.text.includes(".web-warning-title") &&
+        workspaceStyles.text.includes("border-bottom: 1px solid var(--border);") &&
+        workspaceStyles.text.includes(".web-warning-cancel") &&
+        workspaceStyles.text.includes(".web-warning-confirm") &&
+        workspaceStyles.text.includes("background: #df6464;"),
+      "Web warning-dialog proportions or action styling regressed."
     );
     assert(
       workspaceStyles.text.includes("min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));"),

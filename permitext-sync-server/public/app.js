@@ -103,6 +103,7 @@ let workboardPreloadHandle = null;
 const workboardMounts = new Map();
 let researchQuestionDraft = "";
 let researchInterpretationResult = null;
+let activeWebWarningClose = null;
 
 applyReaderSettings();
 
@@ -562,7 +563,10 @@ async function detachProjectWorkboard(project) {
   const identity = projectIdentity(project);
   const popup = openDetachedWindow(identity);
   if (!popup) {
-    window.alert("The Workboard window was blocked. Allow pop-ups for permitext and try again.");
+    await showWebNotice(
+      "Workboard window blocked",
+      "Allow pop-ups for permitext, then try opening the Workboard again."
+    );
     return;
   }
   if (!projectHasDetachedWorkboard(identity)) {
@@ -1524,6 +1528,88 @@ function clear(element) {
   while (element.firstChild) {
     element.removeChild(element.firstChild);
   }
+}
+
+function openWebWarning({ title, message, confirmLabel = "Confirm", cancelLabel = "Cancel", cancellable = true }) {
+  activeWebWarningClose?.(false);
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const titleID = `web-warning-title-${crypto.randomUUID()}`;
+  const messageID = `web-warning-message-${crypto.randomUUID()}`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("section");
+  dialog.className = "web-warning-dialog";
+  dialog.tabIndex = -1;
+  dialog.setAttribute("role", "alertdialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", titleID);
+  dialog.setAttribute("aria-describedby", messageID);
+  const heading = document.createElement("h2");
+  heading.className = "web-warning-title";
+  heading.id = titleID;
+  heading.textContent = title;
+  const body = document.createElement("p");
+  body.className = "web-warning-message";
+  body.id = messageID;
+  body.textContent = message;
+  const actions = document.createElement("div");
+  actions.className = "web-warning-actions";
+  let cancelButton = null;
+  if (cancellable) {
+    cancelButton = document.createElement("button");
+    cancelButton.type = "button";
+    cancelButton.className = "web-warning-button web-warning-cancel";
+    cancelButton.textContent = cancelLabel;
+    actions.append(cancelButton);
+  }
+  const confirmButton = document.createElement("button");
+  confirmButton.type = "button";
+  confirmButton.className = "web-warning-button web-warning-confirm";
+  confirmButton.textContent = confirmLabel;
+  actions.append(confirmButton);
+  dialog.append(heading, body, actions);
+  backdrop.append(dialog);
+  document.body.append(backdrop);
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const close = (confirmed) => {
+      if (settled) return;
+      settled = true;
+      backdrop.remove();
+      if (activeWebWarningClose === close) activeWebWarningClose = null;
+      previousFocus?.focus?.({ preventScroll: true });
+      resolve(confirmed);
+    };
+    activeWebWarningClose = close;
+    cancelButton?.addEventListener("click", () => close(false));
+    confirmButton.addEventListener("click", () => close(true));
+    backdrop.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (cancellable) close(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = cancelButton ? [cancelButton, confirmButton] : [confirmButton];
+      const activeIndex = focusable.indexOf(document.activeElement);
+      const nextIndex = event.shiftKey
+        ? (activeIndex <= 0 ? focusable.length - 1 : activeIndex - 1)
+        : (activeIndex + 1) % focusable.length;
+      event.preventDefault();
+      focusable[nextIndex].focus();
+    });
+    dialog.focus({ preventScroll: true });
+  });
+}
+
+function confirmWebWarning(title, message, options = {}) {
+  return openWebWarning({ title, message, ...options, cancellable: true });
+}
+
+function showWebNotice(title, message, options = {}) {
+  return openWebWarning({ title, message, ...options, confirmLabel: options.confirmLabel || "OK", cancellable: false });
 }
 
 function escapeRegExp(value) {
@@ -6634,12 +6720,17 @@ async function deleteArchivedProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
   const name = project.name || project.title || "this project";
-  if (!window.confirm(`Delete ${name} permanently?`)) return;
+  const confirmed = await confirmWebWarning(
+    "Delete project",
+    `This will permanently delete ${name}. This cannot be undone.`,
+    { confirmLabel: "Delete" }
+  );
+  if (!confirmed) return;
   const currentLeft = track.scrollLeft;
   try {
     await deleteArchivedProjectData(project);
   } catch (error) {
-    window.alert(error.message || "Could not delete the project.");
+    await showWebNotice("Could not delete project", error.message || "The project could not be deleted.");
     return;
   }
   saveWorkspaceState();
@@ -6651,9 +6742,12 @@ async function deleteArchivedProjects(projects) {
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
-  if (!window.confirm(`Delete ${count} ${count === 1 ? "project" : "projects"} permanently? This cannot be undone.`)) {
-    return false;
-  }
+  const confirmed = await confirmWebWarning(
+    `Delete ${count === 1 ? "project" : "projects"}`,
+    `This will permanently delete ${count} ${count === 1 ? "project" : "projects"}. This cannot be undone.`,
+    { confirmLabel: "Delete" }
+  );
+  if (!confirmed) return false;
   const currentLeft = track.scrollLeft;
   let deletedCount = 0;
   const deletedIDs = new Set();
@@ -6664,7 +6758,10 @@ async function deleteArchivedProjects(projects) {
       deletedIDs.add(projectRecordID(project));
     } catch (error) {
       const progress = deletedCount > 0 ? ` Deleted ${deletedCount} of ${count}.` : "";
-      window.alert(`${error.message || "Could not delete the selected projects."}${progress}`);
+      await showWebNotice(
+        "Could not delete projects",
+        `${error.message || "The selected projects could not be deleted."}${progress}`
+      );
       break;
     }
   }
@@ -6799,7 +6896,13 @@ function createProjectSectionSelectionController(panel, actions, content, projec
   removeButton.addEventListener("click", async () => {
     const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
     const count = selectedItems.length;
-    if (!count || !window.confirm(`Remove ${count} saved ${count === 1 ? "item" : "items"} from ${project.name}?`)) return;
+    if (!count) return;
+    const confirmed = await confirmWebWarning(
+      "Remove saved items",
+      `This will remove ${count} saved ${count === 1 ? "item" : "items"} from ${project.name}. Are you sure?`,
+      { confirmLabel: "Remove" }
+    );
+    if (!confirmed) return;
     busy = true;
     update();
     let removedCount = 0;
@@ -6808,10 +6911,16 @@ function createProjectSectionSelectionController(panel, actions, content, projec
         await removeSectionFromProject(project, item);
         removedCount += 1;
       }
-      window.alert(`${removedCount} ${removedCount === 1 ? "item was" : "items were"} removed from ${project.name}.`);
+      await showWebNotice(
+        "Saved items removed",
+        `${removedCount} ${removedCount === 1 ? "item was" : "items were"} removed from ${project.name}.`
+      );
       await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
     } catch (error) {
-      window.alert(`${error.message || "Could not remove the selected project items."} Removed ${removedCount} of ${count}.`);
+      await showWebNotice(
+        "Could not remove saved items",
+        `${error.message || "The selected project items could not be removed."} Removed ${removedCount} of ${count}.`
+      );
       busy = false;
       update();
     }
@@ -7009,7 +7118,7 @@ async function renderProjectDetail(detail) {
           await renderWorkspace();
         } catch (error) {
           removeButton.disabled = false;
-          window.alert(error.message || "Could not remove the section.");
+          await showWebNotice("Could not remove section", error.message || "The section could not be removed.");
         }
       });
       row.append(openButton, removeButton);
@@ -7811,7 +7920,13 @@ function createSavedBulkSelectionController(panel, savedItems) {
   removeButton.addEventListener("click", async () => {
     const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
     const count = selectedItems.length;
-    if (!count || !window.confirm(`Remove the save from ${count} ${count === 1 ? "item" : "items"}?`)) return;
+    if (!count) return;
+    const confirmed = await confirmWebWarning(
+      "Remove saved items",
+      `This will remove the save from ${count} ${count === 1 ? "item" : "items"}. Are you sure?`,
+      { confirmLabel: "Remove" }
+    );
+    if (!confirmed) return;
     busy = true;
     update();
     let removedCount = 0;
@@ -7820,10 +7935,16 @@ function createSavedBulkSelectionController(panel, savedItems) {
         await persistSectionBookmark(item, false, { refreshSavedPanes: false });
         removedCount += 1;
       }
-      window.alert(`${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} removed.`);
+      await showWebNotice(
+        "Saved items removed",
+        `${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} removed.`
+      );
       await renderWorkspace();
     } catch (error) {
-      window.alert(`${error.message || "Could not remove the selected saved items."} Removed ${removedCount} of ${count}.`);
+      await showWebNotice(
+        "Could not remove saved items",
+        `${error.message || "The selected saved items could not be removed."} Removed ${removedCount} of ${count}.`
+      );
       busy = false;
       update();
     }
@@ -8469,16 +8590,17 @@ function renderSettings() {
   });
 
   const clearActionCopy = {
-    searches: ["Clear recent searches?", "This removes recent search history and Jump Back In from this browser. Pinned searches remain."],
-    bookmarks: ["Clear all bookmarks?", "This removes every bookmark saved for the current code version."],
-    notes: ["Clear all notes?", "This removes every note saved for the current code version."],
-    tags: ["Clear all tags?", "This removes every tag from saved sections. Bookmarks and notes are not affected."]
+    searches: ["Clear recent searches", "This will remove recent search history and Jump Back In from this browser. Pinned searches will remain. Are you sure?"],
+    bookmarks: ["Clear all bookmarks", "This will remove every bookmark saved for the current code version. Are you sure?"],
+    notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"],
+    tags: ["Clear all tags", "This will remove every tag from saved sections. Bookmarks and notes will not be affected. Are you sure?"]
   };
   panel.querySelectorAll("[data-clear-action]").forEach((button) => {
     button.addEventListener("click", async () => {
       const action = button.dataset.clearAction;
       const [title, message] = clearActionCopy[action];
-      if (!window.confirm(`${title}\n\n${message}`)) return;
+      const confirmed = await confirmWebWarning(title, message, { confirmLabel: "Confirm" });
+      if (!confirmed) return;
       button.disabled = true;
       try {
         const count = await performSettingsClearAction(action);

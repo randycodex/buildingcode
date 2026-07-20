@@ -85,6 +85,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Notes, comments, and other annotation cards should not use thin border outlines; rely on surface color, spacing, and hierarchy instead.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
 - Search and Saved must remain proportional at the standard 320 px utility-column width: compact header actions, readable rows, and bottom controls that do not crowd the content.
+- Every web confirmation, destructive warning, error alert, and acknowledgement should use the shared Clear-canvas dialog pattern: dimmed backdrop, centered white surface, divided title, concise message, outlined cancel action when applicable, and red confirmation action. Do not use native browser `alert()` or `confirm()` dialogs.
 
 ## Mobile
 

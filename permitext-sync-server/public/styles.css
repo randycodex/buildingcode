@@ -138,6 +138,118 @@ body.is-resizing-notes * {
   user-select: none;
 }
 
+.web-warning-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 4000;
+  display: grid;
+  place-items: center;
+  padding: 22px 12px;
+  background: rgba(24, 24, 28, 0.2);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+}
+
+.web-warning-dialog {
+  width: min(550px, 100%);
+  padding: 40px 40px 40px;
+  overflow: hidden;
+  border: 1px solid rgba(20, 20, 24, 0.08);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-primary);
+  box-shadow: 0 18px 44px rgba(20, 20, 24, 0.22);
+}
+
+.web-warning-dialog:focus {
+  outline: 0;
+}
+
+.web-warning-title {
+  margin: 0;
+  padding: 0 0 12px;
+  border-bottom: 1px solid var(--border);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.web-warning-message {
+  margin: 22px 0 12px;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.web-warning-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.web-warning-button {
+  min-width: 98px;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.web-warning-cancel {
+  border: 1px solid rgba(92, 92, 150, 0.14);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.web-warning-confirm {
+  border: 1px solid #df6464;
+  background: #df6464;
+  color: #ffffff;
+}
+
+.web-warning-cancel:hover,
+.web-warning-cancel:focus-visible {
+  background: var(--surface-muted);
+}
+
+.web-warning-confirm:hover,
+.web-warning-confirm:focus-visible {
+  border-color: #d75757;
+  background: #d75757;
+}
+
+.web-warning-button:focus-visible {
+  outline: 2px solid color-mix(in srgb, #df6464 60%, transparent);
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .web-warning-backdrop {
+    background: rgba(0, 0, 0, 0.58);
+  }
+
+  .web-warning-dialog {
+    border-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 20px 54px rgba(0, 0, 0, 0.58);
+  }
+
+  .web-warning-cancel {
+    border-color: rgba(255, 255, 255, 0.16);
+  }
+}
+
+@media (max-width: 420px) {
+  .web-warning-dialog {
+    padding: 32px 24px;
+  }
+
+  .web-warning-button {
+    min-width: 92px;
+  }
+}
+
 .command-palette-backdrop {
   position: fixed;
   inset: 0;
