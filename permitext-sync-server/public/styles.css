@@ -3330,6 +3330,7 @@ mark {
 }
 
 .saved-panel {
+  --saved-font-size: 10pt;
   position: relative;
 }
 
@@ -3605,7 +3606,7 @@ mark {
   gap: var(--space-2);
   margin: var(--space-2) 0 2px;
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.7) !important;
+  font-size: calc(var(--saved-font-size) * 0.77) !important;
   font-weight: 600;
   letter-spacing: 0.035em;
   text-transform: uppercase;
@@ -3632,6 +3633,7 @@ mark {
 
 .saved-panel .section-label.saved-code-label {
   margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--saved-font-size) !important;
 }
 
 .saved-panel .saved-code-group + .saved-code-group {
@@ -3703,14 +3705,14 @@ mark {
 
 .saved-section-meta {
   color: var(--code-accent);
-  font-size: calc(var(--chrome-font-size) * 0.7) !important;
+  font-size: calc(var(--saved-font-size) * 0.77) !important;
   font-weight: 650;
   line-height: 1.2;
 }
 
 .saved-section-title {
   color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 0.86) !important;
+  font-size: calc(var(--saved-font-size) * 0.946) !important;
   font-weight: 650;
   line-height: 1.25;
 }
@@ -3739,7 +3741,7 @@ mark {
   margin-top: 3px;
   overflow: hidden;
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+  font-size: calc(var(--saved-font-size) * 0.836) !important;
   line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -3750,7 +3752,7 @@ mark {
   margin-top: 3px;
   overflow: hidden;
   color: var(--code-accent);
-  font-size: calc(var(--chrome-font-size) * 0.74) !important;
+  font-size: calc(var(--saved-font-size) * 0.814) !important;
   line-height: 1.3;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -3764,7 +3766,7 @@ mark {
 .saved-section-row .saved-row-tag {
   min-height: 18px;
   padding: 0 var(--space-1);
-  font-size: calc(var(--chrome-font-size) * 0.64) !important;
+  font-size: calc(var(--saved-font-size) * 0.704) !important;
 }
 
 .saved-row-remove {

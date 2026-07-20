@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-saved-heading-v12";
+const workboardClientVersion = "20260719-saved-text-size-v13";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -151,6 +151,7 @@ function loadWorkspaceState() {
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
+      savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
     };
@@ -182,6 +183,7 @@ function loadWorkspaceState() {
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
+      savedTextSize: 10,
       workboards: [],
       detachedWorkboards: []
     };
@@ -684,6 +686,31 @@ function changeReaderTextSize(panel, reader, delta) {
       updateReaderScrollIndicator(openPanel);
     });
   });
+}
+
+function savedTextSizeValue() {
+  return clampNumber(state.savedTextSize, 10, 18, 10);
+}
+
+function applySavedTextSize(panel) {
+  const size = savedTextSizeValue();
+  panel.style.setProperty("--saved-font-size", `${size}pt`);
+  const decreaseButton = panel.querySelector(".saved-text-decrease");
+  const increaseButton = panel.querySelector(".saved-text-increase");
+  if (decreaseButton) {
+    decreaseButton.disabled = size <= 10;
+    decreaseButton.title = `Decrease Saved text size (${size} pt)`;
+  }
+  if (increaseButton) {
+    increaseButton.disabled = size >= 18;
+    increaseButton.title = `Increase Saved text size (${size} pt)`;
+  }
+}
+
+function changeSavedTextSize(delta) {
+  state.savedTextSize = clampNumber(savedTextSizeValue() + delta, 10, 18, 10);
+  track.querySelectorAll(".saved-panel").forEach(applySavedTextSize);
+  saveWorkspaceState();
 }
 
 function newReaderState(overrides = {}) {
@@ -6705,6 +6732,9 @@ async function renderSaved(paneID = "utility:saved") {
   const panel = renderTemplate(savedTemplate);
   panel.classList.add("saved-panel");
   applyPaneWeight(panel, paneID);
+  applySavedTextSize(panel);
+  panel.querySelector(".saved-text-decrease")?.addEventListener("click", () => changeSavedTextSize(-1));
+  panel.querySelector(".saved-text-increase")?.addEventListener("click", () => changeSavedTextSize(1));
   const content = panel.querySelector(".saved-content");
   clear(content);
   const data = await loadSyncedContent();

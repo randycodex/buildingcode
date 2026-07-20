@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("saved-heading-v12"),
-      "Web workspace omitted the saved-heading-v12 assets."
+      webRoot.text.includes("saved-text-size-v13"),
+      "Web workspace omitted the saved-text-size-v13 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -145,6 +145,24 @@ async function main() {
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Saved items")'),
       "Saved column still renders the removed Saved items label."
+    );
+    const projectsTemplateSource = webRoot.text.slice(
+      webRoot.text.indexOf('<template id="projects-template"'),
+      webRoot.text.indexOf('<template id="search-template"')
+    );
+    const savedTemplateSource = webRoot.text.slice(
+      webRoot.text.indexOf('<template id="saved-template"'),
+      webRoot.text.indexOf('<template id="analysis-template"')
+    );
+    assert(
+      savedTemplateSource.includes('aria-label="Saved text size"') &&
+        !projectsTemplateSource.includes('aria-label="Saved text size"') &&
+        webRoot.text.includes('class="reader-text-size-button saved-text-decrease"') &&
+        webRoot.text.includes('class="reader-text-size-button saved-text-increase"') &&
+        workspaceScript.text.includes("function changeSavedTextSize(delta)") &&
+        workspaceScript.text.includes('track.querySelectorAll(".saved-panel").forEach(applySavedTextSize)') &&
+        workspaceScript.text.includes('panel.style.setProperty("--saved-font-size"'),
+      "Saved columns no longer include persistent text-size controls."
     );
     assert(
       !workspaceScript.text.includes("No saved sections") &&
