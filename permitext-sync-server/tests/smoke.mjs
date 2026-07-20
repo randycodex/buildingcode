@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("search-size-v33"),
+      webRoot.text.includes("saved-filter-scroll-v34"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
@@ -310,13 +310,20 @@ async function main() {
       "Search field no longer sits below the column title and above the summary, filters, and results."
     );
     assert(
+      workspaceScript.text.includes("const savedFilterScrollPositions = new Map();") &&
+        workspaceScript.text.includes("savedFilterScrollPositions.set(instance.id") &&
+        workspaceScript.text.includes("const savedFilterScroll = savedFilterScrollPositions.get(savedInstance.id);") &&
+        workspaceScript.text.includes("requestAnimationFrame(restoreFilterScroll);"),
+      "Saved filter menus no longer preserve their horizontal position after selection."
+    );
+    assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
         workspaceScript.text.includes("function openInlineCodeReference") &&
         workspaceScript.text.includes("function openReferenceInAdjacentReader") &&
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-search-size-v33'),
+        webRoot.text.includes('/web/app.js?v=20260720-saved-filter-scroll-v34'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

@@ -97,6 +97,7 @@ const chapterListCache = new Map();
 const chapterCache = new Map();
 const sectionSummaryCache = new Map();
 const annotationPushTimers = new Map();
+const savedFilterScrollPositions = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
 let workboardModulePromise = null;
@@ -7578,6 +7579,10 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     const selected = option.prefix === "ALL" ? instance.codeFilters.length === 0 : instance.codeFilters.includes(option.prefix);
     button.setAttribute("aria-pressed", String(selected));
     button.addEventListener("click", () => {
+      savedFilterScrollPositions.set(instance.id, {
+        code: codeRail.scrollLeft,
+        tag: tagRail.scrollLeft
+      });
       if (option.prefix === "ALL") instance.codeFilters = [];
       else {
         const selectedPrefixes = new Set(instance.codeFilters);
@@ -7598,6 +7603,10 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       button.textContent = tag || "All Tags";
       button.setAttribute("aria-pressed", String(instance.tagFilter === tag));
       button.addEventListener("click", () => {
+        savedFilterScrollPositions.set(instance.id, {
+          code: codeRail.scrollLeft,
+          tag: tagRail.scrollLeft
+        });
         instance.tagFilter = instance.tagFilter === tag && tag ? "" : tag;
         saveWorkspaceState();
         onChange();
@@ -7658,6 +7667,18 @@ async function renderSaved(instance) {
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
   const resolvedItems = await hydrateSavedColumnItems(combinedItems);
   renderSavedFilters(panel, savedInstance, resolvedItems, refreshSavedPanel);
+  const savedFilterScroll = savedFilterScrollPositions.get(savedInstance.id);
+  if (savedFilterScroll) {
+    const codeRail = panel.querySelector(".saved-code-filter");
+    const tagRail = panel.querySelector(".saved-tag-filter");
+    const restoreFilterScroll = () => {
+      codeRail.scrollLeft = Math.min(savedFilterScroll.code, Math.max(0, codeRail.scrollWidth - codeRail.clientWidth));
+      tagRail.scrollLeft = Math.min(savedFilterScroll.tag, Math.max(0, tagRail.scrollWidth - tagRail.clientWidth));
+    };
+    restoreFilterScroll();
+    requestAnimationFrame(restoreFilterScroll);
+    savedFilterScrollPositions.delete(savedInstance.id);
+  }
   const filteredItems = resolvedItems.filter((item) => {
     const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
     const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
