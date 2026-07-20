@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("new-reader-only-v31"),
+      webRoot.text.includes("search-row-only-v32"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
@@ -287,11 +287,13 @@ async function main() {
         !workspaceScript.text.includes('Open in reader') &&
         !workspaceScript.text.includes('Open Section ${detail.sectionNumber} in active reader') &&
         !workspaceScript.text.includes('function openSearchResultInReader') &&
-        workspaceScript.text.includes('function openSearchResultInNewReader') &&
-        workspaceScript.text.includes('newReaderButton.textContent = "New reader"') &&
+        !workspaceScript.text.includes('function openSearchResultInNewReader') &&
+        !workspaceScript.text.includes('newReaderButton') &&
+        !workspaceScript.text.includes('New reader') &&
+        workspaceScript.text.includes('openSectionDetail(searchInstance.id, detail);') &&
         workspaceScript.text.includes("function updateSearchDock") &&
         workspaceScript.text.includes('summaryCopy.textContent = `${resultCount.toLocaleString()}'),
-      "Search results restored the retired active-reader action or omitted their count and New reader destination."
+      "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
     assert(
       workspaceScript.text.includes("function renderSearchHistory") &&
@@ -314,7 +316,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-new-reader-only-v31'),
+        webRoot.text.includes('/web/app.js?v=20260720-search-row-only-v32'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -481,6 +483,11 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      !workspaceStyles.text.includes(".result-row-actions") &&
+        !workspaceStyles.text.includes(".result-reader-action"),
+      "Search results still include styling for the retired Reader action buttons."
+    );
     assert(
       workspaceStyles.text.match(/input:focus,[\s\S]*?input:focus-visible,[\s\S]*?textarea:focus,[\s\S]*?textarea:focus-visible \{[\s\S]*?outline: 0;[\s\S]*?outline-offset: 0;/),
       "Text fields can still render the browser's rectangular focus outline."

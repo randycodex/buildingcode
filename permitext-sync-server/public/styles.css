@@ -3078,28 +3078,6 @@ select option:checked {
   color: var(--code-accent);
 }
 
-.result-row-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.result-reader-action {
-  min-height: 30px;
-  padding: 0 var(--space-3);
-  border: 1px solid color-mix(in srgb, var(--code-accent) 34%, var(--border));
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--code-accent);
-  font-size: calc(var(--chrome-font-size) * 0.78);
-  font-weight: 650;
-}
-
-.result-reader-action:hover,
-.result-reader-action:focus-visible {
-  background: var(--code-accent-soft);
-}
-
 .search-empty-action {
   margin-top: var(--space-3);
 }

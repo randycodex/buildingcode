@@ -1316,20 +1316,6 @@ function searchResultDetail(result) {
   };
 }
 
-async function openSearchResultInNewReader(searchID, detail) {
-  const reader = newReaderState(readerFieldsForSectionDetail(detail));
-  state.readers.push(reader);
-  searchLinkedReadersBySearch()[searchID] = reader.id;
-  const searchPaneID = paneIDForUtilityInstance({ key: "search", id: searchID });
-  placePaneAfter(searchPaneID, paneIDForReader(reader));
-  updateBrowserSectionURL(detail.sectionID);
-  scheduleContinuitySync(reader);
-  saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(reader)] });
-  alignReaderSectionAfterLayout(reader);
-  scrollPaneIntoView(paneIDForReader(reader));
-}
-
 function placeProjectDetailAfterProjects(detail) {
   const detailID = paneIDForProjectDetail(detail);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
@@ -5732,19 +5718,7 @@ async function renderSearchResults(panel, instance) {
         openSectionDetail(searchInstance.id, detail);
       });
 
-      const actions = document.createElement("div");
-      actions.className = "result-row-actions";
-      const newReaderButton = document.createElement("button");
-      newReaderButton.type = "button";
-      newReaderButton.className = "result-reader-action";
-      newReaderButton.textContent = "New reader";
-      newReaderButton.setAttribute("aria-label", `Open Section ${detail.sectionNumber} in a new reader`);
-      newReaderButton.addEventListener("click", () => {
-        recordRecentSearch(query);
-        openSearchResultInNewReader(searchInstance.id, detail);
-      });
-      actions.append(newReaderButton);
-      row.append(mainButton, actions);
+      row.append(mainButton);
       group.append(row);
     });
     results.append(group);
