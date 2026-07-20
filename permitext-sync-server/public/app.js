@@ -1,3 +1,9 @@
+import {
+  inlineCodeReferencePhrases,
+  parseCodeJumpAnchor,
+  rewriteStructuredCodeLinks
+} from "./code-references.js?v=20260720-code-reference-links-v18";
+
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
@@ -4541,7 +4547,7 @@ function renderSectionComments(commentsList, targets) {
 }
 
 function rewriteCodeHTML(html) {
-  return String(html || "")
+  return rewriteStructuredCodeLinks(html)
     .replace(/src=(["'])(?:\.\.\/)+assets\/([^"']+)\1/gi, (_match, quote, fileName) => {
       return `src=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${workboardClientVersion}${quote}`;
     })
@@ -4592,14 +4598,20 @@ function renderCodeBlock(block) {
 function linkInlineCodeReferences(root, panel, reader) {
   if (!root || root.dataset.inlineReferencesLinked === "true") return;
   root.dataset.inlineReferencesLinked = "true";
-  const pattern = /\b(?:(BC|PC|MC|FGC|AC)\s+)?(Sections?|§)\s+(\d+(?:\.\d+){1,5}(?:\([^)]+\))*)/gi;
+
+  root.querySelectorAll("[data-code-jump-anchor]").forEach((reference) => {
+    if (reference.dataset.codeJumpBound === "true") return;
+    reference.dataset.codeJumpBound = "true";
+    reference.addEventListener("click", () => {
+      openStructuredCodeReference(reader, reference.dataset.codeJumpAnchor, reference);
+    });
+  });
+
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
     acceptNode(node) {
-      if (!node.nodeValue?.trim() || !pattern.test(node.nodeValue)) {
-        pattern.lastIndex = 0;
+      if (!node.nodeValue?.trim() || inlineCodeReferencePhrases(node.nodeValue).length === 0) {
         return NodeFilter.FILTER_REJECT;
       }
-      pattern.lastIndex = 0;
       if (node.parentElement?.closest("a, button, input, textarea, select, script, style, .reader-note-control")) {
         return NodeFilter.FILTER_REJECT;
       }
@@ -4611,49 +4623,122 @@ function linkInlineCodeReferences(root, panel, reader) {
 
   textNodes.forEach((textNode) => {
     const text = textNode.nodeValue || "";
-    pattern.lastIndex = 0;
+    const phrases = inlineCodeReferencePhrases(text);
+    if (!phrases.length) return;
     let cursor = 0;
-    let match = pattern.exec(text);
-    if (!match) return;
     const fragment = document.createDocumentFragment();
-    do {
-      if (match.index > cursor) fragment.append(document.createTextNode(text.slice(cursor, match.index)));
-      const reference = document.createElement("button");
-      reference.type = "button";
-      reference.className = "inline-code-reference";
-      reference.textContent = match[0];
-      const codePrefix = (match[1] || reader.codePrefix || "BC").toUpperCase();
-      const sectionNumber = match[3].replace(/\([^)]+\)/g, "");
-      reference.setAttribute("aria-label", `Open ${codePrefix} Section ${sectionNumber}`);
-      reference.addEventListener("click", () => openInlineCodeReference(panel, reader, codePrefix, sectionNumber, reference));
-      fragment.append(reference);
-      cursor = match.index + match[0].length;
-      match = pattern.exec(text);
-    } while (match);
+    phrases.forEach((phrase) => {
+      if (phrase.start > cursor) fragment.append(document.createTextNode(text.slice(cursor, phrase.start)));
+      let phraseCursor = phrase.start;
+      const codePrefix = phrase.codePrefix || reader.codePrefix || "BC";
+      phrase.references.forEach((target) => {
+        if (target.start > phraseCursor) {
+          fragment.append(document.createTextNode(text.slice(phraseCursor, target.start)));
+        }
+        const reference = document.createElement("button");
+        reference.type = "button";
+        reference.className = "inline-code-reference";
+        reference.textContent = text.slice(target.start, target.end);
+        reference.setAttribute("aria-label", `Open ${codePrefix} Section ${target.sectionNumber}`);
+        reference.addEventListener("click", () => {
+          openInlineCodeReference(reader, codePrefix, target.sectionNumber, reference);
+        });
+        fragment.append(reference);
+        phraseCursor = target.end;
+      });
+      if (phraseCursor < phrase.end) {
+        fragment.append(document.createTextNode(text.slice(phraseCursor, phrase.end)));
+      }
+      cursor = phrase.end;
+    });
     if (cursor < text.length) fragment.append(document.createTextNode(text.slice(cursor)));
     textNode.replaceWith(fragment);
   });
 }
 
-async function openInlineCodeReference(panel, reader, codePrefix, sectionNumber, trigger) {
-  if (!sectionNumber) return;
+function normalizedInlineSectionNumber(value) {
+  return String(value || "").replace(/^Section\s+/i, "").replace(/\([^)]+\)/g, "").trim().toLowerCase();
+}
+
+function inlineReferenceSearchResult(results, codePrefix, sectionNumber) {
+  const targetNumber = normalizedInlineSectionNumber(sectionNumber);
+  const codeResults = (results || []).filter((item) =>
+    String(item.codePrefix || "BC").toUpperCase() === codePrefix
+  );
+  const exact = codeResults.find((item) => normalizedInlineSectionNumber(item.sectionNumber) === targetNumber);
+  if (exact) return exact;
+  return codeResults
+    .filter((item) => normalizedInlineSectionNumber(item.sectionNumber).startsWith(`${targetNumber}.`))
+    .sort((left, right) =>
+      normalizedInlineSectionNumber(left.sectionNumber).length - normalizedInlineSectionNumber(right.sectionNumber).length ||
+      String(left.sectionNumber).localeCompare(String(right.sectionNumber), undefined, { numeric: true, sensitivity: "base" })
+    )[0] || null;
+}
+
+async function resolveInlineCodeSection(codePrefix, sectionNumber) {
+  const payload = await api(`/code/search?q=${encodeURIComponent(sectionNumber)}&code=${encodeURIComponent(codePrefix)}&limit=25`);
+  return inlineReferenceSearchResult(payload.results, codePrefix, sectionNumber);
+}
+
+async function openReferenceInAdjacentReader(sourceReader, detail) {
+  const targetReader = newReaderState(readerFieldsForSectionDetail(detail));
+  state.readers.push(targetReader);
+  placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader));
+  if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
+  scheduleContinuitySync(targetReader);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForReader(targetReader)] });
+  if (targetReader.sectionID) alignReaderSectionAfterLayout(targetReader);
+  scrollPaneIntoView(paneIDForReader(targetReader));
+}
+
+async function openInlineCodeReference(reader, codePrefix, sectionNumber, trigger) {
+  if (!sectionNumber || !trigger) return;
+  const normalizedPrefix = String(codePrefix || reader.codePrefix || "BC").toUpperCase();
   trigger.disabled = true;
   trigger.setAttribute("aria-busy", "true");
   try {
-    const payload = await api(`/code/search?q=${encodeURIComponent(sectionNumber)}&code=${encodeURIComponent(codePrefix)}&limit=25`);
-    const normalizeNumber = (value) => String(value || "").replace(/^Section\s+/i, "").trim().toLowerCase();
-    const result = (payload.results || []).find((item) =>
-      (item.codePrefix || "BC").toUpperCase() === codePrefix && normalizeNumber(item.sectionNumber) === normalizeNumber(sectionNumber)
-    );
+    const result = await resolveInlineCodeSection(normalizedPrefix, sectionNumber);
     if (!result) {
-      trigger.title = `Section ${sectionNumber} was not found in ${codePrefix}.`;
+      trigger.title = `Section ${sectionNumber} was not found in ${normalizedPrefix}.`;
       return;
     }
-    Object.assign(reader, readerFieldsForSectionDetail(searchResultDetail(result)));
-    updateBrowserSectionURL(reader.sectionID);
-    scheduleContinuitySync(reader);
-    saveWorkspaceState();
-    await refreshReaderContent(panel, reader);
+    await openReferenceInAdjacentReader(reader, searchResultDetail(result));
+  } finally {
+    if (trigger.isConnected) {
+      trigger.disabled = false;
+      trigger.removeAttribute("aria-busy");
+    }
+  }
+}
+
+async function openStructuredCodeReference(reader, anchor, trigger) {
+  const target = parseCodeJumpAnchor(anchor);
+  if (!target || !trigger) return;
+  if (target.kind === "section") {
+    await openInlineCodeReference(reader, target.codePrefix, target.sectionNumber, trigger);
+    return;
+  }
+
+  trigger.disabled = true;
+  trigger.setAttribute("aria-busy", "true");
+  try {
+    const chapter = chapters.find((item) =>
+      String(item.codePrefix || "").toUpperCase() === target.codePrefix &&
+      String(item.chapterNumber || "").trim().toUpperCase() === target.chapterNumber
+    );
+    if (!chapter) {
+      trigger.title = `${codeDisplayLabel(target.codePrefix)} ${target.targetKind === "appendix" ? "Appendix" : "Chapter"} ${target.chapterNumber} was not found.`;
+      return;
+    }
+    await openReferenceInAdjacentReader(reader, {
+      codePrefix: target.codePrefix,
+      chapterID: chapter.id,
+      chapterNumber: chapter.chapterNumber,
+      sectionID: "",
+      sectionNumber: "",
+      title: chapter.fullTitle || chapter.displayTitle || chapter.title || "Reader"
+    });
   } finally {
     if (trigger.isConnected) {
       trigger.disabled = false;

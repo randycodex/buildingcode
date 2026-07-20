@@ -280,8 +280,12 @@ async function main() {
     assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
         workspaceScript.text.includes("function openInlineCodeReference") &&
-        workspaceScript.text.includes('reference.textContent = match[0]'),
-      "Reader citations no longer become text-preserving inline references."
+        workspaceScript.text.includes("function openReferenceInAdjacentReader") &&
+        workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
+        workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
+        workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
+        webRoot.text.includes('/web/app.js?v=20260720-code-reference-links-v18'),
+      "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
       workspaceScript.text.includes("function openWorkspaceCommandPalette") &&
