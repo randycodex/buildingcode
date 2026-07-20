@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("ios-note-parity-v4"),
-      "Web workspace omitted the ios-note-parity-v4 assets."
+      webRoot.text.includes("compact-saved-v9"),
+      "Web workspace omitted the compact-saved-v9 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -258,6 +258,19 @@ async function main() {
       "Saved and project panes omitted selection removal or new-project saving controls."
     );
     assert(
+      workspaceScript.text.includes("function consolidatedSavedAnnotations") &&
+        workspaceScript.text.includes("function mergeSavedColumnItems") &&
+        workspaceScript.text.includes("async function hydrateSavedColumnItems") &&
+        workspaceScript.text.includes("previewText: String(rawPreview)") &&
+        workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
+        workspaceScript.text.includes("chapterTitleWithoutNumber(") &&
+        workspaceScript.text.includes("const orderedChapterItems = [...chapterItems].sort") &&
+        workspaceScript.text.includes('preview.className = "saved-paragraph-preview"') &&
+        workspaceScript.text.includes('title.className = "saved-section-title"') &&
+        workspaceScript.text.includes('chapterTitle.className = "saved-chapter-title"'),
+      "Saved rows no longer resolve compact code, chapter, section-title, and paragraph-preview content."
+    );
+    assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
         workspaceScript.text.includes("await persistSectionBookmark(sectionPayload, true)") &&
         workspaceScript.text.includes('label.textContent = "Save to project"') &&
@@ -355,6 +368,14 @@ async function main() {
       workspaceStyles.text.includes(".reader-notes-new-project-form button:focus-visible") &&
         workspaceStyles.text.match(/\.reader-notes-new-project-form button \{[\s\S]*?border: 0;[\s\S]*?outline: 0;[\s\S]*?box-shadow: none;/),
       "The inline create-and-save button regained a visible edge treatment."
+    );
+    assert(
+      workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
+        workspaceStyles.text.includes(".saved-paragraph-preview") &&
+        workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
+        workspaceStyles.text.includes(".saved-section-meta") &&
+        workspaceStyles.text.includes(".saved-chapter-title"),
+      "Saved rows no longer keep their compact hierarchy and two-line paragraph previews."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),

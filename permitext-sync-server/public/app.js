@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-ios-note-parity-v4";
+const workboardClientVersion = "20260719-compact-saved-v9";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1599,6 +1599,13 @@ function sectionTitleWithoutNumber(section) {
   const title = String(section?.title || "").trim();
   if (!number || !title) return title;
   return title.replace(new RegExp(`^${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i"), "").trim() || title;
+}
+
+function chapterTitleWithoutNumber(chapterNumber, title) {
+  const number = String(chapterNumber || "").trim();
+  const cleanTitle = String(title || "").trim();
+  if (!number || !cleanTitle) return cleanTitle;
+  return cleanTitle.replace(new RegExp(`^Chapter\\s+${escapeRegExp(number)}\\s*[:–—-]?\\s*`, "i"), "").trim();
 }
 
 function codeLabel(prefix) {
@@ -5028,8 +5035,34 @@ async function resolveSectionDetail(detail) {
   let chapter = null;
   let section = null;
   if (detail.chapterID) {
-    chapter = await fetchChapter(detail.chapterID, { includeBody: true });
-    section = sectionTitleFromID(detail.sectionID, chapter);
+    try {
+      chapter = await fetchChapter(detail.chapterID, { includeBody: true });
+      section = sectionTitleFromID(detail.sectionID, chapter);
+    } catch {
+      chapter = null;
+    }
+  }
+  if (!section && detail.sectionID) {
+    try {
+      const payload = await api(`/code/sections/${encodeURIComponent(detail.sectionID)}`);
+      const resolvedSection = payload.section;
+      if (resolvedSection) {
+        detail.chapterID = resolvedSection.chapterID || detail.chapterID || "";
+        detail.codePrefix = resolvedSection.codePrefix || detail.codePrefix || "BC";
+        detail.chapterNumber = resolvedSection.chapterNumber || detail.chapterNumber || "";
+        detail.sectionNumber = resolvedSection.sectionNumber || detail.sectionNumber || "";
+        detail.title = resolvedSection.title || detail.title || "Section";
+        if (detail.chapterID) {
+          chapter = await fetchChapter(detail.chapterID, { includeBody: true });
+        }
+        section = sectionTitleFromID(detail.sectionID, chapter) || {
+          ...resolvedSection,
+          id: resolvedSection.id || resolvedSection.sectionID || Number(detail.sectionID)
+        };
+      }
+    } catch {
+      // Fall through to text search for legacy records that are not addressable by ID.
+    }
   }
   if (!section) {
     const search = await api(`/code/search?q=${encodeURIComponent(detail.sectionNumber || detail.sectionID)}`);
@@ -6605,28 +6638,121 @@ async function renderSaved(paneID = "utility:saved") {
   }
 
   const { savedItems, annotations } = summary;
-  const annotatedItems = (annotations || []).filter((annotation) =>
-    !annotation.deletedAt &&
-    (String(annotation.noteBody || "").trim() || normalizeAnnotationTags(annotation.tags || []).length)
-  );
+  const annotatedItems = consolidatedSavedAnnotations(annotations || []);
+  const visibleSavedItems = savedItems.slice(0, 48);
+  const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
+  const resolvedItems = await hydrateSavedColumnItems(combinedItems);
 
-  if (savedItems.length > 0) {
-    const visibleSavedItems = savedItems.slice(0, 48);
-    const selectionController = createSavedBulkSelectionController(panel, visibleSavedItems);
+  if (resolvedItems.length > 0) {
+    const selectionController = visibleSavedItems.length
+      ? createSavedBulkSelectionController(panel, visibleSavedItems)
+      : null;
     appendSectionLabel(content, "Saved items");
-    renderSavedItemsByCode(content, visibleSavedItems, paneID, {
-      removableSavedItems: true,
+    renderSavedItemsByCode(content, resolvedItems, paneID, {
+      removableSavedItems: (item) => item.savedColumnKind === "bookmark",
       selectionController
     });
-  }
-
-  if (annotatedItems.length === 0) {
-    appendMutedRow(content, "No notes or tags", "Paragraph notes and tags from this web workspace will appear here.");
   } else {
-    renderSavedItemsByCode(content, annotatedItems.slice(0, 48), paneID);
+    appendMutedRow(content, "No notes or tags", "Paragraph notes and tags from this web workspace will appear here.");
   }
 
   return panel;
+}
+
+function consolidatedSavedAnnotations(annotations = []) {
+  const latestByTarget = new Map();
+  annotations.forEach((annotation) => {
+    if (!annotation || annotation.deletedAt || !annotation.sectionID) return;
+    const blockID = normalizeAnnotationBlockID(annotation.blockID || annotation.anchorID || annotation.contentBlockID);
+    const key = [syncCodeVersion(annotation.codeVersion), annotation.sectionID, blockID].map(String).join(":");
+    const existing = latestByTarget.get(key);
+    if (!existing || Date.parse(annotation.updatedAt || 0) >= Date.parse(existing.updatedAt || 0)) {
+      latestByTarget.set(key, { ...annotation, blockID });
+    }
+  });
+  return Array.from(latestByTarget.values()).flatMap((annotation) => {
+    const merged = annotationForTarget(annotation.sectionID, annotation.blockID);
+    if (!String(merged.noteBody || "").trim() && merged.tags.length === 0) return [];
+    return [{ ...annotation, ...merged, savedColumnKind: "annotation" }];
+  });
+}
+
+function mergeSavedColumnItems(savedItems = [], annotatedItems = []) {
+  const sectionAnnotations = new Map(
+    annotatedItems
+      .filter((item) => !normalizeAnnotationBlockID(item.blockID))
+      .map((item) => [String(item.sectionID || ""), item])
+  );
+  const bookmarkedSectionIDs = new Set(savedItems.map((item) => String(item.sectionID || "")));
+  const bookmarks = savedItems.map((item) => {
+    const annotation = sectionAnnotations.get(String(item.sectionID || ""));
+    return {
+      ...item,
+      ...(annotation ? { noteBody: annotation.noteBody, tags: annotation.tags } : {}),
+      savedColumnKind: "bookmark"
+    };
+  });
+  const annotations = annotatedItems.filter((item) =>
+    normalizeAnnotationBlockID(item.blockID) || !bookmarkedSectionIDs.has(String(item.sectionID || ""))
+  );
+  return [...bookmarks, ...annotations];
+}
+
+async function hydrateSavedColumnItems(items = []) {
+  const sectionPromises = new Map();
+  const resolveItemSection = (item) => {
+    const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
+    const key = [syncCodeVersion(item.codeVersion), sectionID].join(":");
+    if (!sectionPromises.has(key)) {
+      const detail = {
+        codePrefix: item.codePrefix || "BC",
+        chapterID: item.chapterID || "",
+        chapterNumber: item.chapterNumber || "",
+        sectionID,
+        sectionNumber: item.sectionNumber || "",
+        title: item.title || "Section"
+      };
+      sectionPromises.set(key, resolveSectionDetail(detail).then(({ chapter, section }) => ({ chapter, section, detail })));
+    }
+    return sectionPromises.get(key);
+  };
+
+  return Promise.all(items.map(async (item) => {
+    try {
+      const { chapter, section, detail } = await resolveItemSection(item);
+      const blockID = normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID);
+      const annotatedBlocks = section ? annotatedBlocksForSection(section) : [];
+      const block = blockID
+        ? annotatedBlocks.find((candidate) =>
+            normalizeAnnotationBlockID(candidate?.id || candidate?.tableID || candidate?.imageID) === blockID
+          )
+        : null;
+      const rawPreview = block?.plainText || block?.text || sectionPlainText(section) || item.previewText || "";
+      const codePrefix = detail.codePrefix || chapter?.codePrefix || item.codePrefix || "BC";
+      const chapterID = detail.chapterID || chapter?.id || item.chapterID || "";
+      const chapterNumber = detail.chapterNumber || chapter?.chapterNumber || item.chapterNumber || "";
+      const chapterSummary = (await fetchChapterList(codePrefix)).find((candidate) =>
+        String(candidate.id || "") === String(chapterID) ||
+        String(candidate.chapterNumber || "") === String(chapterNumber)
+      );
+      return {
+        ...item,
+        blockID,
+        codePrefix,
+        chapterID,
+        chapterNumber,
+        chapterTitle: chapterTitleWithoutNumber(
+          chapterNumber,
+          chapterSummary?.fullTitle || chapterSummary?.title || chapter?.title || chapter?.displayTitle || chapter?.fullTitle || item.chapterTitle || ""
+        ),
+        sectionNumber: section?.sectionNumber || detail.sectionNumber || item.sectionNumber || "",
+        title: section?.title || detail.title || item.title || "Section",
+        previewText: String(rawPreview).replace(/\s+/g, " ").trim().slice(0, 240)
+      };
+    } catch {
+      return { ...item, previewText: String(item.previewText || "").replace(/\s+/g, " ").trim().slice(0, 240) };
+    }
+  }));
 }
 
 async function refreshOpenSavedPanes() {
@@ -6790,25 +6916,61 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
     });
 
     Array.from(chapterGroups.entries()).forEach(([chapterKey, chapterItems]) => {
+      const orderedChapterItems = [...chapterItems].sort((left, right) => {
+        const sectionOrder = String(left.sectionNumber || left.sectionID || "").localeCompare(
+          String(right.sectionNumber || right.sectionID || ""),
+          undefined,
+          { numeric: true, sensitivity: "base" }
+        );
+        if (sectionOrder) return sectionOrder;
+        const leftIsParagraph = Boolean(normalizeAnnotationBlockID(left.blockID));
+        const rightIsParagraph = Boolean(normalizeAnnotationBlockID(right.blockID));
+        if (leftIsParagraph !== rightIsParagraph) return leftIsParagraph ? 1 : -1;
+        return String(left.blockID || left.id || "").localeCompare(String(right.blockID || right.id || ""));
+      });
       const chapterLabel = document.createElement("p");
       chapterLabel.className = "saved-chapter-label";
-      chapterLabel.textContent = String(chapterKey).startsWith("Chapter") ? chapterKey : `Chapter ${chapterKey}`;
+      const chapterNumber = document.createElement("span");
+      chapterNumber.textContent = String(chapterKey).startsWith("Chapter") ? chapterKey : `Chapter ${chapterKey}`;
+      const chapterTitle = document.createElement("span");
+      chapterTitle.className = "saved-chapter-title";
+      chapterTitle.textContent = String(orderedChapterItems.find((item) => item.chapterTitle)?.chapterTitle || "").trim();
+      chapterLabel.append(chapterNumber);
+      if (chapterTitle.textContent) chapterLabel.append(chapterTitle);
       codeGroup.append(chapterLabel);
-      chapterItems.forEach((item) => {
+      orderedChapterItems.forEach((item) => {
         const row = document.createElement("article");
         row.className = "saved-row saved-section-row";
-        if (options.removableSavedItems) {
+        const removableSavedItem = typeof options.removableSavedItems === "function"
+          ? options.removableSavedItems(item)
+          : Boolean(options.removableSavedItems);
+        const selectableSavedItem = removableSavedItem && Boolean(options.selectionController);
+        if (removableSavedItem) {
           row.classList.add("has-remove-action");
         }
         const openButton = document.createElement("button");
         openButton.className = "saved-row-button saved-section-open";
         openButton.type = "button";
-        const title = document.createElement("strong");
-        title.textContent = sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "");
+        const sectionNumber = String(item.sectionNumber || item.sectionID || "").trim();
+        const titleText = sectionTitleWithoutNumber({ sectionNumber, title: item.title || "Section" }) || "Section";
         const heading = document.createElement("span");
         heading.className = "saved-section-heading";
-        heading.append(title);
+        const meta = document.createElement("span");
+        meta.className = "saved-section-meta";
+        meta.textContent = normalizeAnnotationBlockID(item.blockID)
+          ? ["Paragraph", sectionNumber].filter(Boolean).join(" · ")
+          : sectionNumber;
+        const title = document.createElement("strong");
+        title.className = "saved-section-title";
+        title.textContent = titleText;
+        heading.append(meta, title);
         openButton.append(heading);
+        if (item.previewText) {
+          const preview = document.createElement("span");
+          preview.className = "saved-paragraph-preview";
+          preview.textContent = item.previewText;
+          openButton.append(preview);
+        }
         const annotation = annotationForTarget(item.sectionID, item.blockID || "");
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         if (notePreview) {
@@ -6830,14 +6992,14 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         }
         openButton.addEventListener("click", () => {
           if (options.selectionController?.isActive()) {
-            options.selectionController.toggle(item);
+            if (selectableSavedItem) options.selectionController.toggle(item);
           } else {
             openSectionDetailForExistingSearch(item, { anchorPaneID: paneID });
           }
         });
         row.append(openButton);
-        options.selectionController?.register(row, item);
-        if (options.removableSavedItems) {
+        if (selectableSavedItem) options.selectionController.register(row, item);
+        if (removableSavedItem) {
           const removeButton = document.createElement("button");
           removeButton.className = "saved-row-remove";
           removeButton.type = "button";
