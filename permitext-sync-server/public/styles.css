@@ -820,21 +820,23 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .reader-panel .panel-actions {
   align-items: center;
   justify-content: end;
-  gap: var(--space-1);
+  gap: var(--space-2);
   min-width: 0;
   position: relative;
   z-index: 2;
 }
 
-.reader-text-size-controls {
+.reader-text-size-controls,
+.reader-spacing-controls {
   display: grid;
   grid-template-columns: repeat(2, var(--panel-title-control-size));
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
   height: var(--panel-title-control-size);
 }
 
-.reader-text-size-button {
+.reader-text-size-button,
+.reader-spacing-button {
   display: grid;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
@@ -850,12 +852,20 @@ body.is-detached-workboard-window .detached-workboard-error p {
   line-height: 1;
 }
 
+.reader-spacing-button svg {
+  width: 14px;
+  height: 14px;
+}
+
 .reader-text-size-button:hover,
-.reader-text-size-button:focus-visible {
+.reader-text-size-button:focus-visible,
+.reader-spacing-button:hover,
+.reader-spacing-button:focus-visible {
   color: var(--text-primary);
 }
 
-.reader-text-size-button:disabled {
+.reader-text-size-button:disabled,
+.reader-spacing-button:disabled {
   color: var(--text-tertiary);
   opacity: 0.42;
 }

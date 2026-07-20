@@ -754,6 +754,45 @@ function changeReaderTextSize(panel, reader, delta) {
   });
 }
 
+function readerSpacingValue(reader) {
+  return clampNumber(reader?.lineSpacing, 1, 1.8, 1.2);
+}
+
+function syncReaderSpacingControls(panel, reader) {
+  const spacing = readerSpacingValue(reader);
+  const decreaseButton = panel.querySelector(".reader-spacing-decrease");
+  const increaseButton = panel.querySelector(".reader-spacing-increase");
+  if (decreaseButton) {
+    decreaseButton.disabled = spacing <= 1;
+    decreaseButton.title = `Decrease Reader line spacing (${spacing.toFixed(1)})`;
+  }
+  if (increaseButton) {
+    increaseButton.disabled = spacing >= 1.8;
+    increaseButton.title = `Increase Reader line spacing (${spacing.toFixed(1)})`;
+  }
+}
+
+function applyReaderSpacing(panel, reader) {
+  if (Number.isFinite(Number(reader?.lineSpacing))) {
+    panel.style.setProperty("--reader-line-height", readerSpacingValue(reader).toFixed(1));
+  } else {
+    panel.style.removeProperty("--reader-line-height");
+  }
+  syncReaderSpacingControls(panel, reader);
+}
+
+function changeReaderSpacing(panel, reader, delta) {
+  const nextSpacing = Math.round((readerSpacingValue(reader) + delta) * 10) / 10;
+  (state.readers || []).forEach((openReader) => {
+    openReader.lineSpacing = nextSpacing;
+    const openPanel = track.querySelector(
+      `.reader-panel[data-pane-id="${CSS.escape(paneIDForReader(openReader))}"]`
+    );
+    if (openPanel) applyReaderSpacing(openPanel, openReader);
+  });
+  saveWorkspaceState();
+}
+
 function savedTextSizeValue() {
   return clampNumber(state.savedTextSize, 10, 18, 10);
 }
@@ -5126,6 +5165,8 @@ async function renderReader(reader, options = {}) {
   const commentsButton = panel.querySelector(".reader-comments-toggle");
   const decreaseTextButton = panel.querySelector(".reader-text-decrease");
   const increaseTextButton = panel.querySelector(".reader-text-increase");
+  const decreaseSpacingButton = panel.querySelector(".reader-spacing-decrease");
+  const increaseSpacingButton = panel.querySelector(".reader-spacing-increase");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -5140,6 +5181,7 @@ async function renderReader(reader, options = {}) {
   applyCodeTheme(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
   applyReaderTextSize(panel, reader);
+  applyReaderSpacing(panel, reader);
   selector.hidden = false;
   setTitle(panel, reader);
   reader.commentsOpen = false;
@@ -5158,6 +5200,8 @@ async function renderReader(reader, options = {}) {
   populateCodeSelect(panel, reader);
   decreaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, -1));
   increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
+  decreaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, -0.1));
+  increaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, 0.1));
   codeSelect.addEventListener("change", async () => {
     closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";

@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("permitext-pro-brand-v37"),
+      webRoot.text.includes("reader-spacing-icons-v39"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -168,6 +168,12 @@ async function main() {
         !settingsTemplateSource.includes("Font Size") &&
         !settingsTemplateSource.includes("Line Spacing"),
       "Web Settings still includes the retired Reader Preview sliders."
+    );
+    assert(
+      webRoot.text.includes('class="reader-spacing-controls"') &&
+        webRoot.text.includes('aria-label="Decrease Reader line spacing"') &&
+        webRoot.text.includes('aria-label="Increase Reader line spacing"'),
+      "Reader headers omitted their line-spacing controls."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -353,7 +359,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-permitext-pro-brand-v37'),
+        webRoot.text.includes('/web/app.js?v=20260720-reader-spacing-icons-v39'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -644,9 +650,9 @@ async function main() {
       "Reader workspace still renders its custom scroll indicator."
     );
     assert(
-      workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.reader-text-size-controls \{[\s\S]*?grid-template-columns: repeat\(2, var\(--panel-title-control-size\)\);[\s\S]*?gap: var\(--space-1\);/) &&
-        workspaceStyles.text.match(/\.reader-text-size-button \{[\s\S]*?place-items: center;/),
+      workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-2\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-controls,[\s\S]*?\.reader-spacing-controls \{[\s\S]*?grid-template-columns: repeat\(2, var\(--panel-title-control-size\)\);[\s\S]*?gap: var\(--space-2\);/) &&
+        workspaceStyles.text.match(/\.reader-text-size-button,[\s\S]*?\.reader-spacing-button \{[\s\S]*?place-items: center;/),
       "Reader header controls are no longer equally spaced and center-aligned."
     );
 
