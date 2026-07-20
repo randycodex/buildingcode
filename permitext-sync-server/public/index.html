@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260720-transient-section-detail-v27">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-transient-section-detail-v27">
+    <link rel="stylesheet" href="/web/styles.css?v=20260720-search-field-top-v28">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-search-field-top-v28">
   </head>
   <body>
     <main class="workspace-shell">
@@ -178,13 +178,7 @@
             </button>
           </div>
         </header>
-        <section class="search-results"></section>
-        <footer class="search-dock">
-          <div class="search-result-summary" aria-live="polite" hidden>
-            <span class="search-result-summary-copy"></span>
-            <button class="search-all-codes" type="button" hidden>All Codes</button>
-          </div>
-          <div class="search-code-filter" aria-label="Filter search by code section" hidden></div>
+        <section class="search-dock" aria-label="Search controls">
           <label class="search-box">
             <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="7"></circle>
@@ -199,7 +193,13 @@
               </svg>
             </button>
           </label>
-        </footer>
+          <div class="search-result-summary" aria-live="polite" hidden>
+            <span class="search-result-summary-copy"></span>
+            <button class="search-all-codes" type="button" hidden>All Codes</button>
+          </div>
+          <div class="search-code-filter" aria-label="Filter search by code section" hidden></div>
+        </section>
+        <section class="search-results"></section>
       </article>
     </template>
 
@@ -418,6 +418,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260720-transient-section-detail-v27" type="module"></script>
+    <script src="/web/app.js?v=20260720-search-field-top-v28" type="module"></script>
   </body>
 </html>

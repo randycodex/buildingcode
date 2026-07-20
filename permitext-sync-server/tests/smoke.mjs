@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("transient-section-detail-v27"),
-      "Web workspace omitted the transient section-detail assets."
+      webRoot.text.includes("search-field-top-v28"),
+      "Web workspace omitted the top-positioned Search field assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -168,6 +168,10 @@ async function main() {
     const projectsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="projects-template"'),
       webRoot.text.indexOf('<template id="search-template"')
+    );
+    const searchTemplateSource = webRoot.text.slice(
+      webRoot.text.indexOf('<template id="search-template"'),
+      webRoot.text.indexOf('<template id="saved-template"')
     );
     const savedTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="saved-template"'),
@@ -281,9 +285,11 @@ async function main() {
         workspaceScript.text.includes("function recordRecentSearch") &&
         workspaceScript.text.includes("function pinSearch") &&
         workspaceScript.text.includes("function removeRecentSearch") &&
-        webRoot.text.indexOf('class="search-result-summary"') < webRoot.text.indexOf('class="search-code-filter"') &&
-        webRoot.text.indexOf('class="search-code-filter"') < webRoot.text.indexOf('class="search-box"'),
-      "Search column no longer matches the iOS history and bottom-dock order."
+        searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
+        searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
+        searchTemplateSource.indexOf('class="search-result-summary"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
+        searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-results"'),
+      "Search field no longer sits below the column title and above the summary, filters, and results."
     );
     assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
@@ -292,7 +298,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-transient-section-detail-v27'),
+        webRoot.text.includes('/web/app.js?v=20260720-search-field-top-v28'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
