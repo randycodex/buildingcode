@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("flat-project-saves-v10"),
-      "Web workspace omitted the flat-project-saves-v10 assets."
+      webRoot.text.includes("foreground-sync-v11"),
+      "Web workspace omitted the foreground-sync-v11 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -179,6 +179,17 @@ async function main() {
     assert(
       workspaceScript.text.includes("window.requestAnimationFrame(applyPendingResize)"),
       "Divider resizing is no longer coalesced to animation frames."
+    );
+    assert(
+      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 12_000") &&
+        workspaceScript.text.includes("function canRunForegroundSync()") &&
+        workspaceScript.text.includes('document.visibilityState === "visible"') &&
+        workspaceScript.text.includes("navigator.onLine") &&
+        workspaceScript.text.includes("async function performForegroundSync()") &&
+        workspaceScript.text.includes("await loadSyncedContent({ force: true, skipOutbox: true })") &&
+        workspaceScript.text.includes('window.addEventListener("offline"') &&
+        workspaceScript.text.includes("startForegroundSyncLoop({ immediate: true })"),
+      "Visible web tabs no longer perform incremental foreground sync every 12 seconds."
     );
     assert(
       workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&

@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-flat-project-saves-v10";
+const workboardClientVersion = "20260719-foreground-sync-v11";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -79,6 +79,9 @@ let syncedContent = null;
 let syncLoadPromise = null;
 let syncFlushPromise = null;
 let syncRetryTimer = null;
+let foregroundSyncTimer = null;
+let foregroundSyncPromise = null;
+const foregroundSyncIntervalMilliseconds = 12_000;
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -1786,6 +1789,7 @@ function clearExpiredAccountSession() {
   syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
   clearTimeout(syncRetryTimer);
   syncRetryTimer = null;
+  stopForegroundSyncLoop();
   saveWorkspaceState();
 }
 
@@ -2743,6 +2747,72 @@ function syncResultChangesWorkspace(result) {
 async function flushPendingSyncAndRender() {
   const result = await flushSyncOutbox({ refresh: true });
   if (syncResultChangesWorkspace(result)) await renderWorkspace();
+}
+
+function canRunForegroundSync() {
+  return Boolean(
+    !detachedProjectWindow &&
+    activeAccount() &&
+    navigator.onLine &&
+    document.visibilityState === "visible"
+  );
+}
+
+function stopForegroundSyncLoop() {
+  clearTimeout(foregroundSyncTimer);
+  foregroundSyncTimer = null;
+}
+
+async function performForegroundSync() {
+  if (!canRunForegroundSync()) return null;
+  if (foregroundSyncPromise) return foregroundSyncPromise;
+
+  foregroundSyncPromise = (async () => {
+    const accountUserID = activeAccount()?.userID || "";
+    const previousStatus = syncedContent?.status || "";
+    const previousEventID = Number(syncedContent?.latestEventID || 0);
+    const pushResult = await flushSyncOutbox({ refresh: false });
+    if (activeAccount()?.userID !== accountUserID) {
+      await renderWorkspace();
+      return null;
+    }
+    if (!canRunForegroundSync()) return null;
+
+    if (syncLoadPromise) await syncLoadPromise;
+    const content = await loadSyncedContent({ force: true, skipOutbox: true });
+    if (activeAccount()?.userID !== accountUserID) {
+      await renderWorkspace();
+      return content;
+    }
+    if (!canRunForegroundSync() || content?.status === "error") return content;
+
+    const nextEventID = Number(content?.latestEventID || 0);
+    if (
+      syncResultChangesWorkspace(pushResult) ||
+      content?.status !== previousStatus ||
+      nextEventID !== previousEventID
+    ) {
+      await renderWorkspace();
+    }
+    return content;
+  })().finally(() => {
+    foregroundSyncPromise = null;
+  });
+  return foregroundSyncPromise;
+}
+
+function startForegroundSyncLoop(options = {}) {
+  stopForegroundSyncLoop();
+  if (!canRunForegroundSync()) return;
+  foregroundSyncTimer = window.setTimeout(async () => {
+    try {
+      await performForegroundSync();
+    } catch {
+      // The durable outbox and its exponential retry retain pending local changes.
+    } finally {
+      startForegroundSyncLoop();
+    }
+  }, options.immediate ? 0 : foregroundSyncIntervalMilliseconds);
 }
 
 async function pushMutation(mutation) {
@@ -7224,7 +7294,8 @@ function renderSettings() {
     status.textContent = "Signing in...";
     try {
       await signInCurrentBrowser();
-      renderWorkspace();
+      await renderWorkspace();
+      startForegroundSyncLoop({ immediate: true });
     } catch (error) {
       status.textContent = error.message || "Could not sign in.";
       signInButton.disabled = false;
@@ -7245,8 +7316,9 @@ function renderSettings() {
     } finally {
       state.account = null;
       syncedContent = null;
+      stopForegroundSyncLoop();
       saveWorkspaceState();
-      renderWorkspace();
+      await renderWorkspace();
     }
   });
   checkoutButton.addEventListener("click", async () => {
@@ -7882,11 +7954,16 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
-    void flushPendingSyncAndRender().catch(() => {});
+    startForegroundSyncLoop({ immediate: true });
+  });
+  window.addEventListener("offline", () => {
+    stopForegroundSyncLoop();
   });
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
-      void flushPendingSyncAndRender().catch(() => {});
+      startForegroundSyncLoop({ immediate: true });
+    } else {
+      stopForegroundSyncLoop();
     }
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
@@ -7967,6 +8044,7 @@ async function start() {
     }
   }
   void flushPendingSyncAndRender().catch(() => {});
+  startForegroundSyncLoop();
   refreshEntitlementAfterCheckoutReturn();
 }
 

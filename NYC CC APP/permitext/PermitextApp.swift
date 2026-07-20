@@ -114,18 +114,27 @@ struct PermitextApp: App {
                 }
                 Task {
                     await library.performStartupAccountSyncIfNeeded()
+                    if scenePhase == .active {
+                        library.startForegroundAutomaticSync()
+                    }
+                }
+            }
+            .onChange(of: library.signedInAccount?.appUserID) { _, userID in
+                if userID != nil, scenePhase == .active {
+                    library.startForegroundAutomaticSync()
+                } else {
+                    library.stopForegroundAutomaticSync()
                 }
             }
             .onChange(of: scenePhase) { _, phase in
                 switch phase {
                 case .active:
+                    library.startForegroundAutomaticSync()
                     Task {
                         await library.performForegroundAccountSyncIfNeeded()
                     }
                 case .inactive, .background:
-                    Task {
-                        await library.syncPendingUserContentIfPossible()
-                    }
+                    library.stopForegroundAutomaticSync()
                 @unknown default:
                     break
                 }
@@ -149,6 +158,9 @@ struct PermitextApp: App {
                 }
                 Task {
                     await library.performStartupAccountSyncIfNeeded()
+                    if scenePhase == .active {
+                        library.startForegroundAutomaticSync()
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+import Network
 import os.signpost
 import Security
 import SwiftUI
@@ -132,10 +133,14 @@ final class CodeLibraryViewModel: ObservableObject {
     private var activeSearchWorkTask: Task<[CodeSearchResult], Never>?
     private var activeExportTask: Task<Void, Never>?
     private var userContentAutoSyncTask: Task<Void, Never>?
+    private var foregroundAutomaticSyncTask: Task<Void, Never>?
     private var storeKitUpdatesTask: Task<Void, Never>?
+    private let networkMonitor = NWPathMonitor()
+    private let networkMonitorQueue = DispatchQueue(label: "com.permitext.foreground-sync-network")
+    private var isNetworkAvailable = false
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
-    private let foregroundAccountSyncInterval: TimeInterval = 45
+    private let foregroundAccountSyncInterval: TimeInterval = 12
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     /// Monotonic token used to suppress stale tab re-assertions after a
     /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
@@ -181,6 +186,12 @@ final class CodeLibraryViewModel: ObservableObject {
         self.activeProjectID = continuityContext.activeProjectID
         self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
         refreshPendingUserContentSyncCount()
+        networkMonitor.pathUpdateHandler = { [weak self] path in
+            Task { @MainActor [weak self] in
+                self?.isNetworkAvailable = path.status == .satisfied
+            }
+        }
+        networkMonitor.start(queue: networkMonitorQueue)
         statusMessage = "Loading code library..."
         isInitialContentLoaded = false
         initialLoadProgress = 0
@@ -194,7 +205,9 @@ final class CodeLibraryViewModel: ObservableObject {
 
     deinit {
         userContentAutoSyncTask?.cancel()
+        foregroundAutomaticSyncTask?.cancel()
         storeKitUpdatesTask?.cancel()
+        networkMonitor.cancel()
     }
 
     #if DEBUG
@@ -1880,10 +1893,34 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func performAutomaticUserContentSync() async {
-        guard signedInAccount != nil else { return }
+        guard signedInAccount != nil, isNetworkAvailable else { return }
         await pullRemoteUserContentIfPossible()
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
+    }
+
+    func startForegroundAutomaticSync() {
+        guard isInitialContentLoaded, signedInAccount != nil else {
+            stopForegroundAutomaticSync()
+            return
+        }
+        guard foregroundAutomaticSyncTask == nil else { return }
+        foregroundAutomaticSyncTask = Task { [weak self] in
+            while !Task.isCancelled {
+                guard let self else { return }
+                let delay = UInt64(self.foregroundAccountSyncInterval * 1_000_000_000)
+                try? await Task.sleep(nanoseconds: delay)
+                guard !Task.isCancelled, self.signedInAccount != nil else { return }
+                guard self.isNetworkAvailable, !self.isAccountBusy else { continue }
+                self.lastForegroundAccountSyncAt = Date()
+                await self.performAutomaticUserContentSync()
+            }
+        }
+    }
+
+    func stopForegroundAutomaticSync() {
+        foregroundAutomaticSyncTask?.cancel()
+        foregroundAutomaticSyncTask = nil
     }
 
     private func scheduleUserContentRetry() {
@@ -2170,6 +2207,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func signOut() {
         let account = signedInAccount
+        stopForegroundAutomaticSync()
         signedInAccount = nil
         userContentSyncConflicts = []
         Self.clearSignedInAccount()
@@ -2188,6 +2226,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @discardableResult
     private func handleBackendSessionFailureIfNeeded(_ error: Error) -> Bool {
         guard Self.isBackendAuthenticationFailure(error) else { return false }
+        stopForegroundAutomaticSync()
         signedInAccount = nil
         Self.clearSignedInAccount()
         userContentSyncCheckpoint = nil
