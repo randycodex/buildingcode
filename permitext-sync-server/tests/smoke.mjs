@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("no-scrollbars-v17"),
-      "Web workspace omitted the no-scrollbars workspace assets."
+      webRoot.text.includes("search-saved-parity-v24"),
+      "Web workspace omitted the Search and Saved parity assets."
     );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
@@ -174,19 +174,14 @@ async function main() {
       webRoot.text.indexOf('<template id="analysis-template"')
     );
     assert(
-      savedTemplateSource.includes('aria-label="Saved text size"') &&
-        !projectsTemplateSource.includes('aria-label="Saved text size"') &&
-        webRoot.text.includes('class="reader-text-size-button saved-text-decrease"') &&
-        webRoot.text.includes('class="reader-text-size-button saved-text-increase"') &&
-        workspaceScript.text.includes("function changeSavedTextSize(delta)") &&
-        workspaceScript.text.includes('track.querySelectorAll(".saved-panel").forEach(applySavedTextSize)') &&
-        workspaceScript.text.includes('panel.style.setProperty("--saved-font-size"'),
-      "Saved columns no longer include persistent text-size controls."
-    );
-    assert(
-      !workspaceScript.text.includes("No saved sections") &&
-        !workspaceScript.text.includes("Saved sections synced from iOS or saved in this web workspace"),
-      "Saved pane still included its retired empty bookmark state."
+      savedTemplateSource.includes('aria-label="Sort saved sections"') &&
+        savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
+        savedTemplateSource.includes('class="saved-code-filter"') &&
+        savedTemplateSource.includes('class="saved-tag-filter"') &&
+        !savedTemplateSource.includes("Projects") &&
+        !savedTemplateSource.includes('aria-label="Saved text size"') &&
+        !projectsTemplateSource.includes('aria-label="Saved text size"'),
+      "Saved column no longer matches the iOS action and filter order without Projects."
     );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
@@ -274,8 +269,21 @@ async function main() {
     assert(
       workspaceScript.text.includes('activeReaderButton.textContent = "Open in reader"') &&
         workspaceScript.text.includes('newReaderButton.textContent = "New reader"') &&
-        workspaceScript.text.includes('resultSummary.className = "search-result-summary"'),
+        workspaceScript.text.includes("function updateSearchDock") &&
+        workspaceScript.text.includes('summaryCopy.textContent = `${resultCount.toLocaleString()}'),
       "Search results omitted their count or explicit Reader destinations."
+    );
+    assert(
+      workspaceScript.text.includes("function renderSearchHistory") &&
+        workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
+        workspaceScript.text.includes('appendHistorySection("Pinned"') &&
+        workspaceScript.text.includes('appendHistorySection("Recent Searches"') &&
+        workspaceScript.text.includes("function recordRecentSearch") &&
+        workspaceScript.text.includes("function pinSearch") &&
+        workspaceScript.text.includes("function removeRecentSearch") &&
+        webRoot.text.indexOf('class="search-result-summary"') < webRoot.text.indexOf('class="search-code-filter"') &&
+        webRoot.text.indexOf('class="search-code-filter"') < webRoot.text.indexOf('class="search-box"'),
+      "Search column no longer matches the iOS history and bottom-dock order."
     );
     assert(
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
@@ -284,7 +292,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-code-reference-links-v18'),
+        webRoot.text.includes('/web/app.js?v=20260720-search-saved-parity-v24'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -342,11 +350,13 @@ async function main() {
         workspaceScript.text.includes("async function hydrateSavedColumnItems") &&
         workspaceScript.text.includes("previewText: String(rawPreview)") &&
         workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
-        workspaceScript.text.includes("const orderedItems = [...items].sort") &&
-        !workspaceScript.text.includes('chapterLabel.className = "saved-chapter-label"') &&
+        workspaceScript.text.includes("function sortSavedItems") &&
+        workspaceScript.text.includes('chapterHeader.className = "saved-chapter-header"') &&
         workspaceScript.text.includes('preview.className = "saved-paragraph-preview"') &&
-        workspaceScript.text.includes('title.className = "saved-section-title"'),
-      "Saved rows no longer render a flat code, section-title, and paragraph-preview list."
+        workspaceScript.text.includes('title.className = "saved-section-title"') &&
+        workspaceScript.text.includes("function printSavedItemsAsPDF") &&
+        workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true })'),
+      "Saved rows no longer match the iOS code, chapter, row, sort, and export structure."
     );
     assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
@@ -462,11 +472,12 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
+        workspaceStyles.text.includes(".saved-chapter-header") &&
+        workspaceStyles.text.includes(".saved-inline-filters") &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
-        workspaceStyles.text.includes(".saved-section-meta") &&
-        !workspaceStyles.text.includes(".saved-chapter-title"),
-      "Saved rows no longer keep their flat code-grouped layout and two-line paragraph previews."
+        workspaceStyles.text.includes(".saved-section-meta"),
+      "Saved rows no longer keep their proportional grouped layout and two-line paragraph previews."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),

@@ -45,6 +45,9 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Search should behave like the iOS app.
 - When a behavior already exists in the iOS app, use it as the default reference for web Search/Saved/Projects behavior unless there is a clear desktop-specific reason not to.
+- With no query, keep the iOS menu order: `Jump Back In`, `Pinned`, then `Recent Searches`.
+- Keep the populated Search dock in the iOS order: result summary, code-book filters, then the search field.
+- Preserve the iOS history actions: pin or unpin searches, remove recent searches, reopen recently viewed sections, and toggle their saved state.
 - Code-section filters should support every available code section, not only Building Code, and should be generated from the available code data where practical.
 - Search results should show the count and offer explicit `Open in reader` and `New reader` destinations.
 - Search text should be highlighted in results when practical.
@@ -55,6 +58,9 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 
 - Saved sections, projects, tags, and notes should behave consistently with the iOS app.
 - Saved should be available from the top menu.
+- Keep the iOS Saved order: title with sort and PDF export actions, code-book filters, tag filters when tags exist, then code-book and chapter groups.
+- The web Saved column intentionally omits the iOS Projects folder; Projects remains its own adjacent web workspace tool.
+- Saved sorting, filtering, PDF export, notes, tags, bookmark status, and open-item behavior should match their iOS counterparts.
 - Present Saved and Projects as adjacent parts of `Your workspace`: Saved is the inbox for bookmarks, notes, and tags; Projects organize job-specific work and Workboards. Keep their data models distinct.
 - Project and saved-section interactions should not require learning a separate web-only workflow unless the web layout makes it clearly better.
 
@@ -78,6 +84,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Match the iOS radius set for shared surfaces: cards use a 14 px radius and compact tiles use a 10 px radius unless a desktop-specific control needs a different value.
 - Notes, comments, and other annotation cards should not use thin border outlines; rely on surface color, spacing, and hierarchy instead.
 - Use spacing consistently; prefer tight, deliberate spacing over large mobile-style gaps.
+- Search and Saved must remain proportional at the standard 320 px utility-column width: compact header actions, readable rows, and bottom controls that do not crowd the content.
 
 ## Mobile
 

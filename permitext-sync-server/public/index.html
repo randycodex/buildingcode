@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260720-no-scrollbars-v17">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-no-scrollbars-v17">
+    <link rel="stylesheet" href="/web/styles.css?v=20260720-search-saved-parity-v24">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-search-saved-parity-v24">
   </head>
   <body>
     <main class="workspace-shell">
@@ -178,12 +178,28 @@
             </button>
           </div>
         </header>
-        <label class="search-box">
-          <span>Search</span>
-          <input class="search-input" type="search" autocomplete="off">
-        </label>
-        <div class="search-code-filter" aria-label="Filter search by code section"></div>
         <section class="search-results"></section>
+        <footer class="search-dock">
+          <div class="search-result-summary" aria-live="polite" hidden>
+            <span class="search-result-summary-copy"></span>
+            <button class="search-all-codes" type="button" hidden>All Codes</button>
+          </div>
+          <div class="search-code-filter" aria-label="Filter search by code section" hidden></div>
+          <label class="search-box">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-3.6-3.6"></path>
+            </svg>
+            <span>Search</span>
+            <input class="search-input" type="search" autocomplete="off" placeholder="Search">
+            <button class="search-clear-button" type="button" aria-label="Clear search" hidden>
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="9"></circle>
+                <path d="m9 9 6 6M15 9l-6 6" fill="none" stroke="var(--surface)" stroke-width="2" stroke-linecap="round"></path>
+              </svg>
+            </button>
+          </label>
+        </footer>
       </article>
     </template>
 
@@ -191,14 +207,20 @@
       <article class="workspace-panel utility-panel">
         <header class="panel-header">
           <div>
-            <p class="eyebrow panel-kind">Your workspace</p>
-            <h2 class="panel-title">Saved Inbox</h2>
+            <p class="eyebrow panel-kind">Saved</p>
+            <h2 class="panel-title">Saved</h2>
           </div>
           <div class="panel-actions">
-            <div class="reader-text-size-controls saved-text-size-controls" role="group" aria-label="Saved text size">
-              <button class="reader-text-size-button saved-text-decrease" type="button" aria-label="Decrease Saved text size">A−</button>
-              <button class="reader-text-size-button saved-text-increase" type="button" aria-label="Increase Saved text size">A+</button>
-            </div>
+            <button class="icon-button saved-sort-button" type="button" title="Sort saved sections" aria-label="Sort saved sections" aria-expanded="false">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m3 8 4-4 4 4"></path><path d="M7 4v16"></path><path d="m21 16-4 4-4-4"></path><path d="M17 20V4"></path>
+              </svg>
+            </button>
+            <button class="icon-button saved-export-button" type="button" title="Export saved sections as PDF" aria-label="Export saved sections as PDF" aria-expanded="false">
+              <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3v12"></path><path d="m7 8 5-5 5 5"></path><path d="M5 13v7h14v-7"></path>
+              </svg>
+            </button>
             <button class="icon-button pane-drag-handle" type="button" title="Drag column" aria-label="Drag column" draggable="true">
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
                 <circle cx="9" cy="6" r="1.2"></circle>
@@ -218,6 +240,10 @@
             </button>
           </div>
         </header>
+        <section class="saved-inline-filters" hidden>
+          <div class="saved-code-filter" aria-label="Filter saved sections by code section"></div>
+          <div class="saved-tag-filter" aria-label="Filter saved sections by tag"></div>
+        </section>
         <section class="saved-content">
         </section>
       </article>
@@ -392,6 +418,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260720-code-reference-links-v18" type="module"></script>
+    <script src="/web/app.js?v=20260720-search-saved-parity-v24" type="module"></script>
   </body>
 </html>
