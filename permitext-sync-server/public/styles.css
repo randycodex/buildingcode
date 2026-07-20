@@ -3600,28 +3600,6 @@ mark {
   outline-offset: 3px;
 }
 
-.saved-chapter-label {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  margin: var(--space-2) 0 2px;
-  color: var(--text-secondary);
-  font-size: calc(var(--saved-font-size) * 0.77) !important;
-  font-weight: 600;
-  letter-spacing: 0.035em;
-  text-transform: uppercase;
-}
-
-.saved-chapter-title {
-  min-width: 0;
-  overflow: hidden;
-  font-weight: 550;
-  letter-spacing: 0;
-  text-overflow: ellipsis;
-  text-transform: none;
-  white-space: nowrap;
-}
-
 .saved-section-row {
   position: relative;
   color: var(--text-primary);

@@ -120,8 +120,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="Research"'), "Web workspace omitted its research tool.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("saved-text-size-v13"),
-      "Web workspace omitted the saved-text-size-v13 assets."
+      webRoot.text.includes("saved-flat-list-v14"),
+      "Web workspace omitted the saved-flat-list-v14 assets."
     );
 
     const workspaceScript = await request("/web/app.js");
@@ -296,12 +296,11 @@ async function main() {
         workspaceScript.text.includes("async function hydrateSavedColumnItems") &&
         workspaceScript.text.includes("previewText: String(rawPreview)") &&
         workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
-        workspaceScript.text.includes("chapterTitleWithoutNumber(") &&
-        workspaceScript.text.includes("const orderedChapterItems = [...chapterItems].sort") &&
+        workspaceScript.text.includes("const orderedItems = [...items].sort") &&
+        !workspaceScript.text.includes('chapterLabel.className = "saved-chapter-label"') &&
         workspaceScript.text.includes('preview.className = "saved-paragraph-preview"') &&
-        workspaceScript.text.includes('title.className = "saved-section-title"') &&
-        workspaceScript.text.includes('chapterTitle.className = "saved-chapter-title"'),
-      "Saved rows no longer resolve compact code, chapter, section-title, and paragraph-preview content."
+        workspaceScript.text.includes('title.className = "saved-section-title"'),
+      "Saved rows no longer render a flat code, section-title, and paragraph-preview list."
     );
     assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
@@ -414,8 +413,8 @@ async function main() {
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes(".saved-section-meta") &&
-        workspaceStyles.text.includes(".saved-chapter-title"),
-      "Saved rows no longer keep their compact hierarchy and two-line paragraph previews."
+        !workspaceStyles.text.includes(".saved-chapter-title"),
+      "Saved rows no longer keep their flat code-grouped layout and two-line paragraph previews."
     );
     assert(
       !workspaceStyles.text.includes(".reader-section-title {\n  cursor: pointer;"),

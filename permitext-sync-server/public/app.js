@@ -2,7 +2,7 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
-const workboardClientVersion = "20260719-saved-text-size-v13";
+const workboardClientVersion = "20260719-saved-flat-list-v14";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -1629,13 +1629,6 @@ function sectionTitleWithoutNumber(section) {
   const title = String(section?.title || "").trim();
   if (!number || !title) return title;
   return title.replace(new RegExp(`^${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i"), "").trim() || title;
-}
-
-function chapterTitleWithoutNumber(chapterNumber, title) {
-  const number = String(chapterNumber || "").trim();
-  const cleanTitle = String(title || "").trim();
-  if (!number || !cleanTitle) return cleanTitle;
-  return cleanTitle.replace(new RegExp(`^Chapter\\s+${escapeRegExp(number)}\\s*[:–—-]?\\s*`, "i"), "").trim();
 }
 
 function codeLabel(prefix) {
@@ -6842,20 +6835,12 @@ async function hydrateSavedColumnItems(items = []) {
       const codePrefix = detail.codePrefix || chapter?.codePrefix || item.codePrefix || "BC";
       const chapterID = detail.chapterID || chapter?.id || item.chapterID || "";
       const chapterNumber = detail.chapterNumber || chapter?.chapterNumber || item.chapterNumber || "";
-      const chapterSummary = (await fetchChapterList(codePrefix)).find((candidate) =>
-        String(candidate.id || "") === String(chapterID) ||
-        String(candidate.chapterNumber || "") === String(chapterNumber)
-      );
       return {
         ...item,
         blockID,
         codePrefix,
         chapterID,
         chapterNumber,
-        chapterTitle: chapterTitleWithoutNumber(
-          chapterNumber,
-          chapterSummary?.fullTitle || chapterSummary?.title || chapter?.title || chapter?.displayTitle || chapter?.fullTitle || item.chapterTitle || ""
-        ),
         sectionNumber: section?.sectionNumber || detail.sectionNumber || item.sectionNumber || "",
         title: section?.title || detail.title || item.title || "Section",
         previewText: String(rawPreview).replace(/\s+/g, " ").trim().slice(0, 240)
@@ -7019,40 +7004,28 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
     codeLabel.textContent = codeDisplayLabel(prefix);
     codeGroup.append(codeLabel);
 
-    const chapterGroups = new Map();
-    items.forEach((item) => {
-      const chapterKey = item.chapterNumber || item.chapterTitle || item.chapterID || "Saved";
-      if (!chapterGroups.has(chapterKey)) chapterGroups.set(chapterKey, []);
-      chapterGroups.get(chapterKey).push(item);
+    const orderedItems = [...items].sort((left, right) => {
+      const chapterOrder = String(left.chapterNumber || left.chapterID || "").localeCompare(
+        String(right.chapterNumber || right.chapterID || ""),
+        undefined,
+        { numeric: true, sensitivity: "base" }
+      );
+      if (chapterOrder) return chapterOrder;
+      const sectionOrder = String(left.sectionNumber || left.sectionID || "").localeCompare(
+        String(right.sectionNumber || right.sectionID || ""),
+        undefined,
+        { numeric: true, sensitivity: "base" }
+      );
+      if (sectionOrder) return sectionOrder;
+      const leftIsParagraph = Boolean(normalizeAnnotationBlockID(left.blockID));
+      const rightIsParagraph = Boolean(normalizeAnnotationBlockID(right.blockID));
+      if (leftIsParagraph !== rightIsParagraph) return leftIsParagraph ? 1 : -1;
+      return String(left.blockID || left.id || "").localeCompare(String(right.blockID || right.id || ""));
     });
-
-    Array.from(chapterGroups.entries()).forEach(([chapterKey, chapterItems]) => {
-      const orderedChapterItems = [...chapterItems].sort((left, right) => {
-        const sectionOrder = String(left.sectionNumber || left.sectionID || "").localeCompare(
-          String(right.sectionNumber || right.sectionID || ""),
-          undefined,
-          { numeric: true, sensitivity: "base" }
-        );
-        if (sectionOrder) return sectionOrder;
-        const leftIsParagraph = Boolean(normalizeAnnotationBlockID(left.blockID));
-        const rightIsParagraph = Boolean(normalizeAnnotationBlockID(right.blockID));
-        if (leftIsParagraph !== rightIsParagraph) return leftIsParagraph ? 1 : -1;
-        return String(left.blockID || left.id || "").localeCompare(String(right.blockID || right.id || ""));
-      });
-      const chapterLabel = document.createElement("p");
-      chapterLabel.className = "saved-chapter-label";
-      const chapterNumber = document.createElement("span");
-      chapterNumber.textContent = String(chapterKey).startsWith("Chapter") ? chapterKey : `Chapter ${chapterKey}`;
-      const chapterTitle = document.createElement("span");
-      chapterTitle.className = "saved-chapter-title";
-      chapterTitle.textContent = String(orderedChapterItems.find((item) => item.chapterTitle)?.chapterTitle || "").trim();
-      chapterLabel.append(chapterNumber);
-      if (chapterTitle.textContent) chapterLabel.append(chapterTitle);
-      codeGroup.append(chapterLabel);
-      orderedChapterItems.forEach((item) => {
-        const row = document.createElement("article");
-        row.className = "saved-row saved-section-row";
-        const removableSavedItem = typeof options.removableSavedItems === "function"
+    orderedItems.forEach((item) => {
+      const row = document.createElement("article");
+      row.className = "saved-row saved-section-row";
+      const removableSavedItem = typeof options.removableSavedItems === "function"
           ? options.removableSavedItems(item)
           : Boolean(options.removableSavedItems);
         const selectableSavedItem = removableSavedItem && Boolean(options.selectionController);
@@ -7135,7 +7108,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           row.append(removeButton);
         }
         codeGroup.append(row);
-      });
     });
 
     content.append(codeGroup);
