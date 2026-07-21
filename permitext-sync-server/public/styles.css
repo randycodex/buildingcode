@@ -4703,6 +4703,18 @@ mark {
   border-bottom: 0;
 }
 
+.settings-library-card .settings-row {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.settings-library-card .settings-row > span {
+  display: none;
+}
+
+.settings-library-card .settings-row select {
+  text-align: left;
+}
+
 .settings-list span {
   min-width: 0;
   color: var(--text-primary);
