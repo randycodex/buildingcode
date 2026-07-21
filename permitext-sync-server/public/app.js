@@ -135,6 +135,7 @@ function loadWorkspaceState() {
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       recentSearches: normalizeSearchHistory(saved.recentSearches, 10),
+      recentActivityUpdatedAt: saved.recentActivityUpdatedAt || null,
       pinnedSearches: normalizeSearchHistory(saved.pinnedSearches),
       recentlyViewedSections: Array.isArray(saved.recentlyViewedSections)
         ? saved.recentlyViewedSections.filter((item) => item && Number(item.sectionID) > 0).slice(0, 20)
@@ -181,6 +182,7 @@ function loadWorkspaceState() {
       searchQuery: "",
       searchCodeFilters: [],
       recentSearches: [],
+      recentActivityUpdatedAt: null,
       pinnedSearches: [],
       recentlyViewedSections: [],
       localProjects: [],
@@ -2299,6 +2301,49 @@ function mutationUpdatedAt(mutation) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
+function bulkClearScope(record) {
+  return String(record?.values?.scope || "").trim();
+}
+
+function bulkClearKey(record) {
+  const scope = bulkClearScope(record);
+  if (!scope) return null;
+  return [syncCodeVersion(record.codeVersion), scope].join(":");
+}
+
+function bulkClearTimestamp(clearRecords, codeVersion, scope) {
+  const key = [syncCodeVersion(codeVersion), scope].join(":");
+  const record = clearRecords instanceof Map
+    ? clearRecords.get(key)
+    : (clearRecords || []).find((candidate) => bulkClearKey(candidate) === key);
+  const timestamp = Date.parse(record?.updatedAt || 0);
+  return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function recordSurvivesBulkClear(record, clearRecords, scopes) {
+  const updatedAt = Date.parse(record?.updatedAt || 0);
+  if (!Number.isFinite(updatedAt)) return true;
+  return !scopes.some((scope) => bulkClearTimestamp(clearRecords, record.codeVersion, scope) >= updatedAt);
+}
+
+function currentBulkClearRecords() {
+  const latestByKey = new Map();
+  [
+    ...(syncedContent?.summary?.codeVersionClears || []),
+    ...(state.syncOutbox || [])
+      .map((entry) => mutationKindAndRecord(entry.mutation))
+      .filter(({ kind }) => kind === "codeVersionClear")
+      .map(({ record }) => record)
+  ].forEach((record) => {
+    const key = bulkClearKey(record);
+    const existing = key ? latestByKey.get(key) : null;
+    if (key && (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0))) {
+      latestByKey.set(key, record);
+    }
+  });
+  return Array.from(latestByKey.values());
+}
+
 function summarizeMutations(mutations = []) {
   const sorted = [...mutations].sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left));
   const latestByID = new Map();
@@ -2311,15 +2356,26 @@ function summarizeMutations(mutations = []) {
   const annotations = [];
   const projectSections = [];
   const workboards = [];
+  const codeVersionClears = new Map();
   let latestContinuity = null;
 
   latestByID.forEach((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "codeVersionClear" || !record) return;
+    const key = bulkClearKey(record);
+    const existing = key ? codeVersionClears.get(key) : null;
+    if (key && (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0))) {
+      codeVersionClears.set(key, record);
+    }
+  });
+
+  latestByID.forEach((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
     if (!record || record.deletedAt) return;
-    if (kind === "project") projects.push(record);
-    if (kind === "savedItem") savedItems.push(record);
+    if (kind === "project" && recordSurvivesBulkClear(record, codeVersionClears, ["folders"])) projects.push(record);
+    if (kind === "savedItem" && recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks"])) savedItems.push(record);
     if (kind === "annotation") annotations.push(record);
-    if (kind === "projectSection") projectSections.push(record);
+    if (kind === "projectSection" && recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks", "folders"])) projectSections.push(record);
     if (kind === "workboard") workboards.push(record);
     if (
       kind === "continuity" &&
@@ -2329,15 +2385,25 @@ function summarizeMutations(mutations = []) {
     }
   });
 
-  return { projects, savedItems, annotations, projectSections, workboards, latestContinuity };
+  return {
+    projects,
+    savedItems,
+    annotations,
+    projectSections,
+    workboards,
+    latestContinuity,
+    codeVersionClears: Array.from(codeVersionClears.values())
+  };
 }
 
 function currentContentSummary() {
   const summary = syncedContent?.summary || summarizeMutations([]);
   const summarySavedItems = summary.savedItems || [];
   const summaryAnnotations = summary.annotations || [];
+  const clearRecords = currentBulkClearRecords();
   const localProjectSavedItems = (state.localProjectSections || [])
-    .filter((item) => item && item.sectionID && !item.deletedAt)
+    .filter((item) => item && item.sectionID && !item.deletedAt &&
+      recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))
     .map((item) => ({
       id: `web-saved-${item.sectionID}`,
       userID: item.userID || "local-web",
@@ -2350,7 +2416,8 @@ function currentContentSummary() {
       title: item.title || "Section",
       updatedAt: item.updatedAt || new Date().toISOString()
     }));
-  const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems];
+  const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems]
+    .filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks"]));
   const savedItemsBySection = new Map(
     summarySavedItems.map((item) => [String(item.sectionID || ""), item])
   );
@@ -2371,7 +2438,9 @@ function currentContentSummary() {
     (summary.projectSections || []).map((item) => [projectSectionIdentity(item), item])
   );
   (state.localProjectSections || []).forEach((item) => {
-    if (item) projectSectionsByID.set(projectSectionIdentity(item), item);
+    if (item && recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"])) {
+      projectSectionsByID.set(projectSectionIdentity(item), item);
+    }
   });
   return {
     ...summary,
@@ -2648,6 +2717,15 @@ function continuityRecentEntries(values = {}) {
   }
 }
 
+function continuityRecentSearches(values = {}) {
+  try {
+    const parsed = JSON.parse(values.recentSearchesJSON || "[]");
+    return normalizeSearchHistory(Array.isArray(parsed) ? parsed : [], 10);
+  } catch {
+    return [];
+  }
+}
+
 function recordRecentlyViewedReader(reader) {
   const sectionID = Number(reader?.sectionID || 0);
   if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return;
@@ -2670,6 +2748,7 @@ function recordRecentlyViewedReader(reader) {
     entry,
     ...(state.recentlyViewedSections || []).filter((item) => Number(item?.sectionID) !== sectionID)
   ].slice(0, 20);
+  state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
 }
 
@@ -2713,7 +2792,8 @@ function continuityValuesForReader(reader) {
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
-    recentlyViewedSectionsJSON: JSON.stringify(recentEntries)
+    recentlyViewedSectionsJSON: JSON.stringify(recentEntries),
+    recentSearchesJSON: JSON.stringify(normalizeSearchHistory(state.recentSearches, 10))
   };
 }
 
@@ -2738,6 +2818,26 @@ function scheduleContinuitySync(reader) {
   }, 500);
 }
 
+function scheduleRecentSearchContinuitySync() {
+  const account = activeAccount();
+  if (!account) return;
+  clearTimeout(continuityPushTimer);
+  continuityPushTimer = window.setTimeout(() => {
+    const updatedAt = new Date().toISOString();
+    const reader = state.readers[0] || {};
+    state.continuityAppliedAt = updatedAt;
+    enqueueSyncMutation({
+      continuity: {
+        userID: account.userID,
+        codeVersion: defaultSyncCodeVersion,
+        values: continuityValuesForReader(reader),
+        updatedAt
+      }
+    }, account);
+    flushSyncOutbox({ refresh: true }).catch(() => {});
+  }, 500);
+}
+
 async function applyRemoteContinuityIfNewer() {
   const record = syncedContent?.summary?.latestContinuity;
   const remoteTimestamp = Date.parse(record?.updatedAt || 0);
@@ -2756,8 +2856,16 @@ async function applyRemoteContinuityIfNewer() {
     return;
   }
 
+  const recentActivityTimestamp = Date.parse(state.recentActivityUpdatedAt || 0);
+  if (!Number.isFinite(recentActivityTimestamp) || remoteTimestamp >= recentActivityTimestamp) {
+    const remoteRecentEntries = continuityRecentEntries(record.values);
+    state.recentlyViewedSections = remoteRecentEntries.slice(0, 20);
+    if (record.values?.recentSearchesJSON !== undefined) {
+      state.recentSearches = continuityRecentSearches(record.values);
+    }
+    state.recentActivityUpdatedAt = record.updatedAt;
+  }
   const remoteRecentEntries = continuityRecentEntries(record.values);
-  state.recentlyViewedSections = remoteRecentEntries.slice(0, 20);
   const latestSectionID = Number(remoteRecentEntries[0]?.sectionID || 0);
   const reader = state.readers[0] || newReaderState();
   if (Number.isSafeInteger(latestSectionID) && latestSectionID > 0) {
@@ -3362,10 +3470,13 @@ function visibleProjectRecords(syncedProjects = []) {
     const identity = projectDetailKey(project);
     if (identity) byIdentity.set(identity, project);
   });
-  (state.localProjects || []).forEach((project) => {
-    const identity = projectDetailKey(project);
-    if (identity) byIdentity.set(identity, project);
-  });
+  const clearRecords = currentBulkClearRecords();
+  (state.localProjects || [])
+    .filter((project) => recordSurvivesBulkClear(project, clearRecords, ["folders"]))
+    .forEach((project) => {
+      const identity = projectDetailKey(project);
+      if (identity) byIdentity.set(identity, project);
+    });
   return Array.from(byIdentity.values()).filter((project) => !project.deletedAt).sort((left, right) =>
     String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
       numeric: true,
@@ -3664,8 +3775,22 @@ function annotationForTarget(sectionID, blockID = "") {
   let tags = [];
   let noteResolved = false;
   let tagsResolved = false;
+  const clearRecords = currentBulkClearRecords();
 
   for (const record of records) {
+    const updatedAt = Date.parse(record.updatedAt || 0);
+    const noteWasCleared = Number.isFinite(updatedAt) &&
+      bulkClearTimestamp(clearRecords, record.codeVersion, "notes") >= updatedAt;
+    const tagsWereCleared = Number.isFinite(updatedAt) &&
+      bulkClearTimestamp(clearRecords, record.codeVersion, "tags") >= updatedAt;
+    if (noteWasCleared && !noteResolved) {
+      noteBody = "";
+      noteResolved = true;
+    }
+    if (tagsWereCleared && !tagsResolved) {
+      tags = [];
+      tagsResolved = true;
+    }
     if (record.deletedAt && !noteResolved) {
       noteBody = "";
       noteResolved = true;
@@ -5340,7 +5465,9 @@ function recordRecentSearch(query) {
     trimmed,
     ...(state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0)
   ], 10);
+  state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
+  scheduleRecentSearchContinuitySync();
 }
 
 function isSearchPinned(query) {
@@ -5364,7 +5491,9 @@ function unpinSearch(query) {
 function removeRecentSearch(query) {
   const trimmed = String(query || "").trim();
   state.recentSearches = (state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0);
+  state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
+  scheduleRecentSearchContinuitySync();
 }
 
 function searchRecentlyViewedEntries() {
@@ -8365,28 +8494,30 @@ function bookmarkRecordsForSettings() {
   return Array.from(bySectionID.values()).filter((item) => item?.sectionID && !item.deletedAt);
 }
 
+function enqueueSettingsBulkClear(scope) {
+  const account = activeAccount();
+  if (!account) return null;
+  const mutation = {
+    codeVersionClear: {
+      userID: account.userID,
+      codeVersion: defaultSyncCodeVersion,
+      values: { scope },
+      updatedAt: new Date().toISOString()
+    }
+  };
+  enqueueSyncMutation(mutation, account);
+  return mutation;
+}
+
 async function clearSettingsBookmarks() {
   const records = bookmarkRecordsForSettings();
   const account = activeAccount();
-  const clearedIDs = new Set(records.map((item) => String(item.sectionID)));
-  records.forEach((item) => {
-    const updatedAt = new Date().toISOString();
-    const tombstone = {
-      ...item,
-      id: item.id || `web-saved-${item.sectionID}`,
-      userID: account?.userID || item.userID || "local-web",
-      updatedAt,
-      deletedAt: updatedAt
-    };
-    state.localSavedItems = [
-      ...(state.localSavedItems || []).filter((candidate) => String(candidate.sectionID) !== String(item.sectionID)),
-      tombstone
-    ];
-    if (account) enqueueSyncMutation({ savedItem: tombstone }, account);
-  });
-  state.localSavedSectionIDs = (state.localSavedSectionIDs || []).filter((id) => !clearedIDs.has(String(id)));
+  state.localSavedItems = [];
+  state.localSavedSectionIDs = [];
+  state.localProjectSections = [];
+  enqueueSettingsBulkClear("bookmarks");
   saveWorkspaceState();
-  if (account && records.length) await flushSyncOutbox({ refresh: true });
+  if (account) await flushSyncOutbox({ refresh: true });
   return records.length;
 }
 
@@ -8398,13 +8529,15 @@ async function clearSettingsAnnotations(field) {
     if (!uniqueTargets.has(key)) uniqueTargets.set(key, record);
   });
   uniqueTargets.forEach((record) => {
-    const target = annotationTargetForSection({ ...record, id: record.sectionID }, null, { blockID: record.blockID || "" });
-    if (field === "noteBody") setAnnotationNoteValue(target, "");
-    else setAnnotationTags(target, []);
+    const localRecord = (state.localAnnotations || []).find((item) => String(item.id || "") === String(record.id || ""));
+    if (!localRecord) return;
+    if (field === "noteBody") localRecord.noteBody = "";
+    else localRecord.tags = [];
   });
   if (field === "noteBody") state.sectionNotes = {};
+  enqueueSettingsBulkClear(field === "noteBody" ? "notes" : "tags");
   saveWorkspaceState();
-  if (activeAccount() && uniqueTargets.size) await flushSyncOutbox({ refresh: true });
+  if (activeAccount()) await flushSyncOutbox({ refresh: true });
   return uniqueTargets.size;
 }
 
@@ -8412,6 +8545,7 @@ async function performSettingsClearAction(action) {
   if (action === "searches") {
     state.recentSearches = [];
     state.recentlyViewedSections = [];
+    state.recentActivityUpdatedAt = new Date().toISOString();
     const account = activeAccount();
     if (account) {
       const pendingRecord = [...(state.syncOutbox || [])].reverse()
@@ -8424,7 +8558,7 @@ async function performSettingsClearAction(action) {
         continuity: {
           userID: account.userID,
           codeVersion: defaultSyncCodeVersion,
-          values: { ...existing, recentlyViewedSectionsJSON: "[]" },
+          values: { ...existing, recentlyViewedSectionsJSON: "[]", recentSearchesJSON: "[]" },
           updatedAt
         }
       }, account);
@@ -8432,7 +8566,7 @@ async function performSettingsClearAction(action) {
       if (syncedContent?.summary?.latestContinuity) {
         syncedContent.summary.latestContinuity = {
           ...syncedContent.summary.latestContinuity,
-          values: { ...existing, recentlyViewedSectionsJSON: "[]" },
+          values: { ...existing, recentlyViewedSectionsJSON: "[]", recentSearchesJSON: "[]" },
           updatedAt
         };
       }

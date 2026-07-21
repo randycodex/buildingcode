@@ -847,7 +847,10 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         case .continuity(let record):
             return [record.userID, "continuity", record.codeVersion].joined(separator: ":")
         case .codeVersionClear(let record):
-            return [record.userID, "code-version-clear", record.codeVersion].joined(separator: ":")
+            return [record.userID, "code-version-clear", record.codeVersion, record.values["scope"]]
+                .compactMap { $0 }
+                .filter { !$0.isEmpty }
+                .joined(separator: ":")
         }
     }
 
@@ -1479,6 +1482,16 @@ enum UserContentMergeResolver {
 
     static func decision(for candidate: UserContentMergeCandidate) -> UserContentMergeDecision {
         if candidate.localSyncState == .pendingUpload || candidate.localSyncState == .localOnly {
+            if let localUpdatedAt = candidate.localUpdatedAt,
+               let serverUpdatedAt = candidate.serverUpdatedAt,
+               serverUpdatedAt > localUpdatedAt {
+                return UserContentMergeDecision(
+                    recordID: candidate.recordID,
+                    entityKind: candidate.entityKind,
+                    action: .applyServer,
+                    reason: "The server change is newer than the queued local change."
+                )
+            }
             return UserContentMergeDecision(
                 recordID: candidate.recordID,
                 entityKind: candidate.entityKind,

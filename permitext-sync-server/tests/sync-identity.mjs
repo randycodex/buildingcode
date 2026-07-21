@@ -115,7 +115,16 @@ assert.equal(
   syncMutationRecordID({
     codeVersionClear: { userID, codeVersion: "nyc-2022", values: { scope: "folders" } }
   }),
-  `${userID}:code-version-clear:${defaultSyncCodeVersion}`
+  `${userID}:code-version-clear:${defaultSyncCodeVersion}:folders`
+);
+assert.notEqual(
+  syncMutationRecordID({
+    codeVersionClear: { userID, codeVersion: "nyc-2022", values: { scope: "bookmarks" } }
+  }),
+  syncMutationRecordID({
+    codeVersionClear: { userID, codeVersion: "nyc-2022", values: { scope: "notes" } }
+  }),
+  "Bulk clears for different data categories must not overwrite one another."
 );
 
 console.log("permitext client sync identity passed");

@@ -318,6 +318,15 @@ async function main() {
       "Visible web tabs no longer perform incremental foreground sync every 3 seconds."
     );
     assert(
+      workspaceScript.text.includes("function bulkClearScope(record)") &&
+        workspaceScript.text.includes("function recordSurvivesBulkClear(record, clearRecords, scopes)") &&
+        workspaceScript.text.includes('recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks"])') &&
+        workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "notes")') &&
+        workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "tags")') &&
+        workspaceScript.text.includes("recentSearchesJSON"),
+      "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
+    );
+    assert(
       workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&
         workspaceScript.text.includes("Math.max(value, defaultWidth)") &&
         workspaceScript.text.includes('panel.style.setProperty("--pane-default-min-width"'),
@@ -397,7 +406,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-sync-contract-v59'),
+        webRoot.text.includes('/web/app.js?v=20260721-sync-clears-v60'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -534,7 +543,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("const projectSectionsByID = new Map(") &&
-        workspaceScript.text.includes(".filter((item) => item && item.sectionID && !item.deletedAt)") &&
+        workspaceScript.text.includes('recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"])') &&
         workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
         workspaceScript.text.includes("async function refreshProjectMembershipPanes(project)") &&
         workspaceScript.text.includes("await refreshProjectMembershipPanes(project)") &&
@@ -938,6 +947,42 @@ async function main() {
     assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user ID.");
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
+
+    const clearScopes = ["bookmarks", "notes", "tags"];
+    const clearMutations = clearScopes.map((scope, index) => ({
+      codeVersionClear: {
+        userID,
+        codeVersion: "2022 Construction Codes",
+        values: { scope },
+        updatedAt: new Date(Date.now() + index).toISOString()
+      }
+    }));
+    const pushClears = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: clearMutations }
+      }
+    });
+    assert(pushClears.response.ok, "Bulk clear sync push failed.");
+    assert(pushClears.json.acceptedMutationIDs.length === 3, "Bulk clear categories overwrote one another during push.");
+    assert(
+      clearScopes.every((scope) => pushClears.json.acceptedMutationIDs.some((id) => id.endsWith(`:${scope}`))),
+      "Bulk clear sync IDs did not preserve their category scope."
+    );
+    const pullClears = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const pulledClearScopes = pullClears.json.mutations
+      .filter((mutation) => mutation.codeVersionClear)
+      .map((mutation) => mutation.codeVersionClear.values?.scope);
+    assert(
+      clearScopes.every((scope) => pulledClearScopes.includes(scope)),
+      "A bulk clear category disappeared before another client could pull it."
+    );
 
     const unauthorizedResearch = await request("/research/interpret", {
       method: "POST",
@@ -1764,7 +1809,10 @@ async function main() {
     assert(Number.isInteger(pull.json.latestEventID), "Pull did not return a latest event ID.");
     assert(pull.json.syncRevision === pull.json.latestEventID, "Pull sync revision did not match latest event ID.");
     assert(pull.json.contentMapVersion === 2, "Pull did not return the canonical content-map version.");
-    assert(pull.json.mutations.length === 1, "Pull did not return the pushed mutation.");
+    assert(
+      pull.json.mutations.some((item) => item.savedItem?.sectionID === 900001),
+      "Pull did not return the pushed mutation."
+    );
 
     const invalidInlineWorkboardPush = await request("/sync/push", {
       method: "POST",

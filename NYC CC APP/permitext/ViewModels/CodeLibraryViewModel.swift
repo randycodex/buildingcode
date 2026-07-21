@@ -477,6 +477,10 @@ final class CodeLibraryViewModel: ObservableObject {
            let json = String(data: data, encoding: .utf8) {
             values["recentlyViewedSectionsJSON"] = json
         }
+        if let data = try? JSONEncoder().encode(recentSearches),
+           let json = String(data: data, encoding: .utf8) {
+            values["recentSearchesJSON"] = json
+        }
         return values
     }
 
@@ -491,6 +495,7 @@ final class CodeLibraryViewModel: ObservableObject {
         selectedCodeSectionID = context.selectedCodeSectionID
         activeProjectID = context.activeProjectID
         recentlyViewedSections = context.recentlyViewedSections
+        recentSearches = Self.loadRecentSearches()
         if shouldReloadContent {
             openSelectedContent()
         }
@@ -1394,11 +1399,13 @@ final class CodeLibraryViewModel: ObservableObject {
         updated.insert(trimmed, at: 0)
         recentSearches = Array(updated.prefix(10))
         UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+        queueContinuityContextForSync()
     }
 
     func removeRecentSearch(_ query: String) {
         recentSearches.removeAll { $0.caseInsensitiveCompare(query) == .orderedSame }
         UserDefaults.standard.set(recentSearches, forKey: recentSearchesDefaultsKey)
+        queueContinuityContextForSync()
     }
 
     func clearRecentSearches() {

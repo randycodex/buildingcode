@@ -92,7 +92,8 @@ export function syncMutationRecordID(mutation) {
     return [userID, "continuity", codeVersion].join(":");
   }
   if (kind === "codeVersionClear") {
-    return [userID, "code-version-clear", codeVersion].join(":");
+    const scope = nonEmpty(record.values?.scope);
+    return scope ? [userID, "code-version-clear", codeVersion, scope].join(":") : null;
   }
   return nonEmpty(record.id);
 }

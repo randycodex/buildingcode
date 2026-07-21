@@ -374,7 +374,7 @@ struct UserContentSyncEngine {
                 : localCandidates
             let mergePlan = try previewMerge(incoming: incoming, localCandidates: resolvedLocalCandidates)
             let appliedCount = try applySafeChanges
-                ? applySafeRemoteChanges(incoming: incoming, mergePlan: mergePlan)
+                ? applySafeRemoteChanges(incoming: incoming, mergePlan: mergePlan, account: account)
                 : 0
             let safeNoOpCount = mergePlan.noChangeCount
             let unresolvedCount = mergePlan.keepLocalCount + mergePlan.uploadLocalCount + mergePlan.conflictCount
@@ -515,7 +515,8 @@ struct UserContentSyncEngine {
 
     private func applySafeRemoteChanges(
         incoming: ServerUserContentPullResult,
-        mergePlan: UserContentMergePlan
+        mergePlan: UserContentMergePlan,
+        account: SignedInAccount
     ) throws -> Int {
         guard let repository else { return 0 }
         let decisionsByID = Dictionary(uniqueKeysWithValues: mergePlan.decisions.map { ($0.recordID, $0) })
@@ -529,9 +530,11 @@ struct UserContentSyncEngine {
                 } else {
                     try repository.applyServerUserContentMutation(mutation)
                 }
+                try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
                 appliedCount += 1
             case .deleteLocal:
                 try repository.applyServerUserContentMutation(mutation)
+                try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
                 appliedCount += 1
             case .noChange:
                 // Reapply idempotently so records written under an older code-version
@@ -562,6 +565,11 @@ struct UserContentSyncEngine {
             recentlyViewedSections = decoded.sorted { $0.viewedAt > $1.viewedAt }
         } else {
             recentlyViewedSections = existingContext.recentlyViewedSections
+        }
+        if let rawJSON = values["recentSearchesJSON"],
+           let data = rawJSON.data(using: .utf8),
+           let decoded = try? JSONDecoder().decode([String].self, from: data) {
+            UserDefaults.standard.set(Array(decoded.prefix(10)), forKey: "recentSearches")
         }
 
         let selectedJurisdictionKey = values["selectedJurisdictionKey"].flatMap { $0.isEmpty ? nil : $0 }

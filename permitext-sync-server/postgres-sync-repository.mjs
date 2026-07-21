@@ -15,7 +15,9 @@ function mutationRecordID(mutation) {
     return [record.userID, "continuity", record.codeVersion].join(":");
   }
   if (kind === "codeVersionClear") {
-    return [record.userID, "code-version-clear", record.codeVersion].join(":");
+    return [record.userID, "code-version-clear", record.codeVersion, record.values?.scope]
+      .filter(Boolean)
+      .join(":");
   }
   return record.id || null;
 }

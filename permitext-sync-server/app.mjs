@@ -107,6 +107,7 @@ const allowedMutationKinds = new Set([
   "continuity",
   "codeVersionClear"
 ]);
+const allowedCodeVersionClearScopes = new Set(["bookmarks", "notes", "tags", "folders"]);
 
 const researchInterpretationSchema = {
   type: "object",
@@ -221,7 +222,9 @@ function normalizedMutationRecordID(mutation) {
     return [record.userID, "continuity", record.codeVersion].join(":");
   }
   if (kind === "codeVersionClear") {
-    return [record.userID, "code-version-clear", record.codeVersion].join(":");
+    return [record.userID, "code-version-clear", record.codeVersion, record.values?.scope]
+      .filter(Boolean)
+      .join(":");
   }
   return record.id || null;
 }
@@ -3111,7 +3114,9 @@ function mutationRecordID(mutation) {
     return [record.userID, "continuity", record.codeVersion].join(":");
   }
   if (kind === "codeVersionClear") {
-    return [record.userID, "code-version-clear", record.codeVersion].join(":");
+    return [record.userID, "code-version-clear", record.codeVersion, record.values?.scope]
+      .filter(Boolean)
+      .join(":");
   }
   return record.id || null;
 }
@@ -3346,6 +3351,9 @@ function validateMutation(mutation, userID) {
   }
   if (!mutationRecordID(mutation)) {
     return validationError("Mutation record is missing a stable ID.");
+  }
+  if (kind === "codeVersionClear" && !allowedCodeVersionClearScopes.has(String(record.values?.scope || ""))) {
+    return validationError("Code-version clear mutations require a supported scope.");
   }
   if (!Number.isFinite(mutationUpdatedAt(mutation))) {
     return validationError("Mutation record is missing a valid updatedAt timestamp.");
