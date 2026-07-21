@@ -4144,11 +4144,7 @@ function ensureReaderNotesSheet(panel, reader) {
   actions.className = "reader-notes-actions";
   actions.append(doneButton);
 
-  const noteLabel = document.createElement("strong");
-  noteLabel.className = "reader-notes-trust-label";
-  noteLabel.textContent = "Private note · not code text";
-
-  header.append(bookmarkButton, noteLabel, actions);
+  header.append(bookmarkButton, actions);
 
   const input = document.createElement("textarea");
   input.className = "reader-notes-input";
