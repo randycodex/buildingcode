@@ -2037,7 +2037,10 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func prepareCanonicalCodeVersionMigration(for account: SignedInAccount?) {
         guard let account else { return }
-        let key = "permitext.sync.canonical-code-version-and-project-identity.v2.\(account.appUserID)"
+        // Reconcile once from the complete server state after the project and
+        // bulk-clear tombstone repairs. Older event cursors could otherwise
+        // remain ahead of those repaired records and preserve stale local data.
+        let key = "permitext.sync.full-state-reconciliation.v4.\(account.appUserID)"
         guard !UserDefaults.standard.bool(forKey: key) else { return }
         syncEngine.resetCheckpoint(account: account)
         UserDefaults.standard.set(true, forKey: key)

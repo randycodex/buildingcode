@@ -3185,11 +3185,24 @@ async function canonicalizeSectionRecord(kind, record) {
   }
   const codeVersion = canonicalCodeVersion(record.codeVersion);
   if (kind === "project") {
+    // iOS persists `colorHex`, while early web records also carried `color`
+    // and `tintColor`. Keep every alias aligned at the sync boundary so a
+    // stale legacy field cannot override the latest cross-device color.
+    const canonicalColor = record.colorHex || record.color || record.tintColor || null;
     const clientID = syncProjectIdentity(record.clientID, record.userID) ||
       syncProjectIdentity(record.id, record.userID) ||
       String(record.localFolderID || "").trim() ||
       null;
-    const normalized = { ...record, codeVersion, clientID };
+    const normalized = {
+      ...record,
+      codeVersion,
+      clientID,
+      ...(canonicalColor ? {
+        color: canonicalColor,
+        colorHex: canonicalColor,
+        tintColor: canonicalColor
+      } : {})
+    };
     const nextID = canonicalMutationRecordID(kind, normalized);
     return nextID ? { ...normalized, id: nextID } : normalized;
   }

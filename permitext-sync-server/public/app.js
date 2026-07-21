@@ -3428,7 +3428,9 @@ const projectColorOptions = [
 ];
 
 function projectColor(project) {
-  return project?.color || project?.tintColor || project?.colorHex || projectColorOptions[0];
+  // `colorHex` is the native iOS storage field and the canonical sync value.
+  // Legacy web aliases remain as fallbacks for records created before sync.
+  return project?.colorHex || project?.color || project?.tintColor || projectColorOptions[0];
 }
 
 function projectForegroundColor(color) {

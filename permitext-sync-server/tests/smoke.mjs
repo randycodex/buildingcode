@@ -2146,7 +2146,9 @@ async function main() {
         localFolderID: 42,
         name: "Smoke Project",
         description: "",
+        color: "#879a6d",
         colorHex: "#FF6B35",
+        tintColor: "#6674c8",
         sortOrder: 0,
         updatedAt: "2026-06-04T00:00:00Z"
       }
@@ -2179,6 +2181,18 @@ async function main() {
     assert(projectPush.response.ok, "Project sync push failed.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectRecordID), "Project mutation was not accepted.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
+
+    const canonicalProjectColorPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const canonicalProjectColor = canonicalProjectColorPull.json.mutations.find((mutation) =>
+      mutation.project?.id === projectRecordID
+    )?.project;
+    assert(canonicalProjectColor?.colorHex === "#FF6B35", "Project colorHex changed during canonicalization.");
+    assert(canonicalProjectColor?.color === "#FF6B35", "Legacy web project color did not match colorHex.");
+    assert(canonicalProjectColor?.tintColor === "#FF6B35", "Legacy project tintColor did not match colorHex.");
 
     const webProjectSectionDeletePush = await request("/sync/push", {
       method: "POST",
