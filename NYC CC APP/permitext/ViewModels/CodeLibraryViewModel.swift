@@ -71,7 +71,6 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var readerTheme: ReaderTheme
     @Published private(set) var isInitialContentLoaded: Bool = false
     @Published private(set) var initialLoadProgress: Double = 0
-    @Published var comparisonModeEnabled: Bool
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
@@ -97,7 +96,6 @@ final class CodeLibraryViewModel: ObservableObject {
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
     private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
     private let lastOpenedChapterIDDefaultsKey = "lastOpenedChapterID"
-    private let comparisonModeDefaultsKey = "comparisonModeEnabled"
     private var lastChapterPreloadTask: Task<Void, Never>?
     private var codeSectionWarmupTask: Task<Void, Never>?
     private var chapterWarmupTasks: [Int64: Task<Void, Never>] = [:]
@@ -142,9 +140,6 @@ final class CodeLibraryViewModel: ObservableObject {
     private var lastForegroundAccountSyncAt: Date?
     private let foregroundAccountSyncInterval: TimeInterval = 12
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
-    /// Monotonic token used to suppress stale tab re-assertions after a
-    /// comparison-mode toggle. See `setComparisonMode(enabled:keeping:)`.
-    private var pendingTabAssertionToken: Int = 0
     @Published private(set) var bookmarkRevision: Int = 0
     @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
 
@@ -184,7 +179,6 @@ final class CodeLibraryViewModel: ObservableObject {
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
-        self.comparisonModeEnabled = continuityContext.comparisonModeEnabled
         prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
         refreshPendingUserContentSyncCount()
         networkMonitor.pathUpdateHandler = { [weak self] path in
@@ -433,7 +427,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 context.lastOpenedChapterID = lastOpenedChapterID
             }
             context.activeProjectID = activeProjectID
-            context.comparisonModeEnabled = comparisonModeEnabled
+            // Kept in the continuity payload for compatibility with older app
+            // versions. Current clients always expose both reader contexts.
+            context.comparisonModeEnabled = true
             context.recentlyViewedSections = recentlyViewedSections
         }
         queueContinuityContextForSync()
@@ -486,12 +482,7 @@ final class CodeLibraryViewModel: ObservableObject {
         selectedVersionFileName = context.selectedVersionFileName
         selectedCodeSectionID = context.selectedCodeSectionID
         activeProjectID = context.activeProjectID
-        comparisonModeEnabled = context.comparisonModeEnabled
         recentlyViewedSections = context.recentlyViewedSections
-
-        if !comparisonModeEnabled {
-            BrowserContextID.persistCodeSectionID(context.selectedCodeSectionID, for: .primary)
-        }
         if shouldReloadContent {
             openSelectedContent()
         }
@@ -605,41 +596,11 @@ final class CodeLibraryViewModel: ObservableObject {
     func updateSelectedCodeSection(id: Int64?) {
         selectedCodeSectionID = id
         persistContinuityContext()
-        // Keep the primary browser context in sync so BrowseView always opens
-        // on the section chosen here when comparison mode is off.
-        if !comparisonModeEnabled {
-            BrowserContextID.persistCodeSectionID(id, for: .primary)
-        }
         guard let authoredCodeStore else { return }
         codeSections = Self.sortedCodeSections(authoredCodeStore.codeSections())
         chapters = authoredCodeStore.chapters(codeSectionID: id)
         searchResults = []
         prewarmCodeSectionForBrowsing(id: id)
-    }
-
-    func updateComparisonMode(enabled: Bool) {
-        setComparisonMode(enabled: enabled)
-    }
-
-    func setComparisonMode(enabled: Bool, keeping tab: AppTab? = nil) {
-        let tabToKeep = tab ?? selectedTab
-        comparisonModeEnabled = enabled
-        persistContinuityContext()
-        selectedTab = tabToKeep
-
-        // Inserting/removing the secondary browse tab can leave UIKit on a
-        // stale index for one layout pass. Re-assert after a frame, but use a
-        // token so a user tap during that window cancels the re-assertion
-        // instead of snapping the tab back.
-        pendingTabAssertionToken &+= 1
-        let token = pendingTabAssertionToken
-        Task { @MainActor in
-            try? await Task.sleep(for: .milliseconds(16))
-            guard token == self.pendingTabAssertionToken else { return }
-            if self.selectedTab != tabToKeep {
-                self.selectedTab = tabToKeep
-            }
-        }
     }
 
     func requestBrowserTabSwitch(to context: BrowserContextID) {
@@ -653,8 +614,8 @@ final class CodeLibraryViewModel: ObservableObject {
         } else if context == .primary {
             codeSectionID = selectedCodeSectionID
         } else {
-            // First time the secondary browser appears (comparison mode just
-            // enabled): default it to a *different* code section than primary
+            // First time the secondary reader appears, default it to a
+            // different code section than primary,
             // so the two browsers immediately show distinct content. Falls
             // back to the primary selection if only one section exists.
             codeSectionID = defaultSecondaryCodeSectionID()

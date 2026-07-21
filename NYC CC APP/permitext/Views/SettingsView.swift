@@ -5,16 +5,6 @@ import UIKit
 private enum SettingsRowTypography {
     static let label = Font.body.weight(.medium)
     static let value = Font.body
-    static let toggleTitle = Font.body.weight(.medium)
-}
-
-private enum SettingsControlMetrics {
-    static let switchWidth: CGFloat = 54
-    static let switchHeight: CGFloat = 32
-    static let switchThumbInset: CGFloat = 3
-    static let switchThumbCornerRadius: CGFloat = 12
-    static let switchThumbSize: CGFloat = switchHeight - (switchThumbInset * 2)
-    static let switchThumbTravel: CGFloat = switchWidth - switchThumbSize - (switchThumbInset * 2)
 }
 
 struct SettingsView: View {
@@ -58,8 +48,6 @@ struct SettingsView: View {
                             versionPicker
                             Divider()
                             codeSectionPicker
-                            Divider()
-                            comparisonModeToggle
                         }
                     }
 
@@ -217,20 +205,6 @@ struct SettingsView: View {
                 }
             }
         }
-    }
-
-    private var comparisonModeToggle: some View {
-        Toggle(isOn: Binding(
-            get: { library.comparisonModeEnabled },
-            set: { library.setComparisonMode(enabled: $0, keeping: .settings) }
-        )) {
-            Text("Comparison Mode")
-                .font(SettingsRowTypography.toggleTitle)
-                .foregroundStyle(.primary)
-        }
-        .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
-        .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
-        .toggleStyle(SettingsSwitchToggleStyle())
     }
 
     private var planCard: some View {
@@ -915,56 +889,6 @@ private enum ClearSettingsAction: Identifiable, Equatable {
             return "This removes every note saved for the current code version."
         case .clearTags:
             return "This removes every tag from saved sections for the current code version. Bookmarks and notes are not affected."
-        }
-    }
-}
-
-private struct SettingsSwitchToggleStyle: ToggleStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        HStack(alignment: .center, spacing: CodeScreenMetrics.controlSpacing) {
-            configuration.label
-
-            Spacer(minLength: 0)
-
-            Button {
-                withAnimation(.easeInOut(duration: 0.18)) {
-                    configuration.isOn.toggle()
-                }
-            } label: {
-                ZStack(alignment: .leading) {
-                    Capsule(style: .continuous)
-                        .fill(Color.black.opacity(0.86))
-                        .overlay {
-                            Capsule(style: .continuous)
-                                .strokeBorder(
-                                    configuration.isOn
-                                    ? Color.appChrome.opacity(0.52)
-                                    : Color.white.opacity(0.14),
-                                    lineWidth: 1.5
-                                )
-                        }
-
-                    Capsule(style: .continuous)
-                        .fill(Color.appChrome)
-                        .padding(3)
-                        .frame(width: configuration.isOn ? SettingsControlMetrics.switchWidth : SettingsControlMetrics.switchHeight)
-                        .opacity(configuration.isOn ? 1 : 0)
-
-                    RoundedRectangle(cornerRadius: SettingsControlMetrics.switchThumbCornerRadius, style: .continuous)
-                        .fill(Color.white)
-                        .shadow(color: Color.black.opacity(0.28), radius: 4, x: 0, y: 1)
-                        .frame(
-                            width: SettingsControlMetrics.switchThumbSize,
-                            height: SettingsControlMetrics.switchThumbSize
-                        )
-                        .padding(SettingsControlMetrics.switchThumbInset)
-                        .offset(x: configuration.isOn ? SettingsControlMetrics.switchThumbTravel : 0)
-                }
-                .frame(width: SettingsControlMetrics.switchWidth, height: SettingsControlMetrics.switchHeight)
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Comparison Mode")
-            .accessibilityValue(configuration.isOn ? "On" : "Off")
         }
     }
 }

@@ -565,9 +565,6 @@ struct UserContentSyncEngine {
             ?? existingContext.selectedJurisdictionKey
         let selectedVersionFileName = values["selectedVersionFileName"].flatMap { $0.isEmpty ? nil : $0 }
             ?? (record.codeVersion.isEmpty ? existingContext.selectedVersionFileName : record.codeVersion)
-        let comparisonModeEnabled = values["comparisonModeEnabled"].map { $0 == "true" }
-            ?? existingContext.comparisonModeEnabled
-
         continuityStore.save(
             ContinuityContext(
                 selectedJurisdictionKey: selectedJurisdictionKey,
@@ -575,7 +572,7 @@ struct UserContentSyncEngine {
                 selectedCodeSectionID: values["selectedCodeSectionID"].flatMap(Int64.init),
                 lastOpenedChapterID: values["lastOpenedChapterID"].flatMap(Int64.init),
                 activeProjectID: values["activeProjectID"].flatMap(Int64.init),
-                comparisonModeEnabled: comparisonModeEnabled,
+                comparisonModeEnabled: true,
                 recentlyViewedSections: recentlyViewedSections
             )
         )

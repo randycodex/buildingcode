@@ -1585,7 +1585,7 @@ struct ContinuityContext: Codable, Hashable, Sendable {
         selectedCodeSectionID: nil,
         lastOpenedChapterID: nil,
         activeProjectID: nil,
-        comparisonModeEnabled: false,
+        comparisonModeEnabled: true,
         recentlyViewedSections: []
     )
 }

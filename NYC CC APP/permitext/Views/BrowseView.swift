@@ -52,27 +52,6 @@ struct BrowseView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
         }
-        .onChange(of: library.selectedCodeSectionID) { _, newValue in
-            // When comparison mode is off, the primary browser should always
-            // mirror the code section chosen in Settings. seedBrowseSectionIfNeeded
-            // only runs once per view appearance, so without this onChange the
-            // browse @State stays stuck on whatever it was first seeded with.
-            guard browserContext == .primary, !library.comparisonModeEnabled else { return }
-            if browseCodeSectionID != newValue {
-                browseCodeSectionID = newValue
-                BrowserContextID.persistCodeSectionID(newValue, for: .primary)
-            }
-        }
-        .onChange(of: library.comparisonModeEnabled) { _, isOn in
-            // Turning comparison mode OFF should snap the primary browser back
-            // to whatever Settings says (so the user sees the section they
-            // picked in the settings, not a stale per-context value).
-            guard browserContext == .primary, !isOn else { return }
-            if browseCodeSectionID != library.selectedCodeSectionID {
-                browseCodeSectionID = library.selectedCodeSectionID
-                BrowserContextID.persistCodeSectionID(library.selectedCodeSectionID, for: .primary)
-            }
-        }
         .coordinateSpace(name: "browseScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { newOffset in
             DispatchQueue.main.async {
@@ -264,10 +243,6 @@ struct BrowseView: View {
                     headerTitle(showPicker: true)
                 }
                 .buttonStyle(.plain)
-
-                Spacer(minLength: 0)
-
-                comparisonButton
             }
 
             VStack(alignment: .leading, spacing: 6) {
@@ -286,29 +261,6 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
-    }
-
-    private var comparisonButton: some View {
-        Button {
-            if library.comparisonModeEnabled {
-                library.setComparisonMode(enabled: false, keeping: .browse)
-            } else {
-                library.setComparisonMode(enabled: true, keeping: .browse)
-            }
-        } label: {
-            VStack(spacing: 4) {
-                Image(systemName: library.comparisonModeEnabled ? "rectangle.split.1x2.fill" : "rectangle.split.1x2")
-                    .font(.system(size: 17, weight: .semibold))
-                Text(library.comparisonModeEnabled ? "End" : "Compare")
-                    .font(.caption2.weight(.semibold))
-            }
-            .foregroundStyle(accentColor)
-            .frame(minWidth: 52, minHeight: 44)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel(library.comparisonModeEnabled ? "End comparison" : "Compare code books")
-        .accessibilityHint(library.comparisonModeEnabled ? "Returns to one Browse tab" : "Adds a second Browse tab")
     }
 
     private var continueReadingEntry: RecentlyViewedEntry? {
@@ -428,10 +380,6 @@ struct BrowseView: View {
         browseCodeSectionID = id
         BrowserContextID.persistCodeSectionID(id, for: browserContext)
         library.prewarmCodeSectionForBrowsing(id: id)
-        // In comparison mode each browser keeps its own section; updating the
-        // global selection re-tints the tab bar and can desync the selected tab.
-        guard !library.comparisonModeEnabled else { return }
-        library.updateSelectedCodeSection(id: id)
     }
 
     private func rememberedSectionBinding(for chapterID: Int64) -> Binding<Int64?> {
@@ -512,18 +460,9 @@ struct BrowseView: View {
 
         switch browserContext {
         case .primary:
-            // When comparison mode is off the primary browser should always
-            // reflect the code section chosen in Settings. The per-context
-            // stored value is only authoritative during comparison sessions.
-            if library.comparisonModeEnabled {
-                browseCodeSectionID = stored
-                    ?? library.selectedCodeSectionID
-                    ?? library.codeSections.first?.id
-            } else {
-                browseCodeSectionID = library.selectedCodeSectionID
-                    ?? stored
-                    ?? library.codeSections.first?.id
-            }
+            browseCodeSectionID = stored
+                ?? library.selectedCodeSectionID
+                ?? library.codeSections.first?.id
         case .secondary:
             let primarySectionID = BrowserContextID.storedCodeSectionID(for: .primary)
                 ?? library.selectedCodeSectionID

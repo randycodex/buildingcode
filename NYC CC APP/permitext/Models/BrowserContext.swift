@@ -9,21 +9,6 @@ enum AppTab: Hashable {
     case settings
 }
 
-enum AppTabLayout {
-    static func orderedTabs(comparisonModeEnabled: Bool) -> [AppTab] {
-        var tabs: [AppTab] = [.browse]
-        if comparisonModeEnabled {
-            tabs.append(.browseSecondary)
-        }
-        tabs.append(contentsOf: [.search, .bookmarks, .settings])
-        return tabs
-    }
-
-    static func index(for tab: AppTab, comparisonModeEnabled: Bool) -> Int? {
-        orderedTabs(comparisonModeEnabled: comparisonModeEnabled).firstIndex(of: tab)
-    }
-}
-
 struct ContinuityStore {
     static let shared = ContinuityStore()
 
@@ -37,7 +22,8 @@ struct ContinuityStore {
 
     func load() -> ContinuityContext {
         if let data = UserDefaults.standard.data(forKey: contextDefaultsKey),
-           let decoded = try? JSONDecoder().decode(ContinuityContext.self, from: data) {
+           var decoded = try? JSONDecoder().decode(ContinuityContext.self, from: data) {
+            decoded.comparisonModeEnabled = true
             return decoded
         }
 
@@ -47,7 +33,7 @@ struct ContinuityStore {
             selectedCodeSectionID: legacyInt64(forKey: selectedCodeSectionDefaultsKey),
             lastOpenedChapterID: legacyInt64(forKey: lastOpenedChapterIDDefaultsKey),
             activeProjectID: nil,
-            comparisonModeEnabled: UserDefaults.standard.bool(forKey: comparisonModeDefaultsKey),
+            comparisonModeEnabled: true,
             recentlyViewedSections: loadLegacyRecentlyViewedSections()
         )
     }

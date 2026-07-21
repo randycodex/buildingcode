@@ -74,17 +74,6 @@ struct PermitextApp: App {
             } message: { requirement in
                 Text(requirement.message)
             }
-            .onChange(of: library.comparisonModeEnabled) { _, isEnabled in
-                if !isEnabled, library.selectedTab == .browseSecondary {
-                    library.selectedTab = .browse
-                } else if isEnabled {
-                    let preservedTab = library.selectedTab
-                    Task { @MainActor in
-                        await Task.yield()
-                        library.selectedTab = preservedTab
-                    }
-                }
-            }
             .onChange(of: library.browserTabSwitchRequest) { _, requestedContext in
                 guard let requestedContext else { return }
                 library.selectedTab = requestedContext == .primary ? .browse : .browseSecondary
@@ -195,26 +184,21 @@ private struct PermitextTabNavigation: View {
                 .environment(\.isBrowserTabActive, library.selectedTab == .browse)
                 .tabItem {
                     Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                    Text("Browse")
                 }
-                .accessibilityLabel("Browse")
+                .accessibilityLabel("First reader")
                 .tag(AppTab.browse)
 
-            if library.comparisonModeEnabled {
-                BrowseView(browserContext: .secondary)
-                    .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
-                    .tabItem {
-                        Image(systemName: "text.line.last.and.arrowtriangle.forward")
-                        Text("Compare")
-                    }
-                    .accessibilityLabel("Comparison reader")
-                    .tag(AppTab.browseSecondary)
-            }
+            BrowseView(browserContext: .secondary)
+                .environment(\.isBrowserTabActive, library.selectedTab == .browseSecondary)
+                .tabItem {
+                    Image(systemName: "text.line.last.and.arrowtriangle.forward")
+                }
+                .accessibilityLabel("Second reader")
+                .tag(AppTab.browseSecondary)
 
             SearchView()
                 .tabItem {
                     Image(systemName: "sparkle.magnifyingglass")
-                    Text("Search")
                 }
                 .accessibilityLabel("Search")
                 .tag(AppTab.search)
@@ -222,7 +206,6 @@ private struct PermitextTabNavigation: View {
             BookmarksView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .bookmarks ? "bookmark.fill" : "bookmark")
-                    Text("Saved")
                 }
                 .accessibilityLabel("Saved")
                 .tag(AppTab.bookmarks)
@@ -230,7 +213,6 @@ private struct PermitextTabNavigation: View {
             SettingsView()
                 .tabItem {
                     Image(systemName: library.selectedTab == .settings ? "gearshape.fill" : "gearshape")
-                    Text("Settings")
                 }
                 .accessibilityLabel("Settings")
                 .tag(AppTab.settings)
@@ -294,22 +276,22 @@ private struct AppLaunchLoadingView: View {
         BrowseView()
             .tabItem {
                 Image(systemName: "text.line.first.and.arrowtriangle.forward")
-                Text("")
+            }
+        BrowseView(browserContext: .secondary)
+            .tabItem {
+                Image(systemName: "text.line.last.and.arrowtriangle.forward")
             }
         SearchView()
             .tabItem {
                 Image(systemName: "sparkle.magnifyingglass")
-                Text("")
             }
         BookmarksView()
             .tabItem {
                 Image(systemName: "bookmark")
-                Text("")
             }
         SettingsView()
             .tabItem {
                 Image(systemName: "gearshape")
-                Text("")
             }
     }
     .environmentObject(CodeLibraryViewModel.preview())
