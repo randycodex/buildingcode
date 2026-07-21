@@ -76,17 +76,6 @@ struct BrowseView: View {
                     .padding(.top, 18)
                     .padding(.bottom, 12)
 
-                if let entry = continueReadingEntry,
-                   let chapter = library.chapter(for: entry),
-                   let section = library.sectionSummary(
-                    sectionNumber: entry.sectionNumber,
-                    codeSectionID: entry.codeSectionID
-                   ) {
-                    continueReadingLink(entry: entry, chapter: chapter, section: section)
-                        .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
-                        .padding(.bottom, 18)
-                }
-
                 if chapters.isEmpty {
                     CodeEmptyStateCard(
                         title: "No Chapters",
@@ -261,52 +250,6 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
-    }
-
-    private var continueReadingEntry: RecentlyViewedEntry? {
-        library.recentEntry(for: browseCodeSectionID)
-    }
-
-    private func continueReadingLink(
-        entry: RecentlyViewedEntry,
-        chapter: CodeChapter,
-        section: CodeSectionSummary
-    ) -> some View {
-        NavigationLink {
-            chapterDestination(
-                chapter: chapter,
-                rememberedSectionID: rememberedSectionBinding(for: chapter.id),
-                rememberedAnchorID: rememberedAnchorBinding(for: chapter.id),
-                rememberedScrollOffset: rememberedScrollOffsetBinding(for: chapter.id),
-                initialSection: section
-            )
-        } label: {
-            CodeSurface(accent: accentColor, padding: 14, showsBorder: false) {
-                HStack(alignment: .center, spacing: 12) {
-                    VStack(alignment: .leading, spacing: 5) {
-                        CodeEyebrow(text: "Continue Reading", accent: accentColor)
-
-                        Text("Section \(entry.sectionNumber)")
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(.primary)
-
-                        Text(entry.title)
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                            .multilineTextAlignment(.leading)
-                    }
-
-                    Spacer(minLength: 8)
-
-                    Image(systemName: "arrow.right.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(accentColor)
-                }
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Continue reading Section \(entry.sectionNumber), \(entry.title)")
     }
 
     private func headerTitle(showPicker: Bool) -> some View {
