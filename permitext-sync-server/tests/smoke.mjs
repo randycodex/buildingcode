@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("solid-project-tiles-v45"),
+      webRoot.text.includes("ios-reader-annotations-v46"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -382,7 +382,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-solid-project-tiles-v45'),
+        webRoot.text.includes('/web/app.js?v=20260720-ios-reader-annotations-v46'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -482,7 +482,12 @@ async function main() {
     assert(
       workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
         workspaceScript.text.includes('openReaderNotesSheet(panel, section, reader, { target });') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved projects")'),
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved projects")') &&
+        workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
+        workspaceScript.text.includes('bookmarkButton.hidden = !saved') &&
+        workspaceScript.text.includes('const bookmarkWrapper = wrappers.find((wrapper) => wrapper.classList.contains("has-note")) || wrappers[0] || null') &&
+        workspaceScript.text.includes('const showBookmark = Boolean(saved && wrapper === bookmarkWrapper)') &&
+        !workspaceScript.text.includes("restoreReaderNotesSheet"),
       "Paragraph taps or saved bookmark controls no longer match the iOS note-sheet behavior."
     );
     assert(
@@ -517,7 +522,7 @@ async function main() {
         workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
-        workspaceScript.text.includes('button.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection")'),
+        workspaceScript.text.includes('button.setAttribute("aria-label", "Bookmarked")'),
       "Local-first notes or project saves can be replaced by stale sync data or leave stale Reader bookmark labels."
     );
     assert(
@@ -552,6 +557,11 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?background: var\(--project-color\);[\s\S]*?color: var\(--project-on-color\);/),
       "Saved project tiles no longer use their full project color with a contrast-safe foreground."
+    );
+    assert(
+      !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
+        !workspaceStyles.text.includes(".annotated-code-block:hover .inline-bookmark-toggle"),
+      "Reader annotation status icons still appear on hover without a saved note or bookmark."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 254px;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),

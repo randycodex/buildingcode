@@ -1838,13 +1838,8 @@ select option:checked {
 }
 
 .inline-comment.has-note .inline-comment-toggle,
-.inline-comment.has-saved-section .inline-bookmark-toggle,
-.annotated-code-block:hover .inline-comment-toggle,
-.annotated-code-block:focus-within .inline-comment-toggle,
-.annotated-code-block:hover .inline-bookmark-toggle,
-.annotated-code-block:focus-within .inline-bookmark-toggle {
+.inline-comment.has-saved-section .inline-bookmark-toggle {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .inline-comment-toggle svg,

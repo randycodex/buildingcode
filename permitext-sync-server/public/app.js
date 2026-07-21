@@ -3942,9 +3942,17 @@ async function renderSectionContent(panel, reader) {
     sectionWrapper.append(sectionHeading);
 
     const blocks = annotatedBlocksForSection(section);
+    const bookmarkedBlockIndex = isSectionSaved(section.id)
+      ? Math.max(0, blocks.findIndex((block, blockIndex) => {
+          const blockTarget = annotationTargetForBlock(section, block, reader, blockIndex);
+          return Boolean(noteValueForTarget(blockTarget.sectionID, blockTarget.blockID).trim());
+        }))
+      : -1;
     blocks.forEach((block, index) => {
       const target = annotationTargetForBlock(section, block, reader, index);
-      sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target));
+      sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
+        showBookmark: index === bookmarkedBlockIndex
+      }));
     });
 
     linkInlineCodeReferences(sectionWrapper, panel, reader);
@@ -3954,7 +3962,6 @@ async function renderSectionContent(panel, reader) {
   // Notes now open from each block in the reader notes sheet. Do not build the
   // retired, permanently hidden sidebar editor for every block in the chapter.
   clear(commentsList);
-  restoreReaderNotesSheet(panel, reader, sections);
 
   if (reader.sectionID) {
     requestAnimationFrame(() => {
@@ -4014,7 +4021,7 @@ async function navigateReaderToSection(panel, reader, behavior = "auto") {
   scrollReaderContentToSection(content, reader.sectionID, behavior, reader.sectionNumber);
 }
 
-function renderAnnotatedCodeBlock(block, section, reader, target) {
+function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) {
   const wrapper = document.createElement("div");
   wrapper.className = "annotated-code-block";
   wrapper.dataset.sectionId = String(target.sectionID || "");
@@ -4022,7 +4029,7 @@ function renderAnnotatedCodeBlock(block, section, reader, target) {
   wrapper.dataset.sectionTitle = target.title || "";
   wrapper.dataset.blockId = target.blockID || "";
   wrapper.dataset.blockLabel = target.blockLabel || "";
-  wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target));
+  wrapper.append(renderCodeBlock(block), renderInlineCommentBox(section, reader, target, options));
   wrapper.addEventListener("click", (event) => {
     if (event.target.closest("a, button, input, textarea, select")) return;
     if (window.getSelection && String(window.getSelection()).trim()) return;
@@ -4032,9 +4039,9 @@ function renderAnnotatedCodeBlock(block, section, reader, target) {
   return wrapper;
 }
 
-function renderInlineCommentBox(section, reader, target = annotationTargetForSection(section, reader)) {
+function renderInlineCommentBox(section, _reader, target = annotationTargetForSection(section, _reader), options = {}) {
   const noteBody = noteValueForTarget(target.sectionID, target.blockID);
-  const saved = isSectionSaved(section.id);
+  const saved = Boolean(options.showBookmark);
   const wrapper = document.createElement("section");
   wrapper.className = "inline-comment";
   wrapper.classList.toggle("has-note", Boolean(noteBody.trim()));
@@ -4042,63 +4049,26 @@ function renderInlineCommentBox(section, reader, target = annotationTargetForSec
   wrapper.dataset.commentSectionId = String(section.id);
   wrapper.dataset.commentBlockId = target.blockID || "";
 
-  const button = document.createElement("button");
+  const button = document.createElement("span");
   button.className = "inline-comment-toggle";
-  button.type = "button";
   button.innerHTML = `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path>
     </svg>
-    <span class="sr-only">Comments</span>
+    <span class="sr-only">Has note</span>
   `;
-  button.setAttribute("aria-label", "Comments");
-  button.title = "Open notes";
+  button.setAttribute("aria-label", "Has note");
+  button.setAttribute("aria-hidden", noteBody.trim() ? "false" : "true");
+  button.hidden = !noteBody.trim();
   button.classList.toggle("has-comment", Boolean(noteBody.trim()));
-  button.addEventListener("click", () => {
-    const panel = sectionElementForInlineComment(wrapper)?.closest(".reader-panel");
-    const sheet = panel?.querySelector(".reader-notes-sheet.is-open");
-    if (
-      sheet?.dataset.sectionId === String(section.id) &&
-      sheet?.dataset.blockId === normalizeAnnotationBlockID(target.blockID)
-    ) {
-      closeReaderNotesSheet(panel, reader);
-      return;
-    }
-    openReaderNotesSheet(panel, section, reader, { target });
-  });
 
-  const bookmarkButton = document.createElement("button");
+  const bookmarkButton = document.createElement("span");
   bookmarkButton.className = "inline-bookmark-toggle";
-  bookmarkButton.type = "button";
-  bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save subsection"}</span>`;
-  bookmarkButton.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection");
+  bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
+  bookmarkButton.setAttribute("aria-label", "Bookmarked");
+  bookmarkButton.setAttribute("aria-hidden", saved ? "false" : "true");
+  bookmarkButton.hidden = !saved;
   bookmarkButton.classList.toggle("is-saved", saved);
-  bookmarkButton.setAttribute("aria-pressed", String(saved));
-  bookmarkButton.title = saved ? "Manage saved projects" : "Save subsection";
-
-  bookmarkButton.addEventListener("click", async () => {
-    const panel = sectionElementForInlineComment(wrapper)?.closest(".reader-panel");
-    bookmarkButton.disabled = true;
-    bookmarkButton.classList.remove("has-error");
-    const sectionPayload = {
-      sectionID: section.id,
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      codePrefix: reader?.codePrefix || "BC",
-      chapterID: reader?.chapterID || "",
-      chapterNumber: section.chapterNumber || ""
-    };
-    try {
-      openReaderNotesSheet(panel, section, reader, { target });
-      const sheet = panel?.querySelector(".reader-notes-sheet");
-      if (sheet) await openReaderNotesProjectPicker(sheet, sectionPayload);
-    } catch (error) {
-      bookmarkButton.title = error.message;
-      bookmarkButton.classList.add("has-error");
-    } finally {
-      bookmarkButton.disabled = false;
-    }
-  });
 
   wrapper.append(button, bookmarkButton);
   return wrapper;
@@ -4126,7 +4096,12 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
     const button = wrapper.querySelector(".inline-comment-toggle");
     wrapper.classList.toggle("has-note", hasNote);
     button?.classList.toggle("has-comment", hasNote);
+    if (button) {
+      button.hidden = !hasNote;
+      button.setAttribute("aria-hidden", hasNote ? "false" : "true");
+    }
   });
+  syncReaderNoteBookmarkButtons(sectionID, isSectionSaved(sectionID));
   track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"][data-block-id="${CSS.escape(blockKey)}"]`).forEach((sheet) => {
     const input = sheet.querySelector(".reader-notes-input");
     if (input && input !== options.source) input.value = value;
@@ -4381,11 +4356,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const sectionID = sectionNoteKey(section.id);
   const target = options.target || annotationTargetForSection(section, reader);
   const blockID = normalizeAnnotationBlockID(target.blockID);
-  if (reader) {
-    reader.activeNotesSectionID = sectionID;
-    reader.activeNotesBlockID = blockID;
-    saveWorkspaceState();
-  }
   setReaderNotesActiveTarget(panel, sectionID, blockID);
 
   const saved = isSectionSaved(section.id);
@@ -4450,32 +4420,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   });
 }
 
-function restoreReaderNotesSheet(panel, reader, sections) {
-  const sectionID = sectionNoteKey(reader?.activeNotesSectionID);
-  if (!sectionID) return;
-  const section = (sections || []).find((item) => String(item.id) === sectionID);
-  if (!section) {
-    reader.activeNotesSectionID = "";
-    saveWorkspaceState();
-    return;
-  }
-  const blockID = normalizeAnnotationBlockID(reader?.activeNotesBlockID);
-  const blocks = annotatedBlocksForSection(section);
-  const block = blockID ? blocks.find((item) =>
-    normalizeAnnotationBlockID(item?.id || item?.tableID || item?.imageID) === blockID
-  ) : null;
-  const target = block
-    ? annotationTargetForBlock(section, block, reader, Math.max(0, blocks.indexOf(block)))
-    : annotationTargetForSection(section, reader);
-  openReaderNotesSheet(panel, section, reader, { instant: true, target });
-}
-
 function closeReaderNotesSheet(panel, reader = null, options = {}) {
-  if (reader) {
-    reader.activeNotesSectionID = "";
-    reader.activeNotesBlockID = "";
-    saveWorkspaceState();
-  }
   const sheet = panel?.querySelector(".reader-notes-sheet");
   if (!sheet) return;
   sheet.classList.remove("is-open");
@@ -4492,15 +4437,18 @@ function closeReaderNotesSheet(panel, reader = null, options = {}) {
 function syncReaderNoteBookmarkButtons(sectionID, saved) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
-  track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`).forEach((wrapper) => {
+  const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`));
+  const bookmarkWrapper = wrappers.find((wrapper) => wrapper.classList.contains("has-note")) || wrappers[0] || null;
+  wrappers.forEach((wrapper) => {
     const button = wrapper.querySelector(".inline-bookmark-toggle");
-    wrapper.classList.toggle("has-saved-section", saved);
+    const showBookmark = Boolean(saved && wrapper === bookmarkWrapper);
+    wrapper.classList.toggle("has-saved-section", showBookmark);
     if (!button) return;
-    button.classList.toggle("is-saved", saved);
-    button.setAttribute("aria-pressed", String(saved));
-    button.setAttribute("aria-label", saved ? "Manage saved projects" : "Save subsection");
-    button.title = saved ? "Manage saved projects" : "Save subsection";
-    button.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save subsection"}</span>`;
+    button.classList.toggle("is-saved", showBookmark);
+    button.hidden = !showBookmark;
+    button.setAttribute("aria-hidden", showBookmark ? "false" : "true");
+    button.setAttribute("aria-label", "Bookmarked");
+    button.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
   });
 }
 
