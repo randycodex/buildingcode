@@ -5167,6 +5167,8 @@ async function renderReader(reader, options = {}) {
   const increaseTextButton = panel.querySelector(".reader-text-increase");
   const decreaseSpacingButton = panel.querySelector(".reader-spacing-decrease");
   const increaseSpacingButton = panel.querySelector(".reader-spacing-increase");
+  const typographyToggle = panel.querySelector(".reader-typography-toggle");
+  const typographyTools = panel.querySelector(".reader-typography-tools");
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
@@ -5202,6 +5204,13 @@ async function renderReader(reader, options = {}) {
   increaseTextButton?.addEventListener("click", () => changeReaderTextSize(panel, reader, 1));
   decreaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, -0.1));
   increaseSpacingButton?.addEventListener("click", () => changeReaderSpacing(panel, reader, 0.1));
+  typographyToggle?.addEventListener("click", () => {
+    const willOpen = typographyTools.hidden;
+    typographyTools.hidden = !willOpen;
+    typographyToggle.setAttribute("aria-expanded", String(willOpen));
+    typographyToggle.title = willOpen ? "Hide text and spacing controls" : "Show text and spacing controls";
+    typographyToggle.setAttribute("aria-label", typographyToggle.title);
+  });
   codeSelect.addEventListener("change", async () => {
     closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";
