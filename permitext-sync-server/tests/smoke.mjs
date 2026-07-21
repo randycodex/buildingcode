@@ -430,7 +430,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260721-session-layout-v64'),
+        webRoot.text.includes('/web/app.js?v=20260721-clear-reconcile-v65'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

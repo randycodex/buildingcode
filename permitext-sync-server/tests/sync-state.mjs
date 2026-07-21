@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  annotationAfterBulkClears,
   bulkClearTimestamp,
   mergeNewestRecord,
   recordSurvivesBulkClear
@@ -44,6 +45,47 @@ assert.equal(
   recordSurvivesBulkClear({ codeVersion: canonicalVersion }, clearRecords, ["folders"]),
   true,
   "A bookmark clear incorrectly removed a project folder."
+);
+
+const annotationClearRecords = [
+  ...clearRecords,
+  {
+    userID: "apple:sync-state",
+    codeVersion: canonicalVersion,
+    values: { scope: "notes" },
+    updatedAt: "2026-07-21T12:00:00.000Z"
+  }
+];
+assert.deepEqual(
+  annotationAfterBulkClears({
+    codeVersion: canonicalVersion,
+    noteBody: "Old note",
+    tags: ["Keep tag"],
+    updatedAt: "2026-07-21T11:00:00.000Z"
+  }, annotationClearRecords),
+  {
+    codeVersion: canonicalVersion,
+    noteBody: null,
+    tags: ["Keep tag"],
+    updatedAt: "2026-07-21T11:00:00.000Z"
+  },
+  "Clearing notes also removed a surviving tag."
+);
+annotationClearRecords.push({
+  userID: "apple:sync-state",
+  codeVersion: canonicalVersion,
+  values: { scope: "tags" },
+  updatedAt: "2026-07-21T12:00:00.000Z"
+});
+assert.equal(
+  annotationAfterBulkClears({
+    codeVersion: canonicalVersion,
+    noteBody: "Old note",
+    tags: ["Old tag"],
+    updatedAt: "2026-07-21T11:00:00.000Z"
+  }, annotationClearRecords),
+  null,
+  "An annotation survived after both its note and tags were cleared."
 );
 
 const projects = new Map();

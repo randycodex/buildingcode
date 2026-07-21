@@ -10,11 +10,12 @@ import {
   syncMutationRecordID
 } from "./sync-identity.js?v=20260720-sync-contract-v2";
 import {
+  annotationAfterBulkClears,
   bulkClearKey,
   bulkClearTimestamp,
   mergeNewestRecord,
   recordSurvivesBulkClear
-} from "./sync-state.js?v=20260721-latest-wins-v1";
+} from "./sync-state.js?v=20260721-clear-reconcile-v2";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
@@ -2407,7 +2408,10 @@ function summarizeMutations(mutations = []) {
     if (!record || record.deletedAt) return;
     if (kind === "project" && recordSurvivesBulkClear(record, codeVersionClears, ["folders"])) projects.push(record);
     if (kind === "savedItem" && recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks"])) savedItems.push(record);
-    if (kind === "annotation") annotations.push(record);
+    if (kind === "annotation") {
+      const visibleAnnotation = annotationAfterBulkClears(record, codeVersionClears);
+      if (visibleAnnotation) annotations.push(visibleAnnotation);
+    }
     if (kind === "projectSection" && recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks", "folders"])) projectSections.push(record);
     if (kind === "workboard") workboards.push(record);
     if (
@@ -3113,7 +3117,25 @@ function scheduleSyncOutboxRetry(attemptCount = 1) {
 async function flushSyncOutbox(options = {}) {
   const account = activeAccount();
   if (!account) return { acceptedMutationIDs: [], rejectedMutationIDs: [] };
-  if (syncFlushPromise) return syncFlushPromise;
+  if (syncFlushPromise) {
+    const inFlightResult = await syncFlushPromise;
+    const stillActiveAccount = activeAccount();
+    const hasPending = stillActiveAccount && (state.syncOutbox || [])
+      .some((item) => item.accountUserID === stillActiveAccount.userID);
+    if (!hasPending) return inFlightResult;
+    const followUpResult = await flushSyncOutbox(options);
+    return {
+      ...followUpResult,
+      acceptedMutationIDs: Array.from(new Set([
+        ...(inFlightResult.acceptedMutationIDs || []),
+        ...(followUpResult.acceptedMutationIDs || [])
+      ])),
+      rejectedMutationIDs: Array.from(new Set([
+        ...(inFlightResult.rejectedMutationIDs || []),
+        ...(followUpResult.rejectedMutationIDs || [])
+      ]))
+    };
+  }
 
   syncFlushPromise = (async () => {
     prepareSyncOutboxForFlush(account);

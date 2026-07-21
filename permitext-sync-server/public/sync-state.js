@@ -32,6 +32,19 @@ export function recordSurvivesBulkClear(record, clearRecords, scopes) {
   });
 }
 
+export function annotationAfterBulkClears(record, clearRecords) {
+  if (!record || record.deletedAt) return null;
+  const noteBody = recordSurvivesBulkClear(record, clearRecords, ["notes"])
+    ? record.noteBody
+    : null;
+  const tags = recordSurvivesBulkClear(record, clearRecords, ["tags"])
+    ? record.tags
+    : [];
+  const hasNote = String(noteBody || "").trim().length > 0;
+  const hasTags = Array.isArray(tags) && tags.length > 0;
+  return hasNote || hasTags ? { ...record, noteBody, tags } : null;
+}
+
 export function mergeNewestRecord(recordsByIdentity, identity, candidate) {
   if (!identity || !candidate) return;
   const existing = recordsByIdentity.get(identity);
