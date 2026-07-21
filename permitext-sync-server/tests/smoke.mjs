@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("reader-search-field-v42"),
+      webRoot.text.includes("combined-saved-projects-v44"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -236,12 +236,25 @@ async function main() {
     assert(
       savedTemplateSource.includes('aria-label="Sort saved sections"') &&
         savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
+        savedTemplateSource.includes('class="saved-projects-section"') &&
+        savedTemplateSource.includes('class="saved-project-pages"') &&
+        savedTemplateSource.includes('class="saved-project-page-dots"') &&
+        savedTemplateSource.includes('aria-label="Add project"') &&
         savedTemplateSource.includes('class="saved-code-filter"') &&
         savedTemplateSource.includes('class="saved-tag-filter"') &&
-        !savedTemplateSource.includes("Projects") &&
+        savedTemplateSource.indexOf('class="saved-projects-section"') < savedTemplateSource.indexOf('class="saved-inline-filters"') &&
+        savedTemplateSource.indexOf('class="saved-inline-filters"') < savedTemplateSource.indexOf('class="saved-content"') &&
+        !topbarSource.includes('id="toggle-projects"') &&
         !savedTemplateSource.includes('aria-label="Saved text size"') &&
         !projectsTemplateSource.includes('aria-label="Saved text size"'),
-      "Saved column no longer matches the iOS action and filter order without Projects."
+      "Saved and Projects no longer follow the combined iOS hierarchy."
+    );
+    assert(
+      workspaceScript.text.includes("function renderSavedProjects(panel, paneID, projects, projectSections)") &&
+        workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
+        workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
+        !workspaceScript.text.includes("panes.push(await renderProjects())"),
+      "Combined Saved no longer owns the project grid and project-detail flow."
     );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
@@ -367,7 +380,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-reader-search-field-v42'),
+        webRoot.text.includes('/web/app.js?v=20260720-combined-saved-projects-v44'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

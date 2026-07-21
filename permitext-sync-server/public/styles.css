@@ -3870,7 +3870,202 @@ mark {
 .saved-panel {
   --saved-font-size: var(--reader-font-size);
   position: relative;
-  grid-template-rows: auto auto minmax(0, 1fr);
+  grid-template-rows: auto auto auto minmax(0, 1fr);
+}
+
+.saved-projects-section {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) 0 var(--space-3);
+}
+
+.saved-projects-heading {
+  display: flex;
+  min-height: var(--panel-title-control-size);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.saved-projects-heading .section-label {
+  margin: 0;
+  color: var(--code-accent);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.saved-projects-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.saved-projects-actions button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.saved-projects-actions button:hover,
+.saved-projects-actions button:focus-visible,
+.saved-project-tile-actions button:hover,
+.saved-project-tile-actions button:focus-visible {
+  color: var(--text-primary);
+}
+
+.saved-projects-actions svg {
+  width: 14px;
+  height: 14px;
+}
+
+.saved-project-tile-actions button {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.saved-project-tile-actions svg {
+  width: 13px;
+  height: 13px;
+}
+
+.saved-project-pages {
+  display: flex;
+  width: 100%;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.saved-project-pages::-webkit-scrollbar {
+  display: none;
+}
+
+.saved-project-page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(2, 57px);
+  flex: 0 0 100%;
+  gap: var(--space-2);
+  scroll-snap-align: start;
+}
+
+.saved-project-tile {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  min-width: 0;
+  min-height: 57px;
+  gap: 3px var(--space-1);
+  padding: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--project-color) 22%, var(--border));
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  cursor: pointer;
+}
+
+.saved-project-tile::before {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--project-color);
+  content: "";
+}
+
+.saved-project-tile strong,
+.saved-project-tile > span:not(.saved-project-folder-icon) {
+  min-width: 0;
+  padding-left: calc(7px + var(--space-1));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-project-tile strong {
+  align-self: end;
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+}
+
+.saved-project-tile > span:not(.saved-project-folder-icon) {
+  color: var(--text-tertiary);
+  font-size: calc(var(--chrome-font-size) * 0.66) !important;
+}
+
+.saved-project-folder-icon {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--project-color);
+}
+
+.saved-project-folder-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.saved-project-tile-actions {
+  position: absolute;
+  right: 2px;
+  bottom: 0;
+  display: flex;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.saved-project-tile:hover .saved-project-tile-actions,
+.saved-project-tile:focus-within .saved-project-tile-actions {
+  opacity: 1;
+}
+
+.saved-project-page-dots {
+  display: flex;
+  min-height: 6px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+}
+
+.saved-project-page-dots:empty {
+  display: none;
+}
+
+.saved-project-page-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  opacity: 0.42;
+}
+
+.saved-project-page-dot.is-active {
+  background: var(--text-primary);
+  opacity: 1;
+}
+
+.saved-projects-empty {
+  width: 100%;
+  margin: 0;
+  padding: var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
 }
 
 .saved-panel .panel-actions {

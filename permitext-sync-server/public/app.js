@@ -20,7 +20,6 @@ const workspaceKey = detachedProjectWindow
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
-const toggleProjectsButton = document.querySelector("#toggle-projects");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
@@ -590,7 +589,7 @@ async function detachProjectWorkboard(project) {
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: ["utility:projects", paneIDForProjectDetail(identity)]
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
   });
 }
 
@@ -636,7 +635,7 @@ async function reattachProjectWorkboard(project, detachedWindow = null) {
   localStorage.removeItem("permitext:pendingWorkboardReattach");
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: ["utility:projects", paneIDForProjectDetail(identity)]
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
   });
   scrollPaneIntoView(paneIDForProjectWorkboard(identity));
 }
@@ -1176,12 +1175,11 @@ function defaultActivePaneIDs() {
     return [paneIDForProjectWorkboard(detachedProject)];
   }
   const ids = [];
-  if (state.utilities.projects) ids.push("utility:projects");
-  if (state.utilities.projects) openProjectDetails().forEach((detail) => {
+  openProjectDetails().forEach((detail) => {
     ids.push(paneIDForProjectDetail(detail));
     if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
   });
-  if (state.utilities.projects && state.utilities.archive) ids.push("utility:archive");
+  if (state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
     ids.push(paneIDForUtilityInstance(instance));
     if (instance.key === "search" && sectionDetailsBySearch()[instance.id]) {
@@ -1205,16 +1203,16 @@ function activePaneIDs() {
     !isProjectDetailPaneID(id) &&
     !isProjectWorkboardPaneID(id)
   );
-  if (state.utilities.projects && openProjectDetails().length) {
-    const projectsIndex = paired.indexOf("utility:projects");
+  if (openProjectDetails().length) {
+    const savedIndex = paired.indexOf(primarySavedPaneID());
     const detailIDs = openProjectDetails().flatMap((detail) => [
       paneIDForProjectDetail(detail),
       ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
     ]);
-    if (projectsIndex === -1) {
+    if (savedIndex === -1) {
       paired.push(...detailIDs);
     } else {
-      paired.splice(projectsIndex + 1, 0, ...detailIDs);
+      paired.splice(savedIndex + 1, 0, ...detailIDs);
     }
   }
   (state.utilityInstances || []).forEach((instance) => {
@@ -1346,14 +1344,28 @@ function searchResultDetail(result) {
   };
 }
 
-function placeProjectDetailAfterProjects(detail) {
+function savedPaneIDs() {
+  return (state.utilityInstances || [])
+    .filter((instance) => instance.key === "saved")
+    .map((instance) => paneIDForUtilityInstance(instance));
+}
+
+function primarySavedPaneID() {
+  return savedPaneIDs()[0] || "";
+}
+
+function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
+  return Array.from(new Set([...savedPaneIDs(), ...additionalPaneIDs.filter(Boolean)]));
+}
+
+function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
   const detailID = paneIDForProjectDetail(detail);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && id !== detailID);
   activeIDs.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const projectIndex = ordered.indexOf("utility:projects");
+  const projectIndex = ordered.indexOf(sourcePaneID);
   const openDetailIDs = openProjectDetails().map((item) => paneIDForProjectDetail(item)).filter((id) => id !== detailID);
   const lastDetailIndex = Math.max(...openDetailIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
   const insertIndex = lastDetailIndex !== -1 ? lastDetailIndex + 1 : projectIndex === -1 ? 0 : projectIndex + 1;
@@ -1368,7 +1380,7 @@ function placeArchiveAfterProjectsStack() {
   activeIDs.forEach((id) => {
     if (!ordered.includes(id)) ordered.push(id);
   });
-  const projectIndex = ordered.indexOf("utility:projects");
+  const projectIndex = ordered.indexOf(primarySavedPaneID());
   const projectStackIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
@@ -1409,7 +1421,7 @@ async function openArchiveAfterProjectsStack() {
   state.paneWeights["utility:archive"] = defaultPaneWidthForID("utility:archive");
   placeArchiveAfterProjectsStack();
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView("utility:archive");
 }
 
@@ -1426,7 +1438,7 @@ async function closeArchiveColumn() {
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   delete state.paneWeights["utility:archive"];
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
 }
 
 function normalizePaneWeights(ids) {
@@ -1469,7 +1481,6 @@ function applyPaneWeight(panel, paneID) {
 
 function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
-  toggleProjectsButton.setAttribute("aria-pressed", String(state.utilities.projects));
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
@@ -6681,11 +6692,11 @@ async function openProjectDetail(project, options = {}) {
       placePaneBefore("utility:archive", detailID);
       placeArchiveAfterProjectsStack();
     } else {
-      placeProjectDetailAfterProjects(identity);
+      placeProjectDetailAfterProjects(identity, options.sourcePaneID);
     }
   }
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
 }
 
 function projectDetailMatches(project, detail) {
@@ -6727,7 +6738,7 @@ async function archiveProjects(projects) {
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: ["utility:projects", ...(state.utilities.archive ? ["utility:archive"] : [])]
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(...(state.utilities.archive ? ["utility:archive"] : []))
   });
   track.scrollLeft = currentLeft;
   return true;
@@ -6739,7 +6750,7 @@ async function restoreArchivedProject(project) {
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
   track.scrollLeft = currentLeft;
 }
 
@@ -6761,7 +6772,7 @@ async function deleteArchivedProject(project) {
     return;
   }
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
   track.scrollLeft = currentLeft;
 }
 
@@ -6795,7 +6806,7 @@ async function deleteArchivedProjects(projects) {
   state.localProjects = (state.localProjects || []).filter((item) => !deletedIDs.has(projectRecordID(item)));
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((id) => !deletedIDs.has(id));
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects", "utility:archive"] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
   track.scrollLeft = currentLeft;
   return deletedCount > 0;
 }
@@ -7162,7 +7173,7 @@ async function renderProjectDetail(detail) {
     }
     closeProjectDetailForProject(identity);
     saveWorkspaceState();
-    void transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
+    void transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   });
 
   content.append(savedSection);
@@ -7340,8 +7351,8 @@ function showProjectCreateSheet(panel, project = null) {
       await renderWorkspace();
     } catch (error) {
       saveButton.disabled = false;
-      const content = panel.querySelector(".projects-content");
-      appendMutedRow(content, "Project not synced", error.message || "Could not save the project folder.");
+      const content = panel.querySelector(".projects-content, .saved-project-pages");
+      if (content) appendMutedRow(content, "Project not synced", error.message || "Could not save the project folder.");
     }
   });
 
@@ -7705,6 +7716,7 @@ async function renderSaved(instance) {
   clear(content);
   const data = await loadSyncedContent();
   const summary = currentContentSummary();
+  renderSavedProjects(panel, paneID, summary.projects || [], summary.projectSections || []);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
@@ -7761,6 +7773,98 @@ async function renderSaved(instance) {
   }
 
   return panel;
+}
+
+function renderSavedProjects(panel, paneID, projects, projectSections) {
+  const pages = panel.querySelector(".saved-project-pages");
+  const dots = panel.querySelector(".saved-project-page-dots");
+  const addButton = panel.querySelector(".saved-projects-add-button");
+  const archiveButton = panel.querySelector(".saved-projects-archive-button");
+  const visibleProjects = activeProjectRecords(projects);
+  clear(pages);
+  clear(dots);
+  addButton.addEventListener("click", () => showProjectCreateSheet(panel));
+  archiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
+  archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);
+
+  if (!visibleProjects.length) {
+    const empty = document.createElement("p");
+    empty.className = "saved-projects-empty";
+    empty.textContent = "No projects yet. Use + to create one.";
+    pages.append(empty);
+    return;
+  }
+
+  const projectPages = [];
+  for (let index = 0; index < visibleProjects.length; index += 4) {
+    projectPages.push(visibleProjects.slice(index, index + 4));
+  }
+  projectPages.forEach((pageProjects, pageIndex) => {
+    const page = document.createElement("div");
+    page.className = "saved-project-page";
+    page.setAttribute("aria-label", `Projects page ${pageIndex + 1} of ${projectPages.length}`);
+    pageProjects.forEach((project) => {
+      const tile = document.createElement("article");
+      tile.className = "saved-project-tile";
+      tile.style.setProperty("--project-color", projectColor(project));
+      tile.tabIndex = 0;
+      tile.setAttribute("role", "button");
+      tile.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
+      const heading = document.createElement("strong");
+      heading.textContent = project.name || project.title || "Project";
+      const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
+      const countLabel = document.createElement("span");
+      countLabel.textContent = count === 1 ? "1 saved" : `${count} saved`;
+      const folderIcon = document.createElement("span");
+      folderIcon.className = "saved-project-folder-icon";
+      folderIcon.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path></svg>`;
+      const actions = document.createElement("div");
+      actions.className = "saved-project-tile-actions";
+      const editButton = document.createElement("button");
+      editButton.type = "button";
+      editButton.title = "Edit project";
+      editButton.setAttribute("aria-label", `Edit ${heading.textContent}`);
+      editButton.innerHTML = pencilIconSVG();
+      editButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        showProjectCreateSheet(panel, project);
+      });
+      const archiveProjectButton = document.createElement("button");
+      archiveProjectButton.type = "button";
+      archiveProjectButton.title = "Archive project";
+      archiveProjectButton.setAttribute("aria-label", `Archive ${heading.textContent}`);
+      archiveProjectButton.innerHTML = archiveIconSVG();
+      archiveProjectButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        void archiveProject(project);
+      });
+      actions.append(editButton, archiveProjectButton);
+      tile.append(heading, countLabel, folderIcon, actions);
+      const open = () => openProjectDetail(project, { sourcePaneID: paneID });
+      tile.addEventListener("click", open);
+      tile.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        open();
+      });
+      page.append(tile);
+    });
+    pages.append(page);
+    if (projectPages.length > 1) {
+      const dot = document.createElement("span");
+      dot.className = "saved-project-page-dot";
+      if (pageIndex === 0) dot.classList.add("is-active");
+      dots.append(dot);
+    }
+  });
+  if (projectPages.length > 1) {
+    pages.addEventListener("scroll", () => {
+      const pageIndex = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
+      dots.querySelectorAll(".saved-project-page-dot").forEach((dot, index) => {
+        dot.classList.toggle("is-active", index === pageIndex);
+      });
+    }, { passive: true });
+  }
 }
 
 function consolidatedSavedAnnotations(annotations = []) {
@@ -8686,9 +8790,9 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
-  if (paneID === "utility:projects" || isProjectDetailPaneID(paneID) || isProjectWorkboardPaneID(paneID)) {
+  if (paneID === primarySavedPaneID() || isProjectDetailPaneID(paneID) || isProjectWorkboardPaneID(paneID)) {
     return [
-      "utility:projects",
+      primarySavedPaneID(),
       ...openProjectDetails().flatMap((detail) => [
         paneIDForProjectDetail(detail),
         ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
@@ -9002,14 +9106,11 @@ async function renderWorkspace() {
     saveWorkspaceState();
     return;
   }
-  if (state.utilities.projects) {
-    panes.push(await renderProjects());
-    for (const detail of openProjectDetails()) {
-      panes.push(await renderProjectDetail(detail));
-      if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
-    }
+  for (const detail of openProjectDetails()) {
+    panes.push(await renderProjectDetail(detail));
+    if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
   }
-  if (state.utilities.projects && state.utilities.archive) {
+  if (state.utilities.archive) {
     panes.push(await renderArchive());
   }
   for (const instance of state.utilityInstances || []) {
@@ -9051,18 +9152,15 @@ async function renderUtilityWorkspace(options = {}) {
   setUtilityButtonStates();
 
   const panes = [];
-  if (state.utilities.projects) {
-    panes.push(await reuseOrRenderPane("utility:projects", renderProjects));
-    for (const detail of openProjectDetails()) {
-      const detailID = paneIDForProjectDetail(detail);
-      panes.push(await reuseOrRenderPane(detailID, () => renderProjectDetail(detail)));
-      if (projectHasOpenWorkboard(detail)) {
-        const workboardID = paneIDForProjectWorkboard(detail);
-        panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(detail)));
-      }
+  for (const detail of openProjectDetails()) {
+    const detailID = paneIDForProjectDetail(detail);
+    panes.push(await reuseOrRenderPane(detailID, () => renderProjectDetail(detail)));
+    if (projectHasOpenWorkboard(detail)) {
+      const workboardID = paneIDForProjectWorkboard(detail);
+      panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(detail)));
     }
   }
-  if (state.utilities.projects && state.utilities.archive) {
+  if (state.utilities.archive) {
     panes.push(await reuseOrRenderPane("utility:archive", renderArchive));
   }
   for (const instance of state.utilityInstances || []) {
@@ -9148,7 +9246,7 @@ async function toggleUtilityPane(key) {
   }
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: key === "archive" ? ["utility:projects"] : []
+    refreshPaneIDs: key === "archive" ? projectOverviewRefreshPaneIDs() : []
   });
   if (willOpen) {
     track.scrollTo({ left: 0, behavior: "smooth" });
@@ -9217,8 +9315,7 @@ function workspaceCommandDefinitions() {
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => focusUtility("search", ".search-input") },
     { label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() },
-    { label: "Open Saved Inbox", hint: "Review items before organizing them", run: () => focusUtility("saved") },
-    { label: "Open Projects", hint: "Organized job and research work", run: () => focusUtility("projects") },
+    { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Column Widths", hint: "Fit the current workspace", run: () => fitVisibleColumns() },
@@ -9403,7 +9500,7 @@ async function start() {
     if (event.data?.type === "permitext:detachedWorkboardClosed") {
       state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(event.data.project, item));
       saveWorkspaceState();
-      void transitionWorkspace("utility", { refreshPaneIDs: ["utility:projects"] });
+      void transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
     }
   });
   try {
@@ -9418,9 +9515,6 @@ async function start() {
     saveWorkspaceState();
     await transitionWorkspace("utility");
     scrollPaneIntoView(paneIDForReader(reader));
-  });
-  toggleProjectsButton.addEventListener("click", () => {
-    toggleUtilityPane("projects");
   });
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
