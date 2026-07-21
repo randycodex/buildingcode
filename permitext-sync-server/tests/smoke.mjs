@@ -67,6 +67,14 @@ async function main() {
   const dataPath = join(tempDir, "sync-store.json");
   const workboardSource = await readFile(new URL("../src/workboard.jsx", import.meta.url), "utf8");
   const workboardStyleSource = await readFile(new URL("../src/workboard.css", import.meta.url), "utf8");
+  const iosUserDataStoreSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Data/UserDataStore.swift", import.meta.url),
+    "utf8"
+  );
+  const iosSyncEngineSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Diagnostics/Signposts.swift", import.meta.url),
+    "utf8"
+  );
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
@@ -185,6 +193,7 @@ async function main() {
     );
 
     const workspaceScript = await request("/web/app.js");
+    const syncStateScript = await request("/web/sync-state.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
@@ -318,13 +327,24 @@ async function main() {
       "Visible web tabs no longer perform incremental foreground sync every 3 seconds."
     );
     assert(
-      workspaceScript.text.includes("function bulkClearScope(record)") &&
-        workspaceScript.text.includes("function recordSurvivesBulkClear(record, clearRecords, scopes)") &&
+      syncStateScript.response.ok &&
+        syncStateScript.text.includes("function bulkClearScope(record)") &&
+        syncStateScript.text.includes("function recordSurvivesBulkClear(record, clearRecords, scopes)") &&
+        syncStateScript.text.includes("!Number.isFinite(updatedAt) || clearedAt >= updatedAt") &&
         workspaceScript.text.includes('recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks"])') &&
         workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "notes")') &&
         workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "tags")') &&
+        workspaceScript.text.includes("syncProjectIdentity(detail.clientID, detail.userID)") &&
+        workspaceScript.text.includes("saved.browserCredentialID") &&
         workspaceScript.text.includes("recentSearchesJSON"),
       "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
+    );
+    assert(
+      iosUserDataStoreSource.includes("pendingBulkClearUpdatedAt(for: localizedMutation)") &&
+        iosSyncEngineSource.includes("removingFieldsSuperseded(by: bulkClears)") &&
+        iosSyncEngineSource.includes('supersededScopes.contains("notes")') &&
+        iosSyncEngineSource.includes('supersededScopes.contains("tags")'),
+      "iOS sync no longer protects newer collection clears from stale full-pull records."
     );
     assert(
       workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&
@@ -406,7 +426,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260721-sync-clears-v60'),
+        webRoot.text.includes('/web/app.js?v=20260721-latest-wins-v61'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

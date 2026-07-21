@@ -520,29 +520,48 @@ struct UserContentSyncEngine {
     ) throws -> Int {
         guard let repository else { return 0 }
         let decisionsByID = Dictionary(uniqueKeysWithValues: mergePlan.decisions.map { ($0.recordID, $0) })
+        let bulkClears = incoming.mutations.compactMap { mutation -> ServerContinuityRecord? in
+            guard case .codeVersionClear(let record) = mutation else { return nil }
+            return record
+        }
         var appliedCount = 0
         for mutation in incoming.mutations.sortedForLocalApplication {
             guard let decision = decisionsByID[mutation.recordID] else { continue }
             switch decision.action {
             case .applyServer:
-                if case .continuity(let record) = mutation {
+                guard let applicableMutation = mutation.removingFieldsSuperseded(by: bulkClears) else {
+                    // A full pull includes the current record for every stable
+                    // ID, including records older than a later collection
+                    // clear. Treat those records as consumed by the clear so
+                    // they cannot be reinserted after the clear is applied.
+                    appliedCount += 1
+                    continue
+                }
+                if case .continuity(let record) = applicableMutation {
                     applyServerContinuity(record)
                 } else {
-                    try repository.applyServerUserContentMutation(mutation)
+                    try repository.applyServerUserContentMutation(applicableMutation)
                 }
                 try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
                 appliedCount += 1
             case .deleteLocal:
-                try repository.applyServerUserContentMutation(mutation)
+                guard let applicableMutation = mutation.removingFieldsSuperseded(by: bulkClears) else {
+                    appliedCount += 1
+                    continue
+                }
+                try repository.applyServerUserContentMutation(applicableMutation)
                 try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
                 appliedCount += 1
             case .noChange:
                 // Reapply idempotently so records written under an older code-version
                 // alias are moved into the current local version bucket.
-                if case .continuity(let record) = mutation {
+                guard let applicableMutation = mutation.removingFieldsSuperseded(by: bulkClears) else {
+                    continue
+                }
+                if case .continuity(let record) = applicableMutation {
                     applyServerContinuity(record)
                 } else {
-                    try repository.applyServerUserContentMutation(mutation)
+                    try repository.applyServerUserContentMutation(applicableMutation)
                 }
                 continue
             case .keepLocal, .uploadLocal, .flagConflict:
@@ -604,6 +623,55 @@ private extension Array where Element == ServerUserContentMutation {
 }
 
 private extension ServerUserContentMutation {
+    func removingFieldsSuperseded(by clears: [ServerContinuityRecord]) -> ServerUserContentMutation? {
+        let codeVersion: String
+        let scopes: Set<String>
+        switch self {
+        case .savedItem(let record):
+            codeVersion = record.codeVersion
+            scopes = ["bookmarks"]
+        case .annotation(let record):
+            codeVersion = record.codeVersion
+            scopes = Set([
+                record.noteBody != nil ? "notes" : nil,
+                record.tags != nil ? "tags" : nil
+            ].compactMap { $0 })
+        case .project(let record):
+            codeVersion = record.codeVersion
+            scopes = ["folders"]
+        case .projectSection(let record):
+            codeVersion = record.codeVersion
+            scopes = ["bookmarks", "folders"]
+        case .workboard, .continuity, .codeVersionClear:
+            return self
+        }
+
+        let canonicalCodeVersion = UserContentSyncCodeVersion.server(codeVersion)
+        let supersededScopes = Set(clears.compactMap { clear -> String? in
+            let scope = clear.values["scope"] ?? ""
+            guard scopes.contains(scope) else { return nil }
+            guard UserContentSyncCodeVersion.server(clear.codeVersion) == canonicalCodeVersion else { return nil }
+            return clear.updatedAt >= updatedAt ? scope : nil
+        })
+        guard !supersededScopes.isEmpty else { return self }
+
+        guard case .annotation(let record) = self else { return nil }
+        let noteBody = supersededScopes.contains("notes") ? nil : record.noteBody
+        let tags = supersededScopes.contains("tags") ? nil : record.tags
+        guard noteBody != nil || tags != nil else { return nil }
+        return .annotation(ServerAnnotationRecord(
+            id: record.id,
+            userID: record.userID,
+            codeVersion: record.codeVersion,
+            sectionID: record.sectionID,
+            blockID: record.blockID,
+            noteBody: noteBody,
+            tags: tags,
+            updatedAt: record.updatedAt,
+            deletedAt: record.deletedAt
+        ))
+    }
+
     var localApplicationPriority: Int {
         switch self {
         case .codeVersionClear:

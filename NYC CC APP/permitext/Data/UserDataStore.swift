@@ -2000,11 +2000,70 @@ final class UserDataStore: UserContentRepository {
         var candidates: [String: UserContentMergeCandidate] = [:]
         for mutation in mutations {
             let localizedMutation = localizedServerMutation(mutation)
-            if let candidate = try localMergeCandidate(for: localizedMutation) {
+            let localCandidate = try localMergeCandidate(for: localizedMutation)
+            let pendingClearUpdatedAt = try pendingBulkClearUpdatedAt(for: localizedMutation)
+            if let pendingClearUpdatedAt,
+               localCandidate?.localUpdatedAt.map({ $0 >= pendingClearUpdatedAt }) != true {
+                // A clear is one mutation that intentionally supersedes many
+                // older records. Compare its timestamp against each matching
+                // incoming record so the pull-before-push cycle cannot restore
+                // bookmarks, annotations, or project memberships just before
+                // the clear reaches the server.
+                candidates[mutation.recordID] = UserContentMergeCandidate(
+                    recordID: mutation.recordID,
+                    entityKind: mutation.entityKind,
+                    localUpdatedAt: pendingClearUpdatedAt,
+                    serverUpdatedAt: mutation.updatedAt,
+                    localDeletedAt: pendingClearUpdatedAt,
+                    serverDeletedAt: mutation.deletedAt,
+                    localSyncState: .pendingUpload
+                )
+            } else if let candidate = localCandidate {
                 candidates[mutation.recordID] = candidate
             }
         }
         return candidates
+    }
+
+    private func pendingBulkClearUpdatedAt(for mutation: ServerUserContentMutation) throws -> Date? {
+        let codeVersion: String
+        let scopes: [String]
+        switch mutation {
+        case .savedItem(let record):
+            codeVersion = record.codeVersion
+            scopes = ["bookmarks"]
+        case .annotation(let record):
+            codeVersion = record.codeVersion
+            scopes = [
+                record.noteBody != nil ? "notes" : nil,
+                record.tags != nil ? "tags" : nil
+            ].compactMap { $0 }
+        case .project(let record):
+            codeVersion = record.codeVersion
+            scopes = ["folders"]
+        case .projectSection(let record):
+            codeVersion = record.codeVersion
+            scopes = ["bookmarks", "folders"]
+        case .workboard, .continuity, .codeVersionClear:
+            return nil
+        }
+
+        return try scopes.compactMap { scope in
+            let clearMutation = ServerUserContentMutation.codeVersionClear(
+                ServerContinuityRecord(
+                    userID: "pending-local-clear",
+                    codeVersion: codeVersion,
+                    values: ["scope": scope],
+                    updatedAt: mutation.updatedAt
+                )
+            )
+            return try queuedMergeCandidate(
+                for: clearMutation,
+                entityType: .codeVersionUserData,
+                codeVersion: codeVersion,
+                scope: scope
+            )?.localUpdatedAt
+        }.max()
     }
 
     func discardQueuedMutation(recordID: String, account: SignedInAccount) throws {
