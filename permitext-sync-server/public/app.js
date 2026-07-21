@@ -4184,6 +4184,9 @@ async function openReaderNotesProjectPicker(sheet, sectionPayload) {
 
 function showReaderNotesProjectPicker(sheet, sectionPayload) {
   removeReaderNotesProjectPicker(sheet);
+  if (sheet.getBoundingClientRect().height < 440) {
+    sheet.style.setProperty("--reader-notes-height", "440px");
+  }
   const projects = activeProjectRecords(currentContentSummary().projects || []);
   const picker = document.createElement("section");
   picker.className = "reader-notes-project-picker";
@@ -4302,7 +4305,7 @@ function bindReaderNotesResize(resizer, sheet, panel) {
 
     const panelBounds = panel.getBoundingClientRect();
     const sheetStyles = getComputedStyle(sheet);
-    const minHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-default-height")) || 250;
+    const minHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-min-height")) || 320;
     const maxHeight = Math.max(minHeight, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
 
     const resize = (moveEvent) => {

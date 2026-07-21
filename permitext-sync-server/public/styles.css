@@ -8,7 +8,8 @@
   --reader-notes-surface: #eeeeee;
   --reader-notes-input-surface: #ffffff;
   --reader-notes-active-text: #00636d;
-  --reader-notes-default-height: 250px;
+  --reader-notes-default-height: 360px;
+  --reader-notes-min-height: 320px;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
@@ -1881,12 +1882,12 @@ select option:checked {
 .reader-notes-sheet {
   position: absolute;
   right: var(--reader-scrollbar-rail-width);
-  bottom: 0;
+  bottom: var(--space-3);
   left: 0;
   z-index: 18;
   display: flex;
-  height: var(--reader-notes-height, var(--reader-notes-default-height));
-  min-height: var(--reader-notes-default-height);
+  height: min(var(--reader-notes-height, var(--reader-notes-default-height)), calc(100% - var(--reader-scrollbar-track-top)));
+  min-height: min(var(--reader-notes-min-height), calc(100% - var(--reader-scrollbar-track-top)));
   max-height: calc(100% - var(--reader-scrollbar-track-top));
   padding: var(--space-4) var(--space-4) calc(var(--space-5) + var(--space-4));
   flex-direction: column;
@@ -2126,9 +2127,9 @@ select option:checked {
 
 .reader-notes-input {
   width: 100%;
-  min-height: 0;
-  max-height: calc(100% - var(--panel-title-control-size) - (var(--space-4) * 2));
-  flex: 1 1 auto;
+  min-height: 120px;
+  max-height: 120px;
+  flex: 0 0 120px;
   padding: var(--space-3);
   resize: none;
   border: 0;
@@ -2235,10 +2236,10 @@ select option:checked {
 @container (max-width: 620px) {
   .reader-notes-sheet {
     right: 0;
-    bottom: 0;
+    bottom: var(--space-3);
     left: 0;
-    height: var(--reader-notes-height, var(--reader-notes-default-height));
-    min-height: var(--reader-notes-default-height);
+    height: min(var(--reader-notes-height, var(--reader-notes-default-height)), calc(100% - var(--reader-scrollbar-track-top)));
+    min-height: min(var(--reader-notes-min-height), calc(100% - var(--reader-scrollbar-track-top)));
     padding: var(--space-4) var(--space-3) calc(var(--space-5) + var(--space-4));
   }
 }
