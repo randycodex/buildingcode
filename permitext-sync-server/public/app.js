@@ -3431,22 +3431,27 @@ async function updateProjectFolder(project, details = {}) {
   const localProjects = state.localProjects || [];
   const localIndex = localProjects.findIndex((item) => projectRecordID(item) === id);
   const account = activeAccount();
+  const nextProjects = [...localProjects];
 
-  if (account) {
-    await pushMutation(projectMutationForRecord(updated, account));
-    state.localProjects = localProjects.filter((item) => projectRecordID(item) !== id);
+  if (localIndex >= 0) {
+    nextProjects[localIndex] = { ...nextProjects[localIndex], ...updated };
   } else {
-    const nextProjects = [...localProjects];
-    if (localIndex >= 0) {
-      nextProjects[localIndex] = { ...nextProjects[localIndex], ...updated };
-    } else {
-      nextProjects.push(updated);
-    }
-    state.localProjects = nextProjects;
+    nextProjects.push(updated);
   }
-
+  state.localProjects = nextProjects;
   setOpenProjectDetails(openProjectDetails().map((detail) => projectDetailMatches(project, detail) ? projectIdentity(updated) : detail));
   saveWorkspaceState();
+
+  if (account) {
+    try {
+      await pushMutation(projectMutationForRecord(updated, account));
+      state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
+      saveWorkspaceState();
+    } catch (error) {
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+      // Keep the local edit visible while the durable sync queue recovers.
+    }
+  }
 }
 
 function isSectionSaved(sectionID) {
