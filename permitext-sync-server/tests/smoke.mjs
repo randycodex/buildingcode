@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("settings-alignment-v54"),
+      webRoot.text.includes("compact-settings-v56"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -382,7 +382,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-settings-alignment-v54'),
+        webRoot.text.includes('/web/app.js?v=20260720-compact-settings-v56'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

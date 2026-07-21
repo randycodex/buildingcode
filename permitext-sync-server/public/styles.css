@@ -4704,15 +4704,23 @@ mark {
 }
 
 .settings-library-card .settings-row {
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 82px minmax(0, 1fr);
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-3);
 }
 
 .settings-library-card .settings-row > span {
-  display: none;
+  display: block;
+  font-size: calc(var(--chrome-font-size) * 0.9);
+  font-weight: 500;
+  text-transform: none;
 }
 
 .settings-library-card .settings-row select {
-  text-align: left;
+  min-height: 30px;
+  font-size: calc(var(--chrome-font-size) * 0.9);
+  text-align: right;
 }
 
 .settings-list span {
