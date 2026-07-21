@@ -1,0 +1,98 @@
+export const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+
+export function syncCodeVersion(value) {
+  const candidate = String(value || "").trim();
+  const normalized = candidate.toLocaleLowerCase("en-US");
+  if (
+    !candidate ||
+    normalized === "nyc-2022" ||
+    normalized === "2022 construction codes" ||
+    normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return defaultSyncCodeVersion;
+  return candidate;
+}
+
+function nonEmpty(value) {
+  const candidate = String(value ?? "").trim();
+  return candidate || null;
+}
+
+export function syncProjectIdentity(value, userID = null) {
+  let candidate = nonEmpty(value);
+  if (!candidate) return null;
+
+  while (candidate) {
+    const explicitPrefix = nonEmpty(userID) ? `${String(userID).trim()}:project:` : null;
+    const markerIndex = explicitPrefix
+      ? (candidate.startsWith(explicitPrefix) ? 0 : -1)
+      : candidate.indexOf(":project:");
+    if (markerIndex === -1) return candidate;
+
+    const prefixEnd = explicitPrefix
+      ? explicitPrefix.length
+      : markerIndex + ":project:".length;
+    const prefix = candidate.slice(0, prefixEnd);
+    const remainder = candidate.slice(prefixEnd);
+    const separatorIndex = remainder.indexOf(":");
+    if (separatorIndex === -1) return candidate;
+    const codeVersion = remainder.slice(0, separatorIndex);
+    const identity = remainder.slice(separatorIndex + 1).trim();
+    if (!identity) return candidate;
+    if (identity.startsWith(prefix)) {
+      candidate = identity;
+      continue;
+    }
+    if (codeVersion.toLocaleLowerCase("en-US") === defaultSyncCodeVersion.toLocaleLowerCase("en-US")) {
+      return identity;
+    }
+    return candidate;
+  }
+  return null;
+}
+
+export function syncMutationRecordID(mutation) {
+  const [kind, record] = Object.entries(mutation || {})[0] || [];
+  if (!kind || !record?.userID) return null;
+
+  const userID = nonEmpty(record.userID);
+  const codeVersion = syncCodeVersion(record.codeVersion);
+  const sectionID = nonEmpty(record.sectionID);
+
+  if (kind === "savedItem") {
+    return sectionID ? [userID, "saved", codeVersion, sectionID].join(":") : null;
+  }
+  if (kind === "annotation") {
+    if (!sectionID) return null;
+    return [
+      userID,
+      record.tags !== undefined ? "tags" : "note",
+      codeVersion,
+      sectionID,
+      nonEmpty(record.blockID)
+    ].filter(Boolean).join(":");
+  }
+  if (kind === "project") {
+    const projectID = syncProjectIdentity(record.clientID, userID) ||
+      syncProjectIdentity(record.id, userID) ||
+      nonEmpty(record.localFolderID);
+    return projectID ? [userID, "project", codeVersion, projectID].join(":") : null;
+  }
+  if (kind === "projectSection") {
+    const projectID = syncProjectIdentity(record.folderClientID, userID) || nonEmpty(record.localFolderID);
+    if (!sectionID) return null;
+    return [userID, "project-section", codeVersion, projectID, sectionID, nonEmpty(record.scope)]
+      .filter(Boolean)
+      .join(":");
+  }
+  if (kind === "workboard") {
+    const projectID = nonEmpty(record.projectID);
+    return projectID ? [userID, "workboard", projectID].join(":") : null;
+  }
+  if (kind === "continuity") {
+    return [userID, "continuity", codeVersion].join(":");
+  }
+  if (kind === "codeVersionClear") {
+    return [userID, "code-version-clear", codeVersion].join(":");
+  }
+  return nonEmpty(record.id);
+}

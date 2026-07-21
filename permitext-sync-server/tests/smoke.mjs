@@ -258,6 +258,21 @@ async function main() {
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
       "Combined Saved no longer owns the project grid and project-detail flow."
     );
+    const projectMutationSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("function projectMutationForRecord"),
+      workspaceScript.text.indexOf("function deletedProjectMutationForRecord")
+    );
+    const projectUpdateSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("async function updateProjectFolder"),
+      workspaceScript.text.indexOf("async function archiveProject")
+    );
+    assert(
+      projectMutationSource.includes("colorHex: color") &&
+        projectUpdateSource.includes("colorHex: color") &&
+        !projectMutationSource.includes("project.colorHex || color") &&
+        !projectUpdateSource.includes("project.colorHex || color"),
+      "Project color edits can still send a stale colorHex to another device."
+    );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
       "Detached Workboards still auto-reattached from an unreliable popup.closed check."
@@ -292,7 +307,7 @@ async function main() {
       "Divider resizing is no longer coalesced to animation frames."
     );
     assert(
-      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 12_000") &&
+      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 3_000") &&
         workspaceScript.text.includes("function canRunForegroundSync()") &&
         workspaceScript.text.includes('document.visibilityState === "visible"') &&
         workspaceScript.text.includes("navigator.onLine") &&
@@ -300,7 +315,7 @@ async function main() {
         workspaceScript.text.includes("await loadSyncedContent({ force: true, skipOutbox: true })") &&
         workspaceScript.text.includes('window.addEventListener("offline"') &&
         workspaceScript.text.includes("startForegroundSyncLoop({ immediate: true })"),
-      "Visible web tabs no longer perform incremental foreground sync every 12 seconds."
+      "Visible web tabs no longer perform incremental foreground sync every 3 seconds."
     );
     assert(
       workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&
@@ -382,7 +397,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-compact-settings-v56'),
+        webRoot.text.includes('/web/app.js?v=20260720-sync-contract-v59'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1889,9 +1904,10 @@ async function main() {
       iosAfterWebSavePull.json.mutations.some((item) =>
         item.savedItem?.id === canonicalSavedRecordID &&
         item.savedItem?.sectionID === 113 &&
+        item.savedItem?.title === "Definitions" &&
         !item.savedItem?.deletedAt
       ),
-      "iOS pull did not receive the web-created saved section."
+      "iOS pull did not receive the web-created saved section and its title."
     );
 
     const iosDeleteMutation = {
@@ -2184,7 +2200,7 @@ async function main() {
     assert(fullStatePush.response.ok, "Full restore-state push failed.");
     assert(fullStatePush.json.acceptedMutationIDs.includes(tagRecordID), "Tag mutation was not accepted.");
     assert(
-      fullStatePush.json.acceptedMutationIDs.includes(`${userID}:continuity:nyc-2022`),
+      fullStatePush.json.acceptedMutationIDs.includes(`${userID}:continuity:${defaultSyncCodeVersion}`),
       "Continuity mutation was not accepted."
     );
 
@@ -2240,8 +2256,12 @@ async function main() {
       "Reinstall pull did not restore tags."
     );
     assert(
-      reinstallRecords.some((item) => item.kind === "project" && item.record.clientID === "project-client-smoke"),
-      "Reinstall pull did not restore the project."
+      reinstallRecords.some((item) =>
+        item.kind === "project" &&
+        item.record.clientID === "project-client-smoke" &&
+        item.record.name === "Smoke Project"
+      ),
+      "Reinstall pull did not restore the project name."
     );
     assert(
       reinstallRecords.some((item) => item.kind === "projectSection" && item.record.folderClientID === "project-client-smoke"),

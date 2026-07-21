@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import { syncProjectIdentity } from "./public/sync-identity.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
@@ -3136,7 +3137,10 @@ function canonicalMutationRecordID(kind, record) {
       userID,
       "project",
       codeVersion,
-      record.clientID || record.id || record.localFolderID || null
+      syncProjectIdentity(record.clientID, userID) ||
+        syncProjectIdentity(record.id, userID) ||
+        record.localFolderID ||
+        null
     ].filter(Boolean).join(":");
   }
   if (kind === "projectSection") {
@@ -3144,7 +3148,7 @@ function canonicalMutationRecordID(kind, record) {
       userID,
       "project-section",
       codeVersion,
-      record.folderClientID || record.localFolderID || null,
+      syncProjectIdentity(record.folderClientID, userID) || record.localFolderID || null,
       sectionID,
       record.scope || null
     ].filter(Boolean).join(":");
@@ -3156,6 +3160,12 @@ function canonicalMutationRecordID(kind, record) {
 }
 
 async function canonicalizeSectionRecord(kind, record) {
+  if (kind === "continuity" || kind === "codeVersionClear") {
+    return {
+      ...record,
+      codeVersion: canonicalCodeVersion(record.codeVersion)
+    };
+  }
   if (kind === "workboard") {
     const normalized = {
       ...record,
@@ -3170,9 +3180,19 @@ async function canonicalizeSectionRecord(kind, record) {
   }
   const codeVersion = canonicalCodeVersion(record.codeVersion);
   if (kind === "project") {
-    const normalized = { ...record, codeVersion };
+    const clientID = syncProjectIdentity(record.clientID, record.userID) ||
+      syncProjectIdentity(record.id, record.userID) ||
+      String(record.localFolderID || "").trim() ||
+      null;
+    const normalized = { ...record, codeVersion, clientID };
     const nextID = canonicalMutationRecordID(kind, normalized);
     return nextID ? { ...normalized, id: nextID } : normalized;
+  }
+  if (kind === "projectSection") {
+    record = {
+      ...record,
+      folderClientID: syncProjectIdentity(record.folderClientID, record.userID) || null
+    };
   }
   const canonicalID = await canonicalSectionIDFor({
     codePrefix: record.codePrefix || "BC",
@@ -3209,15 +3229,29 @@ async function canonicalizeMutation(mutation) {
 }
 
 async function canonicalizeMutations(mutations) {
-  return Promise.all((mutations || []).map(canonicalizeMutation));
+  const canonicalized = await Promise.all((mutations || []).map(canonicalizeMutation));
+  const mutationsByID = new Map();
+  for (const mutation of canonicalized) {
+    const recordID = mutationRecordID(mutation);
+    if (!recordID) continue;
+    const existing = mutationsByID.get(recordID);
+    if (!existing || mutationUpdatedAt(mutation) >= mutationUpdatedAt(existing)) {
+      mutationsByID.set(recordID, mutation);
+    }
+  }
+  return Array.from(mutationsByID.values()).sort((left, right) =>
+    String(mutationRecordID(left) || "").localeCompare(String(mutationRecordID(right) || ""))
+  );
 }
 
 function canonicalCodeVersion(value) {
   const candidate = String(value || "").trim();
+  const normalized = candidate.toLocaleLowerCase("en-US");
   if (
     !candidate ||
-    candidate === "nyc-2022" ||
-    candidate === "2022 Construction Codes"
+    normalized === "nyc-2022" ||
+    normalized === "2022 construction codes" ||
+    normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return defaultSyncCodeVersion;
   return candidate;
 }

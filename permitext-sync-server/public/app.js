@@ -3,6 +3,12 @@ import {
   parseCodeJumpAnchor,
   rewriteStructuredCodeLinks
 } from "./code-references.js?v=20260720-code-reference-links-v18";
+import {
+  defaultSyncCodeVersion,
+  syncCodeVersion,
+  syncProjectIdentity,
+  syncMutationRecordID
+} from "./sync-identity.js?v=20260720-sync-contract-v2";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const detachedWorkboardPath = "/detached-workboard";
@@ -33,8 +39,6 @@ const searchTemplate = document.querySelector("#search-template");
 const savedTemplate = document.querySelector("#saved-template");
 const analysisTemplate = document.querySelector("#analysis-template");
 const settingsTemplate = document.querySelector("#settings-template");
-const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
-
 if (detachedWorkboardRoute) document.body.classList.add("is-detached-workboard-window");
 
 const codeOptions = [
@@ -85,7 +89,7 @@ let syncFlushPromise = null;
 let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncPromise = null;
-const foregroundSyncIntervalMilliseconds = 12_000;
+const foregroundSyncIntervalMilliseconds = 3_000;
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -2295,23 +2299,11 @@ function mutationUpdatedAt(mutation) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
-function mutationRecordID(mutation) {
-  const { kind, record } = mutationKindAndRecord(mutation);
-  if (!kind || !record) return null;
-  if (kind === "continuity") {
-    return [record.userID, "continuity", syncCodeVersion(record.codeVersion)].join(":");
-  }
-  if (kind === "codeVersionClear") {
-    return [record.userID, "code-version-clear", syncCodeVersion(record.codeVersion)].join(":");
-  }
-  return record.id || null;
-}
-
 function summarizeMutations(mutations = []) {
   const sorted = [...mutations].sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left));
   const latestByID = new Map();
   sorted.forEach((mutation) => {
-    const id = mutationRecordID(mutation);
+    const id = syncMutationRecordID(mutation);
     if (id && !latestByID.has(id)) latestByID.set(id, mutation);
   });
   const projects = [];
@@ -2338,12 +2330,6 @@ function summarizeMutations(mutations = []) {
   });
 
   return { projects, savedItems, annotations, projectSections, workboards, latestContinuity };
-}
-
-function syncCodeVersion(value) {
-  const candidate = String(value || "").trim();
-  if (!candidate || candidate === "nyc-2022") return defaultSyncCodeVersion;
-  return candidate;
 }
 
 function currentContentSummary() {
@@ -2471,19 +2457,6 @@ async function ensureSyncedContentForRender() {
   }
   if (syncedContent?.status === "connected") return syncedContent;
   return loadSyncedContent();
-}
-
-function syncMutationRecordID(mutation) {
-  const { kind, record } = mutationKindAndRecord(mutation);
-  if (kind === "continuity") {
-    if (!record?.userID) return null;
-    return [record?.userID, "continuity", syncCodeVersion(record?.codeVersion)].join(":");
-  }
-  if (kind === "codeVersionClear") {
-    if (!record?.userID) return null;
-    return [record?.userID, "code-version-clear", syncCodeVersion(record?.codeVersion)].join(":");
-  }
-  return String(record?.id || "").trim();
 }
 
 function syncedWorkboardForProject(projectID) {
@@ -2855,35 +2828,66 @@ function prepareSyncOutboxForFlush(account) {
       return;
     }
     const { kind, record } = mutationKindAndRecord(entry.mutation);
-    if (kind !== "workboard") {
-      repairedEntries.push(entry);
-      return;
+    let mutation = entry.mutation;
+    if (kind === "workboard") {
+      const projectID = recoverQueuedWorkboardProjectID(record);
+      if (!projectID) {
+        changed = true;
+        quarantinedEntries.push({
+          ...entry,
+          conflictedAt: new Date().toISOString(),
+          lastError: "Workboard sync paused because its project identity is missing."
+        });
+        return;
+      }
+      const canonicalWorkboardID = `${account.userID}:workboard:${projectID}`;
+      mutation = {
+        workboard: {
+          ...record,
+          id: canonicalWorkboardID,
+          userID: account.userID,
+          projectID
+        }
+      };
+    } else if (kind === "project") {
+      mutation = {
+        project: {
+          ...record,
+          clientID: syncProjectIdentity(record.clientID, account.userID) ||
+            syncProjectIdentity(record.id, account.userID) ||
+            record.localFolderID ||
+            null
+        }
+      };
+    } else if (kind === "projectSection") {
+      mutation = {
+        projectSection: {
+          ...record,
+          folderClientID: syncProjectIdentity(record.folderClientID, account.userID) || null
+        }
+      };
     }
-    const projectID = recoverQueuedWorkboardProjectID(record);
-    if (!projectID) {
+    const canonicalID = syncMutationRecordID(mutation);
+    if (!canonicalID) {
       changed = true;
       quarantinedEntries.push({
         ...entry,
         conflictedAt: new Date().toISOString(),
-        lastError: "Workboard sync paused because its project identity is missing."
+        lastError: "Sync paused because this record has no stable cross-device identity."
       });
       return;
     }
-    const canonicalID = `${account.userID}:workboard:${projectID}`;
     const repaired = {
       ...entry,
       id: `${account.userID}:${canonicalID}`,
       recordID: canonicalID,
-      mutation: {
-        workboard: {
-          ...record,
-          id: canonicalID,
-          userID: account.userID,
-          projectID
-        }
-      }
+      mutation
     };
-    if (projectID !== String(record.projectID || "") || canonicalID !== String(record.id || "")) changed = true;
+    if (
+      repaired.id !== entry.id ||
+      repaired.recordID !== entry.recordID ||
+      repaired.mutation !== entry.mutation
+    ) changed = true;
     repairedEntries.push(repaired);
   });
   if (!changed) return;
@@ -2900,15 +2904,33 @@ function discardLocalMutationOverlay(mutation) {
   const recordID = syncMutationRecordID(mutation);
   if (!recordID) return;
   if (kind === "savedItem") {
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.id || "") !== recordID);
+    state.localSavedItems = (state.localSavedItems || []).filter((item) =>
+      String(item.id || "") !== String(record.id || "") &&
+      String(item.sectionID || "") !== String(record.sectionID || "")
+    );
     state.localSavedSectionIDs = (state.localSavedSectionIDs || [])
       .filter((sectionID) => String(sectionID) !== String(record.sectionID || ""));
   } else if (kind === "annotation") {
-    state.localAnnotations = (state.localAnnotations || []).filter((item) => String(item.id || "") !== recordID);
+    state.localAnnotations = (state.localAnnotations || []).filter((item) =>
+      String(item.id || "") !== String(record.id || "") &&
+      !(
+        String(item.sectionID || "") === String(record.sectionID || "") &&
+        normalizeAnnotationBlockID(item.blockID) === normalizeAnnotationBlockID(record.blockID)
+      )
+    );
   } else if (kind === "project") {
-    state.localProjects = (state.localProjects || []).filter((item) => String(item.id || "") !== recordID);
+    state.localProjects = (state.localProjects || []).filter((item) => !projectDetailMatches(item, record));
   } else if (kind === "projectSection") {
-    state.localProjectSections = (state.localProjectSections || []).filter((item) => String(item.id || "") !== recordID);
+    const identity = [
+      record.folderClientID || record.localFolderID || "",
+      record.sectionID || "",
+      record.scope || ""
+    ].map(String).join(":");
+    state.localProjectSections = (state.localProjectSections || []).filter((item) => [
+      item.folderClientID || item.localFolderID || "",
+      item.sectionID || "",
+      item.scope || ""
+    ].map(String).join(":") !== identity);
   } else if (kind === "continuity") {
     state.continuityAppliedAt = null;
   }
@@ -3300,7 +3322,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       address: project.address || "",
       description: project.description || "",
       color,
-      colorHex: project.colorHex || color,
+      colorHex: color,
       sortOrder: Number.isFinite(Number(project.sortOrder)) ? Number(project.sortOrder) : 0,
       sortMode: project.sortMode || "Code order",
       createdAt: project.createdAt || now,
@@ -3431,7 +3453,7 @@ async function updateProjectFolder(project, details = {}) {
     address,
     description: String(details.description || "").trim(),
     color,
-    colorHex: project.colorHex || color,
+    colorHex: color,
     tintColor: color,
     updatedAt: now
   };

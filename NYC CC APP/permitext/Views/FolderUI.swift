@@ -222,11 +222,13 @@ struct FolderEditorSheet: View {
                 }
 
                 Section("Color") {
-                    HStack(spacing: 12) {
+                    LazyVGrid(
+                        columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5),
+                        spacing: 12
+                    ) {
                         ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
                             colorSwatch(hex)
                         }
-                        Spacer(minLength: 0)
                     }
                     .padding(.vertical, 4)
                 }

@@ -493,6 +493,7 @@ struct SettingsView: View {
         case .annotation: return "Note or tag conflict"
         case .project: return "Project conflict"
         case .projectSection: return "Project section conflict"
+        case .workboard: return "Workboard conflict"
         case .continuity: return "Reading position conflict"
         case .codeVersionClear: return "Cleared data conflict"
         }

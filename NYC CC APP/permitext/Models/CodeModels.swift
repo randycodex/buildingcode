@@ -422,6 +422,68 @@ struct ServerEntitlementRecord: Codable, Hashable, Sendable {
     let updatedAt: Date
 }
 
+enum UserContentSyncCodeVersion {
+    static let canonicalNYC2022 = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
+    static let localNYC2022 = "2022 CONSTRUCTION CODES"
+
+    private static let nyc2022Aliases = [
+        "nyc-2022",
+        "2022 Construction Codes",
+        canonicalNYC2022
+    ]
+
+    private static func isNYC2022Alias(_ value: String) -> Bool {
+        nyc2022Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
+    static func server(_ value: String) -> String {
+        let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return candidate.isEmpty || isNYC2022Alias(candidate) ? canonicalNYC2022 : candidate
+    }
+
+    static func local(_ value: String) -> String {
+        let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return candidate.isEmpty || isNYC2022Alias(candidate) ? localNYC2022 : candidate
+    }
+}
+
+enum UserContentProjectIdentity {
+    static func stable(_ value: String?, userID: String? = nil) -> String? {
+        guard var candidate = value?.trimmingCharacters(in: .whitespacesAndNewlines), !candidate.isEmpty else {
+            return nil
+        }
+
+        while let marker = projectMarker(in: candidate, userID: userID) {
+            let prefix = String(candidate[..<marker.upperBound])
+            let remainder = String(candidate[marker.upperBound...])
+            guard let separator = remainder.firstIndex(of: ":") else { return candidate }
+            let codeVersion = String(remainder[..<separator])
+            let identityStart = remainder.index(after: separator)
+            let identity = String(remainder[identityStart...]).trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !identity.isEmpty else { return candidate }
+
+            if identity.hasPrefix(prefix) {
+                candidate = identity
+                continue
+            }
+            if codeVersion.caseInsensitiveCompare(UserContentSyncCodeVersion.canonicalNYC2022) == .orderedSame {
+                return identity
+            }
+            return candidate
+        }
+        return candidate
+    }
+
+    private static func projectMarker(in value: String, userID: String?) -> Range<String.Index>? {
+        if let userID {
+            let prefix = "\(userID):project:"
+            return value.hasPrefix(prefix) ? value.range(of: prefix) : nil
+        }
+        guard let marker = value.range(of: ":project:") else { return nil }
+        return value.startIndex..<marker.upperBound
+    }
+}
+
 struct ServerSavedItemRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
@@ -474,6 +536,16 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let deletedAt: Date?
 }
 
+struct ServerWorkboardRecord: Codable, Hashable, Sendable {
+    let id: String
+    let userID: String
+    let codeVersion: String
+    let projectID: String
+    let projectName: String?
+    let updatedAt: Date
+    let deletedAt: Date?
+}
+
 struct ServerContinuityRecord: Codable, Hashable, Sendable {
     let userID: String
     let codeVersion: String
@@ -486,6 +558,7 @@ enum ServerUserContentEntityKind: String, Codable, Hashable, Sendable {
     case annotation
     case project
     case projectSection
+    case workboard
     case continuity
     case codeVersionClear
 }
@@ -495,6 +568,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
     case annotation(ServerAnnotationRecord)
     case project(ServerProjectRecord)
     case projectSection(ServerProjectSectionRecord)
+    case workboard(ServerWorkboardRecord)
     case continuity(ServerContinuityRecord)
     case codeVersionClear(ServerContinuityRecord)
 
@@ -503,6 +577,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         case annotation
         case project
         case projectSection
+        case workboard
         case continuity
         case codeVersionClear
     }
@@ -528,6 +603,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             self = .project(try container.decode(ServerProjectRecord.self, forKey: .project))
         case .projectSection:
             self = .projectSection(try container.decode(ServerProjectSectionRecord.self, forKey: .projectSection))
+        case .workboard:
+            self = .workboard(try container.decode(ServerWorkboardRecord.self, forKey: .workboard))
         case .continuity:
             self = .continuity(try container.decode(ServerContinuityRecord.self, forKey: .continuity))
         case .codeVersionClear:
@@ -546,6 +623,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             try container.encode(record, forKey: .project)
         case .projectSection(let record):
             try container.encode(record, forKey: .projectSection)
+        case .workboard(let record):
+            try container.encode(record, forKey: .workboard)
         case .continuity(let record):
             try container.encode(record, forKey: .continuity)
         case .codeVersionClear(let record):
@@ -555,6 +634,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
 
     init(syncQueueItem item: SyncQueueItem, account: SignedInAccount) throws {
         let payload = item.payload
+        let codeVersion = UserContentSyncCodeVersion.server(payload.codeVersion)
         let deletedAt = item.operationType == .delete ? item.mutationUpdatedAt : nil
         switch item.entityType {
         case .bookmark:
@@ -563,9 +643,9 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             }
             self = .savedItem(
                 ServerSavedItemRecord(
-                    id: Self.recordID(account: account, type: "saved", codeVersion: payload.codeVersion, sectionID: sectionID),
+                    id: Self.recordID(account: account, type: "saved", codeVersion: codeVersion, sectionID: sectionID),
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     sectionID: sectionID,
                     updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
@@ -580,12 +660,12 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     id: Self.recordID(
                         account: account,
                         type: "note",
-                        codeVersion: payload.codeVersion,
+                        codeVersion: codeVersion,
                         sectionID: sectionID,
                         blockID: payload.values["blockID"]
                     ),
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     sectionID: sectionID,
                     blockID: payload.values["blockID"],
                     noteBody: item.operationType == .delete ? nil : payload.values["body"],
@@ -603,12 +683,12 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     id: Self.recordID(
                         account: account,
                         type: "tags",
-                        codeVersion: payload.codeVersion,
+                        codeVersion: codeVersion,
                         sectionID: sectionID,
                         blockID: payload.values["blockID"]
                     ),
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     sectionID: sectionID,
                     blockID: payload.values["blockID"],
                     noteBody: nil,
@@ -621,18 +701,21 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             guard let folderID = payload.folderID else {
                 throw UserContentServerMappingError.missingFolderID(item.entityType)
             }
-            let projectClientID = payload.clientID ?? payload.values["clientID"]
+            let projectClientID = UserContentProjectIdentity.stable(
+                payload.clientID ?? payload.values["clientID"],
+                userID: account.appUserID
+            )
             self = .project(
                 ServerProjectRecord(
                     id: Self.recordID(
                         account: account,
                         type: "project",
-                        codeVersion: payload.codeVersion,
+                        codeVersion: codeVersion,
                         clientID: projectClientID,
                         folderID: folderID
                     ),
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     clientID: projectClientID,
                     localFolderID: folderID,
                     name: item.operationType == .delete ? nil : payload.values["name"],
@@ -648,20 +731,23 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             guard let sectionID = payload.sectionID else {
                 throw UserContentServerMappingError.missingSectionID(item.entityType)
             }
-            let folderClientID = payload.values["folderClientID"]
+            let folderClientID = UserContentProjectIdentity.stable(
+                payload.values["folderClientID"],
+                userID: account.appUserID
+            )
             self = .projectSection(
                 ServerProjectSectionRecord(
                     id: Self.recordID(
                         account: account,
                         type: "project-section",
-                        codeVersion: payload.codeVersion,
+                        codeVersion: codeVersion,
                         clientID: folderClientID,
                         folderID: payload.folderID,
                         sectionID: sectionID,
                         scope: payload.values["scope"]
                     ),
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     folderClientID: folderClientID,
                     localFolderID: payload.folderID,
                     sectionID: sectionID,
@@ -674,7 +760,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             self = .continuity(
                 ServerContinuityRecord(
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     values: payload.values,
                     updatedAt: item.mutationUpdatedAt
                 )
@@ -683,7 +769,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             self = .codeVersionClear(
                 ServerContinuityRecord(
                     userID: account.appUserID,
-                    codeVersion: payload.codeVersion,
+                    codeVersion: codeVersion,
                     values: payload.values,
                     updatedAt: item.mutationUpdatedAt
                 )
@@ -709,17 +795,21 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         blockID: String? = nil,
         scope: String? = nil
     ) -> String {
-        [
+        let normalizedClientID = UserContentProjectIdentity.stable(clientID, userID: account.appUserID)
+        let projectIdentity = normalizedClientID?.isEmpty == false
+            ? normalizedClientID
+            : folderID.map(String.init)
+        return [
             account.appUserID,
             type,
             codeVersion,
-            clientID,
-            folderID.map(String.init),
+            projectIdentity,
             sectionID.map(String.init),
             blockID?.trimmingCharacters(in: .whitespacesAndNewlines),
             scope
         ]
         .compactMap { $0 }
+        .filter { !$0.isEmpty }
         .joined(separator: ":")
     }
 
@@ -733,6 +823,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             return .project
         case .projectSection:
             return .projectSection
+        case .workboard:
+            return .workboard
         case .continuity:
             return .continuity
         case .codeVersionClear:
@@ -749,6 +841,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         case .project(let record):
             return record.id
         case .projectSection(let record):
+            return record.id
+        case .workboard(let record):
             return record.id
         case .continuity(let record):
             return [record.userID, "continuity", record.codeVersion].joined(separator: ":")
@@ -767,6 +861,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             return record.updatedAt
         case .projectSection(let record):
             return record.updatedAt
+        case .workboard(let record):
+            return record.updatedAt
         case .continuity(let record), .codeVersionClear(let record):
             return record.updatedAt
         }
@@ -781,6 +877,8 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
         case .project(let record):
             return record.deletedAt
         case .projectSection(let record):
+            return record.deletedAt
+        case .workboard(let record):
             return record.deletedAt
         case .continuity, .codeVersionClear:
             return nil
@@ -1487,16 +1585,25 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let createdAt: Date
     let updatedAt: Date
 
-    /// Six preset hex palette offered in the folder editor. Chosen to not
-    /// clash with the code-section accents (Building orange, Plumbing blue,
-    /// Mechanical green, Fuel Gas red, General Administrative purple).
+    /// Shared web/iOS project palette. Keep this in the same order as
+    /// `projectColorOptions` in the web client so a project keeps both its
+    /// exact color and its selected swatch on every device.
     static let presetColorHexes: [String] = [
-        "#5C6BC0",   // Indigo
-        "#26A69A",   // Teal
-        "#FF7043",   // Coral
-        "#AB47BC",   // Purple
-        "#789262",   // Sage
-        "#8D6E63"    // Bronze
+        "#6674c8",
+        "#5aaea4",
+        "#f27a4f",
+        "#a14fc0",
+        "#879a6d",
+        "#9b7d6f",
+        "#d75f7a",
+        "#2f8f4e",
+        "#0891b2",
+        "#c96410",
+        "#3f6f9f",
+        "#b58b2a",
+        "#6f58c9",
+        "#c84b7a",
+        "#4f8f8b"
     ]
 
     static let defaultColorHex: String = presetColorHexes[0]

@@ -1846,21 +1846,33 @@ final class UserDataStore: UserContentRepository {
         return connection.string(at: 0, in: statement)
     }
 
-    private func localFolderID(clientID: String?, codeVersion: String) throws -> Int64? {
-        guard let clientID, !clientID.isEmpty else { return nil }
+    private func localFolderIDs(clientID: String?, codeVersion: String) throws -> [Int64] {
+        guard let identity = UserContentProjectIdentity.stable(clientID) else { return [] }
         let statement = try connection.prepare(
             """
-            SELECT id
+            SELECT id, client_id, owner_id
             FROM folders
-            WHERE client_id = ? AND code_version = ?
-            LIMIT 1;
+            WHERE code_version = ?
+            ORDER BY id ASC;
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: clientID, index: 1, to: statement)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
-        guard try connection.step(statement) == SQLITE_ROW else { return nil }
-        return connection.int64(at: 0, in: statement)
+        try connection.bind(text: codeVersion, index: 1, to: statement)
+
+        var matches: [Int64] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            let storedClientID = connection.string(at: 1, in: statement)
+            let ownerID = connection.string(at: 2, in: statement)
+            if UserContentProjectIdentity.stable(storedClientID, userID: ownerID) == identity ||
+                UserContentProjectIdentity.stable(storedClientID) == identity {
+                matches.append(connection.int64(at: 0, in: statement))
+            }
+        }
+        return matches
+    }
+
+    private func localFolderID(clientID: String?, codeVersion: String) throws -> Int64? {
+        try localFolderIDs(clientID: clientID, codeVersion: codeVersion).first
     }
 
     func addSection(_ sectionID: Int64, toFolder folderID: Int64, codeVersion: String) throws {
@@ -1986,7 +1998,8 @@ final class UserDataStore: UserContentRepository {
     func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate] {
         var candidates: [String: UserContentMergeCandidate] = [:]
         for mutation in mutations {
-            if let candidate = try localMergeCandidate(for: mutation) {
+            let localizedMutation = localizedServerMutation(mutation)
+            if let candidate = try localMergeCandidate(for: localizedMutation) {
                 candidates[mutation.recordID] = candidate
             }
         }
@@ -2067,6 +2080,8 @@ final class UserDataStore: UserContentRepository {
                 firstID: folderID,
                 secondID: record.sectionID
             )
+        case .workboard:
+            return nil
         case .continuity, .codeVersionClear:
             return nil
         }
@@ -2162,6 +2177,10 @@ final class UserDataStore: UserContentRepository {
             } else {
                 try upsertServerProjectSection(record)
             }
+        case .workboard:
+            // Workboards remain web-only. Recognize their sync records so they
+            // never prevent iOS from applying the rest of a user's saved data.
+            break
         case .continuity:
             break
         case .codeVersionClear(let record):
@@ -2219,6 +2238,8 @@ final class UserDataStore: UserContentRepository {
                 updatedAt: record.updatedAt,
                 deletedAt: record.deletedAt
             ))
+        case .workboard:
+            return mutation
         case .continuity:
             return mutation
         case .codeVersionClear(let record):
@@ -2232,12 +2253,7 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func localCodeVersion(_ codeVersion: String) -> String {
-        switch codeVersion.trimmingCharacters(in: .whitespacesAndNewlines) {
-        case "nyc-2022", "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1":
-            return "2022 Construction Codes"
-        default:
-            return codeVersion
-        }
+        UserContentSyncCodeVersion.local(codeVersion)
     }
 
     private func upsertServerBookmark(_ record: ServerSavedItemRecord) throws {
@@ -2394,15 +2410,26 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func upsertServerProject(_ record: ServerProjectRecord) throws {
-        let clientID = record.clientID ?? record.id
-        if let localID = try localFolderID(clientID: clientID, codeVersion: record.codeVersion) {
-            try updateServerProject(record, localFolderID: localID, clientID: clientID)
+        let clientID = UserContentProjectIdentity.stable(
+            record.clientID ?? record.id,
+            userID: record.userID
+        ) ?? record.clientID ?? record.id
+        let localIDs = try localFolderIDs(clientID: clientID, codeVersion: record.codeVersion)
+        if let localID = localIDs.first {
+            try performTransaction {
+                try mergeServerProjectDuplicates(
+                    primaryFolderID: localID,
+                    duplicateFolderIDs: Array(localIDs.dropFirst()),
+                    codeVersion: record.codeVersion
+                )
+                try updateServerProject(record, localFolderID: localID, clientID: clientID)
+            }
             return
         }
-        try insertServerProject(record)
+        try insertServerProject(record, clientID: clientID)
     }
 
-    private func insertServerProject(_ record: ServerProjectRecord) throws {
+    private func insertServerProject(_ record: ServerProjectRecord, clientID: String) throws {
         let timestamp = isoFormatter.string(from: record.updatedAt)
         let statement = try connection.prepare(
             """
@@ -2414,7 +2441,7 @@ final class UserDataStore: UserContentRepository {
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: record.clientID ?? record.id, index: 1, to: statement)
+        try connection.bind(text: clientID, index: 1, to: statement)
         try connection.bind(text: record.userID, index: 2, to: statement)
         try connection.bind(text: personalVisibility, index: 3, to: statement)
         try connection.bind(text: syncedContentState, index: 4, to: statement)
@@ -2427,6 +2454,58 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: timestamp, index: 11, to: statement)
         try connection.bind(text: timestamp, index: 12, to: statement)
         _ = try connection.step(statement)
+    }
+
+    private func mergeServerProjectDuplicates(
+        primaryFolderID: Int64,
+        duplicateFolderIDs: [Int64],
+        codeVersion: String
+    ) throws {
+        guard !duplicateFolderIDs.isEmpty else { return }
+
+        let copyMemberships = try connection.prepare(
+            """
+            INSERT OR IGNORE INTO folder_sections (
+                client_id, owner_id, visibility, sync_state, folder_id,
+                code_version, section_id, added_at, updated_at, deleted_at
+            )
+            SELECT
+                client_id, owner_id, visibility, sync_state, ?,
+                code_version, section_id, added_at, updated_at, deleted_at
+            FROM folder_sections
+            WHERE folder_id = ? AND code_version = ?;
+            """
+        )
+        defer { connection.finalize(copyMemberships) }
+        let deleteMemberships = try connection.prepare(
+            "DELETE FROM folder_sections WHERE folder_id = ? AND code_version = ?;"
+        )
+        defer { connection.finalize(deleteMemberships) }
+        let deleteFolder = try connection.prepare(
+            "DELETE FROM folders WHERE id = ? AND code_version = ?;"
+        )
+        defer { connection.finalize(deleteFolder) }
+
+        for duplicateFolderID in duplicateFolderIDs where duplicateFolderID != primaryFolderID {
+            sqlite3_reset(copyMemberships)
+            sqlite3_clear_bindings(copyMemberships)
+            sqlite3_bind_int64(copyMemberships, 1, primaryFolderID)
+            sqlite3_bind_int64(copyMemberships, 2, duplicateFolderID)
+            try connection.bind(text: codeVersion, index: 3, to: copyMemberships)
+            _ = try connection.step(copyMemberships)
+
+            sqlite3_reset(deleteMemberships)
+            sqlite3_clear_bindings(deleteMemberships)
+            sqlite3_bind_int64(deleteMemberships, 1, duplicateFolderID)
+            try connection.bind(text: codeVersion, index: 2, to: deleteMemberships)
+            _ = try connection.step(deleteMemberships)
+
+            sqlite3_reset(deleteFolder)
+            sqlite3_clear_bindings(deleteFolder)
+            sqlite3_bind_int64(deleteFolder, 1, duplicateFolderID)
+            try connection.bind(text: codeVersion, index: 2, to: deleteFolder)
+            _ = try connection.step(deleteFolder)
+        }
     }
 
     private func updateServerProject(_ record: ServerProjectRecord, localFolderID: Int64, clientID: String) throws {
@@ -2466,10 +2545,18 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func deleteServerProject(_ record: ServerProjectRecord) throws {
-        let folderID = try localFolderID(clientID: record.clientID ?? record.id, codeVersion: record.codeVersion) ?? record.localFolderID
+        var folderIDs = try localFolderIDs(
+            clientID: record.clientID ?? record.id,
+            codeVersion: record.codeVersion
+        )
+        if folderIDs.isEmpty, record.localFolderID > 0 {
+            folderIDs = [record.localFolderID]
+        }
         try performTransaction {
-            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
-            try deleteRows(sql: "DELETE FROM folders WHERE code_version = ? AND id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
+            for folderID in folderIDs {
+                try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ? AND folder_id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
+                try deleteRows(sql: "DELETE FROM folders WHERE code_version = ? AND id = ?;", codeVersion: record.codeVersion, sectionID: folderID)
+            }
         }
     }
 

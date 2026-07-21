@@ -508,34 +508,57 @@ private var savedBookmarkList: some View {
 
     private func projectTile(_ folder: CodeFolder) -> some View {
         let color = Color(uiColor: PlatformColor(hex: folder.colorHex) ?? .systemBlue)
+        let foreground = projectForegroundColor(for: folder.colorHex)
         let count = library.bookmarkCount(inFolder: folder.id)
 
         return VStack(alignment: .leading, spacing: 5) {
             HStack(alignment: .center, spacing: 7) {
                 Circle()
-                    .fill(color)
+                    .fill(foreground)
                     .frame(width: 8, height: 8)
 
                 Text(folder.name)
                     .font(.caption.weight(.semibold))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(foreground)
                     .lineLimit(1)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Image(systemName: "folder")
                     .font(.caption2.weight(.semibold))
-                    .foregroundStyle(color)
+                    .foregroundStyle(foreground)
             }
 
             Text("\(count) saved")
                 .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.tertiary)
+                .foregroundStyle(foreground.opacity(0.74))
                 .lineLimit(1)
         }
         .padding(CodeScreenMetrics.compactCardPadding)
         .frame(height: CodeScreenMetrics.savedProjectTileHeight, alignment: .center)
-        .background(Color(uiColor: .secondarySystemGroupedBackground))
+        .background(color)
         .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
+    }
+
+    /// Matches the web card's WCAG-style luminance threshold so the same
+    /// synced project color chooses the same light or dark foreground.
+    private func projectForegroundColor(for hex: String) -> Color {
+        let cleaned = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        guard cleaned.count == 6, let value = Int(cleaned, radix: 16) else {
+            return .white
+        }
+        let channels = [
+            Double((value >> 16) & 0xFF) / 255,
+            Double((value >> 8) & 0xFF) / 255,
+            Double(value & 0xFF) / 255
+        ].map { channel in
+            channel <= 0.04045
+                ? channel / 12.92
+                : pow((channel + 0.055) / 1.055, 2.4)
+        }
+        let luminance = (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2])
+        return luminance > 0.179
+            ? Color(uiColor: UIColor(white: 17.0 / 255.0, alpha: 1))
+            : .white
     }
 
     private var availableFilterSections: [CodeSectionCategory] {

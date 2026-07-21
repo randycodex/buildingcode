@@ -550,7 +550,10 @@ struct UserContentSyncEngine {
     }
 
     private func applyServerContinuity(_ record: ServerContinuityRecord) {
-        let values = record.values
+        var values = record.values
+        if let selectedVersionFileName = values["selectedVersionFileName"] {
+            values["selectedVersionFileName"] = UserContentSyncCodeVersion.local(selectedVersionFileName)
+        }
         let existingContext = continuityStore.load()
         let recentlyViewedSections: [RecentlyViewedEntry]
         if let rawJSON = values["recentlyViewedSectionsJSON"],
@@ -564,7 +567,9 @@ struct UserContentSyncEngine {
         let selectedJurisdictionKey = values["selectedJurisdictionKey"].flatMap { $0.isEmpty ? nil : $0 }
             ?? existingContext.selectedJurisdictionKey
         let selectedVersionFileName = values["selectedVersionFileName"].flatMap { $0.isEmpty ? nil : $0 }
-            ?? (record.codeVersion.isEmpty ? existingContext.selectedVersionFileName : record.codeVersion)
+            ?? (record.codeVersion.isEmpty
+                ? existingContext.selectedVersionFileName
+                : UserContentSyncCodeVersion.local(record.codeVersion))
         continuityStore.save(
             ContinuityContext(
                 selectedJurisdictionKey: selectedJurisdictionKey,
@@ -601,6 +606,8 @@ private extension ServerUserContentMutation {
             return 2
         case .projectSection:
             return 3
+        case .workboard:
+            return 4
         }
     }
 }

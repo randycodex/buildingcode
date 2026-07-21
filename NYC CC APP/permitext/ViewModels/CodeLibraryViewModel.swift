@@ -138,7 +138,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var isNetworkAvailable = false
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
-    private let foregroundAccountSyncInterval: TimeInterval = 12
+    private let foregroundAccountSyncInterval: TimeInterval = 3
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     @Published private(set) var bookmarkRevision: Int = 0
     @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?
@@ -183,7 +183,15 @@ final class CodeLibraryViewModel: ObservableObject {
         refreshPendingUserContentSyncCount()
         networkMonitor.pathUpdateHandler = { [weak self] path in
             Task { @MainActor [weak self] in
-                self?.isNetworkAvailable = path.status == .satisfied
+                guard let self else { return }
+                let becameAvailable = !self.isNetworkAvailable && path.status == .satisfied
+                self.isNetworkAvailable = path.status == .satisfied
+                if becameAvailable,
+                   self.isInitialContentLoaded,
+                   self.signedInAccount != nil,
+                   !self.isAccountBusy {
+                    await self.performAutomaticUserContentSync()
+                }
             }
         }
         networkMonitor.start(queue: networkMonitorQueue)
@@ -505,6 +513,16 @@ final class CodeLibraryViewModel: ObservableObject {
         )
         if citation != "New York City Building Code § 101.2 (2022) — Scope." {
             messages.append("Official section citation formatting failed")
+        }
+        let diagnosticUserID = "apple:sync-diagnostic"
+        let legacyProjectID = "\(diagnosticUserID):project:2022 CONSTRUCTION CODES:2"
+        let repeatedProjectID = "\(diagnosticUserID):project:2022 CONSTRUCTION CODES:\(diagnosticUserID):project:2022 CONSTRUCTION CODES:\(legacyProjectID)"
+        if UserContentSyncCodeVersion.server("2022 CONSTRUCTION CODES") != UserContentSyncCodeVersion.canonicalNYC2022 ||
+            UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYC2022) != "2022 CONSTRUCTION CODES" {
+            messages.append("Cross-device code-version normalization failed")
+        }
+        if UserContentProjectIdentity.stable(repeatedProjectID, userID: diagnosticUserID) != legacyProjectID {
+            messages.append("Cross-device project identity normalization failed")
         }
         if let userDataStore = userContentRepository as? UserDataStore {
             do {
@@ -2012,7 +2030,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func prepareCanonicalCodeVersionMigration(for account: SignedInAccount?) {
         guard let account else { return }
-        let key = "permitext.sync.canonical-code-version.v1.\(account.appUserID)"
+        let key = "permitext.sync.canonical-code-version-and-project-identity.v2.\(account.appUserID)"
         guard !UserDefaults.standard.bool(forKey: key) else { return }
         syncEngine.resetCheckpoint(account: account)
         UserDefaults.standard.set(true, forKey: key)
@@ -2493,6 +2511,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.clearAllFolders(codeVersion: selectedVersion.codeVersion)
             refreshFolders()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -2647,6 +2666,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.clearBookmarks(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -2657,6 +2677,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.clearNotes(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
@@ -2667,6 +2688,7 @@ final class CodeLibraryViewModel: ObservableObject {
         do {
             try userContentRepository.clearAllTags(codeVersion: selectedVersion.codeVersion)
             refreshBookmarks()
+            scheduleUserContentAutoSync()
         } catch {
             statusMessage = error.localizedDescription
         }
