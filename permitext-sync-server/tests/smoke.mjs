@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("combined-saved-projects-v44"),
+      webRoot.text.includes("solid-project-tiles-v45"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -251,6 +251,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function renderSavedProjects(panel, paneID, projects, projectSections)") &&
+        workspaceScript.text.includes("function projectForegroundColor(color)") &&
+        workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
         workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
@@ -380,7 +382,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-combined-saved-projects-v44'),
+        webRoot.text.includes('/web/app.js?v=20260720-solid-project-tiles-v45'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -547,6 +549,10 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?background: var\(--project-color\);[\s\S]*?color: var\(--project-on-color\);/),
+      "Saved project tiles no longer use their full project color with a contrast-safe foreground."
+    );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 254px;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
       "Search field no longer renders at 254 by 42 pixels."
