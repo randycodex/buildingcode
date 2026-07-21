@@ -336,6 +336,10 @@ async function main() {
         workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "tags")') &&
         workspaceScript.text.includes("syncProjectIdentity(detail.clientID, detail.userID)") &&
         workspaceScript.text.includes("saved.browserCredentialID") &&
+        workspaceScript.text.includes('const accountSessionKey = "permitext:webAccount:v1"') &&
+        workspaceScript.text.includes('const tabWorkspaceKey = "permitext:webWorkspaceTab:v1"') &&
+        workspaceScript.text.includes("sessionStorage.setItem(tabWorkspaceKey") &&
+        workspaceScript.text.includes("persistAccountSession(null)") &&
         workspaceScript.text.includes("recentSearchesJSON"),
       "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
     );
@@ -426,7 +430,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260721-latest-wins-v61'),
+        webRoot.text.includes('/web/app.js?v=20260721-session-layout-v64'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -901,6 +905,10 @@ async function main() {
       "Apple web sign-in callback CSP omitted its script nonce."
     );
     assert(appleWebCallback.text.includes("<script nonce="), "Apple web sign-in callback script omitted its nonce.");
+    assert(
+      appleWebCallback.text.includes('const accountSessionKey = "permitext:webAccount:v1"'),
+      "Apple web sign-in callback did not persist the dedicated account session."
+    );
 
     const webCheckoutFallback = await request("/web/?checkout=success");
     assert(webCheckoutFallback.response.ok, "Legacy checkout return URL did not load.");

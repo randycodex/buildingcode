@@ -17,6 +17,8 @@ import {
 } from "./sync-state.js?v=20260721-latest-wins-v1";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
+const accountSessionKey = "permitext:webAccount:v1";
+const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
@@ -65,6 +67,7 @@ const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
 const repeatableUtilityKeys = new Set(["search", "saved", "analysis"]);
+const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
 const sharedWorkspaceStateKeys = [
   "localProjects",
   "localSavedItems",
@@ -75,7 +78,6 @@ const sharedWorkspaceStateKeys = [
   "archivedProjectIDs",
   "sectionNotes",
   "localSavedSectionIDs",
-  "account",
   "continuityAppliedAt"
 ];
 
@@ -119,6 +121,9 @@ applyReaderSettings();
 function loadWorkspaceState() {
   try {
     const sharedState = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
+    const tabState = !detachedProjectWindow
+      ? JSON.parse(sessionStorage.getItem(tabWorkspaceKey) || "null")
+      : null;
     const detachedState = detachedProjectWindow
       ? JSON.parse(localStorage.getItem(workspaceKey) || "{}")
       : null;
@@ -128,7 +133,14 @@ function loadWorkspaceState() {
           paneWeights: detachedState.paneWeights,
           paneOrder: detachedState.paneOrder
         }
-      : sharedState;
+      : tabState && typeof tabState === "object"
+        ? { ...sharedState, ...tabState }
+        : sharedState;
+    if (!detachedState && tabState && typeof tabState === "object") {
+      sharedWorkspaceStateKeys.forEach((key) => {
+        if (sharedState[key] !== undefined) saved[key] = sharedState[key];
+      });
+    }
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = Array.isArray(saved.projectDetails)
       ? saved.projectDetails.filter((detail) => detail && typeof detail === "object")
@@ -171,7 +183,7 @@ function loadWorkspaceState() {
         analysis: false,
         settings: Boolean(saved.utilities?.settings)
       },
-      account: saved.account && typeof saved.account === "object" ? saved.account : null,
+      account: loadPersistedAccount(saved.account),
       browserCredentialID: typeof saved.browserCredentialID === "string" ? saved.browserCredentialID : "",
       paneWeights: saved.paneWeights && typeof saved.paneWeights === "object" ? saved.paneWeights : {},
       paneOrder: Array.isArray(saved.paneOrder) ? saved.paneOrder.filter((id) => typeof id === "string") : [],
@@ -225,6 +237,32 @@ function loadWorkspaceState() {
   }
 }
 
+function loadPersistedAccount(legacyAccount = null) {
+  try {
+    const account = JSON.parse(localStorage.getItem(accountSessionKey) || "null");
+    if (account && typeof account === "object") return account;
+  } catch {
+    // Fall through to the legacy workspace account during migration.
+  }
+  if (legacyAccount && typeof legacyAccount === "object") {
+    try {
+      localStorage.setItem(accountSessionKey, JSON.stringify(legacyAccount));
+    } catch {
+      // The in-memory legacy account can still be used for this tab.
+    }
+    return legacyAccount;
+  }
+  return null;
+}
+
+function persistAccountSession(account = state?.account || null) {
+  if (account && typeof account === "object") {
+    localStorage.setItem(accountSessionKey, JSON.stringify(account));
+    return;
+  }
+  localStorage.removeItem(accountSessionKey);
+}
+
 function newUtilityInstance(key, overrides = {}) {
   const instance = {
     id: overrides.id || crypto.randomUUID(),
@@ -274,7 +312,11 @@ function saveWorkspaceState() {
       Object.entries(state.paneWeights || {}).filter(([paneID]) => !paneID.startsWith("section:detail:"))
     )
   };
-  localStorage.setItem(workspaceKey, JSON.stringify(persistableState));
+  const { account: _account, ...persistableWorkspaceState } = persistableState;
+  if (!detachedProjectWindow) {
+    sessionStorage.setItem(tabWorkspaceKey, JSON.stringify(persistableWorkspaceState));
+  }
+  localStorage.setItem(workspaceKey, JSON.stringify(persistableWorkspaceState));
   if (!detachedProjectWindow) return;
   try {
     const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
@@ -688,8 +730,6 @@ function normalizeSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
   });
   return normalized.slice(0, limit);
 }
-
-const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
 
 function normalizeSavedSortMode(value) {
   return savedSortModes.has(value) ? value : "codeOrder";
@@ -2064,6 +2104,7 @@ function isSessionAuthenticationError(error) {
 function clearExpiredAccountSession() {
   if (!activeAccount()) return;
   state.account = null;
+  persistAccountSession(null);
   syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
   clearTimeout(syncRetryTimer);
   syncRetryTimer = null;
@@ -2094,6 +2135,7 @@ function entitlementSourceLabel(entitlement = currentEntitlement()) {
 function storeAccountEntitlement(entitlement) {
   if (!state.account) return;
   state.account = { ...state.account, entitlement: entitlement || null };
+  persistAccountSession();
   saveWorkspaceState();
 }
 
@@ -2257,6 +2299,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
     publicUsername: account.publicUsername || null,
     entitlement: payload.entitlement || null
   };
+  persistAccountSession();
   syncedContent = null;
   saveWorkspaceState();
   loadSyncedContent({ force: true })
@@ -8732,6 +8775,7 @@ function renderSettings() {
       }, { token: account.sessionToken });
       state.account.publicUsername = payload.account?.publicUsername || null;
       state.account.displayName = payload.account?.displayName || state.account.displayName;
+      persistAccountSession();
       saveWorkspaceState();
       setStatus("Public username saved.");
       profileSaveButton.textContent = "Save Public Username";
@@ -8767,6 +8811,7 @@ function renderSettings() {
       // Clear the local session even if the network is unavailable.
     } finally {
       state.account = null;
+      persistAccountSession(null);
       syncedContent = null;
       stopForegroundSyncLoop();
       saveWorkspaceState();
@@ -9573,6 +9618,21 @@ async function start() {
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   bindWorkspaceKeyboardNavigation();
   window.addEventListener("storage", (event) => {
+    if (event.key === accountSessionKey) {
+      try {
+        state.account = event.newValue ? JSON.parse(event.newValue) : null;
+      } catch {
+        state.account = null;
+      }
+      syncedContent = null;
+      if (activeAccount()) {
+        startForegroundSyncLoop({ immediate: true });
+      } else {
+        stopForegroundSyncLoop();
+      }
+      void renderWorkspace();
+      return;
+    }
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
     if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
       try {

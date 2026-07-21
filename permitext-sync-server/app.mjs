@@ -4651,9 +4651,11 @@ function appleCallbackHTML({ title, message, accountState = null, successPath = 
     <script nonce="${htmlEscape(scriptNonce)}">
       const accountState = ${scriptJSON(accountState)};
       if (accountState) {
+        const accountSessionKey = "permitext:webAccount:v1";
+        localStorage.setItem(accountSessionKey, JSON.stringify(accountState));
         const workspaceKey = "permitext:webWorkspace:v1";
         const saved = JSON.parse(localStorage.getItem(workspaceKey) || "{}");
-        saved.account = accountState;
+        delete saved.account;
         localStorage.setItem(workspaceKey, JSON.stringify(saved));
       }
       window.location.replace(${scriptJSON(successPath)});
