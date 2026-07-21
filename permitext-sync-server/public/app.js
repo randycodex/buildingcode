@@ -1358,6 +1358,13 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   return Array.from(new Set([...savedPaneIDs(), ...additionalPaneIDs.filter(Boolean)]));
 }
 
+async function refreshProjectMembershipPanes(project) {
+  const identity = projectIdentity(project);
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
+  });
+}
+
 function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
   const detailID = paneIDForProjectDetail(detail);
   const activeIDs = defaultActivePaneIDs().filter((id) => id !== detailID);
@@ -2344,7 +2351,7 @@ function currentContentSummary() {
   const summarySavedItems = summary.savedItems || [];
   const summaryAnnotations = summary.annotations || [];
   const localProjectSavedItems = (state.localProjectSections || [])
-    .filter((item) => item && item.sectionID)
+    .filter((item) => item && item.sectionID && !item.deletedAt)
     .map((item) => ({
       id: `web-saved-${item.sectionID}`,
       userID: item.userID || "local-web",
@@ -3513,6 +3520,7 @@ async function persistSectionInProject(project, sectionPayload) {
   const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
   state.localProjectSections = [...current, record];
   saveWorkspaceState();
+  await refreshProjectMembershipPanes(project);
   if (!activeAccount()) return;
   try {
     await pushMutation(projectSectionMutationForSection(project, sectionPayload));
@@ -3560,6 +3568,7 @@ async function removeSectionFromProject(project, item, options = {}) {
     deletion.projectSection
   ];
   saveWorkspaceState();
+  await refreshProjectMembershipPanes(project);
 
   if (activeAccount()) {
     try {

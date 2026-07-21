@@ -120,7 +120,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("ios-reader-annotations-v50"),
+      webRoot.text.includes("ios-reader-annotations-v52"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -382,7 +382,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260720-ios-reader-annotations-v50'),
+        webRoot.text.includes('/web/app.js?v=20260720-ios-reader-annotations-v52'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -519,7 +519,10 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("const projectSectionsByID = new Map(") &&
+        workspaceScript.text.includes(".filter((item) => item && item.sectionID && !item.deletedAt)") &&
         workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
+        workspaceScript.text.includes("async function refreshProjectMembershipPanes(project)") &&
+        workspaceScript.text.includes("await refreshProjectMembershipPanes(project)") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
         workspaceScript.text.includes('button.setAttribute("aria-label", "Bookmarked")'),
