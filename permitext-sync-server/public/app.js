@@ -5172,6 +5172,7 @@ async function renderReader(reader, options = {}) {
   const internalSearchButton = panel.querySelector(".reader-internal-search-toggle");
   const internalSearchBox = panel.querySelector(".reader-internal-search");
   const internalSearchInput = panel.querySelector(".reader-internal-search-input");
+  const internalSearchClearButton = panel.querySelector(".reader-internal-search-clear");
   const readerBody = panel.querySelector(".reader-body");
   const commentsPanel = panel.querySelector(".reader-comments");
   const codeSelect = panel.querySelector(".code-select");
@@ -5193,6 +5194,7 @@ async function renderReader(reader, options = {}) {
   commentsButton.hidden = true;
   internalSearchBox.hidden = true;
   internalSearchInput.value = reader.internalSearchQuery || "";
+  internalSearchClearButton.hidden = !internalSearchInput.value.trim();
   if (options.isSearchResult) {
     closeButton.hidden = false;
   } else {
@@ -5230,6 +5232,7 @@ async function renderReader(reader, options = {}) {
     internalSearchButton.setAttribute("aria-pressed", String(willOpen));
     if (willOpen) {
       internalSearchInput.value = reader.internalSearchQuery || "";
+      internalSearchClearButton.hidden = !internalSearchInput.value.trim();
       internalSearchInput.focus();
       await renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
       return;
@@ -5239,11 +5242,21 @@ async function renderReader(reader, options = {}) {
 
   internalSearchInput.addEventListener("input", () => {
     reader.internalSearchQuery = internalSearchInput.value;
+    internalSearchClearButton.hidden = !internalSearchInput.value.trim();
     saveWorkspaceState();
     clearTimeout(readerSearchTimers.get(reader.id));
     readerSearchTimers.set(reader.id, window.setTimeout(() => {
       renderReaderInternalSearchResults(panel, reader, internalSearchInput.value);
     }, readerInternalSearchDelayMS));
+  });
+
+  internalSearchClearButton.addEventListener("click", () => {
+    reader.internalSearchQuery = "";
+    internalSearchInput.value = "";
+    internalSearchClearButton.hidden = true;
+    saveWorkspaceState();
+    void renderReaderInternalSearchResults(panel, reader, "");
+    internalSearchInput.focus();
   });
 
   closeButton.addEventListener("click", () => {
