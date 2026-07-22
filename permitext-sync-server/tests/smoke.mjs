@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v64"),
+      webRoot.text.includes("columns-refinement-v65"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -165,7 +165,6 @@ async function main() {
       '>Plan</h3>',
       '>Account</h3>',
       '>Sync</h3>',
-      '>Reader Preview</h3>',
       '>Data &amp; Storage</h3>',
       '>Projects</h4>',
       '>Destructive Actions</h4>'
@@ -173,6 +172,12 @@ async function main() {
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
       "Web Settings groups do not match the iOS Settings order."
+    );
+    assert(
+      settingsTemplateSource.includes('>Reader Font</span>') &&
+        settingsTemplateSource.indexOf('class="preview-font-family-select"') < settingsTemplateSource.indexOf('>Plan</h3>') &&
+        !settingsTemplateSource.includes('class="reader-preview-card settings-card"'),
+      "Web Settings no longer keeps Reader Font with the top preferences or restored the redundant preview card."
     );
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);

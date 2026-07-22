@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260722-columns-refinement-v64">
+    <link rel="stylesheet" href="/web/styles.css?v=20260722-columns-refinement-v65">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -364,6 +364,15 @@
             <span>Code Section</span>
             <select class="settings-code-section-select" aria-label="Code section"></select>
           </label>
+          <label class="settings-row">
+            <span>Reader Font</span>
+            <select class="preview-font-family-select" aria-label="Reader font">
+              <option value="system">System</option>
+              <option value="rounded">Rounded</option>
+              <option value="serif">Serif</option>
+              <option value="monospaced">Monospaced</option>
+            </select>
+          </label>
         </section>
         <section class="settings-card settings-plan-card" aria-labelledby="settings-plan-title">
           <h3 id="settings-plan-title" class="section-label settings-section-title">Plan</h3>
@@ -409,23 +418,6 @@
           </div>
           <div class="account-sync-conflicts"></div>
           <button class="settings-secondary-button account-sync-now" type="button">Sync Now</button>
-        </section>
-        <section class="reader-preview-card settings-card" aria-labelledby="settings-reader-preview-title">
-          <h3 id="settings-reader-preview-title" class="section-label settings-section-title">Reader Preview</h3>
-          <div class="reader-preview-sample">
-            <p class="preview-code-title">Section BC 101: General</p>
-            <h3>101.2 Scope.</h3>
-            <p class="preview-copy">The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy of every building or structure.</p>
-          </div>
-          <label class="preview-setting-row preview-font-family-row">
-            <span>Font</span>
-            <select class="preview-font-family-select" aria-label="Reader font">
-              <option value="system">System</option>
-              <option value="rounded">Rounded</option>
-              <option value="serif">Serif</option>
-              <option value="monospaced">Monospaced</option>
-            </select>
-          </label>
         </section>
         <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
           <h3 id="settings-data-title" class="section-label settings-section-title">Data &amp; Storage</h3>
