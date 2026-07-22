@@ -8587,7 +8587,7 @@ async function clearSettingsBookmarks() {
   state.localProjectSections = [];
   enqueueSettingsBulkClear("bookmarks");
   saveWorkspaceState();
-  if (account) await flushSyncOutbox({ refresh: true });
+  if (account) void flushPendingSyncAndRender().catch(() => {});
   return records.length;
 }
 
@@ -8607,7 +8607,7 @@ async function clearSettingsAnnotations(field) {
   if (field === "noteBody") state.sectionNotes = {};
   enqueueSettingsBulkClear(field === "noteBody" ? "notes" : "tags");
   saveWorkspaceState();
-  if (activeAccount()) await flushSyncOutbox({ refresh: true });
+  if (activeAccount()) void flushPendingSyncAndRender().catch(() => {});
   return uniqueTargets.size;
 }
 
@@ -8642,7 +8642,7 @@ async function performSettingsClearAction(action) {
       }
     }
     saveWorkspaceState();
-    if (account) await flushSyncOutbox({ refresh: true });
+    if (account) void flushPendingSyncAndRender().catch(() => {});
     return 0;
   }
   if (action === "bookmarks") return clearSettingsBookmarks();

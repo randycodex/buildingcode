@@ -3246,20 +3246,42 @@ async function canonicalizeMutation(mutation) {
   };
 }
 
-async function canonicalizeMutations(mutations) {
-  const canonicalized = await Promise.all((mutations || []).map(canonicalizeMutation));
+async function canonicalizeMutationBatch(mutations) {
+  const source = mutations || [];
+  const canonicalized = await Promise.all(source.map(canonicalizeMutation));
   const mutationsByID = new Map();
-  for (const mutation of canonicalized) {
+  const aliasesByCanonicalID = new Map();
+  canonicalized.forEach((mutation, index) => {
     const recordID = mutationRecordID(mutation);
-    if (!recordID) continue;
+    if (!recordID) return;
+    const sourceRecordID = mutationRecordID(source[index]);
+    if (sourceRecordID && sourceRecordID !== recordID) {
+      const aliases = aliasesByCanonicalID.get(recordID) || new Set();
+      aliases.add(sourceRecordID);
+      aliasesByCanonicalID.set(recordID, aliases);
+    }
     const existing = mutationsByID.get(recordID);
     if (!existing || mutationUpdatedAt(mutation) >= mutationUpdatedAt(existing)) {
       mutationsByID.set(recordID, mutation);
     }
-  }
-  return Array.from(mutationsByID.values()).sort((left, right) =>
-    String(mutationRecordID(left) || "").localeCompare(String(mutationRecordID(right) || ""))
-  );
+  });
+  return {
+    aliasesByCanonicalID,
+    mutations: Array.from(mutationsByID.values()).sort((left, right) =>
+      String(mutationRecordID(left) || "").localeCompare(String(mutationRecordID(right) || ""))
+    )
+  };
+}
+
+async function canonicalizeMutations(mutations) {
+  return (await canonicalizeMutationBatch(mutations)).mutations;
+}
+
+function includeSubmittedMutationIDAliases(recordIDs, aliasesByCanonicalID) {
+  return Array.from(new Set((recordIDs || []).flatMap((recordID) => [
+    recordID,
+    ...Array.from(aliasesByCanonicalID.get(recordID) || [])
+  ])));
 }
 
 function canonicalCodeVersion(value) {
@@ -3988,7 +4010,8 @@ async function handlePush(request, response) {
     return;
   }
 
-  const incoming = await canonicalizeMutations(body.batch?.mutations || []);
+  const canonicalizedBatch = await canonicalizeMutationBatch(body.batch?.mutations || []);
+  const incoming = canonicalizedBatch.mutations;
   const validation = validateMutations(incoming, userID);
   if (!validation.ok) {
     sendError(response, 400, validation.message);
@@ -4003,8 +4026,14 @@ async function handlePush(request, response) {
     }
     const result = await adapter.pushUserContent(userID, incoming);
     sendJSON(response, 200, {
-      acceptedMutationIDs: result.acceptedMutationIDs,
-      rejectedMutationIDs: result.rejectedMutationIDs,
+      acceptedMutationIDs: includeSubmittedMutationIDAliases(
+        result.acceptedMutationIDs,
+        canonicalizedBatch.aliasesByCanonicalID
+      ),
+      rejectedMutationIDs: includeSubmittedMutationIDAliases(
+        result.rejectedMutationIDs,
+        canonicalizedBatch.aliasesByCanonicalID
+      ),
       latestEventID: result.latestEventID,
       syncRevision: result.latestEventID,
       entitlement: result.entitlement,
@@ -4025,8 +4054,14 @@ async function handlePush(request, response) {
   await writeStore(store);
   const latestEventID = await latestSyncEventID(userID);
   sendJSON(response, 200, {
-    acceptedMutationIDs: merge.acceptedMutationIDs,
-    rejectedMutationIDs: merge.rejectedMutationIDs,
+    acceptedMutationIDs: includeSubmittedMutationIDAliases(
+      merge.acceptedMutationIDs,
+      canonicalizedBatch.aliasesByCanonicalID
+    ),
+    rejectedMutationIDs: includeSubmittedMutationIDAliases(
+      merge.rejectedMutationIDs,
+      canonicalizedBatch.aliasesByCanonicalID
+    ),
     latestEventID,
     syncRevision: latestEventID,
     entitlement: store.entitlements[userID] || null,

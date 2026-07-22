@@ -433,7 +433,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260721-live-clear-reconcile-v66'),
+        webRoot.text.includes('/web/app.js?v=20260721-live-clear-reconcile-v67'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -997,7 +997,7 @@ async function main() {
       }
     });
     assert(pushClears.response.ok, "Bulk clear sync push failed.");
-    assert(pushClears.json.acceptedMutationIDs.length === 3, "Bulk clear categories overwrote one another during push.");
+    assert(pushClears.json.acceptedMutationIDs.length >= 3, "Bulk clear categories overwrote one another during push.");
     assert(
       clearScopes.every((scope) => pushClears.json.acceptedMutationIDs.some((id) => id.endsWith(`:${scope}`))),
       "Bulk clear sync IDs did not preserve their category scope."
@@ -1013,6 +1013,50 @@ async function main() {
     assert(
       clearScopes.every((scope) => pulledClearScopes.includes(scope)),
       "A bulk clear category disappeared before another client could pull it."
+    );
+
+    const aliasUserID = "apple:alias-ack-user";
+    const aliasSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "alias-ack-user",
+          displayName: "Alias Ack User"
+        }
+      }
+    });
+    assert(aliasSignIn.response.ok, "Alias acknowledgment test sign-in failed.");
+    const submittedLegacyMutationID = `${aliasUserID}:legacy-saved:1`;
+    const canonicalSavedMutationID = `${aliasUserID}:saved:${defaultSyncCodeVersion}:1`;
+    const pushLegacySavedItem = await request("/sync/push", {
+      method: "POST",
+      token: aliasSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: aliasUserID },
+        batch: {
+          user: { id: aliasUserID },
+          mutations: [{
+            savedItem: {
+              id: submittedLegacyMutationID,
+              userID: aliasUserID,
+              codeVersion: "2022 Construction Codes",
+              codePrefix: "BC",
+              chapterNumber: "1",
+              sectionID: 1,
+              sectionNumber: "101.1",
+              title: "Title.",
+              updatedAt: new Date(Date.now() + 10).toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(pushLegacySavedItem.response.ok, "Legacy saved-item sync push failed.");
+    assert(
+      pushLegacySavedItem.json.acceptedMutationIDs.includes(submittedLegacyMutationID) &&
+        pushLegacySavedItem.json.acceptedMutationIDs.includes(canonicalSavedMutationID),
+      "A server-canonicalized mutation did not acknowledge the client's submitted queue ID."
     );
 
     const unauthorizedResearch = await request("/research/interpret", {
