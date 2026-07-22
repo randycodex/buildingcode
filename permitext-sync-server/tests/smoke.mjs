@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v70"),
+      webRoot.text.includes("columns-refinement-v71"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -203,8 +203,8 @@ async function main() {
     assert(
       settingsTemplateSource.includes('data-plan-option="free"') &&
         settingsTemplateSource.includes('data-plan-option="pro"') &&
-        settingsTemplateSource.includes('class="settings-billing-line"'),
-      "Web Settings omitted explicit current-plan and upgrade-option states."
+        !settingsTemplateSource.includes('class="settings-billing-line"'),
+      "Web Settings lost active-plan styling or restored the redundant billing summary."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -528,7 +528,7 @@ async function main() {
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
-        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v81'),
+        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v82'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

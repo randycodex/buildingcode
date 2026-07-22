@@ -8694,7 +8694,6 @@ function renderSettings() {
   const versionSelect = panel.querySelector(".settings-version-select");
   const codeSectionSelect = panel.querySelector(".settings-code-section-select");
   const accountCopy = panel.querySelector(".account-status-copy");
-  const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const signInButton = panel.querySelector(".account-sign-in");
@@ -8850,7 +8849,6 @@ function renderSettings() {
       const indicator = row.querySelector(".settings-feature-icon");
       if (indicator) indicator.textContent = active ? "✓" : "";
     });
-    planLabel.textContent = entitlementSourceLabel();
     planDetail.textContent = pro
       ? source === "lifetimeGrant"
         ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."

@@ -4761,7 +4761,6 @@ mark {
 }
 
 .settings-card-copy,
-.settings-billing-line,
 .settings-disclaimer,
 .settings-status-message,
 .account-profile-helper,
@@ -4769,16 +4768,6 @@ mark {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.4;
-}
-
-.settings-billing-line {
-  font-size: 10pt !important;
-  font-weight: 600;
-}
-
-.settings-billing-line strong {
-  color: inherit;
-  font-size: inherit !important;
 }
 
 .settings-plan-features {
@@ -5305,28 +5294,6 @@ mark {
 
 .settings-panel .settings-library-card .settings-row select {
   min-height: 30px;
-}
-
-.settings-panel .settings-billing-line {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  min-height: 34px;
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  font-size: 9.5pt !important;
-}
-
-.settings-panel .settings-billing-line span {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.settings-panel .settings-billing-line strong {
-  color: var(--text-primary);
 }
 
 .settings-panel .settings-plan-features {
