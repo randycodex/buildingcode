@@ -3957,15 +3957,15 @@ mark {
   min-height: 57px;
   gap: 3px var(--space-1);
   padding: var(--space-2);
-  border: 1px solid color-mix(in srgb, var(--project-on-color) 18%, var(--project-color));
+  border: 1px solid color-mix(in srgb, var(--project-color) 52%, var(--border));
   border-radius: var(--radius-control);
-  background: var(--project-color);
-  color: var(--project-on-color);
+  background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
+  color: var(--text-primary);
   cursor: pointer;
 }
 
 .saved-project-tile:focus-visible {
-  outline: 2px solid var(--project-on-color);
+  outline: 2px solid color-mix(in srgb, var(--project-color) 64%, var(--text-primary));
   outline-offset: -3px;
 }
 
@@ -3983,14 +3983,14 @@ mark {
 }
 
 .saved-project-tile > span:not(.saved-project-folder-icon) {
-  color: color-mix(in srgb, var(--project-on-color) 74%, transparent);
+  color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.66) !important;
 }
 
 .saved-project-folder-icon {
   grid-column: 2;
   grid-row: 1;
-  color: var(--project-on-color);
+  color: color-mix(in srgb, var(--project-color) 72%, var(--text-primary));
 }
 
 .saved-project-folder-icon svg {
@@ -4010,7 +4010,7 @@ mark {
 .saved-project-tile .saved-project-tile-actions button,
 .saved-project-tile .saved-project-tile-actions button:hover,
 .saved-project-tile .saved-project-tile-actions button:focus-visible {
-  color: var(--project-on-color);
+  color: var(--text-primary);
 }
 
 .saved-project-tile:hover .saved-project-tile-actions,
