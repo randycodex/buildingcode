@@ -496,7 +496,7 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260721-project-settings-v74'),
+        webRoot.text.includes('/web/app.js?v=20260721-project-settings-v75'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
