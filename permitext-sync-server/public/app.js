@@ -24,7 +24,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260720-settings-parity-v15";
+const workboardClientVersion = "20260722-workboard-zoom-v16";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -3475,6 +3475,12 @@ function projectColor(project) {
   // `colorHex` is the native iOS storage field and the canonical sync value.
   // Legacy web aliases remain as fallbacks for records created before sync.
   return project?.colorHex || project?.color || project?.tintColor || projectColorOptions[0];
+}
+
+function readableProjectName(project) {
+  const name = String(project?.name || project?.title || "Project").trim() || "Project";
+  if (name !== name.toLocaleUpperCase() || name === name.toLocaleLowerCase()) return name;
+  return name.toLocaleLowerCase().replace(/(^|[\s-])\p{L}/gu, (match) => match.toLocaleUpperCase());
 }
 
 function projectForegroundColor(color) {
@@ -8693,21 +8699,14 @@ function renderSettings() {
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
   const codeSectionSelect = panel.querySelector(".settings-code-section-select");
-  const accountSummary = panel.querySelector(".account-summary");
   const accountCopy = panel.querySelector(".account-status-copy");
-  const displayName = panel.querySelector(".account-display-name");
-  const profileEditor = panel.querySelector(".account-profile-editor");
-  const usernameInput = panel.querySelector(".account-public-username");
-  const profileHelper = panel.querySelector(".account-profile-helper");
-  const profileSaveButton = panel.querySelector(".account-profile-save");
-  const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
+  const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const syncTitle = panel.querySelector(".account-sync-title");
-  const syncDetail = panel.querySelector(".connector-status");
   const syncIcon = panel.querySelector(".account-sync-icon");
   const syncButton = panel.querySelector(".account-sync-now");
   const syncConflicts = panel.querySelector(".account-sync-conflicts");
@@ -8723,7 +8722,6 @@ function renderSettings() {
   };
 
   const settingsProjects = visibleProjectRecords(currentContentSummary().projects || []);
-  const settingsProjectSections = currentContentSummary().projectSections || [];
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
   const updateProjectSelection = () => {
@@ -8741,22 +8739,16 @@ function renderSettings() {
     const id = projectRecordID(project);
     const row = document.createElement("label");
     row.className = "settings-project-row";
+    row.style.setProperty("--project-color", projectColor(project));
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.setAttribute("aria-label", `Select ${project.name || project.title || "project"}`);
-    const swatch = document.createElement("span");
-    swatch.className = "settings-project-swatch";
-    swatch.style.setProperty("--project-color", projectColor(project));
-    swatch.setAttribute("aria-hidden", "true");
     const copy = document.createElement("span");
     copy.className = "settings-project-copy";
     const name = document.createElement("strong");
-    name.textContent = project.name || project.title || "Project";
-    const savedCount = settingsProjectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
-    const count = document.createElement("span");
-    count.textContent = savedCount === 1 ? "1 saved item" : `${savedCount} saved items`;
-    copy.append(name, count);
-    row.append(checkbox, swatch, copy);
+    name.textContent = readableProjectName(project);
+    copy.append(name);
+    row.append(checkbox, copy);
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) selectedProjectIDs.add(id);
       else selectedProjectIDs.delete(id);
@@ -8812,13 +8804,6 @@ function renderSettings() {
     syncButton.disabled = !account;
     syncIcon.textContent = !account ? "!" : conflicts.length || pending.length ? "↻" : "✓";
     syncTitle.textContent = !account ? "Not signed in" : conflicts.length ? "Review needed" : pending.length ? "Changes waiting" : "Up to date";
-    syncDetail.textContent = !account
-      ? "Sign in to sync saved work across iOS and web."
-      : conflicts.length
-        ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
-        : pending.length
-          ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
-          : "All browser changes are synced.";
     clear(syncConflicts);
     conflicts.slice(0, 5).forEach((entry) => {
       const { kind, record } = mutationKindAndRecord(entry.mutation);
@@ -8854,41 +8839,35 @@ function renderSettings() {
     });
   };
 
-  const syncProfileEditor = () => {
-    const error = publicUsernameValidationMessage(usernameInput.value);
-    const current = state.account?.publicUsername || "";
-    const draft = normalizedPublicUsername(usernameInput.value) || "";
-    profileHelper.textContent = error || "Used later for public and collaboration features. This stays separate from your Apple identity.";
-    profileHelper.classList.toggle("has-error", Boolean(error));
-    profileSaveButton.disabled = Boolean(error) || draft === current;
-  };
-
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
     const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
-    planLabel.textContent = entitlementSourceLabel();
+    const activePlan = pro ? "pro" : "free";
+    planRows.forEach((row) => {
+      const active = row.dataset.planOption === activePlan;
+      row.classList.toggle("is-active", active);
+      row.setAttribute("aria-current", active ? "true" : "false");
+      const indicator = row.querySelector(".settings-feature-icon");
+      if (indicator) indicator.textContent = active ? "✓" : "";
+    });
     planDetail.textContent = pro
       ? source === "lifetimeGrant"
         ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."
         : "Pro is active. Saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
       : "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity.";
-    checkoutButton.disabled = !account || pro;
-    checkoutButton.textContent = pro ? "Pro Active" : "Upgrade to Pro";
-    planSecondaryButton.hidden = !account || source === "lifetimeGrant";
-    planSecondaryButton.textContent = pro ? "Manage Subscription" : "Restore Purchases";
-    accountSummary.hidden = !account;
-    profileEditor.hidden = !account;
+    checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
+    checkoutButton.textContent = pro
+      ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
+      : "Upgrade to Pro";
+    planSecondaryButton.hidden = !account || pro || source === "lifetimeGrant";
+    planSecondaryButton.textContent = "Restore Purchases";
+    accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    displayName.textContent = account ? accountDisplayName() : "";
-    accountCopy.textContent = account
-      ? `Signed in as ${accountDisplayName()}. Saved work can sync through the connected backend.`
-      : "Sign in to attach local saved work to your account and use cross-device sync.";
-    usernameInput.value = state.account?.publicUsername || "";
-    syncProfileEditor();
+    accountCopy.textContent = "Sign in to attach local saved work to your account and use cross-device sync.";
     renderSyncState();
   };
 
@@ -8907,31 +8886,6 @@ function renderSettings() {
     if (!config.available && !config.browserFallbackAllowed) accountCopy.textContent = "Apple web sign-in is not configured yet.";
   }).catch(() => {
     if (!activeAccount()) accountCopy.textContent = "Could not check sign-in configuration.";
-  });
-
-  usernameInput.addEventListener("input", syncProfileEditor);
-  profileSaveButton.addEventListener("click", async () => {
-    const account = activeAccount();
-    if (!account || profileSaveButton.disabled) return;
-    profileSaveButton.disabled = true;
-    profileSaveButton.textContent = "Saving...";
-    try {
-      const payload = await postJSON("/account/profile", {
-        auth: { accountUserID: account.userID },
-        publicUsername: normalizedPublicUsername(usernameInput.value)
-      }, { token: account.sessionToken });
-      state.account.publicUsername = payload.account?.publicUsername || null;
-      state.account.displayName = payload.account?.displayName || state.account.displayName;
-      persistAccountSession();
-      saveWorkspaceState();
-      setStatus("Public username saved.");
-      profileSaveButton.textContent = "Save Public Username";
-      syncProfileEditor();
-    } catch (error) {
-      profileSaveButton.textContent = "Save Public Username";
-      setStatus(error.message || "Could not save the public username.", true);
-      syncProfileEditor();
-    }
   });
 
   signInButton.addEventListener("click", async () => {
@@ -8967,7 +8921,25 @@ function renderSettings() {
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account || isProAccount()) return;
+    if (!account) return;
+    if (isProAccount()) {
+      if (currentEntitlement()?.source === "lifetimeGrant") return;
+      if (currentEntitlement()?.source === "appleSubscription") {
+        window.location.href = "https://apps.apple.com/account/subscriptions";
+        return;
+      }
+      checkoutButton.disabled = true;
+      setStatus("Opening subscription management...");
+      try {
+        const payload = await postJSON("/billing/web/portal", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+        if (!payload.url) throw new Error("Subscription management did not return a URL.");
+        window.location.href = payload.url;
+      } catch (error) {
+        setStatus(error.message || "Could not open subscription management.", true);
+        checkoutButton.disabled = false;
+      }
+      return;
+    }
     checkoutButton.disabled = true;
     setStatus("Opening checkout...");
     try {
@@ -8981,24 +8953,7 @@ function renderSettings() {
   });
   planSecondaryButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account) return;
-    if (isProAccount()) {
-      if (currentEntitlement()?.source === "appleSubscription") {
-        window.location.href = "https://apps.apple.com/account/subscriptions";
-        return;
-      }
-      planSecondaryButton.disabled = true;
-      setStatus("Opening subscription management...");
-      try {
-        const payload = await postJSON("/billing/web/portal", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
-        if (!payload.url) throw new Error("Subscription management did not return a URL.");
-        window.location.href = payload.url;
-      } catch (error) {
-        setStatus(error.message || "Could not open subscription management.", true);
-        planSecondaryButton.disabled = false;
-      }
-      return;
-    }
+    if (!account || isProAccount()) return;
     const restoreID = window.prompt("Enter the Stripe checkout session or subscription ID from your purchase receipt.");
     if (!restoreID) return;
     planSecondaryButton.disabled = true;

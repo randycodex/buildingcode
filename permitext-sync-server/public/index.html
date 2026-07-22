@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260721-project-settings-v57">
-    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-compact-settings-v56">
+    <link rel="stylesheet" href="/web/styles.css?v=20260722-columns-refinement-v77">
+    <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
     <main class="workspace-shell">
@@ -299,7 +299,7 @@
       <article class="workspace-panel utility-panel">
         <header class="panel-header">
           <div>
-            <p class="eyebrow panel-kind">Workspace</p>
+            <p class="eyebrow panel-kind">Research</p>
             <h2 class="panel-title">Research</h2>
           </div>
           <div class="panel-actions">
@@ -346,7 +346,8 @@
             </button>
           </div>
         </header>
-        <section class="settings-list settings-library-card" aria-label="Code library settings">
+        <section class="settings-card settings-list settings-library-card settings-preferences-card" aria-labelledby="settings-code-preferences-title">
+          <h3 id="settings-code-preferences-title" class="section-label settings-section-title">Code Preferences</h3>
           <label class="settings-row">
             <span>Jurisdiction</span>
             <select class="settings-jurisdiction-select" aria-label="Jurisdiction">
@@ -363,59 +364,8 @@
             <span>Code Section</span>
             <select class="settings-code-section-select" aria-label="Code section"></select>
           </label>
-        </section>
-        <section class="settings-card settings-plan-card">
-          <p class="section-label">Plan</p>
-          <p class="settings-card-copy account-plan-detail"></p>
-          <p class="settings-billing-line">Billing: <strong class="account-plan-label">Free</strong></p>
-          <div class="settings-plan-features">
-            <div class="settings-feature-row">
-              <span class="settings-feature-icon" aria-hidden="true">&#10003;</span>
-              <p><strong>Free</strong><span>Read codes, search, recent history, 25 saved sections, and 10 notes.</span></p>
-            </div>
-            <div class="settings-feature-row">
-              <span class="settings-feature-icon is-pro" aria-hidden="true">&#10003;</span>
-              <p><strong>Pro</strong><span>Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.</span></p>
-            </div>
-          </div>
-          <button class="settings-primary-button account-checkout" type="button">Upgrade to Pro</button>
-          <button class="settings-link-button account-plan-secondary" type="button">Restore Purchases</button>
-        </section>
-        <section class="settings-card account-connector">
-          <p class="section-label">Account</p>
-          <p class="settings-card-copy account-status-copy"></p>
-          <div class="account-summary" hidden>
-            <span>Signed in as</span>
-            <strong class="account-display-name"></strong>
-          </div>
-          <div class="account-profile-editor" hidden>
-            <label for="settings-public-username">Public username</label>
-            <input id="settings-public-username" class="account-public-username" type="text" inputmode="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="username">
-            <p class="account-profile-helper">Used later for public and collaboration features. This stays separate from your Apple identity.</p>
-            <button class="settings-secondary-button account-profile-save" type="button">Save Public Username</button>
-          </div>
-          <button class="settings-primary-button account-sign-in" type="button">Sign in</button>
-          <button class="settings-secondary-button account-clear" type="button">Sign Out</button>
-        </section>
-        <section class="settings-card account-sync-card">
-          <p class="section-label">Sync</p>
-          <div class="account-sync-status">
-            <span class="account-sync-icon" aria-hidden="true">&#8635;</span>
-            <div>
-              <strong class="account-sync-title">Not signed in</strong>
-              <p class="connector-status">Sign in to sync saved work across iOS and web.</p>
-            </div>
-          </div>
-          <div class="account-sync-conflicts"></div>
-          <button class="settings-secondary-button account-sync-now" type="button">Sync Now</button>
-        </section>
-        <section class="reader-preview-card settings-card">
-          <p class="section-label">Reader Preview</p>
-          <p class="preview-code-title">Section BC 101: General</p>
-          <h3>101.2 Scope.</h3>
-          <p class="preview-copy">The provisions of this code shall apply to the construction, alteration, movement, addition, replacement, repair, equipment, use and occupancy of every building or structure.</p>
-          <label class="preview-setting-row preview-font-family-row">
-            <span>Font</span>
+          <label class="settings-row">
+            <span>Reader Font</span>
             <select class="preview-font-family-select" aria-label="Reader font">
               <option value="system">System</option>
               <option value="rounded">Rounded</option>
@@ -424,18 +374,50 @@
             </select>
           </label>
         </section>
-        <section class="settings-card settings-projects-card">
-          <div class="settings-projects-heading">
-            <p class="section-label">Projects</p>
-            <button class="settings-link-button settings-project-select-all" type="button">Select All</button>
+        <section class="settings-card settings-plan-card" aria-labelledby="settings-plan-title">
+          <h3 id="settings-plan-title" class="section-label settings-section-title">Plan</h3>
+          <p class="settings-card-copy account-plan-detail"></p>
+          <div class="settings-plan-features" aria-label="Plan comparison">
+            <div class="settings-feature-row" data-plan-option="free">
+              <span class="settings-feature-icon" aria-hidden="true"></span>
+              <p><strong>Free</strong><span>Read codes, search, recent history, 25 saved sections, and 10 notes.</span></p>
+            </div>
+            <div class="settings-feature-row" data-plan-option="pro">
+              <span class="settings-feature-icon" aria-hidden="true"></span>
+              <p><strong>Pro <span class="settings-plan-upgrade-note">Upgrade option</span></strong><span>Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.</span></p>
+            </div>
           </div>
-          <p class="settings-projects-empty" hidden>No projects yet.</p>
-          <div class="settings-project-list" aria-label="Projects"></div>
-          <button class="settings-secondary-button settings-project-delete" type="button" disabled>Delete Selected</button>
+          <button class="settings-primary-button account-checkout" type="button">Upgrade to Pro</button>
+          <button class="settings-link-button account-plan-secondary" type="button">Restore Purchases</button>
         </section>
-        <section class="settings-card settings-saved-data-card">
-          <p class="section-label">Saved Data</p>
-          <div class="settings-danger-list">
+        <section class="settings-card account-connector" aria-labelledby="settings-account-title">
+          <h3 id="settings-account-title" class="section-label settings-section-title">Account</h3>
+          <p class="settings-card-copy account-status-copy"></p>
+          <button class="settings-primary-button account-sign-in" type="button">Sign in</button>
+          <button class="settings-secondary-button settings-destructive-secondary account-clear" type="button">Sign Out</button>
+        </section>
+        <section class="settings-card account-sync-card" aria-labelledby="settings-sync-title">
+          <h3 id="settings-sync-title" class="section-label settings-section-title">Sync</h3>
+          <div class="account-sync-status">
+            <span class="account-sync-icon" aria-hidden="true">&#8635;</span>
+            <span class="account-sync-title">Not signed in</span>
+          </div>
+          <div class="account-sync-conflicts"></div>
+          <button class="settings-secondary-button account-sync-now" type="button">Sync Now</button>
+        </section>
+        <section class="settings-card settings-data-card" aria-labelledby="settings-data-title">
+          <h3 id="settings-data-title" class="section-label settings-section-title">Data &amp; Storage</h3>
+          <div class="settings-data-subsection settings-projects-card">
+            <div class="settings-projects-heading">
+              <h4>Projects</h4>
+              <button class="settings-link-button settings-project-select-all" type="button">Select All</button>
+            </div>
+            <p class="settings-projects-empty" hidden>No projects yet.</p>
+            <div class="settings-project-list" aria-label="Projects"></div>
+          </div>
+          <div class="settings-danger-zone" role="group" aria-label="Data removal actions">
+            <button class="settings-secondary-button settings-project-delete" type="button" disabled>Delete Selected</button>
+            <div class="settings-danger-list">
             <button class="settings-danger-button" type="button" data-clear-action="searches">
               <span aria-hidden="true">&#8981;</span>
               Clear Recent Searches
@@ -452,6 +434,7 @@
               <span aria-hidden="true">&#9671;</span>
               Clear All Tags
             </button>
+            </div>
           </div>
         </section>
         <p class="settings-disclaimer">permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.</p>
@@ -459,6 +442,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260721-project-settings-v75" type="module"></script>
+    <script src="/web/app.js?v=20260722-columns-refinement-v83" type="module"></script>
   </body>
 </html>

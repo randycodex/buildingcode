@@ -55,6 +55,31 @@
   white-space: nowrap;
 }
 
+.permitext-workboard-zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border, #d9d9dc);
+  border-radius: 999px;
+  background: var(--surface-raised, #fff);
+}
+
+.permitext-workboard-header .permitext-workboard-zoom-controls button {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 17px;
+  line-height: 1;
+}
+
+.permitext-workboard-header .permitext-workboard-zoom-controls button[aria-label="Reset zoom"] {
+  width: 44px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
 .permitext-workboard-header button {
   display: grid;
   width: 30px;

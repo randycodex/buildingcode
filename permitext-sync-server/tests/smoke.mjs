@@ -138,8 +138,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-settings-v57"),
-      "Web workspace omitted the current Search, text-field, and Settings assets."
+      webRoot.text.includes("columns-refinement-v77"),
+      "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
       webRoot.text.indexOf('<header class="topbar">'),
@@ -161,17 +161,35 @@ async function main() {
       webRoot.text.indexOf('<script src="/web/app.js')
     );
     const settingsSectionOrder = [
-      'aria-label="Code library settings"',
-      '>Plan</p>',
-      '>Account</p>',
-      '>Sync</p>',
-      '>Reader Preview</p>',
-      '>Projects</p>',
-      '>Saved Data</p>'
+      '>Code Preferences</h3>',
+      '>Plan</h3>',
+      '>Account</h3>',
+      '>Sync</h3>',
+      '>Data &amp; Storage</h3>',
+      '>Projects</h4>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
       "Web Settings groups do not match the iOS Settings order."
+    );
+    assert(
+      !settingsTemplateSource.includes("Destructive Actions") &&
+        !settingsTemplateSource.includes("Changes apply to the current code data and synced devices."),
+      "Web Settings restored the redundant destructive-actions heading or helper copy."
+    );
+    assert(
+      settingsTemplateSource.includes('>Reader Font</span>') &&
+        settingsTemplateSource.indexOf('class="preview-font-family-select"') < settingsTemplateSource.indexOf('>Plan</h3>') &&
+        !settingsTemplateSource.includes('class="reader-preview-card settings-card"'),
+      "Web Settings no longer keeps Reader Font with the top preferences or restored the redundant preview card."
+    );
+    assert(
+      !settingsTemplateSource.includes("Public username") &&
+        !settingsTemplateSource.includes("account-profile-editor") &&
+        !settingsTemplateSource.includes("account-profile-save") &&
+        !settingsTemplateSource.includes("account-summary") &&
+        !settingsTemplateSource.includes("All browser changes are synced."),
+      "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
@@ -181,6 +199,12 @@ async function main() {
         settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
         settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"'),
       "Web Settings omitted project selection or bulk deletion controls."
+    );
+    assert(
+      settingsTemplateSource.includes('data-plan-option="free"') &&
+        settingsTemplateSource.includes('data-plan-option="pro"') &&
+        !settingsTemplateSource.includes('class="settings-billing-line"'),
+      "Web Settings lost active-plan styling or restored the redundant billing summary."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -212,6 +236,13 @@ async function main() {
     const workspaceScript = await request("/web/app.js");
     const syncStateScript = await request("/web/sync-state.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
+    assert(
+      workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
+        workspaceScript.text.includes('checkoutButton.textContent = pro') &&
+        workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
+        workspaceScript.text.includes(': "Upgrade to Pro"'),
+      "Web Settings no longer distinguishes active Free and Pro plan actions."
+    );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
       "Web workspace script returned the wrong content type."
@@ -496,7 +527,10 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260721-project-settings-v75'),
+        !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
+        !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
+        workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
+        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v83'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -693,8 +727,17 @@ async function main() {
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
-      workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?background: var\(--project-color\);[\s\S]*?color: var\(--project-on-color\);/),
-      "Saved project tiles no longer use their full project color with a contrast-safe foreground."
+      workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),
+      "Saved project tiles no longer use a borderless muted project tint with a contrast-safe foreground."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-panel \.account-plan-secondary \{[\s\S]*?justify-self: center;/),
+      "Restore Purchases is no longer centered beneath the primary plan action."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-project-copy strong \{[^}]*color: var\(--project-color\);[^}]*font-weight: 400;[^}]*text-transform: none;/) &&
+        !workspaceStyles.text.includes(".settings-project-swatch"),
+      "Project selection rows no longer use regular-weight project-colored names without a separate color dot."
     );
     assert(
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
@@ -834,6 +877,11 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
+      workspaceScript.text.includes('const workboardClientVersion = "20260722-workboard-zoom-v16";') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57'),
+      "Web workspace omitted the current Workboard zoom assets."
+    );
+    assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),
       "Workboard script asset returned the wrong content type."
     );
@@ -849,9 +897,17 @@ async function main() {
     );
     assert(
       workboardSource.includes("const preventWheelPanning = (event) =>") &&
+        workboardSource.includes("if (event.ctrlKey || event.metaKey) return;") &&
         workboardSource.includes("event.stopImmediatePropagation();") &&
         workboardSource.includes('host.addEventListener("wheel", preventWheelPanning, { capture: true, passive: false })'),
-      "Workboard wheel panning is no longer blocked at capture phase."
+      "Workboard wheel panning guard no longer preserves trackpad and modified-wheel zoom gestures."
+    );
+    assert(
+      workboardSource.includes("const setWorkboardZoom = useCallback") &&
+        workboardSource.includes('aria-label="Zoom out"') &&
+        workboardSource.includes('aria-label="Reset zoom"') &&
+        workboardSource.includes('aria-label="Zoom in"'),
+      "Workboard omitted its compact zoom controls."
     );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
