@@ -8693,9 +8693,7 @@ function renderSettings() {
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
   const codeSectionSelect = panel.querySelector(".settings-code-section-select");
-  const accountSummary = panel.querySelector(".account-summary");
   const accountCopy = panel.querySelector(".account-status-copy");
-  const displayName = panel.querySelector(".account-display-name");
   const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
@@ -8876,15 +8874,11 @@ function renderSettings() {
       : "Upgrade to Pro";
     planSecondaryButton.hidden = !account || pro || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
-    accountSummary.hidden = !account;
     accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    displayName.textContent = account ? accountDisplayName() : "";
-    accountCopy.textContent = account
-      ? `Signed in as ${accountDisplayName()}. Saved work can sync through the connected backend.`
-      : "Sign in to attach local saved work to your account and use cross-device sync.";
+    accountCopy.textContent = "Sign in to attach local saved work to your account and use cross-device sync.";
     renderSyncState();
   };
 

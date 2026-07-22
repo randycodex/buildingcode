@@ -5160,7 +5160,6 @@ mark {
   letter-spacing: 0;
 }
 
-.account-summary,
 .account-plan-summary {
   display: grid;
   gap: var(--space-1);
@@ -5169,12 +5168,10 @@ mark {
   background: var(--surface);
 }
 
-.account-summary[hidden],
 .account-plan-summary[hidden] {
   display: none;
 }
 
-.account-summary span,
 .account-plan-summary span {
   color: var(--text-secondary);
   font-size: 10pt !important;
@@ -5182,7 +5179,6 @@ mark {
   text-transform: uppercase;
 }
 
-.account-summary strong,
 .account-plan-summary strong {
   min-width: 0;
   color: var(--text-primary);
@@ -5401,44 +5397,6 @@ mark {
 .settings-panel .settings-link-button:disabled,
 .settings-panel .settings-mini-button:disabled {
   opacity: 0.38;
-}
-
-.settings-panel .account-summary {
-  grid-template-columns: 10px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 40px;
-  padding: 2px 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.settings-panel .account-status-indicator {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #32a852;
-  box-shadow: 0 0 0 3px color-mix(in srgb, #32a852 16%, transparent);
-}
-
-.settings-panel .account-summary-copy {
-  display: grid;
-  gap: 1px;
-  min-width: 0;
-}
-
-.settings-panel .account-summary-copy > span {
-  color: var(--text-secondary);
-  font-size: 8.5pt !important;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.settings-panel .account-summary-copy strong {
-  font-size: 9.75pt !important;
-  font-weight: 600;
 }
 
 .settings-panel .account-profile-editor {
