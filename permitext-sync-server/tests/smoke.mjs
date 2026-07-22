@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v69"),
+      webRoot.text.includes("columns-refinement-v70"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -166,12 +166,16 @@ async function main() {
       '>Account</h3>',
       '>Sync</h3>',
       '>Data &amp; Storage</h3>',
-      '>Projects</h4>',
-      '>Destructive Actions</h4>'
+      '>Projects</h4>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
       "Web Settings groups do not match the iOS Settings order."
+    );
+    assert(
+      !settingsTemplateSource.includes("Destructive Actions") &&
+        !settingsTemplateSource.includes("Changes apply to the current code data and synced devices."),
+      "Web Settings restored the redundant destructive-actions heading or helper copy."
     );
     assert(
       settingsTemplateSource.includes('>Reader Font</span>') &&
