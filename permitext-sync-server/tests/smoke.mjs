@@ -664,6 +664,12 @@ async function main() {
       "Project deletion no longer completes locally while account sync is pending."
     );
     assert(
+      workspaceScript.text.includes("function closeDeletedProjectDetails()") &&
+        workspaceScript.text.includes("closeDeletedProjectDetails();") &&
+        workspaceScript.text.includes("deletedDetails.forEach((detail) => closeProjectDetailForProject(detail))"),
+      "Remote project deletion can leave a stale project detail or Workboard column open."
+    );
+    assert(
       workspaceScript.text.includes('options.sourcePaneID === "utility:archive"') &&
         workspaceScript.text.includes('placePaneBefore("utility:archive", detailID)') &&
         workspaceScript.text.includes("placeArchiveAfterProjectsStack();"),

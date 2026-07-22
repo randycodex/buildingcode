@@ -6929,6 +6929,16 @@ function closeProjectDetailForProject(project) {
   state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
 
+function closeDeletedProjectDetails() {
+  if (syncedContent?.status !== "connected") return false;
+  const visibleProjects = visibleProjectRecords(syncedContent.summary?.projects || []);
+  const deletedDetails = openProjectDetails().filter((detail) =>
+    !visibleProjects.some((project) => projectDetailMatches(project, detail))
+  );
+  deletedDetails.forEach((detail) => closeProjectDetailForProject(detail));
+  return deletedDetails.length > 0;
+}
+
 async function archiveProject(project) {
   return archiveProjects([project]);
 }
@@ -9395,6 +9405,7 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
 
 async function renderWorkspace() {
   await ensureSyncedContentForRender();
+  closeDeletedProjectDetails();
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
   setUtilityButtonStates();
@@ -9437,6 +9448,7 @@ async function renderWorkspace() {
 }
 
 async function renderUtilityWorkspace(options = {}) {
+  closeDeletedProjectDetails();
   const existingPanesByID = new Map(
     Array.from(track.querySelectorAll(".workspace-panel"))
       .filter((pane) => pane.dataset.paneId)
