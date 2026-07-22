@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>permitext workspace</title>
-    <link rel="stylesheet" href="/web/styles.css?v=20260720-compact-settings-v56">
+    <link rel="stylesheet" href="/web/styles.css?v=20260721-project-settings-v57">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260720-compact-settings-v56">
   </head>
   <body>
@@ -424,6 +424,15 @@
             </select>
           </label>
         </section>
+        <section class="settings-card settings-projects-card">
+          <div class="settings-projects-heading">
+            <p class="section-label">Projects</p>
+            <button class="settings-link-button settings-project-select-all" type="button">Select All</button>
+          </div>
+          <p class="settings-projects-empty" hidden>No projects yet.</p>
+          <div class="settings-project-list" aria-label="Projects"></div>
+          <button class="settings-secondary-button settings-project-delete" type="button" disabled>Delete Selected</button>
+        </section>
         <section class="settings-card settings-saved-data-card">
           <p class="section-label">Saved Data</p>
           <div class="settings-danger-list">
@@ -450,6 +459,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260721-causal-clear-v73" type="module"></script>
+    <script src="/web/app.js?v=20260721-project-settings-v74" type="module"></script>
   </body>
 </html>

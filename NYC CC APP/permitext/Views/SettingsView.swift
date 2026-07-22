@@ -13,6 +13,8 @@ struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @State private var scrollOffset: CGFloat = 0
     @State private var pendingClearAction: ClearSettingsAction?
+    @State private var selectedProjectIDs = Set<Int64>()
+    @State private var showsProjectDeleteWarning = false
     @State private var publicUsernameDraft = ""
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
@@ -80,6 +82,10 @@ struct SettingsView: View {
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        projectManagementCard
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         savedDataTools
                     }
 
@@ -110,6 +116,9 @@ struct SettingsView: View {
         }
         .coordinateSpace(name: "settingsScroll")
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
+        .onChange(of: library.folders.map(\.id)) { _, folderIDs in
+            selectedProjectIDs.formIntersection(folderIDs)
+        }
     }
 
     private var jurisdictionPicker: some View {
@@ -716,6 +725,128 @@ struct SettingsView: View {
                 action: .clearTags
             )
         }
+    }
+
+    private var projectManagementCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 12) {
+                CodeEyebrow(text: "Projects", accent: settingsChromeColor)
+
+                Spacer(minLength: 0)
+
+                if !library.folders.isEmpty {
+                    Button(selectedProjectIDs.count == library.folders.count ? "Clear All" : "Select All") {
+                        if selectedProjectIDs.count == library.folders.count {
+                            selectedProjectIDs.removeAll()
+                        } else {
+                            selectedProjectIDs = Set(library.folders.map(\.id))
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                }
+            }
+
+            if library.folders.isEmpty {
+                Text("No projects yet.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(Array(library.folders.enumerated()), id: \.element.id) { index, folder in
+                        projectSelectionRow(folder)
+
+                        if index < library.folders.count - 1 {
+                            CodeHairline()
+                        }
+                    }
+                }
+
+                Button(role: .destructive) {
+                    showsProjectDeleteWarning = true
+                } label: {
+                    Label(
+                        selectedProjectIDs.isEmpty
+                            ? "Delete Selected"
+                            : "Delete \(selectedProjectIDs.count) Selected",
+                        systemImage: "trash"
+                    )
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.bordered)
+                .tint(.red)
+                .disabled(selectedProjectIDs.isEmpty)
+                .popover(isPresented: $showsProjectDeleteWarning, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) {
+                    projectDeletePopover
+                        .presentationCompactAdaptation(.popover)
+                }
+            }
+        }
+    }
+
+    private func projectSelectionRow(_ folder: CodeFolder) -> some View {
+        let isSelected = selectedProjectIDs.contains(folder.id)
+        return Button {
+            if isSelected {
+                selectedProjectIDs.remove(folder.id)
+            } else {
+                selectedProjectIDs.insert(folder.id)
+            }
+        } label: {
+            HStack(spacing: 12) {
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.title3)
+                    .foregroundStyle(isSelected ? Color.appChrome : Color.secondary)
+
+                Circle()
+                    .fill(Color(uiColor: PlatformColor(hex: folder.colorHex) ?? .systemBlue))
+                    .frame(width: 12, height: 12)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(folder.name)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+
+                    let count = library.bookmarkCount(inFolder: folder.id)
+                    Text(count == 1 ? "1 saved item" : "\(count) saved items")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+
+                Spacer(minLength: 0)
+            }
+            .contentShape(Rectangle())
+            .padding(.vertical, 9)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(folder.name), \(isSelected ? "selected" : "not selected")")
+    }
+
+    private var projectDeletePopover: some View {
+        let count = selectedProjectIDs.count
+        return VStack(alignment: .leading, spacing: 18) {
+            Text(count == 1 ? "Delete project?" : "Delete projects?")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text("This will permanently delete \(count) \(count == 1 ? "project" : "projects") from every synced device. Saved items will keep their bookmarks. This cannot be undone.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button(count == 1 ? "Delete Project" : "Delete Projects", role: .destructive) {
+                let deletedIDs = library.deleteFolders(ids: selectedProjectIDs)
+                selectedProjectIDs.subtract(deletedIDs)
+                showsProjectDeleteWarning = false
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+        }
+        .frame(width: 300, alignment: .leading)
+        .padding(24)
     }
 
     private var previewFontSize: CGFloat {

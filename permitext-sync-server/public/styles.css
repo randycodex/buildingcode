@@ -4928,6 +4928,82 @@ mark {
   gap: var(--space-2);
 }
 
+.settings-projects-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.settings-projects-heading .settings-link-button {
+  min-height: 24px;
+  font-size: 9.5pt !important;
+}
+
+.settings-project-list {
+  display: grid;
+}
+
+.settings-project-row {
+  display: grid;
+  grid-template-columns: 20px 12px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 48px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.settings-project-row:last-child {
+  border-bottom: 0;
+}
+
+.settings-project-row input {
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--text-primary);
+}
+
+.settings-project-swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--project-color);
+}
+
+.settings-project-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.settings-project-copy strong,
+.settings-project-copy span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-project-copy strong {
+  font-size: 10.5pt !important;
+  font-weight: 600;
+}
+
+.settings-project-copy span,
+.settings-projects-empty {
+  color: var(--text-secondary);
+  font-size: 9.5pt !important;
+}
+
+.settings-projects-empty {
+  margin: 0;
+}
+
+.settings-project-delete:not(:disabled) {
+  color: #d92d20;
+}
+
 .settings-conflict-row {
   display: grid;
   gap: var(--space-1);

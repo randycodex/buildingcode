@@ -572,10 +572,7 @@ struct UserContentSyncEngine {
     }
 
     private func applyServerContinuity(_ record: ServerContinuityRecord) {
-        var values = record.values
-        if let selectedVersionFileName = values["selectedVersionFileName"] {
-            values["selectedVersionFileName"] = UserContentSyncCodeVersion.local(selectedVersionFileName)
-        }
+        let values = record.values
         let existingContext = continuityStore.load()
         let recentlyViewedSections: [RecentlyViewedEntry]
         if let rawJSON = values["recentlyViewedSectionsJSON"],
@@ -591,20 +588,17 @@ struct UserContentSyncEngine {
             UserDefaults.standard.set(Array(decoded.prefix(10)), forKey: "recentSearches")
         }
 
-        let selectedJurisdictionKey = values["selectedJurisdictionKey"].flatMap { $0.isEmpty ? nil : $0 }
-            ?? existingContext.selectedJurisdictionKey
-        let selectedVersionFileName = values["selectedVersionFileName"].flatMap { $0.isEmpty ? nil : $0 }
-            ?? (record.codeVersion.isEmpty
-                ? existingContext.selectedVersionFileName
-                : UserContentSyncCodeVersion.local(record.codeVersion))
+        // Continuity shares activity, not navigation. Pulling another device's
+        // selected version/code/project here used to eject iOS from the code
+        // the person was actively reading.
         continuityStore.save(
             ContinuityContext(
-                selectedJurisdictionKey: selectedJurisdictionKey,
-                selectedVersionFileName: selectedVersionFileName,
-                selectedCodeSectionID: values["selectedCodeSectionID"].flatMap(Int64.init),
-                lastOpenedChapterID: values["lastOpenedChapterID"].flatMap(Int64.init),
-                activeProjectID: values["activeProjectID"].flatMap(Int64.init),
-                comparisonModeEnabled: true,
+                selectedJurisdictionKey: existingContext.selectedJurisdictionKey,
+                selectedVersionFileName: existingContext.selectedVersionFileName,
+                selectedCodeSectionID: existingContext.selectedCodeSectionID,
+                lastOpenedChapterID: existingContext.lastOpenedChapterID,
+                activeProjectID: existingContext.activeProjectID,
+                comparisonModeEnabled: existingContext.comparisonModeEnabled,
                 recentlyViewedSections: recentlyViewedSections
             )
         )

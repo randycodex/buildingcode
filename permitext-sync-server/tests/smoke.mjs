@@ -75,6 +75,14 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Diagnostics/Signposts.swift", import.meta.url),
     "utf8"
   );
+  const iosSettingsSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url),
+    "utf8"
+  );
+  const iosLibraryViewModelSource = await readFile(
+    new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
+    "utf8"
+  );
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const server = spawn(process.execPath, ["server.mjs"], {
@@ -130,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("compact-settings-v56"),
+      webRoot.text.includes("project-settings-v57"),
       "Web workspace omitted the current Search, text-field, and Settings assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -158,6 +166,7 @@ async function main() {
       '>Account</p>',
       '>Sync</p>',
       '>Reader Preview</p>',
+      '>Projects</p>',
       '>Saved Data</p>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
@@ -167,6 +176,12 @@ async function main() {
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
+    assert(
+      settingsTemplateSource.includes('class="settings-project-list"') &&
+        settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
+        settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"'),
+      "Web Settings omitted project selection or bulk deletion controls."
+    );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
         !settingsTemplateSource.includes("settings-comparison-toggle"),
@@ -297,7 +312,7 @@ async function main() {
         workspaceScript.text.includes("await archiveProjects(selectedProjects)") &&
         workspaceScript.text.includes("await deleteArchivedProjects(selectedProjects)") &&
         workspaceScript.text.includes('deleteButton.textContent = `Delete ${selectedCount}`') &&
-        workspaceScript.text.includes("activeAccount() && (!isLocal || isSynced)") &&
+        workspaceScript.text.includes("membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account))") &&
         workspaceScript.text.includes("const deletedIDs = new Set()") &&
         workspaceScript.text.includes("This cannot be undone."),
       "Project panes omitted their shared bulk archive/delete selection flow."
@@ -358,6 +373,43 @@ async function main() {
         iosSyncEngineSource.includes('supersededScopes.contains("tags")'),
       "iOS sync no longer protects newer collection clears from stale full-pull records."
     );
+    const webContinuitySource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("async function applyRemoteContinuityIfNewer"),
+      workspaceScript.text.indexOf("function enqueueSyncMutation")
+    );
+    const iosContinuitySource = iosSyncEngineSource.slice(
+      iosSyncEngineSource.indexOf("private func applyServerContinuity"),
+      iosSyncEngineSource.indexOf("private extension Array")
+    );
+    const iosRefreshContinuitySource = iosLibraryViewModelSource.slice(
+      iosLibraryViewModelSource.indexOf("private func refreshContinuityStateFromStore"),
+      iosLibraryViewModelSource.indexOf("#if DEBUG", iosLibraryViewModelSource.indexOf("private func refreshContinuityStateFromStore"))
+    );
+    assert(
+      !webContinuitySource.includes("state.settingsCodePrefix =") &&
+        !webContinuitySource.includes("readerFieldsForSectionDetail") &&
+        !webContinuitySource.includes("lastOpenedChapterID") &&
+        iosContinuitySource.includes("selectedVersionFileName: existingContext.selectedVersionFileName") &&
+        iosContinuitySource.includes("selectedCodeSectionID: existingContext.selectedCodeSectionID") &&
+        iosContinuitySource.includes("activeProjectID: existingContext.activeProjectID") &&
+        !iosRefreshContinuitySource.includes("openSelectedContent()"),
+      "Remote continuity can still steer another device's active reader, code version, or project."
+    );
+    assert(
+      iosUserDataStoreSource.includes("private func folderSectionSyncTargets") &&
+        iosUserDataStoreSource.includes('values: ["folderClientID": target.folderClientID]') &&
+        iosUserDataStoreSource.includes("let sectionIDs = try sectionIDs(inFolder: id, codeVersion: codeVersion)") &&
+        !iosUserDataStoreSource.includes('values: ["scope": "allFolders"]'),
+      "iOS project membership removals are no longer durable project-specific tombstones."
+    );
+    assert(
+      iosSettingsSource.includes("private var projectManagementCard") &&
+        iosSettingsSource.includes('selectedProjectIDs = Set(library.folders.map(\\.id))') &&
+        iosSettingsSource.includes("showsProjectDeleteWarning = true") &&
+        iosSettingsSource.includes("library.deleteFolders(ids: selectedProjectIDs)") &&
+        iosLibraryViewModelSource.includes("func deleteFolders(ids: Set<Int64>) -> Set<Int64>"),
+      "iOS Settings omitted project selection, Select All, warning, or bulk deletion."
+    );
     assert(
       workspaceScript.text.includes("const hasManyColumns = ids.length >= 4") &&
         workspaceScript.text.includes("Math.max(value, defaultWidth)") &&
@@ -386,6 +438,11 @@ async function main() {
       !workspaceScript.text.includes('title: "Share section"') &&
         !workspaceScript.text.includes("function shareIconSVG()"),
       "Section details still include their retired share control."
+    );
+    assert(
+      workspaceScript.text.includes("chrome.append(saveButton, backButton)") &&
+        workspaceScript.text.includes('label: "Close saved item"'),
+      "Saved-item details no longer place the bookmark on the left and close control on the right."
     );
     assert(
       workspaceScript.text.includes("alignReaderSectionAfterLayout(reader);") &&
@@ -439,7 +496,7 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260721-causal-clear-v73'),
+        webRoot.text.includes('/web/app.js?v=20260721-project-settings-v74'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

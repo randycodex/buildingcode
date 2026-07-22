@@ -486,19 +486,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func refreshContinuityStateFromStore() {
         let context = continuityStore.load()
-        let shouldReloadContent =
-            selectedJurisdictionKey != context.selectedJurisdictionKey ||
-            selectedVersionFileName != context.selectedVersionFileName
-
-        selectedJurisdictionKey = context.selectedJurisdictionKey
-        selectedVersionFileName = context.selectedVersionFileName
-        selectedCodeSectionID = context.selectedCodeSectionID
-        activeProjectID = context.activeProjectID
         recentlyViewedSections = context.recentlyViewedSections
         recentSearches = Self.loadRecentSearches()
-        if shouldReloadContent {
-            openSelectedContent()
-        }
     }
 
     #if DEBUG
@@ -1612,6 +1601,29 @@ final class CodeLibraryViewModel: ObservableObject {
         } catch {
             statusMessage = error.localizedDescription
         }
+    }
+
+    @discardableResult
+    func deleteFolders(ids: Set<Int64>) -> Set<Int64> {
+        guard !ids.isEmpty, let selectedVersion, let userContentRepository else { return [] }
+        var deletedIDs = Set<Int64>()
+        var firstError: Error?
+        for id in ids.sorted() {
+            do {
+                try userContentRepository.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
+                deletedIDs.insert(id)
+            } catch {
+                if firstError == nil { firstError = error }
+            }
+        }
+        refreshFolders()
+        if !deletedIDs.isEmpty {
+            scheduleUserContentAutoSync()
+        }
+        if let firstError {
+            statusMessage = firstError.localizedDescription
+        }
+        return deletedIDs
     }
 
     func addSection(_ sectionID: Int64, toFolder folderID: Int64) {

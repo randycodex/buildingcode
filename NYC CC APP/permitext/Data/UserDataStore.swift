@@ -153,6 +153,7 @@ final class UserDataStore: UserContentRepository {
 
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws {
         if try isBookmarked(sectionID: sectionID, codeVersion: codeVersion) {
+            let folderTargets = try folderSectionSyncTargets(sectionID: sectionID, codeVersion: codeVersion)
             try performTransaction {
                 let statement = try connection.prepare(
                     """
@@ -175,21 +176,25 @@ final class UserDataStore: UserContentRepository {
                 sqlite3_bind_int64(folders, 1, sectionID)
                 try connection.bind(text: codeVersion, index: 2, to: folders)
                 _ = try connection.step(folders)
-            }
-            enqueueSyncOperationIfPossible(
-                entityType: .bookmark,
-                operationType: .delete,
-                payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
-            )
-            enqueueSyncOperationIfPossible(
-                entityType: .folderSection,
-                operationType: .delete,
-                payload: SyncQueuePayload(
-                    codeVersion: codeVersion,
-                    sectionID: sectionID,
-                    values: ["scope": "allFolders"]
+
+                try enqueueSyncOperation(
+                    entityType: .bookmark,
+                    operationType: .delete,
+                    payload: SyncQueuePayload(codeVersion: codeVersion, sectionID: sectionID)
                 )
-            )
+                for target in folderTargets {
+                    try enqueueSyncOperation(
+                        entityType: .folderSection,
+                        operationType: .delete,
+                        payload: SyncQueuePayload(
+                            codeVersion: codeVersion,
+                            sectionID: sectionID,
+                            folderID: target.folderID,
+                            values: ["folderClientID": target.folderClientID]
+                        )
+                    )
+                }
+            }
             return
         }
 
@@ -1767,6 +1772,7 @@ final class UserDataStore: UserContentRepository {
 
     func deleteFolder(id: Int64, codeVersion: String) throws {
         let clientID = try folderClientID(id: id, codeVersion: codeVersion)
+        let sectionIDs = try sectionIDs(inFolder: id, codeVersion: codeVersion)
         try performTransaction {
             // Manual cascade — folder_sections doesn't have a FK constraint, so
             // we wipe membership rows first.
@@ -1790,12 +1796,44 @@ final class UserDataStore: UserContentRepository {
             sqlite3_bind_int64(statement, 1, id)
             try connection.bind(text: codeVersion, index: 2, to: statement)
             _ = try connection.step(statement)
+
+            for sectionID in sectionIDs {
+                try enqueueSyncOperation(
+                    entityType: .folderSection,
+                    operationType: .delete,
+                    payload: SyncQueuePayload(
+                        codeVersion: codeVersion,
+                        sectionID: sectionID,
+                        folderID: id,
+                        values: ["folderClientID": clientID]
+                    )
+                )
+            }
+            try enqueueSyncOperation(
+                entityType: .folder,
+                operationType: .delete,
+                payload: SyncQueuePayload(codeVersion: codeVersion, folderID: id, clientID: clientID)
+            )
         }
-        enqueueSyncOperationIfPossible(
-            entityType: .folder,
-            operationType: .delete,
-            payload: SyncQueuePayload(codeVersion: codeVersion, folderID: id, clientID: clientID)
+    }
+
+    private func sectionIDs(inFolder folderID: Int64, codeVersion: String) throws -> [Int64] {
+        let statement = try connection.prepare(
+            """
+            SELECT section_id
+            FROM folder_sections
+            WHERE folder_id = ? AND code_version = ?;
+            """
         )
+        defer { connection.finalize(statement) }
+        sqlite3_bind_int64(statement, 1, folderID)
+        try connection.bind(text: codeVersion, index: 2, to: statement)
+
+        var sectionIDs: [Int64] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            sectionIDs.append(connection.int64(at: 0, in: statement))
+        }
+        return sectionIDs
     }
 
     private func folderClientID(id: Int64, codeVersion: String) throws -> String {
@@ -1886,52 +1924,91 @@ final class UserDataStore: UserContentRepository {
 
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws {
         let folderClientID = try folderClientID(id: folderID, codeVersion: codeVersion)
-        let statement = try connection.prepare(
-            """
-            DELETE FROM folder_sections
-            WHERE folder_id = ? AND section_id = ? AND code_version = ?;
-            """
-        )
-        defer { connection.finalize(statement) }
-        sqlite3_bind_int64(statement, 1, folderID)
-        sqlite3_bind_int64(statement, 2, sectionID)
-        try connection.bind(text: codeVersion, index: 3, to: statement)
-        _ = try connection.step(statement)
-        enqueueSyncOperationIfPossible(
-            entityType: .folderSection,
-            operationType: .delete,
-            payload: SyncQueuePayload(
-                codeVersion: codeVersion,
-                sectionID: sectionID,
-                folderID: folderID,
-                values: ["folderClientID": folderClientID]
+        try performTransaction {
+            let statement = try connection.prepare(
+                """
+                DELETE FROM folder_sections
+                WHERE folder_id = ? AND section_id = ? AND code_version = ?;
+                """
             )
-        )
+            defer { connection.finalize(statement) }
+            sqlite3_bind_int64(statement, 1, folderID)
+            sqlite3_bind_int64(statement, 2, sectionID)
+            try connection.bind(text: codeVersion, index: 3, to: statement)
+            _ = try connection.step(statement)
+            try enqueueSyncOperation(
+                entityType: .folderSection,
+                operationType: .delete,
+                payload: SyncQueuePayload(
+                    codeVersion: codeVersion,
+                    sectionID: sectionID,
+                    folderID: folderID,
+                    values: ["folderClientID": folderClientID]
+                )
+            )
+        }
     }
 
     /// Removes a section from every folder it belongs to. Called by
     /// toggleBookmark when a bookmark is removed so a section stripped of
     /// its bookmark doesn't keep showing up in folder filters.
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws {
+        let folderTargets = try folderSectionSyncTargets(sectionID: sectionID, codeVersion: codeVersion)
+        try performTransaction {
+            let statement = try connection.prepare(
+                """
+                DELETE FROM folder_sections
+                WHERE section_id = ? AND code_version = ?;
+                """
+            )
+            defer { connection.finalize(statement) }
+            sqlite3_bind_int64(statement, 1, sectionID)
+            try connection.bind(text: codeVersion, index: 2, to: statement)
+            _ = try connection.step(statement)
+            for target in folderTargets {
+                try enqueueSyncOperation(
+                    entityType: .folderSection,
+                    operationType: .delete,
+                    payload: SyncQueuePayload(
+                        codeVersion: codeVersion,
+                        sectionID: sectionID,
+                        folderID: target.folderID,
+                        values: ["folderClientID": target.folderClientID]
+                    )
+                )
+            }
+        }
+    }
+
+    private struct FolderSectionSyncTarget {
+        let folderID: Int64
+        let folderClientID: String
+    }
+
+    private func folderSectionSyncTargets(sectionID: Int64, codeVersion: String) throws -> [FolderSectionSyncTarget] {
         let statement = try connection.prepare(
             """
-            DELETE FROM folder_sections
-            WHERE section_id = ? AND code_version = ?;
+            SELECT fs.folder_id, f.client_id
+            FROM folder_sections AS fs
+            INNER JOIN folders AS f
+                ON f.id = fs.folder_id AND f.code_version = fs.code_version
+            WHERE fs.section_id = ? AND fs.code_version = ?;
             """
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, sectionID)
         try connection.bind(text: codeVersion, index: 2, to: statement)
-        _ = try connection.step(statement)
-        enqueueSyncOperationIfPossible(
-            entityType: .folderSection,
-            operationType: .delete,
-            payload: SyncQueuePayload(
-                codeVersion: codeVersion,
-                sectionID: sectionID,
-                values: ["scope": "allFolders"]
+
+        var targets: [FolderSectionSyncTarget] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            targets.append(
+                FolderSectionSyncTarget(
+                    folderID: connection.int64(at: 0, in: statement),
+                    folderClientID: connection.string(at: 1, in: statement)
+                )
             )
-        )
+        }
+        return targets
     }
 
     /// Wipes every folder + membership row. Wired into Settings' clear-data

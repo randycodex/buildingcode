@@ -2921,14 +2921,6 @@ async function applyRemoteContinuityIfNewer() {
   if (!record || !Number.isFinite(remoteTimestamp) || remoteTimestamp <= appliedTimestamp || hasPendingContinuity) return;
 
   state.continuityAppliedAt = record.updatedAt;
-  const remoteCodeSectionID = String(record.values?.selectedCodeSectionID || "");
-  const remoteCodeSectionChapter = chapters.find((item) => String(item.codeSectionID || "") === remoteCodeSectionID);
-  state.settingsCodePrefix = remoteCodeSectionID ? remoteCodeSectionChapter?.codePrefix || "" : "ALL";
-  if (deepLinkedSectionIDFromLocation()) {
-    saveWorkspaceState();
-    return;
-  }
-
   const recentActivityTimestamp = Date.parse(state.recentActivityUpdatedAt || 0);
   if (!Number.isFinite(recentActivityTimestamp) || remoteTimestamp >= recentActivityTimestamp) {
     const remoteRecentEntries = continuityRecentEntries(record.values);
@@ -2938,29 +2930,10 @@ async function applyRemoteContinuityIfNewer() {
     }
     state.recentActivityUpdatedAt = record.updatedAt;
   }
-  const remoteRecentEntries = continuityRecentEntries(record.values);
-  const latestSectionID = Number(remoteRecentEntries[0]?.sectionID || 0);
-  const reader = state.readers[0] || newReaderState();
-  if (Number.isSafeInteger(latestSectionID) && latestSectionID > 0) {
-    try {
-      const payload = await api(`/code/sections/${latestSectionID}`);
-      Object.assign(reader, readerFieldsForSectionDetail(payload.section));
-    } catch {
-      // Keep the local reader when a continuity record references unavailable content.
-    }
-  } else if (record.values?.lastOpenedChapterID) {
-    const chapter = chapters.find((item) => String(item.id) === String(record.values.lastOpenedChapterID));
-    if (chapter) {
-      Object.assign(reader, {
-        codePrefix: chapter.codePrefix || "BC",
-        chapterID: chapter.id,
-        sectionID: "",
-        sectionNumber: "",
-        title: "Reader"
-      });
-    }
-  }
-  if (!state.readers.length) state.readers = [reader];
+  // A device may share recents, but it must never steer another device's
+  // active reader, selected code, open columns, or project. Those are local
+  // workspace choices and changing them during a background pull caused the
+  // reader to jump to whatever paragraph had just been saved on iOS.
   saveWorkspaceState();
 }
 
@@ -6258,8 +6231,8 @@ async function renderSectionDetail(searchID, detail) {
   const chrome = document.createElement("header");
   chrome.className = "section-detail-chrome";
   const backButton = appendDetailIconButton(chrome, {
-    title: "Back",
-    label: "Back to search",
+    title: "Close",
+    label: "Close saved item",
     svg: circleXIconSVG()
   });
   const saveButton = appendDetailIconButton(chrome, {
@@ -6269,6 +6242,7 @@ async function renderSectionDetail(searchID, detail) {
     svg: bookmarkIconSVG(saved)
   });
   saveButton.setAttribute("aria-pressed", String(saved));
+  chrome.append(saveButton, backButton);
 
   const content = document.createElement("section");
   content.className = "section-detail-content";
@@ -7048,21 +7022,29 @@ async function deleteArchivedProjects(projects) {
 async function deleteArchivedProjectData(project) {
   const id = projectRecordID(project);
   if (!id) return;
-  const isLocal = (state.localProjects || []).some((item) => projectRecordID(item) === id);
-  const isSynced = (syncedContent?.summary?.projects || []).some((item) => projectRecordID(item) === id);
   const workboardID = workboardProjectID(projectIdentity(project));
   const deletedAt = new Date().toISOString();
+  const linkedSections = (currentContentSummary().projectSections || [])
+    .filter((item) => projectSectionBelongsToProject(item, project));
+  const membershipTombstones = linkedSections.map((item) =>
+    deletedProjectSectionMutationForItem(project, item).projectSection
+  );
   state.localProjects = [
     ...(state.localProjects || []).filter((item) => projectRecordID(item) !== id),
     { ...project, updatedAt: deletedAt, deletedAt }
   ];
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
-  state.localProjectSections = (state.localProjectSections || [])
-    .filter((item) => !projectSectionBelongsToProject(item, project));
+  state.localProjectSections = [
+    ...(state.localProjectSections || []).filter((item) => !projectSectionBelongsToProject(item, project)),
+    ...membershipTombstones
+  ];
   saveWorkspaceState();
-  if (activeAccount() && (!isLocal || isSynced)) {
+  if (activeAccount()) {
     try {
-      await pushMutation(deletedProjectMutationForRecord(project));
+      const account = activeAccount();
+      membershipTombstones.forEach((record) => enqueueSyncMutation({ projectSection: record }, account));
+      enqueueSyncMutation(deletedProjectMutationForRecord(project), account);
+      await flushSyncOutbox({ refresh: true });
     } catch (error) {
       if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
       // Keep the local deletion tombstone while sync recovers.
@@ -8719,12 +8701,88 @@ function renderSettings() {
   const syncIcon = panel.querySelector(".account-sync-icon");
   const syncButton = panel.querySelector(".account-sync-now");
   const syncConflicts = panel.querySelector(".account-sync-conflicts");
+  const projectList = panel.querySelector(".settings-project-list");
+  const projectEmpty = panel.querySelector(".settings-projects-empty");
+  const projectSelectAll = panel.querySelector(".settings-project-select-all");
+  const projectDelete = panel.querySelector(".settings-project-delete");
   const status = panel.querySelector(".settings-status-message");
 
   const setStatus = (message, isError = false) => {
     status.textContent = message || "";
     status.classList.toggle("has-error", isError);
   };
+
+  const settingsProjects = visibleProjectRecords(currentContentSummary().projects || []);
+  const settingsProjectSections = currentContentSummary().projectSections || [];
+  const selectedProjectIDs = new Set();
+  const projectCheckboxes = new Map();
+  const updateProjectSelection = () => {
+    const count = selectedProjectIDs.size;
+    projectSelectAll.textContent = count === settingsProjects.length && count > 0 ? "Clear All" : "Select All";
+    projectSelectAll.disabled = settingsProjects.length === 0;
+    projectDelete.disabled = count === 0;
+    projectDelete.textContent = count > 0 ? `Delete ${count} Selected` : "Delete Selected";
+    projectCheckboxes.forEach((checkbox, id) => {
+      checkbox.checked = selectedProjectIDs.has(id);
+    });
+  };
+  projectEmpty.hidden = settingsProjects.length > 0;
+  settingsProjects.forEach((project) => {
+    const id = projectRecordID(project);
+    const row = document.createElement("label");
+    row.className = "settings-project-row";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.setAttribute("aria-label", `Select ${project.name || project.title || "project"}`);
+    const swatch = document.createElement("span");
+    swatch.className = "settings-project-swatch";
+    swatch.style.setProperty("--project-color", projectColor(project));
+    swatch.setAttribute("aria-hidden", "true");
+    const copy = document.createElement("span");
+    copy.className = "settings-project-copy";
+    const name = document.createElement("strong");
+    name.textContent = project.name || project.title || "Project";
+    const savedCount = settingsProjectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
+    const count = document.createElement("span");
+    count.textContent = savedCount === 1 ? "1 saved item" : `${savedCount} saved items`;
+    copy.append(name, count);
+    row.append(checkbox, swatch, copy);
+    checkbox.addEventListener("change", () => {
+      if (checkbox.checked) selectedProjectIDs.add(id);
+      else selectedProjectIDs.delete(id);
+      updateProjectSelection();
+    });
+    projectCheckboxes.set(id, checkbox);
+    projectList.append(row);
+  });
+  projectSelectAll.addEventListener("click", () => {
+    if (selectedProjectIDs.size === settingsProjects.length) selectedProjectIDs.clear();
+    else settingsProjects.forEach((project) => selectedProjectIDs.add(projectRecordID(project)));
+    updateProjectSelection();
+  });
+  projectDelete.addEventListener("click", async () => {
+    const selectedProjects = settingsProjects.filter((project) => selectedProjectIDs.has(projectRecordID(project)));
+    const count = selectedProjects.length;
+    if (!count) return;
+    const confirmed = await confirmWebWarning(
+      count === 1 ? "Delete project" : "Delete projects",
+      `This will permanently delete ${count} ${count === 1 ? "project" : "projects"} from every synced device. Saved items will keep their bookmarks. This cannot be undone.`,
+      { confirmLabel: "Delete" }
+    );
+    if (!confirmed) return;
+    projectDelete.disabled = true;
+    try {
+      for (const project of selectedProjects) {
+        await deleteArchivedProjectData(project);
+      }
+      setStatus(`${count} ${count === 1 ? "project" : "projects"} deleted.`);
+      await renderWorkspace();
+    } catch (error) {
+      setStatus(error.message || "Could not delete the selected projects.", true);
+      projectDelete.disabled = false;
+    }
+  });
+  updateProjectSelection();
 
   jurisdictionSelect.value = "jurisdiction-1";
   versionSelect.value = defaultSyncCodeVersion;
