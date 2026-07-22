@@ -3172,7 +3172,10 @@ async function flushSyncOutbox(options = {}) {
           .filter((item) => accepted.has(item.recordID) || rejected.has(item.recordID))
           .map((item) => item.id));
         const postedEntryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
-        const unknownEntries = entries.filter((item) => !completedEntryIDs.has(item.id));
+        const unknownEntries = entries.filter((item) =>
+          !completedEntryIDs.has(item.id) &&
+          (state.syncOutbox || []).some((current) => current.id === item.id && current.queuedAt === item.queuedAt)
+        );
         const rejectedEntries = entries.filter((item) =>
           rejected.has(item.recordID) &&
           (state.syncOutbox || []).some((current) => current.id === item.id && current.queuedAt === item.queuedAt)
@@ -3180,22 +3183,27 @@ async function flushSyncOutbox(options = {}) {
 
         state.syncOutbox = (state.syncOutbox || [])
           .filter((item) =>
-            !completedEntryIDs.has(item.id) || postedEntryVersions.get(item.id) !== item.queuedAt
+            (!completedEntryIDs.has(item.id) && !unknownEntries.some((entry) => entry.id === item.id)) ||
+              postedEntryVersions.get(item.id) !== item.queuedAt
           );
         state.syncConflicts = [
-          ...(state.syncConflicts || []).filter((item) => !rejectedEntries.some((entry) => entry.id === item.id)),
+          ...(state.syncConflicts || []).filter((item) =>
+            !rejectedEntries.some((entry) => entry.id === item.id) &&
+            !unknownEntries.some((entry) => entry.id === item.id)
+          ),
           ...rejectedEntries.map((item) => ({
             ...item,
             conflictedAt: new Date().toISOString(),
             lastError: "Server has a newer version of this record."
+          })),
+          ...unknownEntries.map((item) => ({
+            ...item,
+            conflictedAt: new Date().toISOString(),
+            lastError: "A legacy queued change could not be reconciled and was paused."
           }))
         ];
         saveWorkspaceState();
         storeAccountEntitlement(payload.entitlement || null);
-
-        if (unknownEntries.length) {
-          throw new Error("The server did not acknowledge every queued change.");
-        }
       } catch (error) {
         const entryVersions = new Map(entries.map((item) => [item.id, item.queuedAt]));
         let highestAttemptCount = 1;
