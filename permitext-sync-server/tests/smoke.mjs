@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v71"),
+      webRoot.text.includes("columns-refinement-v72"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -727,6 +727,10 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),
       "Saved project tiles no longer use a muted project tint with a contrast-safe foreground."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-panel \.account-plan-secondary \{[\s\S]*?justify-self: center;/),
+      "Restore Purchases is no longer centered beneath the primary plan action."
     );
     assert(
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&

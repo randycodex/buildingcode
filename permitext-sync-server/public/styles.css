@@ -5382,6 +5382,10 @@ mark {
   font-weight: 550;
 }
 
+.settings-panel .account-plan-secondary {
+  justify-self: center;
+}
+
 .settings-panel .settings-primary-button:disabled,
 .settings-panel .settings-secondary-button:disabled,
 .settings-panel .settings-link-button:disabled,
