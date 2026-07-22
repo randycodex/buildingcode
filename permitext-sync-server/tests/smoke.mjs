@@ -138,8 +138,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-settings-v57"),
-      "Web workspace omitted the current Search, text-field, and Settings assets."
+      webRoot.text.includes("columns-refinement-v58"),
+      "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
       webRoot.text.indexOf('<header class="topbar">'),
@@ -161,13 +161,14 @@ async function main() {
       webRoot.text.indexOf('<script src="/web/app.js')
     );
     const settingsSectionOrder = [
-      'aria-label="Code library settings"',
-      '>Plan</p>',
-      '>Account</p>',
-      '>Sync</p>',
-      '>Reader Preview</p>',
-      '>Projects</p>',
-      '>Saved Data</p>'
+      '>Code Preferences</h3>',
+      '>Plan</h3>',
+      '>Account</h3>',
+      '>Sync</h3>',
+      '>Reader Preview</h3>',
+      '>Data &amp; Storage</h3>',
+      '>Projects</h4>',
+      '>Destructive Actions</h4>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
@@ -181,6 +182,12 @@ async function main() {
         settingsTemplateSource.includes('class="settings-link-button settings-project-select-all"') &&
         settingsTemplateSource.includes('class="settings-secondary-button settings-project-delete"'),
       "Web Settings omitted project selection or bulk deletion controls."
+    );
+    assert(
+      settingsTemplateSource.includes('data-plan-option="free"') &&
+        settingsTemplateSource.includes('data-plan-option="pro"') &&
+        settingsTemplateSource.includes('class="settings-billing-line"'),
+      "Web Settings omitted explicit current-plan and upgrade-option states."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -212,6 +219,13 @@ async function main() {
     const workspaceScript = await request("/web/app.js");
     const syncStateScript = await request("/web/sync-state.js");
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
+    assert(
+      workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
+        workspaceScript.text.includes('checkoutButton.textContent = pro') &&
+        workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
+        workspaceScript.text.includes(': "Upgrade to Pro"'),
+      "Web Settings no longer distinguishes active Free and Pro plan actions."
+    );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
       "Web workspace script returned the wrong content type."

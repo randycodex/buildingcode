@@ -8702,6 +8702,7 @@ function renderSettings() {
   const profileSaveButton = panel.querySelector(".account-profile-save");
   const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
+  const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
@@ -8868,17 +8869,28 @@ function renderSettings() {
     const pro = isProAccount();
     const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
+    const activePlan = pro ? "pro" : "free";
+    planRows.forEach((row) => {
+      const active = row.dataset.planOption === activePlan;
+      row.classList.toggle("is-active", active);
+      row.setAttribute("aria-current", active ? "true" : "false");
+      const indicator = row.querySelector(".settings-feature-icon");
+      if (indicator) indicator.textContent = active ? "✓" : "";
+    });
     planLabel.textContent = entitlementSourceLabel();
     planDetail.textContent = pro
       ? source === "lifetimeGrant"
         ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."
         : "Pro is active. Saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
       : "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity.";
-    checkoutButton.disabled = !account || pro;
-    checkoutButton.textContent = pro ? "Pro Active" : "Upgrade to Pro";
-    planSecondaryButton.hidden = !account || source === "lifetimeGrant";
-    planSecondaryButton.textContent = pro ? "Manage Subscription" : "Restore Purchases";
+    checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
+    checkoutButton.textContent = pro
+      ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
+      : "Upgrade to Pro";
+    planSecondaryButton.hidden = !account || pro || source === "lifetimeGrant";
+    planSecondaryButton.textContent = "Restore Purchases";
     accountSummary.hidden = !account;
+    accountCopy.hidden = Boolean(account);
     profileEditor.hidden = !account;
     signOutButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
@@ -8967,7 +8979,25 @@ function renderSettings() {
   });
   checkoutButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account || isProAccount()) return;
+    if (!account) return;
+    if (isProAccount()) {
+      if (currentEntitlement()?.source === "lifetimeGrant") return;
+      if (currentEntitlement()?.source === "appleSubscription") {
+        window.location.href = "https://apps.apple.com/account/subscriptions";
+        return;
+      }
+      checkoutButton.disabled = true;
+      setStatus("Opening subscription management...");
+      try {
+        const payload = await postJSON("/billing/web/portal", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+        if (!payload.url) throw new Error("Subscription management did not return a URL.");
+        window.location.href = payload.url;
+      } catch (error) {
+        setStatus(error.message || "Could not open subscription management.", true);
+        checkoutButton.disabled = false;
+      }
+      return;
+    }
     checkoutButton.disabled = true;
     setStatus("Opening checkout...");
     try {
@@ -8981,24 +9011,7 @@ function renderSettings() {
   });
   planSecondaryButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account) return;
-    if (isProAccount()) {
-      if (currentEntitlement()?.source === "appleSubscription") {
-        window.location.href = "https://apps.apple.com/account/subscriptions";
-        return;
-      }
-      planSecondaryButton.disabled = true;
-      setStatus("Opening subscription management...");
-      try {
-        const payload = await postJSON("/billing/web/portal", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
-        if (!payload.url) throw new Error("Subscription management did not return a URL.");
-        window.location.href = payload.url;
-      } catch (error) {
-        setStatus(error.message || "Could not open subscription management.", true);
-        planSecondaryButton.disabled = false;
-      }
-      return;
-    }
+    if (!account || isProAccount()) return;
     const restoreID = window.prompt("Enter the Stripe checkout session or subscription ID from your purchase receipt.");
     if (!restoreID) return;
     planSecondaryButton.disabled = true;

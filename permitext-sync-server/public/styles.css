@@ -5211,6 +5211,447 @@ mark {
   opacity: 1;
 }
 
+/* Settings column hierarchy refinement. */
+.settings-panel {
+  --settings-card-surface: color-mix(in srgb, var(--text-primary) 4.5%, var(--surface));
+  --settings-inset-surface: color-mix(in srgb, var(--text-primary) 3%, var(--surface));
+  --settings-danger: #e2574c;
+  gap: var(--space-2);
+  padding-bottom: var(--space-4);
+  overflow-x: hidden;
+}
+
+.settings-panel .panel-header {
+  margin-bottom: 2px;
+}
+
+.settings-panel > .settings-list,
+.settings-panel > .settings-card {
+  margin-top: 0;
+}
+
+.settings-panel .settings-card,
+.settings-panel .settings-list,
+.settings-panel .reader-preview-card,
+.settings-panel .account-connector {
+  min-width: 0;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--settings-card-surface);
+  box-shadow: none;
+}
+
+.settings-panel .settings-section-title {
+  margin: 0 0 2px;
+  color: var(--text-secondary);
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 9pt !important;
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+}
+
+.settings-panel .settings-card-copy,
+.settings-panel .account-profile-helper,
+.settings-panel .connector-status,
+.settings-panel .account-sync-status p {
+  font-size: 9.5pt !important;
+  line-height: 1.35;
+}
+
+.settings-panel .settings-library-card {
+  padding-bottom: 2px;
+}
+
+.settings-panel .settings-library-card .settings-row {
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: var(--space-2);
+  min-height: 42px;
+  padding: 5px 0;
+  border-color: var(--border);
+}
+
+.settings-panel .settings-library-card .settings-row > span,
+.settings-panel .settings-library-card .settings-row select {
+  font-size: 9.5pt !important;
+}
+
+.settings-panel .settings-library-card .settings-row select {
+  min-height: 32px;
+}
+
+.settings-panel .settings-billing-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-height: 34px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--settings-inset-surface);
+  font-size: 9.5pt !important;
+}
+
+.settings-panel .settings-billing-line span {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.settings-panel .settings-billing-line strong {
+  color: var(--text-primary);
+}
+
+.settings-panel .settings-plan-features {
+  gap: var(--space-1);
+}
+
+.settings-panel .settings-feature-row {
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: var(--space-2);
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+}
+
+.settings-panel .settings-feature-row.is-active {
+  border-color: color-mix(in srgb, var(--text-secondary) 34%, transparent);
+  background: var(--settings-inset-surface);
+}
+
+.settings-panel .settings-feature-icon {
+  width: 18px;
+  height: 18px;
+  border-color: var(--text-tertiary);
+  background: transparent;
+  color: transparent;
+  font-size: 8pt !important;
+}
+
+.settings-panel .settings-feature-row.is-active .settings-feature-icon {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface);
+}
+
+.settings-panel .settings-feature-row p {
+  gap: 1px;
+}
+
+.settings-panel .settings-feature-row strong {
+  font-size: 9.75pt !important;
+}
+
+.settings-panel .settings-feature-row span:not(.settings-feature-icon) {
+  font-size: 9pt !important;
+  line-height: 1.3;
+}
+
+.settings-panel .settings-plan-upgrade-note {
+  display: inline-flex;
+  margin-left: 4px;
+  color: var(--code-accent) !important;
+  font-size: 8pt !important;
+  font-weight: 600;
+}
+
+.settings-panel .settings-feature-row.is-active .settings-plan-upgrade-note {
+  display: none;
+}
+
+.settings-panel .settings-primary-button,
+.settings-panel .settings-secondary-button,
+.settings-panel .settings-mini-button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: 9px;
+  font-size: 9.75pt !important;
+}
+
+.settings-panel .settings-primary-button {
+  border: 1px solid var(--text-primary);
+}
+
+.settings-panel .settings-secondary-button,
+.settings-panel .settings-mini-button {
+  border: 1px solid var(--border);
+  background: var(--settings-inset-surface);
+}
+
+.settings-panel .settings-link-button {
+  justify-self: start;
+  width: fit-content;
+  min-height: 30px;
+  border-radius: 6px;
+  font-size: 9pt !important;
+  font-weight: 550;
+}
+
+.settings-panel .settings-primary-button:disabled,
+.settings-panel .settings-secondary-button:disabled,
+.settings-panel .settings-link-button:disabled,
+.settings-panel .settings-mini-button:disabled {
+  opacity: 0.38;
+}
+
+.settings-panel .account-summary {
+  grid-template-columns: 10px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 40px;
+  padding: 7px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--settings-inset-surface);
+}
+
+.settings-panel .account-status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #32a852;
+  box-shadow: 0 0 0 3px color-mix(in srgb, #32a852 16%, transparent);
+}
+
+.settings-panel .account-summary-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.settings-panel .account-summary-copy > span {
+  color: var(--text-secondary);
+  font-size: 8.5pt !important;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.settings-panel .account-summary-copy strong {
+  font-size: 9.75pt !important;
+  font-weight: 600;
+}
+
+.settings-panel .account-profile-editor {
+  gap: var(--space-1);
+}
+
+.settings-panel .account-profile-editor label {
+  font-size: 9.5pt !important;
+}
+
+.settings-panel .account-profile-editor input {
+  min-height: 40px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--settings-inset-surface);
+  font-size: 9.75pt !important;
+}
+
+.settings-panel .account-profile-editor input:focus-visible {
+  border-color: color-mix(in srgb, var(--text-primary) 45%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+
+.settings-panel .account-profile-save {
+  margin-top: 2px;
+}
+
+.settings-panel .settings-destructive-secondary {
+  margin-top: 2px;
+  border-color: color-mix(in srgb, var(--settings-danger) 44%, transparent);
+  background: transparent;
+  color: var(--settings-danger);
+}
+
+.settings-panel .account-sync-status {
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 7px var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--settings-inset-surface);
+}
+
+.settings-panel .account-sync-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
+  font-size: 9pt !important;
+}
+
+.settings-panel .account-sync-title {
+  font-size: 9.75pt !important;
+}
+
+.settings-panel .reader-preview-card {
+  gap: var(--space-2);
+}
+
+.settings-panel .reader-preview-sample {
+  display: grid;
+  gap: var(--space-1);
+  max-height: 126px;
+  padding: var(--space-2);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--settings-inset-surface);
+}
+
+.settings-panel .preview-code-title {
+  font-size: 8pt !important;
+}
+
+.settings-panel .reader-preview-sample h3 {
+  font-size: calc(var(--reader-font-size) * 0.96) !important;
+}
+
+.settings-panel .preview-copy {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: calc(var(--reader-font-size) * 0.92) !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.settings-panel .preview-setting-row {
+  min-height: 34px;
+  padding-top: 0;
+  font-size: 9.5pt !important;
+}
+
+.settings-panel .settings-data-card {
+  gap: var(--space-3);
+}
+
+.settings-panel .settings-data-subsection,
+.settings-panel .settings-danger-zone {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.settings-panel .settings-projects-heading h4,
+.settings-panel .settings-danger-heading h4 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 9.75pt !important;
+  font-weight: 650;
+}
+
+.settings-panel .settings-projects-heading .settings-link-button {
+  justify-self: auto;
+  min-height: 28px;
+}
+
+.settings-panel .settings-project-row {
+  min-height: 44px;
+}
+
+.settings-panel .settings-project-copy strong {
+  font-size: 9.75pt !important;
+}
+
+.settings-panel .settings-project-copy span,
+.settings-panel .settings-projects-empty {
+  font-size: 8.75pt !important;
+}
+
+.settings-panel .settings-danger-zone {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.settings-panel .settings-danger-heading {
+  display: grid;
+  gap: 2px;
+}
+
+.settings-panel .settings-danger-heading h4 {
+  color: var(--settings-danger);
+}
+
+.settings-panel .settings-danger-heading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 8.75pt !important;
+  line-height: 1.3;
+}
+
+.settings-panel .settings-project-delete {
+  border-color: color-mix(in srgb, var(--settings-danger) 45%, transparent);
+  background: transparent;
+  color: var(--settings-danger);
+}
+
+.settings-panel .settings-project-delete:disabled {
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+
+.settings-panel .settings-danger-list {
+  border-top: 1px solid var(--border);
+}
+
+.settings-panel .settings-danger-button {
+  grid-template-columns: 20px minmax(0, 1fr);
+  min-height: 42px;
+  color: var(--settings-danger);
+  font-size: 9.25pt !important;
+  font-weight: 550;
+}
+
+.settings-panel .settings-danger-button > span {
+  color: inherit;
+  font-size: 10pt !important;
+}
+
+.settings-panel .settings-disclaimer,
+.settings-panel .settings-status-message {
+  align-self: stretch;
+  margin: 0;
+  padding: 2px var(--space-1);
+  font-size: 8.75pt !important;
+  line-height: 1.35;
+}
+
+@container (max-width: 340px) {
+  .settings-panel .settings-card,
+  .settings-panel .settings-list,
+  .settings-panel .reader-preview-card,
+  .settings-panel .account-connector {
+    padding: var(--space-2);
+  }
+
+  .settings-panel .settings-library-card .settings-row {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 0;
+    padding: var(--space-1) 0;
+  }
+
+  .settings-panel .settings-library-card .settings-row select {
+    width: 100%;
+    padding-left: 0;
+    text-align: left;
+  }
+
+  .settings-panel .settings-primary-button,
+  .settings-panel .settings-secondary-button,
+  .settings-panel .settings-danger-button {
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 760px) {
   :root {
     --header-height: 58px;
