@@ -3957,7 +3957,7 @@ mark {
   min-height: 57px;
   gap: 3px var(--space-1);
   padding: var(--space-2);
-  border: 1px solid color-mix(in srgb, var(--project-color) 52%, var(--border));
+  border: 0;
   border-radius: var(--radius-control);
   background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   color: var(--text-primary);
