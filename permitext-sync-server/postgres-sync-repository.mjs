@@ -39,6 +39,13 @@ function blockID(value) {
   return String(value || "").trim();
 }
 
+function mutationWithServerEventID(mutation, value) {
+  const { kind, record } = mutationEntry(mutation);
+  const serverEventID = Number(value || 0);
+  if (!kind || !record || !Number.isSafeInteger(serverEventID) || serverEventID <= 0) return mutation;
+  return { [kind]: { ...record, serverEventID } };
+}
+
 export function createPostgresSyncRepository(sql) {
   function compatibilityQuery(userID, mutation) {
     const recordID = mutationRecordID(mutation);
@@ -320,7 +327,13 @@ export function createPostgresSyncRepository(sql) {
     let filteredQuery;
     if (Number.isSafeInteger(sinceEventID) && sinceEventID >= 0) {
       filteredQuery = sql`
-        SELECT records.mutation
+        SELECT records.mutation,
+          (
+            SELECT MAX(events.event_id)::bigint
+            FROM permitext_sync_events AS events
+            WHERE events.user_id = ${userID}
+              AND events.record_id = records.record_id
+          ) AS server_event_id
         FROM permitext_user_content_records AS records
         WHERE records.user_id = ${userID}
           AND EXISTS (
@@ -333,23 +346,44 @@ export function createPostgresSyncRepository(sql) {
       `;
     } else if (Number.isFinite(since)) {
       filteredQuery = sql`
-        SELECT mutation FROM permitext_user_content_records
-        WHERE user_id = ${userID}
-          AND updated_at > ${new Date(since).toISOString()}::timestamptz
-        ORDER BY record_id
+        SELECT records.mutation,
+          (
+            SELECT MAX(events.event_id)::bigint
+            FROM permitext_sync_events AS events
+            WHERE events.user_id = ${userID}
+              AND events.record_id = records.record_id
+          ) AS server_event_id
+        FROM permitext_user_content_records AS records
+        WHERE records.user_id = ${userID}
+          AND records.updated_at > ${new Date(since).toISOString()}::timestamptz
+        ORDER BY records.record_id
       `;
     } else {
       filteredQuery = sql`
-        SELECT mutation FROM permitext_user_content_records
-        WHERE user_id = ${userID} ORDER BY record_id
+        SELECT records.mutation,
+          (
+            SELECT MAX(events.event_id)::bigint
+            FROM permitext_sync_events AS events
+            WHERE events.user_id = ${userID}
+              AND events.record_id = records.record_id
+          ) AS server_event_id
+        FROM permitext_user_content_records AS records
+        WHERE records.user_id = ${userID} ORDER BY records.record_id
       `;
     }
 
     const [filteredRows, allRows, latestRows, entitlementRows] = await sql.transaction([
       filteredQuery,
       sql`
-        SELECT mutation FROM permitext_user_content_records
-        WHERE user_id = ${userID} ORDER BY record_id
+        SELECT records.mutation,
+          (
+            SELECT MAX(events.event_id)::bigint
+            FROM permitext_sync_events AS events
+            WHERE events.user_id = ${userID}
+              AND events.record_id = records.record_id
+          ) AS server_event_id
+        FROM permitext_user_content_records AS records
+        WHERE records.user_id = ${userID} ORDER BY records.record_id
       `,
       sql`
         SELECT COALESCE(MAX(event_id), 0)::bigint AS latest_event_id
@@ -361,8 +395,8 @@ export function createPostgresSyncRepository(sql) {
     ], { isolationMode: "RepeatableRead", readOnly: true });
 
     return {
-      mutations: filteredRows.map((row) => safeJSON(row.mutation, {})),
-      allMutations: allRows.map((row) => safeJSON(row.mutation, {})),
+      mutations: filteredRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
+      allMutations: allRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
       latestEventID: Number(latestRows[0]?.latest_event_id || 0),
       entitlement: entitlementRows[0]?.entitlement
         ? safeJSON(entitlementRows[0].entitlement, null)

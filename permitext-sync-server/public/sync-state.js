@@ -21,9 +21,25 @@ export function bulkClearTimestamp(clearRecords, codeVersion, scope) {
   }, 0);
 }
 
+export function bulkClearEventID(clearRecords, codeVersion, scope) {
+  const key = [syncCodeVersion(codeVersion), scope].join(":");
+  const matchingRecords = clearRecords instanceof Map
+    ? [clearRecords.get(key)]
+    : (clearRecords || []).filter((candidate) => bulkClearKey(candidate) === key);
+  return matchingRecords.reduce((latest, record) => {
+    const eventID = Number(record?.serverEventID || 0);
+    return Number.isSafeInteger(eventID) ? Math.max(latest, eventID) : latest;
+  }, 0);
+}
+
 export function recordSurvivesBulkClear(record, clearRecords, scopes) {
   const updatedAt = Date.parse(record?.updatedAt || "");
+  const recordEventID = Number(record?.serverEventID || 0);
   return !scopes.some((scope) => {
+    const clearedAtEventID = bulkClearEventID(clearRecords, record?.codeVersion, scope);
+    if (Number.isSafeInteger(recordEventID) && recordEventID > 0 && clearedAtEventID > 0) {
+      return clearedAtEventID >= recordEventID;
+    }
     const clearedAt = bulkClearTimestamp(clearRecords, record?.codeVersion, scope);
     if (clearedAt <= 0) return false;
     // Old browser overlays did not always carry updatedAt. Once a durable

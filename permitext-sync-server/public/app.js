@@ -15,7 +15,7 @@ import {
   bulkClearTimestamp,
   mergeNewestRecord,
   recordSurvivesBulkClear
-} from "./sync-state.js?v=20260721-clear-reconcile-v2";
+} from "./sync-state.js?v=20260721-server-order-v3";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
@@ -2365,8 +2365,7 @@ function mutationUpdatedAt(mutation) {
 }
 
 function currentBulkClearRecords() {
-  const latestByKey = new Map();
-  [
+  return [
     ...(syncedContent?.summary?.codeVersionClears || []),
     ...(state.localBulkClears || []),
     ...(state.syncConflicts || [])
@@ -2377,14 +2376,7 @@ function currentBulkClearRecords() {
       .map((entry) => mutationKindAndRecord(entry.mutation))
       .filter(({ kind }) => kind === "codeVersionClear")
       .map(({ record }) => record)
-  ].forEach((record) => {
-    const key = bulkClearKey(record);
-    const existing = key ? latestByKey.get(key) : null;
-    if (key && (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0))) {
-      latestByKey.set(key, record);
-    }
-  });
-  return Array.from(latestByKey.values());
+  ].filter((record) => Boolean(bulkClearKey(record)));
 }
 
 function absorbBulkClearConflicts() {

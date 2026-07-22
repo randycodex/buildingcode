@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  bulkClearEventID,
   annotationAfterBulkClears,
   bulkClearTimestamp,
   mergeNewestRecord,
@@ -25,6 +26,29 @@ assert.equal(
   bulkClearTimestamp(clearRecords, canonicalVersion, "bookmarks"),
   Date.parse("2026-07-21T12:00:00.000Z"),
   "Bulk clears must match equivalent code-version aliases."
+);
+assert.equal(
+  bulkClearEventID([{ ...clearRecords[0], serverEventID: 42 }], canonicalVersion, "bookmarks"),
+  42,
+  "Bulk clears did not preserve server event order."
+);
+assert.equal(
+  recordSurvivesBulkClear({
+    codeVersion: canonicalVersion,
+    updatedAt: "2026-07-21T13:00:00.000Z",
+    serverEventID: 41
+  }, [{ ...clearRecords[0], updatedAt: "2026-07-21T12:00:00.000Z", serverEventID: 42 }], ["bookmarks"]),
+  false,
+  "A clock-skewed record survived a later server-ordered clear."
+);
+assert.equal(
+  recordSurvivesBulkClear({
+    codeVersion: canonicalVersion,
+    updatedAt: "2026-07-21T11:00:00.000Z",
+    serverEventID: 43
+  }, [{ ...clearRecords[0], updatedAt: "2026-07-21T12:00:00.000Z", serverEventID: 42 }], ["bookmarks"]),
+  true,
+  "A genuinely newer server-ordered record was hidden by an older clear."
 );
 assert.equal(
   recordSurvivesBulkClear({ codeVersion: canonicalVersion, updatedAt: "2026-07-21T11:59:59.000Z" }, clearRecords, ["bookmarks"]),
