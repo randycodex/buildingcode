@@ -89,6 +89,7 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let state = loadWorkspaceState();
+if (absorbSupersededBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
 if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
 const searchTimers = new Map();
@@ -2368,6 +2369,10 @@ function currentBulkClearRecords() {
   [
     ...(syncedContent?.summary?.codeVersionClears || []),
     ...(state.localBulkClears || []),
+    ...(state.syncConflicts || [])
+      .map((entry) => mutationKindAndRecord(entry.mutation))
+      .filter(({ kind }) => kind === "codeVersionClear")
+      .map(({ record }) => record),
     ...(state.syncOutbox || [])
       .map((entry) => mutationKindAndRecord(entry.mutation))
       .filter(({ kind }) => kind === "codeVersionClear")
@@ -2380,6 +2385,28 @@ function currentBulkClearRecords() {
     }
   });
   return Array.from(latestByKey.values());
+}
+
+function absorbSupersededBulkClearConflicts() {
+  let changed = false;
+  const latestLocalClears = new Map((state.localBulkClears || [])
+    .map((record) => [bulkClearKey(record), record])
+    .filter(([key]) => Boolean(key)));
+  state.syncConflicts = (state.syncConflicts || []).filter((entry) => {
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    if (kind !== "codeVersionClear" || entry.lastError !== "Server has a newer version of this record.") {
+      return true;
+    }
+    const key = bulkClearKey(record);
+    const existing = key ? latestLocalClears.get(key) : null;
+    if (key && (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0))) {
+      latestLocalClears.set(key, record);
+    }
+    changed = true;
+    return false;
+  });
+  if (changed) state.localBulkClears = Array.from(latestLocalClears.values());
+  return changed;
 }
 
 function summarizeMutations(mutations = []) {
@@ -3202,6 +3229,7 @@ async function flushSyncOutbox(options = {}) {
             lastError: "A legacy queued change could not be reconciled and was paused."
           }))
         ];
+        absorbSupersededBulkClearConflicts();
         saveWorkspaceState();
         storeAccountEntitlement(payload.entitlement || null);
       } catch (error) {
