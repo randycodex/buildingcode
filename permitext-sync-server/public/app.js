@@ -8702,7 +8702,6 @@ function renderSettings() {
   const checkoutButton = panel.querySelector(".account-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const syncTitle = panel.querySelector(".account-sync-title");
-  const syncDetail = panel.querySelector(".connector-status");
   const syncIcon = panel.querySelector(".account-sync-icon");
   const syncButton = panel.querySelector(".account-sync-now");
   const syncConflicts = panel.querySelector(".account-sync-conflicts");
@@ -8807,13 +8806,6 @@ function renderSettings() {
     syncButton.disabled = !account;
     syncIcon.textContent = !account ? "!" : conflicts.length || pending.length ? "↻" : "✓";
     syncTitle.textContent = !account ? "Not signed in" : conflicts.length ? "Review needed" : pending.length ? "Changes waiting" : "Up to date";
-    syncDetail.textContent = !account
-      ? "Sign in to sync saved work across iOS and web."
-      : conflicts.length
-        ? `${conflicts.length} change${conflicts.length === 1 ? "" : "s"} need review.`
-        : pending.length
-          ? `${pending.length} change${pending.length === 1 ? "" : "s"} waiting to sync.`
-          : "All browser changes are synced.";
     clear(syncConflicts);
     conflicts.slice(0, 5).forEach((entry) => {
       const { kind, record } = mutationKindAndRecord(entry.mutation);

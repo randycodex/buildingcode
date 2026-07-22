@@ -4901,13 +4901,8 @@ mark {
 .account-sync-status {
   display: grid;
   grid-template-columns: 28px minmax(0, 1fr);
-  align-items: start;
+  align-items: center;
   gap: var(--space-2);
-}
-
-.account-sync-status > div {
-  display: grid;
-  gap: 3px;
 }
 
 .account-sync-icon {
@@ -4920,7 +4915,7 @@ mark {
 }
 
 .account-sync-title {
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .account-sync-conflicts {

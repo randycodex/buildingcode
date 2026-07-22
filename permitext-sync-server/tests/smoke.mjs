@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v66"),
+      webRoot.text.includes("columns-refinement-v67"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -183,8 +183,9 @@ async function main() {
       !settingsTemplateSource.includes("Public username") &&
         !settingsTemplateSource.includes("account-profile-editor") &&
         !settingsTemplateSource.includes("account-profile-save") &&
-        !settingsTemplateSource.includes("account-summary"),
-      "Web Settings exposed reserved profile controls or a redundant signed-in summary."
+        !settingsTemplateSource.includes("account-summary") &&
+        !settingsTemplateSource.includes("All browser changes are synced."),
+      "Web Settings exposed reserved profile controls or redundant account and sync copy."
     );
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
@@ -522,7 +523,7 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v79'),
+        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v80'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
