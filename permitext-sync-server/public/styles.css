@@ -4721,6 +4721,7 @@ mark {
   min-height: 30px;
   font-size: calc(var(--chrome-font-size) * 0.9);
   text-align: right;
+  text-align-last: right;
 }
 
 .settings-list span {
@@ -5599,7 +5600,8 @@ mark {
     width: 100%;
     min-height: 26px;
     padding-left: 0;
-    text-align: left;
+    text-align: right;
+    text-align-last: right;
   }
 
   .settings-panel .settings-primary-button,

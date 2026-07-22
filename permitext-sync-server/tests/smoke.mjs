@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v72"),
+      webRoot.text.includes("columns-refinement-v73"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -731,6 +731,11 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.settings-panel \.account-plan-secondary \{[\s\S]*?justify-self: center;/),
       "Restore Purchases is no longer centered beneath the primary plan action."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-library-card \.settings-row select \{[^}]*text-align: right;[^}]*text-align-last: right;/) &&
+        !workspaceStyles.text.match(/@container \(max-width: 340px\)[\s\S]*?\.settings-panel \.settings-library-card \.settings-row select \{[^}]*text-align: left;/),
+      "Code Preferences dropdown values are no longer right-aligned at every panel width."
     );
     assert(
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
