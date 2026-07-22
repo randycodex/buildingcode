@@ -3477,6 +3477,12 @@ function projectColor(project) {
   return project?.colorHex || project?.color || project?.tintColor || projectColorOptions[0];
 }
 
+function readableProjectName(project) {
+  const name = String(project?.name || project?.title || "Project").trim() || "Project";
+  if (name !== name.toLocaleUpperCase() || name === name.toLocaleLowerCase()) return name;
+  return name.toLocaleLowerCase().replace(/(^|[\s-])\p{L}/gu, (match) => match.toLocaleUpperCase());
+}
+
 function projectForegroundColor(color) {
   const match = String(color || "").trim().match(/^#([0-9a-f]{6})$/i);
   if (!match) return "#ffffff";
@@ -8733,19 +8739,16 @@ function renderSettings() {
     const id = projectRecordID(project);
     const row = document.createElement("label");
     row.className = "settings-project-row";
+    row.style.setProperty("--project-color", projectColor(project));
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.setAttribute("aria-label", `Select ${project.name || project.title || "project"}`);
-    const swatch = document.createElement("span");
-    swatch.className = "settings-project-swatch";
-    swatch.style.setProperty("--project-color", projectColor(project));
-    swatch.setAttribute("aria-hidden", "true");
     const copy = document.createElement("span");
     copy.className = "settings-project-copy";
     const name = document.createElement("strong");
-    name.textContent = project.name || project.title || "Project";
+    name.textContent = readableProjectName(project);
     copy.append(name);
-    row.append(checkbox, swatch, copy);
+    row.append(checkbox, copy);
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) selectedProjectIDs.add(id);
       else selectedProjectIDs.delete(id);

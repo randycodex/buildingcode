@@ -4931,7 +4931,7 @@ mark {
 
 .settings-project-row {
   display: grid;
-  grid-template-columns: 18px 12px minmax(0, 1fr);
+  grid-template-columns: 18px minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
@@ -4978,13 +4978,6 @@ mark {
   outline-offset: 2px;
 }
 
-.settings-project-swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--project-color);
-}
-
 .settings-project-copy {
   display: grid;
   gap: 2px;
@@ -5000,7 +4993,9 @@ mark {
 
 .settings-project-copy strong {
   font-size: 10.5pt !important;
-  font-weight: 600;
+  color: var(--project-color);
+  font-weight: 400;
+  text-transform: none;
 }
 
 .settings-project-copy span,

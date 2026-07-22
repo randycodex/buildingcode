@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v73"),
+      webRoot.text.includes("columns-refinement-v75"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -528,7 +528,9 @@ async function main() {
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
-        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v82'),
+        !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
+        workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
+        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v83'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -736,6 +738,11 @@ async function main() {
       workspaceStyles.text.match(/\.settings-library-card \.settings-row select \{[^}]*text-align: right;[^}]*text-align-last: right;/) &&
         !workspaceStyles.text.match(/@container \(max-width: 340px\)[\s\S]*?\.settings-panel \.settings-library-card \.settings-row select \{[^}]*text-align: left;/),
       "Code Preferences dropdown values are no longer right-aligned at every panel width."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-project-copy strong \{[^}]*color: var\(--project-color\);[^}]*font-weight: 400;[^}]*text-transform: none;/) &&
+        !workspaceStyles.text.includes(".settings-project-swatch"),
+      "Project selection rows no longer use regular-weight project-colored names without a separate color dot."
     );
     assert(
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
