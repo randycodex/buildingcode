@@ -496,7 +496,7 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260721-project-settings-v75'),
+        webRoot.text.includes('/web/app.js?v=20260722-workboard-zoom-v77'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -834,6 +834,11 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
+      workspaceScript.text.includes('const workboardClientVersion = "20260722-workboard-zoom-v16";') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57'),
+      "Web workspace omitted the current Workboard zoom assets."
+    );
+    assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),
       "Workboard script asset returned the wrong content type."
     );
@@ -849,9 +854,17 @@ async function main() {
     );
     assert(
       workboardSource.includes("const preventWheelPanning = (event) =>") &&
+        workboardSource.includes("if (event.ctrlKey || event.metaKey) return;") &&
         workboardSource.includes("event.stopImmediatePropagation();") &&
         workboardSource.includes('host.addEventListener("wheel", preventWheelPanning, { capture: true, passive: false })'),
-      "Workboard wheel panning is no longer blocked at capture phase."
+      "Workboard wheel panning guard no longer preserves trackpad and modified-wheel zoom gestures."
+    );
+    assert(
+      workboardSource.includes("const setWorkboardZoom = useCallback") &&
+        workboardSource.includes('aria-label="Zoom out"') &&
+        workboardSource.includes('aria-label="Reset zoom"') &&
+        workboardSource.includes('aria-label="Zoom in"'),
+      "Workboard omitted its compact zoom controls."
     );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
