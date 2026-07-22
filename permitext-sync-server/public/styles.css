@@ -5237,7 +5237,7 @@ mark {
   min-width: 0;
   gap: var(--space-2);
   padding: var(--space-3);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 10px;
   background: var(--settings-card-surface);
   box-shadow: none;
@@ -5271,7 +5271,12 @@ mark {
   gap: var(--space-2);
   min-height: 42px;
   padding: 5px 0;
-  border-color: var(--border);
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-panel .settings-library-card .settings-row:last-child {
+  border-bottom: 0;
 }
 
 .settings-panel .settings-library-card .settings-row > span,
@@ -5313,7 +5318,7 @@ mark {
   grid-template-columns: 18px minmax(0, 1fr);
   gap: var(--space-2);
   padding: 8px;
-  border: 1px solid transparent;
+  border: 0;
   border-radius: 8px;
 }
 
@@ -5373,12 +5378,12 @@ mark {
 }
 
 .settings-panel .settings-primary-button {
-  border: 1px solid var(--text-primary);
+  border: 0;
 }
 
 .settings-panel .settings-secondary-button,
 .settings-panel .settings-mini-button {
-  border: 1px solid var(--border);
+  border: 0;
   background: var(--settings-inset-surface);
 }
 
@@ -5447,7 +5452,7 @@ mark {
 .settings-panel .account-profile-editor input {
   min-height: 40px;
   padding: 0 var(--space-2);
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 8px;
   background: var(--settings-inset-surface);
   font-size: 9.75pt !important;
@@ -5464,9 +5469,9 @@ mark {
 
 .settings-panel .settings-destructive-secondary {
   margin-top: 2px;
-  border-color: color-mix(in srgb, var(--settings-danger) 44%, transparent);
-  background: transparent;
-  color: var(--settings-danger);
+  border: 0;
+  background: var(--text-primary);
+  color: var(--surface);
 }
 
 .settings-panel .account-sync-status {
@@ -5502,7 +5507,7 @@ mark {
   max-height: 126px;
   padding: var(--space-2);
   overflow: hidden;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: 8px;
   background: var(--settings-inset-surface);
 }
@@ -5555,6 +5560,12 @@ mark {
 
 .settings-panel .settings-project-row {
   min-height: 44px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-panel .settings-project-row:last-child {
+  border-bottom: 0;
 }
 
 .settings-panel .settings-project-copy strong {
@@ -5588,13 +5599,12 @@ mark {
 }
 
 .settings-panel .settings-project-delete {
-  border-color: color-mix(in srgb, var(--settings-danger) 45%, transparent);
+  border: 0;
   background: transparent;
   color: var(--settings-danger);
 }
 
 .settings-panel .settings-project-delete:disabled {
-  border-color: var(--border);
   color: var(--text-secondary);
 }
 
@@ -5605,9 +5615,15 @@ mark {
 .settings-panel .settings-danger-button {
   grid-template-columns: 20px minmax(0, 1fr);
   min-height: 42px;
+  border: 0;
+  border-bottom: 1px solid var(--border);
   color: var(--settings-danger);
   font-size: 9.25pt !important;
   font-weight: 550;
+}
+
+.settings-panel .settings-danger-button:last-child {
+  border-bottom: 0;
 }
 
 .settings-panel .settings-danger-button > span {
