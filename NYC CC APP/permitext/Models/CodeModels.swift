@@ -497,6 +497,7 @@ struct ServerSavedItemRecord: Codable, Hashable, Sendable {
     let sectionID: Int64
     let updatedAt: Date
     let deletedAt: Date?
+    var serverEventID: Int64? = nil
 }
 
 struct ServerAnnotationRecord: Codable, Hashable, Sendable {
@@ -509,6 +510,7 @@ struct ServerAnnotationRecord: Codable, Hashable, Sendable {
     let tags: [String]?
     let updatedAt: Date
     let deletedAt: Date?
+    var serverEventID: Int64? = nil
 
     var normalizedBlockID: String {
         blockID?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -528,6 +530,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let sortOrder: Int?
     let updatedAt: Date
     let deletedAt: Date?
+    var serverEventID: Int64? = nil
 }
 
 struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
@@ -540,6 +543,7 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let scope: String?
     let updatedAt: Date
     let deletedAt: Date?
+    var serverEventID: Int64? = nil
 }
 
 struct ServerWorkboardRecord: Codable, Hashable, Sendable {
@@ -550,6 +554,7 @@ struct ServerWorkboardRecord: Codable, Hashable, Sendable {
     let projectName: String?
     let updatedAt: Date
     let deletedAt: Date?
+    var serverEventID: Int64? = nil
 }
 
 struct ServerContinuityRecord: Codable, Hashable, Sendable {
@@ -557,6 +562,7 @@ struct ServerContinuityRecord: Codable, Hashable, Sendable {
     let codeVersion: String
     let values: [String: String]
     let updatedAt: Date
+    var serverEventID: Int64? = nil
 }
 
 enum ServerUserContentEntityKind: String, Codable, Hashable, Sendable {
@@ -891,6 +897,23 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
             return record.deletedAt
         case .continuity, .codeVersionClear:
             return nil
+        }
+    }
+
+    var serverEventID: Int64? {
+        switch self {
+        case .savedItem(let record):
+            return record.serverEventID
+        case .annotation(let record):
+            return record.serverEventID
+        case .project(let record):
+            return record.serverEventID
+        case .projectSection(let record):
+            return record.serverEventID
+        case .workboard(let record):
+            return record.serverEventID
+        case .continuity(let record), .codeVersionClear(let record):
+            return record.serverEventID
         }
     }
 }

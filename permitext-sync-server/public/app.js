@@ -15,7 +15,7 @@ import {
   bulkClearTimestamp,
   mergeNewestRecord,
   recordSurvivesBulkClear
-} from "./sync-state.js?v=20260721-server-order-v3";
+} from "./sync-state.js?v=20260721-causal-clear-v4";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";

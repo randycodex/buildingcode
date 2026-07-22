@@ -37,14 +37,16 @@ export function recordSurvivesBulkClear(record, clearRecords, scopes) {
   const recordEventID = Number(record?.serverEventID || 0);
   return !scopes.some((scope) => {
     const clearedAtEventID = bulkClearEventID(clearRecords, record?.codeVersion, scope);
-    if (Number.isSafeInteger(recordEventID) && recordEventID > 0 && clearedAtEventID > 0) {
-      return clearedAtEventID >= recordEventID;
-    }
     const clearedAt = bulkClearTimestamp(clearRecords, record?.codeVersion, scope);
-    if (clearedAt <= 0) return false;
+    const clearedByServerOrder = Number.isSafeInteger(recordEventID) && recordEventID > 0 &&
+      clearedAtEventID > 0 && clearedAtEventID >= recordEventID;
+    const clearedByEditOrder = clearedAt > 0 &&
+      (!Number.isFinite(updatedAt) || clearedAt >= updatedAt);
     // Old browser overlays did not always carry updatedAt. Once a durable
     // clear exists, an undated copy is necessarily older than that clear.
-    return !Number.isFinite(updatedAt) || clearedAt >= updatedAt;
+    // Either causal axis can prove that a queued record predates a clear;
+    // this prevents an offline replay from resurrecting deleted content.
+    return clearedByServerOrder || clearedByEditOrder;
   });
 }
 

@@ -2305,7 +2305,8 @@ final class UserDataStore: UserContentRepository {
                 codeVersion: localCodeVersion(record.codeVersion),
                 sectionID: record.sectionID,
                 updatedAt: record.updatedAt,
-                deletedAt: record.deletedAt
+                deletedAt: record.deletedAt,
+                serverEventID: record.serverEventID
             ))
         case .annotation(let record):
             return .annotation(ServerAnnotationRecord(
@@ -2317,7 +2318,8 @@ final class UserDataStore: UserContentRepository {
                 noteBody: record.noteBody,
                 tags: record.tags,
                 updatedAt: record.updatedAt,
-                deletedAt: record.deletedAt
+                deletedAt: record.deletedAt,
+                serverEventID: record.serverEventID
             ))
         case .project(let record):
             return .project(ServerProjectRecord(
@@ -2332,7 +2334,8 @@ final class UserDataStore: UserContentRepository {
                 colorHex: record.colorHex,
                 sortOrder: record.sortOrder,
                 updatedAt: record.updatedAt,
-                deletedAt: record.deletedAt
+                deletedAt: record.deletedAt,
+                serverEventID: record.serverEventID
             ))
         case .projectSection(let record):
             return .projectSection(ServerProjectSectionRecord(
@@ -2344,7 +2347,8 @@ final class UserDataStore: UserContentRepository {
                 sectionID: record.sectionID,
                 scope: record.scope,
                 updatedAt: record.updatedAt,
-                deletedAt: record.deletedAt
+                deletedAt: record.deletedAt,
+                serverEventID: record.serverEventID
             ))
         case .workboard:
             return mutation
@@ -2355,7 +2359,8 @@ final class UserDataStore: UserContentRepository {
                 userID: record.userID,
                 codeVersion: localCodeVersion(record.codeVersion),
                 values: record.values,
-                updatedAt: record.updatedAt
+                updatedAt: record.updatedAt,
+                serverEventID: record.serverEventID
             ))
         }
     }

@@ -651,7 +651,17 @@ private extension ServerUserContentMutation {
             let scope = clear.values["scope"] ?? ""
             guard scopes.contains(scope) else { return nil }
             guard UserContentSyncCodeVersion.server(clear.codeVersion) == canonicalCodeVersion else { return nil }
-            return clear.updatedAt >= updatedAt ? scope : nil
+            let clearedByEditOrder = clear.updatedAt >= updatedAt
+            let clearedByServerOrder: Bool
+            if let clearEventID = clear.serverEventID,
+               let recordEventID = serverEventID,
+               clearEventID > 0,
+               recordEventID > 0 {
+                clearedByServerOrder = clearEventID >= recordEventID
+            } else {
+                clearedByServerOrder = false
+            }
+            return clearedByEditOrder || clearedByServerOrder ? scope : nil
         })
         guard !supersededScopes.isEmpty else { return self }
 
@@ -668,7 +678,8 @@ private extension ServerUserContentMutation {
             noteBody: noteBody,
             tags: tags,
             updatedAt: record.updatedAt,
-            deletedAt: record.deletedAt
+            deletedAt: record.deletedAt,
+            serverEventID: record.serverEventID
         ))
     }
 

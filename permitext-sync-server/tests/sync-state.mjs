@@ -47,8 +47,17 @@ assert.equal(
     updatedAt: "2026-07-21T11:00:00.000Z",
     serverEventID: 43
   }, [{ ...clearRecords[0], updatedAt: "2026-07-21T12:00:00.000Z", serverEventID: 42 }], ["bookmarks"]),
+  false,
+  "An older edit replayed after a clear was allowed to resurrect."
+);
+assert.equal(
+  recordSurvivesBulkClear({
+    codeVersion: canonicalVersion,
+    updatedAt: "2026-07-21T13:00:00.000Z",
+    serverEventID: 43
+  }, [{ ...clearRecords[0], updatedAt: "2026-07-21T12:00:00.000Z", serverEventID: 42 }], ["bookmarks"]),
   true,
-  "A genuinely newer server-ordered record was hidden by an older clear."
+  "A genuinely newer record was hidden by an older clear."
 );
 assert.equal(
   recordSurvivesBulkClear({ codeVersion: canonicalVersion, updatedAt: "2026-07-21T11:59:59.000Z" }, clearRecords, ["bookmarks"]),
