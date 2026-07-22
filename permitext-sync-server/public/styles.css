@@ -5467,11 +5467,15 @@ mark {
   margin-top: 2px;
 }
 
-.settings-panel .settings-destructive-secondary {
-  margin-top: 2px;
+.settings-panel .settings-destructive-secondary,
+.settings-panel .account-sync-now {
   border: 0;
   background: var(--text-primary);
   color: var(--surface);
+}
+
+.settings-panel .settings-destructive-secondary {
+  margin-top: 2px;
 }
 
 .settings-panel .account-sync-status {

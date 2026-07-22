@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v61"),
+      webRoot.text.includes("columns-refinement-v62"),
       "Web workspace omitted the current Settings refinement assets."
     );
     const topbarSource = webRoot.text.slice(
