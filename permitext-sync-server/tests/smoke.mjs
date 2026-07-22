@@ -332,6 +332,9 @@ async function main() {
         syncStateScript.text.includes("function recordSurvivesBulkClear(record, clearRecords, scopes)") &&
         syncStateScript.text.includes("!Number.isFinite(updatedAt) || clearedAt >= updatedAt") &&
         workspaceScript.text.includes('recordSurvivesBulkClear(record, codeVersionClears, ["bookmarks"])') &&
+        workspaceScript.text.includes('"localBulkClears"') &&
+        workspaceScript.text.includes("...(state.localBulkClears || [])") &&
+        workspaceScript.text.includes("annotationAfterBulkClears(item, clearRecords)") &&
         workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "notes")') &&
         workspaceScript.text.includes('bulkClearTimestamp(clearRecords, record.codeVersion, "tags")') &&
         workspaceScript.text.includes("syncProjectIdentity(detail.clientID, detail.userID)") &&
@@ -430,7 +433,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        webRoot.text.includes('/web/app.js?v=20260721-clear-reconcile-v65'),
+        webRoot.text.includes('/web/app.js?v=20260721-live-clear-reconcile-v66'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

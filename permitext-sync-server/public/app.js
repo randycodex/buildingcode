@@ -74,6 +74,7 @@ const sharedWorkspaceStateKeys = [
   "localSavedItems",
   "localProjectSections",
   "localAnnotations",
+  "localBulkClears",
   "syncOutbox",
   "syncConflicts",
   "archivedProjectIDs",
@@ -163,6 +164,7 @@ function loadWorkspaceState() {
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
       localProjectSections: Array.isArray(saved.localProjectSections) ? saved.localProjectSections.filter((item) => item && typeof item === "object") : [],
       localAnnotations: Array.isArray(saved.localAnnotations) ? saved.localAnnotations.filter((item) => item && typeof item === "object") : [],
+      localBulkClears: Array.isArray(saved.localBulkClears) ? saved.localBulkClears.filter((item) => item && typeof item === "object") : [],
       syncOutbox: Array.isArray(saved.syncOutbox) ? saved.syncOutbox.filter((item) => item?.mutation && item?.accountUserID) : [],
       syncConflicts: Array.isArray(saved.syncConflicts) ? saved.syncConflicts.filter((item) => item?.mutation) : [],
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
@@ -209,6 +211,7 @@ function loadWorkspaceState() {
       localSavedItems: [],
       localProjectSections: [],
       localAnnotations: [],
+      localBulkClears: [],
       syncOutbox: [],
       syncConflicts: [],
       archivedProjectIDs: [],
@@ -2364,6 +2367,7 @@ function currentBulkClearRecords() {
   const latestByKey = new Map();
   [
     ...(syncedContent?.summary?.codeVersionClears || []),
+    ...(state.localBulkClears || []),
     ...(state.syncOutbox || [])
       .map((entry) => mutationKindAndRecord(entry.mutation))
       .filter(({ kind }) => kind === "codeVersionClear")
@@ -2465,7 +2469,10 @@ function currentContentSummary() {
     summaryAnnotations.map((item) => [String(item.id || ""), item])
   );
   (state.localAnnotations || []).forEach((item) => {
-    if (item?.id) mergeNewestRecord(annotationsByID, String(item.id), item);
+    const visibleAnnotation = annotationAfterBulkClears(item, clearRecords);
+    if (visibleAnnotation?.id) {
+      mergeNewestRecord(annotationsByID, String(visibleAnnotation.id), visibleAnnotation);
+    }
   });
   const projectSectionIdentity = (item) => [
     item.folderClientID || item.projectID || item.localFolderID || "project",
@@ -8562,6 +8569,12 @@ function enqueueSettingsBulkClear(scope) {
       updatedAt: new Date().toISOString()
     }
   };
+  const record = mutation.codeVersionClear;
+  const key = bulkClearKey(record);
+  state.localBulkClears = [
+    ...(state.localBulkClears || []).filter((item) => bulkClearKey(item) !== key),
+    record
+  ];
   enqueueSyncMutation(mutation, account);
   return mutation;
 }
