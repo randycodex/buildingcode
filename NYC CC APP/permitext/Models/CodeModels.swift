@@ -445,6 +445,12 @@ enum UserContentSyncCodeVersion {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         return candidate.isEmpty || isNYC2022Alias(candidate) ? localNYC2022 : candidate
     }
+
+    static func equivalentLocalVersions(_ value: String) -> [String] {
+        let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard candidate.isEmpty || isNYC2022Alias(candidate) else { return [candidate] }
+        return [localNYC2022, "2022 Construction Codes", "nyc-2022", canonicalNYC2022]
+    }
 }
 
 enum UserContentProjectIdentity {

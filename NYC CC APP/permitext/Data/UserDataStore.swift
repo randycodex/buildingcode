@@ -1500,27 +1500,12 @@ final class UserDataStore: UserContentRepository {
 
     func clearBookmarks(codeVersion: String) throws {
         try performTransaction {
-            let statement = try connection.prepare(
-                """
-                DELETE FROM bookmarks
-                WHERE code_version = ?;
-                """
-            )
-            defer { connection.finalize(statement) }
-            try connection.bind(text: codeVersion, index: 1, to: statement)
-            _ = try connection.step(statement)
-
-            // Folder membership references bookmarks. Wipe the junction so
-            // folders don't keep ghost section IDs after Clear Bookmarks.
-            let folderMembershipWipe = try connection.prepare(
-                """
-                DELETE FROM folder_sections
-                WHERE code_version = ?;
-                """
-            )
-            defer { connection.finalize(folderMembershipWipe) }
-            try connection.bind(text: codeVersion, index: 1, to: folderMembershipWipe)
-            _ = try connection.step(folderMembershipWipe)
+            for equivalentVersion in UserContentSyncCodeVersion.equivalentLocalVersions(codeVersion) {
+                try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: equivalentVersion)
+                // Folder membership references bookmarks. Wipe the junction so
+                // folders don't keep ghost section IDs after Clear Bookmarks.
+                try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: equivalentVersion)
+            }
         }
 
         enqueueSyncOperationIfPossible(
@@ -1534,15 +1519,9 @@ final class UserDataStore: UserContentRepository {
     }
 
     func clearNotes(codeVersion: String) throws {
-        let statement = try connection.prepare(
-            """
-            DELETE FROM notes
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(statement) }
-        try connection.bind(text: codeVersion, index: 1, to: statement)
-        _ = try connection.step(statement)
+        for equivalentVersion in UserContentSyncCodeVersion.equivalentLocalVersions(codeVersion) {
+            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ?;", codeVersion: equivalentVersion)
+        }
         enqueueSyncOperationIfPossible(
             entityType: .codeVersionUserData,
             operationType: .delete,
@@ -1555,15 +1534,9 @@ final class UserDataStore: UserContentRepository {
 
     /// Removes every tag for the given code version. Bookmarks and notes are kept.
     func clearAllTags(codeVersion: String) throws {
-        let statement = try connection.prepare(
-            """
-            DELETE FROM bookmark_tags
-            WHERE code_version = ?;
-            """
-        )
-        defer { connection.finalize(statement) }
-        try connection.bind(text: codeVersion, index: 1, to: statement)
-        _ = try connection.step(statement)
+        for equivalentVersion in UserContentSyncCodeVersion.equivalentLocalVersions(codeVersion) {
+            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: equivalentVersion)
+        }
         enqueueSyncOperationIfPossible(
             entityType: .codeVersionUserData,
             operationType: .delete,
@@ -2743,18 +2716,27 @@ final class UserDataStore: UserContentRepository {
     }
 
     private func applyServerCodeVersionClear(_ record: ServerContinuityRecord) throws {
+        let equivalentVersions = UserContentSyncCodeVersion.equivalentLocalVersions(record.codeVersion)
         switch record.values["scope"] {
         case "bookmarks":
-            try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: record.codeVersion)
-            try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: record.codeVersion)
+            for codeVersion in equivalentVersions {
+                try deleteRows(sql: "DELETE FROM bookmarks WHERE code_version = ?;", codeVersion: codeVersion)
+                try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: codeVersion)
+            }
         case "notes":
-            try deleteRows(sql: "DELETE FROM notes WHERE code_version = ?;", codeVersion: record.codeVersion)
+            for codeVersion in equivalentVersions {
+                try deleteRows(sql: "DELETE FROM notes WHERE code_version = ?;", codeVersion: codeVersion)
+            }
         case "tags":
-            try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: record.codeVersion)
+            for codeVersion in equivalentVersions {
+                try deleteRows(sql: "DELETE FROM bookmark_tags WHERE code_version = ?;", codeVersion: codeVersion)
+            }
         case "folders":
             try performTransaction {
-                try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: record.codeVersion)
-                try deleteRows(sql: "DELETE FROM folders WHERE code_version = ?;", codeVersion: record.codeVersion)
+                for codeVersion in equivalentVersions {
+                    try deleteRows(sql: "DELETE FROM folder_sections WHERE code_version = ?;", codeVersion: codeVersion)
+                    try deleteRows(sql: "DELETE FROM folders WHERE code_version = ?;", codeVersion: codeVersion)
+                }
             }
         default:
             break
