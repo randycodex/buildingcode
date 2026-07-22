@@ -8717,7 +8717,6 @@ function renderSettings() {
   };
 
   const settingsProjects = visibleProjectRecords(currentContentSummary().projects || []);
-  const settingsProjectSections = currentContentSummary().projectSections || [];
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
   const updateProjectSelection = () => {
@@ -8746,10 +8745,7 @@ function renderSettings() {
     copy.className = "settings-project-copy";
     const name = document.createElement("strong");
     name.textContent = project.name || project.title || "Project";
-    const savedCount = settingsProjectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
-    const count = document.createElement("span");
-    count.textContent = savedCount === 1 ? "1 saved item" : `${savedCount} saved items`;
-    copy.append(name, count);
+    copy.append(name);
     row.append(checkbox, swatch, copy);
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) selectedProjectIDs.add(id);

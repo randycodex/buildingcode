@@ -4941,7 +4941,7 @@ mark {
 
 .settings-project-row {
   display: grid;
-  grid-template-columns: 20px 12px minmax(0, 1fr);
+  grid-template-columns: 18px 12px minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
@@ -4954,10 +4954,38 @@ mark {
 }
 
 .settings-project-row input {
-  width: 17px;
-  height: 17px;
+  display: grid;
+  width: 18px;
+  height: 18px;
   margin: 0;
-  accent-color: var(--text-primary);
+  appearance: none;
+  place-items: center;
+  border: 1px solid var(--text-tertiary);
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.settings-project-row input::after {
+  color: var(--surface);
+  content: "✓";
+  font-size: 8pt;
+  font-weight: 700;
+  opacity: 0;
+}
+
+.settings-project-row input:checked {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+}
+
+.settings-project-row input:checked::after {
+  opacity: 1;
+}
+
+.settings-project-row input:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .settings-project-swatch {
