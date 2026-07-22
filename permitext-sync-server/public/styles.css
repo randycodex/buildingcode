@@ -5269,8 +5269,8 @@ mark {
 .settings-panel .settings-library-card .settings-row {
   grid-template-columns: 88px minmax(0, 1fr);
   gap: var(--space-2);
-  min-height: 42px;
-  padding: 5px 0;
+  min-height: 38px;
+  padding: 3px 0;
   border: 0;
   border-bottom: 1px solid var(--border);
 }
@@ -5285,7 +5285,7 @@ mark {
 }
 
 .settings-panel .settings-library-card .settings-row select {
-  min-height: 32px;
+  min-height: 30px;
 }
 
 .settings-panel .settings-billing-line {
@@ -5656,11 +5656,13 @@ mark {
     grid-template-columns: minmax(0, 1fr);
     align-items: start;
     gap: 0;
-    padding: var(--space-1) 0;
+    min-height: 48px;
+    padding: 2px 0;
   }
 
   .settings-panel .settings-library-card .settings-row select {
     width: 100%;
+    min-height: 26px;
     padding-left: 0;
     text-align: left;
   }
