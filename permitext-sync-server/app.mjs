@@ -497,6 +497,10 @@ async function createPostgresStoreAdapter() {
       ON permitext_sync_events (user_id, event_id)
     `;
     await sql`
+      CREATE INDEX IF NOT EXISTS permitext_sync_events_user_record_event_idx
+      ON permitext_sync_events (user_id, record_id, event_id DESC)
+    `;
+    await sql`
       CREATE UNIQUE INDEX IF NOT EXISTS permitext_sync_events_record_update_idx
       ON permitext_sync_events (record_id, mutation_updated_at)
     `;

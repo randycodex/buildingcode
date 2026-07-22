@@ -372,7 +372,7 @@ export function createPostgresSyncRepository(sql) {
       `;
     }
 
-    const [filteredRows, allRows, latestRows, entitlementRows] = await sql.transaction([
+    const [filteredRows, dependencyRows, latestRows, entitlementRows] = await sql.transaction([
       filteredQuery,
       sql`
         SELECT records.mutation,
@@ -383,7 +383,9 @@ export function createPostgresSyncRepository(sql) {
               AND events.record_id = records.record_id
           ) AS server_event_id
         FROM permitext_user_content_records AS records
-        WHERE records.user_id = ${userID} ORDER BY records.record_id
+        WHERE records.user_id = ${userID}
+          AND records.entity_kind = 'project'
+        ORDER BY records.record_id
       `,
       sql`
         SELECT COALESCE(MAX(event_id), 0)::bigint AS latest_event_id
@@ -396,7 +398,11 @@ export function createPostgresSyncRepository(sql) {
 
     return {
       mutations: filteredRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
-      allMutations: allRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
+      // Incremental pulls only need project records to resolve a changed
+      // projectSection's parent. Avoid re-reading every saved record on each
+      // foreground poll as a user's library grows.
+      allMutations: [...filteredRows, ...dependencyRows]
+        .map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),
       latestEventID: Number(latestRows[0]?.latest_event_id || 0),
       entitlement: entitlementRows[0]?.entitlement
         ? safeJSON(entitlementRows[0].entitlement, null)

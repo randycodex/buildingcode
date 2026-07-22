@@ -101,6 +101,7 @@ let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncPromise = null;
 const foregroundSyncIntervalMilliseconds = 3_000;
+const foregroundSyncJitterMilliseconds = 300;
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -2458,9 +2459,16 @@ function summarizeMutations(mutations = []) {
 
 function currentContentSummary() {
   const summary = syncedContent?.summary || summarizeMutations([]);
-  const summarySavedItems = summary.savedItems || [];
-  const summaryAnnotations = summary.annotations || [];
   const clearRecords = currentBulkClearRecords();
+  // Always apply every durable clear to the cached remote summary. Incremental
+  // pulls can refresh one clear scope without rebuilding the other scopes, so
+  // trusting the cached summary here could resurrect records cleared moments
+  // earlier by this browser or another device.
+  const summarySavedItems = (summary.savedItems || [])
+    .filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks"]));
+  const summaryAnnotations = (summary.annotations || [])
+    .map((item) => annotationAfterBulkClears(item, clearRecords))
+    .filter(Boolean);
   const localProjectSavedItems = (state.localProjectSections || [])
     .filter((item) => item && item.sectionID && !item.deletedAt &&
       recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))
@@ -2498,7 +2506,9 @@ function currentContentSummary() {
     item.sectionID || item.savedSectionID || item.itemID || item.id || "section"
   ].map(String).join(":");
   const projectSectionsByID = new Map(
-    (summary.projectSections || []).map((item) => [projectSectionIdentity(item), item])
+    (summary.projectSections || [])
+      .filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))
+      .map((item) => [projectSectionIdentity(item), item])
   );
   (state.localProjectSections || []).forEach((item) => {
     if (item && recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"])) {
@@ -3327,7 +3337,11 @@ function startForegroundSyncLoop(options = {}) {
     } finally {
       startForegroundSyncLoop();
     }
-  }, options.immediate ? 0 : foregroundSyncIntervalMilliseconds);
+  }, options.immediate ? 0 : Math.max(
+    500,
+    foregroundSyncIntervalMilliseconds +
+      Math.round((Math.random() * 2 - 1) * foregroundSyncJitterMilliseconds)
+  ));
 }
 
 async function pushMutation(mutation) {

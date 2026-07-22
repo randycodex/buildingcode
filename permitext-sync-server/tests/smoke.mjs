@@ -75,6 +75,8 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Diagnostics/Signposts.swift", import.meta.url),
     "utf8"
   );
+  const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
+  const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
@@ -437,8 +439,23 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260721-causal-clear-v72'),
+        webRoot.text.includes('/web/app.js?v=20260721-causal-clear-v73'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+        workspaceScript.text.includes('const summarySavedItems = (summary.savedItems || [])') &&
+        workspaceScript.text.includes('.filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks"]))') &&
+        workspaceScript.text.includes('.map((item) => annotationAfterBulkClears(item, clearRecords))') &&
+        workspaceScript.text.includes('.filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))'),
+      "Cached remote data can bypass durable cross-device clears."
+    );
+    assert(
+      workspaceScript.text.includes("const foregroundSyncJitterMilliseconds = 300;") &&
+        workspaceScript.text.includes("Math.round((Math.random() * 2 - 1) * foregroundSyncJitterMilliseconds)") &&
+        syncRepositorySource.includes("AND records.entity_kind = 'project'") &&
+        syncRepositorySource.includes("allMutations: [...filteredRows, ...dependencyRows]") &&
+        serverSource.includes("permitext_sync_events_user_record_event_idx"),
+      "Foreground sync no longer spreads polling load or performs incremental dependency reads."
     );
     assert(
       workspaceScript.text.includes("function openWorkspaceCommandPalette") &&
