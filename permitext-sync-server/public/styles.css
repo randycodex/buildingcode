@@ -5289,10 +5289,10 @@ mark {
   justify-content: space-between;
   gap: var(--space-2);
   min-height: 34px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--settings-inset-surface);
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   font-size: 9.5pt !important;
 }
 
@@ -5318,8 +5318,8 @@ mark {
 }
 
 .settings-panel .settings-feature-row.is-active {
-  border-color: color-mix(in srgb, var(--text-secondary) 34%, transparent);
-  background: var(--settings-inset-surface);
+  border-color: transparent;
+  background: transparent;
 }
 
 .settings-panel .settings-feature-icon {
@@ -5403,10 +5403,10 @@ mark {
   align-items: center;
   gap: var(--space-2);
   min-height: 40px;
-  padding: 7px var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--settings-inset-surface);
+  padding: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .settings-panel .account-status-indicator {
@@ -5474,10 +5474,10 @@ mark {
   align-items: center;
   gap: var(--space-2);
   min-height: 44px;
-  padding: 7px var(--space-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--settings-inset-surface);
+  padding: 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
 }
 
 .settings-panel .account-sync-icon {
