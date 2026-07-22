@@ -89,7 +89,7 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let state = loadWorkspaceState();
-if (absorbSupersededBulkClearConflicts()) saveWorkspaceState();
+if (absorbBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
 if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
 const searchTimers = new Map();
@@ -2387,14 +2387,14 @@ function currentBulkClearRecords() {
   return Array.from(latestByKey.values());
 }
 
-function absorbSupersededBulkClearConflicts() {
+function absorbBulkClearConflicts() {
   let changed = false;
   const latestLocalClears = new Map((state.localBulkClears || [])
     .map((record) => [bulkClearKey(record), record])
     .filter(([key]) => Boolean(key)));
   state.syncConflicts = (state.syncConflicts || []).filter((entry) => {
     const { kind, record } = mutationKindAndRecord(entry.mutation);
-    if (kind !== "codeVersionClear" || entry.lastError !== "Server has a newer version of this record.") {
+    if (kind !== "codeVersionClear") {
       return true;
     }
     const key = bulkClearKey(record);
@@ -3229,7 +3229,7 @@ async function flushSyncOutbox(options = {}) {
             lastError: "A legacy queued change could not be reconciled and was paused."
           }))
         ];
-        absorbSupersededBulkClearConflicts();
+        absorbBulkClearConflicts();
         saveWorkspaceState();
         storeAccountEntitlement(payload.entitlement || null);
       } catch (error) {
