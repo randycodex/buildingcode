@@ -8696,10 +8696,6 @@ function renderSettings() {
   const accountSummary = panel.querySelector(".account-summary");
   const accountCopy = panel.querySelector(".account-status-copy");
   const displayName = panel.querySelector(".account-display-name");
-  const profileEditor = panel.querySelector(".account-profile-editor");
-  const usernameInput = panel.querySelector(".account-public-username");
-  const profileHelper = panel.querySelector(".account-profile-helper");
-  const profileSaveButton = panel.querySelector(".account-profile-save");
   const planLabel = panel.querySelector(".account-plan-label");
   const planDetail = panel.querySelector(".account-plan-detail");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
@@ -8855,15 +8851,6 @@ function renderSettings() {
     });
   };
 
-  const syncProfileEditor = () => {
-    const error = publicUsernameValidationMessage(usernameInput.value);
-    const current = state.account?.publicUsername || "";
-    const draft = normalizedPublicUsername(usernameInput.value) || "";
-    profileHelper.textContent = error || "Used later for public and collaboration features. This stays separate from your Apple identity.";
-    profileHelper.classList.toggle("has-error", Boolean(error));
-    profileSaveButton.disabled = Boolean(error) || draft === current;
-  };
-
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
@@ -8891,7 +8878,6 @@ function renderSettings() {
     planSecondaryButton.textContent = "Restore Purchases";
     accountSummary.hidden = !account;
     accountCopy.hidden = Boolean(account);
-    profileEditor.hidden = !account;
     signOutButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
@@ -8899,8 +8885,6 @@ function renderSettings() {
     accountCopy.textContent = account
       ? `Signed in as ${accountDisplayName()}. Saved work can sync through the connected backend.`
       : "Sign in to attach local saved work to your account and use cross-device sync.";
-    usernameInput.value = state.account?.publicUsername || "";
-    syncProfileEditor();
     renderSyncState();
   };
 
@@ -8919,31 +8903,6 @@ function renderSettings() {
     if (!config.available && !config.browserFallbackAllowed) accountCopy.textContent = "Apple web sign-in is not configured yet.";
   }).catch(() => {
     if (!activeAccount()) accountCopy.textContent = "Could not check sign-in configuration.";
-  });
-
-  usernameInput.addEventListener("input", syncProfileEditor);
-  profileSaveButton.addEventListener("click", async () => {
-    const account = activeAccount();
-    if (!account || profileSaveButton.disabled) return;
-    profileSaveButton.disabled = true;
-    profileSaveButton.textContent = "Saving...";
-    try {
-      const payload = await postJSON("/account/profile", {
-        auth: { accountUserID: account.userID },
-        publicUsername: normalizedPublicUsername(usernameInput.value)
-      }, { token: account.sessionToken });
-      state.account.publicUsername = payload.account?.publicUsername || null;
-      state.account.displayName = payload.account?.displayName || state.account.displayName;
-      persistAccountSession();
-      saveWorkspaceState();
-      setStatus("Public username saved.");
-      profileSaveButton.textContent = "Save Public Username";
-      syncProfileEditor();
-    } catch (error) {
-      profileSaveButton.textContent = "Save Public Username";
-      setStatus(error.message || "Could not save the public username.", true);
-      syncProfileEditor();
-    }
   });
 
   signInButton.addEventListener("click", async () => {

@@ -179,6 +179,12 @@ async function main() {
         !settingsTemplateSource.includes('class="reader-preview-card settings-card"'),
       "Web Settings no longer keeps Reader Font with the top preferences or restored the redundant preview card."
     );
+    assert(
+      !settingsTemplateSource.includes("Public username") &&
+        !settingsTemplateSource.includes("account-profile-editor") &&
+        !settingsTemplateSource.includes("account-profile-save"),
+      "Web Settings exposed the reserved public profile editor before collaboration is available."
+    );
     ["Clear Recent Searches", "Clear All Bookmarks", "Clear All Notes", "Clear All Tags"].forEach((label) => {
       assert(settingsTemplateSource.includes(label), `Web Settings omitted ${label}.`);
     });
@@ -515,7 +521,7 @@ async function main() {
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
         workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
-        webRoot.text.includes('/web/app.js?v=20260722-workboard-zoom-v77'),
+        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v78'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
