@@ -507,8 +507,8 @@ private var savedBookmarkList: some View {
     }
 
     private func projectTile(_ folder: CodeFolder) -> some View {
-        let color = Color(uiColor: PlatformColor(hex: folder.colorHex) ?? .systemBlue)
-        let foreground = projectForegroundColor(for: folder.colorHex)
+        let color = projectTileBackgroundColor(for: folder.colorHex)
+        let foreground = Color.primary
         let count = library.bookmarkCount(inFolder: folder.id)
 
         return VStack(alignment: .leading, spacing: 5) {
@@ -539,26 +539,23 @@ private var savedBookmarkList: some View {
         .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.tileCornerRadius, style: .continuous))
     }
 
-    /// Matches the web card's WCAG-style luminance threshold so the same
-    /// synced project color chooses the same light or dark foreground.
-    private func projectForegroundColor(for hex: String) -> Color {
-        let cleaned = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        guard cleaned.count == 6, let value = Int(cleaned, radix: 16) else {
-            return .white
-        }
-        let channels = [
-            Double((value >> 16) & 0xFF) / 255,
-            Double((value >> 8) & 0xFF) / 255,
-            Double(value & 0xFF) / 255
-        ].map { channel in
-            channel <= 0.04045
-                ? channel / 12.92
-                : pow((channel + 0.055) / 1.055, 2.4)
-        }
-        let luminance = (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2])
-        return luminance > 0.179
-            ? Color(uiColor: UIColor(white: 17.0 / 255.0, alpha: 1))
-            : .white
+    /// Matches the web tile's `color-mix(in srgb, project 42%, surface)`.
+    private func projectTileBackgroundColor(for hex: String) -> Color {
+        let project = PlatformColor(hex: hex) ?? .systemBlue
+        return Color(uiColor: UIColor { traits in
+            var red: CGFloat = 0
+            var green: CGFloat = 0
+            var blue: CGFloat = 0
+            var alpha: CGFloat = 0
+            project.resolvedColor(with: traits).getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+            let surface: CGFloat = traits.userInterfaceStyle == .dark ? 0 : 1
+            return UIColor(
+                red: red * 0.42 + surface * 0.58,
+                green: green * 0.42 + surface * 0.58,
+                blue: blue * 0.42 + surface * 0.58,
+                alpha: 1
+            )
+        })
     }
 
     private var availableFilterSections: [CodeSectionCategory] {

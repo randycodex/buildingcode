@@ -3289,12 +3289,15 @@ async function performForegroundSync() {
     if (!canRunForegroundSync()) return null;
 
     if (syncLoadPromise) await syncLoadPromise;
-    const content = await loadSyncedContent({ force: true, skipOutbox: true });
+    let content = await loadSyncedContent({ force: true, skipOutbox: true });
     if (activeAccount()?.userID !== accountUserID) {
       await renderWorkspace();
       return content;
     }
     if (!canRunForegroundSync() || content?.status === "error") return content;
+    if (await migrateLegacyArchivedProjects()) {
+      content = await loadSyncedContent({ force: true, skipOutbox: true });
+    }
 
     const nextEventID = Number(content?.latestEventID || 0);
     if (
@@ -3531,7 +3534,8 @@ function projectMutationForRecord(project, accountOverride = null) {
       sortOrder: Number.isFinite(Number(project.sortOrder)) ? Number(project.sortOrder) : 0,
       sortMode: project.sortMode || "Code order",
       createdAt: project.createdAt || now,
-      updatedAt: now
+      updatedAt: now,
+      archivedAt: project.archivedAt || null
     }
   };
 }
@@ -3561,6 +3565,39 @@ function archivedProjectIDSet() {
   return new Set(state.archivedProjectIDs);
 }
 
+function projectIsArchived(project) {
+  return Boolean(project?.archivedAt) || archivedProjectIDSet().has(projectRecordID(project));
+}
+
+async function migrateLegacyArchivedProjects() {
+  const account = activeAccount();
+  if (!account || syncedContent?.status !== "connected") return false;
+  const legacyArchivedIDs = archivedProjectIDSet();
+  const projects = visibleProjectRecords(syncedContent.summary?.projects || [])
+    .filter((project) => legacyArchivedIDs.has(projectRecordID(project)) && !project.archivedAt);
+  if (!projects.length) return false;
+
+  for (const project of projects) {
+    const archivedAt = new Date().toISOString();
+    const archivedProject = { ...project, archivedAt, updatedAt: archivedAt };
+    const id = projectRecordID(project);
+    state.localProjects = [
+      ...(state.localProjects || []).filter((item) => projectRecordID(item) !== id),
+      archivedProject
+    ];
+    saveWorkspaceState();
+    try {
+      await pushMutation(projectMutationForRecord(archivedProject, account));
+      state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
+      saveWorkspaceState();
+    } catch (error) {
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+      return false;
+    }
+  }
+  return true;
+}
+
 function visibleProjectRecords(syncedProjects = []) {
   const byIdentity = new Map();
   syncedProjects.forEach((project) => {
@@ -3586,13 +3623,11 @@ function visibleProjectRecords(syncedProjects = []) {
 }
 
 function activeProjectRecords(syncedProjects = []) {
-  const archived = archivedProjectIDSet();
-  return visibleProjectRecords(syncedProjects).filter((project) => !archived.has(projectRecordID(project)));
+  return visibleProjectRecords(syncedProjects).filter((project) => !projectIsArchived(project));
 }
 
 function archivedProjectRecords(syncedProjects = []) {
-  const archived = archivedProjectIDSet();
-  return visibleProjectRecords(syncedProjects).filter((project) => archived.has(projectRecordID(project)));
+  return visibleProjectRecords(syncedProjects).filter(projectIsArchived);
 }
 
 function nextProjectName() {
@@ -7593,14 +7628,39 @@ async function archiveProjects(projects) {
   const archived = archivedProjectIDSet();
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
+  const archivedAt = new Date().toISOString();
   eligibleProjects.forEach((project) => archived.add(projectRecordID(project)));
   state.archivedProjectIDs = Array.from(archived);
+  const archivedProjects = eligibleProjects.map((project) => ({
+    ...project,
+    archivedAt,
+    updatedAt: archivedAt
+  }));
+  const archivedIDs = new Set(archivedProjects.map(projectRecordID));
+  state.localProjects = [
+    ...(state.localProjects || []).filter((project) => !archivedIDs.has(projectRecordID(project))),
+    ...archivedProjects
+  ];
   eligibleProjects.forEach((project) => closeProjectDetailForProject(project));
   state.detachedWorkboards = detachedWorkboards().filter((item) =>
     !eligibleProjects.some((project) => projectDetailMatches(project, item))
   );
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
+  const account = activeAccount();
+  if (account) {
+    for (const project of archivedProjects) {
+      try {
+        await pushMutation(projectMutationForRecord(project, account));
+        state.localProjects = (state.localProjects || [])
+          .filter((item) => projectRecordID(item) !== projectRecordID(project));
+      } catch (error) {
+        if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+        // Keep the local archived overlay while the durable sync queue recovers.
+      }
+    }
+    saveWorkspaceState();
+  }
   await transitionWorkspace("utility", {
     refreshPaneIDs: projectOverviewRefreshPaneIDs(...(state.utilities.archive ? ["utility:archive"] : []))
   });
@@ -7611,9 +7671,30 @@ async function archiveProjects(projects) {
 async function restoreArchivedProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
+  const restoredAt = new Date().toISOString();
+  const restoredProject = {
+    ...project,
+    archivedAt: null,
+    updatedAt: restoredAt
+  };
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((projectID) => projectID !== id);
+  state.localProjects = [
+    ...(state.localProjects || []).filter((item) => projectRecordID(item) !== id),
+    restoredProject
+  ];
   const currentLeft = track.scrollLeft;
   saveWorkspaceState();
+  const account = activeAccount();
+  if (account) {
+    try {
+      await pushMutation(projectMutationForRecord(restoredProject, account));
+      state.localProjects = (state.localProjects || []).filter((item) => projectRecordID(item) !== id);
+      saveWorkspaceState();
+    } catch (error) {
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+      // Keep the local restored overlay while the durable sync queue recovers.
+    }
+  }
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
   track.scrollLeft = currentLeft;
 }

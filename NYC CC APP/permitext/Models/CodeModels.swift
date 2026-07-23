@@ -528,6 +528,7 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let description: String?
     let colorHex: String?
     let sortOrder: Int?
+    let archivedAt: Date?
     let updatedAt: Date
     let deletedAt: Date?
     var serverEventID: Int64? = nil
@@ -735,6 +736,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
+                    archivedAt: payload.values["archivedAt"].flatMap(ISO8601DateFormatter().date(from:)),
                     updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
                 )

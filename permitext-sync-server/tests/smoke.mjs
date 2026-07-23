@@ -323,12 +323,24 @@ async function main() {
       workspaceScript.text.indexOf("async function updateProjectFolder"),
       workspaceScript.text.indexOf("async function archiveProject")
     );
+    const projectArchiveSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("async function archiveProject"),
+      workspaceScript.text.indexOf("async function deleteArchivedProject")
+    );
     assert(
       projectMutationSource.includes("colorHex: color") &&
         projectUpdateSource.includes("colorHex: color") &&
         !projectMutationSource.includes("project.colorHex || color") &&
         !projectUpdateSource.includes("project.colorHex || color"),
       "Project color edits can still send a stale colorHex to another device."
+    );
+    assert(
+      projectMutationSource.includes("archivedAt: project.archivedAt || null") &&
+        projectArchiveSource.includes("await pushMutation(projectMutationForRecord(project, account))") &&
+        projectArchiveSource.includes("archivedAt: null") &&
+        workspaceScript.text.includes("async function migrateLegacyArchivedProjects()") &&
+        workspaceScript.text.includes("if (await migrateLegacyArchivedProjects())"),
+      "Project archive and restore state no longer syncs or migrates from legacy browser storage."
     );
     assert(
       !workspaceScript.text.includes("if (popup.closed) void reattachProjectWorkboard(identity)"),
@@ -532,7 +544,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260722-ai-foundation-v4'),
+        webRoot.text.includes('/web/app.js?v=20260723-project-archive-sync-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2589,6 +2601,63 @@ async function main() {
     assert(canonicalProjectColor?.colorHex === "#FF6B35", "Project colorHex changed during canonicalization.");
     assert(canonicalProjectColor?.color === "#FF6B35", "Legacy web project color did not match colorHex.");
     assert(canonicalProjectColor?.tintColor === "#FF6B35", "Legacy project tintColor did not match colorHex.");
+
+    const archivedAt = "2026-06-06T00:30:00Z";
+    const projectArchivePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            project: {
+              ...projectMutation.project,
+              updatedAt: archivedAt,
+              archivedAt
+            }
+          }]
+        }
+      }
+    });
+    assert(projectArchivePush.response.ok, "Project archive sync push failed.");
+    const projectArchivePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const archivedProject = projectArchivePull.json.mutations.find((mutation) =>
+      mutation.project?.id === projectRecordID
+    )?.project;
+    assert(archivedProject?.archivedAt === archivedAt, "Project archive state did not survive sync.");
+
+    const projectRestorePush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            project: {
+              ...projectMutation.project,
+              updatedAt: "2026-06-06T00:45:00Z",
+              archivedAt: null
+            }
+          }]
+        }
+      }
+    });
+    assert(projectRestorePush.response.ok, "Project restore sync push failed.");
+    const projectRestorePull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const restoredProject = projectRestorePull.json.mutations.find((mutation) =>
+      mutation.project?.id === projectRecordID
+    )?.project;
+    assert(restoredProject && restoredProject.archivedAt === null, "Project restore state did not survive sync.");
 
     const webProjectSectionDeletePush = await request("/sync/push", {
       method: "POST",

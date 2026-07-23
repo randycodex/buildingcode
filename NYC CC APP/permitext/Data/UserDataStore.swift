@@ -500,6 +500,7 @@ final class UserDataStore: UserContentRepository {
                 description TEXT NOT NULL DEFAULT '',
                 color_hex TEXT NOT NULL,
                 sort_order INTEGER NOT NULL DEFAULT 0,
+                archived_at TEXT,
                 created_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL DEFAULT '',
                 deleted_at TEXT
@@ -589,6 +590,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folders", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "folders", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folders", column: "deleted_at", definition: "TEXT")
+        try addColumnIfMissing(table: "folders", column: "archived_at", definition: "TEXT")
         try addColumnIfMissing(table: "folder_sections", column: "client_id", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "owner_id", definition: "TEXT NOT NULL DEFAULT 'local'")
         try addColumnIfMissing(table: "folder_sections", column: "visibility", definition: "TEXT NOT NULL DEFAULT 'personal'")
@@ -758,7 +760,7 @@ final class UserDataStore: UserContentRepository {
             "folders": [
                 "id", "client_id", "owner_id", "visibility", "sync_state",
                 "code_version", "name", "address", "description", "color_hex", "sort_order",
-                "created_at", "updated_at", "deleted_at"
+                "archived_at", "created_at", "updated_at", "deleted_at"
             ],
             "folder_sections": [
                 "client_id", "owner_id", "visibility", "sync_state", "folder_id",
@@ -1560,7 +1562,7 @@ final class UserDataStore: UserContentRepository {
             """
             SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, name, address, description, color_hex, sort_order, created_at, updated_at
             FROM folders
-            WHERE code_version = ?
+            WHERE code_version = ? AND archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
             """
         )
@@ -1592,7 +1594,7 @@ final class UserDataStore: UserContentRepository {
 
     func folderCount(codeVersion: String) throws -> Int {
         try countRows(
-            sql: "SELECT COUNT(*) FROM folders WHERE code_version = ?;",
+            sql: "SELECT COUNT(*) FROM folders WHERE code_version = ? AND archived_at IS NULL;",
             codeVersion: codeVersion
         )
     }
@@ -2410,6 +2412,7 @@ final class UserDataStore: UserContentRepository {
                 description: record.description,
                 colorHex: record.colorHex,
                 sortOrder: record.sortOrder,
+                archivedAt: record.archivedAt,
                 updatedAt: record.updatedAt,
                 deletedAt: record.deletedAt,
                 serverEventID: record.serverEventID
@@ -2625,9 +2628,9 @@ final class UserDataStore: UserContentRepository {
             """
             INSERT INTO folders (
                 client_id, owner_id, visibility, sync_state, code_version, name,
-                address, description, color_hex, sort_order, created_at, updated_at, deleted_at
+                address, description, color_hex, sort_order, archived_at, created_at, updated_at, deleted_at
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL);
             """
         )
         defer { connection.finalize(statement) }
@@ -2641,8 +2644,13 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: record.description ?? "", index: 8, to: statement)
         try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 9, to: statement)
         sqlite3_bind_int64(statement, 10, Int64(record.sortOrder ?? 0))
-        try connection.bind(text: timestamp, index: 11, to: statement)
+        if let archivedAt = record.archivedAt {
+            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 11, to: statement)
+        } else {
+            sqlite3_bind_null(statement, 11)
+        }
         try connection.bind(text: timestamp, index: 12, to: statement)
+        try connection.bind(text: timestamp, index: 13, to: statement)
         _ = try connection.step(statement)
     }
 
@@ -2713,6 +2721,7 @@ final class UserDataStore: UserContentRepository {
                 description = ?,
                 color_hex = ?,
                 sort_order = ?,
+                archived_at = ?,
                 updated_at = ?,
                 deleted_at = NULL
             WHERE id = ? AND code_version = ?;
@@ -2728,9 +2737,14 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: record.description ?? "", index: 7, to: statement)
         try connection.bind(text: record.colorHex ?? CodeFolder.defaultColorHex, index: 8, to: statement)
         sqlite3_bind_int64(statement, 9, Int64(record.sortOrder ?? 0))
-        try connection.bind(text: timestamp, index: 10, to: statement)
-        sqlite3_bind_int64(statement, 11, localFolderID)
-        try connection.bind(text: record.codeVersion, index: 12, to: statement)
+        if let archivedAt = record.archivedAt {
+            try connection.bind(text: isoFormatter.string(from: archivedAt), index: 10, to: statement)
+        } else {
+            sqlite3_bind_null(statement, 10)
+        }
+        try connection.bind(text: timestamp, index: 11, to: statement)
+        sqlite3_bind_int64(statement, 12, localFolderID)
+        try connection.bind(text: record.codeVersion, index: 13, to: statement)
         _ = try connection.step(statement)
     }
 
