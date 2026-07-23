@@ -22,6 +22,8 @@ const reviewsPath = join(serverRoot, "evals", "reviews.json");
 const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
 const execFileAsync = promisify(execFile);
+const judgePromptVersion =
+  process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_PROMPT_VERSION || "20260722-exact-rubric-v2";
 
 function argumentValue(name) {
   const index = process.argv.indexOf(name);
@@ -249,6 +251,20 @@ const judgeSchema = {
   ]
 };
 
+function judgeSchemaForRubric(concepts, forbidden, uncertainty) {
+  const schema = structuredClone(judgeSchema);
+  for (const [property, items] of [
+    ["requiredConcepts", concepts],
+    ["forbiddenClaims", forbidden],
+    ["uncertaintyConditions", uncertainty]
+  ]) {
+    schema.properties[property].minItems = items.length;
+    schema.properties[property].maxItems = items.length;
+    schema.properties[property].items.properties.id.enum = items.map((item) => item.id);
+  }
+  return schema;
+}
+
 function answerForJudge(answer) {
   return {
     conclusion: answer.conclusion,
@@ -266,8 +282,13 @@ function answerForJudge(answer) {
 
 function validateJudgeItems(actualItems, expectedItems, label) {
   assert(Array.isArray(actualItems) && actualItems.length === expectedItems.length, `Judge returned the wrong number of ${label}.`);
-  const expectedIDs = new Set(expectedItems.map((item) => item.id));
-  assert(actualItems.every((item) => expectedIDs.has(item.id)), `Judge returned an unknown ${label} ID.`);
+  const expectedIDs = expectedItems.map((item) => item.id);
+  const actualIDs = actualItems.map((item) => item.id);
+  assert(new Set(actualIDs).size === actualIDs.length, `Judge returned duplicate ${label} IDs.`);
+  assert(
+    expectedIDs.every((id) => actualIDs.includes(id)) && actualIDs.every((id) => expectedIDs.includes(id)),
+    `Judge returned an unknown or omitted ${label} ID.`
+  );
 }
 
 async function judgeAnswer(testCase, answer) {
@@ -312,7 +333,7 @@ async function judgeAnswer(testCase, answer) {
         type: "json_schema",
         name: "permitext_research_evaluation",
         strict: true,
-        schema: judgeSchema
+        schema: judgeSchemaForRubric(concepts, forbidden, uncertainty)
       }
     }
   };
@@ -335,6 +356,7 @@ async function judgeAnswer(testCase, answer) {
   validateJudgeItems(judgment.uncertaintyConditions, uncertainty, "uncertainty conditions");
   return {
     model,
+    promptVersion: judgePromptVersion,
     responseTimeMilliseconds: Math.round(performance.now() - startedAt),
     usage: {
       inputTokens: payload.usage?.input_tokens || 0,
@@ -531,6 +553,8 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
     "",
     `Judge model: ${configuration.judgeModel} (${configuration.judgeReasoningEffort})`,
     "",
+    `Judge prompt version: ${configuration.judgePromptVersion}`,
+    "",
     `Answer usage: ${answerUsage.inputTokens} input (${answerUsage.cachedInputTokens} cached), ${answerUsage.outputTokens} output, ${answerUsage.totalTokens} total tokens.`,
     "",
     `Judge usage: ${judgeUsage.inputTokens} input (${judgeUsage.cachedInputTokens} cached), ${judgeUsage.outputTokens} output, ${judgeUsage.totalTokens} total tokens.`,
@@ -698,6 +722,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
     retrievalVersion: "none-selected-evidence-only",
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
     judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
+    judgePromptVersion,
     pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
@@ -770,6 +795,7 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
 function selfTestJudge(testCase) {
   return {
     model: "permitext-eval-self-test",
+    promptVersion: "self-test",
     responseTimeMilliseconds: 10,
     usage: { inputTokens: 10, outputTokens: 10, totalTokens: 20 },
     judgment: {
@@ -813,6 +839,27 @@ function runSelfTest(dataset, datasetText) {
     estimatedCost: { estimatedUSD: 0.01, pricingVersion: "self-test" }
   };
   const judge = selfTestJudge(testCase);
+  const constrainedJudgeSchema = judgeSchemaForRubric(
+    rubricItems(testCase.requiredConcepts, "concept"),
+    rubricItems(testCase.forbiddenClaims, "forbidden"),
+    rubricItems(testCase.missingFacts, "missing-fact")
+  );
+  assert(
+    constrainedJudgeSchema.properties.requiredConcepts.minItems === testCase.requiredConcepts.length &&
+      constrainedJudgeSchema.properties.requiredConcepts.maxItems === testCase.requiredConcepts.length,
+    "Research eval judge schema did not constrain rubric cardinality."
+  );
+  let duplicateJudgeIDsRejected = false;
+  try {
+    validateJudgeItems(
+      [{ id: "concept-1" }, { id: "concept-1" }],
+      [{ id: "concept-1" }, { id: "concept-2" }],
+      "self-test concepts"
+    );
+  } catch {
+    duplicateJudgeIDsRejected = true;
+  }
+  assert(duplicateJudgeIDsRejected, "Research eval judge validation did not reject duplicate rubric IDs.");
   const scoring = scoreCase(dataset, testCase, answer, 15_000, judge);
   assert(scoring.passed && scoring.overallScore === 4, "Research eval self-test did not produce a perfect passing score.");
   const incomplete = scoreCase(dataset, testCase, { ...answer, citations: [] }, 15_000, judge);
