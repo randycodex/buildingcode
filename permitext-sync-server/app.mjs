@@ -12,6 +12,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -36,6 +37,13 @@ const rateLimitPolicies = new Map([
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["billing/web/portal", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/create", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
   ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
@@ -95,7 +103,9 @@ const emptyStore = () => ({
   entitlements: {},
   sessions: {},
   passkeyCredentials: {},
-  mutationsByUserID: {}
+  mutationsByUserID: {},
+  researchConversationsByUserID: {},
+  researchUsageByUserID: {}
 });
 
 const allowedMutationKinds = new Set([
@@ -179,10 +189,56 @@ function createFileStoreAdapter() {
           mutations: Object.values(store.mutationsByUserID || {}).reduce(
             (count, mutations) => count + (mutations?.length || 0),
             0
+          ),
+          researchConversations: Object.values(store.researchConversationsByUserID || {}).reduce(
+            (count, conversations) => count + (conversations?.length || 0),
+            0
+          ),
+          researchUsage: Object.values(store.researchUsageByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
           )
         },
         mutationCounts: mutationCountsByKind
       };
+    },
+    async listResearchConversations(userID) {
+      const store = await this.read();
+      return (store.researchConversationsByUserID?.[userID] || []).slice();
+    },
+    async saveResearchConversation(userID, conversation) {
+      const store = await this.read();
+      store.researchConversationsByUserID ||= {};
+      const conversations = store.researchConversationsByUserID[userID] || [];
+      const index = conversations.findIndex((item) => item.id === conversation.id);
+      if (index === -1) conversations.push(conversation);
+      else conversations[index] = conversation;
+      store.researchConversationsByUserID[userID] = conversations;
+      await this.write(store);
+      return conversation;
+    },
+    async deleteResearchConversation(userID, conversationID) {
+      const store = await this.read();
+      const conversations = store.researchConversationsByUserID?.[userID] || [];
+      const remaining = conversations.filter((item) => item.id !== conversationID);
+      if (remaining.length === conversations.length) return false;
+      store.researchConversationsByUserID[userID] = remaining;
+      await this.write(store);
+      return true;
+    },
+    async researchUsageSince(userID, since) {
+      const store = await this.read();
+      return (store.researchUsageByUserID?.[userID] || []).filter((entry) => entry.createdAt >= since);
+    },
+    async recordResearchUsage(userID, entry) {
+      const store = await this.read();
+      store.researchUsageByUserID ||= {};
+      const cutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
+      store.researchUsageByUserID[userID] = [
+        ...(store.researchUsageByUserID[userID] || []).filter((item) => item.createdAt >= cutoff),
+        entry
+      ];
+      await this.write(store);
     }
   };
 }
@@ -475,6 +531,36 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_comments_user_locator_idx
       ON permitext_comments (user_id, code_version, section_id, block_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_conversations (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        conversation JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_conversations_user_updated_idx
+      ON permitext_research_conversations (user_id, updated_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_usage (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        model TEXT NOT NULL,
+        mode TEXT NOT NULL,
+        input_tokens INTEGER NOT NULL DEFAULT 0,
+        output_tokens INTEGER NOT NULL DEFAULT 0,
+        total_tokens INTEGER NOT NULL DEFAULT 0,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_usage_user_created_idx
+      ON permitext_research_usage (user_id, created_at DESC)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_sync_events (
@@ -821,6 +907,8 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_projects)::int AS projects,
         (SELECT count(*) FROM permitext_project_items)::int AS project_items,
         (SELECT count(*) FROM permitext_comments)::int AS comments,
+        (SELECT count(*) FROM permitext_research_conversations)::int AS research_conversations,
+        (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
         (SELECT count(*) FROM permitext_user_content_records)::int AS user_content_records,
         (SELECT count(*) FROM permitext_sync_events)::int AS sync_events,
         COALESCE((SELECT max(event_id) FROM permitext_sync_events), 0)::bigint AS latest_event_id
@@ -842,6 +930,8 @@ async function createPostgresStoreAdapter() {
         projects: Number(row.projects || 0),
         projectItems: Number(row.project_items || 0),
         comments: Number(row.comments || 0),
+        researchConversations: Number(row.research_conversations || 0),
+        researchUsage: Number(row.research_usage || 0),
         userContentRecords: Number(row.user_content_records || 0),
         syncEvents: Number(row.sync_events || 0)
       }
@@ -1180,6 +1270,80 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.revoke(userID, rawToken);
     },
+    async listResearchConversations(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT conversation
+        FROM permitext_research_conversations
+        WHERE user_id = ${userID}
+        ORDER BY updated_at DESC
+      `;
+      return rows.map((row) => safeJSON(row.conversation, {}));
+    },
+    async saveResearchConversation(userID, conversation) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_research_conversations (
+          id, user_id, title, conversation, created_at, updated_at
+        )
+        VALUES (
+          ${conversation.id},
+          ${userID},
+          ${conversation.title},
+          ${JSON.stringify(conversation)}::jsonb,
+          ${conversation.createdAt}::timestamptz,
+          ${conversation.updatedAt}::timestamptz
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          title = EXCLUDED.title,
+          conversation = EXCLUDED.conversation,
+          updated_at = EXCLUDED.updated_at
+        WHERE permitext_research_conversations.user_id = ${userID}
+      `;
+      return conversation;
+    },
+    async deleteResearchConversation(userID, conversationID) {
+      await ensureSchema();
+      const rows = await sql`
+        DELETE FROM permitext_research_conversations
+        WHERE id = ${conversationID} AND user_id = ${userID}
+        RETURNING id
+      `;
+      return rows.length > 0;
+    },
+    async researchUsageSince(userID, since) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT id, model, mode, input_tokens, output_tokens, total_tokens, created_at
+        FROM permitext_research_usage
+        WHERE user_id = ${userID} AND created_at >= ${since}::timestamptz
+        ORDER BY created_at DESC
+      `;
+      return rows.map((row) => ({
+        id: row.id,
+        model: row.model,
+        mode: row.mode,
+        inputTokens: Number(row.input_tokens || 0),
+        outputTokens: Number(row.output_tokens || 0),
+        totalTokens: Number(row.total_tokens || 0),
+        createdAt: dateToISO(row.created_at)
+      }));
+    },
+    async recordResearchUsage(userID, entry) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_research_usage (
+          id, user_id, model, mode, input_tokens, output_tokens, total_tokens, created_at
+        )
+        VALUES (
+          ${entry.id}, ${userID}, ${entry.model}, ${entry.mode},
+          ${entry.inputTokens}, ${entry.outputTokens}, ${entry.totalTokens},
+          ${entry.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO NOTHING
+      `;
+    },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1254,6 +1418,41 @@ async function storageSummary() {
     latestEventID: 0,
     tables: {}
   };
+}
+
+async function listStoredResearchConversations(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listResearchConversations === "function"
+    ? adapter.listResearchConversations(userID)
+    : [];
+}
+
+async function storedResearchConversation(userID, conversationID) {
+  return (await listStoredResearchConversations(userID)).find((item) => item.id === conversationID) || null;
+}
+
+async function saveStoredResearchConversation(userID, conversation) {
+  const adapter = await storeAdapter();
+  return adapter.saveResearchConversation(userID, conversation);
+}
+
+async function deleteStoredResearchConversation(userID, conversationID) {
+  const adapter = await storeAdapter();
+  return adapter.deleteResearchConversation(userID, conversationID);
+}
+
+async function researchUsageSince(userID, since) {
+  const adapter = await storeAdapter();
+  return typeof adapter.researchUsageSince === "function"
+    ? adapter.researchUsageSince(userID, since)
+    : [];
+}
+
+async function recordResearchUsage(userID, entry) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.recordResearchUsage === "function") {
+    await adapter.recordResearchUsage(userID, entry);
+  }
 }
 
 export function requestBodyLimit(environment = process.env) {
@@ -1945,24 +2144,37 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
     }
     const canonicalID = String(summary.id || summary.sectionID || requestedID);
     const body = await sectionBody(summary.webSectionID || requestedID, {
-      allowMissing: true,
+      allowMissing: false,
       canonicalSectionID: canonicalID
     });
     const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
-    const text = normalizedResearchText(rawText || summary.title, charactersPerSection);
+    const enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
+    const canonicalText = [summary.sectionNumber, summary.title, enactedBodyText]
+      .filter(Boolean)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim();
+    const text = enactedBodyText.slice(0, charactersPerSection);
+    if (!enactedBodyText) {
+      const error = new Error(`Section ${summary.sectionNumber || canonicalID} has no enacted text available for research.`);
+      error.code = "INCOMPLETE_RESEARCH_SECTION";
+      throw error;
+    }
     evidence.push({
       sectionID: canonicalID,
       sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
       title: String(summary.title || body.title || "Section"),
       codePrefix: String(summary.codePrefix || body.codePrefix || ""),
       chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
-      text
+      text,
+      canonicalText,
+      sectionTextHash: createHash("sha256").update(canonicalText).digest("hex")
     });
   }
   return evidence;
 }
 
-function researchPrompt(question, evidence) {
+function researchPrompt(question, evidence, options = {}) {
   const sources = evidence.map((section) => [
     `SECTION_ID: ${section.sectionID}`,
     `CODE: ${section.codePrefix}`,
@@ -1970,7 +2182,20 @@ function researchPrompt(question, evidence) {
     `TITLE: ${section.title}`,
     `TEXT: ${section.text}`
   ].join("\n")).join("\n\n---\n\n");
-  return `QUESTION\n${question}\n\nSELECTED OFFICIAL CODE EVIDENCE\n${sources}`;
+  const selections = (options.selections || []).map((source) => [
+    `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID}`,
+    `SELECTED PASSAGE: ${source.selectedText}`
+  ].join("\n")).join("\n\n");
+  const history = (options.messages || []).slice(-8).map((message) => {
+    if (message.role === "user") return `USER: ${message.question || ""}`;
+    return `ASSISTANT: ${message.answer?.conclusion || ""}\n${message.answer?.explanation || ""}`;
+  }).join("\n\n");
+  return [
+    `QUESTION\n${question}`,
+    selections ? `USER-SELECTED PASSAGES\n${selections}` : "",
+    history ? `RECENT CONVERSATION\n${history}` : "",
+    `OFFICIAL CODE EVIDENCE\n${sources}`
+  ].filter(Boolean).join("\n\n");
 }
 
 function mockResearchInterpretation(question, evidence) {
@@ -2029,7 +2254,15 @@ function validateResearchInterpretation(value, evidence) {
     }
     if (seen.has(sectionID)) continue;
     seen.add(sectionID);
-    citations.push({ ...allowedSections.get(sectionID), relevance });
+    const source = allowedSections.get(sectionID);
+    citations.push({
+      sectionID: source.sectionID,
+      sectionNumber: source.sectionNumber,
+      title: source.title,
+      codePrefix: source.codePrefix,
+      chapterNumber: source.chapterNumber,
+      relevance
+    });
   }
   if (!citations.length) {
     const error = new Error("The model returned no valid citations.");
@@ -2045,7 +2278,7 @@ function validateResearchInterpretation(value, evidence) {
   };
 }
 
-async function openAIResearchInterpretation(question, evidence, userID) {
+async function openAIResearchInterpretation(question, evidence, userID, options = {}) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     const error = new Error("Research AI is not configured.");
@@ -2074,7 +2307,7 @@ async function openAIResearchInterpretation(question, evidence, userID) {
           "State when the evidence is insufficient and identify project facts that must be confirmed.",
           "Every conclusion must cite one or more supplied SECTION_ID values."
         ].join(" "),
-        input: researchPrompt(question, evidence),
+        input: researchPrompt(question, evidence, options),
         text: {
           format: {
             type: "json_schema",
@@ -2176,6 +2409,10 @@ async function handleResearchInterpretation(request, response) {
       sendError(response, 400, error.message);
       return;
     }
+    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
+      sendError(response, 422, "This code section is incomplete and cannot be analyzed yet.");
+      return;
+    }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
       sendError(response, 503, error.message);
       return;
@@ -2190,6 +2427,398 @@ async function handleResearchInterpretation(request, response) {
     }
     throw error;
   }
+}
+
+function researchConversationSummary(conversation) {
+  return {
+    id: conversation.id,
+    title: conversation.title,
+    createdAt: conversation.createdAt,
+    updatedAt: conversation.updatedAt,
+    sourceCount: conversation.sources?.filter((source) => source.kind === "selection").length || 0,
+    messageCount: conversation.messages?.length || 0,
+    sourceStatus: conversation.sourceStatus || "current"
+  };
+}
+
+function researchSourceFromEvidence(evidence, options = {}) {
+  const selectedText = normalizedResearchText(options.selectedText, 4_000);
+  return {
+    id: randomUUID(),
+    kind: options.kind || "related",
+    relationship: options.relationship || "Explicitly referenced by the selected provision",
+    sectionID: evidence.sectionID,
+    sectionNumber: evidence.sectionNumber,
+    title: evidence.title,
+    codePrefix: evidence.codePrefix,
+    chapterNumber: evidence.chapterNumber,
+    selectedText,
+    selectedTextHash: selectedText
+      ? createHash("sha256").update(selectedText).digest("hex")
+      : null,
+    sectionTextHash: evidence.sectionTextHash,
+    codeVersion: defaultSyncCodeVersion,
+    addedAt: new Date().toISOString()
+  };
+}
+
+async function relatedResearchEvidence(primaryEvidence, limit = 3) {
+  const phrases = inlineCodeReferencePhrases(primaryEvidence.text);
+  if (!phrases.length) return [];
+  const catalog = await sectionCatalog();
+  const relatedIDs = [];
+  for (const phrase of phrases) {
+    const codePrefix = phrase.codePrefix || primaryEvidence.codePrefix;
+    for (const reference of phrase.references || []) {
+      const sectionNumber = String(reference.sectionNumber || "").toUpperCase();
+      const summary = catalog.find((item) =>
+        String(item.codePrefix || "").toUpperCase() === String(codePrefix || "").toUpperCase() &&
+        String(item.sectionNumber || "").replace(/\.$/, "").toUpperCase() === sectionNumber
+      );
+      const sectionID = String(summary?.id || "");
+      if (!sectionID || sectionID === primaryEvidence.sectionID || relatedIDs.includes(sectionID)) continue;
+      relatedIDs.push(sectionID);
+      if (relatedIDs.length >= limit) break;
+    }
+    if (relatedIDs.length >= limit) break;
+  }
+  const related = [];
+  for (const sectionID of relatedIDs) {
+    try {
+      related.push(...await researchEvidenceForSectionIDs([sectionID]));
+    } catch (error) {
+      if (!["INCOMPLETE_RESEARCH_SECTION", "INVALID_RESEARCH_SECTION", "ENOENT"].includes(error.code)) throw error;
+    }
+  }
+  return related;
+}
+
+async function researchSourcesForSelection(sectionID, selectedText) {
+  const normalizedSelection = normalizedResearchText(selectedText, 4_000);
+  if (normalizedSelection.length < 2) {
+    const error = new Error("Select enacted code text before starting research.");
+    error.code = "INVALID_RESEARCH_SELECTION";
+    throw error;
+  }
+  const [primary] = await researchEvidenceForSectionIDs([sectionID]);
+  if (!primary.canonicalText.includes(normalizedSelection)) {
+    const error = new Error("The selected passage no longer matches the enacted section text.");
+    error.code = "INVALID_RESEARCH_SELECTION";
+    throw error;
+  }
+  const related = await relatedResearchEvidence(primary);
+  return [
+    researchSourceFromEvidence(primary, {
+      kind: "selection",
+      relationship: "Passage selected by you",
+      selectedText: normalizedSelection
+    }),
+    ...related.map((evidence) => researchSourceFromEvidence(evidence))
+  ];
+}
+
+async function currentResearchEvidence(conversation) {
+  const sectionIDs = Array.from(new Set((conversation.sources || []).map((source) => source.sectionID).filter(Boolean)));
+  const evidence = await researchEvidenceForSectionIDs(sectionIDs);
+  const evidenceByID = new Map(evidence.map((item) => [item.sectionID, item]));
+  const sourceStatuses = (conversation.sources || []).map((source) => {
+    const current = evidenceByID.get(source.sectionID);
+    const selectionPresent = !source.selectedText || Boolean(current?.canonicalText.includes(source.selectedText));
+    return {
+      sourceID: source.id,
+      sectionID: source.sectionID,
+      current: Boolean(current && current.sectionTextHash === source.sectionTextHash && selectionPresent),
+      selectionPresent
+    };
+  });
+  return {
+    evidence,
+    sourceStatuses,
+    stale: sourceStatuses.some((status) => !status.current)
+  };
+}
+
+async function researchConversationForClient(conversation, options = {}) {
+  if (!options.checkSources) return conversation;
+  const current = await currentResearchEvidence(conversation);
+  return {
+    ...conversation,
+    sourceStatus: current.stale ? "changed" : "current",
+    sourceStatuses: current.sourceStatuses
+  };
+}
+
+async function authenticatedResearchBody(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return null;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  return context ? { body, userID } : null;
+}
+
+async function requiredResearchConversation(response, userID, conversationID) {
+  const conversation = await storedResearchConversation(userID, String(conversationID || "").trim());
+  if (!conversation) sendError(response, 404, "Research conversation not found.");
+  return conversation;
+}
+
+async function handleResearchConversationList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversations = await listStoredResearchConversations(context.userID);
+  sendJSON(response, 200, {
+    conversations: conversations
+      .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)))
+      .map(researchConversationSummary)
+  });
+}
+
+async function handleResearchConversationGet(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  sendJSON(response, 200, {
+    conversation: await researchConversationForClient(conversation, { checkSources: true })
+  });
+}
+
+async function handleResearchConversationCreate(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  try {
+    if ((await listStoredResearchConversations(context.userID)).length >= 200) {
+      sendError(response, 409, "Delete an older research conversation before starting another.");
+      return;
+    }
+    const sources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
+    const primary = sources[0];
+    const now = new Date().toISOString();
+    const conversation = {
+      id: randomUUID(),
+      title: `${primary.codePrefix || "Code"} ${primary.sectionNumber || primary.sectionID} — ${primary.title}`.slice(0, 140),
+      createdAt: now,
+      updatedAt: now,
+      codeVersion: defaultSyncCodeVersion,
+      sourceStatus: "current",
+      sources,
+      messages: []
+    };
+    await saveStoredResearchConversation(context.userID, conversation);
+    sendJSON(response, 201, { conversation });
+  } catch (error) {
+    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+      sendError(response, 400, error.message);
+      return;
+    }
+    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
+      sendError(response, 422, "This code section is incomplete and cannot be analyzed yet.");
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleResearchConversationEvidence(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  try {
+    if ((conversation.sources || []).filter((source) => source.kind === "selection").length >= 24) {
+      sendError(response, 409, "This conversation already has the maximum of 24 selected passages.");
+      return;
+    }
+    const addedSources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
+    const existingRelatedIDs = new Set((conversation.sources || []).filter((source) => source.kind === "related").map((source) => source.sectionID));
+    conversation.sources.push(...addedSources.filter((source) => source.kind === "selection" || !existingRelatedIDs.has(source.sectionID)));
+    conversation.updatedAt = new Date().toISOString();
+    conversation.sourceStatus = "current";
+    await saveStoredResearchConversation(context.userID, conversation);
+    sendJSON(response, 200, { conversation });
+  } catch (error) {
+    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+      sendError(response, 400, error.message);
+      return;
+    }
+    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
+      sendError(response, 422, "This code section is incomplete and cannot be analyzed yet.");
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleResearchConversationRefresh(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  const current = await currentResearchEvidence(conversation);
+  const evidenceByID = new Map(current.evidence.map((item) => [item.sectionID, item]));
+  if (current.sourceStatuses.some((status) => !status.selectionPresent)) {
+    sendJSON(response, 409, {
+      error: "A selected passage is no longer present in the enacted text. Start a new research selection from the current code.",
+      code: "RESEARCH_SELECTION_CHANGED",
+      conversation: await researchConversationForClient(conversation, { checkSources: true })
+    });
+    return;
+  }
+  conversation.sources = conversation.sources.map((source) => {
+    const evidence = evidenceByID.get(source.sectionID);
+    return evidence ? {
+      ...source,
+      sectionNumber: evidence.sectionNumber,
+      title: evidence.title,
+      codePrefix: evidence.codePrefix,
+      chapterNumber: evidence.chapterNumber,
+      sectionTextHash: evidence.sectionTextHash,
+      codeVersion: defaultSyncCodeVersion
+    } : source;
+  });
+  conversation.sourceStatus = "current";
+  conversation.updatedAt = new Date().toISOString();
+  await saveStoredResearchConversation(context.userID, conversation);
+  sendJSON(response, 200, { conversation });
+}
+
+function currentMonthStart() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1)).toISOString();
+}
+
+function monthlyResearchRequestLimit() {
+  const configured = Number(process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT);
+  return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100_000 ? configured : 100;
+}
+
+async function handleResearchConversationMessage(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  const question = normalizedResearchText(context.body.question, 2_000);
+  if (question.length < 3) {
+    sendError(response, 400, "Enter a research question.");
+    return;
+  }
+  if ((conversation.messages || []).length >= 200) {
+    sendError(response, 409, "This conversation reached 100 exchanges. Start a new research conversation to continue.");
+    return;
+  }
+  try {
+    const current = await currentResearchEvidence(conversation);
+    if (current.stale) {
+      conversation.sourceStatus = "changed";
+      await saveStoredResearchConversation(context.userID, conversation);
+      sendJSON(response, 409, {
+        error: "The enacted source text changed after it was added. Refresh the sources before asking another question.",
+        code: "RESEARCH_SOURCE_CHANGED",
+        conversation: { ...conversation, sourceStatuses: current.sourceStatuses }
+      });
+      return;
+    }
+    const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+    const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
+    const requestLimit = monthlyResearchRequestLimit();
+    if (!mockMode && usageEntries.length >= requestLimit) {
+      sendJSON(response, 429, {
+        error: "This account reached its monthly AI research limit.",
+        code: "RESEARCH_MONTHLY_LIMIT",
+        usage: { requestsUsed: usageEntries.length, requestLimit }
+      });
+      return;
+    }
+    const selections = conversation.sources.filter((source) => source.kind === "selection");
+    const result = mockMode
+      ? {
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, current.evidence), current.evidence),
+          model: "permitext-mock",
+          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+        }
+      : await openAIResearchInterpretation(question, current.evidence, context.userID, {
+          selections,
+          messages: conversation.messages
+        });
+    const now = new Date().toISOString();
+    const disclaimer = "AI-generated research assistance, not an official code determination.";
+    const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
+    const assistantMessage = {
+      id: randomUUID(),
+      role: "assistant",
+      createdAt: now,
+      answer: {
+        mode: mockMode ? "mock" : "openai",
+        model: result.model,
+        ...result.interpretation,
+        evidenceSectionIDs: current.evidence.map((section) => section.sectionID),
+        usage: result.usage,
+        disclaimer
+      }
+    };
+    conversation.messages.push(userMessage, assistantMessage);
+    conversation.updatedAt = now;
+    conversation.sourceStatus = "current";
+    await saveStoredResearchConversation(context.userID, conversation);
+    if (!mockMode) {
+      await recordResearchUsage(context.userID, {
+        id: randomUUID(),
+        model: result.model,
+        mode: "openai",
+        ...result.usage,
+        createdAt: now
+      });
+    }
+    console.info(JSON.stringify({
+      event: "research_conversation_message",
+      user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
+      evidenceSections: current.evidence.length,
+      totalTokens: result.usage.totalTokens
+    }));
+    sendJSON(response, 200, {
+      conversation,
+      usage: {
+        requestsUsed: mockMode ? 0 : usageEntries.length + 1,
+        requestLimit,
+        mockMode
+      }
+    });
+  } catch (error) {
+    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
+      sendError(response, 422, "A cited code section is incomplete and cannot be analyzed yet.");
+      return;
+    }
+    if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_REFUSAL") {
+      sendError(response, 422, error.message);
+      return;
+    }
+    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "RESEARCH_PROVIDER_ERROR", "TimeoutError"].includes(error.code || error.name)) {
+      sendError(response, 502, "The research model could not return a verified, cited answer.");
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleResearchConversationDelete(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const deleted = await deleteStoredResearchConversation(context.userID, String(context.body.conversationID || "").trim());
+  if (!deleted) {
+    sendError(response, 404, "Research conversation not found.");
+    return;
+  }
+  sendJSON(response, 200, { deleted: true });
 }
 
 function searchSnippet(text, query) {
@@ -4864,6 +5493,13 @@ const handlers = {
   "billing/stripe/webhook": handleStripeWebhook,
   "billing/apple/transactions/verify": handleAppleTransactionVerify,
   "research/interpret": handleResearchInterpretation,
+  "research/conversations/list": handleResearchConversationList,
+  "research/conversations/get": handleResearchConversationGet,
+  "research/conversations/create": handleResearchConversationCreate,
+  "research/conversations/evidence": handleResearchConversationEvidence,
+  "research/conversations/refresh": handleResearchConversationRefresh,
+  "research/conversations/message": handleResearchConversationMessage,
+  "research/conversations/delete": handleResearchConversationDelete,
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
   "workboards/assets/delete": handleWorkboardAssetDelete,

@@ -138,8 +138,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("columns-refinement-v77"),
-      "Web workspace omitted the current Settings refinement assets."
+      webRoot.text.includes("research-conversations-v2"),
+      "Web workspace omitted the current Research conversation assets."
     );
     const topbarSource = webRoot.text.slice(
       webRoot.text.indexOf('<header class="topbar">'),
@@ -530,7 +530,7 @@ async function main() {
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
-        webRoot.text.includes('/web/app.js?v=20260722-columns-refinement-v83'),
+        webRoot.text.includes('/web/app.js?v=20260722-research-conversations-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -580,6 +580,15 @@ async function main() {
       workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
         !workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
       "Research trust labeling or the simplified private-note header regressed."
+    );
+    assert(
+      workspaceScript.text.includes("function bindResearchTextSelection") &&
+        workspaceScript.text.includes('analyzeButton.textContent = state.researchConversationID ? "Analyze in new research" : "Analyze"') &&
+        workspaceScript.text.includes('addButton.textContent = "Add to current research"') &&
+        workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
+        workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
+        workspaceScript.text.includes("opening this conversation has not called an AI model"),
+      "Web Research no longer exposes selection-first, persistent conversations without an eager model call."
     );
     assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
@@ -1256,6 +1265,123 @@ async function main() {
       researchInterpretation.json.disclaimer.includes("not an official code determination"),
       "Research interpretation omitted its authority disclaimer."
     );
+
+    const selectedResearchText = "Owners of such buildings shall notify the department in writing at least 72 hours prior to the commencement of any work pursuant to such permits.";
+    const unauthorizedConversation = await request("/research/conversations/create", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: "8881",
+        selectedText: selectedResearchText
+      }
+    });
+    assert(unauthorizedConversation.response.status === 401, "Research conversation creation allowed an unauthenticated request.");
+
+    const invalidSelection = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: "8881",
+        selectedText: "This sentence is not enacted text."
+      }
+    });
+    assert(invalidSelection.response.status === 400, "Research conversation accepted client text that is absent from the canonical section.");
+
+    const createdConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: "8881",
+        selectedText: selectedResearchText
+      }
+    });
+    assert(createdConversation.response.status === 201, "Research conversation creation failed.");
+    assert(createdConversation.json.conversation.messages.length === 0, "Creating research unexpectedly generated an AI message.");
+    assert(
+      createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&
+        createdConversation.json.conversation.sources[0].sectionTextHash,
+      "Research conversation did not preserve a canonical, versioned selected passage."
+    );
+    const conversationID = createdConversation.json.conversation.id;
+
+    const listedConversations = await request("/research/conversations/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      listedConversations.response.ok && listedConversations.json.conversations.some((item) => item.id === conversationID),
+      "Private research history did not list the new conversation."
+    );
+
+    const conversationMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        question: "When must the owner notify the department?"
+      }
+    });
+    assert(conversationMessage.response.ok, "Research conversation message failed in mock mode.");
+    assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
+    assert(
+      conversationMessage.json.conversation.messages.length === 2 &&
+        conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881",
+      "Research conversation did not persist a cited user and assistant exchange."
+    );
+
+    const fetchedConversation = await request("/research/conversations/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(
+      fetchedConversation.response.ok && fetchedConversation.json.conversation.sourceStatus === "current",
+      "Research conversation did not verify its saved source hash."
+    );
+
+    const researchStore = JSON.parse(await readFile(dataPath, "utf8"));
+    const storedConversation = researchStore.researchConversationsByUserID[userID].find((item) => item.id === conversationID);
+    storedConversation.sources[0].sectionTextHash = "simulated-outdated-source";
+    await writeFile(dataPath, `${JSON.stringify(researchStore, null, 2)}\n`);
+    const staleConversationMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        question: "Can I rely on the old source?"
+      }
+    });
+    assert(
+      staleConversationMessage.response.status === 409 && staleConversationMessage.json.code === "RESEARCH_SOURCE_CHANGED",
+      "Research did not stop a new answer after the enacted source hash changed."
+    );
+    const refreshedConversation = await request("/research/conversations/refresh", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(
+      refreshedConversation.response.ok && refreshedConversation.json.conversation.sourceStatus === "current",
+      "Research sources could not be explicitly refreshed after a code update."
+    );
+
+    const deletedConversation = await request("/research/conversations/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(deletedConversation.response.ok && deletedConversation.json.deleted, "Research conversation deletion failed.");
+    const deletedConversationRead = await request("/research/conversations/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(deletedConversationRead.response.status === 404, "Deleted research conversation remained readable.");
 
     const browserCredentialID = "smoke-browser";
     const browserSignIn = await request("/account/sign-in", {
