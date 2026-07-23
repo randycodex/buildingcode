@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("research-conversations-v2"),
+      webRoot.text.includes("research-selection-v3"),
       "Web workspace omitted the current Research conversation assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -530,7 +530,9 @@ async function main() {
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
-        webRoot.text.includes('/web/app.js?v=20260722-research-conversations-v2'),
+        workspaceScript.text.includes("function researchSelectionTextFromRange") &&
+        workspaceScript.text.includes('data-research-selection-exclude="true"') &&
+        webRoot.text.includes('/web/app.js?v=20260722-research-selection-v3'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1294,7 +1296,7 @@ async function main() {
       body: {
         auth: { accountUserID: userID },
         sectionID: "8881",
-        selectedText: selectedResearchText
+        selectedText: `${selectedResearchText} Has note Bookmarked`
       }
     });
     assert(createdConversation.response.status === 201, "Research conversation creation failed.");
@@ -1331,6 +1333,25 @@ async function main() {
       conversationMessage.json.conversation.messages.length === 2 &&
         conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881",
       "Research conversation did not persist a cited user and assistant exchange."
+    );
+
+    const additionalResearchText = "The real time enforcement unit shall monitor all occupied multiple dwellings with valid permits for (i) the alteration of 10 percent or more of the existing floor surface area of the building or (ii) an addition to the building.";
+    const addedConversationEvidence = await request("/research/conversations/evidence", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        sectionID: "8881",
+        selectedText: `${additionalResearchText} Has note Bookmarked`
+      }
+    });
+    const selectedConversationSources = addedConversationEvidence.json.conversation?.sources.filter((source) => source.kind === "selection") || [];
+    assert(
+      addedConversationEvidence.response.ok &&
+        selectedConversationSources.length === 2 &&
+        selectedConversationSources[1].selectedText === additionalResearchText,
+      "Current research did not append and clean a later enacted-text selection after an analysis."
     );
 
     const fetchedConversation = await request("/research/conversations/get", {

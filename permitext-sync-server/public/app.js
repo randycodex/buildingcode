@@ -4317,6 +4317,7 @@ function renderInlineCommentBox(section, _reader, target = annotationTargetForSe
   wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
   wrapper.dataset.commentBlockId = target.blockID || "";
+  wrapper.dataset.researchSelectionExclude = "true";
 
   const button = document.createElement("span");
   button.className = "inline-comment-toggle";
@@ -7025,6 +7026,23 @@ function closeResearchSelectionMenu() {
   pendingResearchSelection = null;
 }
 
+function researchSelectionTextFromRange(selection, range) {
+  const fragment = range.cloneContents();
+  const container = document.createElement("div");
+  container.append(fragment);
+  container.querySelectorAll('[data-research-selection-exclude="true"]').forEach((element) => element.remove());
+  container.querySelectorAll([
+    "address", "article", "aside", "blockquote", "br", "dd", "div", "dl", "dt",
+    "figcaption", "figure", "footer", "h1", "h2", "h3", "h4", "h5", "h6",
+    "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table",
+    "tbody", "td", "tfoot", "th", "thead", "tr", "ul"
+  ].join(",")).forEach((element) => element.append(document.createTextNode(" ")));
+  return String(container.textContent || selection)
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 4_000);
+}
+
 function researchSelectionFromWindow() {
   const selection = window.getSelection?.();
   if (!selection || selection.rangeCount !== 1 || selection.isCollapsed) return null;
@@ -7034,7 +7052,7 @@ function researchSelectionFromWindow() {
   const source = start?.closest?.(".research-selectable-text");
   if (!source || source !== end?.closest?.(".research-selectable-text")) return null;
   if (source.closest(".research-conversation-panel")) return null;
-  const selectedText = String(selection).replace(/\s+/g, " ").trim().slice(0, 4_000);
+  const selectedText = researchSelectionTextFromRange(selection, range);
   if (selectedText.length < 2) return null;
   const rect = range.getBoundingClientRect();
   if (!rect.width && !rect.height) return null;

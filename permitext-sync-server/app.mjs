@@ -2132,6 +2132,31 @@ function normalizedResearchText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
+function comparableResearchText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00AD\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function matchingCanonicalResearchSelection(value, canonicalText) {
+  const normalized = normalizedResearchText(value, 4_000);
+  const withoutReaderChrome = normalized
+    .replace(/(?:^|\s)(?:Has note|Bookmarked)(?=\s|$)/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  const canonicalComparable = comparableResearchText(canonicalText);
+  for (const candidate of Array.from(new Set([normalized, withoutReaderChrome]))) {
+    if (candidate.length >= 2 && canonicalComparable.includes(comparableResearchText(candidate))) {
+      return candidate;
+    }
+  }
+  return "";
+}
+
 async function researchEvidenceForSectionIDs(sectionIDs) {
   const evidence = [];
   const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
@@ -2501,7 +2526,8 @@ async function researchSourcesForSelection(sectionID, selectedText) {
     throw error;
   }
   const [primary] = await researchEvidenceForSectionIDs([sectionID]);
-  if (!primary.canonicalText.includes(normalizedSelection)) {
+  const canonicalSelection = matchingCanonicalResearchSelection(normalizedSelection, primary.canonicalText);
+  if (!canonicalSelection) {
     const error = new Error("The selected passage no longer matches the enacted section text.");
     error.code = "INVALID_RESEARCH_SELECTION";
     throw error;
@@ -2511,7 +2537,7 @@ async function researchSourcesForSelection(sectionID, selectedText) {
     researchSourceFromEvidence(primary, {
       kind: "selection",
       relationship: "Passage selected by you",
-      selectedText: normalizedSelection
+      selectedText: canonicalSelection
     }),
     ...related.map((evidence) => researchSourceFromEvidence(evidence))
   ];
@@ -2523,7 +2549,9 @@ async function currentResearchEvidence(conversation) {
   const evidenceByID = new Map(evidence.map((item) => [item.sectionID, item]));
   const sourceStatuses = (conversation.sources || []).map((source) => {
     const current = evidenceByID.get(source.sectionID);
-    const selectionPresent = !source.selectedText || Boolean(current?.canonicalText.includes(source.selectedText));
+    const selectionPresent = !source.selectedText || Boolean(
+      current && matchingCanonicalResearchSelection(source.selectedText, current.canonicalText)
+    );
     return {
       sourceID: source.id,
       sectionID: source.sectionID,
