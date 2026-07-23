@@ -2547,6 +2547,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           "When a category, table row, shared-facility condition, or calculation input is needed but not established, name that missing item specifically rather than asking only for generic project information.",
           "When selected evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result.",
           "Do not merely say that a table or category must be checked. Identify the project-specific use category that must be selected from actual use and explain what the selected evidence already establishes.",
+          "If the question attributes a requirement to an agency, funding program, or other authority not represented in the selected evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority.",
           "If the question cannot be answered from the selected evidence, say so directly.",
         "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
       ].join(" "),
