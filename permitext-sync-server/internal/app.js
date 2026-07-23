@@ -138,18 +138,27 @@ function caseDetail(testCase) {
   detail.append(element("h2", { text: testCase.title }));
   const meta = element("p", { className: "meta", text: `${testCase.id} · ${testCase.codeEdition} · ${testCase.difficulty} · ${testCase.sourceType}` });
   detail.append(meta);
+  detail.append(element("p", { className: "meta", text: `${testCase.jurisdiction || "Jurisdiction unavailable"} · ${testCase.sourceReference || "Source reference unavailable"}` }));
   testCase.topics.forEach((topic) => detail.append(element("span", { className: "badge", text: topic })));
+  detail.append(
+    element("h3", { text: "Project context" }),
+    element("div", { className: "evidence", text: JSON.stringify(testCase.projectContext, null, 2) })
+  );
   detail.append(element("h3", { text: "Question" }), element("p", { text: testCase.question }));
   detail.append(element("h3", { text: "Selected evidence" }));
   testCase.selectedEvidence.forEach((source) => {
-    detail.append(element("strong", { text: source.reference }));
+    detail.append(element("strong", { text: `${source.reference} · canonical section ${source.sectionID || "legacy result"}` }));
     source.exactPassages.forEach((passage) => detail.append(element("div", { className: "evidence", text: passage })));
   });
-  detail.append(element("h3", { text: `Expected conclusion (${testCase.expectedCertainty})` }), element("p", { text: testCase.expectedConclusion }));
+  const expectedLevel = testCase.expectedUncertainty?.level || testCase.expectedCertainty || "unspecified";
+  const expectedDescription = testCase.expectedUncertainty?.description || "";
+  detail.append(element("h3", { text: `Expected conclusion (${expectedLevel})` }), element("p", { text: testCase.expectedConclusion }));
+  if (expectedDescription) detail.append(element("p", { className: "meta", text: expectedDescription }));
   appendList(detail, "Required citations", testCase.requiredCitations);
   appendList(detail, "Required concepts", testCase.requiredConcepts);
   appendList(detail, "Missing facts", testCase.missingFacts);
   appendList(detail, "Forbidden claims", testCase.forbiddenClaims);
+  if (testCase.notes) detail.append(element("h3", { text: "Case notes" }), element("p", { text: testCase.notes }));
   appendPreviousReview(detail, latestReview("case", testCase.id));
   detail.append(reviewForm(testCase));
   return detail;
@@ -180,7 +189,14 @@ function runLabel(run) {
 
 function answerText(result) {
   const answer = result?.answer;
-  return answer ? [answer.conclusion, answer.explanation, ...(answer.missingFacts || []).map((item) => `Missing: ${item}`)].join("\n\n") : "No result for this case.";
+  return answer ? [
+    answer.conclusion,
+    answer.explanation,
+    ...(answer.assumptions || []).map((item) => `Assumption: ${item}`),
+    ...(answer.missingFacts || []).map((item) => `Missing fact: ${item}`),
+    ...(answer.evidenceLimitations || []).map((item) => `Evidence limitation: ${item}`),
+    ...(answer.additionalEvidenceNeeded || []).map((item) => `Additional evidence: ${item}`)
+  ].join("\n\n") : "No result for this case.";
 }
 
 function runResultCard(run, caseID) {
@@ -188,10 +204,67 @@ function runResultCard(run, caseID) {
   const card = element("article", { className: "card" });
   card.append(element("h2", { text: run ? runLabel(run) : "No run selected" }));
   if (!result) return card;
+  if (result.error) {
+    card.append(element("p", { className: "fail", text: `ERROR · ${result.error.message}` }));
+    return card;
+  }
   card.append(element("p", { className: result.scoring.passed ? "pass" : "fail", text: `${result.scoring.passed ? "PASS" : "FAIL"} · ${result.scoring.overallScore}/4` }));
+  if (result.scoring.criticalFailures?.length) {
+    card.append(element("p", { className: "fail", text: `Critical: ${result.scoring.criticalFailures.join(", ")}` }));
+  }
+  card.append(element("h3", { text: "Run configuration" }));
+  card.append(element("div", {
+    className: "evidence",
+    text: [
+      `Run: ${run.configuration?.runID || "unknown"}`,
+      `Requested model: ${run.configuration?.answerModel || "unknown"}`,
+      `Returned model: ${result.answer?.model || "unknown"}`,
+      `Prompt: ${run.configuration?.promptVersion || "unknown"}`,
+      `Evidence: ${run.configuration?.evidenceVersion || "unknown"}`,
+      `Retrieval: ${run.configuration?.retrievalVersion || "unknown"}`,
+      `Commit: ${run.configuration?.gitCommit || "unknown"}`
+    ].join("\n")
+  }));
   card.append(element("h3", { text: "Generated answer" }), element("div", { className: "answer", text: answerText(result) }));
-  card.append(element("h3", { text: "Automatic scores" }));
+  appendList(card, "Returned citations", (result.answer?.citations || []).map((citation) =>
+    `${citation.codePrefix} ${citation.sectionNumber} [${citation.sectionID}]: ${citation.relevance}`
+  ));
+  card.append(element("h3", { text: "Quality scores" }));
   Object.entries(result.scoring.metrics).forEach(([name, metric]) => card.append(element("p", { className: "meta", text: `${name}: ${metric.score}/4 — ${metric.rationale}` })));
+  if (result.scoring.deterministic) {
+    card.append(element("h3", { text: "Deterministic validation" }));
+    card.append(element("div", {
+      className: "evidence",
+      text: JSON.stringify({
+        structuralValidity: result.scoring.deterministic.structuralValidity,
+        citationValidation: result.scoring.deterministic.citationValidation,
+        operational: result.scoring.deterministic.operational
+      }, null, 2)
+    }));
+  } else {
+    card.append(element("p", {
+      className: "meta",
+      text: `Legacy operational data: ${result.answerTimeMilliseconds || "—"} ms; ${result.answer?.usage?.inputTokens || 0} input tokens; ${result.answer?.usage?.outputTokens || 0} output tokens; estimated answer cost ${result.answer?.estimatedCost?.estimatedUSD ?? result.answer?.estimatedCostUSD ?? "unavailable"}.`
+    }));
+  }
+  if (result.scoring.semantic) {
+    card.append(element("h3", { text: "Semantic grader detail" }));
+    Object.entries(result.scoring.semantic.metrics || {}).forEach(([name, metric]) => {
+      card.append(element("div", {
+        className: "evidence",
+        text: `${name}: ${metric.score}/4\n${metric.rationale}\nConfidence: ${metric.confidence}; type: ${metric.judgmentType}${metric.failureExcerpt ? `\nFailure excerpt: ${metric.failureExcerpt}` : ""}`
+      }));
+    });
+    [
+      ["Required concepts", result.scoring.semantic.rubricChecks?.requiredConcepts],
+      ["Forbidden claims", result.scoring.semantic.rubricChecks?.forbiddenClaims],
+      ["Missing facts", result.scoring.semantic.rubricChecks?.missingFacts]
+    ].forEach(([title, items]) => {
+      appendList(card, title, (items || []).map((item) =>
+        `${item.id}: ${item.rationale} (${item.confidence}, ${item.judgmentType})${item.failureExcerpt ? ` — ${item.failureExcerpt}` : ""}`
+      ));
+    });
+  }
   appendPreviousReview(card, latestReview("run", caseID, run.configuration.runID));
   card.append(reviewForm(result.testCase, { runID: run.configuration.runID, metrics: result.scoring.metrics }));
   return card;

@@ -1,0 +1,364 @@
+{
+  "schemaVersion": 2,
+  "status": "completed",
+  "createdAt": "2026-07-23T03:07:48.390Z",
+  "updatedAt": "2026-07-23T03:08:00.931Z",
+  "configuration": {
+    "runID": "2f228725-c9b4-4259-a35c-9d2ac70940c2",
+    "datasetSHA256": "a208727d07faf88c3428868ad1b847738cb1aabf261d1b4dcd542566f31781d9",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260722-grounded-passages-v6",
+    "evidenceVersion": "selected-passages-only-v2",
+    "retrievalVersion": "none-selected-evidence-only",
+    "suiteScope": "targeted",
+    "caseIDs": [
+      "building-code-versus-hcr"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260722-exact-rubric-v2",
+    "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+    "gitCommit": "eccd1dccfac911e2652dd3199f57f06d3b9a65ea",
+    "approvedSpendCapUSD": 5.5,
+    "conservativeReservedUSD": 0.091026,
+    "paidRequestCount": 2
+  },
+  "baseline": {
+    "runID": "899b7062-2350-4e67-acfa-e7541f58b68d",
+    "createdAt": "2026-07-23T03:04:58.887Z",
+    "cases": [
+      {
+        "caseID": "building-code-versus-hcr",
+        "previousScore": 3.38,
+        "currentScore": 4,
+        "scoreChange": 0.62,
+        "previousPassed": false,
+        "currentPassed": true
+      }
+    ]
+  },
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "building-code-versus-hcr",
+        "title": "Building Code evidence versus an agency requirement",
+        "status": "approved",
+        "difficulty": "basic",
+        "topics": [
+          "accessibility",
+          "agency requirements",
+          "scope of authority",
+          "evidence limits"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "questionedAuthority": "New York State Homes and Community Renewal (HCR)",
+          "selectedAuthority": "New York City Building Code only",
+          "unknowns": [
+            "applicable HCR standard",
+            "funding requirements",
+            "agency guidance"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 1107.2.2.7.2.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "exactPassages": [
+              "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+            ],
+            "sectionID": "2713",
+            "resolvedTitle": "- 1107.2.2.7.2.2 Forward approach.",
+            "evidenceCharacters": 378,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "Does this section prove that HCR requires a vanity in the bathroom?",
+        "expectedConclusion": "No. The selected Building Code passage establishes the required water-closet clearance when only a forward approach is provided and states when a lavatory may be located on the rear wall. It does not establish an HCR vanity requirement. HCR requirements cannot be confirmed from the selected evidence; the applicable HCR design standard, project funding requirements, or agency guidance must be provided.",
+        "expectedCertainty": "outside selected authority",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "Answer no.",
+          "Explain that the passage regulates water-closet clearances for a forward approach.",
+          "Explain that the passage permits a compliant lavatory on the rear wall under the stated placement condition.",
+          "State that the selected evidence does not establish an HCR vanity requirement.",
+          "Request the applicable HCR material before stating what HCR requires."
+        ],
+        "missingFacts": [
+          "Provide the applicable HCR design standard, project funding requirement, or agency guidance."
+        ],
+        "forbiddenClaims": [
+          "A vanity is required by this Building Code passage.",
+          "A lavatory and a vanity are interchangeable requirements.",
+          "State what HCR requires without HCR material in the evidence."
+        ],
+        "requiredCitations": [
+          "BC 1107.2.2.7.2.2"
+        ],
+        "ready": true
+      },
+      "conversationID": "f1ea8ac3-83ad-48c6-b37e-1b3c82b52fe1",
+      "answeredAt": "2026-07-23T03:07:54.793Z",
+      "judgedAt": "2026-07-23T03:08:00.929Z",
+      "answerTimeMilliseconds": 6374,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v6",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "No. This passage does not prove that HCR requires a vanity in the bathroom. It permits a compliant lavatory in a specific location when only a forward approach is provided to the water closet; it does not state that a lavatory or vanity must be provided. [SECTION_ID 2713; PASSAGE_ID ab9230d3-1790-412a-98df-1013e0033dce]",
+        "explanation": "The selected text applies where the bathroom layout provides only a forward approach to the water closet. In that condition, it sets minimum water-closet clearances: 66 inches measured perpendicular from the rear wall and 48 inches measured perpendicular from the side wall. It then states that a lavatory complying with Section 1107.2.2.5 is permitted on the rear wall if it is at least 18 inches from the water-closet centerline. “Shall be permitted” is an allowance, not a mandate to install a lavatory. Also, the passage uses the term “lavatory,” not “vanity”; whether a particular vanity configuration qualifies as a compliant lavatory cannot be determined without the referenced Section 1107.2.2.5. [SECTION_ID 2713; PASSAGE_ID ab9230d3-1790-412a-98df-1013e0033dce]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the subject dwelling unit or bathroom is an HCR unit and whether this section applies to it.",
+          "Whether the proposed water-closet layout has only a forward approach.",
+          "Whether the question uses “vanity” to mean a lavatory fixture, a cabinet/counter supporting a lavatory, or both.",
+          "Whether a lavatory is required by another applicable code provision or by HCR’s applicable program, funding, or design requirements."
+        ],
+        "evidenceLimitations": [
+          "The selected passage addresses water-closet clearance and the permitted location of a lavatory only; it contains no general fixture-count or bathroom-fixture requirement.",
+          "The selected evidence does not include Section 1107.2.2.5, so lavatory compliance criteria cannot be evaluated.",
+          "The selected evidence does not identify HCR or establish any HCR-specific requirement. Therefore, it cannot establish what HCR requires."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable HCR design standard, funding/program requirements, official guidance, or other HCR authority that is alleged to require a vanity.",
+          "Any applicable code provision requiring bathroom fixtures or specifying when a lavatory must be installed.",
+          "Section 1107.2.2.5, if the issue is whether a proposed lavatory/vanity is compliant or may occupy the stated rear-wall location.",
+          "Bathroom plan information showing the water closet, walls, approach direction, and proposed lavatory/vanity location and dimensions."
+        ],
+        "citations": [
+          {
+            "sectionID": "2713",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "title": "- 1107.2.2.7.2.2 Forward approach.",
+            "codePrefix": "BC",
+            "chapterNumber": "11",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "ab9230d3-1790-412a-98df-1013e0033dce"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ab9230d3-1790-412a-98df-1013e0033dce",
+                "selectedText": "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+              }
+            ],
+            "relevance": "Establishes forward-approach water-closet clearance dimensions and permits, rather than requires, a compliant lavatory on the rear wall under stated conditions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2713"
+        ],
+        "evidenceSourceIDs": [
+          "ab9230d3-1790-412a-98df-1013e0033dce"
+        ],
+        "usage": {
+          "inputTokens": 784,
+          "cachedInputTokens": 0,
+          "outputTokens": 662,
+          "totalTokens": 1446
+        },
+        "estimatedCostUSD": 0.01189,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.01189,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 6135,
+        "usage": {
+          "inputTokens": 1590,
+          "cachedInputTokens": 0,
+          "outputTokens": 741,
+          "totalTokens": 2331
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The answer attributes the correct content to BC 1107.2.2.7.2.2: it identifies the forward-approach condition, the 66-inch rear-wall and 48-inch side-wall clearances, and the permission for a compliant lavatory on the rear wall at least 18 inches from the water-closet centerline. Its citation entry correctly identifies the provision and accurately describes its relevance."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a requirement. It correctly distinguishes a permitted lavatory location from a mandate to install a lavatory or vanity, and does not assert any unsupported HCR requirement.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately states that the selected Building Code evidence cannot establish HCR requirements. It identifies the absent HCR authority and relevant unknowns, including the referenced Section 1107.2.2.5 and the meaning of 'vanity,' without drawing unsupported conclusions."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer directly answers no, explains the operative code language and dimensions, distinguishes lavatory from vanity, states the evidence limitation regarding HCR, and lists specific materials needed to resolve the HCR question."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "The conclusion begins with 'No.'"
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the passage applies to a forward approach to the water closet and sets the associated minimum clearances."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It explains that a compliant lavatory is permitted on the rear wall when it is at least 18 inches from the water-closet centerline."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It expressly states that the passage does not prove or establish an HCR vanity requirement."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It requests the applicable HCR design standard, program/funding requirements, guidance, or other HCR authority before determining what HCR requires."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer expressly rejects the proposition that the passage requires a vanity."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer distinguishes the passage's term 'lavatory' from 'vanity' and does not treat them as interchangeable requirements."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not state what HCR requires; it says that HCR requirements cannot be established from the selected evidence."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "The answer specifically requests applicable HCR design standards, funding/program requirements, official guidance, or other HCR authority."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.01509,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 citations were restricted to selected evidence. The answer attributes the correct content to BC 1107.2.2.7.2.2: it identifies the forward-approach condition, the 66-inch rear-wall and 48-inch side-wall clearances, and the permission for a compliant lavatory on the rear wall at least 18 inches from the water-closet centerline. Its citation entry correctly identifies the provision and accurately describes its relevance."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "1/1 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "5/5 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a requirement. It correctly distinguishes a permitted lavatory location from a mandate to install a lavatory or vanity, and does not assert any unsupported HCR requirement.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer appropriately states that the selected Building Code evidence cannot establish HCR requirements. It identifies the absent HCR authority and relevant unknowns, including the referenced Section 1107.2.2.5 and the meaning of 'vanity,' without drawing unsupported conclusions."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "1/1 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer directly answers no, explains the operative code language and dimensions, distinguishes lavatory from vanity, states the evidence limitation regarding HCR, and lists specific materials needed to resolve the HCR question."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "6374 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 4,
+            "rationale": "$0.011890 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "The conclusion begins with 'No.'"
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the passage applies to a forward approach to the water closet and sets the associated minimum clearances."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It explains that a compliant lavatory is permitted on the rear wall when it is at least 18 inches from the water-closet centerline."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It expressly states that the passage does not prove or establish an HCR vanity requirement."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It requests the applicable HCR design standard, program/funding requirements, guidance, or other HCR authority before determining what HCR requires."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer expressly rejects the proposition that the passage requires a vanity."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer distinguishes the passage's term 'lavatory' from 'vanity' and does not treat them as interchangeable requirements."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not state what HCR requires; it says that HCR requirements cannot be established from the selected evidence."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "The answer specifically requests applicable HCR design standards, funding/program requirements, official guidance, or other HCR authority."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

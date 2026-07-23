@@ -1,0 +1,498 @@
+{
+  "schemaVersion": 2,
+  "status": "completed",
+  "createdAt": "2026-07-23T03:12:11.490Z",
+  "updatedAt": "2026-07-23T03:12:40.084Z",
+  "configuration": {
+    "runID": "f56bae45-5a2e-41d9-9461-4fbf922571a8",
+    "datasetSHA256": "a208727d07faf88c3428868ad1b847738cb1aabf261d1b4dcd542566f31781d9",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260722-grounded-passages-v7",
+    "evidenceVersion": "selected-passages-only-v2",
+    "retrievalVersion": "none-selected-evidence-only",
+    "suiteScope": "targeted",
+    "caseIDs": [
+      "accessory-assembly-plumbing-fixtures"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260722-exact-rubric-v2",
+    "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+    "gitCommit": "0e33ed193177da634a45e7e2d5f2e8846d2abcfd",
+    "approvedSpendCapUSD": 0.5,
+    "conservativeReservedUSD": 0.113958,
+    "paidRequestCount": 2
+  },
+  "baseline": {
+    "runID": "fb2ba69e-f82b-43f6-9712-4e3aa7b597ca",
+    "createdAt": "2026-07-23T03:08:12.514Z",
+    "cases": [
+      {
+        "caseID": "accessory-assembly-plumbing-fixtures",
+        "previousScore": 3.83,
+        "currentScore": 3.87,
+        "scoreChange": 0.04,
+        "previousPassed": true,
+        "currentPassed": true
+      }
+    ]
+  },
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "accessory-assembly-plumbing-fixtures",
+        "title": "Plumbing fixtures for an accessory assembly space",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "plumbing fixtures",
+          "accessory assembly",
+          "occupant load",
+          "fixture calculation"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "space": "Residential multipurpose room",
+          "potentialClassification": "Group B under the accessory assembly provision",
+          "unknowns": [
+            "assembly use category",
+            "occupant load",
+            "shared facilities",
+            "sex distribution"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "sectionID": "132",
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": []
+          },
+          {
+            "reference": "PC 403.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1",
+            "exactPassages": [
+              "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+              "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+            ],
+            "sectionID": "11909",
+            "resolvedTitle": "403.1 Minimum number of fixtures.",
+            "evidenceCharacters": 8488,
+            "ready": true,
+            "missingPassages": []
+          },
+          {
+            "reference": "PC 403.1.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "exactPassages": [
+              "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+              "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+            ],
+            "sectionID": "11910",
+            "resolvedTitle": "403.1.1 Fixture calculations.",
+            "evidenceCharacters": 912,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+        "expectedConclusion": "Not automatically. Although an accessory assembly space with fewer than 75 occupants may be classified as Group B or as part of the occupancy it serves, the code permits the plumbing fixtures for that assembly use to be calculated using the applicable Assembly fixture requirements. The appropriate assembly category must first be identified from the room's actual use. The total occupant load is generally divided equally between the sexes unless approved statistical information supports another distribution. Fixture ratios are then applied, fractions are combined as required for multiple occupancies, and the resulting fractions are rounded up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "State that Group B classification does not automatically control the fixture calculation.",
+          "Explain that applicable Assembly fixture requirements may be used for the accessory assembly use.",
+          "Require identification of the appropriate assembly category based on actual use.",
+          "Explain the general equal division between the sexes and the statistical-data exception.",
+          "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
+          "Avoid providing a final fixture count without the required project facts."
+        ],
+        "missingFacts": [
+          "Confirm the calculated occupant load.",
+          "Confirm the applicable assembly use category.",
+          "Confirm existing shared facilities and relevant project conditions.",
+          "Confirm whether approved statistical information supports a different distribution between the sexes."
+        ],
+        "forbiddenClaims": [
+          "Group B classification always controls the plumbing fixture calculation.",
+          "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+          "Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "PC 403.1",
+          "PC 403.1.1"
+        ],
+        "ready": true
+      },
+      "conversationID": "5dac4287-b2fa-4cf7-9f56-7ca701f44ff1",
+      "answeredAt": "2026-07-23T03:12:28.328Z",
+      "judgedAt": "2026-07-23T03:12:40.082Z",
+      "answerTimeMilliseconds": 16792,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v7",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "No—not as an exclusively required method based on the selected text. If the multipurpose room is an assembly-use room with an occupant load under 75 persons and is accessory to another occupancy, it may be classified as Group B (or as part of the other occupancy), but the plumbing-fixture provisions expressly permit its fixtures to be calculated using the Assembly-occupancy requirements. Thus, Group B classification does not preclude an Assembly-based fixture calculation; the selected evidence does not establish that the normal Group B fixture ratios are the only permitted basis. The applicable Table 403.1 row(s) and ratios are not supplied, so a final fixture count—or a determination whether Group B ratios may alternatively be used—cannot be made from this evidence. [BC §303.1.3, PASSAGE_ID d8c72b84-e4cc-4141-83a4-1cdfeb56c5cc; PC §403.1, PASSAGE_ID 982771a8-9502-458a-854c-c29dd2ba0e30]",
+        "explanation": "BC §303.1.3 classifies an accessory assembly room with fewer than 75 occupants as Group B or part of the other occupancy, while separately allowing the number of plumbing fixtures for that room or space to be calculated under the Assembly-occupancy requirements. PC §403.1 repeats the Assembly-calculation permission for a building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B under the referenced Building Code provision. PC §403.1 generally requires fixtures by occupancy type and minimum quantities in Table 403.1; occupant load and occupancy classification are determined under the Building Code. [BC §303.1.3, PASSAGE_ID d8c72b84-e4cc-4141-83a4-1cdfeb56c5cc; PC §403.1, PASSAGE_ID 6815fd26-f519-4caf-b0be-f2ed5d913630; PC §403.1, PASSAGE_ID 982771a8-9502-458a-854c-c29dd2ba0e30]\n\nIf an Assembly fixture calculation is used, the supplied calculation rule is: determine the Building-Code occupant load; divide it equally between sexes; apply the applicable Table 403.1 fixture ratio(s) for each fixture type to each sex; and round fractional fixture results up. For multiple occupancies, first sum the fractional results for each occupancy and then round up. The equal sex split need not be used where approved statistical data supports a different sex distribution. A separate supplied rule says Group B office calculations use the total occupant load on a given floor, but the evidence does not establish that this multipurpose room is a Group B office occupancy. [PC §403.1.1, PASSAGE_ID 1288bdf7-c702-4678-be53-d7fbc84cc072; PC §403.1.1 Exception, PASSAGE_ID bd734f66-e5b1-4d92-a9e5-4f8de2a66e5c]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the room is in fact used for assembly purposes.",
+          "Whether the room is accessory to another occupancy, if reliance is placed on BC §303.1.3 rather than the separately selected PC language for building or nonaccessory tenant space.",
+          "The Building-Code occupant load for the room, including verification that it is fewer than 75 persons.",
+          "The actual use category and applicable Assembly occupancy row(s) in Table 403.1 for the multipurpose room, and the applicable Group B row(s), if a Group B calculation is proposed.",
+          "Whether the fixture calculation includes multiple occupancies and, if so, each occupancy's occupant load and applicable Table 403.1 ratios.",
+          "Whether the room is a Group B office occupancy; this is necessary before applying the supplied floor-total Group B office calculation rule.",
+          "Whether approved statistical data supports a sex distribution other than 50/50.",
+          "Whether existing or shared plumbing facilities are proposed to serve the multipurpose room, and the selected provisions governing whether and how those facilities may be shared or credited."
+        ],
+        "evidenceLimitations": [
+          "Table 403.1 is not provided. Therefore, the selected evidence does not supply the applicable use-category row, fixture ratios, fixture types, thresholds, or a numerical minimum fixture count.",
+          "The selected passages expressly permit an Assembly-based fixture calculation but do not expressly state whether a Group B-based calculation is also permitted as an alternative in every circumstance, or prescribe which permitted approach controls if they yield different results.",
+          "The selected evidence does not include provisions on fixture location, access, sharing, existing fixtures, or credit for facilities serving more than one space."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable Table 403.1 entries for the room's actual Assembly use and for any proposed Group B calculation, including all fixture ratios and conditions.",
+          "The Building Code basis and calculation establishing the room's occupant load and its accessory relationship, if applicable.",
+          "Selected code provisions governing any proposed use, sharing, or credit of existing/common plumbing facilities.",
+          "If the project intends to use a non-50/50 sex split, the approved statistical data and the applicable approval basis. If it intends to apply the Group B office floor-total rule, evidence establishing that the use is a Group B office occupancy and the total floor occupant load."
+        ],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "chapterNumber": "3",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "d8c72b84-e4cc-4141-83a4-1cdfeb56c5cc"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "d8c72b84-e4cc-4141-83a4-1cdfeb56c5cc",
+                "selectedText": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+              }
+            ],
+            "relevance": "Provides the Group B/accessory-assembly classification rule and expressly permits Assembly-occupancy plumbing-fixture calculations."
+          },
+          {
+            "sectionID": "11909",
+            "sectionNumber": "403.1",
+            "title": "403.1 Minimum number of fixtures.",
+            "codePrefix": "PC",
+            "chapterNumber": "4",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "6815fd26-f519-4caf-b0be-f2ed5d913630",
+              "982771a8-9502-458a-854c-c29dd2ba0e30"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "6815fd26-f519-4caf-b0be-f2ed5d913630",
+                "selectedText": "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code."
+              },
+              {
+                "sourceID": "982771a8-9502-458a-854c-c29dd2ba0e30",
+                "selectedText": "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+              }
+            ],
+            "relevance": "Requires Table 403.1-based fixture quantities and separately permits Assembly calculations for the described under-75 Group B assembly space."
+          },
+          {
+            "sectionID": "11910",
+            "sectionNumber": "403.1.1",
+            "title": "403.1.1 Fixture calculations.",
+            "codePrefix": "PC",
+            "chapterNumber": "4",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "1288bdf7-c702-4678-be53-d7fbc84cc072",
+              "bd734f66-e5b1-4d92-a9e5-4f8de2a66e5c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "1288bdf7-c702-4678-be53-d7fbc84cc072",
+                "selectedText": "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor."
+              },
+              {
+                "sourceID": "bd734f66-e5b1-4d92-a9e5-4f8de2a66e5c",
+                "selectedText": "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+              }
+            ],
+            "relevance": "Supplies the sex-split, ratio, rounding, multiple-occupancy, Group B office, and statistical-data calculation rules."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "132",
+          "11909",
+          "11910"
+        ],
+        "evidenceSourceIDs": [
+          "d8c72b84-e4cc-4141-83a4-1cdfeb56c5cc",
+          "6815fd26-f519-4caf-b0be-f2ed5d913630",
+          "982771a8-9502-458a-854c-c29dd2ba0e30",
+          "1288bdf7-c702-4678-be53-d7fbc84cc072",
+          "bd734f66-e5b1-4d92-a9e5-4f8de2a66e5c"
+        ],
+        "usage": {
+          "inputTokens": 1631,
+          "cachedInputTokens": 0,
+          "outputTokens": 1361,
+          "totalTokens": 2992
+        },
+        "estimatedCostUSD": 0.024493,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.024493,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 11753,
+        "usage": {
+          "inputTokens": 2680,
+          "cachedInputTokens": 0,
+          "outputTokens": 1328,
+          "totalTokens": 4008
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The cited provisions support the claims attributed to them. BC 303.1.3 supports both the under-75 accessory-assembly Group B classification and the permission to calculate plumbing fixtures as Assembly. PC 403.1 supports the Table 403.1 framework and repeats the Assembly-calculation permission. PC 403.1.1 supports the sex split, ratio application, multi-occupancy fractional-summing, rounding, and statistical-data exception discussion."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent fixture ratios, Table 403.1 rows, a final fixture count, shared-facility credits, or an unconditional rule that Group B ratios either must or may always be used. It appropriately identifies those matters as unsupported by the supplied excerpts or dependent on missing project facts.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The response correctly treats the conclusion as conditional. It distinguishes the express permission for an Assembly-based calculation from an unsupported conclusion that normal Group B ratios are the exclusive or universally available alternative, and it identifies the missing occupant-load, use-category, shared-facility, and sex-distribution information."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It directly answers that Group B classification does not make normal Group B fixture requirements the exclusive required method, explains the available Assembly calculation path, gives the supplied calculation mechanics, and provides a concrete list of additional facts and code material needed for a final determination."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly states that Group B classification does not make Group B fixture ratios the only permitted basis."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the provisions expressly permit the fixtures to be calculated under Assembly-occupancy requirements."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It identifies the room's actual use category and applicable Assembly Table 403.1 row(s) as necessary information."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains the general equal sex split and the exception for approved statistical data supporting a different distribution."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It explains applying ratios by fixture type, summing fractional results across multiple occupancies before rounding, and rounding up."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It declines to provide a final count and identifies the missing occupant load, assembly use, shared-facility, and other project-condition facts."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer rejects the idea that Group B classification exclusively controls the plumbing fixture calculation."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "It does not claim that residential-unit fixtures automatically satisfy the room's requirements; instead, it flags shared-facility treatment as requiring additional governing provisions and facts."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "No final fixture count is given, and the answer expressly says the available evidence is insufficient for one."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It requests the Building-Code occupant load and confirmation that it is fewer than 75 persons."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It requests the actual Assembly use category and applicable Table 403.1 row(s)."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It requests confirmation of existing/shared facilities and the provisions governing sharing or credit."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It requests confirmation whether approved statistical data supports a non-50/50 sex distribution."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.02662,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "3/3 citations were restricted to selected evidence. The cited provisions support the claims attributed to them. BC 303.1.3 supports both the under-75 accessory-assembly Group B classification and the permission to calculate plumbing fixtures as Assembly. PC 403.1 supports the Table 403.1 framework and repeats the Assembly-calculation permission. PC 403.1.1 supports the sex split, ratio application, multi-occupancy fractional-summing, rounding, and statistical-data exception discussion."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "3/3 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent fixture ratios, Table 403.1 rows, a final fixture count, shared-facility credits, or an unconditional rule that Group B ratios either must or may always be used. It appropriately identifies those matters as unsupported by the supplied excerpts or dependent on missing project facts.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The response correctly treats the conclusion as conditional. It distinguishes the express permission for an Assembly-based calculation from an unsupported conclusion that normal Group B ratios are the exclusive or universally available alternative, and it identifies the missing occupant-load, use-category, shared-facility, and sex-distribution information."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "It directly answers that Group B classification does not make normal Group B fixture requirements the exclusive required method, explains the available Assembly calculation path, gives the supplied calculation mechanics, and provides a concrete list of additional facts and code material needed for a final determination."
+          },
+          "responseTime": {
+            "score": 3,
+            "rationale": "16792 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 3,
+            "rationale": "$0.024493 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 3.87,
+        "passed": true,
+        "requiredRubricsSatisfied": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly states that Group B classification does not make Group B fixture ratios the only permitted basis."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the provisions expressly permit the fixtures to be calculated under Assembly-occupancy requirements."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It identifies the room's actual use category and applicable Assembly Table 403.1 row(s) as necessary information."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains the general equal sex split and the exception for approved statistical data supporting a different distribution."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It explains applying ratios by fixture type, summing fractional results across multiple occupancies before rounding, and rounding up."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It declines to provide a final count and identifies the missing occupant load, assembly use, shared-facility, and other project-condition facts."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer rejects the idea that Group B classification exclusively controls the plumbing fixture calculation."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "It does not claim that residential-unit fixtures automatically satisfy the room's requirements; instead, it flags shared-facility treatment as requiring additional governing provisions and facts."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "No final fixture count is given, and the answer expressly says the available evidence is insufficient for one."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It requests the Building-Code occupant load and confirmation that it is fewer than 75 persons."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It requests the actual Assembly use category and applicable Table 403.1 row(s)."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It requests confirmation of existing/shared facilities and the provisions governing sharing or credit."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It requests confirmation whether approved statistical data supports a non-50/50 sex distribution."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

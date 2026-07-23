@@ -1,0 +1,415 @@
+{
+  "schemaVersion": 2,
+  "status": "failed",
+  "createdAt": "2026-07-23T02:54:38.196Z",
+  "updatedAt": "2026-07-23T02:55:07.740Z",
+  "configuration": {
+    "runID": "e451c01d-6cdd-4f4d-a583-26ea6dee89da",
+    "datasetSHA256": "00e924afd1851b3fa5ec2ef8cd93b3bc88d096f8462000440956686f16ecb4fa",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260722-grounded-passages-v3",
+    "evidenceVersion": "selected-passages-only-v2",
+    "retrievalVersion": "none-selected-evidence-only",
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+    "gitCommit": "cb3fa7501d7f7d0df4bca94b1a16a0fcc9417538",
+    "approvedSpendCapUSD": 10,
+    "conservativeReservedUSD": 0.181193,
+    "paidRequestCount": 4
+  },
+  "baseline": null,
+  "failure": {
+    "caseID": "single-stair-six-story-r2",
+    "code": null,
+    "message": "Judge returned the wrong number of uncertainty conditions."
+  },
+  "results": [
+    {
+      "testCase": {
+        "id": "scissor-stair-two-exits",
+        "title": "Scissor stair counted as two exits",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "means of egress",
+          "scissor stairs",
+          "Group R-2",
+          "fire-resistance"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "occupancy": "Group R-2 stated by the question",
+          "configuration": "Scissor stair with entrance doors 15 feet apart",
+          "unknowns": [
+            "enclosure rating",
+            "separating construction rating",
+            "construction material"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 1007.1.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1007.1.1",
+            "exactPassages": [
+              "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+              "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+            ],
+            "sectionID": "2197",
+            "resolvedTitle": "1007.1.1 Two exits or exit access doorways.",
+            "evidenceCharacters": 2398,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+        "expectedConclusion": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "State that the 15-foot door separation alone is insufficient.",
+          "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+          "Explain the Group R-2 exception for separately counted stairs.",
+          "Identify the 2-hour enclosure and separating-construction requirements.",
+          "Identify the masonry or masonry-equivalent requirement.",
+          "Identify the minimum 15-foot exit-door separation."
+        ],
+        "missingFacts": [
+          "Confirm Group R-2 occupancy.",
+          "Confirm the stair-enclosure fire-resistance rating.",
+          "Confirm the construction separating the stairs and its fire-resistance rating.",
+          "Confirm masonry or an accepted masonry equivalent."
+        ],
+        "forbiddenClaims": [
+          "Every scissor stair automatically counts as one exit.",
+          "Fifteen feet of door separation automatically makes the stairs compliant.",
+          "Sprinkler protection by itself satisfies the Group R-2 exception."
+        ],
+        "requiredCitations": [
+          "BC 1007.1.1"
+        ],
+        "ready": true
+      },
+      "conversationID": "15280c81-6ba6-4f4d-afb0-0486704807bd",
+      "answeredAt": "2026-07-23T02:54:45.172Z",
+      "judgedAt": "2026-07-23T02:54:52.466Z",
+      "answerTimeMilliseconds": 6949,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v3",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "Yes—conditionally. For a Group R-2 occupancy, two stairs in a scissor stair assembly may be treated as two separate exit stairways if the stated R-2 exception conditions are met: (1) the exit doors are at least 15 feet apart, and (2) the stairs and the construction separating them have the specified 2-hour, masonry-or-masonry-equivalent construction. Because the doors are stated to be 15 feet apart, the door-separation criterion is met if the measurement is taken as required by the code. [§1007.1.1, Passage d157ae75-1100-449b-a889-4011bdf75c13]",
+        "explanation": "The general rule says that stairs sharing a common wall, floor, ceiling, scissor stair assembly, or other enclosure are counted as one exit stairway. [§1007.1.1, Passage 84624b04-cc11-4a07-a343-9e53060e0b96] However, the selected Group R-2 provision expressly permits stairs to share scissor stair assemblies or other enclosures when the required 2-hour masonry or masonry-equivalent construction conditions are satisfied, and requires the exit doors to be no less than 15 feet apart. [§1007.1.1, Passage d157ae75-1100-449b-a889-4011bdf75c13] Thus, 15 feet is sufficient for the stated door-spacing condition, but spacing alone does not establish that the two stairs can be counted separately.",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the building and the subject stairs are within the Group R-2 condition addressed by the selected provision.",
+          "Whether each stair is enclosed by walls having at least a 2-hour fire-resistance rating and is constructed of masonry or masonry equivalent in accordance with department rules.",
+          "Whether the construction separating the two stairs has at least a 2-hour fire-resistance rating and is constructed of masonry or masonry equivalent in accordance with department rules.",
+          "Whether the reported 15-foot distance is the code-required measurement between the exit doors.",
+          "Whether other unprovided code provisions affect the required number, arrangement, independence, or capacity of exits for this building or story."
+        ],
+        "evidenceLimitations": [
+          "The selected excerpts address counting shared/scissor stairs and the stated R-2 exception only; they do not provide the full requirements for means of egress, exit remoteness, stair construction, fire-resistance rating determination, door-distance measurement method, or department rules governing masonry equivalent.",
+          "The selected evidence does not establish the project’s occupancy classification, construction details, existing-condition status, building height, or occupant load.",
+          "This is a code-evidence interpretation, not an approval or determination by the authority having jurisdiction."
+        ],
+        "additionalEvidenceNeeded": [
+          "Project drawings and specifications showing the scissor-stair configuration, the exit-door locations, and how the 15-foot separation is measured.",
+          "Fire-resistance-rated assembly documentation for each stair enclosure and the separation between the stairs.",
+          "Documentation showing compliance with the applicable department rules for masonry or masonry-equivalent construction.",
+          "The remaining applicable provisions governing required exits, exit separation/remoteness, egress capacity, and any existing-building provisions, if applicable."
+        ],
+        "citations": [
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "84624b04-cc11-4a07-a343-9e53060e0b96"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "84624b04-cc11-4a07-a343-9e53060e0b96",
+                "selectedText": "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway."
+              }
+            ],
+            "relevance": "Establishes the general rule that stairs sharing a scissor stair assembly or other common enclosure are counted as one exit stairway."
+          },
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "d157ae75-1100-449b-a889-4011bdf75c13"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "d157ae75-1100-449b-a889-4011bdf75c13",
+                "selectedText": "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+              }
+            ],
+            "relevance": "Provides the Group R-2 exception permitting shared scissor-stair arrangements subject to the 15-foot door separation and specified 2-hour masonry or masonry-equivalent construction conditions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2197"
+        ],
+        "evidenceSourceIDs": [
+          "84624b04-cc11-4a07-a343-9e53060e0b96",
+          "d157ae75-1100-449b-a889-4011bdf75c13"
+        ],
+        "usage": {
+          "inputTokens": 776,
+          "cachedInputTokens": 0,
+          "outputTokens": 813,
+          "totalTokens": 1589
+        },
+        "estimatedCostUSD": 0.014135,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.014135,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "responseTimeMilliseconds": 7293,
+        "usage": {
+          "inputTokens": 1870,
+          "cachedInputTokens": 0,
+          "outputTokens": 938,
+          "totalTokens": 2808
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The cited provision, BC 1007.1.1, supports both attributed propositions: the general rule that stairs sharing a scissor-stair assembly count as one exit stairway, and the stated Group R-2 allowance subject to 15-foot door spacing plus the specified 2-hour masonry or masonry-equivalent enclosure and separation conditions. The answer consistently cites that provision for those claims."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a substitute compliance path or claim that 15-foot spacing alone is sufficient. Its references to measurement method, other egress provisions, and department rules are framed as limitations or items requiring confirmation, rather than as requirements established by the supplied excerpt.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The conclusion is expressly conditional and correctly identifies that the reported 15-foot separation does not by itself establish separately counted stairs. It identifies the unknown enclosure rating, separation rating, masonry or masonry-equivalent construction, and applicability of the Group R-2 condition."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer directly answers the question, explains the baseline rule and exception, and gives a useful checklist of project documentation and unresolved facts needed before applying the exception."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It states that spacing alone does not establish that the stairs can be counted separately."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that shared scissor-stair assemblies are counted as one exit stairway under the general rule."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It describes the Group R-2 provision allowing stairs to share a scissor-stair assembly when its conditions are met."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It identifies the 2-hour requirement for the stair enclosures and the construction separating the stairs."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It identifies masonry or masonry-equivalent construction, including the reference to department rules."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It identifies that the exit doors must be at least 15 feet apart."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer states the general one-stair counting rule but also explains the applicable Group R-2 exception; it does not say every scissor stair automatically counts as one exit."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly says that 15 feet satisfies only the door-spacing condition and that spacing alone is insufficient."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not assert that sprinkler protection satisfies the exception."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It asks whether the building and stairs are within the applicable Group R-2 condition."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It asks whether each stair enclosure has at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It asks whether the construction separating the stairs has the required 2-hour rating and construction."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It asks whether masonry or an accepted masonry equivalent is provided in accordance with department rules."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.018745,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 citations were restricted to selected evidence. The cited provision, BC 1007.1.1, supports both attributed propositions: the general rule that stairs sharing a scissor-stair assembly count as one exit stairway, and the stated Group R-2 allowance subject to 15-foot door spacing plus the specified 2-hour masonry or masonry-equivalent enclosure and separation conditions. The answer consistently cites that provision for those claims."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "1/1 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a substitute compliance path or claim that 15-foot spacing alone is sufficient. Its references to measurement method, other egress provisions, and department rules are framed as limitations or items requiring confirmation, rather than as requirements established by the supplied excerpt.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The conclusion is expressly conditional and correctly identifies that the reported 15-foot separation does not by itself establish separately counted stairs. It identifies the unknown enclosure rating, separation rating, masonry or masonry-equivalent construction, and applicability of the Group R-2 condition."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The answer directly answers the question, explains the baseline rule and exception, and gives a useful checklist of project documentation and unresolved facts needed before applying the exception."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "6949 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 4,
+            "rationale": "$0.014135 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It states that spacing alone does not establish that the stairs can be counted separately."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that shared scissor-stair assemblies are counted as one exit stairway under the general rule."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It describes the Group R-2 provision allowing stairs to share a scissor-stair assembly when its conditions are met."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It identifies the 2-hour requirement for the stair enclosures and the construction separating the stairs."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It identifies masonry or masonry-equivalent construction, including the reference to department rules."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It identifies that the exit doors must be at least 15 feet apart."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer states the general one-stair counting rule but also explains the applicable Group R-2 exception; it does not say every scissor stair automatically counts as one exit."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly says that 15 feet satisfies only the door-spacing condition and that spacing alone is insufficient."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not assert that sprinkler protection satisfies the exception."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It asks whether the building and stairs are within the applicable Group R-2 condition."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It asks whether each stair enclosure has at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It asks whether the construction separating the stairs has the required 2-hour rating and construction."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It asks whether masonry or an accepted masonry equivalent is provided in accordance with department rules."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

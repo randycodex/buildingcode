@@ -1433,7 +1433,7 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(
-      internalData.response.ok && internalData.json.dataset.schemaVersion === 2 &&
+      internalData.response.ok && internalData.json.dataset.schemaVersion === 3 &&
         internalData.json.feedbackCandidates.some((item) => item.answerID === answerID),
       "Owner console data omitted the private evaluation dataset or feedback candidate."
     );

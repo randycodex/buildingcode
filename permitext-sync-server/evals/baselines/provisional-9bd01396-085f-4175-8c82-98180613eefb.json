@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "kind": "permitext-evaluation-baseline",
+  "status": "provisional",
+  "createdAt": "2026-07-23T22:08:22.928Z",
+  "sourceRunID": "9bd01396-085f-4175-8c82-98180613eefb",
+  "sourceResult": "../results/2026-07-23T03-13-13-558Z.json",
+  "unapprovedCaseIDs": [
+    "scissor-stair-two-exits",
+    "single-stair-six-story-r2",
+    "residential-multipurpose-occupancy",
+    "accessory-assembly-plumbing-fixtures",
+    "building-code-versus-hcr"
+  ],
+  "configuration": {
+    "model": "gpt-5.6-terra",
+    "promptVersion": "20260722-grounded-passages-v7",
+    "evidenceVersion": "selected-passages-only-v2",
+    "retrievalVersion": "none-selected-evidence-only",
+    "applicationCommit": "0e33ed193177da634a45e7e2d5f2e8846d2abcfd"
+  },
+  "summary": {
+    "eligibleCases": 5,
+    "passingCases": 5,
+    "failingCases": 0,
+    "overallScore": 3.97,
+    "citationCorrectness": 4,
+    "citationCompleteness": 4,
+    "requiredConceptCoverage": 4,
+    "unsupportedClaimFailures": 0,
+    "uncertaintyFailures": 0,
+    "missingFactFailures": 0,
+    "averageResponseDurationMilliseconds": 8644,
+    "averageInputTokens": 1146,
+    "averageOutputTokens": 979.4,
+    "estimatedAverageCostUSD": 0.017556
+  }
+}

@@ -1,4 +1,27 @@
 {
   "schemaVersion": 1,
-  "reviews": []
+  "reviews": [
+    {
+      "id": "120e991f-4f29-4ba2-b826-18fad121a6d2",
+      "kind": "case",
+      "caseID": "scissor-stair-two-exits",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-23T21:35:50.157Z"
+    },
+    {
+      "id": "eb49440b-2896-449d-900a-e04dd78dabe9",
+      "kind": "case",
+      "caseID": "scissor-stair-two-exits",
+      "runID": null,
+      "decision": "approved",
+      "scoreOverrides": {},
+      "notes": "",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-23T21:35:54.092Z"
+    }
+  ]
 }

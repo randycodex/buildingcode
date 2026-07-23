@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "baselineRunID": "fb2ba69e-f82b-43f6-9712-4e3aa7b597ca",
+  "currentRunID": "9bd01396-085f-4175-8c82-98180613eefb",
+  "baselineCreatedAt": "2026-07-23T03:08:12.514Z",
+  "currentCreatedAt": "2026-07-23T03:13:13.558Z",
+  "configurationChanges": {
+    "promptVersion": {
+      "baseline": "20260722-grounded-passages-v6",
+      "current": "20260722-grounded-passages-v7"
+    },
+    "gitCommit": {
+      "baseline": "eccd1dccfac911e2652dd3199f57f06d3b9a65ea",
+      "current": "0e33ed193177da634a45e7e2d5f2e8846d2abcfd"
+    }
+  },
+  "improvements": [
+    "accessory-assembly-plumbing-fixtures"
+  ],
+  "regressions": [
+    "residential-multipurpose-occupancy"
+  ],
+  "newlyPassing": [],
+  "newlyFailing": [],
+  "substantiallyChangedAnswers": [
+    "scissor-stair-two-exits",
+    "single-stair-six-story-r2",
+    "residential-multipurpose-occupancy",
+    "accessory-assembly-plumbing-fixtures",
+    "building-code-versus-hcr"
+  ],
+  "criticalRegressions": [],
+  "responseTimeIncreases": [
+    "single-stair-six-story-r2",
+    "accessory-assembly-plumbing-fixtures"
+  ],
+  "tokenIncreases": [],
+  "estimatedCostIncreases": [],
+  "cases": [
+    {
+      "caseID": "scissor-stair-two-exits",
+      "repetition": 1,
+      "previousScore": 4,
+      "currentScore": 4,
+      "scoreChange": 0,
+      "previousPassed": true,
+      "currentPassed": true,
+      "newlyPassing": false,
+      "newlyFailing": false,
+      "answerSimilarity": 0.55,
+      "substantiallyChangedAnswer": true,
+      "citationChange": 0,
+      "unsupportedClaimChange": 0,
+      "uncertaintyChange": 0,
+      "missingFactChange": 0,
+      "responseTimeChangeRatio": -0.13,
+      "tokenChangeRatio": 0.02,
+      "estimatedCostChangeRatio": -0.01,
+      "criticalRegressions": []
+    },
+    {
+      "caseID": "single-stair-six-story-r2",
+      "repetition": 1,
+      "previousScore": 4,
+      "currentScore": 4,
+      "scoreChange": 0,
+      "previousPassed": true,
+      "currentPassed": true,
+      "newlyPassing": false,
+      "newlyFailing": false,
+      "answerSimilarity": 0.53,
+      "substantiallyChangedAnswer": true,
+      "citationChange": 0,
+      "unsupportedClaimChange": 0,
+      "uncertaintyChange": 0,
+      "missingFactChange": 0,
+      "responseTimeChangeRatio": 0.21,
+      "tokenChangeRatio": 0.07,
+      "estimatedCostChangeRatio": 0.08,
+      "criticalRegressions": []
+    },
+    {
+      "caseID": "residential-multipurpose-occupancy",
+      "repetition": 1,
+      "previousScore": 4,
+      "currentScore": 3.93,
+      "scoreChange": -0.07,
+      "previousPassed": true,
+      "currentPassed": true,
+      "newlyPassing": false,
+      "newlyFailing": false,
+      "answerSimilarity": 0.4,
+      "substantiallyChangedAnswer": true,
+      "citationChange": 0,
+      "unsupportedClaimChange": 0,
+      "uncertaintyChange": 0,
+      "missingFactChange": 0,
+      "responseTimeChangeRatio": 0.1,
+      "tokenChangeRatio": 0.06,
+      "estimatedCostChangeRatio": 0.08,
+      "criticalRegressions": []
+    },
+    {
+      "caseID": "accessory-assembly-plumbing-fixtures",
+      "repetition": 1,
+      "previousScore": 3.83,
+      "currentScore": 3.93,
+      "scoreChange": 0.1,
+      "previousPassed": true,
+      "currentPassed": true,
+      "newlyPassing": false,
+      "newlyFailing": false,
+      "answerSimilarity": 0.39,
+      "substantiallyChangedAnswer": true,
+      "citationChange": 0,
+      "unsupportedClaimChange": 0,
+      "uncertaintyChange": 0,
+      "missingFactChange": 1,
+      "responseTimeChangeRatio": 0.23,
+      "tokenChangeRatio": 0.06,
+      "estimatedCostChangeRatio": 0.09,
+      "criticalRegressions": []
+    },
+    {
+      "caseID": "building-code-versus-hcr",
+      "repetition": 1,
+      "previousScore": 4,
+      "currentScore": 4,
+      "scoreChange": 0,
+      "previousPassed": true,
+      "currentPassed": true,
+      "newlyPassing": false,
+      "newlyFailing": false,
+      "answerSimilarity": 0.44,
+      "substantiallyChangedAnswer": true,
+      "citationChange": 0,
+      "unsupportedClaimChange": 0,
+      "uncertaintyChange": 0,
+      "missingFactChange": 0,
+      "responseTimeChangeRatio": -0.2,
+      "tokenChangeRatio": 0.01,
+      "estimatedCostChangeRatio": -0.02,
+      "criticalRegressions": []
+    }
+  ]
+}

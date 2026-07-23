@@ -2,6 +2,20 @@ export const evaluationStatuses = ["draft", "reviewed", "approved", "retired"];
 export const evaluationDifficulties = ["basic", "intermediate", "advanced"];
 export const evaluationSourceTypes = [
   "real project",
+  "RFI",
+  "plan-review objection",
+  "code-consultant coordination",
+  "accessibility review",
+  "fire-protection review",
+  "MEP coordination",
+  "Permitext user feedback",
+  "confirmed production failure",
+  "official agency interpretation",
+  "Buildings Bulletin",
+  "public determination or decision",
+  "professional code forum",
+  "educational discussion",
+  "deliberately constructed edge case",
   "tester feedback",
   "professional contributor",
   "synthetic variation",
@@ -15,15 +29,16 @@ export const evaluationCertainties = [
 ];
 
 export const evaluationDimensions = [
+  "structuralValidity",
   "citationCorrectness",
   "citationCompleteness",
   "requiredConceptCoverage",
-  "hallucinationsInventedRequirements",
+  "unsupportedInventedClaims",
   "appropriateUncertainty",
-  "recognitionOfMissingProjectFacts",
+  "missingFactRecognition",
+  "evidenceInsufficiencyRecognition",
   "practicalUsefulness",
-  "responseTime",
-  "tokenCost"
+  "directlyAddressesQuestion"
 ];
 
 function assert(condition, message) {
@@ -36,7 +51,7 @@ function nonemptyStrings(value, message, { allowEmpty = false } = {}) {
 }
 
 export function validateEvaluationDataset(dataset) {
-  assert(dataset?.schemaVersion === 2, "Research eval dataset must use schemaVersion 2.");
+  assert(dataset?.schemaVersion === 3, "Research eval dataset must use schemaVersion 3.");
   assert(Array.isArray(dataset.cases) && dataset.cases.length > 0, "Research eval dataset has no cases.");
   const scoring = dataset.automaticScoring;
   assert(scoring && typeof scoring === "object", "Research eval dataset needs automaticScoring configuration.");
@@ -82,13 +97,22 @@ export function validateEvaluationDataset(dataset) {
     assert(evaluationDifficulties.includes(testCase.difficulty), `${testCase.id} has an invalid difficulty.`);
     nonemptyStrings(testCase.topics, `${testCase.id} needs topics.`);
     assert(typeof testCase.codeEdition === "string" && testCase.codeEdition, `${testCase.id} needs a code edition.`);
+    assert(typeof testCase.jurisdiction === "string" && testCase.jurisdiction, `${testCase.id} needs a jurisdiction.`);
     assert(testCase.projectContext && typeof testCase.projectContext === "object" && !Array.isArray(testCase.projectContext), `${testCase.id} needs projectContext.`);
     assert(typeof testCase.question === "string" && testCase.question.length >= 3, `${testCase.id} needs a question.`);
     assert(typeof testCase.expectedConclusion === "string" && testCase.expectedConclusion, `${testCase.id} needs an expected conclusion.`);
-    assert(evaluationCertainties.includes(testCase.expectedCertainty), `${testCase.id} has an invalid expected certainty.`);
+    assert(
+      testCase.expectedUncertainty &&
+        evaluationCertainties.includes(testCase.expectedUncertainty.level) &&
+        typeof testCase.expectedUncertainty.description === "string" &&
+        testCase.expectedUncertainty.description.trim(),
+      `${testCase.id} has an invalid expected uncertainty.`
+    );
     assert(evaluationSourceTypes.includes(testCase.sourceType), `${testCase.id} has an invalid source type.`);
+    assert(typeof testCase.sourceReference === "string" && testCase.sourceReference.trim(), `${testCase.id} needs a source reference.`);
     assert(testCase.reviewer === null || (typeof testCase.reviewer === "string" && testCase.reviewer.trim()), `${testCase.id} has an invalid reviewer.`);
     assert(testCase.reviewedAt === null || Number.isFinite(Date.parse(testCase.reviewedAt)), `${testCase.id} has an invalid reviewedAt timestamp.`);
+    assert(typeof testCase.notes === "string", `${testCase.id} needs notes, which may be an empty string.`);
     if (["reviewed", "approved", "retired"].includes(testCase.status)) {
       assert(testCase.reviewer && testCase.reviewedAt, `${testCase.id} must identify the reviewer and review date for status ${testCase.status}.`);
     }
@@ -98,7 +122,11 @@ export function validateEvaluationDataset(dataset) {
     nonemptyStrings(testCase.forbiddenClaims, `${testCase.id} needs forbidden claims.`);
     nonemptyStrings(testCase.requiredCitations, `${testCase.id} needs required citations.`);
     const references = new Set();
+    const sectionIDs = new Set();
     for (const source of testCase.selectedEvidence) {
+      assert(/^\d+$/.test(String(source.sectionID || "")), `${testCase.id} has evidence without a canonical numeric sectionID.`);
+      assert(!sectionIDs.has(source.sectionID), `${testCase.id} repeats canonical sectionID ${source.sectionID}.`);
+      sectionIDs.add(source.sectionID);
       assert(typeof source.reference === "string" && source.reference, `${testCase.id} has a source without a reference.`);
       assert(!references.has(source.reference), `${testCase.id} repeats ${source.reference}.`);
       references.add(source.reference);

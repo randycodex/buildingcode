@@ -20,7 +20,6 @@ Packages/
 permitext-sync-server/data/
 permitext-sync-server/node_modules/
 permitext-sync-server/public/workboard-assets/
-permitext-sync-server/evals/results/
 
 NYC CC APP/IMG_*.PNG
 .vercel

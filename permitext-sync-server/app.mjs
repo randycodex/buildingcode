@@ -2596,7 +2596,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   }
   return {
     interpretation: validateResearchInterpretation(value, passageEvidence),
-    model,
+    requestedModel: model,
+    model: payload.model || model,
     configuration,
     usage: {
       inputTokens: payload.usage?.input_tokens || 0,
@@ -3307,6 +3308,7 @@ async function handleResearchConversationMessage(request, response) {
       answer: {
         mode: mockMode ? "mock" : "openai",
         model: result.model,
+        requestedModel: result.requestedModel || result.model,
         promptVersion: result.configuration.promptVersion,
         evidenceVersion: result.configuration.evidenceVersion,
         codeEdition: defaultResearchCodeEdition,
@@ -3328,6 +3330,7 @@ async function handleResearchConversationMessage(request, response) {
       await recordResearchUsage(context.userID, {
         id: randomUUID(),
         model: result.model,
+        requestedModel: result.requestedModel || result.model,
         mode: "openai",
         ...result.usage,
         promptVersion: result.configuration.promptVersion,

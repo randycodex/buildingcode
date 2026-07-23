@@ -12,6 +12,7 @@
     "smoke": "node tests/auth-policy.mjs && node tests/code-references.mjs && node tests/content-integrity.mjs && node tests/sync-identity.mjs && node tests/sync-state.mjs && node tests/smoke.mjs",
     "eval:research": "node tests/research-evals.mjs",
     "eval:research:live": "node tests/research-evals.mjs --run-live",
+    "eval:research:list": "node tests/research-evals.mjs --list",
     "verify:content": "node tests/content-integrity.mjs",
     "verify:postgres": "node tests/postgres-integration.mjs",
     "verify:production": "node tests/production-health.mjs",

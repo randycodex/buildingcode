@@ -1,0 +1,1986 @@
+{
+  "schemaVersion": 2,
+  "status": "completed",
+  "createdAt": "2026-07-23T03:04:58.887Z",
+  "updatedAt": "2026-07-23T03:06:39.609Z",
+  "configuration": {
+    "runID": "899b7062-2350-4e67-acfa-e7541f58b68d",
+    "datasetSHA256": "a208727d07faf88c3428868ad1b847738cb1aabf261d1b4dcd542566f31781d9",
+    "codeEditions": [
+      "2022 New York City Construction Codes"
+    ],
+    "answerModel": "gpt-5.6-terra",
+    "answerReasoningEffort": "medium",
+    "promptVersion": "20260722-grounded-passages-v5",
+    "evidenceVersion": "selected-passages-only-v2",
+    "retrievalVersion": "none-selected-evidence-only",
+    "suiteScope": "full",
+    "caseIDs": [
+      "scissor-stair-two-exits",
+      "single-stair-six-story-r2",
+      "residential-multipurpose-occupancy",
+      "accessory-assembly-plumbing-fixtures",
+      "building-code-versus-hcr"
+    ],
+    "judgeModel": "gpt-5.6-terra",
+    "judgeReasoningEffort": "medium",
+    "judgePromptVersion": "20260722-exact-rubric-v2",
+    "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+    "gitCommit": "5e758038a07497efa45d32d2892635e7e7384b17",
+    "approvedSpendCapUSD": 6,
+    "conservativeReservedUSD": 0.492759,
+    "paidRequestCount": 10
+  },
+  "baseline": {
+    "runID": "00aeee85-b96e-46c0-b8c8-5bba78f85df1",
+    "createdAt": "2026-07-23T03:01:10.872Z",
+    "cases": [
+      {
+        "caseID": "scissor-stair-two-exits",
+        "previousScore": 4,
+        "currentScore": 4,
+        "scoreChange": 0,
+        "previousPassed": true,
+        "currentPassed": true
+      },
+      {
+        "caseID": "single-stair-six-story-r2",
+        "previousScore": 4,
+        "currentScore": 4,
+        "scoreChange": 0,
+        "previousPassed": true,
+        "currentPassed": true
+      },
+      {
+        "caseID": "residential-multipurpose-occupancy",
+        "previousScore": 4,
+        "currentScore": 3.93,
+        "scoreChange": -0.07,
+        "previousPassed": true,
+        "currentPassed": true
+      },
+      {
+        "caseID": "accessory-assembly-plumbing-fixtures",
+        "previousScore": 3.23,
+        "currentScore": 3.71,
+        "scoreChange": 0.48,
+        "previousPassed": false,
+        "currentPassed": true
+      },
+      {
+        "caseID": "building-code-versus-hcr",
+        "previousScore": 3.63,
+        "currentScore": 3.38,
+        "scoreChange": -0.25,
+        "previousPassed": true,
+        "currentPassed": false
+      }
+    ]
+  },
+  "failure": null,
+  "results": [
+    {
+      "testCase": {
+        "id": "scissor-stair-two-exits",
+        "title": "Scissor stair counted as two exits",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "means of egress",
+          "scissor stairs",
+          "Group R-2",
+          "fire-resistance"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "occupancy": "Group R-2 stated by the question",
+          "configuration": "Scissor stair with entrance doors 15 feet apart",
+          "unknowns": [
+            "enclosure rating",
+            "separating construction rating",
+            "construction material"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 1007.1.1",
+            "codePrefix": "BC",
+            "sectionNumber": "1007.1.1",
+            "exactPassages": [
+              "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway.",
+              "Exceptions:",
+              "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+            ],
+            "sectionID": "2197",
+            "resolvedTitle": "1007.1.1 Two exits or exit access doorways.",
+            "evidenceCharacters": 2398,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
+        "expectedConclusion": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "State that the 15-foot door separation alone is insufficient.",
+          "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
+          "Explain the Group R-2 exception for separately counted stairs.",
+          "Identify the 2-hour enclosure and separating-construction requirements.",
+          "Identify the masonry or masonry-equivalent requirement.",
+          "Identify the minimum 15-foot exit-door separation."
+        ],
+        "missingFacts": [
+          "Confirm Group R-2 occupancy.",
+          "Confirm the stair-enclosure fire-resistance rating.",
+          "Confirm the construction separating the stairs and its fire-resistance rating.",
+          "Confirm masonry or an accepted masonry equivalent."
+        ],
+        "forbiddenClaims": [
+          "Every scissor stair automatically counts as one exit.",
+          "Fifteen feet of door separation automatically makes the stairs compliant.",
+          "Sprinkler protection by itself satisfies the Group R-2 exception."
+        ],
+        "requiredCitations": [
+          "BC 1007.1.1"
+        ],
+        "ready": true
+      },
+      "conversationID": "438db3e0-3161-4383-85a8-f0ba16dd6c0e",
+      "answeredAt": "2026-07-23T03:05:07.155Z",
+      "judgedAt": "2026-07-23T03:05:18.414Z",
+      "answerTimeMilliseconds": 8236,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v5",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "Yes—conditionally. Although stairs sharing a scissor stair assembly are generally counted as one exit stairway, the selected Group R-2 exception permits them to share a scissor stair assembly and be treated as separate stairs if all stated exception conditions are met. A 15-foot separation between the exit doors meets the exception’s minimum door-separation threshold because the required distance is “no less than 15 feet.” The stairs therefore may be counted as two separate exits only if the enclosing walls and the construction separating the stairs each have at least a 2-hour fire-resistance rating and are constructed of masonry or masonry equivalent in accordance with department rules. [Section 1007.1.1, Passages a9d92e82-7120-4cda-a571-c0f5b2ab9bb6 and 5c6e8ea8-9094-406a-8a14-8c5a233ea92c]",
+        "explanation": "Section 1007.1.1’s general rule counts stairs sharing a common wall, floor, ceiling, scissor stair assembly, or other enclosure as one exit stairway. The selected Exception 3 specifically modifies that result for Group R-2 occupancies. It permits shared scissor stair assemblies where: (1) the stairs are enclosed by walls with at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent under department rules; (2) the exit doors are at least 15 feet apart; and (3) the construction separating the stairs is also at least 2-hour fire-resistance-rated and masonry or masonry equivalent under department rules. The stated 15-foot door spacing satisfies item 3.1 exactly, subject to verifying the measurement and the remaining construction conditions. [Section 1007.1.1, Passage 5c6e8ea8-9094-406a-8a14-8c5a233ea92c]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the building, or the relevant portion to which this exit analysis applies, is in fact a Group R-2 occupancy; the question states it is, but this is material to use of Exception 3 and should be verified before final reliance.",
+          "Whether the stair-enclosure walls have at least a 2-hour fire-resistance rating.",
+          "Whether those enclosure walls are constructed of masonry or masonry equivalent in accordance with applicable department rules.",
+          "Whether the construction separating the two stairs has at least a 2-hour fire-resistance rating.",
+          "Whether the separating construction is masonry or masonry equivalent in accordance with applicable department rules.",
+          "Whether the stated 15-foot distance is the required distance between the exit doors under the project’s actual layout and measurement documentation."
+        ],
+        "evidenceLimitations": [
+          "The selected text establishes the general counting rule and the specific Group R-2 exception only. It does not provide the department rules defining or approving “masonry or masonry equivalent.”",
+          "The selected text does not establish whether two exits are required for this building, story, space, or occupant load; it only addresses whether shared/scissor stairs may be counted separately under the stated exception.",
+          "The selected text does not provide other egress requirements that may apply to the stairs or exit system, such as required exit number, remoteness, capacity, discharge, or other configuration requirements."
+        ],
+        "additionalEvidenceNeeded": [
+          "Project drawings and specifications showing the exit-door locations and documenting at least 15 feet of separation.",
+          "Fire-resistance-rated assembly documentation for both the stair enclosure walls and the construction separating the two stairs, confirming at least 2-hour ratings.",
+          "Applicable department rules or accepted project documentation establishing that the relevant enclosure and separation construction qualifies as masonry or masonry equivalent.",
+          "If the broader question is whether the building has the required number of exits, the applicable provisions governing the required number of exits, exit separation/remoteness, and capacity for the actual building or story."
+        ],
+        "citations": [
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "a9d92e82-7120-4cda-a571-c0f5b2ab9bb6"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "a9d92e82-7120-4cda-a571-c0f5b2ab9bb6",
+                "selectedText": "Stairs sharing any common wall, floor, ceiling, scissor stair assembly, or other enclosure shall be counted as one exit stairway."
+              }
+            ],
+            "relevance": "Establishes the general rule that stairs sharing a scissor stair assembly are counted as one exit stairway."
+          },
+          {
+            "sectionID": "2197",
+            "sectionNumber": "1007.1.1",
+            "title": "1007.1.1 Two exits or exit access doorways.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "5c6e8ea8-9094-406a-8a14-8c5a233ea92c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "5c6e8ea8-9094-406a-8a14-8c5a233ea92c",
+                "selectedText": "3. Group R-2 occupancies. In Group R-2 occupancies, where stairs are enclosed in walls having at least a 2-hour fire resistance rating and constructed of masonry or masonry equivalent in accordance with department rules: 3.1. The exit doors to such stairs shall be placed a distance apart equal to no less than 15 feet (4572 mm); and 3.2. Such stairs shall be permitted to share common walls, floors, ceilings or scissor stairs assemblies or other enclosures provided that the construction separating the stairs is also of at least a 2-hour fire-resistance rating and constructed of masonry or masonry equivalent in accordance with department rules."
+              }
+            ],
+            "relevance": "Provides the Group R-2 exception, including the 15-foot minimum exit-door separation and the 2-hour masonry-or-equivalent enclosure and separation conditions."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2197"
+        ],
+        "evidenceSourceIDs": [
+          "a9d92e82-7120-4cda-a571-c0f5b2ab9bb6",
+          "1d6f908d-524b-4a5b-803a-077a01dd1994",
+          "5c6e8ea8-9094-406a-8a14-8c5a233ea92c"
+        ],
+        "usage": {
+          "inputTokens": 1105,
+          "cachedInputTokens": 0,
+          "outputTokens": 945,
+          "totalTokens": 2050
+        },
+        "estimatedCostUSD": 0.016938,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.016938,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 11258,
+        "usage": {
+          "inputTokens": 2065,
+          "cachedInputTokens": 0,
+          "outputTokens": 956,
+          "totalTokens": 3021
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The answer cites BC 1007.1.1 for both the general scissor-stair counting rule and Exception 3 for Group R-2. Those claims are directly supported by the supplied passage, including the 15-foot door spacing, 2-hour ratings, and masonry-or-masonry-equivalent conditions."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent substantive conditions or assert an unsupported outcome. It accurately presents separate counting as conditional on all stated Group R-2 exception requirements, and appropriately identifies broader exit-system issues as outside the selected text.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The conclusion is expressly conditional, correctly explains that the stated 15-foot spacing alone does not resolve the issue, and identifies the material facts that require verification before final reliance."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response gives a direct answer, distinguishes the baseline rule from the exception, identifies every operative exception condition, and usefully lists the project documents and additional code topics needed for a complete egress determination."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It states that the stairs may be counted separately only if all exception conditions are met, so the 15-foot spacing alone is not sufficient."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that stairs sharing a scissor stair assembly are generally counted as one exit stairway."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It explains that Exception 3 modifies the general result for Group R-2 occupancies and conditionally permits shared scissor stair assemblies to be treated separately."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It identifies the requirement for both the enclosure walls and the construction separating the stairs to have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It identifies that the enclosure and separating construction must be masonry or masonry equivalent in accordance with department rules."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It identifies that exit doors must be no less than 15 feet apart and correctly recognizes the stated 15-foot spacing as meeting that minimum, subject to verification."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer states the general one-exit-stairway rule but expressly identifies the applicable Group R-2 exception; it does not claim every scissor stair automatically counts as one exit."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly conditions separate counting on the 2-hour and masonry-or-equivalent requirements in addition to the door spacing."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not claim that sprinkler protection satisfies the exception or discuss sprinklers as a substitute for any stated condition."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It calls for verification that the relevant occupancy is in fact Group R-2 before relying on Exception 3."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It calls for verification that the stair-enclosure walls have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It calls for verification of the construction separating the stairs and confirms that it must have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It calls for verification that both relevant enclosure and separating construction qualify as masonry or accepted masonry equivalent under department rules."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.019502,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 citations were restricted to selected evidence. The answer cites BC 1007.1.1 for both the general scissor-stair counting rule and Exception 3 for Group R-2. Those claims are directly supported by the supplied passage, including the 15-foot door spacing, 2-hour ratings, and masonry-or-masonry-equivalent conditions."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "1/1 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent substantive conditions or assert an unsupported outcome. It accurately presents separate counting as conditional on all stated Group R-2 exception requirements, and appropriately identifies broader exit-system issues as outside the selected text.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The conclusion is expressly conditional, correctly explains that the stated 15-foot spacing alone does not resolve the issue, and identifies the material facts that require verification before final reliance."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response gives a direct answer, distinguishes the baseline rule from the exception, identifies every operative exception condition, and usefully lists the project documents and additional code topics needed for a complete egress determination."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "8236 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 4,
+            "rationale": "$0.016938 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It states that the stairs may be counted separately only if all exception conditions are met, so the 15-foot spacing alone is not sufficient."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that stairs sharing a scissor stair assembly are generally counted as one exit stairway."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It explains that Exception 3 modifies the general result for Group R-2 occupancies and conditionally permits shared scissor stair assemblies to be treated separately."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It identifies the requirement for both the enclosure walls and the construction separating the stairs to have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It identifies that the enclosure and separating construction must be masonry or masonry equivalent in accordance with department rules."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It identifies that exit doors must be no less than 15 feet apart and correctly recognizes the stated 15-foot spacing as meeting that minimum, subject to verification."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer states the general one-exit-stairway rule but expressly identifies the applicable Group R-2 exception; it does not claim every scissor stair automatically counts as one exit."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly conditions separate counting on the 2-hour and masonry-or-equivalent requirements in addition to the door spacing."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not claim that sprinkler protection satisfies the exception or discuss sprinklers as a substitute for any stated condition."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It calls for verification that the relevant occupancy is in fact Group R-2 before relying on Exception 3."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It calls for verification that the stair-enclosure walls have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It calls for verification of the construction separating the stairs and confirms that it must have at least a 2-hour fire-resistance rating."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It calls for verification that both relevant enclosure and separating construction qualify as masonry or accepted masonry equivalent under department rules."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "testCase": {
+        "id": "single-stair-six-story-r2",
+        "title": "Single stair in a six-story residential building",
+        "status": "approved",
+        "difficulty": "intermediate",
+        "topics": [
+          "means of egress",
+          "single exit",
+          "Group R-2",
+          "construction type"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "stories": 6,
+          "areaPerStorySquareFeet": 1950,
+          "use": "Residential building",
+          "unknowns": [
+            "occupancy classification",
+            "construction type"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 1006.3.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1006.3.2",
+            "exactPassages": [
+              "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+            ],
+            "sectionID": "2185",
+            "resolvedTitle": "1006.3.2 Single exits.",
+            "evidenceCharacters": 4251,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
+        "expectedConclusion": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "Identify Group R-2 as a condition of Item 7.",
+          "Identify Type I or Type II construction as a condition.",
+          "Identify the six-story maximum.",
+          "Identify the 2,000-square-foot-per-story maximum.",
+          "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
+          "Limit the conclusion to potential availability of the single-exit allowance."
+        ],
+        "missingFacts": [
+          "Confirm the occupancy classification is Group R-2.",
+          "Confirm the construction type is Type I or Type II.",
+          "Check other applicable requirements under evidence supplied for those requirements."
+        ],
+        "forbiddenClaims": [
+          "Every six-story residential building can have one stair.",
+          "The building qualifies without confirming Group R-2 and Type I or Type II construction.",
+          "Assert specific additional requirements that are not supported by selected passages."
+        ],
+        "requiredCitations": [
+          "BC 1006.3.2"
+        ],
+        "ready": true
+      },
+      "conversationID": "b545833a-8923-49c8-a233-581a5e3eb953",
+      "answeredAt": "2026-07-23T03:05:26.149Z",
+      "judgedAt": "2026-07-23T03:05:36.746Z",
+      "answerTimeMilliseconds": 7715,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v5",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "Conditionally yes. The selected passage identifies an allowance for a single exit in buildings classified as Occupancy Group R-2, of Type I or Type II construction, that do not exceed six stories and do not exceed 2,000 square feet per story. Based on the stated six stories and approximately 1,950 square feet on each story, the stated story-count and per-story-area thresholds appear to be within that allowance, subject to verification of the actual project facts and the missing classification/construction facts. [§1006.3.2, Passage de8b6d0f-7793-47d0-b79a-4a533ac8232b]",
+        "explanation": "The selected text is item 7 under §1006.3.2, “Single exits.” It applies only when all listed conditions are met: (1) the building is Occupancy Group R-2; (2) construction is Type I or Type II; (3) the building does not exceed six stories; and (4) no story exceeds 2,000 square feet. The user’s stated approximately 1,950 square feet on each story is 50 square feet below the stated 2,000-square-foot limit, and the stated six-story height equals, rather than exceeds, the stated six-story maximum. [§1006.3.2, Passage de8b6d0f-7793-47d0-b79a-4a533ac8232b]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the proposed residential building is classified as Occupancy Group R-2.",
+          "Whether the building’s construction type is Type I or Type II.",
+          "The verified area of every story, including confirmation that no story exceeds 2,000 square feet; “approximately 1,950 square feet” should be confirmed from the project drawings and the applicable area measurement basis.",
+          "The verified story count under the applicable code definitions, including confirmation that the building does not exceed six stories."
+        ],
+        "evidenceLimitations": [
+          "Only item 7 of §1006.3.2 was supplied. The selected evidence establishes this conditional single-exit allowance but does not provide the surrounding scope, definitions, other egress provisions, or any other requirements that may apply to the exit stair or egress system.",
+          "The selected passage does not establish the project occupancy classification, construction type, or how story area and story count are determined for this project.",
+          "This is an interpretation of the selected code text, not a determination by the authority having jurisdiction."
+        ],
+        "additionalEvidenceNeeded": [
+          "Project code analysis establishing the occupancy classification as R-2.",
+          "Project construction-code analysis establishing Type I or Type II construction.",
+          "Dimensioned plans and area calculations for each story to verify the 2,000-square-foot maximum for every story.",
+          "Project height/story analysis under the applicable code definitions to verify the six-story maximum.",
+          "The remaining applicable provisions of §1006.3.2 and related egress provisions, if confirmation of all single-exit and exit-stair compliance is needed."
+        ],
+        "citations": [
+          {
+            "sectionID": "2185",
+            "sectionNumber": "1006.3.2",
+            "title": "1006.3.2 Single exits.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "de8b6d0f-7793-47d0-b79a-4a533ac8232b"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "de8b6d0f-7793-47d0-b79a-4a533ac8232b",
+                "selectedText": "7. Buildings of Occupancy Group R-2 of construction Type I or II not exceeding six stories and not exceeding 2,000 square feet (185.8 m 2 ) per story."
+              }
+            ],
+            "relevance": "Selected §1006.3.2 item 7 allows a single exit for R-2 buildings of Type I or II construction not exceeding six stories and 2,000 square feet per story."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2185"
+        ],
+        "evidenceSourceIDs": [
+          "de8b6d0f-7793-47d0-b79a-4a533ac8232b"
+        ],
+        "usage": {
+          "inputTokens": 689,
+          "cachedInputTokens": 0,
+          "outputTokens": 717,
+          "totalTokens": 1406
+        },
+        "estimatedCostUSD": 0.012478,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.012478,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 10597,
+        "usage": {
+          "inputTokens": 1700,
+          "cachedInputTokens": 0,
+          "outputTokens": 1157,
+          "totalTokens": 2857
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The answer cites BC 1006.3.2 for the precise conditions stated in the supplied passage: Group R-2, Type I or II, no more than six stories, and no more than 2,000 square feet per story. The citation supports the conditional conclusion drawn from those conditions."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a qualification or treat the project as automatically compliant. Its references to verifying project facts and reviewing other applicable provisions are appropriately framed as limitations and further review, rather than as unsupported specific code requirements.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly gives a conditional answer. It recognizes that the stated story count and approximate floor area meet the expressed numerical thresholds, while Group R-2 classification and Type I or II construction remain unconfirmed. It also appropriately notes that the selected excerpt alone is not a complete egress compliance determination."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response clearly explains the applicable thresholds, applies the provided project facts, identifies the unresolved facts, and lists practical evidence needed to complete the determination. It is directly useful for advancing the code analysis without overstating the result."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly identifies Occupancy Group R-2 as a condition."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It expressly identifies Type I or Type II construction as a condition."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It states that the building may not exceed six stories and correctly notes that six stories equals the maximum."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It states the 2,000-square-foot-per-story maximum and compares the approximate 1,950-square-foot value to it."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It recognizes that the supplied six-story and approximately 1,950-square-foot facts satisfy the stated numerical thresholds, while requiring verification of other conditions."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It limits the result to a conditional availability of the single-exit allowance rather than declaring final compliance."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer does not claim that every six-story residential building may have one stair; it identifies the occupancy, construction-type, story-count, and area conditions."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly says that R-2 classification and Type I or II construction must be verified."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "It does not assert unsupported specific supplemental requirements. It only notes the general limitation that other applicable provisions may need review."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "The answer identifies confirmation of Group R-2 occupancy classification as necessary."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "The answer identifies confirmation of Type I or Type II construction as necessary."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "The answer explains that the supplied item alone is incomplete for full compliance and calls for review of the remaining applicable egress provisions under appropriate evidence."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.021605,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 citations were restricted to selected evidence. The answer cites BC 1006.3.2 for the precise conditions stated in the supplied passage: Group R-2, Type I or II, no more than six stories, and no more than 2,000 square feet per story. The citation supports the conditional conclusion drawn from those conditions."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "1/1 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a qualification or treat the project as automatically compliant. Its references to verifying project facts and reviewing other applicable provisions are appropriately framed as limitations and further review, rather than as unsupported specific code requirements.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer correctly gives a conditional answer. It recognizes that the stated story count and approximate floor area meet the expressed numerical thresholds, while Group R-2 classification and Type I or II construction remain unconfirmed. It also appropriately notes that the selected excerpt alone is not a complete egress compliance determination."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "3/3 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response clearly explains the applicable thresholds, applies the provided project facts, identifies the unresolved facts, and lists practical evidence needed to complete the determination. It is directly useful for advancing the code analysis without overstating the result."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "7715 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 4,
+            "rationale": "$0.012478 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 4,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly identifies Occupancy Group R-2 as a condition."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It expressly identifies Type I or Type II construction as a condition."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It states that the building may not exceed six stories and correctly notes that six stories equals the maximum."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It states the 2,000-square-foot-per-story maximum and compares the approximate 1,950-square-foot value to it."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It recognizes that the supplied six-story and approximately 1,950-square-foot facts satisfy the stated numerical thresholds, while requiring verification of other conditions."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It limits the result to a conditional availability of the single-exit allowance rather than declaring final compliance."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer does not claim that every six-story residential building may have one stair; it identifies the occupancy, construction-type, story-count, and area conditions."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer expressly says that R-2 classification and Type I or II construction must be verified."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "It does not assert unsupported specific supplemental requirements. It only notes the general limitation that other applicable provisions may need review."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "The answer identifies confirmation of Group R-2 occupancy classification as necessary."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "The answer identifies confirmation of Type I or Type II construction as necessary."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "The answer explains that the supplied item alone is incomplete for full compliance and calls for review of the remaining applicable egress provisions under appropriate evidence."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "testCase": {
+        "id": "residential-multipurpose-occupancy",
+        "title": "Occupancy classification of a residential multipurpose room",
+        "status": "approved",
+        "difficulty": "intermediate",
+        "topics": [
+          "occupancy classification",
+          "occupant load",
+          "accessory use",
+          "multipurpose room"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "buildingUse": "Apartment building",
+          "roomAreaNetSquareFeet": 900,
+          "typicalArrangement": "Tables and chairs",
+          "users": "Residents only"
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "sectionID": "132",
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": []
+          },
+          {
+            "reference": "BC 1004.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "1004.1.3",
+            "exactPassages": [
+              "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3.",
+              "Unconcentrated (tables and chairs)",
+              "15 net"
+            ],
+            "sectionID": "2152",
+            "resolvedTitle": "1004.1.3 Areas without fixed seating.",
+            "evidenceCharacters": 3797,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
+        "expectedConclusion": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "Use the 15-net-square-feet-per-occupant factor for unconcentrated tables and chairs.",
+          "Calculate 900 divided by 15 as an occupant load of 60.",
+          "Compare 60 with the fewer-than-75 threshold.",
+          "Explain the Group B or served-occupancy classification option when the room is accessory.",
+          "Avoid automatically classifying every residential amenity room as Group R-2."
+        ],
+        "missingFacts": [
+          "Confirm the actual net area.",
+          "Confirm the furniture arrangement and occupant-load factor.",
+          "Confirm the intended activities.",
+          "Confirm the room is accessory to the residential occupancy."
+        ],
+        "forbiddenClaims": [
+          "Every residential amenity room is automatically Group R-2.",
+          "The room is below 75 occupants without performing the calculation.",
+          "The result is unchanged for concentrated seating, standing space, or another function."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "BC 1004.1.3"
+        ],
+        "ready": true
+      },
+      "conversationID": "701392ed-f20b-4125-a18e-0e2f7e8c3cc2",
+      "answeredAt": "2026-07-23T03:05:47.917Z",
+      "judgedAt": "2026-07-23T03:05:55.997Z",
+      "answerTimeMilliseconds": 11129,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v5",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "Conditionally, no. If the room is an assembly-purpose space that is accessory to the apartment-building occupancy, its calculated occupant load is 60 persons (900 net square feet ÷ 15 net square feet per person). Because 60 is fewer than 75, Section 303.1.3 directs classification as Group B or as part of the occupancy to which it is accessory, rather than requiring classification as a separate assembly occupancy. The selected evidence does not itself establish the specific Group A-3 definition, but it supports use of the accessory-assembly-space rule if its conditions are verified. [Section 132, Passage ca84e062-d110-4c1a-a4d6-229e78a0ba2c; Section 2152, Passages 5d62aab7-de64-4058-abc6-032becc9cec4, 12e731e0-25b9-4cdf-81ce-e291f5a9a6e1, and 23624bc9-4af5-4c7e-a3b6-bbaf724e1cbe]",
+        "explanation": "The supplied occupant-load procedure applies to areas without fixed seating: divide the floor area under consideration by the Table 1004.1.3 factor assigned to the space function. The selected table entries identify “Unconcentrated (tables and chairs)” and a factor of 15 net square feet per person. Using the stated project area and normal layout: 900 net square feet ÷ 15 net square feet/person = 60 persons. Section 303.1.3 applies where an assembly-purpose room or space has an occupant load of fewer than 75 persons and is accessory to another occupancy. It then permits classification as Group B or as part of that other occupancy. That section also permits plumbing-fixture calculations for the room/space to follow assembly-occupancy requirements despite the accessory-space classification. [Section 132, Passage ca84e062-d110-4c1a-a4d6-229e78a0ba2c; Section 2152, Passages 5d62aab7-de64-4058-abc6-032becc9cec4, 12e731e0-25b9-4cdf-81ce-e291f5a9a6e1, and 23624bc9-4af5-4c7e-a3b6-bbaf724e1cbe]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the actual uses of the multipurpose room make it a room or space used for assembly purposes.",
+          "Whether the room is accessory to the apartment-building occupancy, rather than a separately operated or nonaccessory use.",
+          "Whether the stated 900 square feet is the net floor area under consideration for the occupant-load calculation.",
+          "Whether tables and chairs represent the governing normal function/layout; a different actual function could require a different Table 1004.1.3 occupant-load factor.",
+          "Whether any proposed use, layout, or seating arrangement increases the calculated occupant load to 75 persons or more."
+        ],
+        "evidenceLimitations": [
+          "The selected evidence does not include the Group A-3 definition or the general occupancy-classification provisions. Therefore, it cannot independently establish that the room would otherwise be specifically Group A-3.",
+          "The selected evidence provides only the table entry for unconcentrated tables and chairs; it does not provide factors for other multipurpose-room functions or layouts.",
+          "The selected evidence addresses occupancy classification and occupant-load calculation only; it does not establish other code consequences such as egress, fire protection, accessibility, or plumbing-fixture counts."
+        ],
+        "additionalEvidenceNeeded": [
+          "The actual program and proposed layouts for the room, including any uses other than unconcentrated tables and chairs.",
+          "Documentation showing the room is for residents and is accessory to the apartment-building occupancy.",
+          "The applicable Group A-3 definition and general occupancy-classification provisions, if a definitive determination of whether Group A-3 would otherwise apply is required.",
+          "Any additional Table 1004.1.3 rows needed for other intended functions or layouts."
+        ],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "chapterNumber": "3",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "ca84e062-d110-4c1a-a4d6-229e78a0ba2c"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ca84e062-d110-4c1a-a4d6-229e78a0ba2c",
+                "selectedText": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+              }
+            ],
+            "relevance": "Provides the accessory assembly-space exception: fewer than 75 occupants and accessory to another occupancy permits classification as Group B or as part of that occupancy; it also preserves the assembly plumbing-fixture calculation option."
+          },
+          {
+            "sectionID": "2152",
+            "sectionNumber": "1004.1.3",
+            "title": "1004.1.3 Areas without fixed seating.",
+            "codePrefix": "BC",
+            "chapterNumber": "10",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "5d62aab7-de64-4058-abc6-032becc9cec4",
+              "12e731e0-25b9-4cdf-81ce-e291f5a9a6e1",
+              "23624bc9-4af5-4c7e-a3b6-bbaf724e1cbe"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "5d62aab7-de64-4058-abc6-032becc9cec4",
+                "selectedText": "For areas without fixed seating, the occupant load shall be not less than that number determined by dividing the floor area under consideration by the occupant load factor assigned to the function of the space as set forth in Table 1004.1.3."
+              },
+              {
+                "sourceID": "12e731e0-25b9-4cdf-81ce-e291f5a9a6e1",
+                "selectedText": "Unconcentrated (tables and chairs)"
+              },
+              {
+                "sourceID": "23624bc9-4af5-4c7e-a3b6-bbaf724e1cbe",
+                "selectedText": "15 net"
+              }
+            ],
+            "relevance": "Provides the no-fixed-seating calculation method and the selected unconcentrated tables-and-chairs factor of 15 net square feet per person, yielding 60 occupants for the stated 900 net square feet."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "132",
+          "2152"
+        ],
+        "evidenceSourceIDs": [
+          "ca84e062-d110-4c1a-a4d6-229e78a0ba2c",
+          "5d62aab7-de64-4058-abc6-032becc9cec4",
+          "12e731e0-25b9-4cdf-81ce-e291f5a9a6e1",
+          "23624bc9-4af5-4c7e-a3b6-bbaf724e1cbe"
+        ],
+        "usage": {
+          "inputTokens": 1184,
+          "cachedInputTokens": 0,
+          "outputTokens": 1308,
+          "totalTokens": 2492
+        },
+        "estimatedCostUSD": 0.02258,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.02258,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 8080,
+        "usage": {
+          "inputTokens": 2105,
+          "cachedInputTokens": 0,
+          "outputTokens": 915,
+          "totalTokens": 3020
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The answer’s cited code provisions support the propositions attributed to them. BC 1004.1.3 supplies the no-fixed-seating calculation method and the 15-net factor for unconcentrated tables and chairs, supporting 900/15 = 60. BC 303.1.3 supports the fewer-than-75, accessory-to-another-occupancy condition and permits Group B or classification as part of the served occupancy. The answer appropriately notes that the supplied evidence does not include an A-3 definition."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The response does not invent code requirements or assert unsupported definitive conclusions. It expressly makes the result conditional on the room being an accessory assembly-purpose space and identifies the limitations of the supplied evidence. Its discussion of plumbing accurately reflects the stated exception in BC 303.1.3.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer is properly conditional and identifies all material unresolved facts: actual net area, governing furniture/function arrangement, intended activities, and whether the room is accessory to the apartment-building occupancy. It also cautions that the supplied evidence cannot independently establish the specific A-3 definition."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response directly answers the question, shows the occupant-load calculation, explains the fewer-than-75 comparison and accessory-space classification option, and provides a practical list of facts and additional code provisions needed for a definitive determination."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It identifies unconcentrated tables and chairs and applies the 15 net square feet per occupant factor."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It expressly calculates 900 net square feet divided by 15 net square feet per person as 60 persons."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It expressly states that 60 is fewer than 75."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains that, if accessory, BC 303.1.3 permits Group B or classification as part of the occupancy served."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It does not automatically assign the room to Group R-2; instead, it describes the conditional Group B or served-occupancy option and notes the need to verify accessory status."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer does not claim that every residential amenity room is automatically Group R-2."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer performs and shows the 900/15 occupant-load calculation before concluding that the load is below 75."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer expressly warns that a different actual function, layout, or seating arrangement could require another occupant-load factor or increase the occupant load."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It asks whether the stated 900 square feet is the actual net floor area under consideration."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It asks whether tables and chairs are the governing normal layout and notes that another function could require a different Table 1004.1.3 factor."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It identifies the room’s actual uses and program as needing confirmation."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It expressly identifies accessory status to the apartment-building occupancy as needing confirmation."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.018988,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "2/2 citations were restricted to selected evidence. The answer’s cited code provisions support the propositions attributed to them. BC 1004.1.3 supplies the no-fixed-seating calculation method and the 15-net factor for unconcentrated tables and chairs, supporting 900/15 = 60. BC 303.1.3 supports the fewer-than-75, accessory-to-another-occupancy condition and permits Group B or classification as part of the served occupancy. The answer appropriately notes that the supplied evidence does not include an A-3 definition."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "2/2 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "5/5 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The response does not invent code requirements or assert unsupported definitive conclusions. It expressly makes the result conditional on the room being an accessory assembly-purpose space and identifies the limitations of the supplied evidence. Its discussion of plumbing accurately reflects the stated exception in BC 303.1.3.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 4,
+            "rationale": "The answer is properly conditional and identifies all material unresolved facts: actual net area, governing furniture/function arrangement, intended activities, and whether the room is accessory to the apartment-building occupancy. It also cautions that the supplied evidence cannot independently establish the specific A-3 definition."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 4,
+            "rationale": "4/4 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response directly answers the question, shows the occupant-load calculation, explains the fewer-than-75 comparison and accessory-space classification option, and provides a practical list of facts and additional code provisions needed for a definitive determination."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "11129 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 3,
+            "rationale": "$0.022580 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 3.93,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It identifies unconcentrated tables and chairs and applies the 15 net square feet per occupant factor."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It expressly calculates 900 net square feet divided by 15 net square feet per person as 60 persons."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It expressly states that 60 is fewer than 75."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains that, if accessory, BC 303.1.3 permits Group B or classification as part of the occupancy served."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It does not automatically assign the room to Group R-2; instead, it describes the conditional Group B or served-occupancy option and notes the need to verify accessory status."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer does not claim that every residential amenity room is automatically Group R-2."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer performs and shows the 900/15 occupant-load calculation before concluding that the load is below 75."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer expressly warns that a different actual function, layout, or seating arrangement could require another occupant-load factor or increase the occupant load."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It asks whether the stated 900 square feet is the actual net floor area under consideration."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It asks whether tables and chairs are the governing normal layout and notes that another function could require a different Table 1004.1.3 factor."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": true,
+              "rationale": "It identifies the room’s actual uses and program as needing confirmation."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It expressly identifies accessory status to the apartment-building occupancy as needing confirmation."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "testCase": {
+        "id": "accessory-assembly-plumbing-fixtures",
+        "title": "Plumbing fixtures for an accessory assembly space",
+        "status": "approved",
+        "difficulty": "advanced",
+        "topics": [
+          "plumbing fixtures",
+          "accessory assembly",
+          "occupant load",
+          "fixture calculation"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "space": "Residential multipurpose room",
+          "potentialClassification": "Group B under the accessory assembly provision",
+          "unknowns": [
+            "assembly use category",
+            "occupant load",
+            "shared facilities",
+            "sex distribution"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 303.1.3",
+            "codePrefix": "BC",
+            "sectionNumber": "303.1.3",
+            "exactPassages": [
+              "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+            ],
+            "sectionID": "132",
+            "resolvedTitle": "303.1.3 Accessory assembly spaces.",
+            "evidenceCharacters": 408,
+            "ready": true,
+            "missingPassages": []
+          },
+          {
+            "reference": "PC 403.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1",
+            "exactPassages": [
+              "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code.",
+              "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+            ],
+            "sectionID": "11909",
+            "resolvedTitle": "403.1 Minimum number of fixtures.",
+            "evidenceCharacters": 8488,
+            "ready": true,
+            "missingPassages": []
+          },
+          {
+            "reference": "PC 403.1.1",
+            "codePrefix": "PC",
+            "sectionNumber": "403.1.1",
+            "exactPassages": [
+              "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor.",
+              "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+            ],
+            "sectionID": "11910",
+            "resolvedTitle": "403.1.1 Fixture calculations.",
+            "evidenceCharacters": 912,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
+        "expectedConclusion": "Not automatically. Although an accessory assembly space with fewer than 75 occupants may be classified as Group B or as part of the occupancy it serves, the code permits the plumbing fixtures for that assembly use to be calculated using the applicable Assembly fixture requirements. The appropriate assembly category must first be identified from the room's actual use. The total occupant load is generally divided equally between the sexes unless approved statistical information supports another distribution. Fixture ratios are then applied, fractions are combined as required for multiple occupancies, and the resulting fractions are rounded up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+        "expectedCertainty": "conditional",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "State that Group B classification does not automatically control the fixture calculation.",
+          "Explain that applicable Assembly fixture requirements may be used for the accessory assembly use.",
+          "Require identification of the appropriate assembly category based on actual use.",
+          "Explain the general equal division between the sexes and the statistical-data exception.",
+          "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
+          "Avoid providing a final fixture count without the required project facts."
+        ],
+        "missingFacts": [
+          "Confirm the calculated occupant load.",
+          "Confirm the applicable assembly use category.",
+          "Confirm existing shared facilities and relevant project conditions.",
+          "Confirm whether approved statistical information supports a different distribution between the sexes."
+        ],
+        "forbiddenClaims": [
+          "Group B classification always controls the plumbing fixture calculation.",
+          "Residential unit fixtures automatically satisfy the multipurpose-room requirement.",
+          "Provide a final fixture count without the occupant load, assembly use, shared facilities, and project conditions."
+        ],
+        "requiredCitations": [
+          "BC 303.1.3",
+          "PC 403.1",
+          "PC 403.1.1"
+        ],
+        "ready": true
+      },
+      "conversationID": "f009473c-0ae5-4d86-b694-2ead3bd0d169",
+      "answeredAt": "2026-07-23T03:06:08.394Z",
+      "judgedAt": "2026-07-23T03:06:20.981Z",
+      "answerTimeMilliseconds": 12353,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v5",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "No—not as an exclusive requirement. If the multipurpose room is an assembly-use space with an occupant load of fewer than 75 persons and is accessory to another occupancy, it may be classified as Group B (or as part of the other occupancy); however, the selected Building Code provision expressly permits its plumbing-fixture count to be calculated under the Assembly-occupancy requirements. The selected Plumbing Code provision likewise permits fixtures for a qualifying sub-75-person assembly space classified as Group B to be calculated under Assembly requirements. Thus, Group B classification does not require use of the normal Group B fixture ratios for this room; Assembly fixture requirements are a permitted calculation basis. [BC §303.1.3, Passage 147efd7d-516f-4b3d-878a-2183aec70deb; PC §403.1, Passage 42667e92-8559-410c-8c96-2a4270e5f661]",
+        "explanation": "PC §403.1 requires fixtures by occupancy type and the minimum counts in Table 403.1, with occupant load and occupancy classification determined under the NYC Building Code. For the qualifying assembly-space condition, the selected provisions create a permission to use Assembly requirements even though the room is classified as Group B. [PC §403.1, Passage 78d47242-aa25-4875-8910-777533a1742d; BC §303.1.3, Passage 147efd7d-516f-4b3d-878a-2183aec70deb]\n\nIf Assembly requirements are used, the selected fixture-calculation procedure is: (1) establish the Building-Code occupant load; (2) ordinarily divide the total occupant load equally between the sexes; (3) apply the applicable Table 403.1 fixture ratio(s) for each fixture type to each sex’s occupant load; and (4) round fractions up. For multiple occupancies, sum the fractional fixture results for each occupancy before rounding up. The equal sex split need not be used where approved statistical data supports a different sex distribution. [PC §403.1.1, Passages ccf4e918-da65-4995-b964-bbca8298fd64 and 216f6109-b044-4c5c-b945-732de39c320a]\n\nThe special rule in the selected text for Group B office occupancies—using the total occupant load on a given floor—does not establish that this multipurpose room is a Group B office occupancy. Therefore, it cannot be applied to this room from the supplied evidence alone. [PC §403.1.1, Passage ccf4e918-da65-4995-b964-bbca8298fd64]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether the room is actually used for assembly purposes.",
+          "Whether the room’s Building-Code occupant load is fewer than 75 persons; this is a condition of the BC §303.1.3 rule and must be verified.",
+          "Whether the room is accessory to another occupancy, as required by BC §303.1.3 for Group B (or part-of-that-occupancy) classification.",
+          "Whether the space falls within the Plumbing Code wording for a building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B; the supplied PC passage uses that phrasing.",
+          "The Building-Code occupant load used for the fixture calculation.",
+          "The applicable Assembly occupancy row and fixture ratios in Table 403.1, including the actual Assembly use category that corresponds to the room’s use.",
+          "Whether the room is being calculated with other occupancies and, if so, each occupancy’s fractional fixture result before rounding.",
+          "Whether approved statistical data supports a sex distribution other than 50/50."
+        ],
+        "evidenceLimitations": [
+          "The selected evidence does not include Table 403.1. It therefore does not establish the applicable Assembly use category, fixture ratios, fixture types, or a final fixture count.",
+          "The selected evidence permits Assembly-based fixture calculations for the stated qualifying condition, but does not state in the supplied text whether normal Group B calculations are prohibited, or whether a designer may instead elect them. Accordingly, the supported answer is limited to: normal Group B ratios are not the only available basis; Assembly requirements are expressly permitted.",
+          "The question states that Group B classification is permitted because there are fewer than 75 occupants, but the selected BC text also requires that the assembly space be accessory to another occupancy. The selected evidence cannot confirm that project fact.",
+          "No selected evidence establishes whether this is a Group B office occupancy, so the Group B office floor-total calculation rule cannot be treated as applicable."
+        ],
+        "additionalEvidenceNeeded": [
+          "The applicable Table 403.1 Assembly occupancy row and fixture ratios for the multipurpose room’s actual Assembly use category.",
+          "Building-Code documentation establishing the room’s assembly use, accessory relationship to the principal occupancy, and occupant load of fewer than 75 persons.",
+          "The Building-Code occupant-load calculation for the room and for any other occupancy included in a combined fixture calculation.",
+          "Project information identifying whether fixtures are calculated separately or in combination with other occupancies, and any approved statistical data supporting a non-50/50 sex distribution."
+        ],
+        "citations": [
+          {
+            "sectionID": "132",
+            "sectionNumber": "303.1.3",
+            "title": "303.1.3 Accessory assembly spaces.",
+            "codePrefix": "BC",
+            "chapterNumber": "3",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "147efd7d-516f-4b3d-878a-2183aec70deb"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "147efd7d-516f-4b3d-878a-2183aec70deb",
+                "selectedText": "A room or space used for assembly purposes with an occupant load of fewer than 75 persons and accessory to another occupancy shall be classified as a Group B occupancy or as part of that occupancy, except that the number of plumbing fixtures for such a room or space is permitted to be calculated in accordance with the requirements for assembly occupancies."
+              }
+            ],
+            "relevance": "Provides the conditional Group B classification rule for accessory assembly spaces under 75 occupants and expressly permits Assembly-occupancy plumbing-fixture calculations."
+          },
+          {
+            "sectionID": "11909",
+            "sectionNumber": "403.1",
+            "title": "403.1 Minimum number of fixtures.",
+            "codePrefix": "PC",
+            "chapterNumber": "4",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "78d47242-aa25-4875-8910-777533a1742d",
+              "42667e92-8559-410c-8c96-2a4270e5f661"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "78d47242-aa25-4875-8910-777533a1742d",
+                "selectedText": "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. Types of occupancies not shown in Table 403.1 shall be considered individually by the commissioner. The number of occupants shall be determined by the New York City Building Code. Occupancy classification shall be determined in accordance with the New York City Building Code."
+              },
+              {
+                "sourceID": "42667e92-8559-410c-8c96-2a4270e5f661",
+                "selectedText": "The number of fixtures for building or nonaccessory tenant space used for assembly purposes by fewer than 75 persons and classified as Group B occupancy in accordance with Section 303.1, Exception 2 of the New York City Building Code shall be permitted to be calculated in accordance with the requirements for Assembly occupancies."
+              }
+            ],
+            "relevance": "Requires fixture counts by Table 403.1 using Building-Code occupancy classification and occupant load, and specifically permits Assembly calculations for qualifying Group B assembly spaces under 75 occupants."
+          },
+          {
+            "sectionID": "11910",
+            "sectionNumber": "403.1.1",
+            "title": "403.1.1 Fixture calculations.",
+            "codePrefix": "PC",
+            "chapterNumber": "4",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "ccf4e918-da65-4995-b964-bbca8298fd64",
+              "216f6109-b044-4c5c-b945-732de39c320a"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "ccf4e918-da65-4995-b964-bbca8298fd64",
+                "selectedText": "To determine the occupant load of each sex, the total occupant load shall be divided in half. To determine the required number of fixtures, the fixture ratio or ratios for each fixture type shall be applied to the occupant load of each sex in accordance with Table 403.1. Fractional numbers resulting from applying the fixture ratios of Table 403.1 shall be rounded up to the next whole number. For calculations involving multiple occupancies, such fractional numbers for each occupancy shall first be summed and then rounded up to the next whole number. Fixture calculations in Group B office occupancies shall utilize the total occupant load on a given floor to determine the number of fixtures required for that floor."
+              },
+              {
+                "sourceID": "216f6109-b044-4c5c-b945-732de39c320a",
+                "selectedText": "Exception: The total occupant load shall not be required to be divided in half where approved statistical data indicates a distribution of the sexes of other than 50 percent of each sex."
+              }
+            ],
+            "relevance": "Supplies the selected fixture-calculation, rounding, multiple-occupancy, Group B office, and sex-distribution rules."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "132",
+          "11909",
+          "11910"
+        ],
+        "evidenceSourceIDs": [
+          "147efd7d-516f-4b3d-878a-2183aec70deb",
+          "78d47242-aa25-4875-8910-777533a1742d",
+          "42667e92-8559-410c-8c96-2a4270e5f661",
+          "ccf4e918-da65-4995-b964-bbca8298fd64",
+          "216f6109-b044-4c5c-b945-732de39c320a"
+        ],
+        "usage": {
+          "inputTokens": 1515,
+          "cachedInputTokens": 0,
+          "outputTokens": 1321,
+          "totalTokens": 2836
+        },
+        "estimatedCostUSD": 0.023602,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.023602,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 12586,
+        "usage": {
+          "inputTokens": 2649,
+          "cachedInputTokens": 0,
+          "outputTokens": 1403,
+          "totalTokens": 4052
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The cited code sections support the propositions attributed to them. BC 303.1.3 supports conditional Group B classification for an accessory assembly space below 75 occupants and permits Assembly-based plumbing-fixture calculations. PC 403.1 supports both the general Table 403.1 framework and the specific permission for qualifying Group B assembly spaces to use Assembly requirements. PC 403.1.1 supports the sex-split, approved-statistical-data exception, fractional-result aggregation for multiple occupancies, and rounding discussion. The answer also correctly confines the Group B office floor-total rule to Group B office occupancies."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a mandatory exclusive Group B or Assembly calculation method. It accurately characterizes Assembly calculations as permitted and expressly warns that the supplied passages do not establish whether normal Group B calculations are prohibited or remain elective. It does not state a fixture count or claim that residential-unit fixtures satisfy the room's requirements.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 3,
+            "rationale": "The answer is strongly conditional about the accessory relationship, sub-75 occupant-load condition, actual assembly use, applicable Table 403.1 row, combined calculations, and non-50/50 approved statistical data. It also correctly explains that the table is absent and declines to provide a final count. It does not expressly identify existing shared facilities as a fact to be confirmed, although it does request project information about whether fixtures are calculated separately or in combination with other occupancies."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response directly answers that normal Group B requirements are not the exclusive calculation basis, provides the conditional code pathway, lays out the calculation sequence available from the supplied evidence, identifies the missing table and project facts, and avoids overstating what the excerpts establish."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly states that Group B classification does not require normal Group B fixture ratios and that Group B is not the exclusive fixture-calculation basis."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that BC 303.1.3 and PC 403.1 permit qualifying accessory assembly spaces classified as Group B to use Assembly fixture requirements."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It identifies the need for the applicable Table 403.1 Assembly row and fixture ratios corresponding to the room's actual Assembly use category."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains the ordinary equal division of total occupant load between the sexes and the exception for approved statistical data supporting another distribution."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It explains applying fixture ratios by fixture type, summing fractional results across occupancies before rounding where multiple occupancies are involved, and rounding up."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It gives no final fixture count and identifies missing occupant-load, Assembly-category, table, and combined-calculation facts."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer rejects the proposition that Group B classification always controls the fixture calculation."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer does not claim that residential-unit fixtures automatically satisfy the multipurpose-room requirement."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer provides no final fixture count and makes clear that essential project facts and Table 403.1 information are absent."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It repeatedly identifies the Building-Code occupant load, including verification that it is below 75, as necessary."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It requests the applicable Assembly Table 403.1 row/use category based on the room's actual use."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": false,
+              "rationale": "It asks whether fixtures are calculated separately or in combination with other occupancies, but it does not expressly call for confirmation of existing shared facilities."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It explicitly asks whether approved statistical data supports a sex distribution other than 50/50."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.027668,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "3/3 citations were restricted to selected evidence. The cited code sections support the propositions attributed to them. BC 303.1.3 supports conditional Group B classification for an accessory assembly space below 75 occupants and permits Assembly-based plumbing-fixture calculations. PC 403.1 supports both the general Table 403.1 framework and the specific permission for qualifying Group B assembly spaces to use Assembly requirements. PC 403.1.1 supports the sex-split, approved-statistical-data exception, fractional-result aggregation for multiple occupancies, and rounding discussion. The answer also correctly confines the Group B office floor-total rule to Group B office occupancies."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "3/3 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "6/6 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a mandatory exclusive Group B or Assembly calculation method. It accurately characterizes Assembly calculations as permitted and expressly warns that the supplied passages do not establish whether normal Group B calculations are prohibited or remain elective. It does not state a fixture count or claim that residential-unit fixtures satisfy the room's requirements.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 3,
+            "rationale": "The answer is strongly conditional about the accessory relationship, sub-75 occupant-load condition, actual assembly use, applicable Table 403.1 row, combined calculations, and non-50/50 approved statistical data. It also correctly explains that the table is absent and declines to provide a final count. It does not expressly identify existing shared facilities as a fact to be confirmed, although it does request project information about whether fixtures are calculated separately or in combination with other occupancies."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 3,
+            "rationale": "3/4 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 4,
+            "rationale": "The response directly answers that normal Group B requirements are not the exclusive calculation basis, provides the conditional code pathway, lays out the calculation sequence available from the supplied evidence, identifies the missing table and project facts, and avoids overstating what the excerpts establish."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "12353 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 3,
+            "rationale": "$0.023602 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 3.71,
+        "passed": true,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "It expressly states that Group B classification does not require normal Group B fixture ratios and that Group B is not the exclusive fixture-calculation basis."
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that BC 303.1.3 and PC 403.1 permit qualifying accessory assembly spaces classified as Group B to use Assembly fixture requirements."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It identifies the need for the applicable Table 403.1 Assembly row and fixture ratios corresponding to the room's actual Assembly use category."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It explains the ordinary equal division of total occupant load between the sexes and the exception for approved statistical data supporting another distribution."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It explains applying fixture ratios by fixture type, summing fractional results across occupancies before rounding where multiple occupancies are involved, and rounding up."
+            },
+            {
+              "id": "concept-6",
+              "met": true,
+              "rationale": "It gives no final fixture count and identifies missing occupant-load, Assembly-category, table, and combined-calculation facts."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer rejects the proposition that Group B classification always controls the fixture calculation."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer does not claim that residential-unit fixtures automatically satisfy the multipurpose-room requirement."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer provides no final fixture count and makes clear that essential project facts and Table 403.1 information are absent."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": true,
+              "rationale": "It repeatedly identifies the Building-Code occupant load, including verification that it is below 75, as necessary."
+            },
+            {
+              "id": "missing-fact-2",
+              "met": true,
+              "rationale": "It requests the applicable Assembly Table 403.1 row/use category based on the room's actual use."
+            },
+            {
+              "id": "missing-fact-3",
+              "met": false,
+              "rationale": "It asks whether fixtures are calculated separately or in combination with other occupancies, but it does not expressly call for confirmation of existing shared facilities."
+            },
+            {
+              "id": "missing-fact-4",
+              "met": true,
+              "rationale": "It explicitly asks whether approved statistical data supports a sex distribution other than 50/50."
+            }
+          ]
+        }
+      }
+    },
+    {
+      "testCase": {
+        "id": "building-code-versus-hcr",
+        "title": "Building Code evidence versus an agency requirement",
+        "status": "approved",
+        "difficulty": "basic",
+        "topics": [
+          "accessibility",
+          "agency requirements",
+          "scope of authority",
+          "evidence limits"
+        ],
+        "codeEdition": "2022 New York City Construction Codes",
+        "projectContext": {
+          "questionedAuthority": "New York State Homes and Community Renewal (HCR)",
+          "selectedAuthority": "New York City Building Code only",
+          "unknowns": [
+            "applicable HCR standard",
+            "funding requirements",
+            "agency guidance"
+          ]
+        },
+        "selectedEvidence": [
+          {
+            "reference": "BC 1107.2.2.7.2.2",
+            "codePrefix": "BC",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "exactPassages": [
+              "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+            ],
+            "sectionID": "2713",
+            "resolvedTitle": "- 1107.2.2.7.2.2 Forward approach.",
+            "evidenceCharacters": 378,
+            "ready": true,
+            "missingPassages": []
+          }
+        ],
+        "question": "Does this section prove that HCR requires a vanity in the bathroom?",
+        "expectedConclusion": "No. The selected Building Code passage establishes the required water-closet clearance when only a forward approach is provided and states when a lavatory may be located on the rear wall. It does not establish an HCR vanity requirement. HCR requirements cannot be confirmed from the selected evidence; the applicable HCR design standard, project funding requirements, or agency guidance must be provided.",
+        "expectedCertainty": "outside selected authority",
+        "sourceType": "real project",
+        "reviewer": "Permitext owner",
+        "reviewedAt": "2026-07-22T00:00:00.000Z",
+        "requiredConcepts": [
+          "Answer no.",
+          "Explain that the passage regulates water-closet clearances for a forward approach.",
+          "Explain that the passage permits a compliant lavatory on the rear wall under the stated placement condition.",
+          "State that the selected evidence does not establish an HCR vanity requirement.",
+          "Request the applicable HCR material before stating what HCR requires."
+        ],
+        "missingFacts": [
+          "Provide the applicable HCR design standard, project funding requirement, or agency guidance."
+        ],
+        "forbiddenClaims": [
+          "A vanity is required by this Building Code passage.",
+          "A lavatory and a vanity are interchangeable requirements.",
+          "State what HCR requires without HCR material in the evidence."
+        ],
+        "requiredCitations": [
+          "BC 1107.2.2.7.2.2"
+        ],
+        "ready": true
+      },
+      "conversationID": "446383da-e3ca-46b5-9fe1-d0d293413fa2",
+      "answeredAt": "2026-07-23T03:06:27.542Z",
+      "judgedAt": "2026-07-23T03:06:39.606Z",
+      "answerTimeMilliseconds": 6546,
+      "answer": {
+        "mode": "openai",
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-grounded-passages-v5",
+        "evidenceVersion": "selected-passages-only-v2",
+        "codeEdition": "2022 New York City Construction Codes",
+        "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+        "conclusion": "No. This section does not prove that HCR requires a vanity in the bathroom. It addresses required water-closet clearance where only a forward approach is provided, and it permits—not requires—a compliant lavatory on the rear wall under stated conditions. [§1107.2.2.7.2.2, Passage 7aeede99-69d8-4684-b69b-540e8c2a472f]",
+        "explanation": "The operative wording is “A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall.” “Permitted” establishes an allowed location for a lavatory; it does not establish that a lavatory/vanity must be provided. If one is placed on the rear wall under this provision, the selected text states it must comply with Section 1107.2.2.5 and be at least 18 inches from the water-closet centerline. The selected text also states that, where only a forward approach is provided to the water closet, the water-closet clearance must be at least 66 inches perpendicular from the rear wall and 48 inches perpendicular from the side wall. [§1107.2.2.7.2.2, Passage 7aeede99-69d8-4684-b69b-540e8c2a472f]",
+        "assumptions": [],
+        "missingFacts": [
+          "Whether “HCR” refers to a dwelling unit, bathroom, or accessibility category governed by this section.",
+          "Whether the bathroom has only a forward approach to the water closet; that condition triggers the clearance rule stated in the selected passage.",
+          "Whether a lavatory is proposed on the rear wall and, if so, its distance from the water-closet centerline.",
+          "Whether the fixture called a “vanity” is a lavatory for purposes of the code, including whether it complies with Section 1107.2.2.5."
+        ],
+        "evidenceLimitations": [
+          "The selected passage contains no general requirement to provide a lavatory, vanity, or bathroom fixtures.",
+          "Section 1107.2.2.5 is referenced but was not supplied; its compliance criteria cannot be determined from this passage.",
+          "The selected evidence does not define “HCR” or establish which rooms or dwelling units must comply with this section.",
+          "The selected passage does not address whether a vanity cabinet, as distinct from a lavatory, is required or permitted."
+        ],
+        "additionalEvidenceNeeded": [
+          "The code provision establishing whether the applicable HCR bathroom must contain a lavatory or other specified fixtures.",
+          "The definition or project designation of “HCR.”",
+          "Section 1107.2.2.5, if a rear-wall lavatory is proposed.",
+          "Bathroom plan information showing the water-closet approach, rear and side-wall clearances, and proposed lavatory location. [§1107.2.2.7.2.2, Passage 7aeede99-69d8-4684-b69b-540e8c2a472f]"
+        ],
+        "citations": [
+          {
+            "sectionID": "2713",
+            "sectionNumber": "1107.2.2.7.2.2",
+            "title": "- 1107.2.2.7.2.2 Forward approach.",
+            "codePrefix": "BC",
+            "chapterNumber": "11",
+            "codeVersion": "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+            "codeEdition": "2022 New York City Construction Codes",
+            "sourceIDs": [
+              "7aeede99-69d8-4684-b69b-540e8c2a472f"
+            ],
+            "supportingPassages": [
+              {
+                "sourceID": "7aeede99-69d8-4684-b69b-540e8c2a472f",
+                "selectedText": "Where only a forward approach is provided to the water closet, the clearance shall be 66 inches (1676 mm) minimum, measured perpendicular from the rear wall, and 48 inches (1220 mm) minimum, measured perpendicular from the side wall. A lavatory complying with Section 1107.2.2.5 shall be permitted on the rear wall, 18 inches (457.2 mm) minimum from the water closet centerline."
+              }
+            ],
+            "relevance": "This selected passage sets forward-approach water-closet clearances and says a compliant lavatory is “permitted” on the rear wall; it does not state that a lavatory or vanity is required."
+          }
+        ],
+        "evidenceSectionIDs": [
+          "2713"
+        ],
+        "evidenceSourceIDs": [
+          "7aeede99-69d8-4684-b69b-540e8c2a472f"
+        ],
+        "usage": {
+          "inputTokens": 733,
+          "cachedInputTokens": 0,
+          "outputTokens": 724,
+          "totalTokens": 1457
+        },
+        "estimatedCostUSD": 0.012693,
+        "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22",
+        "disclaimer": "AI-generated research assistance, not an official code determination.",
+        "estimatedCost": {
+          "estimatedUSD": 0.012693,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "judge": {
+        "model": "gpt-5.6-terra",
+        "promptVersion": "20260722-exact-rubric-v2",
+        "responseTimeMilliseconds": 12063,
+        "usage": {
+          "inputTokens": 1651,
+          "cachedInputTokens": 0,
+          "outputTokens": 1277,
+          "totalTokens": 2928
+        },
+        "judgment": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "The cited provision, BC 1107.2.2.7.2.2, supports the answer's statements about 66-inch and 48-inch forward-approach water-closet clearances, the permitted rear-wall location of a complying lavatory, and the 18-inch minimum distance from the water-closet centerline. It also supports the conclusion that the passage does not itself require a lavatory or vanity."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a Building Code vanity requirement or assert that HCR imposes any requirement. It appropriately characterizes the rear-wall lavatory language as permissive rather than mandatory and expressly preserves uncertainty over whether a vanity is a lavatory for purposes of other code provisions.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 3,
+            "rationale": "The answer correctly states that the selected passage cannot establish an HCR requirement and identifies relevant limits in the supplied text, including the absent Section 1107.2.2.5. It requests additional governing material, although it would be stronger and more direct to request the applicable HCR design standard, funding requirements, or agency guidance specifically, rather than primarily requesting additional code and project information."
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The direct answer and code explanation are useful and substantively correct. However, the response is more expansive than necessary and includes some less-focused unknowns, such as whether HCR refers to a dwelling unit, bathroom, or accessibility category, despite the context identifying HCR as the questioned authority. Its evidence request should more clearly prioritize the applicable HCR materials."
+          },
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "The conclusion directly answers, \"No.\""
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the passage addresses water-closet clearances where only a forward approach is provided, including the stated dimensions."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It accurately explains that a lavatory complying with Section 1107.2.2.5 is permitted, not required, on the rear wall subject to the placement condition."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It expressly states that the section does not prove HCR requires a vanity and identifies the absence of an HCR requirement in the selected evidence."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It requests further material concerning the provision governing the applicable HCR bathroom and related project designation, though it could have more explicitly requested HCR design standards, funding requirements, or agency guidance."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer expressly says the passage does not require a vanity or lavatory."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer does not claim lavatories and vanities are interchangeable; it identifies that relationship as an unresolved issue."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not state what HCR requires and instead says the selected passage cannot prove an HCR requirement."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": false,
+              "rationale": "The answer seeks additional governing material, but it does not specifically request the applicable HCR design standard, project funding requirement, or agency guidance identified by the record. Its request for an unspecified code provision is directionally helpful but less precise than the required missing fact."
+            }
+          ]
+        },
+        "estimatedCost": {
+          "estimatedUSD": 0.023283,
+          "pricingVersion": "openai-standard-gpt-5.6-terra-2026-07-22"
+        }
+      },
+      "scoring": {
+        "metrics": {
+          "citationCorrectness": {
+            "score": 4,
+            "rationale": "1/1 citations were restricted to selected evidence. The cited provision, BC 1107.2.2.7.2.2, supports the answer's statements about 66-inch and 48-inch forward-approach water-closet clearances, the permitted rear-wall location of a complying lavatory, and the 18-inch minimum distance from the water-closet centerline. It also supports the conclusion that the passage does not itself require a lavatory or vanity."
+          },
+          "citationCompleteness": {
+            "score": 4,
+            "rationale": "1/1 required citations were present."
+          },
+          "requiredConceptCoverage": {
+            "score": 4,
+            "rationale": "5/5 required concepts were covered."
+          },
+          "hallucinationsInventedRequirements": {
+            "score": 4,
+            "rationale": "The answer does not invent a Building Code vanity requirement or assert that HCR imposes any requirement. It appropriately characterizes the rear-wall lavatory language as permissive rather than mandatory and expressly preserves uncertainty over whether a vanity is a lavatory for purposes of other code provisions.",
+            "offendingClaims": []
+          },
+          "appropriateUncertainty": {
+            "score": 3,
+            "rationale": "The answer correctly states that the selected passage cannot establish an HCR requirement and identifies relevant limits in the supplied text, including the absent Section 1107.2.2.5. It requests additional governing material, although it would be stronger and more direct to request the applicable HCR design standard, funding requirements, or agency guidance specifically, rather than primarily requesting additional code and project information."
+          },
+          "recognitionOfMissingProjectFacts": {
+            "score": 0,
+            "rationale": "0/1 required missing-fact conditions were recognized."
+          },
+          "practicalUsefulness": {
+            "score": 3,
+            "rationale": "The direct answer and code explanation are useful and substantively correct. However, the response is more expansive than necessary and includes some less-focused unknowns, such as whether HCR refers to a dwelling unit, bathroom, or accessibility category, despite the context identifying HCR as the questioned authority. Its evidence request should more clearly prioritize the applicable HCR materials."
+          },
+          "responseTime": {
+            "score": 4,
+            "rationale": "6546 ms for the Permitext answer call."
+          },
+          "tokenCost": {
+            "score": 4,
+            "rationale": "$0.012693 estimated answer cost using pricing version openai-standard-gpt-5.6-terra-2026-07-22."
+          }
+        },
+        "overallScore": 3.38,
+        "passed": false,
+        "rubricChecks": {
+          "requiredConcepts": [
+            {
+              "id": "concept-1",
+              "met": true,
+              "rationale": "The conclusion directly answers, \"No.\""
+            },
+            {
+              "id": "concept-2",
+              "met": true,
+              "rationale": "It explains that the passage addresses water-closet clearances where only a forward approach is provided, including the stated dimensions."
+            },
+            {
+              "id": "concept-3",
+              "met": true,
+              "rationale": "It accurately explains that a lavatory complying with Section 1107.2.2.5 is permitted, not required, on the rear wall subject to the placement condition."
+            },
+            {
+              "id": "concept-4",
+              "met": true,
+              "rationale": "It expressly states that the section does not prove HCR requires a vanity and identifies the absence of an HCR requirement in the selected evidence."
+            },
+            {
+              "id": "concept-5",
+              "met": true,
+              "rationale": "It requests further material concerning the provision governing the applicable HCR bathroom and related project designation, though it could have more explicitly requested HCR design standards, funding requirements, or agency guidance."
+            }
+          ],
+          "forbiddenClaims": [
+            {
+              "id": "forbidden-1",
+              "violated": false,
+              "rationale": "The answer expressly says the passage does not require a vanity or lavatory."
+            },
+            {
+              "id": "forbidden-2",
+              "violated": false,
+              "rationale": "The answer does not claim lavatories and vanities are interchangeable; it identifies that relationship as an unresolved issue."
+            },
+            {
+              "id": "forbidden-3",
+              "violated": false,
+              "rationale": "The answer does not state what HCR requires and instead says the selected passage cannot prove an HCR requirement."
+            }
+          ],
+          "uncertaintyConditions": [
+            {
+              "id": "missing-fact-1",
+              "met": false,
+              "rationale": "The answer seeks additional governing material, but it does not specifically request the applicable HCR design standard, project funding requirement, or agency guidance identified by the record. Its request for an unspecified code provision is directionally helpful but less precise than the required missing fact."
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
