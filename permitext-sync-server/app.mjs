@@ -14,7 +14,11 @@ import { createPostgresAccountRepository } from "./postgres-account-repository.m
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
-import { estimatedResearchCost, researchModelConfiguration } from "./research-config.mjs";
+import {
+  estimatedResearchCost,
+  reserveResearchEvaluationSpend,
+  researchModelConfiguration
+} from "./research-config.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -143,6 +147,7 @@ const researchInterpretationSchema = {
     additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     citations: {
       type: "array",
+      minItems: 1,
       items: {
         type: "object",
         additionalProperties: false,
@@ -157,6 +162,15 @@ const researchInterpretationSchema = {
   },
   required: ["conclusion", "explanation", "assumptions", "missingFacts", "evidenceLimitations", "additionalEvidenceNeeded", "citations"]
 };
+
+function researchInterpretationSchemaForEvidence(evidence) {
+  const schema = structuredClone(researchInterpretationSchema);
+  schema.properties.citations.items.properties.sectionID.enum =
+    Array.from(new Set(evidence.map((item) => String(item.sectionID))));
+  schema.properties.citations.items.properties.sourceIDs.items.enum =
+    Array.from(new Set(evidence.map((item) => String(item.sourceID || `section-${item.sectionID}`))));
+  return schema;
+}
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) {
@@ -2515,38 +2529,40 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
   }));
   let response;
   try {
+    const requestBody = {
+      model,
+      store: false,
+      reasoning: { effort: configuration.reasoningEffort },
+      max_output_tokens: 1_500,
+      safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
+      instructions: [
+        "You are a building-code research assistant, not an authority having jurisdiction.",
+        "Interpret only the selected official code evidence supplied in the request.",
+        "Do not use outside knowledge as legal authority and do not invent requirements.",
+        "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
+        "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
+        "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
+        "If the question cannot be answered from the selected evidence, say so directly.",
+        "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
+      ].join(" "),
+      input: researchPrompt(question, passageEvidence, options),
+      text: {
+        format: {
+          type: "json_schema",
+          name: "permitext_code_interpretation",
+          strict: true,
+          schema: researchInterpretationSchemaForEvidence(passageEvidence)
+        }
+      }
+    };
+    reserveResearchEvaluationSpend(requestBody);
     response = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
         authorization: `Bearer ${apiKey}`,
         "content-type": "application/json"
       },
-      body: JSON.stringify({
-        model,
-        store: false,
-        reasoning: { effort: configuration.reasoningEffort },
-        max_output_tokens: 1_500,
-        safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
-        instructions: [
-          "You are a building-code research assistant, not an authority having jurisdiction.",
-          "Interpret only the selected official code evidence supplied in the request.",
-          "Do not use outside knowledge as legal authority and do not invent requirements.",
-          "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
-          "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
-          "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
-          "If the question cannot be answered from the selected evidence, say so directly.",
-          "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
-        ].join(" "),
-        input: researchPrompt(question, passageEvidence, options),
-        text: {
-          format: {
-            type: "json_schema",
-            name: "permitext_code_interpretation",
-            strict: true,
-            schema: researchInterpretationSchema
-          }
-        }
-      }),
+      body: JSON.stringify(requestBody),
       signal: AbortSignal.timeout(45_000)
     });
   } catch (error) {
@@ -2655,6 +2671,10 @@ async function handleResearchInterpretation(request, response) {
       return;
     }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_EVAL_SPEND_CAP") {
       sendError(response, 503, error.message);
       return;
     }
@@ -3337,6 +3357,10 @@ async function handleResearchConversationMessage(request, response) {
       return;
     }
     if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_EVAL_SPEND_CAP") {
       sendError(response, 503, error.message);
       return;
     }

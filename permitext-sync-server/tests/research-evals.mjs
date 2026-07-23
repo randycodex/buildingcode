@@ -7,7 +7,12 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
-import { estimatedResearchCost, researchModelConfiguration } from "../research-config.mjs";
+import {
+  estimatedResearchCost,
+  reserveResearchEvaluationSpend,
+  researchEvaluationSpendStatus,
+  researchModelConfiguration
+} from "../research-config.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
@@ -311,6 +316,7 @@ async function judgeAnswer(testCase, answer) {
       }
     }
   };
+  reserveResearchEvaluationSpend(requestBody);
   const startedAt = performance.now();
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -531,6 +537,8 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
     "",
     `Estimated cost: $${answerCost.toFixed(6)} answers + $${judgeCost.toFixed(6)} judging = $${(answerCost + judgeCost).toFixed(6)} (${configuration.pricingVersion || "pricing unavailable"}).`,
     "",
+    `Approved spend cap: $${Number(configuration.approvedSpendCapUSD || 0).toFixed(2)}; conservative pre-request reservation: $${Number(configuration.conservativeReservedUSD || 0).toFixed(6)} across ${configuration.paidRequestCount || 0} requests.`,
+    "",
     "| Case | Result | Score / 4 | Answer ms | Answer tokens |",
     "| --- | --- | ---: | ---: | ---: |",
     ...summaryRows,
@@ -628,7 +636,9 @@ async function latestBaseline() {
     const candidates = [];
     for (const file of files) {
       const candidate = JSON.parse(await readFile(join(resultsDirectory, file), "utf8"));
-      if (candidate?.results?.length) candidates.push(candidate);
+      if (candidate?.results?.length && (candidate.status === "completed" || candidate.status == null)) {
+        candidates.push(candidate);
+      }
     }
     let reviews = [];
     try {
@@ -674,21 +684,10 @@ function compareWithBaseline(results, baseline) {
 async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
   const account = await signInEvalUser(baseURL);
   const results = [];
-  console.log(`Approved live run: ${checkedCases.length} answer calls plus ${checkedCases.length} judge calls (${checkedCases.length * 2} paid model requests maximum).`);
-  for (const testCase of checkedCases) {
-    const conversationID = await createEvaluationConversation(baseURL, account, testCase);
-    const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
-    answer.estimatedCost = estimatedResearchCost(answer.usage);
-    const judge = await judgeAnswer(testCase, answer);
-    judge.estimatedCost = estimatedResearchCost(judge.usage);
-    const scoring = scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge);
-    results.push({ testCase, conversationID, answeredAt, judgedAt: new Date().toISOString(), answerTimeMilliseconds, answer, judge, scoring });
-    console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
-  }
   const createdAt = new Date().toISOString();
   const stamp = createdAt.replace(/[:.]/g, "-");
   const answerConfiguration = researchModelConfiguration();
-  const configuration = {
+  const baseConfiguration = {
     runID: randomUUID(),
     datasetSHA256: createHash("sha256").update(datasetText).digest("hex"),
     codeEditions: Array.from(new Set(checkedCases.map((testCase) => testCase.codeEdition))),
@@ -699,15 +698,70 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
     retrievalVersion: "none-selected-evidence-only",
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
     judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
-    pricingVersion: results[0]?.answer?.estimatedCost?.pricingVersion || null,
+    pricingVersion: estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
     gitCommit: await currentGitCommit()
   };
-  const baseline = compareWithBaseline(results, await latestBaseline());
+  const priorBaseline = await latestBaseline();
   await mkdir(resultsDirectory, { recursive: true });
   const jsonPath = join(resultsDirectory, `${stamp}.json`);
   const markdownPath = join(resultsDirectory, `${stamp}.md`);
-  await writeFile(jsonPath, `${JSON.stringify({ schemaVersion: 2, createdAt, configuration, baseline, results }, null, 2)}\n`);
-  await writeFile(markdownPath, `${reviewMarkdown(dataset, results, createdAt, configuration)}\n`);
+  const saveSnapshot = async (status, failure = null) => {
+    const spendStatus = researchEvaluationSpendStatus();
+    const configuration = {
+      ...baseConfiguration,
+      approvedSpendCapUSD: spendStatus.capUSD,
+      conservativeReservedUSD: spendStatus.reservedUSD,
+      paidRequestCount: spendStatus.requestCount
+    };
+    const baseline = compareWithBaseline(results, priorBaseline);
+    const snapshot = {
+      schemaVersion: 2,
+      status,
+      createdAt,
+      updatedAt: new Date().toISOString(),
+      configuration,
+      baseline,
+      failure,
+      results
+    };
+    await writeFile(jsonPath, `${JSON.stringify(snapshot, null, 2)}\n`);
+    if (status !== "running") {
+      const failureNotice = failure
+        ? `\n\n## Incomplete run\n\n${failure.caseID}: ${failure.message}\n`
+        : "";
+      await writeFile(
+        markdownPath,
+        `${reviewMarkdown(dataset, results, createdAt, configuration)}${failureNotice}\n`
+      );
+    }
+  };
+
+  console.log(`Approved live run: ${checkedCases.length} answer calls plus ${checkedCases.length} judge calls (${checkedCases.length * 2} paid model requests maximum).`);
+  let activeCase = null;
+  try {
+    for (const testCase of checkedCases) {
+      activeCase = testCase;
+      const conversationID = await createEvaluationConversation(baseURL, account, testCase);
+      const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
+      answer.estimatedCost = estimatedResearchCost(answer.usage);
+      const judge = await judgeAnswer(testCase, answer);
+      judge.estimatedCost = estimatedResearchCost(judge.usage);
+      const scoring = scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge);
+      results.push({ testCase, conversationID, answeredAt, judgedAt: new Date().toISOString(), answerTimeMilliseconds, answer, judge, scoring });
+      await saveSnapshot("running");
+      console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
+    }
+  } catch (error) {
+    await saveSnapshot("failed", {
+      caseID: activeCase?.id || null,
+      code: error.code || null,
+      message: error.message
+    });
+    console.error(`Saved partial machine results: ${jsonPath}`);
+    console.error(`Saved partial review report: ${markdownPath}`);
+    throw error;
+  }
+  await saveSnapshot("completed");
   console.log(`Saved machine results: ${jsonPath}`);
   console.log(`Saved review report: ${markdownPath}`);
   if (results.some((result) => !result.scoring.passed)) process.exitCode = 3;
@@ -794,8 +848,36 @@ function runSelfTest(dataset, datasetText) {
       id: `scale-self-test-${index + 1}`
     }))
   });
+  const spendEnvironment = {
+    PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS: "2.50",
+    PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS: "0.25",
+    PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS: "15",
+    PERMITEXT_RESEARCH_PRICING_VERSION: "self-test",
+    PERMITEXT_RESEARCH_EVAL_MAX_USD: "0.10"
+  };
+  const reservation = reserveResearchEvaluationSpend({
+    model: "self-test",
+    input: "bounded request",
+    max_output_tokens: 100
+  }, spendEnvironment);
+  assert(
+    reservation.active && reservation.requestCount === 1 && reservation.reservedUSD > 0,
+    "Research eval spend-cap self-test did not reserve the bounded request."
+  );
+  let rejectedByCap = false;
+  try {
+    reserveResearchEvaluationSpend({
+      model: "self-test",
+      input: "request that cannot fit within the newly approved cap",
+      max_output_tokens: 100
+    }, { ...spendEnvironment, PERMITEXT_RESEARCH_EVAL_MAX_USD: "0.000001" });
+  } catch (error) {
+    rejectedByCap = error.code === "RESEARCH_EVAL_SPEND_CAP";
+  }
+  assert(rejectedByCap, "Research eval spend-cap self-test did not reject a request above the approved cap.");
   console.log(`Research eval self-test passed for ${dataset.cases.length} data-driven cases. No paid model calls were made.`);
   console.log("Evaluation schema scalability check passed for 500 structured cases without case-specific code.");
+  console.log("Paid evaluation spend-cap reservation self-test passed.");
 }
 
 async function main() {
@@ -828,6 +910,11 @@ async function main() {
     assert(
       estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
       "Paid evals require configured input, cached-input, and output token prices plus PERMITEXT_RESEARCH_PRICING_VERSION so cost scoring is reliable."
+    );
+    const approvedSpendCapUSD = Number(process.env.PERMITEXT_RESEARCH_EVAL_MAX_USD);
+    assert(
+      Number.isFinite(approvedSpendCapUSD) && approvedSpendCapUSD > 0,
+      "Paid evals require PERMITEXT_RESEARCH_EVAL_MAX_USD set to the explicitly approved maximum spend."
     );
   }
 

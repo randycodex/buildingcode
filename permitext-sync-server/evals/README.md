@@ -48,10 +48,11 @@ PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS=... \
 PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS=... \
 PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS=... \
 PERMITEXT_RESEARCH_PRICING_VERSION=... \
+PERMITEXT_RESEARCH_EVAL_MAX_USD=... \
 npm run eval:research:live
 ```
 
-The pricing values are never guessed. Without an explicit pricing version and all three rates, the runner refuses a paid run because token-cost scoring would not be reliable.
+The pricing values are never guessed. Without an explicit pricing version, all three rates, and the dollar cap approved for that run, the runner refuses a paid run. Before each answer or judge call, it reserves a conservative maximum based on every UTF-8 request byte being an uncached input token plus the provider-enforced output-token ceiling. The next request is stopped before it could exceed the approved cap.
 
 Results are written to ignored `evals/results/` JSON and Markdown files. Each run records its ID and timestamp, dataset hash, code editions, Git commit, model/reasoning settings, prompt/evidence/retrieval versions, answers, citations, timing, tokens, reliable estimated cost, automatic scores, and comparison with the preceding saved baseline. Model judging is a regression signal; human review remains the authority for answer keys and score overrides.
 
