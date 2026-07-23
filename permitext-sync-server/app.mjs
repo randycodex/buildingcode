@@ -2090,6 +2090,41 @@ function intersectSets(left, right) {
   return intersection;
 }
 
+function plainTextFromPreparedHTML(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;|&#34;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#176;/gi, "°")
+    .replace(/&#215;/gi, "×")
+    .replace(/&#8211;|&#8212;/gi, "-")
+    .replace(/&#8216;|&#8217;/gi, "'")
+    .replace(/&#8220;|&#8221;/gi, '"')
+    .replace(/[ \t\r\f]+/g, " ")
+    .replace(/\n\s+\n/g, "\n\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function preparedBodyWithDerivedPlainText(body) {
+  return {
+    ...body,
+    blocks: (body.blocks || []).map((block) => {
+      if (String(block.plainText || "").trim() || !block.html) return block;
+      const plainText = plainTextFromPreparedHTML(block.html);
+      return plainText ? { ...block, plainText } : block;
+    })
+  };
+}
+
 async function sectionBody(sectionID, options = {}) {
   const canonicalSectionID = String(options.canonicalSectionID || "").trim();
   const legacySectionID = String(sectionID || "").trim();
@@ -2106,7 +2141,7 @@ async function sectionBody(sectionID, options = {}) {
 
   for (const candidate of candidates) {
     try {
-      return await readJSONFile(candidate);
+      return preparedBodyWithDerivedPlainText(await readJSONFile(candidate));
     } catch (error) {
       if (error.code !== "ENOENT") {
         throw error;

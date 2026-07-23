@@ -131,21 +131,25 @@ enum PreparedChapterContentBuilder {
         codeSectionName: String,
         chapterNumber: String
     ) -> URL? {
-        let fileName = "\(chapterNumber.uppercased()).html"
-        let sectionedURL = bundleRootURL
-            .appendingPathComponent("code-sections", isDirectory: true)
-            .appendingPathComponent(slug(codeSectionName), isDirectory: true)
-            .appendingPathComponent("chapters", isDirectory: true)
-            .appendingPathComponent(fileName, isDirectory: false)
-        if FileManager.default.fileExists(atPath: sectionedURL.path) {
-            return sectionedURL
-        }
-
-        let flatURL = bundleRootURL
-            .appendingPathComponent("chapters", isDirectory: true)
-            .appendingPathComponent(fileName, isDirectory: false)
-        if FileManager.default.fileExists(atPath: flatURL.path) {
-            return flatURL
+        let normalizedChapterNumber = chapterNumber.uppercased()
+        let fileNames = [
+            "\(normalizedChapterNumber).html",
+            "Chapter \(normalizedChapterNumber).html"
+        ]
+        let directories = [
+            bundleRootURL
+                .appendingPathComponent("code-sections", isDirectory: true)
+                .appendingPathComponent(slug(codeSectionName), isDirectory: true)
+                .appendingPathComponent("chapters", isDirectory: true),
+            bundleRootURL.appendingPathComponent("chapters", isDirectory: true)
+        ]
+        for directory in directories {
+            for fileName in fileNames {
+                let candidate = directory.appendingPathComponent(fileName, isDirectory: false)
+                if FileManager.default.fileExists(atPath: candidate.path) {
+                    return candidate
+                }
+            }
         }
 
         return nil
@@ -224,6 +228,7 @@ enum PreparedChapterContentBuilder {
             if isTableStart(in: html, at: richStart) {
                 let tableEnd = matchingTableEnd(in: html, from: richStart) ?? html.endIndex
                 let tableHTML = String(html[richStart..<tableEnd]).trimmingCharacters(in: .whitespacesAndNewlines)
+                let tableText = plainText(fromHTML: tableHTML)
                 if let tableID = tableReferenceID(in: tableHTML) {
                     ordinal += 1
                     blocks.append(
@@ -234,7 +239,7 @@ enum PreparedChapterContentBuilder {
                             tableID: tableID,
                             imageID: nil,
                             caption: nil,
-                            plainText: nil
+                            plainText: tableText.isEmpty ? nil : tableText
                         )
                     )
                 } else if !tableHTML.isEmpty {
@@ -247,7 +252,7 @@ enum PreparedChapterContentBuilder {
                             tableID: nil,
                             imageID: nil,
                             caption: nil,
-                            plainText: nil
+                            plainText: tableText.isEmpty ? nil : tableText
                         )
                     )
                 }

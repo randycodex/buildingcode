@@ -98,7 +98,7 @@ The same URL loads the section-detail workspace in a browser and opens `ReaderVi
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
-The web `Research` pane derives a research set from the canonical sections currently open in readers, search details, and open project details. Users can copy or download that citation set and can ask for a plain-language interpretation grounded only in those selected official sections. The browser sends section IDs rather than code text; the server resolves the canonical bodies, excludes private notes, and rejects any model citation outside the selected evidence. Interpretations are research assistance, not official code determinations, and are not persisted as chat history.
+The web `Research` pane stores conversations built from enacted passages selected by the user. Users can attach additional passages and ask for plain-language interpretations grounded only in the selected official sections. The browser sends section IDs and selected enacted text; the server re-resolves the canonical bodies, excludes private notes, rejects changed selections, and rejects any model citation outside the selected evidence. Interpretations are research assistance, not official code determinations.
 
 Run the interpretation flow locally without calling an external model:
 
@@ -116,6 +116,28 @@ node server.mjs
 ```
 
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, limits each request to 12 selected sections, and records model/token usage without logging the question or code text. The OpenAI account that owns the API key is responsible for model usage charges.
+
+### Research evaluation set
+
+The human-authored architectural cases in `evals/research-cases.json` are the golden set for research quality. Preflight starts an isolated local server and verifies that every selected canonical section actually contains the evidence the case requires. It never calls OpenAI:
+
+```sh
+npm run eval:research
+```
+
+The preflight intentionally blocks a live run when a section is missing, mapped to the wrong body, or missing required table text. Add or revise cases only in the dataset; the runner discovers every case and rubric item without case-specific code. See `evals/README.md` for the field contract and change process.
+
+After explicit spending approval, a full five-case run makes ten paid model requests: five Permitext answers plus five structured scoring calls. It requires both an API key and the paid-run interlock:
+
+```sh
+PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
+OPENAI_API_KEY=... \
+npm run eval:research:live
+```
+
+Live results are written under ignored `evals/results/` as JSON plus a Markdown review report. Every report records the dataset hash, answer and judge configurations, per-dimension scores, response time, and separate answer/judge token usage. Citation scope and completeness are checked deterministically; a strict evidence-only judge scores citation support, invented requirements, uncertainty, required concepts, forbidden claims, and practical usefulness. Automatic scores are regression signals and should still receive periodic review by a building-code professional.
+
+Run the free preflight whenever the dataset or enacted content changes. Whenever prompts, models, model settings, citation logic, evidence assembly, or other AI behavior changes, obtain spending approval, run the live suite before accepting the change, and compare the new JSON/Markdown report with the previous accepted result. Never place a paid live run in unattended CI.
 
 `GET /code/sections?ids=<comma-separated-ids>` resolves up to 100 canonical or legacy section IDs into ordered canonical metadata without loading section bodies. The Research pane batches larger projects through that endpoint and caches results in the browser. Single-section lookup uses the same cached server catalog, avoiding repeated chapter scans.
 
