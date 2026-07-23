@@ -1290,6 +1290,22 @@ async function main() {
     });
     assert(invalidSelection.response.status === 400, "Research conversation accepted client text that is absent from the canonical section.");
 
+    const inlineStyledResearchText = 'This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".';
+    const inlineStyledConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: "1",
+        selectedText: inlineStyledResearchText
+      }
+    });
+    assert(
+      inlineStyledConversation.response.status === 201 &&
+        inlineStyledConversation.json.conversation.sources[0].selectedText === inlineStyledResearchText,
+      "Research conversation rejected rendered enacted text when prepared plain text added spaces around inline styling."
+    );
+
     const createdConversation = await request("/research/conversations/create", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,

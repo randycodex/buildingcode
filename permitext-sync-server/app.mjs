@@ -2139,6 +2139,12 @@ function comparableResearchText(value) {
     .replace(/[\u2018\u2019]/g, "'")
     .replace(/[\u201C\u201D]/g, '"')
     .replace(/\s+/g, " ")
+    // Prepared plain text can add spaces where an inline element meets its
+    // surrounding quotation marks or punctuation even though the reader does
+    // not render those spaces (for example: `" <em>Title</em> ,"`).
+    .replace(/(^|[\s([{])"\s+/g, '$1"')
+    .replace(/\s+([,.;:!?%])/g, "$1")
+    .replace(/\s+"(?=$|[\s,.;:!?%)\]}])/g, '"')
     .trim();
 }
 
