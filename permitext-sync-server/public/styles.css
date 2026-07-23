@@ -3457,6 +3457,73 @@ mark {
   justify-self: start;
 }
 
+.research-citation-passages summary {
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+}
+
+.research-citation-passages blockquote {
+  max-height: 180px;
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-3);
+  overflow: auto;
+  border-left: 2px solid var(--code-accent, var(--text-primary));
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.8) !important;
+  line-height: 1.45;
+}
+
+.research-feedback {
+  display: grid;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.research-feedback-choices {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.research-feedback-choice {
+  min-height: 30px;
+  padding: 0 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.74) !important;
+}
+
+.research-feedback-choice[aria-pressed="true"] {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--surface);
+}
+
+.research-feedback textarea {
+  width: 100%;
+  resize: vertical;
+  padding: var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.research-feedback .ghost-button {
+  justify-self: start;
+}
+
+.research-feedback-status {
+  min-height: 1.1em;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.74) !important;
+}
+
 .research-disclaimer {
   padding-top: var(--space-2);
   border-top: 1px solid var(--border);
@@ -3521,6 +3588,26 @@ mark {
   color: var(--text-secondary);
   font-size: var(--chrome-font-size) !important;
   line-height: 1.45;
+}
+
+.research-usage {
+  padding: var(--space-3) 0;
+  border-block: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+}
+
+.research-usage summary {
+  cursor: pointer;
+  margin-top: var(--space-2);
+}
+
+.research-usage > strong {
+  color: var(--text-primary);
+}
+
+.research-usage p {
+  margin: var(--space-2) 0 0;
 }
 
 .research-conversation-list {

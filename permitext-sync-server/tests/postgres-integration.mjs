@@ -66,6 +66,9 @@ async function cleanupUser() {
   await sql`DELETE FROM permitext_projects WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_project_items WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_comments WHERE user_id = ${userID}`;
+  await sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`;
+  await sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`;
+  await sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_passkey_credentials WHERE user_id = ${userID}`;
   await sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`;

@@ -1,0 +1,117 @@
+export const evaluationStatuses = ["draft", "reviewed", "approved", "retired"];
+export const evaluationDifficulties = ["basic", "intermediate", "advanced"];
+export const evaluationSourceTypes = [
+  "real project",
+  "tester feedback",
+  "professional contributor",
+  "synthetic variation",
+  "production failure"
+];
+export const evaluationCertainties = [
+  "supported",
+  "conditional",
+  "insufficient evidence",
+  "outside selected authority"
+];
+
+export const evaluationDimensions = [
+  "citationCorrectness",
+  "citationCompleteness",
+  "requiredConceptCoverage",
+  "hallucinationsInventedRequirements",
+  "appropriateUncertainty",
+  "recognitionOfMissingProjectFacts",
+  "practicalUsefulness",
+  "responseTime",
+  "tokenCost"
+];
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function nonemptyStrings(value, message, { allowEmpty = false } = {}) {
+  assert(Array.isArray(value) && (allowEmpty || value.length > 0), message);
+  assert(value.every((item) => typeof item === "string" && item.trim()), message);
+}
+
+export function validateEvaluationDataset(dataset) {
+  assert(dataset?.schemaVersion === 2, "Research eval dataset must use schemaVersion 2.");
+  assert(Array.isArray(dataset.cases) && dataset.cases.length > 0, "Research eval dataset has no cases.");
+  const scoring = dataset.automaticScoring;
+  assert(scoring && typeof scoring === "object", "Research eval dataset needs automaticScoring configuration.");
+  assert(
+    evaluationDimensions.length === scoring.dimensions?.length &&
+      evaluationDimensions.every((dimension) => scoring.dimensions.includes(dimension)),
+    "Research eval scoring dimensions must exactly match the supported automatic scores."
+  );
+  assert(
+    Object.keys(scoring.weights || {}).length === evaluationDimensions.length &&
+      evaluationDimensions.every((dimension) => dimension in scoring.weights),
+    "Research eval scoring weights must exactly match the automatic score dimensions."
+  );
+  const weightTotal = evaluationDimensions.reduce(
+    (total, dimension) => total + Number(scoring.weights?.[dimension] || 0),
+    0
+  );
+  assert(Math.abs(weightTotal - 1) < 0.0001, "Research eval scoring weights must total 1.");
+  assert(scoring.scoreScale?.minimum === 0 && scoring.scoreScale?.maximum === 4, "Research eval score scale must run from 0 through 4.");
+  assert(Number(scoring.scoreScale?.passing) >= 0 && Number(scoring.scoreScale?.passing) <= 4, "Research eval passing score is invalid.");
+  for (const thresholdName of ["responseTimeMilliseconds", "tokenCost"]) {
+    const thresholds = scoring[thresholdName];
+    assert(
+      ["score4AtOrBelow", "score3AtOrBelow", "score2AtOrBelow", "score1AtOrBelow"]
+        .every((name) => Number.isFinite(Number(thresholds?.[name]))),
+      `Research eval ${thresholdName} thresholds are incomplete.`
+    );
+    assert(
+      thresholds.score4AtOrBelow <= thresholds.score3AtOrBelow &&
+        thresholds.score3AtOrBelow <= thresholds.score2AtOrBelow &&
+        thresholds.score2AtOrBelow <= thresholds.score1AtOrBelow,
+      `Research eval ${thresholdName} thresholds must increase from score 4 to score 1.`
+    );
+  }
+
+  const ids = new Set();
+  for (const testCase of dataset.cases) {
+    assert(typeof testCase.id === "string" && testCase.id, "Every research eval case needs an ID.");
+    assert(!ids.has(testCase.id), `Duplicate research eval case ID: ${testCase.id}.`);
+    ids.add(testCase.id);
+    assert(typeof testCase.title === "string" && testCase.title, `${testCase.id} needs a title.`);
+    assert(evaluationStatuses.includes(testCase.status), `${testCase.id} has an invalid status.`);
+    assert(evaluationDifficulties.includes(testCase.difficulty), `${testCase.id} has an invalid difficulty.`);
+    nonemptyStrings(testCase.topics, `${testCase.id} needs topics.`);
+    assert(typeof testCase.codeEdition === "string" && testCase.codeEdition, `${testCase.id} needs a code edition.`);
+    assert(testCase.projectContext && typeof testCase.projectContext === "object" && !Array.isArray(testCase.projectContext), `${testCase.id} needs projectContext.`);
+    assert(typeof testCase.question === "string" && testCase.question.length >= 3, `${testCase.id} needs a question.`);
+    assert(typeof testCase.expectedConclusion === "string" && testCase.expectedConclusion, `${testCase.id} needs an expected conclusion.`);
+    assert(evaluationCertainties.includes(testCase.expectedCertainty), `${testCase.id} has an invalid expected certainty.`);
+    assert(evaluationSourceTypes.includes(testCase.sourceType), `${testCase.id} has an invalid source type.`);
+    assert(testCase.reviewer === null || (typeof testCase.reviewer === "string" && testCase.reviewer.trim()), `${testCase.id} has an invalid reviewer.`);
+    assert(testCase.reviewedAt === null || Number.isFinite(Date.parse(testCase.reviewedAt)), `${testCase.id} has an invalid reviewedAt timestamp.`);
+    if (["reviewed", "approved", "retired"].includes(testCase.status)) {
+      assert(testCase.reviewer && testCase.reviewedAt, `${testCase.id} must identify the reviewer and review date for status ${testCase.status}.`);
+    }
+    assert(Array.isArray(testCase.selectedEvidence) && testCase.selectedEvidence.length > 0, `${testCase.id} needs selected evidence.`);
+    nonemptyStrings(testCase.requiredConcepts, `${testCase.id} needs required concepts.`);
+    nonemptyStrings(testCase.missingFacts, `${testCase.id} needs missing facts.`, { allowEmpty: true });
+    nonemptyStrings(testCase.forbiddenClaims, `${testCase.id} needs forbidden claims.`);
+    nonemptyStrings(testCase.requiredCitations, `${testCase.id} needs required citations.`);
+    const references = new Set();
+    for (const source of testCase.selectedEvidence) {
+      assert(typeof source.reference === "string" && source.reference, `${testCase.id} has a source without a reference.`);
+      assert(!references.has(source.reference), `${testCase.id} repeats ${source.reference}.`);
+      references.add(source.reference);
+      assert(source.reference === `${source.codePrefix} ${source.sectionNumber}`, `${testCase.id} has an inconsistent source reference.`);
+      nonemptyStrings(source.exactPassages, `${source.reference} needs exact selected passages.`);
+    }
+    for (const reference of testCase.requiredCitations) {
+      assert(references.has(reference), `${testCase.id} requires citation ${reference}, but it is not selected evidence.`);
+    }
+  }
+  return dataset;
+}
+
+export function approvedEvaluationCases(dataset) {
+  return dataset.cases.filter((testCase) => testCase.status === "approved");
+}

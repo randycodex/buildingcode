@@ -1,16 +1,18 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "name": "Permitext architectural research golden set",
   "description": "Human-authored building-code research cases used to verify evidence quality, grounded reasoning, citation coverage, uncertainty, and prohibited conclusions.",
   "automaticScoring": {
     "dimensions": [
       "citationCorrectness",
       "citationCompleteness",
+      "requiredConceptCoverage",
       "hallucinationsInventedRequirements",
       "appropriateUncertainty",
+      "recognitionOfMissingProjectFacts",
       "practicalUsefulness",
       "responseTime",
-      "tokenUsage"
+      "tokenCost"
     ],
     "scoreScale": {
       "minimum": 0,
@@ -18,13 +20,15 @@
       "passing": 3
     },
     "weights": {
-      "citationCorrectness": 0.18,
-      "citationCompleteness": 0.18,
-      "hallucinationsInventedRequirements": 0.18,
-      "appropriateUncertainty": 0.14,
-      "practicalUsefulness": 0.14,
-      "responseTime": 0.09,
-      "tokenUsage": 0.09
+      "citationCorrectness": 0.14,
+      "citationCompleteness": 0.12,
+      "requiredConceptCoverage": 0.14,
+      "hallucinationsInventedRequirements": 0.15,
+      "appropriateUncertainty": 0.12,
+      "recognitionOfMissingProjectFacts": 0.10,
+      "practicalUsefulness": 0.10,
+      "responseTime": 0.06,
+      "tokenCost": 0.07
     },
     "responseTimeMilliseconds": {
       "score4AtOrBelow": 15000,
@@ -32,19 +36,27 @@
       "score2AtOrBelow": 45000,
       "score1AtOrBelow": 60000
     },
-    "tokenUsage": {
-      "score4AtOrBelow": 900,
-      "score3AtOrBelow": 1400,
-      "score2AtOrBelow": 2000,
-      "score1AtOrBelow": 3000
+    "tokenCost": {
+      "score4AtOrBelow": 0.02,
+      "score3AtOrBelow": 0.05,
+      "score2AtOrBelow": 0.1,
+      "score1AtOrBelow": 0.2
     },
-    "reviewMethod": "Citation, timing, and token scores are deterministic. A second strict structured-output model call automatically scores required concepts, forbidden claims, invented requirements, uncertainty, and practical usefulness."
+    "reviewMethod": "Citation, timing, and configured token-cost scores are deterministic. A second strict structured-output model call scores concepts, forbidden claims, invented requirements, uncertainty, missing-fact recognition, and practical usefulness. Automatic scores remain candidates for knowledgeable human review."
   },
   "cases": [
     {
       "id": "scissor-stair-two-exits",
       "title": "Scissor stair counted as two exits",
+      "status": "approved",
+      "difficulty": "advanced",
+      "topics": ["means of egress", "scissor stairs", "Group R-2", "fire-resistance"],
       "codeEdition": "2022 New York City Construction Codes",
+      "projectContext": {
+        "occupancy": "Group R-2 stated by the question",
+        "configuration": "Scissor stair with entrance doors 15 feet apart",
+        "unknowns": ["enclosure rating", "separating construction rating", "construction material"]
+      },
       "selectedEvidence": [
         {
           "reference": "BC 1007.1.1",
@@ -57,7 +69,11 @@
         }
       ],
       "question": "Our Group R-2 building has a scissor stair with the two stair entrance doors located 15 feet apart. Can the two stairs be counted as two separate exits?",
-      "expectedAnswerSummary": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+      "expectedConclusion": "The 15-foot separation alone is not enough. Under the general rule, stairs sharing a scissor-stair assembly are counted as one exit stairway. However, the Group R-2 exception permits the stairs to share the assembly and be counted separately when the stair enclosures and the construction separating the stairs have at least a 2-hour fire-resistance rating and are constructed of masonry or a masonry equivalent in accordance with department rules. The exit doors must also be at least 15 feet apart. Confirm the occupancy group, enclosure rating, separating construction, and material before concluding that the exception applies.",
+      "expectedCertainty": "conditional",
+      "sourceType": "real project",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-22T00:00:00.000Z",
       "requiredConcepts": [
         "State that the 15-foot door separation alone is insufficient.",
         "Explain the general rule that stairs sharing a scissor-stair assembly count as one exit stairway.",
@@ -66,7 +82,7 @@
         "Identify the masonry or masonry-equivalent requirement.",
         "Identify the minimum 15-foot exit-door separation."
       ],
-      "requiredUncertaintyConditions": [
+      "missingFacts": [
         "Confirm Group R-2 occupancy.",
         "Confirm the stair-enclosure fire-resistance rating.",
         "Confirm the construction separating the stairs and its fire-resistance rating.",
@@ -84,7 +100,16 @@
     {
       "id": "single-stair-six-story-r2",
       "title": "Single stair in a six-story residential building",
+      "status": "approved",
+      "difficulty": "intermediate",
+      "topics": ["means of egress", "single exit", "Group R-2", "construction type"],
       "codeEdition": "2022 New York City Construction Codes",
+      "projectContext": {
+        "stories": 6,
+        "areaPerStorySquareFeet": 1950,
+        "use": "Residential building",
+        "unknowns": ["occupancy classification", "construction type"]
+      },
       "selectedEvidence": [
         {
           "reference": "BC 1006.3.2",
@@ -96,7 +121,11 @@
         }
       ],
       "question": "We are designing a six-story residential building with approximately 1,950 square feet on each story. Can the building be served by one exit stair?",
-      "expectedAnswerSummary": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+      "expectedConclusion": "BC 1006.3.2 permits one exit for a Group R-2 building that is Type I or Type II construction, does not exceed six stories, and does not exceed 2,000 square feet per story. The stated height and floor area satisfy two of those conditions, but compliance cannot be confirmed until the occupancy classification and construction type are known. This passage only establishes that the single-exit allowance may be available; other applicable egress, fire-protection, travel-distance, and design requirements must be checked under their respective sections without inventing requirements that are not in the selected evidence.",
+      "expectedCertainty": "conditional",
+      "sourceType": "real project",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-22T00:00:00.000Z",
       "requiredConcepts": [
         "Identify Group R-2 as a condition of Item 7.",
         "Identify Type I or Type II construction as a condition.",
@@ -105,7 +134,7 @@
         "Recognize that six stories and approximately 1,950 square feet satisfy only the stated height and area conditions.",
         "Limit the conclusion to potential availability of the single-exit allowance."
       ],
-      "requiredUncertaintyConditions": [
+      "missingFacts": [
         "Confirm the occupancy classification is Group R-2.",
         "Confirm the construction type is Type I or Type II.",
         "Check other applicable requirements under evidence supplied for those requirements."
@@ -122,7 +151,16 @@
     {
       "id": "residential-multipurpose-occupancy",
       "title": "Occupancy classification of a residential multipurpose room",
+      "status": "approved",
+      "difficulty": "intermediate",
+      "topics": ["occupancy classification", "occupant load", "accessory use", "multipurpose room"],
       "codeEdition": "2022 New York City Construction Codes",
+      "projectContext": {
+        "buildingUse": "Apartment building",
+        "roomAreaNetSquareFeet": 900,
+        "typicalArrangement": "Tables and chairs",
+        "users": "Residents only"
+      },
       "selectedEvidence": [
         {
           "reference": "BC 303.1.3",
@@ -144,7 +182,11 @@
         }
       ],
       "question": "A 900-net-square-foot multipurpose room in an apartment building will normally contain tables and chairs and is only for residents. Does it need to be classified as Group A-3?",
-      "expectedAnswerSummary": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+      "expectedConclusion": "For an unconcentrated assembly arrangement with tables and chairs, Table 1004.1.3 uses 15 net square feet per occupant. A 900-net-square-foot room therefore has a calculated occupant load of 60 people. Because that is fewer than 75 occupants, and assuming the room is accessory to the residential occupancy, BC 303.1.3 permits it to be classified as Group B or as part of the occupancy it serves rather than as Group A. The result depends on the actual net area, furniture arrangement, intended activities, and whether the room is truly accessory to the residential use.",
+      "expectedCertainty": "conditional",
+      "sourceType": "real project",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-22T00:00:00.000Z",
       "requiredConcepts": [
         "Use the 15-net-square-feet-per-occupant factor for unconcentrated tables and chairs.",
         "Calculate 900 divided by 15 as an occupant load of 60.",
@@ -152,7 +194,7 @@
         "Explain the Group B or served-occupancy classification option when the room is accessory.",
         "Avoid automatically classifying every residential amenity room as Group R-2."
       ],
-      "requiredUncertaintyConditions": [
+      "missingFacts": [
         "Confirm the actual net area.",
         "Confirm the furniture arrangement and occupant-load factor.",
         "Confirm the intended activities.",
@@ -171,7 +213,15 @@
     {
       "id": "accessory-assembly-plumbing-fixtures",
       "title": "Plumbing fixtures for an accessory assembly space",
+      "status": "approved",
+      "difficulty": "advanced",
+      "topics": ["plumbing fixtures", "accessory assembly", "occupant load", "fixture calculation"],
       "codeEdition": "2022 New York City Construction Codes",
+      "projectContext": {
+        "space": "Residential multipurpose room",
+        "potentialClassification": "Group B under the accessory assembly provision",
+        "unknowns": ["assembly use category", "occupant load", "shared facilities", "sex distribution"]
+      },
       "selectedEvidence": [
         {
           "reference": "BC 303.1.3",
@@ -201,7 +251,11 @@
         }
       ],
       "question": "If the multipurpose room is permitted to be classified as Group B because it has fewer than 75 occupants, can its required plumbing fixtures be calculated using the normal Group B fixture requirements?",
-      "expectedAnswerSummary": "Not automatically. Although an accessory assembly space with fewer than 75 occupants may be classified as Group B or as part of the occupancy it serves, the code permits the plumbing fixtures for that assembly use to be calculated using the applicable Assembly fixture requirements. The appropriate assembly category must first be identified from the room's actual use. The total occupant load is generally divided equally between the sexes unless approved statistical information supports another distribution. Fixture ratios are then applied, fractions are combined as required for multiple occupancies, and the resulting fractions are rounded up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+      "expectedConclusion": "Not automatically. Although an accessory assembly space with fewer than 75 occupants may be classified as Group B or as part of the occupancy it serves, the code permits the plumbing fixtures for that assembly use to be calculated using the applicable Assembly fixture requirements. The appropriate assembly category must first be identified from the room's actual use. The total occupant load is generally divided equally between the sexes unless approved statistical information supports another distribution. Fixture ratios are then applied, fractions are combined as required for multiple occupancies, and the resulting fractions are rounded up. A final fixture count requires the calculated occupant load, applicable assembly use, existing shared facilities, and other relevant project conditions.",
+      "expectedCertainty": "conditional",
+      "sourceType": "real project",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-22T00:00:00.000Z",
       "requiredConcepts": [
         "State that Group B classification does not automatically control the fixture calculation.",
         "Explain that applicable Assembly fixture requirements may be used for the accessory assembly use.",
@@ -210,7 +264,7 @@
         "Explain application of fixture ratios, combination of fractions for multiple occupancies, and rounding up.",
         "Avoid providing a final fixture count without the required project facts."
       ],
-      "requiredUncertaintyConditions": [
+      "missingFacts": [
         "Confirm the calculated occupant load.",
         "Confirm the applicable assembly use category.",
         "Confirm existing shared facilities and relevant project conditions.",
@@ -230,7 +284,15 @@
     {
       "id": "building-code-versus-hcr",
       "title": "Building Code evidence versus an agency requirement",
+      "status": "approved",
+      "difficulty": "basic",
+      "topics": ["accessibility", "agency requirements", "scope of authority", "evidence limits"],
       "codeEdition": "2022 New York City Construction Codes",
+      "projectContext": {
+        "questionedAuthority": "New York State Homes and Community Renewal (HCR)",
+        "selectedAuthority": "New York City Building Code only",
+        "unknowns": ["applicable HCR standard", "funding requirements", "agency guidance"]
+      },
       "selectedEvidence": [
         {
           "reference": "BC 1107.2.2.7.2.2",
@@ -242,7 +304,11 @@
         }
       ],
       "question": "Does this section prove that HCR requires a vanity in the bathroom?",
-      "expectedAnswerSummary": "No. The selected Building Code passage establishes the required water-closet clearance when only a forward approach is provided and states when a lavatory may be located on the rear wall. It does not establish an HCR vanity requirement. HCR requirements cannot be confirmed from the selected evidence; the applicable HCR design standard, project funding requirements, or agency guidance must be provided.",
+      "expectedConclusion": "No. The selected Building Code passage establishes the required water-closet clearance when only a forward approach is provided and states when a lavatory may be located on the rear wall. It does not establish an HCR vanity requirement. HCR requirements cannot be confirmed from the selected evidence; the applicable HCR design standard, project funding requirements, or agency guidance must be provided.",
+      "expectedCertainty": "outside selected authority",
+      "sourceType": "real project",
+      "reviewer": "Permitext owner",
+      "reviewedAt": "2026-07-22T00:00:00.000Z",
       "requiredConcepts": [
         "Answer no.",
         "Explain that the passage regulates water-closet clearances for a forward approach.",
@@ -250,7 +316,7 @@
         "State that the selected evidence does not establish an HCR vanity requirement.",
         "Request the applicable HCR material before stating what HCR requires."
       ],
-      "requiredUncertaintyConditions": [
+      "missingFacts": [
         "Provide the applicable HCR design standard, project funding requirement, or agency guidance."
       ],
       "forbiddenClaims": [

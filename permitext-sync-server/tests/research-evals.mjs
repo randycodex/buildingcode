@@ -1,16 +1,22 @@
 import { createServer } from "node:http";
-import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { createHash, randomUUID } from "node:crypto";
+import { execFile } from "node:child_process";
+import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
+import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
+import { estimatedResearchCost, researchModelConfiguration } from "../research-config.mjs";
 
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const serverRoot = resolve(testsDirectory, "..");
 const casesPath = join(serverRoot, "evals", "research-cases.json");
 const resultsDirectory = join(serverRoot, "evals", "results");
+const reviewsPath = join(serverRoot, "evals", "reviews.json");
 const liveMode = process.argv.includes("--run-live");
 const selfTestMode = process.argv.includes("--self-test");
+const execFileAsync = promisify(execFile);
 
 function argumentValue(name) {
   const index = process.argv.indexOf(name);
@@ -36,75 +42,7 @@ function assert(condition, message) {
 }
 
 function validateDataset(dataset) {
-  assert(dataset?.schemaVersion === 1, "Research eval dataset must use schemaVersion 1.");
-  assert(Array.isArray(dataset.cases) && dataset.cases.length > 0, "Research eval dataset has no cases.");
-  const scoring = dataset.automaticScoring;
-  assert(scoring && typeof scoring === "object", "Research eval dataset needs automaticScoring configuration.");
-  const scoringDimensions = [
-    "citationCorrectness",
-    "citationCompleteness",
-    "hallucinationsInventedRequirements",
-    "appropriateUncertainty",
-    "practicalUsefulness",
-    "responseTime",
-    "tokenUsage"
-  ];
-  assert(
-    scoringDimensions.length === scoring.dimensions?.length && scoringDimensions.every((dimension) => scoring.dimensions.includes(dimension)),
-    "Research eval scoring dimensions must exactly match the supported automatic scores."
-  );
-  assert(
-    Object.keys(scoring.weights || {}).length === scoringDimensions.length && scoringDimensions.every((dimension) => dimension in scoring.weights),
-    "Research eval scoring weights must exactly match the automatic score dimensions."
-  );
-  const weightTotal = scoringDimensions.reduce((total, dimension) => total + Number(scoring.weights?.[dimension] || 0), 0);
-  assert(Math.abs(weightTotal - 1) < 0.0001, "Research eval scoring weights must total 1.");
-  assert(scoring.scoreScale?.minimum === 0 && scoring.scoreScale?.maximum === 4, "Research eval score scale must run from 0 through 4.");
-  assert(Number(scoring.scoreScale?.passing) >= 0 && Number(scoring.scoreScale?.passing) <= 4, "Research eval passing score is invalid.");
-  for (const thresholdName of ["responseTimeMilliseconds", "tokenUsage"]) {
-    const thresholds = scoring[thresholdName];
-    assert(
-      ["score4AtOrBelow", "score3AtOrBelow", "score2AtOrBelow", "score1AtOrBelow"]
-        .every((name) => Number.isFinite(Number(thresholds?.[name]))),
-      `Research eval ${thresholdName} thresholds are incomplete.`
-    );
-    assert(
-      thresholds.score4AtOrBelow <= thresholds.score3AtOrBelow &&
-        thresholds.score3AtOrBelow <= thresholds.score2AtOrBelow &&
-        thresholds.score2AtOrBelow <= thresholds.score1AtOrBelow,
-      `Research eval ${thresholdName} thresholds must increase from score 4 to score 1.`
-    );
-  }
-  const ids = new Set();
-  for (const testCase of dataset.cases) {
-    assert(typeof testCase.id === "string" && testCase.id, "Every research eval case needs an ID.");
-    assert(!ids.has(testCase.id), `Duplicate research eval case ID: ${testCase.id}.`);
-    ids.add(testCase.id);
-    assert(typeof testCase.title === "string" && testCase.title, `${testCase.id} needs a title.`);
-    assert(typeof testCase.codeEdition === "string" && testCase.codeEdition, `${testCase.id} needs a code edition.`);
-    assert(typeof testCase.question === "string" && testCase.question.length >= 3, `${testCase.id} needs a question.`);
-    assert(typeof testCase.expectedAnswerSummary === "string" && testCase.expectedAnswerSummary, `${testCase.id} needs an expected answer summary.`);
-    assert(Array.isArray(testCase.selectedEvidence) && testCase.selectedEvidence.length > 0, `${testCase.id} needs selected evidence.`);
-    assert(Array.isArray(testCase.requiredConcepts) && testCase.requiredConcepts.length > 0, `${testCase.id} needs required concepts.`);
-    assert(testCase.requiredConcepts.every((item) => typeof item === "string" && item.trim()), `${testCase.id} has an invalid required concept.`);
-    assert(Array.isArray(testCase.requiredUncertaintyConditions), `${testCase.id} needs required uncertainty conditions.`);
-    assert(testCase.requiredUncertaintyConditions.every((item) => typeof item === "string" && item.trim()), `${testCase.id} has an invalid uncertainty condition.`);
-    assert(Array.isArray(testCase.forbiddenClaims) && testCase.forbiddenClaims.length > 0, `${testCase.id} needs forbidden claims.`);
-    assert(testCase.forbiddenClaims.every((item) => typeof item === "string" && item.trim()), `${testCase.id} has an invalid forbidden claim.`);
-    assert(Array.isArray(testCase.requiredCitations) && testCase.requiredCitations.length > 0, `${testCase.id} needs required citations.`);
-    const references = new Set();
-    for (const source of testCase.selectedEvidence) {
-      assert(typeof source.reference === "string" && source.reference, `${testCase.id} has a source without a reference.`);
-      assert(!references.has(source.reference), `${testCase.id} repeats ${source.reference}.`);
-      references.add(source.reference);
-      assert(source.reference === `${source.codePrefix} ${source.sectionNumber}`, `${testCase.id} has an inconsistent source reference.`);
-      assert(Array.isArray(source.exactPassages) && source.exactPassages.length > 0, `${source.reference} needs exact selected passages.`);
-      assert(source.exactPassages.every((passage) => typeof passage === "string" && passage.trim().length >= 2), `${source.reference} has an invalid exact passage.`);
-    }
-    for (const reference of testCase.requiredCitations) {
-      assert(references.has(reference), `${testCase.id} expects an unselected citation: ${reference}.`);
-    }
-  }
+  return validateEvaluationDataset(dataset);
 }
 
 async function jsonRequest(baseURL, path, options = {}) {
@@ -312,6 +250,8 @@ function answerForJudge(answer) {
     explanation: answer.explanation,
     assumptions: answer.assumptions || [],
     missingFacts: answer.missingFacts || [],
+    evidenceLimitations: answer.evidenceLimitations || [],
+    additionalEvidenceNeeded: answer.additionalEvidenceNeeded || [],
     citations: (answer.citations || []).map((citation) => ({
       reference: `${citation.codePrefix} ${citation.sectionNumber}`,
       relevance: citation.relevance
@@ -328,7 +268,7 @@ function validateJudgeItems(actualItems, expectedItems, label) {
 async function judgeAnswer(testCase, answer) {
   const concepts = rubricItems(testCase.requiredConcepts, "concept");
   const forbidden = rubricItems(testCase.forbiddenClaims, "forbidden");
-  const uncertainty = rubricItems(testCase.requiredUncertaintyConditions, "uncertainty");
+  const uncertainty = rubricItems(testCase.missingFacts, "missing-fact");
   const model = process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL ||
     process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
   const requestBody = {
@@ -353,11 +293,13 @@ async function judgeAnswer(testCase, answer) {
         passages: source.exactPassages
       })),
       question: testCase.question,
-      expectedAnswerSummary: testCase.expectedAnswerSummary,
+      projectContext: testCase.projectContext,
+      expectedConclusion: testCase.expectedConclusion,
+      expectedCertainty: testCase.expectedCertainty,
       requiredCitations: testCase.requiredCitations,
       requiredConcepts: concepts,
       forbiddenClaims: forbidden,
-      requiredUncertaintyConditions: uncertainty,
+      missingFacts: uncertainty,
       candidateAnswer: answerForJudge(answer)
     }),
     text: {
@@ -390,6 +332,7 @@ async function judgeAnswer(testCase, answer) {
     responseTimeMilliseconds: Math.round(performance.now() - startedAt),
     usage: {
       inputTokens: payload.usage?.input_tokens || 0,
+      cachedInputTokens: payload.usage?.input_tokens_details?.cached_tokens || 0,
       outputTokens: payload.usage?.output_tokens || 0,
       totalTokens: payload.usage?.total_tokens || 0
     },
@@ -409,6 +352,15 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
   const citationCompletenessScore = testCase.requiredCitations.length
     ? 4 * requiredCitationCount / testCase.requiredCitations.length
     : 4;
+  const metConcepts = judge.judgment.requiredConcepts.filter((item) => item.met).length;
+  const metMissingFacts = judge.judgment.uncertaintyConditions.filter((item) => item.met).length;
+  const conceptCoverageScore = testCase.requiredConcepts.length
+    ? 4 * metConcepts / testCase.requiredConcepts.length
+    : 4;
+  const missingFactsScore = testCase.missingFacts.length
+    ? 4 * metMissingFacts / testCase.missingFacts.length
+    : 4;
+  assert(Number.isFinite(answer.estimatedCost?.estimatedUSD), "Live scoring requires configured, reliable model pricing.");
   const metrics = {
     citationCorrectness: {
       score: roundScore(Math.min(citationScopeScore, judge.judgment.citationCorrectness.score)),
@@ -418,16 +370,24 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
       score: roundScore(citationCompletenessScore),
       rationale: `${requiredCitationCount}/${testCase.requiredCitations.length} required citations were present.`
     },
+    requiredConceptCoverage: {
+      score: roundScore(conceptCoverageScore),
+      rationale: `${metConcepts}/${testCase.requiredConcepts.length} required concepts were covered.`
+    },
     hallucinationsInventedRequirements: judge.judgment.hallucinationsInventedRequirements,
     appropriateUncertainty: judge.judgment.appropriateUncertainty,
+    recognitionOfMissingProjectFacts: {
+      score: roundScore(missingFactsScore),
+      rationale: `${metMissingFacts}/${testCase.missingFacts.length} required missing-fact conditions were recognized.`
+    },
     practicalUsefulness: judge.judgment.practicalUsefulness,
     responseTime: {
       score: thresholdScore(answerTimeMilliseconds, dataset.automaticScoring.responseTimeMilliseconds),
       rationale: `${answerTimeMilliseconds} ms for the Permitext answer call.`
     },
-    tokenUsage: {
-      score: thresholdScore(answer.usage?.totalTokens || 0, dataset.automaticScoring.tokenUsage),
-      rationale: `${answer.usage?.totalTokens || 0} tokens for the Permitext answer call.`
+    tokenCost: {
+      score: thresholdScore(answer.estimatedCost.estimatedUSD, dataset.automaticScoring.tokenCost),
+      rationale: `$${answer.estimatedCost.estimatedUSD.toFixed(6)} estimated answer cost using pricing version ${answer.estimatedCost.pricingVersion}.`
     }
   };
   const overallScore = roundScore(Object.entries(dataset.automaticScoring.weights).reduce(
@@ -437,8 +397,10 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
   const criticalDimensions = [
     "citationCorrectness",
     "citationCompleteness",
+    "requiredConceptCoverage",
     "hallucinationsInventedRequirements",
     "appropriateUncertainty",
+    "recognitionOfMissingProjectFacts",
     "practicalUsefulness"
   ];
   const passingScore = dataset.automaticScoring.scoreScale.passing;
@@ -468,14 +430,17 @@ function rubricMarkdown(items, failureProperty) {
 function totalUsage(results, key) {
   return results.reduce((total, result) => ({
     inputTokens: total.inputTokens + (result[key].usage?.inputTokens || 0),
+    cachedInputTokens: total.cachedInputTokens + (result[key].usage?.cachedInputTokens || 0),
     outputTokens: total.outputTokens + (result[key].usage?.outputTokens || 0),
     totalTokens: total.totalTokens + (result[key].usage?.totalTokens || 0)
-  }), { inputTokens: 0, outputTokens: 0, totalTokens: 0 });
+  }), { inputTokens: 0, cachedInputTokens: 0, outputTokens: 0, totalTokens: 0 });
 }
 
 function reviewMarkdown(dataset, results, createdAt, configuration) {
   const answerUsage = totalUsage(results, "answer");
   const judgeUsage = totalUsage(results, "judge");
+  const answerCost = results.reduce((total, result) => total + Number(result.answer.estimatedCost?.estimatedUSD || 0), 0);
+  const judgeCost = results.reduce((total, result) => total + Number(result.judge.estimatedCost?.estimatedUSD || 0), 0);
   const summaryRows = results.map((result) =>
     `| ${result.testCase.id} | ${result.scoring.passed ? "PASS" : "FAIL"} | ${result.scoring.overallScore.toFixed(2)} | ${result.answerTimeMilliseconds} | ${result.answer.usage?.totalTokens || 0} |`
   );
@@ -531,9 +496,9 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
       "",
       rubricMarkdown(scoring.rubricChecks.forbiddenClaims, "violated"),
       "",
-      "### Expected answer summary",
+      "### Expected conclusion",
       "",
-      testCase.expectedAnswerSummary,
+      testCase.expectedConclusion,
       "",
       `Judge: ${judge.model}; ${judge.responseTimeMilliseconds} ms; ${judge.usage.totalTokens} tokens.`,
       ""
@@ -544,15 +509,27 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
     "",
     `Created: ${createdAt}`,
     "",
+    `Run ID: ${configuration.runID}`,
+    "",
     `Dataset SHA-256: ${configuration.datasetSHA256}`,
+    "",
+    `Prompt version: ${configuration.promptVersion}`,
+    "",
+    `Evidence version: ${configuration.evidenceVersion}`,
+    "",
+    `Retrieval version: ${configuration.retrievalVersion || "none-selected-evidence-only"}`,
+    "",
+    `Git commit: ${configuration.gitCommit}`,
     "",
     `Permitext model: ${configuration.answerModel} (${configuration.answerReasoningEffort})`,
     "",
     `Judge model: ${configuration.judgeModel} (${configuration.judgeReasoningEffort})`,
     "",
-    `Answer usage: ${answerUsage.inputTokens} input, ${answerUsage.outputTokens} output, ${answerUsage.totalTokens} total tokens.`,
+    `Answer usage: ${answerUsage.inputTokens} input (${answerUsage.cachedInputTokens} cached), ${answerUsage.outputTokens} output, ${answerUsage.totalTokens} total tokens.`,
     "",
-    `Judge usage: ${judgeUsage.inputTokens} input, ${judgeUsage.outputTokens} output, ${judgeUsage.totalTokens} total tokens.`,
+    `Judge usage: ${judgeUsage.inputTokens} input (${judgeUsage.cachedInputTokens} cached), ${judgeUsage.outputTokens} output, ${judgeUsage.totalTokens} total tokens.`,
+    "",
+    `Estimated cost: $${answerCost.toFixed(6)} answers + $${judgeCost.toFixed(6)} judging = $${(answerCost + judgeCost).toFixed(6)} (${configuration.pricingVersion || "pricing unavailable"}).`,
     "",
     "| Case | Result | Score / 4 | Answer ms | Answer tokens |",
     "| --- | --- | ---: | ---: | ---: |",
@@ -612,7 +589,7 @@ async function askEvaluationQuestion(baseURL, account, conversationID, question)
   const answerTimeMilliseconds = Math.round(performance.now() - startedAt);
   const answer = [...(payload.conversation.messages || [])].reverse().find((message) => message.role === "assistant")?.answer;
   assert(answer, "Permitext returned no assistant answer for the evaluation conversation.");
-  return { answer, answerTimeMilliseconds };
+  return { answer, answerTimeMilliseconds, answeredAt: new Date().toISOString() };
 }
 
 async function runMockConversationCases(baseURL, checkedCases) {
@@ -621,8 +598,77 @@ async function runMockConversationCases(baseURL, checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
     const { answer } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
     assert(answer.mode === "mock" && answer.model === "permitext-mock", `${testCase.id} unexpectedly called a live model during preflight.`);
+    const expectedPassageCount = selectedPassages(testCase).length;
+    assert(
+      answer.evidenceSourceIDs?.length === expectedPassageCount &&
+        (answer.citations || []).every((citation) =>
+          (citation.sourceIDs || []).every((sourceID) => answer.evidenceSourceIDs.includes(sourceID))
+        ),
+      `${testCase.id} allowed a related or unselected source into verified answer evidence.`
+    );
   }
   console.log(`Verified ${checkedCases.length}/${checkedCases.length} cases through Permitext's selection and conversation flow in mock mode.`);
+}
+
+async function currentGitCommit() {
+  try {
+    const { stdout } = await execFileAsync("git", ["rev-parse", "HEAD"], { cwd: resolve(serverRoot, "..") });
+    return stdout.trim();
+  } catch {
+    return "unavailable";
+  }
+}
+
+async function latestBaseline() {
+  try {
+    const files = (await readdir(resultsDirectory))
+      .filter((name) => name.endsWith(".json"))
+      .sort()
+      .reverse();
+    const candidates = [];
+    for (const file of files) {
+      const candidate = JSON.parse(await readFile(join(resultsDirectory, file), "utf8"));
+      if (candidate?.results?.length) candidates.push(candidate);
+    }
+    let reviews = [];
+    try {
+      reviews = JSON.parse(await readFile(reviewsPath, "utf8")).reviews || [];
+    } catch (error) {
+      if (error.code !== "ENOENT") throw error;
+    }
+    const approvedRunIDs = reviews
+      .filter((review) => review.kind === "run" && review.decision === "approved" && review.runID)
+      .sort((left, right) => String(right.reviewedAt).localeCompare(String(left.reviewedAt)))
+      .map((review) => review.runID);
+    for (const runID of approvedRunIDs) {
+      const candidate = candidates.find((run) => run.configuration?.runID === runID);
+      if (candidate) return candidate;
+    }
+    return candidates[0] || null;
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+  }
+  return null;
+}
+
+function compareWithBaseline(results, baseline) {
+  if (!baseline) return null;
+  const previousByID = new Map(baseline.results.map((result) => [result.testCase.id, result]));
+  return {
+    runID: baseline.configuration?.runID || null,
+    createdAt: baseline.createdAt,
+    cases: results.map((result) => {
+      const previous = previousByID.get(result.testCase.id);
+      return {
+        caseID: result.testCase.id,
+        previousScore: previous?.scoring?.overallScore ?? null,
+        currentScore: result.scoring.overallScore,
+        scoreChange: previous ? roundScore(result.scoring.overallScore - previous.scoring.overallScore) : null,
+        previousPassed: previous?.scoring?.passed ?? null,
+        currentPassed: result.scoring.passed
+      };
+    })
+  };
 }
 
 async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
@@ -631,25 +677,36 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
   console.log(`Approved live run: ${checkedCases.length} answer calls plus ${checkedCases.length} judge calls (${checkedCases.length * 2} paid model requests maximum).`);
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
-    const { answer, answerTimeMilliseconds } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
+    const { answer, answerTimeMilliseconds, answeredAt } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
+    answer.estimatedCost = estimatedResearchCost(answer.usage);
     const judge = await judgeAnswer(testCase, answer);
+    judge.estimatedCost = estimatedResearchCost(judge.usage);
     const scoring = scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge);
-    results.push({ testCase, conversationID, answerTimeMilliseconds, answer, judge, scoring });
+    results.push({ testCase, conversationID, answeredAt, judgedAt: new Date().toISOString(), answerTimeMilliseconds, answer, judge, scoring });
     console.log(`${scoring.passed ? "PASS" : "FAIL"} ${testCase.title}: ${scoring.overallScore.toFixed(2)}/4, ${answer.usage?.totalTokens || 0} answer tokens`);
   }
   const createdAt = new Date().toISOString();
   const stamp = createdAt.replace(/[:.]/g, "-");
+  const answerConfiguration = researchModelConfiguration();
   const configuration = {
+    runID: randomUUID(),
     datasetSHA256: createHash("sha256").update(datasetText).digest("hex"),
-    answerModel: process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
-    answerReasoningEffort: process.env.PERMITEXT_RESEARCH_REASONING_EFFORT || "medium",
+    codeEditions: Array.from(new Set(checkedCases.map((testCase) => testCase.codeEdition))),
+    answerModel: answerConfiguration.model,
+    answerReasoningEffort: answerConfiguration.reasoningEffort,
+    promptVersion: answerConfiguration.promptVersion,
+    evidenceVersion: answerConfiguration.evidenceVersion,
+    retrievalVersion: "none-selected-evidence-only",
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
-    judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium"
+    judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
+    pricingVersion: results[0]?.answer?.estimatedCost?.pricingVersion || null,
+    gitCommit: await currentGitCommit()
   };
+  const baseline = compareWithBaseline(results, await latestBaseline());
   await mkdir(resultsDirectory, { recursive: true });
   const jsonPath = join(resultsDirectory, `${stamp}.json`);
   const markdownPath = join(resultsDirectory, `${stamp}.md`);
-  await writeFile(jsonPath, `${JSON.stringify({ schemaVersion: 1, createdAt, configuration, results }, null, 2)}\n`);
+  await writeFile(jsonPath, `${JSON.stringify({ schemaVersion: 2, createdAt, configuration, baseline, results }, null, 2)}\n`);
   await writeFile(markdownPath, `${reviewMarkdown(dataset, results, createdAt, configuration)}\n`);
   console.log(`Saved machine results: ${jsonPath}`);
   console.log(`Saved review report: ${markdownPath}`);
@@ -668,7 +725,7 @@ function selfTestJudge(testCase) {
       practicalUsefulness: { score: 4, rationale: "The answer is practical." },
       requiredConcepts: rubricItems(testCase.requiredConcepts, "concept").map((item) => ({ id: item.id, met: true, rationale: "Covered." })),
       forbiddenClaims: rubricItems(testCase.forbiddenClaims, "forbidden").map((item) => ({ id: item.id, violated: false, rationale: "Absent." })),
-      uncertaintyConditions: rubricItems(testCase.requiredUncertaintyConditions, "uncertainty").map((item) => ({ id: item.id, met: true, rationale: "Requested." }))
+      uncertaintyConditions: rubricItems(testCase.missingFacts, "missing-fact").map((item) => ({ id: item.id, met: true, rationale: "Requested." }))
     }
   };
 }
@@ -686,7 +743,9 @@ function runSelfTest(dataset, datasetText) {
     conclusion: "Self-test conclusion.",
     explanation: "Self-test explanation.",
     assumptions: [],
-    missingFacts: testCase.requiredUncertaintyConditions,
+    missingFacts: testCase.missingFacts,
+    evidenceLimitations: [],
+    additionalEvidenceNeeded: [],
     citations: testCase.requiredCitations.map((reference) => {
       const source = testCase.selectedEvidence.find((item) => item.reference === reference);
       return {
@@ -696,7 +755,8 @@ function runSelfTest(dataset, datasetText) {
         relevance: "Self-test citation."
       };
     }),
-    usage: { inputTokens: 450, outputTokens: 450, totalTokens: 900 }
+    usage: { inputTokens: 450, outputTokens: 450, totalTokens: 900 },
+    estimatedCost: { estimatedUSD: 0.01, pricingVersion: "self-test" }
   };
   const judge = selfTestJudge(testCase);
   const scoring = scoreCase(dataset, testCase, answer, 15_000, judge);
@@ -707,11 +767,15 @@ function runSelfTest(dataset, datasetText) {
     "Research eval self-test did not reject missing citations."
   );
   const configuration = {
+    runID: "self-test",
     datasetSHA256: createHash("sha256").update(datasetText).digest("hex"),
     answerModel: answer.model,
     answerReasoningEffort: "self-test",
+    promptVersion: "self-test",
+    evidenceVersion: "self-test",
     judgeModel: judge.model,
-    judgeReasoningEffort: "self-test"
+    judgeReasoningEffort: "self-test",
+    gitCommit: "self-test"
   };
   const report = reviewMarkdown(dataset, [{
     testCase,
@@ -723,7 +787,15 @@ function runSelfTest(dataset, datasetText) {
   for (const dimension of dataset.automaticScoring.dimensions) {
     assert(report.includes(`| ${dimension} |`), `Research eval report omitted ${dimension}.`);
   }
+  validateEvaluationDataset({
+    ...dataset,
+    cases: Array.from({ length: 500 }, (_, index) => ({
+      ...dataset.cases[index % dataset.cases.length],
+      id: `scale-self-test-${index + 1}`
+    }))
+  });
   console.log(`Research eval self-test passed for ${dataset.cases.length} data-driven cases. No paid model calls were made.`);
+  console.log("Evaluation schema scalability check passed for 500 structured cases without case-specific code.");
 }
 
 async function main() {
@@ -739,8 +811,11 @@ async function main() {
   const datasetText = await readFile(casesPath, "utf8");
   const dataset = JSON.parse(datasetText);
   validateDataset(dataset);
+  const approvedCases = approvedEvaluationCases(dataset);
+  assert(approvedCases.length > 0, "Research eval dataset has no approved cases.");
+  const approvedDataset = { ...dataset, cases: approvedCases };
   if (selfTestMode) {
-    runSelfTest(dataset, datasetText);
+    runSelfTest(approvedDataset, datasetText);
     return;
   }
 
@@ -750,6 +825,10 @@ async function main() {
       "Paid evals are locked. Ask for spending approval, then set PERMITEXT_RUN_PAID_RESEARCH_EVALS=1."
     );
     assert(process.env.OPENAI_API_KEY, "Paid evals require OPENAI_API_KEY in the server environment.");
+    assert(
+      estimatedResearchCost({ inputTokens: 0, outputTokens: 0 }).pricingVersion,
+      "Paid evals require configured input, cached-input, and output token prices plus PERMITEXT_RESEARCH_PRICING_VERSION so cost scoring is reliable."
+    );
   }
 
   const tempDirectory = await mkdtemp(join(tmpdir(), "permitext-research-evals-"));
@@ -766,7 +845,7 @@ async function main() {
     process.env.VERCEL_ENV = "";
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
     process.env.PERMITEXT_RESEARCH_MOCK = liveMode ? "" : "1";
-    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(dataset.cases.length);
+    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(approvedCases.length);
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);
     server = createServer(handleRequest);
     await new Promise((resolveListening, rejectListening) => {
@@ -776,7 +855,7 @@ async function main() {
     const address = server.address();
     assert(address && typeof address === "object", "Research eval server did not start.");
     const baseURL = `http://127.0.0.1:${address.port}`;
-    const checkedCases = await preflightCases(baseURL, dataset);
+    const checkedCases = await preflightCases(baseURL, approvedDataset);
     printPreflight(checkedCases);
     const blockedCases = checkedCases.filter((testCase) => !testCase.ready);
     if (blockedCases.length) {
@@ -785,7 +864,7 @@ async function main() {
       return;
     }
     if (liveMode) {
-      await runLiveCases(baseURL, dataset, checkedCases, datasetText);
+      await runLiveCases(baseURL, approvedDataset, checkedCases, datasetText);
     } else {
       await runMockConversationCases(baseURL, checkedCases);
       console.log("All cases are ready. Paid evals remain locked until explicitly approved.");

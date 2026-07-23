@@ -118,6 +118,7 @@ let workboardPreloadHandle = null;
 const workboardMounts = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
+let researchUsage = null;
 let researchQuestionDraft = "";
 let pendingResearchSelection = null;
 let activeWebWarningClose = null;
@@ -6461,7 +6462,74 @@ function appendResearchList(container, title, items) {
   container.append(heading, list);
 }
 
-function renderResearchInterpretation(container, result) {
+function renderResearchFeedback(container, message, conversationID) {
+  if (!message?.id || !conversationID) return;
+  const form = document.createElement("form");
+  form.className = "research-feedback";
+  const heading = document.createElement("strong");
+  heading.textContent = "Was this answer useful?";
+  const choices = document.createElement("div");
+  choices.className = "research-feedback-choices";
+  const categories = [
+    ["helpful", "Helpful"],
+    ["incorrect_misleading", "Incorrect or misleading"],
+    ["missing_information", "Missing information"],
+    ["citation_problem", "Citation problem"],
+    ["other", "Other feedback"]
+  ];
+  let selectedCategory = message.feedback?.category || "";
+  categories.forEach(([value, label]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "research-feedback-choice";
+    button.textContent = label;
+    button.setAttribute("aria-pressed", String(selectedCategory === value));
+    button.addEventListener("click", () => {
+      selectedCategory = value;
+      choices.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      submit.disabled = false;
+    });
+    choices.append(button);
+  });
+  const comment = document.createElement("textarea");
+  comment.rows = 2;
+  comment.maxLength = 2000;
+  comment.placeholder = "Optional comment";
+  comment.value = message.feedback?.userComment || "";
+  const submit = document.createElement("button");
+  submit.type = "submit";
+  submit.className = "ghost-button";
+  submit.textContent = message.feedback ? "Update feedback" : "Send feedback";
+  submit.disabled = !selectedCategory;
+  const status = document.createElement("p");
+  status.className = "research-feedback-status";
+  if (message.feedback) status.textContent = "Saved as a review candidate.";
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!selectedCategory) return;
+    submit.disabled = true;
+    status.textContent = "Saving…";
+    try {
+      const payload = await postResearch("/research/feedback", {
+        conversationID,
+        answerID: message.id,
+        category: selectedCategory,
+        comment: comment.value
+      });
+      message.feedback = payload.feedback;
+      submit.textContent = "Update feedback";
+      status.textContent = "Saved as a review candidate.";
+    } catch (error) {
+      status.textContent = error.message;
+    } finally {
+      submit.disabled = !selectedCategory;
+    }
+  });
+  form.append(heading, choices, comment, submit, status);
+  container.append(form);
+}
+
+function renderResearchInterpretation(container, result, options = {}) {
   clear(container);
   if (!result) return;
 
@@ -6469,14 +6537,16 @@ function renderResearchInterpretation(container, result) {
   card.className = "analysis-card research-result-card";
   const label = document.createElement("p");
   label.className = "section-label";
-  label.textContent = result.mode === "mock" ? "Prototype response" : "AI-assisted research";
+  label.textContent = result.mode === "mock" ? "Prototype response" : "Supported by selected evidence";
   const heading = document.createElement("h3");
   heading.textContent = result.conclusion;
   const explanation = document.createElement("p");
   explanation.textContent = result.explanation;
   card.append(label, heading, explanation);
   appendResearchList(card, "Assumptions", result.assumptions);
-  appendResearchList(card, "Facts to confirm", result.missingFacts);
+  appendResearchList(card, "Missing project facts", result.missingFacts);
+  appendResearchList(card, "Limits of the selected evidence", result.evidenceLimitations);
+  appendResearchList(card, "Additional evidence needed", result.additionalEvidenceNeeded);
 
   const citationsHeading = document.createElement("strong");
   citationsHeading.className = "research-result-subheading";
@@ -6489,18 +6559,29 @@ function renderResearchInterpretation(container, result) {
     citationText.textContent = officialSectionCitation(citation);
     const relevance = document.createElement("p");
     relevance.textContent = citation.relevance;
+    const passageDetails = document.createElement("details");
+    passageDetails.className = "research-citation-passages";
+    const passageSummary = document.createElement("summary");
+    passageSummary.textContent = "Show supporting selected passage";
+    passageDetails.append(passageSummary);
+    (citation.supportingPassages || []).forEach((passage) => {
+      const quote = document.createElement("blockquote");
+      quote.textContent = passage.selectedText;
+      passageDetails.append(quote);
+    });
     const openButton = document.createElement("button");
     openButton.className = "ghost-button";
     openButton.type = "button";
     openButton.textContent = "Open cited section";
     openButton.addEventListener("click", () => openSectionDetailForExistingSearch(citation));
-    citationRow.append(citationText, relevance, openButton);
+    citationRow.append(citationText, relevance, passageDetails, openButton);
     card.append(citationRow);
   });
   const disclaimer = document.createElement("p");
   disclaimer.className = "research-disclaimer";
   disclaimer.textContent = result.disclaimer;
   card.append(disclaimer);
+  if (options.message) renderResearchFeedback(card, options.message, options.conversationID);
   container.append(card);
 }
 
@@ -6683,10 +6764,15 @@ async function refreshResearchConversationList() {
   if (!activeAccount()) {
     researchConversationList = [];
     activeResearchConversation = null;
+    researchUsage = null;
     return [];
   }
-  const payload = await postResearch("/research/conversations/list");
+  const [payload, usagePayload] = await Promise.all([
+    postResearch("/research/conversations/list"),
+    postResearch("/research/usage")
+  ]);
   researchConversationList = payload.conversations || [];
+  researchUsage = usagePayload.usage || null;
   return researchConversationList;
 }
 
@@ -6805,6 +6891,28 @@ async function renderResearch(paneID = "utility:analysis") {
   instruction.textContent = "Highlight enacted text in any Reader, search detail, or project section to begin.";
   listHeader.append(heading, instruction);
   content.append(listHeader);
+
+  if (researchUsage) {
+    const usage = document.createElement("section");
+    usage.className = "research-usage";
+    const primary = document.createElement("strong");
+    primary.textContent = `${researchUsage.requestsUsed} of ${researchUsage.requestLimit} AI requests used this month`;
+    const reset = document.createElement("p");
+    reset.textContent = `Allowance resets ${researchRelativeDate(researchUsage.resetDate)}.`;
+    const details = document.createElement("details");
+    const summary = document.createElement("summary");
+    summary.textContent = "Technical usage details";
+    const tokens = document.createElement("p");
+    tokens.textContent = `${Number(researchUsage.tokens?.totalTokens || 0).toLocaleString()} tokens used.`;
+    details.append(summary, tokens);
+    if (Number.isFinite(researchUsage.estimatedCostUSD)) {
+      const cost = document.createElement("p");
+      cost.textContent = `Estimated usage cost: $${researchUsage.estimatedCostUSD.toFixed(4)}.`;
+      details.append(cost);
+    }
+    usage.append(primary, reset, details);
+    content.append(usage);
+  }
 
   if (!researchConversationList.length) {
     const empty = document.createElement("div");
@@ -6966,7 +7074,7 @@ async function renderResearchConversation(conversationID) {
     }
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
-    renderResearchInterpretation(bubble, message.answer);
+    renderResearchInterpretation(bubble, message.answer, { message, conversationID });
     thread.append(bubble);
   });
   content.append(thread);

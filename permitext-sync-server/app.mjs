@@ -14,12 +14,19 @@ import { createPostgresAccountRepository } from "./postgres-account-repository.m
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
+import { estimatedResearchCost, researchModelConfiguration } from "./research-config.mjs";
+import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
 const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
+const internalPublicPath = join(__dirname, "internal");
+const evaluationCasesPath = join(__dirname, "evals", "research-cases.json");
+const evaluationResultsPath = join(__dirname, "evals", "results");
+const evaluationReviewsPath = join(__dirname, "evals", "reviews.json");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+const defaultResearchCodeEdition = "2022 New York City Construction Codes";
 const maxSyncMutationsPerBatch = 100;
 const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
@@ -44,6 +51,10 @@ const rateLimitPolicies = new Map([
   ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["research/usage", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/feedback", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
   ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
@@ -105,7 +116,8 @@ const emptyStore = () => ({
   passkeyCredentials: {},
   mutationsByUserID: {},
   researchConversationsByUserID: {},
-  researchUsageByUserID: {}
+  researchUsageByUserID: {},
+  researchFeedbackByUserID: {}
 });
 
 const allowedMutationKinds = new Set([
@@ -127,6 +139,8 @@ const researchInterpretationSchema = {
     explanation: { type: "string" },
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
+    evidenceLimitations: { type: "array", items: { type: "string" } },
+    additionalEvidenceNeeded: { type: "array", items: { type: "string" } },
     citations: {
       type: "array",
       items: {
@@ -134,13 +148,14 @@ const researchInterpretationSchema = {
         additionalProperties: false,
         properties: {
           sectionID: { type: "string" },
+          sourceIDs: { type: "array", items: { type: "string" }, minItems: 1 },
           relevance: { type: "string" }
         },
-        required: ["sectionID", "relevance"]
+        required: ["sectionID", "sourceIDs", "relevance"]
       }
     }
   },
-  required: ["conclusion", "explanation", "assumptions", "missingFacts", "citations"]
+  required: ["conclusion", "explanation", "assumptions", "missingFacts", "evidenceLimitations", "additionalEvidenceNeeded", "citations"]
 };
 
 function safeJSON(value, fallback) {
@@ -197,6 +212,10 @@ function createFileStoreAdapter() {
           researchUsage: Object.values(store.researchUsageByUserID || {}).reduce(
             (count, entries) => count + (entries?.length || 0),
             0
+          ),
+          researchFeedback: Object.values(store.researchFeedbackByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
           )
         },
         mutationCounts: mutationCountsByKind
@@ -239,6 +258,25 @@ function createFileStoreAdapter() {
         entry
       ];
       await this.write(store);
+    },
+    async listResearchFeedback(userID) {
+      const store = await this.read();
+      return (store.researchFeedbackByUserID?.[userID] || []).slice();
+    },
+    async listAllResearchFeedback() {
+      const store = await this.read();
+      return Object.values(store.researchFeedbackByUserID || {}).flatMap((entries) => entries || []);
+    },
+    async saveResearchFeedback(userID, feedback) {
+      const store = await this.read();
+      store.researchFeedbackByUserID ||= {};
+      const entries = store.researchFeedbackByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.id === feedback.id);
+      if (index === -1) entries.push(feedback);
+      else entries[index] = feedback;
+      store.researchFeedbackByUserID[userID] = entries;
+      await this.write(store);
+      return feedback;
     }
   };
 }
@@ -249,7 +287,10 @@ function storeHasData(store) {
     entitlements: store.entitlements,
     sessions: store.sessions,
     passkeyCredentials: store.passkeyCredentials,
-    mutationsByUserID: store.mutationsByUserID
+    mutationsByUserID: store.mutationsByUserID,
+    researchConversationsByUserID: store.researchConversationsByUserID,
+    researchUsageByUserID: store.researchUsageByUserID,
+    researchFeedbackByUserID: store.researchFeedbackByUserID
   }).some((value) => value && Object.keys(value).length > 0);
 }
 
@@ -553,14 +594,39 @@ async function createPostgresStoreAdapter() {
         model TEXT NOT NULL,
         mode TEXT NOT NULL,
         input_tokens INTEGER NOT NULL DEFAULT 0,
+        cached_input_tokens INTEGER NOT NULL DEFAULT 0,
         output_tokens INTEGER NOT NULL DEFAULT 0,
         total_tokens INTEGER NOT NULL DEFAULT 0,
+        prompt_version TEXT,
+        evidence_version TEXT,
+        estimated_cost_usd NUMERIC,
+        pricing_version TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS prompt_version TEXT`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS cached_input_tokens INTEGER NOT NULL DEFAULT 0`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS evidence_version TEXT`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS estimated_cost_usd NUMERIC`;
+    await sql`ALTER TABLE permitext_research_usage ADD COLUMN IF NOT EXISTS pricing_version TEXT`;
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_research_usage_user_created_idx
       ON permitext_research_usage (user_id, created_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_feedback (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        conversation_id TEXT NOT NULL,
+        answer_id TEXT NOT NULL,
+        feedback JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_research_feedback_user_answer_idx
+      ON permitext_research_feedback (user_id, answer_id)
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_sync_events (
@@ -909,6 +975,7 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_comments)::int AS comments,
         (SELECT count(*) FROM permitext_research_conversations)::int AS research_conversations,
         (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
+        (SELECT count(*) FROM permitext_research_feedback)::int AS research_feedback,
         (SELECT count(*) FROM permitext_user_content_records)::int AS user_content_records,
         (SELECT count(*) FROM permitext_sync_events)::int AS sync_events,
         COALESCE((SELECT max(event_id) FROM permitext_sync_events), 0)::bigint AS latest_event_id
@@ -932,6 +999,7 @@ async function createPostgresStoreAdapter() {
         comments: Number(row.comments || 0),
         researchConversations: Number(row.research_conversations || 0),
         researchUsage: Number(row.research_usage || 0),
+        researchFeedback: Number(row.research_feedback || 0),
         userContentRecords: Number(row.user_content_records || 0),
         syncEvents: Number(row.sync_events || 0)
       }
@@ -1315,7 +1383,8 @@ async function createPostgresStoreAdapter() {
     async researchUsageSince(userID, since) {
       await ensureSchema();
       const rows = await sql`
-        SELECT id, model, mode, input_tokens, output_tokens, total_tokens, created_at
+        SELECT id, model, mode, input_tokens, cached_input_tokens, output_tokens, total_tokens,
+               prompt_version, evidence_version, estimated_cost_usd, pricing_version, created_at
         FROM permitext_research_usage
         WHERE user_id = ${userID} AND created_at >= ${since}::timestamptz
         ORDER BY created_at DESC
@@ -1325,8 +1394,13 @@ async function createPostgresStoreAdapter() {
         model: row.model,
         mode: row.mode,
         inputTokens: Number(row.input_tokens || 0),
+        cachedInputTokens: Number(row.cached_input_tokens || 0),
         outputTokens: Number(row.output_tokens || 0),
         totalTokens: Number(row.total_tokens || 0),
+        promptVersion: row.prompt_version || null,
+        evidenceVersion: row.evidence_version || null,
+        estimatedCostUSD: row.estimated_cost_usd === null ? null : Number(row.estimated_cost_usd),
+        pricingVersion: row.pricing_version || null,
         createdAt: dateToISO(row.created_at)
       }));
     },
@@ -1334,15 +1408,52 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await sql`
         INSERT INTO permitext_research_usage (
-          id, user_id, model, mode, input_tokens, output_tokens, total_tokens, created_at
+          id, user_id, model, mode, input_tokens, cached_input_tokens, output_tokens, total_tokens,
+          prompt_version, evidence_version, estimated_cost_usd, pricing_version, created_at
         )
         VALUES (
           ${entry.id}, ${userID}, ${entry.model}, ${entry.mode},
-          ${entry.inputTokens}, ${entry.outputTokens}, ${entry.totalTokens},
+          ${entry.inputTokens}, ${entry.cachedInputTokens || 0}, ${entry.outputTokens}, ${entry.totalTokens},
+          ${entry.promptVersion || null}, ${entry.evidenceVersion || null},
+          ${entry.estimatedCostUSD ?? null}, ${entry.pricingVersion || null},
           ${entry.createdAt}::timestamptz
         )
         ON CONFLICT (id) DO NOTHING
       `;
+    },
+    async listResearchFeedback(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT feedback
+        FROM permitext_research_feedback
+        WHERE user_id = ${userID}
+        ORDER BY updated_at DESC
+      `;
+      return rows.map((row) => safeJSON(row.feedback, {}));
+    },
+    async listAllResearchFeedback() {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT feedback
+        FROM permitext_research_feedback
+        ORDER BY updated_at DESC
+      `;
+      return rows.map((row) => safeJSON(row.feedback, {}));
+    },
+    async saveResearchFeedback(userID, feedback) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_research_feedback (
+          id, user_id, conversation_id, answer_id, feedback, created_at, updated_at
+        ) VALUES (
+          ${feedback.id}, ${userID}, ${feedback.conversationID}, ${feedback.answerID},
+          ${JSON.stringify(feedback)}::jsonb, ${feedback.createdAt}::timestamptz, ${feedback.updatedAt}::timestamptz
+        )
+        ON CONFLICT (user_id, answer_id) DO UPDATE SET
+          feedback = EXCLUDED.feedback,
+          updated_at = EXCLUDED.updated_at
+      `;
+      return feedback;
     },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
@@ -1453,6 +1564,28 @@ async function recordResearchUsage(userID, entry) {
   if (typeof adapter.recordResearchUsage === "function") {
     await adapter.recordResearchUsage(userID, entry);
   }
+}
+
+async function listStoredResearchFeedback(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listResearchFeedback === "function"
+    ? adapter.listResearchFeedback(userID)
+    : [];
+}
+
+async function saveStoredResearchFeedback(userID, feedback) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveResearchFeedback !== "function") {
+    throw new Error("Research feedback storage is unavailable.");
+  }
+  return adapter.saveResearchFeedback(userID, feedback);
+}
+
+async function listAllStoredResearchFeedback() {
+  const adapter = await storeAdapter();
+  return typeof adapter.listAllResearchFeedback === "function"
+    ? adapter.listAllResearchFeedback()
+    : [];
 }
 
 export function requestBodyLimit(environment = process.env) {
@@ -2242,25 +2375,23 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
 
 function researchPrompt(question, evidence, options = {}) {
   const sources = evidence.map((section) => [
+    `PASSAGE_ID: ${section.sourceID}`,
     `SECTION_ID: ${section.sectionID}`,
     `CODE: ${section.codePrefix}`,
     `SECTION: ${section.sectionNumber}`,
     `TITLE: ${section.title}`,
-    `TEXT: ${section.text}`
+    `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
+    `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+    `EXACT SELECTED PASSAGE: ${section.text}`
   ].join("\n")).join("\n\n---\n\n");
-  const selections = (options.selections || []).map((source) => [
-    `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID}`,
-    `SELECTED PASSAGE: ${source.selectedText}`
-  ].join("\n")).join("\n\n");
   const history = (options.messages || []).slice(-8).map((message) => {
     if (message.role === "user") return `USER: ${message.question || ""}`;
     return `ASSISTANT: ${message.answer?.conclusion || ""}\n${message.answer?.explanation || ""}`;
   }).join("\n\n");
   return [
     `QUESTION\n${question}`,
-    selections ? `USER-SELECTED PASSAGES\n${selections}` : "",
-    history ? `RECENT CONVERSATION\n${history}` : "",
-    `OFFICIAL CODE EVIDENCE\n${sources}`
+    history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
+    `AUTHORITATIVE USER-SELECTED EVIDENCE\n${sources}`
   ].filter(Boolean).join("\n\n");
 }
 
@@ -2273,8 +2404,11 @@ function mockResearchInterpretation(question, evidence) {
     explanation: "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
     assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
+    evidenceLimitations: ["No code sections or agency documents beyond the passages selected by the user were treated as authority."],
+    additionalEvidenceNeeded: ["Attach any other applicable code section or agency document before relying on requirements not stated in the selected passages."],
     citations: evidence.map((section) => ({
       sectionID: section.sectionID,
+      sourceIDs: [section.sourceID || `section-${section.sectionID}`],
       relevance: `Selected evidence from ${section.sectionNumber || section.title}.`
     }))
   };
@@ -2297,12 +2431,19 @@ function outputTextFromResponse(response) {
 }
 
 function validateResearchInterpretation(value, evidence) {
-  const allowedSections = new Map(evidence.map((section) => [section.sectionID, section]));
+  const allowedSections = new Map();
+  const allowedSources = new Map();
+  for (const section of evidence) {
+    if (!allowedSections.has(section.sectionID)) allowedSections.set(section.sectionID, section);
+    allowedSources.set(section.sourceID || `section-${section.sectionID}`, section);
+  }
   if (!value || typeof value !== "object" ||
       typeof value.conclusion !== "string" || !value.conclusion.trim() ||
       typeof value.explanation !== "string" || !value.explanation.trim() ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
+      !Array.isArray(value.evidenceLimitations) || !value.evidenceLimitations.every((item) => typeof item === "string") ||
+      !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
       !Array.isArray(value.citations) || value.citations.length === 0) {
     const error = new Error("The model returned an invalid interpretation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
@@ -2312,14 +2453,19 @@ function validateResearchInterpretation(value, evidence) {
   const seen = new Set();
   for (const citation of value.citations) {
     const sectionID = String(citation?.sectionID || "").trim();
+    const sourceIDs = Array.isArray(citation?.sourceIDs)
+      ? Array.from(new Set(citation.sourceIDs.map((item) => String(item || "").trim()).filter(Boolean)))
+      : [];
     const relevance = String(citation?.relevance || "").trim();
-    if (!allowedSections.has(sectionID) || !relevance) {
+    if (!allowedSections.has(sectionID) || !sourceIDs.length ||
+        sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID) || !relevance) {
       const error = new Error("The model cited evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
       throw error;
     }
-    if (seen.has(sectionID)) continue;
-    seen.add(sectionID);
+    const citationKey = `${sectionID}:${sourceIDs.slice().sort().join(",")}`;
+    if (seen.has(citationKey)) continue;
+    seen.add(citationKey);
     const source = allowedSections.get(sectionID);
     citations.push({
       sectionID: source.sectionID,
@@ -2327,6 +2473,13 @@ function validateResearchInterpretation(value, evidence) {
       title: source.title,
       codePrefix: source.codePrefix,
       chapterNumber: source.chapterNumber,
+      codeVersion: source.codeVersion || defaultSyncCodeVersion,
+      codeEdition: source.codeEdition || defaultResearchCodeEdition,
+      sourceIDs,
+      supportingPassages: sourceIDs.map((sourceID) => ({
+        sourceID,
+        selectedText: allowedSources.get(sourceID).text
+      })),
       relevance
     });
   }
@@ -2340,6 +2493,8 @@ function validateResearchInterpretation(value, evidence) {
     explanation: value.explanation.trim(),
     assumptions: value.assumptions.map((item) => item.trim()).filter(Boolean),
     missingFacts: value.missingFacts.map((item) => item.trim()).filter(Boolean),
+    evidenceLimitations: value.evidenceLimitations.map((item) => item.trim()).filter(Boolean),
+    additionalEvidenceNeeded: value.additionalEvidenceNeeded.map((item) => item.trim()).filter(Boolean),
     citations
   };
 }
@@ -2351,7 +2506,13 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const model = process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra";
+  const configuration = researchModelConfiguration();
+  const model = configuration.model;
+  const passageEvidence = evidence.map((section) => ({
+    ...section,
+    sourceID: section.sourceID || `section-${section.sectionID}`,
+    codeVersion: section.codeVersion || defaultSyncCodeVersion
+  }));
   let response;
   try {
     response = await fetch("https://api.openai.com/v1/responses", {
@@ -2363,17 +2524,20 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       body: JSON.stringify({
         model,
         store: false,
-        reasoning: { effort: process.env.PERMITEXT_RESEARCH_REASONING_EFFORT || "medium" },
+        reasoning: { effort: configuration.reasoningEffort },
         max_output_tokens: 1_500,
         safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
         instructions: [
           "You are a building-code research assistant, not an authority having jurisdiction.",
           "Interpret only the selected official code evidence supplied in the request.",
           "Do not use outside knowledge as legal authority and do not invent requirements.",
-          "State when the evidence is insufficient and identify project facts that must be confirmed.",
-          "Every conclusion must cite one or more supplied SECTION_ID values."
+          "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
+          "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
+          "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
+          "If the question cannot be answered from the selected evidence, say so directly.",
+          "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
         ].join(" "),
-        input: researchPrompt(question, evidence, options),
+        input: researchPrompt(question, passageEvidence, options),
         text: {
           format: {
             type: "json_schema",
@@ -2408,10 +2572,12 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     throw invalidResponse;
   }
   return {
-    interpretation: validateResearchInterpretation(value, evidence),
+    interpretation: validateResearchInterpretation(value, passageEvidence),
     model,
+    configuration,
     usage: {
       inputTokens: payload.usage?.input_tokens || 0,
+      cachedInputTokens: payload.usage?.input_tokens_details?.cached_tokens || 0,
       outputTokens: payload.usage?.output_tokens || 0,
       totalTokens: payload.usage?.total_tokens || 0
     }
@@ -2448,6 +2614,7 @@ async function handleResearchInterpretation(request, response) {
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, evidence), evidence),
           model: "permitext-mock",
+          configuration: researchModelConfiguration(),
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
       : await openAIResearchInterpretation(question, evidence, userID);
@@ -2457,6 +2624,10 @@ async function handleResearchInterpretation(request, response) {
       user: createHash("sha256").update(userID).digest("hex").slice(0, 16),
       mode: mockMode ? "mock" : "openai",
       model: result.model,
+      promptVersion: result.configuration.promptVersion,
+      evidenceVersion: result.configuration.evidenceVersion,
+      codeEdition: defaultResearchCodeEdition,
+      codeVersion: defaultSyncCodeVersion,
       evidenceSections: evidence.length,
       inputTokens: usage.inputTokens,
       outputTokens: usage.outputTokens,
@@ -2465,6 +2636,10 @@ async function handleResearchInterpretation(request, response) {
     sendJSON(response, 200, {
       mode: mockMode ? "mock" : "openai",
       model: result.model,
+      promptVersion: result.configuration.promptVersion,
+      evidenceVersion: result.configuration.evidenceVersion,
+      codeEdition: defaultResearchCodeEdition,
+      codeVersion: defaultSyncCodeVersion,
       ...result.interpretation,
       evidenceSectionIDs: evidence.map((section) => section.sectionID),
       usage,
@@ -2524,6 +2699,7 @@ function researchSourceFromEvidence(evidence, options = {}) {
       : null,
     sectionTextHash: evidence.sectionTextHash,
     codeVersion: defaultSyncCodeVersion,
+    codeEdition: defaultResearchCodeEdition,
     addedAt: new Date().toISOString()
   };
 }
@@ -2607,6 +2783,23 @@ async function currentResearchEvidence(conversation) {
   };
 }
 
+function selectedResearchEvidence(conversation, currentEvidence) {
+  const evidenceByID = new Map(currentEvidence.map((item) => [item.sectionID, item]));
+  return (conversation.sources || [])
+    .filter((source) => source.kind === "selection" && source.selectedText)
+    .map((source) => {
+      const evidence = evidenceByID.get(source.sectionID);
+      return evidence ? {
+        ...evidence,
+        sourceID: source.id,
+        text: source.selectedText,
+        codeVersion: source.codeVersion || conversation.codeVersion || defaultSyncCodeVersion,
+        codeEdition: source.codeEdition || defaultResearchCodeEdition
+      } : null;
+    })
+    .filter(Boolean);
+}
+
 async function researchConversationForClient(conversation, options = {}) {
   if (!options.checkSources) return conversation;
   const current = await currentResearchEvidence(conversation);
@@ -2650,8 +2843,27 @@ async function handleResearchConversationGet(request, response) {
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  const feedbackByAnswerID = new Map(
+    (await listStoredResearchFeedback(context.userID)).map((feedback) => [feedback.answerID, feedback])
+  );
+  const clientConversation = await researchConversationForClient(conversation, { checkSources: true });
   sendJSON(response, 200, {
-    conversation: await researchConversationForClient(conversation, { checkSources: true })
+    conversation: {
+      ...clientConversation,
+      messages: (clientConversation.messages || []).map((message) => {
+        const feedback = feedbackByAnswerID.get(message.id);
+        return !feedback ? message : {
+          ...message,
+          feedback: {
+            id: feedback.id,
+            status: feedback.status,
+            category: feedback.category,
+            userComment: feedback.userComment,
+            updatedAt: feedback.updatedAt
+          }
+        };
+      })
+    }
   });
 }
 
@@ -2764,6 +2976,249 @@ function monthlyResearchRequestLimit() {
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100_000 ? configured : 100;
 }
 
+function nextMonthStart() {
+  const now = new Date();
+  return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
+}
+
+function researchUsageSummary(entries, options = {}) {
+  const requestLimit = monthlyResearchRequestLimit();
+  const inputTokens = entries.reduce((total, entry) => total + Number(entry.inputTokens || 0), 0);
+  const cachedInputTokens = entries.reduce((total, entry) => total + Number(entry.cachedInputTokens || 0), 0);
+  const outputTokens = entries.reduce((total, entry) => total + Number(entry.outputTokens || 0), 0);
+  const totalTokens = entries.reduce((total, entry) => total + Number(entry.totalTokens || 0), 0);
+  const costsAreReliable = entries.length > 0 && entries.every((entry) => Number.isFinite(entry.estimatedCostUSD));
+  const pricingVersions = Array.from(new Set(entries.map((entry) => entry.pricingVersion).filter(Boolean)));
+  return {
+    requestsUsed: entries.length,
+    requestLimit,
+    resetDate: nextMonthStart(),
+    tokens: { inputTokens, cachedInputTokens, outputTokens, totalTokens },
+    estimatedCostUSD: costsAreReliable
+      ? Number(entries.reduce((total, entry) => total + entry.estimatedCostUSD, 0).toFixed(6))
+      : null,
+    pricingVersion: costsAreReliable && pricingVersions.length === 1 ? pricingVersions[0] : null,
+    mockMode: Boolean(options.mockMode)
+  };
+}
+
+async function handleResearchUsage(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+  const entries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
+  sendJSON(response, 200, { usage: researchUsageSummary(entries, { mockMode }) });
+}
+
+const researchFeedbackCategories = new Set([
+  "helpful",
+  "incorrect_misleading",
+  "missing_information",
+  "citation_problem",
+  "other"
+]);
+
+async function handleResearchFeedback(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
+  if (!conversation) return;
+  const answerID = String(context.body.answerID || "").trim();
+  const category = String(context.body.category || "").trim();
+  const comment = normalizedResearchText(context.body.comment, 2_000);
+  if (!researchFeedbackCategories.has(category)) {
+    sendError(response, 400, "Choose a valid feedback category.");
+    return;
+  }
+  const answerIndex = (conversation.messages || []).findIndex((message) => message.id === answerID && message.role === "assistant");
+  const answerMessage = conversation.messages?.[answerIndex];
+  const questionMessage = [...(conversation.messages || []).slice(0, answerIndex)].reverse().find((message) => message.role === "user");
+  if (!answerMessage || !questionMessage) {
+    sendError(response, 404, "Research answer not found.");
+    return;
+  }
+  const existing = (await listStoredResearchFeedback(context.userID)).find((item) => item.answerID === answerID);
+  const now = new Date().toISOString();
+  const feedback = {
+    id: existing?.id || randomUUID(),
+    status: "candidate",
+    conversationID: conversation.id,
+    answerID,
+    selectedEvidence: (conversation.sources || []).filter((source) => source.kind === "selection").map((source) => ({
+      sourceID: source.id,
+      sectionID: source.sectionID,
+      sectionNumber: source.sectionNumber,
+      codePrefix: source.codePrefix,
+      codeVersion: source.codeVersion,
+      codeEdition: source.codeEdition || defaultResearchCodeEdition,
+      selectedTextHash: source.selectedTextHash
+    })),
+    question: questionMessage.question,
+    answer: answerMessage.answer,
+    citations: answerMessage.answer?.citations || [],
+    model: answerMessage.answer?.model || null,
+    promptVersion: answerMessage.answer?.promptVersion || null,
+    evidenceVersion: answerMessage.answer?.evidenceVersion || null,
+    category,
+    userComment: comment,
+    createdAt: existing?.createdAt || now,
+    updatedAt: now
+  };
+  await saveStoredResearchFeedback(context.userID, feedback);
+  sendJSON(response, existing ? 200 : 201, {
+    feedback: {
+      id: feedback.id,
+      status: feedback.status,
+      category: feedback.category,
+      userComment: feedback.userComment,
+      updatedAt: feedback.updatedAt
+    }
+  });
+}
+
+function internalConsoleIsLocal(request) {
+  const address = String(request.socket?.remoteAddress || "");
+  return ["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(address);
+}
+
+function internalConsoleEnabled(request) {
+  return process.env.PERMITEXT_INTERNAL_CONSOLE === "1" ||
+    Boolean(String(process.env.PERMITEXT_INTERNAL_OWNER_USER_IDS || "").trim()) ||
+    (!process.env.VERCEL && internalConsoleIsLocal(request));
+}
+
+function internalConsoleHasLocalDevelopmentAccess(request) {
+  return !process.env.VERCEL && internalConsoleIsLocal(request);
+}
+
+async function authenticatedInternalBody(request, response) {
+  if (!internalConsoleEnabled(request)) {
+    sendError(response, 404, "Not found.");
+    return null;
+  }
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return null;
+  const ownerIDs = new Set(
+    String(process.env.PERMITEXT_INTERNAL_OWNER_USER_IDS || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean)
+  );
+  if (!internalConsoleHasLocalDevelopmentAccess(request) && !ownerIDs.has(context.userID)) {
+    sendError(response, 403, "Owner access required.");
+    return null;
+  }
+  return context;
+}
+
+async function readEvaluationReviews() {
+  try {
+    const reviews = JSON.parse(await readFile(evaluationReviewsPath, "utf8"));
+    return reviews?.schemaVersion === 1 && Array.isArray(reviews.reviews)
+      ? reviews
+      : { schemaVersion: 1, reviews: [] };
+  } catch (error) {
+    if (error.code === "ENOENT") return { schemaVersion: 1, reviews: [] };
+    throw error;
+  }
+}
+
+async function readEvaluationRuns() {
+  try {
+    const files = (await readdir(evaluationResultsPath))
+      .filter((name) => name.endsWith(".json"))
+      .sort()
+      .reverse()
+      .slice(0, 50);
+    const runs = [];
+    for (const file of files) {
+      try {
+        const run = JSON.parse(await readFile(join(evaluationResultsPath, file), "utf8"));
+        if (run?.configuration && Array.isArray(run.results)) runs.push(run);
+      } catch (error) {
+        console.warn(`Skipped invalid evaluation result ${file}: ${error.message}`);
+      }
+    }
+    return runs;
+  } catch (error) {
+    if (error.code === "ENOENT") return [];
+    throw error;
+  }
+}
+
+async function handleInternalEvaluationData(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
+  validateEvaluationDataset(dataset);
+  sendJSON(response, 200, {
+    dataset,
+    runs: await readEvaluationRuns(),
+    reviews: (await readEvaluationReviews()).reviews,
+    feedbackCandidates: (await listAllStoredResearchFeedback()).filter((item) => item.status === "candidate")
+  });
+}
+
+async function handleInternalEvaluationReview(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  if (!internalConsoleHasLocalDevelopmentAccess(request)) {
+    sendError(response, 405, "Evaluation reviews can currently be changed only from the local owner console.");
+    return;
+  }
+  const kind = String(context.body.kind || "");
+  const caseID = String(context.body.caseID || "").trim();
+  const runID = String(context.body.runID || "").trim();
+  const decision = String(context.body.decision || "").trim();
+  const notes = normalizedResearchText(context.body.notes, 4_000);
+  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "Permitext owner";
+  if (!["case", "run"].includes(kind) || !caseID || !["approved", "rejected"].includes(decision)) {
+    sendError(response, 400, "Provide a case or run review with an approve or reject decision.");
+    return;
+  }
+  const scoreOverrides = {};
+  for (const [dimension, rawScore] of Object.entries(context.body.scoreOverrides || {})) {
+    const score = Number(rawScore);
+    if (!/^[a-zA-Z][a-zA-Z0-9]+$/.test(dimension) || !Number.isFinite(score) || score < 0 || score > 4) {
+      sendError(response, 400, "Score overrides must use valid dimensions and values from 0 through 4.");
+      return;
+    }
+    scoreOverrides[dimension] = Math.round(score * 100) / 100;
+  }
+  const now = new Date().toISOString();
+  if (kind === "case") {
+    const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
+    const testCase = dataset.cases.find((item) => item.id === caseID);
+    if (!testCase) {
+      sendError(response, 404, "Evaluation case not found.");
+      return;
+    }
+    testCase.status = decision === "approved" ? "approved" : "draft";
+    testCase.reviewer = reviewer;
+    testCase.reviewedAt = now;
+    validateEvaluationDataset(dataset);
+    await writeFile(evaluationCasesPath, `${JSON.stringify(dataset, null, 2)}\n`);
+  } else if (!runID) {
+    sendError(response, 400, "Run reviews require a run ID.");
+    return;
+  }
+  const reviewStore = await readEvaluationReviews();
+  const review = {
+    id: randomUUID(),
+    kind,
+    caseID,
+    runID: kind === "run" ? runID : null,
+    decision,
+    scoreOverrides,
+    notes,
+    reviewer,
+    reviewedAt: now
+  };
+  reviewStore.reviews.push(review);
+  await writeFile(evaluationReviewsPath, `${JSON.stringify(reviewStore, null, 2)}\n`);
+  sendJSON(response, 200, { review });
+}
+
 async function handleResearchConversationMessage(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -2797,21 +3252,24 @@ async function handleResearchConversationMessage(request, response) {
       sendJSON(response, 429, {
         error: "This account reached its monthly AI research limit.",
         code: "RESEARCH_MONTHLY_LIMIT",
-        usage: { requestsUsed: usageEntries.length, requestLimit }
+        usage: researchUsageSummary(usageEntries)
       });
       return;
     }
     const selections = conversation.sources.filter((source) => source.kind === "selection");
+    const selectedEvidence = selectedResearchEvidence(conversation, current.evidence);
     const result = mockMode
       ? {
-          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, current.evidence), current.evidence),
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence), selectedEvidence),
           model: "permitext-mock",
+          configuration: researchModelConfiguration(),
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
-      : await openAIResearchInterpretation(question, current.evidence, context.userID, {
+      : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
           selections,
           messages: conversation.messages
         });
+    const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
     const disclaimer = "AI-generated research assistance, not an official code determination.";
     const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
@@ -2822,9 +3280,16 @@ async function handleResearchConversationMessage(request, response) {
       answer: {
         mode: mockMode ? "mock" : "openai",
         model: result.model,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        codeEdition: defaultResearchCodeEdition,
+        codeVersion: conversation.codeVersion,
         ...result.interpretation,
-        evidenceSectionIDs: current.evidence.map((section) => section.sectionID),
+        evidenceSectionIDs: Array.from(new Set(selectedEvidence.map((section) => section.sectionID))),
+        evidenceSourceIDs: selectedEvidence.map((section) => section.sourceID),
         usage: result.usage,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
         disclaimer
       }
     };
@@ -2838,6 +3303,10 @@ async function handleResearchConversationMessage(request, response) {
         model: result.model,
         mode: "openai",
         ...result.usage,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
         createdAt: now
       });
     }
@@ -2847,16 +3316,20 @@ async function handleResearchConversationMessage(request, response) {
       mode: mockMode ? "mock" : "openai",
       model: result.model,
       conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
-      evidenceSections: current.evidence.length,
+      evidenceSections: new Set(selectedEvidence.map((section) => section.sectionID)).size,
+      evidencePassages: selectedEvidence.length,
       totalTokens: result.usage.totalTokens
     }));
     sendJSON(response, 200, {
       conversation,
-      usage: {
-        requestsUsed: mockMode ? 0 : usageEntries.length + 1,
-        requestLimit,
-        mockMode
-      }
+      usage: researchUsageSummary(mockMode ? [] : [
+        ...usageEntries,
+        {
+          ...result.usage,
+          estimatedCostUSD: estimatedCost.estimatedUSD,
+          pricingVersion: estimatedCost.pricingVersion
+        }
+      ], { mockMode })
     });
   } catch (error) {
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
@@ -2918,6 +3391,34 @@ async function handleWebStatic(path, response) {
   try {
     const filePath = join(webPublicPath, ...segments);
     sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), immutableStaticCacheControl);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      sendNotFound(response);
+      return;
+    }
+    throw error;
+  }
+}
+
+async function handleInternalStatic(request, path, response) {
+  if (!internalConsoleEnabled(request)) {
+    sendNotFound(response);
+    return;
+  }
+  const fileName = path === "internal" || path === "internal/"
+    ? "index.html"
+    : decodeURIComponent(path.replace(/^internal\//, ""));
+  if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
+    sendNotFound(response);
+    return;
+  }
+  try {
+    const filePath = join(internalPublicPath, fileName);
+    if (fileName === "index.html") {
+      sendHTML(response, await readFile(filePath, "utf8"));
+      return;
+    }
+    sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), "no-store");
   } catch (error) {
     if (error.code === "ENOENT") {
       sendNotFound(response);
@@ -5569,6 +6070,10 @@ const handlers = {
   "research/conversations/refresh": handleResearchConversationRefresh,
   "research/conversations/message": handleResearchConversationMessage,
   "research/conversations/delete": handleResearchConversationDelete,
+  "research/usage": handleResearchUsage,
+  "research/feedback": handleResearchFeedback,
+  "internal/evaluations/data": handleInternalEvaluationData,
+  "internal/evaluations/review": handleInternalEvaluationReview,
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
   "workboards/assets/delete": handleWorkboardAssetDelete,
@@ -5600,6 +6105,10 @@ export async function handleRequest(request, response) {
       )
     ) {
       await handleWebIndex(request, response);
+      return;
+    }
+    if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {
+      await handleInternalStatic(request, path, response);
       return;
     }
     if (request.method === "GET" && path.startsWith("web/")) {

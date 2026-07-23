@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Permitext Console</title>
+    <link rel="stylesheet" href="/internal/styles.css">
+  </head>
+  <body>
+    <header class="console-header">
+      <div>
+        <p>OWNER-ONLY</p>
+        <h1>Permitext Console</h1>
+      </div>
+      <a href="/">Return to Permitext</a>
+    </header>
+    <main>
+      <aside class="notice">Evaluation answer keys and reviews are available here only after server-side owner authentication. Nothing on this page is part of the customer research interface.</aside>
+      <p id="status" class="status">Loading private evaluation data…</p>
+      <section id="summary" class="summary" hidden></section>
+      <nav class="tabs" aria-label="Console sections" hidden>
+        <button type="button" data-tab="cases" aria-pressed="true">Cases</button>
+        <button type="button" data-tab="runs" aria-pressed="false">Runs and comparison</button>
+        <button type="button" data-tab="feedback" aria-pressed="false">Feedback candidates</button>
+      </nav>
+      <section id="cases" class="tab-panel"></section>
+      <section id="runs" class="tab-panel" hidden></section>
+      <section id="feedback" class="tab-panel" hidden></section>
+    </main>
+    <script src="/internal/app.js" type="module"></script>
+  </body>
+</html>

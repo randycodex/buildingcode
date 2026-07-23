@@ -98,7 +98,7 @@ The same URL loads the section-detail workspace in a browser and opens `ReaderVi
 
 Signed-in web readers also publish the shared `continuity` record after chapter or section navigation and restore only a newer server record. Web updates preserve continuity values owned by iPhone, merge the canonical section into recent history, use the same Swift reference-date encoding, and stay in the durable outbox on network failure. A pending local continuity mutation prevents remote state from overwriting it; choosing the server copy during conflict resolution clears the local continuity checkpoint before pulling again.
 
-The web `Research` pane stores conversations built from enacted passages selected by the user. Users can attach additional passages and ask for plain-language interpretations grounded only in the selected official sections. The browser sends section IDs and selected enacted text; the server re-resolves the canonical bodies, excludes private notes, rejects changed selections, and rejects any model citation outside the selected evidence. Interpretations are research assistance, not official code determinations.
+The web `Research` pane stores conversations built from enacted passages selected by the user. Users can attach additional passages and ask for plain-language interpretations grounded only in those exact passages. Related sections remain disclosed suggestions and are not sent to the model as verified authority. The server re-resolves canonical bodies, excludes private notes, rejects changed selections, verifies every cited section and passage ID, and returns separate supported conclusions, missing facts, evidence limitations, and additional evidence needs. Interpretations are research assistance, not official code determinations.
 
 Run the interpretation flow locally without calling an external model:
 
@@ -115,7 +115,7 @@ PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
 node server.mjs
 ```
 
-`OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, limits each request to 12 selected sections, and records model/token usage without logging the question or code text. The OpenAI account that owns the API key is responsible for model usage charges.
+`OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. The Research list shows requests used versus the monthly allowance and reset date; token totals are secondary, and estimated cost appears only when explicit versioned pricing is configured. The OpenAI account that owns the API key is responsible for model usage charges.
 
 ### Research evaluation set
 
@@ -127,15 +127,21 @@ npm run eval:research
 
 The preflight intentionally blocks a live run when a section is missing, mapped to the wrong body, or missing required table text. Add or revise cases only in the dataset; the runner discovers every case and rubric item without case-specific code. See `evals/README.md` for the field contract and change process.
 
-After explicit spending approval, a full five-case run makes ten paid model requests: five Permitext answers plus five structured scoring calls. It requires both an API key and the paid-run interlock:
+After explicit spending approval, a full five-case run makes ten paid model requests: five Permitext answers plus five structured scoring calls. It requires an API key, the paid-run interlock, and explicit versioned token prices so cost scoring is reliable:
 
 ```sh
 PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
 OPENAI_API_KEY=... \
+PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_PRICING_VERSION=... \
 npm run eval:research:live
 ```
 
-Live results are written under ignored `evals/results/` as JSON plus a Markdown review report. Every report records the dataset hash, answer and judge configurations, per-dimension scores, response time, and separate answer/judge token usage. Citation scope and completeness are checked deterministically; a strict evidence-only judge scores citation support, invented requirements, uncertainty, required concepts, forbidden claims, and practical usefulness. Automatic scores are regression signals and should still receive periodic review by a building-code professional.
+Live results are written under ignored `evals/results/` as JSON plus a Markdown review report. Every report records the run ID and timestamp, dataset hash, Git commit, code edition, prompt/evidence/retrieval versions, answer and judge configurations, response time, tokens, reliable estimated costs, automatic scores, and comparison with the previous saved baseline. Citation scope and completeness are checked deterministically; a strict evidence-only judge scores citation support, invented requirements, uncertainty, missing facts, required concepts, forbidden claims, and practical usefulness. Automatic scores are regression signals and require knowledgeable human review.
+
+Completed answers include lightweight feedback controls. Feedback is stored with the server-derived conversation, evidence, question, answer, citations, model, and prompt/evidence versions. Every record remains a review `candidate`; it is never treated as proof of error or promoted into the approved dataset automatically. The local owner-only console at `/internal` reviews private answer keys, runs, overrides, and candidates without exposing them to the customer interface. See `evals/README.md` for access controls and workflow.
 
 Run the free preflight whenever the dataset or enacted content changes. Whenever prompts, models, model settings, citation logic, evidence assembly, or other AI behavior changes, obtain spending approval, run the live suite before accepting the change, and compare the new JSON/Markdown report with the previous accepted result. Never place a paid live run in unattended CI.
 

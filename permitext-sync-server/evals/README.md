@@ -1,23 +1,33 @@
 # Permitext research evaluations
 
-`research-cases.json` is Permitext's permanent, human-authored golden set for AI research behavior. The evaluator is data-driven: append a case with the fields below and the existing runner will validate, execute, score, and report it without a code change.
+`research-cases.json` is Permitext's permanent, server-private golden set for AI research behavior. It is not served by the production client. Add or edit structured case data; the runner and owner console require no case-specific application code and are designed for hundreds of cases.
 
-Each case requires:
+## Case contract
 
-- `id`: stable, unique identifier.
-- `title`: reviewer-facing name.
-- `codeEdition`: edition governing the exact evidence.
-- `selectedEvidence`: one or more code references with `codePrefix`, `sectionNumber`, and `exactPassages` copied from the enacted text.
-- `question`: the project question sent through the real Permitext research-conversation flow.
-- `requiredCitations`: selected references that must appear in the answer.
-- `requiredConcepts`: ideas a competent answer must cover.
-- `forbiddenClaims`: unsupported or unsafe conclusions the answer must avoid.
-- `requiredUncertaintyConditions`: missing project facts or outside materials the answer must request before concluding.
-- `expectedAnswerSummary`: the domain-expert reference used by the structured judge and human reviewer.
+Every case contains:
 
-The top-level `automaticScoring` object controls the seven score weights, pass scale, latency thresholds, and answer-token thresholds for every case. Scores run from 0 through 4. A case passes only when its weighted score and every critical quality dimension meet the configured passing score.
+- `id`, `title`, `status`, `difficulty`, and `topics`.
+- `codeEdition` and structured `projectContext`.
+- `selectedEvidence` with canonical references and exact enacted passages.
+- `question`, `requiredCitations`, `requiredConcepts`, and `forbiddenClaims`.
+- `missingFacts`, `expectedConclusion`, and `expectedCertainty`.
+- `sourceType`, `reviewer`, and `reviewedAt`.
 
-## Development gate
+The accepted values and full validation contract live in `evaluation-schema.mjs`. Draft cases may have `null` reviewer fields. Reviewed, approved, and retired cases require a reviewer and timestamp. Only `approved` cases are executed by the evaluation runner.
+
+## Dataset-growth workflow
+
+1. Collect a real code-research question.
+2. Attach the exact enacted passages; do not paraphrase the evidence field.
+3. Define the expected conclusion and required canonical citations.
+4. Identify missing project facts and forbidden claims.
+5. Add incomplete, misleading, cross-reference, and out-of-scope variations as separate cases when useful.
+6. Have a knowledgeable human review the evidence and answer key.
+7. Promote the case from `draft` to `approved`; the AI may not approve its own answer key.
+8. Run approved cases after every meaningful model, prompt, evidence, citation, or reasoning change.
+9. Convert confirmed production failures and reviewed user feedback into regression cases. Feedback remains a `candidate` until this review is complete.
+
+## Free development gate
 
 Run the no-cost evidence preflight after changing the dataset or enacted content:
 
@@ -25,16 +35,30 @@ Run the no-cost evidence preflight after changing the dataset or enacted content
 npm run eval:research
 ```
 
-The same preflight and an offline scorer/report self-test are included in `npm run check`. The preflight must resolve each reference to exactly one canonical section, find every exact passage, and successfully exercise every selection through Permitext's real conversation endpoints in mock mode before the evaluator will permit any model request. A blocked case identifies a source preparation, mapping, or selection problem that must be resolved before paid testing.
+The preflight resolves every canonical source, finds every exact passage, and exercises the real selection/conversation workflow in mock mode. `npm run check` also runs the offline scorer/report self-test and this evidence preflight.
 
-After explicit spending approval, run the live suite whenever a prompt, model, reasoning level, response schema, evidence assembly rule, citation rule, or AI-facing conversation behavior changes:
+## Paid baseline gate
+
+A live suite makes two paid requests per approved case: one Permitext answer and one structured judge. It remains locked unless all of the following are supplied after explicit spending approval:
 
 ```sh
 PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 \
 OPENAI_API_KEY=... \
+PERMITEXT_RESEARCH_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS=... \
+PERMITEXT_RESEARCH_PRICING_VERSION=... \
 npm run eval:research:live
 ```
 
-Live execution uses two paid model requests per case: one through Permitext's actual selection-to-conversation path and one strict structured scoring request. Reports are written to ignored `evals/results/` files and include the dataset hash, model configuration, all automatic scores, rubric checks, latency, and separate answer/judge token usage. Compare the new report with the last accepted report before accepting the behavior change. Keep a building-code professional in the review loop for significant releases.
+The pricing values are never guessed. Without an explicit pricing version and all three rates, the runner refuses a paid run because token-cost scoring would not be reliable.
 
-Paid evaluation is deliberately manual. Do not add the live command to unattended CI or run it without the user's approval of the expected number of requests and spending.
+Results are written to ignored `evals/results/` JSON and Markdown files. Each run records its ID and timestamp, dataset hash, code editions, Git commit, model/reasoning settings, prompt/evidence/retrieval versions, answers, citations, timing, tokens, reliable estimated cost, automatic scores, and comparison with the preceding saved baseline. Model judging is a regression signal; human review remains the authority for answer keys and score overrides.
+
+## Owner console
+
+Open `/internal` on the local Permitext server while signed in. Local access is available only from the machine running the development server. In a hosted environment, the console is disabled unless explicitly enabled and the signed-in user ID is listed in `PERMITEXT_INTERNAL_OWNER_USER_IDS`.
+
+The console can inspect private cases, expected conclusions, answers, automatic scores, feedback candidates, and two saved runs side by side. Local reviewers can approve/reject cases, override scores, and add notes. These capabilities are intentionally separate from the customer application.
+
+Never add the live command to unattended CI, expose answer keys through production client assets, promote unreviewed feedback automatically, or infer agency requirements from unrelated Building Code evidence.

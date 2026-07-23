@@ -138,7 +138,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("research-selection-v3"),
+      webRoot.text.includes("ai-foundation-v4"),
       "Web workspace omitted the current Research conversation assets."
     );
     const topbarSource = webRoot.text.slice(
@@ -532,7 +532,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260722-research-selection-v3'),
+        webRoot.text.includes('/web/app.js?v=20260722-ai-foundation-v4'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1347,8 +1347,35 @@ async function main() {
     assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
-        conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881",
+        conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881" &&
+        conversationMessage.json.conversation.messages[1].answer.citations[0].supportingPassages[0].selectedText === selectedResearchText &&
+        conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length === 1,
       "Research conversation did not persist a cited user and assistant exchange."
+    );
+    const answerID = conversationMessage.json.conversation.messages[1].id;
+    const researchUsage = await request("/research/usage", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      researchUsage.response.ok && researchUsage.json.usage.requestsUsed === 0 && researchUsage.json.usage.resetDate,
+      "Research usage did not expose the monthly allowance and reset date."
+    );
+    const researchFeedback = await request("/research/feedback", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        answerID,
+        category: "citation_problem",
+        comment: "The cited passage needs review."
+      }
+    });
+    assert(
+      researchFeedback.response.status === 201 && researchFeedback.json.feedback.status === "candidate",
+      "Research feedback was not saved as a human-review candidate."
     );
 
     const additionalResearchText = "The real time enforcement unit shall monitor all occupied multiple dwellings with valid permits for (i) the alteration of 10 percent or more of the existing floor surface area of the building or (ii) an addition to the building.";
@@ -1376,8 +1403,27 @@ async function main() {
       body: { auth: { accountUserID: userID }, conversationID }
     });
     assert(
-      fetchedConversation.response.ok && fetchedConversation.json.conversation.sourceStatus === "current",
-      "Research conversation did not verify its saved source hash."
+      fetchedConversation.response.ok && fetchedConversation.json.conversation.sourceStatus === "current" &&
+        fetchedConversation.json.conversation.messages[1].feedback?.category === "citation_problem",
+      "Research conversation did not verify its source hash or restore saved answer feedback."
+    );
+
+    const internalConsole = await request("/internal");
+    assert(internalConsole.response.ok && internalConsole.text.includes("Permitext Console"), "Local owner console did not load.");
+    const unauthorizedInternalData = await request("/internal/evaluations/data", {
+      method: "POST",
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(unauthorizedInternalData.response.status === 401, "Owner console exposed private evaluation data without a session.");
+    const internalData = await request("/internal/evaluations/data", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      internalData.response.ok && internalData.json.dataset.schemaVersion === 2 &&
+        internalData.json.feedbackCandidates.some((item) => item.answerID === answerID),
+      "Owner console data omitted the private evaluation dataset or feedback candidate."
     );
 
     const researchStore = JSON.parse(await readFile(dataPath, "utf8"));
