@@ -1,4 +1,4 @@
-export const researchPromptVersion = process.env.PERMITEXT_RESEARCH_PROMPT_VERSION || "20260722-grounded-passages-v3";
+export const researchPromptVersion = process.env.PERMITEXT_RESEARCH_PROMPT_VERSION || "20260722-grounded-passages-v4";
 export const researchEvidenceVersion = process.env.PERMITEXT_RESEARCH_EVIDENCE_VERSION || "selected-passages-only-v2";
 
 let evaluationSpendReservation = {
