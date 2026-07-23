@@ -660,7 +660,11 @@ async function latestBaseline() {
     const candidates = [];
     for (const file of files) {
       const candidate = JSON.parse(await readFile(join(resultsDirectory, file), "utf8"));
-      if (candidate?.results?.length && (candidate.status === "completed" || candidate.status == null)) {
+      if (
+        candidate?.results?.length &&
+        (candidate.status === "completed" || candidate.status == null) &&
+        candidate.configuration?.suiteScope !== "targeted"
+      ) {
         candidates.push(candidate);
       }
     }
@@ -705,7 +709,7 @@ function compareWithBaseline(results, baseline) {
   };
 }
 
-async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
+async function runLiveCases(baseURL, dataset, checkedCases, datasetText, options = {}) {
   const account = await signInEvalUser(baseURL);
   const results = [];
   const createdAt = new Date().toISOString();
@@ -720,6 +724,8 @@ async function runLiveCases(baseURL, dataset, checkedCases, datasetText) {
     promptVersion: answerConfiguration.promptVersion,
     evidenceVersion: answerConfiguration.evidenceVersion,
     retrievalVersion: "none-selected-evidence-only",
+    suiteScope: options.suiteScope || "full",
+    caseIDs: checkedCases.map((testCase) => testCase.id),
     judgeModel: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_MODEL || process.env.PERMITEXT_RESEARCH_MODEL || "gpt-5.6-terra",
     judgeReasoningEffort: process.env.PERMITEXT_RESEARCH_EVAL_JUDGE_REASONING_EFFORT || "medium",
     judgePromptVersion,
@@ -929,9 +935,10 @@ function runSelfTest(dataset, datasetText) {
 
 async function main() {
   if (process.argv.includes("--help")) {
-    console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live]");
+    console.log("Usage: node tests/research-evals.mjs [--self-test | --run-live] [--case CASE_ID]");
     console.log("Default mode validates the dataset and canonical evidence without calling OpenAI.");
     console.log("Live mode makes two paid model requests per case and additionally requires PERMITEXT_RUN_PAID_RESEARCH_EVALS=1 and OPENAI_API_KEY.");
+    console.log("Use --case with an approved case ID for a targeted diagnostic run; targeted runs never replace the full baseline.");
     return;
   }
   if (argumentValue("--cases")) {
@@ -942,7 +949,15 @@ async function main() {
   validateDataset(dataset);
   const approvedCases = approvedEvaluationCases(dataset);
   assert(approvedCases.length > 0, "Research eval dataset has no approved cases.");
-  const approvedDataset = { ...dataset, cases: approvedCases };
+  const requestedCaseID = argumentValue("--case");
+  const selectedCases = requestedCaseID
+    ? approvedCases.filter((testCase) => testCase.id === requestedCaseID)
+    : approvedCases;
+  if (requestedCaseID) {
+    assert(selectedCases.length === 1, `No approved research evaluation case matches --case ${requestedCaseID}.`);
+  }
+  const suiteScope = requestedCaseID ? "targeted" : "full";
+  const approvedDataset = { ...dataset, cases: selectedCases };
   if (selfTestMode) {
     runSelfTest(approvedDataset, datasetText);
     return;
@@ -979,7 +994,7 @@ async function main() {
     process.env.VERCEL_ENV = "";
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
     process.env.PERMITEXT_RESEARCH_MOCK = liveMode ? "" : "1";
-    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(approvedCases.length);
+    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(selectedCases.length);
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);
     server = createServer(handleRequest);
     await new Promise((resolveListening, rejectListening) => {
@@ -998,7 +1013,7 @@ async function main() {
       return;
     }
     if (liveMode) {
-      await runLiveCases(baseURL, approvedDataset, checkedCases, datasetText);
+      await runLiveCases(baseURL, approvedDataset, checkedCases, datasetText, { suiteScope });
     } else {
       await runMockConversationCases(baseURL, checkedCases);
       console.log("All cases are ready. Paid evals remain locked until explicitly approved.");

@@ -56,6 +56,8 @@ The pricing values are never guessed. Without an explicit pricing version, all t
 
 Results are written to ignored `evals/results/` JSON and Markdown files. Each run records its ID and timestamp, dataset hash, code editions, Git commit, model/reasoning settings, prompt/evidence/retrieval versions, answers, citations, timing, tokens, reliable estimated cost, automatic scores, and comparison with the preceding saved baseline. Model judging is a regression signal; human review remains the authority for answer keys and score overrides.
 
+During prompt development, `npm run eval:research:live -- --case CASE_ID` runs one approved case with one answer call and one judge call. The result is marked `targeted` and cannot replace a completed full-suite baseline. Run the complete approved suite after the targeted case is satisfactory.
+
 ## Owner console
 
 Open `/internal` on the local Permitext server while signed in. Local access is available only from the machine running the development server. In a hosted environment, the console is disabled unless explicitly enabled and the signed-in user ID is listed in `PERMITEXT_INTERNAL_OWNER_USER_IDS`.

@@ -2545,6 +2545,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
           "Use selected document structure such as exception headings when it is supplied. If an exception and its conditions are selected, state the conditional result instead of demanding unselected text merely to acknowledge that conditional rule.",
           "When a category, table row, shared-facility condition, or calculation input is needed but not established, name that missing item specifically rather than asking only for generic project information.",
+          "When selected evidence supplies a calculation procedure, briefly explain every material step and exception in that procedure even when missing inputs prevent a final numeric result.",
+          "Do not merely say that a table or category must be checked. Identify the project-specific use category that must be selected from actual use and explain what the selected evidence already establishes.",
           "If the question cannot be answered from the selected evidence, say so directly.",
         "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
       ].join(" "),
