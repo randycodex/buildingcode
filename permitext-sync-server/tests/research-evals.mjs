@@ -432,10 +432,18 @@ function scoreCase(dataset, testCase, answer, answerTimeMilliseconds, judge) {
     "practicalUsefulness"
   ];
   const passingScore = dataset.automaticScoring.scoreScale.passing;
+  const requiredRubricsSatisfied =
+    judge.judgment.requiredConcepts.every((item) => item.met) &&
+    judge.judgment.uncertaintyConditions.every((item) => item.met) &&
+    judge.judgment.forbiddenClaims.every((item) => !item.violated);
   return {
     metrics,
     overallScore,
-    passed: overallScore >= passingScore && criticalDimensions.every((dimension) => metrics[dimension].score >= passingScore),
+    passed:
+      requiredRubricsSatisfied &&
+      overallScore >= passingScore &&
+      criticalDimensions.every((dimension) => metrics[dimension].score >= passingScore),
+    requiredRubricsSatisfied,
     rubricChecks: {
       requiredConcepts: judge.judgment.requiredConcepts,
       forbiddenClaims: judge.judgment.forbiddenClaims,
@@ -872,6 +880,16 @@ function runSelfTest(dataset, datasetText) {
   assert(
     incomplete.metrics.citationCorrectness.score === 0 && incomplete.metrics.citationCompleteness.score === 0 && !incomplete.passed,
     "Research eval self-test did not reject missing citations."
+  );
+  const incompleteUncertaintyJudge = structuredClone(judge);
+  incompleteUncertaintyJudge.judgment.uncertaintyConditions[0].met = false;
+  incompleteUncertaintyJudge.judgment.uncertaintyConditions[0].rationale = "Intentionally omitted by the self-test.";
+  const incompleteUncertainty = scoreCase(dataset, testCase, answer, 15_000, incompleteUncertaintyJudge);
+  assert(
+    incompleteUncertainty.metrics.recognitionOfMissingProjectFacts.score === 3 &&
+      !incompleteUncertainty.requiredRubricsSatisfied &&
+      !incompleteUncertainty.passed,
+    "Research eval self-test allowed a missing required uncertainty condition to pass on weighted score."
   );
   const configuration = {
     runID: "self-test",
