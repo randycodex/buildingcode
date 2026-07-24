@@ -24,6 +24,7 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let sampledItemIDs: [Int64]
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]
+    let rejectionReasons: [String: BackendUserContentRejection]
     let latestEventID: Int64?
     let entitlement: AppEntitlement?
 }
@@ -92,6 +93,7 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: serverBatch.mutations.map(\.recordID),
             rejectedMutationIDs: [],
+            rejectionReasons: [:],
             latestEventID: nil,
             entitlement: nil
         )
@@ -193,6 +195,7 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             sampledItemIDs: batch.items.map(\.id),
             acceptedMutationIDs: response.acceptedMutationIDs,
             rejectedMutationIDs: response.rejectedMutationIDs ?? [],
+            rejectionReasons: response.rejectionReasons ?? [:],
             latestEventID: response.latestEventID ?? response.syncRevision,
             entitlement: response.entitlement
         )
@@ -415,6 +418,7 @@ struct UserContentSyncEngine {
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
                 rejectedMutationIDs: [],
+                rejectionReasons: [:],
                 latestEventID: nil,
                 entitlement: nil
             )
@@ -426,6 +430,7 @@ struct UserContentSyncEngine {
         var sampledItemIDs: [Int64] = []
         var acceptedMutationIDs: [String] = []
         var rejectedMutationIDs: [String] = []
+        var rejectionReasons: [String: BackendUserContentRejection] = [:]
         var latestEventID = checkpoint.latestEventID
         var entitlement: AppEntitlement?
         var processedBatchCount = 0
@@ -444,6 +449,7 @@ struct UserContentSyncEngine {
                 sampledItemIDs.append(contentsOf: report.sampledItemIDs)
                 acceptedMutationIDs.append(contentsOf: report.acceptedMutationIDs)
                 rejectedMutationIDs.append(contentsOf: report.rejectedMutationIDs)
+                rejectionReasons.merge(report.rejectionReasons) { _, latest in latest }
                 latestEventID = report.latestEventID ?? latestEventID
                 entitlement = report.entitlement ?? entitlement
                 let acceptedIDs = Set(report.acceptedMutationIDs)
@@ -456,7 +462,9 @@ struct UserContentSyncEngine {
                     if acceptedIDs.contains(mutation.recordID) {
                         try markCompleted(item)
                     } else if rejectedIDs.contains(mutation.recordID) {
-                        try? markFailed(item, error: UserContentSyncError.rejectedByServer("Server has newer data for this record. Pull latest changes before retrying."))
+                        let message = report.rejectionReasons[mutation.recordID]?.message ??
+                            "Server has newer data for this record. Pull latest changes before retrying."
+                        try? markFailed(item, error: UserContentSyncError.rejectedByServer(message))
                     } else {
                         try? markFailed(item, error: UserContentSyncError.rejectedByServer("Server did not accept this sync item."))
                     }
@@ -480,6 +488,7 @@ struct UserContentSyncEngine {
                 sampledItemIDs: [],
                 acceptedMutationIDs: [],
                 rejectedMutationIDs: [],
+                rejectionReasons: [:],
                 latestEventID: latestEventID,
                 entitlement: nil
             )
@@ -495,6 +504,7 @@ struct UserContentSyncEngine {
             sampledItemIDs: Array(sampledItemIDs.prefix(100)),
             acceptedMutationIDs: acceptedMutationIDs,
             rejectedMutationIDs: rejectedMutationIDs,
+            rejectionReasons: rejectionReasons,
             latestEventID: latestEventID,
             entitlement: entitlement
         )

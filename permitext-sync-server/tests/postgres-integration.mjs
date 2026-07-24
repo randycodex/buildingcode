@@ -224,6 +224,28 @@ try {
     }
   };
 
+  const freeProjectPush = await request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: { user: { id: userID }, mutations: [project] }
+    }
+  });
+  assert(freeProjectPush.response.ok, "Postgres Free-plan enforcement request failed.");
+  assert(
+    freeProjectPush.json.rejectedMutationIDs.length === 1,
+    "Postgres accepted a new Project without a server-owned Pro entitlement."
+  );
+  assert(await countRows("permitext_projects") === 0, "Rejected Free Project was written to Postgres.");
+
+  const initialLifetimeGrant = await request("/admin/lifetime-grants/grant", {
+    method: "POST",
+    token: adminToken,
+    body: { userID }
+  });
+  assert(initialLifetimeGrant.response.ok, "Initial Postgres Pro grant failed.");
+
   const push = await request("/sync/push", {
     method: "POST",
     token,

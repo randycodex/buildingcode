@@ -12,6 +12,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import {
+  enforceFreePlanMutationBatch,
+  hasActiveProEntitlement
+} from "./entitlement-contract.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import {
@@ -2746,120 +2750,10 @@ async function handleResearchInterpretation(request, response) {
   }
   const context = await authenticatedUserContext(request, response, userID);
   if (!context) return;
-
-  const question = normalizedResearchText(body.question, 2_000);
-  if (question.length < 3) {
-    sendError(response, 400, "Enter a research question.");
-    return;
-  }
-  const requestedIDs = Array.isArray(body.sectionIDs)
-    ? Array.from(new Set(body.sectionIDs.map((value) => String(value).trim()).filter(Boolean)))
-    : [];
-  if (!requestedIDs.length || requestedIDs.length > 12 || requestedIDs.some((id) => !/^\d+$/.test(id))) {
-    sendError(response, 400, "Provide between 1 and 12 numeric section IDs.");
-    return;
-  }
-
-  try {
-    const evidence = await researchEvidenceForSectionIDs(requestedIDs);
-    const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
-    const usageEntries = mockMode ? [] : await researchUsageSince(userID, currentMonthStart());
-    const requestLimit = monthlyResearchRequestLimit();
-    if (!mockMode && usageEntries.length >= requestLimit) {
-      sendJSON(response, 429, {
-        error: "This account reached its monthly AI research limit.",
-        code: "RESEARCH_MONTHLY_LIMIT",
-        usage: researchUsageSummary(usageEntries)
-      });
-      return;
-    }
-    const result = mockMode
-      ? {
-          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, evidence), evidence),
-          model: "permitext-mock",
-          configuration: researchModelConfiguration(),
-          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
-        }
-      : await openAIResearchInterpretation(question, evidence, userID);
-    const usage = result.usage;
-    const estimatedCost = estimatedResearchCost(usage);
-    if (!mockMode) {
-      await recordResearchUsage(userID, {
-        id: randomUUID(),
-        model: result.model,
-        requestedModel: result.requestedModel || result.model,
-        mode: "openai",
-        ...usage,
-        promptVersion: result.configuration.promptVersion,
-        evidenceVersion: result.configuration.evidenceVersion,
-        estimatedCostUSD: estimatedCost.estimatedUSD,
-        pricingVersion: estimatedCost.pricingVersion,
-        createdAt: new Date().toISOString()
-      });
-    }
-    console.info(JSON.stringify({
-      event: "research_interpretation",
-      user: createHash("sha256").update(userID).digest("hex").slice(0, 16),
-      mode: mockMode ? "mock" : "openai",
-      model: result.model,
-      promptVersion: result.configuration.promptVersion,
-      evidenceVersion: result.configuration.evidenceVersion,
-      codeEdition: defaultResearchCodeEdition,
-      codeVersion: defaultSyncCodeVersion,
-      evidenceSections: evidence.length,
-      inputTokens: usage.inputTokens,
-      outputTokens: usage.outputTokens,
-      totalTokens: usage.totalTokens
-    }));
-    sendJSON(response, 200, {
-      mode: mockMode ? "mock" : "openai",
-      model: result.model,
-      promptVersion: result.configuration.promptVersion,
-      evidenceVersion: result.configuration.evidenceVersion,
-      codeEdition: defaultResearchCodeEdition,
-      codeVersion: defaultSyncCodeVersion,
-      ...result.interpretation,
-      evidenceSectionIDs: evidence.map((section) => section.sectionID),
-      usage,
-      estimatedCostUSD: estimatedCost.estimatedUSD,
-      pricingVersion: estimatedCost.pricingVersion,
-      monthlyUsage: researchUsageSummary(mockMode ? [] : [
-        ...usageEntries,
-        {
-          ...usage,
-          estimatedCostUSD: estimatedCost.estimatedUSD,
-          pricingVersion: estimatedCost.pricingVersion
-        }
-      ], { mockMode }),
-      disclaimer: "AI-generated research assistance, not an official code determination."
-    });
-  } catch (error) {
-    if (error.code === "INVALID_RESEARCH_SECTION") {
-      sendError(response, 400, error.message);
-      return;
-    }
-    if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
-      sendError(response, 422, "This code section is incomplete and cannot be analyzed yet.");
-      return;
-    }
-    if (error.code === "RESEARCH_NOT_CONFIGURED") {
-      sendError(response, 503, error.message);
-      return;
-    }
-    if (error.code === "RESEARCH_EVAL_SPEND_CAP") {
-      sendError(response, 503, error.message);
-      return;
-    }
-    if (error.code === "RESEARCH_REFUSAL") {
-      sendError(response, 422, error.message);
-      return;
-    }
-    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION", "RESEARCH_PROVIDER_ERROR", "TimeoutError"].includes(error.code || error.name)) {
-      sendError(response, 502, "The research model could not return a verified, cited answer.");
-      return;
-    }
-    throw error;
-  }
+  sendJSON(response, 410, {
+    error: "This Research entry point has been retired. Select enacted text and use a private Research conversation.",
+    code: "RESEARCH_CONVERSATIONS_REQUIRED"
+  });
 }
 
 function researchConversationSummary(conversation) {
@@ -5000,6 +4894,17 @@ function includeSubmittedMutationIDAliases(recordIDs, aliasesByCanonicalID) {
   ])));
 }
 
+function includeSubmittedMutationReasonAliases(reasons, aliasesByCanonicalID) {
+  const expanded = {};
+  for (const [recordID, reason] of Object.entries(reasons || {})) {
+    expanded[recordID] = reason;
+    for (const alias of aliasesByCanonicalID.get(recordID) || []) {
+      expanded[alias] = reason;
+    }
+  }
+  return expanded;
+}
+
 function canonicalCodeVersion(value) {
   const candidate = String(value || "").trim();
   const normalized = candidate.toLocaleLowerCase("en-US");
@@ -5686,7 +5591,15 @@ async function handleWorkboardAssetUpload(request, response) {
     sendError(response, 400, "Missing or invalid Workboard asset identity.");
     return;
   }
-  if (!await authenticatedUserContext(request, response, userID)) return;
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Workboard image uploads require Pro.",
+      code: "PRO_REQUIRED_WORKBOARDS"
+    });
+    return;
+  }
   if (!blobStorageConfigured()) {
     sendError(response, 503, "Private Workboard image storage is not configured.");
     return;
@@ -5829,6 +5742,10 @@ async function handlePush(request, response) {
         result.rejectedMutationIDs,
         canonicalizedBatch.aliasesByCanonicalID
       ),
+      rejectionReasons: includeSubmittedMutationReasonAliases(
+        result.rejectionReasons,
+        canonicalizedBatch.aliasesByCanonicalID
+      ),
       latestEventID: result.latestEventID,
       syncRevision: result.latestEventID,
       entitlement: result.entitlement,
@@ -5844,7 +5761,12 @@ async function handlePush(request, response) {
   store.users[userID] = body.batch?.user ? { ...(store.users[userID] || {}), ...body.batch.user } : store.users[userID];
 
   const existing = await canonicalizeMutations(store.mutationsByUserID[userID] || []);
-  const merge = mergeMutations(existing, incoming);
+  const planEnforcement = enforceFreePlanMutationBatch(
+    existing,
+    incoming,
+    store.entitlements[userID] || null
+  );
+  const merge = mergeMutations(existing, planEnforcement.acceptedMutations);
   store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
   const latestEventID = await latestSyncEventID(userID);
@@ -5854,7 +5776,11 @@ async function handlePush(request, response) {
       canonicalizedBatch.aliasesByCanonicalID
     ),
     rejectedMutationIDs: includeSubmittedMutationIDAliases(
-      merge.rejectedMutationIDs,
+      [...merge.rejectedMutationIDs, ...planEnforcement.rejectedMutationIDs],
+      canonicalizedBatch.aliasesByCanonicalID
+    ),
+    rejectionReasons: includeSubmittedMutationReasonAliases(
+      planEnforcement.rejectionReasons,
       canonicalizedBatch.aliasesByCanonicalID
     ),
     latestEventID,

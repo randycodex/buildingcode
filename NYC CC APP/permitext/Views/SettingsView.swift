@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var showsProjectDeleteWarning = false
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
+    private let webWorkspaceURL = URL(string: "https://permitext-sync.vercel.app")!
 
     private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
@@ -62,6 +63,10 @@ struct SettingsView: View {
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         syncCard
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        webWorkspaceCard
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
@@ -451,9 +456,35 @@ struct SettingsView: View {
         case .annotation: return "Note or tag conflict"
         case .project: return "Project conflict"
         case .projectSection: return "Project section conflict"
-        case .workboard: return "Workboard conflict"
+        case .workboard: return "Web Workboard update"
         case .continuity: return "Reading position conflict"
         case .codeVersionClear: return "Cleared data conflict"
+        }
+    }
+
+    private var webWorkspaceCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CodeEyebrow(text: "Web Workspace", accent: settingsChromeColor)
+
+            Text("Research conversations and editable Workboards are available on the web today. iOS recognizes their account records but does not edit them yet.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button {
+                openURL(webWorkspaceURL)
+            } label: {
+                Label("Open Permitext Web", systemImage: "safari")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.primary.opacity(0.08))
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint("Opens the Permitext web workspace in your browser")
         }
     }
 

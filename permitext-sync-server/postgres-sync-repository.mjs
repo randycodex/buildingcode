@@ -1,3 +1,5 @@
+import { freePlanLimits } from "./entitlement-contract.mjs";
+
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
   return typeof value === "string" ? JSON.parse(value) : value;
@@ -47,6 +49,80 @@ function mutationWithServerEventID(mutation, value) {
 }
 
 export function createPostgresSyncRepository(sql) {
+  function activeProPredicate(ownerUserID) {
+    return sql`
+      EXISTS (
+        SELECT 1
+        FROM permitext_entitlements
+        WHERE user_id = ${ownerUserID}
+          AND lower(plan) = 'pro'
+          AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+      )
+    `;
+  }
+
+  function activeExistingRecordPredicate(recordID, ownerUserID) {
+    return sql`
+      EXISTS (
+        SELECT 1
+        FROM permitext_user_content_records
+        WHERE record_id = ${recordID}
+          AND user_id = ${ownerUserID}
+          AND deleted_at IS NULL
+      )
+    `;
+  }
+
+  function quotaPredicate(userID, mutation) {
+    const recordID = mutationRecordID(mutation);
+    const { kind, record } = mutationEntry(mutation);
+    const ownerUserID = record.userID || userID;
+    const pro = activeProPredicate(ownerUserID);
+    const existing = activeExistingRecordPredicate(recordID, ownerUserID);
+    if (deletedAt(record) || kind === "continuity" || kind === "codeVersionClear") {
+      return sql`TRUE`;
+    }
+    if (kind === "savedItem") {
+      return sql`
+        (
+          ${pro}
+          OR ${existing}
+          OR (
+            SELECT count(*)
+            FROM permitext_user_content_records
+            WHERE user_id = ${ownerUserID}
+              AND entity_kind = 'savedItem'
+              AND deleted_at IS NULL
+          ) < ${freePlanLimits.savedItems}
+        )
+      `;
+    }
+    if (kind === "annotation" && record.tags === undefined && String(record.noteBody || "").trim()) {
+      return sql`
+        (
+          ${pro}
+          OR ${existing}
+          OR (
+            SELECT count(*)
+            FROM permitext_user_content_records
+            WHERE user_id = ${ownerUserID}
+              AND entity_kind = 'annotation'
+              AND deleted_at IS NULL
+              AND coalesce(mutation->'annotation'->>'noteBody', '') <> ''
+              AND NOT (mutation->'annotation' ? 'tags')
+          ) < ${freePlanLimits.notes}
+        )
+      `;
+    }
+    if (kind === "annotation" && Array.isArray(record.tags) && record.tags.length > 0) {
+      return pro;
+    }
+    if (kind === "project" || kind === "projectSection" || kind === "workboard") {
+      return pro;
+    }
+    return sql`TRUE`;
+  }
+
   function compatibilityQuery(userID, mutation) {
     const recordID = mutationRecordID(mutation);
     const { kind, record } = mutationEntry(mutation);
@@ -57,11 +133,11 @@ export function createPostgresSyncRepository(sql) {
         record_id, user_id, entity_kind, code_version, mutation,
         updated_at, deleted_at, server_version
       )
-      VALUES (
+      SELECT
         ${recordID}, ${ownerUserID}, ${kind}, ${record.codeVersion || null},
         ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz,
         ${deletedAt(record)}::timestamptz, 1
-      )
+      WHERE ${quotaPredicate(userID, mutation)}
       ON CONFLICT (record_id) DO UPDATE SET
         user_id = EXCLUDED.user_id,
         entity_kind = EXCLUDED.entity_kind,
@@ -305,7 +381,15 @@ export function createPostgresSyncRepository(sql) {
       SELECT entitlement FROM permitext_entitlements WHERE user_id = ${userID} LIMIT 1
     `);
 
-    const results = await sql.transaction(queries, { isolationMode: "ReadCommitted" });
+    let results;
+    for (let attempt = 1; attempt <= 3; attempt += 1) {
+      try {
+        results = await sql.transaction(queries, { isolationMode: "Serializable" });
+        break;
+      } catch (error) {
+        if (error?.code !== "40001" || attempt === 3) throw error;
+      }
+    }
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];
     mutations.forEach((mutation, index) => {

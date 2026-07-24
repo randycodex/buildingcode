@@ -27,6 +27,27 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertNotEqual(service.canCreateProject(currentCount: 0), .allowed)
     }
 
+    func testUpgradeCallToActionUsesStoreKitLocalizedPrice() {
+        XCTAssertEqual(
+            permitextUpgradeCallToActionTitle(
+                isStoreKitTestProActive: false,
+                currentPlan: .free,
+                proProductDisplayPrice: "$8.99",
+                isStoreKitBusy: false
+            ),
+            "Upgrade to Pro - $8.99/month"
+        )
+        XCTAssertEqual(
+            permitextUpgradeCallToActionTitle(
+                isStoreKitTestProActive: false,
+                currentPlan: .free,
+                proProductDisplayPrice: nil,
+                isStoreKitBusy: true
+            ),
+            "Loading Pro..."
+        )
+    }
+
     func testNYC2022SyncAliasesUseCanonicalServerIdentity() {
         XCTAssertEqual(
             UserContentSyncCodeVersion.server("2022 Construction Codes"),

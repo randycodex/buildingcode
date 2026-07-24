@@ -471,6 +471,19 @@ async function main() {
       "Visible web tabs no longer perform incremental foreground sync every 30 seconds."
     );
     assert(
+      workspaceScript.text.includes("const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 })") &&
+        workspaceScript.text.includes("function presentPlanLimitNotice(title, message)") &&
+        workspaceScript.text.includes("Free saved-section limit reached") &&
+        workspaceScript.text.includes("Free note limit reached") &&
+        workspaceScript.text.includes("Tags require Pro") &&
+        workspaceScript.text.includes("Projects require Pro") &&
+        workspaceScript.text.includes("PDF export requires Pro") &&
+        workspaceScript.text.includes("Workboards require Pro") &&
+        serverSource.includes("Workboard image uploads require Pro.") &&
+        syncRepositorySource.includes("lower(plan) = 'pro'"),
+      "Free and Pro capabilities are no longer enforced consistently by the web UI and server."
+    );
+    assert(
       syncStateScript.response.ok &&
         syncStateScript.text.includes("function bulkClearScope(record)") &&
         syncStateScript.text.includes("function bulkClearEventID(clearRecords, codeVersion, scope)") &&
@@ -1332,29 +1345,7 @@ async function main() {
     });
     assert(unauthorizedResearch.response.status === 401, "Research interpretation allowed an unauthenticated request.");
 
-    const emptyResearchQuestion = await request("/research/interpret", {
-      method: "POST",
-      token: signIn.json.account.backendSessionToken,
-      body: {
-        auth: { accountUserID: userID },
-        question: "",
-        sectionIDs: ["8881"]
-      }
-    });
-    assert(emptyResearchQuestion.response.status === 400, "Research interpretation accepted an empty question.");
-
-    const unknownResearchSection = await request("/research/interpret", {
-      method: "POST",
-      token: signIn.json.account.backendSessionToken,
-      body: {
-        auth: { accountUserID: userID },
-        question: "What notice is required?",
-        sectionIDs: ["999999999"]
-      }
-    });
-    assert(unknownResearchSection.response.status === 400, "Research interpretation accepted an unknown section.");
-
-    const researchInterpretation = await request("/research/interpret", {
+    const retiredResearchInterpretation = await request("/research/interpret", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
       body: {
@@ -1364,20 +1355,13 @@ async function main() {
         evidence: "The client must not be allowed to supply model evidence."
       }
     });
-    assert(researchInterpretation.response.ok, "Research interpretation failed in mock mode.");
-    assert(researchInterpretation.json.mode === "mock", "Research interpretation did not report mock mode.");
-    assert(researchInterpretation.json.model === "permitext-mock", "Research interpretation reported the wrong mock model.");
     assert(
-      researchInterpretation.json.evidenceSectionIDs.join(",") === "8881",
-      "Research interpretation did not use the requested canonical evidence."
+      retiredResearchInterpretation.response.status === 410,
+      "The retired whole-section Research entry point still accepted new analysis."
     );
     assert(
-      researchInterpretation.json.citations.length === 1 && researchInterpretation.json.citations[0].sectionID === "8881",
-      "Research interpretation returned an unverified citation."
-    );
-    assert(
-      researchInterpretation.json.disclaimer.includes("not an official code determination"),
-      "Research interpretation omitted its authority disclaimer."
+      retiredResearchInterpretation.json.code === "RESEARCH_CONVERSATIONS_REQUIRED",
+      "The retired Research entry point did not direct the client to private passage conversations."
     );
 
     const selectedResearchText = "Owners of such buildings shall notify the department in writing at least 72 hours prior to the commencement of any work pursuant to such permits.";
@@ -2109,6 +2093,13 @@ async function main() {
       "Native Apple pull did not receive the web note removal."
     );
 
+    const nativeAppleGrant = await request("/admin/lifetime-grants/grant", {
+      method: "POST",
+      token: grantAdminToken,
+      body: { userID: nativeAppleUserID }
+    });
+    assert(nativeAppleGrant.response.ok, "Native Apple Pro grant failed before the cross-device tag test.");
+
     const nativeTagID = `${nativeAppleUserID}:tags:${defaultSyncCodeVersion}:545:rid-0-0-0-164259`;
     const webTagPush = await request("/sync/push", {
       method: "POST",
@@ -2179,6 +2170,35 @@ async function main() {
       "Client-provided entitlement persisted after sign-in."
     );
 
+    const freeProjectRecordID = `apple:second-smoke-user:project:${defaultSyncCodeVersion}:free-project-smoke`;
+    const freeProjectMutation = {
+      project: {
+        id: "free-project-smoke",
+        userID: "apple:second-smoke-user",
+        codeVersion: defaultSyncCodeVersion,
+        clientID: "free-project-smoke",
+        name: "Free Project Attempt",
+        updatedAt: new Date().toISOString()
+      }
+    };
+    const freeProjectPush = await request("/sync/push", {
+      method: "POST",
+      token: secondSignInAfterClientEntitlement.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        batch: {
+          user: { id: "apple:second-smoke-user" },
+          mutations: [freeProjectMutation]
+        }
+      }
+    });
+    assert(freeProjectPush.response.ok, "Free project enforcement request failed.");
+    assert(
+      freeProjectPush.json.rejectedMutationIDs.includes(freeProjectRecordID) &&
+        freeProjectPush.json.rejectionReasons[freeProjectRecordID]?.code === "PRO_REQUIRED_PROJECTS",
+      "The server accepted a new Project from a Free account."
+    );
+
     const stripeCheckoutEvent = JSON.stringify({
       id: "evt_smoke_checkout",
       type: "checkout.session.completed",
@@ -2212,6 +2232,27 @@ async function main() {
       rawBody: stripeCheckoutEvent
     });
     assert(stripeCheckoutWebhook.response.ok, "Stripe checkout webhook failed.");
+
+    const proProjectPush = await request("/sync/push", {
+      method: "POST",
+      token: secondSignInAfterClientEntitlement.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: "apple:second-smoke-user" },
+        batch: {
+          user: { id: "apple:second-smoke-user" },
+          mutations: [{
+            project: {
+              ...freeProjectMutation.project,
+              updatedAt: new Date(Date.now() + 1_000).toISOString()
+            }
+          }]
+        }
+      }
+    });
+    assert(
+      proProjectPush.response.ok && proProjectPush.json.acceptedMutationIDs.includes(freeProjectRecordID),
+      "An active Pro entitlement did not unlock Project sync."
+    );
     assert(stripeCheckoutWebhook.json.changed === true, "Stripe checkout webhook did not update entitlement.");
 
     const secondSignInAfterStripeWebhook = await request("/account/sign-in", {

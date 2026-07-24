@@ -5,6 +5,21 @@ import os.signpost
 import Security
 import SwiftUI
 
+func permitextUpgradeCallToActionTitle(
+    isStoreKitTestProActive: Bool,
+    currentPlan: AppPlan,
+    proProductDisplayPrice: String?,
+    isStoreKitBusy: Bool
+) -> String {
+    if isStoreKitTestProActive { return "Pro (Test) Active" }
+    if currentPlan == .pro { return "Pro Active" }
+    if let displayPrice = proProductDisplayPrice?.trimmingCharacters(in: .whitespacesAndNewlines),
+       !displayPrice.isEmpty {
+        return "Upgrade to Pro - \(displayPrice)/month"
+    }
+    return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+}
+
 @MainActor
 final class CodeLibraryViewModel: ObservableObject {
     private struct AuthoredContentSnapshot: Sendable {
@@ -1701,10 +1716,12 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     var upgradeCallToActionTitle: String {
-        if isStoreKitTestProActive { return "Pro (Test) Active" }
-        if currentPlan == .pro { return "Pro Active" }
-        if proProductDisplayPrice != nil { return "Upgrade to Pro - $0.00/month" }
-        return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+        permitextUpgradeCallToActionTitle(
+            isStoreKitTestProActive: isStoreKitTestProActive,
+            currentPlan: currentPlan,
+            proProductDisplayPrice: proProductDisplayPrice,
+            isStoreKitBusy: isStoreKitBusy
+        )
     }
 
     var isStoreKitTestProActive: Bool {
@@ -1913,7 +1930,11 @@ final class CodeLibraryViewModel: ObservableObject {
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
             } else if !report.rejectedMutationIDs.isEmpty {
-                statusMessage = "Synced \(report.completedCount) of \(report.attemptedCount) local changes. Pull latest changes before retrying the rest."
+                let rejectionMessage = report.rejectedMutationIDs
+                    .compactMap { report.rejectionReasons[$0]?.message }
+                    .first
+                statusMessage = rejectionMessage ??
+                    "Synced \(report.completedCount) of \(report.attemptedCount) local changes. Pull latest changes before retrying the rest."
             } else if report.completedCount > 0 {
                 statusMessage = "Synced \(report.completedCount) local changes in \(Self.syncDurationText(elapsed))."
             }

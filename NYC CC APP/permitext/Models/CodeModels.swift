@@ -1109,9 +1109,15 @@ struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
     let batch: ServerUserContentBatch
 }
 
+struct BackendUserContentRejection: Codable, Hashable, Sendable {
+    let code: String
+    let message: String
+}
+
 struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     let acceptedMutationIDs: [String]
     let rejectedMutationIDs: [String]?
+    let rejectionReasons: [String: BackendUserContentRejection]?
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
     var entitlement: AppEntitlement? = nil
@@ -1397,6 +1403,7 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         return BackendUserContentPushResponse(
             acceptedMutationIDs: request.batch.mutations.map(\.recordID),
             rejectedMutationIDs: [],
+            rejectionReasons: nil,
             serverTime: Date()
         )
     }

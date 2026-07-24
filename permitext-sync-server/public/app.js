@@ -1021,99 +1021,6 @@ function officialSectionCitation(section) {
   return title ? `${citation} — ${title}` : citation;
 }
 
-async function copyResearchText(text, button, successMessage) {
-  if (await copyTextToClipboard(text)) {
-    showShareButtonResult(button, successMessage);
-  } else {
-    showShareButtonResult(button, "Could not copy");
-  }
-}
-
-async function activeResearchSections() {
-  const contentSummary = currentContentSummary();
-  const savedBySectionID = new Map(
-    (contentSummary.savedItems || []).map((item) => [String(item.sectionID || item.id || ""), item])
-  );
-  const openProjects = openProjectDetails();
-  const projectSections = (contentSummary.projectSections || [])
-    .filter((item) => openProjects.some((project) => projectSectionBelongsToProject(item, project)))
-    .map((item) => ({
-      ...item,
-      ...(savedBySectionID.get(String(item.sectionID || item.savedSectionID || item.itemID || "")) || {})
-    }));
-  const candidates = [
-    ...(state.readers || []).filter((reader) => reader.sectionID),
-    ...Object.values(sectionDetailsBySearch()).filter((detail) => detail?.sectionID),
-    ...projectSections
-  ];
-  const bySectionID = new Map();
-  candidates.forEach((section) => {
-    const sectionID = String(section.sectionID || section.id || "").trim();
-    if (!sectionID || bySectionID.has(sectionID)) return;
-    const chapter = chapters.find((item) => String(item.id) === String(section.chapterID || ""));
-    const summary = {
-      codePrefix: section.codePrefix || chapter?.codePrefix || "BC",
-      chapterID: section.chapterID || chapter?.id || "",
-      chapterNumber: section.chapterNumber || chapter?.chapterNumber || "",
-      sectionID,
-      sectionNumber: section.sectionNumber || "",
-      title: section.title || "Section"
-    };
-    const cached = sectionSummaryCache.get(sectionID);
-    bySectionID.set(sectionID, cached ? { ...summary, ...cached, sectionID } : summary);
-  });
-  const missingIDs = Array.from(bySectionID.values())
-    .filter((section) => !section.sectionNumber || !section.chapterID || section.title === "Section")
-    .map((section) => section.sectionID);
-  if (missingIDs.length) {
-    try {
-      const batches = [];
-      for (let index = 0; index < missingIDs.length; index += 100) {
-        batches.push(missingIDs.slice(index, index + 100));
-      }
-      const payloads = await Promise.all(
-        batches.map((batch) => api(`/code/sections?ids=${encodeURIComponent(batch.join(","))}`))
-      );
-      payloads.flatMap((payload) => payload.sections || []).forEach((section) => {
-        const sectionID = String(section.id || section.sectionID || "");
-        const requestedID = String(section.requestedID || sectionID);
-        if (!sectionID) return;
-        const normalized = { ...section, sectionID };
-        sectionSummaryCache.set(sectionID, normalized);
-        sectionSummaryCache.set(requestedID, normalized);
-        if (bySectionID.has(requestedID)) {
-          bySectionID.set(requestedID, { ...bySectionID.get(requestedID), ...normalized });
-        } else if (bySectionID.has(sectionID)) {
-          bySectionID.set(sectionID, { ...bySectionID.get(sectionID), ...normalized });
-        }
-      });
-    } catch {
-      // Keep locally available metadata if canonical hydration is temporarily unavailable.
-    }
-  }
-  const canonicalSections = new Map();
-  Array.from(bySectionID.values()).forEach((section) => {
-    const sectionID = String(section.sectionID || section.id || "");
-    if (sectionID && !canonicalSections.has(sectionID)) canonicalSections.set(sectionID, section);
-  });
-  return Array.from(canonicalSections.values());
-}
-
-function researchCitationText(section) {
-  return `${officialSectionCitation(section)}\n${sharedSectionURL(section.sectionID)}`;
-}
-
-function downloadResearchText(text, fileName = "permitext-citations.txt") {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = fileName;
-  document.body.append(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 0);
-}
-
 function paneIDForReader(reader, options = {}) {
   return options.isSearchResult ? "reader:search-result" : `reader:${reader.id}`;
 }
@@ -2200,6 +2107,37 @@ function isProAccount() {
   return currentPlan() === "pro";
 }
 
+const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 });
+let planLimitNoticePromise = null;
+
+function webFreePlanUsage() {
+  const summary = currentContentSummary();
+  const noteTargets = new Set(
+    (summary.annotations || [])
+      .filter((annotation) => !annotation.deletedAt && String(annotation.noteBody || "").trim())
+      .map((annotation) => [
+        annotation.codeVersion || defaultSyncCodeVersion,
+        annotation.sectionID || "",
+        normalizeAnnotationBlockID(annotation.blockID)
+      ].join(":"))
+  );
+  return {
+    savedItems: (summary.savedItems || []).filter((item) => !item.deletedAt).length,
+    notes: noteTargets.size
+  };
+}
+
+function presentPlanLimitNotice(title, message) {
+  if (planLimitNoticePromise) return planLimitNoticePromise;
+  planLimitNoticePromise = (async () => {
+    await showWebNotice(title, message, { confirmLabel: "View Plans" });
+    await focusUtility("settings");
+  })().finally(() => {
+    planLimitNoticePromise = null;
+  });
+  return planLimitNoticePromise;
+}
+
 function entitlementSourceLabel(entitlement = currentEntitlement()) {
   if (!entitlement) return "Free";
   if (entitlement.source === "webSubscription") return "Web subscription";
@@ -2701,6 +2639,10 @@ async function loadSyncedWorkboard(projectID) {
 async function saveSyncedWorkboard(board, options = {}) {
   const account = activeAccount();
   if (!account) throw new Error("Sign in to synchronize this Workboard.");
+  if (!isProAccount()) {
+    void presentPlanLimitNotice("Workboards require Pro", "Upgrade to Pro to create or edit Project Workboards.");
+    throw new Error("Workboards require Pro.");
+  }
   const projectID = String(board?.id || board?.projectID || "").trim();
   if (!projectID) throw new Error("This Workboard is missing its project ID.");
   const updatedAt = board.updatedAt || new Date().toISOString();
@@ -3281,7 +3223,9 @@ async function flushSyncOutbox(options = {}) {
           ...rejectedEntries.map((item) => ({
             ...item,
             conflictedAt: new Date().toISOString(),
-            lastError: "Server has a newer version of this record."
+            rejectionCode: payload.rejectionReasons?.[item.recordID]?.code || null,
+            lastError: payload.rejectionReasons?.[item.recordID]?.message ||
+              "Server has a newer version of this record."
           })),
           ...unknownEntries.map((item) => ({
             ...item,
@@ -3423,7 +3367,8 @@ async function pushMutation(mutation) {
     };
   }
   if (result.rejectedMutationIDs.includes(entry.recordID)) {
-    throw new Error("The server has a newer version of this record. Review the synced copy before retrying.");
+    const reason = result.payload?.rejectionReasons?.[entry.recordID];
+    throw new Error(reason?.message || "The server has a newer version of this record. Review the synced copy before retrying.");
   }
   if (!result.acceptedMutationIDs.includes(entry.recordID)) {
     throw new Error("This change remains queued for sync.");
@@ -3718,6 +3663,10 @@ function nextProjectName() {
 }
 
 async function createProjectFolder(details = {}) {
+  if (!isProAccount()) {
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Project workspaces and organize saved code by job.");
+    return null;
+  }
   const now = new Date().toISOString();
   const localFolderID = Date.now();
   const id = `web-project-${localFolderID.toString(36)}`;
@@ -3826,6 +3775,18 @@ function setLocalSectionSaved(sectionID, saved) {
 
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   const existingRecord = savedItemForSection(sectionPayload.sectionID);
+  if (
+    saved &&
+    !isSectionSaved(sectionPayload.sectionID) &&
+    !isProAccount() &&
+    webFreePlanUsage().savedItems >= webFreePlanLimits.savedItems
+  ) {
+    void presentPlanLimitNotice(
+      "Free saved-section limit reached",
+      `Free includes up to ${webFreePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
+    );
+    return false;
+  }
   if (!saved && options.removeProjectLinks !== false) {
     await removeSectionFromAllProjects(sectionPayload);
   }
@@ -3856,9 +3817,14 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // Keep the local record and queued mutation available while sync recovers.
   }
+  return true;
 }
 
 async function persistSectionInProject(project, sectionPayload) {
+  if (!isProAccount()) {
+    void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
+    return false;
+  }
   const record = projectSectionRecordForSection(project, sectionPayload);
   const current = (state.localProjectSections || []).filter((item) => item.id !== record.id);
   state.localProjectSections = [...current, record];
@@ -3873,6 +3839,7 @@ async function persistSectionInProject(project, sectionPayload) {
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
     // Keep the local project link and queued mutation available while sync recovers.
   }
+  return true;
 }
 
 async function removeSectionFromAllProjects(sectionPayload) {
@@ -4112,20 +4079,43 @@ function scheduleAnnotationPush(record) {
 }
 
 function setAnnotationNoteValue(target, value) {
-  if (!target?.sectionID) return;
+  if (!target?.sectionID) return false;
+  const currentNote = noteValueForTarget(target.sectionID, target.blockID);
+  const nextNote = String(value || "");
+  if (
+    !isProAccount() &&
+    !currentNote.trim() &&
+    nextNote.trim() &&
+    webFreePlanUsage().notes >= webFreePlanLimits.notes
+  ) {
+    void presentPlanLimitNotice(
+      "Free note limit reached",
+      `Free includes up to ${webFreePlanLimits.notes} notes. Upgrade to Pro to add more.`
+    );
+    return false;
+  }
   const existingTags = tagsForTarget(target.sectionID, target.blockID);
   const record = annotationRecordForTarget(target, {
-    noteBody: String(value || ""),
+    noteBody: nextNote,
     tags: existingTags,
     syncFields: ["noteBody"]
   });
   upsertLocalAnnotation(record);
   scheduleAnnotationPush(record);
+  return true;
 }
 
 function setAnnotationTags(target, tags) {
-  if (!target?.sectionID) return;
+  if (!target?.sectionID) return false;
+  const currentTags = tagsForTarget(target.sectionID, target.blockID);
   const nextTags = normalizeAnnotationTags(tags);
+  const addsTag = nextTags.some((tag) =>
+    !currentTags.some((current) => current.toLowerCase() === tag.toLowerCase())
+  );
+  if (!isProAccount() && addsTag) {
+    void presentPlanLimitNotice("Tags require Pro", "Upgrade to Pro to add tags and use advanced organization.");
+    return false;
+  }
   const noteBody = noteValueForTarget(target.sectionID, target.blockID);
   const record = annotationRecordForTarget(target, {
     noteBody,
@@ -4135,6 +4125,7 @@ function setAnnotationTags(target, tags) {
   upsertLocalAnnotation(record);
   refreshOpenSavedPanes().catch(() => {});
   scheduleAnnotationPush(record);
+  return true;
 }
 
 function renderAnnotationTagEditor(container, target, options = {}) {
@@ -4155,7 +4146,7 @@ function renderAnnotationTagEditor(container, target, options = {}) {
       chip.textContent = tag;
       chip.title = `Remove ${tag}`;
       chip.addEventListener("click", () => {
-        setAnnotationTags(target, tags.filter((item) => item.toLowerCase() !== tag.toLowerCase()));
+        if (!setAnnotationTags(target, tags.filter((item) => item.toLowerCase() !== tag.toLowerCase()))) return;
         renderAnnotationTagEditor(container, target, options);
         options.onChange?.();
       });
@@ -4171,14 +4162,16 @@ function renderAnnotationTagEditor(container, target, options = {}) {
   const input = document.createElement("input");
   input.className = "annotation-tag-input";
   input.type = "text";
-  input.placeholder = "Add tag";
+  input.placeholder = isProAccount() ? "Add tag" : "Pro required";
   input.setAttribute("aria-label", "Add tag");
+  input.disabled = !isProAccount();
+  if (!isProAccount()) input.title = "Tags require Pro";
   input.addEventListener("keydown", (event) => {
     if (event.key !== "Enter") return;
     event.preventDefault();
     const value = input.value.trim();
     if (!value) return;
-    setAnnotationTags(target, [...tags, value]);
+    if (!setAnnotationTags(target, [...tags, value])) return;
     input.value = "";
     renderAnnotationTagEditor(container, target, options);
     options.onChange?.();
@@ -4464,7 +4457,7 @@ function noteValueForSection(sectionID) {
 }
 
 function setSectionNoteValue(sectionID, value) {
-  setAnnotationNoteValue({ sectionID, codeVersion: defaultSyncCodeVersion, blockID: "" }, value);
+  return setAnnotationNoteValue({ sectionID, codeVersion: defaultSyncCodeVersion, blockID: "" }, value);
 }
 
 function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
@@ -4529,7 +4522,10 @@ function ensureReaderNotesSheet(panel, reader) {
     const sectionID = sheet.dataset.sectionId || "";
     const blockID = sheet.dataset.blockId || "";
     const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: defaultSyncCodeVersion };
-    setAnnotationNoteValue(target, input.value);
+    if (!setAnnotationNoteValue(target, input.value)) {
+      input.value = noteValueForTarget(sectionID, blockID);
+      return;
+    }
     syncReaderNoteControls(sectionID, blockID, input.value, { source: input });
   });
 
@@ -4547,8 +4543,13 @@ function removeReaderNotesProjectPicker(sheet) {
 }
 
 async function openReaderNotesProjectPicker(sheet, sectionPayload) {
+  if (!isProAccount()) {
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved code in Project workspaces.");
+    return;
+  }
   if (!isSectionSaved(sectionPayload.sectionID)) {
-    await persistSectionBookmark(sectionPayload, true);
+    const saved = await persistSectionBookmark(sectionPayload, true);
+    if (!saved) return;
     syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
   }
   showReaderNotesProjectPicker(sheet, sectionPayload);
@@ -5067,7 +5068,10 @@ function renderSectionComments(commentsList, targets) {
     textarea.placeholder = "Add a note";
     textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(target.sectionNumber, target.title)}`);
     textarea.addEventListener("input", () => {
-      setAnnotationNoteValue(target, textarea.value);
+      if (!setAnnotationNoteValue(target, textarea.value)) {
+        textarea.value = noteValueForTarget(target.sectionID, target.blockID);
+        return;
+      }
       syncReaderNoteControls(target.sectionID, target.blockID, textarea.value, { source: textarea });
     });
 
@@ -6510,7 +6514,11 @@ async function renderSectionDetail(searchID, detail) {
 
   let noteTimer = null;
   textarea.addEventListener("input", () => {
-    setAnnotationNoteValue(sectionTarget, textarea.value);
+    if (!setAnnotationNoteValue(sectionTarget, textarea.value)) {
+      textarea.value = noteValueForTarget(sectionTarget.sectionID, "");
+      saveState.textContent = "";
+      return;
+    }
     syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea });
     saveState.textContent = "Saving...";
     window.clearTimeout(noteTimer);
@@ -6730,153 +6738,6 @@ function renderResearchInterpretation(container, result, options = {}) {
   card.append(disclaimer);
   if (options.message) renderResearchFeedback(card, options.message, options.conversationID);
   container.append(card);
-}
-
-async function renderLegacyResearch(paneID) {
-  const panel = renderUtility(analysisTemplate, paneID);
-  panel.classList.add("analysis-panel");
-  const content = panel.querySelector(".analysis-content");
-  const sections = await activeResearchSections();
-
-  const trustBanner = document.createElement("aside");
-  trustBanner.className = "research-trust-banner";
-  trustBanner.setAttribute("role", "note");
-  const trustHeading = document.createElement("strong");
-  trustHeading.textContent = "AI-assisted research — not an official interpretation";
-  const trustCopy = document.createElement("p");
-  trustCopy.textContent = "Verify conclusions against the enacted text and applicable agency guidance. Canonical code text and your private notes remain separate from generated analysis.";
-  trustBanner.append(trustHeading, trustCopy);
-  content.append(trustBanner);
-
-  const summary = document.createElement("article");
-  summary.className = "analysis-card";
-  const label = document.createElement("p");
-  label.className = "section-label";
-  label.textContent = "Research set";
-  const heading = document.createElement("h3");
-  heading.textContent = sections.length === 1 ? "1 active code section" : `${sections.length} active code sections`;
-  const explanation = document.createElement("p");
-  explanation.textContent = sections.length
-    ? "This set follows sections in open readers, search details, and project details. Citations contain official code references and canonical links; private notes are excluded."
-    : "Open a specific section or a project detail to start a citation set. Private notes stay separate from official code references.";
-  const copyAllButton = document.createElement("button");
-  copyAllButton.className = "ghost-button research-copy-all";
-  copyAllButton.type = "button";
-  copyAllButton.title = "Copy all citations";
-  copyAllButton.textContent = "Copy citations";
-  copyAllButton.disabled = sections.length === 0;
-  copyAllButton.addEventListener("click", () => {
-    copyResearchText(sections.map(researchCitationText).join("\n\n"), copyAllButton, "Citations copied");
-  });
-  const downloadButton = document.createElement("button");
-  downloadButton.className = "ghost-button";
-  downloadButton.type = "button";
-  downloadButton.textContent = "Download .txt";
-  downloadButton.disabled = sections.length === 0;
-  downloadButton.addEventListener("click", () => {
-    downloadResearchText(sections.map(researchCitationText).join("\n\n"));
-  });
-  const summaryActions = document.createElement("div");
-  summaryActions.className = "research-summary-actions";
-  summaryActions.append(copyAllButton, downloadButton);
-  summary.append(label, heading, explanation, summaryActions);
-  content.append(summary);
-
-  const interpreter = document.createElement("article");
-  interpreter.className = "analysis-card research-interpreter";
-  const interpreterLabel = document.createElement("p");
-  interpreterLabel.className = "section-label";
-  interpreterLabel.textContent = "AI-assisted research";
-  const interpreterHeading = document.createElement("h3");
-  interpreterHeading.textContent = "Ask about this research set";
-  const interpreterExplanation = document.createElement("p");
-  interpreterExplanation.textContent = sections.length
-    ? `Uses ${sections.length} selected official code ${sections.length === 1 ? "section" : "sections"}. Private notes and general web content are excluded.`
-    : "Open code sections before asking a research question.";
-  const questionLabel = document.createElement("label");
-  questionLabel.className = "research-question-label";
-  questionLabel.textContent = "Research question";
-  const questionInput = document.createElement("textarea");
-  questionInput.className = "research-question-input";
-  questionInput.rows = 4;
-  questionInput.maxLength = 2000;
-  questionInput.placeholder = "For example: What notice is required before this work begins?";
-  questionInput.value = researchQuestionDraft;
-  questionInput.addEventListener("input", () => {
-    researchQuestionDraft = questionInput.value;
-    askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
-  });
-  const askButton = document.createElement("button");
-  askButton.className = "ghost-button research-ask-button";
-  askButton.type = "button";
-  askButton.textContent = "Analyze selected codes";
-  askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
-  const status = document.createElement("p");
-  status.className = "research-interpreter-status";
-  if (!activeAccount()) status.textContent = "Sign in from Settings to use AI-assisted research.";
-  const resultContainer = document.createElement("section");
-  resultContainer.className = "research-interpretation-result";
-  const selectedIDs = sections.map((section) => String(section.sectionID));
-  if (researchInterpretationResult?.evidenceSectionIDs?.join(",") === selectedIDs.join(",")) {
-    renderResearchInterpretation(resultContainer, researchInterpretationResult);
-  }
-  askButton.addEventListener("click", async () => {
-    const account = activeAccount();
-    if (!account || !sections.length || researchQuestionDraft.trim().length < 3) return;
-    askButton.disabled = true;
-    questionInput.disabled = true;
-    status.textContent = "Reviewing the selected code sections…";
-    clear(resultContainer);
-    try {
-      const result = await postJSON("/research/interpret", {
-        auth: { accountUserID: account.userID },
-        question: researchQuestionDraft.trim(),
-        sectionIDs: selectedIDs
-      }, { token: account.sessionToken });
-      researchInterpretationResult = result;
-      renderResearchInterpretation(resultContainer, result);
-      status.textContent = result.mode === "mock"
-        ? "Prototype mode is active; no external model was called."
-        : `Answer verified against ${result.citations.length} selected ${result.citations.length === 1 ? "citation" : "citations"}.`;
-    } catch (error) {
-      status.textContent = error.message || "Code interpretation is temporarily unavailable.";
-    } finally {
-      questionInput.disabled = false;
-      askButton.disabled = !activeAccount() || !sections.length || researchQuestionDraft.trim().length < 3;
-    }
-  });
-  questionLabel.append(questionInput);
-  interpreter.append(interpreterLabel, interpreterHeading, interpreterExplanation, questionLabel, askButton, status);
-  content.append(interpreter, resultContainer);
-
-  sections.forEach((section) => {
-    const row = document.createElement("article");
-    row.className = "saved-row research-evidence-row";
-    const citation = document.createElement("strong");
-    citation.textContent = officialSectionCitation(section);
-    const link = document.createElement("span");
-    link.textContent = sharedSectionURL(section.sectionID);
-    const actions = document.createElement("div");
-    actions.className = "research-evidence-actions";
-    const openButton = document.createElement("button");
-    openButton.className = "ghost-button";
-    openButton.type = "button";
-    openButton.textContent = "Open";
-    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(section));
-    const copyButton = document.createElement("button");
-    copyButton.className = "ghost-button";
-    copyButton.type = "button";
-    copyButton.title = "Copy citation";
-    copyButton.textContent = "Copy";
-    copyButton.addEventListener("click", () => {
-      copyResearchText(researchCitationText(section), copyButton, "Citation copied");
-    });
-    actions.append(openButton, copyButton);
-    row.append(citation, link, actions);
-    content.append(row);
-  });
-
-  return panel;
 }
 
 async function renderUtilityInstance(instance) {
@@ -8628,6 +8489,10 @@ function openSavedActionMenu(panel, anchor, items) {
 }
 
 function printSavedItemsAsPDF(items, scopeLabel) {
+  if (!isProAccount()) {
+    void presentPlanLimitNotice("PDF export requires Pro", "Upgrade to Pro to export saved code, notes, and tags as a PDF.");
+    return;
+  }
   const frame = document.createElement("iframe");
   frame.className = "saved-print-frame";
   frame.title = "Saved sections PDF export";
