@@ -641,7 +641,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-cross-platform-v5'),
+        webRoot.text.includes('/web/app.js?v=20260724-project-foundation-v6'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1453,6 +1453,31 @@ async function main() {
       "An ordinary research response exposed private evaluation material."
     );
     const answerID = conversationMessage.json.conversation.messages[1].id;
+    const immutableAnswerList = await request("/research/answers/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(
+      immutableAnswerList.response.ok &&
+        immutableAnswerList.json.answers.some((answer) =>
+          answer.id === answerID && answer.evidenceCount === 1
+        ),
+      "The generated Research answer was not stored as an immutable historical record."
+    );
+    const immutableAnswerRead = await request("/research/answers/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, answerID }
+    });
+    assert(
+      immutableAnswerRead.response.ok &&
+        immutableAnswerRead.json.answer.immutable === true &&
+        immutableAnswerRead.json.answer.question === "When must the owner notify the department?" &&
+        immutableAnswerRead.json.answer.evidence[0].passageText === selectedResearchText &&
+        immutableAnswerRead.json.answer.passageToCitationMapping[0].evidenceSnapshotIDs.length === 1,
+      "The historical Research endpoint did not restore the exact stored question, evidence, answer, and citation mapping."
+    );
     const researchUsage = await request("/research/usage", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -1526,6 +1551,17 @@ async function main() {
         selectedConversationSources.length === 2 &&
         selectedConversationSources[1].selectedText === additionalResearchText,
       "Current research did not append and clean a later enacted-text selection after an analysis."
+    );
+    const immutableAnswerAfterEvidenceChange = await request("/research/answers/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, answerID }
+    });
+    assert(
+      immutableAnswerAfterEvidenceChange.response.ok &&
+        immutableAnswerAfterEvidenceChange.json.answer.evidence.length === 1 &&
+        immutableAnswerAfterEvidenceChange.json.answer.evidence[0].passageText === selectedResearchText,
+      "Adding later evidence silently changed a historical Research answer."
     );
 
     const fetchedConversation = await request("/research/conversations/get", {
@@ -2854,10 +2890,23 @@ async function main() {
     const cursorPull = await request("/sync/pull", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
-      body: { auth: { accountUserID: userID }, sinceEventID: pull.json.latestEventID }
+      body: {
+        auth: { accountUserID: userID },
+        sinceEventID: pull.json.latestEventID,
+        syncSchemaVersion: 2,
+        clientCapabilities: ["saved-work", "projects", "legacy-unknown-record"]
+      }
     });
     assert(cursorPull.response.ok, "Event cursor sync pull failed.");
     assert(Number.isInteger(cursorPull.json.latestEventID), "Cursor pull did not return a latest event ID.");
+    assert(
+      cursorPull.json.syncSchemaVersion === 2 &&
+        cursorPull.json.clientSchemaVersion === 2 &&
+        cursorPull.json.unknownRecordPolicy === "preserve-and-ignore" &&
+        cursorPull.json.conflictPolicies.researchAnswer === "immutable" &&
+        cursorPull.json.clientCapabilities.includes("legacy-unknown-record"),
+      "Sync compatibility metadata did not preserve an older client's unknown-record declaration."
+    );
 
     const projectMutation = {
       project: {
@@ -2903,6 +2952,66 @@ async function main() {
     assert(projectPush.response.ok, "Project sync push failed.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectRecordID), "Project mutation was not accepted.");
     assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
+    const projectFoundationState = await request("/projects/foundation/state", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
+    });
+    assert(
+      projectFoundationState.response.ok &&
+        projectFoundationState.json.projects.some((project) => project.id === "project-client-smoke") &&
+        projectFoundationState.json.links.some((link) =>
+          link.projectID === "project-client-smoke" &&
+          link.targetKind === "canonicalSection" &&
+          link.targetID === "900001" &&
+          link.metadata.migratedFrom === "projectSection"
+        ) &&
+        projectFoundationState.json.migrationCheckpoint.schemaVersion === 1,
+      "The unified Project foundation did not preserve the existing Project and section membership identities."
+    );
+    const linkSavedToProject = await request("/projects/foundation/link", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        targetKind: "savedItem",
+        targetID: savedSmokeRecordID
+      }
+    });
+    assert(
+      linkSavedToProject.response.status === 201 &&
+        linkSavedToProject.json.link.targetID === savedSmokeRecordID &&
+        linkSavedToProject.json.activity.action === "item.linked",
+      "Linking an existing saved section to a Project failed."
+    );
+    const unlinkSavedFromProject = await request("/projects/foundation/unlink", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        targetKind: "savedItem",
+        targetID: savedSmokeRecordID
+      }
+    });
+    assert(
+      unlinkSavedFromProject.response.ok &&
+        unlinkSavedFromProject.json.link.deletedAt &&
+        unlinkSavedFromProject.json.activity.action === "item.unlinked",
+      "Unlinking an item did not create a relationship tombstone and meaningful activity event."
+    );
+    const pullAfterFoundationUnlink = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      pullAfterFoundationUnlink.json.mutations.some((mutation) =>
+        mutation.savedItem?.id === savedSmokeRecordID && !mutation.savedItem?.deletedAt
+      ),
+      "Unlinking a saved section from a Project deleted the independently owned saved record."
+    );
 
     const canonicalProjectColorPull = await request("/sync/pull", {
       method: "POST",
@@ -2972,6 +3081,17 @@ async function main() {
       mutation.project?.id === projectRecordID
     )?.project;
     assert(restoredProject && restoredProject.archivedAt === null, "Project restore state did not survive sync.");
+    const projectActivityAfterRestore = await request("/projects/foundation/state", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
+    });
+    assert(
+      projectActivityAfterRestore.response.ok &&
+        projectActivityAfterRestore.json.activity.some((event) => event.action === "project.archived") &&
+        projectActivityAfterRestore.json.activity.some((event) => event.action === "project.restored"),
+      "Project archive and restore did not create meaningful activity-history events."
+    );
 
     const webProjectSectionDeletePush = await request("/sync/push", {
       method: "POST",

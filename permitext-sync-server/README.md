@@ -192,7 +192,7 @@ When a Neon database is connected through Vercel, the server uses the first avai
 
 Connect a private Vercel Blob store in the same Vercel project for synchronized Workboard images. Keep the generated Blob credentials server-only; the browser always reads and writes through Permitext's authenticated endpoints.
 
-The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v3`:
+The Neon schema is created automatically on first request. The current Postgres schema is `normalized-v4`:
 
 - `permitext_users`
 - `permitext_entitlements`
@@ -204,11 +204,20 @@ The Neon schema is created automatically on first request. The current Postgres 
 - `permitext_projects`
 - `permitext_project_items`
 - `permitext_comments`
+- `permitext_foundation_artifacts`
+- `permitext_project_links`
+- `permitext_research_answers`
+- `permitext_evidence_snapshots`
+- `permitext_project_activity`
+- `permitext_migration_checkpoints`
+- `permitext_research_conversations`
+- `permitext_research_usage`
+- `permitext_research_feedback`
 - `permitext_sync_events`
 - `permitext_user_content_records`
 - `permitext_sync_state`
 
-`permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables so the backend can scale past the prototype JSON shape. Local development still falls back to the JSON file store if no database URL is present.
+`permitext_user_content_records` and `permitext_sync_state` remain as compatibility mirrors for the existing iOS/web mutation contract. New saved sections, paragraph notes/tags, projects, and project membership are also written into first-class relational tables. Project relationships, immutable Research answers and evidence, meaningful activity, and migration checkpoints use separate owner-scoped tables so older clients can safely ignore record families they do not understand. Local development still falls back to the JSON file store if no database URL is present.
 
 On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instead of reading and rewriting the global store. A push applies conditional row upserts and sync-event inserts in one Neon HTTP transaction; a pull reads only that user's canonical records. Account sessions, profiles, checkout authentication, verified payment entitlements, lifetime grants, and legacy passkey cleanup also use targeted or transactional rows. The JSON file adapter intentionally keeps the simpler whole-file behavior for local smoke testing. Hosted legacy-account merge/repair requests fail safely without changing data until a fully transactional cross-account migration is implemented and verified against Postgres.
 
@@ -222,6 +231,11 @@ On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instea
 - `POST /account/profile`
 - `POST /sync/push`
 - `POST /sync/pull`
+- `POST /projects/foundation/state`
+- `POST /projects/foundation/link`
+- `POST /projects/foundation/unlink`
+- `POST /research/answers/list`
+- `POST /research/answers/get`
 - `POST /workboards/assets/upload`
 - `POST /workboards/assets/read`
 - `POST /workboards/assets/delete`

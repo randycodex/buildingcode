@@ -5,18 +5,18 @@ const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v4";
-const offlineAssetVersion = "20260724-pro-offline-v4";
+const shellCacheName = "permitext-pro-shell-v5";
+const offlineAssetVersion = "20260724-project-foundation-v5";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/",
-  "/web/manifest.webmanifest?v=20260724-pro-offline-v4",
+  "/web/manifest.webmanifest?v=20260724-project-foundation-v5",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260722-ai-foundation-v4-20260724-pro-offline-v4",
+  "/web/styles.css?v=20260722-ai-foundation-v4-20260724-project-foundation-v5",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
-  "/web/app.js?v=20260724-pro-offline-v4",
-  "/web/offline-storage.js?v=20260724-pro-offline-v4",
+  "/web/app.js?v=20260724-project-foundation-v6",
+  "/web/offline-storage.js?v=20260724-project-foundation-v5",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260720-sync-contract-v2",
   "/web/sync-state.js?v=20260721-causal-clear-v4"

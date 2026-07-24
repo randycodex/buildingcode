@@ -25,8 +25,21 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-pro-offline-v4";
+} from "./offline-storage.js?v=20260724-project-foundation-v5";
 
+const permitextSyncSchemaVersion = 2;
+const permitextClientCapabilities = Object.freeze([
+  "saved-work",
+  "notes",
+  "projects",
+  "notebook",
+  "professional-exports",
+  "offline-access",
+  "research",
+  "evidence-discovery",
+  "collaboration",
+  "organization-administration"
+]);
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
 const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
@@ -2549,7 +2562,9 @@ async function loadSyncedContent(options = {}) {
   syncLoadPromise = postJSON("/sync/pull", {
     auth: { accountUserID: account.userID },
     sinceEventID: requestedEventID,
-    contentMapVersion: Number(baseline?.contentMapVersion || 2)
+    contentMapVersion: Number(baseline?.contentMapVersion || 2),
+    syncSchemaVersion: permitextSyncSchemaVersion,
+    clientCapabilities: permitextClientCapabilities
   }, { token: account.sessionToken })
     .then(async (payload) => {
       let entitlement = payload.entitlement || null;
@@ -2569,6 +2584,8 @@ async function loadSyncedContent(options = {}) {
         pulledAt: payload.pulledAt,
         latestEventID: payload.latestEventID ?? payload.syncRevision ?? requestedEventID,
         contentMapVersion,
+        syncSchemaVersion: Number(payload.syncSchemaVersion || permitextSyncSchemaVersion),
+        capabilityContract: payload.capabilityContract || null,
         entitlement,
         mutations,
         summary: summarizeMutations(mutations)
@@ -3187,6 +3204,8 @@ async function flushSyncOutbox(options = {}) {
       try {
         const payload = await postJSON("/sync/push", {
           auth: { accountUserID: account.userID },
+          syncSchemaVersion: permitextSyncSchemaVersion,
+          clientCapabilities: permitextClientCapabilities,
           batch: {
             user: { id: account.userID },
             mutations: entries.map((item) => item.mutation)

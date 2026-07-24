@@ -62,4 +62,20 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             UserContentSyncCodeVersion.localNYC2022
         )
     }
+
+    func testSyncDeclaresVersionedCrossPlatformCapabilities() throws {
+        let request = BackendUserContentPullRequest(
+            auth: BackendAuthContext(accountUserID: "test-user", bearerToken: nil),
+            since: nil
+        )
+        let data = try JSONEncoder().encode(request)
+        let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        let capabilities = try XCTUnwrap(object["clientCapabilities"] as? [String])
+
+        XCTAssertEqual(object["syncSchemaVersion"] as? Int, 2)
+        XCTAssertEqual(Set(capabilities), Set(PermitextCapabilityID.allCases.map(\.rawValue)))
+        XCTAssertTrue(capabilities.contains("notebook"))
+        XCTAssertTrue(capabilities.contains("professional-exports"))
+        XCTAssertTrue(capabilities.contains("organization-administration"))
+    }
 }

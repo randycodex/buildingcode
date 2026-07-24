@@ -953,12 +953,26 @@ struct ServerUserContentBatch: Codable, Hashable, Sendable {
     }
 }
 
+enum PermitextCapabilityID: String, Codable, CaseIterable, Hashable, Sendable {
+    case savedWork = "saved-work"
+    case notes
+    case projects
+    case notebook
+    case professionalExports = "professional-exports"
+    case offlineAccess = "offline-access"
+    case research
+    case evidenceDiscovery = "evidence-discovery"
+    case collaboration
+    case organizationAdministration = "organization-administration"
+}
+
 struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let userID: String
     let pulledAt: Date
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
     var contentMapVersion: Int? = nil
+    var syncSchemaVersion: Int? = nil
     var entitlement: AppEntitlement? = nil
     let mutations: [ServerUserContentMutation]
 }
@@ -1107,6 +1121,8 @@ private struct BackendErrorResponse: Codable, Hashable, Sendable {
 struct BackendUserContentPushRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let batch: ServerUserContentBatch
+    var syncSchemaVersion: Int = 2
+    var clientCapabilities: [String] = PermitextCapabilityID.allCases.map(\.rawValue)
 }
 
 struct BackendUserContentRejection: Codable, Hashable, Sendable {
@@ -1121,6 +1137,7 @@ struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
     var entitlement: AppEntitlement? = nil
+    var syncSchemaVersion: Int? = nil
     let serverTime: Date
 }
 
@@ -1129,6 +1146,8 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let since: Date?
     var sinceEventID: Int64? = nil
     var contentMapVersion: Int? = 2
+    var syncSchemaVersion: Int = 2
+    var clientCapabilities: [String] = PermitextCapabilityID.allCases.map(\.rawValue)
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {

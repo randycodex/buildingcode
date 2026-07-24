@@ -533,6 +533,39 @@ export function createPostgresAccountRepository(sql) {
           AND target.updated_at < source.updated_at
       `,
       sql`UPDATE permitext_research_feedback SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`
+        UPDATE permitext_foundation_artifacts
+        SET user_id = ${targetUserID},
+            envelope = jsonb_set(envelope, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+        WHERE user_id = ${sourceUserID}
+      `,
+      sql`
+        UPDATE permitext_project_links
+        SET user_id = ${targetUserID},
+            link = jsonb_set(link, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+        WHERE user_id = ${sourceUserID}
+      `,
+      sql`
+        UPDATE permitext_research_answers
+        SET user_id = ${targetUserID},
+            answer = jsonb_set(answer, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+        WHERE user_id = ${sourceUserID}
+      `,
+      sql`UPDATE permitext_evidence_snapshots SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`
+        UPDATE permitext_project_activity
+        SET user_id = ${targetUserID},
+            event = jsonb_set(event, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+        WHERE user_id = ${sourceUserID}
+      `,
+      sql`
+        DELETE FROM permitext_migration_checkpoints AS source
+        USING permitext_migration_checkpoints AS target
+        WHERE source.user_id = ${sourceUserID}
+          AND target.user_id = ${targetUserID}
+          AND source.checkpoint_name = target.checkpoint_name
+      `,
+      sql`UPDATE permitext_migration_checkpoints SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
       sql`UPDATE permitext_passkey_credentials SET user_id = ${targetUserID}, updated_at = now() WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_account_sessions WHERE user_id = ${sourceUserID}`,
       sql`DELETE FROM permitext_sessions WHERE user_id = ${sourceUserID}`,
@@ -819,6 +852,15 @@ export function createPostgresAccountRepository(sql) {
       sql`DELETE FROM permitext_projects WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_project_items WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_comments WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_evidence_snapshots WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_research_answers WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_project_activity WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_project_links WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_foundation_artifacts WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_migration_checkpoints WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_research_feedback WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_research_usage WHERE user_id LIKE 'passkey:%'`,
+      sql`DELETE FROM permitext_research_conversations WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_user_content_records WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_account_sessions WHERE user_id LIKE 'passkey:%'`,
       sql`DELETE FROM permitext_sessions WHERE user_id LIKE 'passkey:%'`,

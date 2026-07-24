@@ -69,6 +69,12 @@ async function cleanupUser() {
     await sql`DELETE FROM permitext_projects WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_project_items WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_comments WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_evidence_snapshots WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_research_answers WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_project_activity WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_project_links WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_foundation_artifacts WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_migration_checkpoints WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_research_feedback WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_research_usage WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_research_conversations WHERE user_id = ${cleanupUserID}`;
@@ -103,6 +109,12 @@ async function countRows(tableName) {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_account_sessions WHERE user_id = ${userID}`;
   } else if (tableName === "permitext_entitlements") {
     rows = await sql`SELECT count(*)::int AS count FROM permitext_entitlements WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_project_links") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_project_links WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_project_activity") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_project_activity WHERE user_id = ${userID}`;
+  } else if (tableName === "permitext_migration_checkpoints") {
+    rows = await sql`SELECT count(*)::int AS count FROM permitext_migration_checkpoints WHERE user_id = ${userID}`;
   } else {
     throw new Error(`Unsupported count table: ${tableName}`);
   }
@@ -129,7 +141,7 @@ const server = spawn(process.execPath, ["server.mjs"], {
 
 try {
   const health = await waitForServer();
-  assert(health.schema === "normalized-v3", `Expected normalized-v3 schema, received ${health.schema}.`);
+  assert(health.schema === "normalized-v4", `Expected normalized-v4 schema, received ${health.schema}.`);
 
   await cleanupUser();
 
@@ -139,7 +151,7 @@ try {
   const initialSummary = await request("/admin/storage/summary", { token: adminToken });
   assert(initialSummary.response.ok, "Initial storage summary failed.");
   assert(initialSummary.json.storage === "postgres", "Storage summary did not report postgres.");
-  assert(initialSummary.json.schema === "normalized-v3", "Storage summary did not report normalized-v3.");
+  assert(initialSummary.json.schema === "normalized-v4", "Storage summary did not report normalized-v4.");
   assert(Number.isInteger(initialSummary.json.latestEventID), "Storage summary did not return latestEventID.");
 
   const signIn = await request("/account/sign-in", {
@@ -277,7 +289,13 @@ try {
   const fullPull = await request("/sync/pull", {
     method: "POST",
     token,
-    body: { auth: { accountUserID: userID }, sinceEventID: 0, contentMapVersion: 2 }
+    body: {
+      auth: { accountUserID: userID },
+      sinceEventID: 0,
+      contentMapVersion: 2,
+      syncSchemaVersion: 2,
+      clientCapabilities: ["saved-work", "projects", "legacy-client-extension"]
+    }
   });
   assert(fullPull.response.ok, "Full event-cursor pull failed.");
   assert(fullPull.json.mutations.length === 5, "Full event-cursor pull did not return all events.");
@@ -289,6 +307,63 @@ try {
     "Postgres pull did not restore the Workboard."
   );
   assert(fullPull.json.latestEventID === push.json.latestEventID, "Pull latestEventID did not match push latestEventID.");
+  assert(
+    fullPull.json.syncSchemaVersion === 2 &&
+      fullPull.json.clientSchemaVersion === 2 &&
+      fullPull.json.clientCapabilities.includes("legacy-client-extension") &&
+      fullPull.json.unknownRecordPolicy === "preserve-and-ignore",
+    "Postgres sync did not return the backward-compatible schema and client capability contract."
+  );
+
+  const foundationState = await request("/projects/foundation/state", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      projectID: `postgres-project-client-${runID}`
+    }
+  });
+  assert(
+    foundationState.response.ok &&
+      foundationState.json.links.some((link) =>
+        link.targetKind === "canonicalSection" && link.targetID === "101"
+      ) &&
+      foundationState.json.links.some((link) =>
+        link.targetKind === "workboard" &&
+        link.projectID === `postgres-project-client-${runID}`
+      ),
+    "Postgres Project foundation did not migrate existing Project section and Workboard relationships."
+  );
+  const canonicalSavedID = fullPull.json.mutations.find((mutation) => mutation.savedItem)?.savedItem?.id;
+  const linkedSavedItem = await request("/projects/foundation/link", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      projectID: `postgres-project-client-${runID}`,
+      targetKind: "savedItem",
+      targetID: canonicalSavedID
+    }
+  });
+  assert(linkedSavedItem.response.status === 201, "Postgres Project link creation failed.");
+  const unlinkedSavedItem = await request("/projects/foundation/unlink", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      projectID: `postgres-project-client-${runID}`,
+      targetKind: "savedItem",
+      targetID: canonicalSavedID
+    }
+  });
+  assert(
+    unlinkedSavedItem.response.ok && unlinkedSavedItem.json.link.deletedAt,
+    "Postgres Project unlink did not preserve a relationship tombstone."
+  );
+  assert(await countRows("permitext_saved_items") === 1, "Project unlink deleted the underlying Postgres saved item.");
+  assert(await countRows("permitext_project_links") >= 3, "Project foundation links were not normalized in Postgres.");
+  assert(await countRows("permitext_project_activity") === 2, "Meaningful Project link activity was not stored.");
+  assert(await countRows("permitext_migration_checkpoints") === 1, "Project migration checkpoint was not stored.");
 
   const emptyPull = await request("/sync/pull", {
     method: "POST",
@@ -578,6 +653,9 @@ try {
   assert(finalSummary.json.tables.annotations >= 1, "Storage summary did not include annotation count.");
   assert(finalSummary.json.tables.projects >= 1, "Storage summary did not include project count.");
   assert(finalSummary.json.tables.projectItems >= 1, "Storage summary did not include project item count.");
+  assert(finalSummary.json.tables.projectLinks >= 3, "Storage summary did not include Project link count.");
+  assert(finalSummary.json.tables.activityEvents >= 2, "Storage summary did not include Project activity count.");
+  assert(finalSummary.json.tables.migrationCheckpoints >= 1, "Storage summary did not include migration checkpoint count.");
   assert(finalSummary.json.tables.syncEvents >= 4, "Storage summary did not include sync event count.");
   assert(finalSummary.json.tables.accountSessions >= 1, "Storage summary did not include active hashed sessions.");
   assert(finalSummary.json.tables.legacySessions === 0, "Storage summary reported a plaintext legacy session.");

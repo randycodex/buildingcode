@@ -16,6 +16,16 @@ import {
   enforceFreePlanMutationBatch,
   hasActiveProEntitlement
 } from "./entitlement-contract.mjs";
+import {
+  activityEvent,
+  immutableEvidenceSnapshot,
+  immutableResearchAnswer,
+  ownerScope,
+  projectFoundationSchemaVersion,
+  projectLinkRecord,
+  projectMembershipRules,
+  syncContract
+} from "./project-foundation-contract.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import {
@@ -64,8 +74,13 @@ const rateLimitPolicies = new Map([
   ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["research/answers/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/answers/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/usage", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/feedback", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
@@ -129,6 +144,11 @@ const emptyStore = () => ({
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
+  foundationArtifactsByUserID: {},
+  projectLinksByUserID: {},
+  researchAnswersByUserID: {},
+  activityEventsByUserID: {},
+  migrationCheckpointsByUserID: {},
   researchConversationsByUserID: {},
   researchUsageByUserID: {},
   researchFeedbackByUserID: {}
@@ -192,6 +212,18 @@ function safeJSON(value, fallback) {
   return value;
 }
 
+function canonicalJSONString(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => canonicalJSONString(item)).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) =>
+      `${JSON.stringify(key)}:${canonicalJSONString(value[key])}`
+    ).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function createFileStoreAdapter() {
   return {
     kind: "file",
@@ -240,6 +272,22 @@ function createFileStoreAdapter() {
           researchFeedback: Object.values(store.researchFeedbackByUserID || {}).reduce(
             (count, entries) => count + (entries?.length || 0),
             0
+          ),
+          foundationArtifacts: Object.values(store.foundationArtifactsByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          projectLinks: Object.values(store.projectLinksByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          researchAnswers: Object.values(store.researchAnswersByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          activityEvents: Object.values(store.activityEventsByUserID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
           )
         },
         mutationCounts: mutationCountsByKind
@@ -268,6 +316,82 @@ function createFileStoreAdapter() {
       store.researchConversationsByUserID[userID] = remaining;
       await this.write(store);
       return true;
+    },
+    async listFoundationArtifacts(userID) {
+      const store = await this.read();
+      return (store.foundationArtifactsByUserID?.[userID] || []).slice();
+    },
+    async saveFoundationArtifact(userID, artifact) {
+      const store = await this.read();
+      store.foundationArtifactsByUserID ||= {};
+      const entries = store.foundationArtifactsByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
+      if (index === -1) entries.push(artifact);
+      else entries[index] = artifact;
+      store.foundationArtifactsByUserID[userID] = entries;
+      await this.write(store);
+      return artifact;
+    },
+    async listProjectLinks(userID) {
+      const store = await this.read();
+      return (store.projectLinksByUserID?.[userID] || []).slice();
+    },
+    async saveProjectLink(userID, link) {
+      const store = await this.read();
+      store.projectLinksByUserID ||= {};
+      const entries = store.projectLinksByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.id === link.id);
+      if (index === -1) entries.push(link);
+      else entries[index] = link;
+      store.projectLinksByUserID[userID] = entries;
+      await this.write(store);
+      return link;
+    },
+    async listResearchAnswers(userID) {
+      const store = await this.read();
+      return (store.researchAnswersByUserID?.[userID] || []).slice();
+    },
+    async saveResearchAnswer(userID, answer) {
+      const store = await this.read();
+      store.researchAnswersByUserID ||= {};
+      const entries = store.researchAnswersByUserID[userID] || [];
+      const existing = entries.find((item) => item.id === answer.id);
+      if (existing && canonicalJSONString(existing) !== canonicalJSONString(answer)) {
+        throw new Error("Immutable Research answer cannot be changed.");
+      }
+      if (!existing) entries.push(answer);
+      store.researchAnswersByUserID[userID] = entries;
+      await this.write(store);
+      return existing || answer;
+    },
+    async listActivityEvents(userID) {
+      const store = await this.read();
+      return (store.activityEventsByUserID?.[userID] || []).slice();
+    },
+    async saveActivityEvent(userID, event) {
+      const store = await this.read();
+      store.activityEventsByUserID ||= {};
+      const entries = store.activityEventsByUserID[userID] || [];
+      const existing = entries.find((item) => item.id === event.id);
+      if (existing && canonicalJSONString(existing) !== canonicalJSONString(event)) {
+        throw new Error("Activity events are append-only.");
+      }
+      if (!existing) entries.push(event);
+      store.activityEventsByUserID[userID] = entries;
+      await this.write(store);
+      return existing || event;
+    },
+    async migrationCheckpoint(userID, checkpointName) {
+      const store = await this.read();
+      return store.migrationCheckpointsByUserID?.[userID]?.[checkpointName] || null;
+    },
+    async saveMigrationCheckpoint(userID, checkpointName, checkpoint) {
+      const store = await this.read();
+      store.migrationCheckpointsByUserID ||= {};
+      store.migrationCheckpointsByUserID[userID] ||= {};
+      store.migrationCheckpointsByUserID[userID][checkpointName] = checkpoint;
+      await this.write(store);
+      return checkpoint;
     },
     async researchUsageSince(userID, since) {
       const store = await this.read();
@@ -324,6 +448,11 @@ function storeHasData(store) {
     sessions: store.sessions,
     passkeyCredentials: store.passkeyCredentials,
     mutationsByUserID: store.mutationsByUserID,
+    foundationArtifactsByUserID: store.foundationArtifactsByUserID,
+    projectLinksByUserID: store.projectLinksByUserID,
+    researchAnswersByUserID: store.researchAnswersByUserID,
+    activityEventsByUserID: store.activityEventsByUserID,
+    migrationCheckpointsByUserID: store.migrationCheckpointsByUserID,
     researchConversationsByUserID: store.researchConversationsByUserID,
     researchUsageByUserID: store.researchUsageByUserID,
     researchFeedbackByUserID: store.researchFeedbackByUserID
@@ -648,6 +777,98 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_research_conversations_user_updated_idx
       ON permitext_research_conversations (user_id, updated_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_foundation_artifacts (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        artifact_type TEXT NOT NULL,
+        envelope JSONB NOT NULL DEFAULT '{}'::jsonb,
+        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        archived_at TIMESTAMPTZ,
+        deleted_at TIMESTAMPTZ
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_foundation_artifacts_user_updated_idx
+      ON permitext_foundation_artifacts (user_id, updated_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_project_links (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        project_id TEXT NOT NULL,
+        target_kind TEXT NOT NULL,
+        target_id TEXT NOT NULL,
+        relationship TEXT NOT NULL,
+        link JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        deleted_at TIMESTAMPTZ
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_project_links_project_idx
+      ON permitext_project_links (user_id, project_id, updated_at DESC)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_project_links_target_idx
+      ON permitext_project_links (user_id, target_kind, target_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_research_answers (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        conversation_id TEXT NOT NULL,
+        project_id TEXT,
+        answer JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_research_answers_conversation_idx
+      ON permitext_research_answers (user_id, conversation_id, created_at ASC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_evidence_snapshots (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        answer_id TEXT NOT NULL,
+        source_id TEXT NOT NULL,
+        snapshot JSONB NOT NULL DEFAULT '{}'::jsonb,
+        approved_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_evidence_snapshots_answer_idx
+      ON permitext_evidence_snapshots (user_id, answer_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_project_activity (
+        id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        project_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        object_kind TEXT NOT NULL,
+        object_id TEXT NOT NULL,
+        event JSONB NOT NULL DEFAULT '{}'::jsonb,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_project_activity_project_idx
+      ON permitext_project_activity (user_id, project_id, created_at DESC)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_migration_checkpoints (
+        user_id TEXT NOT NULL,
+        checkpoint_name TEXT NOT NULL,
+        checkpoint JSONB NOT NULL DEFAULT '{}'::jsonb,
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        PRIMARY KEY (user_id, checkpoint_name)
+      )
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_research_usage (
@@ -1036,6 +1257,12 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_project_items)::int AS project_items,
         (SELECT count(*) FROM permitext_comments)::int AS comments,
         (SELECT count(*) FROM permitext_research_conversations)::int AS research_conversations,
+        (SELECT count(*) FROM permitext_foundation_artifacts)::int AS foundation_artifacts,
+        (SELECT count(*) FROM permitext_project_links)::int AS project_links,
+        (SELECT count(*) FROM permitext_research_answers)::int AS research_answers,
+        (SELECT count(*) FROM permitext_evidence_snapshots)::int AS evidence_snapshots,
+        (SELECT count(*) FROM permitext_project_activity)::int AS project_activity,
+        (SELECT count(*) FROM permitext_migration_checkpoints)::int AS migration_checkpoints,
         (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
         (SELECT count(*) FROM permitext_research_feedback)::int AS research_feedback,
         (SELECT count(*) FROM permitext_user_content_records)::int AS user_content_records,
@@ -1045,7 +1272,7 @@ async function createPostgresStoreAdapter() {
     const row = rows[0] || {};
     return {
       storage: "postgres",
-      schema: "normalized-v3",
+      schema: "normalized-v4",
       latestEventID: Number(row.latest_event_id || 0),
       tables: {
         users: Number(row.users || 0),
@@ -1060,6 +1287,12 @@ async function createPostgresStoreAdapter() {
         projectItems: Number(row.project_items || 0),
         comments: Number(row.comments || 0),
         researchConversations: Number(row.research_conversations || 0),
+        foundationArtifacts: Number(row.foundation_artifacts || 0),
+        projectLinks: Number(row.project_links || 0),
+        researchAnswers: Number(row.research_answers || 0),
+        evidenceSnapshots: Number(row.evidence_snapshots || 0),
+        activityEvents: Number(row.project_activity || 0),
+        migrationCheckpoints: Number(row.migration_checkpoints || 0),
         researchUsage: Number(row.research_usage || 0),
         researchFeedback: Number(row.research_feedback || 0),
         userContentRecords: Number(row.user_content_records || 0),
@@ -1361,7 +1594,7 @@ async function createPostgresStoreAdapter() {
 
   return {
     kind: "postgres",
-    schema: "normalized-v3",
+    schema: "normalized-v4",
     async initialize() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1482,6 +1715,193 @@ async function createPostgresStoreAdapter() {
         RETURNING id
       `;
       return rows.length > 0;
+    },
+    async listFoundationArtifacts(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT envelope, payload
+        FROM permitext_foundation_artifacts
+        WHERE user_id = ${userID}
+        ORDER BY updated_at DESC
+      `;
+      return rows.map((row) => ({
+        envelope: safeJSON(row.envelope, {}),
+        payload: safeJSON(row.payload, {})
+      }));
+    },
+    async saveFoundationArtifact(userID, artifact) {
+      await ensureSchema();
+      const envelope = artifact.envelope;
+      await sql`
+        INSERT INTO permitext_foundation_artifacts (
+          id, user_id, artifact_type, envelope, payload,
+          created_at, updated_at, archived_at, deleted_at
+        )
+        VALUES (
+          ${envelope.id}, ${userID}, ${envelope.type},
+          ${JSON.stringify(envelope)}::jsonb, ${JSON.stringify(artifact.payload || {})}::jsonb,
+          ${envelope.createdAt}::timestamptz, ${envelope.updatedAt}::timestamptz,
+          ${envelope.archivedAt}::timestamptz, ${envelope.deletedAt}::timestamptz
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          artifact_type = EXCLUDED.artifact_type,
+          envelope = EXCLUDED.envelope,
+          payload = EXCLUDED.payload,
+          updated_at = EXCLUDED.updated_at,
+          archived_at = EXCLUDED.archived_at,
+          deleted_at = EXCLUDED.deleted_at
+        WHERE permitext_foundation_artifacts.user_id = ${userID}
+          AND permitext_foundation_artifacts.updated_at <= EXCLUDED.updated_at
+      `;
+      return artifact;
+    },
+    async listProjectLinks(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT link
+        FROM permitext_project_links
+        WHERE user_id = ${userID}
+        ORDER BY updated_at DESC
+      `;
+      return rows.map((row) => safeJSON(row.link, {}));
+    },
+    async saveProjectLink(userID, link) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_project_links (
+          id, user_id, project_id, target_kind, target_id, relationship,
+          link, created_at, updated_at, deleted_at
+        )
+        VALUES (
+          ${link.id}, ${userID}, ${link.projectID}, ${link.targetKind}, ${link.targetID},
+          ${link.relationship}, ${JSON.stringify(link)}::jsonb,
+          ${link.createdAt}::timestamptz, ${link.updatedAt}::timestamptz,
+          ${link.deletedAt}::timestamptz
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          project_id = EXCLUDED.project_id,
+          target_kind = EXCLUDED.target_kind,
+          target_id = EXCLUDED.target_id,
+          relationship = EXCLUDED.relationship,
+          link = EXCLUDED.link,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at
+        WHERE permitext_project_links.user_id = ${userID}
+          AND permitext_project_links.updated_at <= EXCLUDED.updated_at
+      `;
+      return link;
+    },
+    async listResearchAnswers(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT answer
+        FROM permitext_research_answers
+        WHERE user_id = ${userID}
+        ORDER BY created_at ASC
+      `;
+      return rows.map((row) => safeJSON(row.answer, {}));
+    },
+    async saveResearchAnswer(userID, answer) {
+      await ensureSchema();
+      const results = await sql.transaction([
+        ...answer.evidence.map((snapshot) => sql`
+          INSERT INTO permitext_evidence_snapshots (
+            id, user_id, answer_id, source_id, snapshot, approved_at
+          )
+          VALUES (
+            ${snapshot.id}, ${userID}, ${answer.id}, ${snapshot.sourceID},
+            ${JSON.stringify(snapshot)}::jsonb, ${snapshot.approvedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `),
+        sql`
+          INSERT INTO permitext_research_answers (
+            id, user_id, conversation_id, project_id, answer, created_at
+          )
+          VALUES (
+            ${answer.id}, ${userID}, ${answer.conversationID}, ${answer.projectID},
+            ${JSON.stringify(answer)}::jsonb, ${answer.createdAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+          RETURNING answer
+        `
+      ]);
+      const inserted = results.at(-1)?.[0]?.answer;
+      if (inserted) return safeJSON(inserted, answer);
+      const rows = await sql`
+        SELECT answer
+        FROM permitext_research_answers
+        WHERE id = ${answer.id} AND user_id = ${userID}
+        LIMIT 1
+      `;
+      const existing = safeJSON(rows[0]?.answer, null);
+      if (!existing || canonicalJSONString(existing) !== canonicalJSONString(answer)) {
+        throw new Error("Immutable Research answer cannot be changed.");
+      }
+      return existing;
+    },
+    async listActivityEvents(userID) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT event
+        FROM permitext_project_activity
+        WHERE user_id = ${userID}
+        ORDER BY created_at DESC
+      `;
+      return rows.map((row) => safeJSON(row.event, {}));
+    },
+    async saveActivityEvent(userID, event) {
+      await ensureSchema();
+      const rows = await sql`
+        INSERT INTO permitext_project_activity (
+          id, user_id, project_id, action, object_kind, object_id, event, created_at
+        )
+        VALUES (
+          ${event.id}, ${userID}, ${event.projectID}, ${event.action},
+          ${event.objectKind}, ${event.objectID}, ${JSON.stringify(event)}::jsonb,
+          ${event.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO NOTHING
+        RETURNING event
+      `;
+      if (rows[0]) return safeJSON(rows[0].event, event);
+      const existingRows = await sql`
+        SELECT event
+        FROM permitext_project_activity
+        WHERE id = ${event.id} AND user_id = ${userID}
+        LIMIT 1
+      `;
+      const existing = safeJSON(existingRows[0]?.event, null);
+      if (!existing || canonicalJSONString(existing) !== canonicalJSONString(event)) {
+        throw new Error("Activity events are append-only.");
+      }
+      return existing;
+    },
+    async migrationCheckpoint(userID, checkpointName) {
+      await ensureSchema();
+      const rows = await sql`
+        SELECT checkpoint
+        FROM permitext_migration_checkpoints
+        WHERE user_id = ${userID} AND checkpoint_name = ${checkpointName}
+        LIMIT 1
+      `;
+      return safeJSON(rows[0]?.checkpoint, null);
+    },
+    async saveMigrationCheckpoint(userID, checkpointName, checkpoint) {
+      await ensureSchema();
+      await sql`
+        INSERT INTO permitext_migration_checkpoints (
+          user_id, checkpoint_name, checkpoint, updated_at
+        )
+        VALUES (
+          ${userID}, ${checkpointName}, ${JSON.stringify(checkpoint)}::jsonb, now()
+        )
+        ON CONFLICT (user_id, checkpoint_name) DO UPDATE SET
+          checkpoint = EXCLUDED.checkpoint,
+          updated_at = now()
+      `;
+      return checkpoint;
     },
     async researchUsageSince(userID, since) {
       await ensureSchema();
@@ -1664,6 +2084,66 @@ async function saveStoredResearchConversation(userID, conversation) {
 async function deleteStoredResearchConversation(userID, conversationID) {
   const adapter = await storeAdapter();
   return adapter.deleteResearchConversation(userID, conversationID);
+}
+
+async function listStoredFoundationArtifacts(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listFoundationArtifacts === "function"
+    ? adapter.listFoundationArtifacts(userID)
+    : [];
+}
+
+async function saveStoredFoundationArtifact(userID, artifact) {
+  const adapter = await storeAdapter();
+  return adapter.saveFoundationArtifact(userID, artifact);
+}
+
+async function listStoredProjectLinks(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listProjectLinks === "function"
+    ? adapter.listProjectLinks(userID)
+    : [];
+}
+
+async function saveStoredProjectLink(userID, link) {
+  const adapter = await storeAdapter();
+  return adapter.saveProjectLink(userID, link);
+}
+
+async function listStoredResearchAnswers(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listResearchAnswers === "function"
+    ? adapter.listResearchAnswers(userID)
+    : [];
+}
+
+async function saveStoredResearchAnswer(userID, answer) {
+  const adapter = await storeAdapter();
+  return adapter.saveResearchAnswer(userID, answer);
+}
+
+async function listStoredActivityEvents(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listActivityEvents === "function"
+    ? adapter.listActivityEvents(userID)
+    : [];
+}
+
+async function saveStoredActivityEvent(userID, event) {
+  const adapter = await storeAdapter();
+  return adapter.saveActivityEvent(userID, event);
+}
+
+async function storedMigrationCheckpoint(userID, checkpointName) {
+  const adapter = await storeAdapter();
+  return typeof adapter.migrationCheckpoint === "function"
+    ? adapter.migrationCheckpoint(userID, checkpointName)
+    : null;
+}
+
+async function saveStoredMigrationCheckpoint(userID, checkpointName, checkpoint) {
+  const adapter = await storeAdapter();
+  return adapter.saveMigrationCheckpoint(userID, checkpointName, checkpoint);
 }
 
 async function researchUsageSince(userID, since) {
@@ -1960,7 +2440,16 @@ function safeWorkboardPathHash(value) {
 }
 
 function workboardAssetPrefix(userID, projectID) {
+  return `project-assets/${safeWorkboardPathHash(projectID)}/workboards/`;
+}
+
+function legacyWorkboardAssetPrefix(userID, projectID) {
   return `workboards/${safeWorkboardPathHash(userID)}/${safeWorkboardPathHash(projectID)}/`;
+}
+
+function workboardAssetPathBelongsToProject(pathname, userID, projectID) {
+  return pathname.startsWith(workboardAssetPrefix(userID, projectID)) ||
+    pathname.startsWith(legacyWorkboardAssetPrefix(userID, projectID));
 }
 
 function workboardAssetExtension(contentType) {
@@ -2903,8 +3392,414 @@ async function authenticatedResearchBody(request, response) {
     sendError(response, 400, "Missing user ID.");
     return null;
   }
-  const context = await authenticatedUserContext(request, response, userID);
-  return context ? { body, userID } : null;
+  const authContext = await authenticatedUserContext(request, response, userID);
+  return authContext ? { body, userID, authContext } : null;
+}
+
+function projectIdentityForRecord(record, userID) {
+  return syncProjectIdentity(record?.clientID, userID) ||
+    syncProjectIdentity(record?.id, userID) ||
+    (record?.localFolderID === null || record?.localFolderID === undefined
+      ? null
+      : `legacy-project-${record.localFolderID}`);
+}
+
+async function userContentMutations(userID) {
+  const store = await readStore();
+  return store.mutationsByUserID?.[userID] || [];
+}
+
+async function ownedProjectRecord(userID, projectID) {
+  const normalizedProjectID = String(projectID || "").trim();
+  const mutations = await userContentMutations(userID);
+  const projectMutation = mutations.find((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "project" || !record || Number.isFinite(Date.parse(record.deletedAt || ""))) return false;
+    return [record.id, record.clientID, projectIdentityForRecord(record, userID)]
+      .filter(Boolean)
+      .some((candidate) => String(candidate) === normalizedProjectID);
+  });
+  return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
+}
+
+async function ownsProjectAssetScope(userID, projectID) {
+  if (await ownedProjectRecord(userID, projectID)) return true;
+  return (await userContentMutations(userID)).some((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    return kind === "workboard" &&
+      !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
+      String(syncProjectIdentity(record?.projectID, userID) || record?.projectID || "") === String(projectID);
+  });
+}
+
+async function ownedProjectTargetExists(userID, targetKind, targetID) {
+  const normalizedTargetID = String(targetID || "").trim();
+  if (targetKind === "canonicalSection") {
+    try {
+      return (await researchEvidenceForSectionIDs([normalizedTargetID])).length === 1;
+    } catch {
+      return false;
+    }
+  }
+  if (targetKind === "selectedPassage") {
+    return (await listStoredResearchConversations(userID))
+      .some((conversation) => (conversation.sources || []).some((source) => source.id === normalizedTargetID));
+  }
+  if (targetKind === "researchConversation") {
+    return Boolean(await storedResearchConversation(userID, normalizedTargetID));
+  }
+  if (targetKind === "researchAnswer") {
+    return (await listStoredResearchAnswers(userID)).some((answer) => answer.id === normalizedTargetID);
+  }
+  if (targetKind === "approvedEvidence") {
+    return (await listStoredResearchAnswers(userID))
+      .some((answer) => (answer.evidence || []).some((snapshot) => snapshot.id === normalizedTargetID));
+  }
+  const mutations = await userContentMutations(userID);
+  if (targetKind === "savedItem") {
+    return mutations.some((mutation) => {
+      const { kind, record } = mutationKindAndRecord(mutation);
+      return kind === "savedItem" &&
+        !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
+        [record?.id, normalizedMutationRecordID(mutation)].includes(normalizedTargetID);
+    });
+  }
+  if (targetKind === "note") {
+    return mutations.some((mutation) => {
+      const { kind, record } = mutationKindAndRecord(mutation);
+      return kind === "annotation" && record?.tags === undefined &&
+        !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
+        [record?.id, normalizedMutationRecordID(mutation)].includes(normalizedTargetID);
+    });
+  }
+  if (targetKind === "workboard") {
+    return mutations.some((mutation) => {
+      const { kind, record } = mutationKindAndRecord(mutation);
+      return kind === "workboard" &&
+        !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
+        [record?.id, normalizedMutationRecordID(mutation)].includes(normalizedTargetID);
+    });
+  }
+  const artifact = (await listStoredFoundationArtifacts(userID))
+    .find((item) => item.envelope?.id === normalizedTargetID && !item.envelope?.deletedAt);
+  if (!artifact) return false;
+  const permittedTypes = {
+    notebookCard: ["notebookCard"],
+    attachment: ["attachment"],
+    reportDraft: ["reportDraft"],
+    reportManifest: ["reportManifest"],
+    generatedReport: ["generatedReport"]
+  };
+  return (permittedTypes[targetKind] || []).includes(artifact.envelope.type);
+}
+
+function deterministicFoundationLinkID(userID, projectID, targetKind, targetID) {
+  return `project-link-${createHash("sha256")
+    .update([userID, projectID, targetKind, targetID].join("\u001f"))
+    .digest("hex")
+    .slice(0, 32)}`;
+}
+
+async function migrateLegacyProjectFoundation(userID) {
+  const checkpointName = `project-foundation-v${projectFoundationSchemaVersion}`;
+  const existingCheckpoint = await storedMigrationCheckpoint(userID, checkpointName);
+
+  const mutations = await userContentMutations(userID);
+  const existingLinks = await listStoredProjectLinks(userID);
+  const existingAnswers = await listStoredResearchAnswers(userID);
+  const answerIDs = new Set(existingAnswers.map((answer) => answer.id));
+  const knownKeys = new Set(existingLinks
+    .map((link) => [link.projectID, link.targetKind, link.targetID].join("\u001f")));
+  let migratedProjectSections = 0;
+  let migratedWorkboards = 0;
+  let migratedResearchAnswers = 0;
+  let unmigratedResearchAnswers = 0;
+  for (const mutation of mutations) {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (!record || Number.isFinite(Date.parse(record.deletedAt || ""))) continue;
+    if (kind === "projectSection") {
+      const projectID = syncProjectIdentity(record.folderClientID, userID) ||
+        (record.localFolderID === null || record.localFolderID === undefined
+          ? null
+          : `legacy-project-${record.localFolderID}`);
+      if (!projectID || !record.sectionID) continue;
+      const targetID = String(record.sectionID);
+      const key = [projectID, "canonicalSection", targetID].join("\u001f");
+      if (knownKeys.has(key)) continue;
+      await saveStoredProjectLink(userID, projectLinkRecord({
+        id: deterministicFoundationLinkID(userID, projectID, "canonicalSection", targetID),
+        owner: ownerScope(userID),
+        projectID,
+        targetKind: "canonicalSection",
+        targetID,
+        relationship: "reference",
+        createdAt: record.updatedAt || new Date().toISOString(),
+        updatedAt: record.updatedAt || new Date().toISOString(),
+        metadata: {
+          migratedFrom: "projectSection",
+          legacyRecordID: record.id || null,
+          scope: record.scope || null,
+          blockID: record.blockID || null
+        }
+      }));
+      knownKeys.add(key);
+      migratedProjectSections += 1;
+    } else if (kind === "workboard" && record.projectID && record.id) {
+      const projectID = syncProjectIdentity(record.projectID, userID) || record.projectID;
+      const key = [projectID, "workboard", record.id].join("\u001f");
+      if (knownKeys.has(key)) continue;
+      await saveStoredProjectLink(userID, projectLinkRecord({
+        id: deterministicFoundationLinkID(userID, projectID, "workboard", record.id),
+        owner: ownerScope(userID),
+        projectID,
+        targetKind: "workboard",
+        targetID: record.id,
+        relationship: "owner",
+        createdAt: record.updatedAt || new Date().toISOString(),
+        updatedAt: record.updatedAt || new Date().toISOString(),
+        metadata: { migratedFrom: "workboard" }
+      }));
+      knownKeys.add(key);
+      migratedWorkboards += 1;
+    }
+  }
+  for (const conversation of await listStoredResearchConversations(userID)) {
+    const messages = conversation.messages || [];
+    for (let index = 0; index < messages.length; index += 1) {
+      const message = messages[index];
+      if (message.role !== "assistant" || !message.answer || answerIDs.has(message.id)) continue;
+      const questionMessage = [...messages.slice(0, index)].reverse()
+        .find((candidate) => candidate.role === "user");
+      const allowedSourceIDs = new Set(message.answer.evidenceSourceIDs || []);
+      const sourceRecords = (conversation.sources || []).filter((source) =>
+        source.kind === "selection" &&
+        source.selectedText &&
+        (!allowedSourceIDs.size || allowedSourceIDs.has(source.id))
+      );
+      try {
+        const snapshots = sourceRecords.map((source) => immutableEvidenceSnapshot({
+          source: {
+            ...source,
+            sourceID: source.id,
+            text: source.selectedText
+          },
+          approvedAt: message.createdAt || conversation.updatedAt || conversation.createdAt,
+          evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
+          sourceLibraryVersion: source.codeVersion || conversation.codeVersion
+        }));
+        const answer = {
+          ...immutableResearchAnswer({
+            id: message.id,
+            owner: ownerScope(userID),
+            conversationID: conversation.id,
+            projectID: conversation.primaryProjectID || null,
+            question: questionMessage?.question,
+            answer: message.answer,
+            evidence: snapshots,
+            citations: message.answer.citations || [],
+            model: message.answer.model || "legacy-research-system",
+            researchSystemVersion: [
+              message.answer.promptVersion || "legacy-prompt",
+              message.answer.evidenceVersion || "legacy-evidence"
+            ].join(":"),
+            createdAt: message.createdAt || conversation.updatedAt || conversation.createdAt
+          }),
+          migratedFromConversation: true
+        };
+        await saveStoredResearchAnswer(userID, answer);
+        answerIDs.add(answer.id);
+        migratedResearchAnswers += 1;
+      } catch {
+        unmigratedResearchAnswers += 1;
+      }
+    }
+  }
+  const checkpoint = {
+    schemaVersion: projectFoundationSchemaVersion,
+    migratedProjectSections: Number(existingCheckpoint?.migratedProjectSections || 0) + migratedProjectSections,
+    migratedWorkboards: Number(existingCheckpoint?.migratedWorkboards || 0) + migratedWorkboards,
+    migratedResearchAnswers: Number(existingCheckpoint?.migratedResearchAnswers || 0) + migratedResearchAnswers,
+    unmigratedResearchAnswers,
+    completedAt: new Date().toISOString()
+  };
+  await saveStoredMigrationCheckpoint(userID, checkpointName, checkpoint);
+  return checkpoint;
+}
+
+async function handleProjectFoundationState(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const checkpoint = await migrateLegacyProjectFoundation(context.userID);
+  const projectID = String(context.body.projectID || "").trim();
+  const projects = (await userContentMutations(context.userID))
+    .map((mutation) => mutationKindAndRecord(mutation))
+    .filter(({ kind, record }) =>
+      kind === "project" && record && !Number.isFinite(Date.parse(record.deletedAt || ""))
+    )
+    .map(({ record }) => ({
+      id: projectIdentityForRecord(record, context.userID),
+      sourceRecordID: record.id,
+      name: record.name || "Untitled Project",
+      address: record.address || "",
+      description: record.description || "",
+      colorHex: record.colorHex || null,
+      archivedAt: record.archivedAt || null,
+      updatedAt: record.updatedAt
+    }));
+  const projectIDs = new Set(projects.map((project) => project.id));
+  if (projectID && !projectIDs.has(projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const links = (await listStoredProjectLinks(context.userID))
+    .filter((link) => !projectID || link.projectID === projectID);
+  const linkedTargetIDs = new Set(links.filter((link) => !link.deletedAt).map((link) => link.targetID));
+  const artifacts = (await listStoredFoundationArtifacts(context.userID))
+    .filter((artifact) => !projectID || linkedTargetIDs.has(artifact.envelope?.id));
+  const answers = (await listStoredResearchAnswers(context.userID))
+    .filter((answer) => !projectID || answer.projectID === projectID)
+    .map((answer) => ({
+      id: answer.id,
+      conversationID: answer.conversationID,
+      projectID: answer.projectID || null,
+      question: answer.question,
+      conclusion: answer.answer?.conclusion || "",
+      evidenceCount: answer.evidence?.length || 0,
+      reviewStatus: answer.reviewStatus,
+      createdAt: answer.createdAt
+    }));
+  const activity = (await listStoredActivityEvents(context.userID))
+    .filter((event) => !projectID || event.projectID === projectID);
+  sendJSON(response, 200, {
+    schemaVersion: projectFoundationSchemaVersion,
+    projects,
+    links,
+    artifacts,
+    researchAnswers: answers,
+    activity,
+    migrationCheckpoint: checkpoint
+  });
+}
+
+async function handleProjectFoundationLink(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Project organization requires Pro.",
+      code: "PRO_REQUIRED_PROJECTS"
+    });
+    return;
+  }
+  const projectID = String(context.body.projectID || "").trim();
+  const targetKind = String(context.body.targetKind || "").trim();
+  const targetID = String(context.body.targetID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  if (!await ownedProjectTargetExists(context.userID, targetKind, targetID)) {
+    sendError(response, 404, "Project item not found.");
+    return;
+  }
+  const links = await listStoredProjectLinks(context.userID);
+  const rule = projectMembershipRules[targetKind];
+  if (rule?.maximumProjects === 1 && links.some((link) =>
+    !link.deletedAt &&
+    link.targetKind === targetKind &&
+    link.targetID === targetID &&
+    link.projectID !== projectID
+  )) {
+    sendJSON(response, 409, {
+      error: "This item already belongs to another Project. Move it with an explicit unlink and link action.",
+      code: "PROJECT_MOVE_REQUIRED"
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  const linkID = deterministicFoundationLinkID(context.userID, projectID, targetKind, targetID);
+  const existing = links.find((link) => link.id === linkID);
+  const link = projectLinkRecord({
+    id: linkID,
+    owner: ownerScope(context.userID),
+    projectID,
+    targetKind,
+    targetID,
+    relationship: context.body.relationship || rule?.relationship || "reference",
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    version: Number(existing?.version || 0) + 1,
+    metadata: context.body.metadata
+  });
+  await saveStoredProjectLink(context.userID, link);
+  if (targetKind === "researchConversation") {
+    const conversation = await storedResearchConversation(context.userID, targetID);
+    conversation.primaryProjectID = projectID;
+    conversation.updatedAt = now;
+    await saveStoredResearchConversation(context.userID, conversation);
+  }
+  const event = activityEvent({
+    owner: ownerScope(context.userID),
+    projectID,
+    actorUserID: context.userID,
+    action: "item.linked",
+    objectKind: targetKind,
+    objectID: targetID,
+    previousStatus: existing?.deletedAt ? "unlinked" : null,
+    newStatus: "linked",
+    createdAt: now
+  });
+  await saveStoredActivityEvent(context.userID, event);
+  sendJSON(response, existing ? 200 : 201, { link, activity: event });
+}
+
+async function handleProjectFoundationUnlink(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const targetKind = String(context.body.targetKind || "").trim();
+  const targetID = String(context.body.targetID || "").trim();
+  const links = await listStoredProjectLinks(context.userID);
+  const existing = links.find((link) =>
+    !link.deletedAt &&
+    link.projectID === projectID &&
+    link.targetKind === targetKind &&
+    link.targetID === targetID
+  );
+  if (!existing) {
+    sendError(response, 404, "Active Project link not found.");
+    return;
+  }
+  const now = new Date().toISOString();
+  const link = projectLinkRecord({
+    ...existing,
+    owner: ownerScope(context.userID),
+    updatedAt: now,
+    deletedAt: now,
+    version: Number(existing.version || 1) + 1
+  });
+  await saveStoredProjectLink(context.userID, link);
+  if (targetKind === "researchConversation") {
+    const conversation = await storedResearchConversation(context.userID, targetID);
+    if (conversation?.primaryProjectID === projectID) {
+      conversation.primaryProjectID = null;
+      conversation.updatedAt = now;
+      await saveStoredResearchConversation(context.userID, conversation);
+    }
+  }
+  const event = activityEvent({
+    owner: ownerScope(context.userID),
+    projectID,
+    actorUserID: context.userID,
+    action: "item.unlinked",
+    objectKind: targetKind,
+    objectID: targetID,
+    previousStatus: "linked",
+    newStatus: "unlinked",
+    createdAt: now
+  });
+  await saveStoredActivityEvent(context.userID, event);
+  sendJSON(response, 200, { link, activity: event });
 }
 
 async function requiredResearchConversation(response, userID, conversationID) {
@@ -2955,6 +3850,57 @@ async function handleResearchConversationGet(request, response) {
   });
 }
 
+async function handleResearchAnswerList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  await migrateLegacyProjectFoundation(context.userID);
+  const conversationID = String(context.body.conversationID || "").trim();
+  const projectID = String(context.body.projectID || "").trim();
+  const answers = (await listStoredResearchAnswers(context.userID))
+    .filter((answer) => !conversationID || answer.conversationID === conversationID)
+    .filter((answer) => !projectID || answer.projectID === projectID)
+    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)))
+    .map((answer) => ({
+      id: answer.id,
+      conversationID: answer.conversationID,
+      projectID: answer.projectID || null,
+      question: answer.question,
+      conclusion: answer.answer?.conclusion || "",
+      evidenceCount: answer.evidence?.length || 0,
+      reviewStatus: answer.reviewStatus,
+      createdAt: answer.createdAt
+    }));
+  sendJSON(response, 200, { answers });
+}
+
+async function handleResearchAnswerGet(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  await migrateLegacyProjectFoundation(context.userID);
+  const answerID = String(context.body.answerID || "").trim();
+  const answer = (await listStoredResearchAnswers(context.userID))
+    .find((item) => item.id === answerID);
+  if (!answer) {
+    sendError(response, 404, "Historical Research answer not found.");
+    return;
+  }
+  const feedback = (await listStoredResearchFeedback(context.userID))
+    .find((item) => item.answerID === answerID);
+  sendJSON(response, 200, {
+    answer: {
+      ...answer,
+      userFeedback: feedback ? {
+        id: feedback.id,
+        category: feedback.category,
+        userComment: feedback.userComment,
+        professionalRole: feedback.professionalRole || "",
+        supportingReference: feedback.supportingReference || "",
+        updatedAt: feedback.userUpdatedAt || feedback.updatedAt
+      } : answer.userFeedback
+    }
+  });
+}
+
 async function handleResearchConversationCreate(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -2972,6 +3918,8 @@ async function handleResearchConversationCreate(request, response) {
       createdAt: now,
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
+      evidenceSetVersion: 1,
+      primaryProjectID: null,
       sourceStatus: "current",
       sources,
       messages: []
@@ -3004,6 +3952,7 @@ async function handleResearchConversationEvidence(request, response) {
     const addedSources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
     const existingRelatedIDs = new Set((conversation.sources || []).filter((source) => source.kind === "related").map((source) => source.sectionID));
     conversation.sources.push(...addedSources.filter((source) => source.kind === "selection" || !existingRelatedIDs.has(source.sectionID)));
+    conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
     conversation.updatedAt = new Date().toISOString();
     conversation.sourceStatus = "current";
     await saveStoredResearchConversation(context.userID, conversation);
@@ -3049,6 +3998,7 @@ async function handleResearchConversationRefresh(request, response) {
     } : source;
   });
   conversation.sourceStatus = "current";
+  conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
   conversation.updatedAt = new Date().toISOString();
   await saveStoredResearchConversation(context.userID, conversation);
   sendJSON(response, 200, { conversation });
@@ -3143,6 +4093,8 @@ async function handleResearchFeedback(request, response) {
     sendError(response, 404, "Research answer not found.");
     return;
   }
+  const immutableAnswerRecord = (await listStoredResearchAnswers(context.userID))
+    .find((item) => item.id === answerID);
   const existing = (await listStoredResearchFeedback(context.userID)).find((item) => item.answerID === answerID);
   const now = new Date().toISOString();
   const feedback = {
@@ -3150,19 +4102,30 @@ async function handleResearchFeedback(request, response) {
     status: "candidate",
     conversationID: conversation.id,
     answerID,
-    selectedEvidence: (conversation.sources || []).filter((source) => source.kind === "selection").map((source) => ({
-      sourceID: source.id,
-      sectionID: source.sectionID,
-      sectionNumber: source.sectionNumber,
-      codePrefix: source.codePrefix,
-      codeVersion: source.codeVersion,
-      codeEdition: source.codeEdition || defaultResearchCodeEdition,
-      selectedTextHash: source.selectedTextHash
-    })),
-    question: questionMessage.question,
-    answer: answerMessage.answer,
-    citations: answerMessage.answer?.citations || [],
-    model: answerMessage.answer?.model || null,
+    selectedEvidence: immutableAnswerRecord
+      ? immutableAnswerRecord.evidence.map((snapshot) => ({
+          sourceID: snapshot.sourceID,
+          sectionID: snapshot.sectionID,
+          sectionNumber: snapshot.sectionNumber,
+          codePrefix: snapshot.codeBook,
+          codeVersion: snapshot.sourceLibraryVersion,
+          codeEdition: snapshot.codeEdition,
+          selectedTextHash: snapshot.passageTextHash,
+          evidenceSnapshotID: snapshot.id
+        }))
+      : (conversation.sources || []).filter((source) => source.kind === "selection").map((source) => ({
+          sourceID: source.id,
+          sectionID: source.sectionID,
+          sectionNumber: source.sectionNumber,
+          codePrefix: source.codePrefix,
+          codeVersion: source.codeVersion,
+          codeEdition: source.codeEdition || defaultResearchCodeEdition,
+          selectedTextHash: source.selectedTextHash
+        })),
+    question: immutableAnswerRecord?.question || questionMessage.question,
+    answer: immutableAnswerRecord?.answer || answerMessage.answer,
+    citations: immutableAnswerRecord?.citations || answerMessage.answer?.citations || [],
+    model: immutableAnswerRecord?.model || answerMessage.answer?.model || null,
     promptVersion: answerMessage.answer?.promptVersion || null,
     evidenceVersion: answerMessage.answer?.evidenceVersion || null,
     category,
@@ -3503,10 +4466,57 @@ async function handleResearchConversationMessage(request, response) {
         disclaimer
       }
     };
+    const evidenceSnapshots = selectedEvidence.map((source) => immutableEvidenceSnapshot({
+      source,
+      approvedAt: now,
+      evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
+      sourceLibraryVersion: source.codeVersion || conversation.codeVersion
+    }));
+    const answerRecord = immutableResearchAnswer({
+      id: assistantMessage.id,
+      owner: ownerScope(context.userID),
+      conversationID: conversation.id,
+      projectID: conversation.primaryProjectID || null,
+      question,
+      answer: assistantMessage.answer,
+      evidence: evidenceSnapshots,
+      citations: assistantMessage.answer.citations || [],
+      model: assistantMessage.answer.model,
+      researchSystemVersion: [
+        assistantMessage.answer.promptVersion,
+        assistantMessage.answer.evidenceVersion
+      ].filter(Boolean).join(":"),
+      createdAt: now
+    });
+    await saveStoredResearchAnswer(context.userID, answerRecord);
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     conversation.sourceStatus = "current";
     await saveStoredResearchConversation(context.userID, conversation);
+    if (conversation.primaryProjectID) {
+      await saveStoredActivityEvent(context.userID, activityEvent({
+        owner: ownerScope(context.userID),
+        projectID: conversation.primaryProjectID,
+        actorUserID: context.userID,
+        action: "research.question.submitted",
+        objectKind: "researchConversation",
+        objectID: conversation.id,
+        newStatus: "submitted",
+        createdAt: now,
+        metadata: { answerID: assistantMessage.id }
+      }));
+      await saveStoredActivityEvent(context.userID, activityEvent({
+        owner: ownerScope(context.userID),
+        projectID: conversation.primaryProjectID,
+        actorUserID: context.userID,
+        action: "research.answer.generated",
+        objectKind: "researchAnswer",
+        objectID: assistantMessage.id,
+        newStatus: "generated",
+        createdAt: now,
+        metadata: { conversationID: conversation.id }
+      }));
+    }
     if (!mockMode) {
       await recordResearchUsage(context.userID, {
         id: randomUUID(),
@@ -5110,6 +6120,47 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
   store.mutationsByUserID[targetUserID] = mergedMutations.mutations;
   delete store.mutationsByUserID[sourceUserID];
 
+  const moveUserEntries = (field, transform = (item) => item) => {
+    store[field] ||= {};
+    const sourceEntries = store[field][sourceUserID] || [];
+    const targetEntries = store[field][targetUserID] || [];
+    const byID = new Map(targetEntries.map((item) => [item.id || item.envelope?.id, item]));
+    for (const sourceEntry of sourceEntries) {
+      const entry = transform(sourceEntry);
+      byID.set(entry.id || entry.envelope?.id, entry);
+    }
+    if (byID.size) store[field][targetUserID] = Array.from(byID.values());
+    delete store[field][sourceUserID];
+  };
+  moveUserEntries("foundationArtifactsByUserID", (artifact) => ({
+    ...artifact,
+    envelope: {
+      ...artifact.envelope,
+      owner: ownerScope(targetUserID)
+    }
+  }));
+  moveUserEntries("projectLinksByUserID", (link) => ({
+    ...link,
+    owner: ownerScope(targetUserID)
+  }));
+  moveUserEntries("researchAnswersByUserID", (answer) => ({
+    ...answer,
+    owner: ownerScope(targetUserID)
+  }));
+  moveUserEntries("activityEventsByUserID", (event) => ({
+    ...event,
+    owner: ownerScope(targetUserID)
+  }));
+  moveUserEntries("researchConversationsByUserID");
+  moveUserEntries("researchUsageByUserID");
+  moveUserEntries("researchFeedbackByUserID");
+  store.migrationCheckpointsByUserID ||= {};
+  store.migrationCheckpointsByUserID[targetUserID] = {
+    ...(store.migrationCheckpointsByUserID[sourceUserID] || {}),
+    ...(store.migrationCheckpointsByUserID[targetUserID] || {})
+  };
+  delete store.migrationCheckpointsByUserID[sourceUserID];
+
   if (!store.entitlements[targetUserID] && store.entitlements[sourceUserID]) {
     store.entitlements[targetUserID] = {
       ...store.entitlements[sourceUserID],
@@ -5600,6 +6651,10 @@ async function handleWorkboardAssetUpload(request, response) {
     });
     return;
   }
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
   if (!blobStorageConfigured()) {
     sendError(response, 503, "Private Workboard image storage is not configured.");
     return;
@@ -5644,7 +6699,11 @@ async function handleWorkboardAssetRead(request, response) {
     return;
   }
   if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  if (!pathname.startsWith(workboardAssetPrefix(userID, projectID))) {
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  if (!workboardAssetPathBelongsToProject(pathname, userID, projectID)) {
     sendError(response, 403, "This Workboard image does not belong to the authenticated project.");
     return;
   }
@@ -5660,7 +6719,7 @@ async function handleWorkboardAssetRead(request, response) {
   }
   response.writeHead(200, {
     ...securityHeaders(),
-    "cache-control": "private, max-age=3600",
+    "cache-control": "private, no-store",
     "content-type": result.blob.contentType || "application/octet-stream",
     ...(Number.isFinite(result.blob.size) ? { "content-length": String(result.blob.size) } : {})
   });
@@ -5683,8 +6742,13 @@ async function handleWorkboardAssetDelete(request, response) {
     return;
   }
   if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  const prefix = workboardAssetPrefix(userID, projectID);
-  if (pathnames.some((pathname) => !pathname.startsWith(prefix))) {
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  if (pathnames.some((pathname) =>
+    !workboardAssetPathBelongsToProject(pathname, userID, projectID)
+  )) {
     sendError(response, 403, "One or more Workboard images do not belong to the authenticated project.");
     return;
   }
@@ -5695,6 +6759,51 @@ async function handleWorkboardAssetDelete(request, response) {
   const { del } = await vercelBlob();
   await del(pathnames);
   sendJSON(response, 200, { deletedCount: pathnames.length });
+}
+
+async function syncResponseContract(userID, entitlement, body, contentMapVersion) {
+  return syncContract({
+    entitlement,
+    clientSchemaVersion: body.syncSchemaVersion ?? body.batch?.syncSchemaVersion,
+    clientCapabilities: body.clientCapabilities ?? body.batch?.clientCapabilities,
+    contentMapVersion,
+    researchMonthlyLimit: monthlyResearchRequestLimit(),
+    migrationCheckpoint: await storedMigrationCheckpoint(
+      userID,
+      `project-foundation-v${projectFoundationSchemaVersion}`
+    )
+  });
+}
+
+async function recordMeaningfulSyncActivity(userID, previousMutations, incomingMutations, acceptedMutationIDs) {
+  const acceptedIDs = new Set(acceptedMutationIDs || []);
+  const previousByID = new Map((previousMutations || []).map((mutation) => [
+    normalizedMutationRecordID(mutation),
+    mutation
+  ]));
+  for (const mutation of incomingMutations || []) {
+    const recordID = normalizedMutationRecordID(mutation);
+    if (!recordID || !acceptedIDs.has(recordID)) continue;
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "project" || !record) continue;
+    const previous = mutationKindAndRecord(previousByID.get(recordID) || {}).record;
+    const wasArchived = Number.isFinite(Date.parse(previous?.archivedAt || ""));
+    const isArchived = Number.isFinite(Date.parse(record.archivedAt || ""));
+    if (wasArchived === isArchived) continue;
+    const projectID = projectIdentityForRecord(record, userID);
+    if (!projectID) continue;
+    await saveStoredActivityEvent(userID, activityEvent({
+      owner: ownerScope(userID),
+      projectID,
+      actorUserID: userID,
+      action: isArchived ? "project.archived" : "project.restored",
+      objectKind: "project",
+      objectID: recordID,
+      previousStatus: wasArchived ? "archived" : "active",
+      newStatus: isArchived ? "archived" : "active",
+      createdAt: record.updatedAt || new Date().toISOString()
+    }));
+  }
 }
 
 async function handlePush(request, response) {
@@ -5732,7 +6841,15 @@ async function handlePush(request, response) {
     if (!context) {
       return;
     }
+    const previousMutations = (await readStore()).mutationsByUserID?.[userID] || [];
     const result = await adapter.pushUserContent(userID, incoming);
+    await recordMeaningfulSyncActivity(
+      userID,
+      previousMutations,
+      incoming,
+      result.acceptedMutationIDs
+    );
+    const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
     sendJSON(response, 200, {
       acceptedMutationIDs: includeSubmittedMutationIDAliases(
         result.acceptedMutationIDs,
@@ -5749,7 +6866,8 @@ async function handlePush(request, response) {
       latestEventID: result.latestEventID,
       syncRevision: result.latestEventID,
       entitlement: result.entitlement,
-      serverTime: new Date().toISOString()
+      serverTime: new Date().toISOString(),
+      ...await syncResponseContract(userID, result.entitlement, body, contentMapVersion)
     });
     return;
   }
@@ -5769,7 +6887,14 @@ async function handlePush(request, response) {
   const merge = mergeMutations(existing, planEnforcement.acceptedMutations);
   store.mutationsByUserID[userID] = merge.mutations;
   await writeStore(store);
+  await recordMeaningfulSyncActivity(
+    userID,
+    existing,
+    planEnforcement.acceptedMutations,
+    merge.acceptedMutationIDs
+  );
   const latestEventID = await latestSyncEventID(userID);
+  const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
   sendJSON(response, 200, {
     acceptedMutationIDs: includeSubmittedMutationIDAliases(
       merge.acceptedMutationIDs,
@@ -5786,7 +6911,13 @@ async function handlePush(request, response) {
     latestEventID,
     syncRevision: latestEventID,
     entitlement: store.entitlements[userID] || null,
-    serverTime: new Date().toISOString()
+    serverTime: new Date().toISOString(),
+    ...await syncResponseContract(
+      userID,
+      store.entitlements[userID] || null,
+      body,
+      contentMapVersion
+    )
   });
 }
 
@@ -5819,7 +6950,8 @@ async function handlePull(request, response) {
       syncRevision: result.latestEventID,
       contentMapVersion,
       entitlement: result.entitlement,
-      mutations
+      mutations,
+      ...await syncResponseContract(userID, result.entitlement, body, contentMapVersion)
     });
     return;
   }
@@ -5841,7 +6973,13 @@ async function handlePull(request, response) {
     syncRevision: latestEventID,
     contentMapVersion,
     entitlement: store.entitlements[userID] || null,
-    mutations
+    mutations,
+    ...await syncResponseContract(
+      userID,
+      store.entitlements[userID] || null,
+      body,
+      contentMapVersion
+    )
   });
 }
 
@@ -6738,8 +7876,13 @@ const handlers = {
   "research/conversations/refresh": handleResearchConversationRefresh,
   "research/conversations/message": handleResearchConversationMessage,
   "research/conversations/delete": handleResearchConversationDelete,
+  "research/answers/list": handleResearchAnswerList,
+  "research/answers/get": handleResearchAnswerGet,
   "research/usage": handleResearchUsage,
   "research/feedback": handleResearchFeedback,
+  "projects/foundation/state": handleProjectFoundationState,
+  "projects/foundation/link": handleProjectFoundationLink,
+  "projects/foundation/unlink": handleProjectFoundationUnlink,
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
