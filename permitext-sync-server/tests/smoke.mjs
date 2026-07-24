@@ -544,7 +544,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260723-project-archive-sync-v1'),
+        webRoot.text.includes('/web/app.js?v=20260724-pro-offline-v3'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

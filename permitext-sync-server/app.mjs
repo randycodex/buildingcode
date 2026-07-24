@@ -1694,12 +1694,13 @@ function sendHTML(response, html, { scriptNonce = null, extraHeaders = {} } = {}
   response.end(html);
 }
 
-function sendStatic(response, contentType, body, cacheControl = "no-store") {
+function sendStatic(response, contentType, body, cacheControl = "no-store", extraHeaders = {}) {
   response.writeHead(200, {
     ...securityHeaders(),
     "content-type": contentType,
     "cache-control": cacheControl,
-    "vercel-cdn-cache-control": cacheControl
+    "vercel-cdn-cache-control": cacheControl,
+    ...extraHeaders
   });
   response.end(body);
 }
@@ -1714,6 +1715,9 @@ function contentTypeForPath(path) {
   }
   if (path.endsWith(".js")) {
     return "text/javascript; charset=utf-8";
+  }
+  if (path.endsWith(".webmanifest")) {
+    return "application/manifest+json; charset=utf-8";
   }
   if (path.endsWith(".svg")) {
     return "image/svg+xml";
@@ -3410,6 +3414,17 @@ function searchSnippet(text, query) {
 
 async function handleWebIndex(_request, response) {
   sendHTML(response, await readFile(join(webPublicPath, "index.html"), "utf8"));
+}
+
+async function handleServiceWorker(response) {
+  const filePath = join(webPublicPath, "service-worker.js");
+  sendStatic(
+    response,
+    contentTypeForPath(filePath),
+    await readFile(filePath),
+    "no-cache",
+    { "service-worker-allowed": "/" }
+  );
 }
 
 async function handleWebStatic(path, response) {
@@ -6143,6 +6158,10 @@ export async function handleRequest(request, response) {
     }
     if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {
       await handleInternalStatic(request, path, response);
+      return;
+    }
+    if (request.method === "GET" && path === "service-worker.js") {
+      await handleServiceWorker(response);
       return;
     }
     if (request.method === "GET" && path.startsWith("web/")) {

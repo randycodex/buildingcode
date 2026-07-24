@@ -16,6 +16,17 @@ import {
   mergeNewestRecord,
   recordSurvivesBulkClear
 } from "./sync-state.js?v=20260721-causal-clear-v4";
+import {
+  disableOfflineFeature,
+  downloadOfflineLibrary,
+  loadOfflineSyncSnapshot,
+  offlineAPI,
+  offlineFeatureMetadata,
+  offlineLibraryStatus,
+  reconcileOfflineFeatureAccess,
+  removeOfflineLibrary,
+  saveOfflineSyncSnapshot
+} from "./offline-storage.js?v=20260724-pro-offline-v3";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
@@ -42,6 +53,7 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
+const connectionStatus = document.querySelector("#connection-status");
 const readerTemplate = document.querySelector("#reader-template");
 const projectsTemplate = document.querySelector("#projects-template");
 const searchTemplate = document.querySelector("#search-template");
@@ -100,6 +112,7 @@ let syncFlushPromise = null;
 let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncPromise = null;
+let serverReachable = navigator.onLine !== false;
 const foregroundSyncIntervalMilliseconds = 3_000;
 const foregroundSyncJitterMilliseconds = 300;
 let continuityPushTimer = null;
@@ -328,6 +341,7 @@ function saveWorkspaceState() {
     sessionStorage.setItem(tabWorkspaceKey, JSON.stringify(persistableWorkspaceState));
   }
   localStorage.setItem(workspaceKey, JSON.stringify(persistableWorkspaceState));
+  updateConnectionStatus();
   if (!detachedProjectWindow) return;
   try {
     const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
@@ -1597,10 +1611,21 @@ function searchCodeFilterOptions() {
 }
 
 async function api(path) {
-  const response = await fetch(path);
-  if (!response.ok) {
-    throw new Error(`Request failed: ${response.status}`);
+  let response;
+  try {
+    response = await fetch(path);
+    serverReachable = true;
+    updateConnectionStatus();
+  } catch (networkError) {
+    serverReachable = false;
+    updateConnectionStatus();
+    if (isProAccount()) {
+      const payload = await offlineAPI(path).catch(() => null);
+      if (payload) return payload;
+    }
+    throw networkError;
   }
+  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
   return response.json();
 }
 
@@ -1638,11 +1663,20 @@ async function postJSON(path, body, options = {}) {
   if (options.token) {
     headers.Authorization = `Bearer ${options.token}`;
   }
-  const response = await fetch(path, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body)
-  });
+  let response;
+  try {
+    response = await fetch(path, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(body)
+    });
+    serverReachable = true;
+  } catch (error) {
+    serverReachable = false;
+    updateConnectionStatus();
+    throw error;
+  }
+  updateConnectionStatus();
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(payload.error || `Request failed: ${response.status}`);
@@ -2115,6 +2149,27 @@ function activeAccount() {
   return userID && sessionToken ? { userID, sessionToken } : null;
 }
 
+function updateConnectionStatus() {
+  if (!connectionStatus) return;
+  const account = activeAccount();
+  const pending = account
+    ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length
+    : 0;
+  const conflicts = account
+    ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length
+    : 0;
+  const offline = navigator.onLine === false || !serverReachable;
+  connectionStatus.classList.toggle("is-offline", offline);
+  connectionStatus.classList.toggle("has-pending", pending > 0 || conflicts > 0);
+  connectionStatus.hidden = false;
+  connectionStatus.textContent = offline
+    ? pending > 0 ? `Offline · ${pending} pending` : "Offline"
+    : conflicts > 0 ? "Review sync"
+      : syncFlushPromise ? "Syncing"
+        : pending > 0 ? `${pending} pending`
+          : account ? "Synced" : "Online";
+}
+
 function isSessionAuthenticationError(error) {
   return Number(error?.status) === 401;
 }
@@ -2128,6 +2183,7 @@ function clearExpiredAccountSession() {
   syncRetryTimer = null;
   stopForegroundSyncLoop();
   saveWorkspaceState();
+  void disableOfflineFeature().catch(() => {});
 }
 
 function currentEntitlement() {
@@ -2135,7 +2191,10 @@ function currentEntitlement() {
 }
 
 function currentPlan() {
-  return currentEntitlement()?.plan === "pro" ? "pro" : "free";
+  const entitlement = currentEntitlement();
+  if (entitlement?.plan !== "pro") return "free";
+  const expiration = Date.parse(entitlement.expiresAt || "");
+  return Number.isFinite(expiration) && expiration <= Date.now() ? "free" : "pro";
 }
 
 function isProAccount() {
@@ -2155,6 +2214,7 @@ function storeAccountEntitlement(entitlement) {
   state.account = { ...state.account, entitlement: entitlement || null };
   persistAccountSession();
   saveWorkspaceState();
+  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
 }
 
 function delay(milliseconds) {
@@ -2320,6 +2380,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   persistAccountSession();
   syncedContent = null;
   saveWorkspaceState();
+  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
   loadSyncedContent({ force: true })
     .then(() => flushSyncOutbox({ refresh: true }))
     .then(() => renderWorkspace())
@@ -2544,7 +2605,7 @@ async function loadSyncedContent(options = {}) {
   if (syncLoadPromise && !options.force) {
     return syncLoadPromise;
   }
-  const baseline = syncedContent?.status === "connected" && syncedContent?.userID === account.userID
+  const baseline = ["connected", "offline"].includes(syncedContent?.status) && syncedContent?.userID === account.userID
     ? syncedContent
     : null;
   const requestedEventID = Number.isSafeInteger(baseline?.latestEventID) ? baseline.latestEventID : null;
@@ -2576,15 +2637,25 @@ async function loadSyncedContent(options = {}) {
         summary: summarizeMutations(mutations)
       };
       await applyRemoteContinuityIfNewer();
+      await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
       storeAccountEntitlement(entitlement);
       return syncedContent;
     })
-    .catch((error) => {
+    .catch(async (error) => {
       if (isSessionAuthenticationError(error)) {
         clearExpiredAccountSession();
         return syncedContent;
       }
-      syncedContent = { status: "error", error: error.message, mutations: [], summary: summarizeMutations([]) };
+      const snapshot = baseline || await loadOfflineSyncSnapshot(account.userID).catch(() => null);
+      const mutations = snapshot?.mutations || [];
+      syncedContent = {
+        ...(snapshot || {}),
+        status: "offline",
+        userID: account.userID,
+        error: error.message,
+        mutations,
+        summary: summarizeMutations(mutations)
+      };
       return syncedContent;
     })
     .finally(() => {
@@ -2610,6 +2681,9 @@ async function ensureSyncedContentForRender() {
     return syncedContent;
   }
   if (syncedContent?.status === "connected") return syncedContent;
+  if (syncedContent?.status === "offline" && (navigator.onLine === false || !serverReachable)) {
+    return syncedContent;
+  }
   return loadSyncedContent();
 }
 
@@ -3242,7 +3316,9 @@ async function flushSyncOutbox(options = {}) {
     return { acceptedMutationIDs, rejectedMutationIDs, payload: latestPayload };
   })().finally(() => {
     syncFlushPromise = null;
+    updateConnectionStatus();
   });
+  updateConnectionStatus();
   return syncFlushPromise;
 }
 
@@ -7527,7 +7603,7 @@ async function renderArchive() {
   actions?.prepend(closeButton);
   clear(content);
   const data = await loadSyncedContent();
-  const sourceProjects = data.status === "connected" ? data.summary.projects : [];
+  const sourceProjects = ["connected", "offline"].includes(data.status) ? data.summary.projects : [];
   const projects = archivedProjectRecords(sourceProjects);
   if (data.status === "error") {
     appendProjectEmptyCard(content, "Sync error", data.error || "Could not load archived projects.");
@@ -9434,6 +9510,11 @@ function renderSettings() {
   const syncIcon = panel.querySelector(".account-sync-icon");
   const syncButton = panel.querySelector(".account-sync-now");
   const syncConflicts = panel.querySelector(".account-sync-conflicts");
+  const offlineCopy = panel.querySelector(".settings-offline-copy");
+  const offlineStatus = panel.querySelector(".settings-offline-status");
+  const offlineProgress = panel.querySelector(".settings-offline-progress");
+  const offlineDownload = panel.querySelector(".settings-offline-download");
+  const offlineRemove = panel.querySelector(".settings-offline-remove");
   const projectList = panel.querySelector(".settings-project-list");
   const projectEmpty = panel.querySelector(".settings-projects-empty");
   const projectSelectAll = panel.querySelector(".settings-project-select-all");
@@ -9525,9 +9606,15 @@ function renderSettings() {
     const account = activeAccount();
     const pending = account ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID) : [];
     const conflicts = account ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID) : [];
-    syncButton.disabled = !account;
-    syncIcon.textContent = !account ? "!" : conflicts.length || pending.length ? "↻" : "✓";
-    syncTitle.textContent = !account ? "Not signed in" : conflicts.length ? "Review needed" : pending.length ? "Changes waiting" : "Up to date";
+    const offline = navigator.onLine === false || !serverReachable;
+    syncButton.disabled = !account || offline;
+    syncIcon.textContent = !account ? "!" : offline ? "○" : conflicts.length || pending.length ? "↻" : "✓";
+    syncTitle.textContent = !account
+      ? "Not signed in"
+      : offline ? pending.length ? `${pending.length} changes waiting for internet` : "Offline · saved on this device"
+        : conflicts.length ? "Review needed"
+          : pending.length ? "Changes waiting"
+            : "Up to date";
     clear(syncConflicts);
     conflicts.slice(0, 5).forEach((entry) => {
       const { kind, record } = mutationKindAndRecord(entry.mutation);
@@ -9563,6 +9650,49 @@ function renderSettings() {
     });
   };
 
+  const renderOfflineState = async () => {
+    const pro = isProAccount();
+    const account = activeAccount();
+    const library = await offlineLibraryStatus().catch(() => ({ available: false, supported: false }));
+    offlineProgress.hidden = true;
+    offlineDownload.disabled = false;
+    offlineRemove.hidden = !library.available;
+    if (!pro) {
+      offlineCopy.textContent = `Offline reading is a Pro feature. The complete searchable code library is about ${offlineFeatureMetadata.estimatedDownload}.`;
+      offlineStatus.textContent = account ? "Upgrade to Pro to download." : "Sign in and upgrade to Pro to download.";
+      offlineDownload.textContent = account ? "Upgrade to Pro" : "Sign In to Continue";
+      return;
+    }
+    offlineCopy.textContent = `Keep the app and complete searchable 2022 Construction Codes on this device. Estimated download: ${offlineFeatureMetadata.estimatedDownload}.`;
+    if (!library.supported) {
+      offlineStatus.textContent = "This browser does not provide the storage required for offline codes.";
+      offlineDownload.textContent = "Offline Storage Unavailable";
+      offlineDownload.disabled = true;
+      return;
+    }
+    if (!library.available) {
+      offlineStatus.textContent = navigator.onLine ? "Not downloaded on this device." : "Connect to the internet to download.";
+      offlineDownload.textContent = "Download for Offline Use";
+      offlineDownload.disabled = navigator.onLine === false;
+      return;
+    }
+    if (library.assetVersion !== offlineFeatureMetadata.assetVersion) {
+      offlineStatus.textContent = navigator.onLine
+        ? "An updated offline code package is available."
+        : "Your offline package works, but must be updated when you reconnect.";
+      offlineDownload.textContent = "Update Offline Codes";
+      offlineDownload.disabled = navigator.onLine === false;
+      return;
+    }
+    const downloaded = new Date(library.downloadedAt);
+    const dateLabel = Number.isNaN(downloaded.getTime())
+      ? "downloaded"
+      : `downloaded ${downloaded.toLocaleDateString()}`;
+    offlineStatus.textContent = `${library.chapterCount || 0} chapters available offline · ${dateLabel}.`;
+    offlineDownload.textContent = "Update Offline Codes";
+    offlineDownload.disabled = navigator.onLine === false;
+  };
+
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
@@ -9593,6 +9723,7 @@ function renderSettings() {
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
     accountCopy.textContent = "Sign in to attach local saved work to your account and use cross-device sync.";
     renderSyncState();
+    void renderOfflineState();
   };
 
   syncAccountState();
@@ -9635,6 +9766,7 @@ function renderSettings() {
     } catch {
       // Clear the local session even if the network is unavailable.
     } finally {
+      await disableOfflineFeature().catch(() => {});
       state.account = null;
       persistAccountSession(null);
       syncedContent = null;
@@ -9704,6 +9836,60 @@ function renderSettings() {
       setStatus(error.message || "Sync failed.", true);
       syncButton.disabled = false;
       syncButton.textContent = "Sync Now";
+    }
+  });
+  offlineDownload.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account) {
+      signInButton.click();
+      return;
+    }
+    if (!isProAccount()) {
+      checkoutButton.click();
+      return;
+    }
+    offlineDownload.disabled = true;
+    offlineRemove.hidden = true;
+    offlineProgress.hidden = false;
+    offlineProgress.value = 0;
+    offlineStatus.textContent = "Confirming Pro access…";
+    try {
+      await loadSyncedContent({ force: true });
+      if (!isProAccount()) {
+        await disableOfflineFeature();
+        throw new Error("An active Pro plan is required for offline access.");
+      }
+      await downloadOfflineLibrary({
+        codeVersion: defaultSyncCodeVersion,
+        onProgress(progress) {
+          offlineProgress.value = progress.percent || 0;
+          offlineStatus.textContent = progress.total > 1
+            ? `${progress.phase} · ${progress.completed} of ${progress.total} chapters`
+            : progress.phase;
+        }
+      });
+      if (syncedContent?.status === "connected" && account.userID === syncedContent.userID) {
+        await saveOfflineSyncSnapshot(account.userID, syncedContent);
+      }
+      offlineStatus.textContent = "Offline access is ready.";
+      await renderOfflineState();
+    } catch (error) {
+      const message = error.message || "Could not download offline codes.";
+      offlineProgress.hidden = true;
+      await renderOfflineState();
+      offlineStatus.textContent = message;
+    }
+  });
+  offlineRemove.addEventListener("click", async () => {
+    offlineRemove.disabled = true;
+    offlineStatus.textContent = "Removing offline download…";
+    try {
+      await removeOfflineLibrary();
+      offlineStatus.textContent = "Offline download removed.";
+      await renderOfflineState();
+    } catch (error) {
+      offlineStatus.textContent = error.message || "Could not remove the offline download.";
+      offlineRemove.disabled = false;
     }
   });
 
@@ -10451,6 +10637,8 @@ async function start() {
     const payload = await api("/code/chapters");
     chapters = payload.chapters || [];
   }
+  updateConnectionStatus();
+  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
   document.addEventListener("click", (event) => {
     if (
       activeCustomSelect &&
@@ -10490,9 +10678,13 @@ async function start() {
     }
   });
   window.addEventListener("online", () => {
+    serverReachable = true;
+    updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
   });
   window.addEventListener("offline", () => {
+    serverReachable = false;
+    updateConnectionStatus();
     stopForegroundSyncLoop();
   });
   document.addEventListener("visibilitychange", () => {

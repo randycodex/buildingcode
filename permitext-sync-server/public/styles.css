@@ -369,6 +369,36 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
+.topbar-account-state {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: var(--space-3);
+}
+
+.connection-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 7%, transparent);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.connection-status.is-offline {
+  background: color-mix(in srgb, #b54708 14%, var(--surface));
+  color: #9a3c06;
+}
+
+.connection-status.has-pending:not(.is-offline) {
+  background: color-mix(in srgb, var(--code-accent) 13%, var(--surface));
+  color: var(--code-accent);
+}
+
 .topbar-brand-name {
   color: var(--text-primary);
   font-size: calc(var(--chrome-font-size) * 1.08);
@@ -5105,6 +5135,61 @@ mark {
   background: var(--surface-muted);
 }
 
+.settings-card-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.settings-pro-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+  color: var(--surface);
+  font-size: 8.5pt !important;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.settings-offline-status {
+  min-height: 20px;
+  color: var(--text-primary);
+  font-size: 9.5pt !important;
+  line-height: 1.35;
+}
+
+.settings-offline-progress {
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+
+.settings-offline-progress::-webkit-progress-bar {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+}
+
+.settings-offline-progress::-webkit-progress-value {
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+}
+
+.settings-offline-progress::-moz-progress-bar {
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+}
+
+.settings-offline-actions {
+  align-items: center;
+}
+
 .settings-card-copy,
 .settings-disclaimer,
 .settings-status-message,
@@ -5971,6 +6056,10 @@ mark {
   }
 
   .topbar-brand {
+    display: none;
+  }
+
+  .topbar-account-state {
     display: none;
   }
 
