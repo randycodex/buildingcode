@@ -59,6 +59,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var proProductDisplayPrice: String?
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
     @Published private(set) var storeKitDebugSummary: String = "not checked"
+    @Published private(set) var storeKitTransactionEnvironment: String?
     @Published private(set) var isStoreKitBusy = false
     /// sectionID → ordered list of folderIDs containing that section. Cached
     /// up front so the Reader and Saved screens don't make per-section DB
@@ -139,6 +140,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private var activeStoreKitPlan: AppPlan = .free
+    private var hasActiveBackendProEntitlement = false
     private let foregroundAccountSyncInterval: TimeInterval = 30
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     @Published private(set) var bookmarkRevision: Int = 0
@@ -1699,9 +1701,32 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     var upgradeCallToActionTitle: String {
+        if isStoreKitTestProActive { return "Pro (Test) Active" }
         if currentPlan == .pro { return "Pro Active" }
         if proProductDisplayPrice != nil { return "Upgrade to Pro - $0.00/month" }
         return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
+    }
+
+    var isStoreKitTestProActive: Bool {
+        guard activeStoreKitPlan == .pro, !hasActiveBackendProEntitlement else { return false }
+        switch storeKitTransactionEnvironment?.lowercased() {
+        case "xcode", "sandbox":
+            return true
+        default:
+            return false
+        }
+    }
+
+    var planBillingLabel: String {
+        guard isStoreKitTestProActive else { return currentEntitlementSource.label }
+        switch storeKitTransactionEnvironment?.lowercased() {
+        case "xcode":
+            return "Apple subscription (Xcode test)"
+        case "sandbox":
+            return "Apple subscription (Sandbox/TestFlight)"
+        default:
+            return "Apple subscription (test)"
+        }
     }
 
     var hasProjectAccess: Bool {
@@ -1767,7 +1792,13 @@ final class CodeLibraryViewModel: ObservableObject {
             let snapshot = try await storeKitSubscriptionService.purchasePro()
             applyStoreKitSnapshot(snapshot)
             await syncAppleTransactionIfPossible(snapshot)
-            statusMessage = currentPlan == .pro ? "Pro is active." : "Purchase cancelled."
+            if currentPlan != .pro {
+                statusMessage = "Purchase cancelled."
+            } else if isStoreKitTestProActive {
+                statusMessage = "Pro (Test) is active on this device. Account-wide Pro still requires a server grant or production purchase."
+            } else {
+                statusMessage = "Pro is active."
+            }
         } catch {
             statusMessage = error.localizedDescription
             entitlementPrompt = EntitlementRequirement(
@@ -1786,7 +1817,13 @@ final class CodeLibraryViewModel: ObservableObject {
         let snapshot = await storeKitSubscriptionService.restorePurchases()
         applyStoreKitSnapshot(snapshot)
         await syncAppleTransactionIfPossible(snapshot)
-        statusMessage = currentPlan == .pro ? "Pro purchase restored." : "No active Pro subscription found."
+        if currentPlan != .pro {
+            statusMessage = "No active Pro subscription found."
+        } else if isStoreKitTestProActive {
+            statusMessage = "Pro (Test) was restored on this device. Account-wide Pro still requires a server grant or production purchase."
+        } else {
+            statusMessage = "Pro purchase restored."
+        }
     }
 
     func handleAppleSignIn(result: Result<ASAuthorization, Error>) async {
@@ -2320,6 +2357,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private func applyBackendEntitlement(_ entitlement: AppEntitlement?) {
         let currentEntitlement = entitlementService.currentEntitlement
         let activeBackendEntitlement = entitlement.flatMap { $0.grantsPro() ? $0 : nil }
+        hasActiveBackendProEntitlement = activeBackendEntitlement != nil
         let resolvedEntitlement: AppEntitlement
         if let activeBackendEntitlement {
             resolvedEntitlement = activeBackendEntitlement
@@ -2354,6 +2392,7 @@ final class CodeLibraryViewModel: ObservableObject {
         proProductDisplayPrice = snapshot.proDisplayPrice
         storeKitLoadedProductIDs = snapshot.loadedProductIDs
         storeKitDebugSummary = snapshot.debugSummary
+        storeKitTransactionEnvironment = snapshot.transactionEnvironment
     }
 
     private func syncAppleTransactionIfPossible(_ snapshot: StoreKitSubscriptionSnapshot) async {

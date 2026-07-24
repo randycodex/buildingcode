@@ -8,6 +8,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 const port = 8794;
 const baseURL = `http://127.0.0.1:${port}`;
 const adminToken = "smoke-admin-token";
+const grantAdminToken = "smoke-grant-admin-token";
 const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -165,6 +166,7 @@ async function main() {
       VERCEL_OIDC_TOKEN: "",
       BLOB_STORE_ID: "",
       PERMITEXT_SYNC_ADMIN_TOKEN: adminToken,
+      PERMITEXT_SYNC_GRANT_ADMIN_TOKEN: grantAdminToken,
       APPLE_TEAM_ID: "ABCDE12345",
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
       APPLE_SERVICE_ID: "com.randycodex.permitext.web",
@@ -1203,7 +1205,7 @@ async function main() {
 
     const grant = await request("/admin/lifetime-grants/grant", {
       method: "POST",
-      token: adminToken,
+      token: grantAdminToken,
       body: { userID }
     });
     assert(grant.response.ok, "Lifetime grant failed.");
@@ -1223,6 +1225,22 @@ async function main() {
     assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user ID.");
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
+
+    const unauthorizedGrantSummaries = await request("/admin/accounts/grant-summaries");
+    assert(
+      unauthorizedGrantSummaries.response.status === 401,
+      "Grant account summaries allowed an unauthenticated request."
+    );
+    const grantSummaries = await request("/admin/accounts/grant-summaries", {
+      token: grantAdminToken
+    });
+    assert(grantSummaries.response.ok, "Grant account summaries failed.");
+    const smokeAccountSummary = grantSummaries.json.accounts.find((account) => account.userID === userID);
+    assert(smokeAccountSummary?.hasActiveSession === true, "Grant account summaries omitted the active account.");
+    assert(
+      smokeAccountSummary?.entitlement?.source === "lifetimeGrant",
+      "Grant account summaries omitted the account entitlement."
+    );
 
     const clearScopes = ["bookmarks", "notes", "tags"];
     const clearMutations = clearScopes.map((scope, index) => ({
@@ -3137,7 +3155,7 @@ async function main() {
 
     const revoke = await request("/admin/lifetime-grants/revoke", {
       method: "POST",
-      token: adminToken,
+      token: grantAdminToken,
       body: { userID }
     });
     assert(revoke.response.ok, "Lifetime revoke failed.");

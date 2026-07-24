@@ -224,7 +224,7 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
-            Text("Billing: \(library.currentEntitlementSource.label)")
+            Text("Billing: \(library.planBillingLabel)")
                 .font(.caption.weight(.semibold))
                 .foregroundStyle(.secondary)
 
@@ -474,6 +474,9 @@ struct SettingsView: View {
 
     private var planSummaryText: String {
         if library.currentPlan == .pro {
+            if library.isStoreKitTestProActive {
+                return "Pro (Test) is active only on this device. Use an account grant to test Pro across iOS and web."
+            }
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
             }

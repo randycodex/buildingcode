@@ -1866,6 +1866,22 @@ function requireAdmin(request, response) {
   return true;
 }
 
+function requireGrantAdmin(request, response) {
+  const configuredTokens = [
+    process.env.PERMITEXT_SYNC_ADMIN_TOKEN,
+    process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN
+  ].filter(Boolean);
+  if (!configuredTokens.length) {
+    sendError(response, 403, "Grant API is disabled.");
+    return false;
+  }
+  if (!configuredTokens.includes(bearerToken(request))) {
+    sendError(response, 401, "Unauthorized.");
+    return false;
+  }
+  return true;
+}
+
 function requireSessionToken(request, response, sessionToken, requestAccount) {
   const suppliedToken = bearerToken(request) || requestAccount?.backendSessionToken;
   if (!suppliedToken) {
@@ -6267,7 +6283,7 @@ async function handleAppleTransactionVerify(request, response) {
 }
 
 async function handleLifetimeGrant(request, response) {
-  if (!requireAdmin(request, response)) {
+  if (!requireGrantAdmin(request, response)) {
     return;
   }
 
@@ -6283,7 +6299,7 @@ async function handleLifetimeGrant(request, response) {
 }
 
 async function handleLifetimeGrantDelete(request, response) {
-  if (!requireAdmin(request, response)) {
+  if (!requireGrantAdmin(request, response)) {
     return;
   }
 
@@ -6296,6 +6312,40 @@ async function handleLifetimeGrantDelete(request, response) {
 
   await deletePersistedEntitlement(userID);
   sendJSON(response, 200, { userID, entitlement: null });
+}
+
+function maskedAccountEmail(value) {
+  const email = String(value || "").trim();
+  const atIndex = email.indexOf("@");
+  if (atIndex <= 0) return null;
+  return `${email.slice(0, Math.min(2, atIndex))}***${email.slice(atIndex)}`;
+}
+
+async function handleGrantAccountSummaries(request, response) {
+  if (!requireGrantAdmin(request, response)) {
+    return;
+  }
+
+  const store = await readStore();
+  const accounts = await Promise.all(
+    Object.entries(store.users || {}).map(async ([userID, account]) => ({
+      userID,
+      authProvider: account.authProvider || null,
+      publicUsername: account.publicUsername || null,
+      displayName: account.displayName || null,
+      email: maskedAccountEmail(account.email),
+      signedInAt: account.signedInAt || null,
+      hasActiveSession: await userHasActiveSession(userID, store),
+      entitlement: store.entitlements[userID] || null
+    }))
+  );
+  accounts.sort((left, right) => {
+    if (left.hasActiveSession !== right.hasActiveSession) {
+      return left.hasActiveSession ? -1 : 1;
+    }
+    return String(right.signedInAt || "").localeCompare(String(left.signedInAt || ""));
+  });
+  sendJSON(response, 200, { accounts: accounts.slice(0, 100) });
 }
 
 async function handleLegacyPasskeyAccountDelete(request, response) {
@@ -6846,6 +6896,10 @@ export async function handleRequest(request, response) {
     }
     if (request.method === "GET" && path === "admin/storage/summary") {
       await handleStorageSummary(request, response);
+      return;
+    }
+    if (request.method === "GET" && path === "admin/accounts/grant-summaries") {
+      await handleGrantAccountSummaries(request, response);
       return;
     }
     if (request.method === "GET" && path === "account/apple-web-config") {

@@ -31,6 +31,12 @@ Enable internal lifetime grant admin routes with:
 PERMITEXT_SYNC_ADMIN_TOKEN=dev-secret node server.mjs
 ```
 
+Lifetime-grant routes can instead use a separate, narrowly scoped credential:
+
+```sh
+PERMITEXT_SYNC_GRANT_ADMIN_TOKEN=grant-secret node server.mjs
+```
+
 Apple sign-in requests may include the identity token issued by Sign in with Apple. When a token is present, the server verifies the Apple signature, issuer, expiration, subject, and configured audience. Every Vercel deployment requires a valid identity token automatically. Local development can opt into the same policy with `PERMITEXT_REQUIRE_APPLE_IDENTITY_TOKEN=1`:
 
 ```sh
@@ -224,6 +230,7 @@ On Postgres, `sync/push` and `sync/pull` use a direct per-user repository instea
 - `POST /billing/apple/transactions/verify`
 - `POST /admin/lifetime-grants/grant`
 - `POST /admin/lifetime-grants/revoke`
+- `GET /admin/accounts/grant-summaries`
 - `POST /admin/accounts/delete-legacy-passkey-users`
 - `POST /admin/accounts/restore-checklist`
 - `GET /admin/storage/summary`
@@ -233,6 +240,10 @@ Admin routes require:
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
+
+The lifetime-grant routes and grant-account summary also accept
+`PERMITEXT_SYNC_GRANT_ADMIN_TOKEN`. That token does not authorize unrelated
+storage, account-repair, or evaluation admin routes.
 
 Storage summary verifies which persistence layer is live and returns table counts plus the latest sync event cursor:
 
