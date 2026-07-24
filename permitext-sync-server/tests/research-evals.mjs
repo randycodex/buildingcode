@@ -1985,11 +1985,21 @@ async function runSelfTest(dataset, datasetText) {
     explanation: "Explanation.",
     assumptions: [],
     missingFacts: [],
-    evidenceLimitations: [],
+    evidenceLimitations: ["Only the selected passages were treated as authority."],
     additionalEvidenceNeeded: [],
     citations: [{ sectionID: "101", sourceIDs: ["source-a"], relevance: "Relevant." }]
   };
   validateResearchInterpretation(interpretation, validationEvidence);
+  let missingEvidenceLimitationRejected = false;
+  try {
+    validateResearchInterpretation({ ...interpretation, evidenceLimitations: [] }, validationEvidence);
+  } catch (error) {
+    missingEvidenceLimitationRejected = error.code === "INVALID_RESEARCH_RESPONSE";
+  }
+  assert(
+    missingEvidenceLimitationRejected,
+    "Production Research validation accepted an answer with no explicit evidence limitation."
+  );
   for (const [label, citations] of [
     ["source from another section", [{ sectionID: "101", sourceIDs: ["source-b"], relevance: "Wrong." }]],
     ["unknown section", [{ sectionID: "999", sourceIDs: ["source-a"], relevance: "Wrong." }]],

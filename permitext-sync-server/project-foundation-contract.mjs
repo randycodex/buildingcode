@@ -87,6 +87,7 @@ export const activityActions = Object.freeze([
   "evidence.removed",
   "research.question.submitted",
   "research.answer.generated",
+  "research.project-context.reviewed",
   "review-status.changed",
   "report.generated",
   "project.archived",

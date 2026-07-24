@@ -203,7 +203,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("ai-foundation-v4"),
+      webRoot.text.includes("project-research-v6") &&
+        webRoot.text.includes("project-research-v7"),
       "Web workspace omitted the current Research conversation assets."
     );
     assert(
@@ -640,8 +641,13 @@ async function main() {
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
+        workspaceScript.text.includes("function renderResearchProjectContext") &&
+        workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
+        workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
+        workspaceScript.text.includes("Project facts are user-provided context only") &&
+        workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-project-foundation-v6'),
+        webRoot.text.includes('/web/app.js?v=20260724-project-research-v7'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1364,6 +1370,55 @@ async function main() {
       "The retired Research entry point did not direct the client to private passage conversations."
     );
 
+    const researchProjectIDs = ["research-project-alpha", "research-project-beta"];
+    const researchSavedItemID = `${userID}:saved:${defaultSyncCodeVersion}:8881`;
+    const researchProjectPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [
+            ...researchProjectIDs.map((clientID, index) => ({
+              project: {
+                id: `research-project-record-${index + 1}`,
+                userID,
+                codeVersion: defaultSyncCodeVersion,
+                clientID,
+                name: index === 0 ? "Research Alpha" : "Research Beta",
+                description: "",
+                colorHex: index === 0 ? "#6674c8" : "#4f8f8b",
+                sortOrder: index,
+                updatedAt: new Date(Date.now() + index).toISOString()
+              }
+            })),
+            {
+              savedItem: {
+                id: "research-saved-item-record",
+                userID,
+                codeVersion: defaultSyncCodeVersion,
+                codePrefix: "AC",
+                chapterNumber: "28",
+                sectionID: 8881,
+                sectionNumber: "28-103.21",
+                title: "Real time enforcement.",
+                updatedAt: new Date(Date.now() + researchProjectIDs.length).toISOString()
+              }
+            }
+          ]
+        }
+      }
+    });
+    assert(
+      researchProjectPush.response.ok &&
+        researchProjectIDs.every((projectID) =>
+          researchProjectPush.json.acceptedMutationIDs.some((mutationID) => mutationID.endsWith(`:${projectID}`))
+        ) &&
+        researchProjectPush.json.acceptedMutationIDs.includes(researchSavedItemID),
+      "Project-linked Research fixtures did not sync as owned Projects with saved-section provenance."
+    );
+
     const selectedResearchText = "Owners of such buildings shall notify the department in writing at least 72 hours prior to the commencement of any work pursuant to such permits.";
     const unauthorizedConversation = await request("/research/conversations/create", {
       method: "POST",
@@ -1408,17 +1463,55 @@ async function main() {
       body: {
         auth: { accountUserID: userID },
         sectionID: "8881",
-        selectedText: `${selectedResearchText} Has note Bookmarked`
+        selectedText: `${selectedResearchText} Has note Bookmarked`,
+        projectID: researchProjectIDs[0],
+        savedItemID: researchSavedItemID
       }
     });
     assert(createdConversation.response.status === 201, "Research conversation creation failed.");
     assert(createdConversation.json.conversation.messages.length === 0, "Creating research unexpectedly generated an AI message.");
     assert(
-      createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&
-        createdConversation.json.conversation.sources[0].sectionTextHash,
-      "Research conversation did not preserve a canonical, versioned selected passage."
+        createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&
+        createdConversation.json.conversation.sources[0].sectionTextHash &&
+        createdConversation.json.conversation.primaryProjectID === researchProjectIDs[0] &&
+        createdConversation.json.conversation.origin.savedItemID === researchSavedItemID,
+      "Research conversation did not preserve a canonical selected passage, Project link, and saved-section provenance."
     );
     const conversationID = createdConversation.json.conversation.id;
+
+    const invalidProjectContext = await request("/research/conversations/project-context", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        projectID: researchProjectIDs[0],
+        facts: [{ text: "Objects are not valid Project facts." }]
+      }
+    });
+    assert(
+      invalidProjectContext.response.status === 400,
+      "Research Project context accepted a non-text fact."
+    );
+    const initialProjectContext = await request("/research/conversations/project-context", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        projectID: researchProjectIDs[0],
+        facts: [
+          "Existing building is described by the user as Type I-B construction.",
+          "The user reports that the building remains occupied during the proposed work."
+        ]
+      }
+    });
+    assert(
+      initialProjectContext.response.ok &&
+        initialProjectContext.json.conversation.projectContext.source === "user-provided" &&
+        initialProjectContext.json.conversation.projectContext.facts.length === 2,
+      "Research Project context was not stored as explicitly user-provided, non-authoritative context."
+    );
 
     const listedConversations = await request("/research/conversations/list", {
       method: "POST",
@@ -1473,10 +1566,102 @@ async function main() {
     assert(
       immutableAnswerRead.response.ok &&
         immutableAnswerRead.json.answer.immutable === true &&
+        immutableAnswerRead.json.answer.projectID === researchProjectIDs[0] &&
         immutableAnswerRead.json.answer.question === "When must the owner notify the department?" &&
         immutableAnswerRead.json.answer.evidence[0].passageText === selectedResearchText &&
         immutableAnswerRead.json.answer.passageToCitationMapping[0].evidenceSnapshotIDs.length === 1,
       "The historical Research endpoint did not restore the exact stored question, evidence, answer, and citation mapping."
+    );
+    const moveResearchWithoutReview = await request("/research/conversations/assign-project", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        projectID: researchProjectIDs[1]
+      }
+    });
+    assert(
+      moveResearchWithoutReview.response.status === 409 &&
+        moveResearchWithoutReview.json.code === "RESEARCH_PROJECT_REVIEW_REQUIRED",
+      "Research moved between Projects without an explicit context-review confirmation."
+    );
+    const moveResearchWithReview = await request("/research/conversations/assign-project", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        projectID: researchProjectIDs[1],
+        confirmMove: true
+      }
+    });
+    assert(
+      moveResearchWithReview.response.ok &&
+        moveResearchWithReview.json.conversation.primaryProjectID === researchProjectIDs[1] &&
+        moveResearchWithReview.json.conversation.projectContextReviewRequired === true &&
+        moveResearchWithReview.json.conversation.projectContext.facts.length === 0,
+      "Confirmed Research movement did not clear Project facts and require a context review."
+    );
+    const blockedResearchBeforeContextReview = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        question: "Can I continue before reviewing the new Project context?"
+      }
+    });
+    assert(
+      blockedResearchBeforeContextReview.response.status === 409 &&
+        blockedResearchBeforeContextReview.json.code === "RESEARCH_PROJECT_REVIEW_REQUIRED",
+      "Research generated a new answer before the moved conversation's Project context was reviewed."
+    );
+    const reviewedMovedProjectContext = await request("/research/conversations/project-context", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        projectID: researchProjectIDs[1],
+        facts: ["The user reports that Research Beta concerns a separate occupied building."]
+      }
+    });
+    assert(
+      reviewedMovedProjectContext.response.ok &&
+        reviewedMovedProjectContext.json.conversation.projectContextReviewRequired === false &&
+        reviewedMovedProjectContext.json.activity.action === "research.project-context.reviewed",
+      "Reviewing moved Project context did not unblock the Research conversation with meaningful activity."
+    );
+    const immutableAnswerAfterMove = await request("/research/answers/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, answerID }
+    });
+    assert(
+      immutableAnswerAfterMove.response.ok &&
+        immutableAnswerAfterMove.json.answer.projectID === researchProjectIDs[0] &&
+        immutableAnswerAfterMove.json.answer.evidence[0].passageText === selectedResearchText,
+      "Moving a Research conversation silently reclassified its historical answer or evidence."
+    );
+    const reusedResearchEvidence = await request("/research/conversations/reuse-evidence", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        answerID,
+        projectID: researchProjectIDs[1]
+      }
+    });
+    assert(
+      reusedResearchEvidence.response.status === 201 &&
+        reusedResearchEvidence.json.conversation.primaryProjectID === researchProjectIDs[1] &&
+        reusedResearchEvidence.json.conversation.messages.length === 0 &&
+        reusedResearchEvidence.json.conversation.origin.answerID === answerID &&
+        reusedResearchEvidence.json.conversation.sources[0].id !==
+          createdConversation.json.conversation.sources[0].id &&
+        !JSON.stringify(reusedResearchEvidence.json.conversation).includes("When must the owner notify the department?"),
+      "Reusing approved evidence did not create a fresh Project-linked conversation with new evidence identities."
     );
     const researchUsage = await request("/research/usage", {
       method: "POST",
@@ -3282,9 +3467,9 @@ async function main() {
     assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
     assert(restoreChecklist.json.passkeyCredentialCount === 0, "Restore checklist reported an active passkey credential.");
-    assert(restoreChecklist.json.mutationCounts.savedItem === 2, "Restore checklist did not count saved items and delete tombstones.");
+    assert(restoreChecklist.json.mutationCounts.savedItem === 3, "Restore checklist did not count saved items and delete tombstones.");
     assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
-    assert(restoreChecklist.json.mutationCounts.project === 1, "Restore checklist did not count projects.");
+    assert(restoreChecklist.json.mutationCounts.project === 3, "Restore checklist did not count projects.");
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
     assert(restoreChecklist.json.mutationCounts.workboard === 1, "Restore checklist did not count Workboards.");
     assert(restoreChecklist.json.mutationCounts.continuity === 1, "Restore checklist did not count continuity.");

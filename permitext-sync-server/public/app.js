@@ -5157,6 +5157,9 @@ function markResearchSelectable(element, source = {}) {
   element.dataset.researchSectionTitle = String(source.title || "Section");
   element.dataset.researchCodePrefix = String(source.codePrefix || "BC");
   element.dataset.researchChapterId = String(source.chapterID || "");
+  if (source.researchSavedItemID) {
+    element.dataset.researchSavedItemId = String(source.researchSavedItemID);
+  }
   return element;
 }
 
@@ -6844,6 +6847,66 @@ function researchRelativeDate(value) {
   return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(timestamp));
 }
 
+function researchProjects() {
+  return activeProjectRecords(currentContentSummary().projects || []);
+}
+
+function researchProjectID(project) {
+  return project ? projectDetailKey(project) : "";
+}
+
+function researchProjectName(projectID) {
+  const project = visibleProjectRecords(currentContentSummary().projects || [])
+    .find((item) => researchProjectID(item) === String(projectID || ""));
+  return project ? readableProjectName(project) : "Unassigned";
+}
+
+function preferredResearchProjectID(conversation = activeResearchConversation) {
+  if (conversation?.primaryProjectID) return conversation.primaryProjectID;
+  const projects = researchProjects();
+  const openProjectIDs = openProjectDetails().map((detail) => projectDetailKey(detail));
+  return openProjectIDs.find((projectID) =>
+    projects.some((project) => researchProjectID(project) === projectID)
+  ) || "";
+}
+
+function createResearchProjectSelect({
+  value = "",
+  includeUnassigned = true,
+  unassignedLabel = "No Project",
+  ariaLabel = "Project"
+} = {}) {
+  const select = document.createElement("select");
+  select.className = "research-project-select";
+  select.setAttribute("aria-label", ariaLabel);
+  if (includeUnassigned) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = unassignedLabel;
+    select.append(option);
+  }
+  researchProjects().forEach((project) => {
+    const option = document.createElement("option");
+    option.value = researchProjectID(project);
+    option.textContent = readableProjectName(project);
+    select.append(option);
+  });
+  if (value && ![...select.options].some((option) => option.value === value)) {
+    const historicalProject = visibleProjectRecords(currentContentSummary().projects || [])
+      .find((project) => researchProjectID(project) === value);
+    if (historicalProject) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = `${readableProjectName(historicalProject)} (Archived)`;
+      select.append(option);
+    }
+  }
+  select.value = value && [...select.options].some((option) => option.value === value)
+    ? value
+    : "";
+  return select;
+}
+
 async function deleteResearchConversationFromList(conversation, button) {
   const confirmed = await confirmWebWarning(
     "Delete research conversation?",
@@ -6961,7 +7024,10 @@ async function renderResearch(paneID = "utility:analysis") {
     const title = document.createElement("strong");
     title.textContent = conversation.title;
     const meta = document.createElement("span");
-    meta.textContent = `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
+    const projectLabel = conversation.primaryProjectID
+      ? `${researchProjectName(conversation.primaryProjectID)} · `
+      : "";
+    meta.textContent = `${projectLabel}${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
     openButton.append(title, meta);
     openButton.addEventListener("click", () => openResearchConversation(conversation.id));
     const deleteButton = document.createElement("button");
@@ -7001,6 +7067,293 @@ function renderResearchSource(source) {
   openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source));
   card.append(openButton);
   return card;
+}
+
+function appendHistoricalResearchList(container, title, items = []) {
+  if (!items.length) return;
+  const heading = document.createElement("strong");
+  heading.textContent = title;
+  const list = document.createElement("ul");
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    row.textContent = item;
+    list.append(row);
+  });
+  container.append(heading, list);
+}
+
+function renderHistoricalResearchRecord(container, answerRecord) {
+  clear(container);
+  const record = document.createElement("article");
+  record.className = "research-historical-record";
+  const heading = document.createElement("div");
+  heading.className = "research-historical-heading";
+  const title = document.createElement("strong");
+  title.textContent = "Immutable Research record";
+  const meta = document.createElement("span");
+  meta.textContent = [
+    researchRelativeDate(answerRecord.createdAt),
+    answerRecord.projectID ? researchProjectName(answerRecord.projectID) : "No Project at answer time",
+    answerRecord.model
+  ].filter(Boolean).join(" · ");
+  heading.append(title, meta);
+
+  const questionLabel = document.createElement("strong");
+  questionLabel.textContent = "Exact stored question";
+  const question = document.createElement("p");
+  question.className = "research-historical-question";
+  question.textContent = answerRecord.question;
+
+  const exactAnswer = document.createElement("section");
+  exactAnswer.className = "research-historical-answer";
+  renderResearchInterpretation(exactAnswer, answerRecord.answer);
+
+  const evidenceHeading = document.createElement("strong");
+  evidenceHeading.textContent = "Approved evidence snapshots";
+  const evidenceList = document.createElement("section");
+  evidenceList.className = "research-historical-evidence";
+  (answerRecord.evidence || []).forEach((evidence) => {
+    const evidenceCard = document.createElement("article");
+    const citation = document.createElement("strong");
+    citation.textContent = `${evidence.codeBook} § ${evidence.sectionNumber}`;
+    const evidenceMeta = document.createElement("span");
+    evidenceMeta.textContent = `${evidence.codeEdition} · Library ${evidence.sourceLibraryVersion}`;
+    const quote = document.createElement("blockquote");
+    quote.textContent = evidence.passageText;
+    const hash = document.createElement("code");
+    hash.textContent = `SHA-256 ${evidence.passageTextHash}`;
+    evidenceCard.append(citation, evidenceMeta, quote, hash);
+    evidenceList.append(evidenceCard);
+  });
+
+  const evidenceBySnapshotID = new Map(
+    (answerRecord.evidence || []).map((evidence) => [evidence.id, evidence])
+  );
+  const mapping = (answerRecord.passageToCitationMapping || []).map((item) => {
+    const snapshotCount = item.evidenceSnapshotIDs?.length || 0;
+    const sourceLabels = Array.from(new Set(
+      (item.evidenceSnapshotIDs || []).map((snapshotID) => {
+        const evidence = evidenceBySnapshotID.get(snapshotID);
+        return evidence
+          ? `${evidence.codeBook} § ${evidence.sectionNumber}`
+          : `Source ${snapshotID}`;
+      })
+    ));
+    return `${sourceLabels.join(", ")}: ${snapshotCount} approved ${snapshotCount === 1 ? "snapshot" : "snapshots"} — ${item.relevance || "Cited support"}`;
+  });
+  const mappingWrap = document.createElement("section");
+  mappingWrap.className = "research-historical-mapping";
+  appendHistoricalResearchList(mappingWrap, "Passage-to-citation mapping", mapping);
+
+  const reuse = document.createElement("section");
+  reuse.className = "research-historical-reuse";
+  const reuseHeading = document.createElement("strong");
+  reuseHeading.textContent = "Start fresh from this approved evidence";
+  const reuseCopy = document.createElement("p");
+  reuseCopy.textContent = "This creates a new, empty Research conversation. It rechecks the passage against the current enacted library and does not copy the old question, answer, assumptions, or Project facts.";
+  const reuseControls = document.createElement("div");
+  reuseControls.className = "research-historical-reuse-controls";
+  const projectSelect = createResearchProjectSelect({
+    value: preferredResearchProjectID(),
+    includeUnassigned: false,
+    ariaLabel: "Project for reused evidence"
+  });
+  const reuseButton = document.createElement("button");
+  reuseButton.className = "ghost-button";
+  reuseButton.type = "button";
+  reuseButton.textContent = "Start new Research";
+  reuseButton.disabled = !projectSelect.value;
+  const reuseStatus = document.createElement("p");
+  reuseStatus.className = "research-historical-status";
+  projectSelect.addEventListener("change", () => {
+    reuseButton.disabled = !projectSelect.value;
+  });
+  reuseButton.addEventListener("click", async () => {
+    if (!projectSelect.value) return;
+    reuseButton.disabled = true;
+    projectSelect.disabled = true;
+    reuseStatus.textContent = "Rechecking the approved evidence…";
+    try {
+      const payload = await postResearch("/research/conversations/reuse-evidence", {
+        answerID: answerRecord.id,
+        projectID: projectSelect.value
+      });
+      await refreshResearchConversationList();
+      await openResearchConversation(payload.conversation.id, { refreshList: true });
+    } catch (error) {
+      reuseStatus.textContent = error.message;
+      projectSelect.disabled = false;
+      reuseButton.disabled = !projectSelect.value;
+    }
+  });
+  reuseControls.append(projectSelect, reuseButton);
+  reuse.append(reuseHeading, reuseCopy, reuseControls, reuseStatus);
+
+  record.append(
+    heading,
+    questionLabel,
+    question,
+    exactAnswer,
+    evidenceHeading,
+    evidenceList,
+    mappingWrap,
+    reuse
+  );
+  container.append(record);
+}
+
+function renderHistoricalResearchControl(container, message) {
+  if (!message?.id) return;
+  const details = document.createElement("details");
+  details.className = "research-historical-details";
+  const summary = document.createElement("summary");
+  summary.textContent = "Open exact historical record";
+  const body = document.createElement("section");
+  body.className = "research-historical-body";
+  let loaded = false;
+  details.addEventListener("toggle", async () => {
+    if (!details.open || loaded) return;
+    loaded = true;
+    body.textContent = "Loading the immutable record…";
+    try {
+      const payload = await postResearch("/research/answers/get", { answerID: message.id });
+      renderHistoricalResearchRecord(body, payload.answer);
+    } catch (error) {
+      loaded = false;
+      body.textContent = error.message;
+    }
+  });
+  details.append(summary, body);
+  container.append(details);
+}
+
+function renderResearchProjectContext(container, conversation) {
+  const section = document.createElement("section");
+  section.className = "research-project-context";
+  const heading = document.createElement("div");
+  heading.className = "research-project-context-heading";
+  const titleWrap = document.createElement("div");
+  const title = document.createElement("strong");
+  title.textContent = "Project context";
+  const copy = document.createElement("p");
+  copy.textContent = "Project facts are user-provided context only. They are never treated as code authority or cited evidence.";
+  titleWrap.append(title, copy);
+  const projectSelect = createResearchProjectSelect({
+    value: conversation.primaryProjectID || "",
+    unassignedLabel: "Unassigned",
+    ariaLabel: "Assign Research conversation to Project"
+  });
+  heading.append(titleWrap, projectSelect);
+  section.append(heading);
+
+  const status = document.createElement("p");
+  status.className = "research-project-context-status";
+  projectSelect.addEventListener("change", async () => {
+    const previousProjectID = conversation.primaryProjectID || "";
+    const targetProjectID = projectSelect.value;
+    projectSelect.disabled = true;
+    status.textContent = "Updating Project assignment…";
+    try {
+      let payload;
+      try {
+        payload = await postResearch("/research/conversations/assign-project", {
+          conversationID: conversation.id,
+          projectID: targetProjectID
+        });
+      } catch (error) {
+        if (error.payload?.code !== "RESEARCH_PROJECT_REVIEW_REQUIRED") throw error;
+        const confirmed = await confirmWebWarning(
+          targetProjectID ? "Move Research to this Project?" : "Unassign this Research?",
+          targetProjectID
+            ? "Existing answers remain immutable in their original Project history. Project facts will be cleared, and you must review the new context before asking another question."
+            : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
+          { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
+        );
+        if (!confirmed) {
+          projectSelect.value = previousProjectID;
+          status.textContent = "";
+          return;
+        }
+        payload = await postResearch("/research/conversations/assign-project", {
+          conversationID: conversation.id,
+          projectID: targetProjectID,
+          confirmMove: true
+        });
+      }
+      activeResearchConversation = payload.conversation;
+      await refreshResearchConversationList();
+      await openResearchConversation(conversation.id, { refreshList: true });
+    } catch (error) {
+      projectSelect.value = previousProjectID;
+      status.textContent = error.message;
+    } finally {
+      projectSelect.disabled = false;
+    }
+  });
+
+  if (conversation.primaryProjectID) {
+    if (conversation.projectContextReviewRequired) {
+      const warning = document.createElement("aside");
+      warning.className = "research-project-context-warning";
+      const warningTitle = document.createElement("strong");
+      warningTitle.textContent = "Context review required";
+      const warningCopy = document.createElement("p");
+      warningCopy.textContent = "Review or replace the Project facts below before generating another answer.";
+      warning.append(warningTitle, warningCopy);
+      section.append(warning);
+    }
+    const form = document.createElement("form");
+    form.className = "research-project-context-form";
+    const label = document.createElement("label");
+    label.textContent = "Project facts — one per line";
+    const facts = document.createElement("textarea");
+    facts.rows = 4;
+    facts.maxLength = 10_000;
+    facts.placeholder = "Example: Existing building is Type I-B construction";
+    facts.value = (conversation.projectContext?.facts || []).join("\n");
+    label.append(facts);
+    const saveButton = document.createElement("button");
+    saveButton.className = "ghost-button";
+    saveButton.type = "submit";
+    saveButton.textContent = conversation.projectContextReviewRequired ? "Confirm reviewed context" : "Save Project context";
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const normalizedFacts = facts.value
+        .split(/\n+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+      if (normalizedFacts.length > 20 || normalizedFacts.some((item) => item.length > 500)) {
+        status.textContent = "Use no more than 20 facts and 500 characters per fact.";
+        return;
+      }
+      facts.disabled = true;
+      saveButton.disabled = true;
+      status.textContent = "Saving reviewed Project context…";
+      try {
+        const payload = await postResearch("/research/conversations/project-context", {
+          conversationID: conversation.id,
+          projectID: conversation.primaryProjectID,
+          facts: normalizedFacts
+        });
+        activeResearchConversation = payload.conversation;
+        await refreshResearchConversationList();
+        await openResearchConversation(conversation.id, { refreshList: true });
+      } catch (error) {
+        status.textContent = error.message;
+        facts.disabled = false;
+        saveButton.disabled = false;
+      }
+    });
+    form.append(label, saveButton);
+    section.append(form);
+  } else {
+    const unassigned = document.createElement("p");
+    unassigned.className = "research-project-context-unassigned";
+    unassigned.textContent = "Assign this conversation when its research belongs to a specific Project.";
+    section.append(unassigned);
+  }
+  section.append(status);
+  container.append(section);
 }
 
 async function renderResearchConversation(conversationID) {
@@ -7046,6 +7399,7 @@ async function renderResearchConversation(conversationID) {
 
   const conversation = activeResearchConversation;
   panelTitle.textContent = conversation.title;
+  renderResearchProjectContext(content, conversation);
   const sources = document.createElement("details");
   sources.className = "research-sources";
   sources.open = conversation.messages.length === 0 || conversation.sourceStatus === "changed";
@@ -7102,6 +7456,7 @@ async function renderResearchConversation(conversationID) {
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
+    renderHistoricalResearchControl(bubble, message);
     thread.append(bubble);
   });
   content.append(thread);
@@ -7118,12 +7473,17 @@ async function renderResearchConversation(conversationID) {
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
   sendButton.textContent = "Analyze";
-  sendButton.disabled = conversation.sourceStatus === "changed" || input.value.trim().length < 3;
+  const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
+  sendButton.disabled = conversation.sourceStatus === "changed" || projectContextBlocked || input.value.trim().length < 3;
+  if (projectContextBlocked) {
+    input.disabled = true;
+    input.placeholder = "Review the Project context above before continuing…";
+  }
   const status = document.createElement("p");
   status.className = "research-composer-status";
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
-    sendButton.disabled = conversation.sourceStatus === "changed" || input.value.trim().length < 3;
+    sendButton.disabled = conversation.sourceStatus === "changed" || projectContextBlocked || input.value.trim().length < 3;
   });
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -7196,6 +7556,7 @@ function researchSelectionFromWindow() {
     sectionNumber: source.dataset.researchSectionNumber,
     title: source.dataset.researchSectionTitle,
     codePrefix: source.dataset.researchCodePrefix,
+    savedItemID: source.dataset.researchSavedItemId || "",
     selectedText,
     rect
   };
@@ -7220,7 +7581,9 @@ async function saveResearchSelection(mode, button, status) {
         })
       : await postResearch("/research/conversations/create", {
           sectionID: selection.sectionID,
-          selectedText: selection.selectedText
+          selectedText: selection.selectedText,
+          projectID: selection.projectID || "",
+          savedItemID: selection.savedItemID || ""
         });
     activeResearchConversation = payload.conversation;
     closeResearchSelectionMenu();
@@ -7250,6 +7613,20 @@ function showResearchSelectionMenu() {
   actions.className = "research-selection-actions";
   const status = document.createElement("span");
   status.className = "research-selection-status";
+  const projects = researchProjects();
+  if (activeAccount() && projects.length) {
+    const projectSelect = createResearchProjectSelect({
+      value: preferredResearchProjectID(),
+      unassignedLabel: "No Project",
+      ariaLabel: "Project for new Research"
+    });
+    projectSelect.classList.add("research-selection-project");
+    pendingResearchSelection.projectID = projectSelect.value;
+    projectSelect.addEventListener("change", () => {
+      if (pendingResearchSelection) pendingResearchSelection.projectID = projectSelect.value;
+    });
+    menu.append(projectSelect);
+  }
   if (state.researchConversationID && activeAccount()) {
     const addButton = document.createElement("button");
     addButton.type = "button";
@@ -9174,7 +9551,10 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           const preview = document.createElement("span");
           preview.className = "saved-paragraph-preview";
           preview.textContent = item.previewText;
-          markResearchSelectable(preview, item);
+          markResearchSelectable(preview, {
+            ...item,
+            researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""
+          });
           openButton.append(preview);
         }
         if (notePreview) {

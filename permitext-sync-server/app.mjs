@@ -73,6 +73,9 @@ const rateLimitPolicies = new Map([
   ["research/conversations/evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/assign-project", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/project-context", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["research/conversations/reuse-evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/answers/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/answers/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -3019,8 +3022,14 @@ function researchPrompt(question, evidence, options = {}) {
     if (message.role === "user") return `USER: ${message.question || ""}`;
     return `ASSISTANT: ${message.answer?.conclusion || ""}\n${message.answer?.explanation || ""}`;
   }).join("\n\n");
+  const projectFacts = (options.projectContextFacts || [])
+    .map((fact, index) => `${index + 1}. ${fact}`)
+    .join("\n");
   return [
     `QUESTION\n${question}`,
+    projectFacts
+      ? `USER-PROVIDED PROJECT FACTS FOR CONTEXT ONLY — NOT CODE AUTHORITY\n${projectFacts}`
+      : "",
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORITATIVE USER-SELECTED EVIDENCE\n${sources}`
   ].filter(Boolean).join("\n\n");
@@ -3077,6 +3086,11 @@ export function validateResearchInterpretation(value, evidence) {
       !Array.isArray(value.additionalEvidenceNeeded) || !value.additionalEvidenceNeeded.every((item) => typeof item === "string") ||
       !Array.isArray(value.citations) || value.citations.length === 0) {
     const error = new Error("The model returned an invalid interpretation.");
+    error.code = "INVALID_RESEARCH_RESPONSE";
+    throw error;
+  }
+  if (!value.evidenceLimitations.some((item) => item.trim())) {
+    const error = new Error("The model omitted the required selected-evidence limitation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
   }
@@ -3161,6 +3175,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "You are a building-code research assistant, not an authority having jurisdiction.",
         "Interpret only the selected official code evidence supplied in the request.",
         "Do not use outside knowledge as legal authority and do not invent requirements.",
+        "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
         "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support a conditional answer, but restate any fact material to an exception or numerical threshold as a project fact to verify before final reliance.",
@@ -3253,6 +3268,8 @@ function researchConversationSummary(conversation) {
     updatedAt: conversation.updatedAt,
     sourceCount: conversation.sources?.filter((source) => source.kind === "selection").length || 0,
     messageCount: conversation.messages?.length || 0,
+    primaryProjectID: conversation.primaryProjectID || null,
+    projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
     sourceStatus: conversation.sourceStatus || "current"
   };
 }
@@ -3668,6 +3685,9 @@ async function handleProjectFoundationState(request, response) {
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
+  const researchConversations = (await listStoredResearchConversations(context.userID))
+    .filter((conversation) => !projectID || conversation.primaryProjectID === projectID)
+    .map(researchConversationSummary);
   const activity = (await listStoredActivityEvents(context.userID))
     .filter((event) => !projectID || event.projectID === projectID);
   sendJSON(response, 200, {
@@ -3675,6 +3695,7 @@ async function handleProjectFoundationState(request, response) {
     projects,
     links,
     artifacts,
+    researchConversations,
     researchAnswers: answers,
     activity,
     migrationCheckpoint: checkpoint
@@ -3901,6 +3922,300 @@ async function handleResearchAnswerGet(request, response) {
   });
 }
 
+async function requireResearchProject(context, response, projectID) {
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Project-linked Research requires Pro.",
+      code: "PRO_REQUIRED_PROJECTS"
+    });
+    return null;
+  }
+  const project = await ownedProjectRecord(context.userID, projectID);
+  if (!project) {
+    sendError(response, 404, "Project not found.");
+    return null;
+  }
+  return project;
+}
+
+async function setResearchConversationProjectLink(userID, conversationID, projectID, now) {
+  const links = await listStoredProjectLinks(userID);
+  const existing = links.find((link) =>
+    link.projectID === projectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversationID
+  );
+  const link = projectLinkRecord({
+    id: deterministicFoundationLinkID(userID, projectID, "researchConversation", conversationID),
+    owner: ownerScope(userID),
+    projectID,
+    targetKind: "researchConversation",
+    targetID: conversationID,
+    relationship: "primary",
+    createdAt: existing?.createdAt || now,
+    updatedAt: now,
+    version: Number(existing?.version || 0) + 1
+  });
+  await saveStoredProjectLink(userID, link);
+  return link;
+}
+
+async function removeResearchConversationProjectLink(userID, conversationID, projectID, now) {
+  const existing = (await listStoredProjectLinks(userID)).find((link) =>
+    !link.deletedAt &&
+    link.projectID === projectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversationID
+  );
+  if (!existing) return null;
+  const link = projectLinkRecord({
+    ...existing,
+    owner: ownerScope(userID),
+    updatedAt: now,
+    deletedAt: now,
+    version: Number(existing.version || 1) + 1
+  });
+  await saveStoredProjectLink(userID, link);
+  return link;
+}
+
+async function recordResearchProjectLinkActivity(userID, projectID, conversationID, action, now) {
+  return saveStoredActivityEvent(userID, activityEvent({
+    owner: ownerScope(userID),
+    projectID,
+    actorUserID: userID,
+    action,
+    objectKind: "researchConversation",
+    objectID: conversationID,
+    previousStatus: action === "item.unlinked" ? "linked" : null,
+    newStatus: action === "item.unlinked" ? "unlinked" : "linked",
+    createdAt: now
+  }));
+}
+
+async function handleResearchConversationAssignProject(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(
+    response,
+    context.userID,
+    context.body.conversationID
+  );
+  if (!conversation) return;
+  const targetProjectID = String(context.body.projectID || "").trim() || null;
+  const currentProjectID = conversation.primaryProjectID || null;
+  const requiresContextReview = Boolean(currentProjectID || (conversation.messages || []).length > 0);
+  if (targetProjectID === currentProjectID) {
+    sendJSON(response, 200, { conversation, moved: false });
+    return;
+  }
+  if (requiresContextReview && context.body.confirmMove !== true) {
+    sendJSON(response, 409, {
+      error: currentProjectID
+        ? "Moving this conversation requires an explicit Project-context review."
+        : "Assigning existing Research requires an explicit Project-context review.",
+      code: "RESEARCH_PROJECT_REVIEW_REQUIRED",
+      currentProjectID,
+      targetProjectID
+    });
+    return;
+  }
+  if (targetProjectID && !await requireResearchProject(context, response, targetProjectID)) return;
+  const now = new Date().toISOString();
+  if (currentProjectID) {
+    await removeResearchConversationProjectLink(
+      context.userID,
+      conversation.id,
+      currentProjectID,
+      now
+    );
+    await recordResearchProjectLinkActivity(
+      context.userID,
+      currentProjectID,
+      conversation.id,
+      "item.unlinked",
+      now
+    );
+  }
+  if (targetProjectID) {
+    await setResearchConversationProjectLink(
+      context.userID,
+      conversation.id,
+      targetProjectID,
+      now
+    );
+    await recordResearchProjectLinkActivity(
+      context.userID,
+      targetProjectID,
+      conversation.id,
+      "item.linked",
+      now
+    );
+  }
+  conversation.primaryProjectID = targetProjectID;
+  conversation.projectContext = targetProjectID ? {
+    projectID: targetProjectID,
+    facts: [],
+    source: "user-provided",
+    updatedAt: now
+  } : null;
+  conversation.projectContextReviewRequired = Boolean(targetProjectID && requiresContextReview);
+  conversation.movedFromProjectID = currentProjectID;
+  conversation.movedAt = now;
+  conversation.updatedAt = now;
+  await saveStoredResearchConversation(context.userID, conversation);
+  sendJSON(response, 200, {
+    conversation,
+    moved: true,
+    contextReviewRequired: conversation.projectContextReviewRequired
+  });
+}
+
+async function handleResearchConversationProjectContext(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(
+    response,
+    context.userID,
+    context.body.conversationID
+  );
+  if (!conversation) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!projectID || conversation.primaryProjectID !== projectID) {
+    sendError(response, 409, "Review the context for the conversation's current Project.");
+    return;
+  }
+  if (!await requireResearchProject(context, response, projectID)) return;
+  if (!Array.isArray(context.body.facts) || context.body.facts.length > 20) {
+    sendError(response, 400, "Project context must be an array of no more than 20 facts.");
+    return;
+  }
+  if (context.body.facts.some((value) =>
+    typeof value !== "string" || value.trim().length > 500
+  )) {
+    sendError(response, 400, "Each Project fact must be text with no more than 500 characters.");
+    return;
+  }
+  const facts = context.body.facts
+    .map((value) => normalizedResearchText(value, 500))
+    .filter(Boolean);
+  if (new Set(facts).size !== facts.length) {
+    sendError(response, 400, "Project context contains duplicate facts.");
+    return;
+  }
+  const now = new Date().toISOString();
+  conversation.projectContext = {
+    projectID,
+    facts,
+    source: "user-provided",
+    updatedAt: now
+  };
+  conversation.projectContextReviewRequired = false;
+  conversation.updatedAt = now;
+  await saveStoredResearchConversation(context.userID, conversation);
+  const event = activityEvent({
+    owner: ownerScope(context.userID),
+    projectID,
+    actorUserID: context.userID,
+    action: "research.project-context.reviewed",
+    objectKind: "researchConversation",
+    objectID: conversation.id,
+    previousStatus: "review-required",
+    newStatus: "reviewed",
+    createdAt: now,
+    metadata: { factCount: facts.length }
+  });
+  await saveStoredActivityEvent(context.userID, event);
+  sendJSON(response, 200, { conversation, activity: event });
+}
+
+async function handleResearchConversationReuseEvidence(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await requireResearchProject(context, response, projectID)) return;
+  const answerID = String(context.body.answerID || "").trim();
+  const answer = (await listStoredResearchAnswers(context.userID))
+    .find((item) => item.id === answerID);
+  if (!answer) {
+    sendError(response, 404, "Historical Research answer not found.");
+    return;
+  }
+  if ((await listStoredResearchConversations(context.userID)).length >= 200) {
+    sendError(response, 409, "Delete an older research conversation before starting another.");
+    return;
+  }
+  const sources = [];
+  const relatedSectionIDs = new Set();
+  try {
+    for (const snapshot of answer.evidence || []) {
+      const resolved = await researchSourcesForSelection(snapshot.sectionID, snapshot.passageText);
+      resolved.forEach((source) => {
+        if (source.kind === "selection") {
+          sources.push({
+            ...source,
+            relationship: "Reused approved evidence from a historical Research answer",
+            reusedFromAnswerID: answer.id,
+            reusedFromEvidenceSnapshotID: snapshot.id
+          });
+        } else if (!relatedSectionIDs.has(source.sectionID)) {
+          relatedSectionIDs.add(source.sectionID);
+          sources.push(source);
+        }
+      });
+    }
+  } catch (error) {
+    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+      sendJSON(response, 409, {
+        error: "The historical passage is no longer present in the current enacted-text library. Reopen the historical answer instead of generating new analysis from changed evidence.",
+        code: "REUSED_EVIDENCE_NOT_CURRENT"
+      });
+      return;
+    }
+    throw error;
+  }
+  if (!sources.some((source) => source.kind === "selection")) {
+    sendError(response, 422, "The historical answer has no reusable approved evidence.");
+    return;
+  }
+  const primary = sources.find((source) => source.kind === "selection");
+  const now = new Date().toISOString();
+  const conversation = {
+    id: randomUUID(),
+    title: `${primary.codePrefix || "Code"} ${primary.sectionNumber || primary.sectionID} — Reused evidence`.slice(0, 140),
+    createdAt: now,
+    updatedAt: now,
+    codeVersion: defaultSyncCodeVersion,
+    evidenceSetVersion: 1,
+    primaryProjectID: projectID,
+    projectContext: {
+      projectID,
+      facts: [],
+      source: "user-provided",
+      updatedAt: now
+    },
+    projectContextReviewRequired: false,
+    sourceStatus: "current",
+    origin: {
+      kind: "reusedEvidence",
+      answerID: answer.id,
+      sourceConversationID: answer.conversationID
+    },
+    sources,
+    messages: []
+  };
+  await saveStoredResearchConversation(context.userID, conversation);
+  await setResearchConversationProjectLink(context.userID, conversation.id, projectID, now);
+  await recordResearchProjectLinkActivity(
+    context.userID,
+    projectID,
+    conversation.id,
+    "item.linked",
+    now
+  );
+  sendJSON(response, 201, { conversation });
+}
+
 async function handleResearchConversationCreate(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -3908,6 +4223,26 @@ async function handleResearchConversationCreate(request, response) {
     if ((await listStoredResearchConversations(context.userID)).length >= 200) {
       sendError(response, 409, "Delete an older research conversation before starting another.");
       return;
+    }
+    const projectID = String(context.body.projectID || "").trim() || null;
+    if (projectID && !await requireResearchProject(context, response, projectID)) return;
+    const savedItemID = String(context.body.savedItemID || "").trim();
+    if (savedItemID) {
+      const savedItem = (await userContentMutations(context.userID))
+        .map((mutation) => mutationKindAndRecord(mutation))
+        .find(({ kind, record }) =>
+          kind === "savedItem" &&
+          !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
+          [record?.id, normalizedMutationRecordID({ savedItem: record })].includes(savedItemID)
+        )?.record;
+      if (!savedItem) {
+        sendError(response, 404, "Saved section not found.");
+        return;
+      }
+      if (String(savedItem.sectionID) !== String(context.body.sectionID)) {
+        sendError(response, 400, "The selected passage does not belong to the saved section.");
+        return;
+      }
     }
     const sources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
     const primary = sources[0];
@@ -3919,12 +4254,40 @@ async function handleResearchConversationCreate(request, response) {
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
       evidenceSetVersion: 1,
-      primaryProjectID: null,
+      primaryProjectID: projectID,
+      projectContext: projectID ? {
+        projectID,
+        facts: [],
+        source: "user-provided",
+        updatedAt: now
+      } : null,
+      projectContextReviewRequired: false,
+      origin: savedItemID ? {
+        kind: "savedItem",
+        savedItemID
+      } : {
+        kind: "selectedPassage"
+      },
       sourceStatus: "current",
       sources,
       messages: []
     };
     await saveStoredResearchConversation(context.userID, conversation);
+    if (projectID) {
+      await setResearchConversationProjectLink(
+        context.userID,
+        conversation.id,
+        projectID,
+        now
+      );
+      await recordResearchProjectLinkActivity(
+        context.userID,
+        projectID,
+        conversation.id,
+        "item.linked",
+        now
+      );
+    }
     sendJSON(response, 201, { conversation });
   } catch (error) {
     if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
@@ -4405,6 +4768,14 @@ async function handleResearchConversationMessage(request, response) {
     sendError(response, 409, "This conversation reached 100 exchanges. Start a new research conversation to continue.");
     return;
   }
+  if (conversation.projectContextReviewRequired) {
+    sendJSON(response, 409, {
+      error: "Review the user-provided Project context before generating another answer.",
+      code: "RESEARCH_PROJECT_REVIEW_REQUIRED",
+      conversation
+    });
+    return;
+  }
   try {
     const current = await currentResearchEvidence(conversation);
     if (current.stale) {
@@ -4437,9 +4808,10 @@ async function handleResearchConversationMessage(request, response) {
           configuration: researchModelConfiguration(),
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
-      : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
+        : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
           selections,
-          messages: conversation.messages
+          messages: conversation.messages,
+          projectContextFacts: conversation.projectContext?.facts || []
         });
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
@@ -7875,6 +8247,9 @@ const handlers = {
   "research/conversations/evidence": handleResearchConversationEvidence,
   "research/conversations/refresh": handleResearchConversationRefresh,
   "research/conversations/message": handleResearchConversationMessage,
+  "research/conversations/assign-project": handleResearchConversationAssignProject,
+  "research/conversations/project-context": handleResearchConversationProjectContext,
+  "research/conversations/reuse-evidence": handleResearchConversationReuseEvidence,
   "research/conversations/delete": handleResearchConversationDelete,
   "research/answers/list": handleResearchAnswerList,
   "research/answers/get": handleResearchAnswerGet,

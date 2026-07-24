@@ -3794,6 +3794,99 @@ mark {
   justify-self: start;
 }
 
+.research-project-context {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--ios-accent-building) 9%, var(--surface-muted));
+}
+
+.research-project-context-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 42%);
+  gap: var(--space-3);
+  align-items: start;
+}
+
+.research-project-context-heading > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.research-project-context-heading p,
+.research-project-context-unassigned,
+.research-project-context-status,
+.research-project-context-warning p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+  line-height: 1.45;
+}
+
+.research-project-select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.84) !important;
+}
+
+.research-project-select:focus-visible,
+.research-project-context textarea:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.research-project-context-warning {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, #f79009 16%, var(--surface));
+}
+
+.research-project-context-form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.research-project-context-form label {
+  display: grid;
+  gap: var(--space-2);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 650;
+}
+
+.research-project-context-form textarea {
+  width: 100%;
+  resize: vertical;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.research-project-context-form .ghost-button {
+  justify-self: start;
+  background: var(--text-primary);
+  color: var(--surface);
+}
+
+.research-project-context-status:empty {
+  display: none;
+}
+
 .research-message-thread {
   display: grid;
   gap: var(--space-4);
@@ -3826,6 +3919,131 @@ mark {
   padding: var(--space-4);
   border: 1px solid var(--border);
   background: var(--surface-muted);
+}
+
+.research-historical-details {
+  margin-top: var(--space-2);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.research-historical-details > summary {
+  cursor: pointer;
+  padding: var(--space-3);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+  font-weight: 650;
+}
+
+.research-historical-body {
+  padding: 0 var(--space-3) var(--space-3);
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
+}
+
+.research-historical-record {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.research-historical-heading {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--text-primary);
+  color: var(--surface);
+}
+
+.research-historical-heading span {
+  color: color-mix(in srgb, var(--surface) 76%, transparent);
+  font-size: calc(var(--chrome-font-size) * 0.76) !important;
+}
+
+.research-historical-question {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.research-historical-answer .research-result-card {
+  padding: var(--space-3);
+  border: 0;
+  background: var(--surface-muted);
+}
+
+.research-historical-evidence {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.research-historical-evidence article {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.research-historical-evidence span,
+.research-historical-evidence code {
+  overflow-wrap: anywhere;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+.research-historical-evidence blockquote {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 3px solid var(--text-primary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.research-historical-mapping {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.research-historical-mapping ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.research-historical-reuse {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--ios-accent-building) 9%, var(--surface-muted));
+}
+
+.research-historical-reuse p,
+.research-historical-status {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.research-historical-reuse-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+}
+
+.research-historical-reuse .ghost-button {
+  background: var(--text-primary);
+  color: var(--surface);
+}
+
+.research-historical-status:empty {
+  display: none;
 }
 
 .research-composer {
@@ -3875,6 +4093,18 @@ mark {
   flex-wrap: wrap;
 }
 
+.research-selection-project {
+  min-height: 34px;
+  border-radius: calc(var(--radius-card) - 3px);
+  background: rgb(255 255 255 / 14%);
+  color: inherit;
+}
+
+.research-selection-project option {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
 .research-selection-menu button {
   min-height: 34px;
   padding: 0 var(--space-3);
@@ -3895,6 +4125,13 @@ mark {
   padding: 2px var(--space-2) 5px;
   color: color-mix(in srgb, var(--surface) 74%, transparent);
   font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+@media (max-width: 560px) {
+  .research-project-context-heading,
+  .research-historical-reuse-controls {
+    grid-template-columns: 1fr;
+  }
 }
 
 .saved-row {
