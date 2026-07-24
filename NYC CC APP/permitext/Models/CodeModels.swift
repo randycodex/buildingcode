@@ -2122,6 +2122,20 @@ struct AppEntitlement: Codable, Hashable, Sendable {
     let plan: AppPlan
     let source: EntitlementSource
     let grantedUserID: String?
+    let expiresAt: Date?
+
+    init(plan: AppPlan, source: EntitlementSource, grantedUserID: String?, expiresAt: Date? = nil) {
+        self.plan = plan
+        self.source = source
+        self.grantedUserID = grantedUserID
+        self.expiresAt = expiresAt
+    }
+
+    func grantsPro(at date: Date = Date()) -> Bool {
+        guard plan == .pro else { return false }
+        guard let expiresAt else { return true }
+        return expiresAt > date
+    }
 
     static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
     static let appleSubscriptionPro = AppEntitlement(plan: .pro, source: .appleSubscription, grantedUserID: nil)
@@ -2423,7 +2437,7 @@ struct LocalEntitlementService: EntitlementService {
     var currentEntitlement: AppEntitlement {
         if let data = defaults.data(forKey: Self.entitlementDefaultsKey),
            let entitlement = try? JSONDecoder().decode(AppEntitlement.self, from: data) {
-            return entitlement
+            return entitlement.grantsPro() || entitlement.plan == .free ? entitlement : .free
         }
         if let lifetimeGrantUserID = defaults.string(forKey: Self.lifetimeGrantUserIDDefaultsKey),
            !lifetimeGrantUserID.isEmpty {
@@ -2504,8 +2518,12 @@ struct LocalEntitlementService: EntitlementService {
         defaults.set(plan.rawValue, forKey: verifiedPlanDefaultsKey)
         if plan == .pro {
             setEntitlement(.appleSubscriptionPro, defaults: defaults)
-        } else if currentStoredEntitlement(defaults: defaults).source.isAppleManagedSubscription {
-            setEntitlement(.free, defaults: defaults)
+        } else {
+            let storedEntitlement = currentStoredEntitlement(defaults: defaults)
+            if storedEntitlement.source.isAppleManagedSubscription,
+               storedEntitlement.grantedUserID == nil {
+                setEntitlement(.free, defaults: defaults)
+            }
         }
     }
 
@@ -2546,6 +2564,7 @@ struct StoreKitSubscriptionSnapshot: Sendable {
     let loadedProductIDs: [String]
     let debugSummary: String
     let signedTransactionInfo: String?
+    let transactionEnvironment: String?
 }
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
@@ -2572,7 +2591,10 @@ actor StoreKitSubscriptionService {
     private let proProductID = StoreKitProductID.proMonthly
     private var cachedProProduct: Product?
 
-    func snapshot(signedTransactionInfo: String? = nil) async -> StoreKitSubscriptionSnapshot {
+    func snapshot(
+        signedTransactionInfo: String? = nil,
+        transactionEnvironment: String? = nil
+    ) async -> StoreKitSubscriptionSnapshot {
         async let planResult = verifiedPlanAndSignedTransactionInfo()
         async let products = proProducts()
         async let debugSummary = transactionDebugSummary()
@@ -2583,7 +2605,8 @@ actor StoreKitSubscriptionService {
             proDisplayPrice: loadedProducts.first { $0.id == proProductID }?.displayPrice,
             loadedProductIDs: loadedProducts.map(\.id),
             debugSummary: await debugSummary,
-            signedTransactionInfo: signedTransactionInfo ?? resolvedPlanResult.signedTransactionInfo
+            signedTransactionInfo: signedTransactionInfo ?? resolvedPlanResult.signedTransactionInfo,
+            transactionEnvironment: transactionEnvironment ?? resolvedPlanResult.transactionEnvironment
         )
     }
 
@@ -2597,7 +2620,10 @@ actor StoreKitSubscriptionService {
         case .success(let verification):
             let transaction = try verifiedTransaction(from: verification)
             await transaction.finish()
-            return await snapshot(signedTransactionInfo: verification.jwsRepresentation)
+            return await snapshot(
+                signedTransactionInfo: verification.jwsRepresentation,
+                transactionEnvironment: transaction.environment.rawValue
+            )
         case .userCancelled:
             return await snapshot()
         case .pending:
@@ -2628,7 +2654,12 @@ actor StoreKitSubscriptionService {
                         LocalEntitlementService.setVerifiedPlan(.pro)
                     }
                     await transaction.finish()
-                    continuation.yield(await snapshot(signedTransactionInfo: result.jwsRepresentation))
+                    continuation.yield(
+                        await snapshot(
+                            signedTransactionInfo: result.jwsRepresentation,
+                            transactionEnvironment: transaction.environment.rawValue
+                        )
+                    )
                 }
             }
             continuation.onTermination = { _ in task.cancel() }
@@ -2642,29 +2673,29 @@ actor StoreKitSubscriptionService {
         return products
     }
 
-    private func verifiedPlanAndSignedTransactionInfo() async -> (plan: AppPlan, signedTransactionInfo: String?) {
+    private func verifiedPlanAndSignedTransactionInfo() async -> (
+        plan: AppPlan,
+        signedTransactionInfo: String?,
+        transactionEnvironment: String?
+    ) {
         for await verification in Transaction.currentEntitlements {
             guard case .verified(let transaction) = verification else { continue }
             guard isActiveProTransaction(transaction) else { continue }
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return (.pro, verification.jwsRepresentation)
+            return (.pro, verification.jwsRepresentation, transaction.environment.rawValue)
         }
         if let verification = await Transaction.latest(for: proProductID),
            case .verified(let transaction) = verification,
            isActiveProTransaction(transaction) {
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return (.pro, verification.jwsRepresentation)
+            return (.pro, verification.jwsRepresentation, transaction.environment.rawValue)
         }
         if await subscriptionStatusIndicatesActivePro() {
             LocalEntitlementService.setVerifiedPlan(.pro)
-            return (.pro, nil)
-        }
-        let currentEntitlement = LocalEntitlementService().currentEntitlement
-        if currentEntitlement.plan == .pro && !currentEntitlement.source.isAppleManagedSubscription {
-            return (.pro, nil)
+            return (.pro, nil, nil)
         }
         LocalEntitlementService.setVerifiedPlan(.free)
-        return (.free, nil)
+        return (.free, nil, nil)
     }
 
     private nonisolated func isActiveProTransaction(_ transaction: Transaction) -> Bool {

@@ -158,13 +158,14 @@ STOREKIT_PRO_PRODUCT_ID=com.randycodex.permitext.pro.monthly \
 APPLE_BUNDLE_ID=com.randycodex.permitext \
 APPLE_APP_STORE_ROOT_SHA256_FINGERPRINTS=... \
 PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN=1 \
+PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS=1 \
 PERMITEXT_PUBLIC_BASE_URL=https://permitext-sync.vercel.app \
 node server.mjs
 ```
 
 Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://permitext-sync.vercel.app/billing/stripe/webhook`.
 
-Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Transactions from an active local Xcode StoreKit configuration remain device-only by design; use App Store sandbox, TestFlight, the App Store, or an internal backend lifetime grant when cross-device entitlement testing is required.
+Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Production requires the configured bundle ID and App Store root fingerprints, and accepts only App Store production transactions. Xcode StoreKit purchases remain device-only, while App Store Sandbox and TestFlight transactions may synchronize only through a non-production backend configured for billing tests. Apple original transaction IDs are permanently bound to the first Permitext account that verifies them, preventing one purchase from being replayed across accounts.
 
 ## Deploy To Vercel
 

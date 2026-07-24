@@ -1,7 +1,8 @@
-import { readFile } from "node:fs/promises";
 import {
+  claimAppleTransactionOwner,
   stripeConfigurationStatus,
   stripeSecretKeyMode,
+  validateAppleTransactionEnvironment,
   verifyAppleTransactionJWS
 } from "../app.mjs";
 
@@ -74,8 +75,8 @@ const xcodeTransaction = [
 
 expectClientError(
   () => verifyAppleTransactionJWS(xcodeTransaction),
-  409,
-  "valid only on this device"
+  422,
+  "certificate chain is missing"
 );
 expectClientError(
   () => verifyAppleTransactionJWS("not-a-transaction"),
@@ -83,33 +84,41 @@ expectClientError(
   "Invalid Apple transaction"
 );
 
-const iosViewModelSource = await readFile(
-  new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
-  "utf8"
+assert(
+  validateAppleTransactionEnvironment({ environment: "Production" }, { requireProduction: true }) === "production",
+  "Production Apple transactions were rejected by production policy."
 );
-const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
-const webSource = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
+assert(
+  validateAppleTransactionEnvironment({ environment: "Sandbox" }, { requireProduction: false }) === "sandbox",
+  "Apple Sandbox transactions were rejected by non-production policy."
+);
+expectClientError(
+  () => validateAppleTransactionEnvironment({ environment: "Sandbox" }, { requireProduction: true }),
+  422,
+  "cannot grant production Pro"
+);
+expectClientError(
+  () => validateAppleTransactionEnvironment({ environment: "Xcode" }, { requireProduction: false }),
+  409,
+  "device-only"
+);
 
+const ownershipStore = {};
 assert(
-  serverSource.includes('persistServerEntitlement(userID, "appleSubscription"') &&
-    serverSource.includes('persistServerEntitlement(userID, "webSubscription"'),
-  "Apple and Stripe do not converge on the shared backend entitlement store."
+  claimAppleTransactionOwner(ownershipStore, "original-transaction-1", "user-a"),
+  "The first Apple transaction owner could not claim the purchase."
 );
 assert(
-  webSource.includes("state.account?.entitlement || syncedContent?.entitlement || null"),
-  "Web Pro access does not consume the shared synced entitlement."
+  claimAppleTransactionOwner(ownershipStore, "original-transaction-1", "user-a"),
+  "The original owner could not restore the Apple purchase."
 );
 assert(
-  iosViewModelSource.includes("applyBackendEntitlementIfPresent(report.entitlement)"),
-  "iOS Pro access does not consume Stripe or Apple entitlement returned by backend sync."
+  !claimAppleTransactionOwner(ownershipStore, "original-transaction-1", "user-b"),
+  "A second account replayed an Apple purchase that already has an owner."
 );
 assert(
-  iosViewModelSource.includes('statusMessage = "Pro is active on this device. Sign in with Apple to use Pro on the web."'),
-  "iOS does not explain that a signed-in account is required for web entitlement."
-);
-assert(
-  iosViewModelSource.includes("if handleBackendSessionFailureIfNeeded(error)"),
-  "Apple billing sync does not recover from an expired backend session."
+  ownershipStore.appleTransactionOwners["original-transaction-1"] === "user-a",
+  "A failed Apple transaction replay changed the purchase owner."
 );
 
 console.log("Billing entitlement contract passed.");

@@ -121,6 +121,7 @@ let blobModulePromise = null;
 const emptyStore = () => ({
   users: {},
   entitlements: {},
+  appleTransactionOwners: {},
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
@@ -433,6 +434,32 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_entitlements_source_granted_idx
       ON permitext_entitlements (source, granted_user_id)
+    `;
+    await sql`
+      CREATE TABLE IF NOT EXISTS permitext_apple_transaction_owners (
+        original_transaction_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      )
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS permitext_apple_transaction_owners_user_idx
+      ON permitext_apple_transaction_owners (user_id)
+    `;
+    await sql`
+      INSERT INTO permitext_apple_transaction_owners (
+        original_transaction_id,
+        user_id
+      )
+      SELECT
+        entitlement->'provider'->>'appleOriginalTransactionID',
+        user_id
+      FROM permitext_entitlements
+      WHERE source = 'appleSubscription'
+        AND coalesce(entitlement->'provider'->>'appleOriginalTransactionID', '') <> ''
+      ORDER BY updated_at ASC
+      ON CONFLICT (original_transaction_id) DO NOTHING
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_sessions (
@@ -1124,6 +1151,29 @@ async function createPostgresStoreAdapter() {
       `;
     }
 
+    const appleTransactionOwners = { ...(store.appleTransactionOwners || {}) };
+    for (const [userID, entitlement] of Object.entries(entitlements)) {
+      const originalTransactionID = entitlement?.source === "appleSubscription"
+        ? entitlement?.provider?.appleOriginalTransactionID
+        : null;
+      if (originalTransactionID && !appleTransactionOwners[originalTransactionID]) {
+        appleTransactionOwners[originalTransactionID] = userID;
+      }
+    }
+    for (const [originalTransactionID, userID] of Object.entries(appleTransactionOwners)) {
+      await sql`
+        INSERT INTO permitext_apple_transaction_owners (
+          original_transaction_id,
+          user_id,
+          updated_at
+        )
+        VALUES (${originalTransactionID}, ${userID}, now())
+        ON CONFLICT (original_transaction_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          updated_at = now()
+      `;
+    }
+
     const sessions = store.sessions || {};
     const desiredSessionUserIDs = new Set(Object.keys(sessions));
     const existingSessions = await sql`SELECT user_id FROM permitext_sessions`;
@@ -1226,9 +1276,14 @@ async function createPostgresStoreAdapter() {
 
   async function readNormalizedStore() {
     const store = emptyStore();
-    const [users, entitlements, sessions, passkeyCredentials, mutations] = await Promise.all([
+    const [users, entitlements, appleTransactionOwners, sessions, passkeyCredentials, mutations] = await Promise.all([
       sql`SELECT id, account FROM permitext_users ORDER BY id`,
       sql`SELECT user_id, entitlement FROM permitext_entitlements ORDER BY user_id`,
+      sql`
+        SELECT original_transaction_id, user_id
+        FROM permitext_apple_transaction_owners
+        ORDER BY original_transaction_id
+      `,
       sql`SELECT user_id, session_token FROM permitext_sessions ORDER BY user_id`,
       sql`SELECT credential_id, user_id FROM permitext_passkey_credentials ORDER BY credential_id`,
       sql`
@@ -1254,6 +1309,9 @@ async function createPostgresStoreAdapter() {
     }
     for (const row of entitlements) {
       store.entitlements[row.user_id] = safeJSON(row.entitlement, {});
+    }
+    for (const row of appleTransactionOwners) {
+      store.appleTransactionOwners[row.original_transaction_id] = row.user_id;
     }
     for (const row of sessions) {
       store.sessions[row.user_id] = row.session_token;
@@ -1343,6 +1401,11 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return accountRepository.saveEntitlement(userID, entitlement);
+    },
+    async claimAppleEntitlement(userID, originalTransactionID, entitlement) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.claimAppleEntitlement(userID, originalTransactionID, entitlement);
     },
     async deleteEntitlement(userID, expected) {
       await ensureSchema();
@@ -4216,6 +4279,37 @@ async function persistServerEntitlement(userID, source, details = {}) {
   return store.entitlements[userID];
 }
 
+export function claimAppleTransactionOwner(store, originalTransactionID, userID) {
+  const normalizedTransactionID = String(originalTransactionID || "").trim();
+  const normalizedUserID = String(userID || "").trim();
+  if (!normalizedTransactionID || !normalizedUserID) {
+    return false;
+  }
+  store.appleTransactionOwners ||= {};
+  const existingOwner = store.appleTransactionOwners[normalizedTransactionID];
+  if (existingOwner && existingOwner !== normalizedUserID) {
+    return false;
+  }
+  store.appleTransactionOwners[normalizedTransactionID] = normalizedUserID;
+  return true;
+}
+
+async function persistAppleServerEntitlement(userID, originalTransactionID, details = {}) {
+  const entitlement = entitlementForSource(userID, "appleSubscription", details);
+  const adapter = await storeAdapter();
+  if (typeof adapter.claimAppleEntitlement === "function") {
+    return adapter.claimAppleEntitlement(userID, originalTransactionID, entitlement);
+  }
+
+  const store = await readStore();
+  if (!claimAppleTransactionOwner(store, originalTransactionID, userID)) {
+    return null;
+  }
+  grantServerEntitlement(store, userID, "appleSubscription", details);
+  await writeStore(store);
+  return store.entitlements[userID];
+}
+
 async function deletePersistedEntitlement(userID, expected = {}) {
   const adapter = await storeAdapter();
   if (typeof adapter.deleteEntitlement === "function") {
@@ -4446,6 +4540,34 @@ function appleStoreKitProductID() {
   return process.env.STOREKIT_PRO_PRODUCT_ID || "com.randycodex.permitext.pro.monthly";
 }
 
+function productionAppleTransactionsRequired() {
+  return process.env.PERMITEXT_REQUIRE_PRODUCTION_APPLE_TRANSACTIONS === "1" ||
+    process.env.VERCEL_ENV === "production";
+}
+
+export function validateAppleTransactionEnvironment(
+  payload,
+  { requireProduction = productionAppleTransactionsRequired() } = {}
+) {
+  const environment = String(payload?.environment || "").trim().toLowerCase();
+  if (environment === "xcode") {
+    throw new ClientAuthError(
+      409,
+      "Xcode StoreKit transactions are device-only and cannot create a web entitlement."
+    );
+  }
+  if (!["production", "sandbox"].includes(environment)) {
+    throw new ClientAuthError(422, "Apple transaction environment is invalid.");
+  }
+  if (requireProduction && environment !== "production") {
+    throw new ClientAuthError(
+      422,
+      "Apple Sandbox and TestFlight transactions cannot grant production Pro."
+    );
+  }
+  return environment;
+}
+
 function x509CertificateFromX5C(certificate) {
   return new X509Certificate(Buffer.from(certificate, "base64"));
 }
@@ -4484,7 +4606,11 @@ function verifyAppleTransactionCertificateChain(x5c) {
 
   const root = certificates[certificates.length - 1];
   const allowedFingerprints = configuredAppleRootFingerprints();
-  if (process.env.PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN === "1" && allowedFingerprints.length === 0) {
+  if (
+    (process.env.PERMITEXT_REQUIRE_APPLE_TRANSACTION_ROOT_PIN === "1" ||
+      productionAppleTransactionsRequired()) &&
+    allowedFingerprints.length === 0
+  ) {
     throw new ClientAuthError(500, "Apple transaction root fingerprints are not configured.");
   }
   if (allowedFingerprints.length > 0 && !allowedFingerprints.includes(certificateFingerprint(root))) {
@@ -4525,13 +4651,13 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
   }
 
   const [encodedHeader, encodedPayload, encodedSignature] = parts;
-  const header = parseJWTPart(encodedHeader);
-  const payload = parseJWTPart(encodedPayload);
-  if (String(payload.environment || "").toLowerCase() === "xcode") {
-    throw new ClientAuthError(
-      409,
-      "This Pro purchase comes from Xcode StoreKit testing and is valid only on this device. Use an App Store sandbox, TestFlight, App Store purchase, or a backend lifetime grant for web access."
-    );
+  let header;
+  let payload;
+  try {
+    header = parseJWTPart(encodedHeader);
+    payload = parseJWTPart(encodedPayload);
+  } catch {
+    throw new ClientAuthError(422, "Invalid Apple transaction.");
   }
   if (header.alg !== "ES256" || !Array.isArray(header.x5c) || !header.x5c[0]) {
     throw new ClientAuthError(422, "Unsupported Apple transaction.");
@@ -4549,12 +4675,16 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
   }
 
   const bundleID = process.env.APPLE_BUNDLE_ID;
+  if (productionAppleTransactionsRequired() && !bundleID) {
+    throw new ClientAuthError(500, "APPLE_BUNDLE_ID is not configured.");
+  }
   if (bundleID && payload.bundleId !== bundleID) {
     throw new ClientAuthError(422, "Apple transaction bundle is invalid.");
   }
   if (payload.productId !== appleStoreKitProductID()) {
     throw new ClientAuthError(422, "Apple transaction product is invalid.");
   }
+  validateAppleTransactionEnvironment(payload);
 
   return payload;
 }
@@ -4965,6 +5095,14 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
     };
   }
   delete store.entitlements[sourceUserID];
+
+  const appleTransactionOwners = store.appleTransactionOwners || {};
+  for (const [originalTransactionID, ownerUserID] of Object.entries(appleTransactionOwners)) {
+    if (ownerUserID === sourceUserID) {
+      appleTransactionOwners[originalTransactionID] = targetUserID;
+    }
+  }
+  store.appleTransactionOwners = appleTransactionOwners;
 
   if (!targetAccount.publicUsername && sourceAccount.publicUsername) {
     targetAccount.publicUsername = sourceAccount.publicUsername;
@@ -5883,6 +6021,10 @@ async function handleAppleTransactionVerify(request, response) {
 
   const transactionID = String(payload.transactionId || "");
   const originalTransactionID = String(payload.originalTransactionId || transactionID);
+  if (!transactionID || !originalTransactionID) {
+    sendError(response, 422, "Apple transaction identifier is missing.");
+    return;
+  }
   const provider = {
     appleTransactionID: transactionID,
     appleOriginalTransactionID: originalTransactionID,
@@ -5903,10 +6045,14 @@ async function handleAppleTransactionVerify(request, response) {
     return;
   }
 
-  const entitlement = await persistServerEntitlement(userID, "appleSubscription", {
+  const entitlement = await persistAppleServerEntitlement(userID, originalTransactionID, {
     expiresAt: appleTransactionExpiration(payload),
     provider
   });
+  if (!entitlement) {
+    sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
+    return;
+  }
   sendJSON(response, 200, { entitlement, transaction: { active: true, productID: payload.productId } });
 }
 

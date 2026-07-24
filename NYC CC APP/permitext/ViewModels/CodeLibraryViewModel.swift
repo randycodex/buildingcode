@@ -138,6 +138,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var isNetworkAvailable = false
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
+    private var activeStoreKitPlan: AppPlan = .free
     private let foregroundAccountSyncInterval: TimeInterval = 3
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     @Published private(set) var bookmarkRevision: Int = 0
@@ -1732,7 +1733,14 @@ final class CodeLibraryViewModel: ObservableObject {
         let snapshot = await storeKitSubscriptionService.snapshot()
         applyStoreKitSnapshot(snapshot)
         if snapshot.plan == .pro && signedInAccount == nil {
-            statusMessage = "Pro is active on this device. Sign in with Apple to use Pro on the web."
+            switch snapshot.transactionEnvironment?.lowercased() {
+            case "xcode":
+                statusMessage = "Pro is active on this device. Xcode StoreKit purchases cannot sync to the web."
+            case "sandbox":
+                statusMessage = "Pro is active in Sandbox or TestFlight. Test purchases do not activate production web Pro."
+            default:
+                statusMessage = "Pro is active on this device. Sign in with Apple to use Pro on the web."
+            }
             return
         }
         await syncAppleTransactionIfPossible(snapshot)
@@ -1820,7 +1828,7 @@ final class CodeLibraryViewModel: ObservableObject {
         Self.saveSignedInAccount(account)
         prepareCanonicalCodeVersionMigration(for: account)
         refreshUserContentSyncCheckpoint()
-        applyBackendEntitlementIfPresent(backendRecord.entitlement)
+        applyBackendEntitlement(backendRecord.entitlement)
         await refreshStoreKitEntitlements()
         await attachLocalDataIfNeeded()
         await pullRemoteUserContentIfPossible()
@@ -1863,7 +1871,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
             let elapsed = Date().timeIntervalSince(startedAt)
-            applyBackendEntitlementIfPresent(report.entitlement)
+            applyBackendEntitlement(report.entitlement)
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
@@ -1986,7 +1994,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
-            applyBackendEntitlementIfPresent(report.entitlement)
+            applyBackendEntitlement(report.entitlement)
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
@@ -2237,10 +2245,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         userContentSyncConflicts = []
         Self.clearSignedInAccount()
-        if currentEntitlementSource == .lifetimeGrant {
-            LocalEntitlementService.clearLifetimeGrant()
-        }
-        refreshCurrentEntitlement()
+        applyBackendEntitlement(nil)
         statusMessage = "Signed out."
         if let account {
             Task {
@@ -2312,13 +2317,29 @@ final class CodeLibraryViewModel: ObservableObject {
         currentEntitlementSource = entitlement.source
     }
 
-    private func applyBackendEntitlementIfPresent(_ entitlement: AppEntitlement?) {
-        guard let entitlement else { return }
-        LocalEntitlementService.setEntitlement(entitlement)
+    private func applyBackendEntitlement(_ entitlement: AppEntitlement?) {
+        let currentEntitlement = entitlementService.currentEntitlement
+        let activeBackendEntitlement = entitlement.flatMap { $0.grantsPro() ? $0 : nil }
+        let resolvedEntitlement: AppEntitlement
+        if let activeBackendEntitlement {
+            resolvedEntitlement = activeBackendEntitlement
+        } else if activeStoreKitPlan == .pro {
+            resolvedEntitlement = .appleSubscriptionPro
+        } else if currentEntitlement.source.isAppleManagedSubscription,
+                  currentEntitlement.grantedUserID == nil,
+                  currentEntitlement.grantsPro() {
+            resolvedEntitlement = currentEntitlement
+        } else if currentEntitlement.source == .debugOverride {
+            resolvedEntitlement = currentEntitlement
+        } else {
+            resolvedEntitlement = .free
+        }
+        LocalEntitlementService.setEntitlement(resolvedEntitlement)
         refreshCurrentEntitlement()
     }
 
     private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
+        activeStoreKitPlan = snapshot.plan
         let entitlement = entitlementService.currentEntitlement
         let resolvedEntitlement: AppEntitlement
         if entitlement.plan == .pro {
@@ -2342,14 +2363,16 @@ final class CodeLibraryViewModel: ObservableObject {
         else {
             return
         }
+        if snapshot.transactionEnvironment?.lowercased() == "xcode" {
+            statusMessage = "Pro is active on this device. Xcode StoreKit purchases cannot sync to the web."
+            return
+        }
         do {
-            if let entitlement = try await accountBackendClient.verifyAppleTransaction(
+            let entitlement = try await accountBackendClient.verifyAppleTransaction(
                 account: signedInAccount,
                 signedTransactionInfo: signedTransactionInfo
-            ) {
-                LocalEntitlementService.setEntitlement(entitlement)
-                refreshCurrentEntitlement()
-            }
+            )
+            applyBackendEntitlement(entitlement)
         } catch {
             if handleBackendSessionFailureIfNeeded(error) {
                 return

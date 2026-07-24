@@ -287,6 +287,48 @@ export function createPostgresAccountRepository(sql) {
     return safeJSON(rows[0]?.entitlement, entitlement);
   }
 
+  async function claimAppleEntitlement(userID, originalTransactionID, entitlement) {
+    const [ownerRows, entitlementRows] = await sql.transaction([
+      sql`
+        INSERT INTO permitext_apple_transaction_owners (
+          original_transaction_id,
+          user_id,
+          updated_at
+        )
+        VALUES (${originalTransactionID}, ${userID}, now())
+        ON CONFLICT (original_transaction_id) DO UPDATE SET
+          updated_at = now()
+        WHERE permitext_apple_transaction_owners.user_id = EXCLUDED.user_id
+        RETURNING user_id
+      `,
+      sql`
+        INSERT INTO permitext_entitlements (
+          user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+        )
+        SELECT
+          ${userID}, ${entitlement.plan || "free"}, ${entitlement.source || "unknown"},
+          ${entitlement.grantedUserID || null}, ${JSON.stringify(entitlement)}::jsonb,
+          ${entitlement.expiresAt || null}::timestamptz, now()
+        WHERE EXISTS (
+          SELECT 1
+          FROM permitext_apple_transaction_owners
+          WHERE original_transaction_id = ${originalTransactionID}
+            AND user_id = ${userID}
+        )
+        ON CONFLICT (user_id) DO UPDATE SET
+          plan = EXCLUDED.plan,
+          source = EXCLUDED.source,
+          granted_user_id = EXCLUDED.granted_user_id,
+          entitlement = EXCLUDED.entitlement,
+          expires_at = EXCLUDED.expires_at,
+          updated_at = now()
+        RETURNING entitlement
+      `
+    ], { isolationMode: "ReadCommitted" });
+    if (!ownerRows.length || !entitlementRows.length) return null;
+    return safeJSON(entitlementRows[0].entitlement, entitlement);
+  }
+
   async function deleteEntitlement(userID, expected = {}) {
     let rows;
     if (expected.source && expected.providerKey && expected.providerValue) {
@@ -368,6 +410,7 @@ export function createPostgresAccountRepository(sql) {
 
   return {
     authenticate,
+    claimAppleEntitlement,
     contextForUser,
     deleteEntitlement,
     deleteLegacyPasskeyAccounts,
