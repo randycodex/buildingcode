@@ -48,6 +48,7 @@ const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260722-workboard-zoom-v16";
+const notebookClientVersion = "20260724-project-notebook-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -87,6 +88,7 @@ const defaultReaderPaneWidth = 520;
 const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
 const defaultWorkboardPaneWidth = 720;
+const defaultNotebookPaneWidth = 760;
 const defaultSettingsPaneWidth = 340;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -141,6 +143,8 @@ let appleIDScriptPromise = null;
 let workboardModulePromise = null;
 let workboardPreloadHandle = null;
 const workboardMounts = new Map();
+let notebookModulePromise = null;
+const notebookMounts = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
 let researchUsage = null;
@@ -227,6 +231,7 @@ function loadWorkspaceState() {
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
       workboards: normalizeProjectIdentities(saved.workboards, saved.workboard),
+      notebooks: normalizeProjectIdentities(saved.notebooks),
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
     };
   } catch {
@@ -268,6 +273,7 @@ function loadWorkspaceState() {
       savedTextSize: 10,
       researchConversationID: "",
       workboards: [],
+      notebooks: [],
       detachedWorkboards: []
     };
   }
@@ -433,6 +439,7 @@ function initializeDetachedProjectState(project) {
   state.projectDetail = null;
   state.projectDetails = [];
   state.workboards = [identity];
+  state.notebooks = [];
   state.detachedWorkboards = [];
   state.utilityInstances = [];
   state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false };
@@ -454,6 +461,11 @@ function openWorkboards() {
   return state.workboards;
 }
 
+function openNotebooks() {
+  state.notebooks = normalizeProjectIdentities(state.notebooks);
+  return state.notebooks;
+}
+
 function detachedWorkboards() {
   state.detachedWorkboards = normalizeProjectIdentities(state.detachedWorkboards);
   return state.detachedWorkboards;
@@ -461,6 +473,10 @@ function detachedWorkboards() {
 
 function projectHasOpenWorkboard(project) {
   return openWorkboards().some((item) => projectDetailMatches(project, item));
+}
+
+function projectHasOpenNotebook(project) {
+  return openNotebooks().some((item) => projectDetailMatches(project, item));
 }
 
 function projectHasDetachedWorkboard(project) {
@@ -476,6 +492,17 @@ function loadWorkboardModule() {
       });
   }
   return workboardModulePromise;
+}
+
+function loadNotebookModule() {
+  if (!notebookModulePromise) {
+    notebookModulePromise = import(`/web/notebook-assets/notebook.js?v=${notebookClientVersion}`)
+      .catch((error) => {
+        notebookModulePromise = null;
+        throw error;
+      });
+  }
+  return notebookModulePromise;
 }
 
 function scheduleWorkboardModulePreload() {
@@ -513,6 +540,29 @@ async function openProjectWorkboard(project) {
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
   scrollPaneIntoView(workboardID);
+}
+
+async function closeProjectNotebook(project) {
+  const notebookID = paneIDForProjectNotebook(project);
+  state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[notebookID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== notebookID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+}
+
+async function openProjectNotebook(project) {
+  const identity = projectIdentity(project);
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    setOpenProjectDetails([...openProjectDetails(), identity]);
+  }
+  if (!projectHasOpenNotebook(identity)) state.notebooks = [...openNotebooks(), identity];
+  const notebookID = paneIDForProjectNotebook(identity);
+  state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
+  placeProjectDetailAfterProjects(identity);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
+  scrollPaneIntoView(notebookID);
 }
 
 async function mountPendingProjectWorkboard(mounted) {
@@ -616,6 +666,18 @@ function cleanupInactiveWorkboardMounts(panes) {
     if (activeProjectIDs.has(projectID)) return;
     disposeProjectWorkboardMount(mounted);
     workboardMounts.delete(projectID);
+  });
+}
+
+function cleanupInactiveNotebookMounts(panes) {
+  const activeProjectIDs = new Set(panes
+    .filter((pane) => pane.classList.contains("notebook-panel"))
+    .map((pane) => pane.dataset.projectId)
+    .filter(Boolean));
+  notebookMounts.forEach((mounted, projectID) => {
+    if (activeProjectIDs.has(projectID)) return;
+    mounted.dispose?.();
+    notebookMounts.delete(projectID);
   });
 }
 
@@ -1078,6 +1140,14 @@ function isProjectWorkboardPaneID(paneID) {
   return String(paneID || "").startsWith("project:workboard:");
 }
 
+function paneIDForProjectNotebook(detail = null) {
+  return `project:notebook:${encodeURIComponent(projectDetailKey(detail))}`;
+}
+
+function isProjectNotebookPaneID(paneID) {
+  return String(paneID || "").startsWith("project:notebook:");
+}
+
 function openProjectDetails() {
   if (Array.isArray(state.projectDetails)) return state.projectDetails;
   return state.projectDetail ? [state.projectDetail] : [];
@@ -1095,6 +1165,7 @@ function setOpenProjectDetails(details) {
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
+  if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
@@ -1106,6 +1177,7 @@ function isFixedWidthPaneID(paneID) {
   return paneID?.startsWith("utility:") ||
     isProjectDetailPaneID(paneID) ||
     isProjectWorkboardPaneID(paneID) ||
+    isProjectNotebookPaneID(paneID) ||
     paneID?.startsWith("section:detail:");
 }
 
@@ -1186,6 +1258,7 @@ function defaultActivePaneIDs() {
   const ids = [];
   openProjectDetails().forEach((detail) => {
     ids.push(paneIDForProjectDetail(detail));
+    if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
   });
   if (state.utilities.archive) ids.push("utility:archive");
@@ -1212,12 +1285,14 @@ function activePaneIDs() {
   const paired = ordered.filter((id) =>
     !id.startsWith("section:detail:") &&
     !isProjectDetailPaneID(id) &&
+    !isProjectNotebookPaneID(id) &&
     !isProjectWorkboardPaneID(id)
   );
   if (openProjectDetails().length) {
     const savedIndex = paired.indexOf(primarySavedPaneID());
     const detailIDs = openProjectDetails().flatMap((detail) => [
       paneIDForProjectDetail(detail),
+      ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
       ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
     ]);
     if (savedIndex === -1) {
@@ -1401,6 +1476,7 @@ function placeArchiveAfterProjectsStack() {
   const projectIndex = ordered.indexOf(primarySavedPaneID());
   const projectStackIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
+    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
@@ -1415,6 +1491,7 @@ function restoreProjectsStackOrder() {
   const projectID = "utility:projects";
   const detailIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
+    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const archiveID = "utility:archive";
@@ -6982,6 +7059,19 @@ async function renderResearch(paneID = "utility:analysis") {
   listHeader.append(heading, instruction);
   content.append(listHeader);
 
+  if (researchQuestionDraft) {
+    const carriedDraft = document.createElement("article");
+    carriedDraft.className = "analysis-card notebook-research-draft";
+    const draftHeading = document.createElement("strong");
+    draftHeading.textContent = "Question ready from Notebook";
+    const draftText = document.createElement("p");
+    draftText.textContent = researchQuestionDraft;
+    const draftInstruction = document.createElement("small");
+    draftInstruction.textContent = "Now highlight the enacted code text you want Permitext to use. The Notebook card is context, not cited authority.";
+    carriedDraft.append(draftHeading, draftText, draftInstruction);
+    content.append(carriedDraft);
+  }
+
   if (researchUsage) {
     const usage = document.createElement("section");
     usage.className = "research-usage";
@@ -7965,6 +8055,557 @@ function projectDetailMatches(project, detail) {
   return Boolean(!ids.length && !detailIDs.length && projectDetailKey(project) === projectDetailKey(detail));
 }
 
+function emptyNotebookDocument() {
+  return {
+    schema: "permitext-notebook-card",
+    schemaVersion: 1,
+    format: "tiptap-json",
+    document: { type: "doc", content: [{ type: "paragraph" }] }
+  };
+}
+
+function notebookCardTypeLabel(cardType) {
+  return {
+    question: "Question",
+    finding: "Finding",
+    assumption: "Assumption",
+    "missing-information": "Missing information",
+    decision: "Decision",
+    "coordination-item": "Coordination item",
+    "review-task": "Review task"
+  }[cardType] || "Note";
+}
+
+function notebookReferenceCandidates(projectID, foundation, cards) {
+  const activeLinks = (foundation.links || []).filter((link) =>
+    !link.deletedAt && link.projectID === projectID
+  );
+  const savedItems = currentContentSummary().savedItems || [];
+  const references = [];
+  activeLinks.filter((link) => link.targetKind === "canonicalSection").forEach((link) => {
+    const savedItem = savedItems.find((item) => String(item.sectionID) === String(link.targetID));
+    const citation = savedItem?.sectionNumber
+      ? `${savedItem.codePrefix || "BC"} § ${savedItem.sectionNumber}`
+      : `Code section ${link.targetID}`;
+    references.push({
+      referenceKind: "canonicalSection",
+      referenceID: String(link.targetID),
+      label: citation
+    });
+  });
+  (foundation.researchAnswers || []).forEach((answer) => {
+    references.push({
+      referenceKind: "researchAnswer",
+      referenceID: answer.id,
+      label: `Research: ${answer.question || answer.conclusion || "Historical answer"}`
+    });
+  });
+  cards.forEach((card) => {
+    references.push({
+      referenceKind: "notebookCard",
+      referenceID: card.id,
+      label: `Notebook: ${card.title}`
+    });
+  });
+  activeLinks.filter((link) => link.targetKind === "workboard").forEach((link) => {
+    references.push({
+      referenceKind: "workboard",
+      referenceID: String(link.targetID),
+      label: "Project Workboard"
+    });
+  });
+  return references.filter((reference, index, all) =>
+    all.findIndex((candidate) =>
+      candidate.referenceKind === reference.referenceKind &&
+      candidate.referenceID === reference.referenceID
+    ) === index
+  );
+}
+
+async function openNotebookReference(project, foundation, reference, selectCard) {
+  if (reference.referenceKind === "canonicalSection") {
+    const savedItem = (currentContentSummary().savedItems || [])
+      .find((item) => String(item.sectionID) === String(reference.referenceID));
+    await openSectionDetailForExistingSearch({
+      sectionID: reference.referenceID,
+      codePrefix: savedItem?.codePrefix || "BC",
+      chapterID: savedItem?.chapterID || "",
+      chapterNumber: savedItem?.chapterNumber || "",
+      sectionNumber: savedItem?.sectionNumber || "",
+      title: savedItem?.title || reference.label
+    });
+    return;
+  }
+  if (reference.referenceKind === "researchAnswer") {
+    const answer = (foundation.researchAnswers || [])
+      .find((candidate) => candidate.id === reference.referenceID);
+    if (answer?.conversationID) await openResearchConversation(answer.conversationID);
+    return;
+  }
+  if (reference.referenceKind === "notebookCard") {
+    await selectCard(reference.referenceID);
+    return;
+  }
+  if (reference.referenceKind === "workboard") {
+    await openProjectWorkboard(project);
+    return;
+  }
+  await showWebNotice(
+    "Linked Project item",
+    "This item is preserved in the Notebook card and will open in its dedicated Project Studio view when that view is available."
+  );
+}
+
+async function renderProjectNotebook(project) {
+  const identity = projectIdentity(project);
+  const projectID = projectDetailKey(identity);
+  const paneID = paneIDForProjectNotebook(identity);
+  notebookMounts.get(projectID)?.dispose?.();
+
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel notebook-panel";
+  panel.dataset.paneId = paneID;
+  panel.dataset.projectId = projectID;
+  panel.style.setProperty("--project-color", identity.color || "#c96410");
+  applyPaneWeight(panel, paneID);
+
+  const header = document.createElement("header");
+  header.className = "notebook-header";
+  const heading = document.createElement("div");
+  const eyebrow = document.createElement("span");
+  eyebrow.className = "notebook-eyebrow";
+  eyebrow.textContent = identity.name;
+  const title = document.createElement("h2");
+  title.textContent = "Notebook";
+  heading.append(eyebrow, title);
+  const closeButton = document.createElement("button");
+  closeButton.className = "notebook-close";
+  closeButton.type = "button";
+  closeButton.textContent = "Close";
+  closeButton.addEventListener("click", () => closeProjectNotebook(identity));
+  header.append(heading, closeButton);
+
+  const shell = document.createElement("div");
+  shell.className = "notebook-shell";
+  const status = document.createElement("p");
+  status.className = "notebook-status";
+  status.setAttribute("role", "status");
+  status.textContent = "Loading Project Notebook…";
+  shell.append(status);
+  panel.append(header, shell);
+
+  let editorMount = null;
+  let editorRenderSequence = 0;
+  let cards = [];
+  let foundation = { links: [], researchAnswers: [] };
+  let activeCard = null;
+  let draftDocument = emptyNotebookDocument();
+  let dirty = false;
+  let disposed = false;
+
+  const mountState = {
+    panel,
+    dispose() {
+      disposed = true;
+      editorRenderSequence += 1;
+      editorMount?.destroy?.();
+      editorMount = null;
+    }
+  };
+  notebookMounts.set(projectID, mountState);
+
+  if (!activeAccount()) {
+    status.textContent = "Sign in from Settings to use the private Project Notebook.";
+    return panel;
+  }
+
+  try {
+    const [foundationPayload, cardPayload] = await Promise.all([
+      postResearch("/projects/foundation/state", { projectID }),
+      postResearch("/notebook/cards/list", { projectID })
+    ]);
+    if (disposed) return panel;
+    foundation = foundationPayload;
+    cards = cardPayload.cards || [];
+    shell.replaceChildren();
+
+    const rail = document.createElement("aside");
+    rail.className = "notebook-card-rail";
+    const railHeader = document.createElement("div");
+    railHeader.className = "notebook-card-rail-header";
+    const railTitle = document.createElement("h3");
+    railTitle.textContent = "Project notes";
+    const newButton = document.createElement("button");
+    newButton.className = "notebook-primary-action";
+    newButton.type = "button";
+    newButton.textContent = "New card";
+    railHeader.append(railTitle, newButton);
+    const cardList = document.createElement("div");
+    cardList.className = "notebook-card-list";
+    rail.append(railHeader, cardList);
+
+    const focus = document.createElement("section");
+    focus.className = "notebook-focus";
+    shell.append(rail, focus);
+
+    async function loadCard(cardID) {
+      if (dirty && activeCard) {
+        const confirmed = await confirmWebWarning(
+          "Discard unsaved Notebook changes?",
+          "Your edits to the focused card have not been saved.",
+          { confirmLabel: "Discard changes" }
+        );
+        if (!confirmed) return;
+      }
+      const payload = await postResearch("/notebook/cards/get", { cardID });
+      activeCard = payload.card;
+      draftDocument = activeCard.document;
+      dirty = false;
+      renderCardList();
+      await renderFocusedCard();
+    }
+
+    function renderCardList() {
+      cardList.replaceChildren();
+      if (!cards.length) {
+        const empty = document.createElement("p");
+        empty.className = "notebook-card-list-empty";
+        empty.textContent = "Create a card for a question, finding, decision, or coordination item.";
+        cardList.append(empty);
+        return;
+      }
+      cards.forEach((card) => {
+        const button = document.createElement("button");
+        button.className = "notebook-card-tile";
+        button.type = "button";
+        button.setAttribute("aria-pressed", String(activeCard?.id === card.id));
+        const type = document.createElement("span");
+        type.textContent = notebookCardTypeLabel(card.cardType);
+        const cardTitle = document.createElement("strong");
+        cardTitle.textContent = card.title;
+        const preview = document.createElement("p");
+        preview.textContent = card.plainText || "Empty card";
+        const meta = document.createElement("small");
+        meta.textContent = `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`;
+        button.append(type, cardTitle, preview, meta);
+        button.addEventListener("click", () => {
+          void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
+        });
+        cardList.append(button);
+      });
+    }
+
+    async function renderFocusedCard() {
+      editorRenderSequence += 1;
+      const renderSequence = editorRenderSequence;
+      editorMount?.destroy?.();
+      editorMount = null;
+      focus.replaceChildren();
+
+      if (!activeCard) {
+        const welcome = document.createElement("div");
+        welcome.className = "notebook-welcome";
+        const welcomeTitle = document.createElement("h3");
+        welcomeTitle.textContent = "A focused workspace for Project thinking";
+        const welcomeCopy = document.createElement("p");
+        welcomeCopy.textContent = "Keep structured notes here, link them to enacted code or historical Research, and reuse them later in a professional report.";
+        const welcomeAction = document.createElement("button");
+        welcomeAction.className = "notebook-primary-action";
+        welcomeAction.type = "button";
+        welcomeAction.textContent = "Create first card";
+        welcomeAction.addEventListener("click", () => newButton.click());
+        welcome.append(welcomeTitle, welcomeCopy, welcomeAction);
+        focus.append(welcome);
+        return;
+      }
+
+      const fields = document.createElement("div");
+      fields.className = "notebook-card-fields";
+      const typeSelect = document.createElement("select");
+      typeSelect.className = "notebook-card-type";
+      typeSelect.setAttribute("aria-label", "Notebook card type");
+      [
+        "question",
+        "finding",
+        "assumption",
+        "missing-information",
+        "decision",
+        "coordination-item",
+        "review-task"
+      ].forEach((cardType) => {
+        const option = document.createElement("option");
+        option.value = cardType;
+        option.textContent = notebookCardTypeLabel(cardType);
+        typeSelect.append(option);
+      });
+      typeSelect.value = activeCard.cardType;
+      const titleInput = document.createElement("input");
+      titleInput.className = "notebook-card-title";
+      titleInput.type = "text";
+      titleInput.maxLength = 300;
+      titleInput.placeholder = "Card title";
+      titleInput.setAttribute("aria-label", "Notebook card title");
+      titleInput.value = activeCard.title;
+      fields.append(typeSelect, titleInput);
+
+      const toolbar = document.createElement("div");
+      toolbar.className = "notebook-toolbar";
+      toolbar.setAttribute("role", "toolbar");
+      toolbar.setAttribute("aria-label", "Notebook formatting and references");
+      const boldButton = document.createElement("button");
+      boldButton.type = "button";
+      boldButton.textContent = "Bold";
+      const italicButton = document.createElement("button");
+      italicButton.type = "button";
+      italicButton.textContent = "Italic";
+      const undoButton = document.createElement("button");
+      undoButton.type = "button";
+      undoButton.textContent = "Undo";
+      const redoButton = document.createElement("button");
+      redoButton.type = "button";
+      redoButton.textContent = "Redo";
+      const referenceSelect = document.createElement("select");
+      referenceSelect.setAttribute("aria-label", "Project item to link");
+      const placeholder = document.createElement("option");
+      placeholder.value = "";
+      placeholder.textContent = "Link Project item…";
+      referenceSelect.append(placeholder);
+      const candidates = notebookReferenceCandidates(projectID, foundation, cards)
+        .filter((reference) =>
+          reference.referenceKind !== "notebookCard" ||
+          reference.referenceID !== activeCard.id
+        );
+      candidates.forEach((reference, index) => {
+        const option = document.createElement("option");
+        option.value = String(index);
+        option.textContent = reference.label;
+        referenceSelect.append(option);
+      });
+      const addReferenceButton = document.createElement("button");
+      addReferenceButton.type = "button";
+      addReferenceButton.textContent = "Add link";
+      addReferenceButton.disabled = true;
+      referenceSelect.addEventListener("change", () => {
+        addReferenceButton.disabled = referenceSelect.value === "";
+      });
+      toolbar.append(
+        boldButton,
+        italicButton,
+        undoButton,
+        redoButton,
+        referenceSelect,
+        addReferenceButton
+      );
+
+      const editorElement = document.createElement("div");
+      editorElement.className = "notebook-editor-surface";
+      const activateFocusedReference = (referenceElement) => {
+        void openNotebookReference(identity, foundation, {
+          referenceKind: referenceElement.dataset.referenceKind,
+          referenceID: referenceElement.dataset.referenceId,
+          label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item"
+        }, loadCard).catch((error) => showWebNotice("Linked item not opened", error.message));
+      };
+      editorElement.addEventListener("click", (event) => {
+        const referenceElement = event.target.closest?.("[data-permitext-reference]");
+        if (!referenceElement) return;
+        event.preventDefault();
+        event.stopPropagation();
+        activateFocusedReference(referenceElement);
+      }, true);
+      editorElement.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const referenceElement = event.target.closest?.("[data-permitext-reference]");
+        if (!referenceElement) return;
+        event.preventDefault();
+        event.stopPropagation();
+        activateFocusedReference(referenceElement);
+      }, true);
+      const footer = document.createElement("div");
+      footer.className = "notebook-card-footer";
+      const saveStatus = document.createElement("span");
+      saveStatus.textContent = activeCard.id ? `Version ${activeCard.version}` : "New card";
+      const footerActions = document.createElement("div");
+      const researchButton = document.createElement("button");
+      researchButton.className = "notebook-secondary-action";
+      researchButton.type = "button";
+      researchButton.textContent = "Start Research";
+      researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "notebook-danger-action";
+      deleteButton.type = "button";
+      deleteButton.textContent = "Delete";
+      deleteButton.hidden = !activeCard.id;
+      const saveButton = document.createElement("button");
+      saveButton.className = "notebook-primary-action";
+      saveButton.type = "button";
+      saveButton.textContent = "Save card";
+      footerActions.append(researchButton, deleteButton, saveButton);
+      footer.append(saveStatus, footerActions);
+      focus.append(fields, toolbar, editorElement, footer);
+
+      typeSelect.addEventListener("change", () => {
+        activeCard.cardType = typeSelect.value;
+        dirty = true;
+        saveStatus.textContent = "Unsaved changes";
+      });
+      titleInput.addEventListener("input", () => {
+        activeCard.title = titleInput.value;
+        dirty = true;
+        saveStatus.textContent = "Unsaved changes";
+      });
+
+      const module = await loadNotebookModule();
+      if (disposed || renderSequence !== editorRenderSequence) return;
+      editorMount = module.mountPermitextNotebookEditor(editorElement, {
+        document: draftDocument,
+        autofocus: !activeCard.id,
+        onChange(document) {
+          draftDocument = document;
+          dirty = true;
+          saveStatus.textContent = "Unsaved changes";
+        },
+        onSelectionChange(selection) {
+          boldButton.setAttribute("aria-pressed", String(selection.bold));
+          italicButton.setAttribute("aria-pressed", String(selection.italic));
+        },
+        onOpenReference: null
+      });
+      boldButton.addEventListener("click", () => editorMount?.toggleBold());
+      italicButton.addEventListener("click", () => editorMount?.toggleItalic());
+      undoButton.addEventListener("click", () => editorMount?.undo());
+      redoButton.addEventListener("click", () => editorMount?.redo());
+      addReferenceButton.addEventListener("click", () => {
+        const reference = candidates[Number(referenceSelect.value)];
+        if (!reference) return;
+        editorMount?.insertReference(reference);
+        referenceSelect.value = "";
+        addReferenceButton.disabled = true;
+      });
+
+      saveButton.addEventListener("click", async () => {
+        saveButton.disabled = true;
+        try {
+          const payload = await postResearch("/notebook/cards/save", {
+            projectID,
+            cardID: activeCard.id || undefined,
+            expectedVersion: activeCard.version || 0,
+            cardType: typeSelect.value,
+            title: titleInput.value,
+            document: editorMount.getDocument()
+          });
+          activeCard = payload.card;
+          draftDocument = activeCard.document;
+          dirty = false;
+          const summary = {
+            id: activeCard.id,
+            version: activeCard.version,
+            cardType: activeCard.cardType,
+            title: activeCard.title,
+            plainText: activeCard.plainText,
+            referenceCount: activeCard.references?.length || 0,
+            createdAt: activeCard.createdAt,
+            updatedAt: activeCard.updatedAt
+          };
+          cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
+          foundation.artifacts = [
+            ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== activeCard.id),
+            { envelope: { id: activeCard.id, type: "notebookCard" }, payload: activeCard }
+          ];
+          renderCardList();
+          await renderFocusedCard();
+        } catch (error) {
+          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT" && error.payload.card) {
+            activeCard = error.payload.card;
+            draftDocument = activeCard.document;
+            dirty = false;
+            await renderFocusedCard();
+            await showWebNotice(
+              "Newer Notebook version loaded",
+              "Another edit was saved first. Permitext loaded the current version so you can review it before editing again."
+            );
+          } else {
+            await showWebNotice("Card not saved", error.message);
+          }
+        } finally {
+          saveButton.disabled = false;
+        }
+      });
+
+      deleteButton.addEventListener("click", async () => {
+        const confirmed = await confirmWebWarning(
+          "Delete Notebook card?",
+          `“${activeCard.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
+          { confirmLabel: "Delete card" }
+        );
+        if (!confirmed) return;
+        deleteButton.disabled = true;
+        try {
+          await postResearch("/notebook/cards/delete", {
+            cardID: activeCard.id,
+            expectedVersion: activeCard.version
+          });
+          cards = cards.filter((card) => card.id !== activeCard.id);
+          activeCard = null;
+          draftDocument = emptyNotebookDocument();
+          dirty = false;
+          renderCardList();
+          await renderFocusedCard();
+        } catch (error) {
+          deleteButton.disabled = false;
+          await showWebNotice("Card not deleted", error.message);
+        }
+      });
+
+      researchButton.addEventListener("click", async () => {
+        const bodyText = String(editorElement.innerText || activeCard.plainText || "").trim();
+        researchQuestionDraft = bodyText || activeCard.title;
+        const researchWasOpen = Boolean(state.utilities.analysis);
+        await focusUtility("analysis");
+        if (researchWasOpen) {
+          await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+          scrollPaneIntoView("utility:analysis");
+        }
+      });
+    }
+
+    newButton.addEventListener("click", async () => {
+      if (dirty && activeCard) {
+        const confirmed = await confirmWebWarning(
+          "Discard unsaved Notebook changes?",
+          "Your edits to the focused card have not been saved.",
+          { confirmLabel: "Discard changes" }
+        );
+        if (!confirmed) return;
+      }
+      activeCard = {
+        id: "",
+        version: 0,
+        cardType: "finding",
+        title: "",
+        plainText: "",
+        references: []
+      };
+      draftDocument = emptyNotebookDocument();
+      dirty = false;
+      renderCardList();
+      await renderFocusedCard();
+    });
+
+    renderCardList();
+    if (cards[0]) {
+      await loadCard(cards[0].id);
+    } else {
+      await renderFocusedCard();
+    }
+  } catch (error) {
+    status.textContent = error.payload?.code === "PRO_REQUIRED_NOTEBOOK"
+      ? "The Project Notebook is included with Permitext Pro."
+      : `Notebook unavailable: ${error.message}`;
+  }
+  return panel;
+}
+
 function closeProjectDetailForProject(project) {
   const matchingDetails = openProjectDetails().filter((detail) => projectDetailMatches(project, detail));
   if (!matchingDetails.length) return;
@@ -7972,11 +8613,15 @@ function closeProjectDetailForProject(project) {
   matchingDetails.forEach((detail) => {
     const detailID = paneIDForProjectDetail(detail);
     const workboardID = paneIDForProjectWorkboard(detail);
+    const notebookID = paneIDForProjectNotebook(detail);
     delete state.paneWeights[detailID];
     delete state.paneWeights[workboardID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== detailID && id !== workboardID);
+    delete state.paneWeights[notebookID];
+    state.paneOrder = (state.paneOrder || [])
+      .filter((id) => id !== detailID && id !== workboardID && id !== notebookID);
   });
   state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
+  state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
 }
 
 function closeDeletedProjectDetails() {
@@ -8346,6 +8991,27 @@ async function renderProjectDetail(detail) {
   chrome.className = "project-detail-chrome";
   const actions = document.createElement("div");
   actions.className = "project-detail-actions";
+  const notebookButton = document.createElement("button");
+  notebookButton.className = "project-notebook-button";
+  notebookButton.type = "button";
+  notebookButton.textContent = "Notebook";
+  notebookButton.setAttribute("aria-pressed", String(projectHasOpenNotebook(identity)));
+  notebookButton.hidden = detachedProjectWindow;
+  notebookButton.addEventListener("pointerenter", () => {
+    void loadNotebookModule().catch(() => {});
+  }, { once: true });
+  notebookButton.addEventListener("focus", () => {
+    void loadNotebookModule().catch(() => {});
+  }, { once: true });
+  notebookButton.addEventListener("click", () => {
+    if (projectHasOpenNotebook(identity)) {
+      void closeProjectNotebook(identity);
+      notebookButton.setAttribute("aria-pressed", "false");
+    } else {
+      void openProjectNotebook(identity);
+      notebookButton.setAttribute("aria-pressed", "true");
+    }
+  });
   const workboardButton = document.createElement("button");
   workboardButton.className = "project-workboard-button";
   workboardButton.type = "button";
@@ -8372,7 +9038,7 @@ async function renderProjectDetail(detail) {
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
-  actions.prepend(workboardButton);
+  actions.prepend(notebookButton, workboardButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -10267,11 +10933,17 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
-  if (paneID === primarySavedPaneID() || isProjectDetailPaneID(paneID) || isProjectWorkboardPaneID(paneID)) {
+  if (
+    paneID === primarySavedPaneID() ||
+    isProjectDetailPaneID(paneID) ||
+    isProjectNotebookPaneID(paneID) ||
+    isProjectWorkboardPaneID(paneID)
+  ) {
     return [
       primarySavedPaneID(),
       ...openProjectDetails().flatMap((detail) => [
         paneIDForProjectDetail(detail),
+        ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
         ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
       ]),
       "utility:archive"
@@ -10518,6 +11190,7 @@ function appendPaneSequence(panes) {
     ])
   );
   cleanupInactiveWorkboardMounts(orderedPanes);
+  cleanupInactiveNotebookMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
   orderedPanes.forEach((pane, index) => {
     if (index > 0) {
@@ -10586,6 +11259,7 @@ async function renderWorkspace() {
   }
   for (const detail of openProjectDetails()) {
     panes.push(await renderProjectDetail(detail));
+    if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
     if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
   }
   if (state.utilities.archive) {
@@ -10638,6 +11312,10 @@ async function renderUtilityWorkspace(options = {}) {
   for (const detail of openProjectDetails()) {
     const detailID = paneIDForProjectDetail(detail);
     panes.push(await reuseOrRenderPane(detailID, () => renderProjectDetail(detail)));
+    if (projectHasOpenNotebook(detail)) {
+      const notebookID = paneIDForProjectNotebook(detail);
+      panes.push(await reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
+    }
     if (projectHasOpenWorkboard(detail)) {
       const workboardID = paneIDForProjectWorkboard(detail);
       panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(detail)));
@@ -10723,11 +11401,13 @@ async function toggleUtilityPane(key) {
     openProjectDetails().forEach((detail) => {
       delete state.paneWeights[paneIDForProjectDetail(detail)];
       delete state.paneWeights[paneIDForProjectWorkboard(detail)];
+      delete state.paneWeights[paneIDForProjectNotebook(detail)];
     });
     delete state.paneWeights["utility:archive"];
     state.paneOrder = (state.paneOrder || []).filter((id) =>
       id !== paneID &&
       !isProjectDetailPaneID(id) &&
+      !isProjectNotebookPaneID(id) &&
       !isProjectWorkboardPaneID(id) &&
       id !== "utility:archive"
     );
@@ -10772,6 +11452,7 @@ async function collapseToOneReader() {
   state.searchLinkedReaders = {};
   setOpenProjectDetails([]);
   state.workboards = [];
+  state.notebooks = [];
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });

@@ -18,6 +18,7 @@ import {
 } from "./entitlement-contract.mjs";
 import {
   activityEvent,
+  artifactEnvelope,
   immutableEvidenceSnapshot,
   immutableResearchAnswer,
   ownerScope,
@@ -26,6 +27,10 @@ import {
   projectMembershipRules,
   syncContract
 } from "./project-foundation-contract.mjs";
+import {
+  notebookCardTypes,
+  normalizeNotebookCardPayload
+} from "./notebook-contract.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import {
@@ -84,6 +89,10 @@ const rateLimitPolicies = new Map([
   ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["notebook/cards/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["notebook/cards/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["notebook/cards/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
@@ -3821,6 +3830,298 @@ async function handleProjectFoundationUnlink(request, response) {
   });
   await saveStoredActivityEvent(context.userID, event);
   sendJSON(response, 200, { link, activity: event });
+}
+
+function notebookCardForClient(artifact, projectIDs = []) {
+  return {
+    id: artifact.envelope.id,
+    version: artifact.envelope.version,
+    createdAt: artifact.envelope.createdAt,
+    updatedAt: artifact.envelope.updatedAt,
+    deletedAt: artifact.envelope.deletedAt,
+    projectIDs,
+    ...artifact.payload
+  };
+}
+
+async function authenticatedNotebookBody(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return null;
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "The Project Notebook requires Pro.",
+      code: "PRO_REQUIRED_NOTEBOOK"
+    });
+    return null;
+  }
+  return context;
+}
+
+async function ownedNotebookArtifact(userID, cardID, options = {}) {
+  const normalizedCardID = String(cardID || "").trim();
+  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+    artifact.envelope?.id === normalizedCardID &&
+    artifact.envelope?.type === "notebookCard" &&
+    (options.includeDeleted || !artifact.envelope?.deletedAt)
+  ) || null;
+}
+
+async function validateNotebookReferences(userID, references) {
+  if (references.length > 100) {
+    throw new Error("Notebook cards are limited to 100 linked references.");
+  }
+  for (const reference of references) {
+    if (!await ownedProjectTargetExists(
+      userID,
+      reference.referenceKind,
+      reference.referenceID
+    )) {
+      throw new Error(`Notebook reference is unavailable: ${reference.label}`);
+    }
+  }
+}
+
+async function handleNotebookCardList(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const links = (await listStoredProjectLinks(context.userID))
+    .filter((link) =>
+      !link.deletedAt &&
+      link.projectID === projectID &&
+      link.targetKind === "notebookCard"
+    );
+  const linkedCardIDs = new Set(links.map((link) => link.targetID));
+  const cards = (await listStoredFoundationArtifacts(context.userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "notebookCard" &&
+      !artifact.envelope?.deletedAt &&
+      linkedCardIDs.has(artifact.envelope.id)
+    )
+    .map((artifact) => ({
+      id: artifact.envelope.id,
+      version: artifact.envelope.version,
+      cardType: artifact.payload.cardType,
+      title: artifact.payload.title,
+      plainText: artifact.payload.plainText,
+      referenceCount: artifact.payload.references?.length || 0,
+      sourceClassification: artifact.payload.sourceClassification,
+      createdAt: artifact.envelope.createdAt,
+      updatedAt: artifact.envelope.updatedAt
+    }))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    cardTypes: notebookCardTypes,
+    projectID,
+    cards
+  });
+}
+
+async function handleNotebookCardGet(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const artifact = await ownedNotebookArtifact(context.userID, context.body.cardID);
+  if (!artifact) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  const projectIDs = (await listStoredProjectLinks(context.userID))
+    .filter((link) =>
+      !link.deletedAt &&
+      link.targetKind === "notebookCard" &&
+      link.targetID === artifact.envelope.id
+    )
+    .map((link) => link.projectID);
+  sendJSON(response, 200, { card: notebookCardForClient(artifact, projectIDs) });
+}
+
+async function handleNotebookCardSave(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+
+  const requestedCardID = String(context.body.cardID || "").trim();
+  const existing = requestedCardID
+    ? await ownedNotebookArtifact(context.userID, requestedCardID)
+    : null;
+  if (requestedCardID && !existing) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  if (
+    existing &&
+    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+  ) {
+    sendJSON(response, 409, {
+      error: "This Notebook card changed after you opened it. Review the current version before saving.",
+      code: "NOTEBOOK_VERSION_CONFLICT",
+      card: notebookCardForClient(existing)
+    });
+    return;
+  }
+
+  const links = await listStoredProjectLinks(context.userID);
+  const activeProjectLink = existing
+    ? links.find((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "notebookCard" &&
+        link.targetID === existing.envelope.id
+      )
+    : null;
+  if (existing && !activeProjectLink) {
+    sendJSON(response, 409, {
+      error: "Link this Notebook card to the Project before editing it here.",
+      code: "NOTEBOOK_PROJECT_LINK_REQUIRED"
+    });
+    return;
+  }
+
+  try {
+    const now = new Date().toISOString();
+    const cardID = existing?.envelope.id || randomUUID();
+    const payload = normalizeNotebookCardPayload({
+      cardType: context.body.cardType,
+      title: context.body.title,
+      document: context.body.document,
+      createdBy: existing?.payload?.createdBy || context.userID,
+      updatedBy: context.userID
+    });
+    await validateNotebookReferences(context.userID, payload.references);
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: cardID,
+        type: "notebookCard",
+        owner: ownerScope(context.userID),
+        createdAt: existing?.envelope.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope.version || 0) + 1
+      }),
+      payload
+    };
+    await saveStoredFoundationArtifact(context.userID, artifact);
+
+    let link = activeProjectLink;
+    if (!link) {
+      link = projectLinkRecord({
+        id: deterministicFoundationLinkID(
+          context.userID,
+          projectID,
+          "notebookCard",
+          cardID
+        ),
+        owner: ownerScope(context.userID),
+        projectID,
+        targetKind: "notebookCard",
+        targetID: cardID,
+        relationship: "reference",
+        createdAt: now,
+        updatedAt: now,
+        version: 1,
+        metadata: { createdWith: "permitext-notebook" }
+      });
+      await saveStoredProjectLink(context.userID, link);
+    }
+    const event = activityEvent({
+      owner: ownerScope(context.userID),
+      projectID,
+      actorUserID: context.userID,
+      action: existing ? "notebook-card.revision.saved" : "notebook-card.created",
+      objectKind: "notebookCard",
+      objectID: cardID,
+      previousStatus: existing ? `version-${existing.envelope.version}` : null,
+      newStatus: `version-${artifact.envelope.version}`,
+      createdAt: now,
+      metadata: {
+        cardType: payload.cardType,
+        referenceCount: payload.references.length
+      }
+    });
+    await saveStoredActivityEvent(context.userID, event);
+    sendJSON(response, existing ? 200 : 201, {
+      card: notebookCardForClient(artifact, [projectID]),
+      link,
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid Notebook card.",
+      code: "INVALID_NOTEBOOK_CARD"
+    });
+  }
+}
+
+async function handleNotebookCardDelete(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const artifact = await ownedNotebookArtifact(context.userID, context.body.cardID);
+  if (!artifact) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion);
+  if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== artifact.envelope.version) {
+    sendJSON(response, 409, {
+      error: "This Notebook card changed after you opened it. Review the current version before deleting it.",
+      code: "NOTEBOOK_VERSION_CONFLICT",
+      card: notebookCardForClient(artifact)
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  const deletedArtifact = {
+    ...artifact,
+    envelope: artifactEnvelope({
+      ...artifact.envelope,
+      owner: ownerScope(context.userID),
+      updatedAt: now,
+      deletedAt: now,
+      version: artifact.envelope.version + 1
+    })
+  };
+  await saveStoredFoundationArtifact(context.userID, deletedArtifact);
+  const activeLinks = (await listStoredProjectLinks(context.userID))
+    .filter((link) =>
+      !link.deletedAt &&
+      link.targetKind === "notebookCard" &&
+      link.targetID === artifact.envelope.id
+    );
+  for (const existingLink of activeLinks) {
+    const link = projectLinkRecord({
+      ...existingLink,
+      owner: ownerScope(context.userID),
+      updatedAt: now,
+      deletedAt: now,
+      version: existingLink.version + 1
+    });
+    await saveStoredProjectLink(context.userID, link);
+    await saveStoredActivityEvent(context.userID, activityEvent({
+      owner: ownerScope(context.userID),
+      projectID: existingLink.projectID,
+      actorUserID: context.userID,
+      action: "item.unlinked",
+      objectKind: "notebookCard",
+      objectID: artifact.envelope.id,
+      previousStatus: "linked",
+      newStatus: "deleted",
+      createdAt: now
+    }));
+  }
+  sendJSON(response, 200, {
+    cardID: artifact.envelope.id,
+    deletedAt: now,
+    unlinkedProjectCount: activeLinks.length
+  });
 }
 
 async function requiredResearchConversation(response, userID, conversationID) {
@@ -8258,6 +8559,10 @@ const handlers = {
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
+  "notebook/cards/list": handleNotebookCardList,
+  "notebook/cards/get": handleNotebookCardGet,
+  "notebook/cards/save": handleNotebookCardSave,
+  "notebook/cards/delete": handleNotebookCardDelete,
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,

@@ -4356,12 +4356,13 @@ mark {
   gap: var(--space-2);
 }
 
-.project-workboard-button {
+.project-workboard-button,
+.project-notebook-button {
   min-height: var(--panel-title-control-size);
   padding: 0 12px;
-  border: 1px solid color-mix(in srgb, var(--project-color) 30%, var(--border));
+  border: 0;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--project-color) 10%, transparent);
+  background: color-mix(in srgb, var(--project-color) 14%, var(--surface));
   color: var(--text-primary);
   font-size: 11px !important;
   font-weight: 600;
@@ -4369,8 +4370,11 @@ mark {
 
 .project-workboard-button:hover,
 .project-workboard-button:focus-visible,
-.project-workboard-button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--project-color) 22%, transparent);
+.project-workboard-button[aria-pressed="true"],
+.project-notebook-button:hover,
+.project-notebook-button:focus-visible,
+.project-notebook-button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
 }
 
 .section-detail-chrome,
@@ -6438,6 +6442,325 @@ mark {
   }
 
   .connector-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.notebook-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--project-color) 8%, var(--surface));
+}
+
+.notebook-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.notebook-header h2,
+.notebook-card-rail h3,
+.notebook-welcome h3 {
+  margin: 0;
+}
+
+.notebook-eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.notebook-close,
+.notebook-toolbar button,
+.notebook-primary-action,
+.notebook-secondary-action,
+.notebook-danger-action {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--toolbar-active);
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.notebook-close:hover,
+.notebook-toolbar button:hover,
+.notebook-secondary-action:hover {
+  background: color-mix(in srgb, var(--project-color) 18%, var(--surface));
+}
+
+.notebook-primary-action {
+  background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
+  color: color-mix(in srgb, var(--text-primary) 94%, #000);
+}
+
+.notebook-danger-action {
+  background: color-mix(in srgb, #d43b32 16%, var(--surface));
+  color: color-mix(in srgb, #d43b32 78%, var(--text-primary));
+}
+
+.notebook-shell {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.72fr) minmax(360px, 1.55fr);
+  min-height: 0;
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + 4px);
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.notebook-status {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: var(--space-5);
+  color: var(--text-secondary);
+}
+
+.notebook-card-rail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--space-3);
+  background: color-mix(in srgb, var(--project-color) 10%, var(--surface-muted));
+}
+
+.notebook-card-rail-header {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.notebook-card-list {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.notebook-card-list-empty {
+  margin: 0;
+  padding: var(--space-3);
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.notebook-card-tile {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface) 82%, var(--project-color));
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.notebook-card-tile:hover,
+.notebook-card-tile[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
+}
+
+.notebook-card-tile > span,
+.notebook-card-tile small {
+  color: var(--text-secondary);
+  font-size: 10px;
+  font-weight: 650;
+}
+
+.notebook-card-tile p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.notebook-focus {
+  display: grid;
+  grid-template-rows: auto auto minmax(220px, 1fr) auto;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-4);
+  background: var(--surface);
+}
+
+.notebook-welcome {
+  align-self: center;
+  justify-self: center;
+  max-width: 460px;
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.notebook-welcome p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.notebook-card-fields {
+  display: grid;
+  grid-template-columns: minmax(130px, 0.42fr) minmax(180px, 1fr);
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.notebook-card-type,
+.notebook-card-title,
+.notebook-toolbar select {
+  min-height: 40px;
+  min-width: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.notebook-card-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.notebook-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+}
+
+.notebook-toolbar button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--project-color) 32%, var(--surface));
+}
+
+.notebook-toolbar select {
+  flex: 1 1 180px;
+}
+
+.notebook-editor-surface {
+  min-height: 0;
+  overflow-y: auto;
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface-muted) 66%, var(--surface));
+  box-shadow: inset 0 0 0 2px transparent;
+}
+
+.notebook-editor-surface:focus-within {
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 48%, transparent);
+}
+
+.notebook-tiptap-editor {
+  min-height: 100%;
+  padding: var(--space-4);
+  outline: none;
+  color: var(--text-primary);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.notebook-tiptap-editor p {
+  margin: 0 0 0.85em;
+}
+
+.notebook-reference-chip {
+  display: inline;
+  padding: 2px 7px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--project-color) 22%, var(--surface));
+  color: var(--text-primary);
+  box-decoration-break: clone;
+  cursor: pointer;
+  font-size: 0.92em;
+  font-weight: 700;
+  -webkit-box-decoration-break: clone;
+}
+
+.notebook-reference-chip:focus-visible,
+.notebook-card-tile:focus-visible,
+.notebook-close:focus-visible,
+.notebook-toolbar button:focus-visible,
+.notebook-primary-action:focus-visible,
+.notebook-secondary-action:focus-visible,
+.notebook-danger-action:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--project-color) 56%, transparent);
+  outline-offset: 2px;
+}
+
+.notebook-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+}
+
+.notebook-card-footer > span {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.notebook-card-footer > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.notebook-research-draft {
+  background: color-mix(in srgb, var(--accent-building) 12%, var(--surface));
+}
+
+.notebook-research-draft p {
+  margin: var(--space-2) 0;
+  color: var(--text-primary);
+  line-height: 1.45;
+}
+
+.notebook-research-draft small {
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+@container (max-width: 620px) {
+  .notebook-shell {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(150px, 0.42fr) minmax(360px, 1fr);
+    overflow-y: auto;
+  }
+
+  .notebook-card-rail {
+    min-height: 150px;
+  }
+
+  .notebook-focus {
+    min-height: 440px;
+  }
+}
+
+@container (max-width: 400px) {
+  .notebook-card-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .notebook-card-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .notebook-card-footer > div {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
   }

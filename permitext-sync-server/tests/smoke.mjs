@@ -3186,6 +3186,122 @@ async function main() {
         unlinkSavedFromProject.json.activity.action === "item.unlinked",
       "Unlinking an item did not create a relationship tombstone and meaningful activity event."
     );
+    const emptyNotebookList = await request("/notebook/cards/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
+    });
+    assert(
+      emptyNotebookList.response.ok &&
+        emptyNotebookList.json.cards.length === 0 &&
+        emptyNotebookList.json.cardTypes.includes("finding"),
+      "The Project Notebook did not start with an empty structured card list."
+    );
+    const notebookDocument = {
+      schema: "permitext-notebook-card",
+      schemaVersion: 1,
+      format: "tiptap-json",
+      document: {
+        type: "doc",
+        content: [{
+          type: "paragraph",
+          content: [{ type: "text", text: "Verify the filing sequence." }]
+        }]
+      }
+    };
+    const createNotebookCard = await request("/notebook/cards/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        expectedVersion: 0,
+        cardType: "review-task",
+        title: "Filing sequence",
+        document: notebookDocument
+      }
+    });
+    assert(
+      createNotebookCard.response.status === 201 &&
+        createNotebookCard.json.card.version === 1 &&
+        createNotebookCard.json.card.plainText === "Verify the filing sequence." &&
+        createNotebookCard.json.activity.action === "notebook-card.created",
+      "Creating a structured Project Notebook card failed."
+    );
+    const notebookCardID = createNotebookCard.json.card.id;
+    const getNotebookCard = await request("/notebook/cards/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, cardID: notebookCardID }
+    });
+    assert(
+      getNotebookCard.response.ok &&
+        getNotebookCard.json.card.projectIDs.includes("project-client-smoke") &&
+        getNotebookCard.json.card.renderedHTML.includes("Verify the filing sequence."),
+      "The Notebook card was not returned with static read-only content and Project membership."
+    );
+    const staleNotebookSave = await request("/notebook/cards/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        cardID: notebookCardID,
+        expectedVersion: 0,
+        cardType: "review-task",
+        title: "Stale filing sequence",
+        document: notebookDocument
+      }
+    });
+    assert(
+      staleNotebookSave.response.status === 409 &&
+        staleNotebookSave.json.code === "NOTEBOOK_VERSION_CONFLICT" &&
+        staleNotebookSave.json.card.version === 1,
+      "The Notebook accepted a stale explicit revision."
+    );
+    const reviseNotebookCard = await request("/notebook/cards/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        cardID: notebookCardID,
+        expectedVersion: 1,
+        cardType: "decision",
+        title: "Filing sequence confirmed",
+        document: notebookDocument
+      }
+    });
+    assert(
+      reviseNotebookCard.response.ok &&
+        reviseNotebookCard.json.card.version === 2 &&
+        reviseNotebookCard.json.activity.action === "notebook-card.revision.saved",
+      "Saving an explicit Notebook revision failed."
+    );
+    const deleteNotebookCard = await request("/notebook/cards/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        cardID: notebookCardID,
+        expectedVersion: 2
+      }
+    });
+    assert(
+      deleteNotebookCard.response.ok &&
+        deleteNotebookCard.json.unlinkedProjectCount === 1 &&
+        deleteNotebookCard.json.deletedAt,
+      "Deleting a Notebook card did not preserve a tombstone and unlink its Project."
+    );
+    const notebookListAfterDelete = await request("/notebook/cards/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
+    });
+    assert(
+      notebookListAfterDelete.response.ok && notebookListAfterDelete.json.cards.length === 0,
+      "A deleted Notebook card remained in the active Project card list."
+    );
     const pullAfterFoundationUnlink = await request("/sync/pull", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
