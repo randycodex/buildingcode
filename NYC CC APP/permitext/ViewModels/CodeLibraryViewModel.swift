@@ -1731,6 +1731,10 @@ final class CodeLibraryViewModel: ObservableObject {
     func refreshStoreKitEntitlements() async {
         let snapshot = await storeKitSubscriptionService.snapshot()
         applyStoreKitSnapshot(snapshot)
+        if snapshot.plan == .pro && signedInAccount == nil {
+            statusMessage = "Pro is active on this device. Sign in with Apple to use Pro on the web."
+            return
+        }
         await syncAppleTransactionIfPossible(snapshot)
     }
 
@@ -2347,6 +2351,9 @@ final class CodeLibraryViewModel: ObservableObject {
                 refreshCurrentEntitlement()
             }
         } catch {
+            if handleBackendSessionFailureIfNeeded(error) {
+                return
+            }
             statusMessage = "Pro is active on this device. Backend billing sync failed: \(error.localizedDescription)"
         }
     }

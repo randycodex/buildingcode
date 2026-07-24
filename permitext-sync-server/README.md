@@ -162,7 +162,9 @@ PERMITEXT_PUBLIC_BASE_URL=https://permitext-sync.vercel.app \
 node server.mjs
 ```
 
-Stripe Checkout only creates the web checkout session. Web Pro access is granted or revoked by signed Stripe webhook events. Apple Pro access is granted only after the iOS app sends Apple's signed StoreKit transaction JWS to the backend.
+Production checkout requires a live Stripe secret (`sk_live_...`) and a live recurring Price. The server rejects test credentials and test-mode webhook events when `VERCEL_ENV=production` or `PERMITEXT_REQUIRE_LIVE_STRIPE=1`, so a `cs_test_...` session can never appear to be a real purchase. Stripe uses different webhook signing secrets for test and live mode; configure the live endpoint at `https://permitext-sync.vercel.app/billing/stripe/webhook`.
+
+Stripe Checkout creates the web subscription session, and the successful return path plus signed Stripe webhook events grant or revoke the shared backend entitlement. Apple Pro access is granted only after the iOS app sends an App Store-signed StoreKit transaction JWS to the backend. Transactions from an active local Xcode StoreKit configuration remain device-only by design; use App Store sandbox, TestFlight, the App Store, or an internal backend lifetime grant when cross-device entitlement testing is required.
 
 ## Deploy To Vercel
 

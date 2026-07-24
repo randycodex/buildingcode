@@ -42,6 +42,7 @@ Use this checklist after backend, account, StoreKit, or sync changes. Passkey re
 8. Sign in with the same Apple account.
 9. Confirm the project, saved section, tag, note, and username restore.
 10. Confirm Settings still shows Pro if the StoreKit subscription is active.
+11. For cross-device entitlement verification, disable the local Xcode StoreKit configuration and use App Store sandbox or TestFlight. Xcode-local transactions are intentionally device-only and must not create a production web entitlement.
 
 ## Server Verification
 

@@ -4239,8 +4239,53 @@ async function persistedStripeEntitlementOwner(subscriptionID) {
   return userID ? { userID, entitlement: store.entitlements[userID] } : null;
 }
 
+export function stripeSecretKeyMode(secretKey = process.env.STRIPE_SECRET_KEY) {
+  const normalized = String(secretKey || "").trim();
+  if (/^(sk|rk)_live_/.test(normalized)) return "live";
+  if (/^(sk|rk)_test_/.test(normalized)) return "test";
+  return normalized ? "unknown" : "missing";
+}
+
+function liveStripeRequired() {
+  return process.env.PERMITEXT_REQUIRE_LIVE_STRIPE === "1" ||
+    process.env.VERCEL_ENV === "production";
+}
+
+export function stripeConfigurationStatus({
+  secretKey = process.env.STRIPE_SECRET_KEY,
+  priceID = process.env.STRIPE_PRO_PRICE_ID,
+  requireLive = liveStripeRequired()
+} = {}) {
+  const mode = stripeSecretKeyMode(secretKey);
+  const missing = [];
+  if (!String(secretKey || "").trim()) missing.push("STRIPE_SECRET_KEY");
+  if (!String(priceID || "").trim()) missing.push("STRIPE_PRO_PRICE_ID");
+  if (missing.length) {
+    return {
+      ready: false,
+      mode,
+      message: `Stripe checkout is not configured. Missing ${missing.join(" and ")}.`
+    };
+  }
+  if (mode === "unknown") {
+    return {
+      ready: false,
+      mode,
+      message: "Stripe checkout uses an unrecognized secret-key format."
+    };
+  }
+  if (requireLive && mode !== "live") {
+    return {
+      ready: false,
+      mode,
+      message: "Stripe checkout is still in test mode. Configure live Stripe credentials before accepting purchases."
+    };
+  }
+  return { ready: true, mode, message: null };
+}
+
 function stripeConfigured() {
-  return Boolean(process.env.STRIPE_SECRET_KEY && process.env.STRIPE_PRO_PRICE_ID);
+  return stripeConfigurationStatus().ready;
 }
 
 function configuredPublicBaseURL(request) {
@@ -4418,14 +4463,14 @@ function certificateFingerprint(certificate) {
 
 function verifyAppleTransactionCertificateChain(x5c) {
   if (!Array.isArray(x5c) || x5c.length < 2) {
-    throw new ClientAuthError(401, "Apple transaction certificate chain is missing.");
+    throw new ClientAuthError(422, "Apple transaction certificate chain is missing.");
   }
 
   const certificates = x5c.map(x509CertificateFromX5C);
   const now = Date.now();
   for (const certificate of certificates) {
     if (Date.parse(certificate.validFrom) > now || Date.parse(certificate.validTo) < now) {
-      throw new ClientAuthError(401, "Apple transaction certificate is not currently valid.");
+      throw new ClientAuthError(422, "Apple transaction certificate is not currently valid.");
     }
   }
 
@@ -4433,7 +4478,7 @@ function verifyAppleTransactionCertificateChain(x5c) {
     const certificate = certificates[index];
     const issuer = certificates[index + 1];
     if (!certificate.checkIssued(issuer) || !certificate.verify(issuer.publicKey)) {
-      throw new ClientAuthError(401, "Apple transaction certificate chain is invalid.");
+      throw new ClientAuthError(422, "Apple transaction certificate chain is invalid.");
     }
   }
 
@@ -4443,10 +4488,10 @@ function verifyAppleTransactionCertificateChain(x5c) {
     throw new ClientAuthError(500, "Apple transaction root fingerprints are not configured.");
   }
   if (allowedFingerprints.length > 0 && !allowedFingerprints.includes(certificateFingerprint(root))) {
-    throw new ClientAuthError(401, "Apple transaction root certificate is not trusted.");
+    throw new ClientAuthError(422, "Apple transaction root certificate is not trusted.");
   }
   if (allowedFingerprints.length === 0 && !/Apple/.test(root.subject)) {
-    throw new ClientAuthError(401, "Apple transaction root certificate is not recognized.");
+    throw new ClientAuthError(422, "Apple transaction root certificate is not recognized.");
   }
 
   return certificates[0].publicKey;
@@ -4454,7 +4499,7 @@ function verifyAppleTransactionCertificateChain(x5c) {
 
 function ecdsaJoseToDER(signature) {
   if (signature.length % 2 !== 0) {
-    throw new ClientAuthError(401, "Invalid Apple transaction signature.");
+    throw new ClientAuthError(422, "Invalid Apple transaction signature.");
   }
   const half = signature.length / 2;
   const encodeInteger = (value) => {
@@ -4473,17 +4518,23 @@ function ecdsaJoseToDER(signature) {
   return Buffer.concat([Buffer.from([0x30, body.length]), body]);
 }
 
-function verifyAppleTransactionJWS(signedTransactionInfo) {
+export function verifyAppleTransactionJWS(signedTransactionInfo) {
   const parts = String(signedTransactionInfo || "").split(".");
   if (parts.length !== 3) {
-    throw new ClientAuthError(401, "Invalid Apple transaction.");
+    throw new ClientAuthError(422, "Invalid Apple transaction.");
   }
 
   const [encodedHeader, encodedPayload, encodedSignature] = parts;
   const header = parseJWTPart(encodedHeader);
   const payload = parseJWTPart(encodedPayload);
+  if (String(payload.environment || "").toLowerCase() === "xcode") {
+    throw new ClientAuthError(
+      409,
+      "This Pro purchase comes from Xcode StoreKit testing and is valid only on this device. Use an App Store sandbox, TestFlight, App Store purchase, or a backend lifetime grant for web access."
+    );
+  }
   if (header.alg !== "ES256" || !Array.isArray(header.x5c) || !header.x5c[0]) {
-    throw new ClientAuthError(401, "Unsupported Apple transaction.");
+    throw new ClientAuthError(422, "Unsupported Apple transaction.");
   }
 
   const publicKey = verifyAppleTransactionCertificateChain(header.x5c);
@@ -4494,15 +4545,15 @@ function verifyAppleTransactionJWS(signedTransactionInfo) {
     ecdsaJoseToDER(decodeBase64URL(encodedSignature))
   );
   if (!signatureOK) {
-    throw new ClientAuthError(401, "Apple transaction signature is invalid.");
+    throw new ClientAuthError(422, "Apple transaction signature is invalid.");
   }
 
   const bundleID = process.env.APPLE_BUNDLE_ID;
   if (bundleID && payload.bundleId !== bundleID) {
-    throw new ClientAuthError(401, "Apple transaction bundle is invalid.");
+    throw new ClientAuthError(422, "Apple transaction bundle is invalid.");
   }
   if (payload.productId !== appleStoreKitProductID()) {
-    throw new ClientAuthError(401, "Apple transaction product is invalid.");
+    throw new ClientAuthError(422, "Apple transaction product is invalid.");
   }
 
   return payload;
@@ -5541,8 +5592,9 @@ async function handlePull(request, response) {
 }
 
 async function handleWebCheckout(request, response) {
-  if (!stripeConfigured()) {
-    sendError(response, 503, "Stripe checkout is not configured.");
+  const stripeStatus = stripeConfigurationStatus();
+  if (!stripeStatus.ready) {
+    sendError(response, 503, stripeStatus.message);
     return;
   }
 
@@ -5587,6 +5639,11 @@ async function handleWebCheckout(request, response) {
     sendError(response, stripeResponse.status, json.error?.message || "Stripe checkout failed.");
     return;
   }
+  if (liveStripeRequired() && json.livemode !== true) {
+    console.error("Stripe returned a test-mode Checkout Session in production.");
+    sendError(response, 502, "Stripe returned a test-mode checkout. No purchase was started.");
+    return;
+  }
 
   sendJSON(response, 200, {
     checkoutSessionID: json.id,
@@ -5595,8 +5652,9 @@ async function handleWebCheckout(request, response) {
 }
 
 async function handleWebPortal(request, response) {
-  if (!stripeConfigured()) {
-    sendError(response, 503, "Stripe subscription management is not configured.");
+  const stripeStatus = stripeConfigurationStatus();
+  if (!stripeStatus.ready) {
+    sendError(response, 503, stripeStatus.message);
     return;
   }
 
@@ -5650,8 +5708,9 @@ async function stripeSubscriptionFromRestoreID(restoreID) {
 }
 
 async function handleStripeRestore(request, response) {
-  if (!stripeConfigured()) {
-    sendError(response, 503, "Stripe restore is not configured.");
+  const stripeStatus = stripeConfigurationStatus();
+  if (!stripeStatus.ready) {
+    sendError(response, 503, stripeStatus.message);
     return;
   }
 
@@ -5714,6 +5773,10 @@ async function handleStripeWebhook(request, response) {
   }
 
   const event = JSON.parse(rawBody.toString("utf8"));
+  if (liveStripeRequired() && event.livemode !== true) {
+    sendError(response, 400, "Stripe test-mode webhook events are not accepted in production.");
+    return;
+  }
   const object = event?.data?.object || {};
   let changed = false;
 
@@ -5808,6 +5871,10 @@ async function handleAppleTransactionVerify(request, response) {
     payload = verifyAppleTransactionJWS(body.signedTransactionInfo);
   } catch (error) {
     if (error instanceof ClientAuthError) {
+      console.warn("Apple transaction verification failed.", {
+        statusCode: error.statusCode,
+        reason: error.message
+      });
       sendError(response, error.statusCode, error.message);
       return;
     }
