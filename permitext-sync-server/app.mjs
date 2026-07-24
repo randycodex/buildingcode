@@ -4472,6 +4472,50 @@ function stripeUserIDFromObject(object) {
     null;
 }
 
+function normalizedStripeAccountUserID(value) {
+  const userID = String(value || "").trim();
+  return userID || null;
+}
+
+export function validateStripeRestoreOwnership({
+  subscription,
+  checkoutSession = null,
+  persistedOwnerUserID = null,
+  requestedUserID
+} = {}) {
+  const requestedOwner = normalizedStripeAccountUserID(requestedUserID);
+  if (!requestedOwner) {
+    throw new ClientAuthError(400, "Missing user ID.");
+  }
+
+  const ownershipClaims = [
+    subscription?.metadata?.accountUserID,
+    checkoutSession?.metadata?.accountUserID,
+    checkoutSession?.subscription_details?.metadata?.accountUserID,
+    checkoutSession?.client_reference_id,
+    persistedOwnerUserID
+  ].map(normalizedStripeAccountUserID).filter(Boolean);
+  const distinctOwners = Array.from(new Set(ownershipClaims));
+
+  if (distinctOwners.length > 1) {
+    throw new ClientAuthError(
+      409,
+      "Stripe subscription ownership records conflict. Contact Permitext support."
+    );
+  }
+  if (!distinctOwners.length) {
+    throw new ClientAuthError(
+      409,
+      "This Stripe subscription is not linked to a Permitext account. Contact Permitext support."
+    );
+  }
+  if (distinctOwners[0] !== requestedOwner) {
+    throw new ClientAuthError(403, "This Stripe subscription belongs to a different Permitext account.");
+  }
+
+  return requestedOwner;
+}
+
 function entitlementMatchesStripeSubscription(subscriptionID) {
   return (entitlement) => entitlement?.source === "webSubscription" &&
     entitlement?.provider?.stripeSubscriptionID === subscriptionID;
@@ -5832,7 +5876,10 @@ async function stripeSubscriptionFromRestoreID(restoreID) {
     throw new ClientAuthError(400, "Missing Stripe restore ID.");
   }
   if (trimmed.startsWith("sub_")) {
-    return stripeAPI(`/v1/subscriptions/${encodeURIComponent(trimmed)}`);
+    return {
+      checkoutSession: null,
+      subscription: await stripeAPI(`/v1/subscriptions/${encodeURIComponent(trimmed)}`)
+    };
   }
   if (trimmed.startsWith("cs_")) {
     const session = await stripeAPI(`/v1/checkout/sessions/${encodeURIComponent(trimmed)}`);
@@ -5840,7 +5887,10 @@ async function stripeSubscriptionFromRestoreID(restoreID) {
     if (!subscriptionID) {
       throw new ClientAuthError(404, "Checkout session has no subscription.");
     }
-    return stripeAPI(`/v1/subscriptions/${encodeURIComponent(subscriptionID)}`);
+    return {
+      checkoutSession: session,
+      subscription: await stripeAPI(`/v1/subscriptions/${encodeURIComponent(subscriptionID)}`)
+    };
   }
   throw new ClientAuthError(400, "Use a Stripe subscription ID or checkout session ID.");
 }
@@ -5863,9 +5913,12 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
+  let checkoutSession;
   let subscription;
   try {
-    subscription = await stripeSubscriptionFromRestoreID(body.restoreID || body.subscriptionID || body.checkoutSessionID);
+    ({ checkoutSession, subscription } = await stripeSubscriptionFromRestoreID(
+      body.restoreID || body.subscriptionID || body.checkoutSessionID
+    ));
   } catch (error) {
     if (error instanceof ClientAuthError) {
       sendError(response, error.statusCode, error.message);
@@ -5878,15 +5931,34 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
+  const subscriptionID = stripeSubscriptionID(subscription.id);
+  const persistedOwner = await persistedStripeEntitlementOwner(subscriptionID);
+  try {
+    validateStripeRestoreOwnership({
+      subscription,
+      checkoutSession,
+      persistedOwnerUserID: persistedOwner?.userID,
+      requestedUserID: userID
+    });
+  } catch (error) {
+    if (error instanceof ClientAuthError) {
+      sendError(response, error.statusCode, error.message);
+      return;
+    }
+    throw error;
+  }
+
+  if (!normalizedStripeAccountUserID(subscription.metadata?.accountUserID)) {
+    await transferStripeSubscriptionMetadata(subscriptionID, userID);
+  }
   const entitlement = await persistServerEntitlement(userID, "webSubscription", {
     expiresAt: stripeSubscriptionExpiresAt(subscription),
     provider: {
       stripeCustomerID: stripeSubscriptionID(subscription.customer),
-      stripeSubscriptionID: stripeSubscriptionID(subscription.id),
+      stripeSubscriptionID: subscriptionID,
       restoredManually: true
     }
   });
-  await transferStripeSubscriptionMetadata(subscription.id, userID);
   sendJSON(response, 200, {
     entitlement,
     subscription: {

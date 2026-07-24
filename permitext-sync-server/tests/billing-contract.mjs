@@ -3,6 +3,7 @@ import {
   stripeConfigurationStatus,
   stripeSecretKeyMode,
   validateAppleTransactionEnvironment,
+  validateStripeRestoreOwnership,
   verifyAppleTransactionJWS
 } from "../app.mjs";
 
@@ -27,6 +28,69 @@ function expectClientError(callback, statusCode, messageFragment) {
   }
   throw new Error(`Expected status ${statusCode}, but validation succeeded.`);
 }
+
+const stripeSubscription = {
+  id: "sub_owned",
+  status: "active",
+  metadata: { accountUserID: "apple:owner" }
+};
+assert(
+  validateStripeRestoreOwnership({
+    subscription: stripeSubscription,
+    requestedUserID: "apple:owner"
+  }) === "apple:owner",
+  "The Stripe subscription owner could not restore their purchase."
+);
+assert(
+  validateStripeRestoreOwnership({
+    subscription: { id: "sub_checkout_owned", status: "active", metadata: {} },
+    checkoutSession: {
+      id: "cs_checkout_owned",
+      client_reference_id: "apple:owner",
+      metadata: { accountUserID: "apple:owner" }
+    },
+    requestedUserID: "apple:owner"
+  }) === "apple:owner",
+  "Matching Checkout ownership could not restore a subscription with missing subscription metadata."
+);
+assert(
+  validateStripeRestoreOwnership({
+    subscription: { id: "sub_persisted_owner", status: "active", metadata: {} },
+    persistedOwnerUserID: "apple:owner",
+    requestedUserID: "apple:owner"
+  }) === "apple:owner",
+  "A persisted Permitext entitlement could not prove legacy Stripe ownership."
+);
+expectClientError(
+  () => validateStripeRestoreOwnership({
+    subscription: stripeSubscription,
+    requestedUserID: "apple:different-user"
+  }),
+  403,
+  "different Permitext account"
+);
+expectClientError(
+  () => validateStripeRestoreOwnership({
+    subscription: {
+      id: "sub_billing_email_only",
+      status: "active",
+      metadata: {},
+      customer_details: { email: "owner@example.com" }
+    },
+    requestedUserID: "apple:owner"
+  }),
+  409,
+  "not linked to a Permitext account"
+);
+expectClientError(
+  () => validateStripeRestoreOwnership({
+    subscription: stripeSubscription,
+    persistedOwnerUserID: "apple:different-user",
+    requestedUserID: "apple:owner"
+  }),
+  409,
+  "ownership records conflict"
+);
 
 assert(stripeSecretKeyMode("") === "missing", "Empty Stripe keys were not classified as missing.");
 assert(stripeSecretKeyMode("sk_test_contract") === "test", "Stripe test key was not detected.");
