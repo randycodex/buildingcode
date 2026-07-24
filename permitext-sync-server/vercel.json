@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "npm run build:workboard",
+  "buildCommand": "npm run verify:deploy-content && npm run build:workboard",
   "outputDirectory": "public",
   "rewrites": [
     {

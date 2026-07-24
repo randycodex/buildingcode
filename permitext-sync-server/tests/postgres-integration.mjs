@@ -22,6 +22,8 @@ const adminToken = "postgres-integration-admin-token";
 const runID = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 const providerUserID = `postgres-integration-${runID}`;
 const userID = `apple:${providerUserID}`;
+const sourceProviderUserID = `postgres-link-source-${runID}`;
+const sourceUserID = `web:${sourceProviderUserID}`;
 const codeVersion = "nyc-2022";
 const sql = neon(databaseURL);
 
@@ -60,21 +62,23 @@ async function waitForServer() {
 }
 
 async function cleanupUser() {
-  await sql`DELETE FROM permitext_sync_events WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_saved_items WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_annotations WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_projects WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_project_items WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_comments WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_passkey_credentials WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_entitlements WHERE user_id = ${userID}`;
-  await sql`DELETE FROM permitext_users WHERE id = ${userID}`;
+  for (const cleanupUserID of [sourceUserID, userID]) {
+    await sql`DELETE FROM permitext_sync_events WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_saved_items WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_annotations WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_projects WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_project_items WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_comments WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_research_feedback WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_research_usage WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_research_conversations WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_user_content_records WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_passkey_credentials WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_account_sessions WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_sessions WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_entitlements WHERE user_id = ${cleanupUserID}`;
+    await sql`DELETE FROM permitext_users WHERE id = ${cleanupUserID}`;
+  }
 }
 
 async function countRows(tableName) {
@@ -378,6 +382,107 @@ try {
     await countRows("permitext_saved_items") === savedItemCountBeforeGrant,
     "Entitlement removal changed unrelated saved content."
   );
+
+  const sourceSignIn = await request("/account/sign-in", {
+    method: "POST",
+    body: {
+      credential: {
+        provider: "web",
+        providerUserID: sourceProviderUserID,
+        displayName: "Postgres Link Source",
+        signedInAt: new Date().toISOString()
+      }
+    }
+  });
+  assert(sourceSignIn.response.ok, "Source browser account sign-in failed.");
+  const sourceToken = sourceSignIn.json.account.backendSessionToken;
+  const sourceSavedItem = {
+    savedItem: {
+      id: `postgres-link-source-saved-${runID}`,
+      userID: sourceUserID,
+      codeVersion,
+      sectionID: 501,
+      updatedAt: "2026-06-27T00:08:00Z"
+    }
+  };
+  const sourcePush = await request("/sync/push", {
+    method: "POST",
+    token: sourceToken,
+    body: {
+      auth: { accountUserID: sourceUserID },
+      batch: { user: { id: sourceUserID }, mutations: [sourceSavedItem] }
+    }
+  });
+  assert(sourcePush.response.ok, "Source browser account mutation push failed.");
+  const sourceGrant = await request("/admin/lifetime-grants/grant", {
+    method: "POST",
+    token: adminToken,
+    body: { userID: sourceUserID }
+  });
+  assert(sourceGrant.response.ok, "Source browser account entitlement grant failed.");
+
+  const linkedSignIn = await request("/account/sign-in", {
+    method: "POST",
+    body: {
+      credential: {
+        provider: "apple",
+        providerUserID,
+        displayName: "Postgres Integration Smoke",
+        signedInAt: new Date().toISOString()
+      },
+      linkFrom: {
+        accountUserID: sourceUserID,
+        sessionToken: sourceToken
+      }
+    }
+  });
+  assert(linkedSignIn.response.ok, "Transactional Postgres account linking failed.");
+  assert(
+    linkedSignIn.json.mergedAccount?.sourceUserID === sourceUserID &&
+      linkedSignIn.json.mergedAccount?.targetUserID === userID,
+    "Postgres account linking returned the wrong merge summary."
+  );
+  assert(
+    linkedSignIn.json.entitlement?.source === "lifetimeGrant",
+    "Postgres account linking did not transfer the source entitlement."
+  );
+  const linkedToken = linkedSignIn.json.account.backendSessionToken;
+  const linkedPull = await request("/sync/pull", {
+    method: "POST",
+    token: linkedToken,
+    body: { auth: { accountUserID: userID }, contentMapVersion: 2 }
+  });
+  assert(linkedPull.response.ok, "Linked Apple account could not pull merged data.");
+  assert(
+    linkedPull.json.mutations.some((mutation) =>
+      mutation.savedItem?.userID === userID && mutation.savedItem?.sectionID === 501
+    ),
+    "Linked Apple account did not receive the source saved section."
+  );
+  const removedSourceRows = await sql`
+    SELECT
+      (SELECT count(*) FROM permitext_users WHERE id = ${sourceUserID})::int AS users,
+      (SELECT count(*) FROM permitext_user_content_records WHERE user_id = ${sourceUserID})::int AS records,
+      (SELECT count(*) FROM permitext_entitlements WHERE user_id = ${sourceUserID})::int AS entitlements
+  `;
+  assert(
+    Number(removedSourceRows[0]?.users || 0) === 0 &&
+      Number(removedSourceRows[0]?.records || 0) === 0 &&
+      Number(removedSourceRows[0]?.entitlements || 0) === 0,
+    "Postgres account linking left source account rows behind."
+  );
+  const retiredSourcePull = await request("/sync/pull", {
+    method: "POST",
+    token: sourceToken,
+    body: { auth: { accountUserID: sourceUserID }, contentMapVersion: 2 }
+  });
+  assert(retiredSourcePull.response.status === 401, "Merged source session remained usable.");
+  const linkedEntitlementRevoke = await request("/admin/lifetime-grants/revoke", {
+    method: "POST",
+    token: adminToken,
+    body: { userID }
+  });
+  assert(linkedEntitlementRevoke.response.ok, "Transferred lifetime grant cleanup failed.");
 
   const secondSignIn = await request("/account/sign-in", {
     method: "POST",

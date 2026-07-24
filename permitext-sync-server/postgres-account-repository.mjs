@@ -141,6 +141,438 @@ export function createPostgresAccountRepository(sql) {
     `;
   }
 
+  async function mergeAccounts(sourceUserID, targetUserID) {
+    if (!sourceUserID || !targetUserID || sourceUserID === targetUserID) return null;
+    const [sourceContext, targetContext] = await Promise.all([
+      contextForUser(sourceUserID),
+      contextForUser(targetUserID)
+    ]);
+    if (!sourceContext || !targetContext) return null;
+
+    const queries = [
+      sql`
+        SELECT record_id
+        FROM permitext_user_content_records
+        WHERE user_id = ${sourceUserID}
+        ORDER BY record_id
+      `,
+      sql`
+        UPDATE permitext_users
+        SET public_username = NULL, updated_at = now()
+        WHERE id = ${sourceUserID}
+      `,
+      sql`
+        UPDATE permitext_users AS target
+        SET public_username = COALESCE(
+              target.public_username,
+              NULLIF(source.account->>'publicUsername', '')
+            ),
+            display_name = COALESCE(target.display_name, source.display_name),
+            migration_state = 'localDataAttached',
+            account = source.account || target.account || jsonb_build_object(
+              'appUserID', ${targetUserID},
+              'migrationState', 'localDataAttached',
+              'mergedAccountIDs',
+                COALESCE(target.account->'mergedAccountIDs', '[]'::jsonb) ||
+                jsonb_build_array(${sourceUserID}),
+              'linkedAppleUserIDs', (
+                SELECT COALESCE(jsonb_agg(DISTINCT identities.subject), '[]'::jsonb)
+                FROM (
+                  SELECT jsonb_array_elements_text(
+                    COALESCE(source.account->'linkedAppleUserIDs', '[]'::jsonb)
+                  ) AS subject
+                  UNION
+                  SELECT jsonb_array_elements_text(
+                    COALESCE(target.account->'linkedAppleUserIDs', '[]'::jsonb)
+                  ) AS subject
+                  UNION SELECT NULLIF(source.auth_provider_user_id, '')
+                  UNION SELECT NULLIF(source.apple_user_id, '')
+                  UNION SELECT NULLIF(target.auth_provider_user_id, '')
+                  UNION SELECT NULLIF(target.apple_user_id, '')
+                ) AS identities
+                WHERE identities.subject IS NOT NULL
+              )
+            ),
+            updated_at = now()
+        FROM permitext_users AS source
+        WHERE source.id = ${sourceUserID} AND target.id = ${targetUserID}
+      `,
+      sql`
+        INSERT INTO permitext_entitlements (
+          user_id, plan, source, granted_user_id, entitlement, expires_at, updated_at
+        )
+        SELECT
+          ${targetUserID}, plan, source, ${targetUserID},
+          entitlement || jsonb_build_object(
+            'grantedUserID', ${targetUserID},
+            'transferredFromUserID', ${sourceUserID},
+            'updatedAt', now()
+          ),
+          expires_at, now()
+        FROM permitext_entitlements
+        WHERE user_id = ${sourceUserID}
+          AND NOT EXISTS (
+            SELECT 1 FROM permitext_entitlements WHERE user_id = ${targetUserID}
+          )
+        ON CONFLICT (user_id) DO NOTHING
+        RETURNING user_id
+      `,
+      sql`DELETE FROM permitext_entitlements WHERE user_id = ${sourceUserID}`,
+      sql`
+        UPDATE permitext_apple_transaction_owners
+        SET user_id = ${targetUserID}, updated_at = now()
+        WHERE user_id = ${sourceUserID}
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            entity_kind,
+            code_version,
+            jsonb_set(
+              CASE
+                WHEN mutation #> ARRAY[entity_kind, 'id'] IS NULL THEN mutation
+                ELSE jsonb_set(
+                  mutation,
+                  ARRAY[entity_kind, 'id'],
+                  to_jsonb(
+                    CASE
+                      WHEN record_id LIKE ${`${sourceUserID}:%`}
+                        THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                      ELSE record_id
+                    END
+                  ),
+                  true
+                )
+              END,
+              ARRAY[entity_kind, 'userID'],
+              to_jsonb(${targetUserID}::text),
+              true
+            ) AS next_mutation,
+            updated_at,
+            deleted_at,
+            server_version
+          FROM permitext_user_content_records
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_user_content_records (
+          record_id, user_id, entity_kind, code_version, mutation,
+          updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, entity_kind, code_version, next_mutation,
+          updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          entity_kind = EXCLUDED.entity_kind,
+          code_version = EXCLUDED.code_version,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(
+            permitext_user_content_records.server_version,
+            EXCLUDED.server_version
+          ) + 1
+        WHERE permitext_user_content_records.updated_at < EXCLUDED.updated_at
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            code_version, section_id,
+            jsonb_set(
+              jsonb_set(
+                mutation, ARRAY['savedItem', 'userID'], to_jsonb(${targetUserID}::text), true
+              ),
+              ARRAY['savedItem', 'id'],
+              to_jsonb(CASE
+                WHEN record_id LIKE ${`${sourceUserID}:%`}
+                  THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                ELSE record_id
+              END),
+              true
+            ) AS next_mutation,
+            updated_at, deleted_at, server_version
+          FROM permitext_saved_items
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_saved_items (
+          record_id, user_id, code_version, section_id, mutation,
+          updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, code_version, section_id, next_mutation,
+          updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          section_id = EXCLUDED.section_id,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(permitext_saved_items.server_version, EXCLUDED.server_version) + 1
+        WHERE permitext_saved_items.updated_at < EXCLUDED.updated_at
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            code_version, section_id, block_id, note_body, tags,
+            jsonb_set(
+              jsonb_set(
+                mutation, ARRAY['annotation', 'userID'], to_jsonb(${targetUserID}::text), true
+              ),
+              ARRAY['annotation', 'id'],
+              to_jsonb(CASE
+                WHEN record_id LIKE ${`${sourceUserID}:%`}
+                  THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                ELSE record_id
+              END),
+              true
+            ) AS next_mutation,
+            updated_at, deleted_at, server_version
+          FROM permitext_annotations
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_annotations (
+          record_id, user_id, code_version, section_id, block_id, note_body, tags,
+          mutation, updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, code_version, section_id, block_id, note_body, tags,
+          next_mutation, updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          section_id = EXCLUDED.section_id,
+          block_id = EXCLUDED.block_id,
+          note_body = EXCLUDED.note_body,
+          tags = EXCLUDED.tags,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(permitext_annotations.server_version, EXCLUDED.server_version) + 1
+        WHERE permitext_annotations.updated_at < EXCLUDED.updated_at
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            code_version, client_id, local_folder_id, name, address, description,
+            color_hex, sort_order,
+            jsonb_set(
+              jsonb_set(
+                mutation, ARRAY['project', 'userID'], to_jsonb(${targetUserID}::text), true
+              ),
+              ARRAY['project', 'id'],
+              to_jsonb(CASE
+                WHEN record_id LIKE ${`${sourceUserID}:%`}
+                  THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                ELSE record_id
+              END),
+              true
+            ) AS next_mutation,
+            updated_at, deleted_at, server_version
+          FROM permitext_projects
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_projects (
+          record_id, user_id, code_version, client_id, local_folder_id, name,
+          address, description, color_hex, sort_order, mutation,
+          updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, code_version, client_id, local_folder_id, name,
+          address, description, color_hex, sort_order, next_mutation,
+          updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          client_id = EXCLUDED.client_id,
+          local_folder_id = EXCLUDED.local_folder_id,
+          name = EXCLUDED.name,
+          address = EXCLUDED.address,
+          description = EXCLUDED.description,
+          color_hex = EXCLUDED.color_hex,
+          sort_order = EXCLUDED.sort_order,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(permitext_projects.server_version, EXCLUDED.server_version) + 1
+        WHERE permitext_projects.updated_at < EXCLUDED.updated_at
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            code_version, project_client_id, local_folder_id, section_id, block_id, scope,
+            jsonb_set(
+              jsonb_set(
+                mutation, ARRAY['projectSection', 'userID'], to_jsonb(${targetUserID}::text), true
+              ),
+              ARRAY['projectSection', 'id'],
+              to_jsonb(CASE
+                WHEN record_id LIKE ${`${sourceUserID}:%`}
+                  THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                ELSE record_id
+              END),
+              true
+            ) AS next_mutation,
+            updated_at, deleted_at, server_version
+          FROM permitext_project_items
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_project_items (
+          record_id, user_id, code_version, project_client_id, local_folder_id,
+          section_id, block_id, scope, mutation, updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, code_version, project_client_id, local_folder_id,
+          section_id, block_id, scope, next_mutation, updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          project_client_id = EXCLUDED.project_client_id,
+          local_folder_id = EXCLUDED.local_folder_id,
+          section_id = EXCLUDED.section_id,
+          block_id = EXCLUDED.block_id,
+          scope = EXCLUDED.scope,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(permitext_project_items.server_version, EXCLUDED.server_version) + 1
+        WHERE permitext_project_items.updated_at < EXCLUDED.updated_at
+      `,
+      sql`
+        WITH moved AS (
+          SELECT
+            CASE
+              WHEN record_id LIKE ${`${sourceUserID}:%`}
+                THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+              ELSE record_id
+            END AS next_record_id,
+            code_version, section_id, block_id, body, visibility,
+            jsonb_set(
+              jsonb_set(
+                mutation, ARRAY['comment', 'userID'], to_jsonb(${targetUserID}::text), true
+              ),
+              ARRAY['comment', 'id'],
+              to_jsonb(CASE
+                WHEN record_id LIKE ${`${sourceUserID}:%`}
+                  THEN ${targetUserID} || substr(record_id, ${sourceUserID.length + 1})
+                ELSE record_id
+              END),
+              true
+            ) AS next_mutation,
+            updated_at, deleted_at, server_version
+          FROM permitext_comments
+          WHERE user_id = ${sourceUserID}
+        )
+        INSERT INTO permitext_comments (
+          record_id, user_id, code_version, section_id, block_id, body, visibility,
+          mutation, updated_at, deleted_at, server_version
+        )
+        SELECT
+          next_record_id, ${targetUserID}, code_version, section_id, block_id, body, visibility,
+          next_mutation, updated_at, deleted_at, server_version
+        FROM moved
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          code_version = EXCLUDED.code_version,
+          section_id = EXCLUDED.section_id,
+          block_id = EXCLUDED.block_id,
+          body = EXCLUDED.body,
+          visibility = EXCLUDED.visibility,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = EXCLUDED.deleted_at,
+          server_version = GREATEST(permitext_comments.server_version, EXCLUDED.server_version) + 1
+        WHERE permitext_comments.updated_at < EXCLUDED.updated_at
+      `,
+      sql`UPDATE permitext_research_conversations SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`UPDATE permitext_research_usage SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`
+        DELETE FROM permitext_research_feedback AS source
+        USING permitext_research_feedback AS target
+        WHERE source.user_id = ${sourceUserID}
+          AND target.user_id = ${targetUserID}
+          AND source.answer_id = target.answer_id
+          AND source.updated_at <= target.updated_at
+      `,
+      sql`
+        DELETE FROM permitext_research_feedback AS target
+        USING permitext_research_feedback AS source
+        WHERE target.user_id = ${targetUserID}
+          AND source.user_id = ${sourceUserID}
+          AND target.answer_id = source.answer_id
+          AND target.updated_at < source.updated_at
+      `,
+      sql`UPDATE permitext_research_feedback SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
+      sql`UPDATE permitext_passkey_credentials SET user_id = ${targetUserID}, updated_at = now() WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_account_sessions WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_sessions WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_sync_events WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_saved_items WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_annotations WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_projects WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_project_items WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_comments WHERE user_id = ${sourceUserID}`,
+      sql`DELETE FROM permitext_user_content_records WHERE user_id = ${sourceUserID}`,
+      sql`
+        INSERT INTO permitext_sync_events (
+          record_id, user_id, entity_kind, code_version, mutation_updated_at, mutation
+        )
+        SELECT
+          record_id, user_id, entity_kind, code_version, updated_at, mutation
+        FROM permitext_user_content_records
+        WHERE user_id = ${targetUserID}
+        ON CONFLICT (record_id, mutation_updated_at) DO NOTHING
+      `,
+      sql`DELETE FROM permitext_users WHERE id = ${sourceUserID}`
+    ];
+
+    const results = await sql.transaction(queries, { isolationMode: "Serializable" });
+    const sourceRows = results[0] || [];
+    const acceptedMutationIDs = sourceRows.map(({ record_id: recordID }) =>
+      recordID.startsWith(`${sourceUserID}:`)
+        ? `${targetUserID}:${recordID.slice(sourceUserID.length + 1)}`
+        : recordID
+    );
+    return {
+      sourceUserID,
+      targetUserID,
+      movedMutationCount: sourceRows.length,
+      acceptedMutationIDs,
+      rejectedMutationIDs: [],
+      transferredEntitlement: Boolean(results[3]?.length)
+    };
+  }
+
   async function signIn(account) {
     const incoming = withoutSessionToken(account);
     const candidates = await matchingAppleAccounts(incoming);
@@ -155,7 +587,8 @@ export function createPostgresAccountRepository(sql) {
       });
     const preferredAlternative = alternatives[0] || null;
     if (exact && preferredAlternative) {
-      return { requiresLegacyMerge: true };
+      await mergeAccounts(exact.id, preferredAlternative.id);
+      return signIn(account);
     }
 
     const targetRow = preferredAlternative || exact;
@@ -415,6 +848,7 @@ export function createPostgresAccountRepository(sql) {
     deleteEntitlement,
     deleteLegacyPasskeyAccounts,
     hasActiveSession,
+    mergeAccounts,
     revoke,
     saveEntitlement,
     signIn,

@@ -1,5 +1,6 @@
 import {
   claimAppleTransactionOwner,
+  sameOriginAbsoluteURL,
   stripeConfigurationStatus,
   stripeSecretKeyMode,
   validateAppleTransactionEnvironment,
@@ -28,6 +29,23 @@ function expectClientError(callback, statusCode, messageFragment) {
   }
   throw new Error(`Expected status ${statusCode}, but validation succeeded.`);
 }
+
+assert(
+  sameOriginAbsoluteURL(
+    "https://permitext.example",
+    "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
+  ) === "https://permitext.example/?checkout=success&session_id={CHECKOUT_SESSION_ID}",
+  "Checkout did not accept a same-origin return path."
+);
+assert(
+  sameOriginAbsoluteURL("https://permitext.example", "https://evil.example/steal") === null,
+  "Checkout accepted a cross-origin return URL."
+);
+assert(
+  sameOriginAbsoluteURL("https://permitext.example", undefined, "/?checkout=cancel") ===
+    "https://permitext.example/?checkout=cancel",
+  "Checkout did not construct its safe default return URL."
+);
 
 const stripeSubscription = {
   id: "sub_owned",

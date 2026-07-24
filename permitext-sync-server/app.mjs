@@ -1392,6 +1392,11 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.signIn(account);
     },
+    async mergeUserAccounts(sourceUserID, targetUserID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      return accountRepository.mergeAccounts(sourceUserID, targetUserID);
+    },
     async updateAccount(userID, account) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -2742,6 +2747,16 @@ async function handleResearchInterpretation(request, response) {
   try {
     const evidence = await researchEvidenceForSectionIDs(requestedIDs);
     const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+    const usageEntries = mockMode ? [] : await researchUsageSince(userID, currentMonthStart());
+    const requestLimit = monthlyResearchRequestLimit();
+    if (!mockMode && usageEntries.length >= requestLimit) {
+      sendJSON(response, 429, {
+        error: "This account reached its monthly AI research limit.",
+        code: "RESEARCH_MONTHLY_LIMIT",
+        usage: researchUsageSummary(usageEntries)
+      });
+      return;
+    }
     const result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, evidence), evidence),
@@ -2751,6 +2766,21 @@ async function handleResearchInterpretation(request, response) {
         }
       : await openAIResearchInterpretation(question, evidence, userID);
     const usage = result.usage;
+    const estimatedCost = estimatedResearchCost(usage);
+    if (!mockMode) {
+      await recordResearchUsage(userID, {
+        id: randomUUID(),
+        model: result.model,
+        requestedModel: result.requestedModel || result.model,
+        mode: "openai",
+        ...usage,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
+        createdAt: new Date().toISOString()
+      });
+    }
     console.info(JSON.stringify({
       event: "research_interpretation",
       user: createHash("sha256").update(userID).digest("hex").slice(0, 16),
@@ -2775,6 +2805,16 @@ async function handleResearchInterpretation(request, response) {
       ...result.interpretation,
       evidenceSectionIDs: evidence.map((section) => section.sectionID),
       usage,
+      estimatedCostUSD: estimatedCost.estimatedUSD,
+      pricingVersion: estimatedCost.pricingVersion,
+      monthlyUsage: researchUsageSummary(mockMode ? [] : [
+        ...usageEntries,
+        {
+          ...usage,
+          estimatedCostUSD: estimatedCost.estimatedUSD,
+          pricingVersion: estimatedCost.pricingVersion
+        }
+      ], { mockMode }),
       disclaimer: "AI-generated research assistance, not an official code determination."
     });
   } catch (error) {
@@ -3847,8 +3887,8 @@ async function handleCodeSearch(request, response) {
   const query = url.searchParams.get("q")?.trim() || "";
   const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
   const resultLimit = Number.isFinite(requestedLimit) && requestedLimit > 0
-    ? Math.min(requestedLimit, 500)
-    : 0;
+    ? Math.min(requestedLimit, 250)
+    : 250;
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
       .split(",")
@@ -3971,11 +4011,17 @@ export function appleIdentityTokenRequired(environment = process.env) {
 }
 
 export function compatibilityAccountMergeAllowed(adapter) {
-  return adapter?.kind !== "postgres";
+  return adapter?.kind !== "postgres" || typeof adapter.mergeUserAccounts === "function";
 }
 
 function appleWebSignInConfigured() {
-  return Boolean(process.env.APPLE_SERVICE_ID?.trim());
+  if (!process.env.APPLE_SERVICE_ID?.trim()) return false;
+  try {
+    appleWebOAuthStateSecret();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function browserFallbackSignInAllowed(request) {
@@ -3986,10 +4032,20 @@ function browserFallbackSignInAllowed(request) {
   return host.startsWith("localhost") || host.startsWith("127.0.0.1");
 }
 
-function appleWebOAuthStateSecret() {
-  return process.env.APPLE_WEB_OAUTH_STATE_SECRET ||
-    process.env.PERMITEXT_SYNC_ADMIN_TOKEN ||
-    process.env.STRIPE_WEBHOOK_SECRET ||
+export function appleWebOAuthStateSecret(environment = process.env) {
+  const dedicatedSecret = String(environment.APPLE_WEB_OAUTH_STATE_SECRET || "").trim();
+  if (dedicatedSecret) return dedicatedSecret;
+  const adminSecret = String(environment.PERMITEXT_SYNC_ADMIN_TOKEN || "").trim();
+  if (adminSecret) {
+    return createHmac("sha256", adminSecret)
+      .update("permitext-apple-web-oauth-state")
+      .digest("hex");
+  }
+  const hostedDeployment = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV);
+  if (hostedDeployment) {
+    throw new ClientAuthError(500, "Apple web OAuth state secret is not configured.");
+  }
+  return environment.STRIPE_WEBHOOK_SECRET ||
     "permitext-local-apple-web-oauth-state";
 }
 
@@ -4056,7 +4112,7 @@ async function appleJWKS() {
   return cachedAppleJWKS;
 }
 
-async function verifyAppleIdentityToken(identityToken) {
+async function verifyAppleIdentityToken(identityToken, options = {}) {
   const parts = String(identityToken || "").split(".");
   if (parts.length !== 3) {
     throw new ClientAuthError(401, "Invalid Apple identity token.");
@@ -4107,6 +4163,9 @@ async function verifyAppleIdentityToken(identityToken) {
       throw new ClientAuthError(401, "Apple identity token audience is invalid.");
     }
   }
+  if (options.expectedNonce && payload.nonce !== options.expectedNonce) {
+    throw new ClientAuthError(401, "Apple identity token nonce is invalid.");
+  }
 
   return payload;
 }
@@ -4116,7 +4175,7 @@ function normalizedAccountEmail(value) {
   return email && /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email) ? email : "";
 }
 
-async function verifiedCredentialIdentity(credential) {
+async function verifiedCredentialIdentity(credential, options = {}) {
   const provider = credential?.provider || "guest";
   if (provider !== "apple") {
     return { providerUserID: credential?.providerUserID || "local-guest", email: "" };
@@ -4133,7 +4192,7 @@ async function verifiedCredentialIdentity(credential) {
     };
   }
 
-  const payload = await verifyAppleIdentityToken(identityToken);
+  const payload = await verifyAppleIdentityToken(identityToken, options);
   if (credential.providerUserID && credential.providerUserID !== payload.sub) {
     throw new ClientAuthError(401, "Apple identity token subject does not match the credential.");
   }
@@ -4143,9 +4202,9 @@ async function verifiedCredentialIdentity(credential) {
   };
 }
 
-async function accountFromCredential(credential) {
+async function accountFromCredential(credential, options = {}) {
   const provider = credential?.provider || "guest";
-  const identity = await verifiedCredentialIdentity(credential);
+  const identity = await verifiedCredentialIdentity(credential, options);
   const providerUserID = identity.providerUserID;
   return {
     appUserID: `${provider}:${providerUserID}`,
@@ -5279,6 +5338,44 @@ async function handleSignIn(request, response) {
     sendError(response, 503, "Account linking is temporarily unavailable while transactional repair is completed.");
     return;
   }
+  if (
+    sourceUserID &&
+    typeof adapter.signInAccount === "function" &&
+    typeof adapter.mergeUserAccounts === "function"
+  ) {
+    const sourceSessionToken = linkFrom.sessionToken || linkFrom.backendSessionToken;
+    if (!await authenticatedUserContext(request, response, sourceUserID, {
+      backendSessionToken: sourceSessionToken
+    })) {
+      return;
+    }
+    const directResult = await adapter.signInAccount(account);
+    if (directResult.requiresLegacyMerge) {
+      sendError(response, 409, "This account requires identity repair before linking can continue.");
+      return;
+    }
+    const targetUserID = directResult.account.appUserID;
+    const mergedAccount = sourceUserID === targetUserID
+      ? null
+      : await adapter.mergeUserAccounts(sourceUserID, targetUserID);
+    if (sourceUserID !== targetUserID && !mergedAccount) {
+      sendError(response, 404, "The source account could not be linked.");
+      return;
+    }
+    const finalContext = await adapter.authenticateUserSession(
+      targetUserID,
+      directResult.account.backendSessionToken
+    );
+    sendJSON(response, 200, {
+      account: {
+        ...(finalContext?.account || directResult.account),
+        backendSessionToken: directResult.account.backendSessionToken
+      },
+      entitlement: finalContext?.entitlement || directResult.entitlement || null,
+      mergedAccount
+    });
+    return;
+  }
   if (!sourceUserID && typeof adapter.signInAccount === "function") {
     const directResult = await adapter.signInAccount(account);
     if (!directResult.requiresLegacyMerge) {
@@ -5342,6 +5439,39 @@ async function handleBrowserAccountLink(request, response) {
   const adapter = await storeAdapter();
   if (!compatibilityAccountMergeAllowed(adapter)) {
     sendError(response, 503, "Browser account repair is temporarily unavailable while transactional repair is completed.");
+    return;
+  }
+
+  if (typeof adapter.mergeUserAccounts === "function") {
+    const context = await authenticatedUserContext(request, response, targetUserID);
+    if (!context) return;
+    if (context.account?.authProvider !== "apple") {
+      sendError(response, 400, "Browser account repair requires an Apple account.");
+      return;
+    }
+    const sourceUserID = `web:${browserCredentialID}`;
+    const mergedAccount = await adapter.mergeUserAccounts(sourceUserID, targetUserID);
+    let finalContext = await adapter.authenticateUserSession(targetUserID, context.sessionToken);
+    if (!finalContext?.entitlement) {
+      const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
+      if (subscription) {
+        const entitlement = await persistServerEntitlement(targetUserID, "webSubscription", {
+          expiresAt: stripeSubscriptionExpiresAt(subscription),
+          provider: {
+            stripeCustomerID: stripeSubscriptionID(subscription.customer),
+            stripeSubscriptionID: stripeSubscriptionID(subscription.id),
+            restoredFromUserID: sourceUserID
+          }
+        });
+        await transferStripeSubscriptionMetadata(subscription.id, targetUserID);
+        finalContext = { ...finalContext, entitlement };
+      }
+    }
+    sendJSON(response, 200, {
+      account: finalContext?.account || context.account,
+      entitlement: finalContext?.entitlement || null,
+      mergedAccount
+    });
     return;
   }
 
@@ -5792,8 +5922,16 @@ async function handleWebCheckout(request, response) {
   }
 
   const baseURL = configuredPublicBaseURL(request);
-  const successURL = body.successURL || `${baseURL}/?checkout=success&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelURL = body.cancelURL || `${baseURL}/?checkout=cancel`;
+  const successURL = sameOriginAbsoluteURL(
+    baseURL,
+    body.successURL,
+    "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
+  );
+  const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
+  if (!successURL || !cancelURL) {
+    sendError(response, 400, "Checkout return URLs must use the Permitext origin.");
+    return;
+  }
   const formBody = encodedFormBody({
     mode: "subscription",
     client_reference_id: userID,
@@ -6344,6 +6482,16 @@ function sameOriginPath(request, value) {
   }
 }
 
+export function sameOriginAbsoluteURL(baseURL, value, fallbackPath = "/") {
+  try {
+    const normalizedBaseURL = new URL(baseURL);
+    const candidate = new URL(value || fallbackPath, normalizedBaseURL);
+    return candidate.origin === normalizedBaseURL.origin ? candidate.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 async function handleAppleWebStart(request, response) {
   if (!appleWebSignInConfigured()) {
     sendError(response, 503, "Apple web sign-in is not configured.");
@@ -6460,19 +6608,65 @@ async function handleAppleWebCallback(request, response) {
       .map((part) => String(part || "").trim())
       .filter(Boolean)
       .join(" ");
-    let account = await accountFromCredential({
-      provider: "apple",
-      displayName: displayName || null,
-      signedInAt: new Date().toISOString(),
-      identityToken,
-      authorizationCode: form.get("code") || undefined
-    });
+    let account = await accountFromCredential(
+      {
+        provider: "apple",
+        displayName: displayName || null,
+        signedInAt: new Date().toISOString(),
+        identityToken,
+        authorizationCode: form.get("code") || undefined
+      },
+      { expectedNonce: oauthState.nonce }
+    );
     const adapter = await storeAdapter();
     if (oauthState.linkFrom?.accountUserID && !compatibilityAccountMergeAllowed(adapter)) {
       sendCallbackHTML(appleCallbackHTML({
         title: "permitext sign in",
         message: "Account linking is temporarily unavailable. Your existing account data was not changed.",
         successPath: "/?appleSignIn=repairUnavailable",
+        scriptNonce
+      }));
+      return;
+    }
+    if (
+      oauthState.linkFrom?.accountUserID &&
+      typeof adapter.signInAccount === "function" &&
+      typeof adapter.mergeUserAccounts === "function"
+    ) {
+      const directResult = await adapter.signInAccount(account);
+      if (directResult.requiresLegacyMerge) {
+        sendCallbackHTML(appleCallbackHTML({
+          title: "permitext sign in",
+          message: "This account needs identity repair before sign-in can continue. Your existing account data was not changed.",
+          successPath: "/?appleSignIn=repairRequired",
+          scriptNonce
+        }));
+        return;
+      }
+      const targetUserID = directResult.account.appUserID;
+      const mergedAccount = oauthState.linkFrom.accountUserID === targetUserID
+        ? null
+        : await adapter.mergeUserAccounts(oauthState.linkFrom.accountUserID, targetUserID);
+      if (oauthState.linkFrom.accountUserID !== targetUserID && !mergedAccount) {
+        throw new Error("The source account could not be linked.");
+      }
+      const finalContext = await adapter.authenticateUserSession(
+        targetUserID,
+        directResult.account.backendSessionToken
+      );
+      const finalAccount = finalContext?.account || directResult.account;
+      sendCallbackHTML(appleCallbackHTML({
+        title: "permitext sign in",
+        message: "Apple sign-in completed. Returning to permitext...",
+        accountState: {
+          userID: targetUserID,
+          sessionToken: directResult.account.backendSessionToken,
+          authProvider: finalAccount.authProvider || "apple",
+          displayName: finalAccount.displayName || displayName || "Apple account",
+          publicUsername: finalAccount.publicUsername || null,
+          entitlement: finalContext?.entitlement || directResult.entitlement || null
+        },
+        successPath: oauthState.successPath || "/",
         scriptNonce
       }));
       return;

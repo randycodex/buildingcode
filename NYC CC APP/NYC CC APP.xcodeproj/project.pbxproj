@@ -42,7 +42,18 @@
 		A10000000000000000000026 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000026 /* AppIcon.icon */; };
 		A10000000000000000000027 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* Assets.xcassets */; };
 		A10000000000000000000028 /* ChapterSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* ChapterSearchSheet.swift */; };
+		B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B60000000000000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A60000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A50000000000000000000001;
+			remoteInfo = permitext;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		A20000000000000000000000 /* permitext.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = permitext.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,10 +98,19 @@
 		A20000000000000000000028 /* ChapterSearchSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterSearchSheet.swift; sourceTree = "<group>"; };
 		A20000000000000000000029 /* Permitext.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Permitext.storekit; sourceTree = "<group>"; };
 		A2000000000000000000002A /* permitext.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = permitext.entitlements; sourceTree = "<group>"; };
+		B20000000000000000000000 /* permitextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = permitextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementAndSyncContractTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A30000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B30000000000000000000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -104,6 +124,7 @@
 			isa = PBXGroup;
 			children = (
 				A40000000000000000000002 /* permitext */,
+				B40000000000000000000001 /* permitextTests */,
 				A40000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -128,6 +149,7 @@
 			isa = PBXGroup;
 			children = (
 				A20000000000000000000000 /* permitext.app */,
+				B20000000000000000000000 /* permitextTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -220,6 +242,14 @@
 			path = Diagnostics;
 			sourceTree = "<group>";
 		};
+		B40000000000000000000001 /* permitextTests */ = {
+			isa = PBXGroup;
+			children = (
+				B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */,
+			);
+			path = permitextTests;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -240,6 +270,23 @@
 			productReference = A20000000000000000000000 /* permitext.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B50000000000000000000001 /* permitextTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B70000000000000000000001 /* Build configuration list for PBXNativeTarget "permitextTests" */;
+			buildPhases = (
+				B30000000000000000000002 /* Sources */,
+				B30000000000000000000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B60000000000000000000002 /* PBXTargetDependency */,
+			);
+			name = permitextTests;
+			productName = permitextTests;
+			productReference = B20000000000000000000000 /* permitextTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -252,6 +299,10 @@
 				TargetAttributes = {
 					A50000000000000000000001 = {
 						CreatedOnToolsVersion = 16.2;
+					};
+					B50000000000000000000001 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = A50000000000000000000001;
 					};
 				};
 			};
@@ -269,6 +320,7 @@
 			projectRoot = "";
 			targets = (
 				A50000000000000000000001 /* permitext */,
+				B50000000000000000000001 /* permitextTests */,
 			);
 		};
 /* End PBXProject section */
@@ -326,7 +378,23 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		B30000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B60000000000000000000002 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A50000000000000000000001 /* permitext */;
+			targetProxy = B60000000000000000000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A80000000000000000000001 /* Debug */ = {
@@ -478,6 +546,55 @@
 			};
 			name = Release;
 		};
+		B80000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 57BY95X97H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitextTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/permitext.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/permitext";
+			};
+			name = Debug;
+		};
+		B80000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 57BY95X97H;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.randycodex.permitextTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/permitext.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/permitext";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -495,6 +612,15 @@
 			buildConfigurations = (
 				A80000000000000000000003 /* Debug */,
 				A80000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B70000000000000000000001 /* Build configuration list for PBXNativeTarget "permitextTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B80000000000000000000001 /* Debug */,
+				B80000000000000000000002 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

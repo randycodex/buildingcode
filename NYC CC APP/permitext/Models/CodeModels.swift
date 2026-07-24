@@ -2387,8 +2387,8 @@ struct EntitlementLimits: Hashable, Sendable {
         projectLimit: 0,
         premiumExportsEnabled: false,
         advancedOrganizationEnabled: false,
-        continuityEnabled: false,
-        crossDeviceSyncEnabled: false
+        continuityEnabled: true,
+        crossDeviceSyncEnabled: true
     )
 
     static let pro = EntitlementLimits(

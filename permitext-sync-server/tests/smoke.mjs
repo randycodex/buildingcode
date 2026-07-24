@@ -458,7 +458,7 @@ async function main() {
       "Divider resizing is no longer coalesced to animation frames."
     );
     assert(
-      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 3_000") &&
+      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 30_000") &&
         workspaceScript.text.includes("function canRunForegroundSync()") &&
         workspaceScript.text.includes('document.visibilityState === "visible"') &&
         workspaceScript.text.includes("navigator.onLine") &&
@@ -466,7 +466,7 @@ async function main() {
         workspaceScript.text.includes("await loadSyncedContent({ force: true, skipOutbox: true })") &&
         workspaceScript.text.includes('window.addEventListener("offline"') &&
         workspaceScript.text.includes("startForegroundSyncLoop({ immediate: true })"),
-      "Visible web tabs no longer perform incremental foreground sync every 3 seconds."
+      "Visible web tabs no longer perform incremental foreground sync every 30 seconds."
     );
     assert(
       syncStateScript.response.ok &&
@@ -626,7 +626,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-pro-offline-v4'),
+        webRoot.text.includes('/web/app.js?v=20260724-cross-platform-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -637,7 +637,7 @@ async function main() {
       "Cached remote data can bypass durable cross-device clears."
     );
     assert(
-      workspaceScript.text.includes("const foregroundSyncJitterMilliseconds = 300;") &&
+      workspaceScript.text.includes("const foregroundSyncJitterMilliseconds = 3_000;") &&
         workspaceScript.text.includes("Math.round((Math.random() * 2 - 1) * foregroundSyncJitterMilliseconds)") &&
         syncRepositorySource.includes("AND records.entity_kind = 'project'") &&
         syncRepositorySource.includes("allMutations: [...filteredRows, ...dependencyRows]") &&

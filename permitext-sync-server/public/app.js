@@ -112,8 +112,8 @@ let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncPromise = null;
 let serverReachable = navigator.onLine !== false;
-const foregroundSyncIntervalMilliseconds = 3_000;
-const foregroundSyncJitterMilliseconds = 300;
+const foregroundSyncIntervalMilliseconds = 30_000;
+const foregroundSyncJitterMilliseconds = 3_000;
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -9745,8 +9745,8 @@ function renderSettings() {
     planDetail.textContent = pro
       ? source === "lifetimeGrant"
         ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."
-        : "Pro is active. Saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
-      : "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity.";
+        : "Pro is active. Unlimited saved work, projects, tags, PDF export, and web offline downloads are unlocked."
+      : "Free includes continuity and cross-device sync. Pro unlocks unlimited saved work, projects, organization, and exports.";
     checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"

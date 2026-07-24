@@ -1,4 +1,9 @@
-import { appleIdentityTokenRequired, compatibilityAccountMergeAllowed, requestBodyLimit } from "../app.mjs";
+import {
+  appleIdentityTokenRequired,
+  appleWebOAuthStateSecret,
+  compatibilityAccountMergeAllowed,
+  requestBodyLimit
+} from "../app.mjs";
 import { accountSessionTTLSeconds } from "../postgres-account-repository.mjs";
 
 function assert(condition, message) {
@@ -50,5 +55,26 @@ assert(
   compatibilityAccountMergeAllowed({ kind: "postgres" }) === false,
   "Postgres allowed the unsafe compatibility account merge path."
 );
+assert(
+  compatibilityAccountMergeAllowed({ kind: "postgres", mergeUserAccounts() {} }) === true,
+  "Postgres did not allow its transactional account merge path."
+);
+assert(
+  appleWebOAuthStateSecret({ APPLE_WEB_OAUTH_STATE_SECRET: "dedicated-secret", VERCEL: "1" }) === "dedicated-secret",
+  "Hosted Apple web sign-in ignored its dedicated OAuth state secret."
+);
+assert(
+  appleWebOAuthStateSecret({ PERMITEXT_SYNC_ADMIN_TOKEN: "admin-secret", VERCEL: "1" }) !== "admin-secret",
+  "Hosted Apple web sign-in did not derive a domain-separated OAuth state key."
+);
+try {
+  appleWebOAuthStateSecret({ VERCEL: "1", STRIPE_WEBHOOK_SECRET: "unrelated-secret" });
+  throw new Error("Hosted Apple web sign-in accepted an unrelated OAuth secret.");
+} catch (error) {
+  assert(
+    error.statusCode === 500 && error.message.includes("OAuth state secret"),
+    "Hosted Apple web sign-in did not clearly reject a missing dedicated OAuth state secret."
+  );
+}
 
 console.log("permitext auth policy passed");

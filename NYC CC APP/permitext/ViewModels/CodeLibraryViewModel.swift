@@ -139,7 +139,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private var activeStoreKitPlan: AppPlan = .free
-    private let foregroundAccountSyncInterval: TimeInterval = 3
+    private let foregroundAccountSyncInterval: TimeInterval = 30
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
     @Published private(set) var bookmarkRevision: Int = 0
     @Published private(set) var userContentSyncCheckpoint: UserContentSyncCheckpoint?

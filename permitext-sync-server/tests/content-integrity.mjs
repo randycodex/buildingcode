@@ -31,6 +31,9 @@ const legacySectionRoot = join(
   "sections"
 );
 const canonicalMapPath = join(serverRoot, "config", "canonical-section-ids.json");
+const xcodeProjectPath = join(workspaceRoot, "NYC CC APP", "NYC CC APP.xcodeproj", "project.pbxproj");
+const minimumAvailableBodyCount = 10_371;
+const minimumAvailableBodyCoverage = 0.80;
 const prefixByCodeSectionID = new Map([
   [1, "BC"],
   [3, "AC"],
@@ -99,13 +102,14 @@ async function pngDimensions(path) {
 }
 
 async function main() {
-  const [bundle, manifest, canonicalMap, searchIndex, chapterFiles, canonicalSectionFiles] = await Promise.all([
+  const [bundle, manifest, canonicalMap, searchIndex, chapterFiles, canonicalSectionFiles, xcodeProject] = await Promise.all([
     readJSON(join(canonicalRoot, "bundle.json")),
     readJSON(join(canonicalPreparedRoot, "manifest.json")),
     readJSON(canonicalMapPath),
     readJSON(join(canonicalPreparedRoot, "searchIndex.json")),
     readdir(chapterRoot),
-    readdir(canonicalSectionRoot)
+    readdir(canonicalSectionRoot),
+    readFile(xcodeProjectPath, "utf8")
   ]);
 
   assert(bundle.chapterStructureSchemaVersion === 2, "Canonical bundle must use external chapter structure schema 2.");
@@ -249,6 +253,15 @@ async function main() {
     availableBodyCount >= expectedPreparedCount,
     `Only ${availableBodyCount} section bodies are available; the manifest promises ${expectedPreparedCount}.`
   );
+  const availableBodyCoverage = rows.length ? availableBodyCount / rows.length : 0;
+  assert(
+    availableBodyCount >= minimumAvailableBodyCount,
+    `Section body coverage regressed to ${availableBodyCount}; expected at least ${minimumAvailableBodyCount}.`
+  );
+  assert(
+    availableBodyCoverage >= minimumAvailableBodyCoverage,
+    `Section body coverage regressed to ${(availableBodyCoverage * 100).toFixed(2)}%; expected at least ${(minimumAvailableBodyCoverage * 100).toFixed(0)}%.`
+  );
   assert(
     missingImageAssets.length === 0,
     `Published section bodies reference ${missingImageAssets.length} missing image assets:\n${missingImageAssets.join("\n")}`
@@ -261,6 +274,14 @@ async function main() {
     placeholderImageAssets.length === 0,
     `Published section bodies reference ${placeholderImageAssets.length} placeholder image assets:\n${placeholderImageAssets.join("\n")}`
   );
+  const resourcesBuildPhase = xcodeProject.match(
+    /\/\* Begin PBXResourcesBuildPhase section \*\/([\s\S]*?)\/\* End PBXResourcesBuildPhase section \*\//
+  )?.[1] || "";
+  assert(resourcesBuildPhase.includes("CodeContent in Resources"), "The iOS target no longer packages CodeContent.");
+  assert(
+    !resourcesBuildPhase.includes(".sqlite in Resources"),
+    "The iOS target packages a legacy SQLite database in addition to authored CodeContent."
+  );
 
   const duplicateDisplayKeys = [...rowsByCanonicalKey.values()].filter((matchingRows) => matchingRows.length > 1);
   console.log("permitext content integrity passed", {
@@ -269,6 +290,8 @@ async function main() {
     indexedSections: indexedSectionIDs.size,
     canonicalOverrides: canonicalOverrideIDs.size,
     availableBodies: availableBodyCount,
+    missingBodies: rows.length - availableBodyCount,
+    availableBodyCoverage: `${(availableBodyCoverage * 100).toFixed(2)}%`,
     referencedImages: referencedImageCount,
     duplicateDisplayKeys: duplicateDisplayKeys.length
   });

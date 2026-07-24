@@ -229,8 +229,8 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
 
             VStack(alignment: .leading, spacing: 10) {
-                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, and 10 notes.")
-                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, PDF export, continuity, and cross-device sync.")
+                planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
+                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, and PDF export.")
             }
 
             Button {
@@ -477,9 +477,9 @@ struct SettingsView: View {
             if library.currentEntitlementSource == .lifetimeGrant {
                 return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
             }
-            return "Pro is active. The same saved work, PDF export, tags, continuity, and cross-device sync are unlocked across iOS and web."
+            return "Pro is active. Unlimited saved work, projects, tags, and PDF export are unlocked across iOS and web."
         }
-        return "Free keeps reading and search usable. Pro unlocks heavier personal-workflow tools when you need more saved work, organization, exports, and continuity."
+        return "Free includes continuity and cross-device sync. Pro unlocks unlimited saved work, projects, organization, and exports."
     }
 
     private var accountSummaryText: String {
