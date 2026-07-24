@@ -20,15 +20,20 @@ import {
   researchModelConfiguration
 } from "./research-config.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
+import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
 const canonicalSectionIDsPath = join(__dirname, "config", "canonical-section-ids.json");
 const webPublicPath = join(__dirname, "public");
 const internalPublicPath = join(__dirname, "internal");
-const evaluationCasesPath = join(__dirname, "evals", "research-cases.json");
-const evaluationResultsPath = join(__dirname, "evals", "results");
-const evaluationReviewsPath = join(__dirname, "evals", "reviews.json");
+const evaluationRootPath = process.env.NODE_ENV === "test" &&
+  String(process.env.PERMITEXT_EVALUATION_ROOT || "").trim()
+  ? String(process.env.PERMITEXT_EVALUATION_ROOT).trim()
+  : join(__dirname, "evals");
+const evaluationCasesPath = join(evaluationRootPath, "research-cases.json");
+const evaluationResultsPath = join(evaluationRootPath, "results");
+const evaluationReviewsPath = join(evaluationRootPath, "reviews.json");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const defaultResearchCodeEdition = "2022 New York City Construction Codes";
 const maxSyncMutationsPerBatch = 100;
@@ -291,6 +296,18 @@ function createFileStoreAdapter() {
       store.researchFeedbackByUserID[userID] = entries;
       await this.write(store);
       return feedback;
+    },
+    async updateResearchFeedback(feedbackID, feedback) {
+      const store = await this.read();
+      for (const [userID, entries] of Object.entries(store.researchFeedbackByUserID || {})) {
+        const index = (entries || []).findIndex((item) => item.id === feedbackID);
+        if (index === -1) continue;
+        entries[index] = feedback;
+        store.researchFeedbackByUserID[userID] = entries;
+        await this.write(store);
+        return feedback;
+      }
+      return null;
     }
   };
 }
@@ -1469,6 +1486,17 @@ async function createPostgresStoreAdapter() {
       `;
       return feedback;
     },
+    async updateResearchFeedback(feedbackID, feedback) {
+      await ensureSchema();
+      const rows = await sql`
+        UPDATE permitext_research_feedback
+        SET feedback = ${JSON.stringify(feedback)}::jsonb,
+            updated_at = ${feedback.updatedAt}::timestamptz
+        WHERE id = ${feedbackID}
+        RETURNING id
+      `;
+      return rows.length ? feedback : null;
+    },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -1600,6 +1628,14 @@ async function listAllStoredResearchFeedback() {
   return typeof adapter.listAllResearchFeedback === "function"
     ? adapter.listAllResearchFeedback()
     : [];
+}
+
+async function updateStoredResearchFeedback(feedbackID, feedback) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateResearchFeedback !== "function") {
+    throw new Error("Research feedback triage storage is unavailable.");
+  }
+  return adapter.updateResearchFeedback(feedbackID, feedback);
 }
 
 export function requestBodyLimit(environment = process.env) {
@@ -2448,7 +2484,7 @@ function outputTextFromResponse(response) {
   throw error;
 }
 
-function validateResearchInterpretation(value, evidence) {
+export function validateResearchInterpretation(value, evidence) {
   const allowedSections = new Map();
   const allowedSources = new Map();
   for (const section of evidence) {
@@ -2472,17 +2508,22 @@ function validateResearchInterpretation(value, evidence) {
   for (const citation of value.citations) {
     const sectionID = String(citation?.sectionID || "").trim();
     const sourceIDs = Array.isArray(citation?.sourceIDs)
-      ? Array.from(new Set(citation.sourceIDs.map((item) => String(item || "").trim()).filter(Boolean)))
+      ? citation.sourceIDs.map((item) => String(item || "").trim()).filter(Boolean)
       : [];
     const relevance = String(citation?.relevance || "").trim();
     if (!allowedSections.has(sectionID) || !sourceIDs.length ||
+        new Set(sourceIDs).size !== sourceIDs.length ||
         sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID) || !relevance) {
       const error = new Error("The model cited evidence outside the selected code sections.");
       error.code = "INVALID_RESEARCH_CITATION";
       throw error;
     }
     const citationKey = `${sectionID}:${sourceIDs.slice().sort().join(",")}`;
-    if (seen.has(citationKey)) continue;
+    if (seen.has(citationKey)) {
+      const error = new Error("The model returned a duplicate citation.");
+      error.code = "INVALID_RESEARCH_CITATION";
+      throw error;
+    }
     seen.add(citationKey);
     const source = allowedSections.get(sectionID);
     citations.push({
@@ -2888,10 +2929,12 @@ async function handleResearchConversationGet(request, response) {
           ...message,
           feedback: {
             id: feedback.id,
-            status: feedback.status,
+            status: "candidate",
             category: feedback.category,
             userComment: feedback.userComment,
-            updatedAt: feedback.updatedAt
+            professionalRole: feedback.professionalRole || "",
+            supportingReference: feedback.supportingReference || "",
+            updatedAt: feedback.userUpdatedAt || feedback.updatedAt
           }
         };
       })
@@ -3050,6 +3093,18 @@ const researchFeedbackCategories = new Set([
   "other"
 ]);
 
+const researchFeedbackProfessionalRoles = new Set([
+  "",
+  "architect_designer",
+  "engineer",
+  "code_zoning_consultant",
+  "expeditor_filing_representative",
+  "contractor",
+  "owner_operator",
+  "student",
+  "other"
+]);
+
 async function handleResearchFeedback(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
@@ -3058,8 +3113,14 @@ async function handleResearchFeedback(request, response) {
   const answerID = String(context.body.answerID || "").trim();
   const category = String(context.body.category || "").trim();
   const comment = normalizedResearchText(context.body.comment, 2_000);
+  const professionalRole = String(context.body.professionalRole || "").trim();
+  const supportingReference = normalizedResearchText(context.body.supportingReference, 500);
   if (!researchFeedbackCategories.has(category)) {
     sendError(response, 400, "Choose a valid feedback category.");
+    return;
+  }
+  if (!researchFeedbackProfessionalRoles.has(professionalRole)) {
+    sendError(response, 400, "Choose a valid optional professional role.");
     return;
   }
   const answerIndex = (conversation.messages || []).findIndex((message) => message.id === answerID && message.role === "assistant");
@@ -3093,7 +3154,12 @@ async function handleResearchFeedback(request, response) {
     evidenceVersion: answerMessage.answer?.evidenceVersion || null,
     category,
     userComment: comment,
+    professionalRole,
+    supportingReference,
+    triageStatus: "new",
+    triageHistory: existing?.triageHistory || [],
     createdAt: existing?.createdAt || now,
+    userUpdatedAt: now,
     updatedAt: now
   };
   await saveStoredResearchFeedback(context.userID, feedback);
@@ -3103,7 +3169,9 @@ async function handleResearchFeedback(request, response) {
       status: feedback.status,
       category: feedback.category,
       userComment: feedback.userComment,
-      updatedAt: feedback.updatedAt
+      professionalRole: feedback.professionalRole,
+      supportingReference: feedback.supportingReference,
+      updatedAt: feedback.userUpdatedAt
     }
   });
 }
@@ -3183,12 +3251,73 @@ async function handleInternalEvaluationData(request, response) {
   if (!context) return;
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
+  const runs = await readEvaluationRuns();
+  const reviews = (await readEvaluationReviews()).reviews;
+  const feedbackRecords = (await listAllStoredResearchFeedback()).filter((item) => item.status === "candidate");
   sendJSON(response, 200, {
     dataset,
-    runs: await readEvaluationRuns(),
-    reviews: (await readEvaluationReviews()).reviews,
-    feedbackCandidates: (await listAllStoredResearchFeedback()).filter((item) => item.status === "candidate")
+    runs,
+    reviews,
+    runReviewStatuses: Object.fromEntries(runs.map((run) => [
+      run.configuration.runID,
+      evaluationRunReviewStatus(run, reviews)
+    ])),
+    feedbackCandidates: feedbackRecords,
+    feedbackRecords
   });
+}
+
+const researchFeedbackTriageStatuses = new Set([
+  "new",
+  "reviewing",
+  "evaluation_candidate",
+  "resolved",
+  "dismissed"
+]);
+
+async function handleInternalFeedbackTriage(request, response) {
+  const context = await authenticatedInternalBody(request, response);
+  if (!context) return;
+  if (!internalConsoleHasLocalDevelopmentAccess(request)) {
+    sendError(response, 405, "Feedback triage can currently be changed only from the local owner console.");
+    return;
+  }
+  const feedbackID = String(context.body.feedbackID || "").trim();
+  const triageStatus = String(context.body.triageStatus || "").trim();
+  const notes = normalizedResearchText(context.body.notes, 4_000);
+  const reviewer = normalizedResearchText(context.body.reviewer, 120) || "Permitext owner";
+  if (!feedbackID || !researchFeedbackTriageStatuses.has(triageStatus)) {
+    sendError(response, 400, "Provide a feedback record and valid triage status.");
+    return;
+  }
+  const existing = (await listAllStoredResearchFeedback()).find((item) => item.id === feedbackID);
+  if (!existing || existing.status !== "candidate") {
+    sendError(response, 404, "Feedback candidate not found.");
+    return;
+  }
+  const now = new Date().toISOString();
+  const triageEntry = {
+    triageStatus,
+    notes,
+    reviewer,
+    reviewedAt: now
+  };
+  const feedback = {
+    ...existing,
+    status: "candidate",
+    triageStatus,
+    triageNotes: notes,
+    triagedBy: reviewer,
+    triagedAt: now,
+    triageHistory: [...(existing.triageHistory || []), triageEntry],
+    updatedAt: now
+  };
+  const saved = await updateStoredResearchFeedback(feedbackID, feedback);
+  if (!saved) {
+    sendError(response, 404, "Feedback candidate not found.");
+    return;
+  }
+  sendJSON(response, 200, { feedback });
 }
 
 async function handleInternalEvaluationReview(request, response) {
@@ -3208,10 +3337,48 @@ async function handleInternalEvaluationReview(request, response) {
     sendError(response, 400, "Provide a case or run review with an approve or reject decision.");
     return;
   }
+  const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
+  validateEvaluationDataset(dataset);
+  let reviewedRun = null;
+  let reviewedResult = null;
+  if (kind === "case") {
+    if (!dataset.cases.some((item) => item.id === caseID)) {
+      sendError(response, 404, "Evaluation case not found.");
+      return;
+    }
+  } else {
+    if (!runID) {
+      sendError(response, 400, "Run reviews require a run ID.");
+      return;
+    }
+    reviewedRun = (await readEvaluationRuns()).find(
+      (run) => String(run.configuration?.runID || "") === runID
+    );
+    if (!reviewedRun) {
+      sendError(response, 404, "Evaluation run not found.");
+      return;
+    }
+    reviewedResult = reviewedRun.results.find((result) => result.testCase?.id === caseID);
+    if (!reviewedResult) {
+      sendError(response, 404, "This evaluation case is not part of the selected run.");
+      return;
+    }
+    if (reviewedResult.error || !reviewedResult.answer || !reviewedResult.scoring?.metrics) {
+      sendError(response, 409, "Only a completed answer with scoring can receive a run review.");
+      return;
+    }
+  }
   const scoreOverrides = {};
+  const allowedOverrideDimensions = new Set(Object.keys(reviewedResult?.scoring?.metrics || {}));
   for (const [dimension, rawScore] of Object.entries(context.body.scoreOverrides || {})) {
     const score = Number(rawScore);
-    if (!/^[a-zA-Z][a-zA-Z0-9]+$/.test(dimension) || !Number.isFinite(score) || score < 0 || score > 4) {
+    if (
+      kind !== "run" ||
+      !allowedOverrideDimensions.has(dimension) ||
+      !Number.isFinite(score) ||
+      score < 0 ||
+      score > 4
+    ) {
       sendError(response, 400, "Score overrides must use valid dimensions and values from 0 through 4.");
       return;
     }
@@ -3219,20 +3386,12 @@ async function handleInternalEvaluationReview(request, response) {
   }
   const now = new Date().toISOString();
   if (kind === "case") {
-    const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
     const testCase = dataset.cases.find((item) => item.id === caseID);
-    if (!testCase) {
-      sendError(response, 404, "Evaluation case not found.");
-      return;
-    }
     testCase.status = decision === "approved" ? "approved" : "draft";
     testCase.reviewer = reviewer;
     testCase.reviewedAt = now;
     validateEvaluationDataset(dataset);
     await writeFile(evaluationCasesPath, `${JSON.stringify(dataset, null, 2)}\n`);
-  } else if (!runID) {
-    sendError(response, 400, "Run reviews require a run ID.");
-    return;
   }
   const reviewStore = await readEvaluationReviews();
   const review = {
@@ -3248,7 +3407,12 @@ async function handleInternalEvaluationReview(request, response) {
   };
   reviewStore.reviews.push(review);
   await writeFile(evaluationReviewsPath, `${JSON.stringify(reviewStore, null, 2)}\n`);
-  sendJSON(response, 200, { review });
+  sendJSON(response, 200, {
+    review,
+    runReviewStatus: reviewedRun
+      ? evaluationRunReviewStatus(reviewedRun, reviewStore.reviews)
+      : null
+  });
 }
 
 async function handleResearchConversationMessage(request, response) {
@@ -6123,6 +6287,7 @@ const handlers = {
   "research/feedback": handleResearchFeedback,
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
+  "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
   "workboards/assets/delete": handleWorkboardAssetDelete,

@@ -52,6 +52,11 @@ function nonemptyStrings(value, message, { allowEmpty = false } = {}) {
 
 export function validateEvaluationDataset(dataset) {
   assert(dataset?.schemaVersion === 3, "Research eval dataset must use schemaVersion 3.");
+  assert(
+    dataset.responseLanguage === undefined ||
+      (typeof dataset.responseLanguage === "string" && /^[a-z]{2,3}(?:-[A-Z]{2})?$/.test(dataset.responseLanguage)),
+    "Research eval responseLanguage must be a supported language tag."
+  );
   assert(Array.isArray(dataset.cases) && dataset.cases.length > 0, "Research eval dataset has no cases.");
   const scoring = dataset.automaticScoring;
   assert(scoring && typeof scoring === "object", "Research eval dataset needs automaticScoring configuration.");
@@ -120,7 +125,35 @@ export function validateEvaluationDataset(dataset) {
     nonemptyStrings(testCase.requiredConcepts, `${testCase.id} needs required concepts.`);
     nonemptyStrings(testCase.missingFacts, `${testCase.id} needs missing facts.`, { allowEmpty: true });
     nonemptyStrings(testCase.forbiddenClaims, `${testCase.id} needs forbidden claims.`);
+    if (testCase.forbiddenPhrases !== undefined) {
+      nonemptyStrings(testCase.forbiddenPhrases, `${testCase.id} has invalid forbidden literal phrases.`);
+    }
     nonemptyStrings(testCase.requiredCitations, `${testCase.id} needs required citations.`);
+    assert(
+      new Set(testCase.requiredCitations).size === testCase.requiredCitations.length,
+      `${testCase.id} repeats a required citation.`
+    );
+    if (testCase.requiredCitationClaims !== undefined) {
+      assert(
+        Array.isArray(testCase.requiredCitationClaims) &&
+          testCase.requiredCitationClaims.length === testCase.requiredCitations.length,
+        `${testCase.id} must describe the claim required from every citation.`
+      );
+      assert(
+        testCase.requiredCitationClaims.every((item) =>
+          item && typeof item === "object" &&
+          typeof item.reference === "string" && item.reference.trim() &&
+          typeof item.requiredClaim === "string" && item.requiredClaim.trim()
+        ),
+        `${testCase.id} has an invalid required citation claim.`
+      );
+      const claimReferences = testCase.requiredCitationClaims.map((item) => item.reference.trim());
+      assert(
+        new Set(claimReferences).size === claimReferences.length &&
+          testCase.requiredCitations.every((reference) => claimReferences.includes(reference)),
+        `${testCase.id} citation claims must exactly match its required citations.`
+      );
+    }
     const references = new Set();
     const sectionIDs = new Set();
     for (const source of testCase.selectedEvidence) {
@@ -135,6 +168,12 @@ export function validateEvaluationDataset(dataset) {
     }
     for (const reference of testCase.requiredCitations) {
       assert(references.has(reference), `${testCase.id} requires citation ${reference}, but it is not selected evidence.`);
+    }
+    for (const item of testCase.requiredCitationClaims || []) {
+      assert(
+        testCase.requiredCitations.includes(item.reference),
+        `${testCase.id} describes ${item.reference}, but that reference is not a required citation.`
+      );
     }
   }
   return dataset;

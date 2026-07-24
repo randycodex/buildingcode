@@ -60,6 +60,11 @@ main { width: min(1440px, 100%); margin: auto; padding: 28px clamp(20px, 4vw, 56
 .badge { display: inline-block; margin: 0 5px 5px 0; padding: 4px 8px; border-radius: 999px; background: #272727; color: #d8d5cf; font-size: 12px; }
 .badge.approved, .pass { color: #78dba9; }
 .badge.draft, .fail { color: #ffb4ab; }
+.badge.new { color: #f4a340; }
+.badge.reviewing { color: #92c7ff; }
+.badge.evaluation_candidate { color: #d5a6ff; }
+.badge.resolved { color: #78dba9; }
+.badge.dismissed { color: #aaa69f; }
 
 .evidence { margin: 12px 0; padding: 12px; border-left: 3px solid #f4a340; background: #181818; white-space: pre-wrap; line-height: 1.5; }
 ul { padding-left: 20px; }
@@ -77,8 +82,10 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
 .metric input { text-align: right; }
 .answer { white-space: pre-wrap; color: #d3d0ca; line-height: 1.5; }
 .feedback-item + .feedback-item { margin-top: 12px; }
+.feedback-controls { display: grid; grid-template-columns: repeat(2, minmax(180px, 280px)); gap: 10px; margin: 16px 0; }
+.feedback-item { margin-top: 14px; }
 
 @media (max-width: 800px) {
-  .split, .compare-grid, .compare-controls { grid-template-columns: 1fr; }
+  .split, .compare-grid, .compare-controls, .feedback-controls { grid-template-columns: 1fr; }
   .console-header { align-items: flex-start; }
 }

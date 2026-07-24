@@ -24,9 +24,8 @@ import {
   offlineFeatureMetadata,
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
-  removeOfflineLibrary,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-pro-offline-v3";
+} from "./offline-storage.js?v=20260724-pro-offline-v4";
 
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
@@ -5081,7 +5080,7 @@ function renderSectionComments(commentsList, targets) {
 function rewriteCodeHTML(html) {
   return rewriteStructuredCodeLinks(html)
     .replace(/src=(["'])(?:\.\.\/)+assets\/([^"']+)\1/gi, (_match, quote, fileName) => {
-      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${workboardClientVersion}${quote}`;
+      return `src=${quote}/code/assets/${encodeURIComponent(fileName)}?v=${offlineFeatureMetadata.assetVersion}${quote}`;
     })
     .replace(/<\s*\/?\s*(annotationdrawer|codeoptions)\b[^>]*>/gi, "");
 }
@@ -5094,7 +5093,7 @@ function renderCodeBlock(block) {
       figure.innerHTML = rewriteCodeHTML(block.html);
     } else if (block.imageID) {
       const image = document.createElement("img");
-      image.src = `/code/assets/${encodeURIComponent(block.imageID)}?v=${workboardClientVersion}`;
+      image.src = `/code/assets/${encodeURIComponent(block.imageID)}?v=${offlineFeatureMetadata.assetVersion}`;
       figure.append(image);
     }
     decorateCodeHTML(figure);
@@ -6605,8 +6604,43 @@ function renderResearchFeedback(container, message, conversationID) {
   const comment = document.createElement("textarea");
   comment.rows = 2;
   comment.maxLength = 2000;
-  comment.placeholder = "Optional comment";
+  comment.placeholder = "What should be corrected? (optional)";
   comment.value = message.feedback?.userComment || "";
+  const optionalContext = document.createElement("details");
+  optionalContext.className = "research-feedback-context";
+  optionalContext.open = Boolean(
+    comment.value ||
+    message.feedback?.professionalRole ||
+    message.feedback?.supportingReference
+  );
+  const optionalSummary = document.createElement("summary");
+  optionalSummary.textContent = "Add supporting context (optional)";
+  const professionalRole = document.createElement("select");
+  professionalRole.setAttribute("aria-label", "Professional role");
+  [
+    ["", "Professional role (optional)"],
+    ["architect_designer", "Architect or designer"],
+    ["engineer", "Engineer"],
+    ["code_zoning_consultant", "Code or zoning consultant"],
+    ["expeditor_filing_representative", "Expeditor or filing representative"],
+    ["contractor", "Contractor"],
+    ["owner_operator", "Owner or operator"],
+    ["student", "Student"],
+    ["other", "Other"]
+  ].forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    professionalRole.append(option);
+  });
+  professionalRole.value = message.feedback?.professionalRole || "";
+  const supportingReference = document.createElement("input");
+  supportingReference.type = "text";
+  supportingReference.maxLength = 500;
+  supportingReference.placeholder = "Code section or official source supporting your feedback";
+  supportingReference.setAttribute("aria-label", "Supporting code section or official source");
+  supportingReference.value = message.feedback?.supportingReference || "";
+  optionalContext.append(optionalSummary, professionalRole, supportingReference, comment);
   const submit = document.createElement("button");
   submit.type = "submit";
   submit.className = "ghost-button";
@@ -6625,7 +6659,9 @@ function renderResearchFeedback(container, message, conversationID) {
         conversationID,
         answerID: message.id,
         category: selectedCategory,
-        comment: comment.value
+        comment: comment.value,
+        professionalRole: professionalRole.value,
+        supportingReference: supportingReference.value
       });
       message.feedback = payload.feedback;
       submit.textContent = "Update feedback";
@@ -6636,7 +6672,7 @@ function renderResearchFeedback(container, message, conversationID) {
       submit.disabled = !selectedCategory;
     }
   });
-  form.append(heading, choices, comment, submit, status);
+  form.append(heading, choices, optionalContext, submit, status);
   container.append(form);
 }
 
@@ -9864,7 +9900,7 @@ function renderSettings() {
         onProgress(progress) {
           offlineProgress.value = progress.percent || 0;
           offlineStatus.textContent = progress.total > 1
-            ? `${progress.phase} · ${progress.completed} of ${progress.total} chapters`
+            ? `${progress.phase} · ${progress.completed} of ${progress.total} ${progress.unit || "items"}`
             : progress.phase;
         }
       });
@@ -9884,7 +9920,7 @@ function renderSettings() {
     offlineRemove.disabled = true;
     offlineStatus.textContent = "Removing offline download…";
     try {
-      await removeOfflineLibrary();
+      await disableOfflineFeature();
       offlineStatus.textContent = "Offline download removed.";
       await renderOfflineState();
     } catch (error) {

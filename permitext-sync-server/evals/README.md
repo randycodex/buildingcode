@@ -6,6 +6,7 @@ This directory is Permitext's server-private, repository-based laboratory for me
 
 - `research-cases.json`: human-authored cases and answer keys.
 - `evaluation-schema.mjs`: data-contract validation and approved-case selection.
+- `evaluation-governance.mjs`: shared full-run eligibility, human-review completeness, and preferred-baseline rules.
 - `results/`: immutable raw JSON runs and generated Markdown review reports.
 - `reviews.json`: human decisions, notes, and score overrides, stored separately from raw answers.
 - `baselines/`: provisional or human-accepted baseline summaries that point to immutable raw runs.
@@ -21,7 +22,7 @@ Every case supports:
 - `sourceType` and `sourceReference`.
 - Structured `projectContext`.
 - `selectedEvidence` containing persisted canonical `sectionID`, code prefix, section number, reference, and exact enacted passages.
-- `question`, `requiredCitations`, `requiredConcepts`, `forbiddenClaims`, and `missingFacts`.
+- `question`, `requiredCitations`, optional claim-specific `requiredCitationClaims`, `requiredConcepts`, `forbiddenClaims`, optional deterministic `forbiddenPhrases`, and `missingFacts`.
 - `expectedConclusion` and explicit `expectedUncertainty` level/description.
 - `reviewer`, `reviewedAt`, and `notes`.
 
@@ -60,7 +61,9 @@ Online/forum material supplies a problem scenario, never an authoritative answer
 
 Build coverage deliberately across direct rules and exceptions, general and occupancy-specific rules, current and older editions, cross-references, outside-agency questions, insufficient selected evidence, and material missing facts such as occupancy, construction type, height, stories, floor area, occupant load, use, location, existing conditions, sprinklers, accessibility standard, and edition.
 
-Feedback categories are `helpful`, `incorrect_misleading`, `missing_information`, `citation_problem`, and `other`. Feedback stores the conversation/answer IDs, selected evidence IDs, question, immutable answer, citations, model, prompt/evidence versions, comment, and timestamp. It always remains a review `candidate`; a thumbs-down is not proof of error and never promotes a case automatically.
+Feedback categories are `helpful`, `incorrect_misleading`, `missing_information`, `citation_problem`, and `other`. Feedback stores the conversation/answer IDs, selected evidence IDs, question, immutable answer, citations, model, prompt/evidence versions, comment, optional self-described professional role, optional supporting reference, and timestamp. It always remains a review `candidate`; a thumbs-down is not proof of error and never promotes a case automatically.
+
+The owner-only console keeps triage separate from candidate status. A candidate may be marked `new`, `reviewing`, `evaluation_candidate`, `resolved`, or `dismissed`, with reviewer notes and an append-only triage history. `evaluation_candidate` means only that the report is worth rebuilding as a reviewed case. It does not write to `research-cases.json`, approve an answer key, modify a prompt or model, or make a run eligible as a baseline.
 
 ## Free validation
 
@@ -125,7 +128,7 @@ Every run uses an isolated temporary local store and synthetic eval account. It 
 
 Quality uses a transparent 0–4 scale:
 
-- Deterministic: answer presence/shape; canonical citation IDs; selected-evidence scope; required-citation completeness; malformed, duplicate, and unsupported returned citations.
+- Deterministic: answer presence/shape; canonical section and passage IDs; selected-evidence scope; explicit inline evidence IDs; required-citation completeness; malformed, duplicate, and unsupported returned citations; and unexpected writing-system contamination when the dataset declares an English response.
 - Semantic: citation-to-claim support, required concepts, unsupported/invented requirements, forbidden claims, uncertainty, missing facts, selected-evidence insufficiency, usefulness, and directness.
 - Operational: duration, input/cached/output/total tokens, and reliable estimated cost are recorded separately from the quality score.
 
@@ -142,7 +145,9 @@ node tests/research-evals.mjs \
   --create-baseline evals/results/RUN.json
 ```
 
-The artifact is `provisional` until every case result in that run has a recorded human approval. Targeted runs cannot become baselines.
+Baseline eligibility is deliberately strict. A source must use the current raw-run schema, be a completed unfiltered full suite, contain exactly one successful result for every case ID recorded by that immutable run, show that every embedded case was approved when it ran, contain no case errors, and use one repetition. Eligibility does not silently change when the current mutable dataset later grows. Legacy, targeted, filtered, repeated, incomplete, and errored runs cannot become baselines.
+
+An eligible artifact remains `provisional` until the latest human decision for every case answer is approved. Any latest rejection blocks the run. One case approval never approves or prefers the full run. Human score overrides are preserved separately and reflected in the baseline summary without changing the immutable raw answer.
 
 Compare a later raw run with a raw baseline run or baseline artifact:
 
@@ -158,6 +163,6 @@ Comparison reports call out improvements, regressions, newly passing/failing cas
 
 Open `/internal` on a local Permitext server while signed in. Hosted access is disabled unless explicitly enabled and restricted to `PERMITEXT_INTERNAL_OWNER_USER_IDS`; writes remain local-only.
 
-The console shows the full private case rubric, project context, enacted evidence, generated answer/citations, deterministic and semantic detail, prior runs, configuration, duration, tokens, cost, score overrides, notes, and approval/rejection. Reviews are append-only records in `reviews.json`; raw generated answers are never modified.
+The console shows the full private case rubric, project context, enacted evidence, generated answer/citations, deterministic and semantic detail, prior runs, configuration, duration, tokens, cost, score overrides, notes, approval/rejection, and full-run baseline eligibility. Each run decision applies to one case answer; the run is accepted only after every case has a current approval. Reviews are append-only records in `reviews.json`; raw generated answers are never modified.
 
 Never expose answer keys through production client assets, run paid evals unattended in CI, promote feedback automatically, or infer an outside agency's requirements from unrelated Building Code evidence.

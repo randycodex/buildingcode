@@ -3533,7 +3533,25 @@ mark {
   color: var(--surface);
 }
 
-.research-feedback textarea {
+.research-feedback-context {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.research-feedback-context summary {
+  width: fit-content;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+}
+
+.research-feedback-context[open] summary {
+  margin-bottom: var(--space-1);
+}
+
+.research-feedback textarea,
+.research-feedback select,
+.research-feedback input {
   width: 100%;
   resize: vertical;
   padding: var(--space-2);

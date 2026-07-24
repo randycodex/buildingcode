@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v3";
+const shellCacheName = "permitext-pro-shell-v4";
 
 self.addEventListener("install", () => {
   self.skipWaiting();
@@ -35,10 +35,18 @@ async function cacheFirstAsset(request) {
   return response;
 }
 
+function isPublicAppNavigation(url) {
+  return url.pathname === "/" ||
+    url.pathname === "/web" ||
+    url.pathname === "/web/" ||
+    url.pathname === "/detached-workboard" ||
+    url.pathname.startsWith("/open/section/");
+}
+
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (event.request.method !== "GET" || url.origin !== self.location.origin) return;
-  if (event.request.mode === "navigate") {
+  if (event.request.mode === "navigate" && isPublicAppNavigation(url)) {
     event.respondWith(networkFirstNavigation(event.request));
     return;
   }

@@ -5,6 +5,8 @@ const tabs = document.querySelector(".tabs");
 const panels = Object.fromEntries([...document.querySelectorAll(".tab-panel")].map((panel) => [panel.id, panel]));
 let data = null;
 let selectedCaseID = "";
+let selectedFeedbackStatus = "open";
+let selectedFeedbackCategory = "all";
 
 function account() {
   try {
@@ -45,13 +47,32 @@ function appendList(parent, title, items) {
 
 function renderSummary() {
   const approved = data.dataset.cases.filter((item) => item.status === "approved").length;
+  const openFeedback = (data.feedbackRecords || data.feedbackCandidates || []).filter((item) =>
+    ["new", "reviewing", "evaluation_candidate"].includes(item.triageStatus || "new")
+  ).length;
   summaryElement.replaceChildren();
-  [["Cases", data.dataset.cases.length], ["Approved", approved], ["Saved runs", data.runs.length], ["Feedback candidates", data.feedbackCandidates.length]].forEach(([label, value]) => {
+  [["Cases", data.dataset.cases.length], ["Approved", approved], ["Saved runs", data.runs.length], ["Open feedback", openFeedback]].forEach(([label, value]) => {
     const card = element("article");
     card.append(element("strong", { text: value }), element("span", { text: label }));
     summaryElement.append(card);
   });
   summaryElement.hidden = false;
+}
+
+async function saveFeedbackTriage(feedback, triageStatus, reviewer, notes, formStatus) {
+  formStatus.textContent = "Saving triage decision…";
+  try {
+    await internalRequest("/internal/evaluations/feedback/triage", {
+      feedbackID: feedback.id,
+      triageStatus,
+      reviewer,
+      notes
+    });
+    formStatus.textContent = "Triage decision saved.";
+    await loadData();
+  } catch (error) {
+    formStatus.textContent = error.message;
+  }
 }
 
 async function saveReview(values, formStatus) {
@@ -67,7 +88,7 @@ async function saveReview(values, formStatus) {
 
 function reviewForm(testCase, options = {}) {
   const form = element("section", { className: "review-form" });
-  form.append(element("h3", { text: options.runID ? "Human run review" : "Case decision" }));
+  form.append(element("h3", { text: options.runID ? "Human answer review (one case)" : "Case decision" }));
   const reviewer = element("input");
   reviewer.placeholder = "Reviewer";
   reviewer.value = testCase.reviewer || "Permitext owner";
@@ -94,8 +115,11 @@ function reviewForm(testCase, options = {}) {
     });
   }
   const actions = element("div", { className: "actions" });
-  const approve = element("button", { text: "Approve" });
-  const reject = element("button", { className: "reject", text: "Reject" });
+  const approve = element("button", { text: options.runID ? "Approve this answer" : "Approve case" });
+  const reject = element("button", {
+    className: "reject",
+    text: options.runID ? "Reject this answer" : "Return case to draft"
+  });
   const result = element("p", { className: "meta" });
   [approve, reject].forEach((button) => {
     button.type = "button";
@@ -187,6 +211,31 @@ function runLabel(run) {
   return `${run.createdAt || "Unknown date"} · ${run.configuration?.answerModel || "model"} · ${run.configuration?.promptVersion || "prompt"}`;
 }
 
+function appendRunReviewStatus(parent, run) {
+  const runID = run?.configuration?.runID;
+  const status = data.runReviewStatuses?.[runID];
+  if (!status) return;
+  const card = element("aside", { className: "evidence" });
+  card.append(element("strong", { text: `Human baseline status: ${status.status}` }));
+  card.append(element("p", {
+    className: "meta",
+    text: `${status.approvedCaseIDs.length}/${status.caseIDs.length} case answers approved`
+  }));
+  if (status.rejectedCaseIDs.length) {
+    card.append(element("p", { className: "fail", text: `Rejected: ${status.rejectedCaseIDs.join(", ")}` }));
+  }
+  if (status.unreviewedCaseIDs.length) {
+    card.append(element("p", { text: `Unreviewed: ${status.unreviewedCaseIDs.join(", ")}` }));
+  }
+  if (status.eligibilityErrors.length) {
+    card.append(element("p", {
+      className: "fail",
+      text: `Not baseline-eligible: ${status.eligibilityErrors.join(" ")}`
+    }));
+  }
+  parent.append(card);
+}
+
 function answerText(result) {
   const answer = result?.answer;
   return answer ? [
@@ -212,6 +261,7 @@ function runResultCard(run, caseID) {
   if (result.scoring.criticalFailures?.length) {
     card.append(element("p", { className: "fail", text: `Critical: ${result.scoring.criticalFailures.join(", ")}` }));
   }
+  appendRunReviewStatus(card, run);
   card.append(element("h3", { text: "Run configuration" }));
   card.append(element("div", {
     className: "evidence",
@@ -306,15 +356,162 @@ function renderRuns() {
   redraw();
 }
 
-function renderFeedback() {
-  const section = element("section", { className: "card" });
-  section.append(element("h2", { text: "Feedback candidates" }), element("p", { className: "meta", text: "These records are evidence for review, not proof that an answer was right or wrong. They are never promoted automatically." }));
-  if (!data.feedbackCandidates.length) section.append(element("p", { text: "No feedback candidates yet." }));
-  data.feedbackCandidates.forEach((feedback) => {
-    const item = element("article", { className: "feedback-item evidence" });
-    item.append(element("strong", { text: feedback.category.replaceAll("_", " ") }), element("p", { text: feedback.question }), element("p", { className: "meta", text: feedback.userComment || "No written comment." }));
-    section.append(item);
+function feedbackStatusLabel(status) {
+  return {
+    new: "New",
+    reviewing: "Reviewing",
+    evaluation_candidate: "Evaluation candidate",
+    resolved: "Resolved",
+    dismissed: "Dismissed"
+  }[status] || "New";
+}
+
+function renderFeedbackItem(feedback) {
+  const item = element("article", { className: "feedback-item card" });
+  const triageStatus = feedback.triageStatus || "new";
+  item.append(
+    element("span", { className: `badge ${triageStatus}`, text: feedbackStatusLabel(triageStatus) }),
+    element("span", { className: "badge", text: feedback.category.replaceAll("_", " ") }),
+    element("h2", { text: feedback.question || "Question unavailable" }),
+    element("p", {
+      className: "meta",
+      text: [
+        feedback.updatedAt || feedback.createdAt || "Unknown date",
+        feedback.model || "Unknown model",
+        feedback.promptVersion || "Unknown prompt",
+        feedback.evidenceVersion || "Unknown evidence version"
+      ].join(" · ")
+    })
+  );
+  if (feedback.professionalRole) {
+    item.append(element("p", { className: "meta", text: `Self-described role: ${feedback.professionalRole.replaceAll("_", " ")}` }));
+  }
+  item.append(
+    element("h3", { text: "User feedback" }),
+    element("p", { text: feedback.userComment || "No written comment." })
+  );
+  if (feedback.supportingReference) {
+    item.append(
+      element("h3", { text: "Supporting section or source supplied by the user" }),
+      element("p", { text: feedback.supportingReference })
+    );
+  }
+  item.append(
+    element("h3", { text: "Immutable generated answer" }),
+    element("div", { className: "answer evidence", text: [
+      feedback.answer?.conclusion,
+      feedback.answer?.explanation
+    ].filter(Boolean).join("\n\n") || "Answer unavailable." })
+  );
+  appendList(
+    item,
+    "Returned citations",
+    (feedback.citations || []).map((citation) =>
+      `${citation.sectionID || "Unknown section"} · ${(citation.sourceIDs || []).join(", ") || "No source IDs"} · ${citation.relevance || "No relevance statement"}`
+    )
+  );
+  appendList(
+    item,
+    "Selected evidence identifiers",
+    (feedback.selectedEvidence || []).map((source) =>
+      `${source.codePrefix || "Code"} ${source.sectionNumber || source.sectionID || "Unknown"} · section ${source.sectionID || "unknown"} · source ${source.sourceID || "unknown"}`
+    )
+  );
+  if (feedback.triageNotes) {
+    item.append(
+      element("h3", { text: "Latest triage note" }),
+      element("p", { text: feedback.triageNotes }),
+      element("p", { className: "meta", text: `${feedback.triagedBy || "Unknown reviewer"} · ${feedback.triagedAt || "Unknown date"}` })
+    );
+  }
+  const form = element("section", { className: "review-form" });
+  form.append(element("h3", { text: "Owner triage" }));
+  const reviewer = element("input");
+  reviewer.placeholder = "Reviewer";
+  reviewer.value = feedback.triagedBy || "Permitext owner";
+  const notes = element("textarea");
+  notes.rows = 3;
+  notes.placeholder = "What was checked, what remains uncertain, or why this report was closed";
+  notes.value = feedback.triageNotes || "";
+  const actions = element("div", { className: "actions" });
+  [
+    ["reviewing", "Start review", ""],
+    ["evaluation_candidate", "Queue as evaluation candidate", ""],
+    ["resolved", "Mark resolved", ""],
+    ["dismissed", "Dismiss", "reject"],
+    ["new", "Return to new", "reject"]
+  ].forEach(([status, label, className]) => {
+    const button = element("button", { text: label, className });
+    button.type = "button";
+    button.addEventListener("click", () =>
+      saveFeedbackTriage(feedback, status, reviewer.value, notes.value, formStatus)
+    );
+    actions.append(button);
   });
+  const formStatus = element("p", { className: "meta" });
+  form.append(
+    reviewer,
+    notes,
+    element("p", {
+      className: "meta",
+      text: "Queueing this report does not create or approve an evaluation case and cannot change the production prompt or model."
+    }),
+    actions,
+    formStatus
+  );
+  item.append(form);
+  return item;
+}
+
+function renderFeedback() {
+  const section = element("section");
+  section.append(
+    element("h2", { text: "Feedback candidates" }),
+    element("p", { className: "meta", text: "User reports are review signals, not proof that an answer is right or wrong. Triage never promotes a case or changes production behavior automatically." })
+  );
+  const records = data.feedbackRecords || data.feedbackCandidates || [];
+  const controls = element("div", { className: "feedback-controls" });
+  const statusFilter = element("select");
+  [
+    ["open", "Open feedback"],
+    ["all", "All feedback"],
+    ["new", "New"],
+    ["reviewing", "Reviewing"],
+    ["evaluation_candidate", "Evaluation candidates"],
+    ["resolved", "Resolved"],
+    ["dismissed", "Dismissed"]
+  ].forEach(([value, label]) => {
+    const option = element("option", { text: label });
+    option.value = value;
+    statusFilter.append(option);
+  });
+  statusFilter.value = selectedFeedbackStatus;
+  const categoryFilter = element("select");
+  const categories = Array.from(new Set(records.map((item) => item.category))).filter(Boolean).sort();
+  [["all", "All categories"], ...categories.map((category) => [category, category.replaceAll("_", " ")])].forEach(([value, label]) => {
+    const option = element("option", { text: label });
+    option.value = value;
+    categoryFilter.append(option);
+  });
+  categoryFilter.value = selectedFeedbackCategory;
+  [statusFilter, categoryFilter].forEach((control) => control.addEventListener("change", () => {
+    selectedFeedbackStatus = statusFilter.value;
+    selectedFeedbackCategory = categoryFilter.value;
+    renderFeedback();
+  }));
+  controls.append(statusFilter, categoryFilter);
+  section.append(controls);
+  const visible = records
+    .filter((feedback) => {
+      const status = feedback.triageStatus || "new";
+      const statusMatches = selectedFeedbackStatus === "all" ||
+        (selectedFeedbackStatus === "open" && ["new", "reviewing", "evaluation_candidate"].includes(status)) ||
+        status === selectedFeedbackStatus;
+      return statusMatches && (selectedFeedbackCategory === "all" || feedback.category === selectedFeedbackCategory);
+    })
+    .sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")));
+  if (!visible.length) section.append(element("p", { text: "No feedback matches these filters." }));
+  visible.forEach((feedback) => section.append(renderFeedbackItem(feedback)));
   panels.feedback.replaceChildren(section);
 }
 

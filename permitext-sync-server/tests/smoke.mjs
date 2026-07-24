@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
 import { createHmac } from "node:crypto";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
@@ -65,6 +65,66 @@ async function waitForServer() {
 async function main() {
   const tempDir = await mkdtemp(join(tmpdir(), "permitext-sync-smoke-"));
   const dataPath = join(tempDir, "sync-store.json");
+  const evaluationRoot = join(tempDir, "private-evaluations");
+  const evaluationResultsPath = join(evaluationRoot, "results");
+  const privateEvaluationSentinel = "PERMITEXT_PRIVATE_EVAL_SENTINEL_DO_NOT_EXPOSE";
+  await mkdir(evaluationResultsPath, { recursive: true });
+  const evaluationDataset = JSON.parse(
+    await readFile(new URL("../evals/research-cases.json", import.meta.url), "utf8")
+  );
+  const evaluationRunCases = evaluationDataset.cases.filter((testCase) => testCase.status === "approved");
+  assert(evaluationRunCases.length > 0, "Smoke evaluation fixture needs at least one approved case.");
+  evaluationDataset.cases[0].notes = `${evaluationDataset.cases[0].notes} ${privateEvaluationSentinel}`;
+  evaluationDataset.cases[0].expectedConclusion =
+    `${evaluationDataset.cases[0].expectedConclusion} ${privateEvaluationSentinel}`;
+  evaluationDataset.cases[0].requiredConcepts.push(privateEvaluationSentinel);
+  evaluationDataset.cases[0].forbiddenClaims.push(privateEvaluationSentinel);
+  evaluationDataset.cases[0].missingFacts.push(privateEvaluationSentinel);
+  evaluationDataset.cases[0].reviewer = privateEvaluationSentinel;
+  const evaluationRunID = "smoke-private-evaluation-run";
+  const evaluationRun = {
+    schemaVersion: 3,
+    status: "completed",
+    createdAt: new Date(0).toISOString(),
+    configuration: {
+      runID: evaluationRunID,
+      datasetSHA256: "smoke-private-dataset-hash",
+      suiteScope: "full",
+      repeat: 1,
+      caseIDs: evaluationRunCases.map((testCase) => testCase.id),
+      answerModel: "smoke-model",
+      promptVersion: "smoke-prompt"
+    },
+    results: evaluationRunCases.map((testCase) => ({
+      repetition: 1,
+      testCase,
+      answer: {
+        conclusion: privateEvaluationSentinel,
+        citations: [],
+        usage: { inputTokens: 1, outputTokens: 1, totalTokens: 2 }
+      },
+      scoring: {
+        passed: true,
+        overallScore: 4,
+        metrics: Object.fromEntries(evaluationDataset.automaticScoring.dimensions.map((dimension) => [
+          dimension,
+          { score: 4, rationale: "Smoke fixture." }
+        ]))
+      }
+    }))
+  };
+  await writeFile(
+    join(evaluationRoot, "research-cases.json"),
+    `${JSON.stringify(evaluationDataset, null, 2)}\n`
+  );
+  await writeFile(
+    join(evaluationRoot, "reviews.json"),
+    `${JSON.stringify({ schemaVersion: 1, reviews: [] }, null, 2)}\n`
+  );
+  await writeFile(
+    join(evaluationResultsPath, "smoke-run.json"),
+    `${JSON.stringify(evaluationRun, null, 2)}\n`
+  );
   const workboardSource = await readFile(new URL("../src/workboard.jsx", import.meta.url), "utf8");
   const workboardStyleSource = await readFile(new URL("../src/workboard.css", import.meta.url), "utf8");
   const iosUserDataStoreSource = await readFile(
@@ -85,14 +145,17 @@ async function main() {
   );
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
+  const researchConfigSource = await readFile(new URL("../research-config.mjs", import.meta.url), "utf8");
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
       ...process.env,
       PORT: String(port),
+      NODE_ENV: "test",
       VERCEL: "",
       VERCEL_ENV: "",
       PERMITEXT_SYNC_DATA_PATH: dataPath,
+      PERMITEXT_EVALUATION_ROOT: evaluationRoot,
       PERMITEXT_SYNC_DATABASE_URL: "",
       DATABASE_URL: "",
       STORAGE_URL: "",
@@ -140,6 +203,10 @@ async function main() {
     assert(
       webRoot.text.includes("ai-foundation-v4"),
       "Web workspace omitted the current Research conversation assets."
+    );
+    assert(
+      !webRoot.text.includes(privateEvaluationSentinel),
+      "Customer HTML exposed private evaluation material."
     );
     const topbarSource = webRoot.text.slice(
       webRoot.text.indexOf('<header class="topbar">'),
@@ -250,6 +317,21 @@ async function main() {
     assert(
       workspaceScript.response.headers.get("cache-control")?.includes("immutable"),
       "Versioned web workspace assets were not browser-cacheable."
+    );
+    assert(
+      !workspaceScript.text.includes(privateEvaluationSentinel),
+      "Customer JavaScript exposed private evaluation material."
+    );
+    const workspaceSourceMap = await request("/web/app.js.map");
+    assert(
+      !workspaceSourceMap.text.includes(privateEvaluationSentinel),
+      "A customer source-map response exposed private evaluation material."
+    );
+    const directEvaluationFile = await request("/evals/research-cases.json");
+    assert(
+      !directEvaluationFile.response.ok &&
+        !directEvaluationFile.text.includes(privateEvaluationSentinel),
+      "The customer static root exposed the server-private evaluation dataset."
     );
     assert(
       !workspaceScript.text.includes('appendSectionLabel(content, "Saved sections")'),
@@ -544,7 +626,7 @@ async function main() {
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-pro-offline-v3'),
+        webRoot.text.includes('/web/app.js?v=20260724-pro-offline-v4'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1364,6 +1446,10 @@ async function main() {
         conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length === 1,
       "Research conversation did not persist a cited user and assistant exchange."
     );
+    assert(
+      !JSON.stringify(conversationMessage.json).includes(privateEvaluationSentinel),
+      "An ordinary research response exposed private evaluation material."
+    );
     const answerID = conversationMessage.json.conversation.messages[1].id;
     const researchUsage = await request("/research/usage", {
       method: "POST",
@@ -1374,6 +1460,26 @@ async function main() {
       researchUsage.response.ok && researchUsage.json.usage.requestsUsed === 0 && researchUsage.json.usage.resetDate,
       "Research usage did not expose the monthly allowance and reset date."
     );
+    const evaluationCasesBeforeFeedback = await readFile(
+      join(evaluationRoot, "research-cases.json"),
+      "utf8"
+    );
+    const evaluationReviewsBeforeFeedback = await readFile(
+      join(evaluationRoot, "reviews.json"),
+      "utf8"
+    );
+    const invalidFeedbackRole = await request("/research/feedback", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID,
+        answerID,
+        category: "citation_problem",
+        professionalRole: "unverified_super_expert"
+      }
+    });
+    assert(invalidFeedbackRole.response.status === 400, "Research feedback accepted an unknown professional role.");
     const researchFeedback = await request("/research/feedback", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -1382,12 +1488,23 @@ async function main() {
         conversationID,
         answerID,
         category: "citation_problem",
-        comment: "The cited passage needs review."
+        comment: "The cited passage needs review.",
+        professionalRole: "architect_designer",
+        supportingReference: "BC 1004.1.3 and the selected enacted passage"
       }
     });
     assert(
-      researchFeedback.response.status === 201 && researchFeedback.json.feedback.status === "candidate",
+      researchFeedback.response.status === 201 &&
+        researchFeedback.json.feedback.status === "candidate" &&
+        researchFeedback.json.feedback.professionalRole === "architect_designer" &&
+        researchFeedback.json.feedback.supportingReference === "BC 1004.1.3 and the selected enacted passage",
       "Research feedback was not saved as a human-review candidate."
+    );
+    assert(
+      await readFile(join(evaluationRoot, "research-cases.json"), "utf8") === evaluationCasesBeforeFeedback &&
+        await readFile(join(evaluationRoot, "reviews.json"), "utf8") === evaluationReviewsBeforeFeedback &&
+        await readFile(new URL("../research-config.mjs", import.meta.url), "utf8") === researchConfigSource,
+      "Submitting feedback modified an evaluation case, review decision, prompt, or model configuration."
     );
 
     const additionalResearchText = "The real time enforcement unit shall monitor all occupied multiple dwellings with valid permits for (i) the alteration of 10 percent or more of the existing floor surface area of the building or (ii) an addition to the building.";
@@ -1416,7 +1533,9 @@ async function main() {
     });
     assert(
       fetchedConversation.response.ok && fetchedConversation.json.conversation.sourceStatus === "current" &&
-        fetchedConversation.json.conversation.messages[1].feedback?.category === "citation_problem",
+        fetchedConversation.json.conversation.messages[1].feedback?.category === "citation_problem" &&
+        fetchedConversation.json.conversation.messages[1].feedback?.professionalRole === "architect_designer" &&
+        fetchedConversation.json.conversation.messages[1].feedback?.supportingReference === "BC 1004.1.3 and the selected enacted passage",
       "Research conversation did not verify its source hash or restore saved answer feedback."
     );
 
@@ -1434,8 +1553,144 @@ async function main() {
     });
     assert(
       internalData.response.ok && internalData.json.dataset.schemaVersion === 3 &&
-        internalData.json.feedbackCandidates.some((item) => item.answerID === answerID),
+        internalData.json.feedbackCandidates.some((item) => item.answerID === answerID) &&
+        internalData.json.feedbackRecords.some((item) =>
+          item.answerID === answerID &&
+          item.triageStatus === "new" &&
+          item.professionalRole === "architect_designer"
+        ) &&
+        internalData.json.runReviewStatuses[evaluationRunID].status === "provisional",
       "Owner console data omitted the private evaluation dataset or feedback candidate."
+    );
+    assert(
+      JSON.stringify(internalData.json).includes(privateEvaluationSentinel),
+      "The authenticated local owner console could not read its private evaluation fixture."
+    );
+    assert(
+      !JSON.stringify(internalData.json.dataset).includes("The cited passage needs review."),
+      "A feedback candidate entered the approved evaluation dataset."
+    );
+    const privateTriageSentinel = "PRIVATE_TRIAGE_NOTE_MUST_NOT_REACH_CUSTOMERS";
+    const unauthorizedFeedbackTriage = await request("/internal/evaluations/feedback/triage", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        feedbackID: researchFeedback.json.feedback.id,
+        triageStatus: "reviewing"
+      }
+    });
+    assert(unauthorizedFeedbackTriage.response.status === 401, "Feedback triage accepted a request without a session.");
+    const triagedFeedback = await request("/internal/evaluations/feedback/triage", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        feedbackID: researchFeedback.json.feedback.id,
+        triageStatus: "evaluation_candidate",
+        reviewer: "Smoke owner",
+        notes: privateTriageSentinel
+      }
+    });
+    assert(
+      triagedFeedback.response.ok &&
+        triagedFeedback.json.feedback.status === "candidate" &&
+        triagedFeedback.json.feedback.triageStatus === "evaluation_candidate" &&
+        triagedFeedback.json.feedback.triageHistory.length === 1,
+      "Owner feedback triage did not preserve candidate status or record its decision history."
+    );
+    assert(
+      await readFile(join(evaluationRoot, "research-cases.json"), "utf8") === evaluationCasesBeforeFeedback &&
+        await readFile(join(evaluationRoot, "reviews.json"), "utf8") === evaluationReviewsBeforeFeedback &&
+        await readFile(new URL("../research-config.mjs", import.meta.url), "utf8") === researchConfigSource,
+      "Feedback triage modified an evaluation case, review decision, prompt, or model configuration."
+    );
+    const conversationAfterTriage = await request("/research/conversations/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, conversationID }
+    });
+    assert(
+      conversationAfterTriage.response.ok &&
+        conversationAfterTriage.json.conversation.messages[1].feedback?.status === "candidate" &&
+        conversationAfterTriage.json.conversation.messages[1].feedback?.updatedAt === researchFeedback.json.feedback.updatedAt &&
+        !JSON.stringify(conversationAfterTriage.json).includes(privateTriageSentinel) &&
+        !JSON.stringify(conversationAfterTriage.json).includes("evaluation_candidate"),
+      "Private owner triage state leaked into the customer conversation response."
+    );
+    const internalDataAfterTriage = await request("/internal/evaluations/data", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      internalDataAfterTriage.json.feedbackRecords.some((item) =>
+        item.answerID === answerID &&
+        item.triageStatus === "evaluation_candidate" &&
+        item.triageNotes === privateTriageSentinel
+      ),
+      "The owner console could not retrieve the saved private triage decision."
+    );
+    const firstEvaluationCaseID = evaluationRunCases[0].id;
+    const approvedOneAnswer = await request("/internal/evaluations/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        kind: "run",
+        runID: evaluationRunID,
+        caseID: firstEvaluationCaseID,
+        decision: "approved",
+        reviewer: "Smoke owner",
+        notes: "Approve one answer only.",
+        scoreOverrides: {}
+      }
+    });
+    assert(
+      approvedOneAnswer.response.ok &&
+        approvedOneAnswer.json.runReviewStatus.status === "provisional" &&
+        approvedOneAnswer.json.runReviewStatus.approvedCaseIDs.length === 1 &&
+        approvedOneAnswer.json.runReviewStatus.unreviewedCaseIDs.length === evaluationRunCases.length - 1,
+      "Approving one case answer incorrectly promoted the entire evaluation run."
+    );
+    const approvedCaseDefinition = await request("/internal/evaluations/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        kind: "case",
+        caseID: firstEvaluationCaseID,
+        decision: "approved",
+        reviewer: "Smoke owner",
+        notes: "Case-level review only.",
+        scoreOverrides: {}
+      }
+    });
+    assert(approvedCaseDefinition.response.ok, "The owner case-level review fixture failed.");
+    const reviewsAfterCaseDecision = JSON.parse(
+      await readFile(join(evaluationRoot, "reviews.json"), "utf8")
+    ).reviews;
+    assert(
+      reviewsAfterCaseDecision.filter((review) => review.kind === "run").length === 1 &&
+        reviewsAfterCaseDecision.filter((review) => review.kind === "case").length === 1,
+      "A case-level approval created or altered a run-level approval."
+    );
+    const internalDataAfterApprovals = await request("/internal/evaluations/data", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      internalDataAfterApprovals.json.runReviewStatuses[evaluationRunID].status === "provisional",
+      "A case-definition mutation made an incompletely reviewed run preferred."
+    );
+    const feedbackPromotionAttempt = await request("/internal/evaluations/feedback/promote", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID }, answerID }
+    });
+    assert(
+      !feedbackPromotionAttempt.response.ok,
+      "Feedback could be promoted without an explicit implemented owner-review workflow."
     );
 
     const researchStore = JSON.parse(await readFile(dataPath, "utf8"));

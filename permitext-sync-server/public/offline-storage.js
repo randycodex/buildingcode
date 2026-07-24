@@ -5,18 +5,18 @@ const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v3";
-const offlineAssetVersion = "20260724-pro-offline-v3";
+const shellCacheName = "permitext-pro-shell-v4";
+const offlineAssetVersion = "20260724-pro-offline-v4";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/",
-  "/web/manifest.webmanifest?v=20260724-pro-offline-v3",
+  "/web/manifest.webmanifest?v=20260724-pro-offline-v4",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260722-ai-foundation-v4-20260724-pro-offline-v3",
+  "/web/styles.css?v=20260722-ai-foundation-v4-20260724-pro-offline-v4",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
-  "/web/app.js?v=20260724-pro-offline-v3",
-  "/web/offline-storage.js?v=20260724-pro-offline-v3",
+  "/web/app.js?v=20260724-pro-offline-v4",
+  "/web/offline-storage.js?v=20260724-pro-offline-v4",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260720-sync-contract-v2",
   "/web/sync-state.js?v=20260721-causal-clear-v4"
@@ -206,6 +206,69 @@ async function mapWithConcurrency(items, concurrency, worker) {
   await Promise.all(runners);
 }
 
+function normalizedOfflineAssetName(value) {
+  const source = String(value || "").split(/[?#]/, 1)[0];
+  if (!source || source.startsWith("data:")) return null;
+  let decoded = source;
+  try {
+    decoded = decodeURIComponent(source);
+  } catch {
+    // Use the undecoded source so malformed input is rejected by the allowlist below.
+  }
+  const name = decoded.split("/").at(-1) || "";
+  return /^[a-zA-Z0-9._-]+$/.test(name) ? name : null;
+}
+
+export function offlineAssetNamesForChapter(chapter) {
+  const names = new Set();
+  for (const section of chapter?.sections || []) {
+    for (const block of section?.blocks || []) {
+      const imageID = normalizedOfflineAssetName(block?.imageID);
+      if (imageID) names.add(imageID);
+      for (const match of String(block?.html || "").matchAll(/<img\b[^>]*\bsrc\s*=\s*["']([^"']+)["']/gi)) {
+        const name = normalizedOfflineAssetName(match[1]);
+        if (name) names.add(name);
+      }
+    }
+  }
+  return [...names];
+}
+
+function offlineAssetURL(name) {
+  return `/code/assets/${encodeURIComponent(name)}?v=${offlineAssetVersion}`;
+}
+
+async function cacheOfflineAssets(assetNames, options = {}) {
+  if (!assetNames.length) return 0;
+  const cache = await caches.open(shellCacheName);
+  let completed = 0;
+  let downloadedBytes = 0;
+  options.onProgress?.({
+    completed: 0,
+    total: assetNames.length,
+    percent: 0,
+    phase: "Downloading figures",
+    unit: "figures"
+  });
+  await mapWithConcurrency(assetNames, 4, async (name) => {
+    const url = offlineAssetURL(name);
+    const response = await fetch(url, { cache: "no-store", signal: options.signal });
+    if (!response.ok) throw new Error(`Offline figure download failed: ${response.status}`);
+    const size = response.clone().arrayBuffer().then((buffer) => buffer.byteLength);
+    await cache.put(url, response);
+    downloadedBytes += await size;
+    completed += 1;
+    options.onProgress?.({
+      completed,
+      total: assetNames.length,
+      percent: Math.round((completed / assetNames.length) * 100),
+      phase: "Downloading figures",
+      unit: "figures"
+    });
+  });
+  return downloadedBytes;
+}
+
 export async function prepareOfflineShell() {
   if (!("serviceWorker" in navigator) || !("caches" in window)) {
     throw new Error("This browser does not support offline installation.");
@@ -223,6 +286,7 @@ export async function downloadOfflineLibrary(options = {}) {
   }
   const installID = crypto.randomUUID();
   const downloadedAt = new Date().toISOString();
+  const referencedAssetNames = new Set();
   let downloadedBytes = 0;
   let completed = 0;
   try {
@@ -231,7 +295,13 @@ export async function downloadOfflineLibrary(options = {}) {
     const indexPayload = await fetchJSON("/code/chapters", options.signal);
     const chapters = indexPayload.chapters || [];
     if (!chapters.length) throw new Error("No code chapters were available for offline download.");
-    options.onProgress?.({ completed: 0, total: chapters.length, percent: 0, phase: "Downloading codes" });
+    options.onProgress?.({
+      completed: 0,
+      total: chapters.length,
+      percent: 0,
+      phase: "Downloading codes",
+      unit: "chapters"
+    });
     await mapWithConcurrency(chapters, 4, async (summary) => {
       const payload = await fetchJSON(
         `/code/chapters/${encodeURIComponent(summary.id)}?include=body`,
@@ -239,6 +309,7 @@ export async function downloadOfflineLibrary(options = {}) {
       );
       const chapter = { ...summary, ...payload.chapter };
       if (!chapter?.id) throw new Error(`Chapter ${summary.id} did not return offline content.`);
+      offlineAssetNamesForChapter(chapter).forEach((name) => referencedAssetNames.add(name));
       downloadedBytes += JSON.stringify(payload).length;
       await writeDownloadedChapter(installID, chapter);
       completed += 1;
@@ -246,8 +317,13 @@ export async function downloadOfflineLibrary(options = {}) {
         completed,
         total: chapters.length,
         percent: Math.round((completed / chapters.length) * 100),
-        phase: "Downloading codes"
+        phase: "Downloading codes",
+        unit: "chapters"
       });
+    });
+    downloadedBytes += await cacheOfflineAssets([...referencedAssetNames].sort(), {
+      onProgress: options.onProgress,
+      signal: options.signal
     });
     const sectionCount = chapters.reduce((count, chapter) => count + Number(chapter.sectionCount || 0), 0);
     await activateInstall({
@@ -347,13 +423,19 @@ export async function removeOfflineLibrary() {
 }
 
 export async function disableOfflineFeature() {
-  await removeOfflineLibrary().catch(() => {});
+  let removalError = null;
+  try {
+    await removeOfflineLibrary();
+  } catch (error) {
+    removalError = error;
+  }
   if ("serviceWorker" in navigator) {
     const registrations = await navigator.serviceWorker.getRegistrations();
     await Promise.all(registrations
       .filter((registration) => registration.scope === `${window.location.origin}/`)
       .map((registration) => registration.unregister()));
   }
+  if (removalError) throw removalError;
 }
 
 export async function reconcileOfflineFeatureAccess(isPro) {
@@ -475,6 +557,12 @@ function compareChapterNumbers(left, right) {
   });
 }
 
+export function compareOfflineChapters(left, right) {
+  return String(left?.codePrefix || "").localeCompare(String(right?.codePrefix || "")) ||
+    compareChapterNumbers(left?.chapterNumber, right?.chapterNumber) ||
+    Number(left?.id) - Number(right?.id);
+}
+
 async function offlineSearch(installID, url) {
   const query = url.searchParams.get("q")?.trim() || "";
   if (query.length < 2) return { query, results: [] };
@@ -550,7 +638,8 @@ export async function offlineAPI(path) {
           sectionCount: chapter.sections?.length || 0
         };
       })
-      .filter((chapter) => !codePrefix || chapter.codePrefix === codePrefix);
+      .filter((chapter) => !codePrefix || chapter.codePrefix === codePrefix)
+      .sort(compareOfflineChapters);
     return { chapters };
   }
   const chapterMatch = url.pathname.match(/^\/code\/chapters\/([a-zA-Z0-9_-]+)$/);
@@ -587,6 +676,6 @@ export async function offlineAPI(path) {
 
 export const offlineFeatureMetadata = {
   assetVersion: offlineAssetVersion,
-  estimatedDownload: "4–6 MB",
+  estimatedDownload: "about 70 MB",
   shellCacheName
 };

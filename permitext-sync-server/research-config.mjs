@@ -19,6 +19,7 @@ export function researchModelConfiguration(environment = process.env) {
 }
 
 function nonnegativeNumber(value) {
+  if (value === undefined || value === null || String(value).trim() === "") return null;
   const number = Number(value);
   return Number.isFinite(number) && number >= 0 ? number : null;
 }
@@ -29,6 +30,37 @@ function researchPricing(environment = process.env) {
     cachedInputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_CACHED_INPUT_USD_PER_MILLION_TOKENS),
     outputRate: nonnegativeNumber(environment.PERMITEXT_RESEARCH_OUTPUT_USD_PER_MILLION_TOKENS),
     pricingVersion: String(environment.PERMITEXT_RESEARCH_PRICING_VERSION || "").trim()
+  };
+}
+
+export function validatePaidResearchEvaluationEnvironment(environment = process.env) {
+  if (environment.PERMITEXT_RUN_PAID_RESEARCH_EVALS !== "1") {
+    throw new Error("Paid evals are locked. Ask for spending approval, then set PERMITEXT_RUN_PAID_RESEARCH_EVALS=1.");
+  }
+  if (!String(environment.OPENAI_API_KEY || "").trim()) {
+    throw new Error("Paid evals require OPENAI_API_KEY in the server environment.");
+  }
+  const pricing = researchPricing(environment);
+  if (
+    pricing.inputRate === null ||
+    pricing.cachedInputRate === null ||
+    pricing.outputRate === null ||
+    !pricing.pricingVersion
+  ) {
+    throw new Error(
+      "Paid evals require configured input, cached-input, and output token prices plus " +
+      "PERMITEXT_RESEARCH_PRICING_VERSION so cost scoring is reliable."
+    );
+  }
+  const approvedSpendCapUSD = nonnegativeNumber(environment.PERMITEXT_RESEARCH_EVAL_MAX_USD);
+  if (!approvedSpendCapUSD) {
+    throw new Error(
+      "Paid evals require PERMITEXT_RESEARCH_EVAL_MAX_USD set to the explicitly approved maximum spend."
+    );
+  }
+  return {
+    approvedSpendCapUSD,
+    pricingVersion: pricing.pricingVersion
   };
 }
 
