@@ -5,7 +5,7 @@
   "coverageGaps": [
     "official agency interpretations outside the current library",
     "knowledgeable-human review of integrity-addressed official map and image selection",
-    "additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, structural-trigger, and roof-recovering drafts"
+    "additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, structural-trigger, roof-recovering, and partial-certificate drafts"
   ],
   "scopeExclusions": [
     "Buildings Bulletins remain intentionally outside the current Research library; explicit source-boundary disclosure is retained, but Bulletin ingestion and retrieval are outside the current implementation scope."
@@ -196,6 +196,15 @@
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
       "notes": "Tests retrieval of the Administrative Code and Building Code roof-recovering provisions while preserving the conjunctive less-than-50-percent and less-than-500-square-foot exception."
+    },
+    {
+      "id": "retrieval-pre-1938-partial-certificate-of-occupancy",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-025-pre-1938-partial-certificate-of-occupancy",
+      "scenarioCategories": ["existing-building conditions", "pre-1938 buildings", "certificate of occupancy", "gross floor area", "cumulative conditions"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests discovery of the narrow partial Certificate of Occupancy provision and requires the 50-percent ceiling plus all other cumulative conditions."
     }
   ]
 }

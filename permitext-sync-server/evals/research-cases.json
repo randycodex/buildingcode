@@ -2091,6 +2091,103 @@
           "requiredClaim": "Chapter 15 generally governs the materials and methods, and Section 1504.9 is inapplicable under the selected exception only when both size conditions are met."
         }
       ]
+    },
+    {
+      "id": "nyc-025-pre-1938-partial-certificate-of-occupancy",
+      "title": "A pre-1938 partial Certificate of Occupancy requires every listed condition",
+      "status": "draft",
+      "difficulty": "intermediate",
+      "topics": [
+        "existing buildings",
+        "pre-1938 buildings",
+        "partial Certificate of Occupancy",
+        "gross floor area",
+        "cumulative conditions"
+      ],
+      "codeEdition": "2022 New York City Construction Codes",
+      "jurisdiction": "New York City, New York",
+      "projectContext": {
+        "building": "Existing five-story building represented by the owner as erected in 1930",
+        "request": "Partial Certificate of Occupancy for three floors represented as 55 percent of the building's gross floor area",
+        "ownerPosition": "The owner says noncombustible construction and an automatic sprinkler system are enough because the selected floors have adequate egress",
+        "unknowns": [
+          "verified erection date",
+          "whether the building has or is otherwise required to have a certificate of occupancy or certificate of completion",
+          "verified gross-floor-area calculations",
+          "construction type",
+          "automatic sprinkler protection",
+          "adequate means of egress from every floor",
+          "commissioner inspection and safety determination"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "9234",
+          "reference": "AC 28-118.20",
+          "codePrefix": "AC",
+          "sectionNumber": "28-118.20",
+          "exactPassages": [
+            "A partial certificate of occupancy may be issued to a specific floor or floors of an existing building erected prior to January 1, 1938 subject to the following conditions:",
+            "1. The building does not have and is not otherwise required to have a certificate of occupancy or certificate of completion, if applicable.",
+            "2. The floor or floors for which a certificate of occupancy is issued shall not constitute more than 50 percent of the gross floor area of the building.",
+            "3. The building is of noncombustible construction and protected with an automatic sprinkler system.",
+            "4. Adequate means of egress are provided from all floors.",
+            "5. Upon inspection, the building is deemed safe for occupancy."
+          ]
+        }
+      ],
+      "question": "An existing five-story building is represented by the owner as erected in 1930. The owner seeks a partial Certificate of Occupancy for three floors represented as 55 percent of the building's gross floor area and says the building is noncombustible, sprinklered, and has adequate egress from those three floors. Based only on AC 28-118.20, may the partial Certificate of Occupancy be issued now, and what still must be established?",
+      "expectedConclusion": "Not on the stated facts. AC 28-118.20 permits a partial Certificate of Occupancy for specified floors of an existing building erected before January 1, 1938 only subject to every listed condition. The represented three-floor scope constitutes 55 percent of the building's gross floor area, which exceeds the provision's maximum of 50 percent and therefore does not satisfy condition 2. The owner's construction and sprinkler assertions address only part of condition 3, and the provision requires adequate means of egress from all floors, not merely the floors included in the requested certificate. It also requires that the building have no certificate of occupancy or certificate of completion and not otherwise be required to have one, as applicable, and requires an inspection determination that the building is safe for occupancy. The word “may” does not make issuance automatic. The erection date, certificate status, floor-area calculation, construction type, sprinkler protection, egress from every floor, and inspection result must be verified before any project-specific eligibility conclusion.",
+      "expectedUncertainty": {
+        "level": "conditional",
+        "description": "The selected provision makes the stated 55-percent request ineligible under condition 2 and identifies the remaining cumulative conditions, but the project assertions, certificate status, building systems, egress, and inspection determination are unverified."
+      },
+      "sourceType": "deliberately constructed edge case",
+      "sourceReference": "Draft scenario constructed solely from canonical enacted 2022 NYC Administrative Code Section 28-118.20.",
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Draft candidate NYC-025 broadens existing-building coverage into the narrow pre-1938 partial Certificate of Occupancy provision. It tests the 50-percent ceiling and all five cumulative conditions without treating owner assertions or safety features as automatic approval.",
+      "requiredConcepts": [
+        "Limit the provision to an existing building erected before January 1, 1938.",
+        "Treat all five listed conditions as cumulative.",
+        "State that a represented 55-percent gross-floor-area scope exceeds the not-more-than-50-percent ceiling.",
+        "Require the building to lack and not otherwise require a certificate of occupancy or certificate of completion, as applicable.",
+        "Require both noncombustible construction and automatic sprinkler protection.",
+        "Require adequate means of egress from all floors, not only the floors in the requested certificate.",
+        "Require an inspection determination that the building is safe for occupancy.",
+        "Do not describe issuance as automatic merely because the provision says a certificate may be issued.",
+        "Treat the owner's age, area, construction, sprinkler, and egress assertions as unverified."
+      ],
+      "missingFacts": [
+        "Reliable evidence that the building was erected before January 1, 1938.",
+        "Existing certificate of occupancy or certificate of completion status.",
+        "Whether the building is otherwise required to have either certificate.",
+        "Verified building gross floor area and requested-floor gross area.",
+        "Verified noncombustible construction classification.",
+        "Automatic sprinkler system scope, approval, and operating condition.",
+        "Adequate means of egress from every floor.",
+        "Inspection findings and the commissioner's safety determination.",
+        "Applicable application, filing, and approval information."
+      ],
+      "forbiddenClaims": [
+        "Any building erected before 1938 automatically qualifies for a partial Certificate of Occupancy.",
+        "Floors comprising 55 percent of gross floor area satisfy the not-more-than-50-percent condition.",
+        "Noncombustible construction and sprinkler protection replace the other listed conditions.",
+        "Egress is required only from the floors covered by the requested certificate.",
+        "The owner's representations prove the erection date, floor area, construction, sprinkler, or egress conditions.",
+        "An inspection and safety determination are optional.",
+        "The word “may” requires the commissioner to issue the certificate.",
+        "The requested partial Certificate of Occupancy is approved or eligible on the stated facts."
+      ],
+      "requiredCitations": [
+        "AC 28-118.20"
+      ],
+      "requiredCitationClaims": [
+        {
+          "reference": "AC 28-118.20",
+          "requiredClaim": "The pre-1938 limitation, the not-more-than-50-percent ceiling, and all remaining certificate-status, construction, sprinkler, egress, and inspection conditions."
+        }
+      ]
     }
   ]
 }

@@ -10,7 +10,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 - official agency interpretations outside the current library
 - knowledgeable-human review of integrity-addressed official map and image selection
-- additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, structural-trigger, and roof-recovering drafts
+- additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, structural-trigger, roof-recovering, and partial-certificate drafts
 
 ## Intentional scope exclusions
 
@@ -892,6 +892,52 @@ Tests retrieval of the Administrative Code and Building Code roof-recovering pro
 > Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 .
 
 > 1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 ).
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 20. retrieval-pre-1938-partial-certificate-of-occupancy
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, pre-1938 buildings, certificate of occupancy, gross floor area, cumulative conditions
+- Source Research case: `nyc-025-pre-1938-partial-certificate-of-occupancy`
+
+### Project question
+
+An existing five-story building is represented by the owner as erected in 1930. The owner seeks a partial Certificate of Occupancy for three floors represented as 55 percent of the building's gross floor area and says the building is noncombustible, sprinklered, and has adequate egress from those three floors. Based only on AC 28-118.20, may the partial Certificate of Occupancy be issued now, and what still must be established?
+
+### Review intent
+
+Tests discovery of the narrow partial Certificate of Occupancy provision and requires the 50-percent ceiling plus all other cumulative conditions.
+
+### Proposed expected evidence
+
+#### AC 28-118.20 — section ID 9234
+
+> A partial certificate of occupancy may be issued to a specific floor or floors of an existing building erected prior to January 1, 1938 subject to the following conditions:
+
+> 1. The building does not have and is not otherwise required to have a certificate of occupancy or certificate of completion, if applicable.
+
+> 2. The floor or floors for which a certificate of occupancy is issued shall not constitute more than 50 percent of the gross floor area of the building.
+
+> 3. The building is of noncombustible construction and protected with an automatic sprinkler system.
+
+> 4. Adequate means of egress are provided from all floors.
+
+> 5. Upon inspection, the building is deemed safe for occupancy.
 
 ### Knowledgeable-human decision
 
