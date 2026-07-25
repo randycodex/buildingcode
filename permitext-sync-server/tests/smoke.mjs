@@ -12,6 +12,10 @@ const grantAdminToken = "smoke-grant-admin-token";
 const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+const smokePNG = Buffer.from(
+  "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+VnweAAAAAElFTkSuQmCC",
+  "base64"
+);
 
 function assert(condition, message) {
   if (!condition) {
@@ -49,6 +53,22 @@ async function request(path, { method = "GET", body, token, headers = {}, rawBod
   return { response, json, text };
 }
 
+async function requestBinary(path, { method = "GET", body, token, headers = {}, rawBody } = {}) {
+  const response = await fetch(`${baseURL}${path}`, {
+    method,
+    headers: {
+      ...(body ? { "content-type": "application/json" } : {}),
+      ...headers,
+      ...(token ? { authorization: `Bearer ${token}` } : {})
+    },
+    body: rawBody ?? (body ? JSON.stringify(body) : undefined)
+  });
+  return {
+    response,
+    body: Buffer.from(await response.arrayBuffer())
+  };
+}
+
 async function waitForServer() {
   for (let attempt = 0; attempt < 40; attempt += 1) {
     try {
@@ -66,6 +86,7 @@ async function waitForServer() {
 async function main() {
   const tempDir = await mkdtemp(join(tmpdir(), "permitext-sync-smoke-"));
   const dataPath = join(tempDir, "sync-store.json");
+  const privateAssetPath = join(tempDir, "private-assets");
   const evaluationRoot = join(tempDir, "private-evaluations");
   const evaluationResultsPath = join(evaluationRoot, "results");
   const privateEvaluationSentinel = "PERMITEXT_PRIVATE_EVAL_SENTINEL_DO_NOT_EXPOSE";
@@ -152,6 +173,10 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Views/BookmarksView.swift", import.meta.url),
     "utf8"
   );
+  const iosExportBuilderSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Data/BookmarkExportBuilder.swift", import.meta.url),
+    "utf8"
+  );
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const researchConfigSource = await readFile(new URL("../research-config.mjs", import.meta.url), "utf8");
@@ -164,6 +189,7 @@ async function main() {
       VERCEL: "",
       VERCEL_ENV: "",
       PERMITEXT_SYNC_DATA_PATH: dataPath,
+      PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: privateAssetPath,
       PERMITEXT_EVALUATION_ROOT: evaluationRoot,
       PERMITEXT_SYNC_DATABASE_URL: "",
       DATABASE_URL: "",
@@ -211,9 +237,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("project-research-v6") &&
-        webRoot.text.includes("project-research-v7"),
-      "Web workspace omitted the current Research conversation assets."
+      webRoot.text.includes("20260724-reports-v2"),
+      "Web workspace omitted the current Report asset version."
     );
     assert(
       !webRoot.text.includes(privateEvaluationSentinel),
@@ -412,22 +437,44 @@ async function main() {
       workspaceScript.text.includes("async function activateProjectStudio(project, options = {})") &&
         workspaceScript.text.includes("state.notebooks = keepNotebookOpen ? [identity] : []") &&
         workspaceScript.text.includes("state.workboards = keepWorkboardOpen ? [identity] : []") &&
+        workspaceScript.text.includes("state.reportDrafts = keepReportDraftOpen ? [identity] : []") &&
         workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
+        workspaceScript.text.includes("Discard unsaved Report Draft changes?") &&
         workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
+        workspaceScript.text.includes("function printReportManifestAsPDF(manifest)") &&
+        workspaceScript.text.includes("async function downloadProjectReportFile") &&
+        workspaceScript.text.includes('fetch("/reports/files/read"') &&
         workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
-      "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Workboard as one guarded workspace."
+      "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
     );
     assert(
       iosSyncEngineSource.includes("async let foundation = transport.projectFoundation") &&
         iosSyncEngineSource.includes("async let notebook = transport.projectNotebookCards") &&
+        iosSyncEngineSource.includes("async let reports = transport.projectReportHistory") &&
         iosCodeModelsSource.includes('post("projects/foundation/state"') &&
         iosCodeModelsSource.includes('post("notebook/cards/list"') &&
+        iosCodeModelsSource.includes('post("reports/history/list"') &&
+        iosCodeModelsSource.includes('post("reports/manifests/get"') &&
+        iosCodeModelsSource.includes('appendingPathComponent("reports/files/upload")') &&
+        iosCodeModelsSource.includes('appendingPathComponent("workboards/previews/read")') &&
+        iosSyncEngineSource.includes("func saveProjectReportPDF") &&
+        iosSyncEngineSource.includes("func projectWorkboardPreview(") &&
         iosLibraryViewModelSource.includes("func projectHubSnapshot(folderID: Int64)") &&
+        iosLibraryViewModelSource.includes("func projectReportPDF(manifestID: String)") &&
+        iosLibraryViewModelSource.includes("func projectWorkboardPreviewData(") &&
+        iosLibraryViewModelSource.includes("SHA256.hash(data: data)") &&
+        iosLibraryViewModelSource.includes("saveProjectReportPDF") &&
         iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Notebook"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
+        iosBookmarksSource.includes('projectHubSection(title: "Exports"') &&
+        iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
+        iosExportBuilderSource.includes("manifest.contentHash") &&
+        iosBookmarksSource.includes("Create & Save iOS PDF") &&
+        iosBookmarksSource.includes('"Read-only preview"') &&
+        iosBookmarksSource.includes("Flattened Project Workboard preview") &&
         iosBookmarksSource.includes("Workboard editing stays on the web."),
-      "iOS Project Hub no longer provides its read-only Notebook, immutable Research, and web-first Workboard contract."
+      "iOS Project Hub no longer provides its read-only Notebook, immutable Research, native Report export, and web-first Workboard contract."
     );
     const projectMutationSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function projectMutationForRecord"),
@@ -676,7 +723,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-project-research-v7'),
+        webRoot.text.includes('/web/app.js?v=20260724-reports-v2'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1032,9 +1079,9 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260722-workboard-zoom-v16";') &&
+      workspaceScript.text.includes('const workboardClientVersion = "20260724-workboard-preview-v17";') &&
         webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57'),
-      "Web workspace omitted the current Workboard zoom assets."
+      "Web workspace omitted the current Workboard preview assets."
     );
     assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),
@@ -1063,6 +1110,15 @@ async function main() {
         workboardSource.includes('aria-label="Reset zoom"') &&
         workboardSource.includes('aria-label="Zoom in"'),
       "Workboard omitted its compact zoom controls."
+    );
+    assert(
+      workboardSource.includes("exportToBlob") &&
+        workboardSource.includes("await savePreview(null") &&
+        workboardSource.includes("await savePreview(blob") &&
+        workspaceScript.text.includes("async function saveWorkboardPreview") &&
+        workspaceScript.text.includes('postJSON("/workboards/previews/clear"') &&
+        workspaceScript.text.includes('new URL("/workboards/previews/upload"'),
+      "Workboard no longer persists its flattened Project preview after a successful sync."
     );
     const workboardStyles = await request("/web/workboard-assets/workboard.css");
     assert(workboardStyles.response.ok, "Nested Workboard stylesheet asset did not load.");
@@ -1600,6 +1656,301 @@ async function main() {
         immutableAnswerRead.json.answer.evidence[0].passageText === selectedResearchText &&
         immutableAnswerRead.json.answer.passageToCitationMapping[0].evidenceSnapshotIDs.length === 1,
       "The historical Research endpoint did not restore the exact stored question, evidence, answer, and citation mapping."
+    );
+    const workboardPreviewUpload = await request("/workboards/previews/upload?" + new URLSearchParams({
+      projectID: researchProjectIDs[0],
+      workboardUpdatedAt: "2026-07-24T11:59:00.000Z",
+      elementCount: "3"
+    }), {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      headers: {
+        "content-type": "image/png",
+        "x-permitext-user-id": userID
+      },
+      rawBody: smokePNG
+    });
+    assert(
+      workboardPreviewUpload.response.status === 201 &&
+        workboardPreviewUpload.json.preview.elementCount === 3 &&
+        workboardPreviewUpload.json.preview.contentHash.length === 64,
+      "Saving an immutable flattened Workboard preview failed."
+    );
+    const workboardPreviewID = workboardPreviewUpload.json.preview.id;
+    const projectFoundationWithPreview = await request("/projects/foundation/state", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      projectFoundationWithPreview.response.ok &&
+        projectFoundationWithPreview.json.workboardPreview.id === workboardPreviewID &&
+        projectFoundationWithPreview.json.workboardPreview.contentHash ===
+          workboardPreviewUpload.json.preview.contentHash,
+      "The iOS Project Hub foundation response omitted the current Workboard preview."
+    );
+    const storedWorkboardPreview = await requestBinary("/workboards/previews/read", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        previewID: workboardPreviewID
+      }
+    });
+    assert(
+      storedWorkboardPreview.response.ok &&
+        storedWorkboardPreview.response.headers.get("content-type") === "image/png" &&
+        storedWorkboardPreview.response.headers.get("cache-control") === "private, no-store" &&
+        storedWorkboardPreview.body.equals(smokePNG),
+      "The flattened Workboard preview was not restored through authenticated private storage."
+    );
+    const reportSources = await request("/reports/sources/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reportSources.response.ok &&
+        reportSources.json.sources.some((source) =>
+          source.kind === "researchAnswer" &&
+          source.id === answerID &&
+          source.sourceClassification === "ai-assisted"
+        ) &&
+        reportSources.json.sources.some((source) =>
+          source.kind === "workboardPreview" &&
+          source.id === workboardPreviewID &&
+          source.sourceClassification === "project-material"
+        ),
+      "The Report Draft could not discover the Project's immutable Research answer and Workboard preview."
+    );
+    const reportDate = "2026-07-24T12:00:00.000Z";
+    const createReportDraft = await request("/reports/drafts/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        title: "Smoke Project Research Report",
+        reportDate,
+        introduction: "A constrained professional report assembled from approved Project Research.",
+        blocks: [
+          {
+            id: "smoke-report-heading",
+            kind: "heading",
+            text: "Supported Research"
+          },
+          {
+            id: "smoke-report-answer",
+            kind: "researchAnswer",
+            sourceID: answerID,
+            label: "When must the owner notify the department?"
+          },
+          {
+            id: "smoke-report-workboard",
+            kind: "workboardPreview",
+            sourceID: workboardPreviewID,
+            label: "Workboard preview"
+          }
+        ]
+      }
+    });
+    assert(
+      createReportDraft.response.status === 201 &&
+        createReportDraft.json.draft.version === 1 &&
+        createReportDraft.json.draft.blocks.length === 3,
+      "Creating a versioned Report Draft failed."
+    );
+    const reportDraftID = createReportDraft.json.draft.id;
+    const staleReportDraft = await request("/reports/drafts/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        draftID: reportDraftID,
+        expectedVersion: 0,
+        title: "Stale Report Draft",
+        reportDate,
+        blocks: createReportDraft.json.draft.blocks
+      }
+    });
+    assert(
+      staleReportDraft.response.status === 409 &&
+        staleReportDraft.json.code === "REPORT_DRAFT_VERSION_CONFLICT" &&
+        staleReportDraft.json.draft.version === 1,
+      "The Report Draft accepted a stale explicit revision."
+    );
+    const generatedProjectReport = await request("/reports/generate", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        draftID: reportDraftID
+      }
+    });
+    assert(
+      generatedProjectReport.response.status === 201 &&
+        generatedProjectReport.json.manifest.immutable === true &&
+        generatedProjectReport.json.manifest.reportVersion === 1 &&
+        generatedProjectReport.json.manifest.items.some((item) =>
+          item.kind === "researchAnswer" &&
+          item.answerID === answerID &&
+          item.sourceClassification === "ai-assisted" &&
+          item.evidence.length === 1
+        ) &&
+        generatedProjectReport.json.manifest.items.some((item) =>
+          item.kind === "workboardPreview" &&
+          item.sourceID === workboardPreviewID &&
+          item.sourceClassification === "project-material"
+        ) &&
+        generatedProjectReport.json.generatedReport.outputFormats.includes("web-pdf") &&
+        generatedProjectReport.json.generatedReport.file.format === "web-pdf" &&
+        generatedProjectReport.json.generatedReport.file.size > 2_000 &&
+        generatedProjectReport.json.generatedReport.file.contentHash.length === 64 &&
+        generatedProjectReport.json.activity.action === "report.generated",
+      "Generating an immutable cross-platform Report Manifest failed."
+    );
+    const reportManifestID = generatedProjectReport.json.manifest.id;
+    const webGeneratedReportID = generatedProjectReport.json.generatedReport.id;
+    const unauthorizedReportPDF = await request("/reports/files/read", {
+      method: "POST",
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        generatedReportID: webGeneratedReportID
+      }
+    });
+    assert(
+      unauthorizedReportPDF.response.status === 401,
+      "Private Report PDF access allowed a missing session token."
+    );
+    const storedWebPDF = await requestBinary("/reports/files/read", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        generatedReportID: webGeneratedReportID
+      }
+    });
+    assert(
+      storedWebPDF.response.ok &&
+        storedWebPDF.response.headers.get("content-type") === "application/pdf" &&
+        storedWebPDF.response.headers.get("cache-control") === "private, no-store" &&
+        storedWebPDF.body.subarray(0, 5).toString("ascii") === "%PDF-" &&
+        storedWebPDF.body.subarray(-1_024).toString("ascii").includes("%%EOF"),
+      "The generated Web PDF was not restored through authenticated private storage."
+    );
+    const uploadedIOSPDF = await request("/reports/files/upload?" + new URLSearchParams({
+      projectID: researchProjectIDs[0],
+      manifestID: reportManifestID,
+      format: "ios-pdf"
+    }), {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      headers: {
+        "content-type": "application/pdf",
+        "x-permitext-user-id": userID
+      },
+      rawBody: storedWebPDF.body
+    });
+    assert(
+      uploadedIOSPDF.response.status === 201 &&
+        uploadedIOSPDF.json.file.format === "ios-pdf" &&
+      uploadedIOSPDF.json.file.contentHash.length === 64 &&
+        uploadedIOSPDF.json.activity.action === "report.export.saved",
+      `Saving a native iOS Report rendition to private storage failed: ${uploadedIOSPDF.response.status} ${uploadedIOSPDF.text}`
+    );
+    const reportHistory = await request("/reports/history/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reportHistory.response.ok &&
+        reportHistory.json.reports[0].id === reportManifestID &&
+        reportHistory.json.reports[0].files.some((file) => file.format === "web-pdf") &&
+        reportHistory.json.reports[0].files.some((file) => file.format === "ios-pdf") &&
+        reportHistory.json.reports[0].contentHash ===
+          generatedProjectReport.json.manifest.contentHash,
+      "Immutable Report history did not preserve the generated manifest."
+    );
+    const readReportManifest = await request("/reports/manifests/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        manifestID: reportManifestID
+      }
+    });
+    assert(
+      readReportManifest.response.ok &&
+        readReportManifest.json.files.length === 2 &&
+        readReportManifest.json.manifest.contentHash ===
+          generatedProjectReport.json.manifest.contentHash &&
+        readReportManifest.json.manifest.items.some((item) =>
+          item.kind === "researchAnswer" &&
+          item.question === "When must the owner notify the department?"
+        ) &&
+        readReportManifest.json.manifest.items.some((item) =>
+          item.kind === "workboardPreview" &&
+          item.sourceID === workboardPreviewID
+        ),
+      "The Report Manifest endpoint did not restore the immutable semantic snapshot."
+    );
+    const clearWorkboardPreview = await request("/workboards/previews/clear", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      clearWorkboardPreview.response.ok &&
+        clearWorkboardPreview.json.clearedCount === 1,
+      "Clearing the Project's active Workboard preview failed."
+    );
+    const reportSourcesAfterPreviewClear = await request("/reports/sources/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reportSourcesAfterPreviewClear.response.ok &&
+        !reportSourcesAfterPreviewClear.json.sources.some((source) =>
+          source.kind === "workboardPreview"
+        ),
+      "A cleared Workboard preview remained available to new Report Drafts."
+    );
+    const historicalWorkboardPreview = await requestBinary("/workboards/previews/read", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0],
+        previewID: workboardPreviewID
+      }
+    });
+    assert(
+      historicalWorkboardPreview.response.ok &&
+        historicalWorkboardPreview.body.equals(smokePNG),
+      "Clearing the active Workboard preview broke an immutable historical Report source."
     );
     const moveResearchWithoutReview = await request("/research/conversations/assign-project", {
       method: "POST",

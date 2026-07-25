@@ -25,7 +25,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-project-foundation-v5";
+} from "./offline-storage.js?v=20260724-reports-v2";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -47,7 +47,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260722-workboard-zoom-v16";
+const workboardClientVersion = "20260724-workboard-preview-v17";
 const notebookClientVersion = "20260724-project-notebook-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -89,6 +89,7 @@ const defaultUtilityPaneWidth = 320;
 const defaultDetailPaneWidth = 320;
 const defaultWorkboardPaneWidth = 720;
 const defaultNotebookPaneWidth = 760;
+const defaultReportDraftPaneWidth = 760;
 const defaultSettingsPaneWidth = 340;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -145,6 +146,7 @@ let workboardPreloadHandle = null;
 const workboardMounts = new Map();
 let notebookModulePromise = null;
 const notebookMounts = new Map();
+const reportDraftMounts = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
 let researchUsage = null;
@@ -185,6 +187,7 @@ function loadWorkspaceState() {
     const activeProjectDetail = projectDetails[0] || null;
     const savedWorkboards = normalizeProjectIdentities(saved.workboards, saved.workboard);
     const savedNotebooks = normalizeProjectIdentities(saved.notebooks);
+    const savedReportDrafts = normalizeProjectIdentities(saved.reportDrafts);
     const savedReaders = Array.isArray(saved.readers)
       ? saved.readers.filter((reader) => reader && typeof reader === "object" && !reader.comparisonManaged)
       : [];
@@ -240,6 +243,9 @@ function loadWorkspaceState() {
       notebooks: activeProjectDetail && savedNotebooks.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
+      reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
+        ? [projectIdentity(activeProjectDetail)]
+        : [],
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
     };
   } catch {
@@ -282,6 +288,7 @@ function loadWorkspaceState() {
       researchConversationID: "",
       workboards: [],
       notebooks: [],
+      reportDrafts: [],
       detachedWorkboards: []
     };
   }
@@ -448,6 +455,7 @@ function initializeDetachedProjectState(project) {
   state.projectDetails = [];
   state.workboards = [identity];
   state.notebooks = [];
+  state.reportDrafts = [];
   state.detachedWorkboards = [];
   state.utilityInstances = [];
   state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false };
@@ -474,6 +482,11 @@ function openNotebooks() {
   return state.notebooks;
 }
 
+function openReportDrafts() {
+  state.reportDrafts = normalizeProjectIdentities(state.reportDrafts);
+  return state.reportDrafts;
+}
+
 function detachedWorkboards() {
   state.detachedWorkboards = normalizeProjectIdentities(state.detachedWorkboards);
   return state.detachedWorkboards;
@@ -485,6 +498,10 @@ function projectHasOpenWorkboard(project) {
 
 function projectHasOpenNotebook(project) {
   return openNotebooks().some((item) => projectDetailMatches(project, item));
+}
+
+function projectHasOpenReportDraft(project) {
+  return openReportDrafts().some((item) => projectDetailMatches(project, item));
 }
 
 function projectHasDetachedWorkboard(project) {
@@ -579,6 +596,33 @@ async function openProjectNotebook(project) {
   return true;
 }
 
+async function closeProjectReportDraft(project) {
+  if (!(await confirmReportDraftDiscard(project))) return false;
+  const reportDraftID = paneIDForProjectReportDraft(project);
+  state.reportDrafts = openReportDrafts().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[reportDraftID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== reportDraftID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  return true;
+}
+
+async function openProjectReportDraft(project) {
+  const identity = projectIdentity(project);
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    const activated = await activateProjectStudio(identity);
+    if (!activated) return false;
+  }
+  state.reportDrafts = [identity];
+  const reportDraftID = paneIDForProjectReportDraft(identity);
+  state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
+  placeProjectDetailAfterProjects(identity);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
+  scrollPaneIntoView(reportDraftID);
+  return true;
+}
+
 async function mountPendingProjectWorkboard(mounted) {
   if (mounted.mountTask || mounted.disposed) return mounted.mountTask;
   mounted.mountTask = (async () => {
@@ -664,6 +708,7 @@ function renderProjectWorkboard(project) {
     syncEnabled,
     loadSyncedBoard: loadSyncedWorkboard,
     saveSyncedBoard: saveSyncedWorkboard,
+    savePreview: (blob, metadata) => saveWorkboardPreview(projectID, blob, metadata),
     uploadAsset: mounted.uploadAsset,
     loadAsset: loadWorkboardAsset,
     remoteRevision
@@ -692,6 +737,18 @@ function cleanupInactiveNotebookMounts(panes) {
     if (activeProjectIDs.has(projectID)) return;
     mounted.dispose?.();
     notebookMounts.delete(projectID);
+  });
+}
+
+function cleanupInactiveReportDraftMounts(panes) {
+  const activeProjectIDs = new Set(panes
+    .filter((pane) => pane.classList.contains("report-draft-panel"))
+    .map((pane) => pane.dataset.projectId)
+    .filter(Boolean));
+  reportDraftMounts.forEach((mounted, projectID) => {
+    if (activeProjectIDs.has(projectID)) return;
+    mounted.dispose?.();
+    reportDraftMounts.delete(projectID);
   });
 }
 
@@ -1164,6 +1221,14 @@ function isProjectNotebookPaneID(paneID) {
   return String(paneID || "").startsWith("project:notebook:");
 }
 
+function paneIDForProjectReportDraft(detail = null) {
+  return `project:report-draft:${encodeURIComponent(projectDetailKey(detail))}`;
+}
+
+function isProjectReportDraftPaneID(paneID) {
+  return String(paneID || "").startsWith("project:report-draft:");
+}
+
 function openProjectDetails() {
   if (Array.isArray(state.projectDetails)) return state.projectDetails;
   return state.projectDetail ? [state.projectDetail] : [];
@@ -1181,6 +1246,14 @@ function setOpenProjectDetails(details) {
 async function confirmNotebookDiscard(project) {
   const projectID = projectDetailKey(project);
   const mounted = notebookMounts.get(projectID);
+  return mounted?.confirmDiscardIfNeeded
+    ? mounted.confirmDiscardIfNeeded()
+    : true;
+}
+
+async function confirmReportDraftDiscard(project) {
+  const projectID = projectDetailKey(project);
+  const mounted = reportDraftMounts.get(projectID);
   return mounted?.confirmDiscardIfNeeded
     ? mounted.confirmDiscardIfNeeded()
     : true;
@@ -1213,41 +1286,55 @@ async function activateProjectStudio(project, options = {}) {
     return true;
   }
   if (current && !(await confirmNotebookDiscard(current))) return false;
+  if (current && !(await confirmReportDraftDiscard(current))) return false;
 
   const keepNotebookOpen = current ? projectHasOpenNotebook(current) : Boolean(options.openNotebook);
   const keepWorkboardOpen = current ? projectHasOpenWorkboard(current) : Boolean(options.openWorkboard);
+  const keepReportDraftOpen = current
+    ? projectHasOpenReportDraft(current)
+    : Boolean(options.openReportDraft);
   const currentDetailID = current ? paneIDForProjectDetail(current) : "";
   const currentNotebookID = current ? paneIDForProjectNotebook(current) : "";
   const currentWorkboardID = current ? paneIDForProjectWorkboard(current) : "";
+  const currentReportDraftID = current ? paneIDForProjectReportDraft(current) : "";
   const detailWidth = currentDetailID ? state.paneWeights[currentDetailID] : null;
   const notebookWidth = currentNotebookID ? state.paneWeights[currentNotebookID] : null;
   const workboardWidth = currentWorkboardID ? state.paneWeights[currentWorkboardID] : null;
+  const reportDraftWidth = currentReportDraftID ? state.paneWeights[currentReportDraftID] : null;
 
   if (current) {
     clearProjectSpecificReaders(current);
     clearProjectSpecificResearch(current);
-    [currentDetailID, currentNotebookID, currentWorkboardID].forEach((paneID) => {
+    [currentDetailID, currentNotebookID, currentWorkboardID, currentReportDraftID].forEach((paneID) => {
       delete state.paneWeights[paneID];
     });
     state.paneOrder = (state.paneOrder || []).filter((paneID) =>
       paneID !== currentDetailID &&
       paneID !== currentNotebookID &&
-      paneID !== currentWorkboardID
+      paneID !== currentWorkboardID &&
+      paneID !== currentReportDraftID
     );
   }
 
   setOpenProjectDetails([identity]);
   state.notebooks = keepNotebookOpen ? [identity] : [];
   state.workboards = keepWorkboardOpen ? [identity] : [];
+  state.reportDrafts = keepReportDraftOpen ? [identity] : [];
   const detailID = paneIDForProjectDetail(identity);
   const notebookID = paneIDForProjectNotebook(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
+  const reportDraftID = paneIDForProjectReportDraft(identity);
   state.paneWeights[detailID] = Number(detailWidth) > 40 ? detailWidth : defaultDetailPaneWidth;
   if (keepNotebookOpen) {
     state.paneWeights[notebookID] = Number(notebookWidth) > 40 ? notebookWidth : defaultNotebookPaneWidth;
   }
   if (keepWorkboardOpen) {
     state.paneWeights[workboardID] = Number(workboardWidth) > 40 ? workboardWidth : defaultWorkboardPaneWidth;
+  }
+  if (keepReportDraftOpen) {
+    state.paneWeights[reportDraftID] = Number(reportDraftWidth) > 40
+      ? reportDraftWidth
+      : defaultReportDraftPaneWidth;
   }
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
   restoreProjectsStackOrder();
@@ -1261,6 +1348,7 @@ function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
+  if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
@@ -1273,6 +1361,7 @@ function isFixedWidthPaneID(paneID) {
     isProjectDetailPaneID(paneID) ||
     isProjectWorkboardPaneID(paneID) ||
     isProjectNotebookPaneID(paneID) ||
+    isProjectReportDraftPaneID(paneID) ||
     paneID?.startsWith("section:detail:");
 }
 
@@ -1354,6 +1443,7 @@ function defaultActivePaneIDs() {
   openProjectDetails().forEach((detail) => {
     ids.push(paneIDForProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
+    if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
     if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
   });
   if (state.utilities.archive) ids.push("utility:archive");
@@ -1381,6 +1471,7 @@ function activePaneIDs() {
     !id.startsWith("section:detail:") &&
     !isProjectDetailPaneID(id) &&
     !isProjectNotebookPaneID(id) &&
+    !isProjectReportDraftPaneID(id) &&
     !isProjectWorkboardPaneID(id)
   );
   if (openProjectDetails().length) {
@@ -1388,6 +1479,7 @@ function activePaneIDs() {
     const detailIDs = openProjectDetails().flatMap((detail) => [
       paneIDForProjectDetail(detail),
       ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+      ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
       ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
     ]);
     if (savedIndex === -1) {
@@ -1572,6 +1664,7 @@ function placeArchiveAfterProjectsStack() {
   const projectStackIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
@@ -1587,6 +1680,7 @@ function restoreProjectsStackOrder() {
   const detailIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const archiveID = "utility:archive";
@@ -2960,6 +3054,35 @@ async function uploadWorkboardAsset(projectID, fileID, file) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Workboard image."));
   return payload.asset;
+}
+
+async function saveWorkboardPreview(projectID, blob, metadata = {}) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to synchronize Workboard previews.");
+  if (!blob) {
+    return postJSON("/workboards/previews/clear", {
+      auth: { accountUserID: account.userID },
+      projectID
+    }, { token: account.sessionToken });
+  }
+  const url = new URL("/workboards/previews/upload", window.location.origin);
+  url.searchParams.set("projectID", projectID);
+  url.searchParams.set("workboardUpdatedAt", metadata.updatedAt || new Date().toISOString());
+  url.searchParams.set("elementCount", String(metadata.elementCount || 0));
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": "image/png",
+      "x-permitext-user-id": account.userID
+    },
+    body: blob
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(responseErrorMessage(payload, "Could not save the Workboard preview."));
+  }
+  return payload.preview;
 }
 
 function blobDataURL(blob) {
@@ -6962,6 +7085,38 @@ async function postResearch(path, values = {}) {
   return postJSON(path, researchRequestBody(values), { token: account.sessionToken });
 }
 
+async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in from Settings to download private Project Reports.");
+  const response = await fetch("/reports/files/read", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${account.sessionToken}`
+    },
+    body: JSON.stringify({
+      auth: { accountUserID: account.userID },
+      projectID,
+      generatedReportID: file.generatedReportID
+    })
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || "The Report PDF could not be downloaded.");
+  }
+  const blob = await response.blob();
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  const safeTitle = String(title || "Permitext Project Report")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "Permitext-Project-Report";
+  anchor.href = url;
+  anchor.download = `${safeTitle}-${file.format || "report"}.pdf`;
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
+}
+
 async function refreshResearchConversationList() {
   if (!activeAccount()) {
     researchConversationList = [];
@@ -8709,6 +8864,729 @@ async function renderProjectNotebook(project) {
   return panel;
 }
 
+function emptyProjectReportDraft(project) {
+  return {
+    id: "",
+    version: 0,
+    title: `${project.name || "Project"} Code Research Report`,
+    reportDate: new Date().toISOString(),
+    introduction: "",
+    blocks: []
+  };
+}
+
+function reportSourceClassificationLabel(value) {
+  return {
+    "published-code": "Published code",
+    "user-authored": "User-authored",
+    "ai-assisted": "AI-assisted Research",
+    "project-material": "Project material"
+  }[value] || "Project content";
+}
+
+function reportBlockTitle(block) {
+  if (block.kind === "heading") return block.text || "Heading";
+  if (block.kind === "paragraph") return (block.text || "Paragraph").slice(0, 80);
+  if (block.kind === "list") return `${block.items?.length || 0} list items`;
+  return block.label || block.title || block.kind;
+}
+
+function appendReportPDFList(documentRoot, parent, title, items) {
+  const normalized = (Array.isArray(items) ? items : []).filter(Boolean);
+  if (!normalized.length) return;
+  const heading = documentRoot.createElement("h4");
+  heading.textContent = title;
+  const list = documentRoot.createElement("ul");
+  normalized.forEach((item) => {
+    const row = documentRoot.createElement("li");
+    row.textContent = String(item);
+    list.append(row);
+  });
+  parent.append(heading, list);
+}
+
+function printReportManifestAsPDF(manifest) {
+  if (!isProAccount()) {
+    void presentPlanLimitNotice(
+      "Professional reports require Pro",
+      "Upgrade to Pro to render a Project Report Manifest as PDF."
+    );
+    return;
+  }
+  const frame = document.createElement("iframe");
+  frame.className = "saved-print-frame";
+  frame.title = `${manifest.title || "Project Report"} PDF export`;
+  frame.srcdoc = "<!doctype html><html><head><title>Permitext Project Report</title></head><body></body></html>";
+  frame.addEventListener("load", () => {
+    const documentRoot = frame.contentDocument;
+    if (!documentRoot) return;
+    const style = documentRoot.createElement("style");
+    style.textContent = `
+      body{margin:0;color:#161616;font:10.5pt/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
+      main{max-width:7.2in;margin:0 auto;padding:.55in .5in .7in}
+      .cover{min-height:7.4in;display:flex;flex-direction:column;justify-content:center;break-after:page}
+      .eyebrow,.classification{font-size:8pt;font-weight:750;letter-spacing:.09em;text-transform:uppercase}
+      .eyebrow{color:#9a4f12}.classification{display:inline-block;margin-bottom:8px;padding:4px 7px;border-radius:999px;background:#f1ece7;color:#5a4a3d}
+      h1{margin:8px 0 14px;font-size:30pt;line-height:1.08}h2{margin:28px 0 10px;font-size:17pt}h3{margin:0 0 8px;font-size:13pt}h4{margin:12px 0 4px;font-size:9pt;text-transform:uppercase;letter-spacing:.06em}
+      p{margin:0 0 10px}.meta{color:#555}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
+      article{margin:0 0 18px;padding:16px;border-radius:10px;background:#f7f5f2;break-inside:avoid}
+      article.published-code{background:#f5eee6}article.ai-assisted{background:#eef1f8}article.user-authored{background:#f4f1f8}
+      blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid #a95a19;color:#333}
+      ul{margin:4px 0 10px;padding-left:20px}.disclaimers{margin-top:32px;padding-top:16px;border-top:1px solid #bbb;color:#555;font-size:8.5pt}
+      .hash{margin-top:14px;overflow-wrap:anywhere;font:7pt/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:#777}
+      @page{margin:.35in}
+    `;
+    documentRoot.head.append(style);
+    const main = documentRoot.createElement("main");
+    const cover = documentRoot.createElement("section");
+    cover.className = "cover";
+    const eyebrow = documentRoot.createElement("p");
+    eyebrow.className = "eyebrow";
+    eyebrow.textContent = "Permitext Project Report";
+    const title = documentRoot.createElement("h1");
+    title.textContent = manifest.title;
+    const projectName = documentRoot.createElement("h2");
+    projectName.textContent = manifest.project?.name || "Project";
+    const metadata = documentRoot.createElement("p");
+    metadata.className = "meta";
+    metadata.textContent = [
+      manifest.project?.address,
+      new Date(manifest.reportDate).toLocaleDateString(),
+      manifest.author?.displayName,
+      `Report version ${manifest.reportVersion}`,
+      manifest.codeEdition
+    ].filter(Boolean).join(" · ");
+    const legend = documentRoot.createElement("div");
+    legend.className = "legend";
+    ["Published code", "User-authored", "AI-assisted Research", "Project material"].forEach((label) => {
+      const item = documentRoot.createElement("span");
+      item.className = "classification";
+      item.textContent = label;
+      legend.append(item);
+    });
+    cover.append(eyebrow, title, projectName, metadata, legend);
+    main.append(cover);
+
+    (manifest.items || []).forEach((item) => {
+      if (item.kind === "heading") {
+        const heading = documentRoot.createElement("h2");
+        heading.textContent = item.text;
+        main.append(heading);
+        return;
+      }
+      if (item.kind === "paragraph") {
+        const paragraph = documentRoot.createElement("p");
+        paragraph.textContent = item.text;
+        main.append(paragraph);
+        return;
+      }
+      if (item.kind === "list") {
+        const list = documentRoot.createElement("ul");
+        (item.items || []).forEach((value) => {
+          const row = documentRoot.createElement("li");
+          row.textContent = value;
+          list.append(row);
+        });
+        main.append(list);
+        return;
+      }
+      const article = documentRoot.createElement("article");
+      article.className = item.sourceClassification || "";
+      const classification = documentRoot.createElement("span");
+      classification.className = "classification";
+      classification.textContent = reportSourceClassificationLabel(item.sourceClassification);
+      article.append(classification);
+      if (item.kind === "evidence") {
+        const heading = documentRoot.createElement("h3");
+        heading.textContent = `${item.codeBook} ${item.sectionNumber}: ${item.title}`;
+        const passage = documentRoot.createElement("blockquote");
+        passage.textContent = item.passageText;
+        article.append(heading, passage);
+      } else if (item.kind === "notebookCard") {
+        const heading = documentRoot.createElement("h3");
+        heading.textContent = item.title;
+        const body = documentRoot.createElement("p");
+        body.textContent = item.plainText;
+        article.append(heading, body);
+      } else if (item.kind === "researchAnswer") {
+        const heading = documentRoot.createElement("h3");
+        heading.textContent = item.question;
+        const conclusion = documentRoot.createElement("p");
+        const conclusionLabel = documentRoot.createElement("strong");
+        conclusionLabel.textContent = "Supported conclusion: ";
+        conclusion.append(conclusionLabel, documentRoot.createTextNode(item.conclusion));
+        article.append(heading, conclusion);
+        if (item.explanation) {
+          const explanation = documentRoot.createElement("p");
+          explanation.textContent = item.explanation;
+          article.append(explanation);
+        }
+        appendReportPDFList(documentRoot, article, "Assumptions", item.assumptions);
+        appendReportPDFList(documentRoot, article, "Missing Project facts", item.missingFacts);
+        appendReportPDFList(documentRoot, article, "Limitations", item.limitations);
+        appendReportPDFList(documentRoot, article, "Additional evidence needed", item.additionalEvidenceNeeded);
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Citations",
+          (item.citations || []).map((citation) =>
+            [citation.sectionID, ...(citation.sourceIDs || [])].filter(Boolean).join(" · ")
+          )
+        );
+      } else {
+        const heading = documentRoot.createElement("h3");
+        heading.textContent = item.title || "Project material";
+        const detail = documentRoot.createElement("p");
+        detail.textContent = item.contentType || "Included Project material";
+        article.append(heading, detail);
+      }
+      main.append(article);
+    });
+
+    const disclaimers = documentRoot.createElement("section");
+    disclaimers.className = "disclaimers";
+    const disclaimerHeading = documentRoot.createElement("h3");
+    disclaimerHeading.textContent = "Professional-use notice";
+    disclaimers.append(disclaimerHeading);
+    (manifest.disclaimers || []).forEach((value) => {
+      const paragraph = documentRoot.createElement("p");
+      paragraph.textContent = value;
+      disclaimers.append(paragraph);
+    });
+    const hash = documentRoot.createElement("p");
+    hash.className = "hash";
+    hash.textContent = `Manifest ${manifest.id} · ${manifest.generatorVersion} · SHA-256 ${manifest.contentHash}`;
+    disclaimers.append(hash);
+    main.append(disclaimers);
+    documentRoot.body.append(main);
+    frame.contentWindow?.focus();
+    frame.contentWindow?.print();
+    window.setTimeout(() => frame.remove(), 1000);
+  }, { once: true });
+  document.body.append(frame);
+}
+
+async function renderProjectReportDraft(project) {
+  const identity = projectIdentity(project);
+  const projectID = projectDetailKey(identity);
+  const paneID = paneIDForProjectReportDraft(identity);
+  reportDraftMounts.get(projectID)?.dispose?.();
+
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel report-draft-panel";
+  panel.dataset.paneId = paneID;
+  panel.dataset.projectId = projectID;
+  panel.style.setProperty("--project-color", identity.color || "#c96410");
+  applyPaneWeight(panel, paneID);
+
+  const header = document.createElement("header");
+  header.className = "report-draft-header";
+  const heading = document.createElement("div");
+  const eyebrow = document.createElement("span");
+  eyebrow.className = "report-draft-eyebrow";
+  eyebrow.textContent = identity.name;
+  const title = document.createElement("h2");
+  title.textContent = "Report Draft";
+  heading.append(eyebrow, title);
+  const closeButton = document.createElement("button");
+  closeButton.className = "report-draft-close";
+  closeButton.type = "button";
+  closeButton.textContent = "Close";
+  closeButton.addEventListener("click", () => {
+    void closeProjectReportDraft(identity);
+  });
+  header.append(heading, closeButton);
+
+  const shell = document.createElement("div");
+  shell.className = "report-draft-shell";
+  const status = document.createElement("p");
+  status.className = "report-draft-status";
+  status.setAttribute("role", "status");
+  status.textContent = "Loading Report Draft…";
+  shell.append(status);
+  panel.append(header, shell);
+
+  let drafts = [];
+  let sources = [];
+  let history = [];
+  let activeDraft = emptyProjectReportDraft(identity);
+  let dirty = false;
+  let disposed = false;
+
+  const mountState = {
+    panel,
+    async confirmDiscardIfNeeded() {
+      if (!dirty) return true;
+      return confirmWebWarning(
+        "Discard unsaved Report Draft changes?",
+        `Your edits to “${activeDraft.title || "Untitled report"}” have not been saved.`,
+        { confirmLabel: "Discard changes" }
+      );
+    },
+    dispose() {
+      disposed = true;
+    }
+  };
+  reportDraftMounts.set(projectID, mountState);
+
+  if (!activeAccount()) {
+    status.textContent = "Sign in from Settings to use private Project Reports.";
+    return panel;
+  }
+
+  const setDirty = () => {
+    dirty = true;
+    status.textContent = "Unsaved changes";
+  };
+
+  const saveDraft = async () => {
+    status.textContent = "Saving Report Draft…";
+    try {
+      const payload = await postResearch("/reports/drafts/save", {
+        projectID,
+        draftID: activeDraft.id,
+        expectedVersion: activeDraft.version || 0,
+        title: activeDraft.title,
+        reportDate: activeDraft.reportDate,
+        introduction: activeDraft.introduction,
+        blocks: activeDraft.blocks
+      });
+      activeDraft = structuredClone(payload.draft);
+      const index = drafts.findIndex((draft) => draft.id === activeDraft.id);
+      if (index === -1) drafts.unshift(structuredClone(activeDraft));
+      else drafts[index] = structuredClone(activeDraft);
+      dirty = false;
+      status.textContent = `Saved revision ${activeDraft.version}`;
+      renderWorkspaceContent();
+      return true;
+    } catch (error) {
+      status.textContent = error.message || "The Report Draft could not be saved.";
+      return false;
+    }
+  };
+
+  const openHistoricalReport = async (manifestID) => {
+    status.textContent = "Loading immutable Report…";
+    try {
+      const payload = await postResearch("/reports/manifests/get", { manifestID });
+      status.textContent = `Opened Report version ${payload.manifest.reportVersion}`;
+      printReportManifestAsPDF(payload.manifest);
+    } catch (error) {
+      status.textContent = error.message || "The historical Report could not be opened.";
+    }
+  };
+
+  const generateReport = async () => {
+    if ((dirty || !activeDraft.id) && !(await saveDraft())) return;
+    if (!activeDraft.blocks.length && !activeDraft.introduction) {
+      status.textContent = "Add at least one Report item before generating a PDF.";
+      return;
+    }
+    status.textContent = "Creating immutable Report Manifest…";
+    try {
+      const payload = await postResearch("/reports/generate", {
+        projectID,
+        draftID: activeDraft.id
+      });
+      const historyPayload = await postResearch("/reports/history/list", { projectID });
+      history = historyPayload.reports || [];
+      status.textContent = `Generated immutable Report version ${payload.manifest.reportVersion}`;
+      renderWorkspaceContent();
+      printReportManifestAsPDF(payload.manifest);
+      await transitionWorkspace("utility", {
+        refreshPaneIDs: [paneIDForProjectDetail(identity)]
+      });
+    } catch (error) {
+      status.textContent = error.message || "The Report could not be generated.";
+    }
+  };
+
+  function renderBlockEditor(container) {
+    if (!activeDraft.blocks.length) {
+      const empty = document.createElement("p");
+      empty.className = "report-draft-empty";
+      empty.textContent = "Add a paragraph, heading, list, or Project source to begin the professional narrative.";
+      container.append(empty);
+      return;
+    }
+    activeDraft.blocks.forEach((block, index) => {
+      const row = document.createElement("article");
+      row.className = `report-draft-block report-draft-block-${block.kind}`;
+      const top = document.createElement("div");
+      top.className = "report-draft-block-top";
+      const label = document.createElement("span");
+      label.className = "report-draft-classification";
+      label.textContent = reportSourceClassificationLabel(
+        block.sourceClassification ||
+        (["heading", "paragraph", "list"].includes(block.kind) ? "user-authored" : sources.find((source) =>
+          source.id === block.sourceID && source.kind === block.kind
+        )?.sourceClassification)
+      );
+      const actions = document.createElement("div");
+      actions.className = "report-draft-block-actions";
+      [
+        { label: "Move up", text: "↑", disabled: index === 0, action: () => index - 1 },
+        {
+          label: "Move down",
+          text: "↓",
+          disabled: index === activeDraft.blocks.length - 1,
+          action: () => index + 1
+        }
+      ].forEach((action) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = action.text;
+        button.title = action.label;
+        button.setAttribute("aria-label", action.label);
+        button.disabled = action.disabled;
+        button.addEventListener("click", () => {
+          const target = action.action();
+          const [moved] = activeDraft.blocks.splice(index, 1);
+          activeDraft.blocks.splice(target, 0, moved);
+          setDirty();
+          renderWorkspaceContent();
+        });
+        actions.append(button);
+      });
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.textContent = "Remove";
+      remove.addEventListener("click", () => {
+        activeDraft.blocks.splice(index, 1);
+        setDirty();
+        renderWorkspaceContent();
+      });
+      actions.append(remove);
+      top.append(label, actions);
+      row.append(top);
+
+      if (block.kind === "heading") {
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = block.text || "";
+        input.placeholder = "Report heading";
+        input.setAttribute("aria-label", "Report heading");
+        input.addEventListener("input", () => {
+          block.text = input.value;
+          setDirty();
+        });
+        row.append(input);
+      } else if (block.kind === "paragraph") {
+        const textarea = document.createElement("textarea");
+        textarea.value = block.text || "";
+        textarea.placeholder = "Professional narrative paragraph";
+        textarea.setAttribute("aria-label", "Report paragraph");
+        textarea.addEventListener("input", () => {
+          block.text = textarea.value;
+          setDirty();
+        });
+        row.append(textarea);
+      } else if (block.kind === "list") {
+        const textarea = document.createElement("textarea");
+        textarea.value = (block.items || []).join("\n");
+        textarea.placeholder = "One list item per line";
+        textarea.setAttribute("aria-label", "Report list items");
+        textarea.addEventListener("input", () => {
+          block.items = textarea.value.split("\n").map((value) => value.trim()).filter(Boolean);
+          setDirty();
+        });
+        row.append(textarea);
+      } else {
+        const sourceTitle = document.createElement("strong");
+        sourceTitle.textContent = reportBlockTitle(block);
+        const source = sources.find((item) => item.kind === block.kind && item.id === block.sourceID);
+        if (source?.summary) {
+          const summary = document.createElement("p");
+          summary.textContent = source.summary;
+          row.append(sourceTitle, summary);
+        } else {
+          row.append(sourceTitle);
+        }
+      }
+      container.append(row);
+    });
+  }
+
+  function renderSourcePalette(container) {
+    const title = document.createElement("p");
+    title.className = "section-label";
+    title.textContent = "Project sources";
+    container.append(title);
+    if (!sources.length) {
+      const empty = document.createElement("p");
+      empty.className = "report-draft-empty";
+      empty.textContent = "Link evidence, Notebook cards, or supported Research to this Project before inserting it.";
+      container.append(empty);
+      return;
+    }
+    sources.forEach((source) => {
+      const row = document.createElement("article");
+      row.className = "report-source-card";
+      const copy = document.createElement("div");
+      const label = document.createElement("span");
+      label.className = "report-draft-classification";
+      label.textContent = reportSourceClassificationLabel(source.sourceClassification);
+      const heading = document.createElement("strong");
+      heading.textContent = source.label;
+      const summary = document.createElement("p");
+      summary.textContent = source.summary || "Project source";
+      copy.append(label, heading, summary);
+      const add = document.createElement("button");
+      add.type = "button";
+      add.textContent = "Add";
+      add.disabled = activeDraft.blocks.some((block) =>
+        block.kind === source.kind && block.sourceID === source.id
+      );
+      add.addEventListener("click", () => {
+        activeDraft.blocks.push({
+          id: crypto.randomUUID(),
+          kind: source.kind,
+          sourceID: source.id,
+          label: source.label,
+          sourceClassification: source.sourceClassification
+        });
+        setDirty();
+        renderWorkspaceContent();
+      });
+      row.append(copy, add);
+      container.append(row);
+    });
+  }
+
+  function renderHistory(container) {
+    const title = document.createElement("p");
+    title.className = "section-label";
+    title.textContent = "Immutable Report history";
+    container.append(title);
+    if (!history.length) {
+      const empty = document.createElement("p");
+      empty.className = "report-draft-empty";
+      empty.textContent = "Generated reports will appear here as dated, immutable versions.";
+      container.append(empty);
+      return;
+    }
+    history.forEach((report) => {
+      const entry = document.createElement("article");
+      entry.className = "report-history-entry";
+      const button = document.createElement("button");
+      button.className = "report-history-card";
+      button.type = "button";
+      const heading = document.createElement("strong");
+      heading.textContent = `Version ${report.reportVersion} · ${report.title}`;
+      const meta = document.createElement("span");
+      meta.textContent = [
+        new Date(report.createdAt).toLocaleDateString(),
+        `${report.itemCount} ${report.itemCount === 1 ? "item" : "items"}`,
+        report.author?.displayName
+      ].filter(Boolean).join(" · ");
+      button.append(heading, meta);
+      button.addEventListener("click", () => {
+        void openHistoricalReport(report.id);
+      });
+      entry.append(button);
+      const files = Array.isArray(report.files) ? report.files : [];
+      if (files.length) {
+        const fileActions = document.createElement("div");
+        fileActions.className = "report-history-files";
+        files.forEach((file) => {
+          const download = document.createElement("button");
+          download.type = "button";
+          download.textContent = file.format === "ios-pdf"
+            ? "Download iOS PDF"
+            : "Download Web PDF";
+          download.addEventListener("click", async () => {
+            download.disabled = true;
+            status.textContent = "Downloading private Report PDF…";
+            try {
+              await downloadProjectReportFile(projectID, file, report.title);
+              status.textContent = `Downloaded Report version ${report.reportVersion}`;
+            } catch (error) {
+              status.textContent = error.message || "The Report PDF could not be downloaded.";
+            } finally {
+              download.disabled = false;
+            }
+          });
+          fileActions.append(download);
+        });
+        entry.append(fileActions);
+      }
+      container.append(entry);
+    });
+  }
+
+  function renderWorkspaceContent() {
+    if (disposed) return;
+    shell.querySelectorAll(":scope > :not(.report-draft-status)").forEach((element) => element.remove());
+
+    const draftPicker = document.createElement("div");
+    draftPicker.className = "report-draft-picker";
+    const select = document.createElement("select");
+    select.setAttribute("aria-label", "Report Draft");
+    const currentOption = document.createElement("option");
+    currentOption.value = activeDraft.id || "";
+    currentOption.textContent = activeDraft.id
+      ? `${activeDraft.title} · revision ${activeDraft.version}`
+      : "New Report Draft";
+    select.append(currentOption);
+    drafts.filter((draft) => draft.id !== activeDraft.id).forEach((draft) => {
+      const option = document.createElement("option");
+      option.value = draft.id;
+      option.textContent = `${draft.title} · revision ${draft.version}`;
+      select.append(option);
+    });
+    const newOption = document.createElement("option");
+    newOption.value = "__new__";
+    newOption.textContent = "New Report Draft…";
+    select.append(newOption);
+    select.addEventListener("change", async () => {
+      if (dirty && !(await mountState.confirmDiscardIfNeeded())) {
+        select.value = activeDraft.id || "";
+        return;
+      }
+      activeDraft = select.value === "__new__"
+        ? emptyProjectReportDraft(identity)
+        : structuredClone(
+            drafts.find((draft) => draft.id === select.value) || emptyProjectReportDraft(identity)
+          );
+      dirty = false;
+      status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
+      renderWorkspaceContent();
+    });
+    draftPicker.append(select);
+
+    const metadata = document.createElement("div");
+    metadata.className = "report-draft-metadata";
+    const titleInput = document.createElement("input");
+    titleInput.type = "text";
+    titleInput.value = activeDraft.title || "";
+    titleInput.placeholder = "Report title";
+    titleInput.setAttribute("aria-label", "Report title");
+    titleInput.addEventListener("input", () => {
+      activeDraft.title = titleInput.value;
+      setDirty();
+    });
+    const dateInput = document.createElement("input");
+    dateInput.type = "date";
+    dateInput.value = String(activeDraft.reportDate || new Date().toISOString()).slice(0, 10);
+    dateInput.setAttribute("aria-label", "Report date");
+    dateInput.addEventListener("input", () => {
+      activeDraft.reportDate = `${dateInput.value}T12:00:00.000Z`;
+      setDirty();
+    });
+    const introduction = document.createElement("textarea");
+    introduction.value = activeDraft.introduction || "";
+    introduction.placeholder = "Optional report introduction";
+    introduction.setAttribute("aria-label", "Report introduction");
+    introduction.addEventListener("input", () => {
+      activeDraft.introduction = introduction.value;
+      setDirty();
+    });
+    metadata.append(titleInput, dateInput, introduction);
+
+    const addControls = document.createElement("div");
+    addControls.className = "report-draft-add-controls";
+    [
+      { kind: "heading", label: "Add heading", value: { text: "Report section" } },
+      { kind: "paragraph", label: "Add paragraph", value: { text: "" } },
+      { kind: "list", label: "Add list", value: { items: [""] } }
+    ].forEach((control) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = control.label;
+      button.addEventListener("click", () => {
+        activeDraft.blocks.push({
+          id: crypto.randomUUID(),
+          kind: control.kind,
+          sourceClassification: "user-authored",
+          ...structuredClone(control.value)
+        });
+        setDirty();
+        renderWorkspaceContent();
+      });
+      addControls.append(button);
+    });
+
+    const blocks = document.createElement("section");
+    blocks.className = "report-draft-blocks";
+    renderBlockEditor(blocks);
+    const sourcePalette = document.createElement("section");
+    sourcePalette.className = "report-source-palette";
+    renderSourcePalette(sourcePalette);
+
+    const primaryActions = document.createElement("div");
+    primaryActions.className = "report-draft-primary-actions";
+    const save = document.createElement("button");
+    save.type = "button";
+    save.textContent = activeDraft.id ? "Save revision" : "Save draft";
+    save.addEventListener("click", () => {
+      void saveDraft();
+    });
+    const generate = document.createElement("button");
+    generate.type = "button";
+    generate.textContent = "Generate Report PDF";
+    generate.addEventListener("click", () => {
+      void generateReport();
+    });
+    primaryActions.append(save, generate);
+
+    const preview = document.createElement("section");
+    preview.className = "report-draft-preview";
+    const previewTitle = document.createElement("p");
+    previewTitle.className = "section-label";
+    previewTitle.textContent = "Report preview";
+    const previewHeading = document.createElement("h3");
+    previewHeading.textContent = activeDraft.title || "Untitled Report";
+    const previewMeta = document.createElement("p");
+    previewMeta.textContent = `${identity.name} · ${new Date(activeDraft.reportDate).toLocaleDateString()}`;
+    preview.append(previewTitle, previewHeading, previewMeta);
+    if (activeDraft.introduction) {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = activeDraft.introduction;
+      preview.append(paragraph);
+    }
+    activeDraft.blocks.slice(0, 12).forEach((block) => {
+      const row = document.createElement(block.kind === "heading" ? "h4" : "p");
+      row.textContent = reportBlockTitle(block);
+      row.className = `report-preview-${block.kind}`;
+      preview.append(row);
+    });
+
+    const historySection = document.createElement("section");
+    historySection.className = "report-history";
+    renderHistory(historySection);
+    shell.append(
+      draftPicker,
+      metadata,
+      addControls,
+      blocks,
+      sourcePalette,
+      primaryActions,
+      preview,
+      historySection
+    );
+  }
+
+  try {
+    const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
+      postResearch("/reports/drafts/list", { projectID }),
+      postResearch("/reports/sources/list", { projectID }),
+      postResearch("/reports/history/list", { projectID })
+    ]);
+    if (disposed) return panel;
+    drafts = draftPayload.drafts || [];
+    sources = sourcePayload.sources || [];
+    history = historyPayload.reports || [];
+    activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
+    status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
+    renderWorkspaceContent();
+  } catch (error) {
+    status.textContent = error.payload?.code === "PRO_REQUIRED_EXPORTS"
+      ? "Professional Project Reports are included with Permitext Pro."
+      : `Report Draft unavailable: ${error.message}`;
+  }
+  return panel;
+}
+
 function closeProjectDetailForProject(project) {
   const matchingDetails = openProjectDetails().filter((detail) => projectDetailMatches(project, detail));
   if (!matchingDetails.length) return;
@@ -8717,14 +9595,22 @@ function closeProjectDetailForProject(project) {
     const detailID = paneIDForProjectDetail(detail);
     const workboardID = paneIDForProjectWorkboard(detail);
     const notebookID = paneIDForProjectNotebook(detail);
+    const reportDraftID = paneIDForProjectReportDraft(detail);
     delete state.paneWeights[detailID];
     delete state.paneWeights[workboardID];
     delete state.paneWeights[notebookID];
+    delete state.paneWeights[reportDraftID];
     state.paneOrder = (state.paneOrder || [])
-      .filter((id) => id !== detailID && id !== workboardID && id !== notebookID);
+      .filter((id) =>
+        id !== detailID &&
+        id !== workboardID &&
+        id !== notebookID &&
+        id !== reportDraftID
+      );
   });
   state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
   state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
+  state.reportDrafts = openReportDrafts().filter((item) => !projectDetailMatches(project, item));
 }
 
 function closeDeletedProjectDetails() {
@@ -9083,18 +9969,22 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
   eyebrow.textContent = "Project Studio";
   const copy = document.createElement("p");
   copy.className = "project-studio-copy";
-  copy.textContent = "This active Project controls every Project-specific workspace. Notebook, Research history, and Workboard switch together.";
+  copy.textContent = "This active Project controls every Project-specific workspace. Notebook, Research history, Report Draft, and Workboard switch together.";
   const metrics = document.createElement("div");
   metrics.className = "project-studio-metrics";
   const notebookCards = (foundation?.artifacts || []).filter((artifact) =>
     artifact.envelope?.type === "notebookCard" && !artifact.envelope?.deletedAt
   );
   const researchAnswers = foundation?.researchAnswers || [];
+  const reportManifests = (foundation?.artifacts || []).filter((artifact) =>
+    artifact.envelope?.type === "reportManifest" && !artifact.envelope?.deletedAt
+  );
   const workboard = syncedWorkboardForProject(workboardProjectID(identity));
   [
     { label: "Saved evidence", value: previewItems.length },
     { label: "Notebook cards", value: notebookCards.length, action: () => openProjectNotebook(identity) },
     { label: "Research answers", value: researchAnswers.length, action: () => focusProjectResearch(identity) },
+    { label: "Reports", value: reportManifests.length, action: () => openProjectReportDraft(identity) },
     { label: "Workboard", value: workboard ? "Saved" : "New", action: () => openProjectWorkboard(identity) }
   ].forEach((metric) => {
     const element = document.createElement(metric.action ? "button" : "div");
@@ -9280,6 +10170,21 @@ async function renderProjectDetail(detail) {
       if (opened) notebookButton.setAttribute("aria-pressed", "true");
     }
   });
+  const reportDraftButton = document.createElement("button");
+  reportDraftButton.className = "project-report-draft-button";
+  reportDraftButton.type = "button";
+  reportDraftButton.textContent = "Report Draft";
+  reportDraftButton.setAttribute("aria-pressed", String(projectHasOpenReportDraft(identity)));
+  reportDraftButton.hidden = detachedProjectWindow;
+  reportDraftButton.addEventListener("click", async () => {
+    if (projectHasOpenReportDraft(identity)) {
+      const closed = await closeProjectReportDraft(identity);
+      if (closed) reportDraftButton.setAttribute("aria-pressed", "false");
+    } else {
+      const opened = await openProjectReportDraft(identity);
+      if (opened) reportDraftButton.setAttribute("aria-pressed", "true");
+    }
+  });
   const workboardButton = document.createElement("button");
   workboardButton.className = "project-workboard-button";
   workboardButton.type = "button";
@@ -9306,7 +10211,7 @@ async function renderProjectDetail(detail) {
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
-  actions.prepend(notebookButton, workboardButton);
+  actions.prepend(notebookButton, reportDraftButton, workboardButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -9438,6 +10343,7 @@ async function renderProjectDetail(detail) {
       return;
     }
     if (!(await confirmNotebookDiscard(identity))) return;
+    if (!(await confirmReportDraftDiscard(identity))) return;
     closeProjectDetailForProject(identity);
     saveWorkspaceState();
     void transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
@@ -11225,6 +12131,7 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
     paneID === primarySavedPaneID() ||
     isProjectDetailPaneID(paneID) ||
     isProjectNotebookPaneID(paneID) ||
+    isProjectReportDraftPaneID(paneID) ||
     isProjectWorkboardPaneID(paneID)
   ) {
     return [
@@ -11232,6 +12139,7 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
       ...openProjectDetails().flatMap((detail) => [
         paneIDForProjectDetail(detail),
         ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+        ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
         ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
       ]),
       "utility:archive"
@@ -11479,6 +12387,7 @@ function appendPaneSequence(panes) {
   );
   cleanupInactiveWorkboardMounts(orderedPanes);
   cleanupInactiveNotebookMounts(orderedPanes);
+  cleanupInactiveReportDraftMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
   orderedPanes.forEach((pane, index) => {
     if (index > 0) {
@@ -11548,6 +12457,7 @@ async function renderWorkspace() {
   for (const detail of openProjectDetails()) {
     panes.push(await renderProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
+    if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
     if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
   }
   if (state.utilities.archive) {
@@ -11603,6 +12513,10 @@ async function renderUtilityWorkspace(options = {}) {
     if (projectHasOpenNotebook(detail)) {
       const notebookID = paneIDForProjectNotebook(detail);
       panes.push(await reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));
+    }
+    if (projectHasOpenReportDraft(detail)) {
+      const reportDraftID = paneIDForProjectReportDraft(detail);
+      panes.push(await reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
     }
     if (projectHasOpenWorkboard(detail)) {
       const workboardID = paneIDForProjectWorkboard(detail);
@@ -11690,12 +12604,14 @@ async function toggleUtilityPane(key) {
       delete state.paneWeights[paneIDForProjectDetail(detail)];
       delete state.paneWeights[paneIDForProjectWorkboard(detail)];
       delete state.paneWeights[paneIDForProjectNotebook(detail)];
+      delete state.paneWeights[paneIDForProjectReportDraft(detail)];
     });
     delete state.paneWeights["utility:archive"];
     state.paneOrder = (state.paneOrder || []).filter((id) =>
       id !== paneID &&
       !isProjectDetailPaneID(id) &&
       !isProjectNotebookPaneID(id) &&
+      !isProjectReportDraftPaneID(id) &&
       !isProjectWorkboardPaneID(id) &&
       id !== "utility:archive"
     );

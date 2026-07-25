@@ -43,6 +43,8 @@ assert.equal(reusableLink.relationship, "reference");
 assert.equal(projectMembershipRules.savedItem.maximumProjects, null);
 assert.equal(projectMembershipRules.researchConversation.maximumProjects, 1);
 assert.equal(projectMembershipRules.workboard.relationship, "owner");
+assert.equal(projectMembershipRules.workboardPreview.relationship, "owner");
+assert.equal(conflictPolicies.workboardPreview, "immutable");
 assert.throws(
   () => projectLinkRecord({
     owner,

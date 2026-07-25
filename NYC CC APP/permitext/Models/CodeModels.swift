@@ -1154,11 +1154,24 @@ struct ProjectActivitySummary: Codable, Hashable, Identifiable, Sendable {
     let createdAt: String
 }
 
+struct ProjectWorkboardPreviewSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let projectID: String
+    let title: String
+    let contentType: String
+    let contentHash: String
+    let size: Int
+    let elementCount: Int
+    let workboardUpdatedAt: String
+    let createdAt: String
+}
+
 struct BackendProjectFoundationResponse: Codable, Hashable, Sendable {
     let schemaVersion: Int
     let researchConversations: [ProjectResearchConversationSummary]
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
+    var workboardPreview: ProjectWorkboardPreviewSummary? = nil
 }
 
 struct BackendProjectNotebookCardsRequest: Codable, Hashable, Sendable {
@@ -1183,12 +1196,185 @@ struct BackendProjectNotebookCardsResponse: Codable, Hashable, Sendable {
     let cards: [ProjectNotebookCardSummary]
 }
 
+struct BackendProjectReportHistoryRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+}
+
+struct ProjectReportAuthor: Codable, Hashable, Sendable {
+    let userID: String
+    let displayName: String
+}
+
+struct ProjectReportFile: Codable, Hashable, Identifiable, Sendable {
+    let generatedReportID: String
+    let manifestID: String
+    let reportVersion: Int
+    let format: String
+    let contentType: String
+    let size: Int
+    let contentHash: String
+    let createdAt: String
+
+    var id: String { generatedReportID }
+}
+
+struct ProjectReportSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let projectID: String
+    let draftID: String
+    let title: String
+    let reportDate: String
+    let author: ProjectReportAuthor
+    let codeEdition: String
+    let reportVersion: Int
+    let itemCount: Int
+    let contentHash: String
+    let generatorVersion: String
+    let createdAt: String
+    let files: [ProjectReportFile]?
+}
+
+struct BackendProjectReportHistoryResponse: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let projectID: String
+    let reports: [ProjectReportSummary]
+}
+
+struct BackendProjectReportManifestRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let manifestID: String
+}
+
+struct ProjectReportProject: Codable, Hashable, Sendable {
+    let id: String
+    let name: String
+    let address: String
+    let description: String
+}
+
+struct ProjectReportCitation: Codable, Hashable, Sendable {
+    let sectionID: String?
+    let sourceIDs: [String]?
+    let evidenceSnapshotIDs: [String]?
+    let relevance: String?
+}
+
+struct ProjectReportEvidenceSnapshot: Codable, Hashable, Sendable {
+    let id: String?
+    let sectionID: String?
+    let sectionNumber: String?
+    let passageText: String?
+    let passageTextHash: String?
+}
+
+struct ProjectReportManifestItem: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let kind: String
+    let order: Int
+    let sourceClassification: String
+    let text: String?
+    let items: [String]?
+    let sourceID: String?
+    let title: String?
+    let sectionID: String?
+    let sectionNumber: String?
+    let codeBook: String?
+    let chapter: String?
+    let passageText: String?
+    let passageTextHash: String?
+    let sourceLibraryVersion: String?
+    let cardID: String?
+    let cardType: String?
+    let plainText: String?
+    let answerID: String?
+    let conversationID: String?
+    let question: String?
+    let conclusion: String?
+    let explanation: String?
+    let assumptions: [String]?
+    let missingFacts: [String]?
+    let limitations: [String]?
+    let additionalEvidenceNeeded: [String]?
+    let citations: [ProjectReportCitation]?
+    let evidence: [ProjectReportEvidenceSnapshot]?
+    let reviewStatus: String?
+    let contentType: String?
+    let contentHash: String?
+    let readPath: String?
+}
+
+struct ProjectReportManifest: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let immutable: Bool
+    let schemaVersion: Int
+    let generatorVersion: String
+    let project: ProjectReportProject
+    let draftID: String
+    let title: String
+    let reportDate: String
+    let author: ProjectReportAuthor
+    let codeEdition: String
+    let items: [ProjectReportManifestItem]
+    let disclaimers: [String]
+    let reportVersion: Int
+    let sourceVersions: [String: StringOrNumber]
+    let createdAt: String
+    let contentHash: String
+}
+
+enum StringOrNumber: Codable, Hashable, Sendable {
+    case string(String)
+    case number(Double)
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if let value = try? container.decode(String.self) {
+            self = .string(value)
+        } else {
+            self = .number(try container.decode(Double.self))
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let value): try container.encode(value)
+        case .number(let value): try container.encode(value)
+        }
+    }
+}
+
+struct BackendProjectReportManifestResponse: Codable, Hashable, Sendable {
+    let manifest: ProjectReportManifest
+    let files: [ProjectReportFile]?
+}
+
+struct BackendProjectReportFileUploadRequest: Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+    let manifestID: String
+    let format: String
+}
+
+struct BackendProjectReportFileUploadResponse: Codable, Hashable, Sendable {
+    let file: ProjectReportFile
+}
+
+struct BackendProjectWorkboardPreviewRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+    let previewID: String
+}
+
 struct ProjectHubSnapshot: Hashable, Sendable {
     let projectID: String
     let notebookCards: [ProjectNotebookCardSummary]
     let researchConversations: [ProjectResearchConversationSummary]
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
+    let reports: [ProjectReportSummary]
+    let workboardPreview: ProjectWorkboardPreviewSummary?
 
     static func empty(projectID: String) -> ProjectHubSnapshot {
         ProjectHubSnapshot(
@@ -1196,7 +1382,9 @@ struct ProjectHubSnapshot: Hashable, Sendable {
             notebookCards: [],
             researchConversations: [],
             researchAnswers: [],
-            activity: []
+            activity: [],
+            reports: [],
+            workboardPreview: nil
         )
     }
 }
@@ -1252,6 +1440,13 @@ protocol PermitextBackendTransport {
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
+    func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse
+    func projectReportManifest(_ request: BackendProjectReportManifestRequest) async throws -> BackendProjectReportManifestResponse
+    func projectReportFileUpload(
+        _ request: BackendProjectReportFileUploadRequest,
+        data: Data
+    ) async throws -> BackendProjectReportFileUploadResponse
+    func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
 }
@@ -1406,6 +1601,64 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse {
+        try await post("reports/history/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func projectReportManifest(_ request: BackendProjectReportManifestRequest) async throws -> BackendProjectReportManifestResponse {
+        try await post("reports/manifests/get", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func projectReportFileUpload(
+        _ upload: BackendProjectReportFileUploadRequest,
+        data: Data
+    ) async throws -> BackendProjectReportFileUploadResponse {
+        var components = URLComponents(
+            url: baseURL.appendingPathComponent("reports/files/upload"),
+            resolvingAgainstBaseURL: false
+        )
+        components?.queryItems = [
+            URLQueryItem(name: "projectID", value: upload.projectID),
+            URLQueryItem(name: "manifestID", value: upload.manifestID),
+            URLQueryItem(name: "format", value: upload.format)
+        ]
+        guard let url = components?.url else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
+        request.setValue("application/pdf", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.setValue(upload.auth.accountUserID, forHTTPHeaderField: "X-Permitext-User-ID")
+        if let token = upload.auth.bearerToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = data
+        return try await send(request)
+    }
+
+    func projectWorkboardPreview(_ preview: BackendProjectWorkboardPreviewRequest) async throws -> Data {
+        var request = URLRequest(url: baseURL.appendingPathComponent("workboards/previews/read"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("image/png", forHTTPHeaderField: "Accept")
+        if let token = preview.auth.bearerToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try encoder.encode(preview)
+        let (data, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
+            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+        }
+        return data
+    }
+
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
         try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1524,6 +1777,29 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             projectID: request.projectID,
             cards: []
         )
+    }
+
+    func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse {
+        BackendProjectReportHistoryResponse(
+            schemaVersion: 1,
+            projectID: request.projectID,
+            reports: []
+        )
+    }
+
+    func projectReportManifest(_ request: BackendProjectReportManifestRequest) async throws -> BackendProjectReportManifestResponse {
+        throw URLError(.fileDoesNotExist)
+    }
+
+    func projectReportFileUpload(
+        _ request: BackendProjectReportFileUploadRequest,
+        data: Data
+    ) async throws -> BackendProjectReportFileUploadResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data {
+        throw URLError(.fileDoesNotExist)
     }
 
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
@@ -2410,6 +2686,18 @@ protocol AccountBackendClient {
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
+    func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest
+    func saveProjectReportPDF(
+        account: SignedInAccount,
+        projectID: String,
+        manifestID: String,
+        data: Data
+    ) async throws -> ProjectReportFile
+    func projectWorkboardPreview(
+        account: SignedInAccount,
+        projectID: String,
+        previewID: String
+    ) async throws -> Data
 }
 
 struct LocalAccountBackendClient: AccountBackendClient {
@@ -2460,6 +2748,27 @@ struct LocalAccountBackendClient: AccountBackendClient {
 
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
         .empty(projectID: projectID)
+    }
+
+    func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest {
+        throw URLError(.fileDoesNotExist)
+    }
+
+    func saveProjectReportPDF(
+        account: SignedInAccount,
+        projectID: String,
+        manifestID: String,
+        data: Data
+    ) async throws -> ProjectReportFile {
+        throw URLError(.unsupportedURL)
+    }
+
+    func projectWorkboardPreview(
+        account: SignedInAccount,
+        projectID: String,
+        previewID: String
+    ) async throws -> Data {
+        throw URLError(.fileDoesNotExist)
     }
 }
 

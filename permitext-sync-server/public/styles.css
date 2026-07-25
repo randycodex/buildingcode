@@ -4348,16 +4348,18 @@ mark {
 }
 
 .project-detail-actions {
-  grid-column: 2;
-  grid-row: 1;
+  grid-column: 1 / -1;
+  grid-row: 2;
   display: flex;
   align-items: start;
-  justify-content: flex-end;
+  justify-content: flex-start;
+  flex-wrap: wrap;
   gap: var(--space-2);
 }
 
 .project-workboard-button,
-.project-notebook-button {
+.project-notebook-button,
+.project-report-draft-button {
   min-height: var(--panel-title-control-size);
   padding: 0 12px;
   border: 0;
@@ -4373,7 +4375,10 @@ mark {
 .project-workboard-button[aria-pressed="true"],
 .project-notebook-button:hover,
 .project-notebook-button:focus-visible,
-.project-notebook-button[aria-pressed="true"] {
+.project-notebook-button[aria-pressed="true"],
+.project-report-draft-button:hover,
+.project-report-draft-button:focus-visible,
+.project-report-draft-button[aria-pressed="true"] {
   background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
 }
 
@@ -4387,6 +4392,7 @@ mark {
 
 .project-detail-back {
   display: grid;
+  margin-left: auto;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
   place-items: center;
@@ -6929,5 +6935,326 @@ button.project-studio-metric:focus-visible {
   .notebook-card-footer > div {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.report-draft-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--project-color) 7%, var(--surface));
+}
+
+.report-draft-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.report-draft-header h2 {
+  margin: 0;
+}
+
+.report-draft-eyebrow {
+  display: block;
+  margin-bottom: 2px;
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.report-draft-close,
+.report-draft-add-controls button,
+.report-draft-block-actions button,
+.report-source-card button,
+.report-draft-primary-actions button,
+.report-history-card,
+.report-history-files button {
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--toolbar-active);
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.report-draft-close:hover,
+.report-draft-add-controls button:hover,
+.report-draft-block-actions button:hover,
+.report-source-card button:hover,
+.report-history-card:hover,
+.report-history-files button:hover {
+  background: color-mix(in srgb, var(--project-color) 22%, var(--surface));
+}
+
+.report-draft-shell {
+  display: grid;
+  align-content: start;
+  gap: var(--space-3);
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--space-3);
+  border-radius: calc(var(--radius-card) + 4px);
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+}
+
+.report-draft-status,
+.report-draft-empty {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.report-draft-picker select,
+.report-draft-metadata input,
+.report-draft-metadata textarea,
+.report-draft-block input,
+.report-draft-block textarea {
+  width: 100%;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.report-draft-picker select,
+.report-draft-metadata input:first-child {
+  font-weight: 700;
+}
+
+.report-draft-metadata {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 0.34fr);
+  gap: var(--space-2);
+}
+
+.report-draft-metadata textarea {
+  grid-column: 1 / -1;
+  min-height: 82px;
+  resize: vertical;
+}
+
+.report-draft-add-controls,
+.report-draft-primary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.report-draft-blocks,
+.report-source-palette,
+.report-history {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.report-draft-block {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface-muted) 78%, var(--project-color));
+}
+
+.report-draft-block-evidence {
+  background: color-mix(in srgb, #b56a20 12%, var(--surface));
+}
+
+.report-draft-block-researchAnswer {
+  background: color-mix(in srgb, #5d6fb4 16%, var(--surface));
+}
+
+.report-draft-block-notebookCard {
+  background: color-mix(in srgb, #785da8 14%, var(--surface));
+}
+
+.report-draft-block-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.report-draft-classification {
+  color: var(--text-secondary);
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.report-draft-block-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.report-draft-block-actions button {
+  min-height: 30px;
+  padding: 5px 9px;
+  font-size: 10px !important;
+}
+
+.report-draft-block textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.report-draft-block strong,
+.report-source-card strong {
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.report-draft-block p,
+.report-source-card p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.report-source-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--project-color) 9%, var(--surface-muted));
+}
+
+.report-source-card > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.report-source-card button:disabled {
+  opacity: 0.48;
+}
+
+.report-draft-primary-actions {
+  position: sticky;
+  z-index: 2;
+  bottom: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.report-draft-primary-actions button:last-child {
+  background: color-mix(in srgb, var(--project-color) 68%, var(--surface));
+}
+
+.report-draft-preview {
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: #f8f6f2;
+  color: #191919;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.12);
+}
+
+.report-draft-preview h3,
+.report-draft-preview h4 {
+  margin: 0 0 var(--space-2);
+}
+
+.report-draft-preview p {
+  margin: 0 0 var(--space-2);
+  color: #444;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.report-draft-preview .section-label {
+  color: #8a4a10;
+}
+
+.report-preview-evidence,
+.report-preview-researchAnswer,
+.report-preview-notebookCard,
+.report-preview-workboardPreview,
+.report-preview-attachment {
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: rgb(0 0 0 / 0.05);
+  font-weight: 650;
+}
+
+.report-history-card {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  text-align: left;
+}
+
+.report-history-entry {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.report-history-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.report-history-files button {
+  min-height: 30px;
+  padding: 5px 10px;
+  font-size: 10px;
+}
+
+.report-history-card span {
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+
+.report-draft-close:focus-visible,
+.report-draft-picker select:focus-visible,
+.report-draft-metadata input:focus-visible,
+.report-draft-metadata textarea:focus-visible,
+.report-draft-block input:focus-visible,
+.report-draft-block textarea:focus-visible,
+.report-draft-add-controls button:focus-visible,
+.report-draft-block-actions button:focus-visible,
+.report-source-card button:focus-visible,
+.report-draft-primary-actions button:focus-visible,
+.report-history-card:focus-visible,
+.report-history-files button:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--project-color) 56%, transparent);
+  outline-offset: 2px;
+}
+
+@container (max-width: 520px) {
+  .report-draft-metadata {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-draft-metadata textarea {
+    grid-column: auto;
+  }
+
+  .report-source-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .report-source-card button,
+  .report-draft-primary-actions button {
+    width: 100%;
   }
 }

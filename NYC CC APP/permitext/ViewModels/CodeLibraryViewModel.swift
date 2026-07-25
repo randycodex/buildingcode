@@ -1,5 +1,6 @@
 import Foundation
 import AuthenticationServices
+import CryptoKit
 import Network
 import os.signpost
 import Security
@@ -1729,6 +1730,49 @@ final class CodeLibraryViewModel: ObservableObject {
             account: signedInAccount,
             projectID: projectID
         )
+    }
+
+    func projectReportPDF(manifestID: String) async throws -> URL {
+        guard let signedInAccount else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        let manifest = try await accountBackendClient.projectReportManifest(
+            account: signedInAccount,
+            manifestID: manifestID
+        )
+        let rendered = try await Task.detached(priority: .userInitiated) {
+            let url = try ProjectReportExportBuilder(manifest: manifest).build()
+            return (url, try Data(contentsOf: url))
+        }.value
+        _ = try await accountBackendClient.saveProjectReportPDF(
+            account: signedInAccount,
+            projectID: manifest.project.id,
+            manifestID: manifest.id,
+            data: rendered.1
+        )
+        return rendered.0
+    }
+
+    func projectWorkboardPreviewData(
+        projectID: String,
+        previewID: String,
+        expectedContentHash: String
+    ) async throws -> Data {
+        guard let signedInAccount else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        let data = try await accountBackendClient.projectWorkboardPreview(
+            account: signedInAccount,
+            projectID: projectID,
+            previewID: previewID
+        )
+        let digest = SHA256.hash(data: data)
+            .map { String(format: "%02x", $0) }
+            .joined()
+        guard digest == expectedContentHash else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        return data
     }
 
     private func denyIfNeeded(_ decision: EntitlementDecision) -> Bool {

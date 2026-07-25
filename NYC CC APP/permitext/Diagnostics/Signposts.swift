@@ -183,13 +183,70 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
                 projectID: projectID
             )
         )
-        let (foundationResponse, notebookResponse) = try await (foundation, notebook)
+        async let reports = transport.projectReportHistory(
+            BackendProjectReportHistoryRequest(
+                auth: authContext(for: account),
+                projectID: projectID
+            )
+        )
+        let (foundationResponse, notebookResponse, reportResponse) = try await (
+            foundation,
+            notebook,
+            reports
+        )
         return ProjectHubSnapshot(
             projectID: projectID,
             notebookCards: notebookResponse.cards,
             researchConversations: foundationResponse.researchConversations,
             researchAnswers: foundationResponse.researchAnswers,
-            activity: foundationResponse.activity
+            activity: foundationResponse.activity,
+            reports: reportResponse.reports,
+            workboardPreview: foundationResponse.workboardPreview
+        )
+    }
+
+    func projectReportManifest(
+        account: SignedInAccount,
+        manifestID: String
+    ) async throws -> ProjectReportManifest {
+        let response = try await transport.projectReportManifest(
+            BackendProjectReportManifestRequest(
+                auth: authContext(for: account),
+                manifestID: manifestID
+            )
+        )
+        return response.manifest
+    }
+
+    func saveProjectReportPDF(
+        account: SignedInAccount,
+        projectID: String,
+        manifestID: String,
+        data: Data
+    ) async throws -> ProjectReportFile {
+        let response = try await transport.projectReportFileUpload(
+            BackendProjectReportFileUploadRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                manifestID: manifestID,
+                format: "ios-pdf"
+            ),
+            data: data
+        )
+        return response.file
+    }
+
+    func projectWorkboardPreview(
+        account: SignedInAccount,
+        projectID: String,
+        previewID: String
+    ) async throws -> Data {
+        try await transport.projectWorkboardPreview(
+            BackendProjectWorkboardPreviewRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                previewID: previewID
+            )
         )
     }
 

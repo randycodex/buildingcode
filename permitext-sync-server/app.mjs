@@ -31,6 +31,13 @@ import {
   notebookCardTypes,
   normalizeNotebookCardPayload
 } from "./notebook-contract.mjs";
+import {
+  immutableReportManifest,
+  normalizeReportDraftPayload,
+  reportDraftForClient,
+  reportManifestSummary
+} from "./report-contract.mjs";
+import { renderReportPDF } from "./report-pdf.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import {
@@ -60,6 +67,8 @@ const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
 const maxWorkboardAssetBytes = 8 * 1024 * 1024;
+const maxWorkboardPreviewBytes = 6 * 1024 * 1024;
+const maxReportFileBytes = 25 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
 const immutableStaticCacheControl = "public, max-age=31536000, s-maxage=31536000, immutable";
 const codeAssetCacheControl = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=3600";
@@ -93,12 +102,25 @@ const rateLimitPolicies = new Map([
   ["notebook/cards/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["reports/sources/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/drafts/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/drafts/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["reports/drafts/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/drafts/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["reports/generate", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["reports/history/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/manifests/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["reports/files/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["reports/files/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
   ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
-  ["workboards/assets/delete", { limit: 60, windowMs: 60 * 60 * 1000 }]
+  ["workboards/assets/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["workboards/previews/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["workboards/previews/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["workboards/previews/clear", { limit: 60, windowMs: 60 * 60 * 1000 }]
 ]);
 const canonicalCodeContentPath = join(
   __dirname,
@@ -2478,6 +2500,96 @@ function workboardAssetPathname(userID, projectID, fileID, contentType) {
   return `${workboardAssetPrefix(userID, projectID)}${safeWorkboardPathHash(fileID)}.${extension}`;
 }
 
+function workboardPreviewPrefix(projectID) {
+  return `project-assets/${safeWorkboardPathHash(projectID)}/workboard-previews/`;
+}
+
+function workboardPreviewPathname(projectID, previewID) {
+  return `${workboardPreviewPrefix(projectID)}${safeWorkboardPathHash(previewID)}.png`;
+}
+
+function workboardPreviewPathBelongsToProject(pathname, projectID) {
+  return pathname.startsWith(workboardPreviewPrefix(projectID)) && pathname.endsWith(".png");
+}
+
+function localPrivateAssetRoot() {
+  return String(process.env.PERMITEXT_LOCAL_PRIVATE_ASSET_PATH || "").trim();
+}
+
+function privateProjectAssetStorageConfigured() {
+  return blobStorageConfigured() || Boolean(localPrivateAssetRoot());
+}
+
+function reportFilePrefix(projectID) {
+  return `project-assets/${safeWorkboardPathHash(projectID)}/reports/`;
+}
+
+function reportFilePathname(projectID, manifestID, generatedReportID, format) {
+  return [
+    reportFilePrefix(projectID),
+    safeWorkboardPathHash(manifestID),
+    "/",
+    safeWorkboardPathHash(generatedReportID),
+    "-",
+    format,
+    ".pdf"
+  ].join("");
+}
+
+function reportFilePathBelongsToProject(pathname, projectID) {
+  return pathname.startsWith(reportFilePrefix(projectID)) && pathname.endsWith(".pdf");
+}
+
+async function storePrivateProjectAsset(pathname, body, contentType) {
+  if (blobStorageConfigured()) {
+    const { put } = await vercelBlob();
+    const blob = await put(pathname, body, {
+      access: "private",
+      addRandomSuffix: false,
+      contentType
+    });
+    return blob.pathname || pathname;
+  }
+  const root = localPrivateAssetRoot();
+  if (!root) throw new Error("Private Report file storage is not configured.");
+  const filePath = join(root, pathname);
+  await mkdir(dirname(filePath), { recursive: true });
+  await writeFile(filePath, body, { flag: "wx" });
+  return pathname;
+}
+
+async function readPrivateProjectAsset(pathname) {
+  if (blobStorageConfigured()) {
+    const { get } = await vercelBlob();
+    const result = await get(pathname, { access: "private" });
+    if (!result || !result.stream) return null;
+    const chunks = [];
+    const reader = result.stream.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(Buffer.from(value));
+    }
+    return Buffer.concat(chunks);
+  }
+  const root = localPrivateAssetRoot();
+  if (!root) return null;
+  try {
+    return await readFile(join(root, pathname));
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+async function storePrivateReportFile(pathname, body) {
+  return storePrivateProjectAsset(pathname, body, "application/pdf");
+}
+
+async function readPrivateReportFile(pathname) {
+  return readPrivateProjectAsset(pathname);
+}
+
 async function vercelBlob() {
   blobModulePromise ||= import("@vercel/blob");
   return blobModulePromise;
@@ -3511,6 +3623,7 @@ async function ownedProjectTargetExists(userID, targetKind, targetID) {
   if (!artifact) return false;
   const permittedTypes = {
     notebookCard: ["notebookCard"],
+    workboardPreview: ["workboardPreview"],
     attachment: ["attachment"],
     reportDraft: ["reportDraft"],
     reportManifest: ["reportManifest"],
@@ -3699,6 +3812,9 @@ async function handleProjectFoundationState(request, response) {
     .map(researchConversationSummary);
   const activity = (await listStoredActivityEvents(context.userID))
     .filter((event) => !projectID || event.projectID === projectID);
+  const workboardPreview = projectID
+    ? workboardPreviewSummary((await projectWorkboardPreviews(context.userID, projectID))[0])
+    : null;
   sendJSON(response, 200, {
     schemaVersion: projectFoundationSchemaVersion,
     projects,
@@ -3707,6 +3823,7 @@ async function handleProjectFoundationState(request, response) {
     researchConversations,
     researchAnswers: answers,
     activity,
+    workboardPreview,
     migrationCheckpoint: checkpoint
   });
 }
@@ -4122,6 +4239,907 @@ async function handleNotebookCardDelete(request, response) {
     deletedAt: now,
     unlinkedProjectCount: activeLinks.length
   });
+}
+
+async function authenticatedReportBody(request, response, options = {}) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return null;
+  if (options.requirePro && !hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Professional Project reports require Pro.",
+      code: "PRO_REQUIRED_EXPORTS"
+    });
+    return null;
+  }
+  return context;
+}
+
+async function linkedProjectArtifact(userID, projectID, targetKind, artifactType, artifactID, options = {}) {
+  const normalizedArtifactID = String(artifactID || "").trim();
+  const linked = (await listStoredProjectLinks(userID)).some((link) =>
+    !link.deletedAt &&
+    link.projectID === projectID &&
+    link.targetKind === targetKind &&
+    link.targetID === normalizedArtifactID
+  );
+  if (!linked) return null;
+  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+    artifact.envelope?.id === normalizedArtifactID &&
+    artifact.envelope?.type === artifactType &&
+    (options.includeDeleted || !artifact.envelope?.deletedAt)
+  ) || null;
+}
+
+async function reportDraftArtifact(userID, projectID, draftID, options = {}) {
+  return linkedProjectArtifact(
+    userID,
+    projectID,
+    "reportDraft",
+    "reportDraft",
+    draftID,
+    options
+  );
+}
+
+async function reportManifestArtifact(userID, manifestID) {
+  const normalizedManifestID = String(manifestID || "").trim();
+  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+    artifact.envelope?.id === normalizedManifestID &&
+    artifact.envelope?.type === "reportManifest" &&
+    !artifact.envelope?.deletedAt
+  ) || null;
+}
+
+function reportSourceClientSummary(source) {
+  return {
+    id: source.id,
+    kind: source.kind,
+    label: source.label,
+    summary: source.summary || "",
+    sourceClassification: source.sourceClassification,
+    updatedAt: source.updatedAt || null
+  };
+}
+
+async function reportSourcesForProject(userID, projectID) {
+  const links = (await listStoredProjectLinks(userID))
+    .filter((link) => !link.deletedAt && link.projectID === projectID);
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  const sources = [];
+
+  const sectionIDs = Array.from(new Set(
+    links.filter((link) => link.targetKind === "canonicalSection").map((link) => link.targetID)
+  ));
+  if (sectionIDs.length) {
+    const evidenceItems = await researchEvidenceForSectionIDs(sectionIDs);
+    evidenceItems.forEach((evidence) => {
+      sources.push({
+        id: evidence.sectionID,
+        kind: "evidence",
+        label: `${evidence.codePrefix || "Code"} ${evidence.sectionNumber}: ${evidence.title}`,
+        summary: evidence.text.slice(0, 500),
+        sourceClassification: "published-code",
+        manifestItem: {
+          kind: "evidence",
+          sectionID: evidence.sectionID,
+          sectionNumber: evidence.sectionNumber,
+          codeBook: evidence.codePrefix || "NYC Construction Code",
+          chapter: evidence.chapterNumber || "unknown",
+          title: evidence.title,
+          passageText: evidence.text,
+          passageTextHash: createHash("sha256").update(evidence.text).digest("hex"),
+          sourceLibraryVersion: defaultSyncCodeVersion
+        }
+      });
+    });
+  }
+
+  const linkedNotebookIDs = new Set(
+    links.filter((link) => link.targetKind === "notebookCard").map((link) => link.targetID)
+  );
+  artifacts
+    .filter((artifact) =>
+      artifact.envelope?.type === "notebookCard" &&
+      !artifact.envelope?.deletedAt &&
+      linkedNotebookIDs.has(artifact.envelope.id)
+    )
+    .forEach((artifact) => {
+      sources.push({
+        id: artifact.envelope.id,
+        kind: "notebookCard",
+        label: artifact.payload.title,
+        summary: artifact.payload.plainText?.slice(0, 500) || "",
+        sourceClassification: "user-authored",
+        updatedAt: artifact.envelope.updatedAt,
+        manifestItem: {
+          kind: "notebookCard",
+          cardID: artifact.envelope.id,
+          cardType: artifact.payload.cardType,
+          title: artifact.payload.title,
+          plainText: artifact.payload.plainText || "",
+          references: artifact.payload.references || []
+        }
+      });
+    });
+
+  (await listStoredResearchAnswers(userID))
+    .filter((answer) => answer.projectID === projectID)
+    .forEach((answer) => {
+      sources.push({
+        id: answer.id,
+        kind: "researchAnswer",
+        label: answer.question,
+        summary: answer.answer?.conclusion?.slice(0, 500) || "",
+        sourceClassification: "ai-assisted",
+        updatedAt: answer.createdAt,
+        manifestItem: {
+          kind: "researchAnswer",
+          answerID: answer.id,
+          conversationID: answer.conversationID,
+          question: answer.question,
+          conclusion: answer.answer?.conclusion || "No supported conclusion was recorded.",
+          explanation: answer.answer?.explanation || "",
+          assumptions: answer.assumptions || answer.answer?.assumptions || [],
+          missingFacts: answer.missingFacts || answer.answer?.missingFacts || [],
+          limitations: answer.limitations || answer.answer?.evidenceLimitations || [],
+          additionalEvidenceNeeded: answer.additionalEvidenceNeeded ||
+            answer.answer?.additionalEvidenceNeeded || [],
+          citations: answer.citations || [],
+          evidence: answer.evidence || [],
+          reviewStatus: answer.reviewStatus || "unreviewed"
+        }
+      });
+    });
+
+  for (const kind of ["workboardPreview", "attachment"]) {
+    const linkedIDs = new Set(
+      links.filter((link) => link.targetKind === kind).map((link) => link.targetID)
+    );
+    artifacts
+      .filter((artifact) =>
+        artifact.envelope?.type === kind &&
+        !artifact.envelope?.deletedAt &&
+        linkedIDs.has(artifact.envelope.id)
+      )
+      .forEach((artifact) => {
+        const contentHash = String(
+          artifact.payload.contentHash ||
+          artifact.payload.sha256 ||
+          artifact.payload.assetHash ||
+          ""
+        ).trim();
+        if (!contentHash) return;
+        sources.push({
+          id: artifact.envelope.id,
+          kind,
+          label: artifact.payload.title || (kind === "workboardPreview" ? "Workboard preview" : "Attachment"),
+          summary: artifact.payload.description || "",
+          sourceClassification: "project-material",
+          updatedAt: artifact.envelope.updatedAt,
+          manifestItem: {
+            kind,
+            sourceID: artifact.envelope.id,
+            title: artifact.payload.title || (kind === "workboardPreview" ? "Workboard preview" : "Attachment"),
+            contentType: artifact.payload.contentType || "",
+            contentHash,
+            readPath: artifact.payload.readPath || ""
+          }
+        });
+      });
+  }
+  return sources;
+}
+
+async function handleReportSourceList(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const sources = await reportSourcesForProject(context.userID, projectID);
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    projectID,
+    sources: sources.map(reportSourceClientSummary)
+  });
+}
+
+async function projectReportDrafts(userID, projectID, options = {}) {
+  const linkedDraftIDs = new Set(
+    (await listStoredProjectLinks(userID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "reportDraft"
+      )
+      .map((link) => link.targetID)
+  );
+  return (await listStoredFoundationArtifacts(userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "reportDraft" &&
+      (options.includeDeleted || !artifact.envelope?.deletedAt) &&
+      linkedDraftIDs.has(artifact.envelope.id)
+    )
+    .sort((left, right) => String(right.envelope.updatedAt).localeCompare(String(left.envelope.updatedAt)));
+}
+
+async function handleReportDraftList(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const drafts = await projectReportDrafts(context.userID, projectID);
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    projectID,
+    drafts: drafts.map((artifact) => reportDraftForClient(artifact, [projectID]))
+  });
+}
+
+async function handleReportDraftGet(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const artifact = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  if (!artifact) {
+    sendError(response, 404, "Report Draft not found.");
+    return;
+  }
+  sendJSON(response, 200, { draft: reportDraftForClient(artifact, [projectID]) });
+}
+
+async function validateReportDraftSources(userID, projectID, draft) {
+  const sources = await reportSourcesForProject(userID, projectID);
+  const sourceKeys = new Set(sources.map((source) => `${source.kind}:${source.id}`));
+  for (const block of draft.blocks) {
+    if (["heading", "paragraph", "list"].includes(block.kind)) continue;
+    if (!sourceKeys.has(`${block.kind}:${block.sourceID}`)) {
+      throw new Error(`Report source is unavailable: ${block.label}`);
+    }
+  }
+}
+
+async function handleReportDraftSave(request, response) {
+  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const requestedDraftID = String(context.body.draftID || "").trim();
+  const existing = requestedDraftID
+    ? await reportDraftArtifact(context.userID, projectID, requestedDraftID)
+    : null;
+  if (requestedDraftID && !existing) {
+    sendError(response, 404, "Report Draft not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  if (
+    existing &&
+    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+  ) {
+    sendJSON(response, 409, {
+      error: "This Report Draft changed after you opened it. Review the current version before saving.",
+      code: "REPORT_DRAFT_VERSION_CONFLICT",
+      draft: reportDraftForClient(existing, [projectID])
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const draftID = existing?.envelope.id || randomUUID();
+    const payload = normalizeReportDraftPayload({
+      title: context.body.title,
+      reportDate: context.body.reportDate,
+      introduction: context.body.introduction,
+      blocks: context.body.blocks,
+      createdBy: existing?.payload?.createdBy || context.userID,
+      updatedBy: context.userID
+    });
+    await validateReportDraftSources(context.userID, projectID, payload);
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: draftID,
+        type: "reportDraft",
+        owner: ownerScope(context.userID),
+        createdAt: existing?.envelope.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope.version || 0) + 1
+      }),
+      payload
+    };
+    await saveStoredFoundationArtifact(context.userID, artifact);
+    if (!existing) {
+      await saveStoredProjectLink(context.userID, projectLinkRecord({
+        id: deterministicFoundationLinkID(context.userID, projectID, "reportDraft", draftID),
+        owner: ownerScope(context.userID),
+        projectID,
+        targetKind: "reportDraft",
+        targetID: draftID,
+        relationship: "owner",
+        createdAt: now,
+        updatedAt: now,
+        version: 1,
+        metadata: { createdWith: "permitext-report-draft" }
+      }));
+    }
+    sendJSON(response, existing ? 200 : 201, {
+      draft: reportDraftForClient(artifact, [projectID])
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid Report Draft.",
+      code: "INVALID_REPORT_DRAFT"
+    });
+  }
+}
+
+async function handleReportDraftDelete(request, response) {
+  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const artifact = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  if (!artifact) {
+    sendError(response, 404, "Report Draft not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion);
+  if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== artifact.envelope.version) {
+    sendJSON(response, 409, {
+      error: "This Report Draft changed after you opened it. Review the current version before deleting it.",
+      code: "REPORT_DRAFT_VERSION_CONFLICT",
+      draft: reportDraftForClient(artifact, [projectID])
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  await saveStoredFoundationArtifact(context.userID, {
+    ...artifact,
+    envelope: artifactEnvelope({
+      ...artifact.envelope,
+      owner: ownerScope(context.userID),
+      updatedAt: now,
+      deletedAt: now,
+      version: artifact.envelope.version + 1
+    })
+  });
+  const activeLink = (await listStoredProjectLinks(context.userID)).find((link) =>
+    !link.deletedAt &&
+    link.projectID === projectID &&
+    link.targetKind === "reportDraft" &&
+    link.targetID === artifact.envelope.id
+  );
+  if (activeLink) {
+    await saveStoredProjectLink(context.userID, projectLinkRecord({
+      ...activeLink,
+      owner: ownerScope(context.userID),
+      updatedAt: now,
+      deletedAt: now,
+      version: activeLink.version + 1
+    }));
+  }
+  sendJSON(response, 200, { draftID: artifact.envelope.id, deletedAt: now });
+}
+
+function reportManifestItemForDraftBlock(block, sourcesByKey) {
+  if (["heading", "paragraph", "list"].includes(block.kind)) return block;
+  const source = sourcesByKey.get(`${block.kind}:${block.sourceID}`);
+  if (!source) throw new Error(`Report source is unavailable: ${block.label}`);
+  return { ...source.manifestItem, id: block.id };
+}
+
+async function projectReportManifests(userID, projectID) {
+  const linkedManifestIDs = new Set(
+    (await listStoredProjectLinks(userID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "reportManifest"
+      )
+      .map((link) => link.targetID)
+  );
+  return (await listStoredFoundationArtifacts(userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "reportManifest" &&
+      !artifact.envelope?.deletedAt &&
+      linkedManifestIDs.has(artifact.envelope.id)
+    )
+    .sort((left, right) =>
+      Number(right.payload?.reportVersion || 0) - Number(left.payload?.reportVersion || 0)
+    );
+}
+
+async function projectGeneratedReports(userID, projectID) {
+  const linkedReportIDs = new Set(
+    (await listStoredProjectLinks(userID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "generatedReport"
+      )
+      .map((link) => link.targetID)
+  );
+  return (await listStoredFoundationArtifacts(userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "generatedReport" &&
+      !artifact.envelope?.deletedAt &&
+      linkedReportIDs.has(artifact.envelope.id)
+    );
+}
+
+function generatedReportFileDescriptor(artifact) {
+  const file = artifact?.payload?.file;
+  if (!file?.pathname) return null;
+  return {
+    generatedReportID: artifact.envelope.id,
+    manifestID: artifact.payload.manifestID,
+    reportVersion: artifact.payload.reportVersion,
+    format: file.format,
+    contentType: file.contentType,
+    size: file.size,
+    contentHash: file.contentHash,
+    createdAt: artifact.payload.createdAt
+  };
+}
+
+async function reportFilesForProject(userID, projectID) {
+  return (await projectGeneratedReports(userID, projectID))
+    .map(generatedReportFileDescriptor)
+    .filter(Boolean)
+    .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+}
+
+async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
+  const requestedIDs = new Set(
+    (manifest.items || [])
+      .filter((item) => item.kind === "workboardPreview")
+      .map((item) => item.sourceID)
+  );
+  if (!requestedIDs.size) return new Map();
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  const material = new Map();
+  for (const artifact of artifacts) {
+    if (
+      !requestedIDs.has(artifact.envelope?.id) ||
+      artifact.envelope?.type !== "workboardPreview" ||
+      artifact.payload?.projectID !== projectID ||
+      !workboardPreviewPathBelongsToProject(artifact.payload?.pathname || "", projectID)
+    ) {
+      continue;
+    }
+    const body = await readPrivateProjectAsset(artifact.payload.pathname);
+    if (!body) continue;
+    const contentHash = createHash("sha256").update(body).digest("hex");
+    if (contentHash !== artifact.payload.contentHash) {
+      throw new Error("The stored Workboard preview no longer matches its immutable content hash.");
+    }
+    material.set(artifact.envelope.id, {
+      body,
+      contentType: artifact.payload.contentType,
+      contentHash
+    });
+  }
+  return material;
+}
+
+async function handleReportGenerate(request, response) {
+  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const project = await ownedProjectRecord(context.userID, projectID);
+  if (!project) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const draft = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  if (!draft) {
+    sendError(response, 404, "Report Draft not found.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Report PDF storage is not configured.");
+    return;
+  }
+  try {
+    const sources = await reportSourcesForProject(context.userID, projectID);
+    const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
+    const priorManifests = await projectReportManifests(context.userID, projectID);
+    const reportVersion = Math.max(
+      0,
+      ...priorManifests.map((artifact) => Number(artifact.payload?.reportVersion || 0))
+    ) + 1;
+    const now = new Date().toISOString();
+    const manifestID = randomUUID();
+    const manifest = immutableReportManifest({
+      id: manifestID,
+      project: {
+        id: projectID,
+        name: project.name || "Untitled Project",
+        address: project.address || "",
+        description: project.description || ""
+      },
+      draftID: draft.envelope.id,
+      title: draft.payload.title,
+      reportDate: draft.payload.reportDate,
+      author: {
+        userID: context.userID,
+        displayName: context.authContext.account?.displayName ||
+          context.authContext.account?.publicUsername ||
+          "Permitext user"
+      },
+      codeEdition: defaultResearchCodeEdition,
+      items: [
+        ...(draft.payload.introduction
+          ? [{ id: `${draft.envelope.id}-introduction`, kind: "paragraph", text: draft.payload.introduction }]
+          : []),
+        ...draft.payload.blocks.map((block) => reportManifestItemForDraftBlock(block, sourcesByKey))
+      ],
+      disclaimers: [
+        "Permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.",
+        "AI-assisted Research is limited to the approved evidence recorded in this report and may require additional Project facts or professional review."
+      ],
+      reportVersion,
+      sourceVersions: {
+        codeEdition: defaultResearchCodeEdition,
+        codeContent: defaultSyncCodeVersion,
+        draftVersion: draft.envelope.version
+      },
+      createdAt: now
+    });
+    const generatedReportID = randomUUID();
+    const projectMaterialBySourceID = await reportProjectMaterialBySourceID(
+      context.userID,
+      projectID,
+      manifest
+    );
+    const pdfBody = await renderReportPDF(manifest, { projectMaterialBySourceID });
+    if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
+      throw new Error("The generated Report PDF exceeds the supported file size.");
+    }
+    const requestedPathname = reportFilePathname(
+      projectID,
+      manifestID,
+      generatedReportID,
+      "web-pdf"
+    );
+    const pathname = await storePrivateReportFile(requestedPathname, pdfBody);
+    const file = {
+      format: "web-pdf",
+      pathname,
+      contentType: "application/pdf",
+      size: pdfBody.length,
+      contentHash: createHash("sha256").update(pdfBody).digest("hex"),
+      createdAt: now
+    };
+    const manifestArtifact = {
+      envelope: artifactEnvelope({
+        id: manifestID,
+        type: "reportManifest",
+        owner: ownerScope(context.userID),
+        createdAt: now,
+        updatedAt: now,
+        version: 1
+      }),
+      payload: manifest
+    };
+    await saveStoredFoundationArtifact(context.userID, manifestArtifact);
+    await saveStoredProjectLink(context.userID, projectLinkRecord({
+      id: deterministicFoundationLinkID(context.userID, projectID, "reportManifest", manifestID),
+      owner: ownerScope(context.userID),
+      projectID,
+      targetKind: "reportManifest",
+      targetID: manifestID,
+      relationship: "owner",
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      metadata: { reportVersion, draftID: draft.envelope.id }
+    }));
+
+    const generatedReport = {
+      manifestID,
+      reportVersion,
+      title: manifest.title,
+      outputFormats: ["web-pdf"],
+      contentHash: manifest.contentHash,
+      generatorVersion: manifest.generatorVersion,
+      file,
+      createdBy: context.userID,
+      createdAt: now
+    };
+    await saveStoredFoundationArtifact(context.userID, {
+      envelope: artifactEnvelope({
+        id: generatedReportID,
+        type: "generatedReport",
+        owner: ownerScope(context.userID),
+        createdAt: now,
+        updatedAt: now,
+        version: 1
+      }),
+      payload: generatedReport
+    });
+    await saveStoredProjectLink(context.userID, projectLinkRecord({
+      id: deterministicFoundationLinkID(
+        context.userID,
+        projectID,
+        "generatedReport",
+        generatedReportID
+      ),
+      owner: ownerScope(context.userID),
+      projectID,
+      targetKind: "generatedReport",
+      targetID: generatedReportID,
+      relationship: "owner",
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      metadata: { manifestID, reportVersion }
+    }));
+    const event = activityEvent({
+      owner: ownerScope(context.userID),
+      projectID,
+      actorUserID: context.userID,
+      action: "report.generated",
+      objectKind: "reportManifest",
+      objectID: manifestID,
+      previousStatus: null,
+      newStatus: `version-${reportVersion}`,
+      createdAt: now,
+      metadata: {
+        draftID: draft.envelope.id,
+        generatedReportID,
+        contentHash: manifest.contentHash
+      }
+    });
+    await saveStoredActivityEvent(context.userID, event);
+    sendJSON(response, 201, {
+      manifest,
+      generatedReport: {
+        id: generatedReportID,
+        ...generatedReport,
+        file: generatedReportFileDescriptor({
+          envelope: { id: generatedReportID },
+          payload: generatedReport
+        })
+      },
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "The Report could not be generated.",
+      code: "INVALID_REPORT_MANIFEST"
+    });
+  }
+}
+
+async function handleReportHistoryList(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const manifests = await projectReportManifests(context.userID, projectID);
+  const files = await reportFilesForProject(context.userID, projectID);
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    projectID,
+    reports: manifests.map((artifact) => ({
+      ...reportManifestSummary(artifact.payload),
+      files: files.filter((file) => file.manifestID === artifact.envelope.id)
+    }))
+  });
+}
+
+async function handleReportManifestGet(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const artifact = await reportManifestArtifact(context.userID, context.body.manifestID);
+  if (!artifact) {
+    sendError(response, 404, "Report Manifest not found.");
+    return;
+  }
+  const linkedProject = (await listStoredProjectLinks(context.userID)).some((link) =>
+    !link.deletedAt &&
+    link.projectID === artifact.payload.project?.id &&
+    link.targetKind === "reportManifest" &&
+    link.targetID === artifact.envelope.id
+  );
+  if (!linkedProject) {
+    sendError(response, 404, "Report Manifest not found.");
+    return;
+  }
+  const files = (await reportFilesForProject(context.userID, artifact.payload.project.id))
+    .filter((file) => file.manifestID === artifact.envelope.id);
+  sendJSON(response, 200, { manifest: artifact.payload, files });
+}
+
+async function handleReportFileUpload(request, response) {
+  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
+  const url = requestURL(request);
+  const projectID = String(url.searchParams.get("projectID") || "").trim();
+  const manifestID = String(url.searchParams.get("manifestID") || "").trim();
+  const format = String(url.searchParams.get("format") || "").trim();
+  if (!userID || !projectID || !manifestID || format !== "ios-pdf") {
+    sendError(response, 400, "Missing or invalid Report PDF identity.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Professional Report files require Pro.",
+      code: "PRO_REQUIRED_EXPORTS"
+    });
+    return;
+  }
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const manifestArtifact = await reportManifestArtifact(userID, manifestID);
+  if (!manifestArtifact || manifestArtifact.payload.project?.id !== projectID) {
+    sendError(response, 404, "Report Manifest not found.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Report PDF storage is not configured.");
+    return;
+  }
+  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
+  if (contentType !== "application/pdf") {
+    sendError(response, 415, "Report files must be PDF documents.");
+    return;
+  }
+  const body = await readBody(request, maxReportFileBytes);
+  const pdfTail = body.subarray(Math.max(0, body.length - 1_024)).toString("ascii");
+  if (
+    body.length < 100 ||
+    body.subarray(0, 5).toString("ascii") !== "%PDF-" ||
+    !pdfTail.includes("%%EOF")
+  ) {
+    sendError(response, 400, "The uploaded Report file is not a valid PDF document.");
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const generatedReportID = randomUUID();
+  const requestedPathname = reportFilePathname(
+    projectID,
+    manifestID,
+    generatedReportID,
+    format
+  );
+  const pathname = await storePrivateReportFile(requestedPathname, body);
+  const file = {
+    format,
+    pathname,
+    contentType,
+    size: body.length,
+    contentHash: createHash("sha256").update(body).digest("hex"),
+    createdAt: now
+  };
+  const generatedReport = {
+    manifestID,
+    reportVersion: manifestArtifact.payload.reportVersion,
+    title: manifestArtifact.payload.title,
+    outputFormats: [format],
+    contentHash: manifestArtifact.payload.contentHash,
+    generatorVersion: "permitext-ios-report-v1",
+    file,
+    createdBy: userID,
+    createdAt: now
+  };
+  const artifact = {
+    envelope: artifactEnvelope({
+      id: generatedReportID,
+      type: "generatedReport",
+      owner: ownerScope(userID),
+      createdAt: now,
+      updatedAt: now,
+      version: 1
+    }),
+    payload: generatedReport
+  };
+  await saveStoredFoundationArtifact(userID, artifact);
+  await saveStoredProjectLink(userID, projectLinkRecord({
+    id: deterministicFoundationLinkID(userID, projectID, "generatedReport", generatedReportID),
+    owner: ownerScope(userID),
+    projectID,
+    targetKind: "generatedReport",
+    targetID: generatedReportID,
+    relationship: "owner",
+    createdAt: now,
+    updatedAt: now,
+    version: 1,
+    metadata: {
+      manifestID,
+      reportVersion: manifestArtifact.payload.reportVersion,
+      format
+    }
+  }));
+  const event = activityEvent({
+    owner: ownerScope(userID),
+    projectID,
+    actorUserID: userID,
+    action: "report.export.saved",
+    objectKind: "generatedReport",
+    objectID: generatedReportID,
+    previousStatus: null,
+    newStatus: format,
+    createdAt: now,
+    metadata: {
+      manifestID,
+      reportVersion: manifestArtifact.payload.reportVersion,
+      contentHash: file.contentHash
+    }
+  });
+  await saveStoredActivityEvent(userID, event);
+  sendJSON(response, 201, {
+    file: generatedReportFileDescriptor(artifact),
+    activity: event
+  });
+}
+
+async function handleReportFileRead(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const generatedReportID = String(context.body.generatedReportID || "").trim();
+  if (!projectID || !generatedReportID) {
+    sendError(response, 400, "Missing Report file identity.");
+    return;
+  }
+  if (!await ownsProjectAssetScope(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const artifact = (await projectGeneratedReports(context.userID, projectID))
+    .find((candidate) => candidate.envelope.id === generatedReportID);
+  const file = artifact?.payload?.file;
+  if (
+    !artifact ||
+    !file?.pathname ||
+    file.contentType !== "application/pdf" ||
+    !reportFilePathBelongsToProject(file.pathname, projectID)
+  ) {
+    sendError(response, 404, "Report PDF not found.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Report PDF storage is not configured.");
+    return;
+  }
+  const body = await readPrivateReportFile(file.pathname);
+  if (!body) {
+    sendError(response, 404, "Report PDF not found.");
+    return;
+  }
+  if (createHash("sha256").update(body).digest("hex") !== file.contentHash) {
+    sendError(response, 409, "The stored Report PDF no longer matches its immutable content hash.");
+    return;
+  }
+  const safeTitle = String(artifact.payload.title || "Permitext Project Report")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "Permitext-Project-Report";
+  const filename = `${safeTitle}-v${artifact.payload.reportVersion}-${file.format}.pdf`;
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, no-store",
+    "content-type": "application/pdf",
+    "content-length": String(body.length),
+    "content-disposition": `attachment; filename="${filename}"`
+  });
+  response.end(body);
 }
 
 async function requiredResearchConversation(response, userID, conversationID) {
@@ -7306,6 +8324,230 @@ async function handleSignOut(request, response) {
   sendJSON(response, 200, { signedOut: true });
 }
 
+function workboardPreviewSummary(artifact) {
+  if (!artifact) return null;
+  return {
+    id: artifact.envelope.id,
+    projectID: artifact.payload.projectID,
+    title: artifact.payload.title,
+    contentType: artifact.payload.contentType,
+    contentHash: artifact.payload.contentHash,
+    size: artifact.payload.size,
+    elementCount: artifact.payload.elementCount,
+    workboardUpdatedAt: artifact.payload.workboardUpdatedAt,
+    createdAt: artifact.envelope.createdAt
+  };
+}
+
+async function projectWorkboardPreviews(userID, projectID) {
+  const linkedPreviewIDs = new Set(
+    (await listStoredProjectLinks(userID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "workboardPreview"
+      )
+      .map((link) => link.targetID)
+  );
+  return (await listStoredFoundationArtifacts(userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "workboardPreview" &&
+      !artifact.envelope?.deletedAt &&
+      linkedPreviewIDs.has(artifact.envelope.id)
+    )
+    .sort((left, right) =>
+      String(right.envelope.createdAt).localeCompare(String(left.envelope.createdAt))
+    );
+}
+
+async function clearActiveWorkboardPreviewLinks(userID, projectID, now = new Date().toISOString()) {
+  const links = (await listStoredProjectLinks(userID))
+    .filter((link) =>
+      !link.deletedAt &&
+      link.projectID === projectID &&
+      link.targetKind === "workboardPreview"
+    );
+  for (const link of links) {
+    await saveStoredProjectLink(userID, projectLinkRecord({
+      ...link,
+      owner: ownerScope(userID),
+      updatedAt: now,
+      deletedAt: now,
+      version: link.version + 1
+    }));
+  }
+  return links.length;
+}
+
+async function handleWorkboardPreviewUpload(request, response) {
+  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
+  const url = requestURL(request);
+  const projectID = String(url.searchParams.get("projectID") || "").trim();
+  const workboardUpdatedAt = String(url.searchParams.get("workboardUpdatedAt") || "").trim();
+  const elementCount = Number(url.searchParams.get("elementCount") || 0);
+  if (
+    !userID ||
+    !projectID ||
+    !Number.isSafeInteger(elementCount) ||
+    elementCount < 1 ||
+    !Number.isFinite(Date.parse(workboardUpdatedAt))
+  ) {
+    sendError(response, 400, "Missing or invalid Workboard preview identity.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Workboard previews require Pro.",
+      code: "PRO_REQUIRED_WORKBOARDS"
+    });
+    return;
+  }
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Workboard preview storage is not configured.");
+    return;
+  }
+  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
+  if (contentType !== "image/png") {
+    sendError(response, 415, "Workboard previews must be PNG images.");
+    return;
+  }
+  const body = await readBody(request, maxWorkboardPreviewBytes);
+  if (
+    body.length < 64 ||
+    body.subarray(0, 8).toString("hex") !== "89504e470d0a1a0a"
+  ) {
+    sendError(response, 400, "The Workboard preview is not a valid PNG image.");
+    return;
+  }
+  const now = new Date().toISOString();
+  const previewID = randomUUID();
+  const requestedPathname = workboardPreviewPathname(projectID, previewID);
+  const pathname = await storePrivateProjectAsset(requestedPathname, body, contentType);
+  const artifact = {
+    envelope: artifactEnvelope({
+      id: previewID,
+      type: "workboardPreview",
+      owner: ownerScope(userID),
+      createdAt: now,
+      updatedAt: now,
+      version: 1
+    }),
+    payload: {
+      projectID,
+      title: "Workboard preview",
+      description: `${elementCount} Workboard ${elementCount === 1 ? "element" : "elements"}`,
+      contentType,
+      contentHash: createHash("sha256").update(body).digest("hex"),
+      pathname,
+      size: body.length,
+      elementCount,
+      workboardUpdatedAt: new Date(workboardUpdatedAt).toISOString(),
+      readPath: "/workboards/previews/read",
+      createdAt: now
+    }
+  };
+  await saveStoredFoundationArtifact(userID, artifact);
+  await clearActiveWorkboardPreviewLinks(userID, projectID, now);
+  await saveStoredProjectLink(userID, projectLinkRecord({
+    id: deterministicFoundationLinkID(userID, projectID, "workboardPreview", previewID),
+    owner: ownerScope(userID),
+    projectID,
+    targetKind: "workboardPreview",
+    targetID: previewID,
+    relationship: "owner",
+    createdAt: now,
+    updatedAt: now,
+    version: 1,
+    metadata: {
+      source: "web-workboard",
+      workboardUpdatedAt: artifact.payload.workboardUpdatedAt
+    }
+  }));
+  sendJSON(response, 201, { preview: workboardPreviewSummary(artifact) });
+}
+
+async function handleWorkboardPreviewRead(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  const projectID = String(body.projectID || "").trim();
+  const previewID = String(body.previewID || "").trim();
+  if (!userID || !projectID || !previewID) {
+    sendError(response, 400, "Missing Workboard preview identity.");
+    return;
+  }
+  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const artifact = (await listStoredFoundationArtifacts(userID)).find((candidate) =>
+    candidate.envelope?.id === previewID &&
+    candidate.envelope?.type === "workboardPreview" &&
+    !candidate.envelope?.deletedAt &&
+    candidate.payload?.projectID === projectID
+  );
+  const pathname = artifact?.payload?.pathname;
+  if (!pathname || !workboardPreviewPathBelongsToProject(pathname, projectID)) {
+    sendError(response, 404, "Workboard preview not found.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Workboard preview storage is not configured.");
+    return;
+  }
+  const image = await readPrivateProjectAsset(pathname);
+  if (!image) {
+    sendError(response, 404, "Workboard preview not found.");
+    return;
+  }
+  if (createHash("sha256").update(image).digest("hex") !== artifact.payload.contentHash) {
+    sendError(
+      response,
+      409,
+      "The stored Workboard preview no longer matches its immutable content hash."
+    );
+    return;
+  }
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, no-store",
+    "content-type": "image/png",
+    "content-length": String(image.length)
+  });
+  response.end(image);
+}
+
+async function handleWorkboardPreviewClear(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  const projectID = String(body.projectID || "").trim();
+  if (!userID || !projectID) {
+    sendError(response, 400, "Missing Workboard preview identity.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID, body.auth);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Workboard previews require Pro.",
+      code: "PRO_REQUIRED_WORKBOARDS"
+    });
+    return;
+  }
+  if (!await ownsProjectAssetScope(userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const clearedCount = await clearActiveWorkboardPreviewLinks(userID, projectID);
+  sendJSON(response, 200, { projectID, clearedCount });
+}
+
 async function handleWorkboardAssetUpload(request, response) {
   const userID = String(request.headers["x-permitext-user-id"] || "").trim();
   const url = requestURL(request);
@@ -8563,12 +9805,25 @@ const handlers = {
   "notebook/cards/get": handleNotebookCardGet,
   "notebook/cards/save": handleNotebookCardSave,
   "notebook/cards/delete": handleNotebookCardDelete,
+  "reports/sources/list": handleReportSourceList,
+  "reports/drafts/list": handleReportDraftList,
+  "reports/drafts/get": handleReportDraftGet,
+  "reports/drafts/save": handleReportDraftSave,
+  "reports/drafts/delete": handleReportDraftDelete,
+  "reports/generate": handleReportGenerate,
+  "reports/history/list": handleReportHistoryList,
+  "reports/manifests/get": handleReportManifestGet,
+  "reports/files/upload": handleReportFileUpload,
+  "reports/files/read": handleReportFileRead,
   "internal/evaluations/data": handleInternalEvaluationData,
   "internal/evaluations/review": handleInternalEvaluationReview,
   "internal/evaluations/feedback/triage": handleInternalFeedbackTriage,
   "workboards/assets/upload": handleWorkboardAssetUpload,
   "workboards/assets/read": handleWorkboardAssetRead,
   "workboards/assets/delete": handleWorkboardAssetDelete,
+  "workboards/previews/upload": handleWorkboardPreviewUpload,
+  "workboards/previews/read": handleWorkboardPreviewRead,
+  "workboards/previews/clear": handleWorkboardPreviewClear,
   "sync/push": handlePush,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,

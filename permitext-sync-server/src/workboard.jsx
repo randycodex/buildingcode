@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { Excalidraw, MainMenu, hashElementsVersion } from "@excalidraw/excalidraw";
+import {
+  Excalidraw,
+  MainMenu,
+  exportToBlob,
+  hashElementsVersion
+} from "@excalidraw/excalidraw";
 import "@excalidraw/excalidraw/index.css";
 import "./workboard.css";
 
@@ -177,6 +182,7 @@ function Workboard({
   syncEnabled = false,
   loadSyncedBoard,
   saveSyncedBoard,
+  savePreview,
   uploadAsset,
   loadAsset,
   remoteRevision = ""
@@ -250,12 +256,41 @@ function Workboard({
       remoteUpdatedAt.current = savedBoard?.updatedAt || syncBoard.updatedAt;
       assets.current = syncBoard.assets;
       await writeBoard({ ...board, assets: syncBoard.assets, syncedAt: remoteUpdatedAt.current });
-      setStatus("Synced");
+      let previewSaved = true;
+      if (savePreview) {
+        try {
+          const elements = (board.elements || []).filter((element) => !element.isDeleted);
+          if (!elements.length) {
+            await savePreview(null, {
+              updatedAt: syncBoard.updatedAt,
+              elementCount: 0
+            });
+          } else {
+            const blob = await exportToBlob({
+              elements,
+              appState: {
+                ...(board.appState || {}),
+                exportBackground: true,
+                exportWithDarkMode: false
+              },
+              files: board.files || {},
+              mimeType: "image/png"
+            });
+            await savePreview(blob, {
+              updatedAt: syncBoard.updatedAt,
+              elementCount: elements.length
+            });
+          }
+        } catch {
+          previewSaved = false;
+        }
+      }
+      setStatus(previewSaved ? "Synced" : "Synced · Preview pending");
     } catch (error) {
       pendingBoard.current = board;
       setStatus(syncEnabled ? "Saved locally · Sync pending" : error.message || "Could not save");
     }
-  }, [saveSyncedBoard, syncEnabled, uploadAsset]);
+  }, [savePreview, saveSyncedBoard, syncEnabled, uploadAsset]);
 
   const capturePendingScene = useCallback((options = {}) => {
     window.clearTimeout(changeTimer.current);

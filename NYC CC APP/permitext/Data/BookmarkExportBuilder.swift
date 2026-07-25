@@ -392,3 +392,392 @@ enum BookmarkExportColors {
         return UIColor.darkGray
     }
 }
+
+/// Renders the shared immutable Report Manifest into a compact native iOS PDF.
+/// The web client intentionally uses a richer layout; both renderers preserve
+/// the same semantic items, classifications, report version, and content hash.
+struct ProjectReportExportBuilder: Sendable {
+    let manifest: ProjectReportManifest
+
+    private let pageSize = CGSize(width: 612, height: 792)
+    private let pageMargin = UIEdgeInsets(top: 58, left: 52, bottom: 56, right: 52)
+
+    func build() throws -> URL {
+        guard !manifest.items.isEmpty else {
+            throw BookmarkExportBuilder.BuildError.empty
+        }
+        let document = composeDocument()
+        let dateStamp = String(manifest.reportDate.prefix(10))
+        let filename = sanitizedFilename(manifest.title)
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(filename)-v\(manifest.reportVersion)-\(dateStamp).pdf")
+        let format = UIGraphicsPDFRendererFormat()
+        format.documentInfo = [
+            kCGPDFContextTitle as String: manifest.title,
+            kCGPDFContextAuthor as String: manifest.author.displayName,
+            kCGPDFContextCreator as String: "Permitext iOS \(manifest.generatorVersion)",
+            kCGPDFContextSubject as String: "Immutable Permitext Project Report \(manifest.contentHash)"
+        ]
+        let renderer = UIGraphicsPDFRenderer(
+            bounds: CGRect(origin: .zero, size: pageSize),
+            format: format
+        )
+        do {
+            try renderer.writePDF(to: url) { context in
+                render(document: document, into: context)
+            }
+        } catch {
+            throw BookmarkExportBuilder.BuildError.ioFailed(error.localizedDescription)
+        }
+        return url
+    }
+
+    private func composeDocument() -> NSAttributedString {
+        let result = NSMutableAttributedString()
+        append(
+            "PERMITEXT PROJECT REPORT\n",
+            to: result,
+            font: .systemFont(ofSize: 10, weight: .bold),
+            color: UIColor(red: 0.66, green: 0.31, blue: 0.08, alpha: 1),
+            spacingAfter: 8,
+            kern: 1.1
+        )
+        append(
+            "\(manifest.title)\n",
+            to: result,
+            font: .systemFont(ofSize: 26, weight: .bold),
+            spacingAfter: 10
+        )
+        append(
+            "\(manifest.project.name)\n",
+            to: result,
+            font: .systemFont(ofSize: 16, weight: .semibold),
+            spacingAfter: 4
+        )
+        let reportMetadata = [
+            manifest.project.address,
+            formattedDate(manifest.reportDate),
+            manifest.author.displayName,
+            "Report version \(manifest.reportVersion)",
+            manifest.codeEdition
+        ].filter { !$0.isEmpty }.joined(separator: " · ")
+        append(
+            "\(reportMetadata)\n\n",
+            to: result,
+            font: .systemFont(ofSize: 9.5),
+            color: UIColor(white: 0.35, alpha: 1),
+            spacingAfter: 18
+        )
+
+        for item in manifest.items.sorted(by: { $0.order < $1.order }) {
+            appendManifestItem(item, to: result)
+        }
+
+        append(
+            "PROFESSIONAL-USE NOTICE\n",
+            to: result,
+            font: .systemFont(ofSize: 9, weight: .bold),
+            color: UIColor(white: 0.3, alpha: 1),
+            spacingBefore: 18,
+            spacingAfter: 6,
+            kern: 0.8
+        )
+        for disclaimer in manifest.disclaimers {
+            append(
+                "• \(disclaimer)\n",
+                to: result,
+                font: .systemFont(ofSize: 8.5),
+                color: UIColor(white: 0.35, alpha: 1),
+                spacingAfter: 4
+            )
+        }
+        append(
+            "\nManifest \(manifest.id)\n\(manifest.generatorVersion) · SHA-256 \(manifest.contentHash)",
+            to: result,
+            font: .monospacedSystemFont(ofSize: 7, weight: .regular),
+            color: UIColor(white: 0.5, alpha: 1),
+            spacingBefore: 8
+        )
+        return result
+    }
+
+    private func appendManifestItem(
+        _ item: ProjectReportManifestItem,
+        to result: NSMutableAttributedString
+    ) {
+        if item.kind == "heading" {
+            append(
+                "\(item.text ?? "Report section")\n",
+                to: result,
+                font: .systemFont(ofSize: 17, weight: .bold),
+                spacingBefore: 16,
+                spacingAfter: 8
+            )
+            return
+        }
+        if item.kind == "paragraph" {
+            append(
+                "\(item.text ?? "")\n",
+                to: result,
+                font: .systemFont(ofSize: 10.5),
+                spacingAfter: 8
+            )
+            return
+        }
+        if item.kind == "list" {
+            for value in item.items ?? [] {
+                append(
+                    "• \(value)\n",
+                    to: result,
+                    font: .systemFont(ofSize: 10.5),
+                    spacingAfter: 3
+                )
+            }
+            return
+        }
+
+        append(
+            "\(classificationLabel(item.sourceClassification).uppercased())\n",
+            to: result,
+            font: .systemFont(ofSize: 8, weight: .bold),
+            color: classificationColor(item.sourceClassification),
+            spacingBefore: 12,
+            spacingAfter: 5,
+            kern: 0.7
+        )
+        switch item.kind {
+        case "evidence":
+            let heading = [
+                item.codeBook,
+                item.sectionNumber,
+                item.title
+            ].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
+            append(
+                "\(heading)\n",
+                to: result,
+                font: .systemFont(ofSize: 13, weight: .semibold),
+                spacingAfter: 5
+            )
+            append(
+                "\(item.passageText ?? "")\n",
+                to: result,
+                font: .systemFont(ofSize: 10),
+                color: UIColor(white: 0.18, alpha: 1),
+                spacingAfter: 10,
+                leftIndent: 12
+            )
+        case "notebookCard":
+            append(
+                "\(item.title ?? "Notebook card")\n",
+                to: result,
+                font: .systemFont(ofSize: 13, weight: .semibold),
+                spacingAfter: 5
+            )
+            append(
+                "\(item.plainText ?? "")\n",
+                to: result,
+                font: .systemFont(ofSize: 10.5),
+                spacingAfter: 10
+            )
+        case "researchAnswer":
+            append(
+                "\(item.question ?? "Research question")\n",
+                to: result,
+                font: .systemFont(ofSize: 13, weight: .semibold),
+                spacingAfter: 5
+            )
+            append(
+                "Supported conclusion\n",
+                to: result,
+                font: .systemFont(ofSize: 9, weight: .bold),
+                spacingAfter: 2
+            )
+            append(
+                "\(item.conclusion ?? "")\n",
+                to: result,
+                font: .systemFont(ofSize: 10.5),
+                spacingAfter: 6
+            )
+            if let explanation = item.explanation, !explanation.isEmpty {
+                append(
+                    "\(explanation)\n",
+                    to: result,
+                    font: .systemFont(ofSize: 10),
+                    spacingAfter: 7
+                )
+            }
+            appendBullets("Assumptions", values: item.assumptions, to: result)
+            appendBullets("Missing Project facts", values: item.missingFacts, to: result)
+            appendBullets("Limitations", values: item.limitations, to: result)
+            appendBullets(
+                "Additional evidence needed",
+                values: item.additionalEvidenceNeeded,
+                to: result
+            )
+            let citations = (item.citations ?? []).map { citation in
+                ([citation.sectionID].compactMap { $0 } + (citation.sourceIDs ?? []))
+                    .joined(separator: " · ")
+            }
+            appendBullets("Citations", values: citations, to: result)
+        default:
+            append(
+                "\(item.title ?? "Project material")\n",
+                to: result,
+                font: .systemFont(ofSize: 13, weight: .semibold),
+                spacingAfter: 4
+            )
+            append(
+                "\((item.contentType ?? "Included Project material"))\n",
+                to: result,
+                font: .systemFont(ofSize: 10),
+                spacingAfter: 10
+            )
+        }
+    }
+
+    private func appendBullets(
+        _ heading: String,
+        values: [String]?,
+        to result: NSMutableAttributedString
+    ) {
+        let normalized = (values ?? []).filter { !$0.isEmpty }
+        guard !normalized.isEmpty else { return }
+        append(
+            "\(heading)\n",
+            to: result,
+            font: .systemFont(ofSize: 8.5, weight: .bold),
+            color: UIColor(white: 0.35, alpha: 1),
+            spacingBefore: 4,
+            spacingAfter: 2,
+            kern: 0.4
+        )
+        for value in normalized {
+            append(
+                "• \(value)\n",
+                to: result,
+                font: .systemFont(ofSize: 9.5),
+                spacingAfter: 2,
+                leftIndent: 10
+            )
+        }
+    }
+
+    private func append(
+        _ string: String,
+        to result: NSMutableAttributedString,
+        font: UIFont,
+        color: UIColor = .black,
+        spacingBefore: CGFloat = 0,
+        spacingAfter: CGFloat = 0,
+        kern: CGFloat = 0,
+        leftIndent: CGFloat = 0
+    ) {
+        let paragraph = NSMutableParagraphStyle()
+        paragraph.paragraphSpacingBefore = spacingBefore
+        paragraph.paragraphSpacing = spacingAfter
+        paragraph.lineSpacing = 2.5
+        paragraph.firstLineHeadIndent = leftIndent
+        paragraph.headIndent = leftIndent
+        result.append(NSAttributedString(
+            string: string,
+            attributes: [
+                .font: font,
+                .foregroundColor: color,
+                .kern: kern,
+                .paragraphStyle: paragraph
+            ]
+        ))
+    }
+
+    private func render(
+        document: NSAttributedString,
+        into context: UIGraphicsPDFRendererContext
+    ) {
+        let framesetter = CTFramesetterCreateWithAttributedString(document)
+        var location = 0
+        let contentRect = CGRect(
+            x: pageMargin.left,
+            y: pageMargin.top,
+            width: pageSize.width - pageMargin.left - pageMargin.right,
+            height: pageSize.height - pageMargin.top - pageMargin.bottom
+        )
+        while location < document.length {
+            context.beginPage()
+            drawPageHeader(in: context.cgContext)
+            let path = CGMutablePath()
+            path.addRect(contentRect)
+            let frame = CTFramesetterCreateFrame(
+                framesetter,
+                CFRange(location: location, length: 0),
+                path,
+                nil
+            )
+            context.cgContext.saveGState()
+            context.cgContext.textMatrix = .identity
+            context.cgContext.translateBy(x: 0, y: pageSize.height)
+            context.cgContext.scaleBy(x: 1, y: -1)
+            CTFrameDraw(frame, context.cgContext)
+            context.cgContext.restoreGState()
+            let visible = CTFrameGetVisibleStringRange(frame)
+            guard visible.length > 0 else { break }
+            location += visible.length
+        }
+    }
+
+    private func drawPageHeader(in context: CGContext) {
+        let attributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 7.5, weight: .semibold),
+            .foregroundColor: UIColor(white: 0.45, alpha: 1)
+        ]
+        NSAttributedString(
+            string: "PERMITEXT · \(manifest.project.name) · REPORT V\(manifest.reportVersion)",
+            attributes: attributes
+        ).draw(at: CGPoint(x: pageMargin.left, y: 31))
+        context.setStrokeColor(UIColor(white: 0.78, alpha: 1).cgColor)
+        context.setLineWidth(0.5)
+        context.move(to: CGPoint(x: pageMargin.left, y: 45))
+        context.addLine(to: CGPoint(x: pageSize.width - pageMargin.right, y: 45))
+        context.strokePath()
+    }
+
+    private func classificationLabel(_ value: String) -> String {
+        switch value {
+        case "published-code": return "Published code"
+        case "user-authored": return "User-authored"
+        case "ai-assisted": return "AI-assisted Research"
+        case "project-material": return "Project material"
+        default: return "Project content"
+        }
+    }
+
+    private func classificationColor(_ value: String) -> UIColor {
+        switch value {
+        case "published-code":
+            return UIColor(red: 0.66, green: 0.31, blue: 0.08, alpha: 1)
+        case "ai-assisted":
+            return UIColor(red: 0.28, green: 0.36, blue: 0.62, alpha: 1)
+        case "user-authored":
+            return UIColor(red: 0.42, green: 0.28, blue: 0.58, alpha: 1)
+        default:
+            return UIColor(white: 0.35, alpha: 1)
+        }
+    }
+
+    private func formattedDate(_ value: String) -> String {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let date = fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+        guard let date else { return String(value.prefix(10)) }
+        return date.formatted(date: .long, time: .omitted)
+    }
+
+    private func sanitizedFilename(_ value: String) -> String {
+        let allowed = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "-_"))
+        let normalized = value
+            .replacingOccurrences(of: " ", with: "-")
+            .unicodeScalars
+            .map { allowed.contains($0) ? String($0) : "" }
+            .joined()
+        return normalized.isEmpty ? "Permitext-Project-Report" : String(normalized.prefix(80))
+    }
+}

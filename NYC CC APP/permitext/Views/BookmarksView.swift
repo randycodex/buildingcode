@@ -1043,6 +1043,11 @@ struct ProjectView: View {
     @State private var projectHubSnapshot: ProjectHubSnapshot?
     @State private var isProjectHubLoading = false
     @State private var projectHubError: String?
+    @State private var projectReportShareURL: URL?
+    @State private var isProjectReportBuilding = false
+    @State private var projectReportBuildError: String?
+    @State private var projectWorkboardPreviewImage: UIImage?
+    @State private var isProjectWorkboardPreviewLoading = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1124,6 +1129,18 @@ struct ProjectView: View {
                 }
             }
         }
+        .sheet(
+            isPresented: Binding(
+                get: { projectReportShareURL != nil },
+                set: { if !$0 { projectReportShareURL = nil } }
+            )
+        ) {
+            if let projectReportShareURL {
+                BookmarkExportShareSheet(fileURL: projectReportShareURL) {
+                    self.projectReportShareURL = nil
+                }
+            }
+        }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
         .refreshable {
             library.refreshBookmarks()
@@ -1191,15 +1208,23 @@ struct ProjectView: View {
 
             projectNotebookSummary
             projectResearchSummary
+            projectReportSummary
             projectWorkboardSummary
         }
     }
 
     private var projectHubMetrics: some View {
-        HStack(spacing: 8) {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 8),
+                GridItem(.flexible(), spacing: 8)
+            ],
+            spacing: 8
+        ) {
             projectHubMetric(value: "\(projectBookmarks.count)", label: "Saved")
             projectHubMetric(value: "\(projectHubSnapshot?.notebookCards.count ?? 0)", label: "Notebook")
             projectHubMetric(value: "\(projectHubSnapshot?.researchAnswers.count ?? 0)", label: "Research")
+            projectHubMetric(value: "\(projectHubSnapshot?.reports.count ?? 0)", label: "Reports")
         }
     }
 
@@ -1309,13 +1334,37 @@ struct ProjectView: View {
     private var projectWorkboardSummary: some View {
         projectHubSection(title: "Workboard", systemImage: "scribble.variable") {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Web workspace")
+                Text(projectHubSnapshot?.workboardPreview == nil ? "Web workspace" : "Read-only preview")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(accentColor)
-                Text("Workboard editing stays on the web. iOS will show a flattened preview here after the web Workboard creates one.")
+                if let projectWorkboardPreviewImage {
+                    Image(uiImage: projectWorkboardPreviewImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxWidth: .infinity)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .accessibilityLabel("Flattened Project Workboard preview")
+                } else if isProjectWorkboardPreviewLoading {
+                    HStack(spacing: 8) {
+                        ProgressView()
+                        Text("Loading flattened Workboard preview…")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Text(
+                    projectHubSnapshot?.workboardPreview == nil
+                        ? "Workboard editing stays on the web. A flattened preview will appear here after a meaningful web revision is saved."
+                        : "This flattened snapshot is for mobile review. Workboard editing stays on the web."
+                )
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if let preview = projectHubSnapshot?.workboardPreview {
+                    Text("\(preview.elementCount) \(preview.elementCount == 1 ? "element" : "elements") · \(projectHubDate(preview.workboardUpdatedAt))")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
                 if let webURL = permitextWebURL {
                     Link(destination: webURL) {
                         Label("Open Permitext Web", systemImage: "arrow.up.right.square")
@@ -1337,6 +1386,77 @@ struct ProjectView: View {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .fill(accentColor.opacity(0.08))
             )
+        }
+    }
+
+    @ViewBuilder
+    private var projectReportSummary: some View {
+        let reports = projectHubSnapshot?.reports ?? []
+        projectHubSection(title: "Exports", systemImage: "doc.richtext") {
+            if reports.isEmpty {
+                projectHubEmpty("No immutable Project Reports have been generated yet.")
+            } else {
+                ForEach(reports.prefix(8)) { report in
+                    VStack(alignment: .leading, spacing: 7) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("REPORT V\(report.reportVersion)")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(accentColor)
+                            Spacer(minLength: 8)
+                            Text(projectHubDate(report.createdAt))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(report.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        Text("\(report.itemCount) \(report.itemCount == 1 ? "item" : "items") · \(report.author.displayName)")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        if let files = report.files, !files.isEmpty {
+                            Text(
+                                "Stored: " + Array(Set(
+                                    files.map { $0.format == "ios-pdf" ? "iOS PDF" : "Web PDF" }
+                                ))
+                                    .sorted()
+                                    .joined(separator: " · ")
+                            )
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                        }
+                        Button {
+                            buildProjectReportPDF(report)
+                        } label: {
+                            Label(
+                                isProjectReportBuilding ? "Building & saving PDF…" : "Create & Save iOS PDF",
+                                systemImage: "square.and.arrow.up"
+                            )
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(accentColor.opacity(0.14))
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(isProjectReportBuilding)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(accentColor.opacity(0.08))
+                    )
+                }
+            }
+            if let projectReportBuildError {
+                Text(projectReportBuildError)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -1394,14 +1514,45 @@ struct ProjectView: View {
         return date?.formatted(date: .abbreviated, time: .omitted) ?? ""
     }
 
+    private func buildProjectReportPDF(_ report: ProjectReportSummary) {
+        guard !isProjectReportBuilding else { return }
+        isProjectReportBuilding = true
+        projectReportBuildError = nil
+        Task {
+            do {
+                projectReportShareURL = try await library.projectReportPDF(manifestID: report.id)
+                await loadProjectHub()
+            } catch {
+                projectReportBuildError = error.localizedDescription
+            }
+            isProjectReportBuilding = false
+        }
+    }
+
     @MainActor
     private func loadProjectHub() async {
         guard !isProjectHubLoading else { return }
         isProjectHubLoading = true
         defer { isProjectHubLoading = false }
         do {
-            projectHubSnapshot = try await library.projectHubSnapshot(folderID: folderID)
+            let snapshot = try await library.projectHubSnapshot(folderID: folderID)
+            projectHubSnapshot = snapshot
             projectHubError = nil
+            projectWorkboardPreviewImage = nil
+            if let preview = snapshot.workboardPreview {
+                isProjectWorkboardPreviewLoading = true
+                do {
+                    let data = try await library.projectWorkboardPreviewData(
+                        projectID: preview.projectID,
+                        previewID: preview.id,
+                        expectedContentHash: preview.contentHash
+                    )
+                    projectWorkboardPreviewImage = UIImage(data: data)
+                } catch {
+                    projectWorkboardPreviewImage = nil
+                }
+                isProjectWorkboardPreviewLoading = false
+            }
         } catch {
             projectHubError = error.localizedDescription
         }
