@@ -4934,13 +4934,16 @@ button.project-studio-metric:focus-visible {
 }
 
 .project-evidence-reviews,
-.project-report-exports {
+.project-report-exports,
+.project-collaboration-notes,
+.project-review-threads {
   display: grid;
   gap: var(--space-2);
 }
 
 .project-evidence-review,
-.project-report-export {
+.project-report-export,
+.project-collaboration-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -4952,26 +4955,31 @@ button.project-studio-metric:focus-visible {
 }
 
 .project-evidence-review > div:first-child,
-.project-report-export > div:first-child {
+.project-report-export > div:first-child,
+.project-collaboration-card > div:first-child,
+.project-collaboration-card > div:first-child > div:first-child {
   display: grid;
   gap: 3px;
   min-width: 0;
 }
 
 .project-evidence-review strong,
-.project-report-export strong {
+.project-report-export strong,
+.project-collaboration-card strong {
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
   line-height: 1.3;
 }
 
 .project-evidence-review span,
-.project-report-export span {
+.project-report-export span,
+.project-collaboration-card span {
   color: var(--text-secondary);
   font-size: 10px !important;
   font-weight: 650;
 }
 
-.project-evidence-review p {
+.project-evidence-review p,
+.project-collaboration-card > p {
   margin: 2px 0 0;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.7) !important;
@@ -4987,7 +4995,11 @@ button.project-studio-metric:focus-visible {
 }
 
 .project-evidence-review-actions button,
-.project-report-export > button {
+.project-report-export > button,
+.project-collaboration-card > div:first-child > button,
+.project-review-request-actions button,
+.project-collaboration-editor-actions button,
+.project-review-comment-form button {
   min-height: 34px;
   padding: 0 var(--space-3);
   border: 0;
@@ -5000,20 +5012,130 @@ button.project-studio-metric:focus-visible {
 }
 
 .project-evidence-review-actions button:hover,
-.project-report-export > button:hover {
+.project-report-export > button:hover,
+.project-collaboration-card > div:first-child > button:hover,
+.project-review-request-actions button:hover,
+.project-collaboration-editor-actions button:hover,
+.project-review-comment-form button:hover {
   background: color-mix(in srgb, var(--project-color) 40%, var(--surface));
 }
 
 .project-evidence-review-actions button:focus-visible,
-.project-report-export > button:focus-visible {
+.project-report-export > button:focus-visible,
+.project-collaboration-card > div:first-child > button:focus-visible,
+.project-review-request-actions button:focus-visible,
+.project-collaboration-editor-actions button:focus-visible,
+.project-review-comment-form button:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--project-color) 56%, transparent);
   outline-offset: 2px;
 }
 
 .project-evidence-review-actions button:disabled,
-.project-report-export > button:disabled {
+.project-report-export > button:disabled,
+.project-collaboration-card > div:first-child > button:disabled,
+.project-review-request-actions button:disabled,
+.project-collaboration-editor-actions button:disabled,
+.project-review-comment-form button:disabled {
   cursor: wait;
   opacity: 0.58;
+}
+
+.project-collaboration-card {
+  display: grid;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+.project-collaboration-card > div:first-child {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.project-review-thread.is-resolved,
+.project-review-thread.is-dismissed {
+  background: color-mix(in srgb, var(--project-color) 5%, var(--surface));
+}
+
+.project-collaboration-editor-slot:empty {
+  display: none;
+}
+
+.project-collaboration-editor {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--project-color) 12%, var(--surface));
+}
+
+.project-collaboration-editor input,
+.project-collaboration-editor textarea,
+.project-collaboration-editor select,
+.project-review-comment-form textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 11px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--project-color) 7%, var(--surface-raised));
+  color: var(--text-primary);
+  font: inherit;
+  font-size: calc(var(--chrome-font-size) * 0.74) !important;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.project-collaboration-editor input:focus-visible,
+.project-collaboration-editor textarea:focus-visible,
+.project-collaboration-editor select:focus-visible,
+.project-review-comment-form textarea:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--project-color) 56%, transparent);
+  outline-offset: 2px;
+}
+
+.project-collaboration-editor-actions,
+.project-review-request-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.project-review-thread-heading {
+  align-items: flex-start;
+}
+
+.project-review-comments {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-review-comments li {
+  display: grid;
+  gap: 3px;
+  padding: var(--space-2);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--project-color) 7%, var(--surface));
+}
+
+.project-review-comments p {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.project-review-comment-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--space-2);
 }
 
 .project-studio-metric:focus-visible,

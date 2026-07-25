@@ -682,14 +682,16 @@ Measure:
 
 Begin this release only after the individual professional workflow is stable.
 
-### Implementation status — July 24, 2026
+### Implementation status — July 25, 2026
 
 The core organization and collaboration foundation is now implemented locally and validated across the backend, web application, and iOS application.
 
-- The web application provides firm creation and administration, invitations, role and seat management, Project transfer, shared Project Studio access, shared Notebook editing, evidence review, Research history, and Report access.
-- The iOS application accepts firm invitation links and provides a read-only shared Project Hub for Notebook cards, Research history, evidence review status, Report downloads, Workboard previews, and recent activity.
+- The web application provides firm creation and administration, invitations, role and seat management, Project transfer, shared Project Studio access, shared Notebook editing, attributed Project notes, evidence review, threaded review coordination, Research history, and Report access.
+- The iOS application accepts firm invitation links and provides a read-only shared Project Hub for Notebook cards, Project notes, review coordination, Research history, evidence review status, Report downloads, Workboard previews, and recent activity.
 - The backend is the authority for organization membership, roles, seat limits, invitations, Project ownership, private asset access, and collaboration permissions.
 - Firm administration and shared editing remain web-first on iPhone. iOS intentionally focuses on review, continuity, and secure Report access.
+- The Project Studio remains one coordinated workspace. Switching Projects replaces the visible Notebook, notes, reviews, Research, reports, and Workboard state instead of opening parallel workboards or leaking the prior Project's content.
+- The Notebook uses a constrained Tiptap editor with canonical versioned JSON owned by Permitext; Tiptap Cloud and paid collaboration services are not foundation dependencies.
 - Shared Workboard editing remains deferred until the ordinary collaboration model has production experience.
 
 ## Phase 3.1 — Organizations
@@ -759,7 +761,7 @@ Support:
 
 Do not merge authorship. Every contribution must retain the identity of its author.
 
-**Status: focused scope implemented.** Authorized web collaborators can create attributed Notebook content and the activity history records the contributor. The next collaboration refinement should add standalone authored notes, threaded review comments, and richer Research-feedback presentation without weakening attribution.
+**Status: complete in the current phase.** Authorized web Editors and Owners can create and revise separately attributed Project notes and Notebook content. Editors, Reviewers, and Owners can add immutable attributed comments. Reviewers and Owners can open revision or missing-project-fact requests and resolve or reopen them. The activity history records each supported action without merging authorship. iOS intentionally presents these records read-only in the Project Hub.
 
 ---
 
@@ -777,7 +779,7 @@ Allow authorized collaborators to:
 
 Consider requiring Reviewer or Owner approval before a Research answer is marked as approved for a Project report.
 
-**Status: focused evidence-review scope implemented.** Editors can propose evidence and Reviewers or Owners can approve or reject it through backend-enforced role checks. Revision requests and structured missing-project-fact workflows remain to be added with the evidence-discovery work.
+**Status: complete in the current controlled-review scope.** Editors can propose evidence and Reviewers or Owners can approve or reject it through backend-enforced role checks. Review threads can target the Project, a Research answer, an evidence review, a Report Draft, or a Notebook card. Revision requests and structured missing-project-fact requests support attributed comments and explicit open, resolved, or dismissed states. A review decision does not automatically approve a Research answer, alter its immutable evidence, or turn Project context into authoritative code evidence.
 
 ---
 
@@ -800,7 +802,7 @@ Add:
 
 Educational, governmental, and institutional accounts may reuse the organization structure with different licensing policies.
 
-**Status: partial.** Seat limits and usage, pending invitations, member deactivation, role management, Project ownership transfer, and organization billing identity are implemented. Centralized billing operations, firm tags, templates, branding, required disclaimers, allowance policy, and data-retention controls remain future firm-administration work.
+**Status: partial.** Seat limits and usage, pending invitations, member deactivation, role management, Project ownership transfer, organization billing identity, and review statuses are implemented. Centralized billing operations, firm tags, templates, branding, required disclaimers, allowance policy, and data-retention controls remain the next firm-administration work.
 
 ---
 
@@ -1046,13 +1048,13 @@ When content must be removed, preserve only the minimum tombstone or audit metad
 
 ## Build after paid validation
 
-19. Organizations
-20. Read-only Project sharing
-21. Authored collaboration
-22. Shared evidence and review
-23. Firm controls
-24. Seat management and billing
-25. Shared Workboard editing
+19. Organizations — core scope completed
+20. Read-only Project sharing — completed
+21. Authored collaboration — completed for notes, Notebook content, comments, and activity
+22. Shared evidence and review — completed for the controlled review workflow
+23. Firm controls — next active phase
+24. Seat management and billing — seat controls implemented; billing operations remain
+25. Shared Workboard editing — intentionally deferred
 
 ## Develop and evaluate in parallel
 
@@ -1071,52 +1073,30 @@ When content must be removed, preserve only the minimum tombstone or audit metad
 
 # Immediate Next Development Sprint
 
-The next sprint should begin with Release 0 stabilization, then establish the Project Record foundation. It should not begin with broad interface work.
+The Project Record foundation and first professional vertical slices are complete. The next sprint should finish the bounded Release 3.5 firm controls that are useful without introducing shared Workboard editing or weakening Research release gates.
 
 ## Sprint deliverables
 
-1. Complete and verify the Release 0 product-contract fixes.
-2. Produce one integrated Project Record foundation specification.
-3. Define stable identity, ownership, and Project-membership rules by record type.
-4. Define immutable versus editable records.
-5. Define the focused Project activity events.
-6. Define owner authorization and future organization-ownership boundaries.
-7. Define synchronization, version compatibility, and conflict behavior by record type.
-8. Produce a migration and rollback plan for existing users.
-9. Create automated migration tests before changing production data.
-10. Implement one thin vertical slice after the foundation specification is approved.
+1. Add organization-owned firm tags with controlled creation, editing, archiving, and Project assignment.
+2. Add reusable organization Report templates without mutating previously generated immutable reports.
+3. Add organization branding and required-disclaimer settings with a safe, unbranded default.
+4. Apply the selected template, branding, and disclaimer snapshot to each new Report Manifest and export.
+5. Add explicit organization retention settings as policy metadata; do not automatically delete user content in this sprint.
+6. Define pooled versus per-seat Research allowance policy and expose usage clearly without making paid model calls.
+7. Complete centralized billing-operation state and audit events without relying on client-supplied authority.
+8. Keep firm administration web-first and show only relevant read-only organization/report context on iOS.
+9. Add backend permission, optimistic-concurrency, migration, PostgreSQL, smoke, offline, web-rendering, and iOS-build coverage for every new record.
+10. Verify the complete collaboration flow in a rendered browser and the Project Hub in an iOS simulator before publishing.
 
-## Required output before implementation
+## Required boundaries
 
-Codex should produce one integrated foundation specification containing:
-
-- Current-state data-model map
-- Proposed schema and relationship diagram
-- Record-type and Project-membership rules
-- Authorization matrix
-- Synchronization and conflict matrix
-- Activity-event list
-- Migration and rollback strategy
-- Privacy and retention behavior
-- Risk assessment
-- Test plan
-
-Avoid creating ten disconnected planning documents. The integrated specification should be reviewed before broad UI work begins.
-
-## First vertical implementation slice
-
-After approval of the foundation specification:
-
-1. Link one existing Research conversation to one Project.
-2. Preserve its exact approved evidence snapshot.
-3. Synchronize the Project relationship through the backend.
-4. Display the Research record in the web Project workspace.
-5. Display a read-only Research summary in the iOS Project Hub.
-6. Include the selected Research record in a basic Project Report Manifest.
-7. Generate a basic web and iOS report from the same manifest.
-8. Verify migration, authorization, sync compatibility, deletion behavior, and rollback.
-
-Do not expand to every Notebook card, attachment type, or Project Studio panel until this vertical slice proves the shared model.
+- Preserve the current one-Project-at-a-time Project Studio and its borderless, filled-control visual language.
+- Keep the constrained Tiptap Notebook and Permitext-owned canonical JSON.
+- Do not begin simultaneous Workboard editing, presence, or object-level conflict work in this sprint.
+- Do not enable public Find Relevant Evidence or Zoning Research until knowledgeable-human scenario approval exists.
+- Do not use Project notes, review comments, firm templates, or disclaimers as authoritative code evidence.
+- Do not make paid Research calls during implementation or validation without explicit approval.
+- Treat retention configuration as policy only until deletion, legal-hold, export, audit, and rollback behavior has a separately reviewed design.
 
 ---
 

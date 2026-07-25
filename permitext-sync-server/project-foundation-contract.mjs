@@ -25,13 +25,16 @@ export const capabilityIDs = Object.freeze({
 
 export const artifactTypes = Object.freeze([
   "note",
+  "projectNote",
   "notebookCard",
   "reportDraft",
   "attachment",
   "workboardPreview",
   "reportManifest",
   "generatedReport",
-  "evidenceReview"
+  "evidenceReview",
+  "reviewThread",
+  "reviewComment"
 ]);
 
 export const projectTargetKinds = Object.freeze([
@@ -39,6 +42,7 @@ export const projectTargetKinds = Object.freeze([
   "selectedPassage",
   "savedItem",
   "note",
+  "projectNote",
   "notebookCard",
   "researchConversation",
   "researchAnswer",
@@ -49,7 +53,9 @@ export const projectTargetKinds = Object.freeze([
   "reportDraft",
   "reportManifest",
   "generatedReport",
-  "evidenceReview"
+  "evidenceReview",
+  "reviewThread",
+  "reviewComment"
 ]);
 
 export const projectMembershipRules = Object.freeze({
@@ -57,6 +63,7 @@ export const projectMembershipRules = Object.freeze({
   selectedPassage: { maximumProjects: null, requiresExplicitLink: true },
   savedItem: { maximumProjects: null, requiresExplicitLink: true },
   note: { maximumProjects: null, requiresExplicitLink: true },
+  projectNote: { maximumProjects: 1, relationship: "owner" },
   notebookCard: { maximumProjects: null, requiresExplicitLink: true },
   researchConversation: { maximumProjects: 1, relationship: "primary" },
   researchAnswer: { maximumProjects: 1, relationship: "primary" },
@@ -67,12 +74,15 @@ export const projectMembershipRules = Object.freeze({
   reportDraft: { maximumProjects: 1, relationship: "owner" },
   reportManifest: { maximumProjects: 1, relationship: "owner" },
   generatedReport: { maximumProjects: 1, relationship: "owner" },
-  evidenceReview: { maximumProjects: 1, relationship: "reference" }
+  evidenceReview: { maximumProjects: 1, relationship: "reference" },
+  reviewThread: { maximumProjects: 1, relationship: "owner" },
+  reviewComment: { maximumProjects: 1, relationship: "reference" }
 });
 
 export const conflictPolicies = Object.freeze({
   savedItem: "latest-valid-record",
   note: "explicit-revision",
+  projectNote: "explicit-revision",
   notebookCard: "explicit-revision",
   researchConversation: "server-ordered-append",
   researchAnswer: "immutable",
@@ -84,6 +94,8 @@ export const conflictPolicies = Object.freeze({
   reportManifest: "immutable",
   generatedReport: "immutable",
   evidenceReview: "explicit-revision",
+  reviewThread: "explicit-revision",
+  reviewComment: "immutable",
   activityEvent: "append-only",
   projectLink: "latest-explicit-link-state"
 });
@@ -93,6 +105,8 @@ export const activityActions = Object.freeze([
   "item.unlinked",
   "note.created",
   "note.revision.saved",
+  "project-note.created",
+  "project-note.revision.saved",
   "notebook-card.created",
   "notebook-card.revision.saved",
   "evidence.approved",
@@ -101,6 +115,10 @@ export const activityActions = Object.freeze([
   "research.answer.generated",
   "research.project-context.reviewed",
   "review-status.changed",
+  "review-thread.created",
+  "review-thread.revision.saved",
+  "review-thread.status.changed",
+  "review-comment.created",
   "report.generated",
   "report.export.saved",
   "project.archived",

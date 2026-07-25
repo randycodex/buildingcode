@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-zoning-library-v6";
+} from "./offline-storage.js?v=20260725-project-collaboration-v7";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10720,6 +10720,441 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
   content.append(section);
 }
 
+function projectCollaborationArtifacts(foundation, type) {
+  return (foundation?.artifacts || [])
+    .filter((artifact) =>
+      artifact.envelope?.type === type &&
+      !artifact.envelope?.deletedAt
+    )
+    .map((artifact) => ({
+      id: artifact.envelope.id,
+      version: artifact.envelope.version,
+      createdAt: artifact.envelope.createdAt,
+      updatedAt: artifact.envelope.updatedAt,
+      ...artifact.payload
+    }))
+    .sort((left, right) =>
+      String(right.updatedAt || right.createdAt || "").localeCompare(
+        String(left.updatedAt || left.createdAt || "")
+      )
+    );
+}
+
+function projectCollaborationActor(item, prefix = "createdBy") {
+  const displayName = String(item?.[`${prefix}DisplayName`] || "").trim();
+  const userID = String(item?.[`${prefix}UserID`] || "").trim();
+  return displayName || (userID === activeAccount()?.userID ? "You" : userID) || "Permitext professional";
+}
+
+function projectCollaborationAccess(identity, permission) {
+  return identity.sharedOrganizationID
+    ? identity.sharedPermissions?.includes(permission)
+    : true;
+}
+
+function projectCollaborationRefresh(identity) {
+  return transitionWorkspace("utility", {
+    refreshPaneIDs: [paneIDForProjectDetail(identity)]
+  });
+}
+
+function projectNoteEditor(identity, note, onCancel) {
+  const form = document.createElement("form");
+  form.className = "project-collaboration-editor";
+  const title = document.createElement("input");
+  title.type = "text";
+  title.maxLength = 160;
+  title.required = true;
+  title.placeholder = "Note title";
+  title.setAttribute("aria-label", "Project note title");
+  title.value = note?.title || "";
+  const body = document.createElement("textarea");
+  body.maxLength = 20000;
+  body.rows = 4;
+  body.placeholder = "Record a Project fact, coordination item, or professional note.";
+  body.setAttribute("aria-label", "Project note");
+  body.value = note?.body || "";
+  const actions = document.createElement("div");
+  actions.className = "project-collaboration-editor-actions";
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = "Cancel";
+  cancel.addEventListener("click", onCancel);
+  const save = document.createElement("button");
+  save.type = "submit";
+  save.textContent = note ? "Save revision" : "Save note";
+  actions.append(cancel, save);
+  form.append(title, body, actions);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    form.querySelectorAll("button, input, textarea").forEach((control) => {
+      control.disabled = true;
+    });
+    try {
+      await postResearch("/projects/collaboration/notes/save", {
+        projectID: projectDetailKey(identity),
+        noteID: note?.id || undefined,
+        expectedVersion: note?.version || 0,
+        title: title.value,
+        body: body.value
+      });
+      await projectCollaborationRefresh(identity);
+    } catch (error) {
+      form.querySelectorAll("button, input, textarea").forEach((control) => {
+        control.disabled = false;
+      });
+      await showWebNotice("Project note not saved", error.message);
+    }
+  });
+  return form;
+}
+
+function appendProjectNotes(content, identity, foundation) {
+  const notes = projectCollaborationArtifacts(foundation, "projectNote");
+  const canEdit = projectCollaborationAccess(identity, "project.note.edit");
+  if (!notes.length && !canEdit) return;
+  const section = document.createElement("section");
+  section.className = "project-studio-section project-collaboration-notes";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Project notes";
+  heading.append(title);
+  const editorSlot = document.createElement("div");
+  editorSlot.className = "project-collaboration-editor-slot";
+  if (canEdit) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.textContent = "Add note";
+    add.addEventListener("click", () => {
+      add.disabled = true;
+      editorSlot.replaceChildren(projectNoteEditor(identity, null, () => {
+        editorSlot.replaceChildren();
+        add.disabled = false;
+      }));
+      editorSlot.querySelector("input")?.focus();
+    });
+    heading.append(add);
+  }
+  section.append(heading, editorSlot);
+  if (!notes.length) {
+    const empty = document.createElement("p");
+    empty.className = "project-studio-empty";
+    empty.textContent = "No standalone Project notes have been recorded yet.";
+    section.append(empty);
+  }
+  notes.slice(0, 12).forEach((note) => {
+    const card = document.createElement("article");
+    card.className = "project-collaboration-card project-note-card";
+    const cardHeading = document.createElement("div");
+    const noteTitle = document.createElement("strong");
+    noteTitle.textContent = note.title;
+    const meta = document.createElement("span");
+    meta.textContent = [
+      `By ${projectCollaborationActor(note)}`,
+      note.updatedByUserID !== note.createdByUserID
+        ? `updated by ${projectCollaborationActor(note, "updatedBy")}`
+        : "",
+      researchRelativeDate(note.updatedAt)
+    ].filter(Boolean).join(" · ");
+    cardHeading.append(noteTitle, meta);
+    if (canEdit) {
+      const edit = document.createElement("button");
+      edit.type = "button";
+      edit.textContent = "Edit";
+      edit.addEventListener("click", () => {
+        const editor = projectNoteEditor(identity, note, () => {
+          editor.replaceWith(card);
+        });
+        card.replaceWith(editor);
+        editor.querySelector("input")?.focus();
+      });
+      cardHeading.append(edit);
+    }
+    card.append(cardHeading);
+    if (note.body) {
+      const body = document.createElement("p");
+      body.textContent = note.body;
+      card.append(body);
+    }
+    section.append(card);
+  });
+  content.append(section);
+}
+
+function projectReviewKindLabel(kind) {
+  return {
+    "general-review": "General review",
+    "revision-request": "Revision request",
+    "missing-project-fact": "Missing Project fact"
+  }[kind] || "Project review";
+}
+
+function projectReviewStatusLabel(status) {
+  return {
+    open: "Open",
+    resolved: "Resolved",
+    dismissed: "Dismissed"
+  }[status] || "Open";
+}
+
+function projectReviewTargets(identity, foundation) {
+  const targets = [{
+    kind: "project",
+    id: projectDetailKey(identity),
+    label: "Entire Project"
+  }];
+  (foundation?.researchAnswers || []).forEach((answer) => {
+    targets.push({
+      kind: "researchAnswer",
+      id: answer.id,
+      label: `Research: ${answer.question || "answer"}`
+    });
+  });
+  [
+    ["evidenceReview", "Evidence review"],
+    ["notebookCard", "Notebook"],
+    ["reportDraft", "Report Draft"]
+  ].forEach(([type, label]) => {
+    projectCollaborationArtifacts(foundation, type).forEach((artifact) => {
+      targets.push({
+        kind: type,
+        id: artifact.id,
+        label: `${label}: ${artifact.title || artifact.note || artifact.id}`
+      });
+    });
+  });
+  return targets;
+}
+
+function projectReviewThreadEditor(identity, foundation, kind, onCancel) {
+  const form = document.createElement("form");
+  form.className = "project-collaboration-editor project-review-editor";
+  const title = document.createElement("input");
+  title.type = "text";
+  title.maxLength = 200;
+  title.required = true;
+  title.placeholder = kind === "missing-project-fact"
+    ? "What Project fact is missing?"
+    : "What needs revision?";
+  title.setAttribute("aria-label", "Review request title");
+  const body = document.createElement("textarea");
+  body.maxLength = 20000;
+  body.rows = 4;
+  body.placeholder = "Explain what is needed and why.";
+  body.setAttribute("aria-label", "Review request details");
+  const target = document.createElement("select");
+  target.setAttribute("aria-label", "Project item to review");
+  projectReviewTargets(identity, foundation).forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.id;
+    option.dataset.targetKind = item.kind;
+    option.textContent = item.label;
+    target.append(option);
+  });
+  const actions = document.createElement("div");
+  actions.className = "project-collaboration-editor-actions";
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.textContent = "Cancel";
+  cancel.addEventListener("click", onCancel);
+  const save = document.createElement("button");
+  save.type = "submit";
+  save.textContent = "Open request";
+  actions.append(cancel, save);
+  form.append(target, title, body, actions);
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const selected = target.selectedOptions[0];
+    form.querySelectorAll("button, input, textarea, select").forEach((control) => {
+      control.disabled = true;
+    });
+    try {
+      await postResearch("/projects/collaboration/threads/save", {
+        projectID: projectDetailKey(identity),
+        expectedVersion: 0,
+        kind,
+        status: "open",
+        targetKind: selected?.dataset.targetKind || "project",
+        targetID: selected?.value || projectDetailKey(identity),
+        title: title.value,
+        body: body.value
+      });
+      await projectCollaborationRefresh(identity);
+    } catch (error) {
+      form.querySelectorAll("button, input, textarea, select").forEach((control) => {
+        control.disabled = false;
+      });
+      await showWebNotice("Review request not saved", error.message);
+    }
+  });
+  return form;
+}
+
+function appendProjectReviewThreads(content, identity, foundation) {
+  const threads = projectCollaborationArtifacts(foundation, "reviewThread");
+  const comments = projectCollaborationArtifacts(foundation, "reviewComment");
+  const commentsByThreadID = new Map();
+  comments.reverse().forEach((comment) => {
+    const items = commentsByThreadID.get(comment.threadID) || [];
+    items.push(comment);
+    commentsByThreadID.set(comment.threadID, items);
+  });
+  const canRequest = projectCollaborationAccess(identity, "project.review.request");
+  const canComment = projectCollaborationAccess(identity, "project.review.comment");
+  const canResolve = projectCollaborationAccess(identity, "project.review.resolve");
+  if (!threads.length && !canRequest) return;
+
+  const section = document.createElement("section");
+  section.className = "project-studio-section project-review-threads";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading project-review-thread-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Review & coordination";
+  const requestActions = document.createElement("div");
+  requestActions.className = "project-review-request-actions";
+  const editorSlot = document.createElement("div");
+  editorSlot.className = "project-collaboration-editor-slot";
+  if (canRequest) {
+    [
+      ["revision-request", "Request revision"],
+      ["missing-project-fact", "Ask for information"]
+    ].forEach(([kind, label]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => {
+        requestActions.querySelectorAll("button").forEach((control) => {
+          control.disabled = true;
+        });
+        editorSlot.replaceChildren(projectReviewThreadEditor(
+          identity,
+          foundation,
+          kind,
+          () => {
+            editorSlot.replaceChildren();
+            requestActions.querySelectorAll("button").forEach((control) => {
+              control.disabled = false;
+            });
+          }
+        ));
+        editorSlot.querySelector("input")?.focus();
+      });
+      requestActions.append(button);
+    });
+  }
+  heading.append(title, requestActions);
+  section.append(heading, editorSlot);
+  if (!threads.length) {
+    const empty = document.createElement("p");
+    empty.className = "project-studio-empty";
+    empty.textContent = "No revision or missing-information requests are open.";
+    section.append(empty);
+  }
+
+  threads.forEach((thread) => {
+    const card = document.createElement("article");
+    card.className = `project-collaboration-card project-review-thread is-${thread.status}`;
+    const cardHeading = document.createElement("div");
+    const copy = document.createElement("div");
+    const threadTitle = document.createElement("strong");
+    threadTitle.textContent = thread.title;
+    const meta = document.createElement("span");
+    meta.textContent = [
+      projectReviewKindLabel(thread.kind),
+      projectReviewStatusLabel(thread.status),
+      String(thread.targetKind || "project").replaceAll(/([a-z])([A-Z])/g, "$1 $2"),
+      `By ${projectCollaborationActor(thread)}`,
+      researchRelativeDate(thread.updatedAt)
+    ].filter(Boolean).join(" · ");
+    copy.append(threadTitle, meta);
+    cardHeading.append(copy);
+    if (canResolve) {
+      const statusButton = document.createElement("button");
+      statusButton.type = "button";
+      statusButton.textContent = thread.status === "open" ? "Resolve" : "Reopen";
+      statusButton.addEventListener("click", async () => {
+        statusButton.disabled = true;
+        try {
+          await postResearch("/projects/collaboration/threads/save", {
+            projectID: projectDetailKey(identity),
+            threadID: thread.id,
+            expectedVersion: thread.version,
+            status: thread.status === "open" ? "resolved" : "open"
+          });
+          await projectCollaborationRefresh(identity);
+        } catch (error) {
+          statusButton.disabled = false;
+          await showWebNotice("Review status not saved", error.message);
+        }
+      });
+      cardHeading.append(statusButton);
+    }
+    card.append(cardHeading);
+    if (thread.body) {
+      const body = document.createElement("p");
+      body.textContent = thread.body;
+      card.append(body);
+    }
+    const threadComments = commentsByThreadID.get(thread.id) || [];
+    if (threadComments.length) {
+      const list = document.createElement("ol");
+      list.className = "project-review-comments";
+      threadComments.forEach((comment) => {
+        const row = document.createElement("li");
+        const commentBody = document.createElement("p");
+        commentBody.textContent = comment.body;
+        const commentMeta = document.createElement("span");
+        commentMeta.textContent = [
+          projectCollaborationActor(comment),
+          researchRelativeDate(comment.createdAt)
+        ].join(" · ");
+        row.append(commentBody, commentMeta);
+        list.append(row);
+      });
+      card.append(list);
+    }
+    if (canComment && thread.status === "open") {
+      const form = document.createElement("form");
+      form.className = "project-review-comment-form";
+      const input = document.createElement("textarea");
+      input.rows = 2;
+      input.maxLength = 10000;
+      input.required = true;
+      input.placeholder = thread.kind === "missing-project-fact"
+        ? "Provide the requested Project fact…"
+        : "Add a response…";
+      input.setAttribute("aria-label", `Respond to ${thread.title}`);
+      const submit = document.createElement("button");
+      submit.type = "submit";
+      submit.textContent = "Post response";
+      form.append(input, submit);
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        input.disabled = true;
+        submit.disabled = true;
+        try {
+          await postResearch("/projects/collaboration/comments/save", {
+            projectID: projectDetailKey(identity),
+            threadID: thread.id,
+            body: input.value
+          });
+          await projectCollaborationRefresh(identity);
+        } catch (error) {
+          input.disabled = false;
+          submit.disabled = false;
+          await showWebNotice("Response not saved", error.message);
+        }
+      });
+      card.append(form);
+    }
+    section.append(card);
+  });
+  content.append(section);
+}
+
 function appendProjectReportExports(content, identity, foundation) {
   const reports = (foundation?.artifacts || [])
     .filter((artifact) =>
@@ -11143,8 +11578,10 @@ async function renderProjectDetail(detail) {
     content.append(warning);
   }
   content.append(savedSection);
+  appendProjectNotes(content, identity, foundation);
   appendProjectResearchHistory(content, identity, foundation);
   appendProjectEvidenceReviews(content, identity, foundation);
+  appendProjectReviewThreads(content, identity, foundation);
   appendProjectReportExports(content, identity, foundation);
   appendProjectActivity(content, foundation);
   panel.append(chrome, content);

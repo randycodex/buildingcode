@@ -1553,12 +1553,23 @@ struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
     let projectID: String?
     let cardType: String?
     let title: String?
+    let body: String?
     let plainText: String?
     let referenceCount: Int?
     let createdAt: String?
     let updatedAt: String?
     let createdBy: String?
     let updatedBy: String?
+    let createdByUserID: String?
+    let createdByDisplayName: String?
+    let updatedByDisplayName: String?
+    let kind: String?
+    let targetKind: String?
+    let targetID: String?
+    let threadID: String?
+    let resolvedByUserID: String?
+    let resolvedByDisplayName: String?
+    let resolvedAt: String?
     let manifestID: String?
     let reportVersion: Int?
     let file: ProjectFoundationArtifactFile?

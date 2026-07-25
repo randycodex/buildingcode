@@ -36,6 +36,18 @@ struct OrganizationProjectHubView: View {
             .sorted { $0.createdAt > $1.createdAt }
     }
 
+    private var projectNotes: [ProjectFoundationArtifact] {
+        collaborationArtifacts(ofType: "projectNote")
+    }
+
+    private var reviewThreads: [ProjectFoundationArtifact] {
+        collaborationArtifacts(ofType: "reviewThread")
+    }
+
+    private var reviewComments: [ProjectFoundationArtifact] {
+        collaborationArtifacts(ofType: "reviewComment")
+    }
+
     private var evidenceReviews: [ProjectFoundationArtifact] {
         (foundation?.artifacts ?? [])
             .filter {
@@ -82,9 +94,11 @@ struct OrganizationProjectHubView: View {
                     }
                 } else if snapshot != nil {
                     projectMetrics
+                    projectNotesSection
                     notebookSection
                     researchSection
                     evidenceReviewSection
+                    reviewCoordinationSection
                     reportSection
                     workboardSection
                     activitySection
@@ -166,8 +180,13 @@ struct OrganizationProjectHubView: View {
         ]
         return LazyVGrid(columns: columns, spacing: 10) {
             metric(value: "\(savedEvidenceCount)", label: "Saved evidence")
+            metric(value: "\(projectNotes.count)", label: "Project notes")
             metric(value: "\(notebookCards.count)", label: "Notebook cards")
             metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Research answers")
+            metric(
+                value: "\(reviewThreads.filter { $0.payload.status == "open" }.count)",
+                label: "Open reviews"
+            )
             metric(value: "\(reportFiles.count)", label: "Report exports")
         }
     }
@@ -186,6 +205,34 @@ struct OrganizationProjectHubView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(projectAccent.opacity(0.1))
         )
+    }
+
+    @ViewBuilder
+    private var projectNotesSection: some View {
+        projectSection(title: "Project notes", systemImage: "text.bubble") {
+            if projectNotes.isEmpty {
+                emptyText("No standalone Project notes have been recorded yet.")
+            } else {
+                ForEach(projectNotes.prefix(8)) { note in
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(note.payload.title ?? "Project note")
+                            .font(.subheadline.weight(.semibold))
+                        if let body = note.payload.body, !body.isEmpty {
+                            Text(body)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(5)
+                        }
+                        Text(
+                            "By \(collaborationActor(note.payload)) · \(relativeDate(note.envelope.updatedAt))"
+                        )
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -260,6 +307,63 @@ struct OrganizationProjectHubView: View {
                     }
                     .projectHubRow(accent: projectAccent)
                 }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var reviewCoordinationSection: some View {
+        if !reviewThreads.isEmpty {
+            projectSection(title: "Review & coordination", systemImage: "person.2.badge.gearshape") {
+                ForEach(reviewThreads) { thread in
+                    VStack(alignment: .leading, spacing: 7) {
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text(thread.payload.title ?? "Project review")
+                                .font(.subheadline.weight(.semibold))
+                            Spacer(minLength: 0)
+                            Text(reviewStatusLabel(thread.payload.status))
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(
+                                    thread.payload.status == "open" ? projectAccent : .secondary
+                                )
+                        }
+                        Text(
+                            [
+                                reviewKindLabel(thread.payload.kind),
+                                "By \(collaborationActor(thread.payload))",
+                                relativeDate(thread.envelope.updatedAt)
+                            ].joined(separator: " · ")
+                        )
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                        if let body = thread.payload.body, !body.isEmpty {
+                            Text(body)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                        ForEach(comments(for: thread.id)) { comment in
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(comment.payload.body ?? "")
+                                    .font(.footnote)
+                                Text(
+                                    "\(collaborationActor(comment.payload)) · \(relativeDate(comment.envelope.createdAt))"
+                                )
+                                    .font(.caption2)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(9)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(projectAccent.opacity(0.065))
+                            )
+                        }
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+                Text("Create requests and respond on Permitext Web.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
             }
         }
     }
@@ -382,6 +486,55 @@ struct OrganizationProjectHubView: View {
         }
     }
 
+    private func collaborationArtifacts(ofType type: String) -> [ProjectFoundationArtifact] {
+        (foundation?.artifacts ?? [])
+            .filter {
+                $0.envelope.type == type &&
+                    $0.envelope.deletedAt == nil
+            }
+            .sorted { $0.envelope.updatedAt > $1.envelope.updatedAt }
+    }
+
+    private func comments(for threadID: String) -> [ProjectFoundationArtifact] {
+        reviewComments
+            .filter { $0.payload.threadID == threadID }
+            .sorted { $0.envelope.createdAt < $1.envelope.createdAt }
+    }
+
+    private func collaborationActor(_ payload: ProjectFoundationArtifactPayload) -> String {
+        if let displayName = payload.createdByDisplayName, !displayName.isEmpty {
+            return displayName
+        }
+        if let userID = payload.createdByUserID, !userID.isEmpty {
+            return userID
+        }
+        return "Permitext professional"
+    }
+
+    private func reviewKindLabel(_ kind: String?) -> String {
+        switch kind {
+        case "revision-request": return "Revision request"
+        case "missing-project-fact": return "Missing Project fact"
+        case "general-review": return "General review"
+        default: return "Project review"
+        }
+    }
+
+    private func reviewStatusLabel(_ status: String?) -> String {
+        switch status {
+        case "resolved": return "Resolved"
+        case "dismissed": return "Dismissed"
+        default: return "Open"
+        }
+    }
+
+    private func relativeDate(_ value: String) -> String {
+        guard let date = ISO8601DateFormatter().date(from: value) else {
+            return "Recently"
+        }
+        return date.formatted(.relative(presentation: .named))
+    }
+
     private func activityLabel(_ action: String) -> String {
         switch action {
         case "item.linked": return "Project item linked"
@@ -390,6 +543,12 @@ struct OrganizationProjectHubView: View {
         case "notebook-card.revision.saved": return "Notebook revision saved"
         case "research.answer.generated": return "Research answer generated"
         case "review-status.changed": return "Evidence review changed"
+        case "project-note.created": return "Project note created"
+        case "project-note.revision.saved": return "Project note revised"
+        case "review-thread.created": return "Review request opened"
+        case "review-thread.revision.saved": return "Review request revised"
+        case "review-thread.status.changed": return "Review request status changed"
+        case "review-comment.created": return "Review response added"
         case "report.generated": return "Report generated"
         case "report.export.saved": return "Report export saved"
         case "project.transferred": return "Project transferred to firm"

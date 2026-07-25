@@ -87,6 +87,11 @@ import {
   zoningSyncCodeVersion
 } from "./zoning-content.mjs";
 import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
+import {
+  normalizeProjectNotePayload,
+  normalizeReviewCommentPayload,
+  normalizeReviewThreadPayload
+} from "./collaboration-contract.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
@@ -139,6 +144,9 @@ const rateLimitPolicies = new Map([
   ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/collaboration/notes/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/collaboration/threads/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["projects/collaboration/comments/save", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["organizations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/create", { limit: 10, windowMs: 60 * 60 * 1000 }],
   ["organizations/update", { limit: 60, windowMs: 60 * 60 * 1000 }],
@@ -5373,6 +5381,449 @@ async function handleOrganizationEvidenceReviewSave(request, response) {
     sendJSON(response, 400, {
       error: error instanceof Error ? error.message : "Invalid evidence review.",
       code: "INVALID_EVIDENCE_REVIEW"
+    });
+  }
+}
+
+function collaborationArtifactForClient(artifact) {
+  return {
+    id: artifact.envelope.id,
+    version: artifact.envelope.version,
+    createdAt: artifact.envelope.createdAt,
+    updatedAt: artifact.envelope.updatedAt,
+    deletedAt: artifact.envelope.deletedAt,
+    ...artifact.payload
+  };
+}
+
+function collaborationActorDisplayName(context) {
+  return String(
+    context.authContext.account?.displayName ||
+    context.authContext.account?.publicUsername ||
+    "Permitext professional"
+  ).trim();
+}
+
+async function collaborationProjectAccess(context, response, permission) {
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    permission
+  );
+  if (!access) return null;
+  if (!access.organization && !hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Project collaboration requires Pro.",
+      code: "PRO_REQUIRED_COLLABORATION"
+    });
+    return null;
+  }
+  return access;
+}
+
+async function reviewTargetExistsInProject(storageOwnerUserID, projectID, targetKind, targetID) {
+  const normalizedTargetID = String(targetID || "").trim();
+  if (targetKind === "project") return normalizedTargetID === projectID;
+  if (targetKind === "researchAnswer") {
+    return (await listStoredResearchAnswers(storageOwnerUserID)).some((answer) =>
+      answer.id === normalizedTargetID && answer.projectID === projectID
+    );
+  }
+  const artifactTypeByTargetKind = {
+    evidenceReview: "evidenceReview",
+    reportDraft: "reportDraft",
+    notebookCard: "notebookCard"
+  };
+  const artifactType = artifactTypeByTargetKind[targetKind];
+  return artifactType
+    ? Boolean(await linkedProjectArtifact(
+        storageOwnerUserID,
+        projectID,
+        targetKind,
+        artifactType,
+        normalizedTargetID
+      ))
+    : false;
+}
+
+async function handleProjectCollaborationNoteSave(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await collaborationProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectNoteEdit
+  );
+  if (!access) return;
+  const requestedNoteID = String(context.body.noteID || "").trim();
+  const existing = requestedNoteID
+    ? await linkedProjectArtifact(
+        access.storageOwnerUserID,
+        projectID,
+        "projectNote",
+        "projectNote",
+        requestedNoteID
+      )
+    : null;
+  if (requestedNoteID && !existing) {
+    sendError(response, 404, "Project note not found.");
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  if (
+    existing &&
+    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+  ) {
+    sendJSON(response, 409, {
+      error: "This Project note changed after you opened it. Review the current version before saving.",
+      code: "PROJECT_NOTE_VERSION_CONFLICT",
+      note: collaborationArtifactForClient(existing)
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const noteID = existing?.envelope.id || randomUUID();
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: noteID,
+        type: "projectNote",
+        owner: access.owner,
+        createdAt: existing?.envelope.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope.version || 0) + 1
+      }),
+      payload: normalizeProjectNotePayload({
+        projectID,
+        title: context.body.title,
+        body: context.body.body,
+        createdByUserID: existing?.payload.createdByUserID || context.userID,
+        updatedByUserID: context.userID,
+        createdByDisplayName: existing?.payload.createdByDisplayName ||
+          collaborationActorDisplayName(context),
+        updatedByDisplayName: collaborationActorDisplayName(context)
+      })
+    };
+    await saveStoredFoundationArtifact(access.storageOwnerUserID, artifact);
+    let link = null;
+    if (!existing) {
+      link = projectLinkRecord({
+        id: deterministicFoundationLinkID(
+          access.storageOwnerUserID,
+          projectID,
+          "projectNote",
+          noteID
+        ),
+        owner: access.owner,
+        projectID,
+        targetKind: "projectNote",
+        targetID: noteID,
+        relationship: "owner",
+        createdAt: now,
+        updatedAt: now,
+        version: 1,
+        metadata: { createdWith: "permitext-project-studio" }
+      });
+      await saveStoredProjectLink(access.storageOwnerUserID, link);
+    }
+    const event = activityEvent({
+      owner: access.owner,
+      projectID,
+      actorUserID: context.userID,
+      action: existing ? "project-note.revision.saved" : "project-note.created",
+      objectKind: "projectNote",
+      objectID: noteID,
+      previousStatus: existing ? `version-${existing.envelope.version}` : null,
+      newStatus: `version-${artifact.envelope.version}`,
+      createdAt: now
+    });
+    await saveStoredActivityEvent(access.storageOwnerUserID, event);
+    sendJSON(response, existing ? 200 : 201, {
+      note: collaborationArtifactForClient(artifact),
+      link,
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid Project note.",
+      code: "INVALID_PROJECT_NOTE"
+    });
+  }
+}
+
+async function handleProjectCollaborationThreadSave(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const viewAccess = await collaborationProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectView
+  );
+  if (!viewAccess) return;
+  const requestedThreadID = String(context.body.threadID || "").trim();
+  const existing = requestedThreadID
+    ? await linkedProjectArtifact(
+        viewAccess.storageOwnerUserID,
+        projectID,
+        "reviewThread",
+        "reviewThread",
+        requestedThreadID
+      )
+    : null;
+  if (requestedThreadID && !existing) {
+    sendError(response, 404, "Project review thread not found.");
+    return;
+  }
+  const requestedStatus = String(context.body.status || existing?.payload.status || "open")
+    .trim()
+    .toLowerCase();
+  if (!existing && requestedStatus !== "open") {
+    sendJSON(response, 400, {
+      error: "New review threads must start open.",
+      code: "INVALID_REVIEW_THREAD_STATUS"
+    });
+    return;
+  }
+  const statusChanged = Boolean(existing && requestedStatus !== existing.payload.status);
+  const requiredPermission = statusChanged
+    ? organizationPermissions.projectReviewResolve
+    : organizationPermissions.projectReviewRequest;
+  if (!viewAccess.permissions.includes(requiredPermission)) {
+    sendJSON(response, 403, {
+      error: "Your Project role does not allow this action.",
+      code: "PROJECT_PERMISSION_REQUIRED",
+      requiredPermission
+    });
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  if (
+    existing &&
+    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+  ) {
+    sendJSON(response, 409, {
+      error: "This review thread changed after you opened it. Review the current version before saving.",
+      code: "REVIEW_THREAD_VERSION_CONFLICT",
+      thread: collaborationArtifactForClient(existing)
+    });
+    return;
+  }
+  const targetKind = String(
+    context.body.targetKind || existing?.payload.targetKind || "project"
+  ).trim();
+  const targetID = String(
+    context.body.targetID || existing?.payload.targetID || projectID
+  ).trim();
+  if (
+    existing &&
+    (targetKind !== existing.payload.targetKind || targetID !== existing.payload.targetID)
+  ) {
+    sendJSON(response, 409, {
+      error: "A review thread cannot be moved to a different Project item.",
+      code: "REVIEW_THREAD_TARGET_IMMUTABLE"
+    });
+    return;
+  }
+  if (!await reviewTargetExistsInProject(
+    viewAccess.storageOwnerUserID,
+    projectID,
+    targetKind,
+    targetID
+  )) {
+    sendError(response, 404, "Review target not found in this Project.");
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const threadID = existing?.envelope.id || randomUUID();
+    const payload = normalizeReviewThreadPayload({
+      projectID,
+      kind: context.body.kind || existing?.payload.kind,
+      status: requestedStatus,
+      targetKind,
+      targetID,
+      title: context.body.title || existing?.payload.title,
+      body: context.body.body ?? existing?.payload.body,
+      createdByUserID: existing?.payload.createdByUserID || context.userID,
+      updatedByUserID: context.userID,
+      createdByDisplayName: existing?.payload.createdByDisplayName ||
+        collaborationActorDisplayName(context),
+      updatedByDisplayName: collaborationActorDisplayName(context),
+      resolvedByUserID: requestedStatus === "open"
+        ? null
+        : statusChanged
+          ? context.userID
+          : existing?.payload.resolvedByUserID,
+      resolvedByDisplayName: requestedStatus === "open"
+        ? ""
+        : statusChanged
+          ? collaborationActorDisplayName(context)
+          : existing?.payload.resolvedByDisplayName,
+      resolvedAt: requestedStatus === "open"
+        ? null
+        : statusChanged
+          ? now
+          : existing?.payload.resolvedAt
+    });
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: threadID,
+        type: "reviewThread",
+        owner: viewAccess.owner,
+        createdAt: existing?.envelope.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope.version || 0) + 1
+      }),
+      payload
+    };
+    await saveStoredFoundationArtifact(viewAccess.storageOwnerUserID, artifact);
+    let link = null;
+    if (!existing) {
+      link = projectLinkRecord({
+        id: deterministicFoundationLinkID(
+          viewAccess.storageOwnerUserID,
+          projectID,
+          "reviewThread",
+          threadID
+        ),
+        owner: viewAccess.owner,
+        projectID,
+        targetKind: "reviewThread",
+        targetID: threadID,
+        relationship: "owner",
+        createdAt: now,
+        updatedAt: now,
+        version: 1,
+        metadata: { targetKind, targetID }
+      });
+      await saveStoredProjectLink(viewAccess.storageOwnerUserID, link);
+    }
+    const event = activityEvent({
+      owner: viewAccess.owner,
+      projectID,
+      actorUserID: context.userID,
+      action: existing
+        ? statusChanged
+          ? "review-thread.status.changed"
+          : "review-thread.revision.saved"
+        : "review-thread.created",
+      objectKind: "reviewThread",
+      objectID: threadID,
+      previousStatus: existing?.payload.status || null,
+      newStatus: payload.status,
+      createdAt: now,
+      metadata: { kind: payload.kind, targetKind, targetID }
+    });
+    await saveStoredActivityEvent(viewAccess.storageOwnerUserID, event);
+    sendJSON(response, existing ? 200 : 201, {
+      thread: collaborationArtifactForClient(artifact),
+      link,
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid review thread.",
+      code: "INVALID_REVIEW_THREAD"
+    });
+  }
+}
+
+async function handleProjectCollaborationCommentSave(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await collaborationProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectReviewComment
+  );
+  if (!access) return;
+  const threadID = String(context.body.threadID || "").trim();
+  const thread = await linkedProjectArtifact(
+    access.storageOwnerUserID,
+    projectID,
+    "reviewThread",
+    "reviewThread",
+    threadID
+  );
+  if (!thread) {
+    sendError(response, 404, "Project review thread not found.");
+    return;
+  }
+  if (thread.payload.status !== "open") {
+    sendJSON(response, 409, {
+      error: "Resolved or dismissed review threads cannot receive new comments.",
+      code: "REVIEW_THREAD_CLOSED",
+      thread: collaborationArtifactForClient(thread)
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const commentID = randomUUID();
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: commentID,
+        type: "reviewComment",
+        owner: access.owner,
+        createdAt: now,
+        updatedAt: now,
+        version: 1
+      }),
+      payload: normalizeReviewCommentPayload({
+        projectID,
+        threadID,
+        body: context.body.body,
+        createdByUserID: context.userID,
+        createdByDisplayName: collaborationActorDisplayName(context),
+        createdAt: now
+      })
+    };
+    await saveStoredFoundationArtifact(access.storageOwnerUserID, artifact);
+    const link = projectLinkRecord({
+      id: deterministicFoundationLinkID(
+        access.storageOwnerUserID,
+        projectID,
+        "reviewComment",
+        commentID
+      ),
+      owner: access.owner,
+      projectID,
+      targetKind: "reviewComment",
+      targetID: commentID,
+      relationship: "reference",
+      createdAt: now,
+      updatedAt: now,
+      version: 1,
+      metadata: { threadID }
+    });
+    await saveStoredProjectLink(access.storageOwnerUserID, link);
+    const event = activityEvent({
+      owner: access.owner,
+      projectID,
+      actorUserID: context.userID,
+      action: "review-comment.created",
+      objectKind: "reviewComment",
+      objectID: commentID,
+      previousStatus: null,
+      newStatus: "created",
+      createdAt: now,
+      metadata: { threadID }
+    });
+    await saveStoredActivityEvent(access.storageOwnerUserID, event);
+    sendJSON(response, 201, {
+      comment: collaborationArtifactForClient(artifact),
+      link,
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid review comment.",
+      code: "INVALID_REVIEW_COMMENT"
     });
   }
 }
@@ -11858,6 +12309,9 @@ const handlers = {
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
+  "projects/collaboration/notes/save": handleProjectCollaborationNoteSave,
+  "projects/collaboration/threads/save": handleProjectCollaborationThreadSave,
+  "projects/collaboration/comments/save": handleProjectCollaborationCommentSave,
   "organizations/list": handleOrganizationList,
   "organizations/create": handleOrganizationCreate,
   "organizations/update": handleOrganizationUpdate,

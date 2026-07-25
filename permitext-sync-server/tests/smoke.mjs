@@ -249,7 +249,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260724-zoning-library-v6"),
+      webRoot.text.includes("20260725-project-collaboration-v7"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -387,6 +387,11 @@ async function main() {
         workspaceScript.text.includes('postResearch("/organizations/members/invite"') &&
         workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
         workspaceScript.text.includes("function appendProjectEvidenceReviews") &&
+        workspaceScript.text.includes("function appendProjectNotes") &&
+        workspaceScript.text.includes("function appendProjectReviewThreads") &&
+        workspaceScript.text.includes('postResearch("/projects/collaboration/notes/save"') &&
+        workspaceScript.text.includes('postResearch("/projects/collaboration/threads/save"') &&
+        workspaceScript.text.includes('postResearch("/projects/collaboration/comments/save"') &&
         workspaceScript.text.includes("function appendProjectReportExports") &&
         workspaceScript.text.includes("if (identity.sharedOnly) row.classList.add(\"is-read-only\")"),
       "Web collaboration UI no longer exposes firm setup, scoped Project access, evidence review, and report downloads."
@@ -756,7 +761,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-zoning-library-v6'),
+        webRoot.text.includes('/web/app.js?v=20260725-project-collaboration-v7'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2188,6 +2193,7 @@ async function main() {
         viewerNotebookWrite.json.code === "PROJECT_PERMISSION_REQUIRED",
       "A Project viewer was allowed to author Notebook content."
     );
+    const pendingSeatInvitationIDs = [];
     for (let index = 1; index <= 3; index += 1) {
       const seatInvitation = await request("/organizations/members/invite", {
         method: "POST",
@@ -2200,6 +2206,7 @@ async function main() {
         }
       });
       assert(seatInvitation.response.status === 201, `Pending firm seat ${index} was not reserved.`);
+      pendingSeatInvitationIDs.push(seatInvitation.json.invitation.id);
     }
     const fullSeatInvitation = await request("/organizations/members/invite", {
       method: "POST",
@@ -2216,6 +2223,20 @@ async function main() {
         fullSeatInvitation.json.code === "ORGANIZATION_SEAT_LIMIT" &&
         fullSeatInvitation.json.seats.used === 5,
       "Firm seat limits did not count active members and pending invitations."
+    );
+    const releasePendingSeat = await request("/organizations/invitations/revoke", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        invitationID: pendingSeatInvitationIDs[0]
+      }
+    });
+    assert(
+      releasePendingSeat.response.ok &&
+        releasePendingSeat.json.invitation.status === "revoked",
+      "A pending firm seat could not be released for the collaboration workflow."
     );
     const deactivateViewer = await request("/organizations/members/update", {
       method: "POST",
@@ -2333,6 +2354,44 @@ async function main() {
       "A Project editor could not propose immutable Research evidence for review."
     );
     const evidenceReviewID = editorEvidenceProposal.json.review.id;
+    const editorProjectNote = await request("/projects/collaboration/notes/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        title: "Filing coordination",
+        body: "Confirm the filing sequence before the next Project review."
+      }
+    });
+    assert(
+      editorProjectNote.response.status === 201 &&
+        editorProjectNote.json.note.createdByUserID === sharedEditorID &&
+        editorProjectNote.json.note.createdByDisplayName === "Smoke Editor" &&
+        editorProjectNote.json.activity.action === "project-note.created" &&
+        editorProjectNote.json.activity.owner.organizationID === organizationID,
+      `A Project editor could not create an attributed standalone Project note: ${editorProjectNote.response.status} ${JSON.stringify(editorProjectNote.json)}`
+    );
+    const projectNoteID = editorProjectNote.json.note.id;
+    const staleProjectNoteWrite = await request("/projects/collaboration/notes/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        noteID: projectNoteID,
+        expectedVersion: 0,
+        title: "Stale filing coordination",
+        body: "This stale revision must not overwrite the current note."
+      }
+    });
+    assert(
+      staleProjectNoteWrite.response.status === 409 &&
+        staleProjectNoteWrite.json.code === "PROJECT_NOTE_VERSION_CONFLICT" &&
+        staleProjectNoteWrite.json.note.version === 1,
+      "Project note optimistic concurrency did not preserve the current revision."
+    );
     const deactivateEditor = await request("/organizations/members/update", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -2440,6 +2499,143 @@ async function main() {
       reviewerNotebookWrite.response.status === 403 &&
         reviewerNotebookWrite.json.code === "PROJECT_PERMISSION_REQUIRED",
       "A Project reviewer was allowed to edit authored Notebook content."
+    );
+    const reviewerProjectNoteWrite = await request("/projects/collaboration/notes/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        title: "Reviewer must not edit notes",
+        body: "Reviewer roles coordinate review without changing authored Project notes."
+      }
+    });
+    assert(
+      reviewerProjectNoteWrite.response.status === 403 &&
+        reviewerProjectNoteWrite.json.code === "PROJECT_PERMISSION_REQUIRED" &&
+        reviewerProjectNoteWrite.json.requiredPermission === "project.note.edit",
+      "A Project reviewer was allowed to author standalone Project notes."
+    );
+    const reviewerMissingFactRequest = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        kind: "missing-project-fact",
+        status: "open",
+        targetKind: "researchAnswer",
+        targetID: answerID,
+        title: "Confirm the Project occupancy group",
+        body: "The professional record needs this fact before the Research conclusion is relied upon."
+      }
+    });
+    assert(
+      reviewerMissingFactRequest.response.status === 201 &&
+        reviewerMissingFactRequest.json.thread.createdByUserID === sharedReviewerID &&
+        reviewerMissingFactRequest.json.thread.createdByDisplayName === "Smoke Reviewer" &&
+        reviewerMissingFactRequest.json.thread.targetID === answerID &&
+        reviewerMissingFactRequest.json.activity.action === "review-thread.created",
+      `A Project reviewer could not open an attributed missing-information request: ${reviewerMissingFactRequest.response.status} ${JSON.stringify(reviewerMissingFactRequest.json)}`
+    );
+    const reviewThreadID = reviewerMissingFactRequest.json.thread.id;
+    const reactivateEditor = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        userID: sharedEditorID,
+        status: "active"
+      }
+    });
+    assert(
+      reactivateEditor.response.ok &&
+        reactivateEditor.json.membership.status === "active",
+      "The Project editor could not be restored to answer the reviewer request."
+    );
+    const editorReviewResponse = await request("/projects/collaboration/comments/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        body: "Occupancy group B is confirmed by the approved Project drawings."
+      }
+    });
+    assert(
+      editorReviewResponse.response.status === 201 &&
+        editorReviewResponse.json.comment.createdByUserID === sharedEditorID &&
+        editorReviewResponse.json.comment.createdByDisplayName === "Smoke Editor" &&
+        editorReviewResponse.json.comment.threadID === reviewThreadID &&
+        editorReviewResponse.json.activity.action === "review-comment.created",
+      "An authorized Project editor could not answer the reviewer request with immutable attribution."
+    );
+    const reviewerResolution = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 1,
+        status: "resolved"
+      }
+    });
+    assert(
+      reviewerResolution.response.ok &&
+        reviewerResolution.json.thread.status === "resolved" &&
+        reviewerResolution.json.thread.resolvedByUserID === sharedReviewerID &&
+        reviewerResolution.json.thread.resolvedByDisplayName === "Smoke Reviewer" &&
+        reviewerResolution.json.activity.action === "review-thread.status.changed",
+      "A Project reviewer could not resolve the answered missing-information request."
+    );
+    const commentAfterResolution = await request("/projects/collaboration/comments/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        body: "A resolved thread must not accept this additional response."
+      }
+    });
+    assert(
+      commentAfterResolution.response.status === 409 &&
+        commentAfterResolution.json.code === "REVIEW_THREAD_CLOSED",
+      "A resolved review thread accepted another comment."
+    );
+    const collaborationSnapshot = await request("/organizations/projects/snapshot", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    const collaborationArtifacts = collaborationSnapshot.json.project?.artifacts || [];
+    assert(
+      collaborationSnapshot.response.ok &&
+        collaborationArtifacts.some((artifact) =>
+          artifact.envelope.type === "projectNote" &&
+          artifact.envelope.id === projectNoteID &&
+          artifact.payload.createdByDisplayName === "Smoke Editor"
+        ) &&
+        collaborationArtifacts.some((artifact) =>
+          artifact.envelope.type === "reviewThread" &&
+          artifact.envelope.id === reviewThreadID &&
+          artifact.payload.status === "resolved"
+        ) &&
+        collaborationArtifacts.some((artifact) =>
+          artifact.envelope.type === "reviewComment" &&
+          artifact.payload.threadID === reviewThreadID &&
+          artifact.payload.createdByDisplayName === "Smoke Editor"
+        ),
+      "The shared Project snapshot did not preserve the complete attributed collaboration record."
     );
 
     const storedWorkboardPreview = await requestBinary("/workboards/previews/read", {

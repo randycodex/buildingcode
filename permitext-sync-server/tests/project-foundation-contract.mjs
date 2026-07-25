@@ -58,6 +58,12 @@ assert.equal(projectMembershipRules.researchConversation.maximumProjects, 1);
 assert.equal(projectMembershipRules.workboard.relationship, "owner");
 assert.equal(projectMembershipRules.workboardPreview.relationship, "owner");
 assert.equal(conflictPolicies.workboardPreview, "immutable");
+assert.equal(projectMembershipRules.projectNote.relationship, "owner");
+assert.equal(projectMembershipRules.reviewThread.relationship, "owner");
+assert.equal(projectMembershipRules.reviewComment.relationship, "reference");
+assert.equal(conflictPolicies.projectNote, "explicit-revision");
+assert.equal(conflictPolicies.reviewThread, "explicit-revision");
+assert.equal(conflictPolicies.reviewComment, "immutable");
 assert.throws(
   () => projectLinkRecord({
     owner,
@@ -212,6 +218,17 @@ const event = activityEvent({
   createdAt
 });
 assert.equal(event.action, "item.linked");
+assert.equal(activityEvent({
+  owner,
+  projectID: "project-1",
+  actorUserID: "user-1",
+  action: "review-thread.status.changed",
+  objectKind: "reviewThread",
+  objectID: "thread-1",
+  previousStatus: "open",
+  newStatus: "resolved",
+  createdAt
+}).newStatus, "resolved");
 assert.throws(
   () => activityEvent({
     owner,
