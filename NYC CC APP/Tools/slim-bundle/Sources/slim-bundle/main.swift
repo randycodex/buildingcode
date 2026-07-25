@@ -34,6 +34,9 @@ let preparedChaptersURL = bundleRoot
 let searchIndexURL = bundleRoot
     .appendingPathComponent("prepared", isDirectory: true)
     .appendingPathComponent("searchIndex.json", isDirectory: false)
+let chapterCatalogURL = bundleRoot
+    .appendingPathComponent("prepared", isDirectory: true)
+    .appendingPathComponent("chapterCatalog.json", isDirectory: false)
 
 func titleThroughFirstPeriod(_ text: String) -> String {
     let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -79,6 +82,7 @@ guard var root = try JSONSerialization.jsonObject(with: bundleData) as? [String:
 
 var invertedIndex: [String: Set<Int64>] = [:]
 var sectionCount = 0
+var compactChapterCatalog: [[Any]] = []
 
 guard var chapters = root["chapters"] as? [[String: Any]] else {
     fputs("Missing chapters\n", stderr)
@@ -191,6 +195,27 @@ for chapterIndex in chapters.indices {
         options: .atomic
     )
 
+    let compactGroups: [[Any]] = groups.map { group in
+        let compactSections: [[Any]] = (group["sections"] as? [[String: Any]] ?? []).compactMap { section in
+            guard let sectionID = jsonInt64(section["id"]) else { return nil }
+            return [
+                sectionID,
+                section["sectionNumber"] as? String ?? "",
+                section["title"] as? String ?? "",
+                section["kind"] as? String ?? "title"
+            ]
+        }
+        return [
+            group["id"] as? String ?? "",
+            group["headerLine"] as? String ?? "",
+            group["headingLine"] ?? NSNull(),
+            group["headerRTFData"] ?? NSNull(),
+            group["headingRTFData"] ?? NSNull(),
+            compactSections
+        ]
+    }
+    compactChapterCatalog.append([chapterID, compactGroups])
+
     var chapterStub: [String: Any] = [
         "id": chapterID,
         "chapterNumber": chapterNumber,
@@ -217,7 +242,16 @@ let searchIndex = SearchIndexFile(schemaVersion: 1, tokens: searchTokens)
 let searchData = try JSONEncoder().encode(searchIndex)
 try searchData.write(to: searchIndexURL, options: .atomic)
 
+let chapterCatalogData = try JSONSerialization.data(
+    withJSONObject: [
+        "schemaVersion": 1,
+        "chapters": compactChapterCatalog
+    ],
+    options: [.sortedKeys]
+)
+try chapterCatalogData.write(to: chapterCatalogURL, options: .atomic)
+
 fputs(
-    "Slimmed bundle (\(slimData.count) bytes), updated \(sectionCount) section files, wrote \(searchTokens.count) search tokens.\n",
+    "Slimmed bundle (\(slimData.count) bytes), updated \(sectionCount) section files, wrote \(searchTokens.count) search tokens and \(compactChapterCatalog.count) compact chapter entries.\n",
     stderr
 )

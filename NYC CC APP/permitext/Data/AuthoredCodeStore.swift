@@ -131,6 +131,91 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let groups: [SectionGroup]
     }
 
+    /// Compact, single-file chapter metadata used to avoid opening and decoding
+    /// every per-chapter JSON file before the first screen can render.
+    private struct PreparedChapterCatalog: Decodable {
+        let schemaVersion: Int
+        let chapters: [PreparedChapterCatalogEntry]
+    }
+
+    private struct PreparedChapterCatalogEntry: Decodable {
+        let chapterID: Int64
+        let groups: [PreparedChapterCatalogGroup]
+
+        init(from decoder: Decoder) throws {
+            var container = try decoder.unkeyedContainer()
+            chapterID = try container.decode(Int64.self)
+            groups = try container.decode([PreparedChapterCatalogGroup].self)
+        }
+
+        var expandedGroups: [SectionGroup] {
+            groups.map(\.expanded)
+        }
+    }
+
+    private struct PreparedChapterCatalogGroup: Decodable {
+        let id: String
+        let headerLine: String
+        let headingLine: String?
+        let headerRTFDataBase64: String?
+        let headingRTFDataBase64: String?
+        let sections: [PreparedChapterCatalogSection]
+
+        init(from decoder: Decoder) throws {
+            var container = try decoder.unkeyedContainer()
+            id = try container.decode(String.self)
+            headerLine = try container.decode(String.self)
+            headingLine = try Self.decodeOptionalString(from: &container)
+            headerRTFDataBase64 = try Self.decodeOptionalString(from: &container)
+            headingRTFDataBase64 = try Self.decodeOptionalString(from: &container)
+            sections = try container.decode([PreparedChapterCatalogSection].self)
+        }
+
+        var expanded: SectionGroup {
+            SectionGroup(
+                id: id,
+                headerLine: headerLine,
+                headingLine: headingLine,
+                headerRTFData: headerRTFDataBase64.flatMap { Data(base64Encoded: $0) },
+                headingRTFData: headingRTFDataBase64.flatMap { Data(base64Encoded: $0) },
+                sections: sections.map(\.expanded)
+            )
+        }
+
+        private static func decodeOptionalString(
+            from container: inout UnkeyedDecodingContainer
+        ) throws -> String? {
+            if try container.decodeNil() {
+                return nil
+            }
+            return try container.decode(String.self)
+        }
+    }
+
+    private struct PreparedChapterCatalogSection: Decodable {
+        let id: Int64
+        let sectionNumber: String
+        let title: String
+        let kind: CodeSectionKind
+
+        init(from decoder: Decoder) throws {
+            var container = try decoder.unkeyedContainer()
+            id = try container.decode(Int64.self)
+            sectionNumber = try container.decode(String.self)
+            title = try container.decode(String.self)
+            kind = try container.decode(CodeSectionKind.self)
+        }
+
+        var expanded: Section {
+            Section(
+                id: id,
+                sectionNumber: sectionNumber,
+                title: title,
+                kind: kind
+            )
+        }
+    }
+
     private struct CodeSection: Decodable {
         let id: Int64
         let codeID: Int64
@@ -163,6 +248,24 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             case richTextOverrideData
             case kind
             case contentBlocks
+        }
+
+        init(
+            id: Int64,
+            sectionNumber: String,
+            title: String,
+            officialText: String = "",
+            richTextOverrideData: Data? = nil,
+            kind: CodeSectionKind,
+            contentBlocks: [CodeContentBlock] = []
+        ) {
+            self.id = id
+            self.sectionNumber = sectionNumber
+            self.title = title
+            self.officialText = officialText
+            self.richTextOverrideData = richTextOverrideData
+            self.kind = kind
+            self.contentBlocks = contentBlocks
         }
 
         init(from decoder: Decoder) throws {
@@ -254,8 +357,23 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     init(jsonURL: URL, codeID: Int64? = nil, jurisdictionID: Int64? = nil) throws {
         let signpostID = OSSignpostID(log: AppSignpost.bundle)
+        let beganAt = ProcessInfo.processInfo.systemUptime
+        var parseSource = "embedded"
         os_signpost(.begin, log: AppSignpost.bundle, name: "bundleParse", signpostID: signpostID)
-        defer { os_signpost(.end, log: AppSignpost.bundle, name: "bundleParse", signpostID: signpostID) }
+        defer {
+            let elapsedMilliseconds = max(
+                0,
+                Int((ProcessInfo.processInfo.systemUptime - beganAt) * 1_000)
+            )
+            os_signpost(.end, log: AppSignpost.bundle, name: "bundleParse", signpostID: signpostID)
+            os_log(
+                .info,
+                log: AppSignpost.bundle,
+                "bundleParse milliseconds=%{public}d source=%{public}@",
+                elapsedMilliseconds,
+                parseSource
+            )
+        }
 
         let data = try Data(contentsOf: jsonURL)
         let decodedProject: Project
@@ -339,6 +457,16 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             .deletingLastPathComponent()
             .appendingPathComponent("prepared", isDirectory: true)
             .appendingPathComponent("chapters", isDirectory: true)
+        let preparedChapterCatalog = bundleUsesExternalChapterStructure
+            ? Self.preparedChapterCatalog(
+                preparedRootURL: preparedChaptersURL.deletingLastPathComponent()
+            )
+            : nil
+        if bundleUsesExternalChapterStructure {
+            parseSource = preparedChapterCatalog == nil
+                ? "per-chapter-json"
+                : "chapter-catalog"
+        }
 
         for codeSection in visibleCodeSections.sorted(by: { $0.name.compare($1.name, options: [.numeric, .caseInsensitive]) == .orderedAscending }) {
             codeSections.append(
@@ -362,7 +490,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
             var chapterSectionList: [Section] = []
             let chapterGroups = bundleUsesExternalChapterStructure
-                ? Self.preparedChapterGroups(chapterID: chapter.id, preparedChaptersURL: preparedChaptersURL)
+                ? preparedChapterCatalog?[chapter.id]
+                    ?? Self.preparedChapterGroups(
+                        chapterID: chapter.id,
+                        preparedChaptersURL: preparedChaptersURL
+                    )
                 : chapter.groups
             let groups = chapterGroups.map { group in
                 let summaries = group.sections.map { section in
@@ -512,6 +644,28 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return []
         }
         return prepared.groups
+    }
+
+    private static func preparedChapterCatalog(
+        preparedRootURL: URL
+    ) -> [Int64: [SectionGroup]]? {
+        let url = preparedRootURL.appendingPathComponent("chapterCatalog.json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let catalog = try? JSONDecoder().decode(PreparedChapterCatalog.self, from: data),
+              catalog.schemaVersion == 1
+        else {
+            return nil
+        }
+
+        var groupsByChapterID: [Int64: [SectionGroup]] = [:]
+        groupsByChapterID.reserveCapacity(catalog.chapters.count)
+        for chapter in catalog.chapters {
+            guard groupsByChapterID[chapter.chapterID] == nil else {
+                return nil
+            }
+            groupsByChapterID[chapter.chapterID] = chapter.expandedGroups
+        }
+        return groupsByChapterID
     }
 
     private func preparedSectionData(sectionID: Int64) -> PreparedSectionData? {
