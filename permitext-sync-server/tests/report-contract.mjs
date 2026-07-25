@@ -174,11 +174,23 @@ const renderedPDF = await renderReportPDF(manifest, {
     ["workboard-preview-1", { body: previewPNG, contentType: "image/png" }]
   ])
 });
+const pdfPageCount = (pdf) =>
+  (pdf.toString("latin1").match(/\/Type\s*\/Page\b/g) || []).length;
 assert.equal(renderedPDF.subarray(0, 5).toString("ascii"), "%PDF-");
 assert(renderedPDF.length > 2_000, "Rendered Report PDF was unexpectedly small.");
 assert(
   renderedPDF.length > renderedWithoutPreview.length,
   "Rendered Report PDF did not embed the flattened Workboard preview."
+);
+assert.equal(
+  pdfPageCount(renderedWithoutPreview),
+  2,
+  "Report footer rendering must not create blank trailing pages."
+);
+assert.equal(
+  pdfPageCount(renderedPDF),
+  2,
+  "Report footer rendering must not create blank trailing pages when a Workboard preview is included."
 );
 
 console.log("Permitext Report contract passed.");

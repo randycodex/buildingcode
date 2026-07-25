@@ -61,16 +61,18 @@ function ensureVerticalSpace(document, height = 72) {
 
 function drawClassification(document, classification) {
   const label = classificationLabels[classification] || "Project material";
+  const renderedLabel = label.toUpperCase();
   const fill = classificationColors[classification] || colors.projectMaterial;
-  const width = Math.min(190, document.widthOfString(label, { font: "Helvetica-Bold" }) + 18);
+  document
+    .font("Helvetica-Bold")
+    .fontSize(7.5);
+  const width = Math.min(190, document.widthOfString(renderedLabel) + 18);
   const x = document.x;
   const y = document.y;
   document.roundedRect(x, y, width, 18, 9).fill(fill);
   document
     .fillColor(colors.ink)
-    .font("Helvetica-Bold")
-    .fontSize(7.5)
-    .text(label.toUpperCase(), x + 9, y + 5, { width: width - 18, lineBreak: false });
+    .text(renderedLabel, x + 9, y + 5, { width: width - 18, lineBreak: false });
   document.y = y + 27;
 }
 
@@ -353,20 +355,26 @@ function drawPageFooters(document, manifest) {
   for (let pageIndex = range.start; pageIndex < range.start + range.count; pageIndex += 1) {
     document.switchToPage(pageIndex);
     const page = document.page;
-    document
-      .fillColor(colors.muted)
-      .font("Helvetica")
-      .fontSize(7)
-      .text(
-        `${footerLabel}  /  ${pageIndex + 1} of ${range.count}`,
-        page.margins.left,
-        page.height - 32,
-        {
-          width: page.width - page.margins.left - page.margins.right,
-          align: "right",
-          lineBreak: false
-        }
-      );
+    const originalBottomMargin = page.margins.bottom;
+    page.margins.bottom = 0;
+    try {
+      document
+        .fillColor(colors.muted)
+        .font("Helvetica")
+        .fontSize(7)
+        .text(
+          `${footerLabel}  /  ${pageIndex + 1} of ${range.count}`,
+          page.margins.left,
+          page.height - 32,
+          {
+            width: page.width - page.margins.left - page.margins.right,
+            align: "right",
+            lineBreak: false
+          }
+        );
+    } finally {
+      page.margins.bottom = originalBottomMargin;
+    }
   }
 }
 
