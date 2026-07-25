@@ -1308,6 +1308,31 @@ struct ProjectReportProject: Codable, Hashable, Sendable {
     let description: String
 }
 
+struct ProjectReportOrganizationPresentation: Codable, Hashable, Sendable {
+    let id: String
+    let name: String
+}
+
+struct ProjectReportTemplatePresentation: Codable, Hashable, Sendable {
+    let id: String
+    let name: String
+    let coverLabel: String
+}
+
+struct ProjectReportBrandingPresentation: Codable, Hashable, Sendable {
+    let displayName: String
+    let accentColorHex: String
+    let website: String?
+    let footerText: String?
+}
+
+struct ProjectReportPresentation: Codable, Hashable, Sendable {
+    let firmControlsVersion: Int
+    let organization: ProjectReportOrganizationPresentation?
+    let template: ProjectReportTemplatePresentation
+    let branding: ProjectReportBrandingPresentation
+}
+
 struct ProjectReportCitation: Codable, Hashable, Sendable {
     let sectionID: String?
     let sourceIDs: [String]?
@@ -1372,6 +1397,7 @@ struct ProjectReportManifest: Codable, Hashable, Identifiable, Sendable {
     let codeEdition: String
     let items: [ProjectReportManifestItem]
     let disclaimers: [String]
+    let presentation: ProjectReportPresentation?
     let reportVersion: Int
     let sourceVersions: [String: StringOrNumber]
     let createdAt: String
@@ -1458,6 +1484,80 @@ struct PermitextOrganizationBillingIdentity: Codable, Hashable, Sendable {
     let seatLimit: Int
 }
 
+struct PermitextOrganizationBillingOperations: Codable, Hashable, Sendable {
+    let authority: String
+    let clientMutable: Bool
+    let status: String
+}
+
+struct PermitextFirmTag: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let name: String
+    let colorHex: String
+    let status: String
+    let createdAt: String
+    let updatedAt: String
+    let order: Int
+}
+
+struct PermitextFirmReportTemplate: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let name: String
+    let description: String?
+    let coverLabel: String
+    let disclaimers: [String]
+    let status: String
+    let createdAt: String
+    let updatedAt: String
+    let order: Int
+}
+
+struct PermitextFirmBranding: Codable, Hashable, Sendable {
+    let displayName: String
+    let accentColorHex: String
+    let website: String?
+    let footerText: String?
+}
+
+struct PermitextFirmResearchAllowance: Codable, Hashable, Sendable {
+    let mode: String
+    let monthlyUnits: Int
+    let resetDayUTC: Int
+    let authority: String
+}
+
+struct PermitextFirmRetentionPolicy: Codable, Hashable, Sendable {
+    let retentionDays: Int
+    let enforcement: String
+    let automaticDeletionEnabled: Bool
+}
+
+struct PermitextFirmControls: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let version: Int
+    let tags: [PermitextFirmTag]
+    let projectTagAssignments: [String: [String]]
+    let reportTemplates: [PermitextFirmReportTemplate]
+    let defaultReportTemplateID: String
+    let branding: PermitextFirmBranding
+    let requiredDisclaimers: [String]
+    let researchAllowance: PermitextFirmResearchAllowance
+    let retentionPolicy: PermitextFirmRetentionPolicy
+    let updatedAt: String
+    let updatedByUserID: String?
+}
+
+struct PermitextFirmResearchUsage: Codable, Hashable, Sendable {
+    let mode: String
+    let authority: String
+    let requestsUsed: Int
+    let requestLimit: Int
+    let monthlyUnits: Int
+    let activeSeats: Int
+    let resetDate: String
+    let totalTokens: Int
+}
+
 struct PermitextOrganizationSeatUsage: Codable, Hashable, Sendable {
     let active: Int
     let pending: Int
@@ -1486,6 +1586,9 @@ struct PermitextOrganization: Codable, Hashable, Identifiable, Sendable {
     let status: String
     let capabilities: PermitextOrganizationCapabilities
     let billingIdentity: PermitextOrganizationBillingIdentity
+    let billingOperations: PermitextOrganizationBillingOperations?
+    let firmControls: PermitextFirmControls?
+    let researchUsage: PermitextFirmResearchUsage?
     let role: String?
     let permissions: [String]
     let accessScope: String

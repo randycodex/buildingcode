@@ -6165,8 +6165,11 @@ button.project-studio-metric:focus-visible {
 .settings-firm-create input,
 .settings-firm-field input,
 .settings-firm-field select,
+.settings-firm-field textarea,
 .settings-firm-invite-result input,
-.settings-firm-member select {
+.settings-firm-member select,
+.settings-firm-standard-row input,
+.settings-firm-standard-row select {
   width: 100%;
   min-width: 0;
   min-height: 38px;
@@ -6175,14 +6178,18 @@ button.project-studio-metric:focus-visible {
   border-radius: 8px;
   background: color-mix(in srgb, var(--text-primary) 7%, transparent);
   color: var(--text-primary);
-  font: inherit;
+  font-size: 9pt !important;
+  line-height: 1.35;
 }
 
 .settings-firm-create input:focus-visible,
 .settings-firm-field input:focus-visible,
 .settings-firm-field select:focus-visible,
+.settings-firm-field textarea:focus-visible,
 .settings-firm-invite-result input:focus-visible,
-.settings-firm-member select:focus-visible {
+.settings-firm-member select:focus-visible,
+.settings-firm-standard-row input:focus-visible,
+.settings-firm-standard-row select:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--code-accent) 48%, transparent);
   outline-offset: 1px;
 }
@@ -6259,6 +6266,113 @@ button.project-studio-metric:focus-visible {
 
 .settings-firm-owner-tools {
   padding-top: var(--space-2);
+}
+
+.settings-firm-standards {
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--code-accent) 9%, var(--surface));
+}
+
+.settings-firm-standards summary {
+  min-height: 34px;
+  color: var(--text-primary);
+  font-size: 9pt !important;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-firm-standards > div,
+.settings-firm-standard-section {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-firm-standards > div {
+  padding-top: var(--space-2);
+}
+
+.settings-firm-standard-section {
+  padding: var(--space-3);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+
+.settings-firm-standard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.settings-firm-standard-heading button {
+  width: auto;
+}
+
+.settings-firm-field textarea {
+  min-height: 72px;
+  padding-block: var(--space-2);
+  resize: vertical;
+}
+
+.settings-firm-field input[type="color"],
+.settings-firm-standard-row input[type="color"] {
+  padding: 5px;
+}
+
+.settings-firm-standard-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px minmax(92px, 0.5fr);
+  gap: var(--space-1);
+}
+
+.settings-firm-subheading {
+  color: var(--text-secondary);
+  font-size: 8.5pt !important;
+  font-weight: 700;
+}
+
+.settings-firm-tag-assignment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-2);
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+}
+
+.settings-firm-tag-assignment legend {
+  width: 100%;
+  color: var(--text-primary);
+  font-size: 8.5pt !important;
+  font-weight: 700;
+}
+
+.settings-firm-tag-assignment label,
+.settings-firm-default-template {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 8.5pt !important;
+}
+
+.settings-firm-tag-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--firm-tag-color);
+}
+
+.settings-firm-template {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--code-accent) 7%, var(--surface));
 }
 
 .settings-firm-field {

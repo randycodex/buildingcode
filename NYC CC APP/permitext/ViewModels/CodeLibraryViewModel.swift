@@ -160,6 +160,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var bookmarkedSectionIDs: Set<Int64> = []
     private var versionLoadTask: Task<Void, Never>?
     private var contentLoadTask: Task<Void, Never>?
+    private var startupWarmupTask: Task<Void, Never>?
     private var searchTask: Task<Void, Never>?
     // Tracks the active inner search task so it can be cancelled independently
     // when a new search starts. Without this, Task.detached bodies accumulate
@@ -250,6 +251,7 @@ final class CodeLibraryViewModel: ObservableObject {
         userContentAutoSyncTask?.cancel()
         foregroundAutomaticSyncTask?.cancel()
         storeKitUpdatesTask?.cancel()
+        startupWarmupTask?.cancel()
         networkMonitor.cancel()
     }
 
@@ -3089,6 +3091,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func openSelectedContent() {
         contentLoadTask?.cancel()
+        startupWarmupTask?.cancel()
         clearCaches()
         isInitialContentLoaded = false
         initialLoadProgress = 0
@@ -3127,14 +3130,14 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.initialLoadProgress = 0.35
                     self.chapters = snapshot.chapters
                     self.refreshBookmarks()
-                    self.initialLoadProgress = 0.55
-                    await self.prewarmSQLiteContent(chapters: snapshot.chapters)
-                    guard !Task.isCancelled else { return }
-                    self.initialLoadProgress = 0.9
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
                     self.initialLoadProgress = 1
                     self.isInitialContentLoaded = true
+                    self.startupWarmupTask = Task { [weak self] in
+                        guard let self else { return }
+                        await self.prewarmSQLiteContent(chapters: snapshot.chapters)
+                    }
                 } catch {
                     guard !Task.isCancelled else { return }
                     self.codeSections = []
@@ -3172,18 +3175,18 @@ final class CodeLibraryViewModel: ObservableObject {
                     self.chapters = snapshot.chapters
                     self.searchResults = []
                     self.refreshBookmarks()
-                    self.initialLoadProgress = 0.55
-                    await self.prewarmAuthoredContent(
-                        version: selectedVersion,
-                        chapters: snapshot.chapters,
-                        store: snapshot.store
-                    )
-                    guard !Task.isCancelled else { return }
-                    self.initialLoadProgress = 0.9
                     self.preloadLastOpenedChapterIfNeeded()
                     self.statusMessage = nil
                     self.initialLoadProgress = 1
                     self.isInitialContentLoaded = true
+                    self.startupWarmupTask = Task { [weak self] in
+                        guard let self else { return }
+                        await self.prewarmAuthoredContent(
+                            version: selectedVersion,
+                            chapters: snapshot.chapters,
+                            store: snapshot.store
+                        )
+                    }
                 } catch {
                     guard !Task.isCancelled else { return }
                     self.codeSections = []
@@ -3545,7 +3548,9 @@ final class CodeLibraryViewModel: ObservableObject {
             let sectionIDs = try await sqliteChapterLoader.firstSectionIDs(chapterIDs: chapters.map(\.id))
             await prewarmSectionDetails(sectionIDs)
         } catch {
-            statusMessage = error.localizedDescription
+            #if DEBUG
+            print("permitext diagnostics: SQLite startup warmup failed: \(error.localizedDescription)")
+            #endif
         }
     }
 
@@ -3556,7 +3561,9 @@ final class CodeLibraryViewModel: ObservableObject {
         for chapter in prioritized {
             if Task.isCancelled { return }
             await warmChapterReaderEntry(chapter: chapter, sectionLimit: 8)
-            initialLoadProgress = min(0.72, initialLoadProgress + 0.04)
+            if !isInitialContentLoaded {
+                initialLoadProgress = min(0.72, initialLoadProgress + 0.04)
+            }
             await Task.yield()
         }
     }
@@ -3639,7 +3646,9 @@ final class CodeLibraryViewModel: ObservableObject {
             _ = await loadSectionDetailsAsync(sectionIDs: batch)
             loadedCount += batch.count
             let progress = Double(loadedCount) / Double(total)
-            initialLoadProgress = min(0.9, 0.55 + (progress * 0.35))
+            if !isInitialContentLoaded {
+                initialLoadProgress = min(0.9, 0.55 + (progress * 0.35))
+            }
             await Task.yield()
         }
     }

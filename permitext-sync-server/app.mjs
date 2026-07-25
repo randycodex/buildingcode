@@ -92,6 +92,14 @@ import {
   normalizeReviewCommentPayload,
   normalizeReviewThreadPayload
 } from "./collaboration-contract.mjs";
+import {
+  activeReportTemplate,
+  defaultFirmControls,
+  normalizeFirmControls,
+  permitextRequiredReportDisclaimers,
+  reportDisclaimersForFirm,
+  reportPresentationSnapshot
+} from "./firm-controls-contract.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
@@ -150,6 +158,7 @@ const rateLimitPolicies = new Map([
   ["organizations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/create", { limit: 10, windowMs: 60 * 60 * 1000 }],
   ["organizations/update", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["organizations/controls/save", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["organizations/members/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/members/invite", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["organizations/members/update", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -165,6 +174,7 @@ const rateLimitPolicies = new Map([
   ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["reports/sources/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["reports/options", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["reports/drafts/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["reports/drafts/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["reports/drafts/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -4410,6 +4420,48 @@ function organizationInvitationForClient(invitation) {
   };
 }
 
+function normalizedOrganizationFirmControls(organization) {
+  return normalizeFirmControls(organization?.firmControls, {
+    organizationName: organization?.name || "Firm workspace",
+    ownerUserID: organization?.ownerUserID || "unknown-owner",
+    createdAt: organization?.createdAt || new Date().toISOString(),
+    updatedAt: organization?.firmControls?.updatedAt ||
+      organization?.updatedAt ||
+      organization?.createdAt ||
+      new Date().toISOString(),
+    updatedByUserID: organization?.firmControls?.updatedByUserID ||
+      organization?.ownerUserID ||
+      "unknown-owner",
+    version: organization?.firmControls?.version || 1
+  });
+}
+
+function firmControlsForClient(organization, access = null) {
+  const controls = normalizedOrganizationFirmControls(organization);
+  const ownerCanManage = access?.permissions?.includes(
+    organizationPermissions.organizationManage
+  );
+  return {
+    ...controls,
+    reportTemplates: controls.reportTemplates.filter((template) =>
+      ownerCanManage || template.status === "active"
+    ),
+    tags: controls.tags.filter((tag) => ownerCanManage || tag.status === "active"),
+    projectTagAssignments: ownerCanManage
+      ? controls.projectTagAssignments
+      : Object.fromEntries(
+          (access?.visibleProjectIDs || [])
+            .filter((projectID) => controls.projectTagAssignments[projectID])
+            .map((projectID) => [
+              projectID,
+              controls.projectTagAssignments[projectID]
+            ])
+        ),
+    administrativeHistory: ownerCanManage ? controls.administrativeHistory : [],
+    updatedByUserID: ownerCanManage ? controls.updatedByUserID : null
+  };
+}
+
 function organizationForClient(organization, access = null, seats = null) {
   return {
     id: organization.id,
@@ -4423,6 +4475,12 @@ function organizationForClient(organization, access = null, seats = null) {
       status: organization.billingIdentity?.status || "trial",
       seatLimit: organization.billingIdentity?.seatLimit || 1
     },
+    billingOperations: {
+      authority: "server-only",
+      clientMutable: false,
+      status: organization.billingIdentity?.status || "trial"
+    },
+    firmControls: firmControlsForClient(organization, access),
     role: access?.role || null,
     permissions: access?.permissions || [],
     accessScope: access?.accessScope || "organization",
@@ -4525,13 +4583,21 @@ async function handleOrganizationList(request, response) {
   }
   const organizations = [];
   for (const access of accessByOrganizationID.values()) {
-    const [projects, seats] = await Promise.all([
+    const controls = normalizedOrganizationFirmControls(access.organization);
+    const [projects, seats, researchUsage] = await Promise.all([
       accessibleOrganizationProjects(context.userID, access.organization.id),
-      access.role === "owner" ? organizationSeatState(access.organization.id) : null
+      access.role === "owner" ? organizationSeatState(access.organization.id) : null,
+      access.role === "owner"
+        ? organizationResearchAllowanceUsage(access.organization.id, controls)
+        : null
     ]);
     organizations.push({
-      ...organizationForClient(access.organization, access, seats),
-      projects
+      ...organizationForClient(access.organization, {
+        ...access,
+        visibleProjectIDs: projects.map((project) => project.id)
+      }, seats),
+      projects,
+      researchUsage
     });
   }
   organizations.sort((left, right) =>
@@ -4627,6 +4693,142 @@ async function handleOrganizationUpdate(request, response) {
     sendJSON(response, 400, {
       error: error instanceof Error ? error.message : "Invalid firm workspace update.",
       code: "INVALID_ORGANIZATION"
+    });
+  }
+}
+
+async function organizationResearchAllowanceUsage(organizationID, controls) {
+  const [memberships, ownerships] = await Promise.all([
+    listStoredOrganizationMemberships(organizationID),
+    listStoredProjectOwnershipsForOrganizations([organizationID])
+  ]);
+  const projectMemberships = (await Promise.all(
+    ownerships.map((ownership) => listStoredProjectMemberships(ownership.projectID))
+  )).flat();
+  const activeUserIDs = Array.from(new Set(
+    [...memberships, ...projectMemberships]
+      .filter((membership) => membership.status === "active")
+      .map((membership) => membership.userID)
+  ));
+  const usageByUser = await Promise.all(activeUserIDs.map(async (userID) => {
+    const entries = await researchUsageSince(userID, currentMonthStart());
+    return {
+      userID,
+      requestsUsed: entries.length,
+      totalTokens: entries.reduce((total, entry) => total + Number(entry.totalTokens || 0), 0)
+    };
+  }));
+  const policy = controls.researchAllowance;
+  return {
+    mode: policy.mode,
+    authority: policy.authority,
+    requestsUsed: usageByUser.reduce((total, entry) => total + entry.requestsUsed, 0),
+    requestLimit: policy.mode === "per-seat"
+      ? policy.monthlyUnits * Math.max(1, activeUserIDs.length)
+      : policy.monthlyUnits,
+    monthlyUnits: policy.monthlyUnits,
+    activeSeats: activeUserIDs.length,
+    resetDate: nextMonthStart(),
+    totalTokens: usageByUser.reduce((total, entry) => total + entry.totalTokens, 0),
+    perSeat: policy.mode === "per-seat" ? usageByUser : []
+  };
+}
+
+function preserveFirmControlCreationMetadata(existing, proposed, updatedAt) {
+  const existingTags = new Map((existing.tags || []).map((tag) => [tag.id, tag]));
+  const existingTemplates = new Map(
+    (existing.reportTemplates || []).map((template) => [template.id, template])
+  );
+  return {
+    ...proposed,
+    administrativeHistory: existing.administrativeHistory,
+    tags: (Array.isArray(proposed?.tags) ? proposed.tags : []).map((tag) => ({
+      ...tag,
+      createdAt: existingTags.get(tag?.id)?.createdAt || updatedAt,
+      updatedAt
+    })),
+    reportTemplates: (Array.isArray(proposed?.reportTemplates)
+      ? proposed.reportTemplates
+      : []).map((template) => ({
+      ...template,
+      createdAt: existingTemplates.get(template?.id)?.createdAt || updatedAt,
+      updatedAt
+    }))
+  };
+}
+
+async function handleOrganizationControlsSave(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access) {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  if (!access.permissions.includes(organizationPermissions.organizationManage)) {
+    sendJSON(response, 403, {
+      error: "Only a firm Owner can change firm standards.",
+      code: "ORGANIZATION_OWNER_REQUIRED"
+    });
+    return;
+  }
+  const existingControls = normalizedOrganizationFirmControls(access.organization);
+  const expectedVersion = Number(context.body.expectedVersion);
+  if (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existingControls.version) {
+    sendJSON(response, 409, {
+      error: "These firm standards changed after you opened them. Review the current version before saving.",
+      code: "FIRM_CONTROLS_VERSION_CONFLICT",
+      controls: firmControlsForClient(access.organization, access)
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const controls = normalizeFirmControls(
+      preserveFirmControlCreationMetadata(existingControls, context.body.controls || {}, now),
+      {
+        organizationName: access.organization.name,
+        ownerUserID: access.organization.ownerUserID,
+        createdAt: access.organization.createdAt,
+        updatedAt: now,
+        updatedByUserID: context.userID,
+        version: existingControls.version + 1,
+        historyEntry: {
+          summary: "Updated firm tags, Report standards, and operating policies."
+        }
+      }
+    );
+    const ownerships = await listStoredProjectOwnershipsForOrganizations([organizationID]);
+    const organizationProjectIDs = new Set(ownerships.map((ownership) => ownership.projectID));
+    const invalidProjectID = Object.keys(controls.projectTagAssignments)
+      .find((projectID) => !organizationProjectIDs.has(projectID));
+    if (invalidProjectID) {
+      sendJSON(response, 400, {
+        error: "A tag assignment references a Project outside this firm workspace.",
+        code: "INVALID_FIRM_PROJECT_ASSIGNMENT"
+      });
+      return;
+    }
+    const organization = organizationRecord({
+      ...access.organization,
+      firmControls: controls,
+      createdAt: access.organization.createdAt,
+      updatedAt: now
+    });
+    await saveStoredOrganization(organization);
+    sendJSON(response, 200, {
+      organization: organizationForClient(organization, {
+        role: access.role,
+        permissions: access.permissions,
+        accessScope: "organization"
+      }, await organizationSeatState(organizationID)),
+      researchUsage: await organizationResearchAllowanceUsage(organizationID, controls)
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid firm standards.",
+      code: "INVALID_FIRM_CONTROLS"
     });
   }
 }
@@ -5132,11 +5334,13 @@ async function handleOrganizationProjectList(request, response) {
     organization: organizationForClient(organization, organizationAccess ? {
       role: organizationAccess.role,
       permissions: organizationAccess.permissions,
-      accessScope: "organization"
+      accessScope: "organization",
+      visibleProjectIDs: projects.map((project) => project.id)
     } : {
       role: projects[0]?.role || "viewer",
       permissions: projects[0]?.permissions || [],
-      accessScope: "project"
+      accessScope: "project",
+      visibleProjectIDs: projects.map((project) => project.id)
     }),
     projects
   });
@@ -5168,10 +5372,11 @@ async function handleOrganizationProjectSnapshot(request, response) {
       permissions: access.permissions,
       readOnly: !access.permissions.includes(organizationPermissions.projectEdit),
       organization: access.organization
-        ? organizationForClient(access.organization, {
+          ? organizationForClient(access.organization, {
             role: access.role,
             permissions: access.permissions,
-            accessScope: access.membership?.projectID ? "project" : "organization"
+            accessScope: access.membership?.projectID ? "project" : "organization",
+            visibleProjectIDs: [access.projectID]
           })
         : null
     },
@@ -6509,6 +6714,58 @@ async function handleReportSourceList(request, response) {
   });
 }
 
+async function reportConfigurationForProject(userID, projectID) {
+  const access = await projectAccessForUser(userID, projectID);
+  if (!access || !access.permissions.includes(organizationPermissions.reportDownload)) {
+    return null;
+  }
+  const controls = access.organization
+    ? normalizedOrganizationFirmControls(access.organization)
+    : defaultFirmControls({
+        organizationName: "Permitext",
+        ownerUserID: userID,
+        createdAt: access.project?.updatedAt || new Date().toISOString()
+      });
+  return {
+    access,
+    controls,
+    organization: access.organization,
+    templates: controls.reportTemplates.filter((template) => template.status === "active"),
+    defaultReportTemplateID: controls.defaultReportTemplateID,
+    branding: controls.branding,
+    requiredDisclaimers: controls.requiredDisclaimers,
+    tags: controls.tags.filter((tag) =>
+      tag.status === "active" &&
+      (controls.projectTagAssignments[access.projectID] || []).includes(tag.id)
+    )
+  };
+}
+
+async function handleReportOptions(request, response) {
+  const context = await authenticatedReportBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const configuration = await reportConfigurationForProject(context.userID, projectID);
+  if (!configuration) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    projectID: configuration.access.projectID,
+    organization: configuration.organization ? {
+      id: configuration.organization.id,
+      name: configuration.organization.name
+    } : null,
+    firmControlsVersion: configuration.controls.version,
+    templates: configuration.templates,
+    defaultReportTemplateID: configuration.defaultReportTemplateID,
+    branding: configuration.branding,
+    requiredDisclaimers: configuration.requiredDisclaimers,
+    tags: configuration.tags
+  });
+}
+
 async function projectReportDrafts(userID, projectID, options = {}) {
   const linkedDraftIDs = new Set(
     (await listStoredProjectLinks(userID))
@@ -6811,6 +7068,12 @@ async function handleReportGenerate(request, response) {
     return;
   }
   try {
+    const reportConfiguration = await reportConfigurationForProject(context.userID, projectID);
+    if (!reportConfiguration) throw new Error("Report configuration is unavailable.");
+    const reportTemplate = activeReportTemplate(
+      reportConfiguration.controls,
+      context.body.reportTemplateID
+    );
     const sources = await reportSourcesForProject(context.userID, projectID);
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
     const priorManifests = await projectReportManifests(context.userID, projectID);
@@ -6844,15 +7107,23 @@ async function handleReportGenerate(request, response) {
           : []),
         ...draft.payload.blocks.map((block) => reportManifestItemForDraftBlock(block, sourcesByKey))
       ],
-      disclaimers: [
-        "Permitext is an unofficial reference tool. Verify legal, permitting, design, and construction decisions against enacted code text and agency guidance.",
-        "AI-assisted Research is limited to the approved evidence recorded in this report and may require additional Project facts or professional review."
-      ],
+      disclaimers: reportConfiguration.organization
+        ? reportDisclaimersForFirm({
+            controls: reportConfiguration.controls,
+            template: reportTemplate
+          })
+        : [...permitextRequiredReportDisclaimers],
+      presentation: reportPresentationSnapshot({
+        organization: reportConfiguration.organization,
+        controls: reportConfiguration.controls,
+        template: reportTemplate
+      }),
       reportVersion,
       sourceVersions: {
         codeEdition: defaultResearchCodeEdition,
         codeContent: defaultSyncCodeVersion,
-        draftVersion: draft.envelope.version
+        draftVersion: draft.envelope.version,
+        firmControlsVersion: reportConfiguration.controls.version
       },
       createdAt: now
     });
@@ -12315,6 +12586,7 @@ const handlers = {
   "organizations/list": handleOrganizationList,
   "organizations/create": handleOrganizationCreate,
   "organizations/update": handleOrganizationUpdate,
+  "organizations/controls/save": handleOrganizationControlsSave,
   "organizations/members/list": handleOrganizationMemberList,
   "organizations/members/invite": handleOrganizationMemberInvite,
   "organizations/members/update": handleOrganizationMemberUpdate,
@@ -12330,6 +12602,7 @@ const handlers = {
   "notebook/cards/save": handleNotebookCardSave,
   "notebook/cards/delete": handleNotebookCardDelete,
   "reports/sources/list": handleReportSourceList,
+  "reports/options": handleReportOptions,
   "reports/drafts/list": handleReportDraftList,
   "reports/drafts/get": handleReportDraftGet,
   "reports/drafts/save": handleReportDraftSave,

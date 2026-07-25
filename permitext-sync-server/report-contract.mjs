@@ -1,8 +1,8 @@
 import { createHash, randomUUID } from "node:crypto";
 
 export const reportDraftSchemaVersion = 1;
-export const reportManifestSchemaVersion = 1;
-export const reportGeneratorVersion = "permitext-report-v1";
+export const reportManifestSchemaVersion = 2;
+export const reportGeneratorVersion = "permitext-report-v2";
 
 export const reportDraftBlockKinds = Object.freeze([
   "heading",
@@ -48,6 +48,43 @@ function positiveInteger(value, label) {
     throw new Error(`Invalid ${label}.`);
   }
   return normalized;
+}
+
+function normalizeReportPresentation(presentation) {
+  if (!presentation) return null;
+  const accentColorHex = String(presentation.branding?.accentColorHex || "").trim().toLowerCase();
+  if (!/^#[0-9a-f]{6}$/.test(accentColorHex)) {
+    throw new Error("Invalid Report branding accent color.");
+  }
+  return {
+    firmControlsVersion: positiveInteger(
+      presentation.firmControlsVersion,
+      "Report firm controls version"
+    ),
+    organization: presentation.organization ? {
+      id: requiredText(presentation.organization.id, "Report organization ID", 256),
+      name: requiredText(presentation.organization.name, "Report organization name", 160)
+    } : null,
+    template: {
+      id: requiredText(presentation.template?.id, "Report template ID", 256),
+      name: requiredText(presentation.template?.name, "Report template name", 120),
+      coverLabel: requiredText(
+        presentation.template?.coverLabel,
+        "Report template cover label",
+        160
+      )
+    },
+    branding: {
+      displayName: requiredText(
+        presentation.branding?.displayName,
+        "Report branding name",
+        160
+      ),
+      accentColorHex,
+      website: optionalText(presentation.branding?.website, 500) || null,
+      footerText: optionalText(presentation.branding?.footerText, 500) || null
+    }
+  };
 }
 
 function stableValue(value) {
@@ -228,6 +265,7 @@ export function immutableReportManifest({
   codeEdition,
   items,
   disclaimers,
+  presentation = null,
   reportVersion,
   sourceVersions,
   createdAt = new Date().toISOString()
@@ -256,6 +294,7 @@ export function immutableReportManifest({
     items: normalizedItems,
     disclaimers: (Array.isArray(disclaimers) ? disclaimers : [])
       .map((value) => requiredText(value, "Report disclaimer", 5_000)),
+    presentation: normalizeReportPresentation(presentation),
     reportVersion: positiveInteger(reportVersion, "Report version"),
     sourceVersions: sourceVersions && typeof sourceVersions === "object" && !Array.isArray(sourceVersions)
       ? structuredClone(sourceVersions)
@@ -279,6 +318,7 @@ export function reportManifestSummary(manifest) {
     codeEdition: manifest.codeEdition,
     reportVersion: manifest.reportVersion,
     itemCount: manifest.items.length,
+    presentation: manifest.presentation ? structuredClone(manifest.presentation) : null,
     contentHash: manifest.contentHash,
     generatorVersion: manifest.generatorVersion,
     createdAt: manifest.createdAt

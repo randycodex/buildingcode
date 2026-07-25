@@ -178,6 +178,10 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Data/BookmarkExportBuilder.swift", import.meta.url),
     "utf8"
   );
+  const iosOrganizationProjectHubSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Views/OrganizationProjectHubView.swift", import.meta.url),
+    "utf8"
+  );
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const researchConfigSource = await readFile(new URL("../research-config.mjs", import.meta.url), "utf8");
@@ -249,7 +253,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260725-project-collaboration-v7"),
+      webRoot.text.includes("20260725-firm-controls-v10"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -480,6 +484,10 @@ async function main() {
         workspaceScript.text.includes("Discard unsaved Report Draft changes?") &&
         workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
         workspaceScript.text.includes("function printReportManifestAsPDF(manifest)") &&
+        workspaceScript.text.includes("function renderFirmStandardsEditor") &&
+        workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
+        workspaceScript.text.includes('postResearch("/reports/options"') &&
+        workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
         workspaceScript.text.includes("async function downloadProjectReportFile") &&
         workspaceScript.text.includes('fetch("/reports/files/read"') &&
         workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
@@ -507,12 +515,26 @@ async function main() {
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Exports"') &&
         iosExportBuilderSource.includes("struct ProjectReportExportBuilder: Sendable") &&
+        iosCodeModelsSource.includes("struct PermitextFirmControls: Codable") &&
+        iosCodeModelsSource.includes("struct ProjectReportPresentation: Codable") &&
+        iosExportBuilderSource.includes("reportCoverLabel") &&
+        iosExportBuilderSource.includes("reportBrandName") &&
+        iosOrganizationProjectHubSource.includes('projectSection(title: "Firm context"') &&
+        iosOrganizationProjectHubSource.includes("assignedFirmTags") &&
         iosExportBuilderSource.includes("manifest.contentHash") &&
         iosBookmarksSource.includes("Create & Save iOS PDF") &&
         iosBookmarksSource.includes('"Read-only preview"') &&
         iosBookmarksSource.includes("Flattened Project Workboard preview") &&
         iosBookmarksSource.includes("Workboard editing stays on the web."),
       "iOS Project Hub no longer provides its read-only Notebook, immutable Research, native Report export, and web-first Workboard contract."
+    );
+    assert(
+      iosLibraryViewModelSource.includes("private var startupWarmupTask: Task<Void, Never>?") &&
+        iosLibraryViewModelSource.includes("startupWarmupTask?.cancel()") &&
+        Array.from(iosLibraryViewModelSource.matchAll(
+          /self\.isInitialContentLoaded = true\s+self\.startupWarmupTask = Task/g
+        )).length === 2,
+      "iOS startup once again blocks first paint on authored or SQLite content prewarming."
     );
     const projectMutationSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function projectMutationForRecord"),
@@ -761,7 +783,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-project-collaboration-v7'),
+        webRoot.text.includes('/web/app.js?v=20260725-firm-controls-v10'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2054,6 +2076,113 @@ async function main() {
         transferProject.json.ownership.originalOwnerUserID === userID,
       "Project transfer did not preserve stable identity, storage ownership, and original attribution."
     );
+    const firmControlsDraft = structuredClone(createOrganization.json.organization.firmControls);
+    const firmControlsTimestamp = "2026-07-25T12:00:00.000Z";
+    firmControlsDraft.tags = [{
+      id: "smoke-filing-tag",
+      name: "Filing",
+      colorHex: "#1267a0",
+      status: "active",
+      createdAt: firmControlsTimestamp,
+      updatedAt: firmControlsTimestamp,
+      order: 0
+    }];
+    firmControlsDraft.projectTagAssignments = {
+      [researchProjectIDs[0]]: ["smoke-filing-tag"]
+    };
+    firmControlsDraft.reportTemplates.push({
+      id: "smoke-client-report",
+      name: "Client Report",
+      description: "Smoke-test firm report presentation.",
+      coverLabel: "Client Code Report",
+      disclaimers: ["Prepared for the named client only."],
+      status: "active",
+      createdAt: firmControlsTimestamp,
+      updatedAt: firmControlsTimestamp,
+      order: 1
+    });
+    firmControlsDraft.defaultReportTemplateID = "smoke-client-report";
+    firmControlsDraft.branding = {
+      displayName: "Smoke Permit Studio",
+      accentColorHex: "#1267a0",
+      website: "https://smoke.test",
+      footerText: "Smoke Permit Studio"
+    };
+    firmControlsDraft.requiredDisclaimers = [
+      "Professional judgment remains required."
+    ];
+    firmControlsDraft.researchAllowance = {
+      mode: "per-seat",
+      monthlyUnits: 75,
+      resetDayUTC: 1,
+      authority: "policy-only"
+    };
+    firmControlsDraft.retentionPolicy = {
+      retentionDays: 3_650,
+      enforcement: "policy-only",
+      automaticDeletionEnabled: true
+    };
+    const saveFirmControls = await request("/organizations/controls/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        expectedVersion: 1,
+        controls: firmControlsDraft
+      }
+    });
+    assert(
+      saveFirmControls.response.ok &&
+        saveFirmControls.json.organization.firmControls.version === 2 &&
+        saveFirmControls.json.organization.firmControls.retentionPolicy.automaticDeletionEnabled === false &&
+        saveFirmControls.json.organization.firmControls.administrativeHistory.length === 1 &&
+        saveFirmControls.json.organization.firmControls.tags[0].createdAt ===
+          saveFirmControls.json.organization.firmControls.tags[0].updatedAt &&
+        saveFirmControls.json.organization.firmControls.reportTemplates[1].createdAt ===
+          saveFirmControls.json.organization.firmControls.reportTemplates[1].updatedAt &&
+        saveFirmControls.json.researchUsage.mode === "per-seat" &&
+        saveFirmControls.json.researchUsage.requestsUsed === 0,
+      "Owner-only firm standards did not preserve policy-only retention, audit history, or usage state."
+    );
+    const savedFirmControls = saveFirmControls.json.organization.firmControls;
+    const staleFirmControls = await request("/organizations/controls/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        expectedVersion: 1,
+        controls: firmControlsDraft
+      }
+    });
+    assert(
+      staleFirmControls.response.status === 409 &&
+        staleFirmControls.json.code === "FIRM_CONTROLS_VERSION_CONFLICT" &&
+        staleFirmControls.json.controls.version === 2,
+      "Firm standards optimistic concurrency did not protect the current revision."
+    );
+    const invalidFirmAssignment = await request("/organizations/controls/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        expectedVersion: 2,
+        controls: {
+          ...savedFirmControls,
+          projectTagAssignments: {
+            ...savedFirmControls.projectTagAssignments,
+            "outside-firm-project": ["smoke-filing-tag"]
+          }
+        }
+      }
+    });
+    assert(
+      invalidFirmAssignment.response.status === 400 &&
+        invalidFirmAssignment.json.code === "INVALID_FIRM_PROJECT_ASSIGNMENT",
+      "Firm tags accepted an assignment to a Project outside the organization."
+    );
 
     const sharedViewerSignIn = await request("/account/sign-in", {
       method: "POST",
@@ -2126,6 +2255,11 @@ async function main() {
       viewerSnapshot.response.ok &&
         viewerSnapshot.json.access.role === "viewer" &&
         viewerSnapshot.json.access.readOnly === true &&
+        viewerSnapshot.json.access.organization.firmControls.updatedByUserID === null &&
+        viewerSnapshot.json.access.organization.firmControls.administrativeHistory.length === 0 &&
+        Object.keys(
+          viewerSnapshot.json.access.organization.firmControls.projectTagAssignments
+        ).every((projectID) => projectID === researchProjectIDs[0]) &&
         viewerSnapshot.json.project.projects.length === 1 &&
         viewerSnapshot.json.project.projects[0].id === researchProjectIDs[0] &&
         viewerSnapshot.json.project.workboardPreview.id === workboardPreviewID,
@@ -2157,6 +2291,20 @@ async function main() {
     assert(
       [403, 404].includes(viewerOrganizationUpdate.response.status),
       "A Project-only viewer was allowed to administer the firm workspace."
+    );
+    const viewerFirmControlsUpdate = await request("/organizations/controls/save", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        organizationID,
+        expectedVersion: 2,
+        controls: savedFirmControls
+      }
+    });
+    assert(
+      [403, 404].includes(viewerFirmControlsUpdate.response.status),
+      "A Project viewer was allowed to change firm tags, templates, or operating policies."
     );
     const viewerMemberDirectory = await request("/organizations/members/list", {
       method: "POST",
@@ -2654,6 +2802,22 @@ async function main() {
         storedWorkboardPreview.body.equals(smokePNG),
       "The flattened Workboard preview was not restored through authenticated private storage."
     );
+    const reportOptions = await request("/reports/options", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reportOptions.response.ok &&
+        reportOptions.json.defaultReportTemplateID === "smoke-client-report" &&
+        reportOptions.json.templates.some((template) => template.id === "smoke-client-report") &&
+        reportOptions.json.tags.some((tag) => tag.id === "smoke-filing-tag") &&
+        reportOptions.json.branding.displayName === "Smoke Permit Studio",
+      "The Report Studio did not receive the Project's firm template, branding, and tag context."
+    );
     const reportSources = await request("/reports/sources/list", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -2740,13 +2904,19 @@ async function main() {
       body: {
         auth: { accountUserID: userID },
         projectID: researchProjectIDs[0],
-        draftID: reportDraftID
+        draftID: reportDraftID,
+        reportTemplateID: "smoke-client-report"
       }
     });
     assert(
       generatedProjectReport.response.status === 201 &&
         generatedProjectReport.json.manifest.immutable === true &&
         generatedProjectReport.json.manifest.reportVersion === 1 &&
+        generatedProjectReport.json.manifest.presentation.firmControlsVersion === 2 &&
+        generatedProjectReport.json.manifest.presentation.template.id === "smoke-client-report" &&
+        generatedProjectReport.json.manifest.presentation.branding.displayName === "Smoke Permit Studio" &&
+        generatedProjectReport.json.manifest.disclaimers.includes("Professional judgment remains required.") &&
+        generatedProjectReport.json.manifest.disclaimers.includes("Prepared for the named client only.") &&
         generatedProjectReport.json.manifest.items.some((item) =>
           item.kind === "researchAnswer" &&
           item.answerID === answerID &&
@@ -2767,6 +2937,29 @@ async function main() {
     );
     const reportManifestID = generatedProjectReport.json.manifest.id;
     const webGeneratedReportID = generatedProjectReport.json.generatedReport.id;
+    const revisedFirmControls = structuredClone(savedFirmControls);
+    revisedFirmControls.branding.displayName = "Smoke Permit Studio Revised";
+    revisedFirmControls.reportTemplates = revisedFirmControls.reportTemplates.map((template) =>
+      template.id === "smoke-client-report"
+        ? { ...template, coverLabel: "Revised Future Report" }
+        : template
+    );
+    const reviseFirmControls = await request("/organizations/controls/save", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        expectedVersion: 2,
+        controls: revisedFirmControls
+      }
+    });
+    assert(
+      reviseFirmControls.response.ok &&
+        reviseFirmControls.json.organization.firmControls.version === 3 &&
+        reviseFirmControls.json.organization.firmControls.administrativeHistory.length === 2,
+      "A later firm-standards revision did not preserve its bounded administrative audit history."
+    );
     const unauthorizedReportPDF = await request("/reports/files/read", {
       method: "POST",
       body: {
@@ -2846,6 +3039,9 @@ async function main() {
         readReportManifest.json.files.length === 2 &&
         readReportManifest.json.manifest.contentHash ===
           generatedProjectReport.json.manifest.contentHash &&
+        readReportManifest.json.manifest.presentation.firmControlsVersion === 2 &&
+        readReportManifest.json.manifest.presentation.template.coverLabel === "Client Code Report" &&
+        readReportManifest.json.manifest.presentation.branding.displayName === "Smoke Permit Studio" &&
         readReportManifest.json.manifest.items.some((item) =>
           item.kind === "researchAnswer" &&
           item.question === "When must the owner notify the department?"

@@ -61,6 +61,14 @@ chapter title, normalized section headings, and complete official provision text
 on both web and iOS. Building Code Appendix U section U101.5 has also been restored
 to the canonical catalog, search index, and runtime.
 
+The iOS cold-start audit also confirmed that first paint was waiting on search-index,
+multi-chapter, and section-detail prewarming. The chapter grid now becomes usable as
+soon as the selected content snapshot is ready; cancellable search and Reader
+prewarming continues in the background. A clean iOS 26.5 simulator reached the
+usable Building Code grid during the first verification capture, and a subsequent
+relaunch was visibly ready at the five-second check instead of the previously
+observed roughly 30–35-second wait.
+
 ### Release 0 gate
 
 Do not begin the unified Project migration until:
@@ -692,6 +700,8 @@ The core organization and collaboration foundation is now implemented locally an
 - Firm administration and shared editing remain web-first on iPhone. iOS intentionally focuses on review, continuity, and secure Report access.
 - The Project Studio remains one coordinated workspace. Switching Projects replaces the visible Notebook, notes, reviews, Research, reports, and Workboard state instead of opening parallel workboards or leaking the prior Project's content.
 - The Notebook uses a constrained Tiptap editor with canonical versioned JSON owned by Permitext; Tiptap Cloud and paid collaboration services are not foundation dependencies.
+- Firm Owners can manage organization tags, Project assignments, reusable Report templates, branding, required disclaimers, Research allowance policy, and policy-only retention from the web. New Reports retain immutable snapshots of those standards.
+- iOS presents assigned firm tags, active Report-template context, branding, policy revision, and retention context read-only in the shared Project Hub and applies immutable Report presentation snapshots to native PDF export.
 - Shared Workboard editing remains deferred until the ordinary collaboration model has production experience.
 
 ## Phase 3.1 — Organizations
@@ -802,7 +812,9 @@ Add:
 
 Educational, governmental, and institutional accounts may reuse the organization structure with different licensing policies.
 
-**Status: partial.** Seat limits and usage, pending invitations, member deactivation, role management, Project ownership transfer, organization billing identity, and review statuses are implemented. Centralized billing operations, firm tags, templates, branding, required disclaimers, allowance policy, and data-retention controls remain the next firm-administration work.
+**Status: complete for the bounded current scope.** Seat limits and usage, pending invitations, member deactivation, role management, Project ownership transfer, review statuses, organization-owned tags and Project assignments, reusable Report templates, branding, required disclaimers, pooled or per-seat Research allowance policy and usage, and policy-only retention are implemented. Firm-control saves use backend permission checks, optimistic concurrency, server-owned administrative history, migration-safe defaults, and PostgreSQL persistence. New web and iOS Reports snapshot the selected template, branding, control revision, and combined disclaimers so later administrative edits cannot change an existing Report.
+
+Billing identity and operation state remain server-authoritative and non-client-mutable. Payment-provider checkout, centralized invoicing, tax handling, and subscription mutation are intentionally deferred until the commercial firm plan is selected; the current client does not simulate or claim those financial operations. Retention does not delete data automatically.
 
 ---
 
@@ -1052,8 +1064,8 @@ When content must be removed, preserve only the minimum tombstone or audit metad
 20. Read-only Project sharing — completed
 21. Authored collaboration — completed for notes, Notebook content, comments, and activity
 22. Shared evidence and review — completed for the controlled review workflow
-23. Firm controls — next active phase
-24. Seat management and billing — seat controls implemented; billing operations remain
+23. Firm controls — bounded operational scope completed
+24. Seat management and billing — seat controls and server-authoritative billing state completed; payment-provider checkout and invoicing remain deferred
 25. Shared Workboard editing — intentionally deferred
 
 ## Develop and evaluate in parallel
@@ -1073,20 +1085,22 @@ When content must be removed, preserve only the minimum tombstone or audit metad
 
 # Immediate Next Development Sprint
 
-The Project Record foundation and first professional vertical slices are complete. The next sprint should finish the bounded Release 3.5 firm controls that are useful without introducing shared Workboard editing or weakening Research release gates.
+The bounded Release 3.5 firm-control scope is complete. The next sprint should
+advance Release 4 evaluation readiness and production hardening without enabling
+public evidence discovery, Zoning Research, shared Workboard editing, or paid calls.
 
 ## Sprint deliverables
 
-1. Add organization-owned firm tags with controlled creation, editing, archiving, and Project assignment.
-2. Add reusable organization Report templates without mutating previously generated immutable reports.
-3. Add organization branding and required-disclaimer settings with a safe, unbranded default.
-4. Apply the selected template, branding, and disclaimer snapshot to each new Report Manifest and export.
-5. Add explicit organization retention settings as policy metadata; do not automatically delete user content in this sprint.
-6. Define pooled versus per-seat Research allowance policy and expose usage clearly without making paid model calls.
-7. Complete centralized billing-operation state and audit events without relying on client-supplied authority.
-8. Keep firm administration web-first and show only relevant read-only organization/report context on iOS.
-9. Add backend permission, optimistic-concurrency, migration, PostgreSQL, smoke, offline, web-rendering, and iOS-build coverage for every new record.
-10. Verify the complete collaboration flow in a rendered browser and the Project Hub in an iOS simulator before publishing.
+1. Publish and monitor the firm-control schema migration against production PostgreSQL, including legacy organization defaults and immutable historical Report compatibility.
+2. Turn the current retrieval draft packet into a focused knowledgeable-human review queue with explicit approve, revise, and reject decisions per scenario.
+3. Expand deterministic retrieval coverage for mechanical systems, Buildings Bulletins, existing-building questions, non-text tables or maps, and outside-agency boundaries.
+4. Preserve the answerable-versus-insufficient-evidence distinction as a hard evaluation gate; aggregate retrieval scores alone must not pass a case.
+5. Keep every new evaluation case in draft until a knowledgeable reviewer approves its expected sources, required concepts, uncertainty conditions, and forbidden claims.
+6. Add Zoning-specific evaluation drafts and source-coverage diagnostics while keeping public Zoning Research disabled.
+7. Collect production evidence on firm invitation, Project transfer, review, Report-template, and native Report-download workflows before expanding collaboration authority.
+8. Write the commercial decision brief for centralized firm checkout and invoicing, including provider, tax, seat-change, cancellation, refund, and audit requirements; do not simulate payment operations in clients.
+9. Record iOS cold-start timings on representative devices and preserve the first-paint-before-prewarm contract as a regression gate.
+10. Continue deferring simultaneous Workboard editing until ordinary collaboration has production experience.
 
 ## Required boundaries
 

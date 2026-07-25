@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260725-project-collaboration-v7";
+} from "./offline-storage.js?v=20260725-firm-controls-v10";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9427,18 +9427,21 @@ function printReportManifestAsPDF(manifest) {
   frame.addEventListener("load", () => {
     const documentRoot = frame.contentDocument;
     if (!documentRoot) return;
+    const presentation = manifest.presentation || {};
+    const accentCandidate = String(presentation.branding?.accentColorHex || "").toLowerCase();
+    const accent = /^#[0-9a-f]{6}$/.test(accentCandidate) ? accentCandidate : "#9a4f12";
     const style = documentRoot.createElement("style");
     style.textContent = `
       body{margin:0;color:#161616;font:10.5pt/1.5 -apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif}
       main{max-width:7.2in;margin:0 auto;padding:.55in .5in .7in}
       .cover{min-height:7.4in;display:flex;flex-direction:column;justify-content:center;break-after:page}
       .eyebrow,.classification{font-size:8pt;font-weight:750;letter-spacing:.09em;text-transform:uppercase}
-      .eyebrow{color:#9a4f12}.classification{display:inline-block;margin-bottom:8px;padding:4px 7px;border-radius:999px;background:#f1ece7;color:#5a4a3d}
+      .eyebrow{color:${accent}}.classification{display:inline-block;margin-bottom:8px;padding:4px 7px;border-radius:999px;background:#f1ece7;color:#5a4a3d}
       h1{margin:8px 0 14px;font-size:30pt;line-height:1.08}h2{margin:28px 0 10px;font-size:17pt}h3{margin:0 0 8px;font-size:13pt}h4{margin:12px 0 4px;font-size:9pt;text-transform:uppercase;letter-spacing:.06em}
       p{margin:0 0 10px}.meta{color:#555}.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:28px}
       article{margin:0 0 18px;padding:16px;border-radius:10px;background:#f7f5f2;break-inside:avoid}
       article.published-code{background:#f5eee6}article.ai-assisted{background:#eef1f8}article.user-authored{background:#f4f1f8}
-      blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid #a95a19;color:#333}
+      blockquote{margin:10px 0 0;padding-left:14px;border-left:3px solid ${accent};color:#333}
       ul{margin:4px 0 10px;padding-left:20px}.disclaimers{margin-top:32px;padding-top:16px;border-top:1px solid #bbb;color:#555;font-size:8.5pt}
       .hash{margin-top:14px;overflow-wrap:anywhere;font:7pt/1.3 ui-monospace,SFMono-Regular,Menlo,monospace;color:#777}
       @page{margin:.35in}
@@ -9449,7 +9452,13 @@ function printReportManifestAsPDF(manifest) {
     cover.className = "cover";
     const eyebrow = documentRoot.createElement("p");
     eyebrow.className = "eyebrow";
-    eyebrow.textContent = "Permitext Project Report";
+    eyebrow.textContent = presentation.template?.coverLabel || "Permitext Project Report";
+    const brand = documentRoot.createElement("p");
+    brand.className = "meta";
+    brand.textContent = [
+      presentation.branding?.displayName,
+      presentation.branding?.website
+    ].filter(Boolean).join(" · ");
     const title = documentRoot.createElement("h1");
     title.textContent = manifest.title;
     const projectName = documentRoot.createElement("h2");
@@ -9471,7 +9480,9 @@ function printReportManifestAsPDF(manifest) {
       item.textContent = label;
       legend.append(item);
     });
-    cover.append(eyebrow, title, projectName, metadata, legend);
+    cover.append(eyebrow);
+    if (brand.textContent) cover.append(brand);
+    cover.append(title, projectName, metadata, legend);
     main.append(cover);
 
     (manifest.items || []).forEach((item) => {
@@ -9616,6 +9627,13 @@ async function renderProjectReportDraft(project) {
   let drafts = [];
   let sources = [];
   let history = [];
+  let reportOptions = {
+    templates: [],
+    defaultReportTemplateID: "permitext-standard",
+    branding: { displayName: "Permitext", accentColorHex: "#a65318" },
+    tags: []
+  };
+  let selectedReportTemplateID = "permitext-standard";
   let activeDraft = emptyProjectReportDraft(identity);
   let dirty = false;
   let disposed = false;
@@ -9693,7 +9711,8 @@ async function renderProjectReportDraft(project) {
     try {
       const payload = await postResearch("/reports/generate", {
         projectID,
-        draftID: activeDraft.id
+        draftID: activeDraft.id,
+        reportTemplateID: selectedReportTemplateID
       });
       const historyPayload = await postResearch("/reports/history/list", { projectID });
       history = historyPayload.reports || [];
@@ -9884,6 +9903,7 @@ async function renderProjectReportDraft(project) {
       meta.textContent = [
         new Date(report.createdAt).toLocaleDateString(),
         `${report.itemCount} ${report.itemCount === 1 ? "item" : "items"}`,
+        report.presentation?.template?.name,
         report.author?.displayName
       ].filter(Boolean).join(" · ");
       button.append(heading, meta);
@@ -9960,6 +9980,26 @@ async function renderProjectReportDraft(project) {
       renderWorkspaceContent();
     });
     draftPicker.append(select);
+    const templateSelect = document.createElement("select");
+    templateSelect.setAttribute("aria-label", "Firm Report template");
+    (reportOptions.templates || []).forEach((template) => {
+      const option = document.createElement("option");
+      option.value = template.id;
+      option.textContent = `${template.name} · ${template.coverLabel}`;
+      templateSelect.append(option);
+    });
+    templateSelect.value = selectedReportTemplateID;
+    templateSelect.addEventListener("change", () => {
+      selectedReportTemplateID = templateSelect.value;
+      renderWorkspaceContent();
+    });
+    draftPicker.append(templateSelect);
+    if (reportOptions.tags?.length) {
+      const tags = document.createElement("p");
+      tags.className = "report-draft-empty";
+      tags.textContent = `Firm tags: ${reportOptions.tags.map((tag) => tag.name).join(", ")}`;
+      draftPicker.append(tags);
+    }
 
     const metadata = document.createElement("div");
     metadata.className = "report-draft-metadata";
@@ -10040,7 +10080,10 @@ async function renderProjectReportDraft(project) {
     preview.className = "report-draft-preview";
     const previewTitle = document.createElement("p");
     previewTitle.className = "section-label";
-    previewTitle.textContent = "Report preview";
+    const selectedTemplate = (reportOptions.templates || []).find((template) =>
+      template.id === selectedReportTemplateID
+    );
+    previewTitle.textContent = selectedTemplate?.coverLabel || "Report preview";
     const previewHeading = document.createElement("h3");
     previewHeading.textContent = activeDraft.title || "Untitled Report";
     const previewMeta = document.createElement("p");
@@ -10074,15 +10117,20 @@ async function renderProjectReportDraft(project) {
   }
 
   try {
-    const [draftPayload, sourcePayload, historyPayload] = await Promise.all([
+    const [draftPayload, sourcePayload, historyPayload, optionsPayload] = await Promise.all([
       postResearch("/reports/drafts/list", { projectID }),
       postResearch("/reports/sources/list", { projectID }),
-      postResearch("/reports/history/list", { projectID })
+      postResearch("/reports/history/list", { projectID }),
+      postResearch("/reports/options", { projectID })
     ]);
     if (disposed) return panel;
     drafts = draftPayload.drafts || [];
     sources = sourcePayload.sources || [];
     history = historyPayload.reports || [];
+    reportOptions = optionsPayload;
+    selectedReportTemplateID = optionsPayload.defaultReportTemplateID ||
+      optionsPayload.templates?.[0]?.id ||
+      "permitext-standard";
     activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
     status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
     renderWorkspaceContent();
@@ -13043,6 +13091,353 @@ async function renderFirmMemberManager(container, organization, setFirmStatus) {
   }
 }
 
+function renderFirmStandardsEditor(organization, setFirmStatus) {
+  const details = document.createElement("details");
+  details.className = "settings-firm-standards";
+  const summary = document.createElement("summary");
+  summary.textContent = "Firm standards, tags & Report templates";
+  const editor = document.createElement("div");
+  details.append(summary, editor);
+  let controls = structuredClone(organization.firmControls || {});
+  const lines = (value) => String(value || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const render = () => {
+    editor.replaceChildren();
+    const intro = document.createElement("p");
+    intro.className = "settings-firm-muted";
+    intro.textContent = `Revision ${controls.version || 1}. New Reports snapshot these settings; older Reports never change.`;
+    editor.append(intro);
+
+    const branding = document.createElement("section");
+    branding.className = "settings-firm-standard-section";
+    const brandingTitle = document.createElement("strong");
+    brandingTitle.textContent = "Report branding";
+    const displayName = document.createElement("input");
+    displayName.value = controls.branding?.displayName || organization.name;
+    displayName.maxLength = 160;
+    displayName.addEventListener("input", () => {
+      controls.branding.displayName = displayName.value;
+    });
+    const accent = document.createElement("input");
+    accent.type = "color";
+    accent.value = controls.branding?.accentColorHex || "#a65318";
+    accent.addEventListener("input", () => {
+      controls.branding.accentColorHex = accent.value;
+    });
+    const website = document.createElement("input");
+    website.type = "url";
+    website.value = controls.branding?.website || "";
+    website.placeholder = "https://firm.example";
+    website.addEventListener("input", () => {
+      controls.branding.website = website.value;
+    });
+    const footer = document.createElement("input");
+    footer.value = controls.branding?.footerText || "";
+    footer.maxLength = 500;
+    footer.placeholder = "Optional PDF footer";
+    footer.addEventListener("input", () => {
+      controls.branding.footerText = footer.value;
+    });
+    const requiredDisclaimers = document.createElement("textarea");
+    requiredDisclaimers.value = (controls.requiredDisclaimers || []).join("\n");
+    requiredDisclaimers.placeholder = "One required firm disclaimer per line";
+    requiredDisclaimers.addEventListener("input", () => {
+      controls.requiredDisclaimers = lines(requiredDisclaimers.value);
+    });
+    branding.append(
+      brandingTitle,
+      firmControlLabel("Firm display name", displayName),
+      firmControlLabel("Accent color", accent),
+      firmControlLabel("Website", website),
+      firmControlLabel("PDF footer", footer),
+      firmControlLabel("Required disclaimers", requiredDisclaimers)
+    );
+    editor.append(branding);
+
+    const tagsSection = document.createElement("section");
+    tagsSection.className = "settings-firm-standard-section";
+    const tagsHeading = document.createElement("div");
+    tagsHeading.className = "settings-firm-standard-heading";
+    const tagsTitle = document.createElement("strong");
+    tagsTitle.textContent = "Project tags";
+    const addTag = document.createElement("button");
+    addTag.className = "settings-secondary-button";
+    addTag.type = "button";
+    addTag.textContent = "Add tag";
+    addTag.addEventListener("click", () => {
+      const now = new Date().toISOString();
+      controls.tags ||= [];
+      controls.tags.push({
+        id: crypto.randomUUID(),
+        name: "New tag",
+        colorHex: "#6b7280",
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+        order: controls.tags.length
+      });
+      render();
+    });
+    tagsHeading.append(tagsTitle, addTag);
+    tagsSection.append(tagsHeading);
+    (controls.tags || []).forEach((tag) => {
+      const row = document.createElement("div");
+      row.className = "settings-firm-standard-row";
+      const name = document.createElement("input");
+      name.value = tag.name || "";
+      name.maxLength = 80;
+      name.setAttribute("aria-label", "Firm tag name");
+      name.addEventListener("input", () => {
+        tag.name = name.value;
+      });
+      const color = document.createElement("input");
+      color.type = "color";
+      color.value = tag.colorHex || "#6b7280";
+      color.setAttribute("aria-label", `${tag.name || "Firm tag"} color`);
+      color.addEventListener("input", () => {
+        tag.colorHex = color.value;
+      });
+      const status = document.createElement("select");
+      status.setAttribute("aria-label", `${tag.name || "Firm tag"} status`);
+      [["active", "Active"], ["archived", "Archived"]].forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        status.append(option);
+      });
+      status.value = tag.status || "active";
+      status.addEventListener("change", () => {
+        tag.status = status.value;
+      });
+      row.append(name, color, status);
+      tagsSection.append(row);
+    });
+    const activeTags = (controls.tags || []).filter((tag) => tag.status === "active");
+    if (activeTags.length && organization.projects?.length) {
+      const assignmentsTitle = document.createElement("span");
+      assignmentsTitle.className = "settings-firm-subheading";
+      assignmentsTitle.textContent = "Assignments";
+      tagsSection.append(assignmentsTitle);
+      (organization.projects || []).forEach((project) => {
+        const assignment = document.createElement("fieldset");
+        assignment.className = "settings-firm-tag-assignment";
+        const legend = document.createElement("legend");
+        legend.textContent = project.name || "Untitled Project";
+        assignment.append(legend);
+        activeTags.forEach((tag) => {
+          const label = document.createElement("label");
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = (controls.projectTagAssignments?.[project.id] || [])
+            .includes(tag.id);
+          checkbox.addEventListener("change", () => {
+            controls.projectTagAssignments ||= {};
+            const assigned = new Set(controls.projectTagAssignments[project.id] || []);
+            if (checkbox.checked) assigned.add(tag.id);
+            else assigned.delete(tag.id);
+            if (assigned.size) controls.projectTagAssignments[project.id] = Array.from(assigned);
+            else delete controls.projectTagAssignments[project.id];
+          });
+          const swatch = document.createElement("span");
+          swatch.className = "settings-firm-tag-swatch";
+          swatch.style.setProperty("--firm-tag-color", tag.colorHex);
+          label.append(checkbox, swatch, document.createTextNode(tag.name));
+          assignment.append(label);
+        });
+        tagsSection.append(assignment);
+      });
+    }
+    editor.append(tagsSection);
+
+    const templatesSection = document.createElement("section");
+    templatesSection.className = "settings-firm-standard-section";
+    const templatesHeading = document.createElement("div");
+    templatesHeading.className = "settings-firm-standard-heading";
+    const templatesTitle = document.createElement("strong");
+    templatesTitle.textContent = "Report templates";
+    const addTemplate = document.createElement("button");
+    addTemplate.className = "settings-secondary-button";
+    addTemplate.type = "button";
+    addTemplate.textContent = "Add template";
+    addTemplate.addEventListener("click", () => {
+      const now = new Date().toISOString();
+      const templateID = crypto.randomUUID();
+      controls.reportTemplates ||= [];
+      controls.reportTemplates.push({
+        id: templateID,
+        name: "New template",
+        description: "",
+        coverLabel: "Project Code Report",
+        disclaimers: [],
+        status: "active",
+        createdAt: now,
+        updatedAt: now,
+        order: controls.reportTemplates.length
+      });
+      const currentDefaultIsActive = controls.reportTemplates.some((template) =>
+        template.id === controls.defaultReportTemplateID && template.status === "active"
+      );
+      if (!currentDefaultIsActive) controls.defaultReportTemplateID = templateID;
+      render();
+    });
+    templatesHeading.append(templatesTitle, addTemplate);
+    templatesSection.append(templatesHeading);
+    (controls.reportTemplates || []).forEach((template) => {
+      const card = document.createElement("article");
+      card.className = "settings-firm-template";
+      const name = document.createElement("input");
+      name.value = template.name || "";
+      name.maxLength = 120;
+      name.addEventListener("input", () => {
+        template.name = name.value;
+      });
+      const coverLabel = document.createElement("input");
+      coverLabel.value = template.coverLabel || "";
+      coverLabel.maxLength = 160;
+      coverLabel.addEventListener("input", () => {
+        template.coverLabel = coverLabel.value;
+      });
+      const description = document.createElement("textarea");
+      description.value = template.description || "";
+      description.placeholder = "Internal description";
+      description.addEventListener("input", () => {
+        template.description = description.value;
+      });
+      const disclaimers = document.createElement("textarea");
+      disclaimers.value = (template.disclaimers || []).join("\n");
+      disclaimers.placeholder = "One template disclaimer per line";
+      disclaimers.addEventListener("input", () => {
+        template.disclaimers = lines(disclaimers.value);
+      });
+      const status = document.createElement("select");
+      [["active", "Active"], ["archived", "Archived"]].forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        status.append(option);
+      });
+      status.value = template.status || "active";
+      status.addEventListener("change", () => {
+        template.status = status.value;
+        if (
+          template.status === "archived" &&
+          controls.defaultReportTemplateID === template.id
+        ) {
+          controls.defaultReportTemplateID = controls.reportTemplates.find((candidate) =>
+            candidate.id !== template.id && candidate.status === "active"
+          )?.id || "";
+        }
+        render();
+      });
+      const defaultTemplate = document.createElement("input");
+      defaultTemplate.type = "radio";
+      defaultTemplate.name = `default-report-template-${organization.id}`;
+      defaultTemplate.checked = controls.defaultReportTemplateID === template.id;
+      defaultTemplate.disabled = template.status !== "active";
+      defaultTemplate.addEventListener("change", () => {
+        if (defaultTemplate.checked) controls.defaultReportTemplateID = template.id;
+      });
+      const defaultLabel = document.createElement("label");
+      defaultLabel.className = "settings-firm-default-template";
+      defaultLabel.append(defaultTemplate, document.createTextNode("Default for new Reports"));
+      card.append(
+        firmControlLabel("Template name", name),
+        firmControlLabel("Cover label", coverLabel),
+        firmControlLabel("Description", description),
+        firmControlLabel("Template disclaimers", disclaimers),
+        firmControlLabel("Status", status),
+        defaultLabel
+      );
+      templatesSection.append(card);
+    });
+    editor.append(templatesSection);
+
+    const policy = document.createElement("section");
+    policy.className = "settings-firm-standard-section";
+    const policyTitle = document.createElement("strong");
+    policyTitle.textContent = "Operating policies";
+    const allowanceMode = document.createElement("select");
+    [["pooled", "Pooled firm allowance"], ["per-seat", "Per-seat allowance"]]
+      .forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        allowanceMode.append(option);
+      });
+    allowanceMode.value = controls.researchAllowance?.mode || "pooled";
+    allowanceMode.addEventListener("change", () => {
+      controls.researchAllowance.mode = allowanceMode.value;
+    });
+    const monthlyUnits = document.createElement("input");
+    monthlyUnits.type = "number";
+    monthlyUnits.min = "1";
+    monthlyUnits.max = "100000";
+    monthlyUnits.value = String(controls.researchAllowance?.monthlyUnits || 100);
+    monthlyUnits.addEventListener("input", () => {
+      controls.researchAllowance.monthlyUnits = Number(monthlyUnits.value);
+    });
+    const retentionDays = document.createElement("input");
+    retentionDays.type = "number";
+    retentionDays.min = "1";
+    retentionDays.max = "36500";
+    retentionDays.value = String(controls.retentionPolicy?.retentionDays || 2555);
+    retentionDays.addEventListener("input", () => {
+      controls.retentionPolicy.retentionDays = Number(retentionDays.value);
+    });
+    const usage = document.createElement("p");
+    usage.className = "settings-firm-muted";
+    usage.textContent = organization.researchUsage
+      ? `${organization.researchUsage.requestsUsed}/${organization.researchUsage.requestLimit} Research requests recorded this period · resets ${new Date(organization.researchUsage.resetDate).toLocaleDateString()}.`
+      : "Research usage will appear after this workspace refreshes.";
+    const retentionNotice = document.createElement("p");
+    retentionNotice.className = "settings-firm-muted";
+    retentionNotice.textContent = "Retention is policy metadata only. Permitext will not automatically delete Project data.";
+    const billingNotice = document.createElement("p");
+    billingNotice.className = "settings-firm-muted";
+    billingNotice.textContent = `${organization.billingIdentity.status} billing state · ${organization.billingIdentity.seatLimit} seats. Billing identifiers and subscription operations remain server-only.`;
+    policy.append(
+      policyTitle,
+      firmControlLabel("Research allowance", allowanceMode),
+      firmControlLabel("Monthly request units", monthlyUnits),
+      usage,
+      firmControlLabel("Retention period (days)", retentionDays),
+      retentionNotice,
+      billingNotice
+    );
+    editor.append(policy);
+
+    const save = document.createElement("button");
+    save.className = "settings-primary-button";
+    save.type = "button";
+    save.textContent = "Save Firm Standards";
+    save.addEventListener("click", async () => {
+      save.disabled = true;
+      try {
+        const payload = await postResearch("/organizations/controls/save", {
+          organizationID: organization.id,
+          expectedVersion: controls.version,
+          controls
+        });
+        controls = structuredClone(payload.organization.firmControls);
+        setFirmStatus(`Firm standards saved as revision ${controls.version}.`);
+        await refreshOrganizationWorkspaceUI();
+      } catch (error) {
+        if (error.payload?.controls) controls = structuredClone(error.payload.controls);
+        setFirmStatus(error.message || "Firm standards could not be saved.", true);
+        save.disabled = false;
+      }
+    });
+    editor.append(save);
+  };
+  details.addEventListener("toggle", () => {
+    if (details.open && !editor.childElementCount) render();
+  });
+  return details;
+}
+
 async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
   const container = panel.querySelector(".settings-firm-content");
   if (!container) return;
@@ -13349,6 +13744,7 @@ async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
         }
       });
       ownerTools.append(
+        renderFirmStandardsEditor(organization, setFirmStatus),
         firmControlLabel("Project ownership", transferSelect),
         transferButton,
         inviteForm,

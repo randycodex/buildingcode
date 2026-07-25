@@ -63,6 +63,14 @@ struct OrganizationProjectHubView: View {
         }.count
     }
 
+    private var assignedFirmTags: [PermitextFirmTag] {
+        guard let controls = organization.firmControls else { return [] }
+        let assignedIDs = Set(controls.projectTagAssignments[project.id] ?? [])
+        return controls.tags
+            .filter { $0.status == "active" && assignedIDs.contains($0.id) }
+            .sorted { $0.order < $1.order }
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
@@ -94,6 +102,7 @@ struct OrganizationProjectHubView: View {
                     }
                 } else if snapshot != nil {
                     projectMetrics
+                    firmStandardsSection
                     projectNotesSection
                     notebookSection
                     researchSection
@@ -205,6 +214,51 @@ struct OrganizationProjectHubView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .fill(projectAccent.opacity(0.1))
         )
+    }
+
+    @ViewBuilder
+    private var firmStandardsSection: some View {
+        if let controls = organization.firmControls {
+            projectSection(title: "Firm context", systemImage: "building.2") {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(controls.branding.displayName)
+                        .font(.subheadline.weight(.semibold))
+                    Text(
+                        "\(controls.reportTemplates.filter { $0.status == "active" }.count) Report templates · standards revision \(controls.version)"
+                    )
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    if !assignedFirmTags.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack(spacing: 7) {
+                                ForEach(assignedFirmTags) { tag in
+                                    Text(tag.name)
+                                        .font(.caption2.weight(.bold))
+                                        .padding(.horizontal, 9)
+                                        .padding(.vertical, 5)
+                                        .background(
+                                            Capsule(style: .continuous)
+                                                .fill(
+                                                    Color(
+                                                        uiColor: PlatformColor(hex: tag.colorHex)
+                                                            ?? .systemGray
+                                                    ).opacity(0.2)
+                                                )
+                                        )
+                                }
+                            }
+                        }
+                    }
+                    Text(
+                        "Retention: \(controls.retentionPolicy.retentionDays) days (policy only; no automatic deletion)"
+                    )
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .projectHubRow(accent: projectAccent)
+            }
+        }
     }
 
     @ViewBuilder

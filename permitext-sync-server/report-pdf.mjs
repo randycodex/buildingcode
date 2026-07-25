@@ -43,6 +43,17 @@ function stringList(value) {
     .filter(Boolean);
 }
 
+function reportPresentation(manifest) {
+  const accent = String(manifest.presentation?.branding?.accentColorHex || "").trim().toLowerCase();
+  return {
+    accent: /^#[0-9a-f]{6}$/.test(accent) ? accent : colors.accent,
+    coverLabel: manifest.presentation?.template?.coverLabel || "Permitext Project Report",
+    displayName: manifest.presentation?.branding?.displayName || "Permitext",
+    website: manifest.presentation?.branding?.website || "",
+    footerText: manifest.presentation?.branding?.footerText || ""
+  };
+}
+
 function ensureVerticalSpace(document, height = 72) {
   if (document.y + height <= document.page.height - document.page.margins.bottom) return;
   document.addPage();
@@ -83,7 +94,7 @@ function drawList(document, title, values) {
   document.moveDown(0.25);
 }
 
-function drawSourceItem(document, item, projectMaterialBySourceID) {
+function drawSourceItem(document, item, projectMaterialBySourceID, presentation) {
   ensureVerticalSpace(document, 105);
   const startX = document.x;
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
@@ -110,7 +121,7 @@ function drawSourceItem(document, item, projectMaterialBySourceID) {
         fontSize: 9.5
       })))
       .lineWidth(2)
-      .strokeColor(colors.accent)
+      .strokeColor(presentation.accent)
       .stroke();
     document
       .fillColor(colors.ink)
@@ -201,13 +212,25 @@ function drawSourceItem(document, item, projectMaterialBySourceID) {
 }
 
 function drawCover(document, manifest) {
+  const presentation = reportPresentation(manifest);
   const contentWidth = document.page.width - document.page.margins.left - document.page.margins.right;
   document.moveDown(4);
   document
-    .fillColor(colors.accent)
+    .fillColor(presentation.accent)
     .font("Helvetica-Bold")
     .fontSize(9)
-    .text("PERMITEXT PROJECT REPORT", { characterSpacing: 1.25 });
+    .text(presentation.coverLabel.toUpperCase(), { characterSpacing: 1.25 });
+  if (presentation.displayName.toLowerCase() !== presentation.coverLabel.toLowerCase()) {
+    document
+      .moveDown(0.5)
+      .fillColor(colors.muted)
+      .font("Helvetica")
+      .fontSize(8)
+      .text(
+        [presentation.displayName, presentation.website].filter(Boolean).join("  /  "),
+        { characterSpacing: 0.25 }
+      );
+  }
   document.moveDown(1.4);
   document
     .fillColor(colors.ink)
@@ -247,6 +270,7 @@ function drawCover(document, manifest) {
 }
 
 function drawBody(document, manifest, projectMaterialBySourceID) {
+  const presentation = reportPresentation(manifest);
   document.addPage();
   if (manifest.project?.description) {
     document
@@ -286,7 +310,7 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
       document.moveDown(0.6);
       return;
     }
-    drawSourceItem(document, item, projectMaterialBySourceID);
+    drawSourceItem(document, item, projectMaterialBySourceID, presentation);
   });
 
   ensureVerticalSpace(document, 130);
@@ -322,7 +346,9 @@ function drawBody(document, manifest, projectMaterialBySourceID) {
     );
 }
 
-function drawPageFooters(document) {
+function drawPageFooters(document, manifest) {
+  const presentation = reportPresentation(manifest);
+  const footerLabel = presentation.footerText || `${presentation.displayName} professional report`;
   const range = document.bufferedPageRange();
   for (let pageIndex = range.start; pageIndex < range.start + range.count; pageIndex += 1) {
     document.switchToPage(pageIndex);
@@ -332,7 +358,7 @@ function drawPageFooters(document) {
       .font("Helvetica")
       .fontSize(7)
       .text(
-        `Permitext professional report  /  ${pageIndex + 1} of ${range.count}`,
+        `${footerLabel}  /  ${pageIndex + 1} of ${range.count}`,
         page.margins.left,
         page.height - 32,
         {
@@ -366,7 +392,7 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
 
   drawCover(document, manifest);
   drawBody(document, manifest, projectMaterialBySourceID);
-  drawPageFooters(document);
+  drawPageFooters(document, manifest);
   document.end();
   return completed;
 }

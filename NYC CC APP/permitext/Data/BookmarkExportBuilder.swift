@@ -401,6 +401,16 @@ struct ProjectReportExportBuilder: Sendable {
 
     private let pageSize = CGSize(width: 612, height: 792)
     private let pageMargin = UIEdgeInsets(top: 58, left: 52, bottom: 56, right: 52)
+    private var presentationAccent: UIColor {
+        PlatformColor(hex: manifest.presentation?.branding.accentColorHex ?? "#a65318")
+            ?? UIColor(red: 0.66, green: 0.31, blue: 0.08, alpha: 1)
+    }
+    private var reportCoverLabel: String {
+        manifest.presentation?.template.coverLabel ?? "Permitext Project Report"
+    }
+    private var reportBrandName: String {
+        manifest.presentation?.branding.displayName ?? "Permitext"
+    }
 
     func build() throws -> URL {
         guard !manifest.items.isEmpty else {
@@ -435,13 +445,26 @@ struct ProjectReportExportBuilder: Sendable {
     private func composeDocument() -> NSAttributedString {
         let result = NSMutableAttributedString()
         append(
-            "PERMITEXT PROJECT REPORT\n",
+            "\(reportCoverLabel.uppercased())\n",
             to: result,
             font: .systemFont(ofSize: 10, weight: .bold),
-            color: UIColor(red: 0.66, green: 0.31, blue: 0.08, alpha: 1),
+            color: presentationAccent,
             spacingAfter: 8,
             kern: 1.1
         )
+        if reportBrandName.lowercased() != reportCoverLabel.lowercased() {
+            let brandLine = [
+                reportBrandName,
+                manifest.presentation?.branding.website
+            ].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
+            append(
+                "\(brandLine)\n",
+                to: result,
+                font: .systemFont(ofSize: 9, weight: .semibold),
+                color: UIColor(white: 0.35, alpha: 1),
+                spacingAfter: 8
+            )
+        }
         append(
             "\(manifest.title)\n",
             to: result,
@@ -492,7 +515,11 @@ struct ProjectReportExportBuilder: Sendable {
             )
         }
         append(
-            "\nManifest \(manifest.id)\n\(manifest.generatorVersion) · SHA-256 \(manifest.contentHash)",
+            [
+                manifest.presentation?.branding.footerText,
+                "Manifest \(manifest.id)",
+                "\(manifest.generatorVersion) · SHA-256 \(manifest.contentHash)"
+            ].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n"),
             to: result,
             font: .monospacedSystemFont(ofSize: 7, weight: .regular),
             color: UIColor(white: 0.5, alpha: 1),
@@ -730,7 +757,7 @@ struct ProjectReportExportBuilder: Sendable {
             .foregroundColor: UIColor(white: 0.45, alpha: 1)
         ]
         NSAttributedString(
-            string: "PERMITEXT · \(manifest.project.name) · REPORT V\(manifest.reportVersion)",
+            string: "\(reportBrandName.uppercased()) · \(manifest.project.name) · REPORT V\(manifest.reportVersion)",
             attributes: attributes
         ).draw(at: CGPoint(x: pageMargin.left, y: 31))
         context.setStrokeColor(UIColor(white: 0.78, alpha: 1).cgColor)

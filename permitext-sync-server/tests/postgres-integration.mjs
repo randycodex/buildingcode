@@ -83,6 +83,32 @@ async function cleanupUser() {
     await sql`DELETE FROM permitext_account_sessions WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_sessions WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_entitlements WHERE user_id = ${cleanupUserID}`;
+    await sql`
+      DELETE FROM permitext_project_memberships
+      WHERE organization_id IN (
+        SELECT id FROM permitext_organizations WHERE owner_user_id = ${cleanupUserID}
+      )
+    `;
+    await sql`
+      DELETE FROM permitext_organization_invitations
+      WHERE organization_id IN (
+        SELECT id FROM permitext_organizations WHERE owner_user_id = ${cleanupUserID}
+      )
+    `;
+    await sql`
+      DELETE FROM permitext_project_ownerships
+      WHERE owner_kind = 'organization'
+        AND owner_id IN (
+          SELECT id FROM permitext_organizations WHERE owner_user_id = ${cleanupUserID}
+        )
+    `;
+    await sql`
+      DELETE FROM permitext_organization_memberships
+      WHERE organization_id IN (
+        SELECT id FROM permitext_organizations WHERE owner_user_id = ${cleanupUserID}
+      )
+    `;
+    await sql`DELETE FROM permitext_organizations WHERE owner_user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_users WHERE id = ${cleanupUserID}`;
   }
 }
@@ -467,6 +493,68 @@ try {
   assert(
     await countRows("permitext_saved_items") === savedItemCountBeforeGrant,
     "Entitlement update changed unrelated saved content."
+  );
+  const postgresOrganization = await request("/organizations/create", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      name: `Postgres Permit Studio ${runID}`
+    }
+  });
+  assert(
+    postgresOrganization.response.status === 201 &&
+      postgresOrganization.json.organization.firmControls.version === 1,
+    "Postgres organization creation did not persist the default firm controls."
+  );
+  const postgresOrganizationID = postgresOrganization.json.organization.id;
+  const postgresFirmControls = structuredClone(
+    postgresOrganization.json.organization.firmControls
+  );
+  postgresFirmControls.branding.displayName = "Postgres Permit Studio";
+  postgresFirmControls.researchAllowance.mode = "per-seat";
+  postgresFirmControls.researchAllowance.monthlyUnits = 50;
+  postgresFirmControls.retentionPolicy.retentionDays = 1_825;
+  const postgresFirmControlsSave = await request("/organizations/controls/save", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      organizationID: postgresOrganizationID,
+      expectedVersion: 1,
+      controls: postgresFirmControls
+    }
+  });
+  assert(
+    postgresFirmControlsSave.response.ok &&
+      postgresFirmControlsSave.json.organization.firmControls.version === 2 &&
+      postgresFirmControlsSave.json.organization.firmControls.branding.displayName ===
+        "Postgres Permit Studio",
+    "Postgres firm controls did not round-trip through the owner-only settings endpoint."
+  );
+  const [postgresFirmControlsRow] = await sql`
+    SELECT organization->'firmControls' AS firm_controls
+    FROM permitext_organizations
+    WHERE id = ${postgresOrganizationID}
+  `;
+  assert(
+    postgresFirmControlsRow?.firm_controls?.version === 2 &&
+      postgresFirmControlsRow?.firm_controls?.retentionPolicy?.automaticDeletionEnabled === false,
+    "Postgres JSONB did not retain the versioned policy-only firm controls."
+  );
+  const postgresOrganizationList = await request("/organizations/list", {
+    method: "POST",
+    token,
+    body: { auth: { accountUserID: userID } }
+  });
+  assert(
+    postgresOrganizationList.response.ok &&
+      postgresOrganizationList.json.organizations.some((organization) =>
+        organization.id === postgresOrganizationID &&
+        organization.firmControls.version === 2 &&
+        organization.billingOperations.clientMutable === false
+      ),
+    "Postgres organization reload omitted firm controls or the server-only billing boundary."
   );
   const lifetimeRevoke = await request("/admin/lifetime-grants/revoke", {
     method: "POST",

@@ -1,6 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { normalizeFirmControls } from "./firm-controls-contract.mjs";
 
-export const organizationSchemaVersion = 1;
+export const organizationSchemaVersion = 2;
 
 export const organizationRoles = Object.freeze([
   "owner",
@@ -183,6 +184,7 @@ export function organizationRecord({
   status = "active",
   capabilities = {},
   billingIdentity = {},
+  firmControls = null,
   createdAt = new Date().toISOString(),
   updatedAt = createdAt
 }) {
@@ -212,6 +214,14 @@ export function organizationRecord({
       customerID: optionalText(billingIdentity.customerID, 256),
       subscriptionID: optionalText(billingIdentity.subscriptionID, 256)
     },
+    firmControls: normalizeFirmControls(firmControls, {
+      organizationName: name,
+      ownerUserID,
+      createdAt,
+      updatedAt: firmControls?.updatedAt || createdAt,
+      updatedByUserID: firmControls?.updatedByUserID || ownerUserID,
+      version: firmControls?.version || 1
+    }),
     createdAt: requiredISO(createdAt, "organization creation date"),
     updatedAt: requiredISO(updatedAt, "organization update date")
   };

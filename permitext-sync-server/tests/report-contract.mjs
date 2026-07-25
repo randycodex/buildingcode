@@ -106,6 +106,24 @@ const manifestInput = {
   disclaimers: [
     "Verify decisions against enacted code text and agency guidance."
   ],
+  presentation: {
+    firmControlsVersion: 3,
+    organization: {
+      id: "organization-1",
+      name: "Permit Studio PLLC"
+    },
+    template: {
+      id: "template-client",
+      name: "Client Report",
+      coverLabel: "Client Code Report"
+    },
+    branding: {
+      displayName: "Permit Studio",
+      accentColorHex: "#1267a0",
+      website: "https://example.test",
+      footerText: "Permit Studio PLLC"
+    }
+  },
   reportVersion: 1,
   sourceVersions: {
     codeEdition: "2022 Construction Codes",
@@ -119,8 +137,15 @@ assert.equal(manifest.immutable, true);
 assert.equal(manifest.items[1].sourceClassification, "published-code");
 assert.equal(manifest.items[2].sourceClassification, "ai-assisted");
 assert.equal(manifest.items[3].sourceClassification, "project-material");
+assert.equal(manifest.presentation.template.id, "template-client");
+assert.equal(manifest.presentation.branding.accentColorHex, "#1267a0");
 assert.equal(manifest.contentHash, repeatedManifest.contentHash);
 assert.equal(reportManifestSummary(manifest).itemCount, 4);
+assert.equal(
+  reportManifestSummary(manifest).presentation.template.name,
+  "Client Report",
+  "Report history summaries must preserve the immutable firm template snapshot."
+);
 assert.equal(
   stableReportJSON({ b: 2, a: 1 }),
   stableReportJSON({ a: 1, b: 2 }),
