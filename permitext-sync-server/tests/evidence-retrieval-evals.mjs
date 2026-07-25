@@ -186,6 +186,8 @@ try {
         candidate.signals &&
         Array.isArray(candidate.richSources) &&
         Array.isArray(candidate.richSourceIDs) &&
+        Array.isArray(candidate.visualSources) &&
+        Array.isArray(candidate.visualSourceIDs) &&
         !candidate.approved
       ),
       `${retrievalCase.id} returned an approved, unexplained, or passage-free candidate.`
@@ -231,6 +233,30 @@ try {
         ) &&
         candidate.richSourceIDs?.length === candidate.richSources.length,
         `${retrievalCase.id} did not attach a complete, integrity-addressed table source for section ${sectionID}.`
+      );
+    }
+    for (const sectionID of retrievalCase.expectedIntegrityAddressedVisualSourceSectionIDs || []) {
+      const candidate = discovery.candidates.find((item) => String(item.sectionID) === String(sectionID));
+      const visualRequirement = candidate?.sourceReviewRequirements?.find((item) =>
+        item.kind === "visual-source"
+      );
+      assert(candidate, `${retrievalCase.id} did not retrieve visual-source section ${sectionID}.`);
+      assert.equal(
+        candidate.preparationEligible,
+        false,
+        `${retrievalCase.id} allowed preparation before the official visual sources were reviewed.`
+      );
+      assert(
+        visualRequirement?.count > 0 &&
+        candidate.visualSources?.length === visualRequirement.count &&
+        candidate.visualSourceIDs?.length === candidate.visualSources.length &&
+        candidate.visualSources.every((source) =>
+          source.kind === "image" &&
+          /^\/code\/assets\/[a-zA-Z0-9._-]+$/.test(source.assetURL || "") &&
+          /^[a-f0-9]{64}$/.test(source.contentHash || "") &&
+          Number(source.byteLength) > 0
+        ),
+        `${retrievalCase.id} did not expose the complete integrity-addressed official visual inventory for section ${sectionID}.`
       );
     }
     for (const kind of retrievalCase.expectedCoverageLimitationKinds || []) {

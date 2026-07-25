@@ -245,6 +245,7 @@ let cachedShippedSearchIndex = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 let blobModulePromise = null;
+const constructionVisualAssetMetadataCache = new Map();
 
 const emptyStore = () => ({
   users: {},
@@ -2751,6 +2752,9 @@ function contentTypeForPath(path) {
   if (path.endsWith(".svg")) {
     return "image/svg+xml";
   }
+  if (path.endsWith(".avif")) {
+    return "image/avif";
+  }
   if (path.endsWith(".png")) {
     return "image/png";
   }
@@ -2770,6 +2774,42 @@ function contentTypeForPath(path) {
     return "font/woff";
   }
   return "application/octet-stream";
+}
+
+async function constructionVisualSourceMetadata(reference) {
+  const assetName = String(reference?.assetName || "").trim();
+  if (!/^[a-zA-Z0-9._-]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(assetName)) return null;
+  let metadataPromise = constructionVisualAssetMetadataCache.get(assetName);
+  if (!metadataPromise) {
+    metadataPromise = readFile(join(assetContentPath, assetName))
+      .then((body) => {
+        const contentHash = createHash("sha256").update(body).digest("hex");
+        return {
+          id: `visual-source-${createHash("sha256")
+            .update(`${assetName}\u001f${contentHash}`)
+            .digest("hex")
+            .slice(0, 24)}`,
+          kind: "image",
+          assetName,
+          assetURL: `/code/assets/${encodeURIComponent(assetName)}`,
+          mediaType: contentTypeForPath(assetName),
+          contentHash,
+          byteLength: body.length
+        };
+      })
+      .catch((error) => {
+        constructionVisualAssetMetadataCache.delete(assetName);
+        if (error.code === "ENOENT") return null;
+        throw error;
+      });
+    constructionVisualAssetMetadataCache.set(assetName, metadataPromise);
+  }
+  const metadata = await metadataPromise;
+  return metadata ? {
+    ...metadata,
+    displayWidth: reference?.displayWidth || null,
+    displayHeight: reference?.displayHeight || null
+  } : null;
 }
 
 function bearerToken(request) {
@@ -8905,6 +8945,7 @@ async function handleResearchEvidenceDiscover(request, response) {
         allowMissing: true,
         canonicalSectionID: section.id
       }),
+      resolveVisualSource: constructionVisualSourceMetadata,
       limit: context.body.limit
     });
     sendJSON(response, 200, {

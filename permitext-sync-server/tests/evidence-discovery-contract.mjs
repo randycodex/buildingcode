@@ -153,6 +153,17 @@ const mapAuthority = await discoverRelevantEvidence({
   catalog,
   invertedIndex,
   readSectionBody: async (section) => bodies.get(section.id),
+  resolveVisualSource: async (reference) => ({
+    id: "visual-source-official-fire-district-map",
+    kind: "image",
+    assetName: reference.assetName,
+    assetURL: `/code/assets/${reference.assetName}`,
+    mediaType: "image/png",
+    contentHash: "a".repeat(64),
+    byteLength: 1_024,
+    displayWidth: reference.displayWidth,
+    displayHeight: reference.displayHeight
+  }),
   limit: 5
 });
 assert.equal(mapAuthority.candidates[0].sectionID, "4", "Appendix-style exact references must resolve.");
@@ -164,6 +175,15 @@ assert(
 assert(
   mapAuthority.coverageLimitations.some((item) => item.kind === "visual-source-review-required"),
   "Map-dependent candidates must disclose the text-only preparation boundary."
+);
+assert(
+  mapAuthority.candidates[0].visualSources.some((item) =>
+    item.assetName === "official-fire-district-map.png" &&
+    item.assetURL === "/code/assets/official-fire-district-map.png" &&
+    item.contentHash === "a".repeat(64) &&
+    item.byteLength === 1_024
+  ),
+  "Map-dependent candidates must expose an integrity-addressed official asset inventory for review."
 );
 
 const tableAuthority = await discoverRelevantEvidence({

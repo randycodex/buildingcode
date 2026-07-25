@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260725-structured-tables-v12";
+} from "./offline-storage.js?v=20260725-visual-inventory-v13";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7407,6 +7407,14 @@ function evidenceCandidateCitation(candidate) {
   return `${candidate.codePrefix || "BC"} § ${candidate.sectionNumber || candidate.sectionID}`;
 }
 
+function formattedByteLength(value) {
+  const bytes = Number(value || 0);
+  if (!Number.isFinite(bytes) || bytes <= 0) return "size unavailable";
+  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  if (bytes >= 1_000) return `${Math.round(bytes / 1_000).toLocaleString()} KB`;
+  return `${bytes.toLocaleString()} bytes`;
+}
+
 function renderEvidenceDiscovery(container) {
   if (
     !hasCapability("evidence-discovery") &&
@@ -7588,6 +7596,34 @@ function renderEvidenceDiscovery(container) {
         });
         structuredSources.append(structuredSourcesHeading, structuredSourcesList);
       }
+      const visualSources = document.createElement("div");
+      visualSources.className = "evidence-candidate-visual-sources";
+      if (candidate.visualSources?.length) {
+        const visualSourcesHeading = document.createElement("strong");
+        visualSourcesHeading.textContent = "Official visual source inventory verified";
+        const visualRequirementCount = candidate.sourceReviewRequirements
+          ?.find((item) => item.kind === "visual-source")?.count;
+        const visualSourcesSummary = document.createElement("p");
+        visualSourcesSummary.textContent = `${candidate.visualSources.length}${visualRequirementCount ? ` of ${visualRequirementCount}` : ""} official assets verified by content hash. Visual review is still required before this candidate can be prepared.`;
+        const visualSourcesDetails = document.createElement("details");
+        const visualSourcesToggle = document.createElement("summary");
+        visualSourcesToggle.textContent = "Review official asset list";
+        const visualSourcesList = document.createElement("ul");
+        candidate.visualSources.forEach((source) => {
+          const item = document.createElement("li");
+          const link = document.createElement("a");
+          link.href = source.assetURL;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = source.assetName;
+          const metadata = document.createElement("span");
+          metadata.textContent = ` · ${formattedByteLength(source.byteLength)} · integrity ${String(source.contentHash || "").slice(0, 12)}`;
+          item.append(link, metadata);
+          visualSourcesList.append(item);
+        });
+        visualSourcesDetails.append(visualSourcesToggle, visualSourcesList);
+        visualSources.append(visualSourcesHeading, visualSourcesSummary, visualSourcesDetails);
+      }
       const signals = document.createElement("p");
       signals.className = "evidence-candidate-signals";
       const signalParts = [
@@ -7641,6 +7677,9 @@ function renderEvidenceDiscovery(container) {
       }
       if (candidate.richSources?.length) {
         card.append(structuredSources);
+      }
+      if (candidate.visualSources?.length) {
+        card.append(visualSources);
       }
       card.append(signals, actions);
       tray.append(card);

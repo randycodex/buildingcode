@@ -3780,7 +3780,8 @@ mark {
 
 .evidence-discovery-outside ul,
 .evidence-candidate-source-requirements ul,
-.evidence-candidate-structured-sources ul {
+.evidence-candidate-structured-sources ul,
+.evidence-candidate-visual-sources ul {
   display: grid;
   gap: var(--space-2);
   margin: 0;
@@ -3916,13 +3917,36 @@ mark {
   line-height: 1.4;
 }
 
+.evidence-candidate-visual-sources {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, #f79009 13%, var(--surface));
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.73) !important;
+  line-height: 1.4;
+}
+
+.evidence-candidate-visual-sources p {
+  margin: 0;
+}
+
+.evidence-candidate-visual-sources summary {
+  color: var(--text-primary);
+  cursor: pointer;
+  font-weight: 650;
+}
+
 .evidence-candidate-source-requirements strong,
-.evidence-candidate-structured-sources strong {
+.evidence-candidate-structured-sources strong,
+.evidence-candidate-visual-sources strong {
   color: var(--text-primary);
 }
 
 .evidence-candidate-source-requirements li,
-.evidence-candidate-structured-sources li {
+.evidence-candidate-structured-sources li,
+.evidence-candidate-visual-sources li {
   margin: 0;
 }
 

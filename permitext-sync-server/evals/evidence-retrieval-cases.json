@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260725-hybrid-candidates-v5",
+  "retrievalVersion": "20260725-hybrid-candidates-v6",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection",
     "official agency interpretations outside the current library",
-    "official maps, images, and non-table rich sources requiring structured evidence",
+    "review, selection, and immutable attachment of integrity-addressed official maps and images",
     "broader structural and occupancy-change existing-building scenarios"
   ],
   "cases": [
@@ -127,6 +127,7 @@
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
       "expectedPreparationBlockedSectionIDs": ["6881"],
+      "expectedIntegrityAddressedVisualSourceSectionIDs": ["6881"],
       "expectedCoverageLimitationKinds": ["visual-source-review-required"],
       "notes": "Tests AC-to-Appendix-D discovery and requires BC D106.1 to remain blocked from text-only preparation because the governing fire-district boundary is carried by official map images."
     },

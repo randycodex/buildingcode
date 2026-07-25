@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v5";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v6";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -342,6 +342,30 @@ function comparableTableReference(value) {
   return normalizedText(value).replace(/^(?:ac|bc|ebc|fc|mc|pc)\s+/, "");
 }
 
+function visualSourceReferences(body) {
+  const references = new Map();
+  for (const block of body?.blocks || []) {
+    for (const match of String(block.html || "").matchAll(/<img\b([^>]*)\bsrc=["']([^"']+)["']([^>]*)>/gi)) {
+      let assetName = "";
+      try {
+        assetName = decodeURIComponent(match[2].split(/[?#]/)[0].split("/").at(-1) || "");
+      } catch {
+        continue;
+      }
+      if (!/^[a-zA-Z0-9._ -]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(assetName)) continue;
+      const attributes = `${match[1] || ""} ${match[3] || ""}`;
+      const width = Number.parseFloat(attributes.match(/\bwidth=["']?([\d.]+)/i)?.[1] || "");
+      const height = Number.parseFloat(attributes.match(/\bheight=["']?([\d.]+)/i)?.[1] || "");
+      references.set(assetName, {
+        assetName,
+        displayWidth: Number.isFinite(width) && width > 0 ? width : null,
+        displayHeight: Number.isFinite(height) && height > 0 ? height : null
+      });
+    }
+  }
+  return Array.from(references.values());
+}
+
 export function structuredRichSources(body) {
   const sources = [];
   for (const block of body?.blocks || []) {
@@ -429,22 +453,14 @@ function passageSegments(body) {
 }
 
 function sourceReviewRequirements(body, passage, richSources) {
-  const imageNames = new Set();
-  for (const block of body?.blocks || []) {
-    for (const match of String(block.html || "").matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)) {
-      const fileName = decodeURIComponent(match[1].split(/[?#]/)[0].split("/").at(-1) || "");
-      if (/^[a-zA-Z0-9._ -]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(fileName)) {
-        imageNames.add(fileName);
-      }
-    }
-  }
+  const imageReferences = visualSourceReferences(body);
   const requirements = [];
-  if (imageNames.size) {
+  if (imageReferences.length) {
     requirements.push({
       kind: "visual-source",
-      count: imageNames.size,
-      assetNames: Array.from(imageNames).slice(0, 50),
-      text: `This section includes ${imageNames.size} official ${imageNames.size === 1 ? "image, figure, or map" : "images, figures, or maps"} that the proposed text passage does not capture.`
+      count: imageReferences.length,
+      assetNames: imageReferences.map((item) => item.assetName).slice(0, 50),
+      text: `This section includes ${imageReferences.length} official ${imageReferences.length === 1 ? "image, figure, or map" : "images, figures, or maps"} that the proposed text passage does not capture.`
     });
   }
   const tableReferences = Array.from(new Set(
@@ -533,6 +549,7 @@ export async function discoverRelevantEvidence({
   catalog,
   invertedIndex,
   readSectionBody,
+  resolveVisualSource,
   limit = 8
 }) {
   const normalizedQuestion = validateEvidenceDiscoveryQuestion(question);
@@ -627,6 +644,17 @@ export async function discoverRelevantEvidence({
     if (!passage) continue;
     const richSources = structuredRichSources(body);
     const reviewRequirements = sourceReviewRequirements(body, passage, richSources);
+    const visualSources = [];
+    if (typeof resolveVisualSource === "function") {
+      for (const reference of visualSourceReferences(body)) {
+        try {
+          const source = await resolveVisualSource(reference);
+          if (source) visualSources.push(source);
+        } catch {
+          // Missing or unreadable assets remain represented by the blocking source-review requirement.
+        }
+      }
+    }
     const passageTableReferences = Array.from(new Set(
       Array.from(String(passage.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
         .map((match) => `Table ${match[1]}`)
@@ -653,7 +681,8 @@ export async function discoverRelevantEvidence({
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
       sourceReviewRequirements: reviewRequirements,
-      richSources: applicableRichSources
+      richSources: applicableRichSources,
+      visualSources
     });
   }
 
@@ -707,6 +736,19 @@ export async function discoverRelevantEvidence({
         contentHash: source.contentHash,
         textLength: source.textLength,
         rowCount: source.rowCount,
+        reviewState: "candidate"
+      })),
+      visualSourceIDs: item.visualSources.map((source) => source.id),
+      visualSources: item.visualSources.map((source) => ({
+        id: source.id,
+        kind: source.kind,
+        assetName: source.assetName,
+        assetURL: source.assetURL,
+        mediaType: source.mediaType,
+        contentHash: source.contentHash,
+        byteLength: source.byteLength,
+        displayWidth: source.displayWidth,
+        displayHeight: source.displayHeight,
         reviewState: "candidate"
       })),
       whyRelevant: candidateExplanation(item),

@@ -259,7 +259,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260725-structured-tables-v12"),
+      webRoot.text.includes("20260725-visual-inventory-v13"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -793,7 +793,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-structured-tables-v12'),
+        webRoot.text.includes('/web/app.js?v=20260725-visual-inventory-v13'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -802,6 +802,8 @@ async function main() {
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
         evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
         evidenceDiscoveryClientSource.includes("Complete structured source included") &&
+        evidenceDiscoveryClientSource.includes("Official visual source inventory verified") &&
+        evidenceDiscoveryClientSource.includes("candidate.visualSources") &&
         evidenceDiscoveryClientSource.includes("candidate.richSourceIDs || []") &&
         evidenceDiscoveryClientSource.includes("Outside Construction Code Research") &&
         evidenceDiscoveryClientSource.includes("outsideItem.sourceURL") &&
@@ -1790,10 +1792,24 @@ async function main() {
         fireDistrictMapCandidate?.sourceReviewRequirements?.some((item) =>
           item.kind === "visual-source" && item.count === 41
         ) &&
+        fireDistrictMapCandidate?.visualSources?.length === 41 &&
+        fireDistrictMapCandidate?.visualSourceIDs?.length === 41 &&
+        fireDistrictMapCandidate.visualSources.every((source) =>
+          source.kind === "image" &&
+          /^\/code\/assets\/[a-zA-Z0-9._-]+$/.test(source.assetURL || "") &&
+          /^[a-f0-9]{64}$/.test(source.contentHash || "") &&
+          source.byteLength > 0
+        ) &&
         fireDistrictMapDiscovery.json.coverageLimitations.some((item) =>
           item.kind === "visual-source-review-required"
         ),
       "Evidence discovery allowed a text-only fire-district determination without its 41 official map images."
+    );
+    const fireDistrictMapAsset = await request(fireDistrictMapCandidate.visualSources[0].assetURL);
+    assert(
+      fireDistrictMapAsset.response.ok &&
+        fireDistrictMapAsset.response.headers.get("content-type")?.startsWith("image/"),
+      "The integrity-addressed fire-district visual inventory referenced an unavailable official asset."
     );
     const buildingsBulletinDiscovery = await request("/research/evidence/discover", {
       method: "POST",

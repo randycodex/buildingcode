@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v5`
+Retrieval implementation: `20260725-hybrid-candidates-v6`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -10,7 +10,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 - dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
-- official maps, images, and non-table rich sources requiring structured evidence
+- review, selection, and immutable attachment of integrity-addressed official maps and images
 - broader structural and occupancy-change existing-building scenarios
 
 ## 1. retrieval-scissor-stair-two-exits
@@ -569,6 +569,7 @@ Corrections or notes:
 - Categories: administrative provisions, fire districts, maps, non-text evidence
 - Source Research case: `nyc-018-fire-district-map-boundary`
 - Must block text-only preparation for section IDs: `6881`
+- Must expose a complete integrity-addressed visual inventory while keeping preparation blocked for section IDs: `6881`
 - Required coverage limitations: `visual-source-review-required`
 
 ### Project question
