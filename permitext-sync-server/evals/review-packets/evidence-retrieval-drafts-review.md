@@ -9,8 +9,8 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 ## Known coverage gaps
 
 - official agency interpretations outside the current library
-- review, selection, and immutable attachment of integrity-addressed official maps and images
-- additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, and structural-trigger drafts
+- knowledgeable-human review of integrity-addressed official map and image selection
+- additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, structural-trigger, and roof-recovering drafts
 
 ## Intentional scope exclusions
 
@@ -848,6 +848,50 @@ Tests the complete enacted six-condition mercantile/business Certificate-of-Occu
 > Accessible features and construction governed by this chapter shall be provided:
 
 > 2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 19. retrieval-prior-code-roof-recovering-boundary
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, roof recovering, cool roofs, prior-code exceptions, multiple sections
+- Source Research case: `nyc-024-prior-code-roof-recovering-boundary`
+
+### Project question
+
+An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?
+
+### Review intent
+
+Tests retrieval of the Administrative Code and Building Code roof-recovering provisions while preserving the conjunctive less-than-50-percent and less-than-500-square-foot exception.
+
+### Proposed expected evidence
+
+#### AC 28-101.4.3 — section ID 8786
+
+> 12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code;
+
+> 12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ).
+
+#### BC 1511.1 — section ID 3403
+
+> Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 .
+
+> 1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 ).
 
 ### Knowledgeable-human decision
 

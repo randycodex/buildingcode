@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T11:06:03.916Z.
+Generated from `evals/research-cases.json` on 2026-07-25T14:12:15.327Z.
 
-This packet contains 13 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 14 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -25,6 +25,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-021-prior-code-wind-surface-area-trigger | Approve / Correct / Reject |  |
 | nyc-022-reestablished-prior-occupancy-boundary | Approve / Correct / Reject |  |
 | nyc-023-mercantile-business-co-exception | Approve / Correct / Reject |  |
+| nyc-024-prior-code-roof-recovering-boundary | Approve / Correct / Reject |  |
 
 ---
 
@@ -1669,6 +1670,124 @@ level: conditional; description: The selected passages define a complete six-con
 ### Existing drafting note
 
 Draft candidate NYC-023 complements the earlier insufficient-evidence B/M scenario by selecting the enacted Administrative Code exception and every expressly cross-referenced Construction Code provision. It tests the six-condition exception without treating applicant assertions as proof and requires knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 14. Prior-code roof recovering does not qualify for the cool-roof exception by percentage alone
+
+- **Case ID:** `nyc-024-prior-code-roof-recovering-boundary`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** intermediate
+- **Topics:** existing buildings, prior-code buildings, roof recovering, cool roofs, conjunctive exceptions
+
+### Scenario source
+
+Draft scenario constructed solely from canonical enacted 2022 NYC Administrative Code Section 28-101.4.3 and Building Code Section 1511.1.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Existing prior-code commercial building with a roof represented as 10,000 square feet; proposedWork: Recovering 4,000 square feet of the existing roof covering; ownerPosition: The owner says the 1968 Building Code election avoids current cool-roof requirements because the proposed work covers less than 50 percent of the roof; unknowns: verified total roof area, verified area to be recovered or replaced, whether the work is roof recovering or replacement within the selected provisions, roof slope, covering, and material assembly, whether another Section 1504.9 exception applies, applicable filing, approval, and inspection requirements
+
+### Question
+
+An existing prior-code commercial building has a roof represented as 10,000 square feet. The owner proposes to recover 4,000 square feet and says the current cool-roof rule does not apply because the work covers less than 50 percent of the roof and the project elects the 1968 Building Code. Based only on AC 28-101.4.3 and BC 1511.1, does the stated work qualify for the exception, and what still must be verified?
+
+### Exact selected Permitext evidence
+
+#### AC 28-101.4.3
+
+Canonical section ID: `8786`
+
+Passage 1:
+
+> 12.1 Installation and materials. Work involving the recovering or replacing of an existing roof covering shall be governed by sections 1511.1 through 1511.7 of the New York city building code;
+
+Passage 2:
+
+> 12.2 Cool roofs. Work involving the recovering or replacing of an existing roof covering shall comply with section 1504.9 of the New York city building code unless the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46 m 2 ).
+
+#### BC 1511.1
+
+Canonical section ID: `3403`
+
+Passage 1:
+
+> Materials and methods of application used for recovering or replacing an existing roof covering shall comply with the requirements of Chapter 15 .
+
+Passage 2:
+
+> 1. Section 1504.9 shall not apply if the area to be recovered or replaced is less than 50 percent of the roof area and less than 500 square feet (46.5 m 2 ).
+
+### Proposed expected conclusion
+
+No, not on the stated measurements. AC 28-101.4.3 and BC 1511.1 both condition the Section 1504.9 exception on the area to be recovered or replaced being less than 50 percent of the roof area and less than 500 square feet. The stated 4,000-square-foot scope is less than 50 percent of a 10,000-square-foot roof but is not less than 500 square feet, so percentage alone does not establish the exception. AC 28-101.4.3 also directs roof-covering recovery and replacement work to BC 1511.1 through 1511.7, and BC 1511.1 generally requires the materials and methods to comply with Chapter 15. The selected evidence therefore does not support the owner's claim that a prior-code election bypasses these roof provisions. The actual roof and work areas, work classification, roof assembly, other Section 1504.9 exceptions, and applicable filing and approval requirements must be verified. Because the technical requirements and other exceptions within Section 1504.9 are not selected, this evidence does not establish final cool-roof compliance.
+
+### Expected uncertainty
+
+level: conditional; description: The selected passages establish that both size conditions are required for this exception, but they do not verify the measurements, classify the work, supply the full Section 1504.9 requirements, or resolve other possible exceptions.
+
+### Required citations and the claim each must support
+
+- **AC 28-101.4.3:** Prior-code roof recovery and replacement work is directed to BC 1511.1 through 1511.7, and the stated cool-roof exception requires both size conditions.
+- **BC 1511.1:** Chapter 15 generally governs the materials and methods, and Section 1504.9 is inapplicable under the selected exception only when both size conditions are met.
+
+### Required concepts
+
+- Treat the less-than-50-percent and less-than-500-square-foot conditions as conjunctive.
+- State that the represented 4,000-square-foot scope does not satisfy the less-than-500-square-foot condition.
+- Reject the claim that percentage alone establishes the Section 1504.9 exception.
+- Explain that AC 28-101.4.3 directs roof recovery and replacement work to BC 1511.1 through 1511.7.
+- Explain that BC 1511.1 generally requires recovering or replacement materials and methods to comply with Chapter 15.
+- Do not treat a prior-code or 1968 Building Code election as a waiver of the selected roof provisions.
+- Request verified areas, work classification, roof facts, other possible Section 1504.9 exceptions, and applicable approvals.
+- State that the selected evidence does not establish final Section 1504.9 technical compliance.
+
+### Facts the answer must identify as missing
+
+- Verified total roof area.
+- Verified area to be recovered or replaced.
+- Whether the project scope is recovering or replacing an existing roof covering under the selected provisions.
+- Roof slope, existing covering, proposed materials, and assembly.
+- Whether another exception within Section 1504.9 applies.
+- The applicable Section 1504.9 technical requirements.
+- Required filing, approval, inspection, and other applicable-code information.
+
+### Claims the answer must not make
+
+- Being under either one of the two size thresholds is sufficient.
+- An area equal to 50 percent satisfies a less-than-50-percent condition.
+- An area equal to 500 square feet satisfies a less-than-500-square-foot condition.
+- The owner's represented roof and work areas are verified by the selected evidence.
+- Electing the 1968 Building Code removes the selected Chapter 15 requirements.
+- The selected evidence contains every technical requirement and exception in Section 1504.9.
+- No other Section 1504.9 exception can apply.
+- The proposed roof work is approved or compliant on the stated facts.
+
+### Existing drafting note
+
+Draft candidate NYC-024 broadens existing-building coverage into prior-code roof recovering and tests the conjunctive percentage-and-area exception without treating the owner's measurements or code election as proof. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
 
 ### Reviewer decision
 
