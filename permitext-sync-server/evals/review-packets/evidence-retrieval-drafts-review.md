@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v6`
+Retrieval implementation: `20260725-hybrid-candidates-v7`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -11,7 +11,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 - dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
 - review, selection, and immutable attachment of integrity-addressed official maps and images
-- broader structural and occupancy-change existing-building scenarios
+- broader occupancy-change existing-building scenarios
 
 ## 1. retrieval-scissor-stair-two-exits
 
@@ -675,6 +675,50 @@ Tests the existing-installation, repair-to-new-work, and same-manner-and-arrange
 #### PC 102.4.1 — section ID 11740
 
 > Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 16. retrieval-prior-code-wind-surface-area-trigger
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, structural alterations, wind loads, whole-building triggers, multiple sections
+- Source Research case: `nyc-021-prior-code-wind-surface-area-trigger`
+
+### Project question
+
+An exterior addition to a prior-code commercial building is said to increase the building's wind surface area by 6 percent in one direction. The owner says only the addition needs wind design and the existing building may remain under its prior-code wind provisions. Based on BC 1601.2.4 and AC 28-101.4.4, does the stated increase trigger whole-building wind design, and what still must be verified?
+
+### Review intent
+
+Tests the prior-code wind-surface-area and lateral-force-capacity exceptions together with the Administrative Code structural-safety boundary.
+
+### Proposed expected evidence
+
+#### BC 1601.2.4 — section ID 3422
+
+> All alterations, minor alterations, and ordinary repairs, to the extent of such work, shall be permitted to be performed in accordance with the wind load requirements set forth in the 1968 Building Code, or where the 1968 Building Code so authorizes, the code in effect prior to December 6, 1968.
+
+> 3. When the wind surface area of a prior code building or structure is increased by more than 5 percent in any direction or there is a permanent decrease of the lateral force capacity by more than 20 percent in any direction, the entire building or structure shall be designed to resist the design wind load as calculated pursuant to the applicable code, but not less than 5 psf (0.24 kN/m 2 ).
+
+#### AC 28-101.4.4 — section ID 8791
+
+> Notwithstanding any other provision of this code, where the alteration of any prior code building or structure in accordance with a provision of this code would result in a reduction of the fire safety or structural safety of such building, relevant provisions of the 1968 building code shall apply to such alteration unless there is full compliance with those provisions of this code that would mitigate or offset such reduction of fire protection or structural safety.
+
+> Where the owner, having a choice to elect the 1968 building code or this code, chooses this code, the applicant shall submit a comparative analysis acceptable to the commissioner of the relevant fire safety and structural safety provisions under the 1968 Code and this code, demonstrating that the alteration does not result in a reduction to the fire and life safety of the building.
 
 ### Knowledgeable-human decision
 

@@ -82,7 +82,7 @@ function caseMarkdown(testCase, index) {
     "",
     "### Expected uncertainty",
     "",
-    testCase.expectedUncertainty,
+    displayValue(testCase.expectedUncertainty),
     "",
     "### Required citations and the claim each must support",
     "",

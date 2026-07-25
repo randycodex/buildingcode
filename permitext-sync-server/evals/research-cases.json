@@ -1581,6 +1581,109 @@
           "requiredClaim": "Conditional minor-work treatment when the same manner and arrangement, no-hazard, and approval conditions are met."
         }
       ]
+    },
+    {
+      "id": "nyc-021-prior-code-wind-surface-area-trigger",
+      "title": "Prior-code wind-surface-area increase can trigger whole-building design",
+      "status": "draft",
+      "difficulty": "advanced",
+      "topics": [
+        "prior-code buildings",
+        "structural alterations",
+        "wind surface area",
+        "lateral force capacity",
+        "whole-building design"
+      ],
+      "codeEdition": "2022 New York City Construction Codes",
+      "jurisdiction": "New York City, New York",
+      "projectContext": {
+        "building": "Existing prior-code commercial building",
+        "proposedWork": "Exterior addition represented by the design team as increasing wind surface area by 6 percent in one direction",
+        "ownerPosition": "Only the addition needs wind design and the existing building may continue under its prior-code wind provisions",
+        "unknowns": [
+          "verified existing and proposed wind surface areas in every direction",
+          "calculation method and direction of the stated increase",
+          "whether lateral force capacity is permanently decreased",
+          "applicable code used for the design wind load",
+          "existing material properties and structural condition",
+          "whether the project elects current-code structural calculations"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "3422",
+          "reference": "BC 1601.2.4",
+          "codePrefix": "BC",
+          "sectionNumber": "1601.2.4",
+          "exactPassages": [
+            "All alterations, minor alterations, and ordinary repairs, to the extent of such work, shall be permitted to be performed in accordance with the wind load requirements set forth in the 1968 Building Code, or where the 1968 Building Code so authorizes, the code in effect prior to December 6, 1968.",
+            "3. When the wind surface area of a prior code building or structure is increased by more than 5 percent in any direction or there is a permanent decrease of the lateral force capacity by more than 20 percent in any direction, the entire building or structure shall be designed to resist the design wind load as calculated pursuant to the applicable code, but not less than 5 psf (0.24 kN/m 2 )."
+          ]
+        },
+        {
+          "sectionID": "8791",
+          "reference": "AC 28-101.4.4",
+          "codePrefix": "AC",
+          "sectionNumber": "28-101.4.4",
+          "exactPassages": [
+            "Notwithstanding any other provision of this code, where the alteration of any prior code building or structure in accordance with a provision of this code would result in a reduction of the fire safety or structural safety of such building, relevant provisions of the 1968 building code shall apply to such alteration unless there is full compliance with those provisions of this code that would mitigate or offset such reduction of fire protection or structural safety.",
+            "Where the owner, having a choice to elect the 1968 building code or this code, chooses this code, the applicant shall submit a comparative analysis acceptable to the commissioner of the relevant fire safety and structural safety provisions under the 1968 Code and this code, demonstrating that the alteration does not result in a reduction to the fire and life safety of the building."
+          ]
+        }
+      ],
+      "question": "An exterior addition to a prior-code commercial building is said to increase the building's wind surface area by 6 percent in one direction. The owner says only the addition needs wind design and the existing building may remain under its prior-code wind provisions. Based on BC 1601.2.4 and AC 28-101.4.4, does the stated increase trigger whole-building wind design, and what still must be verified?",
+      "expectedConclusion": "If the verified wind surface area increases by more than 5 percent in any direction, BC 1601.2.4 exception 3 requires the entire building or structure—not only the addition—to be designed to resist the design wind load calculated under the applicable code, with a minimum of 5 psf. The same whole-building consequence also applies if there is a permanent decrease of lateral force capacity by more than 20 percent in any direction. The general permission to use prior-code wind provisions for alteration work does not override those stated exceptions. AC 28-101.4.4 separately prohibits an alteration from reducing the structural safety of a prior-code building and requires an applicant electing the current code, when that election is available, to submit a comparative analysis acceptable to the commissioner. The owner's 6 percent assertion is not itself verified evidence. The existing and proposed wind surface areas in each direction, calculation method, any permanent lateral-capacity change, applicable design code, structural condition, material properties, and code election must be established before the project-specific conclusion is final.",
+      "expectedUncertainty": {
+        "level": "conditional",
+        "description": "The whole-building trigger follows if the correctly measured increase is more than 5 percent in any direction or lateral-force capacity permanently decreases by more than 20 percent, but the selected evidence does not verify the calculations, structural condition, applicable design code, or code election."
+      },
+      "sourceType": "deliberately constructed edge case",
+      "sourceReference": "Draft scenario constructed from canonical 2022 NYC Building Code Section 1601.2.4 and Administrative Code Section 28-101.4.4.",
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Draft candidate NYC-021 broadens existing-building coverage into structural wind triggers. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.",
+      "requiredConcepts": [
+        "Apply the wind-surface-area trigger only when the increase is more than 5 percent in any direction.",
+        "Identify the separate trigger for a permanent lateral-force-capacity decrease of more than 20 percent in any direction.",
+        "State that either trigger requires the entire building or structure to resist the applicable design wind load.",
+        "State the minimum design wind load of 5 psf.",
+        "Explain that the general prior-code permission does not override the listed exceptions.",
+        "Explain the AC 28-101.4.4 structural-safety and comparative-analysis boundary without treating the project facts as proven.",
+        "Require verified directional measurements, calculations, structural facts, applicable design code, and code election."
+      ],
+      "missingFacts": [
+        "Verified existing and proposed wind surface area in each direction.",
+        "Calculation method and direction for the claimed 6 percent increase.",
+        "Any permanent decrease in lateral force capacity and its percentage by direction.",
+        "Applicable code for calculating the design wind load.",
+        "Existing structural condition and material properties.",
+        "Whether the applicant elects current-code structural calculations and whether that election is available.",
+        "Commissioner-acceptable comparative analysis where required."
+      ],
+      "forbiddenClaims": [
+        "An increase of exactly 5 percent triggers BC 1601.2.4 exception 3.",
+        "The stated 6 percent figure is verified by the selected evidence.",
+        "Only the addition requires wind design after a verified increase of more than 5 percent in any direction.",
+        "The minimum required design wind load may be less than 5 psf.",
+        "A lateral-force-capacity decrease must exceed 5 percent to trigger whole-building design.",
+        "Prior-code wind provisions always control despite the listed exceptions.",
+        "AC 28-101.4.4 permits a reduction in structural safety.",
+        "The proposed alteration is compliant on the stated facts."
+      ],
+      "requiredCitations": [
+        "BC 1601.2.4",
+        "AC 28-101.4.4"
+      ],
+      "requiredCitationClaims": [
+        {
+          "reference": "BC 1601.2.4",
+          "requiredClaim": "General prior-code wind treatment, the more-than-5-percent wind-surface-area and more-than-20-percent lateral-capacity triggers, whole-building consequence, and 5 psf minimum."
+        },
+        {
+          "reference": "AC 28-101.4.4",
+          "requiredClaim": "No reduction of structural safety and the comparative-analysis requirement when the current-code election is made."
+        }
+      ]
     }
   ]
 }

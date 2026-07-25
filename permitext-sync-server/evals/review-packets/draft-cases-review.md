@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T10:33:28.180Z.
+Generated from `evals/research-cases.json` on 2026-07-25T10:50:57.999Z.
 
-This packet contains 10 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 11 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -22,6 +22,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-018-fire-district-map-boundary | Approve / Correct / Reject |  |
 | nyc-019-buildings-bulletin-policy-boundary | Approve / Correct / Reject |  |
 | nyc-020-existing-plumbing-repair-boundary | Approve / Correct / Reject |  |
+| nyc-021-prior-code-wind-surface-area-trigger | Approve / Correct / Reject |  |
 
 ---
 
@@ -88,7 +89,7 @@ PC 403.1.1 permits the occupancy-specific fractional requirements for multiple o
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The selected evidence establishes the calculation method and a conditional accessory-room permission, but it does not support a final count or shared-facility conclusion.
 
 ### Required citations and the claim each must support
 
@@ -215,7 +216,7 @@ No. BC 1004.3 uses the number of installed seats for fixed seating, while areas 
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The selected passages reject automatic movable-seat counting and require independent functional calculations, but a final occupant load and any approved lower basis depend on missing plans, facts, and commissioner action.
 
 ### Required citations and the claim each must support
 
@@ -348,7 +349,7 @@ The enlargement does not, by itself, prove that the entire legacy system must be
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The selected passages establish upgrade triggers and scope principles, but they cannot establish whether the existing system may be retained or must be replaced without project-specific system, occupancy, area, height, and compatibility facts.
 
 ### Required citations and the claim each must support
 
@@ -468,7 +469,7 @@ No Certificate of Occupancy exception can be established from the selected evide
 
 ### Expected uncertainty
 
-[object Object]
+level: outside selected authority; description: The selected evidence supports only a conditional Building Code accessibility conclusion. It cannot resolve the Certificate of Occupancy exception or the zoning transition without additional enacted and official authority.
 
 ### Required citations and the claim each must support
 
@@ -610,7 +611,7 @@ The proposal cannot be approved from the selected evidence. If it is a sidewalk 
 
 ### Expected uncertainty
 
-[object Object]
+level: insufficient evidence; description: The selected passages establish several conditional Building Code constraints, but they do not establish overall approval, current agency jurisdiction, lawful seating capacity, or electrical and operational requirements.
 
 ### Required citations and the claim each must support
 
@@ -733,7 +734,7 @@ The proposed control sequence does not match MC 404.1. For intermittent operatio
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The selected provision resolves the detector types and automatic-operation thresholds, but it does not establish the complete ventilation-system design or detector layout.
 
 ### Required citations and the claim each must support
 
@@ -864,7 +865,7 @@ If verified scope changes increase floor surface area at completion by more than
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The legal consequence is supported if the correctly measured increase is more than 110 percent, but the selected evidence does not verify the project measurements, exclusions, dates, or filing facts.
 
 ### Required citations and the claim each must support
 
@@ -980,7 +981,7 @@ No. AC 28-102.4.5 makes the Appendix D maps controlling for fire-district bounda
 
 ### Expected uncertainty
 
-[object Object]
+level: insufficient evidence; description: The selected text identifies the controlling maps but omits the visual boundary evidence and precise property location required for a parcel-level determination.
 
 ### Required citations and the claim each must support
 
@@ -1075,7 +1076,7 @@ No. AC 28-210.1 establishes that converting or maintaining a dwelling for occupa
 
 ### Expected uncertainty
 
-[object Object]
+level: outside selected authority; description: The selected Construction Code passage does not include the Buildings Bulletin, Zoning Resolution, Housing Maintenance Code, or project facts needed to determine whether the proposed cellar bathroom is permissible.
 
 ### Required citations and the claim each must support
 
@@ -1188,7 +1189,7 @@ The selected evidence does not automatically require the entire existing plumbin
 
 ### Expected uncertainty
 
-[object Object]
+level: conditional; description: The selected passages establish the repair and whole-system boundaries, but the exception depends on the actual scope, original design, safety conditions, and approval.
 
 ### Required citations and the claim each must support
 
@@ -1228,6 +1229,123 @@ The selected evidence does not automatically require the entire existing plumbin
 ### Existing drafting note
 
 Draft candidate NYC-020 broadens existing-building coverage into plumbing repairs. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 11. Prior-code wind-surface-area increase can trigger whole-building design
+
+- **Case ID:** `nyc-021-prior-code-wind-surface-area-trigger`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** prior-code buildings, structural alterations, wind surface area, lateral force capacity, whole-building design
+
+### Scenario source
+
+Draft scenario constructed from canonical 2022 NYC Building Code Section 1601.2.4 and Administrative Code Section 28-101.4.4.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Existing prior-code commercial building; proposedWork: Exterior addition represented by the design team as increasing wind surface area by 6 percent in one direction; ownerPosition: Only the addition needs wind design and the existing building may continue under its prior-code wind provisions; unknowns: verified existing and proposed wind surface areas in every direction, calculation method and direction of the stated increase, whether lateral force capacity is permanently decreased, applicable code used for the design wind load, existing material properties and structural condition, whether the project elects current-code structural calculations
+
+### Question
+
+An exterior addition to a prior-code commercial building is said to increase the building's wind surface area by 6 percent in one direction. The owner says only the addition needs wind design and the existing building may remain under its prior-code wind provisions. Based on BC 1601.2.4 and AC 28-101.4.4, does the stated increase trigger whole-building wind design, and what still must be verified?
+
+### Exact selected Permitext evidence
+
+#### BC 1601.2.4
+
+Canonical section ID: `3422`
+
+Passage 1:
+
+> All alterations, minor alterations, and ordinary repairs, to the extent of such work, shall be permitted to be performed in accordance with the wind load requirements set forth in the 1968 Building Code, or where the 1968 Building Code so authorizes, the code in effect prior to December 6, 1968.
+
+Passage 2:
+
+> 3. When the wind surface area of a prior code building or structure is increased by more than 5 percent in any direction or there is a permanent decrease of the lateral force capacity by more than 20 percent in any direction, the entire building or structure shall be designed to resist the design wind load as calculated pursuant to the applicable code, but not less than 5 psf (0.24 kN/m 2 ).
+
+#### AC 28-101.4.4
+
+Canonical section ID: `8791`
+
+Passage 1:
+
+> Notwithstanding any other provision of this code, where the alteration of any prior code building or structure in accordance with a provision of this code would result in a reduction of the fire safety or structural safety of such building, relevant provisions of the 1968 building code shall apply to such alteration unless there is full compliance with those provisions of this code that would mitigate or offset such reduction of fire protection or structural safety.
+
+Passage 2:
+
+> Where the owner, having a choice to elect the 1968 building code or this code, chooses this code, the applicant shall submit a comparative analysis acceptable to the commissioner of the relevant fire safety and structural safety provisions under the 1968 Code and this code, demonstrating that the alteration does not result in a reduction to the fire and life safety of the building.
+
+### Proposed expected conclusion
+
+If the verified wind surface area increases by more than 5 percent in any direction, BC 1601.2.4 exception 3 requires the entire building or structure—not only the addition—to be designed to resist the design wind load calculated under the applicable code, with a minimum of 5 psf. The same whole-building consequence also applies if there is a permanent decrease of lateral force capacity by more than 20 percent in any direction. The general permission to use prior-code wind provisions for alteration work does not override those stated exceptions. AC 28-101.4.4 separately prohibits an alteration from reducing the structural safety of a prior-code building and requires an applicant electing the current code, when that election is available, to submit a comparative analysis acceptable to the commissioner. The owner's 6 percent assertion is not itself verified evidence. The existing and proposed wind surface areas in each direction, calculation method, any permanent lateral-capacity change, applicable design code, structural condition, material properties, and code election must be established before the project-specific conclusion is final.
+
+### Expected uncertainty
+
+level: conditional; description: The whole-building trigger follows if the correctly measured increase is more than 5 percent in any direction or lateral-force capacity permanently decreases by more than 20 percent, but the selected evidence does not verify the calculations, structural condition, applicable design code, or code election.
+
+### Required citations and the claim each must support
+
+- **BC 1601.2.4:** General prior-code wind treatment, the more-than-5-percent wind-surface-area and more-than-20-percent lateral-capacity triggers, whole-building consequence, and 5 psf minimum.
+- **AC 28-101.4.4:** No reduction of structural safety and the comparative-analysis requirement when the current-code election is made.
+
+### Required concepts
+
+- Apply the wind-surface-area trigger only when the increase is more than 5 percent in any direction.
+- Identify the separate trigger for a permanent lateral-force-capacity decrease of more than 20 percent in any direction.
+- State that either trigger requires the entire building or structure to resist the applicable design wind load.
+- State the minimum design wind load of 5 psf.
+- Explain that the general prior-code permission does not override the listed exceptions.
+- Explain the AC 28-101.4.4 structural-safety and comparative-analysis boundary without treating the project facts as proven.
+- Require verified directional measurements, calculations, structural facts, applicable design code, and code election.
+
+### Facts the answer must identify as missing
+
+- Verified existing and proposed wind surface area in each direction.
+- Calculation method and direction for the claimed 6 percent increase.
+- Any permanent decrease in lateral force capacity and its percentage by direction.
+- Applicable code for calculating the design wind load.
+- Existing structural condition and material properties.
+- Whether the applicant elects current-code structural calculations and whether that election is available.
+- Commissioner-acceptable comparative analysis where required.
+
+### Claims the answer must not make
+
+- An increase of exactly 5 percent triggers BC 1601.2.4 exception 3.
+- The stated 6 percent figure is verified by the selected evidence.
+- Only the addition requires wind design after a verified increase of more than 5 percent in any direction.
+- The minimum required design wind load may be less than 5 psf.
+- A lateral-force-capacity decrease must exceed 5 percent to trigger whole-building design.
+- Prior-code wind provisions always control despite the listed exceptions.
+- AC 28-101.4.4 permits a reduction in structural safety.
+- The proposed alteration is compliant on the stated facts.
+
+### Existing drafting note
+
+Draft candidate NYC-021 broadens existing-building coverage into structural wind triggers. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
 
 ### Reviewer decision
 

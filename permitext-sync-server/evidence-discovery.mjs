@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v6";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v7";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -42,6 +42,10 @@ const conceptExpansions = [
   {
     pattern: /\b(existing|prior-code|legacy|alteration|enlargement)\b/i,
     terms: ["existing", "prior", "legacy", "alteration", "enlargement"]
+  },
+  {
+    pattern: /\b(structural|wind surface|lateral force|wind load)\b/i,
+    terms: ["structural", "wind", "surface", "lateral", "force", "load"]
   },
   {
     pattern: /\b(fire alarm|alarm system|notification)\b/i,
@@ -141,6 +145,14 @@ const topicRoutes = [
       { codePrefix: "AC", sectionPrefix: "28-101.4.5" },
       { codePrefix: "AC", sectionPrefix: "28-101.4.5.1" },
       { codePrefix: "AC", sectionPrefix: "28-101.4.5.2" }
+    ]
+  },
+  {
+    pattern: /\bwind\s+surface\s+area|lateral[- ]force\s+capacity|prior[- ]code.*wind|wind.*prior[- ]code/i,
+    label: "prior-code structural wind provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "1601.2.4" },
+      { codePrefix: "AC", sectionPrefix: "28-101.4.4" }
     ]
   },
   {

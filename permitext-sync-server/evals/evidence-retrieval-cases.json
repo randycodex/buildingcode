@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260725-hybrid-candidates-v6",
+  "retrievalVersion": "20260725-hybrid-candidates-v7",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection",
     "official agency interpretations outside the current library",
     "review, selection, and immutable attachment of integrity-addressed official maps and images",
-    "broader structural and occupancy-change existing-building scenarios"
+    "broader occupancy-change existing-building scenarios"
   ],
   "cases": [
     {
@@ -154,6 +154,15 @@
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
       "notes": "Tests the existing-installation, repair-to-new-work, and same-manner-and-arrangement candidate set without implying automatic whole-system upgrade or automatic exemption."
+    },
+    {
+      "id": "retrieval-prior-code-wind-surface-area-trigger",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-021-prior-code-wind-surface-area-trigger",
+      "scenarioCategories": ["existing-building conditions", "structural alterations", "wind loads", "whole-building triggers", "multiple sections"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests the prior-code wind-surface-area and lateral-force-capacity exceptions together with the Administrative Code structural-safety boundary."
     }
   ]
 }
