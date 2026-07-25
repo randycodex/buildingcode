@@ -1197,6 +1197,9 @@ struct BackendProjectFoundationResponse: Codable, Hashable, Sendable {
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
     var workboardPreview: ProjectWorkboardPreviewSummary? = nil
+    var projects: [PermitextOrganizationProject]? = nil
+    var links: [ProjectFoundationLinkSummary]? = nil
+    var artifacts: [ProjectFoundationArtifact]? = nil
 }
 
 struct BackendProjectNotebookCardsRequest: Codable, Hashable, Sendable {
@@ -1414,6 +1417,202 @@ struct ProjectHubSnapshot: Hashable, Sendable {
     }
 }
 
+struct PermitextOrganizationCapabilities: Codable, Hashable, Sendable {
+    let collaboration: Bool
+    let organizationAdministration: Bool
+    let authoredCollaboration: Bool
+    let sharedEvidenceReview: Bool
+    let sharedWorkboardEditing: Bool
+}
+
+struct PermitextOrganizationBillingIdentity: Codable, Hashable, Sendable {
+    let mode: String
+    let status: String
+    let seatLimit: Int
+}
+
+struct PermitextOrganizationSeatUsage: Codable, Hashable, Sendable {
+    let active: Int
+    let pending: Int
+    let used: Int
+}
+
+struct PermitextOrganizationProject: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let sourceRecordID: String
+    let name: String
+    let address: String
+    let description: String
+    let colorHex: String?
+    let archivedAt: String?
+    let updatedAt: String
+    let originalOwnerUserID: String?
+    let role: String
+    let permissions: [String]
+}
+
+struct PermitextOrganization: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let schemaVersion: Int
+    let name: String
+    let slug: String
+    let status: String
+    let capabilities: PermitextOrganizationCapabilities
+    let billingIdentity: PermitextOrganizationBillingIdentity
+    let role: String?
+    let permissions: [String]
+    let accessScope: String
+    let seats: PermitextOrganizationSeatUsage?
+    let projects: [PermitextOrganizationProject]?
+    let createdAt: String
+    let updatedAt: String
+}
+
+struct BackendOrganizationListRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+}
+
+struct BackendOrganizationListResponse: Codable, Hashable, Sendable {
+    let organizations: [PermitextOrganization]
+}
+
+struct BackendOrganizationInvitationAcceptRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let invitationToken: String
+}
+
+struct BackendOrganizationInvitationSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let organizationID: String
+    let projectID: String?
+    let role: String
+    let status: String
+    let state: String?
+}
+
+struct BackendOrganizationInvitationAcceptResponse: Codable, Hashable, Sendable {
+    let organization: PermitextOrganization
+    let invitation: BackendOrganizationInvitationSummary
+}
+
+struct ProjectFoundationLinkSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let projectID: String
+    let targetKind: String
+    let targetID: String
+    let relationship: String
+    let deletedAt: String?
+}
+
+struct ProjectFoundationArtifactEnvelope: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let type: String
+    let createdAt: String
+    let updatedAt: String
+    let deletedAt: String?
+    let version: Int
+}
+
+struct ProjectFoundationArtifactFile: Codable, Hashable, Sendable {
+    let format: String
+    let pathname: String?
+    let contentType: String
+    let size: Int
+    let contentHash: String
+    let createdAt: String
+}
+
+struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
+    let projectID: String?
+    let cardType: String?
+    let title: String?
+    let plainText: String?
+    let referenceCount: Int?
+    let createdAt: String?
+    let updatedAt: String?
+    let createdBy: String?
+    let updatedBy: String?
+    let manifestID: String?
+    let reportVersion: Int?
+    let file: ProjectFoundationArtifactFile?
+    let answerID: String?
+    let status: String?
+    let note: String?
+    let evidenceSnapshotIDs: [String]?
+    let updatedByUserID: String?
+    let reviewedByUserID: String?
+    let reviewedAt: String?
+}
+
+struct ProjectFoundationArtifact: Codable, Hashable, Identifiable, Sendable {
+    let envelope: ProjectFoundationArtifactEnvelope
+    let payload: ProjectFoundationArtifactPayload
+
+    var id: String { envelope.id }
+
+    var notebookCard: ProjectNotebookCardSummary? {
+        guard envelope.type == "notebookCard",
+              envelope.deletedAt == nil,
+              let cardType = payload.cardType,
+              let title = payload.title else {
+            return nil
+        }
+        return ProjectNotebookCardSummary(
+            id: envelope.id,
+            version: envelope.version,
+            cardType: cardType,
+            title: title,
+            plainText: payload.plainText ?? "",
+            referenceCount: payload.referenceCount ?? 0,
+            createdAt: payload.createdAt ?? envelope.createdAt,
+            updatedAt: payload.updatedAt ?? envelope.updatedAt
+        )
+    }
+
+    var generatedReportFile: ProjectReportFile? {
+        guard envelope.type == "generatedReport",
+              envelope.deletedAt == nil,
+              let manifestID = payload.manifestID,
+              let reportVersion = payload.reportVersion,
+              let file = payload.file else {
+            return nil
+        }
+        return ProjectReportFile(
+            generatedReportID: envelope.id,
+            manifestID: manifestID,
+            reportVersion: reportVersion,
+            format: file.format,
+            contentType: file.contentType,
+            size: file.size,
+            contentHash: file.contentHash,
+            createdAt: payload.createdAt ?? file.createdAt
+        )
+    }
+}
+
+struct PermitextOrganizationProjectAccess: Codable, Hashable, Sendable {
+    let role: String
+    let permissions: [String]
+    let readOnly: Bool
+    let organization: PermitextOrganization?
+}
+
+struct BackendOrganizationProjectSnapshotRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+}
+
+struct BackendOrganizationProjectSnapshotResponse: Codable, Hashable, Sendable {
+    let access: PermitextOrganizationProjectAccess
+    let project: BackendProjectFoundationResponse
+}
+
+struct BackendProjectReportFileReadRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+    let generatedReportID: String
+}
+
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
 }
@@ -1464,6 +1663,13 @@ protocol PermitextBackendTransport {
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
+    func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse
+    func acceptOrganizationInvitation(
+        _ request: BackendOrganizationInvitationAcceptRequest
+    ) async throws -> BackendOrganizationInvitationAcceptResponse
+    func organizationProjectSnapshot(
+        _ request: BackendOrganizationProjectSnapshotRequest
+    ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse
@@ -1472,6 +1678,7 @@ protocol PermitextBackendTransport {
         _ request: BackendProjectReportFileUploadRequest,
         data: Data
     ) async throws -> BackendProjectReportFileUploadResponse
+    func projectReportFile(_ request: BackendProjectReportFileReadRequest) async throws -> Data
     func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
@@ -1619,6 +1826,22 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("billing/apple/transactions/verify", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse {
+        try await post("organizations/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func acceptOrganizationInvitation(
+        _ request: BackendOrganizationInvitationAcceptRequest
+    ) async throws -> BackendOrganizationInvitationAcceptResponse {
+        try await post("organizations/invitations/accept", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func organizationProjectSnapshot(
+        _ request: BackendOrganizationProjectSnapshotRequest
+    ) async throws -> BackendOrganizationProjectSnapshotResponse {
+        try await post("organizations/projects/snapshot", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse {
         try await post("projects/foundation/state", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1662,6 +1885,30 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         }
         request.httpBody = data
         return try await send(request)
+    }
+
+    func projectReportFile(_ report: BackendProjectReportFileReadRequest) async throws -> Data {
+        var request = URLRequest(url: baseURL.appendingPathComponent("reports/files/read"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = requestTimeout
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/pdf", forHTTPHeaderField: "Accept")
+        if let token = report.auth.bearerToken, !token.isEmpty {
+            request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        }
+        request.httpBody = try encoder.encode(report)
+        let (data, response) = try await session.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            let backendMessage = try? decoder.decode(BackendErrorResponse.self, from: data).error
+            throw PermitextBackendHTTPError.serverStatus(httpResponse.statusCode, backendMessage)
+        }
+        guard data.starts(with: Data("%PDF-".utf8)) else {
+            throw PermitextBackendHTTPError.invalidResponse
+        }
+        return data
     }
 
     func projectWorkboardPreview(_ preview: BackendProjectWorkboardPreviewRequest) async throws -> Data {
@@ -1788,6 +2035,22 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         BackendAppleTransactionVerifyResponse(entitlement: .appleSubscriptionPro)
     }
 
+    func organizations(_ request: BackendOrganizationListRequest) async throws -> BackendOrganizationListResponse {
+        BackendOrganizationListResponse(organizations: [])
+    }
+
+    func acceptOrganizationInvitation(
+        _ request: BackendOrganizationInvitationAcceptRequest
+    ) async throws -> BackendOrganizationInvitationAcceptResponse {
+        throw URLError(.unsupportedURL)
+    }
+
+    func organizationProjectSnapshot(
+        _ request: BackendOrganizationProjectSnapshotRequest
+    ) async throws -> BackendOrganizationProjectSnapshotResponse {
+        throw URLError(.fileDoesNotExist)
+    }
+
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse {
         BackendProjectFoundationResponse(
             schemaVersion: 1,
@@ -1822,6 +2085,10 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         data: Data
     ) async throws -> BackendProjectReportFileUploadResponse {
         throw URLError(.unsupportedURL)
+    }
+
+    func projectReportFile(_ request: BackendProjectReportFileReadRequest) async throws -> Data {
+        throw URLError(.fileDoesNotExist)
     }
 
     func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data {
@@ -2755,6 +3022,15 @@ protocol AccountBackendClient {
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
+    func organizations(account: SignedInAccount) async throws -> [PermitextOrganization]
+    func acceptOrganizationInvitation(
+        account: SignedInAccount,
+        invitationToken: String
+    ) async throws -> PermitextOrganization
+    func organizationProjectSnapshot(
+        account: SignedInAccount,
+        projectID: String
+    ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
     func projectReportManifest(account: SignedInAccount, manifestID: String) async throws -> ProjectReportManifest
     func saveProjectReportPDF(
@@ -2763,6 +3039,11 @@ protocol AccountBackendClient {
         manifestID: String,
         data: Data
     ) async throws -> ProjectReportFile
+    func projectReportFile(
+        account: SignedInAccount,
+        projectID: String,
+        generatedReportID: String
+    ) async throws -> Data
     func projectWorkboardPreview(
         account: SignedInAccount,
         projectID: String,
@@ -2816,6 +3097,24 @@ struct LocalAccountBackendClient: AccountBackendClient {
         .appleSubscriptionPro
     }
 
+    func organizations(account: SignedInAccount) async throws -> [PermitextOrganization] {
+        []
+    }
+
+    func acceptOrganizationInvitation(
+        account: SignedInAccount,
+        invitationToken: String
+    ) async throws -> PermitextOrganization {
+        throw URLError(.unsupportedURL)
+    }
+
+    func organizationProjectSnapshot(
+        account: SignedInAccount,
+        projectID: String
+    ) async throws -> BackendOrganizationProjectSnapshotResponse {
+        throw URLError(.fileDoesNotExist)
+    }
+
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
         .empty(projectID: projectID)
     }
@@ -2831,6 +3130,14 @@ struct LocalAccountBackendClient: AccountBackendClient {
         data: Data
     ) async throws -> ProjectReportFile {
         throw URLError(.unsupportedURL)
+    }
+
+    func projectReportFile(
+        account: SignedInAccount,
+        projectID: String,
+        generatedReportID: String
+    ) async throws -> Data {
+        throw URLError(.fileDoesNotExist)
     }
 
     func projectWorkboardPreview(

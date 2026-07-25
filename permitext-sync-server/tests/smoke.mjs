@@ -227,6 +227,16 @@ async function main() {
       ),
       "AASA payload did not advertise section universal links."
     );
+    assert(
+      aasa.json.applinks.details.some((detail) =>
+        detail.appID === "ABCDE12345.com.randycodex.permitext" &&
+        detail.components?.some((component) =>
+          component["/"] === "/" &&
+          component["?"]?.organizationInvite === "*"
+        )
+      ),
+      "AASA payload did not advertise organization invitation universal links."
+    );
 
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
@@ -237,7 +247,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260724-packages-v1"),
+      webRoot.text.includes("20260724-collaboration-v1"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -357,6 +367,17 @@ async function main() {
     assert(
       !workspaceScript.text.includes(privateEvaluationSentinel),
       "Customer JavaScript exposed private evaluation material."
+    );
+    assert(
+      webRoot.text.includes("Firm &amp; Collaboration") &&
+        webRoot.text.includes('class="settings-beta-badge"') &&
+        workspaceScript.text.includes('postResearch("/organizations/create"') &&
+        workspaceScript.text.includes('postResearch("/organizations/members/invite"') &&
+        workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
+        workspaceScript.text.includes("function appendProjectEvidenceReviews") &&
+        workspaceScript.text.includes("function appendProjectReportExports") &&
+        workspaceScript.text.includes("if (identity.sharedOnly) row.classList.add(\"is-read-only\")"),
+      "Web collaboration UI no longer exposes firm setup, scoped Project access, evidence review, and report downloads."
     );
     const workspaceSourceMap = await request("/web/app.js.map");
     assert(
@@ -723,7 +744,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-packages-v1'),
+        webRoot.text.includes('/web/app.js?v=20260724-collaboration-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -755,7 +776,10 @@ async function main() {
         workspaceScript.text.includes("const persistableState = {") &&
         workspaceScript.text.includes("sectionDetails: {},") &&
         workspaceScript.text.includes('!paneID.startsWith("section:detail:")') &&
-        workspaceScript.text.includes("const deepLinkedSectionID = deepLinkedSectionIDFromLocation();\n  consumeBrowserSectionURL();\n  await renderWorkspace();"),
+        workspaceScript.text.includes("const deepLinkedSectionID = deepLinkedSectionIDFromLocation();") &&
+        workspaceScript.text.includes("consumeBrowserSectionURL();") &&
+        workspaceScript.text.includes("if (organizationInvitationTokenFromURL())") &&
+        workspaceScript.text.includes("await renderWorkspace();"),
       "Search-result detail columns can persist or replay after a browser refresh."
     );
     assert(
@@ -1735,6 +1759,476 @@ async function main() {
           workboardPreviewUpload.json.preview.contentHash,
       "The iOS Project Hub foundation response omitted the current Workboard preview."
     );
+
+    const createOrganization = await request("/organizations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        name: "Smoke Permit Studio"
+      }
+    });
+    assert(
+      createOrganization.response.status === 201 &&
+        createOrganization.json.organization.role === "owner" &&
+        createOrganization.json.organization.seats.used === 1,
+      "A Pro account could not create its firm workspace and Owner seat."
+    );
+    const organizationID = createOrganization.json.organization.id;
+    const emailBoundInvitation = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        email: "email-bound@smoke.test",
+        role: "viewer"
+      }
+    });
+    assert(emailBoundInvitation.response.status === 201, "Email-bound firm invitation setup failed.");
+    const noEmailSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-invite-no-email",
+          displayName: "No Email Invite Test"
+        }
+      }
+    });
+    assert(noEmailSignIn.response.ok, "No-email invitation test account sign-in failed.");
+    const noEmailInvitationAccept = await request("/organizations/invitations/accept", {
+      method: "POST",
+      token: noEmailSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: noEmailSignIn.json.account.appUserID },
+        invitationToken: emailBoundInvitation.json.invitationToken
+      }
+    });
+    assert(
+      noEmailInvitationAccept.response.status === 403 &&
+        noEmailInvitationAccept.json.code === "ORGANIZATION_INVITATION_EMAIL_MISMATCH",
+      "An account without the invited email was allowed to accept an email-bound invitation."
+    );
+    const revokeEmailBoundInvitation = await request("/organizations/invitations/revoke", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        invitationID: emailBoundInvitation.json.invitation.id
+      }
+    });
+    assert(revokeEmailBoundInvitation.response.ok, "Email-bound invitation cleanup failed.");
+    const transferProject = await request("/organizations/projects/transfer", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      transferProject.response.ok &&
+        transferProject.json.ownership.owner.organizationID === organizationID &&
+        transferProject.json.ownership.storageOwnerUserID === userID &&
+        transferProject.json.ownership.originalOwnerUserID === userID,
+      "Project transfer did not preserve stable identity, storage ownership, and original attribution."
+    );
+
+    const sharedViewerSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-shared-viewer",
+          email: "viewer@smoke.test",
+          displayName: "Smoke Viewer"
+        }
+      }
+    });
+    assert(sharedViewerSignIn.response.ok, "Shared Project viewer sign-in failed.");
+    const sharedViewerID = sharedViewerSignIn.json.account.appUserID;
+    const sharedViewerToken = sharedViewerSignIn.json.account.backendSessionToken;
+    const inviteViewer = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        email: "viewer@smoke.test",
+        role: "viewer"
+      }
+    });
+    assert(
+      inviteViewer.response.status === 201 &&
+        inviteViewer.json.invitationToken &&
+        !JSON.stringify(inviteViewer.json.invitation).includes("tokenHash"),
+      "Project invitation did not return its one-time credential safely."
+    );
+    const acceptViewer = await request("/organizations/invitations/accept", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        invitationToken: inviteViewer.json.invitationToken
+      }
+    });
+    assert(
+      acceptViewer.response.ok &&
+        acceptViewer.json.organization.role === "viewer" &&
+        acceptViewer.json.organization.accessScope === "project",
+      "The invited viewer could not accept project-specific access."
+    );
+    const viewerCapabilityPull = await request("/sync/pull", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        syncSchemaVersion: 2
+      }
+    });
+    assert(
+      viewerCapabilityPull.response.ok &&
+        viewerCapabilityPull.json.capabilityContract.capabilities.collaboration.enabled === true &&
+        viewerCapabilityPull.json.capabilityContract.capabilities["organization-administration"].enabled === false,
+      "Accepted Project access did not enable collaboration without granting firm administration."
+    );
+    const viewerSnapshot = await request("/organizations/projects/snapshot", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      viewerSnapshot.response.ok &&
+        viewerSnapshot.json.access.role === "viewer" &&
+        viewerSnapshot.json.access.readOnly === true &&
+        viewerSnapshot.json.project.projects.length === 1 &&
+        viewerSnapshot.json.project.projects[0].id === researchProjectIDs[0] &&
+        viewerSnapshot.json.project.workboardPreview.id === workboardPreviewID,
+      "The Project viewer did not receive a scoped, read-only snapshot of the transferred Project."
+    );
+    const viewerWorkboardPreview = await requestBinary("/workboards/previews/read", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        projectID: researchProjectIDs[0],
+        previewID: workboardPreviewID
+      }
+    });
+    assert(
+      viewerWorkboardPreview.response.ok &&
+        viewerWorkboardPreview.body.equals(smokePNG),
+      "A Project viewer could not open its authorized private Workboard preview."
+    );
+    const viewerOrganizationUpdate = await request("/organizations/update", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        organizationID,
+        name: "Unauthorized Rename"
+      }
+    });
+    assert(
+      [403, 404].includes(viewerOrganizationUpdate.response.status),
+      "A Project-only viewer was allowed to administer the firm workspace."
+    );
+    const viewerMemberDirectory = await request("/organizations/members/list", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        organizationID
+      }
+    });
+    assert(
+      [403, 404].includes(viewerMemberDirectory.response.status),
+      "A Project viewer was allowed to read the private firm member directory."
+    );
+    const viewerNotebookWrite = await request("/notebook/cards/save", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        cardType: "coordination-item",
+        title: "Unauthorized viewer edit",
+        document: {
+          type: "doc",
+          content: [{
+            type: "paragraph",
+            content: [{ type: "text", text: "A viewer must not save this." }]
+          }]
+        }
+      }
+    });
+    assert(
+      viewerNotebookWrite.response.status === 403 &&
+        viewerNotebookWrite.json.code === "PROJECT_PERMISSION_REQUIRED",
+      "A Project viewer was allowed to author Notebook content."
+    );
+    for (let index = 1; index <= 3; index += 1) {
+      const seatInvitation = await request("/organizations/members/invite", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          email: `pending-seat-${index}@smoke.test`,
+          role: "viewer"
+        }
+      });
+      assert(seatInvitation.response.status === 201, `Pending firm seat ${index} was not reserved.`);
+    }
+    const fullSeatInvitation = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        email: "over-seat-limit@smoke.test",
+        role: "viewer"
+      }
+    });
+    assert(
+      fullSeatInvitation.response.status === 409 &&
+        fullSeatInvitation.json.code === "ORGANIZATION_SEAT_LIMIT" &&
+        fullSeatInvitation.json.seats.used === 5,
+      "Firm seat limits did not count active members and pending invitations."
+    );
+    const deactivateViewer = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        userID: sharedViewerID,
+        status: "deactivated"
+      }
+    });
+    assert(
+      deactivateViewer.response.ok &&
+        deactivateViewer.json.membership.status === "deactivated",
+      "A firm Owner could not deactivate Project-specific access."
+    );
+    const viewerSnapshotAfterRemoval = await request("/organizations/projects/snapshot", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      viewerSnapshotAfterRemoval.response.status === 404,
+      "Deactivating a Project member did not revoke private Project access."
+    );
+    const sharedEditorSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-shared-editor",
+          email: "editor@smoke.test",
+          displayName: "Smoke Editor"
+        }
+      }
+    });
+    assert(sharedEditorSignIn.response.ok, "Shared Project editor sign-in failed.");
+    const sharedEditorID = sharedEditorSignIn.json.account.appUserID;
+    const sharedEditorToken = sharedEditorSignIn.json.account.backendSessionToken;
+    const inviteEditor = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        email: "editor@smoke.test",
+        role: "editor"
+      }
+    });
+    assert(inviteEditor.response.status === 201, "Available firm seat could not invite a Project editor.");
+    const acceptEditor = await request("/organizations/invitations/accept", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        invitationToken: inviteEditor.json.invitationToken
+      }
+    });
+    assert(
+      acceptEditor.response.ok && acceptEditor.json.organization.role === "editor",
+      "The Project editor could not accept access."
+    );
+    const editorNotebookWrite = await request("/notebook/cards/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        cardType: "coordination-item",
+        title: "Shared coordination",
+        document: {
+          schema: "permitext-notebook-card",
+          schemaVersion: 1,
+          format: "tiptap-json",
+          document: {
+            type: "doc",
+            content: [{
+              type: "paragraph",
+              content: [{ type: "text", text: "Coordinate the filing sequence." }]
+            }]
+          }
+        }
+      }
+    });
+    assert(
+      editorNotebookWrite.response.status === 201 &&
+        editorNotebookWrite.json.card.createdBy === sharedEditorID &&
+      editorNotebookWrite.json.card.updatedBy === sharedEditorID &&
+      editorNotebookWrite.json.activity.actorUserID === sharedEditorID &&
+      editorNotebookWrite.json.activity.owner.organizationID === organizationID,
+      `An authorized Project editor could not create attributed organization-owned Notebook content: ${editorNotebookWrite.response.status} ${JSON.stringify(editorNotebookWrite.json)}`
+    );
+    const editorEvidenceProposal = await request("/organizations/evidence/reviews/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        answerID,
+        expectedVersion: 0,
+        status: "proposed",
+        note: "Selected evidence is ready for professional review."
+      }
+    });
+    assert(
+      editorEvidenceProposal.response.status === 201 &&
+        editorEvidenceProposal.json.review.status === "proposed" &&
+        editorEvidenceProposal.json.review.createdByUserID === sharedEditorID,
+      "A Project editor could not propose immutable Research evidence for review."
+    );
+    const evidenceReviewID = editorEvidenceProposal.json.review.id;
+    const deactivateEditor = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        userID: sharedEditorID,
+        status: "deactivated"
+      }
+    });
+    assert(deactivateEditor.response.ok, "Project editor deactivation failed before reviewer invitation.");
+    const sharedReviewerSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-shared-reviewer",
+          email: "reviewer@smoke.test",
+          displayName: "Smoke Reviewer"
+        }
+      }
+    });
+    assert(sharedReviewerSignIn.response.ok, "Shared Project reviewer sign-in failed.");
+    const sharedReviewerID = sharedReviewerSignIn.json.account.appUserID;
+    const sharedReviewerToken = sharedReviewerSignIn.json.account.backendSessionToken;
+    const inviteReviewer = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        email: "reviewer@smoke.test",
+        role: "reviewer"
+      }
+    });
+    assert(inviteReviewer.response.status === 201, "Available firm seat could not invite a Project reviewer.");
+    const acceptReviewer = await request("/organizations/invitations/accept", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        invitationToken: inviteReviewer.json.invitationToken
+      }
+    });
+    assert(
+      acceptReviewer.response.ok && acceptReviewer.json.organization.role === "reviewer",
+      "The Project reviewer could not accept access."
+    );
+    const reviewerEvidenceList = await request("/organizations/evidence/reviews/list", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reviewerEvidenceList.response.ok &&
+        reviewerEvidenceList.json.access.canReview === true &&
+        reviewerEvidenceList.json.access.canPropose === false &&
+        reviewerEvidenceList.json.reviews.some((review) => review.id === evidenceReviewID),
+      "A Project reviewer could not see the editor's evidence proposal with reviewer-only capabilities."
+    );
+    const reviewerApproval = await request("/organizations/evidence/reviews/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        reviewID: evidenceReviewID,
+        answerID,
+        expectedVersion: 1,
+        status: "approved",
+        note: "Evidence set approved for the Project record."
+      }
+    });
+    assert(
+      reviewerApproval.response.ok &&
+        reviewerApproval.json.review.status === "approved" &&
+        reviewerApproval.json.review.reviewedByUserID === sharedReviewerID &&
+        reviewerApproval.json.activity.actorUserID === sharedReviewerID,
+      "A Project reviewer could not approve the proposed immutable evidence with attribution."
+    );
+    const reviewerNotebookWrite = await request("/notebook/cards/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        cardType: "review-task",
+        title: "Reviewer must not edit",
+        document: {
+          type: "doc",
+          content: [{
+            type: "paragraph",
+            content: [{ type: "text", text: "Reviewer roles are not content editors." }]
+          }]
+        }
+      }
+    });
+    assert(
+      reviewerNotebookWrite.response.status === 403 &&
+        reviewerNotebookWrite.json.code === "PROJECT_PERMISSION_REQUIRED",
+      "A Project reviewer was allowed to edit authored Notebook content."
+    );
+
     const storedWorkboardPreview = await requestBinary("/workboards/previews/read", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -3655,7 +4149,11 @@ async function main() {
     const getNotebookCard = await request("/notebook/cards/get", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
-      body: { auth: { accountUserID: userID }, cardID: notebookCardID }
+      body: {
+        auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
+        cardID: notebookCardID
+      }
     });
     assert(
       getNotebookCard.response.ok &&
@@ -3706,6 +4204,7 @@ async function main() {
       token: signIn.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: userID },
+        projectID: "project-client-smoke",
         cardID: notebookCardID,
         expectedVersion: 2
       }

@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#121212">
     <title>permitext workspace</title>
-    <link rel="manifest" href="/web/manifest.webmanifest?v=20260724-packages-v1">
+    <link rel="manifest" href="/web/manifest.webmanifest?v=20260724-collaboration-v1">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260724-packages-v1">
+    <link rel="stylesheet" href="/web/styles.css?v=20260724-collaboration-v1">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -407,6 +407,14 @@
           <button class="settings-primary-button account-sign-in" type="button">Sign in</button>
           <button class="settings-secondary-button settings-destructive-secondary account-clear" type="button">Sign Out</button>
         </section>
+        <section class="settings-card settings-firm-card" aria-labelledby="settings-firm-title">
+          <div class="settings-card-heading">
+            <h3 id="settings-firm-title" class="section-label settings-section-title">Firm &amp; Collaboration</h3>
+            <span class="settings-beta-badge">Private beta</span>
+          </div>
+          <p class="settings-card-copy">Share selected Projects with explicit Owner, Editor, Reviewer, or Viewer access. Personal files stay private until a Project is transferred.</p>
+          <div class="settings-firm-content" aria-live="polite"></div>
+        </section>
         <section class="settings-card account-sync-card" aria-labelledby="settings-sync-title">
           <h3 id="settings-sync-title" class="section-label settings-section-title">Sync</h3>
           <div class="account-sync-status">
@@ -466,6 +474,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260724-packages-v1" type="module"></script>
+    <script src="/web/app.js?v=20260724-collaboration-v1" type="module"></script>
   </body>
 </html>

@@ -30,7 +30,8 @@ export const artifactTypes = Object.freeze([
   "attachment",
   "workboardPreview",
   "reportManifest",
-  "generatedReport"
+  "generatedReport",
+  "evidenceReview"
 ]);
 
 export const projectTargetKinds = Object.freeze([
@@ -47,7 +48,8 @@ export const projectTargetKinds = Object.freeze([
   "attachment",
   "reportDraft",
   "reportManifest",
-  "generatedReport"
+  "generatedReport",
+  "evidenceReview"
 ]);
 
 export const projectMembershipRules = Object.freeze({
@@ -64,7 +66,8 @@ export const projectMembershipRules = Object.freeze({
   attachment: { maximumProjects: 1, relationship: "owner" },
   reportDraft: { maximumProjects: 1, relationship: "owner" },
   reportManifest: { maximumProjects: 1, relationship: "owner" },
-  generatedReport: { maximumProjects: 1, relationship: "owner" }
+  generatedReport: { maximumProjects: 1, relationship: "owner" },
+  evidenceReview: { maximumProjects: 1, relationship: "reference" }
 });
 
 export const conflictPolicies = Object.freeze({
@@ -80,6 +83,7 @@ export const conflictPolicies = Object.freeze({
   reportDraft: "explicit-revision",
   reportManifest: "immutable",
   generatedReport: "immutable",
+  evidenceReview: "explicit-revision",
   activityEvent: "append-only",
   projectLink: "latest-explicit-link-state"
 });
@@ -101,6 +105,7 @@ export const activityActions = Object.freeze([
   "report.export.saved",
   "project.archived",
   "project.restored",
+  "project.transferred",
   "member.invited",
   "permission.changed"
 ]);
@@ -146,6 +151,25 @@ export function ownerScope(userID) {
   };
 }
 
+export function organizationOwnerScope(organizationID) {
+  const id = requiredText(organizationID, "owner organization ID", 256);
+  return {
+    kind: "organization",
+    id,
+    organizationID: id
+  };
+}
+
+export function normalizedOwnerScope(owner) {
+  if (owner?.kind === "organization") {
+    return organizationOwnerScope(owner.organizationID || owner.id);
+  }
+  if (owner?.kind === "user") {
+    return ownerScope(owner.id);
+  }
+  throw new Error("Invalid owner scope.");
+}
+
 export function artifactEnvelope({
   id = randomUUID(),
   type,
@@ -158,13 +182,12 @@ export function artifactEnvelope({
 }) {
   const normalizedType = requiredText(type, "artifact type", 64);
   if (!artifactTypeSet.has(normalizedType)) throw new Error("Unsupported artifact type.");
-  if (!owner || owner.kind !== "user" || !owner.id) throw new Error("Invalid owner scope.");
   return {
     id: requiredText(id, "artifact ID", 256),
     type: normalizedType,
     createdAt: requiredISO(createdAt, "created date"),
     updatedAt: requiredISO(updatedAt, "updated date"),
-    owner: ownerScope(owner.id),
+    owner: normalizedOwnerScope(owner),
     version: boundedVersion(version),
     archivedAt: optionalISO(archivedAt, "archive date"),
     deletedAt: optionalISO(deletedAt, "deletion date")
@@ -197,7 +220,7 @@ export function projectLinkRecord({
   }
   return {
     id: requiredText(id, "project link ID", 256),
-    owner: ownerScope(owner?.id),
+    owner: normalizedOwnerScope(owner),
     projectID: requiredText(projectID, "project ID", 256),
     targetKind: kind,
     targetID: requiredText(targetID, "project target ID", 256),
@@ -214,6 +237,8 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
   const pro = hasActiveProEntitlement(entitlement, now);
   const research = hasActiveResearchEntitlement(entitlement, now);
   const researchMode = researchEntitlementMode(entitlement, now);
+  const collaboration = options.collaborationEnabled === true;
+  const organizationAdministration = options.organizationAdministrationEnabled === true;
   const researchMonthlyLimit = Number.isSafeInteger(Number(options.researchMonthlyLimit))
     ? Number(options.researchMonthlyLimit)
     : defaultResearchMonthlyLimit;
@@ -241,8 +266,8 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
         monthlyLimit: research ? researchMonthlyLimit : 0
       },
       [capabilityIDs.evidenceDiscovery]: { enabled: false },
-      [capabilityIDs.collaboration]: { enabled: false },
-      [capabilityIDs.organizationAdministration]: { enabled: false }
+      [capabilityIDs.collaboration]: { enabled: collaboration },
+      [capabilityIDs.organizationAdministration]: { enabled: organizationAdministration }
     }
   };
 }
@@ -253,7 +278,9 @@ export function syncContract({
   clientCapabilities = [],
   contentMapVersion,
   migrationCheckpoint = null,
-  researchMonthlyLimit = defaultResearchMonthlyLimit
+  researchMonthlyLimit = defaultResearchMonthlyLimit,
+  collaborationEnabled = false,
+  organizationAdministrationEnabled = false
 }) {
   const normalizedClientSchemaVersion = Number(clientSchemaVersion);
   return {
@@ -267,7 +294,11 @@ export function syncContract({
         .map((value) => String(value || "").trim())
         .filter(Boolean)
     )).slice(0, 100),
-    capabilityContract: capabilityContract(entitlement, Date.now(), { researchMonthlyLimit }),
+    capabilityContract: capabilityContract(entitlement, Date.now(), {
+      researchMonthlyLimit,
+      collaborationEnabled,
+      organizationAdministrationEnabled
+    }),
     contentMapVersion: Number(contentMapVersion || 0),
     migrationCheckpoint,
     unknownRecordPolicy: "preserve-and-ignore",
@@ -351,7 +382,7 @@ export function immutableResearchAnswer({
     immutable: true,
     schemaVersion: projectFoundationSchemaVersion,
     version: 1,
-    owner: ownerScope(owner?.id),
+    owner: normalizedOwnerScope(owner),
     conversationID: requiredText(conversationID, "conversation ID", 256),
     projectID: projectID ? requiredText(projectID, "project ID", 256) : null,
     question: requiredText(question, "research question", 2_000),
@@ -391,7 +422,7 @@ export function activityEvent({
   if (!activityActionSet.has(normalizedAction)) throw new Error("Unsupported activity action.");
   return {
     id: requiredText(id, "activity ID", 256),
-    owner: ownerScope(owner?.id),
+    owner: normalizedOwnerScope(owner),
     projectID: requiredText(projectID, "project ID", 256),
     actorUserID: requiredText(actorUserID, "actor user ID", 256),
     action: normalizedAction,

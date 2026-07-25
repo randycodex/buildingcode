@@ -34,7 +34,7 @@ export function accountSessionTTLSeconds(environment = process.env) {
     : 60 * 60 * 24 * 30;
 }
 
-export function createPostgresAccountRepository(sql) {
+export function createPostgresAccountRepository(sql, options = {}) {
   async function contextForUser(userID) {
     const rows = await sql`
       SELECT users.account, entitlements.entitlement
@@ -536,26 +536,42 @@ export function createPostgresAccountRepository(sql) {
       sql`
         UPDATE permitext_foundation_artifacts
         SET user_id = ${targetUserID},
-            envelope = jsonb_set(envelope, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+            envelope = CASE
+              WHEN envelope #>> '{owner,kind}' = 'user'
+                THEN jsonb_set(envelope, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+              ELSE envelope
+            END
         WHERE user_id = ${sourceUserID}
       `,
       sql`
         UPDATE permitext_project_links
         SET user_id = ${targetUserID},
-            link = jsonb_set(link, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+            link = CASE
+              WHEN link #>> '{owner,kind}' = 'user'
+                THEN jsonb_set(link, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+              ELSE link
+            END
         WHERE user_id = ${sourceUserID}
       `,
       sql`
         UPDATE permitext_research_answers
         SET user_id = ${targetUserID},
-            answer = jsonb_set(answer, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+            answer = CASE
+              WHEN answer #>> '{owner,kind}' = 'user'
+                THEN jsonb_set(answer, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+              ELSE answer
+            END
         WHERE user_id = ${sourceUserID}
       `,
       sql`UPDATE permitext_evidence_snapshots SET user_id = ${targetUserID} WHERE user_id = ${sourceUserID}`,
       sql`
         UPDATE permitext_project_activity
         SET user_id = ${targetUserID},
-            event = jsonb_set(event, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+            event = CASE
+              WHEN event #>> '{owner,kind}' = 'user'
+                THEN jsonb_set(event, '{owner,id}', to_jsonb(${targetUserID}::text), true)
+              ELSE event
+            END
         WHERE user_id = ${sourceUserID}
       `,
       sql`
@@ -588,6 +604,12 @@ export function createPostgresAccountRepository(sql) {
       `,
       sql`DELETE FROM permitext_users WHERE id = ${sourceUserID}`
     ];
+    const additionalMergeQueries = typeof options.mergeUserQueries === "function"
+      ? options.mergeUserQueries(sourceUserID, targetUserID)
+      : [];
+    if (additionalMergeQueries?.length) {
+      queries.splice(queries.length - 1, 0, ...additionalMergeQueries);
+    }
 
     const results = await sql.transaction(queries, { isolationMode: "Serializable" });
     const sourceRows = results[0] || [];

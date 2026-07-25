@@ -6,6 +6,7 @@ import {
   conflictPolicies,
   immutableEvidenceSnapshot,
   immutableResearchAnswer,
+  organizationOwnerScope,
   ownerScope,
   projectLinkRecord,
   projectMembershipRules,
@@ -13,7 +14,14 @@ import {
 } from "../project-foundation-contract.mjs";
 
 const owner = ownerScope("user-1");
+const organizationOwner = organizationOwnerScope("organization-1");
 const createdAt = "2026-07-24T12:00:00.000Z";
+
+assert.deepEqual(organizationOwner, {
+  kind: "organization",
+  id: "organization-1",
+  organizationID: "organization-1"
+});
 
 const envelope = artifactEnvelope({
   id: "card-1",
@@ -25,6 +33,11 @@ assert.deepEqual(Object.keys(envelope).sort(), [
   "archivedAt", "createdAt", "deletedAt", "id", "owner", "type", "updatedAt", "version"
 ]);
 assert.equal(envelope.owner.id, "user-1");
+assert.equal(artifactEnvelope({
+  type: "notebookCard",
+  owner: organizationOwner,
+  createdAt
+}).owner.kind, "organization");
 assert.throws(
   () => artifactEnvelope({ type: "canonicalSection", owner, createdAt }),
   /Unsupported artifact type/,
@@ -61,6 +74,16 @@ const proCapabilities = capabilityContract({ plan: "pro", expiresAt: "2099-01-01
 assert.equal(proCapabilities.capabilities["projects"].enabled, true);
 assert.equal(proCapabilities.capabilities["collaboration"].enabled, false);
 assert.equal(proCapabilities.capabilities.research.enabled, true, "Legacy Pro must keep Research.");
+const organizationCapabilities = capabilityContract(
+  { plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" },
+  Date.now(),
+  {
+    collaborationEnabled: true,
+    organizationAdministrationEnabled: true
+  }
+);
+assert.equal(organizationCapabilities.capabilities["collaboration"].enabled, true);
+assert.equal(organizationCapabilities.capabilities["organization-administration"].enabled, true);
 const freeCapabilities = capabilityContract(null);
 assert.equal(freeCapabilities.schemaVersion, 2);
 assert.equal(freeCapabilities.capabilities["saved-work"].limit, 25);

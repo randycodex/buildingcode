@@ -673,6 +673,16 @@ Measure:
 
 Begin this release only after the individual professional workflow is stable.
 
+### Implementation status — July 24, 2026
+
+The core organization and collaboration foundation is now implemented locally and validated across the backend, web application, and iOS application.
+
+- The web application provides firm creation and administration, invitations, role and seat management, Project transfer, shared Project Studio access, shared Notebook editing, evidence review, Research history, and Report access.
+- The iOS application accepts firm invitation links and provides a read-only shared Project Hub for Notebook cards, Research history, evidence review status, Report downloads, Workboard previews, and recent activity.
+- The backend is the authority for organization membership, roles, seat limits, invitations, Project ownership, private asset access, and collaboration permissions.
+- Firm administration and shared editing remain web-first on iPhone. iOS intentionally focuses on review, continuity, and secure Report access.
+- Shared Workboard editing remains deferred until the ordinary collaboration model has production experience.
+
 ## Phase 3.1 — Organizations
 
 Add:
@@ -692,6 +702,8 @@ Initial roles:
 - Viewer
 
 All permissions must be enforced by the backend.
+
+**Status: core scope complete.** Organization records, membership, Owner/Editor/Reviewer/Viewer roles, capabilities, billing identity, backend permission enforcement, and PostgreSQL repository support are implemented. Organization billing configuration exists as a foundation; centralized firm checkout and invoicing remain part of the later commercial controls.
 
 Before migrating a Project into organization ownership:
 
@@ -719,6 +731,8 @@ Viewers must not be able to edit project records.
 
 This phase should verify authorization, invitations, removal, and private-file access before authored collaboration is introduced.
 
+**Status: complete in the current scope.** Invitation acceptance, Viewer access, removal and deactivation, generated Report download, Notebook and Research reading, Workboard preview access, and private-file authorization are covered by automated server and iOS contract tests.
+
 ---
 
 ## Phase 3.3 — Authored Collaboration
@@ -736,6 +750,8 @@ Support:
 
 Do not merge authorship. Every contribution must retain the identity of its author.
 
+**Status: focused scope implemented.** Authorized web collaborators can create attributed Notebook content and the activity history records the contributor. The next collaboration refinement should add standalone authored notes, threaded review comments, and richer Research-feedback presentation without weakening attribution.
+
 ---
 
 ## Phase 3.4 — Shared Evidence and Research
@@ -751,6 +767,8 @@ Allow authorized collaborators to:
 - Add missing project facts
 
 Consider requiring Reviewer or Owner approval before a Research answer is marked as approved for a Project report.
+
+**Status: focused evidence-review scope implemented.** Editors can propose evidence and Reviewers or Owners can approve or reject it through backend-enforced role checks. Revision requests and structured missing-project-fact workflows remain to be added with the evidence-discovery work.
 
 ---
 
@@ -773,6 +791,8 @@ Add:
 
 Educational, governmental, and institutional accounts may reuse the organization structure with different licensing policies.
 
+**Status: partial.** Seat limits and usage, pending invitations, member deactivation, role management, Project ownership transfer, and organization billing identity are implemented. Centralized billing operations, firm tags, templates, branding, required disclaimers, allowance policy, and data-retention controls remain future firm-administration work.
+
 ---
 
 ## Phase 3.6 — Shared Workboard Editing
@@ -791,6 +811,8 @@ Before release, define:
 - Workboard snapshot history
 
 This feature should not block the earlier firm release.
+
+**Status: intentionally deferred.** Current collaborators receive a verified Workboard preview; simultaneous editing, presence, shared conflicts, and snapshot restoration are not yet enabled.
 
 ---
 

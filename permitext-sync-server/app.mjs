@@ -11,6 +11,7 @@ import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import { createPostgresOrganizationRepository } from "./postgres-organization-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import {
   entitlementPackageIDs,
@@ -21,10 +22,26 @@ import {
   hasActiveResearchEntitlement
 } from "./entitlement-contract.mjs";
 import {
+  evidenceReviewPayload,
+  invitationState,
+  invitationToken,
+  invitationTokenHash,
+  organizationInvitationRecord,
+  organizationMembershipRecord,
+  organizationPermissions,
+  organizationRecord,
+  organizationSeatUsage,
+  organizationSlug,
+  projectMembershipRecord,
+  projectOwnershipRecord,
+  roleAllows
+} from "./organization-contract.mjs";
+import {
   activityEvent,
   artifactEnvelope,
   immutableEvidenceSnapshot,
   immutableResearchAnswer,
+  organizationOwnerScope,
   ownerScope,
   projectFoundationSchemaVersion,
   projectLinkRecord,
@@ -102,6 +119,19 @@ const rateLimitPolicies = new Map([
   ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/create", { limit: 10, windowMs: 60 * 60 * 1000 }],
+  ["organizations/update", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["organizations/members/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/members/invite", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["organizations/members/update", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/invitations/accept", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["organizations/invitations/revoke", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["organizations/projects/transfer", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["organizations/projects/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/projects/snapshot", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["organizations/evidence/reviews/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["organizations/evidence/reviews/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -189,7 +219,12 @@ const emptyStore = () => ({
   migrationCheckpointsByUserID: {},
   researchConversationsByUserID: {},
   researchUsageByUserID: {},
-  researchFeedbackByUserID: {}
+  researchFeedbackByUserID: {},
+  organizations: {},
+  organizationMembershipsByOrganizationID: {},
+  organizationInvitationsByID: {},
+  projectOwnerships: {},
+  projectMembershipsByProjectID: {}
 });
 
 const allowedMutationKinds = new Set([
@@ -326,6 +361,17 @@ function createFileStoreAdapter() {
           activityEvents: Object.values(store.activityEventsByUserID || {}).reduce(
             (count, entries) => count + (entries?.length || 0),
             0
+          ),
+          organizations: Object.keys(store.organizations || {}).length,
+          organizationMemberships: Object.values(store.organizationMembershipsByOrganizationID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
+          ),
+          organizationInvitations: Object.keys(store.organizationInvitationsByID || {}).length,
+          projectOwnerships: Object.keys(store.projectOwnerships || {}).length,
+          projectMemberships: Object.values(store.projectMembershipsByProjectID || {}).reduce(
+            (count, entries) => count + (entries?.length || 0),
+            0
           )
         },
         mutationCounts: mutationCountsByKind
@@ -419,6 +465,125 @@ function createFileStoreAdapter() {
       await this.write(store);
       return existing || event;
     },
+    async organization(organizationID) {
+      const store = await this.read();
+      return store.organizations?.[organizationID] || null;
+    },
+    async organizationBySlug(slug) {
+      const store = await this.read();
+      return Object.values(store.organizations || {})
+        .find((organization) => organization.slug === slug) || null;
+    },
+    async listOrganizationsForUser(userID) {
+      const store = await this.read();
+      const results = [];
+      for (const [organizationID, memberships] of Object.entries(
+        store.organizationMembershipsByOrganizationID || {}
+      )) {
+        const membership = (memberships || []).find((item) =>
+          item.userID === userID && item.status === "active"
+        );
+        const organization = store.organizations?.[organizationID];
+        if (membership && organization?.status === "active") {
+          results.push({ organization, membership });
+        }
+      }
+      return results.sort((left, right) =>
+        String(right.organization.updatedAt || "").localeCompare(
+          String(left.organization.updatedAt || "")
+        )
+      );
+    },
+    async saveOrganization(organization) {
+      const store = await this.read();
+      store.organizations ||= {};
+      store.organizations[organization.id] = organization;
+      await this.write(store);
+      return organization;
+    },
+    async membership(organizationID, userID) {
+      const store = await this.read();
+      return (store.organizationMembershipsByOrganizationID?.[organizationID] || [])
+        .find((item) => item.userID === userID) || null;
+    },
+    async listOrganizationMemberships(organizationID) {
+      const store = await this.read();
+      return (store.organizationMembershipsByOrganizationID?.[organizationID] || []).slice();
+    },
+    async saveOrganizationMembership(membership) {
+      const store = await this.read();
+      store.organizationMembershipsByOrganizationID ||= {};
+      const entries = store.organizationMembershipsByOrganizationID[membership.organizationID] || [];
+      const index = entries.findIndex((item) => item.userID === membership.userID);
+      if (index === -1) entries.push(membership);
+      else entries[index] = membership;
+      store.organizationMembershipsByOrganizationID[membership.organizationID] = entries;
+      await this.write(store);
+      return membership;
+    },
+    async invitationByTokenHash(tokenHash) {
+      const store = await this.read();
+      return Object.values(store.organizationInvitationsByID || {})
+        .find((item) => item.tokenHash === tokenHash) || null;
+    },
+    async listOrganizationInvitations(organizationID) {
+      const store = await this.read();
+      return Object.values(store.organizationInvitationsByID || {})
+        .filter((item) => item.organizationID === organizationID)
+        .sort((left, right) =>
+          String(right.createdAt || "").localeCompare(String(left.createdAt || ""))
+        );
+    },
+    async saveOrganizationInvitation(invitation) {
+      const store = await this.read();
+      store.organizationInvitationsByID ||= {};
+      store.organizationInvitationsByID[invitation.id] = invitation;
+      await this.write(store);
+      return invitation;
+    },
+    async projectOwnership(projectID) {
+      const store = await this.read();
+      return store.projectOwnerships?.[projectID] || null;
+    },
+    async listProjectOwnershipsForOrganizations(organizationIDs) {
+      const allowed = new Set(organizationIDs || []);
+      const store = await this.read();
+      return Object.values(store.projectOwnerships || {})
+        .filter((ownership) => allowed.has(ownership.owner?.organizationID));
+    },
+    async saveProjectOwnership(ownership) {
+      const store = await this.read();
+      store.projectOwnerships ||= {};
+      store.projectOwnerships[ownership.projectID] = ownership;
+      await this.write(store);
+      return ownership;
+    },
+    async projectMembership(projectID, userID) {
+      const store = await this.read();
+      return (store.projectMembershipsByProjectID?.[projectID] || [])
+        .find((item) => item.userID === userID) || null;
+    },
+    async listProjectMemberships(projectID) {
+      const store = await this.read();
+      return (store.projectMembershipsByProjectID?.[projectID] || []).slice();
+    },
+    async listProjectMembershipsForUser(userID) {
+      const store = await this.read();
+      return Object.values(store.projectMembershipsByProjectID || {})
+        .flatMap((entries) => entries || [])
+        .filter((item) => item.userID === userID && item.status === "active");
+    },
+    async saveProjectMembership(membership) {
+      const store = await this.read();
+      store.projectMembershipsByProjectID ||= {};
+      const entries = store.projectMembershipsByProjectID[membership.projectID] || [];
+      const index = entries.findIndex((item) => item.userID === membership.userID);
+      if (index === -1) entries.push(membership);
+      else entries[index] = membership;
+      store.projectMembershipsByProjectID[membership.projectID] = entries;
+      await this.write(store);
+      return membership;
+    },
     async migrationCheckpoint(userID, checkpointName) {
       const store = await this.read();
       return store.migrationCheckpointsByUserID?.[userID]?.[checkpointName] || null;
@@ -493,7 +658,12 @@ function storeHasData(store) {
     migrationCheckpointsByUserID: store.migrationCheckpointsByUserID,
     researchConversationsByUserID: store.researchConversationsByUserID,
     researchUsageByUserID: store.researchUsageByUserID,
-    researchFeedbackByUserID: store.researchFeedbackByUserID
+    researchFeedbackByUserID: store.researchFeedbackByUserID,
+    organizations: store.organizations,
+    organizationMembershipsByOrganizationID: store.organizationMembershipsByOrganizationID,
+    organizationInvitationsByID: store.organizationInvitationsByID,
+    projectOwnerships: store.projectOwnerships,
+    projectMembershipsByProjectID: store.projectMembershipsByProjectID
   }).some((value) => value && Object.keys(value).length > 0);
 }
 
@@ -544,7 +714,11 @@ function mutationRecordDeletedAt(record) {
 async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
-  const accountRepository = createPostgresAccountRepository(sql);
+  const organizationRepository = createPostgresOrganizationRepository(sql);
+  const accountRepository = createPostgresAccountRepository(sql, {
+    mergeUserQueries: (sourceUserID, targetUserID) =>
+      organizationRepository.mergeUserQueries(sourceUserID, targetUserID)
+  });
   const syncRepository = createPostgresSyncRepository(sql);
   let initialized = false;
   let migrated = false;
@@ -982,6 +1156,7 @@ async function createPostgresStoreAdapter() {
       VALUES ('default')
       ON CONFLICT (id) DO NOTHING
     `;
+    await organizationRepository.initialize();
     initialized = true;
   }
 
@@ -1303,6 +1478,11 @@ async function createPostgresStoreAdapter() {
         (SELECT count(*) FROM permitext_migration_checkpoints)::int AS migration_checkpoints,
         (SELECT count(*) FROM permitext_research_usage)::int AS research_usage,
         (SELECT count(*) FROM permitext_research_feedback)::int AS research_feedback,
+        (SELECT count(*) FROM permitext_organizations)::int AS organizations,
+        (SELECT count(*) FROM permitext_organization_memberships)::int AS organization_memberships,
+        (SELECT count(*) FROM permitext_organization_invitations)::int AS organization_invitations,
+        (SELECT count(*) FROM permitext_project_ownerships)::int AS project_ownerships,
+        (SELECT count(*) FROM permitext_project_memberships)::int AS project_memberships,
         (SELECT count(*) FROM permitext_user_content_records)::int AS user_content_records,
         (SELECT count(*) FROM permitext_sync_events)::int AS sync_events,
         COALESCE((SELECT max(event_id) FROM permitext_sync_events), 0)::bigint AS latest_event_id
@@ -1333,6 +1513,11 @@ async function createPostgresStoreAdapter() {
         migrationCheckpoints: Number(row.migration_checkpoints || 0),
         researchUsage: Number(row.research_usage || 0),
         researchFeedback: Number(row.research_feedback || 0),
+        organizations: Number(row.organizations || 0),
+        organizationMemberships: Number(row.organization_memberships || 0),
+        organizationInvitations: Number(row.organization_invitations || 0),
+        projectOwnerships: Number(row.project_ownerships || 0),
+        projectMemberships: Number(row.project_memberships || 0),
         userContentRecords: Number(row.user_content_records || 0),
         syncEvents: Number(row.sync_events || 0)
       }
@@ -2027,6 +2212,74 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.length ? feedback : null;
     },
+    async organization(organizationID) {
+      await ensureSchema();
+      return organizationRepository.organization(organizationID);
+    },
+    async organizationBySlug(slug) {
+      await ensureSchema();
+      return organizationRepository.organizationBySlug(slug);
+    },
+    async listOrganizationsForUser(userID) {
+      await ensureSchema();
+      return organizationRepository.listOrganizationsForUser(userID);
+    },
+    async saveOrganization(organization) {
+      await ensureSchema();
+      return organizationRepository.saveOrganization(organization);
+    },
+    async membership(organizationID, userID) {
+      await ensureSchema();
+      return organizationRepository.membership(organizationID, userID);
+    },
+    async listOrganizationMemberships(organizationID) {
+      await ensureSchema();
+      return organizationRepository.listOrganizationMemberships(organizationID);
+    },
+    async saveOrganizationMembership(membership) {
+      await ensureSchema();
+      return organizationRepository.saveOrganizationMembership(membership);
+    },
+    async invitationByTokenHash(tokenHash) {
+      await ensureSchema();
+      return organizationRepository.invitationByTokenHash(tokenHash);
+    },
+    async listOrganizationInvitations(organizationID) {
+      await ensureSchema();
+      return organizationRepository.listOrganizationInvitations(organizationID);
+    },
+    async saveOrganizationInvitation(invitation) {
+      await ensureSchema();
+      return organizationRepository.saveOrganizationInvitation(invitation);
+    },
+    async projectOwnership(projectID) {
+      await ensureSchema();
+      return organizationRepository.projectOwnership(projectID);
+    },
+    async listProjectOwnershipsForOrganizations(organizationIDs) {
+      await ensureSchema();
+      return organizationRepository.listProjectOwnershipsForOrganizations(organizationIDs);
+    },
+    async saveProjectOwnership(ownership) {
+      await ensureSchema();
+      return organizationRepository.saveProjectOwnership(ownership);
+    },
+    async projectMembership(projectID, userID) {
+      await ensureSchema();
+      return organizationRepository.projectMembership(projectID, userID);
+    },
+    async listProjectMemberships(projectID) {
+      await ensureSchema();
+      return organizationRepository.listProjectMemberships(projectID);
+    },
+    async listProjectMembershipsForUser(userID) {
+      await ensureSchema();
+      return organizationRepository.listProjectMembershipsForUser(userID);
+    },
+    async saveProjectMembership(membership) {
+      await ensureSchema();
+      return organizationRepository.saveProjectMembership(membership);
+    },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -2170,6 +2423,115 @@ async function listStoredActivityEvents(userID) {
 async function saveStoredActivityEvent(userID, event) {
   const adapter = await storeAdapter();
   return adapter.saveActivityEvent(userID, event);
+}
+
+async function storedOrganization(organizationID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.organization === "function"
+    ? adapter.organization(organizationID)
+    : null;
+}
+
+async function storedOrganizationBySlug(slug) {
+  const adapter = await storeAdapter();
+  return typeof adapter.organizationBySlug === "function"
+    ? adapter.organizationBySlug(slug)
+    : null;
+}
+
+async function listStoredOrganizationsForUser(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listOrganizationsForUser === "function"
+    ? adapter.listOrganizationsForUser(userID)
+    : [];
+}
+
+async function saveStoredOrganization(organization) {
+  const adapter = await storeAdapter();
+  return adapter.saveOrganization(organization);
+}
+
+async function storedOrganizationMembership(organizationID, userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.membership === "function"
+    ? adapter.membership(organizationID, userID)
+    : null;
+}
+
+async function listStoredOrganizationMemberships(organizationID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listOrganizationMemberships === "function"
+    ? adapter.listOrganizationMemberships(organizationID)
+    : [];
+}
+
+async function saveStoredOrganizationMembership(membership) {
+  const adapter = await storeAdapter();
+  return adapter.saveOrganizationMembership(membership);
+}
+
+async function storedOrganizationInvitationByToken(token) {
+  const adapter = await storeAdapter();
+  return typeof adapter.invitationByTokenHash === "function"
+    ? adapter.invitationByTokenHash(invitationTokenHash(token))
+    : null;
+}
+
+async function listStoredOrganizationInvitations(organizationID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listOrganizationInvitations === "function"
+    ? adapter.listOrganizationInvitations(organizationID)
+    : [];
+}
+
+async function saveStoredOrganizationInvitation(invitation) {
+  const adapter = await storeAdapter();
+  return adapter.saveOrganizationInvitation(invitation);
+}
+
+async function storedProjectOwnership(projectID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.projectOwnership === "function"
+    ? adapter.projectOwnership(projectID)
+    : null;
+}
+
+async function listStoredProjectOwnershipsForOrganizations(organizationIDs) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listProjectOwnershipsForOrganizations === "function"
+    ? adapter.listProjectOwnershipsForOrganizations(organizationIDs)
+    : [];
+}
+
+async function saveStoredProjectOwnership(ownership) {
+  const adapter = await storeAdapter();
+  return adapter.saveProjectOwnership(ownership);
+}
+
+async function storedProjectMembership(projectID, userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.projectMembership === "function"
+    ? adapter.projectMembership(projectID, userID)
+    : null;
+}
+
+async function listStoredProjectMemberships(projectID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listProjectMemberships === "function"
+    ? adapter.listProjectMemberships(projectID)
+    : [];
+}
+
+async function listStoredProjectMembershipsForUser(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listProjectMembershipsForUser === "function"
+    ? adapter.listProjectMembershipsForUser(userID)
+    : [];
+}
+
+async function saveStoredProjectMembership(membership) {
+  const adapter = await storeAdapter();
+  return adapter.saveProjectMembership(membership);
 }
 
 async function storedMigrationCheckpoint(userID, checkpointName) {
@@ -3571,6 +3933,140 @@ async function ownedProjectRecord(userID, projectID) {
   return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
 }
 
+function rolePermissions(role) {
+  return Object.values(organizationPermissions)
+    .filter((permission) => roleAllows(role, permission));
+}
+
+async function organizationAccessForUser(userID, organizationID) {
+  const organization = await storedOrganization(organizationID);
+  const membership = await storedOrganizationMembership(organizationID, userID);
+  if (
+    !organization ||
+    organization.status !== "active" ||
+    !membership ||
+    membership.status !== "active"
+  ) {
+    return null;
+  }
+  return {
+    organization,
+    membership,
+    role: membership.role,
+    permissions: rolePermissions(membership.role)
+  };
+}
+
+async function projectAccessForUser(userID, projectID) {
+  const normalizedProjectID = String(projectID || "").trim();
+  if (!normalizedProjectID) return null;
+  const ownership = await storedProjectOwnership(normalizedProjectID);
+  if (!ownership) {
+    const project = await ownedProjectRecord(userID, normalizedProjectID);
+    return project ? {
+      projectID: projectIdentityForRecord(project, userID) || normalizedProjectID,
+      project,
+      ownership: projectOwnershipRecord({
+        projectID: projectIdentityForRecord(project, userID) || normalizedProjectID,
+        owner: ownerScope(userID),
+        storageOwnerUserID: userID,
+        originalOwnerUserID: userID,
+        createdAt: project.updatedAt || new Date().toISOString()
+      }),
+      organization: null,
+      membership: null,
+      role: "owner",
+      permissions: rolePermissions("owner"),
+      storageOwnerUserID: userID,
+      owner: ownerScope(userID)
+    } : null;
+  }
+
+  if (ownership.owner?.kind === "user") {
+    if (ownership.owner.id !== userID) return null;
+    const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID);
+    return project ? {
+      projectID: normalizedProjectID,
+      project,
+      ownership,
+      organization: null,
+      membership: null,
+      role: "owner",
+      permissions: rolePermissions("owner"),
+      storageOwnerUserID: ownership.storageOwnerUserID,
+      owner: ownerScope(userID)
+    } : null;
+  }
+
+  const organizationID = ownership.owner?.organizationID || ownership.owner?.id;
+  const organization = await storedOrganization(organizationID);
+  if (!organization || organization.status !== "active") return null;
+  const [projectMembership, organizationMembership] = await Promise.all([
+    storedProjectMembership(normalizedProjectID, userID),
+    storedOrganizationMembership(organizationID, userID)
+  ]);
+  const activeProjectMembership = projectMembership?.status === "active"
+    ? projectMembership
+    : null;
+  const activeOrganizationMembership = organizationMembership?.status === "active"
+    ? organizationMembership
+    : null;
+  const membership = activeOrganizationMembership?.role === "owner"
+    ? activeOrganizationMembership
+    : activeProjectMembership || activeOrganizationMembership;
+  if (!membership) return null;
+  const project = await ownedProjectRecord(ownership.storageOwnerUserID, normalizedProjectID);
+  if (!project) return null;
+  return {
+    projectID: normalizedProjectID,
+    project,
+    ownership,
+    organization,
+    membership,
+    role: membership.role,
+    permissions: rolePermissions(membership.role),
+    storageOwnerUserID: ownership.storageOwnerUserID,
+    owner: organizationOwnerScope(organizationID)
+  };
+}
+
+async function requireProjectPermission(response, userID, projectID, permission) {
+  const access = await projectAccessForUser(userID, projectID);
+  if (!access) {
+    sendError(response, 404, "Project not found.");
+    return null;
+  }
+  if (!access.permissions.includes(permission)) {
+    sendJSON(response, 403, {
+      error: "Your Project role does not allow this action.",
+      code: "PROJECT_PERMISSION_REQUIRED",
+      requiredPermission: permission
+    });
+    return null;
+  }
+  return access;
+}
+
+async function organizationCapabilityAccess(userID) {
+  const [organizationEntries, projectMemberships] = await Promise.all([
+    listStoredOrganizationsForUser(userID),
+    listStoredProjectMembershipsForUser(userID)
+  ]);
+  const activeOrganizations = organizationEntries.filter(({ organization, membership }) =>
+    organization?.status === "active" && membership?.status === "active"
+  );
+  const activeProjectMemberships = projectMemberships.filter((membership) =>
+    membership.status === "active"
+  );
+  return {
+    collaborationEnabled: activeOrganizations.length > 0 || activeProjectMemberships.length > 0,
+    organizationAdministrationEnabled: activeOrganizations.some(({ organization, membership }) =>
+      membership.role === "owner" &&
+      organization.capabilities?.organizationAdministration !== false
+    )
+  };
+}
+
 async function ownsProjectAssetScope(userID, projectID) {
   if (await ownedProjectRecord(userID, projectID)) return true;
   return (await userContentMutations(userID)).some((mutation) => {
@@ -3776,18 +4272,19 @@ async function migrateLegacyProjectFoundation(userID) {
   return checkpoint;
 }
 
-async function handleProjectFoundationState(request, response) {
-  const context = await authenticatedResearchBody(request, response);
-  if (!context) return;
-  const checkpoint = await migrateLegacyProjectFoundation(context.userID);
-  const projectID = String(context.body.projectID || "").trim();
-  const projects = (await userContentMutations(context.userID))
+async function projectFoundationStateForStorageOwner(
+  storageOwnerUserID,
+  projectID = "",
+  options = {}
+) {
+  const checkpoint = await migrateLegacyProjectFoundation(storageOwnerUserID);
+  const allProjects = (await userContentMutations(storageOwnerUserID))
     .map((mutation) => mutationKindAndRecord(mutation))
     .filter(({ kind, record }) =>
       kind === "project" && record && !Number.isFinite(Date.parse(record.deletedAt || ""))
     )
     .map(({ record }) => ({
-      id: projectIdentityForRecord(record, context.userID),
+      id: projectIdentityForRecord(record, storageOwnerUserID),
       sourceRecordID: record.id,
       name: record.name || "Untitled Project",
       address: record.address || "",
@@ -3796,17 +4293,19 @@ async function handleProjectFoundationState(request, response) {
       archivedAt: record.archivedAt || null,
       updatedAt: record.updatedAt
     }));
-  const projectIDs = new Set(projects.map((project) => project.id));
+  const projectIDs = new Set(allProjects.map((project) => project.id));
   if (projectID && !projectIDs.has(projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
+    return null;
   }
-  const links = (await listStoredProjectLinks(context.userID))
+  const projects = projectID && options.includeAllProjects === false
+    ? allProjects.filter((project) => project.id === projectID)
+    : allProjects;
+  const links = (await listStoredProjectLinks(storageOwnerUserID))
     .filter((link) => !projectID || link.projectID === projectID);
   const linkedTargetIDs = new Set(links.filter((link) => !link.deletedAt).map((link) => link.targetID));
-  const artifacts = (await listStoredFoundationArtifacts(context.userID))
+  const artifacts = (await listStoredFoundationArtifacts(storageOwnerUserID))
     .filter((artifact) => !projectID || linkedTargetIDs.has(artifact.envelope?.id));
-  const answers = (await listStoredResearchAnswers(context.userID))
+  const answers = (await listStoredResearchAnswers(storageOwnerUserID))
     .filter((answer) => !projectID || answer.projectID === projectID)
     .map((answer) => ({
       id: answer.id,
@@ -3818,15 +4317,15 @@ async function handleProjectFoundationState(request, response) {
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
-  const researchConversations = (await listStoredResearchConversations(context.userID))
+  const researchConversations = (await listStoredResearchConversations(storageOwnerUserID))
     .filter((conversation) => !projectID || conversation.primaryProjectID === projectID)
     .map(researchConversationSummary);
-  const activity = (await listStoredActivityEvents(context.userID))
+  const activity = (await listStoredActivityEvents(storageOwnerUserID))
     .filter((event) => !projectID || event.projectID === projectID);
   const workboardPreview = projectID
-    ? workboardPreviewSummary((await projectWorkboardPreviews(context.userID, projectID))[0])
+    ? workboardPreviewSummary((await projectWorkboardPreviews(storageOwnerUserID, projectID))[0])
     : null;
-  sendJSON(response, 200, {
+  return {
     schemaVersion: projectFoundationSchemaVersion,
     projects,
     links,
@@ -3836,7 +4335,1003 @@ async function handleProjectFoundationState(request, response) {
     activity,
     workboardPreview,
     migrationCheckpoint: checkpoint
+  };
+}
+
+async function handleProjectFoundationState(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const state = await projectFoundationStateForStorageOwner(context.userID, projectID);
+  if (!state) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  sendJSON(response, 200, state);
+}
+
+function organizationInvitationForClient(invitation) {
+  if (!invitation) return null;
+  const { tokenHash: _tokenHash, ...clientInvitation } = invitation;
+  return {
+    ...clientInvitation,
+    state: invitationState(invitation)
+  };
+}
+
+function organizationForClient(organization, access = null, seats = null) {
+  return {
+    id: organization.id,
+    schemaVersion: organization.schemaVersion,
+    name: organization.name,
+    slug: organization.slug,
+    status: organization.status,
+    capabilities: organization.capabilities,
+    billingIdentity: {
+      mode: organization.billingIdentity?.mode || "beta",
+      status: organization.billingIdentity?.status || "trial",
+      seatLimit: organization.billingIdentity?.seatLimit || 1
+    },
+    role: access?.role || null,
+    permissions: access?.permissions || [],
+    accessScope: access?.accessScope || "organization",
+    seats,
+    createdAt: organization.createdAt,
+    updatedAt: organization.updatedAt
+  };
+}
+
+async function organizationSeatState(organizationID) {
+  const [memberships, invitations, ownerships] = await Promise.all([
+    listStoredOrganizationMemberships(organizationID),
+    listStoredOrganizationInvitations(organizationID),
+    listStoredProjectOwnershipsForOrganizations([organizationID])
+  ]);
+  const projectMemberships = (await Promise.all(
+    ownerships.map((ownership) => listStoredProjectMemberships(ownership.projectID))
+  )).flat();
+  return organizationSeatUsage(
+    [...memberships, ...projectMemberships],
+    invitations
+  );
+}
+
+async function organizationMemberForClient(membership, accounts = null) {
+  const accountStore = accounts || (await readStore()).users || {};
+  const account = accountStore[membership.userID] || null;
+  return {
+    ...membership,
+    account: account ? {
+      displayName: account.displayName || null,
+      publicUsername: account.publicUsername || null,
+      email: accountEmail(account) || null
+    } : null
+  };
+}
+
+async function accessibleOrganizationProjects(userID, organizationID) {
+  const ownerships = await listStoredProjectOwnershipsForOrganizations([organizationID]);
+  const projects = [];
+  for (const ownership of ownerships) {
+    const access = await projectAccessForUser(userID, ownership.projectID);
+    if (!access || !access.permissions.includes(organizationPermissions.projectView)) continue;
+    projects.push({
+      id: access.projectID,
+      sourceRecordID: access.project.id,
+      name: access.project.name || "Untitled Project",
+      address: access.project.address || "",
+      description: access.project.description || "",
+      colorHex: access.project.colorHex || null,
+      archivedAt: access.project.archivedAt || null,
+      updatedAt: access.project.updatedAt,
+      originalOwnerUserID: ownership.originalOwnerUserID,
+      role: access.role,
+      permissions: access.permissions
+    });
+  }
+  return projects.sort((left, right) =>
+    String(right.updatedAt || "").localeCompare(String(left.updatedAt || ""))
+  );
+}
+
+async function availableOrganizationSlug(name) {
+  const base = organizationSlug(name);
+  if (!await storedOrganizationBySlug(base)) return base;
+  for (let suffix = 2; suffix <= 99; suffix += 1) {
+    const candidate = `${base.slice(0, Math.max(1, 64 - String(suffix).length - 1))}-${suffix}`;
+    if (!await storedOrganizationBySlug(candidate)) return candidate;
+  }
+  return `${base.slice(0, 51)}-${randomUUID().slice(0, 12)}`;
+}
+
+async function handleOrganizationList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const [organizationEntries, projectMemberships] = await Promise.all([
+    listStoredOrganizationsForUser(context.userID),
+    listStoredProjectMembershipsForUser(context.userID)
+  ]);
+  const accessByOrganizationID = new Map();
+  for (const { organization, membership } of organizationEntries) {
+    if (organization?.status !== "active" || membership?.status !== "active") continue;
+    accessByOrganizationID.set(organization.id, {
+      organization,
+      role: membership.role,
+      permissions: rolePermissions(membership.role),
+      accessScope: "organization"
+    });
+  }
+  for (const membership of projectMemberships) {
+    if (membership.status !== "active" || accessByOrganizationID.has(membership.organizationID)) continue;
+    const organization = await storedOrganization(membership.organizationID);
+    if (!organization || organization.status !== "active") continue;
+    accessByOrganizationID.set(organization.id, {
+      organization,
+      role: membership.role,
+      permissions: rolePermissions(membership.role),
+      accessScope: "project"
+    });
+  }
+  const organizations = [];
+  for (const access of accessByOrganizationID.values()) {
+    const [projects, seats] = await Promise.all([
+      accessibleOrganizationProjects(context.userID, access.organization.id),
+      access.role === "owner" ? organizationSeatState(access.organization.id) : null
+    ]);
+    organizations.push({
+      ...organizationForClient(access.organization, access, seats),
+      projects
+    });
+  }
+  organizations.sort((left, right) =>
+    String(right.updatedAt || "").localeCompare(String(left.updatedAt || ""))
+  );
+  sendJSON(response, 200, { organizations });
+}
+
+async function handleOrganizationCreate(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Creating a firm workspace requires Pro.",
+      code: "PRO_REQUIRED_ORGANIZATION"
+    });
+    return;
+  }
+  try {
+    const name = String(context.body.name || "").trim();
+    const now = new Date().toISOString();
+    const organization = organizationRecord({
+      name,
+      slug: await availableOrganizationSlug(name),
+      ownerUserID: context.userID,
+      createdAt: now
+    });
+    const membership = organizationMembershipRecord({
+      organizationID: organization.id,
+      userID: context.userID,
+      role: "owner",
+      createdAt: now
+    });
+    await saveStoredOrganization(organization);
+    await saveStoredOrganizationMembership(membership);
+    sendJSON(response, 201, {
+      organization: organizationForClient(organization, {
+        role: "owner",
+        permissions: rolePermissions("owner"),
+        accessScope: "organization"
+      }, { active: 1, pending: 0, used: 1 })
+    });
+  } catch (error) {
+    if (error?.code === "23505") {
+      sendJSON(response, 409, {
+        error: "That firm workspace name is already in use.",
+        code: "ORGANIZATION_SLUG_CONFLICT"
+      });
+      return;
+    }
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid firm workspace.",
+      code: "INVALID_ORGANIZATION"
+    });
+  }
+}
+
+async function handleOrganizationUpdate(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access) {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  if (!access.permissions.includes(organizationPermissions.organizationManage)) {
+    sendJSON(response, 403, {
+      error: "Only a firm Owner can change workspace settings.",
+      code: "ORGANIZATION_OWNER_REQUIRED"
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const organization = organizationRecord({
+      ...access.organization,
+      name: context.body.name ?? access.organization.name,
+      slug: access.organization.slug,
+      ownerUserID: access.organization.ownerUserID,
+      createdAt: access.organization.createdAt,
+      updatedAt: now
+    });
+    await saveStoredOrganization(organization);
+    sendJSON(response, 200, {
+      organization: organizationForClient(organization, {
+        role: access.role,
+        permissions: access.permissions,
+        accessScope: "organization"
+      }, await organizationSeatState(organizationID))
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid firm workspace update.",
+      code: "INVALID_ORGANIZATION"
+    });
+  }
+}
+
+async function handleOrganizationMemberList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access) {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  if (!access.permissions.includes(organizationPermissions.memberManage)) {
+    sendJSON(response, 403, {
+      error: "Only a firm Owner can view the member directory.",
+      code: "ORGANIZATION_OWNER_REQUIRED"
+    });
+    return;
+  }
+  const [memberships, invitations, ownerships, store] = await Promise.all([
+    listStoredOrganizationMemberships(organizationID),
+    listStoredOrganizationInvitations(organizationID),
+    listStoredProjectOwnershipsForOrganizations([organizationID]),
+    readStore()
+  ]);
+  const projectMemberships = (await Promise.all(
+    ownerships.map((ownership) => listStoredProjectMemberships(ownership.projectID))
+  )).flat();
+  const members = await Promise.all(
+    memberships.map((membership) => organizationMemberForClient(membership, store.users || {}))
+  );
+  const projectMembers = await Promise.all(
+    projectMemberships.map((membership) => organizationMemberForClient(membership, store.users || {}))
+  );
+  sendJSON(response, 200, {
+    organization: organizationForClient(access.organization, {
+      role: access.role,
+      permissions: access.permissions,
+      accessScope: "organization"
+    }, organizationSeatUsage([...memberships, ...projectMemberships], invitations)),
+    members,
+    projectMembers,
+    invitations: access.permissions.includes(organizationPermissions.memberManage)
+      ? invitations.map(organizationInvitationForClient)
+      : []
   });
+}
+
+async function handleOrganizationMemberInvite(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access) {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  if (!access.permissions.includes(organizationPermissions.memberInvite)) {
+    sendJSON(response, 403, {
+      error: "Only a firm Owner can invite members.",
+      code: "ORGANIZATION_OWNER_REQUIRED"
+    });
+    return;
+  }
+  const projectID = String(context.body.projectID || "").trim() || null;
+  if (projectID) {
+    const ownership = await storedProjectOwnership(projectID);
+    if (
+      ownership?.owner?.kind !== "organization" ||
+      ownership.owner.organizationID !== organizationID
+    ) {
+      sendError(response, 404, "Organization Project not found.");
+      return;
+    }
+  }
+  const seats = await organizationSeatState(organizationID);
+  if (seats.used >= access.organization.billingIdentity.seatLimit) {
+    sendJSON(response, 409, {
+      error: "This firm workspace has no available seats.",
+      code: "ORGANIZATION_SEAT_LIMIT",
+      seats
+    });
+    return;
+  }
+  try {
+    const credentials = invitationToken();
+    const now = new Date().toISOString();
+    const invitation = organizationInvitationRecord({
+      organizationID,
+      projectID,
+      invitedEmail: context.body.email,
+      invitedUserID: context.body.userID,
+      role: context.body.role || "viewer",
+      tokenHash: credentials.tokenHash,
+      invitedByUserID: context.userID,
+      createdAt: now
+    });
+    const pendingInvitations = await listStoredOrganizationInvitations(organizationID);
+    const duplicate = pendingInvitations.find((candidate) =>
+      invitationState(candidate) === "pending" &&
+      candidate.projectID === invitation.projectID &&
+      (
+        (invitation.invitedUserID && candidate.invitedUserID === invitation.invitedUserID) ||
+        (invitation.invitedEmail && candidate.invitedEmail === invitation.invitedEmail)
+      )
+    );
+    if (duplicate) {
+      sendJSON(response, 409, {
+        error: "An active invitation already exists for this person and scope.",
+        code: "ORGANIZATION_INVITATION_EXISTS"
+      });
+      return;
+    }
+    await saveStoredOrganizationInvitation(invitation);
+    if (projectID) {
+      const ownership = await storedProjectOwnership(projectID);
+      await saveStoredActivityEvent(ownership.storageOwnerUserID, activityEvent({
+        owner: organizationOwnerScope(organizationID),
+        projectID,
+        actorUserID: context.userID,
+        action: "member.invited",
+        objectKind: "organizationInvitation",
+        objectID: invitation.id,
+        newStatus: "pending",
+        createdAt: now,
+        metadata: {
+          role: invitation.role,
+          invitedUserID: invitation.invitedUserID
+        }
+      }));
+    }
+    sendJSON(response, 201, {
+      invitation: organizationInvitationForClient(invitation),
+      invitationToken: credentials.token,
+      acceptPath: `/?organizationInvite=${encodeURIComponent(credentials.token)}`
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid firm invitation.",
+      code: "INVALID_ORGANIZATION_INVITATION"
+    });
+  }
+}
+
+async function handleOrganizationInvitationAccept(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const token = String(context.body.invitationToken || "").trim();
+  if (!token) {
+    sendError(response, 400, "Missing invitation token.");
+    return;
+  }
+  const invitation = await storedOrganizationInvitationByToken(token);
+  if (!invitation) {
+    sendError(response, 404, "Firm invitation not found.");
+    return;
+  }
+  const state = invitationState(invitation);
+  if (state !== "pending") {
+    sendJSON(response, 409, {
+      error: state === "expired"
+        ? "This firm invitation has expired."
+        : "This firm invitation is no longer available.",
+      code: `ORGANIZATION_INVITATION_${state.toUpperCase()}`
+    });
+    return;
+  }
+  if (invitation.invitedUserID && invitation.invitedUserID !== context.userID) {
+    sendJSON(response, 403, {
+      error: "This invitation belongs to a different Permitext account.",
+      code: "ORGANIZATION_INVITATION_ACCOUNT_MISMATCH"
+    });
+    return;
+  }
+  const accountEmailValue = accountEmail(context.authContext.account);
+  if (
+    invitation.invitedEmail &&
+    invitation.invitedEmail !== accountEmailValue
+  ) {
+    sendJSON(response, 403, {
+      error: "Sign in with the email address that received this invitation.",
+      code: "ORGANIZATION_INVITATION_EMAIL_MISMATCH"
+    });
+    return;
+  }
+  const organization = await storedOrganization(invitation.organizationID);
+  if (!organization || organization.status !== "active") {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  const [existingOrganizationMembership, existingProjectMembership, seats] = await Promise.all([
+    storedOrganizationMembership(invitation.organizationID, context.userID),
+    invitation.projectID
+      ? storedProjectMembership(invitation.projectID, context.userID)
+      : Promise.resolve(null),
+    organizationSeatState(invitation.organizationID)
+  ]);
+  const alreadyUsesSeat =
+    existingOrganizationMembership?.status === "active" ||
+    existingProjectMembership?.status === "active";
+  if (!alreadyUsesSeat && seats.used > organization.billingIdentity.seatLimit) {
+    sendJSON(response, 409, {
+      error: "This firm workspace has no available seats.",
+      code: "ORGANIZATION_SEAT_LIMIT",
+      seats
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  if (invitation.projectID) {
+    const ownership = await storedProjectOwnership(invitation.projectID);
+    if (
+      ownership?.owner?.kind !== "organization" ||
+      ownership.owner.organizationID !== invitation.organizationID
+    ) {
+      sendError(response, 404, "Organization Project not found.");
+      return;
+    }
+    await saveStoredProjectMembership(projectMembershipRecord({
+      organizationID: invitation.organizationID,
+      projectID: invitation.projectID,
+      userID: context.userID,
+      role: invitation.role,
+      invitedByUserID: invitation.invitedByUserID,
+      invitationID: invitation.id,
+      createdAt: existingProjectMembership?.createdAt || now,
+      updatedAt: now
+    }));
+  } else {
+    await saveStoredOrganizationMembership(organizationMembershipRecord({
+      organizationID: invitation.organizationID,
+      userID: context.userID,
+      role: invitation.role,
+      invitedByUserID: invitation.invitedByUserID,
+      invitationID: invitation.id,
+      createdAt: existingOrganizationMembership?.createdAt || now,
+      updatedAt: now
+    }));
+  }
+  const acceptedInvitation = organizationInvitationRecord({
+    ...invitation,
+    status: "accepted",
+    updatedAt: now,
+    acceptedAt: now,
+    acceptedByUserID: context.userID
+  });
+  await saveStoredOrganizationInvitation(acceptedInvitation);
+  sendJSON(response, 200, {
+    organization: organizationForClient(organization, {
+      role: invitation.role,
+      permissions: rolePermissions(invitation.role),
+      accessScope: invitation.projectID ? "project" : "organization"
+    }, await organizationSeatState(invitation.organizationID)),
+    invitation: organizationInvitationForClient(acceptedInvitation)
+  });
+}
+
+async function handleOrganizationInvitationRevoke(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access || !access.permissions.includes(organizationPermissions.memberManage)) {
+    sendError(response, access ? 403 : 404, access
+      ? "Only a firm Owner can revoke invitations."
+      : "Firm workspace not found.");
+    return;
+  }
+  const invitationID = String(context.body.invitationID || "").trim();
+  const invitation = (await listStoredOrganizationInvitations(organizationID))
+    .find((candidate) => candidate.id === invitationID);
+  if (!invitation) {
+    sendError(response, 404, "Firm invitation not found.");
+    return;
+  }
+  if (invitationState(invitation) !== "pending") {
+    sendJSON(response, 409, {
+      error: "Only a pending invitation can be revoked.",
+      code: "ORGANIZATION_INVITATION_NOT_PENDING"
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  const revoked = organizationInvitationRecord({
+    ...invitation,
+    status: "revoked",
+    updatedAt: now
+  });
+  await saveStoredOrganizationInvitation(revoked);
+  sendJSON(response, 200, { invitation: organizationInvitationForClient(revoked) });
+}
+
+async function handleOrganizationMemberUpdate(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access || !access.permissions.includes(organizationPermissions.memberManage)) {
+    sendError(response, access ? 403 : 404, access
+      ? "Only a firm Owner can manage members."
+      : "Firm workspace not found.");
+    return;
+  }
+  const targetUserID = String(context.body.userID || "").trim();
+  const projectID = String(context.body.projectID || "").trim() || null;
+  if (!targetUserID) {
+    sendError(response, 400, "Missing member user ID.");
+    return;
+  }
+  if (targetUserID === access.organization.ownerUserID) {
+    sendJSON(response, 409, {
+      error: "Transfer firm ownership before changing the Owner account.",
+      code: "ORGANIZATION_OWNER_PROTECTED"
+    });
+    return;
+  }
+  const current = projectID
+    ? await storedProjectMembership(projectID, targetUserID)
+    : await storedOrganizationMembership(organizationID, targetUserID);
+  if (!current || current.organizationID !== organizationID) {
+    sendError(response, 404, "Firm member not found.");
+    return;
+  }
+  const status = String(context.body.status || current.status).trim().toLowerCase();
+  const role = String(context.body.role || current.role).trim().toLowerCase();
+  if (role === "owner") {
+    sendJSON(response, 409, {
+      error: "Use a dedicated ownership-transfer workflow to assign a new Owner.",
+      code: "ORGANIZATION_OWNER_TRANSFER_REQUIRED"
+    });
+    return;
+  }
+  if (status === "active" && current.status !== "active") {
+    const seats = await organizationSeatState(organizationID);
+    if (seats.used >= access.organization.billingIdentity.seatLimit) {
+      sendJSON(response, 409, {
+        error: "This firm workspace has no available seats.",
+        code: "ORGANIZATION_SEAT_LIMIT",
+        seats
+      });
+      return;
+    }
+  }
+  try {
+    const now = new Date().toISOString();
+    const updated = projectID
+      ? projectMembershipRecord({
+          ...current,
+          role,
+          status,
+          createdAt: current.createdAt,
+          updatedAt: now,
+          deactivatedAt: status === "deactivated" ? now : null
+        })
+      : organizationMembershipRecord({
+          ...current,
+          role,
+          status,
+          createdAt: current.createdAt,
+          updatedAt: now,
+          deactivatedAt: status === "deactivated" ? now : null
+        });
+    if (projectID) await saveStoredProjectMembership(updated);
+    else await saveStoredOrganizationMembership(updated);
+    if (projectID) {
+      const ownership = await storedProjectOwnership(projectID);
+      await saveStoredActivityEvent(ownership.storageOwnerUserID, activityEvent({
+        owner: organizationOwnerScope(organizationID),
+        projectID,
+        actorUserID: context.userID,
+        action: "permission.changed",
+        objectKind: "projectMembership",
+        objectID: updated.id,
+        previousStatus: `${current.role}:${current.status}`,
+        newStatus: `${updated.role}:${updated.status}`,
+        createdAt: now
+      }));
+    }
+    sendJSON(response, 200, {
+      membership: await organizationMemberForClient(updated),
+      seats: await organizationSeatState(organizationID)
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid member update.",
+      code: "INVALID_ORGANIZATION_MEMBERSHIP"
+    });
+  }
+}
+
+async function handleOrganizationProjectTransfer(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Transferring a Project to a firm workspace requires Pro.",
+      code: "PRO_REQUIRED_ORGANIZATION"
+    });
+    return;
+  }
+  const organizationID = String(context.body.organizationID || "").trim();
+  const access = await organizationAccessForUser(context.userID, organizationID);
+  if (!access || !access.permissions.includes(organizationPermissions.projectTransfer)) {
+    sendError(response, access ? 403 : 404, access
+      ? "Only a firm Owner can transfer Projects."
+      : "Firm workspace not found.");
+    return;
+  }
+  const requestedProjectID = String(context.body.projectID || "").trim();
+  const project = await ownedProjectRecord(context.userID, requestedProjectID);
+  if (!project) {
+    sendError(response, 404, "Personal Project not found.");
+    return;
+  }
+  const projectID = projectIdentityForRecord(project, context.userID) || requestedProjectID;
+  const existingOwnership = await storedProjectOwnership(projectID);
+  if (existingOwnership?.owner?.kind === "organization") {
+    sendJSON(response, 409, {
+      error: "This Project already belongs to a firm workspace.",
+      code: "PROJECT_ALREADY_TRANSFERRED"
+    });
+    return;
+  }
+  if (
+    existingOwnership &&
+    (
+      existingOwnership.owner?.kind !== "user" ||
+      existingOwnership.owner?.id !== context.userID
+    )
+  ) {
+    sendJSON(response, 409, {
+      error: "This Project identity already belongs to another account.",
+      code: "PROJECT_OWNERSHIP_CONFLICT"
+    });
+    return;
+  }
+  const now = new Date().toISOString();
+  const ownership = projectOwnershipRecord({
+    projectID,
+    owner: organizationOwnerScope(organizationID),
+    storageOwnerUserID: context.userID,
+    originalOwnerUserID: existingOwnership?.originalOwnerUserID || context.userID,
+    transferredByUserID: context.userID,
+    createdAt: existingOwnership?.createdAt || now,
+    updatedAt: now
+  });
+  const projectMembership = projectMembershipRecord({
+    organizationID,
+    projectID,
+    userID: context.userID,
+    role: "owner",
+    createdAt: now
+  });
+  await saveStoredProjectOwnership(ownership);
+  await saveStoredProjectMembership(projectMembership);
+  await saveStoredActivityEvent(context.userID, activityEvent({
+    owner: organizationOwnerScope(organizationID),
+    projectID,
+    actorUserID: context.userID,
+    action: "project.transferred",
+    objectKind: "project",
+    objectID: project.id,
+    previousStatus: "personal",
+    newStatus: "organization",
+    createdAt: now,
+    metadata: {
+      organizationID,
+      originalOwnerUserID: context.userID
+    }
+  }));
+  sendJSON(response, 200, {
+    ownership,
+    project: {
+      id: projectID,
+      sourceRecordID: project.id,
+      name: project.name || "Untitled Project",
+      address: project.address || "",
+      description: project.description || "",
+      colorHex: project.colorHex || null,
+      archivedAt: project.archivedAt || null,
+      updatedAt: project.updatedAt
+    }
+  });
+}
+
+async function handleOrganizationProjectList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const organizationID = String(context.body.organizationID || "").trim();
+  const organization = await storedOrganization(organizationID);
+  if (!organization || organization.status !== "active") {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  const projects = await accessibleOrganizationProjects(context.userID, organizationID);
+  const organizationAccess = await organizationAccessForUser(context.userID, organizationID);
+  if (!organizationAccess && !projects.length) {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  sendJSON(response, 200, {
+    organization: organizationForClient(organization, organizationAccess ? {
+      role: organizationAccess.role,
+      permissions: organizationAccess.permissions,
+      accessScope: "organization"
+    } : {
+      role: projects[0]?.role || "viewer",
+      permissions: projects[0]?.permissions || [],
+      accessScope: "project"
+    }),
+    projects
+  });
+}
+
+async function handleOrganizationProjectSnapshot(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  const state = await projectFoundationStateForStorageOwner(
+    access.storageOwnerUserID,
+    access.projectID,
+    { includeAllProjects: false }
+  );
+  if (!state) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  sendJSON(response, 200, {
+    access: {
+      role: access.role,
+      permissions: access.permissions,
+      readOnly: !access.permissions.includes(organizationPermissions.projectEdit),
+      organization: access.organization
+        ? organizationForClient(access.organization, {
+            role: access.role,
+            permissions: access.permissions,
+            accessScope: access.membership?.projectID ? "project" : "organization"
+          })
+        : null
+    },
+    project: state
+  });
+}
+
+function evidenceReviewForClient(artifact) {
+  return {
+    id: artifact.envelope.id,
+    version: artifact.envelope.version,
+    createdAt: artifact.envelope.createdAt,
+    updatedAt: artifact.envelope.updatedAt,
+    deletedAt: artifact.envelope.deletedAt,
+    ...artifact.payload
+  };
+}
+
+async function projectEvidenceReviewArtifacts(storageOwnerUserID, projectID) {
+  const reviewIDs = new Set(
+    (await listStoredProjectLinks(storageOwnerUserID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "evidenceReview"
+      )
+      .map((link) => link.targetID)
+  );
+  return (await listStoredFoundationArtifacts(storageOwnerUserID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "evidenceReview" &&
+      !artifact.envelope?.deletedAt &&
+      reviewIDs.has(artifact.envelope.id)
+    )
+    .sort((left, right) =>
+      String(right.envelope.updatedAt || "").localeCompare(
+        String(left.envelope.updatedAt || "")
+      )
+    );
+}
+
+async function handleOrganizationEvidenceReviewList(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  const reviews = await projectEvidenceReviewArtifacts(
+    access.storageOwnerUserID,
+    projectID
+  );
+  sendJSON(response, 200, {
+    projectID,
+    access: {
+      role: access.role,
+      canPropose: access.permissions.includes(organizationPermissions.evidencePropose),
+      canReview: access.permissions.includes(organizationPermissions.evidenceReview)
+    },
+    reviews: reviews.map(evidenceReviewForClient)
+  });
+}
+
+async function handleOrganizationEvidenceReviewSave(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const status = String(context.body.status || "proposed").trim().toLowerCase();
+  const requiredPermission = status === "proposed"
+    ? organizationPermissions.evidencePropose
+    : organizationPermissions.evidenceReview;
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    requiredPermission
+  );
+  if (!access) return;
+  const answerID = String(context.body.answerID || "").trim();
+  const answer = (await listStoredResearchAnswers(access.storageOwnerUserID))
+    .find((candidate) =>
+      candidate.id === answerID &&
+      candidate.projectID === projectID
+    );
+  if (!answer) {
+    sendError(response, 404, "Project Research answer not found.");
+    return;
+  }
+  const existingReviews = await projectEvidenceReviewArtifacts(
+    access.storageOwnerUserID,
+    projectID
+  );
+  const requestedReviewID = String(context.body.reviewID || "").trim();
+  const existing = requestedReviewID
+    ? existingReviews.find((candidate) => candidate.envelope.id === requestedReviewID)
+    : existingReviews.find((candidate) => candidate.payload.answerID === answerID);
+  if (requestedReviewID && !existing) {
+    sendError(response, 404, "Evidence review not found.");
+    return;
+  }
+  if (existing && existing.payload.answerID !== answerID) {
+    sendJSON(response, 409, {
+      error: "This evidence review belongs to a different Research answer.",
+      code: "EVIDENCE_REVIEW_ANSWER_MISMATCH"
+    });
+    return;
+  }
+  const expectedVersion = Number(context.body.expectedVersion ?? 0);
+  if (
+    existing &&
+    (!Number.isSafeInteger(expectedVersion) || expectedVersion !== existing.envelope.version)
+  ) {
+    sendJSON(response, 409, {
+      error: "This evidence review changed after you opened it. Review the current version before saving.",
+      code: "EVIDENCE_REVIEW_VERSION_CONFLICT",
+      review: evidenceReviewForClient(existing)
+    });
+    return;
+  }
+  const availableEvidenceIDs = new Set(
+    (answer.evidence || []).map((snapshot) => snapshot.id)
+  );
+  const evidenceSnapshotIDs = Array.isArray(context.body.evidenceSnapshotIDs)
+    ? context.body.evidenceSnapshotIDs.map((value) => String(value || "").trim())
+    : Array.from(availableEvidenceIDs);
+  if (evidenceSnapshotIDs.some((snapshotID) => !availableEvidenceIDs.has(snapshotID))) {
+    sendJSON(response, 400, {
+      error: "The review can only reference immutable evidence stored with this answer.",
+      code: "INVALID_EVIDENCE_REVIEW_SNAPSHOT"
+    });
+    return;
+  }
+  try {
+    const now = new Date().toISOString();
+    const payload = evidenceReviewPayload({
+      projectID,
+      answerID,
+      evidenceSnapshotIDs,
+      status,
+      note: context.body.note,
+      createdByUserID: existing?.payload.createdByUserID || context.userID,
+      updatedByUserID: context.userID,
+      reviewedByUserID: status === "proposed"
+        ? existing?.payload.reviewedByUserID
+        : context.userID,
+      reviewedAt: status === "proposed"
+        ? existing?.payload.reviewedAt
+        : now
+    });
+    const reviewID = existing?.envelope.id || randomUUID();
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: reviewID,
+        type: "evidenceReview",
+        owner: access.owner,
+        createdAt: existing?.envelope.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope.version || 0) + 1
+      }),
+      payload
+    };
+    await saveStoredFoundationArtifact(access.storageOwnerUserID, artifact);
+    if (!existing) {
+      await saveStoredProjectLink(access.storageOwnerUserID, projectLinkRecord({
+        id: deterministicFoundationLinkID(
+          access.storageOwnerUserID,
+          projectID,
+          "evidenceReview",
+          reviewID
+        ),
+        owner: access.owner,
+        projectID,
+        targetKind: "evidenceReview",
+        targetID: reviewID,
+        relationship: "reference",
+        createdAt: now,
+        updatedAt: now,
+        version: 1,
+        metadata: { answerID }
+      }));
+    }
+    const event = activityEvent({
+      owner: access.owner,
+      projectID,
+      actorUserID: context.userID,
+      action: "review-status.changed",
+      objectKind: "evidenceReview",
+      objectID: reviewID,
+      previousStatus: existing?.payload.status || null,
+      newStatus: payload.status,
+      createdAt: now,
+      metadata: {
+        answerID,
+        evidenceSnapshotCount: payload.evidenceSnapshotIDs.length
+      }
+    });
+    await saveStoredActivityEvent(access.storageOwnerUserID, event);
+    sendJSON(response, existing ? 200 : 201, {
+      review: evidenceReviewForClient(artifact),
+      activity: event
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid evidence review.",
+      code: "INVALID_EVIDENCE_REVIEW"
+    });
+  }
 }
 
 async function handleProjectFoundationLink(request, response) {
@@ -3974,15 +5469,33 @@ function notebookCardForClient(artifact, projectIDs = []) {
 
 async function authenticatedNotebookBody(request, response) {
   const context = await authenticatedResearchBody(request, response);
-  if (!context) return null;
-  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+  return context;
+}
+
+async function notebookProjectAccess(context, response, permission) {
+  const projectID = String(context.body.projectID || "").trim();
+  if (!projectID) {
+    sendError(response, 400, "Missing Notebook Project identity.");
+    return null;
+  }
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    permission
+  );
+  if (!access) return null;
+  if (
+    !access.organization &&
+    !hasActiveProEntitlement(context.authContext.entitlement)
+  ) {
     sendJSON(response, 403, {
       error: "The Project Notebook requires Pro.",
       code: "PRO_REQUIRED_NOTEBOOK"
     });
     return null;
   }
-  return context;
+  return access;
 }
 
 async function ownedNotebookArtifact(userID, cardID, options = {}) {
@@ -4013,18 +5526,20 @@ async function handleNotebookCardList(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const links = (await listStoredProjectLinks(context.userID))
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  const links = (await listStoredProjectLinks(access.storageOwnerUserID))
     .filter((link) =>
       !link.deletedAt &&
       link.projectID === projectID &&
       link.targetKind === "notebookCard"
     );
   const linkedCardIDs = new Set(links.map((link) => link.targetID));
-  const cards = (await listStoredFoundationArtifacts(context.userID))
+  const cards = (await listStoredFoundationArtifacts(access.storageOwnerUserID))
     .filter((artifact) =>
       artifact.envelope?.type === "notebookCard" &&
       !artifact.envelope?.deletedAt &&
@@ -4046,6 +5561,10 @@ async function handleNotebookCardList(request, response) {
     schemaVersion: 1,
     cardTypes: notebookCardTypes,
     projectID,
+    access: {
+      role: access.role,
+      readOnly: !access.permissions.includes(organizationPermissions.projectEdit)
+    },
     cards
   });
 }
@@ -4053,18 +5572,31 @@ async function handleNotebookCardList(request, response) {
 async function handleNotebookCardGet(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
-  const artifact = await ownedNotebookArtifact(context.userID, context.body.cardID);
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  const artifact = await ownedNotebookArtifact(
+    access.storageOwnerUserID,
+    context.body.cardID
+  );
   if (!artifact) {
     sendError(response, 404, "Notebook card not found.");
     return;
   }
-  const projectIDs = (await listStoredProjectLinks(context.userID))
+  const projectIDs = (await listStoredProjectLinks(access.storageOwnerUserID))
     .filter((link) =>
       !link.deletedAt &&
       link.targetKind === "notebookCard" &&
       link.targetID === artifact.envelope.id
     )
     .map((link) => link.projectID);
+  if (!projectIDs.includes(access.projectID)) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
   sendJSON(response, 200, { card: notebookCardForClient(artifact, projectIDs) });
 }
 
@@ -4072,14 +5604,17 @@ async function handleNotebookCardSave(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const storageOwnerUserID = access.storageOwnerUserID;
 
   const requestedCardID = String(context.body.cardID || "").trim();
   const existing = requestedCardID
-    ? await ownedNotebookArtifact(context.userID, requestedCardID)
+    ? await ownedNotebookArtifact(storageOwnerUserID, requestedCardID)
     : null;
   if (requestedCardID && !existing) {
     sendError(response, 404, "Notebook card not found.");
@@ -4098,7 +5633,7 @@ async function handleNotebookCardSave(request, response) {
     return;
   }
 
-  const links = await listStoredProjectLinks(context.userID);
+  const links = await listStoredProjectLinks(storageOwnerUserID);
   const activeProjectLink = existing
     ? links.find((link) =>
         !link.deletedAt &&
@@ -4125,30 +5660,30 @@ async function handleNotebookCardSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    await validateNotebookReferences(context.userID, payload.references);
+    await validateNotebookReferences(storageOwnerUserID, payload.references);
     const artifact = {
       envelope: artifactEnvelope({
         id: cardID,
         type: "notebookCard",
-        owner: ownerScope(context.userID),
+        owner: access.owner,
         createdAt: existing?.envelope.createdAt || now,
         updatedAt: now,
         version: Number(existing?.envelope.version || 0) + 1
       }),
       payload
     };
-    await saveStoredFoundationArtifact(context.userID, artifact);
+    await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
 
     let link = activeProjectLink;
     if (!link) {
       link = projectLinkRecord({
         id: deterministicFoundationLinkID(
-          context.userID,
+          storageOwnerUserID,
           projectID,
           "notebookCard",
           cardID
         ),
-        owner: ownerScope(context.userID),
+        owner: access.owner,
         projectID,
         targetKind: "notebookCard",
         targetID: cardID,
@@ -4158,10 +5693,10 @@ async function handleNotebookCardSave(request, response) {
         version: 1,
         metadata: { createdWith: "permitext-notebook" }
       });
-      await saveStoredProjectLink(context.userID, link);
+      await saveStoredProjectLink(storageOwnerUserID, link);
     }
     const event = activityEvent({
-      owner: ownerScope(context.userID),
+      owner: access.owner,
       projectID,
       actorUserID: context.userID,
       action: existing ? "notebook-card.revision.saved" : "notebook-card.created",
@@ -4175,7 +5710,7 @@ async function handleNotebookCardSave(request, response) {
         referenceCount: payload.references.length
       }
     });
-    await saveStoredActivityEvent(context.userID, event);
+    await saveStoredActivityEvent(storageOwnerUserID, event);
     sendJSON(response, existing ? 200 : 201, {
       card: notebookCardForClient(artifact, [projectID]),
       link,
@@ -4192,7 +5727,16 @@ async function handleNotebookCardSave(request, response) {
 async function handleNotebookCardDelete(request, response) {
   const context = await authenticatedNotebookBody(request, response);
   if (!context) return;
-  const artifact = await ownedNotebookArtifact(context.userID, context.body.cardID);
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const artifact = await ownedNotebookArtifact(
+    access.storageOwnerUserID,
+    context.body.cardID
+  );
   if (!artifact) {
     sendError(response, 404, "Notebook card not found.");
     return;
@@ -4211,30 +5755,44 @@ async function handleNotebookCardDelete(request, response) {
     ...artifact,
     envelope: artifactEnvelope({
       ...artifact.envelope,
-      owner: ownerScope(context.userID),
+      owner: access.owner,
       updatedAt: now,
       deletedAt: now,
       version: artifact.envelope.version + 1
     })
   };
-  await saveStoredFoundationArtifact(context.userID, deletedArtifact);
-  const activeLinks = (await listStoredProjectLinks(context.userID))
+  const activeLinks = (await listStoredProjectLinks(access.storageOwnerUserID))
     .filter((link) =>
       !link.deletedAt &&
       link.targetKind === "notebookCard" &&
       link.targetID === artifact.envelope.id
     );
+  if (!activeLinks.some((link) => link.projectID === access.projectID)) {
+    sendError(response, 404, "Notebook card not found.");
+    return;
+  }
+  for (const existingLink of activeLinks) {
+    const linkedAccess = await projectAccessForUser(context.userID, existingLink.projectID);
+    if (!linkedAccess?.permissions.includes(organizationPermissions.projectEdit)) {
+      sendJSON(response, 403, {
+        error: "This Notebook card is linked to another Project you cannot edit.",
+        code: "NOTEBOOK_LINKED_PROJECT_PERMISSION_REQUIRED"
+      });
+      return;
+    }
+  }
+  await saveStoredFoundationArtifact(access.storageOwnerUserID, deletedArtifact);
   for (const existingLink of activeLinks) {
     const link = projectLinkRecord({
       ...existingLink,
-      owner: ownerScope(context.userID),
+      owner: access.owner,
       updatedAt: now,
       deletedAt: now,
       version: existingLink.version + 1
     });
-    await saveStoredProjectLink(context.userID, link);
-    await saveStoredActivityEvent(context.userID, activityEvent({
-      owner: ownerScope(context.userID),
+    await saveStoredProjectLink(access.storageOwnerUserID, link);
+    await saveStoredActivityEvent(access.storageOwnerUserID, activityEvent({
+      owner: access.owner,
       projectID: existingLink.projectID,
       actorUserID: context.userID,
       action: "item.unlinked",
@@ -5109,11 +6667,14 @@ async function handleReportFileRead(request, response) {
     sendError(response, 400, "Missing Report file identity.");
     return;
   }
-  if (!await ownsProjectAssetScope(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const artifact = (await projectGeneratedReports(context.userID, projectID))
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.reportDownload
+  );
+  if (!access) return;
+  const artifact = (await projectGeneratedReports(access.storageOwnerUserID, projectID))
     .find((candidate) => candidate.envelope.id === generatedReportID);
   const file = artifact?.payload?.file;
   if (
@@ -7937,20 +9498,23 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
     ...artifact,
     envelope: {
       ...artifact.envelope,
-      owner: ownerScope(targetUserID)
+      owner: artifact.envelope?.owner?.kind === "organization"
+        ? artifact.envelope.owner
+        : ownerScope(targetUserID)
     }
   }));
   moveUserEntries("projectLinksByUserID", (link) => ({
     ...link,
-    owner: ownerScope(targetUserID)
+    owner: link.owner?.kind === "organization" ? link.owner : ownerScope(targetUserID)
   }));
   moveUserEntries("researchAnswersByUserID", (answer) => ({
     ...answer,
-    owner: ownerScope(targetUserID)
+    owner: answer.owner?.kind === "organization" ? answer.owner : ownerScope(targetUserID)
   }));
   moveUserEntries("activityEventsByUserID", (event) => ({
     ...event,
-    owner: ownerScope(targetUserID)
+    owner: event.owner?.kind === "organization" ? event.owner : ownerScope(targetUserID),
+    actorUserID: event.actorUserID === sourceUserID ? targetUserID : event.actorUserID
   }));
   moveUserEntries("researchConversationsByUserID");
   moveUserEntries("researchUsageByUserID");
@@ -7979,6 +9543,90 @@ async function mergeAccountInto(store, sourceUserID, targetUserID) {
     }
   }
   store.appleTransactionOwners = appleTransactionOwners;
+
+  for (const [organizationID, organization] of Object.entries(store.organizations || {})) {
+    if (organization.ownerUserID === sourceUserID) {
+      store.organizations[organizationID] = {
+        ...organization,
+        ownerUserID: targetUserID,
+        updatedAt: new Date().toISOString()
+      };
+    }
+  }
+  const membershipRoleRank = { owner: 4, editor: 3, reviewer: 2, viewer: 1 };
+  const mergeMembershipEntries = (entries) => {
+    const byUserID = new Map();
+    for (const original of entries || []) {
+      const membership = original.userID === sourceUserID
+        ? { ...original, userID: targetUserID, updatedAt: new Date().toISOString() }
+        : original;
+      const existing = byUserID.get(membership.userID);
+      if (!existing) {
+        byUserID.set(membership.userID, membership);
+        continue;
+      }
+      const preferred = (membershipRoleRank[membership.role] || 0) >
+        (membershipRoleRank[existing.role] || 0)
+        ? membership
+        : existing;
+      byUserID.set(membership.userID, {
+        ...preferred,
+        id: existing.id,
+        status: existing.status === "active" || membership.status === "active"
+          ? "active"
+          : "deactivated",
+        deactivatedAt: existing.status === "active" || membership.status === "active"
+          ? null
+          : preferred.deactivatedAt,
+        updatedAt: [existing.updatedAt, membership.updatedAt].filter(Boolean).sort().at(-1)
+      });
+    }
+    return Array.from(byUserID.values());
+  };
+  for (const [organizationID, memberships] of Object.entries(
+    store.organizationMembershipsByOrganizationID || {}
+  )) {
+    store.organizationMembershipsByOrganizationID[organizationID] =
+      mergeMembershipEntries(memberships);
+  }
+  for (const [projectID, memberships] of Object.entries(
+    store.projectMembershipsByProjectID || {}
+  )) {
+    store.projectMembershipsByProjectID[projectID] = mergeMembershipEntries(memberships);
+  }
+  for (const [invitationID, invitation] of Object.entries(
+    store.organizationInvitationsByID || {}
+  )) {
+    store.organizationInvitationsByID[invitationID] = {
+      ...invitation,
+      invitedUserID: invitation.invitedUserID === sourceUserID
+        ? targetUserID
+        : invitation.invitedUserID,
+      invitedByUserID: invitation.invitedByUserID === sourceUserID
+        ? targetUserID
+        : invitation.invitedByUserID,
+      acceptedByUserID: invitation.acceptedByUserID === sourceUserID
+        ? targetUserID
+        : invitation.acceptedByUserID
+    };
+  }
+  for (const [projectID, ownership] of Object.entries(store.projectOwnerships || {})) {
+    store.projectOwnerships[projectID] = {
+      ...ownership,
+      owner: ownership.owner?.kind === "user" && ownership.owner.id === sourceUserID
+        ? ownerScope(targetUserID)
+        : ownership.owner,
+      storageOwnerUserID: ownership.storageOwnerUserID === sourceUserID
+        ? targetUserID
+        : ownership.storageOwnerUserID,
+      originalOwnerUserID: ownership.originalOwnerUserID === sourceUserID
+        ? targetUserID
+        : ownership.originalOwnerUserID,
+      transferredByUserID: ownership.transferredByUserID === sourceUserID
+        ? targetUserID
+        : ownership.transferredByUserID
+    };
+  }
 
   if (!targetAccount.publicUsername && sourceAccount.publicUsername) {
     targetAccount.publicUsername = sourceAccount.publicUsername;
@@ -8598,11 +10246,14 @@ async function handleWorkboardPreviewRead(request, response) {
     return;
   }
   if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const artifact = (await listStoredFoundationArtifacts(userID)).find((candidate) =>
+  const access = await requireProjectPermission(
+    response,
+    userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  const artifact = (await listStoredFoundationArtifacts(access.storageOwnerUserID)).find((candidate) =>
     candidate.envelope?.id === previewID &&
     candidate.envelope?.type === "workboardPreview" &&
     !candidate.envelope?.deletedAt &&
@@ -8730,11 +10381,14 @@ async function handleWorkboardAssetRead(request, response) {
     return;
   }
   if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  if (!workboardAssetPathBelongsToProject(pathname, userID, projectID)) {
+  const access = await requireProjectPermission(
+    response,
+    userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  if (!workboardAssetPathBelongsToProject(pathname, access.storageOwnerUserID, projectID)) {
     sendError(response, 403, "This Workboard image does not belong to the authenticated project.");
     return;
   }
@@ -8793,12 +10447,14 @@ async function handleWorkboardAssetDelete(request, response) {
 }
 
 async function syncResponseContract(userID, entitlement, body, contentMapVersion) {
+  const organizationCapabilities = await organizationCapabilityAccess(userID);
   return syncContract({
     entitlement,
     clientSchemaVersion: body.syncSchemaVersion ?? body.batch?.syncSchemaVersion,
     clientCapabilities: body.clientCapabilities ?? body.batch?.clientCapabilities,
     contentMapVersion,
     researchMonthlyLimit: monthlyResearchRequestLimit(),
+    ...organizationCapabilities,
     migrationCheckpoint: await storedMigrationCheckpoint(
       userID,
       `project-foundation-v${projectFoundationSchemaVersion}`
@@ -9654,7 +11310,17 @@ function handleAppleAppSiteAssociation(_request, response) {
     },
     applinks: {
       apps: [],
-      details: [{ appID, paths: ["/open/section/*"] }]
+      details: [
+        { appID, paths: ["/open/section/*"] },
+        {
+          appID,
+          components: [{
+            "/": "/",
+            "?": { organizationInvite: "*" },
+            comment: "Firm and Project invitation links"
+          }]
+        }
+      ]
     }
   });
 }
@@ -9990,6 +11656,19 @@ const handlers = {
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
+  "organizations/list": handleOrganizationList,
+  "organizations/create": handleOrganizationCreate,
+  "organizations/update": handleOrganizationUpdate,
+  "organizations/members/list": handleOrganizationMemberList,
+  "organizations/members/invite": handleOrganizationMemberInvite,
+  "organizations/members/update": handleOrganizationMemberUpdate,
+  "organizations/invitations/accept": handleOrganizationInvitationAccept,
+  "organizations/invitations/revoke": handleOrganizationInvitationRevoke,
+  "organizations/projects/transfer": handleOrganizationProjectTransfer,
+  "organizations/projects/list": handleOrganizationProjectList,
+  "organizations/projects/snapshot": handleOrganizationProjectSnapshot,
+  "organizations/evidence/reviews/list": handleOrganizationEvidenceReviewList,
+  "organizations/evidence/reviews/save": handleOrganizationEvidenceReviewSave,
   "notebook/cards/list": handleNotebookCardList,
   "notebook/cards/get": handleNotebookCardGet,
   "notebook/cards/save": handleNotebookCardSave,

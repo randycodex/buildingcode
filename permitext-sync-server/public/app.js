@@ -25,7 +25,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-packages-v1";
+} from "./offline-storage.js?v=20260724-collaboration-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -123,6 +123,8 @@ const searchTimers = new Map();
 const readerSearchTimers = new Map();
 let syncedContent = null;
 let syncLoadPromise = null;
+let organizationWorkspace = null;
+let organizationLoadPromise = null;
 let syncFlushPromise = null;
 let syncRetryTimer = null;
 let foregroundSyncTimer = null;
@@ -7135,6 +7137,68 @@ async function postResearch(path, values = {}) {
   return postJSON(path, researchRequestBody(values), { token: account.sessionToken });
 }
 
+async function loadOrganizationWorkspace(options = {}) {
+  const account = activeAccount();
+  if (!account) {
+    organizationWorkspace = { organizations: [] };
+    return organizationWorkspace;
+  }
+  if (options.force) {
+    organizationWorkspace = null;
+    organizationLoadPromise = null;
+  }
+  if (organizationWorkspace) return organizationWorkspace;
+  if (!organizationLoadPromise) {
+    organizationLoadPromise = postResearch("/organizations/list")
+      .then((payload) => {
+        organizationWorkspace = {
+          organizations: Array.isArray(payload.organizations) ? payload.organizations : []
+        };
+        return organizationWorkspace;
+      })
+      .catch((error) => {
+        organizationWorkspace = { organizations: [], error: error.message };
+        return organizationWorkspace;
+      })
+      .finally(() => {
+        organizationLoadPromise = null;
+      });
+  }
+  return organizationLoadPromise;
+}
+
+function sharedProjectsFromOrganizations(workspace = organizationWorkspace) {
+  return (workspace?.organizations || []).flatMap((organization) =>
+    (organization.projects || []).map((project) => ({
+      ...project,
+      id: project.id,
+      clientID: project.id,
+      sharedOrganizationID: organization.id,
+      sharedOrganizationName: organization.name,
+      sharedRole: project.role || organization.role,
+      sharedPermissions: project.permissions || organization.permissions || [],
+      sharedOnly: true
+    }))
+  );
+}
+
+async function projectsWithOrganizationAccess(projects = []) {
+  const workspace = await loadOrganizationWorkspace();
+  const sharedProjects = sharedProjectsFromOrganizations(workspace);
+  const sharedByID = new Map(sharedProjects.map((project) => [String(project.id), project]));
+  const localIDs = new Set();
+  const combined = projects.map((project) => {
+    const identity = projectDetailKey(project);
+    localIDs.add(identity);
+    const shared = sharedByID.get(identity);
+    return shared ? { ...project, ...shared, sharedOnly: false } : project;
+  });
+  sharedProjects.forEach((project) => {
+    if (!localIDs.has(projectDetailKey(project))) combined.push(project);
+  });
+  return combined;
+}
+
 async function downloadProjectReportFile(projectID, file, title = "Permitext Project Report") {
   const account = activeAccount();
   if (!account) throw new Error("Sign in from Settings to download private Project Reports.");
@@ -8362,7 +8426,16 @@ function projectIdentity(project) {
     title: project.title || project.name || "Project",
     address: project.address || "",
     description: project.description || "",
-    color: projectColor(project)
+    color: projectColor(project),
+    ...(project.sharedOrganizationID ? {
+      sharedOrganizationID: project.sharedOrganizationID,
+      sharedOrganizationName: project.sharedOrganizationName || "",
+      sharedRole: project.sharedRole || "viewer",
+      sharedPermissions: Array.isArray(project.sharedPermissions)
+        ? project.sharedPermissions
+        : [],
+      sharedOnly: project.sharedOnly === true
+    } : {})
   };
 }
 
@@ -8553,6 +8626,7 @@ async function renderProjectNotebook(project) {
   let activeCard = null;
   let draftDocument = emptyNotebookDocument();
   let dirty = false;
+  let notebookReadOnly = false;
   let disposed = false;
 
   const mountState = {
@@ -8581,13 +8655,25 @@ async function renderProjectNotebook(project) {
 
   try {
     const [foundationPayload, cardPayload] = await Promise.all([
-      postResearch("/projects/foundation/state", { projectID }),
+      identity.sharedOrganizationID
+        ? postResearch("/organizations/projects/snapshot", { projectID })
+            .then((payload) => payload.project)
+        : postResearch("/projects/foundation/state", { projectID }),
       postResearch("/notebook/cards/list", { projectID })
     ]);
     if (disposed) return panel;
     foundation = foundationPayload;
     cards = cardPayload.cards || [];
+    notebookReadOnly = cardPayload.access?.readOnly === true;
     shell.replaceChildren();
+    if (identity.sharedOrganizationID) {
+      const accessNote = document.createElement("p");
+      accessNote.className = "notebook-access-note";
+      accessNote.textContent = notebookReadOnly
+        ? `${identity.sharedOrganizationName || "Firm"} · ${identity.sharedRole || "viewer"} access · view only`
+        : `${identity.sharedOrganizationName || "Firm"} · ${identity.sharedRole || "editor"} access · edits are attributed to your account`;
+      shell.append(accessNote);
+    }
 
     const rail = document.createElement("aside");
     rail.className = "notebook-card-rail";
@@ -8599,6 +8685,7 @@ async function renderProjectNotebook(project) {
     newButton.className = "notebook-primary-action";
     newButton.type = "button";
     newButton.textContent = "New card";
+    newButton.disabled = notebookReadOnly;
     railHeader.append(railTitle, newButton);
     const cardList = document.createElement("div");
     cardList.className = "notebook-card-list";
@@ -8617,7 +8704,7 @@ async function renderProjectNotebook(project) {
         );
         if (!confirmed) return;
       }
-      const payload = await postResearch("/notebook/cards/get", { cardID });
+      const payload = await postResearch("/notebook/cards/get", { projectID, cardID });
       activeCard = payload.card;
       draftDocument = activeCard.document;
       dirty = false;
@@ -8699,6 +8786,7 @@ async function renderProjectNotebook(project) {
         typeSelect.append(option);
       });
       typeSelect.value = activeCard.cardType;
+      typeSelect.disabled = notebookReadOnly;
       const titleInput = document.createElement("input");
       titleInput.className = "notebook-card-title";
       titleInput.type = "text";
@@ -8706,6 +8794,7 @@ async function renderProjectNotebook(project) {
       titleInput.placeholder = "Card title";
       titleInput.setAttribute("aria-label", "Notebook card title");
       titleInput.value = activeCard.title;
+      titleInput.disabled = notebookReadOnly;
       fields.append(typeSelect, titleInput);
 
       const toolbar = document.createElement("div");
@@ -8756,6 +8845,11 @@ async function renderProjectNotebook(project) {
         referenceSelect,
         addReferenceButton
       );
+      if (notebookReadOnly) {
+        toolbar.querySelectorAll("button, select").forEach((control) => {
+          control.disabled = true;
+        });
+      }
 
       const editorElement = document.createElement("div");
       editorElement.className = "notebook-editor-surface";
@@ -8795,11 +8889,13 @@ async function renderProjectNotebook(project) {
       deleteButton.className = "notebook-danger-action";
       deleteButton.type = "button";
       deleteButton.textContent = "Delete";
-      deleteButton.hidden = !activeCard.id;
+      deleteButton.hidden = !activeCard.id || notebookReadOnly;
       const saveButton = document.createElement("button");
       saveButton.className = "notebook-primary-action";
       saveButton.type = "button";
       saveButton.textContent = "Save card";
+      saveButton.hidden = notebookReadOnly;
+      researchButton.hidden = notebookReadOnly;
       footerActions.append(researchButton, deleteButton, saveButton);
       footer.append(saveStatus, footerActions);
       focus.append(fields, toolbar, editorElement, footer);
@@ -8819,8 +8915,10 @@ async function renderProjectNotebook(project) {
       if (disposed || renderSequence !== editorRenderSequence) return;
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
-        autofocus: !activeCard.id,
+        autofocus: !notebookReadOnly && !activeCard.id,
+        editable: !notebookReadOnly,
         onChange(document) {
+          if (notebookReadOnly) return;
           draftDocument = document;
           dirty = true;
           saveStatus.textContent = "Unsaved changes";
@@ -8902,6 +9000,7 @@ async function renderProjectNotebook(project) {
         deleteButton.disabled = true;
         try {
           await postResearch("/notebook/cards/delete", {
+            projectID,
             cardID: activeCard.id,
             expectedVersion: activeCard.version
           });
@@ -10040,6 +10139,8 @@ function projectActivityLabel(event) {
     "research.project-context.reviewed": "Project context reviewed",
     "review-status.changed": "Review status changed",
     "report.generated": "Report generated",
+    "report.export.saved": "Report export saved",
+    "project.transferred": "Project transferred to firm",
     "project.archived": "Project archived",
     "project.restored": "Project restored"
   }[event?.action] || String(event?.action || "Project updated").replaceAll(".", " ");
@@ -10085,9 +10186,21 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
   [
     { label: "Saved evidence", value: previewItems.length },
     { label: "Notebook cards", value: notebookCards.length, action: () => openProjectNotebook(identity) },
-    { label: "Research answers", value: researchAnswers.length, action: () => focusProjectResearch(identity) },
-    { label: "Reports", value: reportManifests.length, action: () => openProjectReportDraft(identity) },
-    { label: "Workboard", value: workboard ? "Saved" : "New", action: () => openProjectWorkboard(identity) }
+    {
+      label: "Research answers",
+      value: researchAnswers.length,
+      action: identity.sharedOnly ? null : () => focusProjectResearch(identity)
+    },
+    {
+      label: "Reports",
+      value: reportManifests.length,
+      action: identity.sharedOnly ? null : () => openProjectReportDraft(identity)
+    },
+    {
+      label: "Workboard",
+      value: workboard ? "Saved" : "New",
+      action: identity.sharedOnly ? null : () => openProjectWorkboard(identity)
+    }
   ].forEach((metric) => {
     const element = document.createElement(metric.action ? "button" : "div");
     element.className = "project-studio-metric";
@@ -10118,10 +10231,13 @@ function appendProjectResearchHistory(content, identity, foundation) {
   title.textContent = "Research history";
   const openResearch = document.createElement("button");
   openResearch.type = "button";
-  openResearch.textContent = "Open Research";
-  openResearch.addEventListener("click", () => {
-    void focusProjectResearch(identity);
-  });
+  openResearch.textContent = identity.sharedOnly ? "Read-only history" : "Open Research";
+  openResearch.disabled = identity.sharedOnly;
+  if (!identity.sharedOnly) {
+    openResearch.addEventListener("click", () => {
+      void focusProjectResearch(identity);
+    });
+  }
   heading.append(title, openResearch);
   section.append(heading);
 
@@ -10134,9 +10250,9 @@ function appendProjectResearchHistory(content, identity, foundation) {
     section.append(empty);
   } else {
     answers.slice(0, 8).forEach((answer) => {
-      const button = document.createElement("button");
-      button.className = "project-research-history-card";
-      button.type = "button";
+      const card = document.createElement(identity.sharedOnly ? "article" : "button");
+      card.className = "project-research-history-card";
+      if (!identity.sharedOnly) card.type = "button";
       const question = document.createElement("strong");
       question.textContent = answer.question || "Research answer";
       const conclusion = document.createElement("p");
@@ -10147,13 +10263,213 @@ function appendProjectResearchHistory(content, identity, foundation) {
         researchRelativeDate(answer.createdAt),
         answer.reviewStatus
       ].filter(Boolean).join(" · ");
-      button.append(question, conclusion, meta);
-      button.addEventListener("click", () => {
-        if (answer.conversationID) void openResearchConversation(answer.conversationID);
-      });
-      section.append(button);
+      card.append(question, conclusion, meta);
+      if (!identity.sharedOnly) {
+        card.addEventListener("click", () => {
+          if (answer.conversationID) void openResearchConversation(answer.conversationID);
+        });
+      }
+      section.append(card);
     });
   }
+  content.append(section);
+}
+
+function projectEvidenceReviews(foundation) {
+  return (foundation?.artifacts || [])
+    .filter((artifact) =>
+      artifact.envelope?.type === "evidenceReview" &&
+      !artifact.envelope?.deletedAt
+    )
+    .map((artifact) => ({
+      id: artifact.envelope.id,
+      version: artifact.envelope.version,
+      updatedAt: artifact.envelope.updatedAt,
+      ...artifact.payload
+    }))
+    .sort((left, right) =>
+      String(right.updatedAt || "").localeCompare(String(left.updatedAt || ""))
+    );
+}
+
+function evidenceReviewStatusLabel(status) {
+  return {
+    proposed: "Proposed",
+    approved: "Approved",
+    "changes-requested": "Changes requested"
+  }[status] || "Not reviewed";
+}
+
+function appendProjectEvidenceReviews(content, identity, foundation) {
+  if (!identity.sharedOrganizationID) return;
+  const answers = foundation?.researchAnswers || [];
+  const reviews = projectEvidenceReviews(foundation);
+  const canPropose = identity.sharedPermissions?.includes("evidence.propose");
+  const canReview = identity.sharedPermissions?.includes("evidence.review");
+  if (!answers.length && !reviews.length) return;
+
+  const reviewsByAnswerID = new Map(reviews.map((review) => [review.answerID, review]));
+  const section = document.createElement("section");
+  section.className = "project-studio-section project-evidence-reviews";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Evidence review";
+  const scope = document.createElement("span");
+  scope.className = "project-review-scope";
+  scope.textContent = "Immutable Research evidence";
+  heading.append(title, scope);
+  section.append(heading);
+
+  answers.slice(0, 8).forEach((answer) => {
+    const review = reviewsByAnswerID.get(answer.id);
+    const row = document.createElement("article");
+    row.className = "project-evidence-review";
+    const copy = document.createElement("div");
+    const question = document.createElement("strong");
+    question.textContent = answer.question || "Research answer";
+    const meta = document.createElement("span");
+    meta.textContent = [
+      evidenceReviewStatusLabel(review?.status),
+      review?.updatedAt ? researchRelativeDate(review.updatedAt) : "",
+      `${answer.evidenceCount || 0} ${answer.evidenceCount === 1 ? "source" : "sources"}`
+    ].filter(Boolean).join(" · ");
+    copy.append(question, meta);
+    if (review?.note) {
+      const note = document.createElement("p");
+      note.textContent = review.note;
+      copy.append(note);
+    }
+    row.append(copy);
+
+    const actions = document.createElement("div");
+    actions.className = "project-evidence-review-actions";
+    const submit = async (status, note) => {
+      actions.querySelectorAll("button").forEach((button) => {
+        button.disabled = true;
+      });
+      try {
+        await postResearch("/organizations/evidence/reviews/save", {
+          projectID: projectDetailKey(identity),
+          answerID: answer.id,
+          reviewID: review?.id || undefined,
+          expectedVersion: review?.version || 0,
+          status,
+          note
+        });
+        await transitionWorkspace("utility", {
+          refreshPaneIDs: [paneIDForProjectDetail(identity)]
+        });
+      } catch (error) {
+        actions.querySelectorAll("button").forEach((button) => {
+          button.disabled = false;
+        });
+        await showWebNotice("Evidence review not saved", error.message);
+      }
+    };
+
+    if (canPropose && (!review || review.status === "changes-requested")) {
+      const propose = document.createElement("button");
+      propose.type = "button";
+      propose.textContent = review ? "Resubmit" : "Propose";
+      propose.addEventListener("click", () => {
+        void submit(
+          "proposed",
+          review ? "Evidence resubmitted after requested changes." : "Evidence submitted for professional review."
+        );
+      });
+      actions.append(propose);
+    }
+    if (canReview && review) {
+      if (review.status !== "approved") {
+        const approve = document.createElement("button");
+        approve.type = "button";
+        approve.textContent = "Approve";
+        approve.addEventListener("click", () => {
+          void submit("approved", "Evidence set approved for the Project record.");
+        });
+        actions.append(approve);
+      }
+      if (review.status !== "changes-requested") {
+        const requestChanges = document.createElement("button");
+        requestChanges.type = "button";
+        requestChanges.textContent = "Request changes";
+        requestChanges.addEventListener("click", async () => {
+          const confirmed = await confirmWebWarning(
+            "Request evidence changes?",
+            "This preserves the Research answer and evidence snapshots. It changes only the separate professional review record.",
+            { confirmLabel: "Request Changes" }
+          );
+          if (confirmed) {
+            await submit("changes-requested", "Reviewer requested changes to the selected evidence set.");
+          }
+        });
+        actions.append(requestChanges);
+      }
+    }
+    if (actions.childElementCount) row.append(actions);
+    section.append(row);
+  });
+  content.append(section);
+}
+
+function appendProjectReportExports(content, identity, foundation) {
+  const reports = (foundation?.artifacts || [])
+    .filter((artifact) =>
+      artifact.envelope?.type === "generatedReport" &&
+      !artifact.envelope?.deletedAt &&
+      artifact.payload?.file
+    )
+    .sort((left, right) =>
+      String(right.envelope.updatedAt || right.payload?.createdAt || "").localeCompare(
+        String(left.envelope.updatedAt || left.payload?.createdAt || "")
+      )
+    );
+  if (!reports.length) return;
+
+  const section = document.createElement("section");
+  section.className = "project-studio-section project-report-exports";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Report exports";
+  section.append(title);
+  reports.slice(0, 8).forEach((artifact) => {
+    const row = document.createElement("article");
+    row.className = "project-report-export";
+    const copy = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = artifact.payload.title || "Permitext Project Report";
+    const meta = document.createElement("span");
+    meta.textContent = [
+      artifact.payload.reportVersion ? `Version ${artifact.payload.reportVersion}` : "",
+      String(artifact.payload.file.format || "PDF").replaceAll("-", " "),
+      researchRelativeDate(artifact.payload.createdAt || artifact.envelope.updatedAt)
+    ].filter(Boolean).join(" · ");
+    copy.append(name, meta);
+    const download = document.createElement("button");
+    download.type = "button";
+    download.textContent = "Download PDF";
+    download.addEventListener("click", async () => {
+      download.disabled = true;
+      try {
+        await downloadProjectReportFile(
+          projectDetailKey(identity),
+          {
+            ...artifact.payload.file,
+            generatedReportID: artifact.envelope.id
+          },
+          artifact.payload.title
+        );
+      } catch (error) {
+        await showWebNotice("Report could not be downloaded", error.message);
+      } finally {
+        download.disabled = false;
+      }
+    });
+    row.append(copy, download);
+    section.append(row);
+  });
   content.append(section);
 }
 
@@ -10206,7 +10522,7 @@ async function renderProjectDetail(detail) {
       };
     })
     .filter(Boolean);
-  const previewItems = await Promise.all(linkedSavedItems.map(async (item) => {
+  let previewItems = await Promise.all(linkedSavedItems.map(async (item) => {
     const resolvedDetail = {
       codePrefix: item.codePrefix || "BC",
       chapterID: item.chapterID || "",
@@ -10233,12 +10549,58 @@ async function renderProjectDetail(detail) {
   let foundationError = "";
   if (activeAccount()) {
     try {
-      foundation = await postResearch("/projects/foundation/state", {
-        projectID: projectDetailKey(identity)
-      });
+      if (identity.sharedOrganizationID) {
+        const payload = await postResearch("/organizations/projects/snapshot", {
+          projectID: projectDetailKey(identity)
+        });
+        foundation = payload.project;
+        identity.sharedRole = payload.access?.role || identity.sharedRole;
+        identity.sharedPermissions = payload.access?.permissions || identity.sharedPermissions;
+      } else {
+        foundation = await postResearch("/projects/foundation/state", {
+          projectID: projectDetailKey(identity)
+        });
+      }
     } catch (error) {
       foundationError = error.message || "Project history is temporarily unavailable.";
     }
+  }
+  if (identity.sharedOrganizationID && foundation) {
+    const existingSectionIDs = new Set(
+      previewItems.map((item) => String(item.sectionID || item.savedSectionID || item.itemID || ""))
+    );
+    const linkedSectionIDs = Array.from(new Set(
+      (foundation.links || [])
+        .filter((link) =>
+          !link.deletedAt &&
+          link.targetKind === "canonicalSection" &&
+          !existingSectionIDs.has(String(link.targetID || ""))
+        )
+        .map((link) => String(link.targetID || ""))
+        .filter(Boolean)
+    ));
+    const sharedItems = await Promise.all(linkedSectionIDs.map(async (sectionID) => {
+      try {
+        const { chapter, section } = await resolveSectionDetail({
+          codePrefix: "BC",
+          sectionID,
+          title: "Linked code section"
+        });
+        return {
+          id: `shared-section-${sectionID}`,
+          sectionID,
+          codePrefix: section?.codePrefix || chapter?.codePrefix || "BC",
+          chapterID: section?.chapterID || chapter?.id || "",
+          chapterNumber: section?.chapterNumber || chapter?.chapterNumber || "",
+          sectionNumber: section?.sectionNumber || sectionID,
+          title: section?.title || "Linked code section",
+          previewText: sectionPlainText(section).replace(/\s+/g, " ").trim().slice(0, 260)
+        };
+      } catch {
+        return null;
+      }
+    }));
+    previewItems = [...previewItems, ...sharedItems.filter(Boolean)];
   }
 
   const panel = document.createElement("article");
@@ -10278,6 +10640,10 @@ async function renderProjectDetail(detail) {
   reportDraftButton.textContent = "Report Draft";
   reportDraftButton.setAttribute("aria-pressed", String(projectHasOpenReportDraft(identity)));
   reportDraftButton.hidden = detachedProjectWindow;
+  if (identity.sharedOnly) {
+    reportDraftButton.disabled = true;
+    reportDraftButton.title = "Shared Report Draft editing will follow the collaboration foundation.";
+  }
   reportDraftButton.addEventListener("click", async () => {
     if (projectHasOpenReportDraft(identity)) {
       const closed = await closeProjectReportDraft(identity);
@@ -10293,6 +10659,10 @@ async function renderProjectDetail(detail) {
   workboardButton.textContent = "Workboard";
   workboardButton.setAttribute("aria-pressed", String(projectHasOpenWorkboard(identity)));
   workboardButton.hidden = detachedProjectWindow;
+  if (identity.sharedOnly) {
+    workboardButton.disabled = true;
+    workboardButton.title = "Shared Workboard editing is intentionally scheduled after authored collaboration.";
+  }
   const preloadWorkboard = () => {
     void loadWorkboardModule().catch(() => {});
   };
@@ -10319,6 +10689,12 @@ async function renderProjectDetail(detail) {
   const title = document.createElement("h2");
   title.textContent = identity.name;
   headingGroup.append(title);
+  if (identity.sharedOrganizationID) {
+    const sharedBadge = document.createElement("span");
+    sharedBadge.className = "project-shared-role";
+    sharedBadge.textContent = `${identity.sharedOrganizationName || "Firm"} · ${identity.sharedRole || "viewer"}`;
+    headingGroup.append(sharedBadge);
+  }
   const addressText = String(project.address || identity.address || "").trim();
   if (addressText) {
     const address = document.createElement("p");
@@ -10356,7 +10732,7 @@ async function renderProjectDetail(detail) {
   savedHeading.className = "section-label";
   savedHeading.textContent = "Saved evidence";
   savedSection.append(savedHeading);
-  const selectionController = previewItems.length
+  const selectionController = previewItems.length && !identity.sharedOnly
     ? createProjectSectionSelectionController(panel, actions, content, identity, previewItems)
     : null;
   const codeGroups = new Map();
@@ -10383,6 +10759,7 @@ async function renderProjectDetail(detail) {
     orderedItems.forEach((item) => {
       const row = document.createElement("article");
       row.className = "saved-row project-detail-saved-row";
+      if (identity.sharedOnly) row.classList.add("is-read-only");
       const openButton = document.createElement("button");
       openButton.className = "project-detail-section-open";
       openButton.type = "button";
@@ -10426,7 +10803,8 @@ async function renderProjectDetail(detail) {
           await showWebNotice("Could not remove section", error.message || "The section could not be removed.");
         }
       });
-      row.append(openButton, removeButton);
+      row.append(openButton);
+      if (!identity.sharedOnly) row.append(removeButton);
       selectionController?.register(row, item);
       codeGroup.append(row);
     });
@@ -10460,6 +10838,8 @@ async function renderProjectDetail(detail) {
   }
   content.append(savedSection);
   appendProjectResearchHistory(content, identity, foundation);
+  appendProjectEvidenceReviews(content, identity, foundation);
+  appendProjectReportExports(content, identity, foundation);
   appendProjectActivity(content, foundation);
   panel.append(chrome, content);
   return panel;
@@ -11005,7 +11385,8 @@ async function renderSaved(instance) {
   clear(content);
   const data = await loadSyncedContent();
   const summary = currentContentSummary();
-  renderSavedProjects(panel, paneID, summary.projects || [], summary.projectSections || []);
+  const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
+  renderSavedProjects(panel, paneID, workspaceProjects, summary.projectSections || []);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
@@ -11095,6 +11476,7 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
     pageProjects.forEach((project) => {
       const tile = document.createElement("article");
       tile.className = "saved-project-tile";
+      if (project.sharedOrganizationID) tile.classList.add("is-shared");
       const tileColor = projectColor(project);
       tile.style.setProperty("--project-color", tileColor);
       tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor));
@@ -11105,7 +11487,9 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
       heading.textContent = project.name || project.title || "Project";
       const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
       const countLabel = document.createElement("span");
-      countLabel.textContent = count === 1 ? "1 saved" : `${count} saved`;
+      countLabel.textContent = project.sharedOrganizationID
+        ? `${project.sharedRole || "viewer"} · ${project.sharedOrganizationName || "Firm"}`
+        : count === 1 ? "1 saved" : `${count} saved`;
       const folderIcon = document.createElement("span");
       folderIcon.className = "saved-project-folder-icon";
       folderIcon.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path></svg>`;
@@ -11129,7 +11513,7 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
         event.stopPropagation();
         void archiveProject(project);
       });
-      actions.append(editButton, archiveProjectButton);
+      if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, countLabel, folderIcon, actions);
       const open = () => openProjectDetail(project, { sourcePaneID: paneID });
       tile.addEventListener("click", open);
@@ -11753,6 +12137,490 @@ async function performSettingsClearAction(action) {
   return 0;
 }
 
+function organizationInvitationTokenFromURL() {
+  return new URLSearchParams(window.location.search).get("organizationInvite") || "";
+}
+
+function clearOrganizationInvitationURL() {
+  const url = new URL(window.location.href);
+  url.searchParams.delete("organizationInvite");
+  window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}` || "/");
+}
+
+function firmControlLabel(text, control) {
+  const label = document.createElement("label");
+  label.className = "settings-firm-field";
+  const caption = document.createElement("span");
+  caption.textContent = text;
+  label.append(caption, control);
+  return label;
+}
+
+async function refreshOrganizationWorkspaceUI() {
+  await loadOrganizationWorkspace({ force: true });
+  const refreshPaneIDs = activePaneIDs().filter((paneID) =>
+    paneID === "utility:settings" ||
+    paneID.startsWith("utility:saved:") ||
+    isProjectDetailPaneID(paneID) ||
+    isProjectNotebookPaneID(paneID)
+  );
+  await transitionWorkspace("utility", { refreshPaneIDs });
+}
+
+async function renderFirmMemberManager(container, organization, setFirmStatus) {
+  container.replaceChildren();
+  const loading = document.createElement("p");
+  loading.className = "settings-firm-muted";
+  loading.textContent = "Loading members…";
+  container.append(loading);
+  try {
+    const payload = await postResearch("/organizations/members/list", {
+      organizationID: organization.id
+    });
+    container.replaceChildren();
+    const members = [
+      ...(payload.members || []).map((membership) => ({ ...membership, scope: "Firm" })),
+      ...(payload.projectMembers || []).map((membership) => ({
+        ...membership,
+        scope: (organization.projects || []).find((project) => project.id === membership.projectID)?.name ||
+          "Project"
+      }))
+    ];
+    const unique = new Map();
+    members.forEach((membership) => {
+      const key = `${membership.projectID || "firm"}:${membership.userID}`;
+      unique.set(key, membership);
+    });
+    if (!unique.size) {
+      const empty = document.createElement("p");
+      empty.className = "settings-firm-muted";
+      empty.textContent = "No members yet.";
+      container.append(empty);
+    }
+    unique.forEach((membership) => {
+      const row = document.createElement("article");
+      row.className = "settings-firm-member";
+      const copy = document.createElement("div");
+      const name = document.createElement("strong");
+      name.textContent = membership.account?.displayName ||
+        membership.account?.email ||
+        membership.userID;
+      const meta = document.createElement("span");
+      meta.textContent = `${membership.scope} · ${membership.status}`;
+      copy.append(name, meta);
+      row.append(copy);
+      if (membership.role === "owner") {
+        const role = document.createElement("span");
+        role.className = "settings-firm-role";
+        role.textContent = "Owner";
+        row.append(role);
+      } else {
+        const roleSelect = document.createElement("select");
+        roleSelect.setAttribute("aria-label", `Role for ${name.textContent}`);
+        ["editor", "reviewer", "viewer"].forEach((role) => {
+          const option = document.createElement("option");
+          option.value = role;
+          option.textContent = role[0].toUpperCase() + role.slice(1);
+          roleSelect.append(option);
+        });
+        roleSelect.value = membership.role;
+        const statusButton = document.createElement("button");
+        statusButton.className = "settings-mini-button";
+        statusButton.type = "button";
+        statusButton.textContent = membership.status === "active" ? "Remove" : "Restore";
+        const updateMembership = async (values) => {
+          roleSelect.disabled = true;
+          statusButton.disabled = true;
+          try {
+            await postResearch("/organizations/members/update", {
+              organizationID: organization.id,
+              projectID: membership.projectID || undefined,
+              userID: membership.userID,
+              ...values
+            });
+            setFirmStatus("Member access updated.");
+            await refreshOrganizationWorkspaceUI();
+          } catch (error) {
+            setFirmStatus(error.message || "Member access could not be updated.", true);
+            roleSelect.disabled = false;
+            statusButton.disabled = false;
+          }
+        };
+        roleSelect.addEventListener("change", () => {
+          void updateMembership({ role: roleSelect.value });
+        });
+        statusButton.addEventListener("click", () => {
+          void updateMembership({
+            status: membership.status === "active" ? "deactivated" : "active"
+          });
+        });
+        const actions = document.createElement("div");
+        actions.className = "settings-firm-member-actions";
+        actions.append(roleSelect, statusButton);
+        row.append(actions);
+      }
+      container.append(row);
+    });
+    (payload.invitations || []).filter((invitation) => invitation.state === "pending")
+      .forEach((invitation) => {
+        const row = document.createElement("article");
+        row.className = "settings-firm-member is-pending";
+        const copy = document.createElement("div");
+        const name = document.createElement("strong");
+        name.textContent = invitation.invitedEmail || invitation.invitedUserID || "Pending invitation";
+        const meta = document.createElement("span");
+        const scope = invitation.projectID
+          ? (organization.projects || []).find((project) => project.id === invitation.projectID)?.name || "Project"
+          : "Firm";
+        meta.textContent = `${scope} · ${invitation.role} · pending`;
+        copy.append(name, meta);
+        const revoke = document.createElement("button");
+        revoke.className = "settings-mini-button";
+        revoke.type = "button";
+        revoke.textContent = "Revoke";
+        revoke.addEventListener("click", async () => {
+          revoke.disabled = true;
+          try {
+            await postResearch("/organizations/invitations/revoke", {
+              organizationID: organization.id,
+              invitationID: invitation.id
+            });
+            setFirmStatus("Invitation revoked.");
+            await refreshOrganizationWorkspaceUI();
+          } catch (error) {
+            setFirmStatus(error.message || "Invitation could not be revoked.", true);
+            revoke.disabled = false;
+          }
+        });
+        row.append(copy, revoke);
+        container.append(row);
+      });
+  } catch (error) {
+    loading.textContent = error.message || "Members could not be loaded.";
+  }
+}
+
+async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
+  const container = panel.querySelector(".settings-firm-content");
+  if (!container) return;
+  container.replaceChildren();
+  const setFirmStatus = (message, isError = false) => {
+    setStatus(message, isError);
+    const inline = container.querySelector(".settings-firm-status");
+    if (inline) {
+      inline.textContent = message || "";
+      inline.classList.toggle("has-error", isError);
+    }
+  };
+  const account = activeAccount();
+  if (!account) {
+    const message = document.createElement("p");
+    message.className = "settings-firm-muted";
+    message.textContent = organizationInvitationTokenFromURL()
+      ? "Sign in to review and accept this firm invitation."
+      : "Sign in to create a firm workspace or open Projects shared with you.";
+    container.append(message);
+    return;
+  }
+
+  const pendingInvitationToken = organizationInvitationTokenFromURL();
+  if (pendingInvitationToken) {
+    const invitation = document.createElement("section");
+    invitation.className = "settings-firm-invitation";
+    const copy = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = "Firm invitation";
+    const detail = document.createElement("span");
+    detail.textContent = "Accept only if you recognize the firm or Project that shared this link.";
+    copy.append(title, detail);
+    const accept = document.createElement("button");
+    accept.className = "settings-primary-button";
+    accept.type = "button";
+    accept.textContent = "Accept Invitation";
+    accept.addEventListener("click", async () => {
+      accept.disabled = true;
+      try {
+        const payload = await postResearch("/organizations/invitations/accept", {
+          invitationToken: pendingInvitationToken
+        });
+        clearOrganizationInvitationURL();
+        setFirmStatus(`Access added to ${payload.organization.name}.`);
+        await refreshOrganizationWorkspaceUI();
+      } catch (error) {
+        setFirmStatus(error.message || "The invitation could not be accepted.", true);
+        accept.disabled = false;
+      }
+    });
+    invitation.append(copy, accept);
+    container.append(invitation);
+  }
+
+  const workspace = await loadOrganizationWorkspace();
+  const organizations = workspace.organizations || [];
+  if (workspace.error) {
+    const error = document.createElement("p");
+    error.className = "settings-firm-muted has-error";
+    error.textContent = workspace.error;
+    container.append(error);
+  }
+
+  const creationForm = document.createElement("form");
+  creationForm.className = "settings-firm-create";
+  const nameInput = document.createElement("input");
+  nameInput.type = "text";
+  nameInput.maxLength = 160;
+  nameInput.placeholder = "Firm or team name";
+  nameInput.setAttribute("aria-label", "Firm or team name");
+  const createButton = document.createElement("button");
+  createButton.className = "settings-primary-button";
+  createButton.type = "submit";
+  createButton.textContent = "Create Firm Workspace";
+  createButton.disabled = !isProAccount();
+  creationForm.append(nameInput, createButton);
+  if (!isProAccount()) {
+    const note = document.createElement("p");
+    note.className = "settings-firm-muted";
+    note.textContent = "Pro is required to create a firm workspace. Invited members can participate without buying a separate personal plan.";
+    creationForm.append(note);
+  }
+  creationForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!nameInput.value.trim() || createButton.disabled) return;
+    createButton.disabled = true;
+    try {
+      const payload = await postResearch("/organizations/create", {
+        name: nameInput.value.trim()
+      });
+      setFirmStatus(`${payload.organization.name} created with five private-beta seats.`);
+      await refreshOrganizationWorkspaceUI();
+    } catch (error) {
+      setFirmStatus(error.message || "The firm workspace could not be created.", true);
+      createButton.disabled = false;
+    }
+  });
+  container.append(creationForm);
+
+  if (!organizations.length) {
+    const empty = document.createElement("p");
+    empty.className = "settings-firm-muted";
+    empty.textContent = "No firm workspaces yet.";
+    container.append(empty);
+  }
+
+  for (const organization of organizations) {
+    const card = document.createElement("article");
+    card.className = "settings-firm-workspace";
+    const heading = document.createElement("div");
+    heading.className = "settings-firm-workspace-heading";
+    const copy = document.createElement("div");
+    const name = document.createElement("strong");
+    name.textContent = organization.name;
+    const meta = document.createElement("span");
+    meta.textContent = [
+      organization.role,
+      organization.accessScope === "project" ? "Project access" : "Firm access",
+      organization.seats ? `${organization.seats.used}/${organization.billingIdentity.seatLimit} seats` : ""
+    ].filter(Boolean).join(" · ");
+    copy.append(name, meta);
+    const role = document.createElement("span");
+    role.className = "settings-firm-role";
+    role.textContent = organization.role || "member";
+    heading.append(copy, role);
+    card.append(heading);
+
+    const projectList = document.createElement("div");
+    projectList.className = "settings-firm-projects";
+    (organization.projects || []).forEach((project) => {
+      const button = document.createElement("button");
+      button.className = "settings-firm-project";
+      button.type = "button";
+      const projectName = document.createElement("strong");
+      projectName.textContent = project.name || "Untitled Project";
+      const projectMeta = document.createElement("span");
+      projectMeta.textContent = `${project.role || organization.role} · Open Project Studio`;
+      button.append(projectName, projectMeta);
+      button.addEventListener("click", () => {
+        void openProjectDetail({
+          ...project,
+          clientID: project.id,
+          sharedOrganizationID: organization.id,
+          sharedOrganizationName: organization.name,
+          sharedRole: project.role || organization.role,
+          sharedPermissions: project.permissions || organization.permissions || [],
+          sharedOnly: !settingsProjects.some((candidate) =>
+            projectDetailKey(candidate) === String(project.id)
+          )
+        }, { sourcePaneID: "utility:settings" });
+      });
+      projectList.append(button);
+    });
+    if (!organization.projects?.length) {
+      const empty = document.createElement("p");
+      empty.className = "settings-firm-muted";
+      empty.textContent = "No Projects are shared in this workspace yet.";
+      projectList.append(empty);
+    }
+    card.append(projectList);
+
+    if (organization.permissions?.includes("project.transfer")) {
+      const ownerTools = document.createElement("section");
+      ownerTools.className = "settings-firm-owner-tools";
+      const transferSelect = document.createElement("select");
+      transferSelect.setAttribute("aria-label", "Personal Project to transfer");
+      const transferPlaceholder = document.createElement("option");
+      transferPlaceholder.value = "";
+      transferPlaceholder.textContent = "Choose a personal Project…";
+      transferSelect.append(transferPlaceholder);
+      const organizationProjectIDs = new Set(
+        organizations.flatMap((entry) => entry.projects || []).map((project) => String(project.id))
+      );
+      settingsProjects.filter((project) =>
+        !organizationProjectIDs.has(projectDetailKey(project))
+      ).forEach((project) => {
+        const option = document.createElement("option");
+        option.value = projectDetailKey(project);
+        option.textContent = readableProjectName(project);
+        transferSelect.append(option);
+      });
+      const transferButton = document.createElement("button");
+      transferButton.className = "settings-secondary-button";
+      transferButton.type = "button";
+      transferButton.textContent = "Transfer to Firm";
+      transferButton.disabled = true;
+      transferSelect.addEventListener("change", () => {
+        transferButton.disabled = !transferSelect.value;
+      });
+      transferButton.addEventListener("click", async () => {
+        if (!transferSelect.value) return;
+        const confirmed = await confirmWebWarning(
+          "Transfer Project to firm?",
+          "The Project keeps its stable identity and original-owner attribution. Firm roles will control future shared access.",
+          { confirmLabel: "Transfer Project" }
+        );
+        if (!confirmed) return;
+        transferButton.disabled = true;
+        try {
+          await postResearch("/organizations/projects/transfer", {
+            organizationID: organization.id,
+            projectID: transferSelect.value
+          });
+          setFirmStatus("Project transferred. Existing files and history were preserved.");
+          await refreshOrganizationWorkspaceUI();
+        } catch (error) {
+          setFirmStatus(error.message || "The Project could not be transferred.", true);
+          transferButton.disabled = false;
+        }
+      });
+
+      const inviteForm = document.createElement("form");
+      inviteForm.className = "settings-firm-invite";
+      const email = document.createElement("input");
+      email.type = "email";
+      email.autocomplete = "email";
+      email.placeholder = "teammate@example.com";
+      email.required = true;
+      const inviteRole = document.createElement("select");
+      inviteRole.setAttribute("aria-label", "Invitation role");
+      [
+        ["viewer", "Viewer"],
+        ["editor", "Editor"],
+        ["reviewer", "Reviewer"]
+      ].forEach(([value, label]) => {
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = label;
+        inviteRole.append(option);
+      });
+      const inviteScope = document.createElement("select");
+      inviteScope.setAttribute("aria-label", "Invitation scope");
+      const allProjects = document.createElement("option");
+      allProjects.value = "";
+      allProjects.textContent = "Entire firm workspace";
+      inviteScope.append(allProjects);
+      (organization.projects || []).forEach((project) => {
+        const option = document.createElement("option");
+        option.value = project.id;
+        option.textContent = `Only ${project.name}`;
+        inviteScope.append(option);
+      });
+      const inviteButton = document.createElement("button");
+      inviteButton.className = "settings-primary-button";
+      inviteButton.type = "submit";
+      inviteButton.textContent = "Create Invitation Link";
+      const invitationResult = document.createElement("div");
+      invitationResult.className = "settings-firm-invite-result";
+      inviteForm.append(
+        firmControlLabel("Email", email),
+        firmControlLabel("Role", inviteRole),
+        firmControlLabel("Scope", inviteScope),
+        inviteButton,
+        invitationResult
+      );
+      inviteForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        inviteButton.disabled = true;
+        invitationResult.replaceChildren();
+        try {
+          const payload = await postResearch("/organizations/members/invite", {
+            organizationID: organization.id,
+            projectID: inviteScope.value || undefined,
+            email: email.value,
+            role: inviteRole.value
+          });
+          const invitationURL = `${window.location.origin}${payload.acceptPath}`;
+          const link = document.createElement("input");
+          link.readOnly = true;
+          link.value = invitationURL;
+          link.setAttribute("aria-label", "Invitation link");
+          const copyButton = document.createElement("button");
+          copyButton.className = "settings-secondary-button";
+          copyButton.type = "button";
+          copyButton.textContent = "Copy Link";
+          copyButton.addEventListener("click", async () => {
+            try {
+              await navigator.clipboard.writeText(invitationURL);
+              copyButton.textContent = "Copied";
+            } catch {
+              link.focus();
+              link.select();
+              setFirmStatus("Invitation link selected. Copy it with your browser or keyboard.");
+            }
+          });
+          invitationResult.append(link, copyButton);
+          setFirmStatus("Invitation created. Permitext does not email it yet; send the private link directly.");
+        } catch (error) {
+          setFirmStatus(error.message || "The invitation could not be created.", true);
+          inviteButton.disabled = false;
+        }
+      });
+
+      const members = document.createElement("details");
+      members.className = "settings-firm-members";
+      const summary = document.createElement("summary");
+      summary.textContent = "Members & pending invitations";
+      const memberList = document.createElement("div");
+      members.append(summary, memberList);
+      members.addEventListener("toggle", () => {
+        if (members.open && !memberList.childElementCount) {
+          void renderFirmMemberManager(memberList, organization, setFirmStatus);
+        }
+      });
+      ownerTools.append(
+        firmControlLabel("Project ownership", transferSelect),
+        transferButton,
+        inviteForm,
+        members
+      );
+      card.append(ownerTools);
+    }
+    container.append(card);
+  }
+  const firmStatus = document.createElement("p");
+  firmStatus.className = "settings-firm-status";
+  firmStatus.setAttribute("role", "status");
+  container.append(firmStatus);
+}
+
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
@@ -11853,6 +12721,7 @@ function renderSettings() {
     }
   });
   updateProjectSelection();
+  void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
 
   jurisdictionSelect.value = "jurisdiction-1";
   versionSelect.value = defaultSyncCodeVersion;
@@ -12024,6 +12893,8 @@ function renderSettings() {
     setStatus("Signing in...");
     try {
       await signInCurrentBrowser();
+      organizationWorkspace = null;
+      organizationLoadPromise = null;
       await renderWorkspace();
       startForegroundSyncLoop({ immediate: true });
     } catch (error) {
@@ -12044,6 +12915,8 @@ function renderSettings() {
     } finally {
       await disableOfflineFeature().catch(() => {});
       state.account = null;
+      organizationWorkspace = null;
+      organizationLoadPromise = null;
       persistAccountSession(null);
       syncedContent = null;
       stopForegroundSyncLoop();
@@ -13118,6 +13991,10 @@ async function start() {
   });
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
   consumeBrowserSectionURL();
+  if (organizationInvitationTokenFromURL()) {
+    state.utilities.settings = true;
+    saveWorkspaceState();
+  }
   await renderWorkspace();
   scheduleWorkboardModulePreload();
   if (deepLinkedSectionID) {

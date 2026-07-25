@@ -134,4 +134,120 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(AppEntitlement.lifetimeGrant(userID: "user").grantsResearch())
         XCTAssertTrue(AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "legacy").grantsResearch())
     }
+
+    @MainActor
+    func testOrganizationInvitationUniversalLinkExtractsOnlyPrivateToken() throws {
+        let invitationURL = try XCTUnwrap(
+            URL(string: "https://permitext-sync.vercel.app/?organizationInvite=private-token-123")
+        )
+        XCTAssertEqual(
+            CodeLibraryViewModel.organizationInvitationToken(from: invitationURL),
+            "private-token-123"
+        )
+        XCTAssertNil(
+            CodeLibraryViewModel.organizationInvitationToken(
+                from: URL(string: "https://example.com/?organizationInvite=private-token-123")!
+            )
+        )
+        XCTAssertNil(
+            CodeLibraryViewModel.organizationInvitationToken(
+                from: URL(string: "https://permitext-sync.vercel.app/open/section/101?organizationInvite=token")!
+            )
+        )
+    }
+
+    func testOrganizationSnapshotDecodesNotebookAndGeneratedReportArtifacts() throws {
+        let data = Data(
+            """
+            {
+              "access": {
+                "role": "reviewer",
+                "permissions": ["project.view", "project.review", "evidence.review", "report.download"],
+                "readOnly": true,
+                "organization": null
+              },
+              "project": {
+                "schemaVersion": 1,
+                "projects": [{
+                  "id": "project-1",
+                  "sourceRecordID": "folder-1",
+                  "name": "225 Broadway",
+                  "address": "225 Broadway",
+                  "description": "Filing review",
+                  "colorHex": "#315A72",
+                  "archivedAt": null,
+                  "updatedAt": "2026-07-24T20:00:00.000Z",
+                  "originalOwnerUserID": "owner-1",
+                  "role": "reviewer",
+                  "permissions": ["project.view"]
+                }],
+                "links": [{
+                  "id": "link-1",
+                  "projectID": "project-1",
+                  "targetKind": "canonicalSection",
+                  "targetID": "101",
+                  "relationship": "reference",
+                  "deletedAt": null
+                }],
+                "artifacts": [
+                  {
+                    "envelope": {
+                      "id": "card-1",
+                      "type": "notebookCard",
+                      "createdAt": "2026-07-24T20:00:00.000Z",
+                      "updatedAt": "2026-07-24T20:10:00.000Z",
+                      "deletedAt": null,
+                      "version": 2
+                    },
+                    "payload": {
+                      "cardType": "coordination-item",
+                      "title": "Filing sequence",
+                      "plainText": "Coordinate submission order.",
+                      "referenceCount": 1
+                    }
+                  },
+                  {
+                    "envelope": {
+                      "id": "report-1",
+                      "type": "generatedReport",
+                      "createdAt": "2026-07-24T21:00:00.000Z",
+                      "updatedAt": "2026-07-24T21:00:00.000Z",
+                      "deletedAt": null,
+                      "version": 1
+                    },
+                    "payload": {
+                      "manifestID": "manifest-1",
+                      "reportVersion": 3,
+                      "title": "Permit Review",
+                      "createdAt": "2026-07-24T21:00:00.000Z",
+                      "file": {
+                        "format": "web-pdf",
+                        "pathname": "private/report.pdf",
+                        "contentType": "application/pdf",
+                        "size": 1024,
+                        "contentHash": "abc123",
+                        "createdAt": "2026-07-24T21:00:00.000Z"
+                      }
+                    }
+                  }
+                ],
+                "researchConversations": [],
+                "researchAnswers": [],
+                "activity": [],
+                "workboardPreview": null
+              }
+            }
+            """.utf8
+        )
+        let response = try JSONDecoder().decode(
+            BackendOrganizationProjectSnapshotResponse.self,
+            from: data
+        )
+
+        XCTAssertEqual(response.access.role, "reviewer")
+        XCTAssertTrue(response.access.readOnly)
+        XCTAssertEqual(response.project.links?.count, 1)
+        XCTAssertEqual(response.project.artifacts?.compactMap(\.notebookCard).first?.title, "Filing sequence")
+        XCTAssertEqual(response.project.artifacts?.compactMap(\.generatedReportFile).first?.reportVersion, 3)
+    }
 }

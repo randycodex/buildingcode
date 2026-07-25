@@ -173,6 +173,38 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.entitlement
     }
 
+    func organizations(account: SignedInAccount) async throws -> [PermitextOrganization] {
+        let response = try await transport.organizations(
+            BackendOrganizationListRequest(auth: authContext(for: account))
+        )
+        return response.organizations
+    }
+
+    func acceptOrganizationInvitation(
+        account: SignedInAccount,
+        invitationToken: String
+    ) async throws -> PermitextOrganization {
+        let response = try await transport.acceptOrganizationInvitation(
+            BackendOrganizationInvitationAcceptRequest(
+                auth: authContext(for: account),
+                invitationToken: invitationToken
+            )
+        )
+        return response.organization
+    }
+
+    func organizationProjectSnapshot(
+        account: SignedInAccount,
+        projectID: String
+    ) async throws -> BackendOrganizationProjectSnapshotResponse {
+        try await transport.organizationProjectSnapshot(
+            BackendOrganizationProjectSnapshotRequest(
+                auth: authContext(for: account),
+                projectID: projectID
+            )
+        )
+    }
+
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
         async let foundation = transport.projectFoundation(
             BackendProjectFoundationRequest(
@@ -237,6 +269,20 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             data: data
         )
         return response.file
+    }
+
+    func projectReportFile(
+        account: SignedInAccount,
+        projectID: String,
+        generatedReportID: String
+    ) async throws -> Data {
+        try await transport.projectReportFile(
+            BackendProjectReportFileReadRequest(
+                auth: authContext(for: account),
+                projectID: projectID,
+                generatedReportID: generatedReportID
+            )
+        )
     }
 
     func projectWorkboardPreview(

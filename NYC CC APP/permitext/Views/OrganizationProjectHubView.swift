@@ -1,0 +1,454 @@
+import SwiftUI
+import UIKit
+
+struct OrganizationProjectHubView: View {
+    @EnvironmentObject private var library: CodeLibraryViewModel
+    let organization: PermitextOrganization
+    let project: PermitextOrganizationProject
+
+    @State private var snapshot: BackendOrganizationProjectSnapshotResponse?
+    @State private var workboardImage: UIImage?
+    @State private var isLoading = false
+    @State private var errorMessage: String?
+    @State private var reportShareURL: URL?
+    @State private var downloadingReportID: String?
+
+    private var projectAccent: Color {
+        Color(
+            uiColor: PlatformColor(hex: project.colorHex ?? CodeFolder.defaultColorHex)
+                ?? .systemBlue
+        )
+    }
+
+    private var foundation: BackendProjectFoundationResponse? {
+        snapshot?.project
+    }
+
+    private var notebookCards: [ProjectNotebookCardSummary] {
+        (foundation?.artifacts ?? [])
+            .compactMap(\.notebookCard)
+            .sorted { $0.updatedAt > $1.updatedAt }
+    }
+
+    private var reportFiles: [ProjectReportFile] {
+        (foundation?.artifacts ?? [])
+            .compactMap(\.generatedReportFile)
+            .sorted { $0.createdAt > $1.createdAt }
+    }
+
+    private var evidenceReviews: [ProjectFoundationArtifact] {
+        (foundation?.artifacts ?? [])
+            .filter {
+                $0.envelope.type == "evidenceReview" &&
+                    $0.envelope.deletedAt == nil
+            }
+            .sorted { $0.envelope.updatedAt > $1.envelope.updatedAt }
+    }
+
+    private var savedEvidenceCount: Int {
+        (foundation?.links ?? []).filter {
+            $0.targetKind == "canonicalSection" && $0.deletedAt == nil
+        }.count
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
+                projectHeader
+
+                if isLoading && snapshot == nil {
+                    CodeSurface(accent: projectAccent, showsBorder: false) {
+                        HStack(spacing: 12) {
+                            ProgressView()
+                            Text("Loading shared Project…")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                } else if let errorMessage {
+                    CodeSurface(accent: projectAccent, showsBorder: false) {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(errorMessage)
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            Button("Try Again") {
+                                Task { await loadSnapshot() }
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(projectAccent)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                } else if snapshot != nil {
+                    projectMetrics
+                    notebookSection
+                    researchSection
+                    evidenceReviewSection
+                    reportSection
+                    workboardSection
+                    activitySection
+                }
+            }
+            .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.top, CodeScreenMetrics.screenHorizontalPadding)
+            .padding(.bottom, CodeScreenMetrics.tabBarClearance)
+        }
+        .background(CodeAppBackdrop(accent: projectAccent).ignoresSafeArea())
+        .navigationTitle("Project Hub")
+        .navigationBarTitleDisplayMode(.inline)
+        .tint(Color.appChrome)
+        .task {
+            await loadSnapshot()
+        }
+        .refreshable {
+            await loadSnapshot()
+        }
+        .sheet(
+            isPresented: Binding(
+                get: { reportShareURL != nil },
+                set: { if !$0 { reportShareURL = nil } }
+            )
+        ) {
+            if let reportShareURL {
+                BookmarkExportShareSheet(fileURL: reportShareURL) {
+                    self.reportShareURL = nil
+                }
+            }
+        }
+    }
+
+    private var projectHeader: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Text(project.name)
+                    .font(.largeTitle.bold())
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 0)
+                Text((snapshot?.access.role ?? project.role).capitalized)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.primary)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(projectAccent.opacity(0.18))
+                    )
+            }
+
+            if !project.address.isEmpty {
+                Label(project.address, systemImage: "mappin.and.ellipse")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            if !project.description.isEmpty {
+                Text(project.description)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Text(
+                snapshot?.access.readOnly == false
+                    ? "\(organization.name) · Editor role · editing is available on web"
+                    : "\(organization.name) · Read-only role"
+            )
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private var projectMetrics: some View {
+        let columns = [
+            GridItem(.flexible(), spacing: 10),
+            GridItem(.flexible(), spacing: 10)
+        ]
+        return LazyVGrid(columns: columns, spacing: 10) {
+            metric(value: "\(savedEvidenceCount)", label: "Saved evidence")
+            metric(value: "\(notebookCards.count)", label: "Notebook cards")
+            metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Research answers")
+            metric(value: "\(reportFiles.count)", label: "Report exports")
+        }
+    }
+
+    private func metric(value: String, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(value)
+                .font(.title3.bold())
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(projectAccent.opacity(0.1))
+        )
+    }
+
+    @ViewBuilder
+    private var notebookSection: some View {
+        projectSection(title: "Notebook", systemImage: "note.text") {
+            if notebookCards.isEmpty {
+                emptyText("No synced Notebook cards yet.")
+            } else {
+                ForEach(notebookCards.prefix(8)) { card in
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(card.title)
+                            .font(.subheadline.weight(.semibold))
+                        Text(card.cardType.replacingOccurrences(of: "-", with: " ").capitalized)
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(projectAccent)
+                        if !card.plainText.isEmpty {
+                            Text(card.plainText)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(4)
+                        }
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var researchSection: some View {
+        projectSection(title: "Research history", systemImage: "text.magnifyingglass") {
+            let answers = foundation?.researchAnswers ?? []
+            if answers.isEmpty {
+                emptyText("No immutable Research answers are linked to this Project.")
+            } else {
+                ForEach(answers.prefix(8)) { answer in
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(answer.question)
+                            .font(.subheadline.weight(.semibold))
+                        if !answer.conclusion.isEmpty {
+                            Text(answer.conclusion)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(4)
+                        }
+                        Text("\(answer.evidenceCount) approved \(answer.evidenceCount == 1 ? "source" : "sources") · \(answer.reviewStatus)")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var evidenceReviewSection: some View {
+        if !evidenceReviews.isEmpty {
+            projectSection(title: "Evidence review", systemImage: "checkmark.seal") {
+                ForEach(evidenceReviews) { review in
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(evidenceReviewLabel(review.payload.status))
+                            .font(.subheadline.weight(.semibold))
+                        Text("\(review.payload.evidenceSnapshotIDs?.count ?? 0) immutable evidence snapshots")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        if let note = review.payload.note, !note.isEmpty {
+                            Text(note)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var reportSection: some View {
+        projectSection(title: "Report exports", systemImage: "doc.richtext") {
+            if reportFiles.isEmpty {
+                emptyText("No generated Project Report PDFs are available yet.")
+            } else {
+                ForEach(reportFiles) { file in
+                    HStack(alignment: .center, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Project Report · Version \(file.reportVersion)")
+                                .font(.subheadline.weight(.semibold))
+                            Text("\(file.format.replacingOccurrences(of: "-", with: " ").uppercased()) · \(ByteCountFormatter.string(fromByteCount: Int64(file.size), countStyle: .file))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer(minLength: 0)
+                        Button {
+                            downloadReport(file)
+                        } label: {
+                            if downloadingReportID == file.id {
+                                ProgressView()
+                                    .frame(width: 22, height: 22)
+                            } else {
+                                Image(systemName: "square.and.arrow.down")
+                                    .font(.body.weight(.semibold))
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(downloadingReportID != nil)
+                        .accessibilityLabel("Download Project Report PDF")
+                    }
+                    .projectHubRow(accent: projectAccent)
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var workboardSection: some View {
+        if let preview = foundation?.workboardPreview {
+            projectSection(title: "Workboard preview", systemImage: "rectangle.3.group") {
+                if let workboardImage {
+                    Image(uiImage: workboardImage)
+                        .resizable()
+                        .scaledToFit()
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .accessibilityLabel("Latest read-only Workboard preview")
+                } else {
+                    HStack(spacing: 10) {
+                        ProgressView()
+                        Text("Loading preview…")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Text("\(preview.elementCount) elements · Editing remains on Permitext Web")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var activitySection: some View {
+        let activity = foundation?.activity ?? []
+        if !activity.isEmpty {
+            projectSection(title: "Recent activity", systemImage: "clock.arrow.circlepath") {
+                ForEach(activity.sorted { $0.createdAt > $1.createdAt }.prefix(10)) { event in
+                    HStack(alignment: .top, spacing: 10) {
+                        Circle()
+                            .fill(projectAccent.opacity(0.7))
+                            .frame(width: 7, height: 7)
+                            .padding(.top, 5)
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(activityLabel(event.action))
+                                .font(.footnote.weight(.semibold))
+                            Text(event.objectKind.replacingOccurrences(of: "-", with: " ").capitalized)
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func projectSection<Content: View>(
+        title: String,
+        systemImage: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        CodeSurface(accent: projectAccent, showsBorder: false) {
+            VStack(alignment: .leading, spacing: 12) {
+                Label(title, systemImage: systemImage)
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                content()
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private func emptyText(_ value: String) -> some View {
+        Text(value)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func evidenceReviewLabel(_ status: String?) -> String {
+        switch status {
+        case "approved": return "Approved"
+        case "changes-requested": return "Changes requested"
+        case "proposed": return "Proposed for review"
+        default: return "Evidence review"
+        }
+    }
+
+    private func activityLabel(_ action: String) -> String {
+        switch action {
+        case "item.linked": return "Project item linked"
+        case "item.unlinked": return "Project item removed"
+        case "notebook-card.created": return "Notebook card created"
+        case "notebook-card.revision.saved": return "Notebook revision saved"
+        case "research.answer.generated": return "Research answer generated"
+        case "review-status.changed": return "Evidence review changed"
+        case "report.generated": return "Report generated"
+        case "report.export.saved": return "Report export saved"
+        case "project.transferred": return "Project transferred to firm"
+        case "member.invited": return "Project member invited"
+        default:
+            return action.replacingOccurrences(of: ".", with: " ").capitalized
+        }
+    }
+
+    private func downloadReport(_ file: ProjectReportFile) {
+        guard downloadingReportID == nil else { return }
+        downloadingReportID = file.id
+        Task {
+            defer { downloadingReportID = nil }
+            do {
+                reportShareURL = try await library.organizationProjectReportURL(
+                    projectID: project.id,
+                    projectName: project.name,
+                    file: file
+                )
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    private func loadSnapshot() async {
+        guard !isLoading else { return }
+        isLoading = true
+        errorMessage = nil
+        defer { isLoading = false }
+        do {
+            let response = try await library.organizationProjectSnapshot(projectID: project.id)
+            snapshot = response
+            workboardImage = nil
+            if let preview = response.project.workboardPreview {
+                let data = try? await library.projectWorkboardPreviewData(
+                    projectID: project.id,
+                    previewID: preview.id,
+                    expectedContentHash: preview.contentHash
+                )
+                if let data {
+                    workboardImage = UIImage(data: data)
+                }
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+}
+
+private extension View {
+    func projectHubRow(accent: Color) -> some View {
+        self
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(11)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(accent.opacity(0.075))
+            )
+    }
+}

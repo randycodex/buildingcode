@@ -85,6 +85,9 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
+    @Published private(set) var organizations: [PermitextOrganization] = []
+    @Published private(set) var isOrganizationWorkspaceLoading = false
+    @Published private(set) var pendingOrganizationInvitationToken: String?
     @Published private(set) var pendingUserContentSyncCount = 0
     @Published private(set) var userContentSyncConflicts: [UserContentSyncConflict] = []
     @Published private(set) var proProductDisplayPrice: String?
@@ -1369,6 +1372,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func handleOpenURL(_ url: URL) {
+        if let invitationToken = Self.organizationInvitationToken(from: url) {
+            pendingOrganizationInvitationToken = invitationToken
+            selectedTab = .settings
+            return
+        }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
         pendingDeepLinkedSectionID = sectionID
         selectedTab = .search
@@ -1393,6 +1401,21 @@ final class CodeLibraryViewModel: ObservableObject {
             return nil
         }
         return sectionID
+    }
+
+    static func organizationInvitationToken(from url: URL) -> String? {
+        guard url.scheme?.lowercased() == "https",
+              url.host?.lowercased() == "permitext-sync.vercel.app",
+              url.path == "/" || url.path.isEmpty,
+              let token = URLComponents(url: url, resolvingAgainstBaseURL: false)?
+                .queryItems?
+                .first(where: { $0.name == "organizationInvite" })?
+                .value?
+                .trimmingCharacters(in: .whitespacesAndNewlines),
+              !token.isEmpty else {
+            return nil
+        }
+        return token
     }
 
     static func sharedSectionURL(sectionID: Int64) -> URL {
@@ -1736,6 +1759,93 @@ final class CodeLibraryViewModel: ObservableObject {
         )
     }
 
+    func refreshOrganizations() async {
+        guard let signedInAccount else {
+            organizations = []
+            return
+        }
+        guard !isOrganizationWorkspaceLoading else { return }
+        isOrganizationWorkspaceLoading = true
+        defer { isOrganizationWorkspaceLoading = false }
+        do {
+            organizations = try await accountBackendClient.organizations(account: signedInAccount)
+        } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func acceptPendingOrganizationInvitation() async {
+        guard let signedInAccount,
+              let invitationToken = pendingOrganizationInvitationToken,
+              !invitationToken.isEmpty else {
+            statusMessage = signedInAccount == nil
+                ? "Sign in before accepting the firm invitation."
+                : "This firm invitation is no longer available."
+            return
+        }
+        guard !isOrganizationWorkspaceLoading else { return }
+        isOrganizationWorkspaceLoading = true
+        defer { isOrganizationWorkspaceLoading = false }
+        do {
+            let organization = try await accountBackendClient.acceptOrganizationInvitation(
+                account: signedInAccount,
+                invitationToken: invitationToken
+            )
+            pendingOrganizationInvitationToken = nil
+            organizations = try await accountBackendClient.organizations(account: signedInAccount)
+            statusMessage = "Access added to \(organization.name)."
+        } catch {
+            if handleBackendSessionFailureIfNeeded(error) { return }
+            statusMessage = error.localizedDescription
+        }
+    }
+
+    func organizationProjectSnapshot(
+        projectID: String
+    ) async throws -> BackendOrganizationProjectSnapshotResponse {
+        guard let signedInAccount else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        return try await accountBackendClient.organizationProjectSnapshot(
+            account: signedInAccount,
+            projectID: projectID
+        )
+    }
+
+    func organizationProjectReportURL(
+        projectID: String,
+        projectName: String,
+        file: ProjectReportFile
+    ) async throws -> URL {
+        guard let signedInAccount else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        let data = try await accountBackendClient.projectReportFile(
+            account: signedInAccount,
+            projectID: projectID,
+            generatedReportID: file.generatedReportID
+        )
+        let digest = SHA256.hash(data: data)
+            .map { String(format: "%02x", $0) }
+            .joined()
+        guard digest == file.contentHash else {
+            throw URLError(.cannotDecodeContentData)
+        }
+        let safeName = projectName
+            .replacingOccurrences(
+                of: #"[^a-zA-Z0-9]+"#,
+                with: "-",
+                options: .regularExpression
+            )
+            .trimmingCharacters(in: CharacterSet(charactersIn: "-"))
+        let fileName = safeName.isEmpty ? "Permitext-Project-Report" : String(safeName.prefix(80))
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(fileName)-\(file.format).pdf")
+        try data.write(to: url, options: .atomic)
+        return url
+    }
+
     func projectReportPDF(manifestID: String) async throws -> URL {
         guard let signedInAccount else {
             throw ProjectHubLoadError.signInRequired
@@ -2020,6 +2130,7 @@ final class CodeLibraryViewModel: ObservableObject {
         await syncPendingUserContentIfPossible()
         await pullRemoteUserContentIfPossible()
         await refreshLifetimeGrant(announcesMissingGrant: false)
+        await refreshOrganizations()
     }
 
     func attachLocalDataIfNeeded() async {
@@ -2438,6 +2549,7 @@ final class CodeLibraryViewModel: ObservableObject {
         let account = signedInAccount
         stopForegroundAutomaticSync()
         signedInAccount = nil
+        organizations = []
         userContentSyncConflicts = []
         Self.clearSignedInAccount()
         currentCapabilityContract = nil
@@ -2455,6 +2567,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard Self.isBackendAuthenticationFailure(error) else { return false }
         stopForegroundAutomaticSync()
         signedInAccount = nil
+        organizations = []
         Self.clearSignedInAccount()
         userContentSyncCheckpoint = nil
         userContentSyncConflicts = []

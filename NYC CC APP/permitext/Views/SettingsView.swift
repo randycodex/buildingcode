@@ -62,6 +62,10 @@ struct SettingsView: View {
                     }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
+                        firmWorkspaceCard
+                    }
+
+                    CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         syncCard
                     }
 
@@ -122,6 +126,9 @@ struct SettingsView: View {
         .onPreferenceChange(CodeScrollOffsetPreferenceKey.self) { scrollOffset = $0 }
         .onChange(of: library.folders.map(\.id)) { _, folderIDs in
             selectedProjectIDs.formIntersection(folderIDs)
+        }
+        .task(id: library.signedInAccount?.appUserID) {
+            await library.refreshOrganizations()
         }
     }
 
@@ -378,6 +385,177 @@ struct SettingsView: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var firmWorkspaceCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                CodeEyebrow(text: "Firm & Collaboration", accent: settingsChromeColor)
+                Spacer(minLength: 0)
+                Text("Private beta")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Color.appChrome)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 5)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.appChrome.opacity(0.12))
+                    )
+            }
+
+            Text("Open firm-owned Projects with your assigned Owner, Editor, Reviewer, or Viewer role. Project administration and member changes remain on the web.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            if library.pendingOrganizationInvitationToken != nil {
+                VStack(alignment: .leading, spacing: 10) {
+                    Label("Firm invitation ready", systemImage: "person.2.badge.plus")
+                        .font(.subheadline.weight(.semibold))
+
+                    Text(library.signedInAccount == nil
+                         ? "Sign in with Apple, then return here to accept the private invitation."
+                         : "Accept only if you recognize the firm or Project that shared this link.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+
+                    if library.signedInAccount != nil {
+                        Button {
+                            Task { await library.acceptPendingOrganizationInvitation() }
+                        } label: {
+                            Label(
+                                library.isOrganizationWorkspaceLoading ? "Accepting…" : "Accept Invitation",
+                                systemImage: "checkmark.circle.fill"
+                            )
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 11)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.appChrome.opacity(0.12))
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(library.isOrganizationWorkspaceLoading)
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                        .fill(Color.appChrome.opacity(0.07))
+                )
+            }
+
+            if library.signedInAccount == nil {
+                Text("Sign in to see firm workspaces and Projects shared with you.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            } else if library.isOrganizationWorkspaceLoading && library.organizations.isEmpty {
+                HStack(spacing: 10) {
+                    ProgressView()
+                    Text("Loading firm access…")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else if library.organizations.isEmpty {
+                Text("No firm workspaces yet. Create one or transfer a personal Project from Permitext Web.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            } else {
+                ForEach(library.organizations) { organization in
+                    VStack(alignment: .leading, spacing: 10) {
+                        HStack(alignment: .top, spacing: 10) {
+                            VStack(alignment: .leading, spacing: 3) {
+                                Text(organization.name)
+                                    .font(.headline)
+                                Text(firmWorkspaceMetadata(organization))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            Spacer(minLength: 0)
+                            Text((organization.role ?? "member").capitalized)
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(.primary)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 5)
+                                .background(
+                                    Capsule(style: .continuous)
+                                        .fill(Color.primary.opacity(0.08))
+                                )
+                        }
+
+                        ForEach(organization.projects ?? []) { project in
+                            NavigationLink {
+                                OrganizationProjectHubView(
+                                    organization: organization,
+                                    project: project
+                                )
+                            } label: {
+                                HStack(spacing: 10) {
+                                    Circle()
+                                        .fill(
+                                            Color(
+                                                uiColor: PlatformColor(
+                                                    hex: project.colorHex ?? CodeFolder.defaultColorHex
+                                                ) ?? .systemBlue
+                                            )
+                                        )
+                                        .frame(width: 10, height: 10)
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(project.name)
+                                            .font(.subheadline.weight(.semibold))
+                                            .foregroundStyle(.primary)
+                                        Text(project.address.isEmpty
+                                             ? "\(project.role.capitalized) access"
+                                             : "\(project.role.capitalized) · \(project.address)")
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .lineLimit(1)
+                                    }
+                                    Spacer(minLength: 0)
+                                    Image(systemName: "chevron.right")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(.tertiary)
+                                }
+                                .padding(11)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .fill(Color.primary.opacity(0.055))
+                                )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                    .padding(12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.primary.opacity(0.04))
+                    )
+                }
+            }
+
+            Button {
+                openURL(webWorkspaceURL)
+            } label: {
+                Label("Manage Firms on Permitext Web", systemImage: "safari")
+                    .font(.footnote.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 10)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color.primary.opacity(0.08))
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func firmWorkspaceMetadata(_ organization: PermitextOrganization) -> String {
+        let access = organization.accessScope == "project" ? "Project access" : "Firm access"
+        guard let seats = organization.seats else { return access }
+        return "\(access) · \(seats.used)/\(organization.billingIdentity.seatLimit) seats"
     }
 
     private var syncCard: some View {
