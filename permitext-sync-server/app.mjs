@@ -66,6 +66,10 @@ import {
   reserveResearchEvaluationSpend,
   researchModelConfiguration
 } from "./research-config.mjs";
+import {
+  discoverRelevantEvidence,
+  evidenceDiscoveryFeatureEnabled
+} from "./evidence-discovery.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
 
@@ -108,6 +112,7 @@ const rateLimitPolicies = new Map([
   ["research/conversations/evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["research/evidence/discover", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/assign-project", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/project-context", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/reuse-evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
@@ -7290,7 +7295,8 @@ function researchUsageSummary(entries, options = {}) {
       ? Number(entries.reduce((total, entry) => total + entry.estimatedCostUSD, 0).toFixed(6))
       : null,
     pricingVersion: costsAreReliable && pricingVersions.length === 1 ? pricingVersions[0] : null,
-    mockMode: Boolean(options.mockMode)
+    mockMode: Boolean(options.mockMode),
+    evidenceDiscoveryEnabled: Boolean(options.evidenceDiscoveryEnabled)
   };
 }
 
@@ -7299,7 +7305,13 @@ async function handleResearchUsage(request, response) {
   if (!context) return;
   const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
   const entries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
-  sendJSON(response, 200, { usage: researchUsageSummary(entries, { mockMode }) });
+  sendJSON(response, 200, {
+    usage: researchUsageSummary(entries, {
+      mockMode,
+      evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled() &&
+        hasActiveResearchEntitlement(context.authContext.entitlement)
+    })
+  });
 }
 
 const researchFeedbackCategories = new Set([
@@ -7849,6 +7861,51 @@ async function handleResearchConversationDelete(request, response) {
     return;
   }
   sendJSON(response, 200, { deleted: true });
+}
+
+async function handleResearchEvidenceDiscover(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  if (!evidenceDiscoveryFeatureEnabled()) {
+    sendJSON(response, 403, {
+      error: "Find Relevant Evidence is not enabled for this private beta.",
+      code: "EVIDENCE_DISCOVERY_NOT_ENABLED"
+    });
+    return;
+  }
+  const projectID = String(context.body.projectID || "").trim();
+  if (projectID) {
+    const access = await requireProjectPermission(
+      response,
+      context.userID,
+      projectID,
+      organizationPermissions.projectView
+    );
+    if (!access) return;
+  }
+  try {
+    const discovery = await discoverRelevantEvidence({
+      question: context.body.question,
+      catalog: await sectionCatalog(),
+      invertedIndex: await shippedSearchIndex(),
+      readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
+        allowMissing: true,
+        canonicalSectionID: section.id
+      }),
+      limit: context.body.limit
+    });
+    sendJSON(response, 200, {
+      ...discovery,
+      projectID: projectID || null,
+      generatedAnswer: false,
+      paidModelCall: false
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid evidence discovery request.",
+      code: "INVALID_EVIDENCE_DISCOVERY"
+    });
+  }
 }
 
 function searchSnippet(text, query) {
@@ -10454,6 +10511,7 @@ async function syncResponseContract(userID, entitlement, body, contentMapVersion
     clientCapabilities: body.clientCapabilities ?? body.batch?.clientCapabilities,
     contentMapVersion,
     researchMonthlyLimit: monthlyResearchRequestLimit(),
+    evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled(),
     ...organizationCapabilities,
     migrationCheckpoint: await storedMigrationCheckpoint(
       userID,
@@ -11653,6 +11711,7 @@ const handlers = {
   "research/answers/get": handleResearchAnswerGet,
   "research/usage": handleResearchUsage,
   "research/feedback": handleResearchFeedback,
+  "research/evidence/discover": handleResearchEvidenceDiscover,
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,

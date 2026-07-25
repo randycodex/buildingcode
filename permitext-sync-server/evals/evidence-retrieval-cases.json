@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "retrievalVersion": "20260724-hybrid-candidates-v1",
+  "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
+  "coverageGaps": [
+    "mechanical-system questions",
+    "dedicated Buildings Bulletin retrieval",
+    "official agency interpretations outside the current library",
+    "tables and maps requiring non-text retrieval",
+    "broader existing-building scenarios"
+  ],
+  "cases": [
+    {
+      "id": "retrieval-scissor-stair-two-exits",
+      "status": "draft",
+      "sourceResearchCaseID": "scissor-stair-two-exits",
+      "scenarioCategories": ["direct code question", "exceptions", "egress"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests whether the candidate set finds the governing scissor-stair rule and its R-2 exception."
+    },
+    {
+      "id": "retrieval-single-stair-six-story-r2",
+      "status": "draft",
+      "sourceResearchCaseID": "single-stair-six-story-r2",
+      "scenarioCategories": ["direct code question", "egress", "missing project facts"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests one-exit discovery without treating area and story count as sufficient by themselves."
+    },
+    {
+      "id": "retrieval-residential-multipurpose-occupancy",
+      "status": "draft",
+      "sourceResearchCaseID": "residential-multipurpose-occupancy",
+      "scenarioCategories": ["occupancy classification", "multiple sections", "missing project facts"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests discovery across accessory-assembly classification and occupant-load provisions."
+    },
+    {
+      "id": "retrieval-accessory-assembly-plumbing-fixtures",
+      "status": "draft",
+      "sourceResearchCaseID": "accessory-assembly-plumbing-fixtures",
+      "scenarioCategories": ["multiple-code question", "plumbing", "exceptions"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests candidate completeness across Building Code classification and Plumbing Code fixture rules."
+    },
+    {
+      "id": "retrieval-building-code-versus-hcr",
+      "status": "draft",
+      "sourceResearchCaseID": "building-code-versus-hcr",
+      "scenarioCategories": ["misleading question", "insufficient query context", "outside current library"],
+      "expectedBehavior": "insufficient-query",
+      "evaluationDepth": 12,
+      "notes": "The source question says only 'this section'; retrieval should disclose missing context and the HCR evidence boundary instead of claiming candidate authority."
+    },
+    {
+      "id": "retrieval-mixed-occupancy-fixture-rounding",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-001-mixed-occupancy-fixture-rounding",
+      "scenarioCategories": ["multiple-code question", "plumbing", "mixed occupancies"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests fractional-calculation and accessory-assembly candidate coverage."
+    },
+    {
+      "id": "retrieval-stated-occupancy-movable-seats",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-002-stated-occupancy-movable-seats",
+      "scenarioCategories": ["administrative provisions", "occupant load", "missing project facts"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests completeness across several closely related occupant-load provisions."
+    },
+    {
+      "id": "retrieval-legacy-fire-alarm-enlargement",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-011-legacy-fire-alarm-enlargement",
+      "scenarioCategories": ["existing-building conditions", "fire protection", "multiple sections"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests legacy-system and enlargement candidate discovery without assuming full replacement."
+    },
+    {
+      "id": "retrieval-b-m-co-accessibility-boundary",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-013-b-m-co-accessibility-boundary",
+      "scenarioCategories": ["administrative provisions", "accessibility", "outside current library"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests Building Code candidates while preserving the zoning and Certificate of Occupancy boundary."
+    },
+    {
+      "id": "retrieval-sidewalk-cafe-evidence-boundary",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-015-sidewalk-cafe-evidence-boundary",
+      "scenarioCategories": ["accessibility", "egress", "agency boundary", "multiple sections"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests a broad candidate set whose completeness depends on several café-specific provisions."
+    }
+  ]
+}

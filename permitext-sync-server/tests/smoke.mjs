@@ -206,6 +206,7 @@ async function main() {
       APPLE_SERVICE_ID: "com.randycodex.permitext.web",
       PERMITEXT_PUBLIC_BASE_URL: baseURL,
       PERMITEXT_RESEARCH_MOCK: "1",
+      PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },
     stdio: ["ignore", "pipe", "pipe"]
@@ -247,7 +248,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260724-collaboration-v1"),
+      webRoot.text.includes("20260724-evidence-discovery-v4"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -348,6 +349,10 @@ async function main() {
 
     const workspaceScript = await request("/web/app.js");
     const syncStateScript = await request("/web/sync-state.js");
+    const evidenceDiscoveryClientSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("function renderEvidenceDiscovery"),
+      workspaceScript.text.indexOf("async function renderResearch")
+    );
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
     assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
@@ -744,8 +749,19 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-collaboration-v1'),
+        webRoot.text.includes('/web/app.js?v=20260724-evidence-discovery-v4'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
+        evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
+        evidenceDiscoveryClientSource.includes("Approve") &&
+        evidenceDiscoveryClientSource.includes("Reject") &&
+        evidenceDiscoveryClientSource.includes("Prepare Approved Evidence") &&
+        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/create"') &&
+        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/evidence"') &&
+        !evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/message"'),
+      "The Evidence Tray no longer preserves explicit candidate review before Research analysis."
     );
     assert(
         workspaceScript.text.includes('const summarySavedItems = (summary.savedItems || [])') &&
@@ -1373,6 +1389,19 @@ async function main() {
         freeResearchCreate.json.code === "RESEARCH_ADDON_REQUIRED",
       "Free account was allowed to create Research."
     );
+    const freeEvidenceDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: freeResearchToken,
+      body: {
+        auth: { accountUserID: freeResearchUserID },
+        question: "Can a scissor stair count as two exits?"
+      }
+    });
+    assert(
+      freeEvidenceDiscovery.response.status === 402 &&
+        freeEvidenceDiscovery.json.code === "RESEARCH_ADDON_REQUIRED",
+      "Free account was allowed to use Find Relevant Evidence."
+    );
 
     const grant = await request("/admin/lifetime-grants/grant", {
       method: "POST",
@@ -1396,6 +1425,65 @@ async function main() {
     assert(signIn.json.account.appUserID === userID, "Sign-in returned the wrong user ID.");
     assert(signIn.json.account.backendSessionToken, "Sign-in did not return a backend session token.");
     assert(signIn.json.entitlement?.source === "lifetimeGrant", "Sign-in did not return the granted entitlement.");
+    const discoveryCapabilityPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        syncSchemaVersion: 2,
+        clientCapabilities: ["evidence-discovery"]
+      }
+    });
+    assert(
+      discoveryCapabilityPull.response.ok &&
+        discoveryCapabilityPull.json.capabilityContract.capabilities["evidence-discovery"].enabled === true &&
+        discoveryCapabilityPull.json.capabilityContract.capabilities["evidence-discovery"].release === "private-beta",
+      "The private-beta capability contract did not expose evidence discovery to an entitled account."
+    );
+    const scissorEvidenceDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "Our Group R-2 building has a scissor stair. Can the stairs count as two exits?",
+        limit: 12
+      }
+    });
+    assert(
+      scissorEvidenceDiscovery.response.ok &&
+        scissorEvidenceDiscovery.json.generatedAnswer === false &&
+        scissorEvidenceDiscovery.json.paidModelCall === false &&
+        scissorEvidenceDiscovery.json.candidates.length > 0 &&
+        scissorEvidenceDiscovery.json.candidates.every((candidate) =>
+          candidate.candidateState === "candidate" &&
+          candidate.selectedText &&
+          !candidate.approved
+        ) &&
+        scissorEvidenceDiscovery.json.candidates.some((candidate) =>
+          candidate.sectionID === "2197" &&
+          candidate.codePrefix === "BC" &&
+          candidate.sectionNumber === "1007.1.1"
+        ),
+      "Find Relevant Evidence did not return unapproved canonical scissor-stair candidates without generating an answer."
+    );
+    const outsideAuthorityDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "Does this section prove that HCR requires a vanity?"
+      }
+    });
+    assert(
+      outsideAuthorityDiscovery.response.ok &&
+        outsideAuthorityDiscovery.json.coverageLimitations.some((item) =>
+          item.kind === "query-context-required"
+        ) &&
+        outsideAuthorityDiscovery.json.outsideCurrentLibrary.some((item) =>
+          item.label === "HCR requirements"
+        ),
+      "Evidence discovery did not disclose missing section context and outside-agency authority."
+    );
 
     const unauthorizedGrantSummaries = await request("/admin/accounts/grant-summaries");
     assert(
@@ -2586,7 +2674,10 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(
-      researchUsage.response.ok && researchUsage.json.usage.requestsUsed === 0 && researchUsage.json.usage.resetDate,
+      researchUsage.response.ok &&
+        researchUsage.json.usage.requestsUsed === 0 &&
+        researchUsage.json.usage.resetDate &&
+        researchUsage.json.usage.evidenceDiscoveryEnabled === true,
       "Research usage did not expose the monthly allowance and reset date."
     );
     const evaluationCasesBeforeFeedback = await readFile(

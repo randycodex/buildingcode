@@ -25,7 +25,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-collaboration-v1";
+} from "./offline-storage.js?v=20260724-evidence-discovery-v4";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -153,6 +153,7 @@ let researchConversationList = [];
 let activeResearchConversation = null;
 let researchUsage = null;
 let researchQuestionDraft = "";
+let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
 let activeWebWarningClose = null;
 
@@ -7371,6 +7372,278 @@ async function deleteResearchConversationFromList(conversation, button) {
   }
 }
 
+function evidenceCandidateCitation(candidate) {
+  return `${candidate.codePrefix || "BC"} § ${candidate.sectionNumber || candidate.sectionID}`;
+}
+
+function renderEvidenceDiscovery(container) {
+  if (
+    !hasCapability("evidence-discovery") &&
+    researchUsage?.evidenceDiscoveryEnabled !== true
+  ) return;
+  if (
+    activeEvidenceDiscovery &&
+    activeEvidenceDiscovery.accountUserID !== activeAccount()?.userID
+  ) {
+    activeEvidenceDiscovery = null;
+  }
+
+  const section = document.createElement("section");
+  section.className = "evidence-discovery";
+  const header = document.createElement("header");
+  header.className = "evidence-discovery-header";
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "section-label";
+  eyebrow.textContent = "Private beta · candidate retrieval";
+  const heading = document.createElement("h3");
+  heading.textContent = "Find Relevant Evidence";
+  const copy = document.createElement("p");
+  copy.textContent = "Describe the project question. Permitext searches the enacted library and proposes passages for your review; it does not generate an answer or approve evidence.";
+  header.append(eyebrow, heading, copy);
+
+  const form = document.createElement("form");
+  form.className = "evidence-discovery-form";
+  const questionLabel = document.createElement("label");
+  const questionLabelText = document.createElement("span");
+  questionLabelText.textContent = "Project question";
+  const question = document.createElement("textarea");
+  question.rows = 4;
+  question.maxLength = 2_000;
+  question.placeholder = "Example: Can a six-story R-2 building use one exit stair?";
+  question.value = activeEvidenceDiscovery?.question || researchQuestionDraft;
+  questionLabel.append(questionLabelText, question);
+  const controls = document.createElement("div");
+  controls.className = "evidence-discovery-form-controls";
+  const projectSelect = createResearchProjectSelect({
+    value: activeEvidenceDiscovery?.projectID || preferredResearchProjectID(),
+    unassignedLabel: "No Project",
+    ariaLabel: "Project for candidate evidence"
+  });
+  const findButton = document.createElement("button");
+  findButton.className = "evidence-discovery-find";
+  findButton.type = "submit";
+  findButton.textContent = "Find Candidate Evidence";
+  findButton.disabled = question.value.trim().length < 3;
+  controls.append(projectSelect, findButton);
+  projectSelect.addEventListener("change", () => {
+    if (activeEvidenceDiscovery) {
+      activeEvidenceDiscovery.projectID = projectSelect.value;
+    }
+  });
+  const formStatus = document.createElement("p");
+  formStatus.className = "evidence-discovery-status";
+  question.addEventListener("input", () => {
+    findButton.disabled = question.value.trim().length < 3;
+  });
+  form.append(questionLabel, controls, formStatus);
+
+  const results = document.createElement("section");
+  results.className = "evidence-discovery-results";
+
+  const renderResults = () => {
+    clear(results);
+    const discovery = activeEvidenceDiscovery;
+    if (!discovery?.response) return;
+    const response = discovery.response;
+    const candidates = response.candidates || [];
+    const approved = candidates.filter((candidate) => candidate.reviewState === "approved");
+    const summary = document.createElement("div");
+    summary.className = "evidence-discovery-summary";
+    const summaryText = document.createElement("strong");
+    summaryText.textContent = `${candidates.length} unapproved ${candidates.length === 1 ? "candidate" : "candidates"}`;
+    const searched = document.createElement("span");
+    searched.textContent = `${Number(response.searchedSectionCount || 0).toLocaleString()} enacted sections searched`;
+    summary.append(summaryText, searched);
+    results.append(summary);
+
+    if (response.coverageLimitations?.length) {
+      const limitations = document.createElement("aside");
+      limitations.className = "evidence-discovery-limitations";
+      const limitationsHeading = document.createElement("strong");
+      limitationsHeading.textContent = "Review boundary";
+      const list = document.createElement("ul");
+      response.coverageLimitations.forEach((limitation) => {
+        const item = document.createElement("li");
+        item.textContent = limitation.text;
+        list.append(item);
+      });
+      limitations.append(limitationsHeading, list);
+      results.append(limitations);
+    }
+
+    if (response.outsideCurrentLibrary?.length) {
+      const outside = document.createElement("aside");
+      outside.className = "evidence-discovery-outside";
+      const outsideHeading = document.createElement("strong");
+      outsideHeading.textContent = "Outside the current library";
+      const outsideCopy = document.createElement("p");
+      outsideCopy.textContent = response.outsideCurrentLibrary.map((item) => item.text).join(" ");
+      outside.append(outsideHeading, outsideCopy);
+      results.append(outside);
+    }
+
+    const tray = document.createElement("section");
+    tray.className = "evidence-candidate-tray";
+    candidates.forEach((candidate) => {
+      const reviewState = candidate.reviewState || "candidate";
+      const card = document.createElement("article");
+      card.className = `evidence-candidate-card is-${reviewState}`;
+      const cardHeader = document.createElement("div");
+      cardHeader.className = "evidence-candidate-heading";
+      const citationWrap = document.createElement("div");
+      const rank = document.createElement("span");
+      rank.className = "evidence-candidate-rank";
+      rank.textContent = `#${candidate.rank}`;
+      const citation = document.createElement("strong");
+      citation.textContent = evidenceCandidateCitation(candidate);
+      const title = document.createElement("p");
+      title.textContent = candidate.title || "Enacted section";
+      citationWrap.append(citation, title);
+      const stateBadge = document.createElement("span");
+      stateBadge.className = "evidence-candidate-state";
+      stateBadge.textContent = reviewState === "approved"
+        ? "Approved for this Research"
+        : reviewState === "rejected"
+          ? "Rejected"
+          : "Candidate · not approved";
+      cardHeader.append(rank, citationWrap, stateBadge);
+      const why = document.createElement("p");
+      why.className = "evidence-candidate-why";
+      why.textContent = candidate.whyRelevant;
+      const quote = document.createElement("blockquote");
+      quote.textContent = candidate.selectedText;
+      const signals = document.createElement("p");
+      signals.className = "evidence-candidate-signals";
+      const signalParts = [
+        candidate.relevance ? `${candidate.relevance} lexical relevance` : "",
+        candidate.signals?.topicRoutes?.length ? "curated topic route" : "",
+        candidate.signals?.containsException ? "exception language" : "",
+        candidate.signals?.containsCrossReference ? "cross-reference present" : ""
+      ].filter(Boolean);
+      signals.textContent = signalParts.join(" · ");
+      const actions = document.createElement("div");
+      actions.className = "evidence-candidate-actions";
+      const approveButton = document.createElement("button");
+      approveButton.type = "button";
+      approveButton.className = "evidence-candidate-approve";
+      approveButton.textContent = reviewState === "approved" ? "Approved" : "Approve";
+      approveButton.setAttribute("aria-pressed", String(reviewState === "approved"));
+      approveButton.addEventListener("click", () => {
+        candidate.reviewState = reviewState === "approved" ? "candidate" : "approved";
+        renderResults();
+      });
+      const rejectButton = document.createElement("button");
+      rejectButton.type = "button";
+      rejectButton.className = "evidence-candidate-reject";
+      rejectButton.textContent = reviewState === "rejected" ? "Rejected" : "Reject";
+      rejectButton.setAttribute("aria-pressed", String(reviewState === "rejected"));
+      rejectButton.addEventListener("click", () => {
+        candidate.reviewState = reviewState === "rejected" ? "candidate" : "rejected";
+        renderResults();
+      });
+      const openButton = document.createElement("button");
+      openButton.type = "button";
+      openButton.className = "evidence-candidate-open";
+      openButton.textContent = "Open source";
+      openButton.addEventListener("click", () => openSectionDetailForExistingSearch(candidate, {
+        anchorPaneID: "utility:analysis"
+      }));
+      actions.append(approveButton, rejectButton, openButton);
+      card.append(cardHeader, why, quote, signals, actions);
+      tray.append(card);
+    });
+    results.append(tray);
+
+    const prepare = document.createElement("section");
+    prepare.className = "evidence-discovery-prepare";
+    const prepareCopy = document.createElement("p");
+    prepareCopy.textContent = approved.length
+      ? `${approved.length} approved ${approved.length === 1 ? "passage is" : "passages are"} ready to attach. Preparing evidence creates an empty Research conversation; Analyze remains a separate action.`
+      : "Approve at least one passage to prepare a Research conversation.";
+    const prepareButton = document.createElement("button");
+    prepareButton.type = "button";
+    prepareButton.className = "evidence-discovery-prepare-button";
+    prepareButton.textContent = `Prepare Approved Evidence${approved.length ? ` (${approved.length})` : ""}`;
+    prepareButton.disabled = approved.length === 0;
+    const prepareStatus = document.createElement("p");
+    prepareStatus.className = "evidence-discovery-status";
+    prepareButton.addEventListener("click", async () => {
+      if (!approved.length) return;
+      prepareButton.disabled = true;
+      prepareStatus.textContent = "Attaching only the passages you approved…";
+      let payload = null;
+      try {
+        for (const [index, candidate] of approved.entries()) {
+          payload = index === 0
+            ? await postResearch("/research/conversations/create", {
+                sectionID: candidate.sectionID,
+                selectedText: candidate.selectedText,
+                projectID: discovery.projectID || ""
+              })
+            : await postResearch("/research/conversations/evidence", {
+                conversationID: payload.conversation.id,
+                sectionID: candidate.sectionID,
+                selectedText: candidate.selectedText
+              });
+        }
+        activeResearchConversation = payload.conversation;
+        researchQuestionDraft = discovery.question;
+        activeEvidenceDiscovery = null;
+        await refreshResearchConversationList();
+        await openResearchConversation(payload.conversation.id, { refreshList: true });
+      } catch (error) {
+        prepareStatus.textContent = error.message;
+        prepareButton.disabled = false;
+      }
+    });
+    prepare.append(prepareCopy, prepareButton, prepareStatus);
+    results.append(prepare);
+  };
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const normalizedQuestion = question.value.replace(/\s+/g, " ").trim();
+    if (normalizedQuestion.length < 3) return;
+    question.disabled = true;
+    projectSelect.disabled = true;
+    findButton.disabled = true;
+    formStatus.textContent = "Searching the enacted library for review candidates…";
+    try {
+      const response = await postResearch("/research/evidence/discover", {
+        question: normalizedQuestion,
+        projectID: projectSelect.value,
+        limit: 12
+      });
+      activeEvidenceDiscovery = {
+        accountUserID: activeAccount()?.userID || "",
+        question: normalizedQuestion,
+        projectID: projectSelect.value,
+        response: {
+          ...response,
+          candidates: (response.candidates || []).map((candidate) => ({
+            ...candidate,
+            reviewState: "candidate"
+          }))
+        }
+      };
+      formStatus.textContent = response.candidates?.length
+        ? "Candidates found. Review each passage before approval."
+        : "No candidates were found. Refine the question or identify a code section.";
+      renderResults();
+    } catch (error) {
+      formStatus.textContent = error.message;
+    } finally {
+      question.disabled = false;
+      projectSelect.disabled = false;
+      findButton.disabled = question.value.trim().length < 3;
+    }
+  });
+
+  section.append(header, form, results);
+  container.append(section);
+  renderResults();
+}
+
 async function renderResearch(paneID = "utility:analysis") {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
@@ -7478,6 +7751,8 @@ async function renderResearch(paneID = "utility:analysis") {
     usage.append(primary, reset, details);
     content.append(usage);
   }
+
+  renderEvidenceDiscovery(content);
 
   if (!researchConversationList.length) {
     const empty = document.createElement("div");

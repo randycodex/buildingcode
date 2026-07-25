@@ -237,6 +237,7 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
   const pro = hasActiveProEntitlement(entitlement, now);
   const research = hasActiveResearchEntitlement(entitlement, now);
   const researchMode = researchEntitlementMode(entitlement, now);
+  const evidenceDiscovery = research && options.evidenceDiscoveryEnabled === true;
   const collaboration = options.collaborationEnabled === true;
   const organizationAdministration = options.organizationAdministrationEnabled === true;
   const researchMonthlyLimit = Number.isSafeInteger(Number(options.researchMonthlyLimit))
@@ -265,7 +266,11 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
         requiresPro: true,
         monthlyLimit: research ? researchMonthlyLimit : 0
       },
-      [capabilityIDs.evidenceDiscovery]: { enabled: false },
+      [capabilityIDs.evidenceDiscovery]: {
+        enabled: evidenceDiscovery,
+        requiresResearch: true,
+        release: evidenceDiscovery ? "private-beta" : "unavailable"
+      },
       [capabilityIDs.collaboration]: { enabled: collaboration },
       [capabilityIDs.organizationAdministration]: { enabled: organizationAdministration }
     }
@@ -279,6 +284,7 @@ export function syncContract({
   contentMapVersion,
   migrationCheckpoint = null,
   researchMonthlyLimit = defaultResearchMonthlyLimit,
+  evidenceDiscoveryEnabled = false,
   collaborationEnabled = false,
   organizationAdministrationEnabled = false
 }) {
@@ -296,6 +302,7 @@ export function syncContract({
     )).slice(0, 100),
     capabilityContract: capabilityContract(entitlement, Date.now(), {
       researchMonthlyLimit,
+      evidenceDiscoveryEnabled,
       collaborationEnabled,
       organizationAdministrationEnabled
     }),

@@ -853,6 +853,8 @@ Measure:
 
 Do not evaluate only whether one relevant section appears. Evaluate whether the candidate set is sufficiently complete for professional review.
 
+**Status: draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current ten cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all nine answerable draft scenarios and correctly identifies the tenth as missing section context. This is useful engineering evidence, not release approval. Mechanical systems, Buildings Bulletins, outside-agency interpretations, non-text tables or maps, and broader existing-building scenarios remain explicit coverage gaps.
+
 ---
 
 ## Phase 4.2 — Find Relevant Evidence
@@ -880,6 +882,8 @@ Clearly distinguish:
 ### Release gate
 
 Do not publicly launch Find Relevant Evidence until evaluation demonstrates dependable candidate discovery across the approved scenario categories.
+
+**Status: private-beta web prototype implemented; public launch remains disabled.** A Research-entitled user can enter a Project question, receive deterministic hybrid lexical and curated-topic candidates from the canonical enacted-code library, review the retrieval explanation and coverage limitations, approve or reject each passage, open its enacted source, and prepare only the approved passages in an empty Research conversation. Preparing evidence does not generate an answer or make a paid model call; Analyze remains a separate user action. The server requires the private-beta environment flag in addition to the Research entitlement, all returned evidence is explicitly unapproved, and the production capability stays unavailable until knowledgeable-human review produces approved scenario gates. This assembly workflow is web-first; iOS receives the capability contract and retains access to synchronized Research history but does not expose candidate assembly in this release.
 
 ---
 

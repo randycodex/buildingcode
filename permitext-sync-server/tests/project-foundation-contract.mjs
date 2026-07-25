@@ -111,6 +111,24 @@ const researchCapabilities = capabilityContract({
 });
 assert.equal(researchCapabilities.capabilities.research.enabled, true);
 assert.equal(researchCapabilities.capabilities.research.monthlyLimit, 100);
+assert.equal(researchCapabilities.capabilities["evidence-discovery"].enabled, false);
+const discoveryCapabilities = capabilityContract(
+  {
+    plan: "pro",
+    expiresAt: "2099-01-01T00:00:00.000Z",
+    provider: { permitextPackage: "pro" },
+    addOns: {
+      research: {
+        enabled: true,
+        expiresAt: "2099-01-01T00:00:00.000Z"
+      }
+    }
+  },
+  Date.now(),
+  { evidenceDiscoveryEnabled: true }
+);
+assert.equal(discoveryCapabilities.capabilities["evidence-discovery"].enabled, true);
+assert.equal(discoveryCapabilities.capabilities["evidence-discovery"].release, "private-beta");
 
 const compatibility = syncContract({
   entitlement: null,
