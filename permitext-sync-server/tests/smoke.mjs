@@ -140,6 +140,12 @@ async function main() {
     join(evaluationRoot, "research-cases.json"),
     `${JSON.stringify(evaluationDataset, null, 2)}\n`
   );
+  await Promise.all([
+    ["evidence-retrieval-cases.json", new URL("../evals/evidence-retrieval-cases.json", import.meta.url)],
+    ["zoning-cases.json", new URL("../evals/zoning-cases.json", import.meta.url)]
+  ].map(async ([name, source]) => {
+    await writeFile(join(evaluationRoot, name), await readFile(source, "utf8"));
+  }));
   await writeFile(
     join(evaluationRoot, "reviews.json"),
     `${JSON.stringify({ schemaVersion: 1, reviews: [] }, null, 2)}\n`
@@ -531,10 +537,14 @@ async function main() {
     assert(
       iosLibraryViewModelSource.includes("private var startupWarmupTask: Task<Void, Never>?") &&
         iosLibraryViewModelSource.includes("startupWarmupTask?.cancel()") &&
+        iosLibraryViewModelSource.includes("startupFirstUsableDurationMilliseconds") &&
+        iosLibraryViewModelSource.includes('name: "firstUsableContent"') &&
+        iosLibraryViewModelSource.includes('name: "backgroundWarmup"') &&
+        iosSyncEngineSource.includes('category: "Startup"') &&
         Array.from(iosLibraryViewModelSource.matchAll(
           /self\.isInitialContentLoaded = true\s+self\.startupWarmupTask = Task/g
         )).length === 2,
-      "iOS startup once again blocks first paint on authored or SQLite content prewarming."
+      "iOS startup no longer measures first usable content before cancellable authored or SQLite prewarming."
     );
     const projectMutationSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function projectMutationForRecord"),
@@ -3301,6 +3311,11 @@ async function main() {
     });
     assert(
       internalData.response.ok && internalData.json.dataset.schemaVersion === 3 &&
+        internalData.json.retrievalDataset.cases.length > 0 &&
+        internalData.json.zoningDataset.cases.length > 0 &&
+        internalData.json.zoningReviewCases.every((testCase) =>
+          testCase.selectedEvidence.length === testCase.selectedEvidenceSectionIDs.length
+        ) &&
         internalData.json.feedbackCandidates.some((item) => item.answerID === answerID) &&
         internalData.json.feedbackRecords.some((item) =>
           item.answerID === answerID &&
@@ -3414,12 +3429,80 @@ async function main() {
       }
     });
     assert(approvedCaseDefinition.response.ok, "The owner case-level review fixture failed.");
+    const approvedResearchCaseIDs = new Set(
+      internalData.json.dataset.cases
+        .filter((testCase) => testCase.status === "approved")
+        .map((testCase) => testCase.id)
+    );
+    const unapprovedRetrievalCase = internalData.json.retrievalDataset.cases.find(
+      (testCase) => !approvedResearchCaseIDs.has(testCase.sourceResearchCaseID)
+    );
+    assert(unapprovedRetrievalCase, "Smoke retrieval approval guard needs a linked draft Research case.");
+    const prematureRetrievalApproval = await request("/internal/evaluations/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        kind: "retrieval-case",
+        caseID: unapprovedRetrievalCase.id,
+        decision: "approved",
+        reviewer: "Smoke retrieval reviewer",
+        notes: "This must remain blocked while its Research evidence case is a draft."
+      }
+    });
+    assert(
+      prematureRetrievalApproval.response.status === 409,
+      "A retrieval scenario was approved before its linked Research evidence case."
+    );
+    const retrievalCaseID = internalData.json.retrievalDataset.cases[0].id;
+    const revisedRetrievalCase = await request("/internal/evaluations/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        kind: "retrieval-case",
+        caseID: retrievalCaseID,
+        decision: "revise",
+        reviewer: "Smoke retrieval reviewer",
+        notes: "Revise the candidate expectation."
+      }
+    });
+    assert(revisedRetrievalCase.response.ok, "The retrieval review queue did not accept a revise decision.");
+    const zoningCaseID = internalData.json.zoningDataset.cases[0].id;
+    const rejectedZoningCase = await request("/internal/evaluations/review", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        kind: "zoning-case",
+        caseID: zoningCaseID,
+        decision: "rejected",
+        reviewer: "Smoke zoning reviewer",
+        notes: "Reject the draft case."
+      }
+    });
+    assert(rejectedZoningCase.response.ok, "The Zoning review queue did not accept a reject decision.");
+    const savedRetrievalDataset = JSON.parse(
+      await readFile(join(evaluationRoot, "evidence-retrieval-cases.json"), "utf8")
+    );
+    const savedZoningDataset = JSON.parse(
+      await readFile(join(evaluationRoot, "zoning-cases.json"), "utf8")
+    );
+    assert(
+      savedRetrievalDataset.cases.find((testCase) => testCase.id === retrievalCaseID).status === "draft" &&
+        savedRetrievalDataset.cases.find((testCase) => testCase.id === retrievalCaseID).reviewer === "Smoke retrieval reviewer" &&
+        savedZoningDataset.cases.find((testCase) => testCase.id === zoningCaseID).status === "rejected" &&
+        savedZoningDataset.cases.find((testCase) => testCase.id === zoningCaseID).reviewer === "Smoke zoning reviewer",
+      "Supplemental review decisions were not persisted with explicit reviewer metadata."
+    );
     const reviewsAfterCaseDecision = JSON.parse(
       await readFile(join(evaluationRoot, "reviews.json"), "utf8")
     ).reviews;
     assert(
       reviewsAfterCaseDecision.filter((review) => review.kind === "run").length === 1 &&
-        reviewsAfterCaseDecision.filter((review) => review.kind === "case").length === 1,
+        reviewsAfterCaseDecision.filter((review) => review.kind === "case").length === 1 &&
+        reviewsAfterCaseDecision.filter((review) => review.kind === "retrieval-case").length === 1 &&
+        reviewsAfterCaseDecision.filter((review) => review.kind === "zoning-case").length === 1,
       "A case-level approval created or altered a run-level approval."
     );
     const internalDataAfterApprovals = await request("/internal/evaluations/data", {

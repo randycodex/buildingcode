@@ -90,6 +90,13 @@ function normalizedSectionNumber(value) {
     .toUpperCase();
 }
 
+function normalizedHeadingTitle(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "");
+}
+
 function headingWrapperStart(html, headingStart) {
   const preceding = html.slice(0, headingStart);
   const wrapperStart = preceding.toLowerCase().lastIndexOf("<div><span depth=");
@@ -131,6 +138,8 @@ function chapterHeadings(source) {
     headings.push({
       sectionNumber: sectionMatch[1].replace(/\s+/g, ""),
       normalizedSectionNumber: normalizedSectionNumber(sectionMatch[1]),
+      headingText,
+      normalizedHeadingTitle: normalizedHeadingTitle(headingText),
       headingStart,
       contentStart: headingEnd,
       wrapperStart: headingWrapperStart(source.html, headingStart)
@@ -146,13 +155,29 @@ export async function constructionChapterHeadingNumbers(codePrefix, chapterNumbe
   return chapterHeadings(source).map((heading) => heading.sectionNumber);
 }
 
+export async function constructionChapterHeadingDetails(codePrefix, chapterNumber) {
+  const source = await constructionChapterHTMLSource(codePrefix, chapterNumber);
+  if (!source) return [];
+  return chapterHeadings(source).map(({ sectionNumber, headingText }) => ({
+    sectionNumber,
+    headingText
+  }));
+}
+
 export async function constructionHTMLBodyForSection(section) {
   if (!section?.id || !section?.chapterNumber || !section?.sectionNumber) return null;
   const source = await constructionChapterHTMLSource(section.codePrefix, section.chapterNumber);
   if (!source) return null;
   const headings = chapterHeadings(source);
   const target = normalizedSectionNumber(section.sectionNumber);
-  const index = headings.findIndex((heading) => heading.normalizedSectionNumber === target);
+  const candidates = headings
+    .map((heading, index) => ({ heading, index }))
+    .filter(({ heading }) => heading.normalizedSectionNumber === target);
+  const expectedTitle = normalizedHeadingTitle(section.title);
+  const selected = candidates.find(
+    ({ heading }) => expectedTitle && heading.normalizedHeadingTitle === expectedTitle
+  ) || candidates[0];
+  const index = selected?.index ?? -1;
   if (index < 0) return null;
   const start = headings[index].contentStart;
   const end = index + 1 < headings.length ? headings[index + 1].wrapperStart : source.html.length;

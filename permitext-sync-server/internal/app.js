@@ -5,6 +5,8 @@ const tabs = document.querySelector(".tabs");
 const panels = Object.fromEntries([...document.querySelectorAll(".tab-panel")].map((panel) => [panel.id, panel]));
 let data = null;
 let selectedCaseID = "";
+let selectedRetrievalCaseID = "";
+let selectedZoningCaseID = "";
 let selectedFeedbackStatus = "open";
 let selectedFeedbackCategory = "all";
 
@@ -47,11 +49,20 @@ function appendList(parent, title, items) {
 
 function renderSummary() {
   const approved = data.dataset.cases.filter((item) => item.status === "approved").length;
+  const retrievalApproved = data.retrievalDataset.cases.filter((item) => item.status === "approved").length;
+  const zoningApproved = data.zoningDataset.cases.filter((item) => item.status === "approved").length;
   const openFeedback = (data.feedbackRecords || data.feedbackCandidates || []).filter((item) =>
     ["new", "reviewing", "evaluation_candidate"].includes(item.triageStatus || "new")
   ).length;
   summaryElement.replaceChildren();
-  [["Cases", data.dataset.cases.length], ["Approved", approved], ["Saved runs", data.runs.length], ["Open feedback", openFeedback]].forEach(([label, value]) => {
+  [
+    ["Research cases", data.dataset.cases.length],
+    ["Research approved", approved],
+    ["Retrieval approved", `${retrievalApproved}/${data.retrievalDataset.cases.length}`],
+    ["Zoning approved", `${zoningApproved}/${data.zoningDataset.cases.length}`],
+    ["Saved runs", data.runs.length],
+    ["Open feedback", openFeedback]
+  ].forEach(([label, value]) => {
     const card = element("article");
     card.append(element("strong", { text: value }), element("span", { text: label }));
     summaryElement.append(card);
@@ -88,7 +99,10 @@ async function saveReview(values, formStatus) {
 
 function reviewForm(testCase, options = {}) {
   const form = element("section", { className: "review-form" });
-  form.append(element("h3", { text: options.runID ? "Human answer review (one case)" : "Case decision" }));
+  const reviewKind = options.runID ? "run" : options.reviewKind || "case";
+  form.append(element("h3", {
+    text: options.runID ? "Human answer review (one case)" : "Knowledgeable-human case decision"
+  }));
   const reviewer = element("input");
   reviewer.placeholder = "Reviewer";
   reviewer.value = testCase.reviewer || "Permitext owner";
@@ -115,26 +129,42 @@ function reviewForm(testCase, options = {}) {
     });
   }
   const actions = element("div", { className: "actions" });
-  const approve = element("button", { text: options.runID ? "Approve this answer" : "Approve case" });
-  const reject = element("button", {
-    className: "reject",
-    text: options.runID ? "Reject this answer" : "Return case to draft"
-  });
   const result = element("p", { className: "meta" });
-  [approve, reject].forEach((button) => {
+  const decisions = options.runID
+    ? [
+        ["approved", "Approve this answer", ""],
+        ["rejected", "Reject this answer", "reject"]
+      ]
+    : [
+        ["approved", "Approve case", ""],
+        ["revise", "Send for revision", "revise"],
+        ["rejected", "Reject case", "reject"]
+      ];
+  decisions.forEach(([decision, label, className]) => {
+    const button = element("button", { text: label, className });
     button.type = "button";
+    if (decision === "approved" && options.approvalDisabled) {
+      button.disabled = true;
+      button.title = options.approvalDisabledReason || "Approval prerequisites are incomplete.";
+    }
     button.addEventListener("click", () => saveReview({
-      kind: options.runID ? "run" : "case",
+      kind: reviewKind,
       caseID: testCase.id,
       runID: options.runID || "",
-      decision: button === approve ? "approved" : "rejected",
+      decision,
       reviewer: reviewer.value,
       notes: notes.value,
       scoreOverrides: overrides
     }, result));
+    actions.append(button);
   });
-  actions.append(approve, reject);
   form.prepend(reviewer, notes);
+  if (!options.runID) {
+    form.append(element("p", {
+      className: "meta",
+      text: "Approve, revise, and reject are explicit local-only decisions. No automatic score or generated answer can choose one."
+    }));
+  }
   form.append(actions, result);
   return form;
 }
@@ -157,7 +187,8 @@ function appendPreviousReview(parent, review) {
   parent.append(card);
 }
 
-function caseDetail(testCase) {
+function caseDetail(testCase, options = {}) {
+  const reviewKind = options.reviewKind || "case";
   const detail = element("article", { className: "card" });
   detail.append(element("h2", { text: testCase.title }));
   const meta = element("p", { className: "meta", text: `${testCase.id} · ${testCase.codeEdition} · ${testCase.difficulty} · ${testCase.sourceType}` });
@@ -183,8 +214,8 @@ function caseDetail(testCase) {
   appendList(detail, "Missing facts", testCase.missingFacts);
   appendList(detail, "Forbidden claims", testCase.forbiddenClaims);
   if (testCase.notes) detail.append(element("h3", { text: "Case notes" }), element("p", { text: testCase.notes }));
-  appendPreviousReview(detail, latestReview("case", testCase.id));
-  detail.append(reviewForm(testCase));
+  appendPreviousReview(detail, latestReview(reviewKind, testCase.id));
+  detail.append(reviewForm(testCase, { reviewKind }));
   return detail;
 }
 
@@ -205,6 +236,139 @@ function renderCases() {
   if (selected) detail.append(caseDetail(selected));
   wrapper.append(list, detail);
   panels.cases.replaceChildren(wrapper);
+}
+
+function reviewQueueList(cases, selectedID, onSelect) {
+  const list = element("aside", { className: "card list" });
+  cases.forEach((testCase) => {
+    const button = element("button");
+    button.setAttribute("aria-pressed", String(testCase.id === selectedID));
+    button.append(
+      element("strong", { text: testCase.title || testCase.id }),
+      element("div", { className: `badge ${testCase.status}`, text: testCase.status })
+    );
+    button.addEventListener("click", () => onSelect(testCase.id));
+    list.append(button);
+  });
+  return list;
+}
+
+function retrievalCaseDetail(retrievalCase) {
+  const researchCase = data.dataset.cases.find(
+    (testCase) => testCase.id === retrievalCase.sourceResearchCaseID
+  );
+  const detail = element("article", { className: "card" });
+  detail.append(
+    element("h2", { text: retrievalCase.id }),
+    element("p", {
+      className: "meta",
+      text: `${retrievalCase.status} · ${retrievalCase.expectedBehavior} · depth ${retrievalCase.evaluationDepth}`
+    })
+  );
+  retrievalCase.scenarioCategories.forEach((category) =>
+    detail.append(element("span", { className: "badge", text: category }))
+  );
+  detail.append(
+    element("h3", { text: "Project question" }),
+    element("p", { text: researchCase?.question || "Referenced Research case is unavailable." }),
+    element("h3", { text: "Review intent" }),
+    element("p", { text: retrievalCase.notes })
+  );
+  if (researchCase) {
+    detail.append(element("h3", { text: "Proposed expected evidence" }));
+    researchCase.selectedEvidence.forEach((source) => {
+      detail.append(element("strong", { text: `${source.reference} · canonical section ${source.sectionID}` }));
+      source.exactPassages.forEach((passage) =>
+        detail.append(element("div", { className: "evidence", text: passage }))
+      );
+    });
+    if (researchCase.status !== "approved") {
+      detail.append(element("p", {
+        className: "meta",
+        text: "Approval is locked until the linked Research evidence case is approved."
+      }));
+    }
+  }
+  appendPreviousReview(detail, latestReview("retrieval-case", retrievalCase.id));
+  detail.append(reviewForm(retrievalCase, {
+    reviewKind: "retrieval-case",
+    approvalDisabled: researchCase?.status !== "approved",
+    approvalDisabledReason: "Approve the linked Research evidence case first."
+  }));
+  return detail;
+}
+
+function renderRetrievalCases() {
+  const cases = data.retrievalDataset.cases;
+  selectedRetrievalCaseID ||= cases[0]?.id || "";
+  const wrapper = element("div", { className: "split" });
+  wrapper.append(
+    reviewQueueList(cases, selectedRetrievalCaseID, (caseID) => {
+      selectedRetrievalCaseID = caseID;
+      renderRetrievalCases();
+    })
+  );
+  const detail = element("section");
+  const selected = cases.find((testCase) => testCase.id === selectedRetrievalCaseID);
+  if (selected) detail.append(retrievalCaseDetail(selected));
+  wrapper.append(detail);
+  panels.retrieval.replaceChildren(wrapper);
+}
+
+function zoningCaseDetail(testCase) {
+  const detail = element("article", { className: "card" });
+  detail.append(
+    element("h2", { text: testCase.id }),
+    element("p", {
+      className: "meta",
+      text: `${testCase.status} · ${testCase.category} · ${data.zoningDataset.codeVersion}`
+    }),
+    element("p", {
+      className: "meta",
+      text: "Reviewing or approving a case does not enable Zoning in public AI Research."
+    }),
+    element("h3", { text: "Question" }),
+    element("p", { text: testCase.question }),
+    element("h3", { text: "Selected official evidence" })
+  );
+  (testCase.selectedEvidence || []).forEach((source) => {
+    const evidence = element("div", { className: "evidence" });
+    const sourceLink = element("a", { text: `${source.reference} — ${source.title}` });
+    sourceLink.href = source.sourceURL;
+    sourceLink.target = "_blank";
+    sourceLink.rel = "noreferrer";
+    evidence.append(
+      sourceLink,
+      element("p", {
+        className: "meta",
+        text: `${source.version || "Version unavailable"} · last amended ${source.lastAmended || "not stated"} · section ${source.sectionID}`
+      }),
+      element("p", { text: source.previewText })
+    );
+    detail.append(evidence);
+  });
+  appendList(detail, "Required concepts", testCase.requiredConcepts);
+  appendList(detail, "Forbidden claims", testCase.forbiddenClaims);
+  appendPreviousReview(detail, latestReview("zoning-case", testCase.id));
+  detail.append(reviewForm(testCase, { reviewKind: "zoning-case" }));
+  return detail;
+}
+
+function renderZoningCases() {
+  const cases = data.zoningReviewCases;
+  selectedZoningCaseID ||= cases[0]?.id || "";
+  const wrapper = element("div", { className: "split" });
+  wrapper.append(
+    reviewQueueList(cases, selectedZoningCaseID, (caseID) => {
+      selectedZoningCaseID = caseID;
+      renderZoningCases();
+    })
+  );
+  const detail = element("section");
+  const selected = cases.find((testCase) => testCase.id === selectedZoningCaseID);
+  if (selected) detail.append(zoningCaseDetail(selected));
+  wrapper.append(detail);
+  panels.zoning.replaceChildren(wrapper);
 }
 
 function runLabel(run) {
@@ -518,6 +682,8 @@ function renderFeedback() {
 function renderAll() {
   renderSummary();
   renderCases();
+  renderRetrievalCases();
+  renderZoningCases();
   renderRuns();
   renderFeedback();
   tabs.hidden = false;

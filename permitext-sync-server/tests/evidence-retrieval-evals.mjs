@@ -42,7 +42,16 @@ function validateRetrievalDataset(dataset, researchDataset) {
   for (const testCase of dataset.cases) {
     assert(testCase.id && !ids.has(testCase.id), `Invalid or duplicate retrieval case ${testCase.id}.`);
     ids.add(testCase.id);
-    assert.equal(testCase.status, "draft", `${testCase.id} must remain a human-review draft.`);
+    assert(
+      ["draft", "reviewed", "approved", "rejected"].includes(testCase.status),
+      `${testCase.id} has an invalid human-review status.`
+    );
+    const hasReviewer = Boolean(String(testCase.reviewer || "").trim());
+    const hasReviewDate = Number.isFinite(Date.parse(testCase.reviewedAt || ""));
+    assert.equal(hasReviewer, hasReviewDate, `${testCase.id} has incomplete reviewer metadata.`);
+    if (["reviewed", "approved", "rejected"].includes(testCase.status)) {
+      assert(hasReviewer, `${testCase.id} needs reviewer metadata for status ${testCase.status}.`);
+    }
     assert(researchByID.has(testCase.sourceResearchCaseID), `${testCase.id} has no canonical Research source case.`);
     assert(
       ["candidate-recall", "insufficient-query"].includes(testCase.expectedBehavior),
@@ -141,7 +150,7 @@ try {
   })).account;
 
   const results = [];
-  for (const retrievalCase of retrievalDataset.cases) {
+  for (const retrievalCase of retrievalDataset.cases.filter((testCase) => testCase.status !== "rejected")) {
     const researchCase = researchByID.get(retrievalCase.sourceResearchCaseID);
     const discovery = await jsonRequest(baseURL, "/research/evidence/discover", {
       method: "POST",
@@ -235,9 +244,12 @@ try {
   const recallResults = results.filter((result) => result.recall !== null);
   const meanRecall = recallResults.reduce((sum, result) => sum + result.recall, 0) / recallResults.length;
   const meanPassageRecall = recallResults.reduce((sum, result) => sum + result.passageRecall, 0) / recallResults.length;
+  const draftCases = retrievalDataset.cases.filter((testCase) => testCase.status === "draft");
   const approvedCases = retrievalDataset.cases.filter((testCase) => testCase.status === "approved");
+  const rejectedCases = retrievalDataset.cases.filter((testCase) => testCase.status === "rejected");
   console.log(
-    `Summary: ${retrievalDataset.cases.length} draft cases, ${approvedCases.length} approved retrieval gates, ` +
+    `Summary: ${draftCases.length} draft cases, ${approvedCases.length} approved retrieval gates, ` +
+    `${rejectedCases.length} rejected cases, ` +
     `${(meanRecall * 100).toFixed(1)}% mean section recall@12, ` +
     `${(meanPassageRecall * 100).toFixed(1)}% mean passage recall.`
   );

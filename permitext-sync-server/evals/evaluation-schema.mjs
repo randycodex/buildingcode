@@ -1,4 +1,4 @@
-export const evaluationStatuses = ["draft", "reviewed", "approved", "retired"];
+export const evaluationStatuses = ["draft", "reviewed", "approved", "rejected", "retired"];
 export const evaluationDifficulties = ["basic", "intermediate", "advanced"];
 export const evaluationSourceTypes = [
   "real project",
@@ -118,7 +118,7 @@ export function validateEvaluationDataset(dataset) {
     assert(testCase.reviewer === null || (typeof testCase.reviewer === "string" && testCase.reviewer.trim()), `${testCase.id} has an invalid reviewer.`);
     assert(testCase.reviewedAt === null || Number.isFinite(Date.parse(testCase.reviewedAt)), `${testCase.id} has an invalid reviewedAt timestamp.`);
     assert(typeof testCase.notes === "string", `${testCase.id} needs notes, which may be an empty string.`);
-    if (["reviewed", "approved", "retired"].includes(testCase.status)) {
+    if (["reviewed", "approved", "rejected", "retired"].includes(testCase.status)) {
       assert(testCase.reviewer && testCase.reviewedAt, `${testCase.id} must identify the reviewer and review date for status ${testCase.status}.`);
     }
     assert(Array.isArray(testCase.selectedEvidence) && testCase.selectedEvidence.length > 0, `${testCase.id} needs selected evidence.`);

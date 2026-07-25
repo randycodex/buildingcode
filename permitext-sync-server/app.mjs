@@ -111,6 +111,8 @@ const evaluationRootPath = process.env.NODE_ENV === "test" &&
   ? String(process.env.PERMITEXT_EVALUATION_ROOT).trim()
   : join(__dirname, "evals");
 const evaluationCasesPath = join(evaluationRootPath, "research-cases.json");
+const evidenceRetrievalCasesPath = join(evaluationRootPath, "evidence-retrieval-cases.json");
+const zoningEvaluationCasesPath = join(evaluationRootPath, "zoning-cases.json");
 const evaluationResultsPath = join(evaluationRootPath, "results");
 const evaluationReviewsPath = join(evaluationRootPath, "reviews.json");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -3443,7 +3445,7 @@ async function sectionBody(sectionID, options = {}) {
   if (legacySectionID && legacySectionID !== canonicalSectionID) {
     candidates.push(join(canonicalSectionContentPath, `${legacySectionID}.json`));
   }
-  if (legacySectionID) {
+  if (legacySectionID && (!canonicalSectionID || legacySectionID !== canonicalSectionID)) {
     candidates.push(join(legacySectionContentPath, `${legacySectionID}.json`));
   }
 
@@ -8248,16 +8250,82 @@ async function readEvaluationRuns() {
   }
 }
 
+const reviewableCaseStatuses = new Set(["draft", "reviewed", "approved", "rejected"]);
+
+function validateSupplementalEvaluationDataset(dataset, label) {
+  if (dataset?.schemaVersion !== 1 || !Array.isArray(dataset.cases) || !dataset.cases.length) {
+    throw new Error(`${label} evaluation dataset is invalid.`);
+  }
+  const ids = new Set();
+  for (const testCase of dataset.cases) {
+    const id = String(testCase?.id || "").trim();
+    if (!id || ids.has(id) || !reviewableCaseStatuses.has(testCase.status)) {
+      throw new Error(`${label} evaluation case ${id || "without an ID"} is invalid.`);
+    }
+    ids.add(id);
+    const hasReviewer = Boolean(String(testCase.reviewer || "").trim());
+    const hasReviewDate = Number.isFinite(Date.parse(testCase.reviewedAt || ""));
+    if (hasReviewer !== hasReviewDate) {
+      throw new Error(`${label} evaluation case ${id} has incomplete reviewer metadata.`);
+    }
+    if (["reviewed", "approved", "rejected"].includes(testCase.status) && !hasReviewer) {
+      throw new Error(`${label} evaluation case ${id} needs reviewer metadata for status ${testCase.status}.`);
+    }
+  }
+  return dataset;
+}
+
+async function readSupplementalEvaluationDataset(path, label) {
+  return validateSupplementalEvaluationDataset(
+    JSON.parse(await readFile(path, "utf8")),
+    label
+  );
+}
+
+async function zoningReviewEvidence(testCase) {
+  return Promise.all((testCase.selectedEvidenceSectionIDs || []).map(async (sectionID) => {
+    const [summary, section] = await Promise.all([
+      zoningSectionSummary(sectionID),
+      zoningSection(sectionID)
+    ]);
+    if (!summary || !section?.blocks?.length) {
+      throw new Error(`Zoning review case ${testCase.id} references unavailable section ${sectionID}.`);
+    }
+    return {
+      sectionID: String(sectionID),
+      reference: `ZR ${summary.sectionNumber}`,
+      title: summary.title,
+      sourceURL: section.zoning?.sourceURL || "",
+      version: section.zoning?.version || "",
+      lastAmended: section.zoning?.lastAmended || null,
+      previewText: section.previewText || section.blocks.map((block) => block.plainText || "").join(" ")
+    };
+  }));
+}
+
 async function handleInternalEvaluationData(request, response) {
   const context = await authenticatedInternalBody(request, response);
   if (!context) return;
   const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
   validateEvaluationDataset(dataset);
-  const runs = await readEvaluationRuns();
-  const reviews = (await readEvaluationReviews()).reviews;
-  const feedbackRecords = (await listAllStoredResearchFeedback()).filter((item) => item.status === "candidate");
+  const [retrievalDataset, zoningDataset, runs, reviewStore, storedFeedback] = await Promise.all([
+    readSupplementalEvaluationDataset(evidenceRetrievalCasesPath, "Evidence retrieval"),
+    readSupplementalEvaluationDataset(zoningEvaluationCasesPath, "Zoning"),
+    readEvaluationRuns(),
+    readEvaluationReviews(),
+    listAllStoredResearchFeedback()
+  ]);
+  const reviews = reviewStore.reviews;
+  const feedbackRecords = storedFeedback.filter((item) => item.status === "candidate");
+  const zoningReviewCases = await Promise.all(zoningDataset.cases.map(async (testCase) => ({
+    ...testCase,
+    selectedEvidence: await zoningReviewEvidence(testCase)
+  })));
   sendJSON(response, 200, {
     dataset,
+    retrievalDataset,
+    zoningDataset,
+    zoningReviewCases,
     runs,
     reviews,
     runReviewStatuses: Object.fromEntries(runs.map((run) => [
@@ -8335,18 +8403,55 @@ async function handleInternalEvaluationReview(request, response) {
   const decision = String(context.body.decision || "").trim();
   const notes = normalizedResearchText(context.body.notes, 4_000);
   const reviewer = normalizedResearchText(context.body.reviewer, 120) || "Permitext owner";
-  if (!["case", "run"].includes(kind) || !caseID || !["approved", "rejected"].includes(decision)) {
-    sendError(response, 400, "Provide a case or run review with an approve or reject decision.");
+  const caseKinds = new Set(["case", "retrieval-case", "zoning-case"]);
+  const allowedDecisions = kind === "run"
+    ? new Set(["approved", "rejected"])
+    : new Set(["approved", "revise", "rejected"]);
+  if ((!caseKinds.has(kind) && kind !== "run") || !caseID || !allowedDecisions.has(decision)) {
+    sendError(response, 400, "Provide a supported review with an approve, revise, or reject decision.");
     return;
   }
-  const dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
-  validateEvaluationDataset(dataset);
+  let dataset = null;
+  let datasetPath = null;
+  if (kind === "case" || kind === "run") {
+    dataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
+    validateEvaluationDataset(dataset);
+    datasetPath = evaluationCasesPath;
+  } else if (kind === "retrieval-case") {
+    dataset = await readSupplementalEvaluationDataset(
+      evidenceRetrievalCasesPath,
+      "Evidence retrieval"
+    );
+    datasetPath = evidenceRetrievalCasesPath;
+  } else {
+    dataset = await readSupplementalEvaluationDataset(
+      zoningEvaluationCasesPath,
+      "Zoning"
+    );
+    datasetPath = zoningEvaluationCasesPath;
+  }
   let reviewedRun = null;
   let reviewedResult = null;
-  if (kind === "case") {
+  if (caseKinds.has(kind)) {
     if (!dataset.cases.some((item) => item.id === caseID)) {
       sendError(response, 404, "Evaluation case not found.");
       return;
+    }
+    if (kind === "retrieval-case" && decision === "approved") {
+      const researchDataset = JSON.parse(await readFile(evaluationCasesPath, "utf8"));
+      validateEvaluationDataset(researchDataset);
+      const retrievalCase = dataset.cases.find((item) => item.id === caseID);
+      const sourceResearchCase = researchDataset.cases.find(
+        (item) => item.id === retrievalCase.sourceResearchCaseID
+      );
+      if (sourceResearchCase?.status !== "approved") {
+        sendError(
+          response,
+          409,
+          "Approve the linked Research evidence case before approving this retrieval scenario."
+        );
+        return;
+      }
     }
   } else {
     if (!runID) {
@@ -8387,13 +8492,22 @@ async function handleInternalEvaluationReview(request, response) {
     scoreOverrides[dimension] = Math.round(score * 100) / 100;
   }
   const now = new Date().toISOString();
-  if (kind === "case") {
+  if (caseKinds.has(kind)) {
     const testCase = dataset.cases.find((item) => item.id === caseID);
-    testCase.status = decision === "approved" ? "approved" : "draft";
+    testCase.status = decision === "approved"
+      ? "approved"
+      : decision === "rejected" ? "rejected" : "draft";
     testCase.reviewer = reviewer;
     testCase.reviewedAt = now;
-    validateEvaluationDataset(dataset);
-    await writeFile(evaluationCasesPath, `${JSON.stringify(dataset, null, 2)}\n`);
+    if (kind === "case") {
+      validateEvaluationDataset(dataset);
+    } else {
+      validateSupplementalEvaluationDataset(
+        dataset,
+        kind === "retrieval-case" ? "Evidence retrieval" : "Zoning"
+      );
+    }
+    await writeFile(datasetPath, `${JSON.stringify(dataset, null, 2)}\n`);
   }
   const reviewStore = await readEvaluationReviews();
   const review = {

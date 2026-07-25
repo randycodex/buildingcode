@@ -36,9 +36,16 @@ for (const testCase of dataset.cases) {
   assert(!caseIDs.has(testCase.id), `Duplicate zoning evaluation case: ${testCase.id}`);
   caseIDs.add(testCase.id);
   requiredCategories.delete(testCase.category);
-  assert.equal(testCase.status, "draft", `${testCase.id} must remain a draft until qualified review.`);
-  assert.equal(testCase.reviewer, null, `${testCase.id} cannot name a reviewer before review.`);
-  assert.equal(testCase.reviewedAt, null, `${testCase.id} cannot have a review date before review.`);
+  assert(
+    ["draft", "reviewed", "approved", "rejected"].includes(testCase.status),
+    `${testCase.id} has an invalid human-review status.`
+  );
+  const hasReviewer = Boolean(String(testCase.reviewer || "").trim());
+  const hasReviewDate = Number.isFinite(Date.parse(testCase.reviewedAt || ""));
+  assert.equal(hasReviewer, hasReviewDate, `${testCase.id} has incomplete reviewer metadata.`);
+  if (["reviewed", "approved", "rejected"].includes(testCase.status)) {
+    assert(hasReviewer, `${testCase.id} needs reviewer metadata for status ${testCase.status}.`);
+  }
   assert(testCase.question.trim().length >= 40);
   assert(testCase.requiredConcepts.length >= 3);
   assert(testCase.forbiddenClaims.length >= 2);
@@ -56,6 +63,12 @@ for (const testCase of dataset.cases) {
 }
 
 assert.equal(requiredCategories.size, 0, `Missing zoning evaluation categories: ${[...requiredCategories].join(", ")}`);
-assert(dataset.cases.every((testCase) => testCase.status !== "approved"));
+assert.equal(dataset.researchEligibility, false, "Zoning cases cannot enable public Research.");
 
-console.log(`zoning evaluation drafts passed: ${dataset.cases.length} unapproved human-review cases`);
+console.log("zoning evaluation review cases passed", {
+  total: dataset.cases.length,
+  draft: dataset.cases.filter((testCase) => testCase.status === "draft").length,
+  approved: dataset.cases.filter((testCase) => testCase.status === "approved").length,
+  rejected: dataset.cases.filter((testCase) => testCase.status === "rejected").length,
+  publicResearchEnabled: false
+});

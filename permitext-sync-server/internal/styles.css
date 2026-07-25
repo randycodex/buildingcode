@@ -75,6 +75,8 @@ textarea, input, select { width: 100%; padding: 10px; border: 1px solid #3a3a3a;
 .actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .actions button { padding: 9px 12px; border: 1px solid #474747; border-radius: 9px; background: #f2f0eb; color: #111; }
 .actions button.reject { background: transparent; color: #ffb4ab; }
+.actions button.revise { background: #2d261b; color: #ffd18f; }
+.evidence a { color: #92c7ff; }
 
 .compare-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
 .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }

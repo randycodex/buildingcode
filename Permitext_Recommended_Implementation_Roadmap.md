@@ -52,7 +52,7 @@ Consolidate new Research activity on the selected-passage conversation workflow 
 - Preserve the existing web check, smoke, content-integrity, billing, authentication, and Postgres verification gates.
 - Record a known-good production, web, backend, and iOS baseline before schema expansion begins.
 
-**Current implementation checkpoint — July 24, 2026:** The Construction Codes
+**Current implementation checkpoint — July 25, 2026:** The Construction Codes
 baseline now audits all five code families, all 118 chapters, all 12,891 catalog
 sections, all 101 runtime HTML sources, and every bundled local asset reference.
 The runtime resolves each section against its own code family instead of reusing
@@ -61,13 +61,22 @@ chapter title, normalized section headings, and complete official provision text
 on both web and iOS. Building Code Appendix U section U101.5 has also been restored
 to the canonical catalog, search index, and runtime.
 
-The iOS cold-start audit also confirmed that first paint was waiting on search-index,
+The audit also found 9,958 current section identifiers that collide with obsolete
+legacy prepared-body filenames. Legacy bodies are no longer eligible when the
+current canonical identifier is known. Mechanical Code 404.1 now resolves to the
+official enclosed-parking-garage ventilation provision instead of an obsolete
+spray-booth provision. Official same-number headings are disambiguated by their
+full normalized titles, with regressions for the duplicated Building Code 908.10
+designations.
+
+The iOS cold-start audit confirmed that first paint had been waiting on search-index,
 multi-chapter, and section-detail prewarming. The chapter grid now becomes usable as
 soon as the selected content snapshot is ready; cancellable search and Reader
-prewarming continues in the background. A clean iOS 26.5 simulator reached the
-usable Building Code grid during the first verification capture, and a subsequent
-relaunch was visibly ready at the five-second check instead of the previously
-observed roughly 30–35-second wait.
+prewarming continues in the background. Instrumented iOS 26.5 simulator runs
+recorded cold process launches of 1,446 ms and 1,291 ms on an iPhone 17 Pro and
+iPhone 17, followed by immediate relaunches of 1,218 ms and 1,146 ms. Simulator
+boot and application-install time are excluded. Physical-device timing remains a
+release-candidate verification item.
 
 ### Release 0 gate
 
@@ -876,7 +885,7 @@ Measure:
 
 Do not evaluate only whether one relevant section appears. Evaluate whether the candidate set is sufficiently complete for professional review.
 
-**Status: draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current ten cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all nine answerable draft scenarios and correctly identifies the tenth as missing section context. This is useful engineering evidence, not release approval. Mechanical systems, Buildings Bulletins, outside-agency interpretations, non-text tables or maps, and broader existing-building scenarios remain explicit coverage gaps.
+**Status: draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current eleven cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all ten answerable draft scenarios and correctly identifies the eleventh as missing section context. Mechanical Code 404.1 now gives the program an enclosed-parking-garage mechanical scenario, and every answerable draft currently has 100% expected-section and expected-passage recall at depth 12. This is useful engineering evidence, not release approval. Buildings Bulletins, outside-agency interpretations, non-text tables or maps, and broader existing-building scenarios remain explicit coverage gaps.
 
 ---
 
@@ -1101,6 +1110,40 @@ public evidence discovery, Zoning Research, shared Workboard editing, or paid ca
 8. Write the commercial decision brief for centralized firm checkout and invoicing, including provider, tax, seat-change, cancellation, refund, and audit requirements; do not simulate payment operations in clients.
 9. Record iOS cold-start timings on representative devices and preserve the first-paint-before-prewarm contract as a regression gate.
 10. Continue deferring simultaneous Workboard editing until ordinary collaboration has production experience.
+
+## Current sprint checkpoint — July 25, 2026
+
+1. The firm-control migration and legacy-default behavior are published on
+   production PostgreSQL, and production health reports the PostgreSQL repository.
+   Immutable historical Report compatibility remains covered by automated
+   contracts. A full signed-in production workflow still requires a designated
+   test account and must not be simulated with real customer records.
+2. Private Research, retrieval, and Zoning review queues now expose separate
+   Approve, Send for revision, and Reject decisions. Dataset mutations remain
+   local-only and reviewer-controlled; the production owner console is read-only.
+3. Mechanical retrieval coverage is added and passes the draft diagnostic.
+   Buildings Bulletins, outside-agency material, non-text tables or maps, and
+   broader existing-building scenarios remain named gaps rather than implied
+   coverage.
+4. The answerable-versus-insufficient-evidence distinction remains a hard case
+   gate, and all ten answerable draft cases currently achieve complete expected
+   section and passage recall at diagnostic depth 12.
+5. All new Research, retrieval, and Zoning scenarios remain drafts. No scenario
+   was automatically approved and no paid model call was made.
+6. Zoning has its own draft dataset, source-coverage diagnostic, evidence
+   hydration, and review queue. Public Zoning Research remains disabled.
+7. Server contracts cover invitation, transfer, review, Report-template, and
+   native Report-download authority. Non-mutating production deployment evidence
+   is collected at publish time; account-specific end-to-end proof remains blocked
+   until a designated test account is available.
+8. The centralized billing decision brief recommends Stripe Billing with
+   explicit seat, tax, cancellation, refund, audit, webhook, and iOS purchasing
+   boundaries. No client simulates provider payment state.
+9. Startup signposts and regression ordering are implemented. Two current iPhone
+   simulators record 1.15–1.45-second usable-content timings; physical iPhone and
+   iPad measurements remain release-candidate checks.
+10. Simultaneous Workboard editing, presence, and object-level conflict work
+    remain deferred.
 
 ## Required boundaries
 

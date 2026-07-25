@@ -106,8 +106,35 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published var selectedCodeSectionID: Int64?
     @Published var statusMessage: String?
     @Published var readerTheme: ReaderTheme
-    @Published private(set) var isInitialContentLoaded: Bool = false
+    @Published private(set) var isInitialContentLoaded: Bool = false {
+        didSet {
+            guard isInitialContentLoaded, !oldValue, !hasRecordedFirstUsableContent else {
+                return
+            }
+            hasRecordedFirstUsableContent = true
+            let elapsedMilliseconds = max(
+                0,
+                Int((ProcessInfo.processInfo.systemUptime - startupBeganAt) * 1_000)
+            )
+            startupFirstUsableDurationMilliseconds = elapsedMilliseconds
+            os_signpost(
+                .end,
+                log: AppSignpost.startup,
+                name: "firstUsableContent",
+                signpostID: startupSignpostID,
+                "milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+            os_log(
+                .info,
+                log: AppSignpost.startup,
+                "firstUsableContent milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+        }
+    }
     @Published private(set) var initialLoadProgress: Double = 0
+    @Published private(set) var startupFirstUsableDurationMilliseconds: Int?
     @Published var selectedTab: AppTab = .browse
     @Published var browserTabSwitchRequest: BrowserContextID?
     @Published private(set) var pendingDeepLinkedSectionID: Int64? = nil
@@ -123,6 +150,9 @@ final class CodeLibraryViewModel: ObservableObject {
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
     private let accountBackendClient: AccountBackendClient
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
+    private let startupBeganAt = ProcessInfo.processInfo.systemUptime
+    private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
+    private var hasRecordedFirstUsableContent = false
     private let recentSearchesDefaultsKey = "recentSearches"
     private let pinnedSearchesDefaultsKey = "pinnedSearches"
     private let recentlyViewedSectionsDefaultsKey = "recentlyViewedSections"
@@ -220,6 +250,12 @@ final class CodeLibraryViewModel: ObservableObject {
         let continuityContext = continuityStore.load()
         self.recentlyViewedSections = continuityContext.recentlyViewedSections
         self.activeProjectID = continuityContext.activeProjectID
+        os_signpost(
+            .begin,
+            log: AppSignpost.startup,
+            name: "firstUsableContent",
+            signpostID: startupSignpostID
+        )
         prepareCanonicalCodeVersionMigration(for: loadedSignedInAccount)
         refreshPendingUserContentSyncCount()
         networkMonitor.pathUpdateHandler = { [weak self] path in
@@ -3523,6 +3559,36 @@ final class CodeLibraryViewModel: ObservableObject {
         chapters: [CodeChapter],
         store: AuthoredCodeStore
     ) async {
+        let signpostID = OSSignpostID(log: AppSignpost.startup)
+        let beganAt = ProcessInfo.processInfo.systemUptime
+        os_signpost(
+            .begin,
+            log: AppSignpost.startup,
+            name: "backgroundWarmup",
+            signpostID: signpostID,
+            "%{public}s",
+            "authored"
+        )
+        defer {
+            let elapsedMilliseconds = max(
+                0,
+                Int((ProcessInfo.processInfo.systemUptime - beganAt) * 1_000)
+            )
+            os_signpost(
+                .end,
+                log: AppSignpost.startup,
+                name: "backgroundWarmup",
+                signpostID: signpostID,
+                "authored milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+            os_log(
+                .info,
+                log: AppSignpost.startup,
+                "backgroundWarmup authored milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+        }
         _ = version
         // Warm the search index in the background so the first search doesn't
         // pay the cost of reading + JSON-decoding the 3 MB searchIndex.json on
@@ -3541,6 +3607,36 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func prewarmSQLiteContent(chapters: [CodeChapter]) async {
+        let signpostID = OSSignpostID(log: AppSignpost.startup)
+        let beganAt = ProcessInfo.processInfo.systemUptime
+        os_signpost(
+            .begin,
+            log: AppSignpost.startup,
+            name: "backgroundWarmup",
+            signpostID: signpostID,
+            "%{public}s",
+            "sqlite"
+        )
+        defer {
+            let elapsedMilliseconds = max(
+                0,
+                Int((ProcessInfo.processInfo.systemUptime - beganAt) * 1_000)
+            )
+            os_signpost(
+                .end,
+                log: AppSignpost.startup,
+                name: "backgroundWarmup",
+                signpostID: signpostID,
+                "sqlite milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+            os_log(
+                .info,
+                log: AppSignpost.startup,
+                "backgroundWarmup sqlite milliseconds=%{public}d",
+                elapsedMilliseconds
+            )
+        }
         await prewarmStartupPriorityChapters(chapters)
 
         guard let sqliteChapterLoader else { return }

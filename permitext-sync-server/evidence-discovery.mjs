@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260724-hybrid-candidates-v1";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v2";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -119,6 +119,11 @@ const topicRoutes = [
       { codePrefix: "BC", sectionPrefix: "3111", includeDescendants: true },
       { codePrefix: "BC", sectionPrefix: "1108.2.9.1" }
     ]
+  },
+  {
+    pattern: /\benclosed\s+(?:parking\s+)?garage|intermittent\s+(?:mechanical\s+)?ventilation|carbon\s+monoxide.*nitrogen\s+dioxide/i,
+    label: "enclosed-parking-garage ventilation controls",
+    targets: [{ codePrefix: "MC", sectionPrefix: "404.1" }]
   }
 ];
 
@@ -328,9 +333,16 @@ export async function discoverRelevantEvidence({
           continue;
         }
         const id = comparableSectionID(section.id);
-        const routeMatch = routesByID.get(id) || { score: 0, labels: new Set() };
+        const routeMatch = routesByID.get(id) || {
+          score: 0,
+          labels: new Set(),
+          exactTarget: false
+        };
         routeMatch.score += 45;
         routeMatch.labels.add(route.label);
+        if (sectionNumber === target.sectionPrefix) {
+          routeMatch.exactTarget = true;
+        }
         routesByID.set(id, routeMatch);
       }
     }
@@ -392,12 +404,15 @@ export async function discoverRelevantEvidence({
       score: finalScore,
       coverage,
       exactReference,
+      exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches]))
     });
   }
 
   detailed.sort((left, right) =>
+    Number(right.exactReference) - Number(left.exactReference) ||
+    Number(right.exactTopicRouteTarget) - Number(left.exactTopicRouteTarget) ||
     right.score - left.score ||
     right.coverage - left.coverage ||
     String(left.section.sectionNumber || "").localeCompare(
@@ -439,6 +454,7 @@ export async function discoverRelevantEvidence({
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
         topicRoutes: item.matchedRoutes,
+        exactTopicRouteTarget: item.exactTopicRouteTarget,
         exactReference: item.exactReference,
         containsException: /\bexception\b/i.test(item.passage.text),
         containsCrossReference: /\b(section|table|chapter)\s+\d/i.test(item.passage.text)

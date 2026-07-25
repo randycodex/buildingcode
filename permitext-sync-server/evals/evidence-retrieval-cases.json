@@ -1,9 +1,8 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260724-hybrid-candidates-v1",
+  "retrievalVersion": "20260725-hybrid-candidates-v2",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
-    "mechanical-system questions",
     "dedicated Buildings Bulletin retrieval",
     "official agency interpretations outside the current library",
     "tables and maps requiring non-text retrieval",
@@ -99,6 +98,15 @@
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
       "notes": "Tests a broad candidate set whose completeness depends on several café-specific provisions."
+    },
+    {
+      "id": "retrieval-enclosed-garage-intermittent-ventilation",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-016-enclosed-garage-intermittent-ventilation",
+      "scenarioCategories": ["mechanical systems", "enclosed parking garages", "detector controls"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests canonical Mechanical Code 404.1 discovery and guards against the confirmed stale legacy body-ID collision."
     }
   ]
 }

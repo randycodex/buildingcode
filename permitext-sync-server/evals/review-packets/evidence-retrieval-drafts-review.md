@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260724-hybrid-candidates-v1`
+Retrieval implementation: `20260725-hybrid-candidates-v2`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -8,7 +8,6 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 ## Known coverage gaps
 
-- mechanical-system questions
 - dedicated Buildings Bulletin retrieval
 - official agency interpretations outside the current library
 - tables and maps requiring non-text retrieval
@@ -451,6 +450,46 @@ Tests a broad candidate set whose completeness depends on several café-specific
 #### BC 3111.7 — section ID 5686
 
 > Unless separated from seating inside the building by fire partitions complying with Section 713 , the seating for enclosed sidewalk cafes shall be added to that inside the building in order to determine whether a place of assembly certificate of operation is required.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 11. retrieval-enclosed-garage-intermittent-ventilation
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: mechanical systems, enclosed parking garages, detector controls
+- Source Research case: `nyc-016-enclosed-garage-intermittent-ventilation`
+
+### Project question
+
+An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?
+
+### Review intent
+
+Tests canonical Mechanical Code 404.1 discovery and guards against the confirmed stale legacy body-ID collision.
+
+### Proposed expected evidence
+
+#### MC 404.1 — section ID 10442
+
+> Where mechanical ventilation systems for enclosed parking garages operate intermittently, such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors.
+
+> Such detectors shall be installed in accordance with their manufacturers' instructions.
+
+> Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb).
 
 ### Knowledgeable-human decision
 

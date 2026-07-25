@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-24T15:37:22.811Z.
+Generated from `evals/research-cases.json` on 2026-07-25T07:56:01.520Z.
 
-This packet contains 5 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 6 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -17,6 +17,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-011-legacy-fire-alarm-enlargement | Approve / Correct / Reject |  |
 | nyc-013-b-m-co-accessibility-boundary | Approve / Correct / Reject |  |
 | nyc-015-sidewalk-cafe-evidence-boundary | Approve / Correct / Reject |  |
+| nyc-016-enclosed-garage-intermittent-ventilation | Approve / Correct / Reject |  |
 
 ---
 
@@ -660,6 +661,109 @@ The proposal cannot be approved from the selected evidence. If it is a sidewalk 
 ### Existing drafting note
 
 Draft candidate NYC-015. Exact enacted passages were copied from Permitext canonical content. Agency, property-line, electrical, seating, and accessibility conclusions require knowledgeable review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 6. Intermittent enclosed-garage ventilation detector controls
+
+- **Case ID:** `nyc-016-enclosed-garage-intermittent-ventilation`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** intermediate
+- **Topics:** mechanical ventilation, enclosed parking garages, carbon monoxide detection, nitrogen dioxide detection
+
+### Scenario source
+
+Draft scenario constructed from the canonical enacted text of 2022 NYC Mechanical Code Section 404.1 after correcting a confirmed legacy body-ID collision.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+project: Enclosed parking garage with an intermittently operated mechanical ventilation system; proposedControl: Operate the ventilation system from carbon monoxide detectors only, using a 35 ppm carbon monoxide set point; unknowns: detector manufacturer instructions, detector locations and coverage, whether any other control sequence is proposed, full mechanical-system design
+
+### Question
+
+An enclosed parking garage will use intermittent mechanical ventilation. The proposed controls use carbon monoxide detectors only and start the system at 35 ppm carbon monoxide. Based only on the selected Mechanical Code provision, is that control sequence compliant, and what can and cannot be concluded?
+
+### Exact selected Permitext evidence
+
+#### MC 404.1
+
+Canonical section ID: `10442`
+
+Passage 1:
+
+> Where mechanical ventilation systems for enclosed parking garages operate intermittently, such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors.
+
+Passage 2:
+
+> Such detectors shall be installed in accordance with their manufacturers' instructions.
+
+Passage 3:
+
+> Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb).
+
+### Proposed expected conclusion
+
+The proposed control sequence does not match MC 404.1. For intermittent operation in an enclosed parking garage, automatic operation must use carbon monoxide detectors in conjunction with nitrogen dioxide detectors. The system must operate automatically when carbon monoxide reaches 25 ppm or nitrogen dioxide reaches 500 ppb, so a carbon-monoxide-only sequence at 35 ppm omits the required nitrogen dioxide detection and exceeds the stated carbon monoxide trigger. The detectors must also be installed according to their manufacturers' instructions. The selected provision does not establish detector quantity or placement, the complete ventilation rate and capacity, or compliance of the rest of the mechanical design.
+
+### Expected uncertainty
+
+[object Object]
+
+### Required citations and the claim each must support
+
+- **MC 404.1:** Automatic intermittent operation using carbon monoxide detection together with nitrogen dioxide detection, the 25 ppm and 500 ppb alternative trigger thresholds, and manufacturer-instruction installation.
+
+### Required concepts
+
+- State that intermittent enclosed-garage ventilation must operate automatically.
+- Require carbon monoxide detection in conjunction with nitrogen dioxide detection.
+- Identify 25 ppm carbon monoxide as an automatic-operation threshold.
+- Identify 500 ppb nitrogen dioxide as an automatic-operation threshold.
+- State that detector installation must follow the manufacturers' instructions.
+- Explain that the selected evidence does not establish detector quantity, detector placement, ventilation rate, system capacity, or complete mechanical-design compliance.
+
+### Facts the answer must identify as missing
+
+- Detector manufacturer and installation instructions.
+- Detector quantity, locations, and coverage.
+- Complete control sequence.
+- Required ventilation airflow rate and system capacity.
+- Other applicable Mechanical Code provisions and project conditions.
+
+### Claims the answer must not make
+
+- Carbon monoxide detection alone satisfies MC 404.1.
+- A 35 ppm carbon monoxide trigger satisfies MC 404.1.
+- Nitrogen dioxide detection is optional.
+- The system must wait until both the carbon monoxide and nitrogen dioxide thresholds are reached.
+- MC 404.1 alone establishes detector quantity or placement.
+- The selected evidence proves that the complete garage ventilation design complies with the Mechanical Code.
+
+### Existing drafting note
+
+Draft candidate NYC-016. This case is also a regression guard for canonical Mechanical Code body selection. It requires knowledgeable-human review before approval.
 
 ### Reviewer decision
 

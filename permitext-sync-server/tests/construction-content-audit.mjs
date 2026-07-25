@@ -2,6 +2,7 @@ import { access, readFile, readdir, stat } from "node:fs/promises";
 import { dirname, join, resolve } from "node:path";
 import { parse } from "parse5";
 import {
+  constructionChapterHeadingDetails,
   constructionChapterHeadingNumbers,
   constructionChapterHTMLSource,
   constructionContentRoot,
@@ -223,6 +224,7 @@ async function main() {
     ]);
   }
   const unmatchedSourceHeadings = [];
+  let disambiguatedDuplicateHeadingCount = 0;
   for (const chapters of chaptersBySourcePath.values()) {
     const firstChapter = chapters[0];
     const code = codeBySectionID.get(Number(firstChapter.codeSectionID));
@@ -238,6 +240,34 @@ async function main() {
           chapterNumbers: chapters.map((chapter) => chapter.chapterNumber),
           sectionNumber
         });
+      }
+    }
+    const sourceHeadingDetails = await constructionChapterHeadingDetails(
+      code.prefix,
+      firstChapter.chapterNumber
+    );
+    const sourceHeadingsByNumber = new Map();
+    for (const heading of sourceHeadingDetails) {
+      const key = normalizeSectionNumber(heading.sectionNumber);
+      sourceHeadingsByNumber.set(key, [
+        ...(sourceHeadingsByNumber.get(key) || []),
+        heading
+      ]);
+    }
+    for (const chapter of chapters) {
+      for (const section of sectionsByChapterID.get(Number(chapter.id)) || []) {
+        const matchingNumberHeadings = sourceHeadingsByNumber.get(
+          normalizeSectionNumber(section.sectionNumber)
+        ) || [];
+        if (matchingNumberHeadings.length < 2) continue;
+        const matchingTitleHeadings = matchingNumberHeadings.filter(
+          (heading) => normalizeTextKey(heading.headingText) === normalizeTextKey(section.title)
+        );
+        assert(
+          matchingTitleHeadings.length === 1,
+          `${code.prefix} ${section.sectionNumber} (${section.id}) cannot be uniquely matched among duplicate official headings by its title: ${section.title}`
+        );
+        disambiguatedDuplicateHeadingCount += 1;
       }
     }
   }
@@ -310,6 +340,62 @@ async function main() {
     "Administrative Chapter 4 repeats a chapter or section title inside its provision body."
   );
 
+  const mechanicalChapter4 = bundle.chapters.find((chapter) =>
+    codeBySectionID.get(Number(chapter.codeSectionID))?.prefix === "MC" &&
+    String(chapter.chapterNumber) === "4"
+  );
+  const mechanicalParkingGarage = sectionsByChapterID.get(Number(mechanicalChapter4?.id))
+    ?.find((section) => section.sectionNumber === "404.1");
+  assert(mechanicalParkingGarage?.id === 10442, "Mechanical section 404.1 identity changed.");
+  const mechanicalParkingGarageBody = await constructionHTMLBodyForSection(mechanicalParkingGarage);
+  const mechanicalParkingGarageText = mechanicalParkingGarageBody?.blocks
+    ?.map((block) => block.plainText || "")
+    .join(" ") || "";
+  assert(
+    mechanicalParkingGarageText.includes(
+      "such operation shall be automatic by means of carbon monoxide detectors applied in conjunction with nitrogen dioxide detectors"
+    ),
+    "Mechanical section 404.1 is missing its official enclosed-parking-garage provision body."
+  );
+  assert(
+    !mechanicalParkingGarageText.includes("spray booth"),
+    "Mechanical section 404.1 resolved to a stale legacy spray-operations body."
+  );
+
+  const buildingChapter9 = bundle.chapters.find((chapter) =>
+    codeBySectionID.get(Number(chapter.codeSectionID))?.prefix === "BC" &&
+    String(chapter.chapterNumber) === "9"
+  );
+  const flammableGasSection = sectionsByChapterID.get(Number(buildingChapter9?.id))
+    ?.find((section) => section.sectionNumber === "908.10");
+  assert(
+    flammableGasSection?.title.includes("Flammable gas"),
+    "Building Code section 908.10 identity changed."
+  );
+  const naturalGasAlarmSection = {
+    ...flammableGasSection,
+    id: -90810,
+    title: "908.10 Natural gas alarms.* [Repealed]"
+  };
+  const [flammableGasBody, naturalGasAlarmBody] = await Promise.all([
+    constructionHTMLBodyForSection(flammableGasSection),
+    constructionHTMLBodyForSection(naturalGasAlarmSection)
+  ]);
+  const flammableGasText = flammableGasBody?.blocks?.map((block) => block.plainText || "").join(" ") || "";
+  const naturalGasAlarmText = naturalGasAlarmBody?.blocks?.map((block) => block.plainText || "").join(" ") || "";
+  assert(
+    flammableGasText.includes("Rooms and spaces containing flammable gas distribution piping"),
+    "The first Building Code 908.10 designation resolved to the wrong duplicate heading."
+  );
+  assert(
+    naturalGasAlarmText.includes("Repealed L.L. 2025/102"),
+    "The second Building Code 908.10 designation resolved to the wrong duplicate heading."
+  );
+  assert(
+    !naturalGasAlarmText.includes("Rooms and spaces containing flammable gas distribution piping"),
+    "Duplicate Building Code 908.10 provisions were merged or misidentified."
+  );
+
   const appendixU = bundle.chapters.find(
     (chapter) => chapter.codeSectionID === 1 && String(chapter.chapterNumber) === "U"
   );
@@ -350,6 +436,7 @@ async function main() {
     titleOnlyOrNestedCatalogEntries: missingHTMLBodyCount,
     htmlCoverageByPrefix,
     duplicateAdjacentHeadings: 0,
+    duplicateOfficialHeadingsDisambiguatedByTitle: disambiguatedDuplicateHeadingCount,
     administrativeChapter4TitleOccurrences: 1
   });
 }
