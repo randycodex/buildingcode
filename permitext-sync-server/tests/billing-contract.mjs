@@ -1,7 +1,9 @@
 import {
+  applePackageIDForProductID,
   claimAppleTransactionOwner,
   sameOriginAbsoluteURL,
   stripeConfigurationStatus,
+  stripePackageIDFromObject,
   stripeSecretKeyMode,
   validateAppleTransactionEnvironment,
   validateStripeRestoreOwnership,
@@ -143,6 +145,44 @@ assert(
     requireLive: true
   }).ready,
   "Production checkout rejected a live Stripe configuration."
+);
+assert(
+  stripeConfigurationStatus({
+    packageID: "research",
+    secretKey: "sk_test_contract",
+    priceID: "price_research_contract",
+    requireLive: false
+  }).ready,
+  "Research checkout did not accept its independently configured Stripe price."
+);
+assert(
+  !stripeConfigurationStatus({
+    packageID: "research",
+    secretKey: "sk_test_contract",
+    priceID: "",
+    requireLive: false
+  }).ready,
+  "Research checkout was enabled without a Research price."
+);
+assert(
+  stripePackageIDFromObject({ metadata: { permitextPackage: "research" } }) === "research",
+  "Stripe Research metadata did not select the Research package."
+);
+assert(
+  stripePackageIDFromObject({ metadata: {} }) === "pro",
+  "Legacy Stripe subscriptions must remain Pro."
+);
+assert(
+  stripePackageIDFromObject({ metadata: { permitextPackage: "unknown" } }) === null,
+  "Unknown Stripe package metadata was accepted."
+);
+assert(
+  applePackageIDForProductID("com.randycodex.permitext.pro.monthly") === "pro",
+  "The Pro StoreKit product did not map to Pro."
+);
+assert(
+  applePackageIDForProductID("com.randycodex.permitext.research.monthly") === "research",
+  "The Research StoreKit product did not map to the Research Add-On."
 );
 
 const xcodeTransaction = [

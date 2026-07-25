@@ -13,8 +13,12 @@ import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import {
+  entitlementPackageIDs,
+  entitlementWithPackage,
+  entitlementWithoutPackage,
   enforceFreePlanMutationBatch,
-  hasActiveProEntitlement
+  hasActiveProEntitlement,
+  hasActiveResearchEntitlement
 } from "./entitlement-contract.mjs";
 import {
   activityEvent,
@@ -3523,7 +3527,7 @@ async function researchConversationForClient(conversation, options = {}) {
   };
 }
 
-async function authenticatedResearchBody(request, response) {
+async function authenticatedResearchBody(request, response, options = {}) {
   const body = await readJSON(request);
   const userID = String(body.auth?.accountUserID || "").trim();
   if (!userID) {
@@ -3531,6 +3535,13 @@ async function authenticatedResearchBody(request, response) {
     return null;
   }
   const authContext = await authenticatedUserContext(request, response, userID);
+  if (authContext && options.requireResearch && !hasActiveResearchEntitlement(authContext.entitlement)) {
+    sendJSON(response, 402, {
+      error: "Research requires an active Pro plan and the Research Add-On.",
+      code: "RESEARCH_ADDON_REQUIRED"
+    });
+    return null;
+  }
   return authContext ? { body, userID, authContext } : null;
 }
 
@@ -5313,7 +5324,7 @@ async function recordResearchProjectLinkActivity(userID, projectID, conversation
 }
 
 async function handleResearchConversationAssignProject(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const conversation = await requiredResearchConversation(
     response,
@@ -5391,7 +5402,7 @@ async function handleResearchConversationAssignProject(request, response) {
 }
 
 async function handleResearchConversationProjectContext(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const conversation = await requiredResearchConversation(
     response,
@@ -5449,7 +5460,7 @@ async function handleResearchConversationProjectContext(request, response) {
 }
 
 async function handleResearchConversationReuseEvidence(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
   if (!await requireResearchProject(context, response, projectID)) return;
@@ -5536,7 +5547,7 @@ async function handleResearchConversationReuseEvidence(request, response) {
 }
 
 async function handleResearchConversationCreate(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   try {
     if ((await listStoredResearchConversations(context.userID)).length >= 200) {
@@ -5622,7 +5633,7 @@ async function handleResearchConversationCreate(request, response) {
 }
 
 async function handleResearchConversationEvidence(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
@@ -5653,7 +5664,7 @@ async function handleResearchConversationEvidence(request, response) {
 }
 
 async function handleResearchConversationRefresh(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
@@ -6074,7 +6085,7 @@ async function handleInternalEvaluationReview(request, response) {
 }
 
 async function handleResearchConversationMessage(request, response) {
-  const context = await authenticatedResearchBody(request, response);
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
@@ -6900,24 +6911,19 @@ async function canonicalizeAppleAccountForSignIn(store, account) {
   return store.users[target.appUserID];
 }
 
-function entitlementForSource(userID, source, details = {}) {
-  const entitlement = {
-    plan: "pro",
+function entitlementForSource(userID, source, details = {}, existingEntitlement = null) {
+  return entitlementWithPackage(existingEntitlement, {
+    userID,
+    packageID: details.packageID || entitlementPackageIDs.pro,
     source,
-    grantedUserID: userID,
-    updatedAt: new Date().toISOString()
-  };
-  if (details.expiresAt) {
-    entitlement.expiresAt = details.expiresAt;
-  }
-  if (details.provider) {
-    entitlement.provider = details.provider;
-  }
-  return entitlement;
+    expiresAt: details.expiresAt || null,
+    provider: details.provider || {},
+    explicitPackage: details.explicitPackage !== false
+  });
 }
 
 function grantServerEntitlement(store, userID, source, details = {}) {
-  const entitlement = entitlementForSource(userID, source, details);
+  const entitlement = entitlementForSource(userID, source, details, store.entitlements[userID] || null);
   store.entitlements[userID] = entitlement;
   return entitlement;
 }
@@ -6938,15 +6944,20 @@ function entitlementMatchesExpected(entitlement, expected = {}) {
 }
 
 async function persistServerEntitlement(userID, source, details = {}) {
-  const entitlement = entitlementForSource(userID, source, details);
+  const currentStore = await readStore();
+  const entitlement = entitlementForSource(
+    userID,
+    source,
+    details,
+    currentStore.entitlements[userID] || null
+  );
   const adapter = await storeAdapter();
   if (typeof adapter.saveEntitlement === "function") {
     return adapter.saveEntitlement(userID, entitlement);
   }
-  const store = await readStore();
-  grantServerEntitlement(store, userID, source, details);
-  await writeStore(store);
-  return store.entitlements[userID];
+  currentStore.entitlements[userID] = entitlement;
+  await writeStore(currentStore);
+  return currentStore.entitlements[userID];
 }
 
 export function claimAppleTransactionOwner(store, originalTransactionID, userID) {
@@ -6965,22 +6976,44 @@ export function claimAppleTransactionOwner(store, originalTransactionID, userID)
 }
 
 async function persistAppleServerEntitlement(userID, originalTransactionID, details = {}) {
-  const entitlement = entitlementForSource(userID, "appleSubscription", details);
+  const currentStore = await readStore();
+  const entitlement = entitlementForSource(
+    userID,
+    "appleSubscription",
+    details,
+    currentStore.entitlements[userID] || null
+  );
   const adapter = await storeAdapter();
   if (typeof adapter.claimAppleEntitlement === "function") {
     return adapter.claimAppleEntitlement(userID, originalTransactionID, entitlement);
   }
 
-  const store = await readStore();
-  if (!claimAppleTransactionOwner(store, originalTransactionID, userID)) {
+  if (!claimAppleTransactionOwner(currentStore, originalTransactionID, userID)) {
     return null;
   }
-  grantServerEntitlement(store, userID, "appleSubscription", details);
-  await writeStore(store);
-  return store.entitlements[userID];
+  currentStore.entitlements[userID] = entitlement;
+  await writeStore(currentStore);
+  return currentStore.entitlements[userID];
 }
 
 async function deletePersistedEntitlement(userID, expected = {}) {
+  if (expected.packageID === entitlementPackageIDs.research) {
+    const currentStore = await readStore();
+    const decision = entitlementWithoutPackage(
+      currentStore.entitlements[userID] || null,
+      entitlementPackageIDs.research,
+      expected
+    );
+    if (!decision.changed) return false;
+    const adapter = await storeAdapter();
+    if (typeof adapter.saveEntitlement === "function") {
+      await adapter.saveEntitlement(userID, decision.entitlement);
+      return true;
+    }
+    currentStore.entitlements[userID] = decision.entitlement;
+    await writeStore(currentStore);
+    return true;
+  }
   const adapter = await storeAdapter();
   if (typeof adapter.deleteEntitlement === "function") {
     return adapter.deleteEntitlement(userID, expected);
@@ -7015,15 +7048,37 @@ function liveStripeRequired() {
     process.env.VERCEL_ENV === "production";
 }
 
-export function stripeConfigurationStatus({
-  secretKey = process.env.STRIPE_SECRET_KEY,
-  priceID = process.env.STRIPE_PRO_PRICE_ID,
-  requireLive = liveStripeRequired()
-} = {}) {
+function normalizedCommercialPackageID(value, fallback = entitlementPackageIDs.pro) {
+  const normalized = String(value || fallback).trim().toLowerCase();
+  return Object.values(entitlementPackageIDs).includes(normalized) ? normalized : null;
+}
+
+function stripePriceEnvironmentKey(packageID) {
+  return packageID === entitlementPackageIDs.research
+    ? "STRIPE_RESEARCH_PRICE_ID"
+    : "STRIPE_PRO_PRICE_ID";
+}
+
+function stripePriceID(packageID) {
+  return process.env[stripePriceEnvironmentKey(packageID)];
+}
+
+export function stripeConfigurationStatus(options = {}) {
+  const packageID = normalizedCommercialPackageID(options.packageID);
+  const secretKey = options.secretKey ?? process.env.STRIPE_SECRET_KEY;
+  const priceID = options.priceID ?? stripePriceID(packageID);
+  const requireLive = options.requireLive ?? liveStripeRequired();
   const mode = stripeSecretKeyMode(secretKey);
   const missing = [];
   if (!String(secretKey || "").trim()) missing.push("STRIPE_SECRET_KEY");
-  if (!String(priceID || "").trim()) missing.push("STRIPE_PRO_PRICE_ID");
+  if (!packageID) {
+    return {
+      ready: false,
+      mode,
+      message: "Stripe checkout requested an unsupported Permitext package."
+    };
+  }
+  if (!String(priceID || "").trim()) missing.push(stripePriceEnvironmentKey(packageID));
   if (missing.length) {
     return {
       ready: false,
@@ -7048,8 +7103,8 @@ export function stripeConfigurationStatus({
   return { ready: true, mode, message: null };
 }
 
-function stripeConfigured() {
-  return stripeConfigurationStatus().ready;
+function stripeConfigured(packageID = entitlementPackageIDs.pro) {
+  return stripeConfigurationStatus({ packageID }).ready;
 }
 
 function configuredPublicBaseURL(request) {
@@ -7142,6 +7197,24 @@ function stripeUserIDFromObject(object) {
     null;
 }
 
+export function stripePackageIDFromObject(object) {
+  const explicit = object?.metadata?.permitextPackage ||
+    object?.subscription_details?.metadata?.permitextPackage ||
+    object?.parent?.subscription_details?.metadata?.permitextPackage ||
+    null;
+  return explicit
+    ? normalizedCommercialPackageID(explicit, null)
+    : entitlementPackageIDs.pro;
+}
+
+function stripePackageIsExplicit(object) {
+  return Boolean(
+    object?.metadata?.permitextPackage ||
+    object?.subscription_details?.metadata?.permitextPackage ||
+    object?.parent?.subscription_details?.metadata?.permitextPackage
+  );
+}
+
 function normalizedStripeAccountUserID(value) {
   const userID = String(value || "").trim();
   return userID || null;
@@ -7186,9 +7259,26 @@ export function validateStripeRestoreOwnership({
   return requestedOwner;
 }
 
+function entitlementPackageForStripeSubscription(entitlement, subscriptionID) {
+  if (
+    entitlement?.source === "webSubscription" &&
+    entitlement?.provider?.stripeSubscriptionID === subscriptionID
+  ) {
+    return entitlementPackageIDs.pro;
+  }
+  if (
+    entitlement?.addOns?.research?.source === "webSubscription" &&
+    entitlement?.addOns?.research?.provider?.stripeSubscriptionID === subscriptionID
+  ) {
+    return entitlementPackageIDs.research;
+  }
+  return null;
+}
+
 function entitlementMatchesStripeSubscription(subscriptionID) {
-  return (entitlement) => entitlement?.source === "webSubscription" &&
-    entitlement?.provider?.stripeSubscriptionID === subscriptionID;
+  return (entitlement) => Boolean(
+    entitlementPackageForStripeSubscription(entitlement, subscriptionID)
+  );
 }
 
 function findUserIDForStripeSubscription(store, subscriptionID) {
@@ -7230,28 +7320,48 @@ async function stripeAPI(path, { method = "GET", body = null } = {}) {
   return json;
 }
 
-async function activeStripeSubscriptionForUserID(userID) {
-  if (!stripeConfigured() || !userID) {
+async function activeStripeSubscriptionForUserID(userID, packageID = entitlementPackageIDs.pro) {
+  if (!stripeConfigured(packageID) || !userID) {
     return null;
   }
   const query = `metadata['accountUserID']:'${stripeSearchValue(userID)}'`;
   const searchParams = new URLSearchParams({ query, limit: "10" });
   const payload = await stripeAPI(`/v1/subscriptions/search?${searchParams.toString()}`);
-  return (payload.data || []).find((subscription) => ["active", "trialing"].includes(subscription.status)) || null;
+  return (payload.data || []).find((subscription) =>
+    ["active", "trialing"].includes(subscription.status) &&
+    stripePackageIDFromObject(subscription) === packageID
+  ) || null;
 }
 
-async function transferStripeSubscriptionMetadata(subscriptionID, targetUserID) {
-  if (!stripeConfigured() || !subscriptionID || !targetUserID) {
+async function transferStripeSubscriptionMetadata(
+  subscriptionID,
+  targetUserID,
+  packageID = entitlementPackageIDs.pro
+) {
+  if (!stripeConfigured(packageID) || !subscriptionID || !targetUserID) {
     return;
   }
   await stripeAPI(`/v1/subscriptions/${encodeURIComponent(subscriptionID)}`, {
     method: "POST",
-    body: encodedFormBody({ metadata: { accountUserID: targetUserID } })
+    body: encodedFormBody({
+      metadata: {
+        accountUserID: targetUserID,
+        permitextPackage: packageID
+      }
+    })
   });
 }
 
-function appleStoreKitProductID() {
-  return process.env.STOREKIT_PRO_PRODUCT_ID || "com.randycodex.permitext.pro.monthly";
+function appleStoreKitProductID(packageID = entitlementPackageIDs.pro) {
+  return packageID === entitlementPackageIDs.research
+    ? process.env.STOREKIT_RESEARCH_PRODUCT_ID || "com.randycodex.permitext.research.monthly"
+    : process.env.STOREKIT_PRO_PRODUCT_ID || "com.randycodex.permitext.pro.monthly";
+}
+
+export function applePackageIDForProductID(productID) {
+  return Object.values(entitlementPackageIDs).find(
+    (packageID) => appleStoreKitProductID(packageID) === productID
+  ) || null;
 }
 
 function productionAppleTransactionsRequired() {
@@ -7395,7 +7505,7 @@ export function verifyAppleTransactionJWS(signedTransactionInfo) {
   if (bundleID && payload.bundleId !== bundleID) {
     throw new ClientAuthError(422, "Apple transaction bundle is invalid.");
   }
-  if (payload.productId !== appleStoreKitProductID()) {
+  if (!applePackageIDForProductID(payload.productId)) {
     throw new ClientAuthError(422, "Apple transaction product is invalid.");
   }
   validateAppleTransactionEnvironment(payload);
@@ -8118,7 +8228,10 @@ async function handleBrowserAccountLink(request, response) {
     if (!finalContext?.entitlement) {
       const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
       if (subscription) {
+        const packageID = stripePackageIDFromObject(subscription);
         const entitlement = await persistServerEntitlement(targetUserID, "webSubscription", {
+          packageID,
+          explicitPackage: stripePackageIsExplicit(subscription),
           expiresAt: stripeSubscriptionExpiresAt(subscription),
           provider: {
             stripeCustomerID: stripeSubscriptionID(subscription.customer),
@@ -8126,7 +8239,7 @@ async function handleBrowserAccountLink(request, response) {
             restoredFromUserID: sourceUserID
           }
         });
-        await transferStripeSubscriptionMetadata(subscription.id, targetUserID);
+        await transferStripeSubscriptionMetadata(subscription.id, targetUserID, packageID);
         finalContext = { ...finalContext, entitlement };
       }
     }
@@ -8157,7 +8270,10 @@ async function handleBrowserAccountLink(request, response) {
   if (!store.entitlements[targetUserID]) {
     const subscription = await activeStripeSubscriptionForUserID(sourceUserID);
     if (subscription) {
+      const packageID = stripePackageIDFromObject(subscription);
       grantServerEntitlement(store, targetUserID, "webSubscription", {
+        packageID,
+        explicitPackage: stripePackageIsExplicit(subscription),
         expiresAt: stripeSubscriptionExpiresAt(subscription),
         provider: {
           stripeCustomerID: stripeSubscriptionID(subscription.customer),
@@ -8165,7 +8281,7 @@ async function handleBrowserAccountLink(request, response) {
           restoredFromUserID: sourceUserID
         }
       });
-      await transferStripeSubscriptionMetadata(subscription.id, targetUserID);
+      await transferStripeSubscriptionMetadata(subscription.id, targetUserID, packageID);
     }
   }
   if (!mergedAccount) {
@@ -8899,20 +9015,34 @@ async function handlePull(request, response) {
 }
 
 async function handleWebCheckout(request, response) {
-  const stripeStatus = stripeConfigurationStatus();
+  const body = await readJSON(request);
+  const packageID = normalizedCommercialPackageID(body.packageID);
+  if (!packageID) {
+    sendError(response, 400, "Choose a supported Permitext package.");
+    return;
+  }
+  const stripeStatus = stripeConfigurationStatus({ packageID });
   if (!stripeStatus.ready) {
     sendError(response, 503, stripeStatus.message);
     return;
   }
 
-  const body = await readJSON(request);
   const userID = body.auth?.accountUserID;
   if (!userID) {
     sendError(response, 400, "Missing user ID.");
     return;
   }
 
-  if (!await authenticatedUserContext(request, response, userID)) {
+  const accountContext = await authenticatedUserContext(request, response, userID);
+  if (!accountContext) return;
+  if (
+    packageID === entitlementPackageIDs.research &&
+    !hasActiveProEntitlement(accountContext.entitlement)
+  ) {
+    sendJSON(response, 409, {
+      error: "Subscribe to Pro before adding Research.",
+      code: "PRO_REQUIRED_FOR_RESEARCH"
+    });
     return;
   }
 
@@ -8920,7 +9050,7 @@ async function handleWebCheckout(request, response) {
   const successURL = sameOriginAbsoluteURL(
     baseURL,
     body.successURL,
-    "/?checkout=success&session_id={CHECKOUT_SESSION_ID}"
+    `/?checkout=success&package=${packageID}&session_id={CHECKOUT_SESSION_ID}`
   );
   const cancelURL = sameOriginAbsoluteURL(baseURL, body.cancelURL, "/?checkout=cancel");
   if (!successURL || !cancelURL) {
@@ -8933,10 +9063,10 @@ async function handleWebCheckout(request, response) {
     success_url: successURL,
     cancel_url: cancelURL,
     allow_promotion_codes: true,
-    line_items: [{ price: process.env.STRIPE_PRO_PRICE_ID, quantity: 1 }],
-    metadata: { accountUserID: userID },
+    line_items: [{ price: stripePriceID(packageID), quantity: 1 }],
+    metadata: { accountUserID: userID, permitextPackage: packageID },
     subscription_data: {
-      metadata: { accountUserID: userID }
+      metadata: { accountUserID: userID, permitextPackage: packageID }
     }
   });
 
@@ -8962,6 +9092,7 @@ async function handleWebCheckout(request, response) {
 
   sendJSON(response, 200, {
     checkoutSessionID: json.id,
+    packageID,
     url: json.url
   });
 }
@@ -8983,7 +9114,10 @@ async function handleWebPortal(request, response) {
   const context = await authenticatedUserContext(request, response, userID);
   if (!context) return;
 
-  let customerID = stripeSubscriptionID(context.entitlement?.provider?.stripeCustomerID);
+  let customerID = stripeSubscriptionID(
+    context.entitlement?.provider?.stripeCustomerID ||
+    context.entitlement?.addOns?.research?.provider?.stripeCustomerID
+  );
   if (!customerID) {
     const subscription = await activeStripeSubscriptionForUserID(userID);
     customerID = stripeSubscriptionID(subscription?.customer);
@@ -9042,9 +9176,8 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
-  if (!await authenticatedUserContext(request, response, userID)) {
-    return;
-  }
+  const accountContext = await authenticatedUserContext(request, response, userID);
+  if (!accountContext) return;
 
   let checkoutSession;
   let subscription;
@@ -9064,6 +9197,21 @@ async function handleStripeRestore(request, response) {
     return;
   }
 
+  const packageID = stripePackageIDFromObject(subscription);
+  if (!packageID) {
+    sendError(response, 422, "Stripe subscription has unsupported Permitext package metadata.");
+    return;
+  }
+  if (
+    packageID === entitlementPackageIDs.research &&
+    !hasActiveProEntitlement(accountContext.entitlement)
+  ) {
+    sendJSON(response, 409, {
+      error: "Restore an active Pro plan before restoring Research.",
+      code: "PRO_REQUIRED_FOR_RESEARCH"
+    });
+    return;
+  }
   const subscriptionID = stripeSubscriptionID(subscription.id);
   const persistedOwner = await persistedStripeEntitlementOwner(subscriptionID);
   try {
@@ -9082,9 +9230,11 @@ async function handleStripeRestore(request, response) {
   }
 
   if (!normalizedStripeAccountUserID(subscription.metadata?.accountUserID)) {
-    await transferStripeSubscriptionMetadata(subscriptionID, userID);
+    await transferStripeSubscriptionMetadata(subscriptionID, userID, packageID);
   }
   const entitlement = await persistServerEntitlement(userID, "webSubscription", {
+    packageID,
+    explicitPackage: stripePackageIsExplicit(subscription),
     expiresAt: stripeSubscriptionExpiresAt(subscription),
     provider: {
       stripeCustomerID: stripeSubscriptionID(subscription.customer),
@@ -9096,7 +9246,8 @@ async function handleStripeRestore(request, response) {
     entitlement,
     subscription: {
       id: subscription.id,
-      status: subscription.status
+      status: subscription.status,
+      packageID
     }
   });
 }
@@ -9127,7 +9278,10 @@ async function handleStripeWebhook(request, response) {
   case "checkout.session.completed": {
     const userID = stripeUserIDFromObject(object);
     if (userID && (object.mode === "subscription" || object.payment_status === "paid")) {
+      const packageID = stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
+        packageID,
+        explicitPackage: stripePackageIsExplicit(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
           stripeSubscriptionID: stripeSubscriptionID(object.subscription),
@@ -9143,7 +9297,10 @@ async function handleStripeWebhook(request, response) {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionID(object);
     if (userID && ["active", "trialing"].includes(object.status)) {
+      const packageID = stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
+        packageID,
+        explicitPackage: stripePackageIsExplicit(object),
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -9153,7 +9310,11 @@ async function handleStripeWebhook(request, response) {
       changed = true;
     } else if (subscriptionID && ["canceled", "incomplete_expired", "unpaid", "paused"].includes(object.status)) {
       const owner = await persistedStripeEntitlementOwner(subscriptionID);
+      const packageID = owner
+        ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
+        : stripePackageIDFromObject(object);
       changed = owner ? await deletePersistedEntitlement(owner.userID, {
+        packageID,
         source: "webSubscription",
         providerKey: "stripeSubscriptionID",
         providerValue: subscriptionID
@@ -9164,7 +9325,11 @@ async function handleStripeWebhook(request, response) {
   case "customer.subscription.deleted": {
     const subscriptionID = stripeSubscriptionID(object);
     const owner = await persistedStripeEntitlementOwner(subscriptionID);
+    const packageID = owner
+      ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
+      : stripePackageIDFromObject(object);
     changed = owner ? await deletePersistedEntitlement(owner.userID, {
+      packageID,
       source: "webSubscription",
       providerKey: "stripeSubscriptionID",
       providerValue: subscriptionID
@@ -9172,10 +9337,18 @@ async function handleStripeWebhook(request, response) {
     break;
   }
   case "invoice.payment_succeeded": {
-    const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionIDFromObject(object);
+    const owner = subscriptionID ? await persistedStripeEntitlementOwner(subscriptionID) : null;
+    const userID = stripeUserIDFromObject(object) || owner?.userID;
     if (userID && subscriptionID) {
+      const packageID = owner
+        ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
+        : stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
+        packageID,
+        explicitPackage: stripePackageIsExplicit(object) ||
+          Boolean(owner?.entitlement?.provider?.permitextPackage) ||
+          Boolean(owner?.entitlement?.addOns?.research?.provider?.permitextPackage),
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
@@ -9226,6 +9399,7 @@ async function handleAppleTransactionVerify(request, response) {
 
   const transactionID = String(payload.transactionId || "");
   const originalTransactionID = String(payload.originalTransactionId || transactionID);
+  const packageID = applePackageIDForProductID(payload.productId);
   if (!transactionID || !originalTransactionID) {
     sendError(response, 422, "Apple transaction identifier is missing.");
     return;
@@ -9239,6 +9413,7 @@ async function handleAppleTransactionVerify(request, response) {
 
   if (!appleTransactionActive(payload)) {
     const removed = await deletePersistedEntitlement(userID, {
+      packageID,
       source: "appleSubscription",
       providerKey: "appleOriginalTransactionID",
       providerValue: originalTransactionID
@@ -9250,7 +9425,18 @@ async function handleAppleTransactionVerify(request, response) {
     return;
   }
 
+  if (
+    packageID === entitlementPackageIDs.research &&
+    !hasActiveProEntitlement(accountContext.entitlement)
+  ) {
+    sendJSON(response, 409, {
+      error: "Restore or subscribe to Pro before activating Research.",
+      code: "PRO_REQUIRED_FOR_RESEARCH"
+    });
+    return;
+  }
   const entitlement = await persistAppleServerEntitlement(userID, originalTransactionID, {
+    packageID,
     expiresAt: appleTransactionExpiration(payload),
     provider
   });
@@ -9258,7 +9444,10 @@ async function handleAppleTransactionVerify(request, response) {
     sendError(response, 409, "This Apple purchase is already linked to another Permitext account.");
     return;
   }
-  sendJSON(response, 200, { entitlement, transaction: { active: true, productID: payload.productId } });
+  sendJSON(response, 200, {
+    entitlement,
+    transaction: { active: true, productID: payload.productId, packageID }
+  });
 }
 
 async function handleLifetimeGrant(request, response) {

@@ -4,6 +4,13 @@ export const freePlanLimits = Object.freeze({
   projects: 0
 });
 
+export const entitlementPackageIDs = Object.freeze({
+  pro: "pro",
+  research: "research"
+});
+
+const fullAccessSources = new Set(["lifetimeGrant", "debugOverride"]);
+
 function mutationEntry(mutation) {
   const [kind, record] = Object.entries(mutation || {})[0] || [];
   return { kind, record: record || {} };
@@ -34,6 +41,128 @@ export function hasActiveProEntitlement(entitlement, now = Date.now()) {
   if (String(entitlement?.plan || "").toLowerCase() !== "pro") return false;
   const expiration = Date.parse(entitlement?.expiresAt || "");
   return !Number.isFinite(expiration) || expiration > now;
+}
+
+export function activeEntitlementAddOn(entitlement, addOnID, now = Date.now()) {
+  const addOn = entitlement?.addOns?.[String(addOnID || "")];
+  if (!addOn || addOn.enabled === false) return null;
+  const expiration = Date.parse(addOn.expiresAt || "");
+  return !Number.isFinite(expiration) || expiration > now ? addOn : null;
+}
+
+export function researchEntitlementMode(entitlement, now = Date.now()) {
+  if (!hasActiveProEntitlement(entitlement, now)) return "unavailable";
+  if (activeEntitlementAddOn(entitlement, entitlementPackageIDs.research, now)) return "add-on";
+  if (fullAccessSources.has(String(entitlement?.source || ""))) return "included";
+  if (entitlement?.legacyResearchIncluded === true) return "legacy-included";
+
+  const explicitPackage = String(
+    entitlement?.packageID ||
+    entitlement?.provider?.permitextPackage ||
+    ""
+  ).trim();
+  return explicitPackage ? "unavailable" : "legacy-included";
+}
+
+export function hasActiveResearchEntitlement(entitlement, now = Date.now()) {
+  return researchEntitlementMode(entitlement, now) !== "unavailable";
+}
+
+function entitlementProviderMatches(provider, expected = {}) {
+  if (expected.source && provider?.source !== expected.source) return false;
+  if (expected.providerKey && provider?.provider?.[expected.providerKey] !== expected.providerValue) return false;
+  return true;
+}
+
+export function entitlementWithPackage(
+  existingEntitlement,
+  { userID, packageID, source, expiresAt = null, provider = {}, explicitPackage = true, now = new Date() }
+) {
+  const normalizedPackageID = String(packageID || "").trim();
+  if (!Object.values(entitlementPackageIDs).includes(normalizedPackageID)) {
+    throw new Error("Unsupported Permitext package.");
+  }
+  const updatedAt = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
+  const packageProvider = {
+    ...provider,
+    ...(explicitPackage ? { permitextPackage: normalizedPackageID } : {})
+  };
+
+  if (normalizedPackageID === entitlementPackageIDs.pro) {
+    const entitlement = {
+      plan: "pro",
+      ...(explicitPackage ? { packageID: entitlementPackageIDs.pro } : {}),
+      source,
+      grantedUserID: userID,
+      updatedAt,
+      provider: packageProvider,
+      ...(existingEntitlement?.addOns ? { addOns: existingEntitlement.addOns } : {})
+    };
+    if (expiresAt) entitlement.expiresAt = expiresAt;
+    if (
+      existingEntitlement?.legacyResearchIncluded === true ||
+      (!explicitPackage && (
+        !existingEntitlement ||
+        researchEntitlementMode(existingEntitlement, Date.parse(updatedAt)) === "legacy-included"
+      ))
+    ) {
+      entitlement.legacyResearchIncluded = true;
+    }
+    return entitlement;
+  }
+
+  if (!hasActiveProEntitlement(existingEntitlement, Date.parse(updatedAt))) {
+    throw new Error("Research requires an active Pro plan.");
+  }
+  const researchAddOn = {
+    enabled: true,
+    source,
+    updatedAt,
+    provider: packageProvider
+  };
+  if (expiresAt) researchAddOn.expiresAt = expiresAt;
+  return {
+    ...existingEntitlement,
+    updatedAt,
+    addOns: {
+      ...(existingEntitlement.addOns || {}),
+      [entitlementPackageIDs.research]: researchAddOn
+    }
+  };
+}
+
+export function entitlementWithoutPackage(existingEntitlement, packageID, expected = {}, now = new Date()) {
+  const normalizedPackageID = String(packageID || "").trim();
+  if (!existingEntitlement) return { changed: false, entitlement: null };
+
+  if (normalizedPackageID === entitlementPackageIDs.pro) {
+    const candidate = {
+      source: existingEntitlement.source,
+      provider: existingEntitlement.provider
+    };
+    return entitlementProviderMatches(candidate, expected)
+      ? { changed: true, entitlement: null }
+      : { changed: false, entitlement: existingEntitlement };
+  }
+
+  if (normalizedPackageID !== entitlementPackageIDs.research) {
+    return { changed: false, entitlement: existingEntitlement };
+  }
+  const addOn = existingEntitlement.addOns?.[entitlementPackageIDs.research];
+  if (!addOn || !entitlementProviderMatches(addOn, expected)) {
+    return { changed: false, entitlement: existingEntitlement };
+  }
+  const addOns = { ...(existingEntitlement.addOns || {}) };
+  delete addOns[entitlementPackageIDs.research];
+  const updatedAt = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
+  return {
+    changed: true,
+    entitlement: {
+      ...existingEntitlement,
+      updatedAt,
+      ...(Object.keys(addOns).length ? { addOns } : { addOns: {} })
+    }
+  };
 }
 
 export function freePlanUsage(mutations) {

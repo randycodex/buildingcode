@@ -27,6 +27,7 @@ struct UserContentSyncPushReport: Hashable, Sendable {
     let rejectionReasons: [String: BackendUserContentRejection]
     let latestEventID: Int64?
     let entitlement: AppEntitlement?
+    let capabilityContract: PermitextCapabilityContract?
 }
 
 struct UserContentSyncPullReport: Hashable, Sendable {
@@ -39,6 +40,7 @@ struct UserContentSyncPullReport: Hashable, Sendable {
     let skippedReason: String?
     let mergePlan: UserContentMergePlan
     let entitlement: AppEntitlement?
+    let capabilityContract: PermitextCapabilityContract?
 
     var appliedRemoteContinuity: Bool {
         mergePlan.decisions.contains {
@@ -95,7 +97,8 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
             rejectedMutationIDs: [],
             rejectionReasons: [:],
             latestEventID: nil,
-            entitlement: nil
+            entitlement: nil,
+            capabilityContract: nil
         )
     }
 
@@ -277,7 +280,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             rejectedMutationIDs: response.rejectedMutationIDs ?? [],
             rejectionReasons: response.rejectionReasons ?? [:],
             latestEventID: response.latestEventID ?? response.syncRevision,
-            entitlement: response.entitlement
+            entitlement: response.entitlement,
+            capabilityContract: response.capabilityContract
         )
     }
 
@@ -441,7 +445,8 @@ struct UserContentSyncEngine {
                 accountUserID: nil,
                 skippedReason: "No signed-in account.",
                 mergePlan: UserContentMergePlan(decisions: []),
-                entitlement: nil
+                entitlement: nil,
+                capabilityContract: nil
             )
         }
 
@@ -479,7 +484,8 @@ struct UserContentSyncEngine {
                 accountUserID: account.appUserID,
                 skippedReason: nil,
                 mergePlan: mergePlan,
-                entitlement: incoming.entitlement
+                entitlement: incoming.entitlement,
+                capabilityContract: incoming.capabilityContract
             )
         } catch {
             checkpointStore.save(checkpoint.markingFailed(error: error, at: Date()))
@@ -500,7 +506,8 @@ struct UserContentSyncEngine {
                 rejectedMutationIDs: [],
                 rejectionReasons: [:],
                 latestEventID: nil,
-                entitlement: nil
+                entitlement: nil,
+                capabilityContract: nil
             )
         }
 
@@ -513,6 +520,7 @@ struct UserContentSyncEngine {
         var rejectionReasons: [String: BackendUserContentRejection] = [:]
         var latestEventID = checkpoint.latestEventID
         var entitlement: AppEntitlement?
+        var capabilityContract: PermitextCapabilityContract?
         var processedBatchCount = 0
 
         while processedBatchCount < maxBatches {
@@ -532,6 +540,7 @@ struct UserContentSyncEngine {
                 rejectionReasons.merge(report.rejectionReasons) { _, latest in latest }
                 latestEventID = report.latestEventID ?? latestEventID
                 entitlement = report.entitlement ?? entitlement
+                capabilityContract = report.capabilityContract ?? capabilityContract
                 let acceptedIDs = Set(report.acceptedMutationIDs)
                 let rejectedIDs = Set(report.rejectedMutationIDs)
                 for item in batch.items {
@@ -570,7 +579,8 @@ struct UserContentSyncEngine {
                 rejectedMutationIDs: [],
                 rejectionReasons: [:],
                 latestEventID: latestEventID,
-                entitlement: nil
+                entitlement: nil,
+                capabilityContract: nil
             )
         }
 
@@ -586,7 +596,8 @@ struct UserContentSyncEngine {
             rejectedMutationIDs: rejectedMutationIDs,
             rejectionReasons: rejectionReasons,
             latestEventID: latestEventID,
-            entitlement: entitlement
+            entitlement: entitlement,
+            capabilityContract: capabilityContract
         )
     }
 

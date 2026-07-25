@@ -237,8 +237,8 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260724-reports-v2"),
-      "Web workspace omitted the current Report asset version."
+      webRoot.text.includes("20260724-packages-v1"),
+      "Web workspace omitted the current package asset version."
     );
     assert(
       !webRoot.text.includes(privateEvaluationSentinel),
@@ -723,7 +723,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-reports-v2'),
+        webRoot.text.includes('/web/app.js?v=20260724-packages-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1306,6 +1306,49 @@ async function main() {
       }
     });
     assert(unsignedPush.response.status === 401, "Push allowed a user with no backend session.");
+
+    const freeResearchSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-free-research-user",
+          displayName: "Free Research Smoke User"
+        }
+      }
+    });
+    assert(freeResearchSignIn.response.ok, "Free Research smoke account sign-in failed.");
+    const freeResearchUserID = freeResearchSignIn.json.account.appUserID;
+    const freeResearchToken = freeResearchSignIn.json.account.backendSessionToken;
+    const freeCapabilityPull = await request("/sync/pull", {
+      method: "POST",
+      token: freeResearchToken,
+      body: {
+        auth: { accountUserID: freeResearchUserID },
+        syncSchemaVersion: 2,
+        clientCapabilities: ["research", "offline-access"]
+      }
+    });
+    assert(freeCapabilityPull.response.ok, "Free capability contract pull failed.");
+    assert(
+      freeCapabilityPull.json.capabilityContract?.capabilities?.research?.enabled === false &&
+        freeCapabilityPull.json.capabilityContract?.capabilities?.["offline-access"]?.enabled === false,
+      "Free capability contract incorrectly unlocked Research or offline access."
+    );
+    const freeResearchCreate = await request("/research/conversations/create", {
+      method: "POST",
+      token: freeResearchToken,
+      body: {
+        auth: { accountUserID: freeResearchUserID },
+        sectionID: "1",
+        selectedText: "Any selected text"
+      }
+    });
+    assert(
+      freeResearchCreate.response.status === 402 &&
+        freeResearchCreate.json.code === "RESEARCH_ADDON_REQUIRED",
+      "Free account was allowed to create Research."
+    );
 
     const grant = await request("/admin/lifetime-grants/grant", {
       method: "POST",

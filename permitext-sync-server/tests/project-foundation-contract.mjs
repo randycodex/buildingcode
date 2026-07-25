@@ -60,11 +60,34 @@ assert.throws(
 const proCapabilities = capabilityContract({ plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" });
 assert.equal(proCapabilities.capabilities["projects"].enabled, true);
 assert.equal(proCapabilities.capabilities["collaboration"].enabled, false);
+assert.equal(proCapabilities.capabilities.research.enabled, true, "Legacy Pro must keep Research.");
 const freeCapabilities = capabilityContract(null);
+assert.equal(freeCapabilities.schemaVersion, 2);
 assert.equal(freeCapabilities.capabilities["saved-work"].limit, 25);
 assert.equal(freeCapabilities.capabilities["projects"].enabled, false);
-assert.equal(freeCapabilities.capabilities.research.enabled, true);
-assert.equal(freeCapabilities.capabilities.research.monthlyLimit, 100);
+assert.equal(freeCapabilities.capabilities["offline-access"].enabled, false);
+assert.equal(freeCapabilities.capabilities.research.enabled, false);
+assert.equal(freeCapabilities.capabilities.research.monthlyLimit, 0);
+const packagedProCapabilities = capabilityContract({
+  plan: "pro",
+  expiresAt: "2099-01-01T00:00:00.000Z",
+  provider: { permitextPackage: "pro" }
+});
+assert.equal(packagedProCapabilities.capabilities.research.enabled, false);
+assert.equal(packagedProCapabilities.packages.research.requiresPro, true);
+const researchCapabilities = capabilityContract({
+  plan: "pro",
+  expiresAt: "2099-01-01T00:00:00.000Z",
+  provider: { permitextPackage: "pro" },
+  addOns: {
+    research: {
+      enabled: true,
+      expiresAt: "2099-01-01T00:00:00.000Z"
+    }
+  }
+});
+assert.equal(researchCapabilities.capabilities.research.enabled, true);
+assert.equal(researchCapabilities.capabilities.research.monthlyLimit, 100);
 
 const compatibility = syncContract({
   entitlement: null,

@@ -5,18 +5,18 @@ const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v7";
-const offlineAssetVersion = "20260724-reports-v2";
+const shellCacheName = "permitext-pro-shell-v8";
+const offlineAssetVersion = "20260724-packages-v1";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/",
-  "/web/manifest.webmanifest?v=20260724-reports-v2",
+  "/web/manifest.webmanifest?v=20260724-packages-v1",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260724-reports-v2",
+  "/web/styles.css?v=20260724-packages-v1",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
-  "/web/app.js?v=20260724-reports-v2",
-  "/web/offline-storage.js?v=20260724-reports-v2",
+  "/web/app.js?v=20260724-packages-v1",
+  "/web/offline-storage.js?v=20260724-packages-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260720-sync-contract-v2",
   "/web/sync-state.js?v=20260721-causal-clear-v4"

@@ -966,6 +966,30 @@ enum PermitextCapabilityID: String, Codable, CaseIterable, Hashable, Sendable {
     case organizationAdministration = "organization-administration"
 }
 
+struct PermitextCapabilityState: Codable, Hashable, Sendable {
+    let enabled: Bool
+    let limit: Int?
+    let monthlyLimit: Int?
+    let requiresPro: Bool?
+}
+
+struct PermitextPackageState: Codable, Hashable, Sendable {
+    let active: Bool
+    let requiresPro: Bool?
+    let mode: String?
+}
+
+struct PermitextCapabilityContract: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let plan: AppPlan
+    let packages: [String: PermitextPackageState]?
+    let capabilities: [String: PermitextCapabilityState]
+
+    func enables(_ capability: PermitextCapabilityID) -> Bool {
+        capabilities[capability.rawValue]?.enabled == true
+    }
+}
+
 struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     let userID: String
     let pulledAt: Date
@@ -974,6 +998,7 @@ struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     var contentMapVersion: Int? = nil
     var syncSchemaVersion: Int? = nil
     var entitlement: AppEntitlement? = nil
+    var capabilityContract: PermitextCapabilityContract? = nil
     let mutations: [ServerUserContentMutation]
 }
 
@@ -1412,6 +1437,7 @@ struct BackendUserContentPushResponse: Codable, Hashable, Sendable {
     var latestEventID: Int64? = nil
     var syncRevision: Int64? = nil
     var entitlement: AppEntitlement? = nil
+    var capabilityContract: PermitextCapabilityContract? = nil
     var syncSchemaVersion: Int? = nil
     let serverTime: Date
 }
@@ -2535,22 +2561,66 @@ enum EntitlementSource: String, Codable, Hashable, Sendable {
 }
 
 struct AppEntitlement: Codable, Hashable, Sendable {
+    struct Provider: Codable, Hashable, Sendable {
+        let permitextPackage: String?
+    }
+
+    struct AddOn: Codable, Hashable, Sendable {
+        let enabled: Bool?
+        let source: String?
+        let expiresAt: Date?
+        let provider: Provider?
+
+        func isActive(at date: Date = Date()) -> Bool {
+            guard enabled != false else { return false }
+            guard let expiresAt else { return true }
+            return expiresAt > date
+        }
+    }
+
     let plan: AppPlan
     let source: EntitlementSource
     let grantedUserID: String?
     let expiresAt: Date?
+    let packageID: String?
+    let legacyResearchIncluded: Bool?
+    let provider: Provider?
+    let addOns: [String: AddOn]?
 
-    init(plan: AppPlan, source: EntitlementSource, grantedUserID: String?, expiresAt: Date? = nil) {
+    init(
+        plan: AppPlan,
+        source: EntitlementSource,
+        grantedUserID: String?,
+        expiresAt: Date? = nil,
+        packageID: String? = nil,
+        legacyResearchIncluded: Bool? = nil,
+        provider: Provider? = nil,
+        addOns: [String: AddOn]? = nil
+    ) {
         self.plan = plan
         self.source = source
         self.grantedUserID = grantedUserID
         self.expiresAt = expiresAt
+        self.packageID = packageID
+        self.legacyResearchIncluded = legacyResearchIncluded
+        self.provider = provider
+        self.addOns = addOns
     }
 
     func grantsPro(at date: Date = Date()) -> Bool {
         guard plan == .pro else { return false }
         guard let expiresAt else { return true }
         return expiresAt > date
+    }
+
+    func grantsResearch(at date: Date = Date()) -> Bool {
+        guard grantsPro(at: date) else { return false }
+        if addOns?["research"]?.isActive(at: date) == true { return true }
+        if source == .lifetimeGrant || source == .debugOverride { return true }
+        if legacyResearchIncluded == true { return true }
+        let explicitPackage = packageID ?? provider?.permitextPackage
+        guard let explicitPackage else { return true }
+        return explicitPackage.isEmpty
     }
 
     static let free = AppEntitlement(plan: .free, source: .none, grantedUserID: nil)
@@ -3010,19 +3080,25 @@ struct LocalEntitlementService: EntitlementService {
 
 enum StoreKitProductID {
     static let proMonthly = "com.randycodex.permitext.pro.monthly"
+    static let researchMonthly = "com.randycodex.permitext.research.monthly"
 }
 
 struct StoreKitSubscriptionSnapshot: Sendable {
     let plan: AppPlan
+    let researchActive: Bool
     let proDisplayPrice: String?
+    let researchDisplayPrice: String?
     let loadedProductIDs: [String]
     let debugSummary: String
     let signedTransactionInfo: String?
     let transactionEnvironment: String?
+    let researchSignedTransactionInfo: String?
+    let researchTransactionEnvironment: String?
 }
 
 enum StoreKitSubscriptionServiceError: LocalizedError {
     case proProductUnavailable
+    case researchProductUnavailable
     case unverifiedTransaction
     case pendingApproval
     case unknownPurchaseResult
@@ -3031,6 +3107,8 @@ enum StoreKitSubscriptionServiceError: LocalizedError {
         switch self {
         case .proProductUnavailable:
             return "The Pro monthly subscription is not available yet. Check the App Store product setup."
+        case .researchProductUnavailable:
+            return "The Research Add-On is not available yet. Check the App Store product setup."
         case .unverifiedTransaction:
             return "The purchase could not be verified."
         case .pendingApproval:
@@ -3043,7 +3121,9 @@ enum StoreKitSubscriptionServiceError: LocalizedError {
 
 actor StoreKitSubscriptionService {
     private let proProductID = StoreKitProductID.proMonthly
+    private let researchProductID = StoreKitProductID.researchMonthly
     private var cachedProProduct: Product?
+    private var cachedResearchProduct: Product?
 
     func snapshot(
         signedTransactionInfo: String? = nil,
@@ -3051,22 +3131,51 @@ actor StoreKitSubscriptionService {
     ) async -> StoreKitSubscriptionSnapshot {
         async let planResult = verifiedPlanAndSignedTransactionInfo()
         async let products = proProducts()
+        async let researchResult = verifiedResearchAndSignedTransactionInfo()
         async let debugSummary = transactionDebugSummary()
         let loadedProducts = await products
         let resolvedPlanResult = await planResult
+        let resolvedResearchResult = await researchResult
         return StoreKitSubscriptionSnapshot(
             plan: resolvedPlanResult.plan,
+            researchActive: resolvedResearchResult.active,
             proDisplayPrice: loadedProducts.first { $0.id == proProductID }?.displayPrice,
+            researchDisplayPrice: loadedProducts.first { $0.id == researchProductID }?.displayPrice,
             loadedProductIDs: loadedProducts.map(\.id),
             debugSummary: await debugSummary,
             signedTransactionInfo: signedTransactionInfo ?? resolvedPlanResult.signedTransactionInfo,
-            transactionEnvironment: transactionEnvironment ?? resolvedPlanResult.transactionEnvironment
+            transactionEnvironment: transactionEnvironment ?? resolvedPlanResult.transactionEnvironment,
+            researchSignedTransactionInfo: resolvedResearchResult.signedTransactionInfo,
+            researchTransactionEnvironment: resolvedResearchResult.transactionEnvironment
         )
     }
 
     func purchasePro() async throws -> StoreKitSubscriptionSnapshot {
         guard let product = await proProducts().first(where: { $0.id == proProductID }) else {
             throw StoreKitSubscriptionServiceError.proProductUnavailable
+        }
+
+        let result = try await product.purchase()
+        switch result {
+        case .success(let verification):
+            let transaction = try verifiedTransaction(from: verification)
+            await transaction.finish()
+            return await snapshot(
+                signedTransactionInfo: verification.jwsRepresentation,
+                transactionEnvironment: transaction.environment.rawValue
+            )
+        case .userCancelled:
+            return await snapshot()
+        case .pending:
+            throw StoreKitSubscriptionServiceError.pendingApproval
+        @unknown default:
+            throw StoreKitSubscriptionServiceError.unknownPurchaseResult
+        }
+    }
+
+    func purchaseResearch() async throws -> StoreKitSubscriptionSnapshot {
+        guard let product = await proProducts().first(where: { $0.id == researchProductID }) else {
+            throw StoreKitSubscriptionServiceError.researchProductUnavailable
         }
 
         let result = try await product.purchase()
@@ -3107,6 +3216,7 @@ actor StoreKitSubscriptionService {
                     if isActiveProTransaction(transaction) {
                         LocalEntitlementService.setVerifiedPlan(.pro)
                     }
+                    guard isTrackedTransaction(transaction) else { continue }
                     await transaction.finish()
                     continuation.yield(
                         await snapshot(
@@ -3121,10 +3231,13 @@ actor StoreKitSubscriptionService {
     }
 
     private func proProducts() async -> [Product] {
-        if let cachedProProduct { return [cachedProProduct] }
-        let products = (try? await Product.products(for: [proProductID])) ?? []
+        if cachedProProduct != nil || cachedResearchProduct != nil {
+            return [cachedProProduct, cachedResearchProduct].compactMap { $0 }
+        }
+        let products = (try? await Product.products(for: [proProductID, researchProductID])) ?? []
         cachedProProduct = products.first { $0.id == proProductID }
-        return products
+        cachedResearchProduct = products.first { $0.id == researchProductID }
+        return products.filter { [proProductID, researchProductID].contains($0.id) }
     }
 
     private func verifiedPlanAndSignedTransactionInfo() async -> (
@@ -3162,8 +3275,49 @@ actor StoreKitSubscriptionService {
         return true
     }
 
+    private nonisolated func isActiveResearchTransaction(_ transaction: Transaction) -> Bool {
+        guard transaction.productID == StoreKitProductID.researchMonthly,
+              transaction.revocationDate == nil
+        else {
+            return false
+        }
+        if let expirationDate = transaction.expirationDate, expirationDate <= Date() {
+            return false
+        }
+        return true
+    }
+
+    private nonisolated func isTrackedTransaction(_ transaction: Transaction) -> Bool {
+        isActiveProTransaction(transaction) || isActiveResearchTransaction(transaction)
+    }
+
+    private func verifiedResearchAndSignedTransactionInfo() async -> (
+        active: Bool,
+        signedTransactionInfo: String?,
+        transactionEnvironment: String?
+    ) {
+        for await verification in Transaction.currentEntitlements {
+            guard case .verified(let transaction) = verification,
+                  isActiveResearchTransaction(transaction)
+            else {
+                continue
+            }
+            return (true, verification.jwsRepresentation, transaction.environment.rawValue)
+        }
+        if let verification = await Transaction.latest(for: researchProductID),
+           case .verified(let transaction) = verification,
+           isActiveResearchTransaction(transaction) {
+            return (true, verification.jwsRepresentation, transaction.environment.rawValue)
+        }
+        return (await subscriptionStatusIndicatesActive(productID: researchProductID), nil, nil)
+    }
+
     private func subscriptionStatusIndicatesActivePro() async -> Bool {
-        guard let subscription = await proProducts().first(where: { $0.id == proProductID })?.subscription,
+        await subscriptionStatusIndicatesActive(productID: proProductID)
+    }
+
+    private func subscriptionStatusIndicatesActive(productID: String) async -> Bool {
+        guard let subscription = await proProducts().first(where: { $0.id == productID })?.subscription,
               let statuses = try? await subscription.status else {
             return false
         }
@@ -3183,7 +3337,7 @@ actor StoreKitSubscriptionService {
         for await entitlement in Transaction.currentEntitlements {
             switch entitlement {
             case .verified(let transaction):
-                let activeText = isActiveProTransaction(transaction) ? "active" : "inactive"
+                let activeText = isTrackedTransaction(transaction) ? "active" : "inactive"
                 currentEntitlementDescriptions.append("\(transaction.productID) \(activeText)")
             case .unverified(let transaction, _):
                 currentEntitlementDescriptions.append("\(transaction.productID) unverified")
@@ -3211,16 +3365,19 @@ actor StoreKitSubscriptionService {
     }
 
     private func subscriptionStatusDebugSummary() async -> String {
-        guard let subscription = await proProducts().first(where: { $0.id == proProductID })?.subscription else {
+        let subscriptions = await proProducts().compactMap(\.subscription)
+        guard !subscriptions.isEmpty else {
             return "none"
         }
-        guard let statuses = try? await subscription.status else {
-            return "unavailable"
+        var statusValues: [String] = []
+        for subscription in subscriptions {
+            guard let statuses = try? await subscription.status else {
+                statusValues.append("unavailable")
+                continue
+            }
+            statusValues.append(contentsOf: statuses.map { String(describing: $0.state) })
         }
-        guard !statuses.isEmpty else {
-            return "none"
-        }
-        return statuses.map { String(describing: $0.state) }.joined(separator: ", ")
+        return statusValues.isEmpty ? "none" : statusValues.joined(separator: ", ")
     }
 
     private func verifiedTransaction(from result: VerificationResult<Transaction>) throws -> Transaction {

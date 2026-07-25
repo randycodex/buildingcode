@@ -78,4 +78,60 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(capabilities.contains("professional-exports"))
         XCTAssertTrue(capabilities.contains("organization-administration"))
     }
+
+    func testCapabilityContractDecodesResearchPackaging() throws {
+        let data = Data(
+            """
+            {
+              "schemaVersion": 2,
+              "plan": "pro",
+              "packages": {
+                "pro": { "active": true },
+                "research": { "active": false, "requiresPro": true, "mode": "unavailable" }
+              },
+              "capabilities": {
+                "projects": { "enabled": true },
+                "offline-access": { "enabled": true },
+                "research": { "enabled": false, "monthlyLimit": 0, "requiresPro": true }
+              }
+            }
+            """.utf8
+        )
+        let contract = try JSONDecoder().decode(PermitextCapabilityContract.self, from: data)
+
+        XCTAssertEqual(contract.schemaVersion, 2)
+        XCTAssertTrue(contract.enables(.projects))
+        XCTAssertTrue(contract.enables(.offlineAccess))
+        XCTAssertFalse(contract.enables(.research))
+    }
+
+    func testPackagedProNeedsResearchAddOnWhileLegacyAndLifetimeKeepAccess() {
+        let packagedPro = AppEntitlement(
+            plan: .pro,
+            source: .webSubscription,
+            grantedUserID: "user",
+            packageID: "pro",
+            provider: .init(permitextPackage: "pro")
+        )
+        XCTAssertFalse(packagedPro.grantsResearch())
+
+        let proWithResearch = AppEntitlement(
+            plan: .pro,
+            source: .webSubscription,
+            grantedUserID: "user",
+            packageID: "pro",
+            provider: .init(permitextPackage: "pro"),
+            addOns: [
+                "research": .init(
+                    enabled: true,
+                    source: "webSubscription",
+                    expiresAt: nil,
+                    provider: .init(permitextPackage: "research")
+                )
+            ]
+        )
+        XCTAssertTrue(proWithResearch.grantsResearch())
+        XCTAssertTrue(AppEntitlement.lifetimeGrant(userID: "user").grantsResearch())
+        XCTAssertTrue(AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "legacy").grantsResearch())
+    }
 }

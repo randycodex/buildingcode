@@ -1,8 +1,14 @@
 import assert from "node:assert/strict";
 import {
+  activeEntitlementAddOn,
+  entitlementPackageIDs,
+  entitlementWithPackage,
+  entitlementWithoutPackage,
   enforceFreePlanMutationBatch,
   freePlanLimits,
-  hasActiveProEntitlement
+  hasActiveProEntitlement,
+  hasActiveResearchEntitlement,
+  researchEntitlementMode
 } from "../entitlement-contract.mjs";
 
 const userID = "entitlement-contract-user";
@@ -99,8 +105,127 @@ assert.equal(decision.rejectedMutationIDs.length, proOnlyMutations.length);
 
 const activePro = { plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" };
 assert.equal(hasActiveProEntitlement(activePro), true);
+assert.equal(
+  researchEntitlementMode(activePro),
+  "legacy-included",
+  "Existing Pro records without package metadata must keep Research during migration."
+);
+assert.equal(hasActiveResearchEntitlement(activePro), true);
 decision = enforceFreePlanMutationBatch(savedAtLimit, [savedOverLimit, ...proOnlyMutations], activePro);
 assert.equal(decision.acceptedMutations.length, proOnlyMutations.length + 1);
+
+const packagedPro = {
+  plan: "pro",
+  expiresAt: "2099-01-01T00:00:00.000Z",
+  provider: { permitextPackage: entitlementPackageIDs.pro }
+};
+assert.equal(hasActiveResearchEntitlement(packagedPro), false, "New Pro packages must not imply Research.");
+const proWithResearch = {
+  ...packagedPro,
+  addOns: {
+    research: {
+      enabled: true,
+      expiresAt: "2099-01-01T00:00:00.000Z",
+      source: "webSubscription"
+    }
+  }
+};
+assert.equal(activeEntitlementAddOn(proWithResearch, entitlementPackageIDs.research)?.enabled, true);
+assert.equal(researchEntitlementMode(proWithResearch), "add-on");
+assert.equal(hasActiveResearchEntitlement(proWithResearch), true);
+assert.equal(
+  hasActiveResearchEntitlement({
+    ...proWithResearch,
+    addOns: {
+      research: {
+        enabled: true,
+        expiresAt: "2020-01-01T00:00:00.000Z"
+      }
+    }
+  }),
+  false,
+  "Expired Research add-ons must not remain active."
+);
+assert.equal(
+  hasActiveResearchEntitlement({ plan: "pro", source: "lifetimeGrant" }),
+  true,
+  "Lifetime grants must retain full Research access."
+);
+
+const packagedAt = new Date("2026-07-24T18:00:00.000Z");
+const newPackagedPro = entitlementWithPackage(null, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  expiresAt: "2099-01-01T00:00:00.000Z",
+  provider: { stripeSubscriptionID: "sub_pro" },
+  now: packagedAt
+});
+assert.equal(newPackagedPro.provider.permitextPackage, entitlementPackageIDs.pro);
+assert.equal(hasActiveResearchEntitlement(newPackagedPro), false);
+const restoredLegacyPro = entitlementWithPackage(null, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  provider: { stripeSubscriptionID: "sub_legacy" },
+  explicitPackage: false,
+  now: packagedAt
+});
+assert.equal(restoredLegacyPro.legacyResearchIncluded, true);
+assert.equal(hasActiveResearchEntitlement(restoredLegacyPro), true);
+const refreshedLegacyPro = entitlementWithPackage(restoredLegacyPro, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  provider: {
+    stripeSubscriptionID: "sub_legacy",
+    permitextPackage: entitlementPackageIDs.pro
+  },
+  explicitPackage: true,
+  now: packagedAt
+});
+assert.equal(hasActiveResearchEntitlement(refreshedLegacyPro), true);
+const packagedWithResearch = entitlementWithPackage(newPackagedPro, {
+  userID,
+  packageID: entitlementPackageIDs.research,
+  source: "webSubscription",
+  expiresAt: "2099-01-01T00:00:00.000Z",
+  provider: { stripeSubscriptionID: "sub_research" },
+  now: packagedAt
+});
+assert.equal(hasActiveResearchEntitlement(packagedWithResearch), true);
+const researchRevocation = entitlementWithoutPackage(
+  packagedWithResearch,
+  entitlementPackageIDs.research,
+  {
+    source: "webSubscription",
+    providerKey: "stripeSubscriptionID",
+    providerValue: "sub_research"
+  },
+  packagedAt
+);
+assert.equal(researchRevocation.changed, true);
+assert.equal(hasActiveProEntitlement(researchRevocation.entitlement), true);
+assert.equal(hasActiveResearchEntitlement(researchRevocation.entitlement), false);
+const mismatchedRevocation = entitlementWithoutPackage(
+  packagedWithResearch,
+  entitlementPackageIDs.research,
+  {
+    providerKey: "stripeSubscriptionID",
+    providerValue: "sub_other"
+  },
+  packagedAt
+);
+assert.equal(mismatchedRevocation.changed, false);
+assert.throws(
+  () => entitlementWithPackage(null, {
+    userID,
+    packageID: entitlementPackageIDs.research,
+    source: "webSubscription",
+    now: packagedAt
+  }),
+  /active Pro plan/
+);
 
 assert.equal(
   hasActiveProEntitlement({ plan: "pro", expiresAt: "2020-01-01T00:00:00.000Z" }),

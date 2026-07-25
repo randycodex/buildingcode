@@ -825,8 +825,13 @@ export function createPostgresAccountRepository(sql) {
     const rows = await sql`
       SELECT user_id, entitlement
       FROM permitext_entitlements
-      WHERE source = 'webSubscription'
+      WHERE (
+        source = 'webSubscription'
         AND entitlement->'provider'->>'stripeSubscriptionID' = ${subscriptionID}
+      ) OR (
+        entitlement->'addOns'->'research'->>'source' = 'webSubscription'
+        AND entitlement->'addOns'->'research'->'provider'->>'stripeSubscriptionID' = ${subscriptionID}
+      )
       LIMIT 1
     `;
     if (!rows[0]) return null;

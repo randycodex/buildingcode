@@ -170,6 +170,11 @@ async function signInEvalUser(baseURL) {
       }
     }
   });
+  await jsonRequest(baseURL, "/admin/lifetime-grants/grant", {
+    method: "POST",
+    token: process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN,
+    body: { userID: result.account.appUserID }
+  });
   return result.account;
 }
 
@@ -2403,6 +2408,7 @@ async function main() {
     process.env.VERCEL = "";
     process.env.VERCEL_ENV = "";
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
+    process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
     process.env.PERMITEXT_RESEARCH_MOCK = liveMode ? "" : "1";
     process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(selectedCases.length * repeat);
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);

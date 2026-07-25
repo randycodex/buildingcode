@@ -235,7 +235,8 @@ struct SettingsView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
-                planFeatureRow("Pro", details: "Unlimited saved sections, notes, projects, tags, and PDF export.")
+                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and offline access.")
+                planFeatureRow("Research Add-On", details: "Selected-evidence Research, verified citations, immutable answer history, conversation history, and a monthly AI allowance. Requires Pro.")
             }
 
             Button {
@@ -255,6 +256,23 @@ struct SettingsView: View {
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
             .opacity(library.isStoreKitBusy || library.currentPlan == .pro ? 0.55 : 1)
 
+            Button {
+                Task { await library.purchaseResearch() }
+            } label: {
+                Label(researchButtonTitle, systemImage: "text.magnifyingglass")
+                    .font(.subheadline.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(.primary)
+                    .padding(.vertical, 12)
+                    .background(
+                        Capsule(style: .continuous)
+                            .fill(Color(uiColor: .secondarySystemGroupedBackground))
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(!canPurchaseResearch)
+            .opacity(canPurchaseResearch ? 1 : 0.55)
+
             if library.currentPlan == .pro {
                 Button {
                     openURL(subscriptionManagementURL)
@@ -265,18 +283,17 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.plain)
                 .foregroundStyle(.secondary)
-            } else {
-                Button {
-                    Task { await library.restorePurchases() }
-                } label: {
-                    Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
-                        .font(.footnote.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .disabled(library.isStoreKitBusy)
             }
+            Button {
+                Task { await library.restorePurchases() }
+            } label: {
+                Text(library.isStoreKitBusy ? "Checking purchases..." : "Restore Purchases")
+                    .font(.footnote.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.secondary)
+            .disabled(library.isStoreKitBusy)
 
             #if DEBUG
             Text(library.accountSyncDebugSummary)
@@ -509,11 +526,30 @@ struct SettingsView: View {
                 return "Pro (Test) is active only on this device. Use an account grant to test Pro across iOS and web."
             }
             if library.currentEntitlementSource == .lifetimeGrant {
-                return "Lifetime Pro is active. This account has gifted access and does not need an App Store subscription."
+                return "Lifetime Pro is active, including Research. This gifted account does not need an App Store subscription."
             }
-            return "Pro is active. Unlimited saved work, projects, tags, and PDF export are unlocked across iOS and web."
+            if library.hasResearchAccess {
+                return "Pro and Research are active. Projects, Notebook, Report Draft, professional exports, offline access, and selected-evidence Research are unlocked."
+            }
+            return "Pro is active. Projects, Notebook, Report Draft, professional exports, tags, and offline access are unlocked. Research is available separately."
         }
-        return "Free includes continuity and cross-device sync. Pro unlocks unlimited saved work, projects, organization, and exports."
+        return "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace."
+    }
+
+    private var canPurchaseResearch: Bool {
+        library.currentPlan == .pro &&
+            !library.hasResearchAccess &&
+            library.researchProductDisplayPrice != nil &&
+            !library.isStoreKitBusy
+    }
+
+    private var researchButtonTitle: String {
+        if library.hasResearchAccess { return "Research Active" }
+        guard library.currentPlan == .pro else { return "Pro Required for Research" }
+        if let price = library.researchProductDisplayPrice, !price.isEmpty {
+            return "Add Research - \(price)/month"
+        }
+        return library.isStoreKitBusy ? "Loading Research..." : "Research Purchase Not Configured"
     }
 
     private var accountSummaryText: String {
@@ -555,9 +591,9 @@ struct SettingsView: View {
 
     private func planFeatureRow(_ title: String, details: String) -> some View {
         HStack(alignment: .top, spacing: 10) {
-            Image(systemName: title == "Pro" ? "checkmark.seal.fill" : "checkmark.circle")
+            Image(systemName: title == "Free" ? "checkmark.circle" : "checkmark.seal.fill")
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(title == "Pro" ? Color.appChrome : .secondary)
+                .foregroundStyle(title == "Free" ? Color.secondary : Color.appChrome)
                 .frame(width: 20)
 
             VStack(alignment: .leading, spacing: 2) {

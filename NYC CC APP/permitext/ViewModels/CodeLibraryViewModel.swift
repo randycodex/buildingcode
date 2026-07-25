@@ -81,12 +81,15 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var activeProjectID: Int64?
     @Published private(set) var currentPlan: AppPlan
     @Published private(set) var currentEntitlementSource: EntitlementSource
+    @Published private(set) var currentCapabilityContract: PermitextCapabilityContract? = nil
     @Published private(set) var entitlementPrompt: EntitlementRequirement?
     @Published private(set) var signedInAccount: SignedInAccount?
     @Published private(set) var isAccountBusy = false
     @Published private(set) var pendingUserContentSyncCount = 0
     @Published private(set) var userContentSyncConflicts: [UserContentSyncConflict] = []
     @Published private(set) var proProductDisplayPrice: String?
+    @Published private(set) var researchProductDisplayPrice: String?
+    @Published private(set) var isStoreKitResearchActive = false
     @Published private(set) var storeKitLoadedProductIDs: [String] = []
     @Published private(set) var storeKitDebugSummary: String = "not checked"
     @Published private(set) var storeKitTransactionEnvironment: String?
@@ -170,6 +173,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private var didRunStartupAccountSync = false
     private var lastForegroundAccountSyncAt: Date?
     private var activeStoreKitPlan: AppPlan = .free
+    private var activeStoreKitResearch = false
     private var hasActiveBackendProEntitlement = false
     private let foregroundAccountSyncInterval: TimeInterval = 30
     private let automaticSyncRetryDelays: [TimeInterval] = [5, 10, 20, 40, 80]
@@ -1822,12 +1826,39 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     var hasProjectAccess: Bool {
-        currentPlan == .pro
+        hasCapability(.projects)
+    }
+
+    var hasResearchAccess: Bool {
+        hasCapability(.research)
+    }
+
+    func hasCapability(_ capability: PermitextCapabilityID) -> Bool {
+        if capability == .research, activeStoreKitPlan == .pro, activeStoreKitResearch {
+            return true
+        }
+        if activeStoreKitPlan == .pro,
+           [.projects, .notebook, .professionalExports, .offlineAccess].contains(capability) {
+            return true
+        }
+        if let currentCapabilityContract {
+            return currentCapabilityContract.enables(capability)
+        }
+        switch capability {
+        case .savedWork, .notes:
+            return true
+        case .projects, .notebook, .professionalExports, .offlineAccess:
+            return currentPlan == .pro
+        case .research:
+            return entitlementService.currentEntitlement.grantsResearch()
+        case .evidenceDiscovery, .collaboration, .organizationAdministration:
+            return false
+        }
     }
 
     @discardableResult
     func requireProjectAccess() -> Bool {
-        guard currentPlan != .pro else { return true }
+        guard !hasCapability(.projects) else { return true }
         let requirement = EntitlementRequirement(
             feature: .unlimitedProjects,
             requiredPlan: .pro,
@@ -1901,6 +1932,27 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
+    func purchaseResearch() async {
+        guard !isStoreKitBusy else { return }
+        guard currentPlan == .pro else {
+            statusMessage = "Subscribe to Pro before adding Research."
+            return
+        }
+        isStoreKitBusy = true
+        defer { isStoreKitBusy = false }
+
+        do {
+            let snapshot = try await storeKitSubscriptionService.purchaseResearch()
+            applyStoreKitSnapshot(snapshot)
+            await syncAppleTransactionIfPossible(snapshot)
+            statusMessage = snapshot.researchActive
+                ? "Research is active."
+                : "Research purchase cancelled."
+        } catch {
+            statusMessage = error.localizedDescription
+        }
+    }
+
     func restorePurchases() async {
         guard !isStoreKitBusy else { return }
         isStoreKitBusy = true
@@ -1912,9 +1964,13 @@ final class CodeLibraryViewModel: ObservableObject {
         if currentPlan != .pro {
             statusMessage = "No active Pro subscription found."
         } else if isStoreKitTestProActive {
-            statusMessage = "Pro (Test) was restored on this device. Account-wide Pro still requires a server grant or production purchase."
+            statusMessage = snapshot.researchActive
+                ? "Pro and Research (Test) were restored on this device. Test purchases cannot activate production web access."
+                : "Pro (Test) was restored on this device. Account-wide Pro still requires a server grant or production purchase."
         } else {
-            statusMessage = "Pro purchase restored."
+            statusMessage = snapshot.researchActive
+                ? "Pro and Research purchases restored."
+                : "Pro purchase restored."
         }
     }
 
@@ -2000,7 +2056,10 @@ final class CodeLibraryViewModel: ObservableObject {
             let startedAt = Date()
             let report = try await syncEngine.processPendingWork(account: signedInAccount)
             let elapsed = Date().timeIntervalSince(startedAt)
-            applyBackendEntitlement(report.entitlement)
+            applyBackendEntitlement(
+                report.entitlement,
+                capabilityContract: report.capabilityContract
+            )
             refreshUserContentSyncCheckpoint()
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
@@ -2127,7 +2186,10 @@ final class CodeLibraryViewModel: ObservableObject {
 
         do {
             let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
-            applyBackendEntitlement(report.entitlement)
+            applyBackendEntitlement(
+                report.entitlement,
+                capabilityContract: report.capabilityContract
+            )
             if report.appliedRemoteContinuity {
                 refreshContinuityStateFromStore()
             }
@@ -2378,6 +2440,7 @@ final class CodeLibraryViewModel: ObservableObject {
         signedInAccount = nil
         userContentSyncConflicts = []
         Self.clearSignedInAccount()
+        currentCapabilityContract = nil
         applyBackendEntitlement(nil)
         statusMessage = "Signed out."
         if let account {
@@ -2450,7 +2513,13 @@ final class CodeLibraryViewModel: ObservableObject {
         currentEntitlementSource = entitlement.source
     }
 
-    private func applyBackendEntitlement(_ entitlement: AppEntitlement?) {
+    private func applyBackendEntitlement(
+        _ entitlement: AppEntitlement?,
+        capabilityContract: PermitextCapabilityContract? = nil
+    ) {
+        if let capabilityContract {
+            currentCapabilityContract = capabilityContract
+        }
         let currentEntitlement = entitlementService.currentEntitlement
         let activeBackendEntitlement = entitlement.flatMap { $0.grantsPro() ? $0 : nil }
         hasActiveBackendProEntitlement = activeBackendEntitlement != nil
@@ -2474,6 +2543,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func applyStoreKitSnapshot(_ snapshot: StoreKitSubscriptionSnapshot) {
         activeStoreKitPlan = snapshot.plan
+        activeStoreKitResearch = snapshot.researchActive
+        isStoreKitResearchActive = snapshot.researchActive
         let entitlement = entitlementService.currentEntitlement
         let resolvedEntitlement: AppEntitlement
         if entitlement.plan == .pro {
@@ -2486,33 +2557,37 @@ final class CodeLibraryViewModel: ObservableObject {
         currentPlan = resolvedEntitlement.plan
         currentEntitlementSource = resolvedEntitlement.source
         proProductDisplayPrice = snapshot.proDisplayPrice
+        researchProductDisplayPrice = snapshot.researchDisplayPrice
         storeKitLoadedProductIDs = snapshot.loadedProductIDs
         storeKitDebugSummary = snapshot.debugSummary
         storeKitTransactionEnvironment = snapshot.transactionEnvironment
     }
 
     private func syncAppleTransactionIfPossible(_ snapshot: StoreKitSubscriptionSnapshot) async {
-        guard let signedInAccount,
-              let signedTransactionInfo = snapshot.signedTransactionInfo,
-              !signedTransactionInfo.isEmpty
-        else {
-            return
-        }
-        if snapshot.transactionEnvironment?.lowercased() == "xcode" {
-            statusMessage = "Pro is active on this device. Xcode StoreKit purchases cannot sync to the web."
-            return
-        }
-        do {
-            let entitlement = try await accountBackendClient.verifyAppleTransaction(
-                account: signedInAccount,
-                signedTransactionInfo: signedTransactionInfo
-            )
-            applyBackendEntitlement(entitlement)
-        } catch {
-            if handleBackendSessionFailureIfNeeded(error) {
-                return
+        guard let signedInAccount else { return }
+        let candidates: [(String, String?)] = [
+            (snapshot.signedTransactionInfo ?? "", snapshot.transactionEnvironment),
+            (snapshot.researchSignedTransactionInfo ?? "", snapshot.researchTransactionEnvironment)
+        ]
+        var synchronizedTransactions: Set<String> = []
+        for (signedTransactionInfo, environment) in candidates
+        where !signedTransactionInfo.isEmpty && synchronizedTransactions.insert(signedTransactionInfo).inserted {
+            if environment?.lowercased() == "xcode" {
+                statusMessage = "StoreKit test access is active on this device. Xcode purchases cannot sync to the web."
+                continue
             }
-            statusMessage = "Pro is active on this device. Backend billing sync failed: \(error.localizedDescription)"
+            do {
+                let entitlement = try await accountBackendClient.verifyAppleTransaction(
+                    account: signedInAccount,
+                    signedTransactionInfo: signedTransactionInfo
+                )
+                applyBackendEntitlement(entitlement)
+            } catch {
+                if handleBackendSessionFailureIfNeeded(error) {
+                    return
+                }
+                statusMessage = "App Store access is active on this device. Backend billing sync failed: \(error.localizedDescription)"
+            }
         }
     }
 

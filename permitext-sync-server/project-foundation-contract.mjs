@@ -1,5 +1,10 @@
 import { createHash, randomUUID } from "node:crypto";
-import { freePlanLimits, hasActiveProEntitlement } from "./entitlement-contract.mjs";
+import {
+  freePlanLimits,
+  hasActiveProEntitlement,
+  hasActiveResearchEntitlement,
+  researchEntitlementMode
+} from "./entitlement-contract.mjs";
 
 export const projectFoundationSchemaVersion = 1;
 export const syncSchemaVersion = 2;
@@ -207,20 +212,34 @@ export function projectLinkRecord({
 
 export function capabilityContract(entitlement, now = Date.now(), options = {}) {
   const pro = hasActiveProEntitlement(entitlement, now);
+  const research = hasActiveResearchEntitlement(entitlement, now);
+  const researchMode = researchEntitlementMode(entitlement, now);
   const researchMonthlyLimit = Number.isSafeInteger(Number(options.researchMonthlyLimit))
     ? Number(options.researchMonthlyLimit)
     : defaultResearchMonthlyLimit;
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     plan: pro ? "pro" : "free",
+    packages: {
+      pro: { active: pro },
+      research: {
+        active: research,
+        requiresPro: true,
+        mode: researchMode
+      }
+    },
     capabilities: {
       [capabilityIDs.savedWork]: { enabled: true, limit: pro ? null : freePlanLimits.savedItems },
       [capabilityIDs.notes]: { enabled: true, limit: pro ? null : freePlanLimits.notes },
       [capabilityIDs.projects]: { enabled: pro, limit: pro ? null : freePlanLimits.projects },
       [capabilityIDs.notebook]: { enabled: pro },
       [capabilityIDs.professionalExports]: { enabled: pro },
-      [capabilityIDs.offlineAccess]: { enabled: true },
-      [capabilityIDs.research]: { enabled: true, monthlyLimit: researchMonthlyLimit },
+      [capabilityIDs.offlineAccess]: { enabled: pro },
+      [capabilityIDs.research]: {
+        enabled: research,
+        requiresPro: true,
+        monthlyLimit: research ? researchMonthlyLimit : 0
+      },
       [capabilityIDs.evidenceDiscovery]: { enabled: false },
       [capabilityIDs.collaboration]: { enabled: false },
       [capabilityIDs.organizationAdministration]: { enabled: false }

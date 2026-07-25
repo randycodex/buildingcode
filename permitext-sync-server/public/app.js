@@ -25,7 +25,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-reports-v2";
+} from "./offline-storage.js?v=20260724-packages-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1804,7 +1804,7 @@ async function api(path) {
   } catch (networkError) {
     serverReachable = false;
     updateConnectionStatus();
-    if (isProAccount()) {
+    if (hasCapability("offline-access")) {
       const payload = await offlineAPI(path).catch(() => null);
       if (payload) return payload;
     }
@@ -2386,6 +2386,44 @@ function isProAccount() {
   return currentPlan() === "pro";
 }
 
+function currentCapabilityContract() {
+  const account = activeAccount();
+  if (!account || syncedContent?.userID !== account.userID) return null;
+  return syncedContent?.capabilityContract || null;
+}
+
+function entitlementResearchEnabled(entitlement = currentEntitlement()) {
+  if (!isProAccount()) return false;
+  const addOn = entitlement?.addOns?.research;
+  const addOnExpiration = Date.parse(addOn?.expiresAt || "");
+  if (
+    addOn &&
+    addOn.enabled !== false &&
+    (!Number.isFinite(addOnExpiration) || addOnExpiration > Date.now())
+  ) {
+    return true;
+  }
+  if (["lifetimeGrant", "debugOverride"].includes(entitlement?.source)) return true;
+  if (entitlement?.legacyResearchIncluded === true) return true;
+  return !String(entitlement?.packageID || entitlement?.provider?.permitextPackage || "").trim();
+}
+
+function hasCapability(capabilityID) {
+  const contractValue = currentCapabilityContract()?.capabilities?.[capabilityID]?.enabled;
+  if (typeof contractValue === "boolean") return contractValue;
+  if (["saved-work", "notes"].includes(capabilityID)) return true;
+  if (capabilityID === "research") return entitlementResearchEnabled();
+  if ([
+    "projects",
+    "notebook",
+    "professional-exports",
+    "offline-access"
+  ].includes(capabilityID)) {
+    return isProAccount();
+  }
+  return false;
+}
+
 const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 });
 let planLimitNoticePromise = null;
 
@@ -2428,9 +2466,16 @@ function entitlementSourceLabel(entitlement = currentEntitlement()) {
 function storeAccountEntitlement(entitlement) {
   if (!state.account) return;
   state.account = { ...state.account, entitlement: entitlement || null };
+  if (syncedContent && syncedContent.userID === state.account.userID) {
+    syncedContent = {
+      ...syncedContent,
+      entitlement: entitlement || null,
+      capabilityContract: null
+    };
+  }
   persistAccountSession();
   saveWorkspaceState();
-  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
+  void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
 }
 
 function delay(milliseconds) {
@@ -2444,7 +2489,11 @@ async function refreshEntitlementAfterCheckoutReturn() {
   const account = activeAccount();
   if (searchParams.get("checkout") !== "success" || !account) return;
   const sessionID = searchParams.get("session_id");
-  if (sessionID && !isProAccount()) {
+  const checkoutPackage = searchParams.get("package") === "research" ? "research" : "pro";
+  const checkoutActive = () => checkoutPackage === "research"
+    ? hasCapability("research")
+    : isProAccount();
+  if (sessionID && !checkoutActive()) {
     try {
       const payload = await postJSON("/billing/stripe/restore", {
         auth: { accountUserID: account.userID },
@@ -2457,7 +2506,7 @@ async function refreshEntitlementAfterCheckoutReturn() {
   }
   for (let attempt = 0; attempt < 8; attempt += 1) {
     await loadSyncedContent({ force: true });
-    if (isProAccount()) {
+    if (checkoutActive()) {
       clearCheckoutReturnURL();
       await renderWorkspace();
       return;
@@ -2471,6 +2520,7 @@ function clearCheckoutReturnURL() {
   const url = new URL(window.location.href);
   url.searchParams.delete("checkout");
   url.searchParams.delete("session_id");
+  url.searchParams.delete("package");
   url.searchParams.delete("appleSignIn");
   const next = `${url.pathname}${url.search}${url.hash}`;
   window.history.replaceState({}, "", next || "/");
@@ -2596,7 +2646,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   persistAccountSession();
   syncedContent = null;
   saveWorkspaceState();
-  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
+  void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
   loadSyncedContent({ force: true })
     .then(() => flushSyncOutbox({ refresh: true }))
     .then(() => renderWorkspace())
@@ -2922,7 +2972,7 @@ async function loadSyncedWorkboard(projectID) {
 async function saveSyncedWorkboard(board, options = {}) {
   const account = activeAccount();
   if (!account) throw new Error("Sign in to synchronize this Workboard.");
-  if (!isProAccount()) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Workboards require Pro", "Upgrade to Pro to create or edit Project Workboards.");
     throw new Error("Workboards require Pro.");
   }
@@ -3977,7 +4027,7 @@ function nextProjectName() {
 }
 
 async function createProjectFolder(details = {}) {
-  if (!isProAccount()) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Project workspaces and organize saved code by job.");
     return null;
   }
@@ -4135,7 +4185,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
 }
 
 async function persistSectionInProject(project, sectionPayload) {
-  if (!isProAccount()) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
     return false;
   }
@@ -4857,7 +4907,7 @@ function removeReaderNotesProjectPicker(sheet) {
 }
 
 async function openReaderNotesProjectPicker(sheet, sectionPayload) {
-  if (!isProAccount()) {
+  if (!hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved code in Project workspaces.");
     return;
   }
@@ -7300,12 +7350,33 @@ async function renderResearch(paneID = "utility:analysis") {
     return panel;
   }
 
+  const researchEnabled = hasCapability("research");
+  if (!researchEnabled) {
+    const upgrade = document.createElement("article");
+    upgrade.className = "analysis-card research-empty-state";
+    const upgradeHeading = document.createElement("h3");
+    upgradeHeading.textContent = isProAccount()
+      ? "Research Add-On required"
+      : "Pro and Research required";
+    const upgradeCopy = document.createElement("p");
+    upgradeCopy.textContent = "Your saved Research history remains readable. Add Research to start conversations, attach evidence, or generate new answers.";
+    const upgradeButton = document.createElement("button");
+    upgradeButton.className = "ghost-button";
+    upgradeButton.type = "button";
+    upgradeButton.textContent = "View Plans";
+    upgradeButton.addEventListener("click", () => focusUtility("settings"));
+    upgrade.append(upgradeHeading, upgradeCopy, upgradeButton);
+    content.append(upgrade);
+  }
+
   const listHeader = document.createElement("div");
   listHeader.className = "research-list-header";
   const heading = document.createElement("h3");
   heading.textContent = "Conversations";
   const instruction = document.createElement("p");
-  instruction.textContent = "Highlight enacted text in any Reader, search detail, or project section to begin.";
+  instruction.textContent = researchEnabled
+    ? "Highlight enacted text in any Reader, search detail, or project section to begin."
+    : "Historical conversations stay available in read-only form.";
   listHeader.append(heading, instruction);
   content.append(listHeader);
 
@@ -7322,7 +7393,7 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(carriedDraft);
   }
 
-  if (researchUsage) {
+  if (researchUsage && researchEnabled) {
     const usage = document.createElement("section");
     usage.className = "research-usage";
     const primary = document.createElement("strong");
@@ -7502,6 +7573,8 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   reuseButton.className = "ghost-button";
   reuseButton.type = "button";
   reuseButton.textContent = "Start new Research";
+  reuseButton.disabled = !hasCapability("research");
+  if (reuseButton.disabled) reuseButton.title = "Research Add-On required";
   reuseButton.disabled = !projectSelect.value;
   const reuseStatus = document.createElement("p");
   reuseStatus.className = "research-historical-status";
@@ -7692,6 +7765,12 @@ function renderResearchProjectContext(container, conversation) {
     unassigned.textContent = "Assign this conversation when its research belongs to a specific Project.";
     section.append(unassigned);
   }
+  if (!hasCapability("research")) {
+    section.querySelectorAll("button, select, textarea").forEach((control) => {
+      control.disabled = true;
+    });
+    status.textContent = "Read-only history · Research Add-On required to change Project context.";
+  }
   section.append(status);
   container.append(section);
 }
@@ -7762,6 +7841,8 @@ async function renderResearchConversation(conversationID) {
     refreshButton.className = "ghost-button";
     refreshButton.type = "button";
     refreshButton.textContent = "Refresh sources";
+    refreshButton.disabled = !hasCapability("research");
+    if (refreshButton.disabled) refreshButton.title = "Research Add-On required";
     refreshButton.addEventListener("click", async () => {
       refreshButton.disabled = true;
       try {
@@ -7814,7 +7895,15 @@ async function renderResearchConversation(conversationID) {
   sendButton.type = "submit";
   sendButton.textContent = "Analyze";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
-  sendButton.disabled = conversation.sourceStatus === "changed" || projectContextBlocked || input.value.trim().length < 3;
+  const researchEnabled = hasCapability("research");
+  sendButton.disabled = !researchEnabled ||
+    conversation.sourceStatus === "changed" ||
+    projectContextBlocked ||
+    input.value.trim().length < 3;
+  if (!researchEnabled) {
+    input.disabled = true;
+    input.placeholder = "Research Add-On required to continue this conversation…";
+  }
   if (projectContextBlocked) {
     input.disabled = true;
     input.placeholder = "Review the Project context above before continuing…";
@@ -7823,7 +7912,10 @@ async function renderResearchConversation(conversationID) {
   status.className = "research-composer-status";
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
-    sendButton.disabled = conversation.sourceStatus === "changed" || projectContextBlocked || input.value.trim().length < 3;
+    sendButton.disabled = !researchEnabled ||
+      conversation.sourceStatus === "changed" ||
+      projectContextBlocked ||
+      input.value.trim().length < 3;
   });
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -7908,6 +8000,16 @@ async function saveResearchSelection(mode, button, status) {
   if (!activeAccount()) {
     closeResearchSelectionMenu();
     await focusUtility("settings");
+    return;
+  }
+  if (!hasCapability("research")) {
+    closeResearchSelectionMenu();
+    await presentPlanLimitNotice(
+      "Research Add-On required",
+      isProAccount()
+        ? "Add Research to start conversations and analyze selected enacted text."
+        : "Upgrade to Pro first, then add Research to analyze selected enacted text."
+    );
     return;
   }
   button.disabled = true;
@@ -8906,7 +9008,7 @@ function appendReportPDFList(documentRoot, parent, title, items) {
 }
 
 function printReportManifestAsPDF(manifest) {
-  if (!isProAccount()) {
+  if (!hasCapability("professional-exports")) {
     void presentPlanLimitNotice(
       "Professional reports require Pro",
       "Upgrade to Pro to render a Project Report Manifest as PDF."
@@ -10745,7 +10847,7 @@ function openSavedActionMenu(panel, anchor, items) {
 }
 
 function printSavedItemsAsPDF(items, scopeLabel) {
-  if (!isProAccount()) {
+  if (!hasCapability("professional-exports")) {
     void presentPlanLimitNotice("PDF export requires Pro", "Upgrade to Pro to export saved code, notes, and tags as a PDF.");
     return;
   }
@@ -11665,6 +11767,7 @@ function renderSettings() {
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const checkoutButton = panel.querySelector(".account-checkout");
+  const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
   const syncTitle = panel.querySelector(".account-sync-title");
   const syncIcon = panel.querySelector(".account-sync-icon");
@@ -11811,7 +11914,7 @@ function renderSettings() {
   };
 
   const renderOfflineState = async () => {
-    const pro = isProAccount();
+    const pro = hasCapability("offline-access");
     const account = activeAccount();
     const library = await offlineLibraryStatus().catch(() => ({ available: false, supported: false }));
     offlineProgress.hidden = true;
@@ -11856,11 +11959,16 @@ function renderSettings() {
   const syncAccountState = () => {
     const account = activeAccount();
     const pro = isProAccount();
+    const research = hasCapability("research");
+    const researchAddOn = currentEntitlement()?.addOns?.research || null;
     const source = currentEntitlement()?.source;
     const canLinkApple = Boolean(account && state.account?.authProvider === "web");
-    const activePlan = pro ? "pro" : "free";
     planRows.forEach((row) => {
-      const active = row.dataset.planOption === activePlan;
+      const active = row.dataset.planOption === "free"
+        ? !pro
+        : row.dataset.planOption === "pro"
+          ? pro
+          : row.dataset.planOption === "research" && research;
       row.classList.toggle("is-active", active);
       row.setAttribute("aria-current", active ? "true" : "false");
       const indicator = row.querySelector(".settings-feature-icon");
@@ -11868,14 +11976,22 @@ function renderSettings() {
     });
     planDetail.textContent = pro
       ? source === "lifetimeGrant"
-        ? "Lifetime Pro is active. This account has gifted access and does not need a subscription."
-        : "Pro is active. Unlimited saved work, projects, tags, PDF export, and web offline downloads are unlocked."
-      : "Free includes continuity and cross-device sync. Pro unlocks unlimited saved work, projects, organization, and exports.";
+        ? "Lifetime Pro is active, including Research. This gifted account does not need a subscription."
+        : research
+          ? "Pro and Research are active. Projects, Notebook, Report Draft, professional exports, offline codes, and selected-evidence Research are unlocked."
+          : "Pro is active. Projects, Notebook, Report Draft, professional exports, tags, and web offline downloads are unlocked. Research is available separately."
+      : "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace.";
     checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro";
-    planSecondaryButton.hidden = !account || pro || source === "lifetimeGrant";
+    researchCheckoutButton.disabled = !account || !pro || (research && !researchAddOn);
+    researchCheckoutButton.textContent = !pro
+      ? "Pro Required for Research"
+      : research
+        ? researchAddOn ? "Manage Research Add-On" : "Research Included"
+        : "Add Research";
+    planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
     accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
@@ -11959,7 +12075,14 @@ function renderSettings() {
     checkoutButton.disabled = true;
     setStatus("Opening checkout...");
     try {
-      const payload = await postJSON("/billing/web/checkout", { auth: { accountUserID: account.userID } }, { token: account.sessionToken });
+      const payload = await postJSON(
+        "/billing/web/checkout",
+        {
+          auth: { accountUserID: account.userID },
+          packageID: "pro"
+        },
+        { token: account.sessionToken }
+      );
       if (!payload.url) throw new Error("Checkout did not return a URL.");
       window.location.href = payload.url;
     } catch (error) {
@@ -11967,9 +12090,61 @@ function renderSettings() {
       checkoutButton.disabled = false;
     }
   });
+  researchCheckoutButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account) return;
+    if (!isProAccount()) {
+      void presentPlanLimitNotice(
+        "Research requires Pro",
+        "Upgrade to Pro first, then add selected-evidence Research."
+      );
+      return;
+    }
+    const researchAddOn = currentEntitlement()?.addOns?.research || null;
+    if (hasCapability("research")) {
+      if (!researchAddOn) return;
+      const source = researchAddOn.source;
+      if (source === "appleSubscription") {
+        window.location.href = "https://apps.apple.com/account/subscriptions";
+        return;
+      }
+      researchCheckoutButton.disabled = true;
+      setStatus("Opening Research subscription management...");
+      try {
+        const payload = await postJSON(
+          "/billing/web/portal",
+          { auth: { accountUserID: account.userID } },
+          { token: account.sessionToken }
+        );
+        if (!payload.url) throw new Error("Subscription management did not return a URL.");
+        window.location.href = payload.url;
+      } catch (error) {
+        setStatus(error.message || "Could not open subscription management.", true);
+        researchCheckoutButton.disabled = false;
+      }
+      return;
+    }
+    researchCheckoutButton.disabled = true;
+    setStatus("Opening Research checkout...");
+    try {
+      const payload = await postJSON(
+        "/billing/web/checkout",
+        {
+          auth: { accountUserID: account.userID },
+          packageID: "research"
+        },
+        { token: account.sessionToken }
+      );
+      if (!payload.url) throw new Error("Checkout did not return a URL.");
+      window.location.href = payload.url;
+    } catch (error) {
+      setStatus(error.message || "Could not open Research checkout.", true);
+      researchCheckoutButton.disabled = false;
+    }
+  });
   planSecondaryButton.addEventListener("click", async () => {
     const account = activeAccount();
-    if (!account || isProAccount()) return;
+    if (!account) return;
     const restoreID = window.prompt("Enter the Stripe checkout session or subscription ID from your purchase receipt.");
     if (!restoreID) return;
     planSecondaryButton.disabled = true;
@@ -12004,7 +12179,7 @@ function renderSettings() {
       signInButton.click();
       return;
     }
-    if (!isProAccount()) {
+    if (!hasCapability("offline-access")) {
       checkoutButton.click();
       return;
     }
@@ -12015,7 +12190,7 @@ function renderSettings() {
     offlineStatus.textContent = "Confirming Pro access…";
     try {
       await loadSyncedContent({ force: true });
-      if (!isProAccount()) {
+      if (!hasCapability("offline-access")) {
         await disableOfflineFeature();
         throw new Error("An active Pro plan is required for offline access.");
       }
@@ -12823,7 +12998,7 @@ async function start() {
     chapters = payload.chapters || [];
   }
   updateConnectionStatus();
-  void reconcileOfflineFeatureAccess(isProAccount()).catch(() => {});
+  void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
   document.addEventListener("click", (event) => {
     if (
       activeCustomSelect &&
