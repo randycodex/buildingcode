@@ -68,7 +68,8 @@ import {
 } from "./research-config.mjs";
 import {
   discoverRelevantEvidence,
-  evidenceDiscoveryFeatureEnabled
+  evidenceDiscoveryFeatureEnabled,
+  structuredRichSources
 } from "./evidence-discovery.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
@@ -3529,8 +3530,10 @@ function comparableResearchText(value) {
     .trim();
 }
 
+const maximumResearchSelectionCharacters = 12_000;
+
 function matchingCanonicalResearchSelection(value, canonicalText) {
-  const normalized = normalizedResearchText(value, 4_000);
+  const normalized = normalizedResearchText(value, maximumResearchSelectionCharacters);
   const withoutReaderChrome = normalized
     .replace(/(?:^|\s)(?:Has note|Bookmarked)(?=\s|$)/gi, " ")
     .replace(/\s+/g, " ")
@@ -3580,23 +3583,34 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
       chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
       text,
       canonicalText,
-      sectionTextHash: createHash("sha256").update(canonicalText).digest("hex")
+      sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
+      richSources: structuredRichSources(body)
     });
   }
   return evidence;
 }
 
 function researchPrompt(question, evidence, options = {}) {
-  const sources = evidence.map((section) => [
-    `PASSAGE_ID: ${section.sourceID}`,
-    `SECTION_ID: ${section.sectionID}`,
-    `CODE: ${section.codePrefix}`,
-    `SECTION: ${section.sectionNumber}`,
-    `TITLE: ${section.title}`,
-    `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
-    `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
-    `EXACT SELECTED PASSAGE: ${section.text}`
-  ].join("\n")).join("\n\n---\n\n");
+  const sources = evidence.map((section) => {
+    const lines = [
+      `PASSAGE_ID: ${section.sourceID}`,
+      `SECTION_ID: ${section.sectionID}`,
+      `CODE: ${section.codePrefix}`,
+      `SECTION: ${section.sectionNumber}`,
+      `TITLE: ${section.title}`,
+      `CODE_EDITION: ${section.codeEdition || defaultResearchCodeEdition}`,
+      `CODE_VERSION: ${section.codeVersion || defaultSyncCodeVersion}`,
+      `EXACT SELECTED PASSAGE: ${section.text}`
+    ];
+    if (section.richSourceID && section.richSourceGrids) {
+      lines.push(
+        `STRUCTURED_OFFICIAL_SOURCE: ${section.richSourceReference || section.richSourceID}`,
+        `STRUCTURED_SOURCE_CONTENT_HASH: ${section.richSourceContentHash}`,
+        `STRUCTURED_TABLE_GRIDS_JSON: ${JSON.stringify(section.richSourceGrids)}`
+      );
+    }
+    return lines.join("\n");
+  }).join("\n\n---\n\n");
   const history = (options.messages || []).slice(-8).map((message) => {
     if (message.role === "user") return `USER: ${message.question || ""}`;
     return `ASSISTANT: ${message.answer?.conclusion || ""}\n${message.answer?.explanation || ""}`;
@@ -3854,7 +3868,11 @@ function researchConversationSummary(conversation) {
 }
 
 function researchSourceFromEvidence(evidence, options = {}) {
-  const selectedText = normalizedResearchText(options.selectedText, 4_000);
+  const selectedText = normalizedResearchText(
+    options.selectedText,
+    maximumResearchSelectionCharacters
+  );
+  const richSource = options.richSource || null;
   return {
     id: randomUUID(),
     kind: options.kind || "related",
@@ -3868,6 +3886,12 @@ function researchSourceFromEvidence(evidence, options = {}) {
     selectedTextHash: selectedText
       ? createHash("sha256").update(selectedText).digest("hex")
       : null,
+    richSourceID: richSource?.id || null,
+    richSourceKind: richSource?.kind || null,
+    richSourceReference: richSource?.reference || null,
+    richSourceContentHash: richSource?.contentHash || null,
+    richSourceRowCount: richSource?.rowCount || null,
+    richSourceGrids: richSource?.grids || null,
     sectionTextHash: evidence.sectionTextHash,
     codeVersion: defaultSyncCodeVersion,
     codeEdition: defaultResearchCodeEdition,
@@ -3906,8 +3930,29 @@ async function relatedResearchEvidence(primaryEvidence, limit = 3) {
   return related;
 }
 
-async function researchSourcesForSelection(sectionID, selectedText) {
-  const normalizedSelection = normalizedResearchText(selectedText, 4_000);
+function requestedRichSourceIDs(value) {
+  if (value === undefined || value === null) return [];
+  if (!Array.isArray(value)) {
+    const error = new Error("Structured evidence source IDs must be an array.");
+    error.code = "INVALID_RESEARCH_RICH_SOURCE";
+    throw error;
+  }
+  const ids = Array.from(new Set(
+    value.map((item) => String(item || "").trim()).filter(Boolean)
+  ));
+  if (ids.length > 8 || ids.length !== value.length) {
+    const error = new Error("Structured evidence source IDs are invalid.");
+    error.code = "INVALID_RESEARCH_RICH_SOURCE";
+    throw error;
+  }
+  return ids;
+}
+
+async function researchSourcesForSelection(sectionID, selectedText, options = {}) {
+  const normalizedSelection = normalizedResearchText(
+    selectedText,
+    maximumResearchSelectionCharacters
+  );
   if (normalizedSelection.length < 2) {
     const error = new Error("Select enacted code text before starting research.");
     error.code = "INVALID_RESEARCH_SELECTION";
@@ -3920,13 +3965,44 @@ async function researchSourcesForSelection(sectionID, selectedText) {
     error.code = "INVALID_RESEARCH_SELECTION";
     throw error;
   }
+  const richSourcesByID = new Map(
+    (primary.richSources || []).map((source) => [source.id, source])
+  );
+  const richSourceIDs = requestedRichSourceIDs(options.richSourceIDs);
+  const exactRichSource = (primary.richSources || []).find((source) =>
+    comparableResearchText(source.text) === comparableResearchText(canonicalSelection)
+  );
+  const requestedRichSources = richSourceIDs.map((sourceID) => {
+    const source = richSourcesByID.get(sourceID);
+    if (!source) {
+      const error = new Error("The structured evidence source is no longer available in the enacted section.");
+      error.code = "INVALID_RESEARCH_RICH_SOURCE";
+      throw error;
+    }
+    return source;
+  });
   const related = await relatedResearchEvidence(primary);
-  return [
+  const selectionSources = [
     researchSourceFromEvidence(primary, {
       kind: "selection",
-      relationship: "Passage selected by you",
-      selectedText: canonicalSelection
-    }),
+      relationship: exactRichSource
+        ? `Structured official ${exactRichSource.reference} approved by you`
+        : "Passage selected by you",
+      selectedText: canonicalSelection,
+      richSource: exactRichSource
+    })
+  ];
+  for (const richSource of requestedRichSources) {
+    if (richSource.id === exactRichSource?.id) continue;
+    selectionSources.push(researchSourceFromEvidence(primary, {
+      kind: "selection",
+      relationship: `Structured official ${richSource.reference} approved by you`,
+      selectedText: richSource.text,
+      richSource
+    }));
+  }
+  return [
+    ...selectionSources,
     ...related.map((evidence) => researchSourceFromEvidence(evidence))
   ];
 }
@@ -3937,9 +4013,18 @@ async function currentResearchEvidence(conversation) {
   const evidenceByID = new Map(evidence.map((item) => [item.sectionID, item]));
   const sourceStatuses = (conversation.sources || []).map((source) => {
     const current = evidenceByID.get(source.sectionID);
-    const selectionPresent = !source.selectedText || Boolean(
-      current && matchingCanonicalResearchSelection(source.selectedText, current.canonicalText)
-    );
+    const currentRichSource = source.richSourceID
+      ? current?.richSources?.find((item) => item.id === source.richSourceID)
+      : null;
+    const selectionPresent = source.richSourceID
+      ? Boolean(
+          currentRichSource &&
+          currentRichSource.contentHash === source.richSourceContentHash &&
+          comparableResearchText(currentRichSource.text) === comparableResearchText(source.selectedText)
+        )
+      : !source.selectedText || Boolean(
+          current && matchingCanonicalResearchSelection(source.selectedText, current.canonicalText)
+        );
     return {
       sourceID: source.id,
       sectionID: source.sectionID,
@@ -3960,12 +4045,21 @@ function selectedResearchEvidence(conversation, currentEvidence) {
     .filter((source) => source.kind === "selection" && source.selectedText)
     .map((source) => {
       const evidence = evidenceByID.get(source.sectionID);
+      const richSource = source.richSourceID
+        ? evidence?.richSources?.find((item) => item.id === source.richSourceID)
+        : null;
       return evidence ? {
         ...evidence,
         sourceID: source.id,
         text: source.selectedText,
         codeVersion: source.codeVersion || conversation.codeVersion || defaultSyncCodeVersion,
-        codeEdition: source.codeEdition || defaultResearchCodeEdition
+        codeEdition: source.codeEdition || defaultResearchCodeEdition,
+        richSourceID: richSource?.id || null,
+        richSourceKind: richSource?.kind || null,
+        richSourceReference: richSource?.reference || null,
+        richSourceContentHash: richSource?.contentHash || null,
+        richSourceRowCount: richSource?.rowCount || null,
+        richSourceGrids: richSource?.grids || null
       } : null;
     })
     .filter(Boolean);
@@ -7931,7 +8025,11 @@ async function handleResearchConversationCreate(request, response) {
         return;
       }
     }
-    const sources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
+    const sources = await researchSourcesForSelection(
+      context.body.sectionID,
+      context.body.selectedText,
+      { richSourceIDs: context.body.richSourceIDs }
+    );
     const primary = sources[0];
     const now = new Date().toISOString();
     const conversation = {
@@ -7977,7 +8075,7 @@ async function handleResearchConversationCreate(request, response) {
     }
     sendJSON(response, 201, { conversation });
   } catch (error) {
-    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION", "INVALID_RESEARCH_RICH_SOURCE"].includes(error.code)) {
       sendError(response, 400, error.message);
       return;
     }
@@ -7999,7 +8097,19 @@ async function handleResearchConversationEvidence(request, response) {
       sendError(response, 409, "This conversation already has the maximum of 24 selected passages.");
       return;
     }
-    const addedSources = await researchSourcesForSelection(context.body.sectionID, context.body.selectedText);
+    const addedSources = await researchSourcesForSelection(
+      context.body.sectionID,
+      context.body.selectedText,
+      { richSourceIDs: context.body.richSourceIDs }
+    );
+    const existingSelectionCount = (conversation.sources || [])
+      .filter((source) => source.kind === "selection").length;
+    const addedSelectionCount = addedSources
+      .filter((source) => source.kind === "selection").length;
+    if (existingSelectionCount + addedSelectionCount > 24) {
+      sendError(response, 409, "Adding this evidence would exceed the maximum of 24 selected passages.");
+      return;
+    }
     const existingRelatedIDs = new Set((conversation.sources || []).filter((source) => source.kind === "related").map((source) => source.sectionID));
     conversation.sources.push(...addedSources.filter((source) => source.kind === "selection" || !existingRelatedIDs.has(source.sectionID)));
     conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
@@ -8008,7 +8118,7 @@ async function handleResearchConversationEvidence(request, response) {
     await saveStoredResearchConversation(context.userID, conversation);
     sendJSON(response, 200, { conversation });
   } catch (error) {
-    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION", "INVALID_RESEARCH_RICH_SOURCE"].includes(error.code)) {
       sendError(response, 400, error.message);
       return;
     }

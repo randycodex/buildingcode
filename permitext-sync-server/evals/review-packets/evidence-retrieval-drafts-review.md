@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v3`
+Retrieval implementation: `20260725-hybrid-candidates-v4`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -10,7 +10,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 - dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
-- tables and maps requiring non-text retrieval
+- official maps, images, and non-table rich sources requiring structured evidence
 - broader existing-building scenarios
 
 ## 1. retrieval-scissor-stair-two-exits
@@ -140,8 +140,7 @@ Corrections or notes:
 - Diagnostic depth: 12
 - Categories: multiple-code question, plumbing, exceptions
 - Source Research case: `accessory-assembly-plumbing-fixtures`
-- Must block text-only preparation for section IDs: `11909`
-- Required coverage limitations: `referenced-table-review-required`
+- Must attach a complete structured rich source for section IDs: `11909`
 
 ### Project question
 
@@ -149,7 +148,7 @@ If the multipurpose room is permitted to be classified as Group B because it has
 
 ### Review intent
 
-Tests candidate completeness across Building Code classification and Plumbing Code fixture rules while requiring the Table 403.1 candidate to remain blocked from text-only preparation.
+Tests candidate completeness across Building Code classification and Plumbing Code fixture rules while requiring the complete official Table 403.1 source to accompany the proposed PC 403.1 passage.
 
 ### Proposed expected evidence
 
@@ -226,8 +225,7 @@ Corrections or notes:
 - Diagnostic depth: 12
 - Categories: multiple-code question, plumbing, mixed occupancies
 - Source Research case: `nyc-001-mixed-occupancy-fixture-rounding`
-- Must block text-only preparation for section IDs: `11909`
-- Required coverage limitations: `referenced-table-review-required`
+- Must attach a complete structured rich source for section IDs: `11909`
 
 ### Project question
 
@@ -235,7 +233,7 @@ A residential-building cellar contains Group B, F, and S spaces plus a multipurp
 
 ### Review intent
 
-Tests fractional-calculation and accessory-assembly candidate coverage while requiring the Table 403.1 candidate to remain blocked from text-only preparation.
+Tests fractional-calculation and accessory-assembly candidate coverage while requiring the complete official Table 403.1 source to accompany the proposed PC 403.1 passage.
 
 ### Proposed expected evidence
 

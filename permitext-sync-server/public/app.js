@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260725-evidence-boundaries-v11";
+} from "./offline-storage.js?v=20260725-structured-tables-v12";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7575,13 +7575,29 @@ function renderEvidenceDiscovery(container) {
         });
         sourceRequirements.append(sourceRequirementsHeading, sourceRequirementsList);
       }
+      const structuredSources = document.createElement("div");
+      structuredSources.className = "evidence-candidate-structured-sources";
+      if (candidate.richSources?.length) {
+        const structuredSourcesHeading = document.createElement("strong");
+        structuredSourcesHeading.textContent = "Complete structured source included";
+        const structuredSourcesList = document.createElement("ul");
+        candidate.richSources.forEach((source) => {
+          const item = document.createElement("li");
+          item.textContent = `${source.reference} · ${Number(source.rowCount || 0).toLocaleString()} structured rows · integrity ${String(source.contentHash || "").slice(0, 12)}`;
+          structuredSourcesList.append(item);
+        });
+        structuredSources.append(structuredSourcesHeading, structuredSourcesList);
+      }
       const signals = document.createElement("p");
       signals.className = "evidence-candidate-signals";
       const signalParts = [
         candidate.relevance ? `${candidate.relevance} lexical relevance` : "",
         candidate.signals?.topicRoutes?.length ? "curated topic route" : "",
         candidate.signals?.containsVisualSource ? "map or visual present" : "",
-        candidate.signals?.referencesTable ? "complete table needed" : "",
+        candidate.signals?.includesStructuredTable ? "complete structured table included" : "",
+        candidate.signals?.referencesTable && !candidate.signals?.includesStructuredTable
+          ? "complete table needed"
+          : "",
         candidate.signals?.containsException ? "exception language" : "",
         candidate.signals?.containsCrossReference ? "cross-reference present" : ""
       ].filter(Boolean);
@@ -7623,6 +7639,9 @@ function renderEvidenceDiscovery(container) {
       if (candidate.sourceReviewRequirements?.length) {
         card.append(sourceRequirements);
       }
+      if (candidate.richSources?.length) {
+        card.append(structuredSources);
+      }
       card.append(signals, actions);
       tray.append(card);
     });
@@ -7652,12 +7671,14 @@ function renderEvidenceDiscovery(container) {
             ? await postResearch("/research/conversations/create", {
                 sectionID: candidate.sectionID,
                 selectedText: candidate.selectedText,
+                richSourceIDs: candidate.richSourceIDs || [],
                 projectID: discovery.projectID || ""
               })
             : await postResearch("/research/conversations/evidence", {
                 conversationID: payload.conversation.id,
                 sectionID: candidate.sectionID,
-                selectedText: candidate.selectedText
+                selectedText: candidate.selectedText,
+                richSourceIDs: candidate.richSourceIDs || []
               });
         }
         activeResearchConversation = payload.conversation;

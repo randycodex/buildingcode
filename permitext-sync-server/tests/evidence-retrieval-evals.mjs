@@ -184,6 +184,8 @@ try {
         candidate.selectedText &&
         candidate.whyRelevant &&
         candidate.signals &&
+        Array.isArray(candidate.richSources) &&
+        Array.isArray(candidate.richSourceIDs) &&
         !candidate.approved
       ),
       `${retrievalCase.id} returned an approved, unexplained, or passage-free candidate.`
@@ -211,6 +213,24 @@ try {
       assert(
         candidate.sourceReviewRequirements?.length,
         `${retrievalCase.id} did not explain the additional source review for section ${sectionID}.`
+      );
+    }
+    for (const sectionID of retrievalCase.expectedStructuredRichSourceSectionIDs || []) {
+      const candidate = discovery.candidates.find((item) => String(item.sectionID) === String(sectionID));
+      assert(candidate, `${retrievalCase.id} did not retrieve structured-source section ${sectionID}.`);
+      assert.equal(
+        candidate.preparationEligible,
+        true,
+        `${retrievalCase.id} did not allow preparation after attaching the complete structured source for section ${sectionID}.`
+      );
+      assert(
+        candidate.richSources?.some((source) =>
+          source.kind === "table" &&
+          source.contentHash &&
+          Number(source.rowCount) > 0
+        ) &&
+        candidate.richSourceIDs?.length === candidate.richSources.length,
+        `${retrievalCase.id} did not attach a complete, integrity-addressed table source for section ${sectionID}.`
       );
     }
     for (const kind of retrievalCase.expectedCoverageLimitationKinds || []) {

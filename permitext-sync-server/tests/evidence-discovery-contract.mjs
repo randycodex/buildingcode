@@ -37,6 +37,12 @@ const catalog = [{
   chapterNumber: "1",
   sectionNumber: "28-101.4.5",
   title: "Prior-code buildings"
+}, {
+  id: "6",
+  codePrefix: "PC",
+  chapterNumber: "4",
+  sectionNumber: "403.9",
+  title: "Fixture schedule without published table"
 }];
 
 const invertedIndex = new Map([
@@ -54,7 +60,8 @@ const invertedIndex = new Map([
   ["prior", new Set(["5"])],
   ["code", new Set(["5"])],
   ["floor", new Set(["5"])],
-  ["surface", new Set(["5"])]
+  ["surface", new Set(["5"])],
+  ["schedule", new Set(["6"])]
 ]);
 
 const bodies = new Map([
@@ -67,7 +74,8 @@ const bodies = new Map([
   ["2", {
     blocks: [{
       id: "fixture-rule",
-      plainText: "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1."
+      plainText: "Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1. PC Table 403.1 Minimum Number of Required Plumbing Fixtures. Classification B, office: one water closet per 25 for the first 50 and one per 50 for the remainder. Footnote: The fixtures shown are based on one fixture being the minimum required.",
+      html: "<p>Plumbing fixtures shall be provided for the type of occupancy and in the minimum number shown in Table 403.1.</p><a title=\"PC Table 403.1\"></a><strong>Table 403.1 Minimum Number of Required Plumbing Fixtures</strong><ScrollTable><table><tbody><tr><th>Classification</th><th>Description</th><th>Water closets</th></tr><tr><td>B</td><td>Office</td><td>1 per 25 for the first 50 and 1 per 50 for the remainder</td></tr></tbody></table></ScrollTable><p>Footnote: The fixtures shown are based on one fixture being the minimum required.</p>"
     }]
   }],
   ["3", {
@@ -87,6 +95,12 @@ const bodies = new Map([
     blocks: [{
       id: "prior-code-threshold",
       plainText: "Where the floor surface area of a prior code building is increased by more than 110 percent, the entire building shall comply with this code as if it were a new building."
+    }]
+  }],
+  ["6", {
+    blocks: [{
+      id: "fixture-schedule-without-table",
+      plainText: "The fixture schedule shall use the values in Table 403.1, which is not included in this source."
     }]
   }]
 ]);
@@ -160,15 +174,40 @@ const tableAuthority = await discoverRelevantEvidence({
   limit: 5
 });
 assert.equal(tableAuthority.candidates[0].sectionID, "2", "Plumbing Code exact references must resolve.");
-assert.equal(tableAuthority.candidates[0].preparationEligible, false);
+assert.equal(tableAuthority.candidates[0].preparationEligible, true);
 assert(
-  tableAuthority.candidates[0].sourceReviewRequirements.some((item) =>
-    item.kind === "referenced-table" && item.references.includes("Table 403.1")
+  tableAuthority.candidates[0].richSources.some((item) =>
+    item.kind === "table" &&
+    item.reference === "PC Table 403.1" &&
+    item.rowCount === 2 &&
+    item.contentHash
   ),
-  "A passage that delegates its values to a table must require the complete table."
+  "A published official table must be attached as a structured candidate source."
 );
 assert(
-  tableAuthority.coverageLimitations.some((item) => item.kind === "referenced-table-review-required"),
+  !tableAuthority.coverageLimitations.some((item) => item.kind === "referenced-table-review-required"),
+  "A complete structured table must satisfy the text-only table boundary."
+);
+
+const incompleteTableAuthority = await discoverRelevantEvidence({
+  question: "What fixture schedule does PC 403.9 require?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 5
+});
+assert.equal(incompleteTableAuthority.candidates[0].sectionID, "6");
+assert.equal(incompleteTableAuthority.candidates[0].preparationEligible, false);
+assert(
+  incompleteTableAuthority.candidates[0].sourceReviewRequirements.some((item) =>
+    item.kind === "referenced-table" && item.references.includes("Table 403.1")
+  ),
+  "A table reference without the published table must remain blocked."
+);
+assert(
+  incompleteTableAuthority.coverageLimitations.some((item) =>
+    item.kind === "referenced-table-review-required"
+  ),
   "Incomplete table-dependent candidates must disclose the preparation boundary."
 );
 

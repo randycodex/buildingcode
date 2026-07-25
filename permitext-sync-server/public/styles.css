@@ -3779,7 +3779,8 @@ mark {
 }
 
 .evidence-discovery-outside ul,
-.evidence-candidate-source-requirements ul {
+.evidence-candidate-source-requirements ul,
+.evidence-candidate-structured-sources ul {
   display: grid;
   gap: var(--space-2);
   margin: 0;
@@ -3904,11 +3905,24 @@ mark {
   line-height: 1.4;
 }
 
-.evidence-candidate-source-requirements strong {
+.evidence-candidate-structured-sources {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, #12b76a 13%, var(--surface));
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.73) !important;
+  line-height: 1.4;
+}
+
+.evidence-candidate-source-requirements strong,
+.evidence-candidate-structured-sources strong {
   color: var(--text-primary);
 }
 
-.evidence-candidate-source-requirements li {
+.evidence-candidate-source-requirements li,
+.evidence-candidate-structured-sources li {
   margin: 0;
 }
 

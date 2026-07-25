@@ -1,11 +1,11 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260725-hybrid-candidates-v3",
+  "retrievalVersion": "20260725-hybrid-candidates-v4",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection",
     "official agency interpretations outside the current library",
-    "tables and maps requiring non-text retrieval",
+    "official maps, images, and non-table rich sources requiring structured evidence",
     "broader existing-building scenarios"
   ],
   "cases": [
@@ -43,9 +43,8 @@
       "scenarioCategories": ["multiple-code question", "plumbing", "exceptions"],
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
-      "expectedPreparationBlockedSectionIDs": ["11909"],
-      "expectedCoverageLimitationKinds": ["referenced-table-review-required"],
-      "notes": "Tests candidate completeness across Building Code classification and Plumbing Code fixture rules while requiring the Table 403.1 candidate to remain blocked from text-only preparation."
+      "expectedStructuredRichSourceSectionIDs": ["11909"],
+      "notes": "Tests candidate completeness across Building Code classification and Plumbing Code fixture rules while requiring the complete official Table 403.1 source to accompany the proposed PC 403.1 passage."
     },
     {
       "id": "retrieval-building-code-versus-hcr",
@@ -63,9 +62,8 @@
       "scenarioCategories": ["multiple-code question", "plumbing", "mixed occupancies"],
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
-      "expectedPreparationBlockedSectionIDs": ["11909"],
-      "expectedCoverageLimitationKinds": ["referenced-table-review-required"],
-      "notes": "Tests fractional-calculation and accessory-assembly candidate coverage while requiring the Table 403.1 candidate to remain blocked from text-only preparation."
+      "expectedStructuredRichSourceSectionIDs": ["11909"],
+      "notes": "Tests fractional-calculation and accessory-assembly candidate coverage while requiring the complete official Table 403.1 source to accompany the proposed PC 403.1 passage."
     },
     {
       "id": "retrieval-stated-occupancy-movable-seats",

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v3";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v4";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -269,6 +269,122 @@ function comparableSectionID(value) {
   return String(value || "").trim();
 }
 
+function plainTextFromPublishedHTML(value) {
+  return String(value || "")
+    .replace(/<br\s*\/?\s*>/gi, "\n")
+    .replace(/<\/(p|div|li|tr|h[1-6])>/gi, "\n")
+    .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;|&#160;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;|&#34;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&#176;/gi, "°")
+    .replace(/&#215;/gi, "×")
+    .replace(/&#8211;|&#8212;/gi, "-")
+    .replace(/&#8216;|&#8217;/gi, "'")
+    .replace(/&#8220;|&#8221;/gi, '"')
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function positiveSpan(value) {
+  const parsed = Number.parseInt(String(value || ""), 10);
+  return Number.isSafeInteger(parsed) && parsed > 1 ? parsed : 1;
+}
+
+function structuredRowsFromTableHTML(value) {
+  return Array.from(String(value || "").matchAll(/<tr\b[^>]*>([\s\S]*?)<\/tr>/gi))
+    .map((rowMatch) => ({
+      cells: Array.from(rowMatch[1].matchAll(/<(td|th)\b([^>]*)>([\s\S]*?)<\/\1>/gi))
+        .map((cellMatch) => {
+          const attributes = cellMatch[2] || "";
+          const rowSpan = attributes.match(/\browspan=["']?(\d+)/i)?.[1];
+          const columnSpan = attributes.match(/\bcolspan=["']?(\d+)/i)?.[1];
+          return {
+            text: plainTextFromPublishedHTML(cellMatch[3]),
+            rowSpan: positiveSpan(rowSpan),
+            columnSpan: positiveSpan(columnSpan)
+          };
+        })
+        .filter((cell) => cell.text)
+    }))
+    .filter((row) => row.cells.length);
+}
+
+function tableReferenceFromHTML(value) {
+  const titledReferences = Array.from(
+    String(value || "").matchAll(/\btitle=["']([^"']*\bTable\s+[A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)[^"']*["']/gi)
+  );
+  if (titledReferences.length) {
+    return plainTextFromPublishedHTML(titledReferences.at(-1)[1]);
+  }
+  const plainText = plainTextFromPublishedHTML(value);
+  const references = Array.from(
+    plainText.matchAll(/\b(?:AC|BC|EBC|FC|MC|PC)?\s*Table\s+[A-Z]?\d+(?:\.[0-9A-Za-z-]+)*/gi)
+  );
+  return references.at(-1)?.[0]?.replace(/\s+/g, " ").trim() || "Official table";
+}
+
+function comparableTableReference(value) {
+  return normalizedText(value).replace(/^(?:ac|bc|ebc|fc|mc|pc)\s+/, "");
+}
+
+export function structuredRichSources(body) {
+  const sources = [];
+  for (const block of body?.blocks || []) {
+    const html = String(block.html || "");
+    if (!html) continue;
+    const tableMatches = Array.from(html.matchAll(/<ScrollTable\b[\s\S]*?<\/ScrollTable>/gi));
+    for (const [index, tableMatch] of tableMatches.entries()) {
+      const precedingStart = Math.max(0, tableMatch.index - 2_500);
+      const precedingHTML = html.slice(precedingStart, tableMatch.index);
+      const anchorMatches = Array.from(
+        precedingHTML.matchAll(/<a\b[^>]*\btitle=["'][^"']*\bTable\s+[A-Z]?\d+(?:\.[0-9A-Za-z-]+)*[^"']*["'][^>]*>/gi)
+      );
+      const captionOffset = anchorMatches.at(-1)?.index;
+      const sourceStart = captionOffset === undefined
+        ? tableMatch.index
+        : precedingStart + captionOffset;
+      const nextMatch = tableMatches[index + 1];
+      const sourceEnd = nextMatch?.index ?? html.length;
+      const sourceHTML = html.slice(sourceStart, sourceEnd);
+      const reference = tableReferenceFromHTML(sourceHTML);
+      const grids = Array.from(tableMatch[0].matchAll(/<table\b[\s\S]*?<\/table>/gi))
+        .map((match) => ({ rows: structuredRowsFromTableHTML(match[0]) }))
+        .filter((grid) => grid.rows.length);
+      const rowCount = grids.reduce((count, grid) => count + grid.rows.length, 0);
+      const text = plainTextFromPublishedHTML(sourceHTML);
+      if (!text || !rowCount) continue;
+      const contentHash = createHash("sha256")
+        .update(JSON.stringify({ reference, text, grids }))
+        .digest("hex");
+      sources.push({
+        id: `rich-source-${createHash("sha256")
+          .update([
+            String(block.id || ""),
+            reference,
+            contentHash
+          ].join("\u001f"))
+          .digest("hex")
+          .slice(0, 24)}`,
+        kind: "table",
+        reference,
+        blockID: String(block.id || "") || null,
+        contentHash,
+        text,
+        textLength: text.length,
+        rowCount,
+        grids
+      });
+    }
+  }
+  return sources;
+}
+
 function sectionText(section, body) {
   return [
     section.codePrefix,
@@ -303,7 +419,7 @@ function passageSegments(body) {
   return segments;
 }
 
-function sourceReviewRequirements(body, passage) {
+function sourceReviewRequirements(body, passage, richSources) {
   const imageNames = new Set();
   for (const block of body?.blocks || []) {
     for (const match of String(block.html || "").matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)) {
@@ -326,11 +442,17 @@ function sourceReviewRequirements(body, passage) {
     Array.from(String(passage?.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
       .map((match) => `Table ${match[1]}`)
   ));
-  if (tableReferences.length) {
+  const missingTableReferences = tableReferences.filter((reference) =>
+    !(richSources || []).some((source) =>
+      source.kind === "table" &&
+      comparableTableReference(source.reference) === comparableTableReference(reference)
+    )
+  );
+  if (missingTableReferences.length) {
     requirements.push({
       kind: "referenced-table",
-      references: tableReferences,
-      text: `The proposed passage refers to ${tableReferences.join(", ")} without including the table's complete structured values.`
+      references: missingTableReferences,
+      text: `The proposed passage refers to ${missingTableReferences.join(", ")} without including the table's complete structured values.`
     });
   }
   return requirements;
@@ -494,7 +616,17 @@ export async function discoverRelevantEvidence({
     const routeMatch = routesByID.get(entry.id);
     const passage = bestPassage(body, terms, bigrams);
     if (!passage) continue;
-    const reviewRequirements = sourceReviewRequirements(body, passage);
+    const richSources = structuredRichSources(body);
+    const reviewRequirements = sourceReviewRequirements(body, passage, richSources);
+    const passageTableReferences = Array.from(new Set(
+      Array.from(String(passage.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
+        .map((match) => `Table ${match[1]}`)
+    ));
+    const applicableRichSources = richSources.filter((source) =>
+      passageTableReferences.some((reference) =>
+        comparableTableReference(source.reference) === comparableTableReference(reference)
+      )
+    );
     const finalScore = entry.score +
       coverage * 12 +
       titleMatches * 2.6 +
@@ -511,7 +643,8 @@ export async function discoverRelevantEvidence({
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
       matchedRoutes: Array.from(routeMatch?.labels || []),
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
-      sourceReviewRequirements: reviewRequirements
+      sourceReviewRequirements: reviewRequirements,
+      richSources: applicableRichSources
     });
   }
 
@@ -557,6 +690,16 @@ export async function discoverRelevantEvidence({
       blockID: item.passage.blockID || null,
       preparationEligible: item.sourceReviewRequirements.length === 0,
       sourceReviewRequirements: item.sourceReviewRequirements,
+      richSourceIDs: item.richSources.map((source) => source.id),
+      richSources: item.richSources.map((source) => ({
+        id: source.id,
+        kind: source.kind,
+        reference: source.reference,
+        contentHash: source.contentHash,
+        textLength: source.textLength,
+        rowCount: source.rowCount,
+        reviewState: "candidate"
+      })),
       whyRelevant: candidateExplanation(item),
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
@@ -565,7 +708,8 @@ export async function discoverRelevantEvidence({
         exactReference: item.exactReference,
         requiresAdditionalSourceReview: item.sourceReviewRequirements.length > 0,
         containsVisualSource: item.sourceReviewRequirements.some((requirement) => requirement.kind === "visual-source"),
-        referencesTable: item.sourceReviewRequirements.some((requirement) => requirement.kind === "referenced-table"),
+        referencesTable: /\bTable\s+[A-Z]?\d/i.test(item.passage.text),
+        includesStructuredTable: item.richSources.some((source) => source.kind === "table"),
         containsException: /\bexception\b/i.test(item.passage.text),
         containsCrossReference: /\b(section|table|chapter)\s+\d/i.test(item.passage.text)
       }

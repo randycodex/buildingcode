@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import {
   activityEvent,
   artifactEnvelope,
@@ -165,6 +166,47 @@ const evidence = immutableEvidenceSnapshot({
 assert.equal(evidence.passageText, "The exact approved passage.");
 assert.equal(evidence.passageTextHash.length, 64);
 assert.equal(evidence.snapshotHash.length, 64);
+
+const structuredGrids = [{
+  rows: [{
+    cells: [
+      { text: "Occupancy", rowSpan: 2, columnSpan: 1 },
+      { text: "Water closets", rowSpan: 1, columnSpan: 2 }
+    ]
+  }]
+}];
+const structuredText = "Table 403.1 Minimum Number of Required Plumbing Fixtures";
+const structuredReference = "PC Table 403.1";
+const structuredContentHash = createHash("sha256")
+  .update(JSON.stringify({
+    reference: structuredReference,
+    text: structuredText,
+    grids: structuredGrids
+  }))
+  .digest("hex");
+const structuredEvidence = immutableEvidenceSnapshot({
+  id: "evidence-structured-1",
+  source: {
+    sourceID: "source-structured-1",
+    sectionID: "11909",
+    sectionNumber: "403.1",
+    chapterNumber: "4",
+    codePrefix: "PC",
+    codeEdition: "2022 New York City Construction Codes",
+    codeVersion: "library-v1",
+    text: structuredText,
+    richSourceID: "rich-source-table-403-1",
+    richSourceKind: "table",
+    richSourceReference: structuredReference,
+    richSourceContentHash: structuredContentHash,
+    richSourceRowCount: 1,
+    richSourceGrids: structuredGrids
+  },
+  approvedAt: createdAt
+});
+assert.equal(structuredEvidence.structuredSource.reference, structuredReference);
+assert.equal(structuredEvidence.structuredSource.contentHash, structuredContentHash);
+assert.equal(structuredEvidence.structuredSource.grids[0].rows[0].cells[0].rowSpan, 2);
 
 const immutableAnswer = immutableResearchAnswer({
   id: "answer-1",

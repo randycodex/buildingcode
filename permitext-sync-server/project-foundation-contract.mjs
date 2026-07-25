@@ -161,6 +161,48 @@ function boundedVersion(value, field = "version") {
   return normalized;
 }
 
+function immutableStructuredEvidenceSource(source, passageText) {
+  if (!source?.richSourceID) return null;
+  const grids = (Array.isArray(source.richSourceGrids) ? source.richSourceGrids : [])
+    .slice(0, 8)
+    .map((grid) => ({
+      rows: (Array.isArray(grid?.rows) ? grid.rows : []).slice(0, 500).map((row) => ({
+        cells: (Array.isArray(row?.cells) ? row.cells : []).slice(0, 100).map((cell) => ({
+          text: requiredText(cell?.text, "structured evidence cell", 20_000),
+          rowSpan: boundedVersion(cell?.rowSpan || 1, "structured evidence row span"),
+          columnSpan: boundedVersion(cell?.columnSpan || 1, "structured evidence column span")
+        }))
+      }))
+    }));
+  const rowCount = grids.reduce((total, grid) => total + grid.rows.length, 0);
+  if (!grids.length || !rowCount || rowCount !== Number(source.richSourceRowCount)) {
+    throw new Error("Invalid structured evidence rows.");
+  }
+  const reference = requiredText(source.richSourceReference, "structured evidence reference", 512);
+  const contentHash = requiredText(
+    source.richSourceContentHash,
+    "structured evidence content hash",
+    64
+  );
+  if (!/^[a-f0-9]{64}$/.test(contentHash)) {
+    throw new Error("Invalid structured evidence content hash.");
+  }
+  const expectedHash = createHash("sha256")
+    .update(JSON.stringify({ reference, text: passageText, grids }))
+    .digest("hex");
+  if (contentHash !== expectedHash) {
+    throw new Error("Structured evidence content no longer matches its integrity hash.");
+  }
+  return {
+    id: requiredText(source.richSourceID, "structured evidence source ID", 256),
+    kind: requiredText(source.richSourceKind, "structured evidence kind", 64),
+    reference,
+    contentHash,
+    rowCount,
+    grids
+  };
+}
+
 export function ownerScope(userID) {
   return {
     kind: "user",
@@ -362,6 +404,8 @@ export function immutableEvidenceSnapshot({
     evidenceSetVersion: boundedVersion(evidenceSetVersion, "evidence set version"),
     sourceLibraryVersion: libraryVersion
   };
+  const structuredSource = immutableStructuredEvidenceSource(source, passageText);
+  if (structuredSource) snapshot.structuredSource = structuredSource;
   return {
     ...snapshot,
     snapshotHash: createHash("sha256").update(JSON.stringify(snapshot)).digest("hex")

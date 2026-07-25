@@ -56,6 +56,9 @@ function renderPacket(retrievalDataset, researchDataset) {
       ...(retrievalCase.expectedPreparationBlockedSectionIDs?.length
         ? [`- Must block text-only preparation for section IDs: ${retrievalCase.expectedPreparationBlockedSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
         : []),
+      ...(retrievalCase.expectedStructuredRichSourceSectionIDs?.length
+        ? [`- Must attach a complete structured rich source for section IDs: ${retrievalCase.expectedStructuredRichSourceSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
+        : []),
       ...(retrievalCase.expectedOutsideCurrentLibrary?.length
         ? [`- Must disclose outside-scope authorities: ${retrievalCase.expectedOutsideCurrentLibrary.join(", ")}`]
         : []),

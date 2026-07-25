@@ -259,7 +259,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260725-evidence-boundaries-v11"),
+      webRoot.text.includes("20260725-structured-tables-v12"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -793,7 +793,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-evidence-boundaries-v11'),
+        webRoot.text.includes('/web/app.js?v=20260725-structured-tables-v12'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -801,6 +801,8 @@ async function main() {
       evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
         evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
+        evidenceDiscoveryClientSource.includes("Complete structured source included") &&
+        evidenceDiscoveryClientSource.includes("candidate.richSourceIDs || []") &&
         evidenceDiscoveryClientSource.includes("Outside Construction Code Research") &&
         evidenceDiscoveryClientSource.includes("outsideItem.sourceURL") &&
         evidenceDiscoveryClientSource.includes("candidate.preparationEligible !== false") &&
@@ -1647,6 +1649,109 @@ async function main() {
           candidate.sectionNumber === "1007.1.1"
         ),
       "Find Relevant Evidence did not return unapproved canonical scissor-stair candidates without generating an answer."
+    );
+    const plumbingTableDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "For an accessory assembly room, what minimum fixtures does PC 403.1 and Table 403.1 require?",
+        limit: 12
+      }
+    });
+    const plumbingTableCandidate = plumbingTableDiscovery.json.candidates?.find((candidate) =>
+      candidate.sectionID === "11909"
+    );
+    assert(
+      plumbingTableDiscovery.response.ok &&
+        plumbingTableCandidate?.preparationEligible === true &&
+        plumbingTableCandidate?.richSourceIDs?.length === 1 &&
+        plumbingTableCandidate?.richSources?.some((source) =>
+          source.kind === "table" &&
+          source.reference === "PC Table 403.1" &&
+          source.contentHash &&
+          source.rowCount > 0
+        ) &&
+        plumbingTableCandidate?.sourceReviewRequirements?.length === 0,
+      "Evidence discovery did not attach the complete structured PC Table 403.1 source."
+    );
+    const invalidStructuredEvidence = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: plumbingTableCandidate.sectionID,
+        selectedText: plumbingTableCandidate.selectedText,
+        richSourceIDs: ["rich-source-client-forgery"]
+      }
+    });
+    assert(
+      invalidStructuredEvidence.response.status === 400,
+      "Research accepted a structured evidence ID that was not derived from the current enacted source."
+    );
+    const structuredTableConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: plumbingTableCandidate.sectionID,
+        selectedText: plumbingTableCandidate.selectedText,
+        richSourceIDs: plumbingTableCandidate.richSourceIDs
+      }
+    });
+    const structuredTableSelections = structuredTableConversation.json.conversation?.sources
+      ?.filter((source) => source.kind === "selection") || [];
+    assert(
+      structuredTableConversation.response.status === 201 &&
+        structuredTableSelections.length === 2 &&
+        structuredTableSelections.some((source) =>
+          source.richSourceKind === "table" &&
+          source.richSourceReference === "PC Table 403.1" &&
+          source.richSourceContentHash === plumbingTableCandidate.richSources[0].contentHash &&
+          source.richSourceRowCount === plumbingTableCandidate.richSources[0].rowCount &&
+          source.richSourceGrids?.some((grid) =>
+            grid.rows?.some((row) =>
+              row.cells?.some((cell) => cell.rowSpan > 1 || cell.columnSpan > 1)
+            )
+          ) &&
+          source.selectedText.includes("Minimum Number of Required Plumbing Fixtures")
+        ),
+      "Preparing a table-dependent candidate did not preserve the separately approved structured source."
+    );
+    const structuredTableMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID: structuredTableConversation.json.conversation.id,
+        question: "Which structured table evidence governs the minimum fixture count?"
+      }
+    });
+    const structuredTableAnswerID = structuredTableMessage.json?.conversation?.messages?.find(
+      (message) => message.role === "assistant"
+    )?.id;
+    const structuredTableAnswer = await request("/research/answers/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        answerID: structuredTableAnswerID
+      }
+    });
+    assert(
+      structuredTableMessage.response.ok &&
+        structuredTableAnswer.response.ok &&
+        structuredTableAnswer.json.answer.evidence.some((snapshot) =>
+          snapshot.structuredSource?.reference === "PC Table 403.1" &&
+          snapshot.structuredSource.contentHash === plumbingTableCandidate.richSources[0].contentHash &&
+          snapshot.structuredSource.rowCount === plumbingTableCandidate.richSources[0].rowCount &&
+          snapshot.structuredSource.grids.some((grid) =>
+            grid.rows.some((row) =>
+              row.cells.some((cell) => cell.rowSpan > 1 || cell.columnSpan > 1)
+            )
+          )
+        ),
+      "The immutable Research answer did not retain the approved table grid and integrity identity."
     );
     const outsideAuthorityDiscovery = await request("/research/evidence/discover", {
       method: "POST",
