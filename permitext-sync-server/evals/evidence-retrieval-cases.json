@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260725-hybrid-candidates-v4",
+  "retrievalVersion": "20260725-hybrid-candidates-v5",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection",
     "official agency interpretations outside the current library",
     "official maps, images, and non-table rich sources requiring structured evidence",
-    "broader existing-building scenarios"
+    "broader structural and occupancy-change existing-building scenarios"
   ],
   "cases": [
     {
@@ -144,6 +144,15 @@
       ],
       "expectedCoverageLimitationKinds": ["outside-current-library"],
       "notes": "Tests retrieval of the selected illegal-conversion provision while separately disclosing that Buildings Bulletin, Zoning Resolution, and Housing Maintenance Code authority is outside the current Construction Code Research scope."
+    },
+    {
+      "id": "retrieval-existing-plumbing-repair-boundary",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-020-existing-plumbing-repair-boundary",
+      "scenarioCategories": ["existing-building conditions", "plumbing", "repairs", "exceptions", "scope boundaries"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests the existing-installation, repair-to-new-work, and same-manner-and-arrangement candidate set without implying automatic whole-system upgrade or automatic exemption."
     }
   ]
 }

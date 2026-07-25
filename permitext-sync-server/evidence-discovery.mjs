@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v4";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v5";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -82,6 +82,15 @@ const topicRoutes = [
     targets: [
       { codePrefix: "PC", sectionPrefix: "403.1", includeDescendants: true },
       { codePrefix: "BC", sectionPrefix: "303.1.3" }
+    ]
+  },
+  {
+    pattern: /\bexisting\s+(?:plumbing\s+)?(?:system|installation)|same\s+(?:manner|route).*(?:arrangement)|ordinary\s+repair.*plumb/i,
+    label: "existing plumbing installation repair provisions",
+    targets: [
+      { codePrefix: "PC", sectionPrefix: "102.2" },
+      { codePrefix: "PC", sectionPrefix: "102.4" },
+      { codePrefix: "PC", sectionPrefix: "102.4.1" }
     ]
   },
   {

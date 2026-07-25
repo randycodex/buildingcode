@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v4`
+Retrieval implementation: `20260725-hybrid-candidates-v5`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -11,7 +11,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 - dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
 - official maps, images, and non-table rich sources requiring structured evidence
-- broader existing-building scenarios
+- broader structural and occupancy-change existing-building scenarios
 
 ## 1. retrieval-scissor-stair-two-exits
 
@@ -630,6 +630,50 @@ Tests retrieval of the selected illegal-conversion provision while separately di
 #### AC 28-210.1 — section ID 9361
 
 > It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 15. retrieval-existing-plumbing-repair-boundary
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, plumbing, repairs, exceptions, scope boundaries
+- Source Research case: `nyc-020-existing-plumbing-repair-boundary`
+
+### Project question
+
+An existing prior-code office building has a plumbing system said to have been lawfully installed before the current code. The project will replace a short corroded drain-pipe segment in the same route and arrangement. The owner calls it an ordinary repair and says the old system can remain exactly as-is. Based on PC 102.2, PC 102.4, and PC 102.4.1, must the entire existing plumbing installation be upgraded, and can the repair avoid the new-installation rules?
+
+### Review intent
+
+Tests the existing-installation, repair-to-new-work, and same-manner-and-arrangement candidate set without implying automatic whole-system upgrade or automatic exemption.
+
+### Proposed expected evidence
+
+#### PC 102.2 — section ID 11734
+
+> Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system.
+
+#### PC 102.4 — section ID 11739
+
+> Additions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.
+
+#### PC 102.4.1 — section ID 11740
+
+> Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.
 
 ### Knowledgeable-human decision
 

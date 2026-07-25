@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T08:29:20.421Z.
+Generated from `evals/research-cases.json` on 2026-07-25T10:33:28.180Z.
 
-This packet contains 9 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 10 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -21,6 +21,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-017-prior-code-floor-surface-area-110-percent | Approve / Correct / Reject |  |
 | nyc-018-fire-district-map-boundary | Approve / Correct / Reject |  |
 | nyc-019-buildings-bulletin-policy-boundary | Approve / Correct / Reject |  |
+| nyc-020-existing-plumbing-repair-boundary | Approve / Correct / Reject |  |
 
 ---
 
@@ -1111,6 +1112,122 @@ No. AC 28-210.1 establishes that converting or maintaining a dwelling for occupa
 ### Existing drafting note
 
 Draft candidate NYC-019 tests an explicit outside-authority boundary. Permitext must link to the official Buildings Bulletins source without representing that it has retrieved or analyzed the bulletin.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 10. Existing plumbing repair does not automatically trigger a whole-system upgrade
+
+- **Case ID:** `nyc-020-existing-plumbing-repair-boundary`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** intermediate
+- **Topics:** existing plumbing installations, prior-code buildings, repairs, new-installation requirements, whole-system upgrade boundary
+
+### Scenario source
+
+Draft scenario constructed from the canonical enacted text of 2022 NYC Plumbing Code Sections 102.2, 102.4, and 102.4.1.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Existing prior-code office building; existingSystem: Plumbing installation represented by the owner as lawfully installed before the current code; proposedWork: Replacement of a short corroded drain-pipe segment in the same route and arrangement; ownerPosition: The work is an ordinary repair and the entire existing installation may remain exactly as-is; unknowns: lawful installation and original approved design, exact repair scope and whether it is minor, whether the replacement is in the same manner and arrangement, unsafe, hazardous, overloaded, or unsanitary conditions, required departmental approval and inspection, other applicable testing, filing, and building requirements
+
+### Question
+
+An existing prior-code office building has a plumbing system said to have been lawfully installed before the current code. The project will replace a short corroded drain-pipe segment in the same route and arrangement. The owner calls it an ordinary repair and says the old system can remain exactly as-is. Based on PC 102.2, PC 102.4, and PC 102.4.1, must the entire existing plumbing installation be upgraded, and can the repair avoid the new-installation rules?
+
+### Exact selected Permitext evidence
+
+#### PC 102.2
+
+Canonical section ID: `11734`
+
+Passage 1:
+
+> Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system.
+
+#### PC 102.4
+
+Canonical section ID: `11739`
+
+Passage 1:
+
+> Additions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded.
+
+#### PC 102.4.1
+
+Canonical section ID: `11740`
+
+Passage 1:
+
+> Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved.
+
+### Proposed expected conclusion
+
+The selected evidence does not automatically require the entire existing plumbing installation to be upgraded. PC 102.4 requires the repair work to conform to the requirements for new installations while expressly stating that the existing installation need not be brought into compliance with every current-code requirement; the work also may not make the installation unsafe, hazardous, or overloaded. PC 102.4.1 provides a conditional exception for minor work performed in the same manner and arrangement as the existing system, but only when the work is not hazardous and is approved. PC 102.2 separately permits continued use and maintenance of a lawfully existing system only when the use, maintenance, or repair accords with the original design and creates no hazard to life, health, or property. The owner's labels and assumptions do not establish those conditions. The lawful status, original design, exact repair scope, same-manner-and-arrangement facts, safety condition, approval, and other applicable testing or filing requirements must be verified.
+
+### Expected uncertainty
+
+[object Object]
+
+### Required citations and the claim each must support
+
+- **PC 102.2:** Conditional continued use and maintenance of a lawfully existing installation in accordance with its original design and without a hazard.
+- **PC 102.4:** New-installation requirements apply to the repair without automatically requiring whole-existing-system compliance, and the work may not create an unsafe, hazardous, or overloaded condition.
+- **PC 102.4.1:** Conditional minor-work treatment when the same manner and arrangement, no-hazard, and approval conditions are met.
+
+### Required concepts
+
+- Reject an automatic whole-existing-system upgrade based solely on the repair.
+- State that the repair work generally must conform to new-installation requirements.
+- State that the work may not make the installation unsafe, hazardous, or overloaded.
+- Explain the conditional same-manner-and-arrangement rule for minor work.
+- Tie continued use and maintenance to lawful existence, the original design, and absence of hazards.
+- Treat the owner's ordinary-repair label as an unverified project assertion.
+- Request the project facts and approval needed to determine whether the conditional exception applies.
+
+### Facts the answer must identify as missing
+
+- Evidence that the existing plumbing installation was lawfully installed.
+- Original approved design and arrangement.
+- Exact limits and classification of the proposed repair.
+- Whether the replacement uses the same manner and arrangement.
+- Unsafe, hazardous, overloaded, or unsanitary existing or resulting conditions.
+- Required departmental approval, inspection, testing, and filing information.
+
+### Claims the answer must not make
+
+- Every repair requires the entire existing plumbing installation to be upgraded.
+- No current-code requirement applies to the proposed repair.
+- The owner's ordinary-repair label establishes the PC 102.4.1 exception.
+- Same route alone proves the work uses the same manner and arrangement.
+- A lawfully existing installation may remain hazardous.
+- Approval is unnecessary for the conditional minor-work rule.
+- The proposed repair is compliant on the stated facts.
+
+### Existing drafting note
+
+Draft candidate NYC-020 broadens existing-building coverage into plumbing repairs. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
 
 ### Reviewer decision
 

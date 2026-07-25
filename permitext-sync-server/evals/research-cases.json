@@ -1467,6 +1467,120 @@
           "requiredClaim": "Illegal conversion or maintenance for occupancy beyond the legally authorized family count, while not treating the section as a cellar-bathroom approval."
         }
       ]
+    },
+    {
+      "id": "nyc-020-existing-plumbing-repair-boundary",
+      "title": "Existing plumbing repair does not automatically trigger a whole-system upgrade",
+      "status": "draft",
+      "difficulty": "intermediate",
+      "topics": [
+        "existing plumbing installations",
+        "prior-code buildings",
+        "repairs",
+        "new-installation requirements",
+        "whole-system upgrade boundary"
+      ],
+      "codeEdition": "2022 New York City Construction Codes",
+      "jurisdiction": "New York City, New York",
+      "projectContext": {
+        "building": "Existing prior-code office building",
+        "existingSystem": "Plumbing installation represented by the owner as lawfully installed before the current code",
+        "proposedWork": "Replacement of a short corroded drain-pipe segment in the same route and arrangement",
+        "ownerPosition": "The work is an ordinary repair and the entire existing installation may remain exactly as-is",
+        "unknowns": [
+          "lawful installation and original approved design",
+          "exact repair scope and whether it is minor",
+          "whether the replacement is in the same manner and arrangement",
+          "unsafe, hazardous, overloaded, or unsanitary conditions",
+          "required departmental approval and inspection",
+          "other applicable testing, filing, and building requirements"
+        ]
+      },
+      "selectedEvidence": [
+        {
+          "sectionID": "11734",
+          "reference": "PC 102.2",
+          "codePrefix": "PC",
+          "sectionNumber": "102.2",
+          "exactPassages": [
+            "Except as otherwise specifically provided, plumbing systems lawfully in existence on July 1, 2008 or on the effective date of a subsequent amendment of this code shall be permitted to have their use and maintenance continued if the use, maintenance or repair is in accordance with the original design and no hazard to life, health or property is created by such plumbing system."
+          ]
+        },
+        {
+          "sectionID": "11739",
+          "reference": "PC 102.4",
+          "codePrefix": "PC",
+          "sectionNumber": "102.4",
+          "exactPassages": [
+            "Additions, alterations, renovations or repairs to installations shall conform to that required for new installations without requiring the existing installation to comply with all of the requirements of this code. Additions, alterations or repairs shall not cause an existing installation to become unsafe, hazardous or overloaded."
+          ]
+        },
+        {
+          "sectionID": "11740",
+          "reference": "PC 102.4.1",
+          "codePrefix": "PC",
+          "sectionNumber": "102.4.1",
+          "exactPassages": [
+            "Minor additions, alterations, renovations and repairs to existing installations shall meet the provisions for new construction, unless such work is done in the same manner and arrangement as was in the existing system, is not hazardous and is approved."
+          ]
+        }
+      ],
+      "question": "An existing prior-code office building has a plumbing system said to have been lawfully installed before the current code. The project will replace a short corroded drain-pipe segment in the same route and arrangement. The owner calls it an ordinary repair and says the old system can remain exactly as-is. Based on PC 102.2, PC 102.4, and PC 102.4.1, must the entire existing plumbing installation be upgraded, and can the repair avoid the new-installation rules?",
+      "expectedConclusion": "The selected evidence does not automatically require the entire existing plumbing installation to be upgraded. PC 102.4 requires the repair work to conform to the requirements for new installations while expressly stating that the existing installation need not be brought into compliance with every current-code requirement; the work also may not make the installation unsafe, hazardous, or overloaded. PC 102.4.1 provides a conditional exception for minor work performed in the same manner and arrangement as the existing system, but only when the work is not hazardous and is approved. PC 102.2 separately permits continued use and maintenance of a lawfully existing system only when the use, maintenance, or repair accords with the original design and creates no hazard to life, health, or property. The owner's labels and assumptions do not establish those conditions. The lawful status, original design, exact repair scope, same-manner-and-arrangement facts, safety condition, approval, and other applicable testing or filing requirements must be verified.",
+      "expectedUncertainty": {
+        "level": "conditional",
+        "description": "The selected passages establish the repair and whole-system boundaries, but the exception depends on the actual scope, original design, safety conditions, and approval."
+      },
+      "sourceType": "deliberately constructed edge case",
+      "sourceReference": "Draft scenario constructed from the canonical enacted text of 2022 NYC Plumbing Code Sections 102.2, 102.4, and 102.4.1.",
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Draft candidate NYC-020 broadens existing-building coverage into plumbing repairs. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.",
+      "requiredConcepts": [
+        "Reject an automatic whole-existing-system upgrade based solely on the repair.",
+        "State that the repair work generally must conform to new-installation requirements.",
+        "State that the work may not make the installation unsafe, hazardous, or overloaded.",
+        "Explain the conditional same-manner-and-arrangement rule for minor work.",
+        "Tie continued use and maintenance to lawful existence, the original design, and absence of hazards.",
+        "Treat the owner's ordinary-repair label as an unverified project assertion.",
+        "Request the project facts and approval needed to determine whether the conditional exception applies."
+      ],
+      "missingFacts": [
+        "Evidence that the existing plumbing installation was lawfully installed.",
+        "Original approved design and arrangement.",
+        "Exact limits and classification of the proposed repair.",
+        "Whether the replacement uses the same manner and arrangement.",
+        "Unsafe, hazardous, overloaded, or unsanitary existing or resulting conditions.",
+        "Required departmental approval, inspection, testing, and filing information."
+      ],
+      "forbiddenClaims": [
+        "Every repair requires the entire existing plumbing installation to be upgraded.",
+        "No current-code requirement applies to the proposed repair.",
+        "The owner's ordinary-repair label establishes the PC 102.4.1 exception.",
+        "Same route alone proves the work uses the same manner and arrangement.",
+        "A lawfully existing installation may remain hazardous.",
+        "Approval is unnecessary for the conditional minor-work rule.",
+        "The proposed repair is compliant on the stated facts."
+      ],
+      "requiredCitations": [
+        "PC 102.2",
+        "PC 102.4",
+        "PC 102.4.1"
+      ],
+      "requiredCitationClaims": [
+        {
+          "reference": "PC 102.2",
+          "requiredClaim": "Conditional continued use and maintenance of a lawfully existing installation in accordance with its original design and without a hazard."
+        },
+        {
+          "reference": "PC 102.4",
+          "requiredClaim": "New-installation requirements apply to the repair without automatically requiring whole-existing-system compliance, and the work may not create an unsafe, hazardous, or overloaded condition."
+        },
+        {
+          "reference": "PC 102.4.1",
+          "requiredClaim": "Conditional minor-work treatment when the same manner and arrangement, no-hazard, and approval conditions are met."
+        }
+      ]
     }
   ]
 }
