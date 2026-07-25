@@ -65,6 +65,20 @@ function validateRetrievalDataset(dataset, researchDataset) {
     );
     assert(Array.isArray(testCase.scenarioCategories) && testCase.scenarioCategories.length, `${testCase.id} needs scenario categories.`);
     assert(typeof testCase.notes === "string" && testCase.notes.trim(), `${testCase.id} needs review notes.`);
+    for (const optionalExpectation of [
+      "expectedOutsideCurrentLibrary",
+      "expectedPreparationBlockedSectionIDs",
+      "expectedCoverageLimitationKinds"
+    ]) {
+      if (testCase[optionalExpectation] !== undefined) {
+        assert(
+          Array.isArray(testCase[optionalExpectation]) &&
+            testCase[optionalExpectation].length &&
+            testCase[optionalExpectation].every((item) => typeof item === "string" && item.trim()),
+          `${testCase.id} has an invalid ${optionalExpectation} expectation.`
+        );
+      }
+    }
   }
   return researchByID;
 }
@@ -178,6 +192,33 @@ try {
       discovery.coverageLimitations.some((item) => item.kind === "candidate-review-required"),
       `${retrievalCase.id} did not disclose the human approval boundary.`
     );
+    for (const label of retrievalCase.expectedOutsideCurrentLibrary || []) {
+      const outsideItem = discovery.outsideCurrentLibrary.find((item) => item.label === label);
+      assert(outsideItem, `${retrievalCase.id} did not disclose the ${label} outside-library boundary.`);
+      assert(
+        /^https:\/\/.+/i.test(outsideItem.sourceURL || ""),
+        `${retrievalCase.id} did not provide an authoritative source link for ${label}.`
+      );
+    }
+    for (const sectionID of retrievalCase.expectedPreparationBlockedSectionIDs || []) {
+      const candidate = discovery.candidates.find((item) => String(item.sectionID) === String(sectionID));
+      assert(candidate, `${retrievalCase.id} did not retrieve source-review section ${sectionID}.`);
+      assert.equal(
+        candidate.preparationEligible,
+        false,
+        `${retrievalCase.id} allowed text-only preparation for source-review section ${sectionID}.`
+      );
+      assert(
+        candidate.sourceReviewRequirements?.length,
+        `${retrievalCase.id} did not explain the additional source review for section ${sectionID}.`
+      );
+    }
+    for (const kind of retrievalCase.expectedCoverageLimitationKinds || []) {
+      assert(
+        discovery.coverageLimitations.some((item) => item.kind === kind),
+        `${retrievalCase.id} did not disclose the ${kind} coverage limitation.`
+      );
+    }
 
     if (retrievalCase.expectedBehavior === "insufficient-query") {
       assert(
@@ -223,7 +264,8 @@ try {
       ranks: expectedSources.map((source) => ({
         reference: source.reference,
         rank: rankByID.get(String(source.sectionID)) || null
-      }))
+      })),
+      blockedSections: (retrievalCase.expectedPreparationBlockedSectionIDs || []).length
     });
   }
 
@@ -238,7 +280,8 @@ try {
       `passage recall ${(result.passageRecall * 100).toFixed(0)}%; ` +
       `top result ${result.topRelevant ? "relevant" : "not expected"}; ` +
       `missed ${result.missedSections.join(", ") || "none"}; ` +
-      `expected ranks ${result.ranks.map(({ reference, rank }) => `${reference}=${rank || "missed"}`).join(", ")}.`
+      `expected ranks ${result.ranks.map(({ reference, rank }) => `${reference}=${rank || "missed"}`).join(", ")}; ` +
+      `source-review blocks ${result.blockedSections}.`
     );
   }
   const recallResults = results.filter((result) => result.recall !== null);

@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v2`
+Retrieval implementation: `20260725-hybrid-candidates-v3`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -8,7 +8,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 ## Known coverage gaps
 
-- dedicated Buildings Bulletin retrieval
+- dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
 - tables and maps requiring non-text retrieval
 - broader existing-building scenarios
@@ -140,6 +140,8 @@ Corrections or notes:
 - Diagnostic depth: 12
 - Categories: multiple-code question, plumbing, exceptions
 - Source Research case: `accessory-assembly-plumbing-fixtures`
+- Must block text-only preparation for section IDs: `11909`
+- Required coverage limitations: `referenced-table-review-required`
 
 ### Project question
 
@@ -147,7 +149,7 @@ If the multipurpose room is permitted to be classified as Group B because it has
 
 ### Review intent
 
-Tests candidate completeness across Building Code classification and Plumbing Code fixture rules.
+Tests candidate completeness across Building Code classification and Plumbing Code fixture rules while requiring the Table 403.1 candidate to remain blocked from text-only preparation.
 
 ### Proposed expected evidence
 
@@ -224,6 +226,8 @@ Corrections or notes:
 - Diagnostic depth: 12
 - Categories: multiple-code question, plumbing, mixed occupancies
 - Source Research case: `nyc-001-mixed-occupancy-fixture-rounding`
+- Must block text-only preparation for section IDs: `11909`
+- Required coverage limitations: `referenced-table-review-required`
 
 ### Project question
 
@@ -231,7 +235,7 @@ A residential-building cellar contains Group B, F, and S spaces plus a multipurp
 
 ### Review intent
 
-Tests fractional-calculation and accessory-assembly candidate coverage.
+Tests fractional-calculation and accessory-assembly candidate coverage while requiring the Table 403.1 candidate to remain blocked from text-only preparation.
 
 ### Proposed expected evidence
 
@@ -490,6 +494,144 @@ Tests canonical Mechanical Code 404.1 discovery and guards against the confirmed
 > Such detectors shall be installed in accordance with their manufacturers' instructions.
 
 > Such systems shall operate automatically upon detection of a concentration of carbon monoxide of 25 parts per million (ppm) or nitrogen dioxide of 500 parts per billion (ppb).
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 12. retrieval-prior-code-floor-surface-area-110-percent
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, administrative provisions, scope changes, multiple sections
+- Source Research case: `nyc-017-prior-code-floor-surface-area-110-percent`
+
+### Project question
+
+A prior-code building was filed as an alteration based on a 105 percent floor-surface-area increase, but scope changes during construction may raise the increase to 115 percent. Can the project remain an alteration, what happens if the threshold is crossed, and what must be included or excluded when checking the percentage?
+
+### Review intent
+
+Tests closely related Administrative Code candidates for the more-than-110-percent trigger, construction-scope changes, measurement exclusions, and floor-surface-area definition.
+
+### Proposed expected evidence
+
+#### AC 28-101.4.5 — section ID 8792
+
+> Notwithstanding sections 28-101.4.3 and 28-102.4.3 or any other provision of this code that would authorize alterations of prior code buildings in accordance with the 1968 building code or prior codes, where the proposed work at the completion of construction will increase the amount of floor surface area of a prior code building by more than 110%, over the amount of existing floor surface area, such entire building shall be made to comply with the provisions of this code as if it were a new building hereafter erected. See section 28-105.2 for permits for such work.
+
+> Exceptions. When determining the amount of existing floor surface area for the purposes of section 28-101.4.5 , the following shall be excluded from the measured square footage of floor surface area:
+
+> 1. The square footage of floors removed during the course of the work when such floors are removed together with the supporting beams, joists, decking and slabs on grade.
+
+> 2. The square footage of any floor that was installed together with the supporting beams, joists, decking and slabs on grade less than 12 months prior to submission of the application for construction document approval for the proposed work. For the purposes of this exception, floors installed pursuant to a work permit signed off less than 12 months before such submission shall not be counted as existing floor surface area.
+
+#### AC 28-101.4.5.1 — section ID 8793
+
+> In cases where changes in the scope of work during the course of construction would result in increasing the floor surface area at the completion of construction by more than 110 percent, over the amount of existing floor surface area as determined pursuant to section 28-101.4.5 , such entire building shall be made to comply with the provisions of this code as if hereafter erected and such work shall be refiled as a new building application in accordance with the provisions of section 28-105.2 .
+
+> Exception: Work to the extent necessary to relieve an emergency condition may be performed prior to amending plans or obtaining a new permit pursuant to sections 28-105.4.1 and 28-105.12.2 .
+
+#### AC 28-101.4.5.2 — section ID 8794
+
+> As used in Section 28-101.4.5 , the following term shall have the following meaning unless the context or subject matter requires otherwise.
+
+> FLOOR SURFACE AREA. Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 13. retrieval-fire-district-map-boundary
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: administrative provisions, fire districts, maps, non-text evidence
+- Source Research case: `nyc-018-fire-district-map-boundary`
+- Must block text-only preparation for section IDs: `6881`
+- Required coverage limitations: `visual-source-review-required`
+
+### Project question
+
+The project address is in Queens. Based only on the selected text from AC 28-102.4.5 and BC D106.1, can Permitext confirm that the lot is inside the fire district?
+
+### Review intent
+
+Tests AC-to-Appendix-D discovery and requires BC D106.1 to remain blocked from text-only preparation because the governing fire-district boundary is carried by official map images.
+
+### Proposed expected evidence
+
+#### AC 28-102.4.5 — section ID 8808
+
+> The boundaries of fire districts shall be in accordance with the maps set forth in Appendix D of the New York city building code.
+
+#### BC D106.1 — section ID 6881
+
+> Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the "fire district maps" as per Figures D106.1(1) and D106.1(2) .
+
+> Figure D106.1(1) Fire District Maps Borough of Staten Island (Richmond County)
+
+> Figure D106.1(2) Fire District Maps Borough of Queens
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 14. retrieval-buildings-bulletin-policy-boundary
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: administrative provisions, Buildings Bulletin, zoning, Housing Maintenance Code, outside current library
+- Source Research case: `nyc-019-buildings-bulletin-policy-boundary`
+- Must disclose outside-scope authorities: NYC Buildings Bulletins, NYC Zoning Resolution Research, NYC Housing Maintenance Code
+- Required coverage limitations: `outside-current-library`
+
+### Project question
+
+Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?
+
+### Review intent
+
+Tests retrieval of the selected illegal-conversion provision while separately disclosing that Buildings Bulletin, Zoning Resolution, and Housing Maintenance Code authority is outside the current Construction Code Research scope.
+
+### Proposed expected evidence
+
+#### AC 28-210.1 — section ID 9361
+
+> It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed.
 
 ### Knowledgeable-human decision
 

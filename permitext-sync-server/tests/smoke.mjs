@@ -259,7 +259,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260725-firm-controls-v10"),
+      webRoot.text.includes("20260725-evidence-boundaries-v11"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -793,12 +793,17 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-firm-controls-v10'),
+        webRoot.text.includes('/web/app.js?v=20260725-evidence-boundaries-v11'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
-        evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
+      evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
+        evidenceDiscoveryClientSource.includes("Additional source review required") &&
+        evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
+        evidenceDiscoveryClientSource.includes("Outside Construction Code Research") &&
+        evidenceDiscoveryClientSource.includes("outsideItem.sourceURL") &&
+        evidenceDiscoveryClientSource.includes("candidate.preparationEligible !== false") &&
         evidenceDiscoveryClientSource.includes("Approve") &&
         evidenceDiscoveryClientSource.includes("Reject") &&
         evidenceDiscoveryClientSource.includes("Prepare Approved Evidence") &&
@@ -1613,12 +1618,15 @@ async function main() {
     });
     assert(
       scissorEvidenceDiscovery.response.ok &&
+        scissorEvidenceDiscovery.json.schemaVersion === 2 &&
         scissorEvidenceDiscovery.json.generatedAnswer === false &&
         scissorEvidenceDiscovery.json.paidModelCall === false &&
         scissorEvidenceDiscovery.json.candidates.length > 0 &&
         scissorEvidenceDiscovery.json.candidates.every((candidate) =>
           candidate.candidateState === "candidate" &&
           candidate.selectedText &&
+          typeof candidate.preparationEligible === "boolean" &&
+          Array.isArray(candidate.sourceReviewRequirements) &&
           !candidate.approved
         ) &&
         scissorEvidenceDiscovery.json.candidates.some((candidate) =>
@@ -1642,9 +1650,55 @@ async function main() {
           item.kind === "query-context-required"
         ) &&
         outsideAuthorityDiscovery.json.outsideCurrentLibrary.some((item) =>
-          item.label === "HCR requirements"
+          item.label === "HCR requirements" &&
+          item.sourceURL === "https://hcr.ny.gov/"
         ),
       "Evidence discovery did not disclose missing section context and outside-agency authority."
+    );
+    const fireDistrictMapDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "Can BC D106.1 and AC 28-102.4.5 prove that this Queens lot is inside the fire district?",
+        limit: 12
+      }
+    });
+    const fireDistrictMapCandidate = fireDistrictMapDiscovery.json.candidates?.find((candidate) =>
+      candidate.sectionID === "6881"
+    );
+    assert(
+      fireDistrictMapDiscovery.response.ok &&
+        fireDistrictMapCandidate?.preparationEligible === false &&
+        fireDistrictMapCandidate?.sourceReviewRequirements?.some((item) =>
+          item.kind === "visual-source" && item.count === 41
+        ) &&
+        fireDistrictMapDiscovery.json.coverageLimitations.some((item) =>
+          item.kind === "visual-source-review-required"
+        ),
+      "Evidence discovery allowed a text-only fire-district determination without its 41 official map images."
+    );
+    const buildingsBulletinDiscovery = await request("/research/evidence/discover", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        question: "Does AC 28-210.1 prove that Buildings Bulletin 2011-010, zoning, and the Housing Maintenance Code permit a three-fixture bathroom in this cellar?",
+        limit: 12
+      }
+    });
+    assert(
+      buildingsBulletinDiscovery.response.ok &&
+        buildingsBulletinDiscovery.json.candidates.some((candidate) =>
+          candidate.sectionID === "9361" &&
+          candidate.sectionNumber === "28-210.1"
+        ) &&
+        ["NYC Buildings Bulletins", "NYC Zoning Resolution Research", "NYC Housing Maintenance Code"].every((label) =>
+          buildingsBulletinDiscovery.json.outsideCurrentLibrary.some((item) =>
+            item.label === label && /^https:\/\/.+/.test(item.sourceURL || "")
+          )
+        ),
+      "Evidence discovery blurred the boundary between Construction Code candidates and outside Bulletin, Zoning, or Housing Maintenance authority."
     );
 
     const unauthorizedGrantSummaries = await request("/admin/accounts/grant-summaries");

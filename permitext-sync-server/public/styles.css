@@ -3771,11 +3771,33 @@ mark {
 }
 
 .evidence-discovery-limitations li,
-.evidence-discovery-outside p {
+.evidence-discovery-outside li {
   margin: 0;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.74) !important;
   line-height: 1.4;
+}
+
+.evidence-discovery-outside ul,
+.evidence-candidate-source-requirements ul {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: 1rem;
+}
+
+.evidence-discovery-outside li {
+  display: grid;
+  gap: 3px;
+}
+
+.evidence-discovery-outside a {
+  width: fit-content;
+  color: var(--text-primary);
+  font-weight: 650;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--text-primary) 45%, transparent);
+  text-underline-offset: 2px;
 }
 
 .evidence-candidate-tray {
@@ -3871,6 +3893,25 @@ mark {
   line-height: 1.4;
 }
 
+.evidence-candidate-source-requirements {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, #f79009 16%, var(--surface));
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.73) !important;
+  line-height: 1.4;
+}
+
+.evidence-candidate-source-requirements strong {
+  color: var(--text-primary);
+}
+
+.evidence-candidate-source-requirements li {
+  margin: 0;
+}
+
 .evidence-candidate-card blockquote {
   max-height: 180px;
   margin: 0;
@@ -3895,6 +3936,11 @@ mark {
   padding: 0 7px;
   background: color-mix(in srgb, var(--text-primary) 10%, var(--surface));
   color: var(--text-primary);
+}
+
+.evidence-candidate-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.52;
 }
 
 .evidence-candidate-approve[aria-pressed="true"] {

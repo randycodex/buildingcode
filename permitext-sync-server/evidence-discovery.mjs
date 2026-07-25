@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v2";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v3";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -124,16 +124,86 @@ const topicRoutes = [
     pattern: /\benclosed\s+(?:parking\s+)?garage|intermittent\s+(?:mechanical\s+)?ventilation|carbon\s+monoxide.*nitrogen\s+dioxide/i,
     label: "enclosed-parking-garage ventilation controls",
     targets: [{ codePrefix: "MC", sectionPrefix: "404.1" }]
+  },
+  {
+    pattern: /\b(?:more\s+than\s+)?110\s*percent|floor\s+surface\s+area|prior[- ]code.*(?:enlargement|increase)|increase.*prior[- ]code/i,
+    label: "prior-code building floor-surface-area provisions",
+    targets: [
+      { codePrefix: "AC", sectionPrefix: "28-101.4.5" },
+      { codePrefix: "AC", sectionPrefix: "28-101.4.5.1" },
+      { codePrefix: "AC", sectionPrefix: "28-101.4.5.2" }
+    ]
+  },
+  {
+    pattern: /\bfire\s+district\s+maps?|appendix\s+d.*maps?|staten\s+island.*fire\s+district|queens.*fire\s+district/i,
+    label: "fire-district text and official-map provisions",
+    targets: [
+      { codePrefix: "AC", sectionPrefix: "28-102.4.5" },
+      { codePrefix: "BC", sectionPrefix: "D106.1" }
+    ]
+  },
+  {
+    pattern: /\bthree[- ]fixture\s+bathroom|bathroom.*cellar|cellar.*(?:bathroom|illegal\s+conversion)/i,
+    label: "cellar use and illegal-residential-conversion provisions",
+    targets: [{ codePrefix: "AC", sectionPrefix: "28-210.1" }]
   }
 ];
 
 const outsideLibrarySignals = [
-  { pattern: /\bHCR\b/i, label: "HCR requirements" },
-  { pattern: /\bzoning\b/i, label: "zoning requirements" },
-  { pattern: /\bFDNY\b|Fire Department/i, label: "Fire Department requirements" },
-  { pattern: /\bADA\b|federal accessibility/i, label: "federal accessibility requirements" },
-  { pattern: /\blandmarks?\b|LPC\b/i, label: "Landmarks requirements" },
-  { pattern: /\bDEP\b|environmental protection/i, label: "environmental-agency requirements" }
+  {
+    pattern: /\bHCR\b/i,
+    label: "HCR requirements",
+    sourceName: "New York State Homes and Community Renewal",
+    sourceURL: "https://hcr.ny.gov/"
+  },
+  {
+    pattern: /\bzoning\b|\bZR\s*\d/i,
+    label: "NYC Zoning Resolution Research",
+    sourceName: "NYC Zoning Resolution",
+    sourceURL: "https://zr.planning.nyc.gov/"
+  },
+  {
+    pattern: /\b(?:buildings?|DOB)\s+bulletin|\bBB\s*20\d{2}[-–]\d+\b/i,
+    label: "NYC Buildings Bulletins",
+    sourceName: "NYC Department of Buildings — Buildings Bulletins",
+    sourceURL: "https://www.nyc.gov/site/buildings/codes/building-bulletins.page"
+  },
+  {
+    pattern: /\b(?:Housing Maintenance Code|HMC)\b/i,
+    label: "NYC Housing Maintenance Code",
+    sourceName: "NYC Laws — Housing Maintenance Code",
+    sourceURL: "https://www.nyc.gov/site/hpd/services-and-information/housing-maintenance-code.page"
+  },
+  {
+    pattern: /\b(?:Existing Building Code|EBC)\b/i,
+    label: "NYC Existing Building Code",
+    sourceName: "NYC Department of Buildings — Existing Building Code",
+    sourceURL: "https://www.nyc.gov/site/buildings/codes/existing-building-code.page"
+  },
+  {
+    pattern: /\bFDNY\b|Fire Department/i,
+    label: "Fire Department requirements",
+    sourceName: "FDNY Fire Code and Rules",
+    sourceURL: "https://www.nyc.gov/site/fdny/about/resources/code-and-rules/nyc-fire-code.page"
+  },
+  {
+    pattern: /\bADA\b|federal accessibility/i,
+    label: "federal accessibility requirements",
+    sourceName: "U.S. Department of Justice — ADA",
+    sourceURL: "https://www.ada.gov/"
+  },
+  {
+    pattern: /\blandmarks?\b|LPC\b/i,
+    label: "Landmarks requirements",
+    sourceName: "NYC Landmarks Preservation Commission",
+    sourceURL: "https://www.nyc.gov/site/lpc/index.page"
+  },
+  {
+    pattern: /\bDEP\b|environmental protection/i,
+    label: "environmental-agency requirements",
+    sourceName: "NYC Department of Environmental Protection",
+    sourceURL: "https://www.nyc.gov/site/dep/index.page"
+  }
 ];
 
 function normalizedText(value) {
@@ -178,7 +248,7 @@ function queryTermWeights(question) {
 
 function codeReferences(question) {
   const references = [];
-  const pattern = /\b(BC|EBC|FC|MC|PC)\s*([0-9]{2,4}(?:\.[0-9A-Za-z-]+)+)\b/gi;
+  const pattern = /\b(AC|BC|EBC|FC|MC|PC)\s*(?:§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.[0-9A-Za-z-]+)+)\b/gi;
   for (const match of String(question || "").matchAll(pattern)) {
     references.push({
       codePrefix: match[1].toUpperCase(),
@@ -231,6 +301,39 @@ function passageSegments(body) {
     if (current) segments.push({ blockID: String(block.id || ""), text: current });
   }
   return segments;
+}
+
+function sourceReviewRequirements(body, passage) {
+  const imageNames = new Set();
+  for (const block of body?.blocks || []) {
+    for (const match of String(block.html || "").matchAll(/<img\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi)) {
+      const fileName = decodeURIComponent(match[1].split(/[?#]/)[0].split("/").at(-1) || "");
+      if (/^[a-zA-Z0-9._ -]+\.(?:avif|gif|jpe?g|png|webp)$/i.test(fileName)) {
+        imageNames.add(fileName);
+      }
+    }
+  }
+  const requirements = [];
+  if (imageNames.size) {
+    requirements.push({
+      kind: "visual-source",
+      count: imageNames.size,
+      assetNames: Array.from(imageNames).slice(0, 50),
+      text: `This section includes ${imageNames.size} official ${imageNames.size === 1 ? "image, figure, or map" : "images, figures, or maps"} that the proposed text passage does not capture.`
+    });
+  }
+  const tableReferences = Array.from(new Set(
+    Array.from(String(passage?.text || "").matchAll(/\bTable\s+([A-Z]?\d+(?:\.[0-9A-Za-z-]+)*)/gi))
+      .map((match) => `Table ${match[1]}`)
+  ));
+  if (tableReferences.length) {
+    requirements.push({
+      kind: "referenced-table",
+      references: tableReferences,
+      text: `The proposed passage refers to ${tableReferences.join(", ")} without including the table's complete structured values.`
+    });
+  }
+  return requirements;
 }
 
 function passageScore(text, terms, bigrams) {
@@ -391,6 +494,7 @@ export async function discoverRelevantEvidence({
     const routeMatch = routesByID.get(entry.id);
     const passage = bestPassage(body, terms, bigrams);
     if (!passage) continue;
+    const reviewRequirements = sourceReviewRequirements(body, passage);
     const finalScore = entry.score +
       coverage * 12 +
       titleMatches * 2.6 +
@@ -406,7 +510,8 @@ export async function discoverRelevantEvidence({
       exactReference,
       exactTopicRouteTarget: Boolean(routeMatch?.exactTarget),
       matchedRoutes: Array.from(routeMatch?.labels || []),
-      matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches]))
+      matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
+      sourceReviewRequirements: reviewRequirements
     });
   }
 
@@ -450,12 +555,17 @@ export async function discoverRelevantEvidence({
       title: String(item.section.title || "Section"),
       selectedText: item.passage.text,
       blockID: item.passage.blockID || null,
+      preparationEligible: item.sourceReviewRequirements.length === 0,
+      sourceReviewRequirements: item.sourceReviewRequirements,
       whyRelevant: candidateExplanation(item),
       signals: {
         matchedTerms: item.matchedTerms.slice(0, 12),
         topicRoutes: item.matchedRoutes,
         exactTopicRouteTarget: item.exactTopicRouteTarget,
         exactReference: item.exactReference,
+        requiresAdditionalSourceReview: item.sourceReviewRequirements.length > 0,
+        containsVisualSource: item.sourceReviewRequirements.some((requirement) => requirement.kind === "visual-source"),
+        referencesTable: item.sourceReviewRequirements.some((requirement) => requirement.kind === "referenced-table"),
         containsException: /\bexception\b/i.test(item.passage.text),
         containsCrossReference: /\b(section|table|chapter)\s+\d/i.test(item.passage.text)
       }
@@ -469,19 +579,37 @@ export async function discoverRelevantEvidence({
     kind: "retrieval-completeness",
     text: "Lexical retrieval can miss exceptions, cross-references, tables, definitions, or requirements expressed with different terminology."
   }];
+  if (candidates.some((candidate) =>
+    candidate.sourceReviewRequirements.some((requirement) => requirement.kind === "visual-source")
+  )) {
+    coverageLimitations.push({
+      kind: "visual-source-review-required",
+      text: "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. That candidate cannot be prepared for Analyze Selected Evidence."
+    });
+  }
+  if (candidates.some((candidate) =>
+    candidate.sourceReviewRequirements.some((requirement) => requirement.kind === "referenced-table")
+  )) {
+    coverageLimitations.push({
+      kind: "referenced-table-review-required",
+      text: "At least one candidate refers to a table whose complete structured values are not in the proposed passage. That candidate cannot be prepared until the table itself can be reviewed as evidence."
+    });
+  }
   if (/\b(this|that|the above|attached)\s+(section|passage|requirement)\b/i.test(normalizedQuestion) && !references.length) {
     coverageLimitations.push({
       kind: "query-context-required",
       text: "The question refers to a section without identifying it. Add the code citation or open the section and select its enacted text."
     });
   }
-  const outsideCurrentLibrary = outsideLibrarySignals
+  const outsideCurrentLibrary = Array.from(new Map(outsideLibrarySignals
     .filter(({ pattern }) => pattern.test(normalizedQuestion))
-    .map(({ label }) => ({
+    .map(({ label, sourceName, sourceURL }) => [label, {
       kind: "outside-current-library",
       label,
-      text: `${label} may require authoritative material outside Permitext's current 2022 NYC Construction Codes library.`
-    }));
+      sourceName,
+      sourceURL,
+      text: `${label} may require authoritative material outside Permitext's current Construction Code Research scope.`
+    }])).values());
   if (outsideCurrentLibrary.length) {
     coverageLimitations.push({
       kind: "outside-current-library",
@@ -490,7 +618,7 @@ export async function discoverRelevantEvidence({
   }
 
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     retrievalVersion: evidenceDiscoveryVersion,
     question: normalizedQuestion,
     candidateState: "unreviewed",

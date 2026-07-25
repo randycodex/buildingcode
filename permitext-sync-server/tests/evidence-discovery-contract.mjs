@@ -25,6 +25,18 @@ const catalog = [{
   chapterNumber: "5",
   sectionNumber: "504.3",
   title: "Height in stories"
+}, {
+  id: "4",
+  codePrefix: "BC",
+  chapterNumber: "D",
+  sectionNumber: "D106.1",
+  title: "Fire district maps"
+}, {
+  id: "5",
+  codePrefix: "AC",
+  chapterNumber: "1",
+  sectionNumber: "28-101.4.5",
+  title: "Prior-code buildings"
 }];
 
 const invertedIndex = new Map([
@@ -35,7 +47,14 @@ const invertedIndex = new Map([
   ["plumbing", new Set(["2"])],
   ["fixture", new Set(["2"])],
   ["height", new Set(["3"])],
-  ["stories", new Set(["3"])]
+  ["stories", new Set(["3"])],
+  ["fire", new Set(["4"])],
+  ["district", new Set(["4"])],
+  ["maps", new Set(["4"])],
+  ["prior", new Set(["5"])],
+  ["code", new Set(["5"])],
+  ["floor", new Set(["5"])],
+  ["surface", new Set(["5"])]
 ]);
 
 const bodies = new Map([
@@ -56,6 +75,19 @@ const bodies = new Map([
       id: "height-rule",
       plainText: "The maximum number of stories shall not exceed the limits specified for the construction type."
     }]
+  }],
+  ["4", {
+    blocks: [{
+      id: "fire-district-map",
+      plainText: "The boundaries of the fire districts are shown on the following maps.",
+      html: "<p>The boundaries are shown below.</p><img src=\"../assets/official-fire-district-map.png\" alt=\"Fire district map\">"
+    }]
+  }],
+  ["5", {
+    blocks: [{
+      id: "prior-code-threshold",
+      plainText: "Where the floor surface area of a prior code building is increased by more than 110 percent, the entire building shall comply with this code as if it were a new building."
+    }]
   }]
 ]);
 
@@ -67,7 +99,7 @@ const discovery = await discoverRelevantEvidence({
   limit: 20
 });
 
-assert.equal(discovery.schemaVersion, 1);
+assert.equal(discovery.schemaVersion, 2);
 assert.equal(discovery.retrievalVersion, evidenceDiscoveryVersion);
 assert.equal(discovery.candidateState, "unreviewed");
 assert.equal(discovery.candidates[0].sectionID, "1");
@@ -96,6 +128,58 @@ assert(
   outsideAuthority.outsideCurrentLibrary.some((item) => item.label === "HCR requirements"),
   "Outside-agency requirements must be identified separately from code candidates."
 );
+assert.equal(
+  outsideAuthority.outsideCurrentLibrary.find((item) => item.label === "HCR requirements")?.sourceURL,
+  "https://hcr.ny.gov/",
+  "Outside-agency boundaries must link to an authoritative starting point."
+);
+
+const mapAuthority = await discoverRelevantEvidence({
+  question: "Show me BC D106.1 fire district maps.",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 5
+});
+assert.equal(mapAuthority.candidates[0].sectionID, "4", "Appendix-style exact references must resolve.");
+assert.equal(mapAuthority.candidates[0].preparationEligible, false);
+assert(
+  mapAuthority.candidates[0].sourceReviewRequirements.some((item) => item.kind === "visual-source"),
+  "A text passage must not hide an official map or image in the same section."
+);
+assert(
+  mapAuthority.coverageLimitations.some((item) => item.kind === "visual-source-review-required"),
+  "Map-dependent candidates must disclose the text-only preparation boundary."
+);
+
+const tableAuthority = await discoverRelevantEvidence({
+  question: "What minimum plumbing fixtures does PC 403.1 require?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 5
+});
+assert.equal(tableAuthority.candidates[0].sectionID, "2", "Plumbing Code exact references must resolve.");
+assert.equal(tableAuthority.candidates[0].preparationEligible, false);
+assert(
+  tableAuthority.candidates[0].sourceReviewRequirements.some((item) =>
+    item.kind === "referenced-table" && item.references.includes("Table 403.1")
+  ),
+  "A passage that delegates its values to a table must require the complete table."
+);
+assert(
+  tableAuthority.coverageLimitations.some((item) => item.kind === "referenced-table-review-required"),
+  "Incomplete table-dependent candidates must disclose the preparation boundary."
+);
+
+const administrativeAuthority = await discoverRelevantEvidence({
+  question: "What does AC 28-101.4.5 require when prior-code floor surface area increases by more than 110 percent?",
+  catalog,
+  invertedIndex,
+  readSectionBody: async (section) => bodies.get(section.id),
+  limit: 5
+});
+assert.equal(administrativeAuthority.candidates[0].sectionID, "5", "Administrative Code exact references must resolve.");
 
 assert.equal(evidenceDiscoveryFeatureEnabled({}), false);
 assert.equal(evidenceDiscoveryFeatureEnabled({ PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1" }), true);

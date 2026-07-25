@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260725-firm-controls-v10";
+} from "./offline-storage.js?v=20260725-evidence-boundaries-v11";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7477,7 +7477,10 @@ function renderEvidenceDiscovery(container) {
     if (!discovery?.response) return;
     const response = discovery.response;
     const candidates = response.candidates || [];
-    const approved = candidates.filter((candidate) => candidate.reviewState === "approved");
+    const approved = candidates.filter((candidate) =>
+      candidate.reviewState === "approved" &&
+      candidate.preparationEligible !== false
+    );
     const summary = document.createElement("div");
     summary.className = "evidence-discovery-summary";
     const summaryText = document.createElement("strong");
@@ -7506,10 +7509,24 @@ function renderEvidenceDiscovery(container) {
       const outside = document.createElement("aside");
       outside.className = "evidence-discovery-outside";
       const outsideHeading = document.createElement("strong");
-      outsideHeading.textContent = "Outside the current library";
-      const outsideCopy = document.createElement("p");
-      outsideCopy.textContent = response.outsideCurrentLibrary.map((item) => item.text).join(" ");
-      outside.append(outsideHeading, outsideCopy);
+      outsideHeading.textContent = "Outside Construction Code Research";
+      const outsideList = document.createElement("ul");
+      response.outsideCurrentLibrary.forEach((outsideItem) => {
+        const item = document.createElement("li");
+        const copy = document.createElement("span");
+        copy.textContent = outsideItem.text;
+        item.append(copy);
+        if (outsideItem.sourceURL) {
+          const link = document.createElement("a");
+          link.href = outsideItem.sourceURL;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = `Open ${outsideItem.sourceName || outsideItem.label || "official source"}`;
+          item.append(link);
+        }
+        outsideList.append(item);
+      });
+      outside.append(outsideHeading, outsideList);
       results.append(outside);
     }
 
@@ -7532,22 +7549,39 @@ function renderEvidenceDiscovery(container) {
       citationWrap.append(citation, title);
       const stateBadge = document.createElement("span");
       stateBadge.className = "evidence-candidate-state";
-      stateBadge.textContent = reviewState === "approved"
-        ? "Approved for this Research"
-        : reviewState === "rejected"
-          ? "Rejected"
-          : "Candidate · not approved";
+      stateBadge.textContent = candidate.preparationEligible === false
+        ? "Additional source review required"
+        : reviewState === "approved"
+          ? "Approved for this Research"
+          : reviewState === "rejected"
+            ? "Rejected"
+            : "Candidate · not approved";
       cardHeader.append(rank, citationWrap, stateBadge);
       const why = document.createElement("p");
       why.className = "evidence-candidate-why";
       why.textContent = candidate.whyRelevant;
       const quote = document.createElement("blockquote");
       quote.textContent = candidate.selectedText;
+      const sourceRequirements = document.createElement("div");
+      sourceRequirements.className = "evidence-candidate-source-requirements";
+      if (candidate.sourceReviewRequirements?.length) {
+        const sourceRequirementsHeading = document.createElement("strong");
+        sourceRequirementsHeading.textContent = "Cannot prepare from text alone";
+        const sourceRequirementsList = document.createElement("ul");
+        candidate.sourceReviewRequirements.forEach((requirement) => {
+          const item = document.createElement("li");
+          item.textContent = requirement.text;
+          sourceRequirementsList.append(item);
+        });
+        sourceRequirements.append(sourceRequirementsHeading, sourceRequirementsList);
+      }
       const signals = document.createElement("p");
       signals.className = "evidence-candidate-signals";
       const signalParts = [
         candidate.relevance ? `${candidate.relevance} lexical relevance` : "",
         candidate.signals?.topicRoutes?.length ? "curated topic route" : "",
+        candidate.signals?.containsVisualSource ? "map or visual present" : "",
+        candidate.signals?.referencesTable ? "complete table needed" : "",
         candidate.signals?.containsException ? "exception language" : "",
         candidate.signals?.containsCrossReference ? "cross-reference present" : ""
       ].filter(Boolean);
@@ -7559,7 +7593,12 @@ function renderEvidenceDiscovery(container) {
       approveButton.className = "evidence-candidate-approve";
       approveButton.textContent = reviewState === "approved" ? "Approved" : "Approve";
       approveButton.setAttribute("aria-pressed", String(reviewState === "approved"));
+      approveButton.disabled = candidate.preparationEligible === false;
+      if (candidate.preparationEligible === false) {
+        approveButton.title = "Open the source and review its maps, images, or complete tables before using it as evidence.";
+      }
       approveButton.addEventListener("click", () => {
+        if (candidate.preparationEligible === false) return;
         candidate.reviewState = reviewState === "approved" ? "candidate" : "approved";
         renderResults();
       });
@@ -7580,7 +7619,11 @@ function renderEvidenceDiscovery(container) {
         anchorPaneID: "utility:analysis"
       }));
       actions.append(approveButton, rejectButton, openButton);
-      card.append(cardHeader, why, quote, signals, actions);
+      card.append(cardHeader, why, quote);
+      if (candidate.sourceReviewRequirements?.length) {
+        card.append(sourceRequirements);
+      }
+      card.append(signals, actions);
       tray.append(card);
     });
     results.append(tray);

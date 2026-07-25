@@ -53,6 +53,15 @@ function renderPacket(retrievalDataset, researchDataset) {
       `- Diagnostic depth: ${retrievalCase.evaluationDepth}`,
       `- Categories: ${retrievalCase.scenarioCategories.join(", ")}`,
       `- Source Research case: \`${researchCase.id}\``,
+      ...(retrievalCase.expectedPreparationBlockedSectionIDs?.length
+        ? [`- Must block text-only preparation for section IDs: ${retrievalCase.expectedPreparationBlockedSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
+        : []),
+      ...(retrievalCase.expectedOutsideCurrentLibrary?.length
+        ? [`- Must disclose outside-scope authorities: ${retrievalCase.expectedOutsideCurrentLibrary.join(", ")}`]
+        : []),
+      ...(retrievalCase.expectedCoverageLimitationKinds?.length
+        ? [`- Required coverage limitations: ${retrievalCase.expectedCoverageLimitationKinds.map((kind) => `\`${kind}\``).join(", ")}`]
+        : []),
       "",
       "### Project question",
       "",

@@ -885,7 +885,9 @@ Measure:
 
 Do not evaluate only whether one relevant section appears. Evaluate whether the candidate set is sufficiently complete for professional review.
 
-**Status: draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current eleven cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all ten answerable draft scenarios and correctly identifies the eleventh as missing section context. Mechanical Code 404.1 now gives the program an enclosed-parking-garage mechanical scenario, and every answerable draft currently has 100% expected-section and expected-passage recall at depth 12. This is useful engineering evidence, not release approval. Buildings Bulletins, outside-agency interpretations, non-text tables or maps, and broader existing-building scenarios remain explicit coverage gaps.
+**Status: expanded draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current fourteen cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all thirteen answerable draft scenarios and correctly identifies the remaining scenario as missing section context. The draft set now covers Mechanical Code 404.1, a prior-code building that crosses the Administrative Code's more-than-110-percent floor-surface-area threshold, a fire-district question governed by official Appendix D map images, a referenced plumbing table, and a Buildings Bulletin/Zoning/Housing Maintenance boundary. Every answerable draft currently has 100% expected-section and expected-passage recall at depth 12.
+
+The diagnostic now treats incomplete source forms as failures rather than successful text matches. A candidate that contains official images or refers to a table whose complete structured values are not in the proposed passage is blocked from text-only preparation and identifies the additional source review required. Questions that invoke Buildings Bulletins, the Zoning Resolution, the Housing Maintenance Code, HCR, FDNY, federal accessibility, Landmarks, or DEP authority receive a separate outside-scope disclosure with an official source link. This is useful engineering evidence, not release approval. A dedicated Buildings Bulletin corpus, complete structured table/map evidence ingestion, additional outside-agency interpretations, and broader existing-building scenarios remain coverage gaps.
 
 ---
 
@@ -915,7 +917,9 @@ Clearly distinguish:
 
 Do not publicly launch Find Relevant Evidence until evaluation demonstrates dependable candidate discovery across the approved scenario categories.
 
-**Status: private-beta web prototype implemented; public launch remains disabled.** A Research-entitled user can enter a Project question, receive deterministic hybrid lexical and curated-topic candidates from the canonical enacted-code library, review the retrieval explanation and coverage limitations, approve or reject each passage, open its enacted source, and prepare only the approved passages in an empty Research conversation. Preparing evidence does not generate an answer or make a paid model call; Analyze remains a separate user action. The server requires the private-beta environment flag in addition to the Research entitlement, all returned evidence is explicitly unapproved, and the production capability stays unavailable until knowledgeable-human review produces approved scenario gates. This assembly workflow is web-first; iOS receives the capability contract and retains access to synchronized Research history but does not expose candidate assembly in this release.
+**Status: private-beta web prototype implemented; public launch remains disabled.** A Research-entitled user can enter a Project question, receive deterministic hybrid lexical and curated-topic candidates from the canonical enacted-code library, review the retrieval explanation and coverage limitations, approve or reject each passage, open its enacted source, and prepare only the approved passages in an empty Research conversation. Preparing evidence does not generate an answer or make a paid model call; Analyze remains a separate user action. Map/image-dependent and incomplete-table candidates visibly explain why text alone is insufficient, cannot be approved for preparation, and still allow the professional to open the enacted source. Outside-scope authorities are separated from Construction Code candidates and link to authoritative starting points without claiming that Permitext retrieved or analyzed those materials.
+
+The server requires the private-beta environment flag in addition to the Research entitlement, all returned evidence is explicitly unapproved, and the production capability stays unavailable until knowledgeable-human review produces approved scenario gates. This assembly workflow is web-first; iOS receives the capability contract and retains access to synchronized Research history but does not expose candidate assembly in this release.
 
 ---
 
@@ -1121,13 +1125,18 @@ public evidence discovery, Zoning Research, shared Workboard editing, or paid ca
 2. Private Research, retrieval, and Zoning review queues now expose separate
    Approve, Send for revision, and Reject decisions. Dataset mutations remain
    local-only and reviewer-controlled; the production owner console is read-only.
-3. Mechanical retrieval coverage is added and passes the draft diagnostic.
-   Buildings Bulletins, outside-agency material, non-text tables or maps, and
-   broader existing-building scenarios remain named gaps rather than implied
-   coverage.
+3. Mechanical, prior-code floor-surface-area, fire-district map, referenced-table,
+   and Buildings Bulletin/Zoning/Housing Maintenance boundary scenarios are
+   added and pass the draft diagnostic. Text-only preparation is blocked when
+   an official map, image, or complete referenced table is absent, and
+   outside-scope authorities receive official source links. Dedicated Buildings
+   Bulletin ingestion, complete structured map/table evidence, additional agency
+   interpretations, and broader existing-building scenarios remain named gaps
+   rather than implied coverage.
 4. The answerable-versus-insufficient-evidence distinction remains a hard case
-   gate, and all ten answerable draft cases currently achieve complete expected
-   section and passage recall at diagnostic depth 12.
+   gate, and all thirteen answerable draft cases currently achieve complete
+   expected section and passage recall at diagnostic depth 12. The map and table
+   scenarios additionally hard-fail if text-only preparation is allowed.
 5. All new Research, retrieval, and Zoning scenarios remain drafts. No scenario
    was automatically approved and no paid model call was made.
 6. Zoning has its own draft dataset, source-coverage diagnostic, evidence

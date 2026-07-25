@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T07:56:01.520Z.
+Generated from `evals/research-cases.json` on 2026-07-25T08:29:20.421Z.
 
-This packet contains 6 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 9 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -18,6 +18,9 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-013-b-m-co-accessibility-boundary | Approve / Correct / Reject |  |
 | nyc-015-sidewalk-cafe-evidence-boundary | Approve / Correct / Reject |  |
 | nyc-016-enclosed-garage-intermittent-ventilation | Approve / Correct / Reject |  |
+| nyc-017-prior-code-floor-surface-area-110-percent | Approve / Correct / Reject |  |
+| nyc-018-fire-district-map-boundary | Approve / Correct / Reject |  |
+| nyc-019-buildings-bulletin-policy-boundary | Approve / Correct / Reject |  |
 
 ---
 
@@ -764,6 +767,350 @@ The proposed control sequence does not match MC 404.1. For intermittent operatio
 ### Existing drafting note
 
 Draft candidate NYC-016. This case is also a regression guard for canonical Mechanical Code body selection. It requires knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 7. Prior-code building crosses the 110 percent floor-surface-area threshold
+
+- **Case ID:** `nyc-017-prior-code-floor-surface-area-110-percent`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** prior-code buildings, floor surface area, scope changes, new-building compliance, administrative provisions
+
+### Scenario source
+
+Draft scenario constructed from canonical 2022 NYC Administrative Code Sections 28-101.4.5, 28-101.4.5.1, and 28-101.4.5.2.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Prior-code building filed as an alteration; originalScope: Proposed floor-surface-area increase stated as 105 percent; changedScope: Construction changes may increase floor surface area by 115 percent; unknowns: verified existing and proposed floor-surface-area measurements, floors removed with their supporting construction, floors installed less than 12 months before filing, permit and filing status, whether emergency work is involved
+
+### Question
+
+A prior-code building was filed as an alteration based on a 105 percent floor-surface-area increase, but scope changes during construction may raise the increase to 115 percent. Can the project remain an alteration, what happens if the threshold is crossed, and what must be included or excluded when checking the percentage?
+
+### Exact selected Permitext evidence
+
+#### AC 28-101.4.5
+
+Canonical section ID: `8792`
+
+Passage 1:
+
+> Notwithstanding sections 28-101.4.3 and 28-102.4.3 or any other provision of this code that would authorize alterations of prior code buildings in accordance with the 1968 building code or prior codes, where the proposed work at the completion of construction will increase the amount of floor surface area of a prior code building by more than 110%, over the amount of existing floor surface area, such entire building shall be made to comply with the provisions of this code as if it were a new building hereafter erected. See section 28-105.2 for permits for such work.
+
+Passage 2:
+
+> Exceptions. When determining the amount of existing floor surface area for the purposes of section 28-101.4.5 , the following shall be excluded from the measured square footage of floor surface area:
+
+Passage 3:
+
+> 1. The square footage of floors removed during the course of the work when such floors are removed together with the supporting beams, joists, decking and slabs on grade.
+
+Passage 4:
+
+> 2. The square footage of any floor that was installed together with the supporting beams, joists, decking and slabs on grade less than 12 months prior to submission of the application for construction document approval for the proposed work. For the purposes of this exception, floors installed pursuant to a work permit signed off less than 12 months before such submission shall not be counted as existing floor surface area.
+
+#### AC 28-101.4.5.1
+
+Canonical section ID: `8793`
+
+Passage 1:
+
+> In cases where changes in the scope of work during the course of construction would result in increasing the floor surface area at the completion of construction by more than 110 percent, over the amount of existing floor surface area as determined pursuant to section 28-101.4.5 , such entire building shall be made to comply with the provisions of this code as if hereafter erected and such work shall be refiled as a new building application in accordance with the provisions of section 28-105.2 .
+
+Passage 2:
+
+> Exception: Work to the extent necessary to relieve an emergency condition may be performed prior to amending plans or obtaining a new permit pursuant to sections 28-105.4.1 and 28-105.12.2 .
+
+#### AC 28-101.4.5.2
+
+Canonical section ID: `8794`
+
+Passage 1:
+
+> As used in Section 28-101.4.5 , the following term shall have the following meaning unless the context or subject matter requires otherwise.
+
+Passage 2:
+
+> FLOOR SURFACE AREA. Floor surface area is the gross square foot area of all horizontal floor and roof surfaces, including roofs of bulkheads and superstructures, of a building or structure at any level, including cellar, attic and roof.
+
+### Proposed expected conclusion
+
+If verified scope changes increase floor surface area at completion by more than 110 percent over existing floor surface area as determined under AC 28-101.4.5, AC 28-101.4.5.1 requires the entire building to comply as if newly erected and requires the work to be refiled as a new-building application under AC 28-105.2. The narrow emergency exception allows only work necessary to relieve an emergency condition before plans are amended or a new permit is obtained. AC 28-101.4.5.2 defines floor surface area as the gross area of all horizontal floor and roof surfaces at every level, expressly including bulkhead and superstructure roofs, cellar, attic, and roof. When measuring existing floor surface area, AC 28-101.4.5 excludes qualifying floors removed with their supporting construction and qualifying floors installed with their supporting construction less than 12 months before the filing. The stated 105 and 115 percent estimates are not enough without verified measurements, dates, removed-floor scope, and filing facts.
+
+### Expected uncertainty
+
+[object Object]
+
+### Required citations and the claim each must support
+
+- **AC 28-101.4.5:** More-than-110-percent trigger, whole-building new-code consequence, and the two stated existing-floor-area exclusions.
+- **AC 28-101.4.5.1:** Scope-change trigger, whole-building compliance, new-building refiling, and the limited emergency-work exception.
+- **AC 28-101.4.5.2:** Definition of floor surface area, including all listed horizontal floor and roof surfaces.
+
+### Required concepts
+
+- Apply the threshold only when the increase is more than 110 percent over existing floor surface area.
+- State that crossing the threshold makes the entire building comply as if newly erected.
+- State that a scope change crossing the threshold requires refiling as a new-building application.
+- Limit the emergency exception to work necessary to relieve an emergency condition before amended plans or a new permit.
+- Define floor surface area as gross horizontal floor and roof area at every level, including the specifically listed areas.
+- Identify both exclusions from measured existing floor surface area.
+- Require verified measurements, dates, removed-floor scope, and filing facts before deciding whether the threshold was crossed.
+
+### Facts the answer must identify as missing
+
+- Verified existing floor surface area.
+- Verified proposed floor surface area at completion.
+- Scope and supporting construction of any floors removed.
+- Installation and sign-off dates for recently installed floors.
+- Current application and permit status.
+- Whether work is necessary to relieve an emergency condition.
+
+### Claims the answer must not make
+
+- An increase of exactly 110 percent triggers AC 28-101.4.5.
+- The project may remain an alteration after a verified increase of more than 110 percent.
+- Only occupiable floor area counts as floor surface area.
+- Cellars, attics, roofs, bulkhead roofs, and superstructure roofs are always excluded.
+- Every removed floor is excluded regardless of whether its supporting construction is removed.
+- Emergency work permanently eliminates the refiling requirement.
+- The estimates alone prove that the threshold was crossed.
+
+### Existing drafting note
+
+Draft candidate NYC-017 broadens prior-code-building coverage. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 8. Fire-district determination requires the official maps
+
+- **Case ID:** `nyc-018-fire-district-map-boundary`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** fire districts, official maps, non-text evidence, administrative provisions, Appendix D
+
+### Scenario source
+
+Draft non-text-evidence scenario constructed from canonical AC 28-102.4.5 and BC D106.1, including the official Appendix D map assets shipped in Permitext.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+project: Queens property whose fire-district status is disputed; location: A street address is supplied, but no survey point or official map sheet is included in selected evidence; unknowns: precise lot location, applicable map sheet, location relative to the depicted fire-district boundary, whether any later authoritative boundary material applies
+
+### Question
+
+The project address is in Queens. Based only on the selected text from AC 28-102.4.5 and BC D106.1, can Permitext confirm that the lot is inside the fire district?
+
+### Exact selected Permitext evidence
+
+#### AC 28-102.4.5
+
+Canonical section ID: `8808`
+
+Passage 1:
+
+> The boundaries of fire districts shall be in accordance with the maps set forth in Appendix D of the New York city building code.
+
+#### BC D106.1
+
+Canonical section ID: `6881`
+
+Passage 1:
+
+> Within the boroughs of Staten Island (Richmond County) and Queens, the fire districts shall comprise such areas indicated on the "fire district maps" as per Figures D106.1(1) and D106.1(2) .
+
+Passage 2:
+
+> Figure D106.1(1) Fire District Maps Borough of Staten Island (Richmond County)
+
+Passage 3:
+
+> Figure D106.1(2) Fire District Maps Borough of Queens
+
+### Proposed expected conclusion
+
+No. AC 28-102.4.5 makes the Appendix D maps controlling for fire-district boundaries. BC D106.1 says that the Staten Island and Queens fire districts are the areas shown on Figures D106.1(1) and D106.1(2), but the selected text contains only the cross-reference and figure captions, not the mapped boundary information needed to locate the lot. Permitext can identify the governing map source, but it cannot decide the lot's status from the text alone. A professional must review the applicable official map image at usable resolution against the precise property location and verify whether any later authoritative boundary material applies.
+
+### Expected uncertainty
+
+[object Object]
+
+### Required citations and the claim each must support
+
+- **AC 28-102.4.5:** Appendix D maps control the fire-district boundaries.
+- **BC D106.1:** Staten Island and Queens fire-district areas are indicated on the named figures, whose visual boundary information is absent from the selected text.
+
+### Required concepts
+
+- State that the Appendix D maps control the fire-district boundaries.
+- Identify Figures D106.1(1) and D106.1(2) as the Staten Island and Queens fire-district maps.
+- State that the selected text and figure captions do not contain the mapped boundary geometry.
+- Refuse to determine whether the Queens lot is inside the fire district from text alone.
+- Require visual review of the applicable official map against the precise property location.
+- Preserve uncertainty about later authoritative boundary material.
+
+### Facts the answer must identify as missing
+
+- Precise lot location or survey point.
+- Applicable official Appendix D map sheet and readable map image.
+- Location of the lot relative to the depicted boundary.
+- Any later authoritative boundary material.
+
+### Claims the answer must not make
+
+- Every property in Queens is in a fire district.
+- No property in Queens is in a fire district.
+- A Queens address alone establishes fire-district status.
+- The figure captions contain enough information to locate the lot.
+- Permitext reviewed map pixels that were not included in selected evidence.
+- The selected text establishes parcel-level fire-district status.
+
+### Existing drafting note
+
+Draft candidate NYC-018 is a release-boundary case: text-only candidate preparation must remain blocked for BC D106.1 until its official map images can be reviewed as evidence.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 9. Construction Code text does not substitute for a Buildings Bulletin
+
+- **Case ID:** `nyc-019-buildings-bulletin-policy-boundary`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** Buildings Bulletins, cellar bathrooms, illegal residential conversions, outside current library, authority boundaries
+
+### Scenario source
+
+NYC Department of Buildings Bulletin 2011-010, official PDF: https://www.nyc.gov/assets/buildings/bldgs_bulletins/bb_2011-010.pdf. The bulletin is scenario provenance and remains outside the selected evidence.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: One- or two-family dwelling with a proposed three-fixture bathroom in the cellar; claim: Buildings Bulletin 2011-010 is said to permit the bathroom; availableEvidence: Only AC 28-210.1 is selected from Permitext's current Construction Code Research library; unknowns: the authoritative Buildings Bulletin text and all stated conditions, lawful family count and occupancy, cellar use and layout, Zoning Resolution compliance, Housing Maintenance Code compliance, other applicable code provisions and agency records
+
+### Question
+
+Does the current Permitext Construction Code evidence prove that a three-fixture bathroom is permitted in the cellar of this one- or two-family dwelling under Buildings Bulletin 2011-010, the Zoning Resolution, and the Housing Maintenance Code?
+
+### Exact selected Permitext evidence
+
+#### AC 28-210.1
+
+Canonical section ID: `9361`
+
+Passage 1:
+
+> It shall be unlawful, except in accordance with all requirements of this code, to convert any dwelling for occupancy by more than the legally authorized number of families or to assist, take part in, maintain or permit the maintenance of such conversion. Upon the finding of such violation and the imposition of punishment for such violation as set forth in this code the department or if applicable the environmental control board shall forward to the internal revenue service, the New York state department of taxation and finance and the New York city department of finance the name and address of the respondent or defendant, the address of the building or structure with respect to which the violation occurred and the time period during which the violation was found to have existed.
+
+### Proposed expected conclusion
+
+No. AC 28-210.1 establishes that converting or maintaining a dwelling for occupancy by more than the legally authorized number of families is unlawful except in accordance with all code requirements. It does not establish a cellar-bathroom allowance, reproduce Buildings Bulletin 2011-010, prove compliance with the bulletin's conditions, or supply the Zoning Resolution and Housing Maintenance Code requirements. Those authorities are outside Permitext's current Construction Code Research scope and must be obtained and reviewed in authoritative form together with the project's lawful occupancy, cellar use, layout, and other applicable requirements. The selected evidence supports an illegal-conversion caution only; it cannot approve the bathroom.
+
+### Expected uncertainty
+
+[object Object]
+
+### Required citations and the claim each must support
+
+- **AC 28-210.1:** Illegal conversion or maintenance for occupancy beyond the legally authorized family count, while not treating the section as a cellar-bathroom approval.
+
+### Required concepts
+
+- Explain the illegal-residential-conversion rule supported by AC 28-210.1.
+- State that AC 28-210.1 does not itself establish a cellar-bathroom allowance.
+- State that Buildings Bulletin 2011-010 is not included in the selected evidence.
+- State that the selected evidence does not establish the Zoning Resolution or Housing Maintenance Code requirements.
+- Refuse to approve the bathroom from the current Construction Code evidence.
+- Require authoritative outside-source review and project-specific occupancy and cellar facts.
+
+### Facts the answer must identify as missing
+
+- Authoritative text and applicability conditions of Buildings Bulletin 2011-010.
+- Lawfully authorized number of families and current occupancy records.
+- Proposed and existing cellar use and layout.
+- Applicable Zoning Resolution provisions.
+- Applicable Housing Maintenance Code provisions.
+- Other applicable Construction Code provisions and agency records.
+
+### Claims the answer must not make
+
+- AC 28-210.1 permits a three-fixture cellar bathroom.
+- Buildings Bulletin 2011-010 was analyzed as selected evidence.
+- Every one- or two-family dwelling may install a cellar bathroom.
+- A cellar bathroom never affects illegal-conversion analysis.
+- The current candidate set establishes Zoning Resolution compliance.
+- The current candidate set establishes Housing Maintenance Code compliance.
+- The proposed bathroom is approved or compliant.
+
+### Existing drafting note
+
+Draft candidate NYC-019 tests an explicit outside-authority boundary. Permitext must link to the official Buildings Bulletins source without representing that it has retrieved or analyzed the bulletin.
 
 ### Reviewer decision
 
