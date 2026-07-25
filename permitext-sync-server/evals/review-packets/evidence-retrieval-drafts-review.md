@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v7`
+Retrieval implementation: `20260725-hybrid-candidates-v8`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -11,7 +11,7 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 - dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
 - review, selection, and immutable attachment of integrity-addressed official maps and images
-- broader occupancy-change existing-building scenarios
+- additional occupancy-change existing-building scenarios
 
 ## 1. retrieval-scissor-stair-two-exits
 
@@ -719,6 +719,58 @@ Tests the prior-code wind-surface-area and lateral-force-capacity exceptions tog
 > Notwithstanding any other provision of this code, where the alteration of any prior code building or structure in accordance with a provision of this code would result in a reduction of the fire safety or structural safety of such building, relevant provisions of the 1968 building code shall apply to such alteration unless there is full compliance with those provisions of this code that would mitigate or offset such reduction of fire protection or structural safety.
 
 > Where the owner, having a choice to elect the 1968 building code or this code, chooses this code, the applicant shall submit a comparative analysis acceptable to the commissioner of the relevant fire safety and structural safety provisions under the 1968 Code and this code, demonstrating that the alteration does not result in a reduction to the fire and life safety of the building.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 17. retrieval-reestablished-prior-occupancy-boundary
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, occupancy changes, certificate of occupancy, administrative provisions, multiple sections
+- Source Research case: `nyc-022-reestablished-prior-occupancy-boundary`
+
+### Project question
+
+A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?
+
+### Review intent
+
+Tests the difference between continuing a lawful existing occupancy and re-establishing a former occupancy after an intervening change, including certificate boundaries.
+
+### Proposed expected evidence
+
+#### AC 28-102.4 — section ID 8803
+
+> The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules.
+
+#### AC 28-102.4.2 — section ID 8805
+
+> Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 or 28-101.4.4 , changes in the use or occupancy of any building or structure made after July 1, 2008 shall comply with the provisions of this code.
+
+> Any changes made in the use or occupancy of a building or structure not in compliance with this code shall be prohibited and shall be a violation of this code.
+
+> After a change in use or occupancy has been made in a building, the re-establishment of a prior use or occupancy that would not be lawful in a new building of the same construction class shall be prohibited unless and until all the applicable provisions of this code and other applicable laws and rules for such reestablished use or occupancy shall have been complied with.
+
+#### AC 28-118.3.1 — section ID 9198
+
+> No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use.
+
+#### AC 28-118.3.2 — section ID 9199
+
+> No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.
 
 ### Knowledgeable-human decision
 

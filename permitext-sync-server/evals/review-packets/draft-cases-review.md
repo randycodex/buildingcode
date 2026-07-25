@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T10:50:57.999Z.
+Generated from `evals/research-cases.json` on 2026-07-25T10:53:29.411Z.
 
-This packet contains 11 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 12 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -23,6 +23,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-019-buildings-bulletin-policy-boundary | Approve / Correct / Reject |  |
 | nyc-020-existing-plumbing-repair-boundary | Approve / Correct / Reject |  |
 | nyc-021-prior-code-wind-surface-area-trigger | Approve / Correct / Reject |  |
+| nyc-022-reestablished-prior-occupancy-boundary | Approve / Correct / Reject |  |
 
 ---
 
@@ -1346,6 +1347,141 @@ level: conditional; description: The whole-building trigger follows if the corre
 ### Existing drafting note
 
 Draft candidate NYC-021 broadens existing-building coverage into structural wind triggers. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 12. A formerly lawful occupancy is not automatically resumable
+
+- **Case ID:** `nyc-022-reestablished-prior-occupancy-boundary`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** existing buildings, change of occupancy, re-establishment of prior occupancy, certificate of occupancy, administrative provisions
+
+### Scenario source
+
+Draft scenario constructed from canonical 2022 NYC Administrative Code Sections 28-102.4, 28-102.4.2, 28-118.3.1, and 28-118.3.2.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Existing prior-code commercial building; formerOccupancy: Storage occupancy represented by the owner as lawful before July 1, 2008; currentOccupancy: Office occupancy established under a certificate of occupancy issued after July 1, 2008; proposal: Resume the former storage occupancy without a new filing or amended certificate of occupancy; ownerPosition: The former occupancy may resume automatically because it was lawful before the current code; unknowns: former and current occupancy-group classifications, former and current zoning use groups, current certificate of occupancy and approved construction documents, whether the former occupancy would be lawful in a new building of the same construction class, applicable current-code and other legal requirements, scope of any alteration work
+
+### Question
+
+A prior-code commercial building was lawfully used for storage before July 1, 2008, then changed to office occupancy under a later certificate of occupancy. The owner now wants to resume the former storage occupancy without a new filing or amended certificate, arguing that the old occupancy was once lawful. Based on AC 28-102.4, AC 28-102.4.2, AC 28-118.3.1, and AC 28-118.3.2, may the former occupancy resume automatically, and what must be established first?
+
+### Exact selected Permitext evidence
+
+#### AC 28-102.4
+
+Canonical section ID: `8803`
+
+Passage 1:
+
+> The lawful use or occupancy of any existing building or structure, including the use of any service equipment therein, may be continued unless a retroactive change is specifically required by the provisions of this code or other applicable laws or rules.
+
+#### AC 28-102.4.2
+
+Canonical section ID: `8805`
+
+Passage 1:
+
+> Except as otherwise provided in sections 28-101.4.1 , 28-101.4.2 , 28-101.4.3 or 28-101.4.4 , changes in the use or occupancy of any building or structure made after July 1, 2008 shall comply with the provisions of this code.
+
+Passage 2:
+
+> Any changes made in the use or occupancy of a building or structure not in compliance with this code shall be prohibited and shall be a violation of this code.
+
+Passage 3:
+
+> After a change in use or occupancy has been made in a building, the re-establishment of a prior use or occupancy that would not be lawful in a new building of the same construction class shall be prohibited unless and until all the applicable provisions of this code and other applicable laws and rules for such reestablished use or occupancy shall have been complied with.
+
+#### AC 28-118.3.1
+
+Canonical section ID: `9198`
+
+Passage 1:
+
+> No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use.
+
+#### AC 28-118.3.2
+
+Canonical section ID: `9199`
+
+Passage 1:
+
+> No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.
+
+### Proposed expected conclusion
+
+No automatic right to resume the former storage occupancy is established by the selected evidence. AC 28-102.4 permits continuation of a lawful existing use or occupancy unless a retroactive change is required, but the proposal follows an intervening change to office occupancy and therefore is not established as mere continuation of the former occupancy. AC 28-102.4.2 requires post-July 1, 2008 changes in use or occupancy to comply with the current code, prohibits noncompliant changes, and specifically prohibits re-establishing a prior use or occupancy that would not be lawful in a new building of the same construction class until all applicable code provisions and other laws and rules for that re-established occupancy are satisfied. AC 28-118.3.1 requires a certificate of occupancy when alteration changes an occupancy group or zoning use group, and AC 28-118.3.2 prohibits changes inconsistent with the last certificate of occupancy until a new or amended certificate is issued. The former and current occupancy and zoning classifications, construction class, current certificate and approved documents, legality of the former occupancy in a comparable new building, applicable requirements, and proposed work must be verified before determining the required filing and whether the former occupancy may lawfully resume.
+
+### Expected uncertainty
+
+level: conditional; description: The selected passages reject automatic reliance on a formerly lawful occupancy, but the filing and compliance result depends on the actual classifications, construction class, current certificate, approved documents, applicable laws, and scope of work.
+
+### Required citations and the claim each must support
+
+- **AC 28-102.4:** Conditional continuation of a lawful existing occupancy, without treating it as automatic re-establishment after an intervening change.
+- **AC 28-102.4.2:** Current-code compliance for post-2008 occupancy changes, prohibition on noncompliant changes, and the condition on re-establishing a prior occupancy.
+- **AC 28-118.3.1:** Certificate-of-occupancy requirement when an alteration changes an occupancy group or zoning use group.
+- **AC 28-118.3.2:** New-or-amended-certificate requirement for a change inconsistent with the last certificate or triggering a special provision.
+
+### Required concepts
+
+- Distinguish continuation of a lawful existing occupancy from re-establishment after an intervening occupancy change.
+- State that post-July 1, 2008 occupancy changes generally must comply with the current code.
+- State the prohibition on a noncompliant occupancy change.
+- Explain the specific condition on re-establishing a prior occupancy that would not be lawful in a new building of the same construction class.
+- Identify the certificate-of-occupancy requirement for an alteration changing an occupancy group or zoning use group.
+- Identify the new-or-amended-certificate requirement for a change inconsistent with the last certificate.
+- Require the actual classifications, construction class, certificate, approved documents, applicable requirements, and work scope.
+
+### Facts the answer must identify as missing
+
+- Evidence of the former lawful storage occupancy.
+- Former and current occupancy-group classifications.
+- Former and current zoning use groups.
+- Building construction class.
+- Current certificate of occupancy and approved construction documents.
+- Whether the former occupancy would be lawful in a new building of the same construction class.
+- Applicable current-code provisions and other laws and rules.
+- Scope and classification of any proposed alteration work.
+
+### Claims the answer must not make
+
+- Any occupancy that was once lawful may be resumed automatically.
+- AC 28-102.4 makes the intervening office occupancy irrelevant.
+- A post-July 1, 2008 occupancy change may disregard current-code requirements.
+- No certificate amendment is needed regardless of the last issued certificate.
+- The proposal necessarily changes an occupancy group or zoning use group without verifying the classifications.
+- The former storage occupancy would be unlawful in a comparable new building without verifying the construction class and applicable requirements.
+- The proposed occupancy is approved or compliant on the stated facts.
+
+### Existing drafting note
+
+Draft candidate NYC-022 broadens existing-building coverage into re-establishment of a former occupancy. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
 
 ### Reviewer decision
 

@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "retrievalVersion": "20260725-hybrid-candidates-v7",
+  "retrievalVersion": "20260725-hybrid-candidates-v8",
   "notes": "All retrieval cases remain drafts until a knowledgeable human reviews candidate-set completeness, rank expectations, and passage relevance. They inherit exact canonical evidence from the referenced Research evaluation case.",
   "coverageGaps": [
     "dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection",
     "official agency interpretations outside the current library",
     "review, selection, and immutable attachment of integrity-addressed official maps and images",
-    "broader occupancy-change existing-building scenarios"
+    "additional occupancy-change existing-building scenarios"
   ],
   "cases": [
     {
@@ -163,6 +163,15 @@
       "expectedBehavior": "candidate-recall",
       "evaluationDepth": 12,
       "notes": "Tests the prior-code wind-surface-area and lateral-force-capacity exceptions together with the Administrative Code structural-safety boundary."
+    },
+    {
+      "id": "retrieval-reestablished-prior-occupancy-boundary",
+      "status": "draft",
+      "sourceResearchCaseID": "nyc-022-reestablished-prior-occupancy-boundary",
+      "scenarioCategories": ["existing-building conditions", "occupancy changes", "certificate of occupancy", "administrative provisions", "multiple sections"],
+      "expectedBehavior": "candidate-recall",
+      "evaluationDepth": 12,
+      "notes": "Tests the difference between continuing a lawful existing occupancy and re-establishing a former occupancy after an intervening change, including certificate boundaries."
     }
   ]
 }

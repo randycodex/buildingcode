@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v7";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v8";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -153,6 +153,16 @@ const topicRoutes = [
     targets: [
       { codePrefix: "BC", sectionPrefix: "1601.2.4" },
       { codePrefix: "AC", sectionPrefix: "28-101.4.4" }
+    ]
+  },
+  {
+    pattern: /\bre-?establish(?:ing|ed|ment)?\b.*\b(?:use|occupancy)|\bformerly\s+lawful\s+(?:use|occupancy)|\bprior\s+(?:use|occupancy)\b.*\bresume/i,
+    label: "existing-building occupancy re-establishment provisions",
+    targets: [
+      { codePrefix: "AC", sectionPrefix: "28-102.4" },
+      { codePrefix: "AC", sectionPrefix: "28-102.4.2" },
+      { codePrefix: "AC", sectionPrefix: "28-118.3.1" },
+      { codePrefix: "AC", sectionPrefix: "28-118.3.2" }
     ]
   },
   {
