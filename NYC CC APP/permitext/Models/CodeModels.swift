@@ -307,7 +307,12 @@ struct CodeChapter: Identifiable, Hashable, Sendable {
     let title: String
 
     var displayLabel: String {
-        if title.localizedCaseInsensitiveContains("appendix") || chapterNumber.rangeOfCharacter(from: .letters) != nil {
+        let normalizedNumber = chapterNumber.uppercased()
+        let isConstructionAppendixNumber =
+            normalizedNumber.range(of: #"^[A-Z]+\d*$"#, options: .regularExpression) != nil
+        if title.localizedCaseInsensitiveContains("appendix")
+            || normalizedNumber.hasPrefix("APP-")
+            || isConstructionAppendixNumber {
             return "Appendix \(chapterNumber)"
         }
         return "Chapter \(chapterNumber)"
@@ -425,31 +430,53 @@ struct ServerEntitlementRecord: Codable, Hashable, Sendable {
 enum UserContentSyncCodeVersion {
     static let canonicalNYC2022 = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1"
     static let localNYC2022 = "2022 CONSTRUCTION CODES"
+    static let canonicalNYCZoning =
+        "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1"
+    static let localNYCZoning = "NYC Zoning Resolution — text through 2026-07-16"
 
     private static let nyc2022Aliases = [
         "nyc-2022",
         "2022 Construction Codes",
         canonicalNYC2022
     ]
+    private static let nycZoningAliases = [
+        "nyc-zoning-resolution",
+        "NYC Zoning Resolution",
+        localNYCZoning,
+        canonicalNYCZoning
+    ]
 
     private static func isNYC2022Alias(_ value: String) -> Bool {
         nyc2022Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
     }
 
+    private static func isNYCZoningAlias(_ value: String) -> Bool {
+        nycZoningAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
     static func server(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return candidate.isEmpty || isNYC2022Alias(candidate) ? canonicalNYC2022 : candidate
+        if candidate.isEmpty || isNYC2022Alias(candidate) { return canonicalNYC2022 }
+        if isNYCZoningAlias(candidate) { return canonicalNYCZoning }
+        return candidate
     }
 
     static func local(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        return candidate.isEmpty || isNYC2022Alias(candidate) ? localNYC2022 : candidate
+        if candidate.isEmpty || isNYC2022Alias(candidate) { return localNYC2022 }
+        if isNYCZoningAlias(candidate) { return localNYCZoning }
+        return candidate
     }
 
     static func equivalentLocalVersions(_ value: String) -> [String] {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard candidate.isEmpty || isNYC2022Alias(candidate) else { return [candidate] }
-        return [localNYC2022, "2022 Construction Codes", "nyc-2022", canonicalNYC2022]
+        if candidate.isEmpty || isNYC2022Alias(candidate) {
+            return [localNYC2022, "2022 Construction Codes", "nyc-2022", canonicalNYC2022]
+        }
+        if isNYCZoningAlias(candidate) {
+            return [localNYCZoning, "NYC Zoning Resolution", "nyc-zoning-resolution", canonicalNYCZoning]
+        }
+        return [candidate]
     }
 }
 

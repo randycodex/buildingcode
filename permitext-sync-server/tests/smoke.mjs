@@ -12,6 +12,7 @@ const grantAdminToken = "smoke-grant-admin-token";
 const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
+const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 const smokePNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+VnweAAAAAElFTkSuQmCC",
   "base64"
@@ -248,7 +249,7 @@ async function main() {
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
-      webRoot.text.includes("20260724-evidence-discovery-v4"),
+      webRoot.text.includes("20260724-zoning-library-v6"),
       "Web workspace omitted the current package asset version."
     );
     assert(
@@ -364,6 +365,12 @@ async function main() {
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
       "Web workspace script returned the wrong content type."
+    );
+    assert(
+      workspaceScript.text.includes('{ prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }') &&
+        workspaceScript.text.includes("syncCodeVersionForPrefix") &&
+        workspaceScript.text.includes('toUpperCase() === "ZR"'),
+      "Web workspace omitted the Zoning Resolution library or its Research exclusion."
     );
     assert(
       workspaceScript.response.headers.get("cache-control")?.includes("immutable"),
@@ -749,7 +756,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260724-evidence-discovery-v4'),
+        webRoot.text.includes('/web/app.js?v=20260724-zoning-library-v6'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1186,6 +1193,8 @@ async function main() {
       sharedSectionLink.response.headers.get("content-type")?.includes("text/html"),
       "Shared section URL did not return the web workspace HTML."
     );
+    const zoningSectionLink = await request("/open/section/20018521");
+    assert(zoningSectionLink.response.ok, "Zoning section URL did not load the web workspace.");
 
     const detachedWorkboard = await request("/detached-workboard");
     assert(detachedWorkboard.response.ok, "Detached Workboard URL did not load the web workspace.");
@@ -1206,6 +1215,61 @@ async function main() {
       ),
       "Web reader did not prefer the canonical iPhone section body."
     );
+    const administrativeChapter4Section = await request("/code/sections/9810");
+    assert(administrativeChapter4Section.response.ok, "Administrative section 28-401.1 did not load.");
+    assert(
+      administrativeChapter4Section.json.section.codePrefix === "AC" &&
+        administrativeChapter4Section.json.section.chapterID === 77 &&
+        administrativeChapter4Section.json.section.sectionNumber === "28-401.1",
+      "Administrative section 28-401.1 returned the wrong code or chapter identity."
+    );
+    const administrativeChapter4Text = administrativeChapter4Section.json.section.blocks
+      .map((block) => block.plainText || "")
+      .join(" ");
+    assert(
+      administrativeChapter4Text.includes(
+        "This chapter shall apply to the licensing and registration of businesses, trades and occupations engaged in building work regulated by this code."
+      ) &&
+        !administrativeChapter4Section.json.section.blocks.some((block) => block.kind === "title") &&
+        !administrativeChapter4Text.trim().startsWith("§ 28-401.1"),
+      "Administrative Chapter 4 repeated its section title or omitted the official provision body."
+    );
+    const administrativeChapter4 = await request("/code/chapters/77?include=body");
+    assert(administrativeChapter4.response.ok, "Administrative Chapter 4 did not load with section bodies.");
+    assert(
+      administrativeChapter4.json.chapter.groups?.[0]?.headerLine === "SECTION 28-401" &&
+        administrativeChapter4.json.chapter.sections?.[0]?.headerLine === "SECTION 28-401",
+      "Administrative Chapter 4 retained the incorrect Building Code prefix in its group heading."
+    );
+    assert(
+      administrativeChapter4.json.chapter.sections.some((section) =>
+        section.id === 9810 &&
+        section.blocks?.some((block) =>
+          block.plainText?.startsWith("This chapter shall apply to the licensing and registration")
+        )
+      ),
+      "Administrative Chapter 4 did not expose its corrected section body in chapter reading."
+    );
+
+    const ancillaryDwellingUnitRules = await request("/code/sections/25651");
+    assert(ancillaryDwellingUnitRules.response.ok, "Newly cataloged BC U101.5 did not load.");
+    assert(
+      ancillaryDwellingUnitRules.json.section.codePrefix === "BC" &&
+        ancillaryDwellingUnitRules.json.section.chapterNumber === "U" &&
+        ancillaryDwellingUnitRules.json.section.sectionNumber === "U101.5" &&
+        ancillaryDwellingUnitRules.json.section.blocks?.some((block) =>
+          block.plainText?.includes("consult with the fire department and the office of emergency management")
+        ),
+      "BC U101.5 did not preserve its source identity and provision body."
+    );
+    const ancillaryDwellingUnitRulesSearch = await request(
+      "/code/search?q=U101.5%20Department%20rules.&code=BC&limit=20"
+    );
+    assert(
+      ancillaryDwellingUnitRulesSearch.response.ok &&
+        ancillaryDwellingUnitRulesSearch.json.results.some((result) => result.id === 25651),
+      "Construction search omitted newly cataloged BC U101.5."
+    );
     const missingSharedSection = await request("/code/sections/999999999");
     assert(missingSharedSection.response.status === 404, "Unknown shared section did not return 404.");
 
@@ -1221,6 +1285,65 @@ async function main() {
     );
     const oversizedSectionBatch = await request(`/code/sections?ids=${Array.from({ length: 101 }, (_, index) => index + 1).join(",")}`);
     assert(oversizedSectionBatch.response.status === 400, "Oversized section metadata batch was not rejected.");
+
+    const codeLibraries = await request("/code/libraries");
+    assert(codeLibraries.response.ok, "Code-library metadata did not load.");
+    const zoningLibrary = codeLibraries.json.libraries.find((library) => library.id === "nyc-zoning-resolution");
+    assert(zoningLibrary, "Code-library metadata omitted the Zoning Resolution.");
+    assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
+    assert(zoningLibrary.textChangesThrough === "2026-07-16", "Zoning library returned the wrong source cutoff.");
+    assert(zoningLibrary.researchEligibility === false, "Zoning Research was enabled before its approval gate.");
+
+    const zoningChapters = await request("/code/chapters?code=ZR");
+    assert(zoningChapters.response.ok, "Zoning chapter index did not load.");
+    assert(zoningChapters.json.chapters.length === 117, "Zoning chapter index was incomplete.");
+    assert(zoningChapters.json.chapters.every((chapter) => chapter.codePrefix === "ZR"));
+    const zoningChapter = await request("/code/chapters/15000102?include=body");
+    assert(zoningChapter.response.ok, "Zoning chapter I-2 did not load.");
+    assert(zoningChapter.json.chapter.codeVersion === zoningSyncCodeVersion);
+    assert(
+      zoningChapter.json.chapter.sections.some((section) =>
+        section.sectionNumber === "12-01" &&
+        section.blocks?.some((block) => block.plainText?.includes("particular shall control the general"))
+      ),
+      "Zoning chapter I-2 omitted its canonical section body."
+    );
+    const zoningSection = await request("/code/sections/20018521");
+    assert(zoningSection.response.ok, "Zoning section 12-01 did not load.");
+    assert(zoningSection.json.section.codePrefix === "ZR");
+    assert(zoningSection.json.section.codeVersion === zoningSyncCodeVersion);
+    assert(zoningSection.json.section.zoning.researchEligibility === false);
+    assert(zoningSection.json.section.zoning.amendmentHistory.length > 0);
+    const zoningSectionBatch = await request("/code/sections?ids=20018521,8881");
+    assert(zoningSectionBatch.response.ok, "Mixed-library section metadata batch did not load.");
+    assert(
+      zoningSectionBatch.json.sections.map((section) => section.requestedID).join(",") === "20018521,8881" &&
+        zoningSectionBatch.json.sections[0].codePrefix === "ZR" &&
+        zoningSectionBatch.json.sections[1].codePrefix !== "ZR",
+      "Mixed-library section metadata batch did not preserve requested order."
+    );
+    const zoningSearch = await request("/code/search?q=particular%20shall%20control&code=ZR&limit=20");
+    assert(zoningSearch.response.ok, "Zoning search did not load.");
+    assert(
+      zoningSearch.json.results.some((result) =>
+        result.id === 20_018_521 &&
+        result.codeVersion === zoningSyncCodeVersion
+      ),
+      "Zoning search did not return section 12-01 with its library identity."
+    );
+    assert(
+      zoningSearch.json.results.every((result) => result.codePrefix === "ZR"),
+      "Zoning-only search leaked another code library."
+    );
+    const zoningAsset = await requestBinary(
+      "/code/assets/zr-cb9efe3ace35b565-06-Hunts-Point-Map-3-Subarea-2-01_0.jpg"
+    );
+    assert(zoningAsset.response.ok, "Zoning map asset did not load.");
+    assert(
+      zoningAsset.response.headers.get("content-type")?.includes("image/jpeg") &&
+        zoningAsset.body.length === 994_765,
+      "Zoning map asset returned the wrong media."
+    );
 
     const duplicateNumberChapter = await request("/code/chapters/47");
     assert(duplicateNumberChapter.response.ok, "Duplicate-number appendix chapter did not load.");
@@ -1238,7 +1361,9 @@ async function main() {
       import.meta.url
     ), "utf8"));
     for (const [query, expectedIDs] of Object.entries(searchGolden)) {
-      const search = await request(`/code/search?q=${encodeURIComponent(query)}&limit=200`);
+      const search = await request(
+        `/code/search?q=${encodeURIComponent(query)}&code=BC,AC,PC,MC,FGC&limit=200`
+      );
       assert(search.response.ok, `Canonical web search failed for ${query}.`);
       const actualIDs = search.json.results.map((result) => result.id);
       const firstMismatch = expectedIDs.findIndex((id, index) => actualIDs[index] !== id);
@@ -3937,6 +4062,67 @@ async function main() {
       "iOS pull did not receive the web-created saved section and its title."
     );
 
+    const zoningSavedRecordID = `${userID}:saved:${zoningSyncCodeVersion}:20018521`;
+    const zoningNoteRecordID = `${userID}:note:${zoningSyncCodeVersion}:20018521`;
+    const zoningContentPush = await request("/sync/push", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [
+            {
+              savedItem: {
+                id: "ios-zoning-saved-20018521",
+                userID,
+                codeVersion: "NYC Zoning Resolution — text through 2026-07-16",
+                codePrefix: "ZR",
+                chapterNumber: "I-2",
+                sectionID: 20_018_521,
+                sectionNumber: "12-01",
+                title: "Rules Applying to Text of Resolution",
+                updatedAt: "2026-06-04T01:15:00Z"
+              }
+            },
+            {
+              annotation: {
+                id: "ios-zoning-note-20018521",
+                userID,
+                codeVersion: "NYC Zoning Resolution",
+                codePrefix: "ZR",
+                chapterNumber: "I-2",
+                sectionID: 20_018_521,
+                sectionNumber: "12-01",
+                noteBody: "Verify this zoning rule with the project record.",
+                updatedAt: "2026-06-04T01:16:00Z"
+              }
+            }
+          ]
+        }
+      }
+    });
+    assert(zoningContentPush.response.ok, "iOS-style Zoning save and note push failed.");
+    assert(zoningContentPush.json.acceptedMutationIDs.includes(zoningSavedRecordID));
+    assert(zoningContentPush.json.acceptedMutationIDs.includes(zoningNoteRecordID));
+    const zoningContentPull = await request("/sync/pull", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    assert(
+      zoningContentPull.response.ok &&
+        zoningContentPull.json.mutations.some((item) =>
+          item.savedItem?.id === zoningSavedRecordID &&
+          item.savedItem?.codeVersion === zoningSyncCodeVersion
+        ) &&
+        zoningContentPull.json.mutations.some((item) =>
+          item.annotation?.id === zoningNoteRecordID &&
+          item.annotation?.noteBody === "Verify this zoning rule with the project record."
+        ),
+      "Zoning Saved and Notes did not round-trip with a canonical cross-device identity."
+    );
+
     const iosDeleteMutation = {
       savedItem: {
         id: canonicalSavedRecordID,
@@ -4596,8 +4782,8 @@ async function main() {
     assert(restoreChecklist.json.entitlement?.plan === "pro", "Restore checklist did not report the entitlement.");
     assert(restoreChecklist.json.hasSession === true, "Restore checklist did not report the session.");
     assert(restoreChecklist.json.passkeyCredentialCount === 0, "Restore checklist reported an active passkey credential.");
-    assert(restoreChecklist.json.mutationCounts.savedItem === 3, "Restore checklist did not count saved items and delete tombstones.");
-    assert(restoreChecklist.json.mutationCounts.annotation === 2, "Restore checklist did not count annotations.");
+    assert(restoreChecklist.json.mutationCounts.savedItem === 4, "Restore checklist did not count saved items and delete tombstones.");
+    assert(restoreChecklist.json.mutationCounts.annotation === 3, "Restore checklist did not count annotations.");
     assert(restoreChecklist.json.mutationCounts.project === 3, "Restore checklist did not count projects.");
     assert(restoreChecklist.json.mutationCounts.projectSection === 1, "Restore checklist did not count project memberships.");
     assert(restoreChecklist.json.mutationCounts.workboard === 1, "Restore checklist did not count Workboards.");

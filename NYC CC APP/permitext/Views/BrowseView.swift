@@ -534,6 +534,8 @@ struct BrowseView: View {
             return .existingBuilding
         case let name where name.contains("RESIDENTIAL"):
             return .residential
+        case let name where name.contains("ZONING"):
+            return .zoning
         default:
             return .building
         }
@@ -821,6 +823,7 @@ private enum ChapterTilePalette {
     case fire
     case existingBuilding
     case residential
+    case zoning
 
     private static func dynamicColor(light: UInt32, dark: UInt32) -> Color {
         Color(uiColor: UIColor { trait in
@@ -843,6 +846,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0xDDB29E, dark: 0x301816)
         case .existingBuilding: return Self.dynamicColor(light: 0xC9C8B6, dark: 0x2B2A22)
         case .residential: return Self.dynamicColor(light: 0xD8C1AA, dark: 0x332217)
+        case .zoning: return Self.dynamicColor(light: 0xD9EFEC, dark: 0x0D2523)
         }
     }
 
@@ -859,6 +863,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0xBFD2B2, dark: 0x1F2F1A)
         case .existingBuilding: return Self.dynamicColor(light: 0xC9BED9, dark: 0x2A2435)
         case .residential: return Self.dynamicColor(light: 0xBFD0DC, dark: 0x1E2B37)
+        case .zoning: return Self.dynamicColor(light: 0xD7E6EF, dark: 0x10212D)
         }
     }
 
@@ -875,6 +880,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0x301816, dark: 0xDDB29E)
         case .existingBuilding: return Self.dynamicColor(light: 0x2B2A22, dark: 0xC9C8B6)
         case .residential: return Self.dynamicColor(light: 0x332217, dark: 0xD8C1AA)
+        case .zoning: return Self.dynamicColor(light: 0x2F6F68, dark: 0x6BC0B5)
         }
     }
 
@@ -891,6 +897,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0xA65A53, dark: 0xD58F86)
         case .existingBuilding: return Self.dynamicColor(light: 0x7E7865, dark: 0xBCB69E)
         case .residential: return Self.dynamicColor(light: 0x9B7547, dark: 0xD0A577)
+        case .zoning: return Self.dynamicColor(light: 0x17433F, dark: 0xE0F6F3)
         }
     }
 
@@ -907,6 +914,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0x1F2F1A, dark: 0xBFD2B2)
         case .existingBuilding: return Self.dynamicColor(light: 0x2A2435, dark: 0xC9BED9)
         case .residential: return Self.dynamicColor(light: 0x1E2B37, dark: 0xBFD0DC)
+        case .zoning: return Self.dynamicColor(light: 0x1E6B78, dark: 0x8DD3DD)
         }
     }
 
@@ -923,6 +931,7 @@ private enum ChapterTilePalette {
         case .fire: return Self.dynamicColor(light: 0x618E4D, dark: 0x96C17E)
         case .existingBuilding: return Self.dynamicColor(light: 0x73639A, dark: 0xA695CB)
         case .residential: return Self.dynamicColor(light: 0x567F99, dark: 0x89AEC8)
+        case .zoning: return Self.dynamicColor(light: 0x173F4A, dark: 0xE3F6FA)
         }
     }
 }

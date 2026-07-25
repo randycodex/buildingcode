@@ -72,6 +72,21 @@ import {
 } from "./evidence-discovery.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
+import {
+  isZoningChapterID,
+  isZoningSectionID,
+  zoningAssetFilePath,
+  zoningChapter,
+  zoningChapterIndex,
+  zoningCodePrefix,
+  zoningContentMetadata,
+  zoningSearchIndex,
+  zoningSection,
+  zoningSectionCatalog,
+  zoningSectionSummary,
+  zoningSyncCodeVersion
+} from "./zoning-content.mjs";
+import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dataPath = process.env.PERMITEXT_SYNC_DATA_PATH || join(__dirname, "data", "sync-store.json");
@@ -3193,6 +3208,21 @@ function codePrefixForChapter(chapter, manifestChapter = null) {
   return "";
 }
 
+function normalizedConstructionHeaderLine(headerLine, codePrefix) {
+  const value = String(headerLine || "").trim();
+  if (codePrefix === "AC") {
+    return value.replace(/^SECTION\s+BC\s+(?=28-)/i, "SECTION ");
+  }
+  return value;
+}
+
+function normalizedConstructionChapterGroups(groups, codePrefix) {
+  return (groups || []).map((group) => ({
+    ...group,
+    headerLine: normalizedConstructionHeaderLine(group.headerLine, codePrefix)
+  }));
+}
+
 function displayTitleForChapter(chapter) {
   const chapterNumber = String(chapter.chapterNumber || "").trim();
   const isAppendix = chapterNumber && !/^\d+$/.test(chapterNumber);
@@ -3289,7 +3319,8 @@ async function buildSectionCatalog() {
   const sectionSummaries = [];
   for (const chapterSummary of chapters) {
     const chapter = await readJSONFile(join(chapterContentPath, `${chapterSummary.id}.json`));
-    for (const section of flattenChapterSections(chapter)) {
+    const groups = normalizedConstructionChapterGroups(chapter.groups, chapterSummary.codePrefix);
+    for (const section of flattenChapterSections({ ...chapter, groups })) {
       const canonicalSection = await canonicalizeSectionPayload(section, {
         codePrefix: chapterSummary.codePrefix,
         chapterNumber: chapterSummary.chapterNumber
@@ -3407,6 +3438,13 @@ async function sectionBody(sectionID, options = {}) {
       }
     }
   }
+
+  const summary = await sectionSummaryByID(canonicalSectionID || legacySectionID);
+  const htmlBody = await constructionHTMLBodyForSection(summary);
+  if (htmlBody) {
+    return htmlBody;
+  }
+
   if (options.allowMissing) {
     return { blocks: [], sectionID: Number(canonicalSectionID || legacySectionID) };
   }
@@ -7991,7 +8029,8 @@ async function handleCodeAsset(path, response) {
     return;
   }
   try {
-    const filePath = join(assetContentPath, fileName);
+    const zoningPath = fileName.startsWith("zr-") ? await zoningAssetFilePath(fileName) : null;
+    const filePath = zoningPath || join(assetContentPath, fileName);
     sendStatic(response, contentTypeForPath(filePath), await readFile(filePath), codeAssetCacheControl);
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -8002,9 +8041,28 @@ async function handleCodeAsset(path, response) {
   }
 }
 
+async function handleCodeLibraries(_request, response) {
+  sendJSON(response, 200, {
+    libraries: [
+      {
+        id: "nyc-2022-construction-codes",
+        codeVersion: defaultResearchCodeEdition,
+        syncCodeVersion: defaultSyncCodeVersion,
+        displayName: "2022 Construction Codes",
+        codePrefixes: [...codeSectionIDPrefixMap.values()],
+        researchEligibility: true
+      },
+      await zoningContentMetadata()
+    ]
+  });
+}
+
 async function handleCodeChapters(request, response) {
   const codePrefix = requestURL(request).searchParams.get("code")?.trim().toUpperCase();
-  const chapters = await chapterIndex();
+  const chapters = [
+    ...(codePrefix === zoningCodePrefix ? [] : await chapterIndex()),
+    ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex())
+  ];
   sendJSON(response, 200, {
     chapters: codePrefix ? chapters.filter((chapter) => chapter.codePrefix === codePrefix) : chapters
   });
@@ -8016,13 +8074,45 @@ async function handleCodeChapter(request, path, response) {
     sendError(response, 400, "Invalid chapter ID.");
     return;
   }
+  const includeBody = requestURL(request).searchParams.get("include") === "body";
+  if (isZoningChapterID(chapterID)) {
+    const [chapter, chapterSummary] = await Promise.all([
+      zoningChapter(chapterID),
+      zoningChapterIndex().then((entries) => entries.find((entry) => String(entry.id) === chapterID))
+    ]);
+    if (!chapter || !chapterSummary) {
+      sendNotFound(response);
+      return;
+    }
+    const sections = flattenChapterSections(chapter);
+    const sectionPayload = includeBody
+      ? await Promise.all(sections.map(async (section) => ({
+          ...section,
+          blocks: (await zoningSection(section.id))?.blocks || []
+        })))
+      : sections;
+    sendJSON(response, 200, {
+      chapter: {
+        id: chapter.chapterID,
+        codePrefix: zoningCodePrefix,
+        codeSectionID: 1,
+        codeVersion: zoningSyncCodeVersion,
+        chapterNumber: chapter.chapterNumber,
+        displayTitle: chapterSummary.displayTitle,
+        fullTitle: chapterSummary.fullTitle,
+        groups: chapter.groups || [],
+        sections: sectionPayload
+      }
+    });
+    return;
+  }
   const chapter = await readJSONFile(join(chapterContentPath, `${chapterID}.json`));
   const manifest = await chapterManifest();
   const manifestChapter = manifest.get(String(chapter.chapterID));
-  const includeBody = requestURL(request).searchParams.get("include") === "body";
   const codePrefix = codePrefixForChapter(chapter, manifestChapter);
   const chapterNumber = manifestChapter?.chapterNumber || chapter.chapterNumber;
-  const sections = flattenChapterSections(chapter);
+  const groups = normalizedConstructionChapterGroups(chapter.groups, codePrefix);
+  const sections = flattenChapterSections({ ...chapter, groups });
   const canonicalSections = await canonicalizeChapterSections(sections, {
     codePrefix,
     chapterNumber
@@ -8047,7 +8137,7 @@ async function handleCodeChapter(request, path, response) {
         ...chapter,
         chapterNumber
       }),
-      groups: chapter.groups || [],
+      groups,
       sections: sectionPayload
     }
   });
@@ -8057,6 +8147,30 @@ async function handleCodeSection(path, response) {
   const sectionID = path.split("/").at(-1);
   if (!/^\d+$/.test(sectionID || "")) {
     sendError(response, 400, "Invalid section ID.");
+    return;
+  }
+  if (isZoningSectionID(sectionID)) {
+    const [summary, body] = await Promise.all([
+      zoningSectionSummary(sectionID),
+      zoningSection(sectionID)
+    ]);
+    if (!summary || !body) {
+      sendNotFound(response);
+      return;
+    }
+    sendJSON(response, 200, {
+      section: {
+        ...body,
+        chapterID: summary.chapterID,
+        chapterNumber: summary.chapterNumber,
+        codePrefix: zoningCodePrefix,
+        codeVersion: zoningSyncCodeVersion,
+        sectionID: Number(summary.id),
+        sectionNumber: summary.sectionNumber,
+        title: summary.title,
+        webSectionID: null
+      }
+    });
     return;
   }
   const summary = await sectionSummaryByID(sectionID);
@@ -8071,7 +8185,7 @@ async function handleCodeSection(path, response) {
     }
     sendJSON(response, 200, {
       section: {
-        blocks: [{ id: `${sectionID}-title`, kind: "title", plainText: summary.title || "" }],
+        blocks: [],
         chapterNumber: summary.chapterNumber,
         chapterID: summary.chapterID,
         codePrefix: summary.codePrefix,
@@ -8106,7 +8220,7 @@ async function handleCodeSections(request, response) {
     return;
   }
   const uniqueIDs = Array.from(new Set(ids));
-  const catalog = await sectionCatalog();
+  const catalog = [...await sectionCatalog(), ...await zoningSectionCatalog()];
   const byID = new Map();
   catalog.forEach((section) => {
     byID.set(String(section.id), section);
@@ -8119,6 +8233,31 @@ async function handleCodeSections(request, response) {
         return section ? { ...section, requestedID: id } : null;
       })
       .filter(Boolean)
+  });
+}
+
+function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
+  let candidateIDs = new Set(index.get(queryTokens[0]) || []);
+  for (const token of queryTokens.slice(1)) {
+    candidateIDs = intersectSets(candidateIDs, index.get(token) || new Set());
+    if (!candidateIDs.size) break;
+  }
+  if (/^[A-Za-z]?\d/.test(query)) {
+    for (const [token, sectionIDs] of index) {
+      if (!token.startsWith(normalizedQuery)) continue;
+      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
+    }
+  }
+  return candidateIDs;
+}
+
+async function searchableSectionBody(section) {
+  if (section.codePrefix === zoningCodePrefix || isZoningSectionID(section.id)) {
+    return await zoningSection(section.id) || { blocks: [] };
+  }
+  return sectionBody(section.webSectionID || section.id, {
+    allowMissing: true,
+    canonicalSectionID: section.id
   });
 }
 
@@ -8146,23 +8285,22 @@ async function handleCodeSearch(request, response) {
     return;
   }
 
-  const index = await shippedSearchIndex();
-  let candidateIDs = new Set(index.get(queryTokens[0]) || []);
-  for (const token of queryTokens.slice(1)) {
-    candidateIDs = intersectSets(candidateIDs, index.get(token) || new Set());
-    if (!candidateIDs.size) break;
+  const includeConstruction = codeFilter.size === 0 || [...codeFilter].some((prefix) => prefix !== zoningCodePrefix);
+  const includeZoning = codeFilter.size === 0 || codeFilter.has(zoningCodePrefix);
+  const candidates = [];
+  if (includeConstruction) {
+    const index = await shippedSearchIndex();
+    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    candidates.push(...(await sectionCatalog()).filter((section) =>
+      candidateIDs.has(section.id) &&
+      (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
+    ));
   }
-  if (/^[A-Za-z]?\d/.test(query)) {
-    for (const [token, sectionIDs] of index) {
-      if (!token.startsWith(normalizedQuery)) continue;
-      for (const sectionID of sectionIDs) candidateIDs.add(sectionID);
-    }
+  if (includeZoning) {
+    const index = await zoningSearchIndex();
+    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    candidates.push(...(await zoningSectionCatalog()).filter((section) => candidateIDs.has(section.id)));
   }
-
-  const candidates = (await sectionCatalog()).filter((section) =>
-    candidateIDs.has(section.id) &&
-    (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
-  );
   const hits = candidates.map((section) => {
     const sectionNumber = String(section.sectionNumber || "").toLowerCase();
     const title = String(section.title || "").toLowerCase();
@@ -8189,15 +8327,14 @@ async function handleCodeSearch(request, response) {
   const totalResults = hits.length;
   const selectedHits = resultLimit ? hits.slice(0, resultLimit) : hits;
   const results = await Promise.all(selectedHits.map(async ({ section }) => {
-    const body = await sectionBody(section.webSectionID || section.id, {
-      allowMissing: true,
-      canonicalSectionID: section.id
-    });
+    const body = await searchableSectionBody(section);
     const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
     return {
       id: section.id,
       chapterID: section.chapterID,
       codePrefix: section.codePrefix,
+      codeVersion: section.codeVersion ||
+        (section.codePrefix === zoningCodePrefix ? zoningSyncCodeVersion : defaultSyncCodeVersion),
       chapterNumber: section.chapterNumber,
       sectionNumber: section.sectionNumber,
       title: section.title,
@@ -9343,6 +9480,12 @@ function canonicalCodeVersion(value) {
     normalized === "2022 construction codes" ||
     normalized === defaultSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return defaultSyncCodeVersion;
+  if (
+    normalized === "nyc-zoning-resolution" ||
+    normalized === "nyc zoning resolution" ||
+    normalized === "nyc zoning resolution — text through 2026-07-16" ||
+    normalized === zoningSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return zoningSyncCodeVersion;
   return candidate;
 }
 
@@ -11795,6 +11938,10 @@ export async function handleRequest(request, response) {
     }
     if (request.method === "GET" && path.startsWith("code/assets/")) {
       await handleCodeAsset(path, response);
+      return;
+    }
+    if (request.method === "GET" && path === "code/libraries") {
+      await handleCodeLibraries(request, response);
       return;
     }
     if (request.method === "GET" && path === "code/chapters") {

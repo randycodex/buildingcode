@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "eligible": false,
+  "selectedEvidenceResearch": false,
+  "evidenceDiscovery": false,
+  "reason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass.",
+  "requiredBeforeEnablement": [
+    "Reliable zoning section resolution",
+    "Stable passage identity",
+    "Zoning citation validation",
+    "Table and map handling validation",
+    "Amendment and effective-date validation",
+    "Approved zoning-specific evaluation cases"
+  ]
+}

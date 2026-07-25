@@ -2,8 +2,10 @@ import assert from "node:assert/strict";
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
+  syncCodeVersionForPrefix,
   syncProjectIdentity,
-  syncMutationRecordID
+  syncMutationRecordID,
+  zoningSyncCodeVersion
 } from "../public/sync-identity.js";
 
 const userID = "apple:sync-contract";
@@ -12,6 +14,15 @@ assert.equal(syncCodeVersion("nyc-2022"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion("2022 Construction Codes"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion("2022 CONSTRUCTION CODES"), defaultSyncCodeVersion);
 assert.equal(syncCodeVersion(defaultSyncCodeVersion), defaultSyncCodeVersion);
+assert.equal(syncCodeVersion("nyc-zoning-resolution"), zoningSyncCodeVersion);
+assert.equal(syncCodeVersion("NYC Zoning Resolution"), zoningSyncCodeVersion);
+assert.equal(
+  syncCodeVersion("NYC Zoning Resolution — text through 2026-07-16"),
+  zoningSyncCodeVersion
+);
+assert.equal(syncCodeVersionForPrefix("ZR"), zoningSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("zr"), zoningSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("BC"), defaultSyncCodeVersion);
 
 const legacyProjectID = `${userID}:project:2022 CONSTRUCTION CODES:2`;
 const repeatedProjectID = `${userID}:project:2022 CONSTRUCTION CODES:${userID}:project:2022 CONSTRUCTION CODES:${legacyProjectID}`;
@@ -26,6 +37,42 @@ assert.equal(
     savedItem: { id: "web-saved-101", userID, codeVersion: "nyc-2022", sectionID: 101 }
   }),
   `${userID}:saved:${defaultSyncCodeVersion}:101`
+);
+assert.equal(
+  syncMutationRecordID({
+    savedItem: {
+      id: "web-saved-zr-20018521",
+      userID,
+      codeVersion: "nyc-zoning-resolution",
+      sectionID: 20_018_521
+    }
+  }),
+  `${userID}:saved:${zoningSyncCodeVersion}:20018521`
+);
+assert.equal(
+  syncMutationRecordID({
+    annotation: {
+      id: "web-note-zr-20018521",
+      userID,
+      codeVersion: zoningSyncCodeVersion,
+      sectionID: 20_018_521,
+      noteBody: "Zoning note"
+    }
+  }),
+  `${userID}:note:${zoningSyncCodeVersion}:20018521`
+);
+assert.equal(
+  syncMutationRecordID({
+    projectSection: {
+      id: "web-project-section-zr",
+      folderClientID: "shared-project-id",
+      userID,
+      codeVersion: zoningSyncCodeVersion,
+      sectionID: 20_018_521,
+      scope: "manual"
+    }
+  }),
+  `${userID}:project-section:${zoningSyncCodeVersion}:shared-project-id:20018521:manual`
 );
 assert.equal(
   syncMutationRecordID({

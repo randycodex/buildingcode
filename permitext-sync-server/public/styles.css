@@ -676,6 +676,11 @@ body.is-detached-workboard-window .detached-workboard-error p {
   --code-accent-soft: rgba(198, 40, 40, 0.12);
 }
 
+.code-theme-zoning {
+  --code-accent: #2f6f68;
+  --code-accent-soft: rgba(47, 111, 104, 0.13);
+}
+
 @media (prefers-color-scheme: dark) {
   .workspace-panel,
   .code-theme-building {
@@ -701,6 +706,11 @@ body.is-detached-workboard-window .detached-workboard-error p {
   .code-theme-fuel-gas {
     --code-accent: var(--ios-accent-fuel-gas);
     --code-accent-soft: rgba(255, 123, 123, 0.15);
+  }
+
+  .code-theme-zoning {
+    --code-accent: #70c9bd;
+    --code-accent-soft: rgba(112, 201, 189, 0.16);
   }
 }
 
@@ -2740,7 +2750,8 @@ select option:checked {
 .search-filter-chip.code-theme-administrative[aria-pressed="true"],
 .search-filter-chip.code-theme-plumbing[aria-pressed="true"],
 .search-filter-chip.code-theme-mechanical[aria-pressed="true"],
-.search-filter-chip.code-theme-fuel-gas[aria-pressed="true"] {
+.search-filter-chip.code-theme-fuel-gas[aria-pressed="true"],
+.search-filter-chip.code-theme-zoning[aria-pressed="true"] {
   background: color-mix(in srgb, var(--code-accent) 22%, transparent);
   color: var(--code-accent);
   -webkit-text-fill-color: var(--code-accent);
@@ -2758,7 +2769,8 @@ select option:checked {
 .search-filter-chip.code-theme-administrative[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-plumbing[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-mechanical[aria-pressed="true"]:hover,
-.search-filter-chip.code-theme-fuel-gas[aria-pressed="true"]:hover {
+.search-filter-chip.code-theme-fuel-gas[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-zoning[aria-pressed="true"]:hover {
   background: color-mix(in srgb, var(--code-accent) 28%, transparent);
 }
 

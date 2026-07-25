@@ -52,6 +52,15 @@ Consolidate new Research activity on the selected-passage conversation workflow 
 - Preserve the existing web check, smoke, content-integrity, billing, authentication, and Postgres verification gates.
 - Record a known-good production, web, backend, and iOS baseline before schema expansion begins.
 
+**Current implementation checkpoint — July 24, 2026:** The Construction Codes
+baseline now audits all five code families, all 118 chapters, all 12,891 catalog
+sections, all 101 runtime HTML sources, and every bundled local asset reference.
+The runtime resolves each section against its own code family instead of reusing
+another book's same-numbered chapter. Administrative Code Chapter 4 now has one
+chapter title, normalized section headings, and complete official provision text
+on both web and iOS. Building Code Appendix U section U101.5 has also been restored
+to the canonical catalog, search index, and runtime.
+
 ### Release 0 gate
 
 Do not begin the unified Project migration until:
@@ -891,6 +900,23 @@ Do not publicly launch Find Relevant Evidence until evaluation demonstrates depe
 
 Treat zoning as a separate content and validation program.
 
+### Implementation status — July 24, 2026
+
+The Zoning content and reader milestone is implemented and locally validated on
+the web and in the iOS application.
+
+- The canonical package is sourced from the official NYC Zoning Resolution site
+  and identifies its text as current through July 16, 2026.
+- The package contains 14 Articles, 101 chapters, 16 appendix pages, 4,068
+  provisions, 305 tables, 208 map references, 13,141 amendment events, and the
+  locally required map and document assets.
+- Web and iOS support the Zoning library as a separately identified, teal-themed
+  code source with browsing, chapter reading, section reading, search, saved
+  sections, notes, Project linking, and direct section links.
+- Zoning Research remains disabled. Six Zoning evaluation scenarios exist only
+  as unapproved human-review drafts; they do not authorize public AI analysis and
+  no paid model calls are made by the validation suite.
+
 ## Content foundation
 
 Build a canonical zoning package preserving:
@@ -932,6 +958,11 @@ Add zoning to selected-evidence Research only after:
 - Zoning-specific evaluation cases pass.
 
 Zoning must never be described as supported until the actual content and Research validation are complete.
+
+**Status:** The content foundation and non-AI Reader/Search scope are complete.
+Selected-evidence Zoning Research remains blocked until knowledgeable-human
+review approves sufficient evaluation coverage and the table, map, amendment,
+effective-date, passage-identity, and citation-validation gates are all met.
 
 ---
 
@@ -1027,13 +1058,13 @@ When content must be removed, preserve only the minimum tombstone or audit metad
 
 26. Evidence-retrieval evaluation dataset
 27. Find Relevant Evidence prototype
-28. Zoning content pipeline
-29. Zoning Reader and Search validation
+28. Zoning content pipeline — completed
+29. Zoning Reader and Search validation — completed
 
 ## Release later
 
 30. Find Relevant Evidence
-31. Zoning Research
+31. Zoning Research — blocked pending knowledgeable-human evaluation approval
 32. Advanced cross-code analysis
 
 ---

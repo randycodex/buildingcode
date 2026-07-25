@@ -1,0 +1,3652 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-25T03:41:27.849Z",
+  "libraryID": "nyc-zoning-resolution",
+  "sourceAuthority": "New York City Department of City Planning",
+  "sourceHomepageURL": "https://zr.planning.nyc.gov/",
+  "sourceDownloadsURL": "https://zr.planning.nyc.gov/zr-downloads",
+  "textChangesThrough": "2026-07-16",
+  "statedCounts": {
+    "articles": 14,
+    "appendices": 11,
+    "zoningMaps": 126
+  },
+  "documents": [
+    {
+      "kind": "homepage",
+      "sourceURL": "https://zr.planning.nyc.gov/",
+      "contentHash": "39fb792d9958c6790d4709c5d971411dc99c36d3655ee084c3d767a3bb986ad2"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-b-index-special-purpose-districts",
+      "contentHash": "75ae37f2bd933a56787ba86db7c994b25ae26a55a581312297326edee10bc7e4"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-c-table-1-city-environmental-quality-review-ceqr-environmental-requirements-e-designations",
+      "contentHash": "b0a712430f4c186a2a886fcc71bb626205d7ce46956ad12f7d82798fcca5a939"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-c-table-2-city-environmental-quality-review-ceqr-environmental-requirements-environmental",
+      "contentHash": "bbb1603f25fd58caa9adbffddcc73f467ef4da777ea91fde42693f98ebd3dd78"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-d-zoning-map-amendment-d-restrictive-declarations",
+      "contentHash": "e828036cf87c6f3ede3e6659083beef228d2d09d19756f151e216eb44db6f9b0"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-e-design-requirements-plazas-residential-plazas-and-urban-plazas-developed-prior-october",
+      "contentHash": "548003893706ab23a80c5ba5ab07d3f6df27efcc1261e2cb5f45146c0a2a1bb4"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-inclusionary-housing-designated-areas-and-mandatory-inclusionary-housing-areas-0",
+      "contentHash": "fbd8d6ff8520b0df8421a3304db8d61ef3e12dab8c0f558c519526fe2700915a"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas",
+      "contentHash": "a8962c7e7338d4f2ad33e66cd730673026ff779b7919ee94064166d4d4d7d3ba"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-0",
+      "contentHash": "cb3a80906ce329f7387de1a12bd58d5d3a444b666b6c2c6a8d61c4d30d2dbb7d"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-1",
+      "contentHash": "9fa29b136b3ba50714f5ba0aedfbe9ee4621fc807925b4d4cba3ffec1eaa61ea"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-2",
+      "contentHash": "71204de2f0fade14efdb33b7456aa95215d7ca5ae59bd8889ba7f37a25d36f8d"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-f-mandatory-inclusionary-housing-areas-and-former-inclusionary-housing-designated-areas-3",
+      "contentHash": "369fcd80d628ccbc77639b6a02c119232bdd4539a0ffab8bf93e584ff2d15147"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-g-radioactive-materials",
+      "contentHash": "5db73617dc7cef9bb24633a36c66621f194901b7bc1f6eba1485ff547c26ceeb"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-h-arterial-highways",
+      "contentHash": "3abaa21ba05ff1adb54df7c758c34e04ce754ecbc39369e114098b4891e69a90"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-i",
+      "contentHash": "d912b81fd524fdc89e80679048510027d9a8dff11c0dc9430a15056672d538c1"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-j-designated-areas-within-manufacturing-districts",
+      "contentHash": "a9bf776e36b1db2f86ac4ab30d60d167cc893dcec1dee5d0e0544f713172cf7c"
+    },
+    {
+      "kind": "appendix",
+      "sourceURL": "https://zr.planning.nyc.gov/appendix-k-areas-nursing-home-restrictions",
+      "contentHash": "f13194957f9305694ebae5047bd62d4c1b456433502c099773d7d5d989914ef5"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i",
+      "contentHash": "07f1e5b8365276bd67155b7676c7f2e589970c06e1f254c163c4a0bca9cb2708"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-1",
+      "contentHash": "25b5e3f8483f141baf8fa44d84c20e55d3c83a6ab4d57d56a3b18a387a8e8d5c"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-2",
+      "contentHash": "7105a40c12d4018a9bf0a0278ba51bfe3232ec2e37aef92bed58d233948875c0"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-3",
+      "contentHash": "81b0fb76f8ea78b177766398f748c37b921d6407db648c0cf76ba779251b32da"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-5",
+      "contentHash": "767ada684f3b6c77dbbe017ff9d82e34d26d078f32333e8d4b905ac4e1327460"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-i/chapter-6",
+      "contentHash": "82579264cdc3bfb120b5eae167098fab88d2d3e5369c6141eb5be78735555cad"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii",
+      "contentHash": "fbcf5d9bb775acd1b43d40d63791f2bd03ffb14ec63b1c80adf20e090975dbb2"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-1",
+      "contentHash": "ff344e77406e04e13f9500f6a060db06bfd5a00bfa39d91b0c03bd0b36cc0f1a"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-2",
+      "contentHash": "534d1976dabf8fce25d7c893a3648c751dfec3f70ab08246f754f5996c056693"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-3",
+      "contentHash": "bb33304b8659dfe7afd955548d162ad6f0f56e35f985284acb83f385ac59410c"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-4",
+      "contentHash": "03caad2cfa865a959c2237588a039bd11110c606ed96a82fbd00baf3bb966b0b"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-5",
+      "contentHash": "1d485643c26aa0351def2fcb94e45998a1c584ee45155156b73a2096f1fe96d7"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-6",
+      "contentHash": "96f74d91f3dadec41f6abdcd7e42e46f7bf91806e2ee7daf381e433a7291c2ef"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ii/chapter-7",
+      "contentHash": "326e1e82ed3bd24f9e410bf7b2bda72a2f13948e2f7912277175dfc382dea800"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii",
+      "contentHash": "5e298e6c4e154d42ced224d25c9f013eb471aa19f11811cce0cd98b4f0e6aed0"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-1",
+      "contentHash": "eb8e445516cbc78f2196186282a16f1584def6dda21d0c704e4e71ba725cd741"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-2",
+      "contentHash": "7f1666aea42bd728baa364fa1bd72194fadf18ba4b6f4154979e3409f229a5ba"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-3",
+      "contentHash": "6e25b91821e4afb5c0202bb9fdee1dfb0b50427a97df0b85d3ab857be10877ef"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-4",
+      "contentHash": "0af2640eed326887cfa375216684fef6b34dc25a9f123a4f354a314048276116"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-5",
+      "contentHash": "775f1baa672640d20046503d02c7ee92585d14e7aafc22e4f4b2495297cb9507"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-6",
+      "contentHash": "f4c62386c6499a0291d131c5276dbb5ff996bdb1455a0d42f343e2f0fc9b8d52"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iii/chapter-7",
+      "contentHash": "6319c0af745759012b2b7784c393fe8a4516e7b857bdf79c1c8b8d1438d72cbb"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iv",
+      "contentHash": "57dbd869cb38f39f39777ce4a7a62830e6c2499844ef01e2f96db5288c827938"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-1",
+      "contentHash": "76c40daca80300653f57dffe14ce4af9f65615997ba376788120275f625345d1"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-2",
+      "contentHash": "740893042c3cbebe3f78ecb4f0e7ede88e08ff900aa137357786164bef63bec5"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-3",
+      "contentHash": "dcb71c59298d92fe8327a321ac4092dec586b32a80a743d3f9d12ae17c2fc336"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-iv/chapter-4",
+      "contentHash": "b4b4f4563f9070adda1f36adfb12240267d34ef587ab74efce305111d7bf9cfe"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix",
+      "contentHash": "f766a9f0451d051985a23a567dc0d948ded84a3ee8ea29fd391160912fd5cbaf"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-1",
+      "contentHash": "05def1eb17d71cb614fb78275398b13bfb6c5ed17e2d02db2bd53df8ccc88550"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-2",
+      "contentHash": "0f0b2a2f6cd42713cd50d70ff64deab80a606b08ffb9d8acb436443a0e676783"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-3",
+      "contentHash": "576e0cba6144d4b0ac185b81a68468275cdecf45bd53ca9cd2936faf59373d06"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-4",
+      "contentHash": "e394f9d63576b407a8abe0a4090a785891b24a538437a8328a8643adbf2069d9"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-5",
+      "contentHash": "a92c613954f4f1754f3e415bd611cc80f00c52bbdee165fab5bd02f8b1874aab"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-6",
+      "contentHash": "601b0626c6d24fff6606bd5cbf9648110cd68c8bacfb8b8bb1a358c60caafba9"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-7",
+      "contentHash": "da14bf6fd8df13e7ae1365cbeb70e5ac8216ae9a6b5ab7ad9a0d9113f96e10fb"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-8",
+      "contentHash": "82bc4cf31fc3b01be50b1f32a0c6c3816770118a9e62d24f25aa76b4cddca8f1"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-ix/chapter-9",
+      "contentHash": "6b1b0365748cb0e94c229f0d393e8ddc3e06653dcb563bfcd99d6c82a9dc97cc"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-v",
+      "contentHash": "a6e8acc69ef95340bc1d209feb5edba08dbf2e0088e5ea71b70f21a5b762ba62"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-1",
+      "contentHash": "3a1bb52c6754777d4d2e3bc11f54a2a83f9bc5b7cef65291e0d8d5357d4c3c7d"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-2",
+      "contentHash": "4704324fe1155c407385697db96f2023d6b2314c93ab45c6567fd9a1f592512e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-3",
+      "contentHash": "958179ebf90be8ee6b3fc89ea356e8b23b48acff6c842747f9b6b754e282ebce"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-v/chapter-4",
+      "contentHash": "5693be1e6e23e52f877d21e4a1b7f4ac7a264f2a54bf04cfbfb7630af0e29160"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi",
+      "contentHash": "accd3b75a0e733e43a8fb9033b7f18a81cb5934640f8199c431ea8374f0b0582"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-1",
+      "contentHash": "5ddb30784f65a3d3604048e688ffc3d71f4d2ba3db487c612f56beb3d48e0fe6"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-2",
+      "contentHash": "4b6c5c77c8339ecee5939a4c995c8d939302b01626c15dda1faaad57221833f1"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-3",
+      "contentHash": "50e368060ce192234b0ce66887f0d2449859425843fe5a7b763910cdd7102523"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-4",
+      "contentHash": "0c3e8c240422473aa876128e20ee70816a7849c9bad08f5f1ddd369dd77f2426"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-5",
+      "contentHash": "4f888c450af1c8d9dac01b588a0b1a11600141234273d684c6b2410a1ffccd1d"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vi/chapter-6",
+      "contentHash": "5c767d6fc3cbdfa47055c8c922aed14a7198657a30baed8b643eca2d08a2f8b8"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii",
+      "contentHash": "98dc893a53c20f0cc150eaca273c5e4cf8fa41899200ef845cc45b490de93a04"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-1",
+      "contentHash": "2f27a2dd9b1897fc357198e116999ae488c84fd3d694340136fe16b45e5611f0"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-2",
+      "contentHash": "ef4ad31cbc60a7479321d0de31c2756771ea6e95d9e9f63e2c2a2f899ea6925c"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-3",
+      "contentHash": "3c68b27e42a7aa9445c904b6482694e47f1b59305900d850fbfd7ef98db8bb72"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-4",
+      "contentHash": "b68d31eb2ad9900e30c38cd5ad91dfcccff95a9cca05ba5428ca726856c90601"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-5",
+      "contentHash": "2b046544059144978ce932b6e40fc9547a0009563bbc48a5007a070bd8970b7e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-6",
+      "contentHash": "f954bb676f826dfb91e893e30335682aab16f819df19e40c09381be2f85ffa9e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-7",
+      "contentHash": "1724bcbe3cfddbd64b58e11fb3023da8026079ccb099eb116f009a3e8b5b95d4"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-8",
+      "contentHash": "b7700c2a4905f060350ebf5e2a25e521542221627ef4b4d4a9a1c64ee3783c20"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-vii/chapter-9",
+      "contentHash": "31e11d819587bafabec9e6d48c8a858e0c34e999f8c55203ee5fbed410efce77"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii",
+      "contentHash": "a99900024f2a31be7ee3abef83137b59357061a86f9a9c055ddc422b3115e4bd"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-1",
+      "contentHash": "8062978fe62ae0bdcb7476ef4d703238931d42cf8754d65eb2e26fbdb8f92991"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-2",
+      "contentHash": "dca512f5b579ac71fdf89dab05ab286b29afbb1ddfbd3e382e3f0a8ff9dff70d"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-3",
+      "contentHash": "4c1696c345f6a8798eb16aa01ac3f7498e3814f4ed790d5f8f0d15e323c6739c"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-4",
+      "contentHash": "15367967c29cf317bcbc61bebaf586314cc52c5d5b3e426d68f245c4ac00ee3f"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-5",
+      "contentHash": "8a76a0b7a30e6bed78f4030de0ee64113d291bdcfbf73a13b9954734339e9375"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-6",
+      "contentHash": "77f1d95c5e86dcc9f9fd42610a15ad19ef5fb59b043299f0b59ecdad7a09529b"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-7",
+      "contentHash": "2b7f78639ae54b75ebf78d16197a0acada5bc04bf7d27c54292efc69f3e3d774"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-8",
+      "contentHash": "7e0993afdd582fc24838dfdb48d3c05be6c2e6b18cf76bff49cb47c66fd71996"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-viii/chapter-9",
+      "contentHash": "9d1f7eb1f1070adb956f6cd236491412e0da5a22feef43e86db78335559e870f"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x",
+      "contentHash": "a385cb09554a6d073c40d1eb57ef74fc9d3a20b5c312d59df9bc40cdceaa6e9d"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-1",
+      "contentHash": "db5e15a6cc4897b4970736a786ebf48ab0265abeb8d8bd746027ed6b502c2980"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-2",
+      "contentHash": "942bf40d17bad87a72c3b1ea4924bcb58d6f8d79e43db10799d2e23521632631"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-3",
+      "contentHash": "f2463cc37795663b90048829e3c0a1083920732197effc2b1283f74ecfff0809"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-4",
+      "contentHash": "0eed3871a3c68ef99392bd4d3667fd3976f8614abcfe52c9ef8fe382404c6273"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-5",
+      "contentHash": "70b9011e012ab94f160cb3cd0d329e6f1e46732241ec132300d6beb045eba192"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-6",
+      "contentHash": "419a8ff8fa8ae0236edded2628dd2623d93acac4b755f3e2d58edb57bbdd45f6"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-7",
+      "contentHash": "1f337b3cde9776b0dec65bcf066a891f6d144420343e016faaf2a61973ca681f"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-8",
+      "contentHash": "0b314f6099534e380623dc8a8a25f6439ba7687272a4ce9e7fdcdff75b3714ca"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-x/chapter-9",
+      "contentHash": "c9c2b05b987a13b3b20fdc4cbbf12bf2a6861235ab7abf75e0ac695f7d6b7276"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi",
+      "contentHash": "d99be3977cfe99b32565c71440edcbdf65d4da437c72719def5c96654c267fed"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-1",
+      "contentHash": "3c4751b0a69c07fca3a34de936b5eb6b5b70b5f1263c6ae61810a6b374e5a8cf"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-2",
+      "contentHash": "e7620660346e206a8319997630f8a6e371eb28a099e1eaae396d4fe514caf4ac"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-3",
+      "contentHash": "754a309b7f4b10f6e8a8d09146c6cb9ffc08d4729adf1ad47ad0b07811bf2664"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-4",
+      "contentHash": "4e52eb148cc42b9e189980a2a0a7b4cb37b7805ff09b56f2f9af71145f799ec5"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-5",
+      "contentHash": "c4ba16e117805552e874e8fe6dd5602a8df62383801c4283b64e9e84a00de59b"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-6",
+      "contentHash": "9a49e881da8db89af7807009e481215637900fc9cf36485c9314bc11e6ac21b6"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-7",
+      "contentHash": "836ecf5dad0d2d726dd01912274ea99824f4e366c122983a1fc06a8b8a0110b0"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-8",
+      "contentHash": "3262ac960b16745751f4d09a57fa8958867f5646457328d570d297eafa87e915"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xi/chapter-9",
+      "contentHash": "55fe11097c99b89a99bde74bafbdfd449067848f1fce7ac203ac58e4faa2e55f"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii",
+      "contentHash": "020697a78f06c9aa159286af0f4ad40eaecef1d1b0943e5cd3444823116bffb0"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-1",
+      "contentHash": "69a35565b4828f976fd6977f05430cfa88c8d20a53d22de08ac39a24e6c1b33e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-2",
+      "contentHash": "8901477f639503441e5358538cd9d118a0c4800110e73cd6a89535335c4cc21d"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-3",
+      "contentHash": "98ee953c7a89165c9b8f06daf3c36a18cecabd257d36cb2dadcfbee588690626"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-4",
+      "contentHash": "d5685eb2c370199af60ef4aa10862995272179b7cd57ee60a7ba008377aa2a8f"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-5",
+      "contentHash": "60cd20a8f5e6e1f009063e803c381587add41ec0b2c0950cf2c5a73f56721b47"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-6",
+      "contentHash": "f5fa7ab222d7b2ef887152bb3c789a79346e36bda7c600beb4f8439eabe6d089"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-7",
+      "contentHash": "2040737c5c958d42f346da1fc258f53bd6f52de7b06a2d1e6aaefb35222d8821"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xii/chapter-8",
+      "contentHash": "15301576563bf5be9193bbde82485802d9dbbbfa19ae1f01e5d6e71e3a17bb80"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii",
+      "contentHash": "4515c1c886ce0d5ff73508894885e38d58d7fe057e22d2daef6c4e3c77a57bfb"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-1",
+      "contentHash": "a26a5aa232ac14a41efde6031839f521e4e158aa8b5e55cff363a9d9e48f5955"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-2",
+      "contentHash": "33f13388dbfdd85aa4de21a0a01544e7b69c343d6e38c4fe833b17175453b0e1"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-3",
+      "contentHash": "44c62923926a27186bf4b86dd3259a52ec08a16198b83414e55c50c64ad0726f"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-4",
+      "contentHash": "50393c4d509ebd86fb8d5ad347c44b43fbb73b60c19f81286a9f31590603cb1b"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-5",
+      "contentHash": "d64481aa472b555f772c937244f5ca976de6abcc893c0d07f9fb099f6761da8a"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-6",
+      "contentHash": "302599895cbae8246692a025e97e7bcd8c3689ff3bea223e452b53ecd689e48e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-7",
+      "contentHash": "0cab63b9675625449f5833847b72b5a1d16a2872159c97f433e3529122ae51e7"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-8",
+      "contentHash": "b1d550dbe5f1237dc52c4c6458cbf49c30809e99e99f15cb673f930c12717fb9"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiii/chapter-9",
+      "contentHash": "fd36a646350a98ea2a1a3bb10a1c7eabaa3021b399d2a56219ee1c3e66feaa27"
+    },
+    {
+      "kind": "article",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv",
+      "contentHash": "0d6928054fedbea1ca9c2c9c75960ca3c9e6a1a9060eda03f6e29d8be82f8f7c"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-1",
+      "contentHash": "6fa9e026acb4efc144c26d2b858faaf9eda3a544fbc5a2d6fa3cda2549329e74"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-2",
+      "contentHash": "f36be75fc127349836b1b98e77dd44b7357c2b941a819c4c674bb2e6da2e9de8"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-3",
+      "contentHash": "e5492f30ac0754a69986fb90bcf714e684a91de85254a1c5988b5d2e1d365ca4"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-4",
+      "contentHash": "4cd30f3ca9fefeae367369feb1b73703d12001cd621da6eaaefcfb7f00c31ece"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-5",
+      "contentHash": "59f8ecdd93930dcd69d98f92f99e515bdecff480734079e2a1e462b4addac98e"
+    },
+    {
+      "kind": "chapter",
+      "sourceURL": "https://zr.planning.nyc.gov/article-xiv/chapter-6",
+      "contentHash": "52c5e8079183b2a17e7876d886f893d023a401d68997b3801ba73d157ce1ce31"
+    }
+  ],
+  "assets": [
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/06%20Hunts%20Point%20Map%203%20Subarea%202-01_0.jpg",
+      "fileName": "zr-cb9efe3ace35b565-06-Hunts-Point-Map-3-Subarea-2-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 994765,
+      "contentHash": "cb9efe3ace35b565e4c7f0b327b93d48dd74f40aae374a16aaa0eb85832952d3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/109%20Marcus%20Garvey%20Blvd-%20MIH%20Map_postCHO_edit-01_0.jpg",
+      "fileName": "zr-e35289f4f7af7224-109-Marcus-Garvey-Blvd--MIH-Map_postCHO_edit-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 748846,
+      "contentHash": "e35289f4f7af722406905b55c23e949b5ca4155dab31f4995b1dc1bd67acc5a1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/1160%20Pugsley%20Avenue%20-%20MIHMap%20%282-25-25%29-01.jpg",
+      "fileName": "zr-68fe4394b78bcf5a-1160-Pugsley-Avenue---MIHMap-2-25-25--01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 301148,
+      "contentHash": "68fe4394b78bcf5a8ee9ce2ed1aca8154c761622089634bb4f51b8b9b570ad76"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/1166-Bedford-Avenue-Rezoning---MIHMap--9-11-25--01.jpg",
+      "fileName": "zr-7e9d3c13acdcc0b4-1166-Bedford-Avenue-Rezoning---MIHMap--9-11-25--01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 881302,
+      "contentHash": "7e9d3c13acdcc0b4f36131a93c6def8a63d6145d0b9207312a342c263052b4a4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/164th-Street-Rezoning---MIHMap--10-13-25--01.jpg",
+      "fileName": "zr-6782985c574ad6e5-164th-Street-Rezoning---MIHMap--10-13-25--01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 276141,
+      "contentHash": "6782985c574ad6e552359fc97ed8494cc331b12887fc447c8ed25e3ea9c4f50e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/19%20Flatlands_Fairfield%20Map%203%20Subarea%202-01.jpg",
+      "fileName": "zr-91c5353f6bef6183-19-Flatlands_Fairfield-Map-3-Subarea-2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1728360,
+      "contentHash": "91c5353f6bef6183bd6b7596aff4c9bbe1bfabc9b42b2d8ab46d784c4d5f88a3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/198-208-Richmond-Terrace---MIH-Map--5-4-26-%20%281%29-01.jpg",
+      "fileName": "zr-947a7d0787a6052a-198-208-Richmond-Terrace---MIH-Map--5-4-26--1--01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 269266,
+      "contentHash": "947a7d0787a6052aa2f6205261ec2935d812b8ea989ed0146b2ba739727ae55d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-013_1%20Anti-Hrassmnt_no%20strikeout-01.jpg",
+      "fileName": "zr-43ee7bacb4c4b5bc-23-013_1-Anti-Hrassmnt_no-strikeout-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 328847,
+      "contentHash": "43ee7bacb4c4b5bcf6bc0d2f39301b3144522e8792f920be9357c26668da2fe7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-344c1%20Corner%20Lot_2.jpg",
+      "fileName": "zr-d452739e295c9294-23-344c1-Corner-Lot_2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 123242,
+      "contentHash": "d452739e295c929434ac1441533331abe794ed533374f266ef07bc2e76a20811"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-344c2%20Z%20Lot%20Bnd%20by%202%20or%20More%20Sts-01.jpg",
+      "fileName": "zr-04ad006f468c9ca4-23-344c2-Z-Lot-Bnd-by-2-or-More-Sts-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 166396,
+      "contentHash": "04ad006f468c9ca496f0c330f14fa37cd43fcb3beb5d499691ed08fe6e0b86cd"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-344d1%20Mult%20rear%20lot%20lines-01.jpg",
+      "fileName": "zr-303f0288d0072d96-23-344d1-Mult-rear-lot-lines-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 174233,
+      "contentHash": "303f0288d0072d968b16c092c937878a2e2a7c322b575307901b52c53fe3b915"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-344d2%20Mult%20rear%20lot%20lines%205%20ft%20min-01.jpg",
+      "fileName": "zr-4e127c1aabb04475-23-344d2-Mult-rear-lot-lines-5-ft-min-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 161849,
+      "contentHash": "4e127c1aabb044758c9b68952f9ae5c4587be7841ca13b2ba62b61402f10cd16"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/23-344d4%20Mult%20lot%20lines%20not%20subj%20to%20int%20lot%20regs-01.jpg",
+      "fileName": "zr-996cd30a2b2dc586-23-344d4-Mult-lot-lines-not-subj-to-int-lot-regs-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 159643,
+      "contentHash": "996cd30a2b2dc586db6e525ea10579072fd42e23a14290c6f42837a6b3c2b84b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/27-20_2%20Anti-Hrassmnt_no%20strikeout-01.jpg",
+      "fileName": "zr-f33d5b2cd167f517-27-20_2-Anti-Hrassmnt_no-strikeout-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 683439,
+      "contentHash": "f33d5b2cd167f5175958bb3f8fe775ed73a7b7d534e69836dff26cfd88031a13"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/2950_W24_St_Revised-MIH-Map--9-5-25-_two%20MIH%20polygons_php%20edits_24Mar2026-01.jpg",
+      "fileName": "zr-ed82fe68f6494420-2950_W24_St_Revised-MIH-Map--9-5-25-_two-MIH-polygons_php-edits_24Mar2026-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 355020,
+      "contentHash": "ed82fe68f6494420e49c1986d072e034a9212b01c4aefcefbd4e8680ad97c8e0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/7120%20New%20Utrecht%20Avenue%20-%20MIH%20Map_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-8f69450453d42455-7120-New-Utrecht-Avenue---MIH-Map_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 327539,
+      "contentHash": "8f69450453d42455ea9baca07e7a2a9d938da6806774605da2692f494031d6ce"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A02-C02%20Use%20Chart%20Example%20800x556_0.png",
+      "fileName": "zr-207dbbfe0a3d29b1-A02-C02-Use-Chart-Example-800x556_0.png",
+      "contentType": "image/png",
+      "byteCount": 52042,
+      "contentHash": "207dbbfe0a3d29b156c1cd9f3e30db21dd929fc6feb4f6672d26561978282d60"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A02-C02%20Use%20Chart%20Notation_800x800.png",
+      "fileName": "zr-4dcb388b1702041f-A02-C02-Use-Chart-Notation_800x800.png",
+      "contentType": "image/png",
+      "byteCount": 75661,
+      "contentHash": "4dcb388b1702041f7c2bed411bbf7aa224808c0cc07c6c61bb96160ba3c6d493"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A03-C02%20and%20A04-C02%20Use%20Chart%20Notation_800x800%20png%20_1.png",
+      "fileName": "zr-09ddf01a5fbce856-A03-C02-and-A04-C02-Use-Chart-Notation_800x800-png-_1.png",
+      "contentType": "image/png",
+      "byteCount": 72861,
+      "contentHash": "09ddf01a5fbce85669f281596e185f1bfc623fdcbd76543c210c6b9c2ab85b3f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A03-C02%20and%20A04-C02%20Use%20Chart%20Notation_800x800%20png%20.png",
+      "fileName": "zr-09ddf01a5fbce856-A03-C02-and-A04-C02-Use-Chart-Notation_800x800-png-.png",
+      "contentType": "image/png",
+      "byteCount": 72861,
+      "contentHash": "09ddf01a5fbce85669f281596e185f1bfc623fdcbd76543c210c6b9c2ab85b3f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A03-C02%20Use%20Chart%20Example_800x608_png.png",
+      "fileName": "zr-71ab0005551d5d85-A03-C02-Use-Chart-Example_800x608_png.png",
+      "contentType": "image/png",
+      "byteCount": 59697,
+      "contentHash": "71ab0005551d5d85a343e69c389f0a60e18464739c38a7ac193a0f229b014f33"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/A04%20-%20C02%20use%20chart%20example_800x800.png",
+      "fileName": "zr-0a2c86357b86b340-A04---C02-use-chart-example_800x800.png",
+      "contentType": "image/png",
+      "byteCount": 36039,
+      "contentHash": "0a2c86357b86b340f0e3ce39c8099434ad421a7ff4207a18c8b21d0f6fa10962"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX-F_BK_CD16_Map1__MIHa1%2C2%2C8%2C12-01.jpg",
+      "fileName": "zr-93ec155a38f30c7d-APPENDIX-F_BK_CD16_Map1__MIHa1-2-8-12-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 930359,
+      "contentHash": "93ec155a38f30c7df505441ea82f208e8bb42c7757a5c174cda414f4f9946302"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD_14_Map2_MIHa1.jpg",
+      "fileName": "zr-4ade8a27c0078aad-APPENDIX-F_BK_CD_14_Map2_MIHa1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1460862,
+      "contentHash": "4ade8a27c0078aad6fdb54242a3d99df3d2bfe321fb2a91b0299e28e2e93d41e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD1_Map1_MIHa5_w_Monitor_MIHa-01.jpg",
+      "fileName": "zr-041c6a1d0bc1bbd4-APPENDIX-F_BK_CD1_Map1_MIHa5_w_Monitor_MIHa-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 579670,
+      "contentHash": "041c6a1d0bc1bbd4dd229a39b7c82df8afd94fd3cbd853fe7b89c34aaa01123c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD11_Map2_Area2-01.jpg",
+      "fileName": "zr-237948a59af14527-APPENDIX-F_BK_CD11_Map2_Area2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 267123,
+      "contentHash": "237948a59af145276be54f8ca085a8c573856c97ebc928e975a346363d1407ce"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD12_Map5_MIHa5.jpg",
+      "fileName": "zr-cf7cd95b42e86551-APPENDIX-F_BK_CD12_Map5_MIHa5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 464835,
+      "contentHash": "cf7cd95b42e86551c532e97458dac1e5a9e1609072930f7df9d4df369ff68b72"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD14_Map1_IHda.jpg",
+      "fileName": "zr-7ec36a8e173e27a4-APPENDIX-F_BK_CD14_Map1_IHda.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 359066,
+      "contentHash": "7ec36a8e173e27a43cf34e0458f0afe270de76e8d321d27623d88abee707c914"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD14_Map3_MIHa4.jpg",
+      "fileName": "zr-2bf69b85d6bb3415-APPENDIX-F_BK_CD14_Map3_MIHa4.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 854988,
+      "contentHash": "2bf69b85d6bb341556ff8270a591f0a175490f7cc4c9add3c76531308f39577e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD14_Map4_MIHa2.jpg",
+      "fileName": "zr-4038f1a7df8abda3-APPENDIX-F_BK_CD14_Map4_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 266926,
+      "contentHash": "4038f1a7df8abda3ba02a54c8dbd813b2719be79cb6d7f0347be336f93be7b20"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD14_Map5_MIHa3.jpg",
+      "fileName": "zr-4e5065dfc17621ca-APPENDIX-F_BK_CD14_Map5_MIHa3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 516227,
+      "contentHash": "4e5065dfc17621ca4743aa62b413578e5b3ac12d5e81da828cf06f05b4095b01"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD14_Map6_MIHa5.jpg",
+      "fileName": "zr-e812fc935c9647bd-APPENDIX-F_BK_CD14_Map6_MIHa5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 522286,
+      "contentHash": "e812fc935c9647bdadbbfe0d906bae55c71df983b171cf5e7bd160361964a86b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map1_MIHa1.jpg",
+      "fileName": "zr-716ffe73c626bab3-APPENDIX-F_BK_CD15_Map1_MIHa1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 263402,
+      "contentHash": "716ffe73c626bab328363b495bff889de0f69695a535cc5c9eb0977a96990009"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map10_MIHa12_-01_0.jpg",
+      "fileName": "zr-8a5d756a14e99087-APPENDIX-F_BK_CD15_Map10_MIHa12_-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 348516,
+      "contentHash": "8a5d756a14e99087322a936a4e21097818edb982cbd7df7796bad67088fa87b8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map2_MIHa2_1.jpg",
+      "fileName": "zr-50ff98246091d99c-APPENDIX-F_BK_CD15_Map2_MIHa2_1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 324915,
+      "contentHash": "50ff98246091d99c756f85d5c6d14117b45fcfeae30f36fa9681c57054e0c717"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map3_MIHa3.jpg",
+      "fileName": "zr-90ca7d442f05c6a0-APPENDIX-F_BK_CD15_Map3_MIHa3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 445348,
+      "contentHash": "90ca7d442f05c6a08bef0694925d4a3dafed3eaf69b27236d8b54383f191239f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map5_MIHa5_1.jpg",
+      "fileName": "zr-07e7de1ccd53206d-APPENDIX-F_BK_CD15_Map5_MIHa5_1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 273944,
+      "contentHash": "07e7de1ccd53206db3646d4c5b00b9cce8da3b10c5fc457c527a88d32717536f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map7_MIHa7%2C13-01.jpg",
+      "fileName": "zr-5f1e4815295b0934-APPENDIX-F_BK_CD15_Map7_MIHa7-13-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 425556,
+      "contentHash": "5f1e4815295b093494a97e4d2daa336fb040debae14f3dc7ff5588ab51902a69"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD15_Map8_MIHa9-01.jpg",
+      "fileName": "zr-e17d683e27143322-APPENDIX-F_BK_CD15_Map8_MIHa9-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 352209,
+      "contentHash": "e17d683e2714332295f837f6009efaef1796dd0edebe987264351558418c00cd"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD16_Map2_MIHa3.jpg",
+      "fileName": "zr-9648fa2d4d38be49-APPENDIX-F_BK_CD16_Map2_MIHa3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 313620,
+      "contentHash": "9648fa2d4d38be4934479bb26542e3680cc2a1c50c73267bba61f925cce41415"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD16_Map5_MIHa6.jpg",
+      "fileName": "zr-13343d5b4ea341bb-APPENDIX-F_BK_CD16_Map5_MIHa6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 345852,
+      "contentHash": "13343d5b4ea341bbc6998481806d9a525c70ce72e9cc3056585fc33630ebc56d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD16_Map6_MIH%20area%2010-01_0.jpg",
+      "fileName": "zr-f2f62256dfd93f7e-APPENDIX-F_BK_CD16_Map6_MIH-area-10-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 310285,
+      "contentHash": "f2f62256dfd93f7eeb9b508c9259d4f1ebc70aca77b65250ebaec1d4611c76ed"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD16_Map6_MIH%20area%2010-01.jpg",
+      "fileName": "zr-50cafb90650fb680-APPENDIX-F_BK_CD16_Map6_MIH-area-10-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 393519,
+      "contentHash": "50cafb90650fb680c9b39085a7eef2fefa5fd4af8e9e36367f6017e21deb77b0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD2_Map3_MIHa7-01.jpg",
+      "fileName": "zr-0c6822f662ebcef6-APPENDIX-F_BK_CD2_Map3_MIHa7-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 584441,
+      "contentHash": "0c6822f662ebcef6bbb2100c9dfa610a25d56795fee4f3ba279b406050a26189"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD2_Map4.jpg",
+      "fileName": "zr-b5bae12aa9eb732b-APPENDIX-F_BK_CD2_Map4.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 302178,
+      "contentHash": "b5bae12aa9eb732b0dae3e329d21a534f49629ff390d5d0beb28dfbd41a4c462"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD2_Map5_MIHa1%2C8_SCANNED%20-%20To%20Be%20FIXED.jpg",
+      "fileName": "zr-91c4651344d10535-APPENDIX-F_BK_CD2_Map5_MIHa1-8_SCANNED---To-Be-FIXED.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 400075,
+      "contentHash": "91c4651344d1053518dd34fa47dd0ba944b6c74d628bf6d6cc4633935fd8fd7c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD2_Map9_MIHa9.jpg",
+      "fileName": "zr-c3ae9ae51da30c9f-APPENDIX-F_BK_CD2_Map9_MIHa9.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 448724,
+      "contentHash": "c3ae9ae51da30c9f84aa26733fe682041d08afc208cc086364a773954884e5e0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD3_Map4_IHda.jpg",
+      "fileName": "zr-be364d1078d247d9-APPENDIX-F_BK_CD3_Map4_IHda.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 297761,
+      "contentHash": "be364d1078d247d9ec26248eec99ccae6b25fc54add3baa7840bda7f24a78946"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map%208_MIHa10-01.jpg",
+      "fileName": "zr-c24a3b5f01130606-APPENDIX-F_BK_CD5_Map-8_MIHa10-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 533853,
+      "contentHash": "c24a3b5f01130606700e6891ab72eb538e8323df6f1d825d219fd2cff06d3008"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map3_MIHa3.jpg",
+      "fileName": "zr-e878b3b45e8e9085-APPENDIX-F_BK_CD5_Map3_MIHa3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 331580,
+      "contentHash": "e878b3b45e8e9085a85e1a89c9b17dad30234a35840590fcc7870a261ed36579"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map4_MIHa4.jpg",
+      "fileName": "zr-05326076f4f33cd0-APPENDIX-F_BK_CD5_Map4_MIHa4.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 305438,
+      "contentHash": "05326076f4f33cd06804937509f8b538861d65ad44967dea7e3385a0a08418ba"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map5_MIHa5.jpg",
+      "fileName": "zr-0b27d04b1ce2a5d8-APPENDIX-F_BK_CD5_Map5_MIHa5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 277845,
+      "contentHash": "0b27d04b1ce2a5d84a0cd37a4118f0cd591a9c562463f758c125aad49cfe4b0a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map6_MIHa7.jpg",
+      "fileName": "zr-55697d0a78fccc03-APPENDIX-F_BK_CD5_Map6_MIHa7.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 467569,
+      "contentHash": "55697d0a78fccc03b0d009f7f463f6ac5876783ada7d40103705fbb6f1d248c3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD5_Map7_MIHa8-01.jpg",
+      "fileName": "zr-b78c706f5afd96b6-APPENDIX-F_BK_CD5_Map7_MIHa8-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 467878,
+      "contentHash": "b78c706f5afd96b6a9c96aaf2037d04b4af85c2f0b261f8cf2e766e5f16f0ee5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD6_Map%202_MIHa1_0.jpg",
+      "fileName": "zr-d03859a732453040-APPENDIX-F_BK_CD6_Map-2_MIHa1_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 297077,
+      "contentHash": "d03859a7324530407aa715eafbeafcdbc49931cf9af92a88fa8fd6475d0073f8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD6_Map1_MIHa2%2C3%2C4%2C5%2C6.jpg",
+      "fileName": "zr-982bd9d7ca935e1b-APPENDIX-F_BK_CD6_Map1_MIHa2-3-4-5-6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1330271,
+      "contentHash": "982bd9d7ca935e1b3942acdae4362048f3f4f58620784416c7ac36bc27e29fdc"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD7_Map1_MIHa3_0.jpg",
+      "fileName": "zr-4ed1a852a18502df-APPENDIX-F_BK_CD7_Map1_MIHa3_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 367719,
+      "contentHash": "4ed1a852a18502df96bb8044d2e2260cdb6188f2ad6d4918db3f6f8c284a4cd0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD7_Map2_IHda_0.jpg",
+      "fileName": "zr-d6870bccf6816d05-APPENDIX-F_BK_CD7_Map2_IHda_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 581662,
+      "contentHash": "d6870bccf6816d0595e4e58c288028a29765a404e0e55b1643326a0b928fbb91"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD7_Map3_MIHa1%2C2.jpg",
+      "fileName": "zr-993aee2ac9503194-APPENDIX-F_BK_CD7_Map3_MIHa1-2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 447967,
+      "contentHash": "993aee2ac950319480598aad8c25d120ca212ae996c0820126b04003bebf6aed"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK_CD7_MIHa3%2C13-01.jpg",
+      "fileName": "zr-ab938021c07b2cb1-APPENDIX-F_BK_CD7_MIHa3-13-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 511782,
+      "contentHash": "ab938021c07b2cb1ee8333b2c100e6e685aebaa2b5602069e8d2ac081b0e766b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BK%20CD3_Map3_MIHa1%2C2%2C3%2C4%2C7%2C9%2C10%2C13-01.jpg",
+      "fileName": "zr-e74c13e66ccc7f8f-APPENDIX-F_BK-CD3_Map3_MIHa1-2-3-4-7-9-10-13-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 827094,
+      "contentHash": "e74c13e66ccc7f8f4a06de15a60e09dab3395800ddef4d155e4ef25aacc3b640"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Bronx_CD9_Map8_MIH%20area%208-01.jpg",
+      "fileName": "zr-d2305ddf3d707646-APPENDIX-F_Bronx_CD9_Map8_MIH-area-8-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 435089,
+      "contentHash": "d2305ddf3d707646e159b27375202c405799530ffef6c5bc19a06e9a7bd7583c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Brooklyn_CD15_Map6_MIHa6-01.jpg",
+      "fileName": "zr-ffaf58eff096c2ed-APPENDIX-F_Brooklyn_CD15_Map6_MIHa6-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 459609,
+      "contentHash": "ffaf58eff096c2ed5c1101797c829498efb48aaa97d8825444a4f6164bdb74c6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Brooklyn_CD16_Map4_MIH%20area%209.jpg",
+      "fileName": "zr-ea3bbfac22ebb53d-APPENDIX-F_Brooklyn_CD16_Map4_MIH-area-9.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 640803,
+      "contentHash": "ea3bbfac22ebb53d47dae691a061955d09d72228a6f18ae917250c352d33efff"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Brooklyn_CD16_Map7_MIHa11.jpg",
+      "fileName": "zr-61f58acdd5189aed-APPENDIX-F_Brooklyn_CD16_Map7_MIHa11.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 326381,
+      "contentHash": "61f58acdd5189aed74dc63363544589e6784102a8c25250eae15da7b687dc585"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Brooklyn_CD2_Map10_MIH%20area%2012.jpg",
+      "fileName": "zr-174190e02b99801a-APPENDIX-F_Brooklyn_CD2_Map10_MIH-area-12.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 517117,
+      "contentHash": "174190e02b99801a927d94ab9d2e25c6ba44e0d548066856faa213c917382301"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD1_Map3_MIHa2.jpg",
+      "fileName": "zr-3c994a4f7206ae75-APPENDIX-F_BX_CD1_Map3_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 408713,
+      "contentHash": "3c994a4f7206ae7558e865d0380552c11ed31d156fcb24e1eeac4d12ac9dea0e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD1_Map5_MIHa6.jpg",
+      "fileName": "zr-63d8528506ab7d4d-APPENDIX-F_BX_CD1_Map5_MIHa6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 334983,
+      "contentHash": "63d8528506ab7d4d31447d8e1c5d928a008821b9519729d981b1ee5a103d5e97"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD1_Map7_MIHa8.jpg",
+      "fileName": "zr-3e7721d1a1a9a1a9-APPENDIX-F_BX_CD1_Map7_MIHa8.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 328576,
+      "contentHash": "3e7721d1a1a9a1a98b41372ce5e0d1d80bd8c0c29de0d33f86b972e1176a9f53"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD11_Map2_MIHa2%2C4-01.jpg",
+      "fileName": "zr-3f90390d09dfad07-APPENDIX-F_BX_CD11_Map2_MIHa2-4-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 353150,
+      "contentHash": "3f90390d09dfad07e2767025dade4bfd88fab31cb264e2a7c9b05db88446c0e5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD3_Map2_MIHa1-01.jpg",
+      "fileName": "zr-77a446b9c886945a-APPENDIX-F_BX_CD3_Map2_MIHa1-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 289438,
+      "contentHash": "77a446b9c886945afa0cd6af78680a0affc524b865584c2ed3be930cc279cc74"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD4_Map4_MIHa4-01.jpg",
+      "fileName": "zr-e53e7f82001e4a42-APPENDIX-F_BX_CD4_Map4_MIHa4-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 357124,
+      "contentHash": "e53e7f82001e4a4201706d04df4c4dedc19401b4180ec0ba0950e68cd74c8383"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_BX_CD6_Map3_MIHarea5%2C8.jpg",
+      "fileName": "zr-fd562c3ce296e2ea-APPENDIX-F_BX_CD6_Map3_MIHarea5-8.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 781870,
+      "contentHash": "fd562c3ce296e2ea87bad08db79b8b19805f45cc9ae777cf6fc8cc8ae901ef4e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD10_Map2_MIHa2%2C3.jpg",
+      "fileName": "zr-3a841f40d26082af-APPENDIX-F_MN_CD10_Map2_MIHa2-3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 439617,
+      "contentHash": "3a841f40d26082afeca263b5424921d603e0549bacc061688c9635e24d910422"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD11_Map5_MIHa1%2C4%2C5%2C8%2C10-01.jpg",
+      "fileName": "zr-6e73644106f7d622-APPENDIX-F_MN_CD11_Map5_MIHa1-4-5-8-10-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 509102,
+      "contentHash": "6e73644106f7d62267cdafc2e520c0fef610f46f0e836e3f5c129e581cedd5d7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD4_Map2_MIHa4%2C5_%20%281%29.jpg",
+      "fileName": "zr-7a73ce0a025689a2-APPENDIX-F_MN_CD4_Map2_MIHa4-5_-1-.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 392380,
+      "contentHash": "7a73ce0a025689a2929d75fd7e11a08e2e031b2b8ec557e84f9dc6bf2087e64f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD6_Map2_MIHarea%201_1.jpg",
+      "fileName": "zr-4ae6ef59a796d0b5-APPENDIX-F_MN_CD6_Map2_MIHarea-1_1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 281049,
+      "contentHash": "4ae6ef59a796d0b5ea8d8317b110827ab5f5151bcdd57e2d97cd81b6bff29a18"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD8_M3_MIHa3-01.jpg",
+      "fileName": "zr-d2776599d6605122-APPENDIX-F_MN_CD8_M3_MIHa3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 446722,
+      "contentHash": "d2776599d66051222860c4b67a850400e13dfc97fdb92b5fc24deafa9465a1a7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD8_Map2_MIHa2-01.jpg",
+      "fileName": "zr-a9650b5651d0321c-APPENDIX-F_MN_CD8_Map2_MIHa2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 478442,
+      "contentHash": "a9650b5651d0321c90d5fc1c88b8d0b2a8bbe66e617ebec7d9fe7d1eb6986a78"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_MN_CD9_Map2_MIHa1-01.jpg",
+      "fileName": "zr-155a0c7e43e2f7be-APPENDIX-F_MN_CD9_Map2_MIHa1-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 409386,
+      "contentHash": "155a0c7e43e2f7be1a01e0e661b4757c648aba60d49b543c2f683153d4298955"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD_8%2B12_MIHa_3%2B4-01.jpg",
+      "fileName": "zr-4eb53de99aa63a73-APPENDIX-F_QN_CD_8-12_MIHa_3-4-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2026658,
+      "contentHash": "4eb53de99aa63a73dbc1d67b44e4bc7532438df61346019e0a84ea2ab1236f29"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD%2014_Map%204_MIHa4.jpg",
+      "fileName": "zr-5b42f0c99a6602ce-APPENDIX-F_QN_CD-14_Map-4_MIHa4.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 289953,
+      "contentHash": "5b42f0c99a6602ce1823fb9ef60bda8a30fbecf2bdc8fdb98430d40e8ec8cb99"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD1_Map10_MIHa16.jpg",
+      "fileName": "zr-f626bd046ed57d61-APPENDIX-F_QN_CD1_Map10_MIHa16.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 333356,
+      "contentHash": "f626bd046ed57d61128cd2ae4ad9792cb99746c65b64d490a726d72c8aee9074"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD1_Map12_MIHa24-01.jpg",
+      "fileName": "zr-eda88385014bf0a8-APPENDIX-F_QN_CD1_Map12_MIHa24-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 353834,
+      "contentHash": "eda88385014bf0a804df1f42f6591335439e29778dcd473235fa2d832ff331c6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD1_Map2_IHda-01.jpg",
+      "fileName": "zr-79570def8b1d3c93-APPENDIX-F_QN_CD1_Map2_IHda-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 346235,
+      "contentHash": "79570def8b1d3c93b559a76785bacdb7ebe7cff8a58f11b51538d09db21ccaf1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD1_Map8_MIHa8%2C20-01_0.jpg",
+      "fileName": "zr-20571e1315082ca8-APPENDIX-F_QN_CD1_Map8_MIHa8-20-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 561317,
+      "contentHash": "20571e1315082ca8d9b9824dd3559f1acc121d3cf7878cc7e5b8cfa501a1ccc6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD1%20and%202_Map1_MIHa1%2C2_final-01.jpg",
+      "fileName": "zr-87ba6665ceb48fa2-APPENDIX-F_QN_CD1-and-2_Map1_MIHa1-2_final-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1004187,
+      "contentHash": "87ba6665ceb48fa26903aa48fa3aed755eaa5f5dfc3a082991ba46b3ea5c22c0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD10_Map1_MIHa1.jpg",
+      "fileName": "zr-948020d4aa376dea-APPENDIX-F_QN_CD10_Map1_MIHa1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 308331,
+      "contentHash": "948020d4aa376dea67840b49fef75ebc907d13a19527518d0adf01c8c232422e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD11_Map2_MIHa2-01.jpg",
+      "fileName": "zr-a0b44377a67bd7d1-APPENDIX-F_QN_CD11_Map2_MIHa2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 388168,
+      "contentHash": "a0b44377a67bd7d11dc426283157fb6a7521f1450511f36cd22eb36951ec750c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD12_Map4_MIHa4-01_0.jpg",
+      "fileName": "zr-072b1283eb719404-APPENDIX-F_QN_CD12_Map4_MIHa4-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 412655,
+      "contentHash": "072b1283eb7194047d9dada0efbfe82a6e3cc2f032653e802eb9b47a25432f2e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD14_Map%203_MIHa3%2C5.jpg",
+      "fileName": "zr-cdcd57922a4fa281-APPENDIX-F_QN_CD14_Map-3_MIHa3-5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 813861,
+      "contentHash": "cdcd57922a4fa2816b2cfe5c1afd86f90b762d0ff49c456b6e107fa20cd21bdf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD14_Map1_MIHa1.jpg",
+      "fileName": "zr-fcd8b5dfc451776c-APPENDIX-F_QN_CD14_Map1_MIHa1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 255491,
+      "contentHash": "fcd8b5dfc451776cc34d67f6b78573a256431fe559cca4cc96dcc887b1f99c63"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD2_Map1_IH_MIHa4_postCHO-01.jpg",
+      "fileName": "zr-084d9eed67f54b7b-APPENDIX-F_QN_CD2_Map1_IH_MIHa4_postCHO-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 351044,
+      "contentHash": "084d9eed67f54b7b7c91281ce516931f0067e8d2ac3d31e4b3869bdf18891c2c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD2_Map3_IHda.jpg",
+      "fileName": "zr-12c9b727cff7420d-APPENDIX-F_QN_CD2_Map3_IHda.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 218841,
+      "contentHash": "12c9b727cff7420d73ede9cea8a0911f8819175ab4fd9d1bd4cd440eccd05d4e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD2_Map4_MIHa5.jpg",
+      "fileName": "zr-0ce8ba0a3cc80c1a-APPENDIX-F_QN_CD2_Map4_MIHa5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 444247,
+      "contentHash": "0ce8ba0a3cc80c1a36593e6e9373360e65922b7be3743f1f684b51a5acb62550"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD2_Map5_MIHa6.jpg",
+      "fileName": "zr-3a2e3714ad5d76d4-APPENDIX-F_QN_CD2_Map5_MIHa6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 318933,
+      "contentHash": "3a2e3714ad5d76d4b7cd2a233d1d1d7e93e00c15a3ca47628ef4fec755e2b3a4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD2_Map6_MIHa7-01.jpg",
+      "fileName": "zr-0c18444419d4a673-APPENDIX-F_QN_CD2_Map6_MIHa7-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 456157,
+      "contentHash": "0c18444419d4a673cc8f4ecf8ee3603146e0a074720afab9b797de498e142a6e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD3_Map1_MIHa1.jpg",
+      "fileName": "zr-e2e7a61cde0cd914-APPENDIX-F_QN_CD3_Map1_MIHa1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 197927,
+      "contentHash": "e2e7a61cde0cd914367416b0843c7de913b0e7cec808f64d14af8181e2de39e5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD4_Map1_MIHa1_0.jpg",
+      "fileName": "zr-379d19322ca4f2e8-APPENDIX-F_QN_CD4_Map1_MIHa1_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 243660,
+      "contentHash": "379d19322ca4f2e85e39857b6b04c48e4dd3279112751563abff170ad2c56c3d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD6_Map1_MIHa1%2C6.jpg",
+      "fileName": "zr-e7560e6648d18e7e-APPENDIX-F_QN_CD6_Map1_MIHa1-6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 423103,
+      "contentHash": "e7560e6648d18e7e2aa3da3b865c37bb3a1365ee44449f40950ee3e1e66ca8f5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD7_Map6_MIHa6-01.jpg",
+      "fileName": "zr-f7be357b7139ffe0-APPENDIX-F_QN_CD7_Map6_MIHa6-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 399113,
+      "contentHash": "f7be357b7139ffe03dbd7a398d08e547ad27f73156dac0841ab17235ad89cee9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_CD8_Map2_MIHa2.jpg",
+      "fileName": "zr-eb84819a8f3f68a6-APPENDIX-F_QN_CD8_Map2_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 304211,
+      "contentHash": "eb84819a8f3f68a608fa386fb032a2117939d942b4406881a0d6e76b412f5236"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN_Map2_MIHa2-01-01_0.jpg",
+      "fileName": "zr-a71f942f2d4162fc-APPENDIX-F_QN_Map2_MIHa2-01-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 537638,
+      "contentHash": "a71f942f2d4162fc5232d898f44d2a65bb6199d1e10b103a6f62a15f4e6bf68a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN%20CD%207_Map2_MIHa2.jpg",
+      "fileName": "zr-263dbcb5437dbad3-APPENDIX-F_QN-CD-7_Map2_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 299783,
+      "contentHash": "263dbcb5437dbad39ca57f3cfbf751e55a039b78c4fb8ad7321afb6eb1351f86"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_QN%20CD%207_Map3_MIHa3_0.jpg",
+      "fileName": "zr-d79a9d9327ed419c-APPENDIX-F_QN-CD-7_Map3_MIHa3_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 431592,
+      "contentHash": "d79a9d9327ed419cfd8ede5d02d04f6215773974123442bd2185c60276aa4063"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Queens_CD12_Map3_MIHa3-01.jpg",
+      "fileName": "zr-4b469efe07aefe0a-APPENDIX-F_Queens_CD12_Map3_MIHa3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 342405,
+      "contentHash": "4b469efe07aefe0ad45e8ec74e349443a220ed3a63664ef6a64d0b3db8cbfde9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F_Queens_CD14_Map5_MIH%20area%206_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-884be8cbb3c31135-APPENDIX-F_Queens_CD14_Map5_MIH-area-6_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 312464,
+      "contentHash": "884be8cbb3c3113514c660ec98aebce1ae1b240394f5931f2351e2ba1b756847"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPENDIX%20F%2C%20Brooklyn%20CD%203%2C%20Map%206%2C%20MIHa%206.jpg",
+      "fileName": "zr-29420657e5b32bd4-APPENDIX-F-Brooklyn-CD-3-Map-6-MIHa-6.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 336753,
+      "contentHash": "29420657e5b32bd466edba386f8494bae764176f60eac5fb023172bef1c66e7b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD1_Map2_IH%2BMIH2%2C3%2C4%2C6%2C7%2C9%2C10%2C11%2C12-01.jpg",
+      "fileName": "zr-fdd70ac642fe7f46-APPX-F_BK_CD1_Map2_IH-MIH2-3-4-6-7-9-10-11-12-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1793318,
+      "contentHash": "fdd70ac642fe7f46349f08c173a5b7a69780a8666c3c5d4749956d8f17c38f9c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD1_Map6_MIHa13-01.jpg",
+      "fileName": "zr-1f120d628114c60e-APPX-F_BK_CD1_Map6_MIHa13-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 521656,
+      "contentHash": "1f120d628114c60eacf8a5c22d7e2e0941555f405ff7f2015aa9aec61d6a42ce"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD10_Map2_MIHa2-01.jpg",
+      "fileName": "zr-0058767fc3c1d6a1-APPX-F_BK_CD10_Map2_MIHa2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 463190,
+      "contentHash": "0058767fc3c1d6a1d2c3c956a575c61ab0ffce48052ba2c636ead3b8bd6fb6e2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD10_Map3_MIHa1%2C3-01_0.jpg",
+      "fileName": "zr-49f385ac990da657-APPX-F_BK_CD10_Map3_MIHa1-3-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 503426,
+      "contentHash": "49f385ac990da6577884d0f3eab4f42879c09cc571485bace57b0778817d3536"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_cd11_MIHa3.5.jpg",
+      "fileName": "zr-3463fe29c990d52b-APPX-F_BK_cd11_MIHa3.5.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 425410,
+      "contentHash": "3463fe29c990d52bb1e3ff80d9639d3eff991343bc2ca1eb16a04bf674ef9bba"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD12_Map3_MIHa3%2C7-01.jpg",
+      "fileName": "zr-a30d3201be7ee2a3-APPX-F_BK_CD12_Map3_MIHa3-7-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 572969,
+      "contentHash": "a30d3201be7ee2a3a04e6ebf0a93231298003aff297b25647de1d30623db9493"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD13_Map2_MIHa3-01.jpg",
+      "fileName": "zr-c76657236359176d-APPX-F_BK_CD13_Map2_MIHa3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 373946,
+      "contentHash": "c76657236359176db42214f23dcb611051abd2b9c3c4ad345d24c642e8384ee4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD15_M8_MIHa11-01_0.jpg",
+      "fileName": "zr-33dbf6774c745a4a-APPX-F_BK_CD15_M8_MIHa11-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 256587,
+      "contentHash": "33dbf6774c745a4a45747d7c60c0e7c6ab25ddac6642ea712539d36443e8dcdf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD18_Map1_MIHa1-01.jpg",
+      "fileName": "zr-b6f6d690a45a5d88-APPX-F_BK_CD18_Map1_MIHa1-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 390227,
+      "contentHash": "b6f6d690a45a5d88f3fa91705381abec5435be22f8e1b820b0e7c98fadb9a381"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD2_Map1_MIHa5%2C14-01.jpg",
+      "fileName": "zr-b1bbed79b46b46a3-APPX-F_BK_CD2_Map1_MIHa5-14-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 598268,
+      "contentHash": "b1bbed79b46b46a38a7ba92cb57d2d910143cc9237d2b22185863b78ccf4d0a3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD2_Map2_MIHa1%2C2%2C4.6.8.10%2C15-01.jpg",
+      "fileName": "zr-26745fcc61a3b969-APPX-F_BK_CD2_Map2_MIHa1-2-4.6.8.10-15-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 722779,
+      "contentHash": "26745fcc61a3b969fe4a8d650db6e502fda597141e0a76c19f5efcd6b8a64d6e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD3_Map8_MIHa16-01.jpg",
+      "fileName": "zr-2c67c87382f2ac48-APPX-F_BK_CD3_Map8_MIHa16-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 406236,
+      "contentHash": "2c67c87382f2ac48a921e8435cacd44c200df922d216c928bcbffc2c2234e1e1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD5_Map2_MIHa2.jpg",
+      "fileName": "zr-6659bd6c7cb87db0-APPX-F_BK_CD5_Map2_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 297434,
+      "contentHash": "6659bd6c7cb87db020cc9df4f90942b46c5136488cbde8302845265b31078370"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD6_Map3_MIHa7-01-01-01.jpg",
+      "fileName": "zr-3f35c4e19708fb89-APPX-F_BK_CD6_Map3_MIHa7-01-01-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 431228,
+      "contentHash": "3f35c4e19708fb89a9a53d5553a1ec5b67c16b8ae232caf8b7c6cd6ede9b8c07"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD7_Map4_MIHa4-01.jpg",
+      "fileName": "zr-3ec2796658d2bdf0-APPX-F_BK_CD7_Map4_MIHa4-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 460526,
+      "contentHash": "3ec2796658d2bdf07fde9711068ddbf6ccf2846a18da844167b1bc9e95733c2b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD8_M5_MIHa10-01.jpg",
+      "fileName": "zr-ea062db8a9abcb3a-APPX-F_BK_CD8_M5_MIHa10-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 243165,
+      "contentHash": "ea062db8a9abcb3ae1fc0d7ab19844cb1bb0dc0b6f4f12c3960248d8375e05c9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD8_Map1_MIHa1%2C2%2C9%20%28and%203%2C5%2C6%2C7%2C8%29.jpg",
+      "fileName": "zr-461c1201c5f39d5e-APPX-F_BK_CD8_Map1_MIHa1-2-9-and-3-5-6-7-8-.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2195560,
+      "contentHash": "461c1201c5f39d5e2219836d78bf7b4aa26b2ddac59a6e893f8260ade70fd498"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK_CD9_M1_MIHa1%2C2%2C3%2C4_0.jpg",
+      "fileName": "zr-ba0a84556c86e9c8-APPX-F_BK_CD9_M1_MIHa1-2-3-4_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 491767,
+      "contentHash": "ba0a84556c86e9c82f00b47a41e767fb7725b47a2bf152395338fc7310c46880"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK%20CD%205_Map1_MIHa1%2C6%2C9.jpg",
+      "fileName": "zr-77e4af72d78601bd-APPX-F_BK-CD-5_Map1_MIHa1-6-9.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1472896,
+      "contentHash": "77e4af72d78601bd50a3df270e5ecd82d5ce348e242d8d599892202b328e7c99"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BK%20CD15_Map4_MIHa4%2C8%2C10.jpg",
+      "fileName": "zr-3b34c02697850e9d-APPX-F_BK-CD15_Map4_MIHa4-8-10.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 481860,
+      "contentHash": "3b34c02697850e9deb0397a0cd0af7f2994c25290ee27297a7ea16aa2bd58298"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BX_CD1_Map10_Area12_0.jpg",
+      "fileName": "zr-7b56d4af0237b911-APPX-F_BX_CD1_Map10_Area12_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 118155,
+      "contentHash": "7b56d4af0237b91157b35e12dd79f71998d74e6d4d3a2e501141b13744839435"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BX_CD1_Map9_MIHa10%2C13-01.jpg",
+      "fileName": "zr-3f34eb5fa92ec30b-APPX-F_BX_CD1_Map9_MIHa10-13-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 273882,
+      "contentHash": "3f34eb5fa92ec30b519edf2ce5ec0b1e2a2e03fe3e2d26e2f2c648bcc268b8fa"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BX_CD10%2C11_Map1_MIHa1%2C2%2C3_final-01_0.jpg",
+      "fileName": "zr-58e916644a978eeb-APPX-F_BX_CD10-11_Map1_MIHa1-2-3_final-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 867059,
+      "contentHash": "58e916644a978eebe9510f57e902a5ffdb7d3d677f60dcc804a176ac91c21327"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BX_CD8_Map1_MIHa1-01.jpg",
+      "fileName": "zr-cfa444c08cd77d91-APPX-F_BX_CD8_Map1_MIHa1-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 325814,
+      "contentHash": "cfa444c08cd77d91503bc9a769692dd44e1a934edcff11560b484f733fdaafe6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_BX_CD9%2C10%2C11_Map1_MIHa1%2C2%2C3_final2-01_0.jpg",
+      "fileName": "zr-d4fbbb04c404da7c-APPX-F_BX_CD9-10-11_Map1_MIHa1-2-3_final2-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1307780,
+      "contentHash": "d4fbbb04c404da7c1083297caa8607c4178ec295981e77a01ca6f1c07e380020"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD11_Map2_MIHa2_1.jpg",
+      "fileName": "zr-79cd17afc7d0a6c2-APPX-F_MN_CD11_Map2_MIHa2_1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 611733,
+      "contentHash": "79cd17afc7d0a6c2f2866c3ecc04d8aa5c0a0708291f8e27ebe540bf1a153598"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD11_Map3_MIHa3_2.jpg",
+      "fileName": "zr-efdb81c48db4fd48-APPX-F_MN_CD11_Map3_MIHa3_2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 777453,
+      "contentHash": "efdb81c48db4fd4831aaaedfe71087b46b1ce7776f547aa021c8031e8f84503d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD11_Map7_MIHa7.jpg",
+      "fileName": "zr-f609c18eee5fd6be-APPX-F_MN_CD11_Map7_MIHa7.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 291995,
+      "contentHash": "f609c18eee5fd6be44eb9a751f4498d398b5656763d559dfead09d444b749c54"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD11_Map8_MIHa9_The%20Beacon%20-%20MIH%20Map.jpg",
+      "fileName": "zr-83d881f96ae8780a-APPX-F_MN_CD11_Map8_MIHa9_The-Beacon---MIH-Map.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 375918,
+      "contentHash": "83d881f96ae8780a837c7ce64e86398cab38e90727ae1f063b3e734bd9790081"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD12_Map1_MIHa1_0.jpg",
+      "fileName": "zr-f1ae55e6f75ecbd2-APPX-F_MN_CD12_Map1_MIHa1_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 826965,
+      "contentHash": "f1ae55e6f75ecbd2a3ba7d0392995e4fb442b58da7809ebf4d5893cbf6d5eae4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD4and5_Map1_MIHa1-02.jpg",
+      "fileName": "zr-52a1fda1ebaafb30-APPX-F_MN_CD4and5_Map1_MIHa1-02.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 745176,
+      "contentHash": "52a1fda1ebaafb30365378d4ec9789b46f2018f6f2e9383b16463c7ee757b0b4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD6_Map3_MIHa2.3-01.jpg",
+      "fileName": "zr-2708d9127dc92d9c-APPX-F_MN_CD6_Map3_MIHa2.3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 667641,
+      "contentHash": "2708d9127dc92d9cfc409d3c8c3b4837040e5d8ac13eb4424e78e20f8e9bbf35"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_MN_CD9%2C10%2C11_MIHa3-01.jpg",
+      "fileName": "zr-cb6edfa66d9507ab-APPX-F_MN_CD9-10-11_MIHa3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 387184,
+      "contentHash": "cb6edfa66d9507ab94ae68ecb24dcc8f4d60a9b3c8fb9efe1fa6e3f801762597"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_Q_CD1_Map9_MIHa9%2C18%2C23-01.jpg",
+      "fileName": "zr-725945a969d8b3a2-APPX-F_Q_CD1_Map9_MIHa9-18-23-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 788614,
+      "contentHash": "725945a969d8b3a2f1f4f42b17a1076c7a60dc93ec11ce206c0a5683d09e7872"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD1_Map1_MIHa3%2C5%2C10%2C11%2C14%2C15%2C19%2C21%2C22%2C25.jpg",
+      "fileName": "zr-23da9491111c31e2-APPX-F_QN_CD1_Map1_MIHa3-5-10-11-14-15-19-21-22-25.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1580591,
+      "contentHash": "23da9491111c31e24197a84cc962b8ab3450ba6d1f391533a69d91c16f5703bf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD10_M2_MIHa2-01.jpg",
+      "fileName": "zr-3eeeb37032096dd1-APPX-F_QN_CD10_M2_MIHa2-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 366093,
+      "contentHash": "3eeeb37032096dd1b6e40a126114f672b8d6a4ade5f162efcf769ce4d58fb4af"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD14_Map2_MIHa2%2C7-01.jpg",
+      "fileName": "zr-3f504a85bd6b7dd4-APPX-F_QN_CD14_Map2_MIHa2-7-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 1226480,
+      "contentHash": "3f504a85bd6b7dd4d5ec078f9e5321237ae971ecafce56e7c0ff8239720ab996"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD4_Map2_MIHa3-01.jpg",
+      "fileName": "zr-0797a984fc3adbad-APPX-F_QN_CD4_Map2_MIHa3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 496635,
+      "contentHash": "0797a984fc3adbadefcadd4d8c9596cad6828b18dc7ed587df305577d2a3ea2d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD6_Map2_MIHa2.jpg",
+      "fileName": "zr-ed9786d13869870f-APPX-F_QN_CD6_Map2_MIHa2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 388063,
+      "contentHash": "ed9786d13869870f10ac1c024d3ff6f768b1ec613074fa884aa93f03620d4a5f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD6_Map3_MIHa3.jpg",
+      "fileName": "zr-a919331723f7d91e-APPX-F_QN_CD6_Map3_MIHa3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 378110,
+      "contentHash": "a919331723f7d91eb0b349573f066b397f03f7a4088ed062d82a054495029a21"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD6_Map4_MIHa4%2C5%2C7-01_0.jpg",
+      "fileName": "zr-4b735a62cd690f0e-APPX-F_QN_CD6_Map4_MIHa4-5-7-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 503325,
+      "contentHash": "4b735a62cd690f0e72df874159ef1959b689556a1451bfcfd58e4c5ea6fc3d52"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN_CD7_Map5_MIHa5-01.jpg",
+      "fileName": "zr-777406eca14eb00d-APPX-F_QN_CD7_Map5_MIHa5-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 377336,
+      "contentHash": "777406eca14eb00dd83aa39ef1ec53d59f61544a0938becf93d3bc3ab6ad83a7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_QN%20CD1%20Map%205_MIH%20areas%204%2C6%2C7%2C17.jpg",
+      "fileName": "zr-b4b1187a648f5b7f-APPX-F_QN-CD1-Map-5_MIH-areas-4-6-7-17.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 627365,
+      "contentHash": "b4b1187a648f5b7fcbae84475efafd1d8a7cca23e9fc8e480045dd0c8c7c35e3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/APPX%20F_SI_CD1_Map2_MIHa2%2C3%2C4%2C6_0.jpg",
+      "fileName": "zr-03e34da6e620e916-APPX-F_SI_CD1_Map2_MIHa2-3-4-6_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2731905,
+      "contentHash": "03e34da6e620e91667bd62f6152253e04f946bf63ae2659db5dfd28ab9673d6a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20102%E2%80%93615.0.png",
+      "fileName": "zr-11ba0d01a7a61ea8-Zoning-Resolutions-102-615.0.png",
+      "contentType": "image/png",
+      "byteCount": 175175,
+      "contentHash": "11ba0d01a7a61ea8d7079a2fa646533b943df431a2760a0507016306e9de45c1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20105%E2%80%9301.0.png",
+      "fileName": "zr-741038d01628de77-Zoning-Resolutions-105-01.0.png",
+      "contentType": "image/png",
+      "byteCount": 6361,
+      "contentHash": "741038d01628de775fc447c81bcadb079d9e92d09b4b23c1d40c583029eb5897"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20118%E2%80%9331.0.png",
+      "fileName": "zr-095565a16cd026de-Zoning-Resolutions-118-31.0.png",
+      "contentType": "image/png",
+      "byteCount": 46930,
+      "contentHash": "095565a16cd026de3bd02d2a2874a2111df88cd287099c923c6efff419df37a8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20119%E2%80%9301.0.png",
+      "fileName": "zr-741038d01628de77-Zoning-Resolutions-119-01.0.png",
+      "contentType": "image/png",
+      "byteCount": 6361,
+      "contentHash": "741038d01628de775fc447c81bcadb079d9e92d09b4b23c1d40c583029eb5897"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2013%E2%80%93141.0.png",
+      "fileName": "zr-47a394e48be9a77b-Zoning-Resolutions-13-141.0.png",
+      "contentType": "image/png",
+      "byteCount": 121172,
+      "contentHash": "47a394e48be9a77bc617ce42db7401263f33fe524e786646c930cf8fcdf3f1b9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2013%E2%80%93141.1.png",
+      "fileName": "zr-9cd43579b6862b78-Zoning-Resolutions-13-141.1.png",
+      "contentType": "image/png",
+      "byteCount": 220957,
+      "contentHash": "9cd43579b6862b78ae1e06e745f07878b9ded346e8906836934f0e723c3842a6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20134%E2%80%9326.0.png",
+      "fileName": "zr-3dc8ef2e975b46f7-Zoning-Resolutions-134-26.0.png",
+      "contentType": "image/png",
+      "byteCount": 37447,
+      "contentHash": "3dc8ef2e975b46f7064c728398596cee5ede0c94749a02354c8ffd45feb55a90"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20134%E2%80%9326.1.png",
+      "fileName": "zr-962acd8a607c5e26-Zoning-Resolutions-134-26.1.png",
+      "contentType": "image/png",
+      "byteCount": 11727,
+      "contentHash": "962acd8a607c5e26e45ecf62629a0edaa56895d35d54847d2794bea92f6fa2c5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20134%E2%80%9326.2.png",
+      "fileName": "zr-1bcdf3820a9723b3-Zoning-Resolutions-134-26.2.png",
+      "contentType": "image/png",
+      "byteCount": 19272,
+      "contentHash": "1bcdf3820a9723b309e27c38bf410f532972c789370593990d29134867d1f77d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93236.0.png",
+      "fileName": "zr-579f55dc737501df-Zoning-Resolutions-139-236.0.png",
+      "contentType": "image/png",
+      "byteCount": 116655,
+      "contentHash": "579f55dc737501dfbc27b4a902abb3e3444fc5c404854212e4dc08f82d1b5c5b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93236.1.png",
+      "fileName": "zr-b9a15f035ce1a670-Zoning-Resolutions-139-236.1.png",
+      "contentType": "image/png",
+      "byteCount": 106388,
+      "contentHash": "b9a15f035ce1a6708a57e7f6d1c71330a690a6355f6cf9d5a42c263d3ca623d1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93236.2.png",
+      "fileName": "zr-e1a6635c458c4306-Zoning-Resolutions-139-236.2.png",
+      "contentType": "image/png",
+      "byteCount": 111329,
+      "contentHash": "e1a6635c458c4306a725327fc170b31fda4f22ab8a7db9e672f187659bfa8cad"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.0.png",
+      "fileName": "zr-68e4e729b865f81b-Zoning-Resolutions-139-541.0.png",
+      "contentType": "image/png",
+      "byteCount": 86873,
+      "contentHash": "68e4e729b865f81b8dcb5e27268d826419317c09c3876063629a37ccdd9a8c09"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.1.png",
+      "fileName": "zr-3a64f8f6933c4e70-Zoning-Resolutions-139-541.1.png",
+      "contentType": "image/png",
+      "byteCount": 54026,
+      "contentHash": "3a64f8f6933c4e701fae3dab00c03ee1973134f2650fccd71ef3c7d75497dbea"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.2.png",
+      "fileName": "zr-7f888365e9449df0-Zoning-Resolutions-139-541.2.png",
+      "contentType": "image/png",
+      "byteCount": 67187,
+      "contentHash": "7f888365e9449df0172fa0594a614715655989ceb0d8922269ba59330f4449bf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.3.png",
+      "fileName": "zr-0800deec74b67cae-Zoning-Resolutions-139-541.3.png",
+      "contentType": "image/png",
+      "byteCount": 371280,
+      "contentHash": "0800deec74b67cae89d8a54892224dfc37afb11420e73adf3fec97c1c0b28228"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.4.png",
+      "fileName": "zr-22cd287096198ecd-Zoning-Resolutions-139-541.4.png",
+      "contentType": "image/png",
+      "byteCount": 64075,
+      "contentHash": "22cd287096198ecd8d6fce575d053afd435ce2541d081589e6403e6bd57dc9b7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93541.5.png",
+      "fileName": "zr-5edbd12d2baf30cf-Zoning-Resolutions-139-541.5.png",
+      "contentType": "image/png",
+      "byteCount": 69165,
+      "contentHash": "5edbd12d2baf30cf458a90f2e34e9747e4af949a35ffec48cc2458705dba8b7e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20139%E2%80%93543.0.png",
+      "fileName": "zr-26dc5bd9c3b74feb-Zoning-Resolutions-139-543.0.png",
+      "contentType": "image/png",
+      "byteCount": 74556,
+      "contentHash": "26dc5bd9c3b74feb97bb777b75f9c051fa78a499447c86bd7b49e6fe634a5393"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2016%E2%80%9303.0.png",
+      "fileName": "zr-381de07d407432b2-Zoning-Resolutions-16-03.0.png",
+      "contentType": "image/png",
+      "byteCount": 505925,
+      "contentHash": "381de07d407432b24cd845252f18d4a4de7d6e101fb632adbbadd3c99db9a3e6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93361.0.png",
+      "fileName": "zr-4f76e1e97d53ff06-Zoning-Resolutions-24-361.0.png",
+      "contentType": "image/png",
+      "byteCount": 9674,
+      "contentHash": "4f76e1e97d53ff06bed2627061668133793dbfac4abd1e953f3acba964aca34c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93361.1.png",
+      "fileName": "zr-aeb17015d9d3ec96-Zoning-Resolutions-24-361.1.png",
+      "contentType": "image/png",
+      "byteCount": 8493,
+      "contentHash": "aeb17015d9d3ec96927021967a43ecfaa815a00955f28207bb11cae14ee63936"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93393.0.png",
+      "fileName": "zr-42e924a7db7643b5-Zoning-Resolutions-24-393.0.png",
+      "contentType": "image/png",
+      "byteCount": 12783,
+      "contentHash": "42e924a7db7643b58bd3f42112918a39111f63276ff92f0cc1e25bfc08079b36"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93393.1.png",
+      "fileName": "zr-d964f938b4efc437-Zoning-Resolutions-24-393.1.png",
+      "contentType": "image/png",
+      "byteCount": 12410,
+      "contentHash": "d964f938b4efc4371082bddd5957118bc8e94503cf874f8cf5447609ec27cad0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93393.2.png",
+      "fileName": "zr-f651b95581d7a602-Zoning-Resolutions-24-393.2.png",
+      "contentType": "image/png",
+      "byteCount": 12789,
+      "contentHash": "f651b95581d7a6026bbc3ff8abe56b3e896e98536fb9a5a0a0b488897a0386d3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93521.0.png",
+      "fileName": "zr-71d3319c4ed2b359-Zoning-Resolutions-24-521.0.png",
+      "contentType": "image/png",
+      "byteCount": 63177,
+      "contentHash": "71d3319c4ed2b359f40541c3f514ac4c5cebf8b81a84b6253fdd16dec7a4434e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93522.0.png",
+      "fileName": "zr-8645b643049d8425-Zoning-Resolutions-24-522.0.png",
+      "contentType": "image/png",
+      "byteCount": 75055,
+      "contentHash": "8645b643049d8425b6f1fb59492e32a1d987b2fa411daad2814689bb231b3ffe"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%9353.0.png",
+      "fileName": "zr-e307584433b64aa0-Zoning-Resolutions-24-53.0.png",
+      "contentType": "image/png",
+      "byteCount": 67678,
+      "contentHash": "e307584433b64aa0ca0948dd6b71e37973ef4428349aaa7e1e5c653a26401d9e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93551.0.png",
+      "fileName": "zr-c08898eadd0fce43-Zoning-Resolutions-24-551.0.png",
+      "contentType": "image/png",
+      "byteCount": 85843,
+      "contentHash": "c08898eadd0fce4355833693c9fe129e00f9a9f6bc4dd5e59797cfdad0c03f5f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2024%E2%80%93552.0.png",
+      "fileName": "zr-6b38fc3269302abf-Zoning-Resolutions-24-552.0.png",
+      "contentType": "image/png",
+      "byteCount": 43661,
+      "contentHash": "6b38fc3269302abf70cad6ba9d6a06fcebec4458dca5b6ee1920fc9fb4c05328"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93261.0.png",
+      "fileName": "zr-be03cbec1d81c6ff-Zoning-Resolutions-33-261.0.png",
+      "contentType": "image/png",
+      "byteCount": 8386,
+      "contentHash": "be03cbec1d81c6ff07262e67da77ce31164856bdf5cdb3eab559e47b4f49ed1a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93261.1.png",
+      "fileName": "zr-4b14e7ee9dbecb95-Zoning-Resolutions-33-261.1.png",
+      "contentType": "image/png",
+      "byteCount": 8514,
+      "contentHash": "4b14e7ee9dbecb95790251f32c8d71dd4827e507c87c0a5560cb9d92b064d87a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93291.0.png",
+      "fileName": "zr-5228f0c02a05f5b9-Zoning-Resolutions-33-291.0.png",
+      "contentType": "image/png",
+      "byteCount": 27653,
+      "contentHash": "5228f0c02a05f5b9f8ac901179443a4b5be62dfd217f32f1ba63ad5860e23369"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93292.0.png",
+      "fileName": "zr-cdd2d54dd729879d-Zoning-Resolutions-33-292.0.png",
+      "contentType": "image/png",
+      "byteCount": 18423,
+      "contentHash": "cdd2d54dd729879d91e1098dc82dbc2b7680e95c975df53da4cc96a12d9d68f0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93293.0.png",
+      "fileName": "zr-e19a6cbde2104ddf-Zoning-Resolutions-33-293.0.png",
+      "contentType": "image/png",
+      "byteCount": 19093,
+      "contentHash": "e19a6cbde2104ddf23fd957e53b683b3f71deeea2b34340f20c5084ad0972891"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93303.0.png",
+      "fileName": "zr-fedc1e1514ec3c99-Zoning-Resolutions-33-303.0.png",
+      "contentType": "image/png",
+      "byteCount": 12117,
+      "contentHash": "fedc1e1514ec3c99952c00d16d4b175b9f210c9a39e0abc5d79a527bfd16205f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93303.1.png",
+      "fileName": "zr-0844aa01f4bb53c4-Zoning-Resolutions-33-303.1.png",
+      "contentType": "image/png",
+      "byteCount": 10662,
+      "contentHash": "0844aa01f4bb53c4fb3e9c08533a14d1da0118f701640f6cb8b7f4455b62c26a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93432.0.png",
+      "fileName": "zr-ae85037697815e61-Zoning-Resolutions-33-432.0.png",
+      "contentType": "image/png",
+      "byteCount": 91758,
+      "contentHash": "ae85037697815e61fbe2daa2ff4c7f375837fd9916122a440c00930a36f8487d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2033%E2%80%93442.0.png",
+      "fileName": "zr-4fc8b3d3c18f2e10-Zoning-Resolutions-33-442.0.png",
+      "contentType": "image/png",
+      "byteCount": 100264,
+      "contentHash": "4fc8b3d3c18f2e10604e75f8cb56e204891605ee6aff9f9e6301edc186e26e52"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2036%E2%80%9358.0.png",
+      "fileName": "zr-5602b02e6510fbe9-Zoning-Resolutions-36-58.0.png",
+      "contentType": "image/png",
+      "byteCount": 73291,
+      "contentHash": "5602b02e6510fbe9ebcd48a549b21252fd5dc198606049030ce55b8fb71a66f3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2036%E2%80%9358.1.png",
+      "fileName": "zr-67721a9a33346da4-Zoning-Resolutions-36-58.1.png",
+      "contentType": "image/png",
+      "byteCount": 29768,
+      "contentHash": "67721a9a33346da468ef9cf25e96f295f3cf3e8ee77df26687e4050279e0f565"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2036%E2%80%9358.2.png",
+      "fileName": "zr-6ea0a505bdcb3831-Zoning-Resolutions-36-58.2.png",
+      "contentType": "image/png",
+      "byteCount": 37465,
+      "contentHash": "6ea0a505bdcb38319a315436418bc90a91406d0c16d3b370d687b4860130da83"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2036%E2%80%9373.0.png",
+      "fileName": "zr-c6b97183500e97a4-Zoning-Resolutions-36-73.0.png",
+      "contentType": "image/png",
+      "byteCount": 19800,
+      "contentHash": "c6b97183500e97a439cb4457a0f613859b54480f419b10555f31bf212a013d07"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2037%E2%80%93922.0.png",
+      "fileName": "zr-45c78954c5b6dadf-Zoning-Resolutions-37-922.0.png",
+      "contentType": "image/png",
+      "byteCount": 107969,
+      "contentHash": "45c78954c5b6dadf0d8b77a8897f48d5a492ea90e31d625078925cb71e67cff2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2037%E2%80%93922.1.png",
+      "fileName": "zr-0b1a02ef50e21280-Zoning-Resolutions-37-922.1.png",
+      "contentType": "image/png",
+      "byteCount": 31204,
+      "contentHash": "0b1a02ef50e21280623243b81b9a9ff590952edd7b2552de579c4fe2399db406"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%93261.0.png",
+      "fileName": "zr-be03cbec1d81c6ff-Zoning-Resolutions-43-261.0.png",
+      "contentType": "image/png",
+      "byteCount": 8386,
+      "contentHash": "be03cbec1d81c6ff07262e67da77ce31164856bdf5cdb3eab559e47b4f49ed1a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%93261.1.png",
+      "fileName": "zr-4b14e7ee9dbecb95-Zoning-Resolutions-43-261.1.png",
+      "contentType": "image/png",
+      "byteCount": 8514,
+      "contentHash": "4b14e7ee9dbecb95790251f32c8d71dd4827e507c87c0a5560cb9d92b064d87a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%93313.0.png",
+      "fileName": "zr-fedc1e1514ec3c99-Zoning-Resolutions-43-313.0.png",
+      "contentType": "image/png",
+      "byteCount": 12117,
+      "contentHash": "fedc1e1514ec3c99952c00d16d4b175b9f210c9a39e0abc5d79a527bfd16205f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%93313.1.png",
+      "fileName": "zr-0844aa01f4bb53c4-Zoning-Resolutions-43-313.1.png",
+      "contentType": "image/png",
+      "byteCount": 10662,
+      "contentHash": "0844aa01f4bb53c4fb3e9c08533a14d1da0118f701640f6cb8b7f4455b62c26a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%9343.0.png",
+      "fileName": "zr-2fd4b7caa141607b-Zoning-Resolutions-43-43.0.png",
+      "contentType": "image/png",
+      "byteCount": 56056,
+      "contentHash": "2fd4b7caa141607b55b58ae1c3414cc22d8b2af00322abfb86b15df0c68cc31f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2043%E2%80%9344.0.png",
+      "fileName": "zr-403ed68204b10ac9-Zoning-Resolutions-43-44.0.png",
+      "contentType": "image/png",
+      "byteCount": 64340,
+      "contentHash": "403ed68204b10ac98fd3abe3d682cd2375dd70ecb4f3f19b54313e2f35ae08a1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2061%E2%80%9330.0.png",
+      "fileName": "zr-419e4a01e9f5f4bf-Zoning-Resolutions-61-30.0.png",
+      "contentType": "image/png",
+      "byteCount": 44367,
+      "contentHash": "419e4a01e9f5f4bfd1bc7667ed418489aeaf83fde9dc103b00ed71f4018d2f58"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2061%E2%80%9342.0.png",
+      "fileName": "zr-f88ff3cdd091236b-Zoning-Resolutions-61-42.0.png",
+      "contentType": "image/png",
+      "byteCount": 85357,
+      "contentHash": "f88ff3cdd091236b740c5897237923c1996b2057d04fbf9cf523d05b9839960a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2061%E2%80%9342.1.png",
+      "fileName": "zr-15d7b0bba671954a-Zoning-Resolutions-61-42.1.png",
+      "contentType": "image/png",
+      "byteCount": 138961,
+      "contentHash": "15d7b0bba671954af30fb9480241d1a4c9c130fbc74b670658bcd933cfd24cbe"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2061%E2%80%9342.2.png",
+      "fileName": "zr-f20ff153673c0cb8-Zoning-Resolutions-61-42.2.png",
+      "contentType": "image/png",
+      "byteCount": 95739,
+      "contentHash": "f20ff153673c0cb83e4f78584abc55a8a6e1ff1ded8b6ca3133b83b14042b0cf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9311.0.png",
+      "fileName": "zr-94d2c711ddc9a0e5-Zoning-Resolutions-62-11.0.png",
+      "contentType": "image/png",
+      "byteCount": 27944,
+      "contentHash": "94d2c711ddc9a0e529488620e973446f9cc151e31e8d8f4985ac81608338b932"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9311.1.png",
+      "fileName": "zr-960af66d748301b4-Zoning-Resolutions-62-11.1.png",
+      "contentType": "image/png",
+      "byteCount": 30220,
+      "contentHash": "960af66d748301b4de65d8f23086b31d84f9ea0a35b119fe33cee86e2c0cf04b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9311.2.png",
+      "fileName": "zr-4b5c06bcb0ec44e4-Zoning-Resolutions-62-11.2.png",
+      "contentType": "image/png",
+      "byteCount": 47730,
+      "contentHash": "4b5c06bcb0ec44e4a095ddf6a5f53f059f41193bdf0fedecfd5023c542ec3ef4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9311.3.png",
+      "fileName": "zr-9384faadb271df87-Zoning-Resolutions-62-11.3.png",
+      "contentType": "image/png",
+      "byteCount": 40288,
+      "contentHash": "9384faadb271df872c3c60127ecf881c8eb67dd3291c534e10811313f22c7cbf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93332.0.png",
+      "fileName": "zr-603ae00ba3187902-Zoning-Resolutions-62-332.0.png",
+      "contentType": "image/png",
+      "byteCount": 62527,
+      "contentHash": "603ae00ba3187902c43131b3dfb1bedd01d4ec031cccc806239291153c960758"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93332.1.png",
+      "fileName": "zr-a74be0580e818764-Zoning-Resolutions-62-332.1.png",
+      "contentType": "image/png",
+      "byteCount": 44535,
+      "contentHash": "a74be0580e818764cb2193de13923b13849415d2ec7305d69347a8bf67dc8136"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93511.0.png",
+      "fileName": "zr-9dc404aeed663c77-Zoning-Resolutions-62-511.0.png",
+      "contentType": "image/png",
+      "byteCount": 102474,
+      "contentHash": "9dc404aeed663c775e8cae3055b3d41231cea1bf3e6294c508ac48fbe9b6bb67"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93511.1.png",
+      "fileName": "zr-7489b7ba82153f97-Zoning-Resolutions-62-511.1.png",
+      "contentType": "image/png",
+      "byteCount": 77684,
+      "contentHash": "7489b7ba82153f97bd0fb47230e84e593a243f1260b6e5da8da1b43ad88c5abf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93512.0.png",
+      "fileName": "zr-2951ae4d15483b0d-Zoning-Resolutions-62-512.0.png",
+      "contentType": "image/png",
+      "byteCount": 61019,
+      "contentHash": "2951ae4d15483b0d63394a8ae78c9bdfd976d6960b1a9a0306ce9303f331d0bc"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9354.0.png",
+      "fileName": "zr-bf2fdc093192606f-Zoning-Resolutions-62-54.0.png",
+      "contentType": "image/png",
+      "byteCount": 93892,
+      "contentHash": "bf2fdc093192606f6e6608cd40ec503de9a1a4ab7232f54c8308cb4b5f8754f7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93561.0.png",
+      "fileName": "zr-60fced360975bf35-Zoning-Resolutions-62-561.0.png",
+      "contentType": "image/png",
+      "byteCount": 78773,
+      "contentHash": "60fced360975bf35280f1cbf20a09ad30b7340d514a38c0891e437ba5d15ac0c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93561.1.png",
+      "fileName": "zr-8d53ee1c7286d0da-Zoning-Resolutions-62-561.1.png",
+      "contentType": "image/png",
+      "byteCount": 74040,
+      "contentHash": "8d53ee1c7286d0da08cd99c370dd2ce692ccd36188ee1f6d01406c3f247a2388"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93561.2.png",
+      "fileName": "zr-b322212bdcb9da12-Zoning-Resolutions-62-561.2.png",
+      "contentType": "image/png",
+      "byteCount": 47968,
+      "contentHash": "b322212bdcb9da12b7569249b8d045114812b56ee844d573bd421b105bcc0058"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%9364.0.png",
+      "fileName": "zr-5ed7619e30b80ef3-Zoning-Resolutions-62-64.0.png",
+      "contentType": "image/png",
+      "byteCount": 121736,
+      "contentHash": "5ed7619e30b80ef3410ae38762a7a4c931f4d365a0b9fd8a36d7e2235370505c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93654.0.png",
+      "fileName": "zr-47a88af90ed8643b-Zoning-Resolutions-62-654.0.png",
+      "contentType": "image/png",
+      "byteCount": 87225,
+      "contentHash": "47a88af90ed8643bb07e9b392f02c04b1c7da373b9d08fbe733c83cdb009ea00"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93931.0.png",
+      "fileName": "zr-41fd6d91b5086735-Zoning-Resolutions-62-931.0.png",
+      "contentType": "image/png",
+      "byteCount": 145869,
+      "contentHash": "41fd6d91b5086735508e16c0939c52ff5e55865b456ad51effc4153110e8b4bb"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93931.1.png",
+      "fileName": "zr-cccda1b0144b63cf-Zoning-Resolutions-62-931.1.png",
+      "contentType": "image/png",
+      "byteCount": 152093,
+      "contentHash": "cccda1b0144b63cff8a107eafa50822fc40fcf8b5fbb5827ef7d6c2b08c57776"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93931.2.png",
+      "fileName": "zr-f5026f7d1a1c64d1-Zoning-Resolutions-62-931.2.png",
+      "contentType": "image/png",
+      "byteCount": 219638,
+      "contentHash": "f5026f7d1a1c64d1e331176339d23081f4ed0dcce0e8b5ffc935035d8ee798cd"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93931.3.png",
+      "fileName": "zr-7fb64290e6e70b5a-Zoning-Resolutions-62-931.3.png",
+      "contentType": "image/png",
+      "byteCount": 210109,
+      "contentHash": "7fb64290e6e70b5a6973103295a80f4fed2a77c6f07d240d9edbf863305eff77"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2062%E2%80%93931.4.png",
+      "fileName": "zr-ab6b7b4b0f91b622-Zoning-Resolutions-62-931.4.png",
+      "contentType": "image/png",
+      "byteCount": 199931,
+      "contentHash": "ab6b7b4b0f91b622c99f4a00c5788d7428a8d535cf2318381eed880f41ac23ac"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2064%E2%80%93321.0.png",
+      "fileName": "zr-22fe3c2c20b69eaa-Zoning-Resolutions-64-321.0.png",
+      "contentType": "image/png",
+      "byteCount": 189593,
+      "contentHash": "22fe3c2c20b69eaa4770a6baf66ff47d1074b21831e8e2496689c5d450ee97a0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2064%E2%80%93321.1.png",
+      "fileName": "zr-f1c745d37dcd1acc-Zoning-Resolutions-64-321.1.png",
+      "contentType": "image/png",
+      "byteCount": 151567,
+      "contentHash": "f1c745d37dcd1acc0a6e744c86cf7b1b10305a9fb9abf057e4f10207a58351a8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2074%E2%80%93968.1.png",
+      "fileName": "zr-baf39df59ed079b7-Zoning-Resolutions-74-968.1.png",
+      "contentType": "image/png",
+      "byteCount": 167784,
+      "contentHash": "baf39df59ed079b76eeff103ca7514daea1c42c73528673a0e061d6a057a33aa"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2079%E2%80%93401.0.png",
+      "fileName": "zr-afffb320b20ee2ea-Zoning-Resolutions-79-401.0.png",
+      "contentType": "image/png",
+      "byteCount": 114963,
+      "contentHash": "afffb320b20ee2ea417455caccd5da5b4ae1841f0b8d45e2aa91b55f7fcad337"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2079%E2%80%93401.1.png",
+      "fileName": "zr-ea1a438482760e72-Zoning-Resolutions-79-401.1.png",
+      "contentType": "image/png",
+      "byteCount": 179119,
+      "contentHash": "ea1a438482760e7204022edf5b81330b434335fd6244026d6d4012e800bdb895"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.0.png",
+      "fileName": "zr-9bad4fe81b9f9262-Zoning-Resolutions-81-261.0.png",
+      "contentType": "image/png",
+      "byteCount": 52304,
+      "contentHash": "9bad4fe81b9f9262618782148e263ae2d27c96b728846e6dada8a0a5654f976d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.1.png",
+      "fileName": "zr-ec1b30898ef78599-Zoning-Resolutions-81-261.1.png",
+      "contentType": "image/png",
+      "byteCount": 74118,
+      "contentHash": "ec1b30898ef785996979e1a7d1a8739ef57d7af884425d19c98364bb6907e17a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.2.png",
+      "fileName": "zr-8d4fdc5d6482169b-Zoning-Resolutions-81-261.2.png",
+      "contentType": "image/png",
+      "byteCount": 61980,
+      "contentHash": "8d4fdc5d6482169b26db1ab454d1d41d0d4f049e4ae78c99e5fb87cddf29c1dc"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.3.png",
+      "fileName": "zr-30f868dc4d8499de-Zoning-Resolutions-81-261.3.png",
+      "contentType": "image/png",
+      "byteCount": 71456,
+      "contentHash": "30f868dc4d8499de488af1c6a934acbffb0bcd4f057a801d9ff73c71468c53e6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.4.png",
+      "fileName": "zr-8d0faaba1ac992f1-Zoning-Resolutions-81-261.4.png",
+      "contentType": "image/png",
+      "byteCount": 28787,
+      "contentHash": "8d0faaba1ac992f12ad288a49f3cd42b4fa2ff1de83ff6f1d1a677868969cd09"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.5.png",
+      "fileName": "zr-dd26456732eacc57-Zoning-Resolutions-81-261.5.png",
+      "contentType": "image/png",
+      "byteCount": 90879,
+      "contentHash": "dd26456732eacc577fa1a04cb43dc5baa1cc79e81e2d0831835c764ab982ec8b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.6.png",
+      "fileName": "zr-1a56f0cb5f8517f2-Zoning-Resolutions-81-261.6.png",
+      "contentType": "image/png",
+      "byteCount": 62976,
+      "contentHash": "1a56f0cb5f8517f2dfcf5f60362a1cb02058303fe6707ca8a9935bfc8160aeb4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93261.7.png",
+      "fileName": "zr-c4d11536af9c3d24-Zoning-Resolutions-81-261.7.png",
+      "contentType": "image/png",
+      "byteCount": 71906,
+      "contentHash": "c4d11536af9c3d24f40fb7da59c426c4a8f29a5ae9f8fecd94fb6785006945bf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93262.0.png",
+      "fileName": "zr-6127ae61a2ca36d4-Zoning-Resolutions-81-262.0.png",
+      "contentType": "image/png",
+      "byteCount": 46485,
+      "contentHash": "6127ae61a2ca36d4de2db660d6bab7d675bb20af75cee2ce6f3065771b8503b7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93262.1.png",
+      "fileName": "zr-f34825d2de4f0d56-Zoning-Resolutions-81-262.1.png",
+      "contentType": "image/png",
+      "byteCount": 51040,
+      "contentHash": "f34825d2de4f0d5665c0c2b1359b9380427db9a5ec6e3137646b7d8c173559de"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93264.0.png",
+      "fileName": "zr-e0445fc12879ad51-Zoning-Resolutions-81-264.0.png",
+      "contentType": "image/png",
+      "byteCount": 64535,
+      "contentHash": "e0445fc12879ad51753205306afc41461223b597a6b830dbe8be70034cb0be70"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93264.1.png",
+      "fileName": "zr-27461e8c592fdecf-Zoning-Resolutions-81-264.1.png",
+      "contentType": "image/png",
+      "byteCount": 47179,
+      "contentHash": "27461e8c592fdecf9b379d4757c94ce2ef123eabf679f7b97e3a0950002ff76f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93264.2.png",
+      "fileName": "zr-6e457bb2d3a23e04-Zoning-Resolutions-81-264.2.png",
+      "contentType": "image/png",
+      "byteCount": 29505,
+      "contentHash": "6e457bb2d3a23e040eda06102774f0e7c21082f633b934c3c902e8badd3fe910"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93264.3.png",
+      "fileName": "zr-122518081bfd5430-Zoning-Resolutions-81-264.3.png",
+      "contentType": "image/png",
+      "byteCount": 28505,
+      "contentHash": "122518081bfd5430e22b64be85b865a8a80f0d2d9497cdda62b4acefee2f94df"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93264.4.png",
+      "fileName": "zr-634acc64a86d1576-Zoning-Resolutions-81-264.4.png",
+      "contentType": "image/png",
+      "byteCount": 42911,
+      "contentHash": "634acc64a86d1576bdf98ad81240f2fac74ced06b8fbf3cf1cf3609e063c17db"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93265.0.png",
+      "fileName": "zr-65d665ac29076e5c-Zoning-Resolutions-81-265.0.png",
+      "contentType": "image/png",
+      "byteCount": 25778,
+      "contentHash": "65d665ac29076e5cf9c9b74cdd6b7967601b7ff4c4d1941a85588ba18db63d57"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93265.1.png",
+      "fileName": "zr-49d373790a2acdee-Zoning-Resolutions-81-265.1.png",
+      "contentType": "image/png",
+      "byteCount": 175767,
+      "contentHash": "49d373790a2acdeeb663c219a0e7a4ec147fb4d83b95a8de9a4646f6f5ae1a43"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93265.2.png",
+      "fileName": "zr-4b4a67fbf67e320f-Zoning-Resolutions-81-265.2.png",
+      "contentType": "image/png",
+      "byteCount": 30788,
+      "contentHash": "4b4a67fbf67e320fa0572417fe5704e920f40ccb3c25441ae4a3ce1f9f532a52"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93265.3.png",
+      "fileName": "zr-c356c958982a1aab-Zoning-Resolutions-81-265.3.png",
+      "contentType": "image/png",
+      "byteCount": 95720,
+      "contentHash": "c356c958982a1aab1ce778849246e925d70d4bdd5a4b8efe06c0c3a678b122c8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93265.4.png",
+      "fileName": "zr-02a5368d3c0b4370-Zoning-Resolutions-81-265.4.png",
+      "contentType": "image/png",
+      "byteCount": 103099,
+      "contentHash": "02a5368d3c0b4370f5697b955da87bcd5e842c6f70db3f411cb9f76a545af59d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93271.0.png",
+      "fileName": "zr-d25769fe599643e7-Zoning-Resolutions-81-271.0.png",
+      "contentType": "image/png",
+      "byteCount": 21443,
+      "contentHash": "d25769fe599643e7fb6b7e19558c524cc54991a44da7e632b48d7b889224c87f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93271.1.png",
+      "fileName": "zr-d4d0d72d01293bee-Zoning-Resolutions-81-271.1.png",
+      "contentType": "image/png",
+      "byteCount": 43171,
+      "contentHash": "d4d0d72d01293bee471c2b67e78fc162f0776872250a83814dc94d193bc36c28"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93272.0.png",
+      "fileName": "zr-2e8382ce491b80dc-Zoning-Resolutions-81-272.0.png",
+      "contentType": "image/png",
+      "byteCount": 69445,
+      "contentHash": "2e8382ce491b80dc637d045de3e01f4422587780928ac8d34040779c0fce2add"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93272.1.png",
+      "fileName": "zr-2a84dd73edf8266a-Zoning-Resolutions-81-272.1.png",
+      "contentType": "image/png",
+      "byteCount": 73796,
+      "contentHash": "2a84dd73edf8266aabee951c98f4c1776dfd65f8b57860ebd9c2f9d4155e0ddf"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93272.2.png",
+      "fileName": "zr-5635f1a7534d85f5-Zoning-Resolutions-81-272.2.png",
+      "contentType": "image/png",
+      "byteCount": 40043,
+      "contentHash": "5635f1a7534d85f50c3895186825356d6ef0414f80a47f09d903425a80533e17"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93272.3.png",
+      "fileName": "zr-3b35395c8161941e-Zoning-Resolutions-81-272.3.png",
+      "contentType": "image/png",
+      "byteCount": 56114,
+      "contentHash": "3b35395c8161941ed7400ce321c546b4223d9bf906a1434098ef73f92c878de0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93272.4.png",
+      "fileName": "zr-ba51a0af91930461-Zoning-Resolutions-81-272.4.png",
+      "contentType": "image/png",
+      "byteCount": 25008,
+      "contentHash": "ba51a0af91930461c191f51a603dfc4ed7b142931c4cee1e41cb6e1a2bac3479"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93273.0.png",
+      "fileName": "zr-542ff17262f6d5ae-Zoning-Resolutions-81-273.0.png",
+      "contentType": "image/png",
+      "byteCount": 14475,
+      "contentHash": "542ff17262f6d5ae103702909f9b50c5fa8f703739db6e27383e28388812b4a8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93273.1.png",
+      "fileName": "zr-17f30f17e55dd22d-Zoning-Resolutions-81-273.1.png",
+      "contentType": "image/png",
+      "byteCount": 51803,
+      "contentHash": "17f30f17e55dd22d3a7f5fa311730ff594872fa7cd792f6b53ba0d858054f081"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93274.0.png",
+      "fileName": "zr-b90c1bf1c6a87b41-Zoning-Resolutions-81-274.0.png",
+      "contentType": "image/png",
+      "byteCount": 45748,
+      "contentHash": "b90c1bf1c6a87b419b9bdb0aa67a7baba68ac23ffc4bbf05fcd9d6b954b40435"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93274.1.png",
+      "fileName": "zr-25ef47fce2c6fab6-Zoning-Resolutions-81-274.1.png",
+      "contentType": "image/png",
+      "byteCount": 94098,
+      "contentHash": "25ef47fce2c6fab67240c295abbbf190fd2154675fc088edd113345ed4baba49"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%9343.0.png",
+      "fileName": "zr-b493977aa45b9a43-Zoning-Resolutions-81-43.0.png",
+      "contentType": "image/png",
+      "byteCount": 183659,
+      "contentHash": "b493977aa45b9a434d11294a92eade684b82d0fd4bd014ba253bf048cd95bd78"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2081%E2%80%93732.0.png",
+      "fileName": "zr-87113a7bf19819a1-Zoning-Resolutions-81-732.0.png",
+      "contentType": "image/png",
+      "byteCount": 88714,
+      "contentHash": "87113a7bf19819a1c7be3fcebc52841030109b258d389bd158de518fffa579a9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2091%E2%80%9334.0.png",
+      "fileName": "zr-d0e00ad37daf1d9d-Zoning-Resolutions-91-34.0.png",
+      "contentType": "image/png",
+      "byteCount": 30764,
+      "contentHash": "d0e00ad37daf1d9df3db6f573317cd6d48a0e45b25dd076f46a0960573981365"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.0.png",
+      "fileName": "zr-9dbb67a1387d21d9-Zoning-Resolutions-95-031.0.png",
+      "contentType": "image/png",
+      "byteCount": 42547,
+      "contentHash": "9dbb67a1387d21d9fdadf1fb35984f7412df1179d13e9b8870431e9ef6a97531"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.1.png",
+      "fileName": "zr-0c41d18e971d271f-Zoning-Resolutions-95-031.1.png",
+      "contentType": "image/png",
+      "byteCount": 19862,
+      "contentHash": "0c41d18e971d271feedf9874094a997be5e608f8fa21e6ae5f8ee53bd8e1d66a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.2.png",
+      "fileName": "zr-7e77e392b4311f3d-Zoning-Resolutions-95-031.2.png",
+      "contentType": "image/png",
+      "byteCount": 16875,
+      "contentHash": "7e77e392b4311f3db02c077f937d8fe468dd4d0c3bc8551a4630cd9f33dde1bb"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.3.png",
+      "fileName": "zr-3bc541cd6096f6f3-Zoning-Resolutions-95-031.3.png",
+      "contentType": "image/png",
+      "byteCount": 12069,
+      "contentHash": "3bc541cd6096f6f3e25efedad58cda5998347f8a74f9a392c23e8fd36580659d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.4.png",
+      "fileName": "zr-3bb7e574db043f3a-Zoning-Resolutions-95-031.4.png",
+      "contentType": "image/png",
+      "byteCount": 31523,
+      "contentHash": "3bb7e574db043f3a47c608e1a3ace7479be385370f4c4d64e99457e8dbf0f895"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93031.5.png",
+      "fileName": "zr-be6b2f20c487644d-Zoning-Resolutions-95-031.5.png",
+      "contentType": "image/png",
+      "byteCount": 31966,
+      "contentHash": "be6b2f20c487644de08891357a90fa42b0c7c3c32706ee3c0f658335c0195ae1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%2095%E2%80%93033.0.png",
+      "fileName": "zr-d9ab9750e0b7bca7-Zoning-Resolutions-95-033.0.png",
+      "contentType": "image/png",
+      "byteCount": 28395,
+      "contentHash": "d9ab9750e0b7bca7d85252d6afe6917ed03cb331aea1f16ffd98a0e273552f24"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20E-Design%20Requirements%20for%20Plazas,%20Residential%20Plazas%20and%20Urban%20Plazas%20Developed%20Prior%20to%20October%2017,%202007.4.png",
+      "fileName": "zr-a0984db8530307d5-ts-for-Plazas-Residential-Plazas-and-Urban-Plazas-Developed-Prior-to-October-17-2007.4.png",
+      "contentType": "image/png",
+      "byteCount": 11391,
+      "contentHash": "a0984db8530307d52f903c5a2ccc51b5a2ea77047e5a881eda238f1f720d5f0f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.10.png",
+      "fileName": "zr-898a01b04c5e1e58-Zoning-Resolutions-Appendix-I-Transit-Zone.10.png",
+      "contentType": "image/png",
+      "byteCount": 388667,
+      "contentHash": "898a01b04c5e1e5861a1088eed641036089c5c5fc9043758b0cc32f13f40b691"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.11.png",
+      "fileName": "zr-479e8d38153a65b8-Zoning-Resolutions-Appendix-I-Transit-Zone.11.png",
+      "contentType": "image/png",
+      "byteCount": 382838,
+      "contentHash": "479e8d38153a65b86799a9ce5db0cb5e8beaa39bf3b2202aaf50a8166baca329"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.12.png",
+      "fileName": "zr-dff352f8af15e493-Zoning-Resolutions-Appendix-I-Transit-Zone.12.png",
+      "contentType": "image/png",
+      "byteCount": 397105,
+      "contentHash": "dff352f8af15e493936ba73d67c2d4364d32861d5cf4639014197e25d52f1392"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.13.png",
+      "fileName": "zr-c4d1f6aae7092566-Zoning-Resolutions-Appendix-I-Transit-Zone.13.png",
+      "contentType": "image/png",
+      "byteCount": 427449,
+      "contentHash": "c4d1f6aae709256695fed13384c2eb0f199f9490c27a1a0c2b0cbd9f83267e0b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.14.png",
+      "fileName": "zr-3e9d8f979a6b3983-Zoning-Resolutions-Appendix-I-Transit-Zone.14.png",
+      "contentType": "image/png",
+      "byteCount": 473053,
+      "contentHash": "3e9d8f979a6b3983f3862774dc5ef320fa3cc3f05a28a93ed8a00e5760c9ab1a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.15.png",
+      "fileName": "zr-62cff55c46b4abcb-Zoning-Resolutions-Appendix-I-Transit-Zone.15.png",
+      "contentType": "image/png",
+      "byteCount": 387220,
+      "contentHash": "62cff55c46b4abcbe9cd48f9ba7d0f822f659bdb4a83c706b684ad2f30c44c0f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.16.png",
+      "fileName": "zr-2da2a4bb277cafea-Zoning-Resolutions-Appendix-I-Transit-Zone.16.png",
+      "contentType": "image/png",
+      "byteCount": 423349,
+      "contentHash": "2da2a4bb277cafea1a73222564f5201525f760d0a350c6d7b6a09b7243cc080e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.17.png",
+      "fileName": "zr-e75f9bbb9711b58a-Zoning-Resolutions-Appendix-I-Transit-Zone.17.png",
+      "contentType": "image/png",
+      "byteCount": 385471,
+      "contentHash": "e75f9bbb9711b58a01ebbeeb8bf8efcb2cbe485640d81fea47bca08aa128ee94"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.21.png",
+      "fileName": "zr-7239129bc7a2904b-Zoning-Resolutions-Appendix-I-Transit-Zone.21.png",
+      "contentType": "image/png",
+      "byteCount": 318224,
+      "contentHash": "7239129bc7a2904be566d0befa44812a153bdb8669d456f6dc331709e106add4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.10.png",
+      "fileName": "zr-f3b5910c96053868-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.10.png",
+      "contentType": "image/png",
+      "byteCount": 256621,
+      "contentHash": "f3b5910c9605386804cf5e6c5a83298b9455756bee261c227636c709f8d56028"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.11.png",
+      "fileName": "zr-2b0eed8c75865cfc-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.11.png",
+      "contentType": "image/png",
+      "byteCount": 246414,
+      "contentHash": "2b0eed8c75865cfc25d8542ff3d41dc2f1a246d94689d0e7d096c8a4cdff7870"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.12.png",
+      "fileName": "zr-5bf9146e941e6af9-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.12.png",
+      "contentType": "image/png",
+      "byteCount": 237242,
+      "contentHash": "5bf9146e941e6af992dcd3598af1f100c822732cf6f2da1ce8223196eb68b5c4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.13.png",
+      "fileName": "zr-d4b1c68b4306aa65-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.13.png",
+      "contentType": "image/png",
+      "byteCount": 294604,
+      "contentHash": "d4b1c68b4306aa656605ce61cdad009e412a508876f994a53521203c750fae04"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.14.png",
+      "fileName": "zr-97212d49cdfd8289-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.14.png",
+      "contentType": "image/png",
+      "byteCount": 181456,
+      "contentHash": "97212d49cdfd8289867972a5beee09b4af754ab8056deb87e5f7306b9797a8de"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.16.png",
+      "fileName": "zr-30815b5d48fc1143-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.16.png",
+      "contentType": "image/png",
+      "byteCount": 264947,
+      "contentHash": "30815b5d48fc1143a95312bb4013d0466d58547f19a0060313d27f683dad7b08"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.17.png",
+      "fileName": "zr-3c46c841449ada1d-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.17.png",
+      "contentType": "image/png",
+      "byteCount": 329045,
+      "contentHash": "3c46c841449ada1d82fdb6724ce7185a595a5e87c027e807b29d94c24d760d4f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.18.png",
+      "fileName": "zr-a19269dce4e51697-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.18.png",
+      "contentType": "image/png",
+      "byteCount": 287233,
+      "contentHash": "a19269dce4e51697c4cfcb5005b126253038c54a1d8824905c49deea7165384e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.19.png",
+      "fileName": "zr-73d4036e8165ca69-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.19.png",
+      "contentType": "image/png",
+      "byteCount": 323549,
+      "contentHash": "73d4036e8165ca69fa03376c419c07fd06e5e950803552347caa80621d38a138"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.20.png",
+      "fileName": "zr-a1ba467a95881700-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.20.png",
+      "contentType": "image/png",
+      "byteCount": 229672,
+      "contentHash": "a1ba467a9588170092db0d9067055de163c2c6bbeea4f6ae367d852c244e9672"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.21.png",
+      "fileName": "zr-78beee256ec35d39-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.21.png",
+      "contentType": "image/png",
+      "byteCount": 315712,
+      "contentHash": "78beee256ec35d3981d7e4320119301127dbd278f68e27ec25a3575b4686d976"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.22.png",
+      "fileName": "zr-0e1928762d6790e4-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.22.png",
+      "contentType": "image/png",
+      "byteCount": 333003,
+      "contentHash": "0e1928762d6790e458df833e31898214bd46009e4e1728bf5aa7a05eca50fa04"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.23.png",
+      "fileName": "zr-51c02c36ef6c85de-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.23.png",
+      "contentType": "image/png",
+      "byteCount": 392075,
+      "contentHash": "51c02c36ef6c85de066e3ff9f520697f5e9c06a602eac712378b7d2234273061"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.24.png",
+      "fileName": "zr-593e58d2c5a99174-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.24.png",
+      "contentType": "image/png",
+      "byteCount": 263711,
+      "contentHash": "593e58d2c5a99174c85676e40f9afd61dd6a1ebdbff60342231e6ad3395fbb8f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.25.png",
+      "fileName": "zr-53ce60cba274df85-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.25.png",
+      "contentType": "image/png",
+      "byteCount": 320362,
+      "contentHash": "53ce60cba274df858203acbafc10b4c7752c56c2eda32c739f1dc1e05870d9ee"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.26.png",
+      "fileName": "zr-53bc52f263862331-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.26.png",
+      "contentType": "image/png",
+      "byteCount": 314516,
+      "contentHash": "53bc52f263862331dbf782c939df9c7f76381b41e18641cb93fb465aac15f216"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.27.png",
+      "fileName": "zr-dec7ab81b6a577b9-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.27.png",
+      "contentType": "image/png",
+      "byteCount": 430920,
+      "contentHash": "dec7ab81b6a577b96dfa266055a1e96091f9979c70c40c4ca258f8b4cdfc5096"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.29.png",
+      "fileName": "zr-2a1c4498cf6b3119-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.29.png",
+      "contentType": "image/png",
+      "byteCount": 343735,
+      "contentHash": "2a1c4498cf6b311993fa9ffce98a7e0a70d12c3402a0efa9080329026e002975"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.30.png",
+      "fileName": "zr-9dd9a2cdc216348c-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.30.png",
+      "contentType": "image/png",
+      "byteCount": 304343,
+      "contentHash": "9dd9a2cdc216348cbef32eb0d270b65a3779c03650f7d27cdfc4cc2900027bd6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.31.png",
+      "fileName": "zr-d5740341b644dce4-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.31.png",
+      "contentType": "image/png",
+      "byteCount": 246123,
+      "contentHash": "d5740341b644dce4ebba23c010be14d1c7ed99ea25b13abdc9f59c2de56c7093"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.32.png",
+      "fileName": "zr-06f22bbc29bebcea-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.32.png",
+      "contentType": "image/png",
+      "byteCount": 316253,
+      "contentHash": "06f22bbc29bebcea5097a3fb0e60039913a3a5d2140a571f0addc0c5454461e3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.33.png",
+      "fileName": "zr-41f642a677ce38f9-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.33.png",
+      "contentType": "image/png",
+      "byteCount": 283526,
+      "contentHash": "41f642a677ce38f977dccd2dbf79a74115cdf03afd57cfcd6f779a5cbb06e7a5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.34.png",
+      "fileName": "zr-724c53886c3f6bd5-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.34.png",
+      "contentType": "image/png",
+      "byteCount": 343738,
+      "contentHash": "724c53886c3f6bd5fc1318742c43a43c49e5991f3c77ee2676aec3a65173b415"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.35.png",
+      "fileName": "zr-90a1b5cebb7191e8-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.35.png",
+      "contentType": "image/png",
+      "byteCount": 360601,
+      "contentHash": "90a1b5cebb7191e837b75ae6530fbec28bdc87d343b564e615e28e37fba6750f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.36.png",
+      "fileName": "zr-8b93d422df67c38a-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.36.png",
+      "contentType": "image/png",
+      "byteCount": 416964,
+      "contentHash": "8b93d422df67c38acb609c81500e5cf98a118a6b64731ff062cee052e11d1391"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.37.png",
+      "fileName": "zr-bf974e507fe5ed31-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.37.png",
+      "contentType": "image/png",
+      "byteCount": 306199,
+      "contentHash": "bf974e507fe5ed31243ef4b158d200c90e5ca46d1578ff9c58dcd842e44b1cb1"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.38.png",
+      "fileName": "zr-a51f9f33b7eba727-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.38.png",
+      "contentType": "image/png",
+      "byteCount": 262239,
+      "contentHash": "a51f9f33b7eba727bb2549cf9b6b55de207ad0bbc861e732f53c4382b0b8ae21"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.39.png",
+      "fileName": "zr-4d50b9e20a5bddd1-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.39.png",
+      "contentType": "image/png",
+      "byteCount": 163044,
+      "contentHash": "4d50b9e20a5bddd1ec41ece452248963425b06805aea502d8b32024efae9c17c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.40.png",
+      "fileName": "zr-df8c396049109b11-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.40.png",
+      "contentType": "image/png",
+      "byteCount": 277700,
+      "contentHash": "df8c396049109b11436e37477422a4465922afde6e12e8f1b081c4472b068b19"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.41.png",
+      "fileName": "zr-3bc189d38e80304a-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.41.png",
+      "contentType": "image/png",
+      "byteCount": 396246,
+      "contentHash": "3bc189d38e80304ac68bf852cab4fcb2e49b85a900a4a2c84dae8085df659183"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.42.png",
+      "fileName": "zr-4a78a471ac25ce96-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.42.png",
+      "contentType": "image/png",
+      "byteCount": 359829,
+      "contentHash": "4a78a471ac25ce96737bdd8f1f15e3976169b12470fedfe3d21abca7624e68b8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.43.png",
+      "fileName": "zr-b5fa783663e48d23-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.43.png",
+      "contentType": "image/png",
+      "byteCount": 327346,
+      "contentHash": "b5fa783663e48d23b0f446498a8aeddc559b2c2d9290d15a5f0ba38e4ac9a078"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.44.png",
+      "fileName": "zr-4367567605f21b92-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.44.png",
+      "contentType": "image/png",
+      "byteCount": 283378,
+      "contentHash": "4367567605f21b92e24860699c3ff753a9e1f416a9dad15064fdb789a4c35d51"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.45.png",
+      "fileName": "zr-071d220cf025892a-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.45.png",
+      "contentType": "image/png",
+      "byteCount": 257756,
+      "contentHash": "071d220cf025892a138cff1c9b73459a40fca326e747ee48da248d9b6e19dc61"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.46.png",
+      "fileName": "zr-8faa0b7edeaf9edf-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.46.png",
+      "contentType": "image/png",
+      "byteCount": 240145,
+      "contentHash": "8faa0b7edeaf9edf965526216dfc4dc254aefeeb7f324ae0c1c10d921ef95aa2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.47.png",
+      "fileName": "zr-d07b418d33cc4ace-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.47.png",
+      "contentType": "image/png",
+      "byteCount": 276651,
+      "contentHash": "d07b418d33cc4ace467e125bd03be7448d8e20e089a347a958142f14f1857a36"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.48.png",
+      "fileName": "zr-86eb07ccd579c543-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.48.png",
+      "contentType": "image/png",
+      "byteCount": 410936,
+      "contentHash": "86eb07ccd579c54322d0d6b9468b9d6ed4273a30b43f51ff8518cb491ffd0357"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.49.png",
+      "fileName": "zr-c655da957bd8fc92-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.49.png",
+      "contentType": "image/png",
+      "byteCount": 304710,
+      "contentHash": "c655da957bd8fc92582ce72d067e1334a023bfdbf085b66d997693bde377fe22"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.50.png",
+      "fileName": "zr-2a902659faea6c8d-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.50.png",
+      "contentType": "image/png",
+      "byteCount": 286443,
+      "contentHash": "2a902659faea6c8dfdc68b9ded773eaf8ec4c047d76f4a0396376e7febe11498"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.51.png",
+      "fileName": "zr-5c94928ad9f5af53-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.51.png",
+      "contentType": "image/png",
+      "byteCount": 393168,
+      "contentHash": "5c94928ad9f5af5357d25075462d725fabdf2d10f6a6ce682da8e0288454b6f2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.52.png",
+      "fileName": "zr-ec1a8be5c713e18c-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.52.png",
+      "contentType": "image/png",
+      "byteCount": 285800,
+      "contentHash": "ec1a8be5c713e18c221fe8a18935b317430778f37ed4d348b9b989c9e80938ce"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.53.png",
+      "fileName": "zr-be7bd24dea089400-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.53.png",
+      "contentType": "image/png",
+      "byteCount": 288019,
+      "contentHash": "be7bd24dea0894001ecd9d94d88edb83b4eb8de30fcba51b0e446b8dc3301c2b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.54.png",
+      "fileName": "zr-c284d916fc86f575-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.54.png",
+      "contentType": "image/png",
+      "byteCount": 267751,
+      "contentHash": "c284d916fc86f575c6b2a2b5de96d034a5e459fdfa6a60bd6930c6516c3208b2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.55.png",
+      "fileName": "zr-18a0cfb99c910c8c-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.55.png",
+      "contentType": "image/png",
+      "byteCount": 201446,
+      "contentHash": "18a0cfb99c910c8c9da9bfa10262f1cab36f578de2c003b01eeec04f9a76c7a5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.56.png",
+      "fileName": "zr-73502b155d5f08b5-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.56.png",
+      "contentType": "image/png",
+      "byteCount": 165363,
+      "contentHash": "73502b155d5f08b5edb8341cfebb4c18bd7ad2b46e92d91ba74d8b02eab8bf6f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.57.png",
+      "fileName": "zr-c31b1660b36c1cef-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.57.png",
+      "contentType": "image/png",
+      "byteCount": 174490,
+      "contentHash": "c31b1660b36c1cefec9e42061c0173fee6dcf9cfeacda6cd8483f01c70210d6e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.58.png",
+      "fileName": "zr-1f29a9a14d78efec-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.58.png",
+      "contentType": "image/png",
+      "byteCount": 266907,
+      "contentHash": "1f29a9a14d78efec79992d2733adc930648ae94af7af0832dfcbcfc07f99c2c4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.59.png",
+      "fileName": "zr-a3271a7e6ab8d229-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.59.png",
+      "contentType": "image/png",
+      "byteCount": 192601,
+      "contentHash": "a3271a7e6ab8d229ae1f0cc3a5cb48e8ef10ffdd964365d88c73818deed533b5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.6.png",
+      "fileName": "zr-57dfb93a8ad7d4c2-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.6.png",
+      "contentType": "image/png",
+      "byteCount": 137914,
+      "contentHash": "57dfb93a8ad7d4c24b83bc84e0565ead4a597c09ece6710234fec0e252ad8b01"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.60.png",
+      "fileName": "zr-eb7d1b878b5542c1-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.60.png",
+      "contentType": "image/png",
+      "byteCount": 192030,
+      "contentHash": "eb7d1b878b5542c11446b71fd4abc3bf3a8a04f544214992d265b8aeea9606a6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.61.png",
+      "fileName": "zr-fdc47d4795783a91-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.61.png",
+      "contentType": "image/png",
+      "byteCount": 212779,
+      "contentHash": "fdc47d4795783a914cd4e39efb70b2b0d941c7c3fbae1d592169adf1f5ce77f0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.62.png",
+      "fileName": "zr-0a7e5bd4bdd39cb5-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.62.png",
+      "contentType": "image/png",
+      "byteCount": 221939,
+      "contentHash": "0a7e5bd4bdd39cb5c0fbd7e9ec41cd68637996b0a01d2d1cd4087c88df9f1b44"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.63.png",
+      "fileName": "zr-6ad064673e7a667b-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.63.png",
+      "contentType": "image/png",
+      "byteCount": 236334,
+      "contentHash": "6ad064673e7a667b2a45c89442a759c31c0fef35a0e6ac87001746bb70069efe"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.7.png",
+      "fileName": "zr-787f670ae4e49194-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.7.png",
+      "contentType": "image/png",
+      "byteCount": 160918,
+      "contentHash": "787f670ae4e491940e2c4e0f10f13c50e7f1c5f8be01ec50ab0785ab0e3afe10"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.8.png",
+      "fileName": "zr-ade0675886010184-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.8.png",
+      "contentType": "image/png",
+      "byteCount": 158153,
+      "contentHash": "ade06758860101842938194290ec7c46bcd65e33377ccbd6ed2799f73624408d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20J-Designated%20Areas%20Within%20Manufacturing%20Districts.9.png",
+      "fileName": "zr-40d9d96698864a20-Zoning-Resolutions-Appendix-J-Designated-Areas-Within-Manufacturing-Districts.9.png",
+      "contentType": "image/png",
+      "byteCount": 133994,
+      "contentHash": "40d9d96698864a20cbbe82d03bb073d8a187d4c7717c1eb5c0b0e2770d3cc692"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.10.png",
+      "fileName": "zr-ba1b5ac8bd7cebc5-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.10.png",
+      "contentType": "image/png",
+      "byteCount": 150411,
+      "contentHash": "ba1b5ac8bd7cebc50f6fb7fdc3be5421ad69cbcdcef6aecedeb83a408a465b7e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.11.png",
+      "fileName": "zr-800278b6662c8f81-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.11.png",
+      "contentType": "image/png",
+      "byteCount": 162170,
+      "contentHash": "800278b6662c8f817a2ebb513e9798e66ee796270f696a3162c43e3a23ca1617"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.6.png",
+      "fileName": "zr-7d2f1c4c4dc427f5-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.6.png",
+      "contentType": "image/png",
+      "byteCount": 127220,
+      "contentHash": "7d2f1c4c4dc427f5d3993c998beaafed496cb648f5443abff877f74ee8988725"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.7.png",
+      "fileName": "zr-b26c97ba310c13a9-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.7.png",
+      "contentType": "image/png",
+      "byteCount": 201184,
+      "contentHash": "b26c97ba310c13a95271391544ac6be3e9a13d3952499e420aea7210846230b0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.8.png",
+      "fileName": "zr-dd2eeee7f03ccf81-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.8.png",
+      "contentType": "image/png",
+      "byteCount": 232129,
+      "contentHash": "dd2eeee7f03ccf81b282597a41d01a15a8a7ff50dee5a2db3102a56766e31e8e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/doc_images/Zoning%20Resolutions%20Appendix%20K-Areas%20With%20Nursing%20Home%20Restrictions.9.png",
+      "fileName": "zr-3f8b6a607159bf40-Zoning-Resolutions-Appendix-K-Areas-With-Nursing-Home-Restrictions.9.png",
+      "contentType": "image/png",
+      "byteCount": 151826,
+      "contentHash": "3f8b6a607159bf403a9f39a1824baf33e203e32aef4ecb9b64dd66c473ee739c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/Impeded%20Access%20Frontages_800x652%20png.png",
+      "fileName": "zr-05b35b68dd4384bf-Impeded-Access-Frontages_800x652-png.png",
+      "contentType": "image/png",
+      "byteCount": 36354,
+      "contentHash": "05b35b68dd4384bf5581257c86ec044bde3f869b6843acdf99b21c370b538fc8"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/130%20St.%20Felix%20Street%20ready%20for%20ZR_F%20BK%20CD2%20Map%208.jpg",
+      "fileName": "zr-8d1ea0598fb42b3f-130-St.-Felix-Street-ready-for-ZR_F-BK-CD2-Map-8.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 227127,
+      "contentHash": "8d1ea0598fb42b3f2dbee4015ebd8a578baf823deb5e1d2a729735c953a45051"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/1776%2048th%20ST_APPENDIX%20F%20BK%20CD12%20Map%204_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-d35d7a30d35ba7df-1776-48th-ST_APPENDIX-F-BK-CD12-Map-4_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 148964,
+      "contentHash": "d35d7a30d35ba7df198a410d2ee9eee19e94a82afdec1ca421fee2541a9dc7c6"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/2021-12-15_SoHo_NoHo_ZoningText_Map_MIH%20with%20effective%20date_ready%20for%20ZR-01_0.jpg",
+      "fileName": "zr-a46943647bb12125-2021-12-15_SoHo_NoHo_ZoningText_Map_MIH-with-effective-date_ready-for-ZR-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 387454,
+      "contentHash": "a46943647bb1212555fafbd87b0f257b0aca25a254e2336dca218ad8a049e235"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/31st%20Street%20Rezoning%20-%20MIHMap%20%283-23-21%29_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-9bf46f6bd544dc85-31st-Street-Rezoning---MIHMap-3-23-21-_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 324157,
+      "contentHash": "9bf46f6bd544dc8570831f92b22f0e6afa24b0a28d122573da37aee3bc0c4a4b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/909%20Castle%20Hill%20Avenue%20-%20MIHMap%20%286-30-21%29_ready%20for%20ZR.jpg",
+      "fileName": "zr-bfe44dbf76eabb35-909-Castle-Hill-Avenue---MIHMap-6-30-21-_ready-for-ZR.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 113742,
+      "contentHash": "bfe44dbf76eabb356dedfe7d429b13075af52b4933265f5a5eb0d0a8d4f48413"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPENDIX%20F_BX%20CD%209_Map%207_Area%207_.jpg",
+      "fileName": "zr-e3b88b8be51887bd-APPENDIX-F_BX-CD-9_Map-7_Area-7_.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 280002,
+      "contentHash": "e3b88b8be51887bdef7051a6e5dacd734057a4e439aaf3a7eb619473e1a014c5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPENDIX%20F_KCD12_Map1_Area3-01.jpg",
+      "fileName": "zr-36bbb3e882f56bcf-APPENDIX-F_KCD12_Map1_Area3-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 503166,
+      "contentHash": "36bbb3e882f56bcf8568937d06b1ee6494e940293347cbd8fe578e1a005a6ef9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPENDIX%20F%20BK%20CD%201%20Map%205%20MIHa%208.jpg",
+      "fileName": "zr-812e7cc7e6e325a3-APPENDIX-F-BK-CD-1-Map-5-MIHa-8.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 139736,
+      "contentHash": "812e7cc7e6e325a3858edd1abbe9025d474f74f6f4fb9a0c08110b6ec46b9e4f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPENDIX%20F%20Bronx%20CD4_Map3Area%203.jpg",
+      "fileName": "zr-3d02117c9c47e20c-APPENDIX-F-Bronx-CD4_Map3Area-3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 90729,
+      "contentHash": "3d02117c9c47e20c6f2422d3fc5d0a8c3ef22245ee5fa0e01f8bcdaeb6b3c7db"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPX%20F_BX%20CD%2012_Map2_Area%202.jpg",
+      "fileName": "zr-4ccfbbe8ca43d2b6-APPX-F_BX-CD-12_Map2_Area-2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 118590,
+      "contentHash": "4ccfbbe8ca43d2b618932d8f44e07f50c175f5cc4808bf5f05b46993d453c494"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPX%20F_QN%20CD%201_Map%204_MIH%20area%2013_19May2022-01.jpg",
+      "fileName": "zr-e02940261ddef698-APPX-F_QN-CD-1_Map-4_MIH-area-13_19May2022-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 622084,
+      "contentHash": "e02940261ddef6989cd1fbe05da52a65db4903c30f3e62d6cb49546c1370dd6d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/APPX%20F%20BX%20CD%2010%20Map%201%20Area%201_0.jpg",
+      "fileName": "zr-059ffcad3baf1276-APPX-F-BX-CD-10-Map-1-Area-1_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 496149,
+      "contentHash": "059ffcad3baf1276524ef8b5c9f1b8eebd66723805a6bdb8f8c956e7aa18953b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD01-Map-3.png",
+      "fileName": "zr-a8c037b01811cae6-BK-CD01-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 134196,
+      "contentHash": "a8c037b01811cae6707ee21f69228277b2fb1018786076834942a201b9d9e42b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD01-Map-4.png",
+      "fileName": "zr-82c9229aa251f679-BK-CD01-Map-4.png",
+      "contentType": "image/png",
+      "byteCount": 368367,
+      "contentHash": "82c9229aa251f679349aabc68087d0d66079c3d129dda335d97579e06a773845"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD02-Map-6.png",
+      "fileName": "zr-4de401a6eece6a70-BK-CD02-Map-6.png",
+      "contentType": "image/png",
+      "byteCount": 269753,
+      "contentHash": "4de401a6eece6a707c66064211a7395e41323840fbf0fe45e78ced7ea1ff494b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD03-Map-2.png",
+      "fileName": "zr-b7e3f18b4df5efd4-BK-CD03-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 160905,
+      "contentHash": "b7e3f18b4df5efd4ed6e16ded5d4c61b5393dcb01a1df3749615c27977b77d33"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD04-Map-1.png",
+      "fileName": "zr-69ad8cb73435762c-BK-CD04-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 351803,
+      "contentHash": "69ad8cb73435762c4ca3e6fb76fc8b2485d6e349a73a803629f118f67df121f3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD11-Map-1.png",
+      "fileName": "zr-f2fa42ede36bec29-BK-CD11-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 187667,
+      "contentHash": "f2fa42ede36bec2906051be1fcfd64e18658b5b2888f7f1dd4d4956fbc93b73c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD12-Map-1.png",
+      "fileName": "zr-d6cdf99758570151-BK-CD12-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 150621,
+      "contentHash": "d6cdf99758570151d2f20fd7c3845d84463a2e357e195c702ce48fc50ff1778a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD12-Map-2.png",
+      "fileName": "zr-2eb70269b03ca9a4-BK-CD12-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 173009,
+      "contentHash": "2eb70269b03ca9a42eb5663a00338fb277861b7eefc8de0ae276717a2f3a93ae"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BK-CD16-Map-3.png",
+      "fileName": "zr-9aaf9e72495a129d-BK-CD16-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 219223,
+      "contentHash": "9aaf9e72495a129d65724b53974b19b277ff4319f744458320ad7786f7a4d6f2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD1-Map-2.png",
+      "fileName": "zr-ed56c4ebd3222148-BX-CD1-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 305372,
+      "contentHash": "ed56c4ebd322214832192d1432f04029a21567f7985519b70e570cf14a0640c2"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD1-Map-4.png",
+      "fileName": "zr-77f47083eaad2961-BX-CD1-Map-4.png",
+      "contentType": "image/png",
+      "byteCount": 154975,
+      "contentHash": "77f47083eaad2961e2bd3dc51583aecddadc334e38c95bd5c8d44bce0dc57333"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD1-Map-6.png",
+      "fileName": "zr-6d2886b97b9ccbb5-BX-CD1-Map-6.png",
+      "contentType": "image/png",
+      "byteCount": 186724,
+      "contentHash": "6d2886b97b9ccbb5da2ec28d36a7bdbcbb7f09729a0f79f565148564012a900a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD1-Map-8.png",
+      "fileName": "zr-ffdc83a8c5434ef9-BX-CD1-Map-8.png",
+      "contentType": "image/png",
+      "byteCount": 167548,
+      "contentHash": "ffdc83a8c5434ef9cbb05e92534a4bfdf813c900e503be0f4977fda58feb5b29"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD11-Map-3.png",
+      "fileName": "zr-5103dda3ee777e7d-BX-CD11-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 190113,
+      "contentHash": "5103dda3ee777e7d99bdbc073b2bb464064c2fb1506fbeceddd15023355ab5c4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD2-Map-1.png",
+      "fileName": "zr-0946002730698fac-BX-CD2-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 168153,
+      "contentHash": "0946002730698fac211df33399c5bf6eaa78e4e7758bc6735aa8a7bc1fd93152"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD2-Map-2.png",
+      "fileName": "zr-965ca5aaac92ff33-BX-CD2-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 254128,
+      "contentHash": "965ca5aaac92ff33353bd274913cf329967be76c8db61450ac266962258b417c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD3-Map-1.png",
+      "fileName": "zr-d5bca5a8958a832f-BX-CD3-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 284286,
+      "contentHash": "d5bca5a8958a832f5f346eaec6206c337ae696896fff9151af3855e1c842f409"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD4-5-7-Map-1.png",
+      "fileName": "zr-4dda66348b30edee-BX-CD4-5-7-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 693585,
+      "contentHash": "4dda66348b30edee1f8d74cd4296d145668d07805134ac1b71956e5b961ba3cb"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD4-5-7-Map-2.png",
+      "fileName": "zr-7cfb28d7547d8a69-BX-CD4-5-7-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 606637,
+      "contentHash": "7cfb28d7547d8a6914069e2dad0f4af6cb12fde421ff9ab1f3a6ed75cd9dea54"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD4-Map-1.png",
+      "fileName": "zr-359c8ba788c0d868-BX-CD4-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 501630,
+      "contentHash": "359c8ba788c0d868eecb11bc0f4c0a0556aa1c1af929dbb1006a1fddc1566ae9"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD4-Map-2.png",
+      "fileName": "zr-5891356e7a8b0087-BX-CD4-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 204818,
+      "contentHash": "5891356e7a8b0087d71626f2239a0d500543fc5af0bbad51d88340c42a4009ad"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD6-Map-2.png",
+      "fileName": "zr-c33c43c4da03136b-BX-CD6-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 260903,
+      "contentHash": "c33c43c4da03136beb63226b1baf6e00fc493a8ef96235f9636806c4c83a0f04"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD6-Map-4.png",
+      "fileName": "zr-16aea52c3c2de6aa-BX-CD6-Map-4.png",
+      "contentType": "image/png",
+      "byteCount": 329973,
+      "contentHash": "16aea52c3c2de6aaaa453dedf5fd90e4491284329d8baf7cfdf7479f02bf5d0c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD6-Map-5.png",
+      "fileName": "zr-c706dd8b9411ff94-BX-CD6-Map-5.png",
+      "contentType": "image/png",
+      "byteCount": 271698,
+      "contentHash": "c706dd8b9411ff949ac9439bf9b5cf259b3d5300a8d7a01ba8934b1032348080"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD6-Map-6.png",
+      "fileName": "zr-6095857f76569393-BX-CD6-Map-6.png",
+      "contentType": "image/png",
+      "byteCount": 269280,
+      "contentHash": "6095857f765693938a78a1d628fbcb50a057703dbb5b3c1da47f99c3592fca9d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD7-Map-1.png",
+      "fileName": "zr-491e00177e1e356a-BX-CD7-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 276909,
+      "contentHash": "491e00177e1e356a9d0192ff2f400273a1197ec95a595c03bc3439d922ea8a7f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD9-Map-2.png",
+      "fileName": "zr-e599b8340df83d48-BX-CD9-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 233977,
+      "contentHash": "e599b8340df83d48841ed855595f760353fa0c2845a2839f0ef1a60387f29a67"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD9-Map-3.png",
+      "fileName": "zr-bad459941055004e-BX-CD9-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 253666,
+      "contentHash": "bad459941055004ec2eab52ba7fe09f96f72e655c296da3e810aa59c21ceec77"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD9-Map-4.png",
+      "fileName": "zr-0fa95318521a4479-BX-CD9-Map-4.png",
+      "contentType": "image/png",
+      "byteCount": 221261,
+      "contentHash": "0fa95318521a4479c782d6dd72f8c3cae4249cf30ed42f5d149a5026438c35eb"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/BX-CD9-Map-5.png",
+      "fileName": "zr-dc9e2ff16c113d2b-BX-CD9-Map-5.png",
+      "contentType": "image/png",
+      "byteCount": 145076,
+      "contentHash": "dc9e2ff16c113d2b17767b989bb717d8db420ff1f169d85c9df17414d8971405"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/F%20MN%20CD4%20Map4_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-9faed620eba9f3f9-F-MN-CD4-Map4_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 198762,
+      "contentHash": "9faed620eba9f3f9b28ca57c70581ea209205ba859d3b04176a2e42427ad94b0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/F%20QN%20CD%208%20Map%201%20Area%201_185-17%20Hillside%20Avenue_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-d01d64869dc00969-F-QN-CD-8-Map-1-Area-1_185-17-Hillside-Avenue_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 205557,
+      "contentHash": "d01d64869dc00969dfa71785c53870b7f4b1a1ecff36d0f6e3369039b80b14f7"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/Fbx1_1%20Map1%20BxCD1%20without%20underline-01_0.jpg",
+      "fileName": "zr-c41ab4fac3513ea4-Fbx1_1-Map1-BxCD1-without-underline-01_0.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 172846,
+      "contentHash": "c41ab4fac3513ea412a26b680c515e6bccbf79e77b2031aeb47d49d845a5fe18"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/Fbx6_1%20Map1%20CD6-01.jpg",
+      "fileName": "zr-3f49b1383cb7fa76-Fbx6_1-Map1-CD6-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 207929,
+      "contentHash": "3f49b1383cb7fa762bf82821f6956d5507e9f7d057ad48c35c9b95d1d6e39305"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD01-Map-1.png",
+      "fileName": "zr-588214b0185b64a6-MN-CD01-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 233466,
+      "contentHash": "588214b0185b64a6615306890f79dec65d5e81bbbada7dcf1cac2990c9c6fa27"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD02-Map-1.png",
+      "fileName": "zr-21afb5545305c194-MN-CD02-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 352170,
+      "contentHash": "21afb5545305c19489c244bf6db6fca7eefc096bda64417bd0ccd1ba107e04da"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD03-Map-1.png",
+      "fileName": "zr-1aa69fde240a2465-MN-CD03-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 487779,
+      "contentHash": "1aa69fde240a24659f676ebfa740f3e14a31712b9d9a43472c5dc4a295b179e4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD03-Map-2.png",
+      "fileName": "zr-9949a2168d976e77-MN-CD03-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 326717,
+      "contentHash": "9949a2168d976e7733f04973c37b641c3a4e342c48458e7151ca361ddb053c4b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD04-Map-1.png",
+      "fileName": "zr-df0609830c11c8a1-MN-CD04-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 207255,
+      "contentHash": "df0609830c11c8a18507a427ee2fedcb1e9484c75be66220c239538adee6712f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD04-Map-3.png",
+      "fileName": "zr-1e9c0ce5b19f4124-MN-CD04-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 38580,
+      "contentHash": "1e9c0ce5b19f4124b989046bb8592568dab593fe880b5e9304aa85a0b7a9fad4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD05-Map-1.png",
+      "fileName": "zr-d21d240bb488dec7-MN-CD05-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 83857,
+      "contentHash": "d21d240bb488dec7703bb7f86519eb5052466df7e3f7931e42a60aff206fa689"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD06-Map-1.png",
+      "fileName": "zr-cee5dab7f33dfcc5-MN-CD06-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 59924,
+      "contentHash": "cee5dab7f33dfcc56031195fad2dde651cc6fbe244b530c34cb0079a8f2901d0"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD07-Map-1.png",
+      "fileName": "zr-db2c65d8589ab527-MN-CD07-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 158448,
+      "contentHash": "db2c65d8589ab527967f2ac663b6dd2b1450b9295db1def6f092a04e860468be"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD07-Map-2.png",
+      "fileName": "zr-171d926508956546-MN-CD07-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 62160,
+      "contentHash": "171d92650895654645826523288f06c701a4000458482e70b391de18bc619d7a"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD07-Map-3.png",
+      "fileName": "zr-80227e8a5e16f8c6-MN-CD07-Map-3.png",
+      "contentType": "image/png",
+      "byteCount": 193874,
+      "contentHash": "80227e8a5e16f8c6c74cf0a32ab678556cef1ac46e213c60ef49a677725cd6da"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD09-Map-1.png",
+      "fileName": "zr-d7f245cd1ecd96ec-MN-CD09-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 65374,
+      "contentHash": "d7f245cd1ecd96ec1c7634945144382dfd55b9d0816f70acc831c70d42487f0e"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD10-Map-1.png",
+      "fileName": "zr-e980c59aa996a895-MN-CD10-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 152574,
+      "contentHash": "e980c59aa996a895f0e79bb7b7b4326964808fde15d996a7673e58faa7298de5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/MN-CD11-Map-6.png",
+      "fileName": "zr-92a86b1395a0e150-MN-CD11-Map-6.png",
+      "contentType": "image/png",
+      "byteCount": 281203,
+      "contentHash": "92a86b1395a0e15081518bff494bfaa0b2b6f226661eda4c5e8352c6ba486501"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/NYBC%20MIH%20Map_ready%20for%20ZR-01.jpg",
+      "fileName": "zr-6866fa5ce10805f9-NYBC-MIH-Map_ready-for-ZR-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 307474,
+      "contentHash": "6866fa5ce10805f98df2154b8dba39093ade15421e7f76e507ab31a20f67d5a5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/QN-CD02-Map-2.png",
+      "fileName": "zr-fa7f7d03489d4512-QN-CD02-Map-2.png",
+      "contentType": "image/png",
+      "byteCount": 308933,
+      "contentHash": "fa7f7d03489d4512ba2572808266c97217f70429dcd86eabf38d69d583e84e7f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/QN-CD07-Map-1.png",
+      "fileName": "zr-f6dd39a6907f541c-QN-CD07-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 270931,
+      "contentHash": "f6dd39a6907f541cb5f913d94b6e8d7ead8db83084124f0f7c534ecebfd4870d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/QN-CD11-Map-1.png",
+      "fileName": "zr-e823ad6b87fabb76-QN-CD11-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 190397,
+      "contentHash": "e823ad6b87fabb768c0a85c23c8e3cbe97bde75c90a3a722ff8b7dd8e13f707d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/QN-CD12-Map-1.png",
+      "fileName": "zr-05e94eeffe30842e-QN-CD12-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 271234,
+      "contentHash": "05e94eeffe30842eae771660f18a9ad6dc73efbe89ec4f14c3535c2f9c749da5"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/SI-CD1-Map-1.png",
+      "fileName": "zr-f175821fe5fba9ab-SI-CD1-Map-1.png",
+      "contentType": "image/png",
+      "byteCount": 278599,
+      "contentHash": "f175821fe5fba9ab904ef3ba3654a08e1652a9c028151f4eb119fab08b3e9afa"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/Suydam%20Street_ready%20for%20ZR.jpg",
+      "fileName": "zr-1e506a3146768b88-Suydam-Street_ready-for-ZR.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 231751,
+      "contentHash": "1e506a3146768b8879983b419f6002e0cbce6142cb81ad867f51c06d588eb58b"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/inline-images/Zoning%20Resolutions%20Appendix%20I-Transit%20Zone.7.fixed_.png",
+      "fileName": "zr-8d5695a273a14c99-Zoning-Resolutions-Appendix-I-Transit-Zone.7.fixed_.png",
+      "contentType": "image/png",
+      "byteCount": 1054803,
+      "contentHash": "8d5695a273a14c999d10b5dc0b1f4bed8fc2ef8e36ee7f47513a6a8d25cf24fa"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/proposed%20map-01.jpg",
+      "fileName": "zr-37002c224cfeb924-proposed-map-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 263224,
+      "contentHash": "37002c224cfeb9240c7e8ae90563bcdafe6dd358361b638e4290f86d7a6557da"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/Social%20block%20diagram_800x652.png",
+      "fileName": "zr-b640e0cbb203d6b5-Social-block-diagram_800x652.png",
+      "contentType": "image/png",
+      "byteCount": 35658,
+      "contentHash": "b640e0cbb203d6b5812e6ec5f8d1dd7cd68f365658b422e9d2c36f63ce89ac93"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZone_KeyMap-01.jpg",
+      "fileName": "zr-e65968964f208872-TransitZone_KeyMap-01.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 937248,
+      "contentHash": "e65968964f2088722ce3d884acc558d4a12e23f71ff7ca9cace0e75ff80e35a3"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZoneMap12_1.jpg",
+      "fileName": "zr-8dba2bd3160b60cc-TransitZoneMap12_1.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2423150,
+      "contentHash": "8dba2bd3160b60ccf0480e8879f401f3697db1d7c1cfad5483127096b27e4ab4"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZoneMap13.jpg",
+      "fileName": "zr-1214a873acbe8712-TransitZoneMap13.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2553978,
+      "contentHash": "1214a873acbe8712fa65b6f9486bfb9c6ebf8e68613dee010b503eed25c4ab01"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZoneMap14.jpg",
+      "fileName": "zr-140ad79f747c8e92-TransitZoneMap14.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2798810,
+      "contentHash": "140ad79f747c8e921ffb6538cabab970318f31e3d76b564960a83f275703848f"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZoneMap2.jpg",
+      "fileName": "zr-1f73f7c60ce25b9f-TransitZoneMap2.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2131293,
+      "contentHash": "1f73f7c60ce25b9fb6fa95f8cd2b571b4b289d88e2a94e2dd66d46cfbb05ab0c"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/TransitZoneMap3.jpg",
+      "fileName": "zr-0d63ae37f3e28ea5-TransitZoneMap3.jpg",
+      "contentType": "image/jpeg",
+      "byteCount": 2551555,
+      "contentHash": "0d63ae37f3e28ea56058e5fac1a5f46a6fa7561ad66e8b53c947766d26b2095d"
+    },
+    {
+      "sourceURL": "https://zr.planning.nyc.gov/sites/default/files/Zoning%20Resolution%20Article%20X%20Chapter%209%20Special%20Little%20Italy%20District%20109-23%20Storefront_0.png",
+      "fileName": "zr-9ad22420b5069a93-oning-Resolution-Article-X-Chapter-9-Special-Little-Italy-District-109-23-Storefront_0.png",
+      "contentType": "image/png",
+      "byteCount": 37515,
+      "contentHash": "9ad22420b5069a9317a8264b097d3d37c2d91c9f20bcef10402f81957cbec469"
+    }
+  ],
+  "validationSummary": {
+    "articles": 14,
+    "chapters": 101,
+    "appendixPages": 16,
+    "sections": 4068,
+    "subsections": 6571,
+    "tables": 305,
+    "mapReferences": 208,
+    "amendmentEvents": 13141,
+    "assets": 423
+  },
+  "researchEligibility": false,
+  "researchBlockedReason": "Zoning is excluded from AI Research until zoning-specific citation, table, map, amendment, and evaluation gates pass."
+}

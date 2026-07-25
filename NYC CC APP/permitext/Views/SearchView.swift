@@ -139,6 +139,11 @@ struct SearchView: View {
             .onChange(of: library.pendingDeepLinkedSectionID) { _, _ in
                 openPendingDeepLinkedSectionIfNeeded()
             }
+            .onChange(of: library.isInitialContentLoaded) { _, isLoaded in
+                if isLoaded {
+                    openPendingDeepLinkedSectionIfNeeded()
+                }
+            }
             .task(id: query) {
                 let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
                 guard !trimmedQuery.isEmpty else {
@@ -320,6 +325,7 @@ struct SearchView: View {
 
     private func openPendingDeepLinkedSectionIfNeeded() {
         guard library.selectedTab == .search,
+              library.isInitialContentLoaded,
               let sectionID = library.consumePendingDeepLinkedSectionID() else { return }
         isSearchFieldFocused = false
         searchNavigationPath = NavigationPath()

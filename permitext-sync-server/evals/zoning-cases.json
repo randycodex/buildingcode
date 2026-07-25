@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "libraryID": "nyc-zoning-resolution",
+  "codeVersion": "NYC Zoning Resolution — text through 2026-07-16",
+  "researchEligibility": false,
+  "governance": {
+    "status": "draft",
+    "humanReviewRequired": true,
+    "minimumQualifiedReviewers": 1,
+    "automaticApprovalAllowed": false,
+    "paidEvaluationAllowed": false,
+    "reviewScope": [
+      "citation fidelity",
+      "tables",
+      "maps",
+      "appendices",
+      "amendment history",
+      "special-purpose districts",
+      "explicit uncertainty"
+    ]
+  },
+  "cases": [
+    {
+      "id": "zr-rules-of-construction",
+      "category": "citation-fidelity",
+      "status": "draft",
+      "question": "How does the Zoning Resolution instruct a reader to resolve a conflict between the enacted text and an illustration or summary table?",
+      "selectedEvidenceSectionIDs": [20018521],
+      "requiredConcepts": [
+        "The particular controls the general.",
+        "The enacted text controls over a caption, illustration, summary table, or illustrative table.",
+        "The answer identifies Section 12-01."
+      ],
+      "forbiddenClaims": [
+        "An illustration overrides the enacted text.",
+        "The answer relies on a section outside the selected evidence."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "zr-use-group-table",
+      "category": "table",
+      "status": "draft",
+      "question": "Using only the selected table, summarize how Use Group I allowances differ across M1, M2, and M3 districts and explain the table symbols.",
+      "selectedEvidenceSectionIDs": [20017276],
+      "requiredConcepts": [
+        "The answer treats the table as structured evidence.",
+        "The answer distinguishes district columns and symbol meanings.",
+        "The answer does not infer a use allowance from prose that is absent from the selected table."
+      ],
+      "forbiddenClaims": [
+        "Every Use Group I use has the same allowance in every Manufacturing District.",
+        "A symbol is interpreted without support in the selected evidence."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "zr-appendix-map-boundaries",
+      "category": "map",
+      "status": "draft",
+      "question": "What can the selected Appendix J material establish about designated areas, and what site-specific conclusion cannot be made without identifying the applicable map and location?",
+      "selectedEvidenceSectionIDs": [20021237],
+      "requiredConcepts": [
+        "The answer cites Appendix J.",
+        "The answer distinguishes Subarea 1 and Subarea 2 treatment described in the selected evidence.",
+        "The answer states that a parcel-specific conclusion requires the applicable map and parcel location."
+      ],
+      "forbiddenClaims": [
+        "A particular tax lot is inside a designated area without parcel and map evidence.",
+        "The map image is treated as decorative rather than authoritative selected evidence."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "zr-special-district-demolition",
+      "category": "special-purpose-district",
+      "status": "draft",
+      "question": "What prerequisites does Section 101-75 state before a demolition permit may be issued in the identified Subdistrict, and what exception does it recognize?",
+      "selectedEvidenceSectionIDs": [20020889],
+      "requiredConcepts": [
+        "The answer identifies the Special Downtown Brooklyn District context.",
+        "The answer describes building-application approval and the stated construction-financing evidence.",
+        "The answer recognizes the unsafe-building exception stated in the selected provision."
+      ],
+      "forbiddenClaims": [
+        "The rule is described as citywide.",
+        "The answer invents a demolition prerequisite not present in the selected evidence."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "zr-amendment-history",
+      "category": "amendment-history",
+      "status": "draft",
+      "question": "What does the imported amendment history show about Section 42-00, and what should a professional verify before relying on a historical version for a particular date?",
+      "selectedEvidenceSectionIDs": [20017271],
+      "requiredConcepts": [
+        "The answer distinguishes current text from amendment-history metadata.",
+        "The answer identifies multiple amendment events.",
+        "The answer recommends verifying the effective date and official report for the date at issue."
+      ],
+      "forbiddenClaims": [
+        "The current text is represented as unchanged since 1961.",
+        "An amendment note is treated as a complete historical reconstruction of prior enacted text."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    },
+    {
+      "id": "zr-missing-location-facts",
+      "category": "explicit-uncertainty",
+      "status": "draft",
+      "question": "Is a proposed self-storage use permitted as-of-right on a specific property when no address, zoning district, special district, or mapped subarea has been provided?",
+      "selectedEvidenceSectionIDs": [20017276, 20021237],
+      "requiredConcepts": [
+        "The answer declines to make a parcel-specific determination.",
+        "The answer identifies the missing location, zoning-district, special-district, and mapped-subarea facts.",
+        "The answer separates general use-table evidence from map applicability."
+      ],
+      "forbiddenClaims": [
+        "The proposed use is approved or prohibited for the unidentified property.",
+        "The answer silently retrieves evidence outside the selected sections."
+      ],
+      "reviewer": null,
+      "reviewedAt": null
+    }
+  ]
+}

@@ -80,7 +80,7 @@ final class BundleDatabaseLocator {
         let entries: [CachedScanEntry]
     }
 
-    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v2"
+    private static let cacheDefaultsKey = "BundleDatabaseLocator.cachedScan.v3"
 
     private static var appVersionKey: String {
         let info = Bundle.main.infoDictionary

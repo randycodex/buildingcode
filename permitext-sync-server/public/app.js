@@ -6,9 +6,10 @@ import {
 import {
   defaultSyncCodeVersion,
   syncCodeVersion,
+  syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260720-sync-contract-v2";
+} from "./sync-identity.js?v=20260724-zoning-library-v3";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
@@ -25,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260724-evidence-discovery-v4";
+} from "./offline-storage.js?v=20260724-zoning-library-v6";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -80,7 +81,8 @@ const codeOptions = [
   { prefix: "AC", label: "General Administrative Code", theme: "administrative" },
   { prefix: "PC", label: "Plumbing Code", theme: "plumbing" },
   { prefix: "MC", label: "Mechanical Code", theme: "mechanical" },
-  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" }
+  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" },
+  { prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }
 ];
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
@@ -1051,6 +1053,7 @@ function newReaderState(overrides = {}) {
   return {
     id: crypto.randomUUID(),
     codePrefix,
+    codeVersion: syncCodeVersion(overrides.codeVersion || syncCodeVersionForPrefix(codePrefix)),
     chapterID: overrides.chapterID || "",
     sectionID: "",
     sectionNumber: "",
@@ -1427,8 +1430,10 @@ function searchLinkedReadersBySearch() {
 }
 
 function readerFieldsForSectionDetail(detail, overrides = {}) {
+  const codePrefix = detail.codePrefix || "BC";
   return {
-    codePrefix: detail.codePrefix || "BC",
+    codePrefix,
+    codeVersion: syncCodeVersion(detail.codeVersion || syncCodeVersionForPrefix(codePrefix)),
     chapterID: detail.chapterID || "",
     sectionID: detail.sectionID,
     sectionNumber: detail.sectionNumber || "",
@@ -1608,8 +1613,10 @@ function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
 }
 
 function searchResultDetail(result) {
+  const codePrefix = result.codePrefix || "BC";
   return {
-    codePrefix: result.codePrefix || "BC",
+    codePrefix,
+    codeVersion: syncCodeVersion(result.codeVersion || syncCodeVersionForPrefix(codePrefix)),
     chapterID: result.chapterID || "",
     chapterNumber: result.chapterNumber || "",
     sectionID: result.id || result.sectionID,
@@ -1981,9 +1988,9 @@ function sectionDisplayTitle(sectionNumber, title, fallback = "Section") {
     if (/^appendix\b/i.test(cleanTitle) || /^section\b/i.test(cleanTitle)) {
       return cleanTitle;
     }
-    const duplicatePattern = new RegExp(`^${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i");
+    const duplicatePattern = new RegExp(`^(?:§\\s*)?${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i");
     if (duplicatePattern.test(cleanTitle)) {
-      return cleanTitle;
+      return cleanTitle.replace(/^§\s*/i, "").trim();
     }
   }
   return `${number} ${cleanTitle || fallback}`.trim();
@@ -2166,7 +2173,7 @@ function sectionTitleWithoutNumber(section) {
   const number = String(section?.sectionNumber || "").trim();
   const title = String(section?.title || "").trim();
   if (!number || !title) return title;
-  return title.replace(new RegExp(`^${escapeRegExp(number)}(?:\\b|[\\s.:;-]+)`, "i"), "").trim() || title;
+  return stripLeadingSectionNumber(title, number) || title;
 }
 
 function codeLabel(prefix) {
@@ -3745,6 +3752,10 @@ async function pushMutation(mutation) {
 
 function savedMutationForReader(reader) {
   return savedMutationForSection({
+    codeVersion: reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix),
+    codePrefix: reader.codePrefix || "BC",
+    chapterID: reader.chapterID || "",
+    chapterNumber: reader.chapterNumber || "",
     sectionID: reader.sectionID,
     sectionNumber: reader.sectionNumber,
     title: reader.title
@@ -3760,11 +3771,12 @@ function savedMutationForSection(section) {
 }
 
 function savedRecordForSection(section, userID = "local-web", updatedAt = new Date().toISOString()) {
+  const codePrefix = section.codePrefix || "BC";
   return {
     id: `web-saved-${section.sectionID}`,
     userID,
-    codeVersion: defaultSyncCodeVersion,
-    codePrefix: section.codePrefix || "BC",
+    codeVersion: syncCodeVersion(section.codeVersion || syncCodeVersionForPrefix(codePrefix)),
+    codePrefix,
     chapterID: section.chapterID || "",
     chapterNumber: section.chapterNumber || "",
     sectionID: Number(section.sectionID),
@@ -3782,7 +3794,9 @@ function projectSectionRecordForSection(project, sectionPayload) {
   return {
     id: `web-project-section-${folderClientID}-${sectionID}`,
     userID: account?.userID || "local-web",
-    codeVersion: defaultSyncCodeVersion,
+    codeVersion: syncCodeVersion(
+      sectionPayload.codeVersion || syncCodeVersionForPrefix(sectionPayload.codePrefix)
+    ),
     codePrefix: sectionPayload.codePrefix || "BC",
     chapterID: sectionPayload.chapterID || "",
     chapterNumber: sectionPayload.chapterNumber || "",
@@ -4548,9 +4562,12 @@ function renderAnnotationTagEditor(container, target, options = {}) {
 }
 
 function annotationTargetForSection(section, reader = null, overrides = {}) {
+  const codePrefix = reader?.codePrefix || section.codePrefix || "BC";
   return {
-    codeVersion: defaultSyncCodeVersion,
-    codePrefix: reader?.codePrefix || section.codePrefix || "BC",
+    codeVersion: syncCodeVersion(
+      reader?.codeVersion || section.codeVersion || syncCodeVersionForPrefix(codePrefix)
+    ),
+    codePrefix,
     chapterID: reader?.chapterID || section.chapterID || "",
     chapterNumber: reader?.chapterNumber || section.chapterNumber || "",
     sectionID: section.id || section.sectionID,
@@ -4570,7 +4587,7 @@ function annotationTargetForBlock(section, block, reader = null, index = 0) {
 }
 
 function annotatedBlocksForSection(section) {
-  const sourceBlocks = section.blocks?.length ? section.blocks : [{ id: `section-${section.id}`, plainText: section.title || "" }];
+  const sourceBlocks = Array.isArray(section.blocks) ? section.blocks : [];
   return sourceBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
 }
 
@@ -5498,7 +5515,9 @@ function renderCodeBlock(block) {
 }
 
 function markResearchSelectable(element, source = {}) {
-  if (!element || !source.sectionID) return element;
+  if (!element || !source.sectionID || String(source.codePrefix || "").toUpperCase() === "ZR") {
+    return element;
+  }
   element.classList.add("research-selectable-text");
   element.dataset.researchSectionId = String(source.sectionID);
   element.dataset.researchSectionNumber = String(source.sectionNumber || "");
@@ -5951,6 +5970,7 @@ async function renderReader(reader, options = {}) {
   codeSelect.addEventListener("change", async () => {
     closeReaderNotesSheet(panel, reader, { instant: true });
     reader.codePrefix = codeSelect.value || "BC";
+    reader.codeVersion = syncCodeVersionForPrefix(reader.codePrefix);
     applyCodeTheme(panel, reader);
     reader.chapterID = await firstChapterIDForCode(reader.codePrefix);
     reader.sectionID = "";
@@ -6727,7 +6747,14 @@ function pencilIconSVG() {
 }
 
 function makeSectionPayloadFromDetail(detail, section) {
+  const codePrefix = detail.codePrefix || section?.codePrefix || "BC";
   return {
+    codeVersion: syncCodeVersion(
+      detail.codeVersion || section?.codeVersion || syncCodeVersionForPrefix(codePrefix)
+    ),
+    codePrefix,
+    chapterID: detail.chapterID || section?.chapterID || "",
+    chapterNumber: detail.chapterNumber || section?.chapterNumber || "",
     sectionID: detail.sectionID,
     sectionNumber: section?.sectionNumber || detail.sectionNumber || "",
     title: section?.title || detail.title || "Section"
@@ -6743,12 +6770,10 @@ async function renderSectionDetail(searchID, detail) {
 
   const { chapter, section } = await resolveSectionDetail(detail);
   const sectionPayload = makeSectionPayloadFromDetail(detail, section);
-  sectionPayload.codePrefix = detail.codePrefix || "BC";
-  sectionPayload.chapterID = detail.chapterID || chapter?.id || "";
-  sectionPayload.chapterNumber = detail.chapterNumber || chapter?.chapterNumber || "";
+  sectionPayload.chapterID ||= chapter?.id || "";
+  sectionPayload.chapterNumber ||= chapter?.chapterNumber || "";
   const sectionTarget = {
     ...sectionPayload,
-    codeVersion: defaultSyncCodeVersion,
     blockID: ""
   };
   const saved = isSectionSaved(detail.sectionID);
@@ -6810,10 +6835,16 @@ async function renderSectionDetail(searchID, detail) {
   });
   if (section?.blocks?.length) {
     section.blocks.forEach((block) => body.append(renderCodeBlock(block)));
-  } else {
-    const paragraph = document.createElement("p");
-    paragraph.textContent = bodyText || section?.title || detail.title || "";
-    body.append(paragraph);
+  } else if (bodyText) {
+    const normalizedBodyText = bodyText.replace(/\s+/g, " ").trim().toLocaleLowerCase();
+    const normalizedTitles = [section?.title, detail.title]
+      .map((value) => String(value || "").replace(/\s+/g, " ").trim().toLocaleLowerCase())
+      .filter(Boolean);
+    if (!normalizedTitles.includes(normalizedBodyText)) {
+      const paragraph = document.createElement("p");
+      paragraph.textContent = bodyText;
+      body.append(paragraph);
+    }
   }
 
   const notes = document.createElement("section");

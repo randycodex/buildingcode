@@ -36,6 +36,12 @@
           "kind" : "title",
           "sectionNumber" : "U101.4",
           "title" : "U101.4 Certificate of occupancy."
+        },
+        {
+          "id" : 25651,
+          "kind" : "title",
+          "sectionNumber" : "U101.5",
+          "title" : "U101.5 Department rules."
         }
       ]
     },

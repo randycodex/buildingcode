@@ -249,7 +249,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     private var shippedSearchIndex: [String: Set<Int64>]?
     private var shippedSearchIndexByCodeSectionID: [Int64: [String: Set<Int64>]] = [:]
     private var synthesizedContentBlocksBySectionID: [Int64: [CodeContentBlock]] = [:]
-    private var synthesizedChapterNumbers: Set<String> = []
+    private var synthesizedChapterKeys: Set<String> = []
     private let synthesizedContentLock = NSLock()
 
     init(jsonURL: URL, codeID: Int64? = nil, jurisdictionID: Int64? = nil) throws {
@@ -679,7 +679,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             return cached
         }
         let chapterNumber = indexed.chapter.chapterNumber.uppercased()
-        if synthesizedChapterNumbers.contains(chapterNumber) {
+        let chapterKey = "\(indexed.chapter.codeSectionID ?? indexed.chapter.id):\(chapterNumber)"
+        if synthesizedChapterKeys.contains(chapterKey) {
             synthesizedContentLock.unlock()
             return []
         }
@@ -695,7 +696,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
         synthesizedContentLock.lock()
         synthesizedContentBlocksBySectionID.merge(chapterBlocks) { current, _ in current }
-        synthesizedChapterNumbers.insert(chapterNumber)
+        synthesizedChapterKeys.insert(chapterKey)
         let blocks = synthesizedContentBlocksBySectionID[indexed.section.id] ?? []
         synthesizedContentLock.unlock()
         return blocks
@@ -1224,27 +1225,23 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         codeSectionName: String?,
         chaptersURL: URL
     ) -> URL? {
-        for fileName in chapterHTMLFileNameCandidates(for: chapterNumber) {
-            let flatURL = chaptersURL.appendingPathComponent(fileName, isDirectory: false)
-            if FileManager.default.fileExists(atPath: flatURL.path) {
-                return flatURL
+        if let codeSectionName {
+            let sectionedChaptersURL = chaptersURL
+                .deletingLastPathComponent()
+                .appendingPathComponent("code-sections", isDirectory: true)
+                .appendingPathComponent(slug(codeSectionName), isDirectory: true)
+                .appendingPathComponent("chapters", isDirectory: true)
+            for fileName in chapterHTMLFileNameCandidates(for: chapterNumber) {
+                let sectionedURL = sectionedChaptersURL.appendingPathComponent(fileName, isDirectory: false)
+                if FileManager.default.fileExists(atPath: sectionedURL.path) {
+                    return sectionedURL
+                }
             }
         }
 
-        guard let codeSectionName else { return nil }
-        let sectionedChaptersURL = chaptersURL
-            .deletingLastPathComponent()
-            .appendingPathComponent("code-sections", isDirectory: true)
-            .appendingPathComponent(slug(codeSectionName), isDirectory: true)
-            .appendingPathComponent("chapters", isDirectory: true)
-        for fileName in chapterHTMLFileNameCandidates(for: chapterNumber) {
-            let sectionedURL = sectionedChaptersURL.appendingPathComponent(fileName, isDirectory: false)
-            if FileManager.default.fileExists(atPath: sectionedURL.path) {
-                return sectionedURL
-            }
-        }
-
-        return nil
+        return chapterHTMLFileNameCandidates(for: chapterNumber)
+            .map { chaptersURL.appendingPathComponent($0, isDirectory: false) }
+            .first { FileManager.default.fileExists(atPath: $0.path) }
     }
 
     private static func chapterHTMLFileNameCandidates(for chapterNumber: String) -> [String] {
@@ -1261,6 +1258,14 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         append("\(trimmed).html")
         append("\(trimmed.uppercased()).html")
         append("Chapter \(trimmed).html")
+        if let match = trimmed.uppercased().range(
+            of: #"^[A-Z]+\d+$"#,
+            options: .regularExpression
+        ) {
+            let grouped = String(trimmed.uppercased()[match])
+                .replacingOccurrences(of: #"\d+$"#, with: "", options: .regularExpression)
+            append("\(grouped).html")
+        }
         if trimmed.localizedCaseInsensitiveContains("appendix") {
             append("Appendices.html")
         } else if trimmed.rangeOfCharacter(from: .letters) != nil {
@@ -1273,15 +1278,29 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     }
 
     private static func htmlHeadings(in html: String) -> [HTMLHeading] {
-        let pattern = #"<h6\b[^>]*>\s*([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*)\.?\s*.*?</h6>"#
+        let pattern = #"<h6\b[^>]*>(.*?)</h6>"#
         guard let regex = try? NSRegularExpression(pattern: pattern, options: [.caseInsensitive, .dotMatchesLineSeparators]) else {
+            return []
+        }
+        guard let sectionNumberRegex = try? NSRegularExpression(
+            pattern: #"^(?:§\s*)?([A-Za-z]*\d+(?:[-.]\s*\d+)*(?:\([A-Za-z0-9]+\))?)\.?(?=\s|$)"#,
+            options: [.caseInsensitive]
+        ) else {
             return []
         }
         let nsHTML = html as NSString
         let matches = regex.matches(in: html, range: NSRange(location: 0, length: nsHTML.length))
         return matches.compactMap { match in
             guard match.numberOfRanges > 1 else { return nil }
-            let sectionNumber = nsHTML.substring(with: match.range(at: 1))
+            let headingText = plainText(fromHTML: nsHTML.substring(with: match.range(at: 1)))
+            let headingTextRange = NSRange(location: 0, length: (headingText as NSString).length)
+            guard let sectionMatch = sectionNumberRegex.firstMatch(in: headingText, range: headingTextRange),
+                  sectionMatch.numberOfRanges > 1 else {
+                return nil
+            }
+            let sectionNumber = (headingText as NSString)
+                .substring(with: sectionMatch.range(at: 1))
+                .replacingOccurrences(of: #"\s+"#, with: "", options: .regularExpression)
             let wrapperStart = headingWrapperStart(in: html, headingLocation: match.range.location)
             return HTMLHeading(
                 sectionNumber: sectionNumber,
@@ -1530,6 +1549,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             "&gt;": ">",
             "&quot;": "\"",
             "&#39;": "'",
+            "&#167;": "§",
+            "&sect;": "§",
             "&#176;": "°",
             "&#8211;": "-",
             "&#8212;": "-",
@@ -1546,6 +1567,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
 
     private static func normalizedSectionNumber(_ value: String) -> String {
         value
+            .replacingOccurrences(of: #"\s+"#, with: "", options: .regularExpression)
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .trimmingCharacters(in: CharacterSet(charactersIn: "."))
             .uppercased()
@@ -1563,6 +1585,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         let rhsNumeric = Int(rhs.chapterNumber) != nil
         if lhsNumeric != rhsNumeric {
             return lhsNumeric
+        }
+        let lhsAppendixCollection = lhs.chapterNumber.uppercased().hasPrefix("APP-")
+        let rhsAppendixCollection = rhs.chapterNumber.uppercased().hasPrefix("APP-")
+        if lhsAppendixCollection != rhsAppendixCollection {
+            return !lhsAppendixCollection
         }
         return lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
     }

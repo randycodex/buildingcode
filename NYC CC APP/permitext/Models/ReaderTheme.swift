@@ -139,6 +139,7 @@ enum CodeSectionThemeProfile: Sendable {
     case administrative
     case mechanical
     case plumbing
+    case zoning
 
     init(codeSectionName: String?) {
         let normalizedName = (codeSectionName ?? "")
@@ -154,6 +155,8 @@ enum CodeSectionThemeProfile: Sendable {
             self = .mechanical
         case let name where name.contains("PLUMBING"):
             self = .plumbing
+        case let name where name.contains("ZONING"):
+            self = .zoning
         default:
             self = .building
         }
@@ -171,6 +174,8 @@ enum CodeSectionThemeProfile: Sendable {
             return "#2F8F4E"
         case .plumbing:
             return "#0891B2"
+        case .zoning:
+            return "#2F6F68"
         }
     }
 
@@ -186,6 +191,8 @@ enum CodeSectionThemeProfile: Sendable {
             return "#6EDC8C"
         case .plumbing:
             return "#67E8F9"
+        case .zoning:
+            return "#70C9BD"
         }
     }
 

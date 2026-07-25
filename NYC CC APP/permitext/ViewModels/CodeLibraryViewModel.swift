@@ -358,8 +358,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 storedResolvedSelection = nil
             }
 
-            let resolvedSelection = authoredResolvedSelection
-                ?? storedResolvedSelection
+            let resolvedSelection = storedResolvedSelection
+                ?? authoredResolvedSelection
                 ?? candidateVersions.first?.fileName
                 ?? availableVersions.first?.fileName
                 ?? ""
@@ -554,6 +554,11 @@ final class CodeLibraryViewModel: ObservableObject {
         if UserContentSyncCodeVersion.server("2022 CONSTRUCTION CODES") != UserContentSyncCodeVersion.canonicalNYC2022 ||
             UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYC2022) != "2022 CONSTRUCTION CODES" {
             messages.append("Cross-device code-version normalization failed")
+        }
+        if UserContentSyncCodeVersion.server("NYC Zoning Resolution") != UserContentSyncCodeVersion.canonicalNYCZoning ||
+            UserContentSyncCodeVersion.local(UserContentSyncCodeVersion.canonicalNYCZoning) !=
+                UserContentSyncCodeVersion.localNYCZoning {
+            messages.append("Cross-device Zoning Resolution normalization failed")
         }
         if UserContentProjectIdentity.stable(repeatedProjectID, userID: diagnosticUserID) != legacyProjectID {
             messages.append("Cross-device project identity normalization failed")
@@ -1378,8 +1383,21 @@ final class CodeLibraryViewModel: ObservableObject {
             return
         }
         guard let sectionID = Self.deepLinkedSectionID(from: url) else { return }
+        selectVersionForDeepLinkedSection(sectionID)
         pendingDeepLinkedSectionID = sectionID
         selectedTab = .search
+    }
+
+    private func selectVersionForDeepLinkedSection(_ sectionID: Int64) {
+        let targetCodeVersion = sectionID >= 20_000_000
+            ? UserContentSyncCodeVersion.canonicalNYCZoning
+            : UserContentSyncCodeVersion.canonicalNYC2022
+        guard let version = availableVersions.first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) == targetCodeVersion
+        }), version.fileName != selectedVersionFileName else {
+            return
+        }
+        updateSelectedVersion(fileName: version.fileName)
     }
 
     func consumePendingDeepLinkedSectionID() -> Int64? {

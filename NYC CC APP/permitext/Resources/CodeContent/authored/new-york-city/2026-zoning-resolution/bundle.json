@@ -1,0 +1,860 @@
+{
+  "schemaVersion": 5,
+  "chapterStructureSchemaVersion": 2,
+  "sectionContentSchemaVersion": 2,
+  "jurisdictions": [
+    {
+      "id": 1,
+      "name": "New York City"
+    }
+  ],
+  "codes": [
+    {
+      "id": 1,
+      "jurisdictionID": 1,
+      "name": "NYC Zoning Resolution — text through 2026-07-16"
+    }
+  ],
+  "codeSections": [
+    {
+      "id": 1,
+      "codeID": 1,
+      "name": "ZONING RESOLUTION"
+    }
+  ],
+  "chapters": [
+    {
+      "id": 15000101,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "I-1",
+      "title": "Article I, Chapter 1 — Title, Establishment of Controls and Interpretation of Regulations"
+    },
+    {
+      "id": 15000102,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "I-2",
+      "title": "Article I, Chapter 2 — Construction of Language and Definitions"
+    },
+    {
+      "id": 15000103,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "I-3",
+      "title": "Article I, Chapter 3 — Comprehensive Off-street Parking and Loading Regulations in the Manhattan Core"
+    },
+    {
+      "id": 15000105,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "I-5",
+      "title": "Article I, Chapter 5 — Residential Conversion within Existing Buildings"
+    },
+    {
+      "id": 15000106,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "I-6",
+      "title": "Article I, Chapter 6 — Comprehensive Off-street Parking Regulations in the Long Island City Area"
+    },
+    {
+      "id": 15000201,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-1",
+      "title": "Article II, Chapter 1 — Statement of Legislative Intent"
+    },
+    {
+      "id": 15000202,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-2",
+      "title": "Article II, Chapter 2 — Use Regulations"
+    },
+    {
+      "id": 15000203,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-3",
+      "title": "Article II, Chapter 3 — Residential Bulk Regulations in Residence Districts"
+    },
+    {
+      "id": 15000204,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-4",
+      "title": "Article II, Chapter 4 — Bulk Regulations for Community Facilities in Residence Districts"
+    },
+    {
+      "id": 15000205,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-5",
+      "title": "Article II, Chapter 5 — Accessory Off-Street Parking and Loading Regulations"
+    },
+    {
+      "id": 15000206,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-6",
+      "title": "Article II, Chapter 6 — Special Urban Design Regulations"
+    },
+    {
+      "id": 15000207,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "II-7",
+      "title": "Article II, Chapter 7 — Additional Regulations and Administration in Residence Districts"
+    },
+    {
+      "id": 15000301,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-1",
+      "title": "Article III, Chapter 1 — Statement of Legislative Intent"
+    },
+    {
+      "id": 15000302,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-2",
+      "title": "Article III, Chapter 2 — Use Regulations"
+    },
+    {
+      "id": 15000303,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-3",
+      "title": "Article III, Chapter 3 — Bulk Regulations for Commercial or Community Facility Buildings in Commercial Districts"
+    },
+    {
+      "id": 15000304,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-4",
+      "title": "Article III, Chapter 4 — Bulk Regulations for Residential Buildings in Commercial Districts"
+    },
+    {
+      "id": 15000305,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-5",
+      "title": "Article III, Chapter 5 — Bulk Regulations for Mixed Buildings in Commercial Districts"
+    },
+    {
+      "id": 15000306,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-6",
+      "title": "Article III, Chapter 6 — Accessory Off-Street Parking and Loading Regulations"
+    },
+    {
+      "id": 15000307,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "III-7",
+      "title": "Article III, Chapter 7 — Special Urban Design Regulations"
+    },
+    {
+      "id": 15000401,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IV-1",
+      "title": "Article IV, Chapter 1 — Statement of Legislative Intent"
+    },
+    {
+      "id": 15000402,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IV-2",
+      "title": "Article IV, Chapter 2 — Use Regulations"
+    },
+    {
+      "id": 15000403,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IV-3",
+      "title": "Article IV, Chapter 3 — Bulk Regulations"
+    },
+    {
+      "id": 15000404,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IV-4",
+      "title": "Article IV, Chapter 4 — Accessory Off-Street Parking and Loading Regulations"
+    },
+    {
+      "id": 15000501,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "V-1",
+      "title": "Article V, Chapter 1 — Statement of Legislative Intent"
+    },
+    {
+      "id": 15000502,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "V-2",
+      "title": "Article V, Chapter 2 — Non-Conforming Uses"
+    },
+    {
+      "id": 15000503,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "V-3",
+      "title": "Article V, Chapter 3 — Conforming Uses in Violation of Supplementary Use Regulations"
+    },
+    {
+      "id": 15000504,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "V-4",
+      "title": "Article V, Chapter 4 — Non-Complying Buildings"
+    },
+    {
+      "id": 15000601,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-1",
+      "title": "Article VI, Chapter 1 — Special Regulations Applying Around Major Airports"
+    },
+    {
+      "id": 15000602,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-2",
+      "title": "Article VI, Chapter 2 — Special Regulations Applying in the Waterfront Area"
+    },
+    {
+      "id": 15000603,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-3",
+      "title": "Article VI, Chapter 3 — Special Regulations Applying to FRESH Food Stores"
+    },
+    {
+      "id": 15000604,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-4",
+      "title": "Article VI, Chapter 4 — Special Regulations Applying in Flood Zones"
+    },
+    {
+      "id": 15000605,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-5",
+      "title": "Article VI, Chapter 5 — Special Regulations Applying in Designated Recovery Areas"
+    },
+    {
+      "id": 15000606,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VI-6",
+      "title": "Article VI, Chapter 6 — Special Regulations Applying Around Mass Transit Stations"
+    },
+    {
+      "id": 15000701,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-1",
+      "title": "Article VII, Chapter 1 — Enforcement, Administration and Amendments"
+    },
+    {
+      "id": 15000702,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-2",
+      "title": "Article VII, Chapter 2 — Interpretations and Variances"
+    },
+    {
+      "id": 15000703,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-3",
+      "title": "Article VII, Chapter 3 — Special Permits by the Board of Standards and Appeals"
+    },
+    {
+      "id": 15000704,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-4",
+      "title": "Article VII, Chapter 4 — Special Permits by the City Planning Commission"
+    },
+    {
+      "id": 15000705,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-5",
+      "title": "Article VII, Chapter 5 — Authorizations and Certifications by the City Planning Commission"
+    },
+    {
+      "id": 15000706,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-6",
+      "title": "Article VII, Chapter 6 — Location of District Boundaries"
+    },
+    {
+      "id": 15000707,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-7",
+      "title": "Article VII, Chapter 7 — Special Provisions for Zoning Lots Divided by District Boundaries"
+    },
+    {
+      "id": 15000708,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-8",
+      "title": "Article VII, Chapter 8 — Special Regulations Applying to Large-Scale Residential Developments"
+    },
+    {
+      "id": 15000709,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VII-9",
+      "title": "Article VII, Chapter 9 — Special Regulations Applying to Large-Scale Community Facility Developments"
+    },
+    {
+      "id": 15000801,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-1",
+      "title": "Article VIII, Chapter 1 — Special Midtown District (MiD)"
+    },
+    {
+      "id": 15000802,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-2",
+      "title": "Article VIII, Chapter 2 — Special Lincoln Square District (L)"
+    },
+    {
+      "id": 15000803,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-3",
+      "title": "Article VIII, Chapter 3 — Special Limited Commercial District (LC)"
+    },
+    {
+      "id": 15000804,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-4",
+      "title": "Article VIII, Chapter 4 — Special Battery Park City District (BPC)"
+    },
+    {
+      "id": 15000805,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-5",
+      "title": "Article VIII, Chapter 5 — Special United Nations Development District (U)"
+    },
+    {
+      "id": 15000806,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-6",
+      "title": "Article VIII, Chapter 6 — Special Forest Hills District (FH)"
+    },
+    {
+      "id": 15000807,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-7",
+      "title": "Article VIII, Chapter 7 — Special Harlem River Waterfront District (HRW)"
+    },
+    {
+      "id": 15000808,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-8",
+      "title": "Article VIII, Chapter 8 — Special Hudson Square District (HSQ)"
+    },
+    {
+      "id": 15000809,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "VIII-9",
+      "title": "Article VIII, Chapter 9 — Special Hudson River Park District (HRP)"
+    },
+    {
+      "id": 15000901,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-1",
+      "title": "Article IX, Chapter 1 — Special Lower Manhattan District (LM)"
+    },
+    {
+      "id": 15000902,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-2",
+      "title": "Article IX, Chapter 2 — Special Park Improvement District (PI)"
+    },
+    {
+      "id": 15000903,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-3",
+      "title": "Article IX, Chapter 3 — Special Hudson Yards District (HY)"
+    },
+    {
+      "id": 15000904,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-4",
+      "title": "Article IX, Chapter 4 — Special Sheepshead Bay District (SB)"
+    },
+    {
+      "id": 15000905,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-5",
+      "title": "Article IX, Chapter 5 — Special Transit Land Use District (TA)"
+    },
+    {
+      "id": 15000906,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-6",
+      "title": "Article IX, Chapter 6 — Special Clinton District (CL)"
+    },
+    {
+      "id": 15000907,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-7",
+      "title": "Article IX, Chapter 7 — Special 125th Street District (125)"
+    },
+    {
+      "id": 15000908,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-8",
+      "title": "Article IX, Chapter 8 — Special West Chelsea District (WCh)"
+    },
+    {
+      "id": 15000909,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "IX-9",
+      "title": "Article IX, Chapter 9 — Special Madison Avenue Preservation District (MP)"
+    },
+    {
+      "id": 15001001,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-1",
+      "title": "Article X, Chapter 1 — Special Downtown Brooklyn District (DB)"
+    },
+    {
+      "id": 15001002,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-2",
+      "title": "Article X, Chapter 2 — Special Scenic View District (SV-1)"
+    },
+    {
+      "id": 15001003,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-3",
+      "title": "Article X, Chapter 3 — Special Planned Community Preservation District (PC)"
+    },
+    {
+      "id": 15001004,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-4",
+      "title": "Article X, Chapter 4 — Special Manhattanville Mixed Use District (MMU)"
+    },
+    {
+      "id": 15001005,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-5",
+      "title": "Article X, Chapter 5 — Special Natural Area District (NA)"
+    },
+    {
+      "id": 15001006,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-6",
+      "title": "Article X, Chapter 6 — Special Coney Island Mixed Use District (CO)"
+    },
+    {
+      "id": 15001007,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-7",
+      "title": "Article X, Chapter 7 — Special South Richmond Development District (SRD)"
+    },
+    {
+      "id": 15001008,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-8",
+      "title": "Article X, Chapter 8 — Special Hunts Point District (HP)"
+    },
+    {
+      "id": 15001009,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "X-9",
+      "title": "Article X, Chapter 9 — Special Little Italy District (LI)"
+    },
+    {
+      "id": 15001101,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-1",
+      "title": "Article XI, Chapter 1 — Special Tribeca Mixed Use District (TMU)"
+    },
+    {
+      "id": 15001102,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-2",
+      "title": "Article XI, Chapter 2 — Special City Island District (CD)"
+    },
+    {
+      "id": 15001103,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-3",
+      "title": "Article XI, Chapter 3 — Special Ocean Parkway District (OP)"
+    },
+    {
+      "id": 15001104,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-4",
+      "title": "Article XI, Chapter 4 — Special Bay Ridge District (BR)"
+    },
+    {
+      "id": 15001105,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-5",
+      "title": "Article XI, Chapter 5 — Special Downtown Jamaica District (DJ)"
+    },
+    {
+      "id": 15001106,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-6",
+      "title": "Article XI, Chapter 6 — Special Stapleton Waterfront District (SW)"
+    },
+    {
+      "id": 15001107,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-7",
+      "title": "Article XI, Chapter 7 — Special Long Island City Mixed Use District (LIC)"
+    },
+    {
+      "id": 15001108,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-8",
+      "title": "Article XI, Chapter 8 — Special Union Square District (US)"
+    },
+    {
+      "id": 15001109,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XI-9",
+      "title": "Article XI, Chapter 9 — Special Hillsides Preservation District (HS)"
+    },
+    {
+      "id": 15001201,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-1",
+      "title": "Article XII, Chapter 1 — Special Midtown South Mixed Use District (MSX)"
+    },
+    {
+      "id": 15001202,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-2",
+      "title": "Article XII, Chapter 2 — Special Grand Concourse Preservation District (C)"
+    },
+    {
+      "id": 15001203,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-3",
+      "title": "Article XII, Chapter 3 — Special Mixed Use District (MX)"
+    },
+    {
+      "id": 15001204,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-4",
+      "title": "Article XII, Chapter 4 — Special Willets Point District (WP)"
+    },
+    {
+      "id": 15001205,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-5",
+      "title": "Article XII, Chapter 5 — Special Southern Hunters Point District (SHP)"
+    },
+    {
+      "id": 15001206,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-6",
+      "title": "Article XII, Chapter 6 — Special College Point District (CP)"
+    },
+    {
+      "id": 15001207,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-7",
+      "title": "Article XII, Chapter 7 — Special Flushing Waterfront District (FW)"
+    },
+    {
+      "id": 15001208,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XII-8",
+      "title": "Article XII, Chapter 8 — Special St. George District (SG)"
+    },
+    {
+      "id": 15001301,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-1",
+      "title": "Article XIII, Chapter 1 — Special Coney Island District (CI)"
+    },
+    {
+      "id": 15001302,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-2",
+      "title": "Article XIII, Chapter 2 — Special Enhanced Commercial District (EC)"
+    },
+    {
+      "id": 15001303,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-3",
+      "title": "Article XIII, Chapter 3 — Special Southern Roosevelt Island District (SRI)"
+    },
+    {
+      "id": 15001304,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-4",
+      "title": "Article XIII, Chapter 4 — Special Governors Island District (GI)"
+    },
+    {
+      "id": 15001305,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-5",
+      "title": "Article XIII, Chapter 5 — Special Bay Street Corridor District (BSC)"
+    },
+    {
+      "id": 15001306,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-6",
+      "title": "Article XIII, Chapter 6 — Special Downtown Far Rockaway District (DFR)"
+    },
+    {
+      "id": 15001307,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-7",
+      "title": "Article XIII, Chapter 7 — Special Coastal Risk District (CR)"
+    },
+    {
+      "id": 15001308,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-8",
+      "title": "Article XIII, Chapter 8 — Special East Harlem Corridors District (EHC)"
+    },
+    {
+      "id": 15001309,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIII-9",
+      "title": "Article XIII, Chapter 9 — Special Gowanus Mixed Use District (G)"
+    },
+    {
+      "id": 15001401,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-1",
+      "title": "Article XIV, Chapter 1 — Special Jerome Corridor District (J)"
+    },
+    {
+      "id": 15001402,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-2",
+      "title": "Article XIV, Chapter 2 — Special Inwood District (IN)"
+    },
+    {
+      "id": 15001403,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-3",
+      "title": "Article XIV, Chapter 3 — Special SoHo-NoHo Mixed Use District (SNX)"
+    },
+    {
+      "id": 15001404,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-4",
+      "title": "Article XIV, Chapter 4 — Special Brooklyn Navy Yard District (BNY)"
+    },
+    {
+      "id": 15001405,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-5",
+      "title": "Article XIV, Chapter 5 — Special Eastchester – East Tremont Corridor District (ETC)"
+    },
+    {
+      "id": 15001406,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "XIV-6",
+      "title": "Article XIV, Chapter 6 — Special Atlantic Avenue Mixed Use District (AAM)"
+    },
+    {
+      "id": 16021239,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-B-21239",
+      "title": "APPENDIX B — Index of Special Purpose Districts"
+    },
+    {
+      "id": 16021242,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-C-21242",
+      "title": "APPENDIX C, Table 1 — City Environmental Quality Review (CEQR) Environmental Requirements: (E) Designations"
+    },
+    {
+      "id": 16021243,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-C-21243",
+      "title": "APPENDIX C, Table 2 — City Environmental Quality Review (CEQR) Environmental Requirements: Environmental Restrictive Declarations"
+    },
+    {
+      "id": 16021241,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-D-21241",
+      "title": "APPENDIX D — Zoning Map Amendment (\"D\") Restrictive Declarations"
+    },
+    {
+      "id": 16021240,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-E-21240",
+      "title": "APPENDIX E — Design Requirements for Plazas, Residential Plazas and Urban Plazas Developed Prior to October 17, 2007"
+    },
+    {
+      "id": 16021424,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21424",
+      "title": "APPENDIX F – Mandatory Inclusionary Housing Areas and former Inclusionary Housing Designated Areas"
+    },
+    {
+      "id": 16021765,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21765",
+      "title": "Appendix F – The Bronx"
+    },
+    {
+      "id": 16021766,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21766",
+      "title": "Appendix F – Brooklyn"
+    },
+    {
+      "id": 16021767,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21767",
+      "title": "Appendix F - Manhattan"
+    },
+    {
+      "id": 16021768,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21768",
+      "title": "Appendix F - Queens"
+    },
+    {
+      "id": 16021769,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-F-21769",
+      "title": "Appendix F - Staten Island"
+    },
+    {
+      "id": 16021235,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-G-21235",
+      "title": "APPENDIX G — Radioactive Materials"
+    },
+    {
+      "id": 16021233,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-H-21233",
+      "title": "APPENDIX H — Arterial Highways"
+    },
+    {
+      "id": 16021238,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-I-21238",
+      "title": "APPENDIX I"
+    },
+    {
+      "id": 16021237,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-J-21237",
+      "title": "APPENDIX J — Designated Areas Within Manufacturing Districts"
+    },
+    {
+      "id": 16021498,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "APP-K-21498",
+      "title": "APPENDIX K — Areas With Nursing Home Restrictions"
+    }
+  ],
+  "tables": [],
+  "lastStructuredImportPaths": [],
+  "nextJurisdictionID": 2,
+  "nextCodeID": 2,
+  "nextCodeSectionID": 2,
+  "nextChapterID": 16021770,
+  "nextSectionID": 20023155,
+  "zoningContract": {
+    "schemaVersion": 1,
+    "libraryID": "nyc-zoning-resolution",
+    "sourceURL": "https://zr.planning.nyc.gov/",
+    "textChangesThrough": "2026-07-16",
+    "researchEligibility": false
+  }
+}
