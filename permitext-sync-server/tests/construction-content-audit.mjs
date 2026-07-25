@@ -362,6 +362,23 @@ async function main() {
     "Mechanical section 404.1 resolved to a stale legacy spray-operations body."
   );
 
+  const plumbingChapter4 = bundle.chapters.find((chapter) =>
+    codeBySectionID.get(Number(chapter.codeSectionID))?.prefix === "PC" &&
+    String(chapter.chapterNumber) === "4"
+  );
+  const minimumFixtureSection = sectionsByChapterID.get(Number(plumbingChapter4?.id))
+    ?.find((section) => section.sectionNumber === "403.1");
+  assert(minimumFixtureSection?.id === 11909, "Plumbing section 403.1 identity changed.");
+  const minimumFixtureBody = await constructionHTMLBodyForSection(minimumFixtureSection);
+  assert(
+    minimumFixtureBody?.blocks?.some((block) =>
+      /<ScrollTable\b/i.test(block.html || "") &&
+      /<table\b/i.test(block.html || "") &&
+      String(block.plainText || "").includes("Minimum Number of Required Plumbing Fixtures")
+    ),
+    "Plumbing section 403.1 is missing the complete official Table 403.1 source."
+  );
+
   const buildingChapter9 = bundle.chapters.find((chapter) =>
     codeBySectionID.get(Number(chapter.codeSectionID))?.prefix === "BC" &&
     String(chapter.chapterNumber) === "9"

@@ -63,6 +63,33 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testPlumbingFixtureSectionUsesPublishedOfficialTable() throws {
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator().availableCodeVersions().first {
+                UserContentSyncCodeVersion.server($0.codeVersion) ==
+                    UserContentSyncCodeVersion.canonicalNYC2022
+            }
+        )
+        let store = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+        let section = try XCTUnwrap(store.sectionDetail(sectionID: 11_909))
+        let tableBlock = try XCTUnwrap(
+            section.contentBlocks.first { block in
+                block.kind == .table &&
+                    block.html?.range(
+                        of: #"<ScrollTable\b"#,
+                        options: [.regularExpression, .caseInsensitive]
+                    ) != nil
+            }
+        )
+
+        XCTAssertEqual(section.sectionNumber, "403.1")
+        XCTAssertTrue(tableBlock.html?.localizedCaseInsensitiveContains("<table") == true)
+    }
+
     func testSyncDeclaresVersionedCrossPlatformCapabilities() throws {
         let request = BackendUserContentPullRequest(
             auth: BackendAuthContext(accountUserID: "test-user", bearerToken: nil),

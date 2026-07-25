@@ -1276,6 +1276,18 @@ async function main() {
         !administrativeChapter4Text.trim().startsWith("§ 28-401.1"),
       "Administrative Chapter 4 repeated its section title or omitted the official provision body."
     );
+    const plumbingFixtureTable = await request("/code/sections/11909");
+    assert(plumbingFixtureTable.response.ok, "Plumbing Code section 403.1 did not load.");
+    assert(
+      plumbingFixtureTable.json.section.codePrefix === "PC" &&
+        plumbingFixtureTable.json.section.sectionNumber === "403.1" &&
+        plumbingFixtureTable.json.section.blocks.some((block) =>
+          /<ScrollTable\b/i.test(block.html || "") &&
+          /<table\b/i.test(block.html || "") &&
+          String(block.plainText || "").includes("Minimum Number of Required Plumbing Fixtures")
+        ),
+      "PC 403.1 flattened Table 403.1 instead of serving the complete official table source."
+    );
     const administrativeChapter4 = await request("/code/chapters/77?include=body");
     assert(administrativeChapter4.response.ok, "Administrative Chapter 4 did not load with section bodies.");
     assert(

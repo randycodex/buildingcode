@@ -3435,6 +3435,31 @@ function preparedBodyWithDerivedPlainText(body) {
   };
 }
 
+function bodyContainsRichSource(body) {
+  return (body?.blocks || []).some((block) =>
+    block.kind === "table" ||
+    block.kind === "image" ||
+    /<(?:scrolltable|table|img)\b/i.test(String(block.html || ""))
+  );
+}
+
+function bodyReferencesRichSource(body) {
+  return (body?.blocks || []).some((block) =>
+    /\b(?:Table|Figure)\s+[A-Z]?\d|\bfire\s+district\s+maps?\b/i.test(
+      `${block.plainText || ""} ${plainTextFromPreparedHTML(block.html || "")}`
+    )
+  );
+}
+
+async function bodyEnrichedWithOfficialRichSource(body, sectionID) {
+  if (bodyContainsRichSource(body) || !bodyReferencesRichSource(body)) {
+    return body;
+  }
+  const summary = await sectionSummaryByID(sectionID);
+  const htmlBody = await constructionHTMLBodyForSection(summary);
+  return bodyContainsRichSource(htmlBody) ? htmlBody : body;
+}
+
 async function sectionBody(sectionID, options = {}) {
   const canonicalSectionID = String(options.canonicalSectionID || "").trim();
   const legacySectionID = String(sectionID || "").trim();
@@ -3451,7 +3476,11 @@ async function sectionBody(sectionID, options = {}) {
 
   for (const candidate of candidates) {
     try {
-      return preparedBodyWithDerivedPlainText(await readJSONFile(candidate));
+      const preparedBody = preparedBodyWithDerivedPlainText(await readJSONFile(candidate));
+      return await bodyEnrichedWithOfficialRichSource(
+        preparedBody,
+        canonicalSectionID || legacySectionID
+      );
     } catch (error) {
       if (error.code !== "ENOENT") {
         throw error;

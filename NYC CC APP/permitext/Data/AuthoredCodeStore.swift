@@ -459,7 +459,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
     func sectionDetail(sectionID: Int64) -> ReaderSectionDetail? {
         guard let indexed = sectionIndex[sectionID] else { return nil }
         let preparedData = bundleUsesExternalSectionText ? preparedSectionData(sectionID: sectionID) : nil
-        let contentBlocks: [CodeContentBlock]
+        var contentBlocks: [CodeContentBlock]
         if !indexed.section.contentBlocks.isEmpty {
             contentBlocks = indexed.section.contentBlocks
         } else if let preparedBlocks = preparedData?.blocks, !preparedBlocks.isEmpty {
@@ -469,6 +469,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         } else {
             contentBlocks = synthesizedContentBlocks(for: indexed)
         }
+        contentBlocks = contentBlocksEnrichedWithPublishedRichSources(
+            contentBlocks,
+            for: indexed
+        )
         let officialText = resolvedOfficialText(
             preparedOfficialText: preparedData?.officialText,
             fallbackOfficialText: indexed.section.officialText,
@@ -636,6 +640,44 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         }
 
         return fallbackTitle.titleThroughFirstPeriod
+    }
+
+    private func contentBlocksEnrichedWithPublishedRichSources(
+        _ contentBlocks: [CodeContentBlock],
+        for indexed: IndexedSection
+    ) -> [CodeContentBlock] {
+        guard !Self.containsRichSource(contentBlocks),
+              Self.referencesRichSource(contentBlocks) else {
+            return contentBlocks
+        }
+        let publishedBlocks = synthesizedContentBlocks(for: indexed)
+        return Self.containsRichSource(publishedBlocks) ? publishedBlocks : contentBlocks
+    }
+
+    private static func containsRichSource(_ blocks: [CodeContentBlock]) -> Bool {
+        blocks.contains { block in
+            if block.kind == .table || block.kind == .image {
+                return true
+            }
+            guard let html = block.html else { return false }
+            return html.range(
+                of: #"<(?:ScrollTable|table|img)\b"#,
+                options: [.regularExpression, .caseInsensitive]
+            ) != nil
+        }
+    }
+
+    private static func referencesRichSource(_ blocks: [CodeContentBlock]) -> Bool {
+        let text = blocks.map { block in
+            let directText = block.plainText ?? ""
+            let htmlText = block.html.map { Self.plainText(fromHTML: $0) } ?? ""
+            return "\(directText) \(htmlText)"
+        }
+        .joined(separator: " ")
+        return text.range(
+            of: #"\b(?:Table|Figure)\s+[A-Z]?\d|\bfire\s+district\s+maps?\b"#,
+            options: [.regularExpression, .caseInsensitive]
+        ) != nil
     }
 
     private func plainText(from contentBlocks: [CodeContentBlock]) -> String {
