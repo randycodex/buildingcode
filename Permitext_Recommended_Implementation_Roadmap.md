@@ -885,9 +885,9 @@ Measure:
 
 Do not evaluate only whether one relevant section appears. Evaluate whether the candidate set is sufficiently complete for professional review.
 
-**Status: expanded draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current seventeen cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all sixteen answerable draft scenarios and correctly identifies the remaining scenario as missing section context. The draft set now covers Mechanical Code 404.1, a prior-code building that crosses the Administrative Code's more-than-110-percent floor-surface-area threshold, a prior-code structural alteration that crosses the Building Code's wind-surface-area trigger, re-establishment of a former occupancy after an intervening change, existing-installation plumbing repair boundaries, a fire-district question governed by official Appendix D map images, a referenced plumbing table, and a Buildings Bulletin/Zoning/Housing Maintenance boundary. Every answerable draft currently has 100% expected-section and expected-passage recall at depth 12.
+**Status: expanded draft diagnostic program implemented; public gate remains blocked.** Permitext now has a separate retrieval dataset mapped to the canonical selected-evidence Research cases, a free deterministic evaluation harness, and a generated knowledgeable-human review packet. The current eighteen cases remain drafts with zero approved retrieval gates. At diagnostic depth 12, the current implementation recalls the expected sections and passages in all seventeen answerable draft scenarios and correctly identifies the remaining scenario as missing section context. The draft set now covers Mechanical Code 404.1, a prior-code building that crosses the Administrative Code's more-than-110-percent floor-surface-area threshold, a prior-code structural alteration that crosses the Building Code's wind-surface-area trigger, re-establishment of a former occupancy after an intervening change, the complete six-condition mercantile/business Certificate-of-Occupancy exception, existing-installation plumbing repair boundaries, a fire-district question governed by official Appendix D map images, a referenced plumbing table, and a Buildings Bulletin/Zoning/Housing Maintenance boundary. Every answerable draft currently has 100% expected-section and expected-passage recall at depth 12.
 
-The diagnostic now treats incomplete source forms as failures rather than successful text matches. A candidate that contains official images or refers to a table whose complete structured values are unavailable is blocked from preparation and identifies the additional source review required. When a complete official table is present in the enacted source, Permitext now extracts its row and span structure, assigns a stable integrity-addressed source identity, and requires that structured source to accompany the approved passage into Research. For official images and maps, Permitext now verifies the locally served asset bytes and exposes a complete integrity-addressed review inventory, but it continues to block preparation because visual review, selection, and immutable attachment are not yet implemented. Questions that invoke Buildings Bulletins, the Zoning Resolution, the Housing Maintenance Code, HCR, FDNY, federal accessibility, Landmarks, or DEP authority receive a separate outside-scope disclosure with an official source link. This is useful engineering evidence, not release approval. A dedicated Buildings Bulletin corpus, visual-source review and attachment, additional outside-agency interpretations, and broader occupancy-change existing-building scenarios remain coverage gaps.
+The diagnostic now treats incomplete source forms as failures rather than successful text matches. A candidate that contains official images or refers to a table whose complete structured values are unavailable is blocked from preparation and identifies the additional source review required. When a complete official table is present in the enacted source, Permitext now extracts its row and span structure, assigns a stable integrity-addressed source identity, and requires that structured source to accompany the approved passage into Research. For official images and maps, Permitext now verifies the locally served asset bytes and exposes a complete integrity-addressed review inventory, but it continues to block preparation because visual review, selection, and immutable attachment are not yet implemented. Questions that invoke Buildings Bulletins, the Zoning Resolution, the Housing Maintenance Code, HCR, FDNY, federal accessibility, Landmarks, or DEP authority receive a separate outside-scope disclosure with an official source link. Buildings Bulletins are intentionally excluded from ingestion and Research; the existing boundary disclosure remains, but Bulletin ingestion and retrieval are outside the current implementation scope. This is useful engineering evidence, not release approval. Visual-source review and attachment, additional outside-agency interpretations, and broader existing-building scenarios remain coverage gaps.
 
 ---
 
@@ -1106,7 +1106,7 @@ public evidence discovery, Zoning Research, shared Workboard editing, or paid ca
 
 1. Publish and monitor the firm-control schema migration against production PostgreSQL, including legacy organization defaults and immutable historical Report compatibility.
 2. Turn the current retrieval draft packet into a focused knowledgeable-human review queue with explicit approve, revise, and reject decisions per scenario.
-3. Expand deterministic retrieval coverage for mechanical systems, Buildings Bulletins, existing-building questions, non-text tables or maps, and outside-agency boundaries.
+3. Expand deterministic retrieval coverage for mechanical systems, existing-building questions, non-text tables or maps, and outside-agency boundaries. Keep Buildings Bulletins outside the current library with explicit source-boundary disclosure only.
 4. Preserve the answerable-versus-insufficient-evidence distinction as a hard evaluation gate; aggregate retrieval scores alone must not pass a case.
 5. Keep every new evaluation case in draft until a knowledgeable reviewer approves its expected sources, required concepts, uncertainty conditions, and forbidden claims.
 6. Add Zoning-specific evaluation drafts and source-coverage diagnostics while keeping public Zoning Research disabled.
@@ -1126,7 +1126,8 @@ public evidence discovery, Zoning Research, shared Workboard editing, or paid ca
    Approve, Send for revision, and Reject decisions. Dataset mutations remain
    local-only and reviewer-controlled; the production owner console is read-only.
 3. Mechanical, prior-code floor-surface-area, prior-code structural wind,
-   re-established occupancy, existing-installation plumbing repair,
+   re-established occupancy, the six-condition mercantile/business
+   Certificate-of-Occupancy exception, existing-installation plumbing repair,
    fire-district map, referenced-table, and Buildings
    Bulletin/Zoning/Housing Maintenance boundary scenarios are added and pass
    the draft diagnostic. Text-only preparation is blocked when
@@ -1135,12 +1136,14 @@ public evidence discovery, Zoning Research, shared Workboard editing, or paid ca
    visual review, selection, and attachment remain blocked. Complete official tables retain
    integrity-addressed row and span structure as separately approved Research
    evidence; incomplete table references remain blocked. Outside-scope
-   authorities receive official source links. Dedicated Buildings Bulletin
-   ingestion, visual-source review and attachment, additional agency
-   interpretations, and broader occupancy-change
-   existing-building scenarios remain named gaps rather than implied coverage.
+   authorities receive official source links. Buildings Bulletins are now an
+   explicit scope exclusion: source-boundary disclosure remains, but Bulletin
+   ingestion and retrieval are outside the current implementation scope.
+   Visual-source review and
+   attachment, additional agency interpretations, and broader existing-building
+   scenarios remain named gaps rather than implied coverage.
 4. The answerable-versus-insufficient-evidence distinction remains a hard case
-   gate, and all sixteen answerable draft cases currently achieve complete
+   gate, and all seventeen answerable draft cases currently achieve complete
    expected section and passage recall at diagnostic depth 12. The map and table
    scenarios additionally hard-fail if text-only preparation is allowed.
 5. All new Research, retrieval, and Zoning scenarios remain drafts. No scenario

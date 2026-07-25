@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v8`
+Retrieval implementation: `20260725-hybrid-candidates-v9`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -8,10 +8,13 @@ Run `npm run eval:retrieval` from `permitext-sync-server` for the current free d
 
 ## Known coverage gaps
 
-- dedicated Buildings Bulletin retrieval beyond explicit source-boundary detection
 - official agency interpretations outside the current library
 - review, selection, and immutable attachment of integrity-addressed official maps and images
-- additional occupancy-change existing-building scenarios
+- additional existing-building scenarios beyond the current occupancy-change, repair, enlargement, and structural-trigger drafts
+
+## Intentional scope exclusions
+
+- Buildings Bulletins remain intentionally outside the current Research library; explicit source-boundary disclosure is retained, but Bulletin ingestion and retrieval are outside the current implementation scope.
 
 ## 1. retrieval-scissor-stair-two-exits
 
@@ -771,6 +774,80 @@ Tests the difference between continuing a lawful existing occupancy and re-estab
 #### AC 28-118.3.2 — section ID 9199
 
 > No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.
+
+### Knowledgeable-human decision
+
+- [ ] Approve this candidate-set expectation as written
+- [ ] Correct the expected sections or passages
+- [ ] Reject this scenario as unsuitable
+
+Reviewer:
+
+Decision date:
+
+Corrections or notes:
+
+---
+
+## 18. retrieval-mercantile-business-co-exception
+
+- Dataset status: **DRAFT**
+- Expected behavior: `candidate-recall`
+- Diagnostic depth: 12
+- Categories: existing-building conditions, occupancy changes, certificate of occupancy, exceptions, fire protection, accessibility
+- Source Research case: `nyc-023-mercantile-business-co-exception`
+- Must disclose outside-scope authorities: NYC Zoning Resolution Research
+- Required coverage limitations: `outside-current-library`
+
+### Project question
+
+An existing ground-floor establishment is proposed to change from a mercantile establishment and Group M occupancy to a business establishment and Group B occupancy. The applicant says both uses are within the same zoning use group, the existing and proposed occupant loads are 70 and 72 persons, the public enters directly from the exterior, and neither the required exits nor the live load stated on the existing Certificate of Occupancy will change. Accessibility and fire-protection compliance have not been documented. Based on AC 28-118.3, AC 28-118.3.1, AC 28-118.3.2, BC 901.9.2, and BC 1101.3.1, may the applicant rely on the Certificate-of-Occupancy exception now, and what still must be established?
+
+### Review intent
+
+Tests the complete enacted six-condition mercantile/business Certificate-of-Occupancy exception together with its fire-protection and accessibility cross-references, while requiring outside-source verification of the stated zoning-use-group fact.
+
+### Proposed expected evidence
+
+#### AC 28-118.3 — section ID 9197
+
+> The provisions of sections 28-118.3.1 through 28-118.3.4 shall apply to completed buildings or open lots.
+
+> The provisions of sections 28-118.3.1 and 28-118.3.2 shall not be interpreted to require an issuance of a new or amended certificate of occupancy for a change from a mercantile establishment to a business establishment, or from a business establishment to a mercantile establishment, provided all the following criteria are met:
+
+> 1. Such alteration is limited to a change within the same zoning use group;
+
+> 2. The maximum occupant load for the individual establishment, both as existing and proposed, does not exceed 74 persons based on occupant load calculations in accordance with Table 6-2 of the 1968 building code or Table 1004.1.3 of the New York city building code, as applicable;
+
+> 3. The establishment is located on the ground floor, accessed by the public directly from the exterior of the building;
+
+> 4. The establishment undergoing alteration complies or is made to comply with any other requirements that would be applicable to the alteration, including but not limited to accessibility, and fire protection requirements pursuant to sections 901.9.2 and 1101.3.1 of the New York city building code;
+
+> 5. Such alteration does not require a change in the required exits. Relocation of exit doors of the same size or larger shall not constitute a change in the required exits;
+
+> 6. Such alteration does not require a change in the live load from that stated on the existing certificate of occupancy.
+
+#### AC 28-118.3.1 — section ID 9198
+
+> No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use.
+
+#### AC 28-118.3.2 — section ID 9199
+
+> No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.
+
+#### BC 901.9.2 — section ID 1552
+
+> Fire protection systems governed by this chapter shall be provided:
+
+> 1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.
+
+> 2. Throughout a space, where a change is made in the occupancy group classification or usage of the space.
+
+#### BC 1101.3.1 — section ID 2626
+
+> Accessible features and construction governed by this chapter shall be provided:
+
+> 2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution.
 
 ### Knowledgeable-human decision
 

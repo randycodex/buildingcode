@@ -20,6 +20,20 @@ function normalizedText(value) {
     .toLowerCase();
 }
 
+function canonicalComparableText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00AD\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\s+/g, " ")
+    .replace(/(^|[\s([{])"\s+/g, '$1"')
+    .replace(/\s+([,.;:!?%])/g, "$1")
+    .replace(/\s+"(?=$|[\s,.;:!?%)\]}])/g, '"')
+    .trim()
+    .toLowerCase();
+}
+
 function tokenSet(value) {
   return new Set(normalizedText(value).match(/[a-z0-9]+(?:[.-][a-z0-9]+)*/g) || []);
 }
@@ -36,6 +50,18 @@ function validateRetrievalDataset(dataset, researchDataset) {
   assert.equal(dataset.schemaVersion, 1, "Evidence retrieval dataset must use schemaVersion 1.");
   assert.equal(dataset.retrievalVersion, evidenceDiscoveryVersion, "Retrieval dataset version does not match the implementation.");
   assert(Array.isArray(dataset.coverageGaps) && dataset.coverageGaps.length, "Retrieval dataset must disclose coverage gaps.");
+  assert(
+    Array.isArray(dataset.scopeExclusions) &&
+      dataset.scopeExclusions.length &&
+      dataset.scopeExclusions.every((item) => typeof item === "string" && item.trim()),
+    "Retrieval dataset must disclose intentional scope exclusions."
+  );
+  assert(
+    dataset.scopeExclusions.some((item) =>
+      /Buildings Bulletins.*outside.*Research library/i.test(item)
+    ),
+    "Buildings Bulletin ingestion must remain an explicit Research scope exclusion."
+  );
   assert(Array.isArray(dataset.cases) && dataset.cases.length, "Retrieval dataset has no cases.");
   const researchByID = new Map(researchDataset.cases.map((testCase) => [testCase.id, testCase]));
   const ids = new Set();
@@ -162,6 +188,47 @@ try {
       }
     }
   })).account;
+
+  const preflightResearchCases = Array.from(new Set(
+    retrievalDataset.cases
+      .filter((testCase) => testCase.status !== "rejected")
+      .map((testCase) => testCase.sourceResearchCaseID)
+  )).map((caseID) => researchByID.get(caseID));
+  for (const researchCase of preflightResearchCases) {
+    for (const source of researchCase.selectedEvidence) {
+      const parameters = new URLSearchParams({
+        q: source.sectionNumber,
+        code: source.codePrefix,
+        limit: "20"
+      });
+      const search = await jsonRequest(baseURL, `/code/search?${parameters}`);
+      const exactMatches = (search.results || []).filter((result) =>
+        result.codePrefix === source.codePrefix &&
+        result.sectionNumber === source.sectionNumber
+      );
+      assert.equal(
+        exactMatches.length,
+        1,
+        `${researchCase.id} expected exactly one canonical ${source.reference} search result.`
+      );
+      const sectionPayload = await jsonRequest(baseURL, `/code/sections/${exactMatches[0].id}`);
+      const section = sectionPayload.section || {};
+      assert.equal(
+        String(section.sectionID || exactMatches[0].id),
+        String(source.sectionID),
+        `${researchCase.id} ${source.reference} resolved to the wrong canonical section ID.`
+      );
+      const enactedText = canonicalComparableText(
+        (section.blocks || []).map((block) => block.plainText || "").join("\n\n")
+      );
+      for (const passage of source.exactPassages) {
+        assert(
+          enactedText.includes(canonicalComparableText(passage)),
+          `${researchCase.id} ${source.reference} is missing an expected exact canonical passage.`
+        );
+      }
+    }
+  }
 
   const results = [];
   for (const retrievalCase of retrievalDataset.cases.filter((testCase) => testCase.status !== "rejected")) {
@@ -315,6 +382,9 @@ try {
     });
   }
 
+  console.log(
+    `Canonical evidence preflight: ${preflightResearchCases.length}/${preflightResearchCases.length} linked Research cases are exact-section and exact-passage ready.`
+  );
   console.log("Permitext evidence retrieval draft diagnostics");
   for (const result of results) {
     if (result.behavior === "insufficient-query") {

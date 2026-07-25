@@ -2,9 +2,9 @@
 
 **Development-only document — contains private answer keys and must not be served to Permitext customers.**
 
-Generated from `evals/research-cases.json` on 2026-07-25T10:53:29.411Z.
+Generated from `evals/research-cases.json` on 2026-07-25T11:06:03.916Z.
 
-This packet contains 12 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
+This packet contains 13 draft cases. Reviewing this document does not alter the evaluation dataset or approve a case automatically.
 
 For each case, confirm that the exact enacted passages are correct, the proposed conclusion follows from those passages, the required concepts and citations are complete, and the missing-fact and forbidden-claim rules are appropriate. Select one decision and write any corrections. A case remains a draft until the decision is deliberately entered into Permitext's owner review system.
 
@@ -24,6 +24,7 @@ For each case, confirm that the exact enacted passages are correct, the proposed
 | nyc-020-existing-plumbing-repair-boundary | Approve / Correct / Reject |  |
 | nyc-021-prior-code-wind-surface-area-trigger | Approve / Correct / Reject |  |
 | nyc-022-reestablished-prior-occupancy-boundary | Approve / Correct / Reject |  |
+| nyc-023-mercantile-business-co-exception | Approve / Correct / Reject |  |
 
 ---
 
@@ -1482,6 +1483,192 @@ level: conditional; description: The selected passages reject automatic reliance
 ### Existing drafting note
 
 Draft candidate NYC-022 broadens existing-building coverage into re-establishment of a former occupancy. Exact enacted passages were copied from Permitext canonical content and require knowledgeable-human review before approval.
+
+### Reviewer decision
+
+- [ ] Approve as written
+- [ ] Approve after the corrections written below
+- [ ] Reject
+
+**Reviewer name:** ________________________________________________
+
+**Review date:** ___________________________________________________
+
+**Corrections or notes:**
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+____________________________________________________________________
+
+---
+
+## 13. The mercantile-to-business Certificate of Occupancy exception is conditional
+
+- **Case ID:** `nyc-023-mercantile-business-co-exception`
+- **Current status:** draft
+- **Jurisdiction:** New York City, New York
+- **Code edition:** 2022 New York City Construction Codes
+- **Difficulty:** advanced
+- **Topics:** existing buildings, mercantile and business occupancies, Certificate of Occupancy exception, fire protection, accessibility
+
+### Scenario source
+
+Draft scenario constructed solely from canonical enacted 2022 NYC Administrative Code Sections 28-118.3, 28-118.3.1, and 28-118.3.2 and Building Code Sections 901.9.2 and 1101.3.1.
+
+The source supplies the scenario only. Forum comments, bulletin summaries, and third-party answers are not the answer key.
+
+### Project context
+
+building: Existing building represented by the applicant as a prior-code building; establishment: Ground-floor establishment proposed to change from a mercantile establishment and Group M occupancy to a business establishment and Group B occupancy; applicantAssertions: both uses are within the same zoning use group, existing and proposed occupant loads are 70 and 72 persons, the public enters directly from the exterior, the alteration does not change the required exits, the alteration does not change the live load stated on the existing Certificate of Occupancy; unknowns: support for each applicant assertion, existing Certificate of Occupancy and approved documents, applicable zoning use-group classification, occupant-load calculations, accessibility compliance, fire-protection scope, other applicable alteration, permit, and approval requirements
+
+### Question
+
+An existing ground-floor establishment is proposed to change from a mercantile establishment and Group M occupancy to a business establishment and Group B occupancy. The applicant says both uses are within the same zoning use group, the existing and proposed occupant loads are 70 and 72 persons, the public enters directly from the exterior, and neither the required exits nor the live load stated on the existing Certificate of Occupancy will change. Accessibility and fire-protection compliance have not been documented. Based on AC 28-118.3, AC 28-118.3.1, AC 28-118.3.2, BC 901.9.2, and BC 1101.3.1, may the applicant rely on the Certificate-of-Occupancy exception now, and what still must be established?
+
+### Exact selected Permitext evidence
+
+#### AC 28-118.3
+
+Canonical section ID: `9197`
+
+Passage 1:
+
+> The provisions of sections 28-118.3.1 through 28-118.3.4 shall apply to completed buildings or open lots.
+
+Passage 2:
+
+> The provisions of sections 28-118.3.1 and 28-118.3.2 shall not be interpreted to require an issuance of a new or amended certificate of occupancy for a change from a mercantile establishment to a business establishment, or from a business establishment to a mercantile establishment, provided all the following criteria are met:
+
+Passage 3:
+
+> 1. Such alteration is limited to a change within the same zoning use group;
+
+Passage 4:
+
+> 2. The maximum occupant load for the individual establishment, both as existing and proposed, does not exceed 74 persons based on occupant load calculations in accordance with Table 6-2 of the 1968 building code or Table 1004.1.3 of the New York city building code, as applicable;
+
+Passage 5:
+
+> 3. The establishment is located on the ground floor, accessed by the public directly from the exterior of the building;
+
+Passage 6:
+
+> 4. The establishment undergoing alteration complies or is made to comply with any other requirements that would be applicable to the alteration, including but not limited to accessibility, and fire protection requirements pursuant to sections 901.9.2 and 1101.3.1 of the New York city building code;
+
+Passage 7:
+
+> 5. Such alteration does not require a change in the required exits. Relocation of exit doors of the same size or larger shall not constitute a change in the required exits;
+
+Passage 8:
+
+> 6. Such alteration does not require a change in the live load from that stated on the existing certificate of occupancy.
+
+#### AC 28-118.3.1
+
+Canonical section ID: `9198`
+
+Passage 1:
+
+> No building, open lot or portion thereof hereafter altered so as to change from one occupancy group to another, or from one zoning use group to another, either in whole or in part, shall be occupied or used unless and until the commissioner has issued a certificate of occupancy certifying that the alteration work for which the permit was issued has been completed substantially in accordance with the approved construction documents and the provisions of this code and other applicable laws and rules for the new occupancy or use.
+
+#### AC 28-118.3.2
+
+Canonical section ID: `9199`
+
+Passage 1:
+
+> No change shall be made to a building, open lot or portion thereof inconsistent with the last issued certificate of occupancy or, where applicable, inconsistent with the last issued certificate of completion for such building or open lot or which would bring it under some special provision of this code or other applicable laws or rules, unless and until the commissioner has issued a new or amended certificate of occupancy.
+
+#### BC 901.9.2
+
+Canonical section ID: `1552`
+
+Passage 1:
+
+> Fire protection systems governed by this chapter shall be provided:
+
+Passage 2:
+
+> 1. To the entire building as if the building were hereafter erected, where a change is made in the main use or dominant occupancy of such building.
+
+Passage 3:
+
+> 2. Throughout a space, where a change is made in the occupancy group classification or usage of the space.
+
+#### BC 1101.3.1
+
+Canonical section ID: `2626`
+
+Passage 1:
+
+> Accessible features and construction governed by this chapter shall be provided:
+
+Passage 2:
+
+> 2. Throughout a space, including the immediate entrance(s) thereto, where an alteration is made that is considered either: (i) a change in occupancy classification of such space in accordance with this code, or (ii) a change in the zoning use group of such space in accordance with the New York City Zoning Resolution.
+
+### Proposed expected conclusion
+
+Not yet. AC 28-118.3 creates a narrow exception under which AC 28-118.3.1 and AC 28-118.3.2 do not require issuance of a new or amended Certificate of Occupancy for a mercantile-to-business or business-to-mercantile change, but only if all six stated criteria are met. The applicant's assertions correspond to several criteria, including the same zoning use group, no more than 74 persons in both conditions, a ground-floor establishment with direct exterior public access, no required-exit change, and no change in the live load stated on the existing Certificate. Those assertions are not verified by the selected evidence. Criterion 4 independently requires the establishment to comply or be made to comply with all other requirements applicable to the alteration, expressly including the BC 901.9.2 fire-protection and BC 1101.3.1 accessibility requirements. For the stated space-level Group M-to-B classification change, BC 901.9.2 requires Chapter 9 fire-protection systems throughout the space; it does not by itself identify which particular systems are required. If this is an alteration in a prior-code building considered a change in the space's occupancy classification or zoning use group, BC 1101.3.1 requires applicable accessible features and construction throughout the space, including its immediate entrances. Until every AC 28-118.3 criterion, the actual classifications, occupant-load calculations, existing Certificate, exit and live-load conditions, accessibility scope, fire-protection scope, and other applicable requirements are documented, the exception cannot be treated as established. The exception also does not itself waive permits, approvals, or compliance obligations outside the selected provisions.
+
+### Expected uncertainty
+
+level: conditional; description: The selected passages define a complete six-condition Certificate-of-Occupancy exception and related fire-protection and accessibility consequences, but they do not verify the applicant's facts, identify the particular fire-protection systems, or establish all other permit and alteration requirements.
+
+### Required citations and the claim each must support
+
+- **AC 28-118.3:** The conditional mercantile/business Certificate-of-Occupancy exception and all six criteria, including preserved fire-protection and accessibility requirements.
+- **AC 28-118.3.1:** The general Certificate-of-Occupancy rule for an alteration changing an occupancy group or zoning use group, which the AC 28-118.3 exception conditionally limits.
+- **AC 28-118.3.2:** The general new-or-amended-certificate rule for changes inconsistent with the last certificate or triggering a special provision, which the AC 28-118.3 exception conditionally limits.
+- **BC 901.9.2:** The distinction between whole-building main-use or dominant-occupancy changes and fire-protection requirements throughout a space whose occupancy classification or usage changes.
+- **BC 1101.3.1:** The conditional accessibility requirement throughout the changed space and its immediate entrances.
+
+### Required concepts
+
+- Describe the AC 28-118.3 exception as conditional on every one of its six criteria.
+- Identify the same-zoning-use-group condition.
+- Apply the no-more-than-74-person condition to both the existing and proposed occupant loads and require the applicable calculation.
+- Identify the ground-floor and direct-exterior-public-access condition.
+- Identify the no-required-exit-change condition and its same-size-or-larger exit-door relocation rule.
+- Identify the no-live-load-change condition by reference to the existing Certificate of Occupancy.
+- Explain that criterion 4 preserves all other applicable alteration requirements, expressly including fire protection and accessibility.
+- Apply BC 901.9.2 at the stated space level without inventing particular fire-protection systems.
+- State the conditional BC 1101.3.1 accessibility consequence throughout the space and immediate entrances.
+- Treat the applicant's factual assertions as unverified and request the supporting project records and analyses.
+- Do not treat the Certificate-of-Occupancy exception as a waiver of permits, approvals, or other applicable requirements.
+
+### Facts the answer must identify as missing
+
+- Verification that the existing building is a prior-code building for the BC 1101.3.1 application.
+- Existing Certificate of Occupancy, certificate of completion where applicable, and approved construction documents.
+- Authoritative confirmation that the existing and proposed establishments are within the same zoning use group.
+- Existing and proposed occupancy-group classifications.
+- Existing and proposed occupant-load calculations under the applicable table.
+- Ground-floor location and direct exterior public-access configuration.
+- Existing and proposed required-exit analysis, including any exit-door relocation.
+- Existing Certificate live load and proposed live-load requirements.
+- Applicable Chapter 9 fire-protection systems and compliance scope.
+- Applicable Chapter 11 accessible features, immediate entrances, and compliance scope.
+- Other applicable alteration, filing, permit, approval, and agency requirements.
+
+### Claims the answer must not make
+
+- A mercantile-to-business or business-to-mercantile change never requires a new or amended Certificate of Occupancy.
+- Meeting only some of the six AC 28-118.3 criteria is sufficient.
+- The applicant's same-zoning-use-group assertion is established by the selected evidence.
+- An occupant load of 74 or less by itself establishes the exception.
+- The Certificate-of-Occupancy exception waives accessibility or fire-protection compliance.
+- BC 901.9.2 identifies the particular fire-protection systems required for this establishment.
+- A space-level occupancy-classification change automatically requires whole-building fire-protection compliance.
+- BC 1101.3.1 applies without confirming its prior-code-building and alteration context.
+- The exception waives all permits, approvals, or other applicable alteration requirements.
+- The proposed change is approved or compliant on the stated facts.
+
+### Existing drafting note
+
+Draft candidate NYC-023 complements the earlier insufficient-evidence B/M scenario by selecting the enacted Administrative Code exception and every expressly cross-referenced Construction Code provision. It tests the six-condition exception without treating applicant assertions as proof and requires knowledgeable-human review before approval.
 
 ### Reviewer decision
 

@@ -37,6 +37,10 @@ function renderPacket(retrievalDataset, researchDataset) {
     "## Known coverage gaps",
     "",
     ...retrievalDataset.coverageGaps.map((gap) => `- ${gap}`),
+    "",
+    "## Intentional scope exclusions",
+    "",
+    ...(retrievalDataset.scopeExclusions || []).map((exclusion) => `- ${exclusion}`),
     ""
   ];
 

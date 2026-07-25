@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v8";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v9";
 export const evidenceDiscoveryMaximumCandidates = 12;
 
 const stopWords = new Set([
@@ -163,6 +163,17 @@ const topicRoutes = [
       { codePrefix: "AC", sectionPrefix: "28-102.4.2" },
       { codePrefix: "AC", sectionPrefix: "28-118.3.1" },
       { codePrefix: "AC", sectionPrefix: "28-118.3.2" }
+    ]
+  },
+  {
+    pattern: /\bmercantile\b.*\bbusiness\b|\bbusiness\b.*\bmercantile\b|\bcertificate\s+of\s+occupancy\b.*\b74\b|\bsame\s+zoning\s+use\s+group\b/i,
+    label: "mercantile and business Certificate-of-Occupancy exception provisions",
+    targets: [
+      { codePrefix: "AC", sectionPrefix: "28-118.3" },
+      { codePrefix: "AC", sectionPrefix: "28-118.3.1" },
+      { codePrefix: "AC", sectionPrefix: "28-118.3.2" },
+      { codePrefix: "BC", sectionPrefix: "901.9.2" },
+      { codePrefix: "BC", sectionPrefix: "1101.3.1" }
     ]
   },
   {
