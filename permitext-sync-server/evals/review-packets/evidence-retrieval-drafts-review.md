@@ -1,6 +1,6 @@
 # Permitext Evidence Retrieval Draft Review Packet
 
-Retrieval implementation: `20260725-hybrid-candidates-v9`
+Retrieval implementation: `20260725-hybrid-candidates-v10`
 
 All cases in this packet are drafts. A knowledgeable reviewer must approve, correct, or reject the expected candidate set and passage relevance before any case can become a release gate. Retrieval output is candidate evidence only and does not authorize or generate a Research answer.
 
@@ -572,7 +572,7 @@ Corrections or notes:
 - Categories: administrative provisions, fire districts, maps, non-text evidence
 - Source Research case: `nyc-018-fire-district-map-boundary`
 - Must block text-only preparation for section IDs: `6881`
-- Must expose a complete integrity-addressed visual inventory while keeping preparation blocked for section IDs: `6881`
+- Must expose a complete integrity-addressed visual inventory and require explicit visual review and selection before preparation for section IDs: `6881`
 - Required coverage limitations: `visual-source-review-required`
 
 ### Project question

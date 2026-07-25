@@ -64,7 +64,7 @@ function renderPacket(retrievalDataset, researchDataset) {
         ? [`- Must attach a complete structured rich source for section IDs: ${retrievalCase.expectedStructuredRichSourceSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
         : []),
       ...(retrievalCase.expectedIntegrityAddressedVisualSourceSectionIDs?.length
-        ? [`- Must expose a complete integrity-addressed visual inventory while keeping preparation blocked for section IDs: ${retrievalCase.expectedIntegrityAddressedVisualSourceSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
+        ? [`- Must expose a complete integrity-addressed visual inventory and require explicit visual review and selection before preparation for section IDs: ${retrievalCase.expectedIntegrityAddressedVisualSourceSectionIDs.map((id) => `\`${id}\``).join(", ")}`]
         : []),
       ...(retrievalCase.expectedOutsideCurrentLibrary?.length
         ? [`- Must disclose outside-scope authorities: ${retrievalCase.expectedOutsideCurrentLibrary.join(", ")}`]

@@ -203,6 +203,56 @@ function immutableStructuredEvidenceSource(source, passageText) {
   };
 }
 
+function immutableVisualEvidenceSources(source) {
+  const sources = Array.isArray(source?.visualSources) ? source.visualSources : [];
+  if (!sources.length) return [];
+  if (sources.length > 4) throw new Error("Too many visual evidence sources.");
+  return sources.map((visualSource) => {
+    const id = requiredText(visualSource?.id, "visual evidence source ID", 256);
+    const assetName = requiredText(visualSource?.assetName, "visual evidence asset name", 512);
+    const assetURL = requiredText(visualSource?.assetURL, "visual evidence asset URL", 1_024);
+    const mediaType = requiredText(visualSource?.mediaType, "visual evidence media type", 64);
+    const contentHash = requiredText(visualSource?.contentHash, "visual evidence content hash", 64);
+    const dataBase64 = requiredText(
+      visualSource?.dataBase64,
+      "visual evidence binary snapshot",
+      6_000_000
+    );
+    if (
+      !/^[a-zA-Z0-9._-]+\.(?:gif|jpe?g|png|webp)$/i.test(assetName) ||
+      !/^\/code\/assets\/[a-zA-Z0-9._%-]+$/.test(assetURL) ||
+      !["image/gif", "image/jpeg", "image/png", "image/webp"].includes(mediaType) ||
+      !/^[a-f0-9]{64}$/.test(contentHash) ||
+      !/^[a-zA-Z0-9+/]+={0,2}$/.test(dataBase64)
+    ) {
+      throw new Error("Invalid visual evidence source.");
+    }
+    const body = Buffer.from(dataBase64, "base64");
+    if (
+      !body.length ||
+      body.toString("base64") !== dataBase64 ||
+      body.length !== Number(visualSource.byteLength) ||
+      createHash("sha256").update(body).digest("hex") !== contentHash
+    ) {
+      throw new Error("Visual evidence content no longer matches its integrity metadata.");
+    }
+    const displayWidth = Number(visualSource.displayWidth);
+    const displayHeight = Number(visualSource.displayHeight);
+    return {
+      id,
+      kind: "image",
+      assetName,
+      assetURL,
+      mediaType,
+      contentHash,
+      byteLength: body.length,
+      displayWidth: Number.isFinite(displayWidth) && displayWidth > 0 ? displayWidth : null,
+      displayHeight: Number.isFinite(displayHeight) && displayHeight > 0 ? displayHeight : null,
+      dataBase64
+    };
+  });
+}
+
 export function ownerScope(userID) {
   return {
     kind: "user",
@@ -406,6 +456,8 @@ export function immutableEvidenceSnapshot({
   };
   const structuredSource = immutableStructuredEvidenceSource(source, passageText);
   if (structuredSource) snapshot.structuredSource = structuredSource;
+  const visualSources = immutableVisualEvidenceSources(source);
+  if (visualSources.length) snapshot.visualSources = visualSources;
   return {
     ...snapshot,
     snapshotHash: createHash("sha256").update(JSON.stringify(snapshot)).digest("hex")

@@ -169,7 +169,11 @@ const mapAuthority = await discoverRelevantEvidence({
 assert.equal(mapAuthority.candidates[0].sectionID, "4", "Appendix-style exact references must resolve.");
 assert.equal(mapAuthority.candidates[0].preparationEligible, false);
 assert(
-  mapAuthority.candidates[0].sourceReviewRequirements.some((item) => item.kind === "visual-source"),
+  mapAuthority.candidates[0].sourceReviewRequirements.some((item) =>
+    item.kind === "visual-source" &&
+    item.reviewMode === "explicit-selection" &&
+    item.maximumSelections === 4
+  ),
   "A text passage must not hide an official map or image in the same section."
 );
 assert(

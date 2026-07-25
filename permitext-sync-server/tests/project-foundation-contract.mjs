@@ -208,6 +208,57 @@ assert.equal(structuredEvidence.structuredSource.reference, structuredReference)
 assert.equal(structuredEvidence.structuredSource.contentHash, structuredContentHash);
 assert.equal(structuredEvidence.structuredSource.grids[0].rows[0].cells[0].rowSpan, 2);
 
+const visualBody = Buffer.from("immutable official visual evidence");
+const visualContentHash = createHash("sha256").update(visualBody).digest("hex");
+const visualEvidence = immutableEvidenceSnapshot({
+  id: "evidence-visual-1",
+  source: {
+    sourceID: "source-visual-1",
+    sectionID: "6881",
+    sectionNumber: "D106.1",
+    chapterNumber: "D",
+    codePrefix: "BC",
+    codeEdition: "2022 New York City Construction Codes",
+    codeVersion: "library-v1",
+    text: "The exact approved map-dependent passage.",
+    visualSources: [{
+      id: "visual-source-map-1",
+      kind: "image",
+      assetName: "official-map.jpg",
+      assetURL: "/code/assets/official-map.jpg",
+      mediaType: "image/jpeg",
+      contentHash: visualContentHash,
+      byteLength: visualBody.length,
+      displayWidth: 640,
+      displayHeight: 480,
+      dataBase64: visualBody.toString("base64")
+    }]
+  },
+  approvedAt: createdAt
+});
+assert.equal(visualEvidence.visualSources[0].contentHash, visualContentHash);
+assert.equal(visualEvidence.visualSources[0].dataBase64, visualBody.toString("base64"));
+assert.equal(visualEvidence.visualSources[0].byteLength, visualBody.length);
+let rejectedTamperedVisualEvidence = false;
+try {
+  immutableEvidenceSnapshot({
+    id: "evidence-visual-tampered",
+    source: {
+      ...visualEvidence,
+      text: visualEvidence.passageText,
+      codeVersion: visualEvidence.sourceLibraryVersion,
+      visualSources: [{
+        ...visualEvidence.visualSources[0],
+        dataBase64: Buffer.from("tampered").toString("base64")
+      }]
+    },
+    approvedAt: createdAt
+  });
+} catch {
+  rejectedTamperedVisualEvidence = true;
+}
+assert.equal(rejectedTamperedVisualEvidence, true);
+
 const immutableAnswer = immutableResearchAnswer({
   id: "answer-1",
   owner,

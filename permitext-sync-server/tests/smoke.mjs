@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { createHmac } from "node:crypto";
+import { createHash, createHmac } from "node:crypto";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -793,7 +793,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-visual-inventory-v13'),
+        webRoot.text.includes('/web/app.js?v=20260725-visual-review-v14'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -802,12 +802,15 @@ async function main() {
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
         evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
         evidenceDiscoveryClientSource.includes("Complete structured source included") &&
-        evidenceDiscoveryClientSource.includes("Official visual source inventory verified") &&
+        evidenceDiscoveryClientSource.includes("Review official visual evidence") &&
         evidenceDiscoveryClientSource.includes("candidate.visualSources") &&
+        evidenceDiscoveryClientSource.includes("candidate.selectedVisualSourceIDs") &&
+        evidenceDiscoveryClientSource.includes("candidate.visualReviewConfirmed") &&
+        evidenceDiscoveryClientSource.includes("evidenceCandidatePreparationReady(candidate)") &&
         evidenceDiscoveryClientSource.includes("candidate.richSourceIDs || []") &&
         evidenceDiscoveryClientSource.includes("Outside Construction Code Research") &&
         evidenceDiscoveryClientSource.includes("outsideItem.sourceURL") &&
-        evidenceDiscoveryClientSource.includes("candidate.preparationEligible !== false") &&
+        evidenceDiscoveryClientSource.includes("visualSourceIDs: candidate.selectedVisualSourceIDs || []") &&
         evidenceDiscoveryClientSource.includes("Approve") &&
         evidenceDiscoveryClientSource.includes("Reject") &&
         evidenceDiscoveryClientSource.includes("Prepare Approved Evidence") &&
@@ -1790,7 +1793,10 @@ async function main() {
       fireDistrictMapDiscovery.response.ok &&
         fireDistrictMapCandidate?.preparationEligible === false &&
         fireDistrictMapCandidate?.sourceReviewRequirements?.some((item) =>
-          item.kind === "visual-source" && item.count === 41
+          item.kind === "visual-source" &&
+          item.count === 41 &&
+          item.reviewMode === "explicit-selection" &&
+          item.maximumSelections === 4
         ) &&
         fireDistrictMapCandidate?.visualSources?.length === 41 &&
         fireDistrictMapCandidate?.visualSourceIDs?.length === 41 &&
@@ -1810,6 +1816,95 @@ async function main() {
       fireDistrictMapAsset.response.ok &&
         fireDistrictMapAsset.response.headers.get("content-type")?.startsWith("image/"),
       "The integrity-addressed fire-district visual inventory referenced an unavailable official asset."
+    );
+    const unreviewedVisualConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: fireDistrictMapCandidate.sectionID,
+        selectedText: fireDistrictMapCandidate.selectedText
+      }
+    });
+    assert(
+      unreviewedVisualConversation.response.status === 400 &&
+        unreviewedVisualConversation.json.error?.includes("Review and select"),
+      "Research accepted a map-dependent passage without explicit visual-source review."
+    );
+    const forgedVisualConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: fireDistrictMapCandidate.sectionID,
+        selectedText: fireDistrictMapCandidate.selectedText,
+        visualSourceIDs: ["visual-source-client-forgery"],
+        visualReviewConfirmed: true
+      }
+    });
+    assert(
+      forgedVisualConversation.response.status === 400,
+      "Research accepted a visual-source ID that was not derived from the current enacted source."
+    );
+    const selectedMapSource = fireDistrictMapCandidate.visualSources[0];
+    const visualConversation = await request("/research/conversations/create", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        sectionID: fireDistrictMapCandidate.sectionID,
+        selectedText: fireDistrictMapCandidate.selectedText,
+        visualSourceIDs: [selectedMapSource.id],
+        visualReviewConfirmed: true
+      }
+    });
+    const visualSelection = visualConversation.json.conversation?.sources?.find((source) =>
+      source.kind === "selection"
+    );
+    const storedVisualSource = visualSelection?.visualSources?.[0];
+    assert(
+      visualConversation.response.status === 201 &&
+        storedVisualSource?.id === selectedMapSource.id &&
+        storedVisualSource.contentHash === selectedMapSource.contentHash &&
+        storedVisualSource.byteLength === selectedMapSource.byteLength &&
+        Buffer.from(storedVisualSource.dataBase64, "base64").length === selectedMapSource.byteLength &&
+        createHash("sha256")
+          .update(Buffer.from(storedVisualSource.dataBase64, "base64"))
+          .digest("hex") === selectedMapSource.contentHash &&
+        visualSelection.visualReviewConfirmedAt,
+      "Preparing reviewed map evidence did not preserve the exact selected image bytes and review timestamp."
+    );
+    const visualMessage = await request("/research/conversations/message", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        conversationID: visualConversation.json.conversation.id,
+        question: "What does the selected official map establish, and what remains uncertain?"
+      }
+    });
+    const visualAnswerID = visualMessage.json?.conversation?.messages?.find(
+      (message) => message.role === "assistant"
+    )?.id;
+    const visualAnswer = await request("/research/answers/get", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        answerID: visualAnswerID
+      }
+    });
+    assert(
+      visualMessage.response.ok &&
+        visualAnswer.response.ok &&
+        visualAnswer.json.answer.evidence.some((snapshot) =>
+          snapshot.visualSources?.some((source) =>
+            source.id === selectedMapSource.id &&
+            source.contentHash === selectedMapSource.contentHash &&
+            Buffer.from(source.dataBase64, "base64").length === selectedMapSource.byteLength
+          )
+        ),
+      "The immutable Research answer did not retain the approved official visual evidence."
     );
     const buildingsBulletinDiscovery = await request("/research/evidence/discover", {
       method: "POST",

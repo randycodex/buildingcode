@@ -1,7 +1,8 @@
 import { createHash } from "node:crypto";
 
-export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v9";
+export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v10";
 export const evidenceDiscoveryMaximumCandidates = 12;
+export const evidenceDiscoveryMaximumVisualSelections = 4;
 
 const stopWords = new Set([
   "a", "about", "after", "all", "also", "an", "and", "any", "are", "as", "at",
@@ -375,7 +376,7 @@ function comparableTableReference(value) {
   return normalizedText(value).replace(/^(?:ac|bc|ebc|fc|mc|pc)\s+/, "");
 }
 
-function visualSourceReferences(body) {
+export function visualSourceReferences(body) {
   const references = new Map();
   for (const block of body?.blocks || []) {
     for (const match of String(block.html || "").matchAll(/<img\b([^>]*)\bsrc=["']([^"']+)["']([^>]*)>/gi)) {
@@ -492,8 +493,10 @@ function sourceReviewRequirements(body, passage, richSources) {
     requirements.push({
       kind: "visual-source",
       count: imageReferences.length,
+      reviewMode: "explicit-selection",
+      maximumSelections: evidenceDiscoveryMaximumVisualSelections,
       assetNames: imageReferences.map((item) => item.assetName).slice(0, 50),
-      text: `This section includes ${imageReferences.length} official ${imageReferences.length === 1 ? "image, figure, or map" : "images, figures, or maps"} that the proposed text passage does not capture.`
+      text: `This section includes ${imageReferences.length} official ${imageReferences.length === 1 ? "image, figure, or map" : "images, figures, or maps"} that the proposed text passage does not capture. Review and explicitly select up to ${evidenceDiscoveryMaximumVisualSelections} applicable visual sources before preparing this evidence.`
     });
   }
   const tableReferences = Array.from(new Set(
@@ -812,7 +815,7 @@ export async function discoverRelevantEvidence({
   )) {
     coverageLimitations.push({
       kind: "visual-source-review-required",
-      text: "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. That candidate cannot be prepared for Analyze Selected Evidence."
+      text: "At least one candidate depends on an official image, figure, or map that is not captured by its text passage. Review and explicitly select the applicable visual source before preparing that candidate."
     });
   }
   if (candidates.some((candidate) =>

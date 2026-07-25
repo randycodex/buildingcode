@@ -7,7 +7,10 @@ import { basename, dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { approvedEvaluationCases, validateEvaluationDataset } from "../evals/evaluation-schema.mjs";
-import { validateResearchInterpretation } from "../app.mjs";
+import {
+  researchInputForEvidence,
+  validateResearchInterpretation
+} from "../app.mjs";
 import {
   evaluationRunEligibility,
   evaluationRunReviewStatus,
@@ -2262,6 +2265,40 @@ async function runSelfTest(dataset, datasetText) {
     rejectedByCap = error.code === "RESEARCH_EVAL_SPEND_CAP";
   }
   assert(rejectedByCap, "Research eval spend-cap self-test did not reject a request above the approved cap.");
+  const visualInputBody = Buffer.from("official visual input");
+  const visualInput = researchInputForEvidence("What does the selected map show?", [{
+    sourceID: "source-visual-self-test",
+    sectionID: "6881",
+    sectionNumber: "D106.1",
+    title: "Fire district maps",
+    codePrefix: "BC",
+    chapterNumber: "D",
+    codeEdition: "2022 New York City Construction Codes",
+    codeVersion: "self-test-library",
+    text: "The selected official passage.",
+    visualSources: [{
+      id: "visual-source-self-test",
+      assetName: "official-map.jpg",
+      mediaType: "image/jpeg",
+      contentHash: createHash("sha256").update(visualInputBody).digest("hex"),
+      byteLength: visualInputBody.length,
+      dataBase64: visualInputBody.toString("base64")
+    }]
+  }]);
+  assert(
+    Array.isArray(visualInput) &&
+      visualInput[0]?.role === "user" &&
+      visualInput[0]?.content?.some((item) =>
+        item.type === "input_text" &&
+        item.text.includes("ATTACHED_OFFICIAL_VISUAL_SOURCE_ID: visual-source-self-test")
+      ) &&
+      visualInput[0]?.content?.some((item) =>
+        item.type === "input_image" &&
+        item.detail === "original" &&
+        item.image_url === `data:image/jpeg;base64,${visualInputBody.toString("base64")}`
+      ),
+    "Research visual-input assembly did not bind the immutable image to its selected passage."
+  );
   const snapshotDirectory = await mkdtemp(join(tmpdir(), "permitext-eval-snapshot-self-test-"));
   try {
     const snapshotPath = join(snapshotDirectory, "run.json");

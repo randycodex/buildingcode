@@ -69,7 +69,9 @@ import {
 import {
   discoverRelevantEvidence,
   evidenceDiscoveryFeatureEnabled,
-  structuredRichSources
+  evidenceDiscoveryMaximumVisualSelections,
+  structuredRichSources,
+  visualSourceReferences
 } from "./evidence-discovery.mjs";
 import { validateEvaluationDataset } from "./evals/evaluation-schema.mjs";
 import { evaluationRunReviewStatus } from "./evals/evaluation-governance.mjs";
@@ -246,6 +248,9 @@ let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 let blobModulePromise = null;
 const constructionVisualAssetMetadataCache = new Map();
+const maximumResearchVisualEvidenceBytes = 4 * 1024 * 1024;
+const maximumResearchConversationVisualSources = 8;
+const maximumResearchConversationVisualEvidenceBytes = 8 * 1024 * 1024;
 
 const emptyStore = () => ({
   users: {},
@@ -2812,6 +2817,52 @@ async function constructionVisualSourceMetadata(reference) {
   } : null;
 }
 
+async function constructionVisualSourceWithContent(source) {
+  const assetName = String(source?.assetName || "").trim();
+  if (!/^[a-zA-Z0-9._-]+\.(?:gif|jpe?g|png|webp)$/i.test(assetName)) {
+    const error = new Error("The selected visual evidence format is not supported for Research.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  let body;
+  try {
+    body = await readFile(join(assetContentPath, assetName));
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      const missing = new Error("The selected visual evidence is no longer available in the enacted source.");
+      missing.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+      throw missing;
+    }
+    throw error;
+  }
+  const contentHash = createHash("sha256").update(body).digest("hex");
+  const currentID = `visual-source-${createHash("sha256")
+    .update(`${assetName}\u001f${contentHash}`)
+    .digest("hex")
+    .slice(0, 24)}`;
+  if (
+    currentID !== source.id ||
+    contentHash !== source.contentHash ||
+    body.length !== Number(source.byteLength)
+  ) {
+    const error = new Error("The selected visual evidence no longer matches the current enacted source.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  return {
+    id: currentID,
+    kind: "image",
+    assetName,
+    assetURL: source.assetURL,
+    mediaType: source.mediaType,
+    contentHash,
+    byteLength: body.length,
+    displayWidth: source.displayWidth || null,
+    displayHeight: source.displayHeight || null,
+    dataBase64: body.toString("base64")
+  };
+}
+
 function bearerToken(request) {
   const authorization = request.headers.authorization || "";
   const match = authorization.match(/^Bearer\s+(.+)$/i);
@@ -3615,6 +3666,12 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
       error.code = "INCOMPLETE_RESEARCH_SECTION";
       throw error;
     }
+    const visualReferences = visualSourceReferences(body);
+    const visualSources = (await Promise.all(
+      visualReferences.map((reference) =>
+        constructionVisualSourceMetadata(reference)
+      )
+    )).filter(Boolean);
     evidence.push({
       sectionID: canonicalID,
       sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
@@ -3624,7 +3681,9 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
       text,
       canonicalText,
       sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
-      richSources: structuredRichSources(body)
+      richSources: structuredRichSources(body),
+      visualSourceReferenceCount: visualReferences.length,
+      visualSources
     });
   }
   return evidence;
@@ -3649,6 +3708,14 @@ function researchPrompt(question, evidence, options = {}) {
         `STRUCTURED_TABLE_GRIDS_JSON: ${JSON.stringify(section.richSourceGrids)}`
       );
     }
+    for (const visualSource of section.visualSources || []) {
+      lines.push(
+        `ATTACHED_OFFICIAL_VISUAL_SOURCE_ID: ${visualSource.id}`,
+        `ATTACHED_VISUAL_ASSET: ${visualSource.assetName}`,
+        `ATTACHED_VISUAL_MEDIA_TYPE: ${visualSource.mediaType}`,
+        `ATTACHED_VISUAL_CONTENT_HASH: ${visualSource.contentHash}`
+      );
+    }
     return lines.join("\n");
   }).join("\n\n---\n\n");
   const history = (options.messages || []).slice(-8).map((message) => {
@@ -3666,6 +3733,56 @@ function researchPrompt(question, evidence, options = {}) {
     history ? `UNTRUSTED CONVERSATION HISTORY FOR CONTEXT ONLY — NOT AUTHORITY\n${history}` : "",
     `AUTHORITATIVE USER-SELECTED EVIDENCE\n${sources}`
   ].filter(Boolean).join("\n\n");
+}
+
+export function researchInputForEvidence(question, evidence, options = {}) {
+  const textInput = researchPrompt(question, evidence, options);
+  const visualSources = evidence.flatMap((section) =>
+    (section.visualSources || []).map((visualSource) => ({
+      section,
+      visualSource
+    }))
+  );
+  if (!visualSources.length) return textInput;
+  const totalBytes = visualSources.reduce(
+    (sum, item) => sum + Number(item.visualSource.byteLength || 0),
+    0
+  );
+  if (
+    visualSources.length > maximumResearchConversationVisualSources ||
+    totalBytes > maximumResearchConversationVisualEvidenceBytes
+  ) {
+    const error = new Error("The selected visual evidence exceeds the Research request limit.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  const content = [{ type: "input_text", text: textInput }];
+  for (const { section, visualSource } of visualSources) {
+    const mediaType = String(visualSource.mediaType || "").toLowerCase();
+    const dataBase64 = String(visualSource.dataBase64 || "");
+    if (
+      !["image/gif", "image/jpeg", "image/png", "image/webp"].includes(mediaType) ||
+      !/^[a-zA-Z0-9+/]+={0,2}$/.test(dataBase64)
+    ) {
+      const error = new Error("The selected visual evidence is not a valid supported image.");
+      error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+      throw error;
+    }
+    content.push({
+      type: "input_text",
+      text: [
+        `The next image is immutable official visual evidence attached to PASSAGE_ID ${section.sourceID}.`,
+        `VISUAL_SOURCE_ID: ${visualSource.id}`,
+        `ASSET: ${visualSource.assetName}`,
+        `SHA-256: ${visualSource.contentHash}`
+      ].join("\n")
+    }, {
+      type: "input_image",
+      image_url: `data:${mediaType};base64,${dataBase64}`,
+      detail: "original"
+    });
+  }
+  return [{ role: "user", content }];
 }
 
 function mockResearchInterpretation(question, evidence) {
@@ -3761,7 +3878,13 @@ export function validateResearchInterpretation(value, evidence) {
       sourceIDs,
       supportingPassages: sourceIDs.map((sourceID) => ({
         sourceID,
-        selectedText: allowedSources.get(sourceID).text
+        selectedText: allowedSources.get(sourceID).text,
+        visualSources: (allowedSources.get(sourceID).visualSources || []).map((visualSource) => ({
+          id: visualSource.id,
+          assetName: visualSource.assetName,
+          mediaType: visualSource.mediaType,
+          contentHash: visualSource.contentHash
+        }))
       })),
       relevance
     });
@@ -3807,6 +3930,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
         "Interpret only the selected official code evidence supplied in the request.",
+        "When a selected source includes attached official visual evidence, examine only the attached images and identify the exact visual source used through its PASSAGE_ID; never infer what an unselected map or image shows.",
+        "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
         "Do not use outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
         "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
@@ -3822,7 +3947,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           "If the question cannot be answered from the selected evidence, say so directly.",
         "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
       ].join(" "),
-      input: researchPrompt(question, passageEvidence, options),
+      input: researchInputForEvidence(question, passageEvidence, options),
       text: {
         format: {
           type: "json_schema",
@@ -3913,6 +4038,18 @@ function researchSourceFromEvidence(evidence, options = {}) {
     maximumResearchSelectionCharacters
   );
   const richSource = options.richSource || null;
+  const visualSources = (options.visualSources || []).map((visualSource) => ({
+    id: visualSource.id,
+    kind: visualSource.kind,
+    assetName: visualSource.assetName,
+    assetURL: visualSource.assetURL,
+    mediaType: visualSource.mediaType,
+    contentHash: visualSource.contentHash,
+    byteLength: visualSource.byteLength,
+    displayWidth: visualSource.displayWidth || null,
+    displayHeight: visualSource.displayHeight || null,
+    dataBase64: visualSource.dataBase64
+  }));
   return {
     id: randomUUID(),
     kind: options.kind || "related",
@@ -3932,6 +4069,10 @@ function researchSourceFromEvidence(evidence, options = {}) {
     richSourceContentHash: richSource?.contentHash || null,
     richSourceRowCount: richSource?.rowCount || null,
     richSourceGrids: richSource?.grids || null,
+    visualSources,
+    visualReviewConfirmedAt: visualSources.length
+      ? options.visualReviewConfirmedAt || new Date().toISOString()
+      : null,
     sectionTextHash: evidence.sectionTextHash,
     codeVersion: defaultSyncCodeVersion,
     codeEdition: defaultResearchCodeEdition,
@@ -3988,6 +4129,39 @@ function requestedRichSourceIDs(value) {
   return ids;
 }
 
+function requestedVisualSourceIDs(value, reviewConfirmed) {
+  if (value === undefined || value === null) {
+    if (reviewConfirmed === true) {
+      const error = new Error("Select at least one official visual source before confirming visual review.");
+      error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+      throw error;
+    }
+    return [];
+  }
+  if (!Array.isArray(value)) {
+    const error = new Error("Visual evidence source IDs must be an array.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  const ids = Array.from(new Set(
+    value.map((item) => String(item || "").trim()).filter(Boolean)
+  ));
+  if (!ids.length && value.length === 0 && reviewConfirmed !== true) return [];
+  if (
+    !ids.length ||
+    ids.length > evidenceDiscoveryMaximumVisualSelections ||
+    ids.length !== value.length ||
+    reviewConfirmed !== true
+  ) {
+    const error = new Error(
+      `Select and confirm between one and ${evidenceDiscoveryMaximumVisualSelections} official visual sources.`
+    );
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  return ids;
+}
+
 async function researchSourcesForSelection(sectionID, selectedText, options = {}) {
   const normalizedSelection = normalizedResearchText(
     selectedText,
@@ -4021,15 +4195,60 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     }
     return source;
   });
+  const visualSourceIDs = requestedVisualSourceIDs(
+    options.visualSourceIDs,
+    options.visualReviewConfirmed
+  );
+  if (
+    Number(primary.visualSourceReferenceCount || 0) > 0 &&
+    primary.visualSources.length !== primary.visualSourceReferenceCount
+  ) {
+    const error = new Error("The complete official visual-source inventory is not available for review.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
+  if (primary.visualSources.length && !visualSourceIDs.length) {
+    const error = new Error("Review and select the applicable official visual evidence before preparing this passage.");
+    error.code = "RESEARCH_VISUAL_REVIEW_REQUIRED";
+    throw error;
+  }
+  const visualSourcesByID = new Map(
+    primary.visualSources.map((source) => [source.id, source])
+  );
+  const requestedVisualSources = [];
+  for (const sourceID of visualSourceIDs) {
+    const source = visualSourcesByID.get(sourceID);
+    if (!source) {
+      const error = new Error("The visual evidence source is no longer available in the enacted section.");
+      error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+      throw error;
+    }
+    requestedVisualSources.push(await constructionVisualSourceWithContent(source));
+  }
+  if (
+    requestedVisualSources.reduce((total, source) => total + source.byteLength, 0) >
+    maximumResearchVisualEvidenceBytes
+  ) {
+    const error = new Error("The selected visual evidence exceeds the per-passage Research limit.");
+    error.code = "INVALID_RESEARCH_VISUAL_SOURCE";
+    throw error;
+  }
   const related = await relatedResearchEvidence(primary);
+  const visualReviewConfirmedAt = requestedVisualSources.length
+    ? new Date().toISOString()
+    : null;
   const selectionSources = [
     researchSourceFromEvidence(primary, {
       kind: "selection",
-      relationship: exactRichSource
+      relationship: requestedVisualSources.length
+        ? `${requestedVisualSources.length} official visual ${requestedVisualSources.length === 1 ? "source" : "sources"} reviewed and selected by you`
+        : exactRichSource
         ? `Structured official ${exactRichSource.reference} approved by you`
         : "Passage selected by you",
       selectedText: canonicalSelection,
-      richSource: exactRichSource
+      richSource: exactRichSource,
+      visualSources: requestedVisualSources,
+      visualReviewConfirmedAt
     })
   ];
   for (const richSource of requestedRichSources) {
@@ -4051,12 +4270,12 @@ async function currentResearchEvidence(conversation) {
   const sectionIDs = Array.from(new Set((conversation.sources || []).map((source) => source.sectionID).filter(Boolean)));
   const evidence = await researchEvidenceForSectionIDs(sectionIDs);
   const evidenceByID = new Map(evidence.map((item) => [item.sectionID, item]));
-  const sourceStatuses = (conversation.sources || []).map((source) => {
+  const sourceStatuses = await Promise.all((conversation.sources || []).map(async (source) => {
     const current = evidenceByID.get(source.sectionID);
     const currentRichSource = source.richSourceID
       ? current?.richSources?.find((item) => item.id === source.richSourceID)
       : null;
-    const selectionPresent = source.richSourceID
+    const textSelectionPresent = source.richSourceID
       ? Boolean(
           currentRichSource &&
           currentRichSource.contentHash === source.richSourceContentHash &&
@@ -4065,13 +4284,41 @@ async function currentResearchEvidence(conversation) {
       : !source.selectedText || Boolean(
           current && matchingCanonicalResearchSelection(source.selectedText, current.canonicalText)
         );
+    let visualSelectionPresent = true;
+    for (const storedVisualSource of source.visualSources || []) {
+      const currentVisualSource = current?.visualSources?.find((item) =>
+        item.id === storedVisualSource.id
+      );
+      if (!currentVisualSource) {
+        visualSelectionPresent = false;
+        break;
+      }
+      try {
+        const resolved = await constructionVisualSourceWithContent(currentVisualSource);
+        if (
+          resolved.contentHash !== storedVisualSource.contentHash ||
+          resolved.byteLength !== storedVisualSource.byteLength ||
+          resolved.mediaType !== storedVisualSource.mediaType ||
+          resolved.dataBase64 !== storedVisualSource.dataBase64
+        ) {
+          visualSelectionPresent = false;
+          break;
+        }
+      } catch (error) {
+        if (error.code !== "INVALID_RESEARCH_VISUAL_SOURCE") throw error;
+        visualSelectionPresent = false;
+        break;
+      }
+    }
+    const selectionPresent = textSelectionPresent && visualSelectionPresent;
     return {
       sourceID: source.id,
       sectionID: source.sectionID,
       current: Boolean(current && current.sectionTextHash === source.sectionTextHash && selectionPresent),
-      selectionPresent
+      selectionPresent,
+      visualSelectionPresent
     };
-  });
+  }));
   return {
     evidence,
     sourceStatuses,
@@ -4099,7 +4346,8 @@ function selectedResearchEvidence(conversation, currentEvidence) {
         richSourceReference: richSource?.reference || null,
         richSourceContentHash: richSource?.contentHash || null,
         richSourceRowCount: richSource?.rowCount || null,
-        richSourceGrids: richSource?.grids || null
+        richSourceGrids: richSource?.grids || null,
+        visualSources: (source.visualSources || []).map((visualSource) => ({ ...visualSource }))
       } : null;
     })
     .filter(Boolean);
@@ -7970,7 +8218,18 @@ async function handleResearchConversationReuseEvidence(request, response) {
   const relatedSectionIDs = new Set();
   try {
     for (const snapshot of answer.evidence || []) {
-      const resolved = await researchSourcesForSelection(snapshot.sectionID, snapshot.passageText);
+      const visualSourceIDs = (snapshot.visualSources || []).map((source) => source.id);
+      const resolved = await researchSourcesForSelection(
+        snapshot.sectionID,
+        snapshot.passageText,
+        {
+          richSourceIDs: snapshot.structuredSource?.id
+            ? [snapshot.structuredSource.id]
+            : [],
+          visualSourceIDs,
+          visualReviewConfirmed: visualSourceIDs.length > 0
+        }
+      );
       resolved.forEach((source) => {
         if (source.kind === "selection") {
           sources.push({
@@ -7986,7 +8245,13 @@ async function handleResearchConversationReuseEvidence(request, response) {
       });
     }
   } catch (error) {
-    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION"].includes(error.code)) {
+    if ([
+      "INVALID_RESEARCH_SELECTION",
+      "INVALID_RESEARCH_SECTION",
+      "INVALID_RESEARCH_RICH_SOURCE",
+      "INVALID_RESEARCH_VISUAL_SOURCE",
+      "RESEARCH_VISUAL_REVIEW_REQUIRED"
+    ].includes(error.code)) {
       sendJSON(response, 409, {
         error: "The historical passage is no longer present in the current enacted-text library. Reopen the historical answer instead of generating new analysis from changed evidence.",
         code: "REUSED_EVIDENCE_NOT_CURRENT"
@@ -8068,7 +8333,11 @@ async function handleResearchConversationCreate(request, response) {
     const sources = await researchSourcesForSelection(
       context.body.sectionID,
       context.body.selectedText,
-      { richSourceIDs: context.body.richSourceIDs }
+      {
+        richSourceIDs: context.body.richSourceIDs,
+        visualSourceIDs: context.body.visualSourceIDs,
+        visualReviewConfirmed: context.body.visualReviewConfirmed
+      }
     );
     const primary = sources[0];
     const now = new Date().toISOString();
@@ -8115,7 +8384,13 @@ async function handleResearchConversationCreate(request, response) {
     }
     sendJSON(response, 201, { conversation });
   } catch (error) {
-    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION", "INVALID_RESEARCH_RICH_SOURCE"].includes(error.code)) {
+    if ([
+      "INVALID_RESEARCH_SELECTION",
+      "INVALID_RESEARCH_SECTION",
+      "INVALID_RESEARCH_RICH_SOURCE",
+      "INVALID_RESEARCH_VISUAL_SOURCE",
+      "RESEARCH_VISUAL_REVIEW_REQUIRED"
+    ].includes(error.code)) {
       sendError(response, 400, error.message);
       return;
     }
@@ -8140,7 +8415,11 @@ async function handleResearchConversationEvidence(request, response) {
     const addedSources = await researchSourcesForSelection(
       context.body.sectionID,
       context.body.selectedText,
-      { richSourceIDs: context.body.richSourceIDs }
+      {
+        richSourceIDs: context.body.richSourceIDs,
+        visualSourceIDs: context.body.visualSourceIDs,
+        visualReviewConfirmed: context.body.visualReviewConfirmed
+      }
     );
     const existingSelectionCount = (conversation.sources || [])
       .filter((source) => source.kind === "selection").length;
@@ -8148,6 +8427,18 @@ async function handleResearchConversationEvidence(request, response) {
       .filter((source) => source.kind === "selection").length;
     if (existingSelectionCount + addedSelectionCount > 24) {
       sendError(response, 409, "Adding this evidence would exceed the maximum of 24 selected passages.");
+      return;
+    }
+    const combinedVisualSources = [
+      ...(conversation.sources || []),
+      ...addedSources
+    ].flatMap((source) => source.visualSources || []);
+    if (
+      combinedVisualSources.length > maximumResearchConversationVisualSources ||
+      combinedVisualSources.reduce((total, source) => total + Number(source.byteLength || 0), 0) >
+        maximumResearchConversationVisualEvidenceBytes
+    ) {
+      sendError(response, 409, "Adding this evidence would exceed the Research conversation visual-evidence limit.");
       return;
     }
     const existingRelatedIDs = new Set((conversation.sources || []).filter((source) => source.kind === "related").map((source) => source.sectionID));
@@ -8158,7 +8449,13 @@ async function handleResearchConversationEvidence(request, response) {
     await saveStoredResearchConversation(context.userID, conversation);
     sendJSON(response, 200, { conversation });
   } catch (error) {
-    if (["INVALID_RESEARCH_SELECTION", "INVALID_RESEARCH_SECTION", "INVALID_RESEARCH_RICH_SOURCE"].includes(error.code)) {
+    if ([
+      "INVALID_RESEARCH_SELECTION",
+      "INVALID_RESEARCH_SECTION",
+      "INVALID_RESEARCH_RICH_SOURCE",
+      "INVALID_RESEARCH_VISUAL_SOURCE",
+      "RESEARCH_VISUAL_REVIEW_REQUIRED"
+    ].includes(error.code)) {
       sendError(response, 400, error.message);
       return;
     }
@@ -8179,7 +8476,7 @@ async function handleResearchConversationRefresh(request, response) {
   const evidenceByID = new Map(current.evidence.map((item) => [item.sectionID, item]));
   if (current.sourceStatuses.some((status) => !status.selectionPresent)) {
     sendJSON(response, 409, {
-      error: "A selected passage is no longer present in the enacted text. Start a new research selection from the current code.",
+      error: "A selected passage, structured source, or visual attachment no longer matches the enacted library. Start a new research selection from the current code.",
       code: "RESEARCH_SELECTION_CHANGED",
       conversation: await researchConversationForClient(conversation, { checkSources: true })
     });
@@ -8738,7 +9035,7 @@ async function handleResearchConversationMessage(request, response) {
       conversation.sourceStatus = "changed";
       await saveStoredResearchConversation(context.userID, conversation);
       sendJSON(response, 409, {
-        error: "The enacted source text changed after it was added. Refresh the sources before asking another question.",
+        error: "The enacted passage, structured source, or visual attachment changed after it was added. Refresh the sources before asking another question.",
         code: "RESEARCH_SOURCE_CHANGED",
         conversation: { ...conversation, sourceStatuses: current.sourceStatuses }
       });

@@ -7415,6 +7415,26 @@ function formattedByteLength(value) {
   return `${bytes.toLocaleString()} bytes`;
 }
 
+function evidenceCandidateVisualRequirement(candidate) {
+  return candidate.sourceReviewRequirements?.find((item) => item.kind === "visual-source") || null;
+}
+
+function evidenceCandidatePreparationReady(candidate) {
+  const requirements = candidate.sourceReviewRequirements || [];
+  if (requirements.some((item) => item.kind !== "visual-source")) return false;
+  const visualRequirement = evidenceCandidateVisualRequirement(candidate);
+  if (!visualRequirement) return candidate.preparationEligible !== false;
+  const selected = Array.isArray(candidate.selectedVisualSourceIDs)
+    ? candidate.selectedVisualSourceIDs
+    : [];
+  const maximumSelections = Number(visualRequirement.maximumSelections || 4);
+  return (
+    selected.length >= 1 &&
+    selected.length <= maximumSelections &&
+    candidate.visualReviewConfirmed === true
+  );
+}
+
 function renderEvidenceDiscovery(container) {
   if (
     !hasCapability("evidence-discovery") &&
@@ -7487,7 +7507,7 @@ function renderEvidenceDiscovery(container) {
     const candidates = response.candidates || [];
     const approved = candidates.filter((candidate) =>
       candidate.reviewState === "approved" &&
-      candidate.preparationEligible !== false
+      evidenceCandidatePreparationReady(candidate)
     );
     const summary = document.createElement("div");
     summary.className = "evidence-discovery-summary";
@@ -7557,13 +7577,21 @@ function renderEvidenceDiscovery(container) {
       citationWrap.append(citation, title);
       const stateBadge = document.createElement("span");
       stateBadge.className = "evidence-candidate-state";
-      stateBadge.textContent = candidate.preparationEligible === false
-        ? "Additional source review required"
-        : reviewState === "approved"
-          ? "Approved for this Research"
-          : reviewState === "rejected"
-            ? "Rejected"
-            : "Candidate · not approved";
+      const visualRequirement = evidenceCandidateVisualRequirement(candidate);
+      const preparationReady = evidenceCandidatePreparationReady(candidate);
+      stateBadge.textContent = visualRequirement && preparationReady
+        ? reviewState === "approved"
+          ? "Visual evidence reviewed · approved"
+          : "Visual evidence reviewed · ready for approval"
+        : visualRequirement
+          ? "Select and confirm applicable visual evidence"
+          : candidate.preparationEligible === false
+            ? "Additional source review required"
+            : reviewState === "approved"
+              ? "Approved for this Research"
+              : reviewState === "rejected"
+                ? "Rejected"
+                : "Candidate · not approved";
       cardHeader.append(rank, citationWrap, stateBadge);
       const why = document.createElement("p");
       why.className = "evidence-candidate-why";
@@ -7600,29 +7628,95 @@ function renderEvidenceDiscovery(container) {
       visualSources.className = "evidence-candidate-visual-sources";
       if (candidate.visualSources?.length) {
         const visualSourcesHeading = document.createElement("strong");
-        visualSourcesHeading.textContent = "Official visual source inventory verified";
-        const visualRequirementCount = candidate.sourceReviewRequirements
-          ?.find((item) => item.kind === "visual-source")?.count;
+        visualSourcesHeading.textContent = "Review official visual evidence";
+        const visualRequirementCount = visualRequirement?.count;
+        const maximumSelections = Number(visualRequirement?.maximumSelections || 4);
+        const selectedVisualSourceIDs = new Set(candidate.selectedVisualSourceIDs || []);
         const visualSourcesSummary = document.createElement("p");
-        visualSourcesSummary.textContent = `${candidate.visualSources.length}${visualRequirementCount ? ` of ${visualRequirementCount}` : ""} official assets verified by content hash. Visual review is still required before this candidate can be prepared.`;
+        visualSourcesSummary.textContent = `${candidate.visualSources.length}${visualRequirementCount ? ` of ${visualRequirementCount}` : ""} official assets verified by content hash. Select only the applicable image${maximumSelections === 1 ? "" : "s"} (up to ${maximumSelections}); Permitext will preserve the selected bytes with the Research record.`;
         const visualSourcesDetails = document.createElement("details");
+        visualSourcesDetails.open = candidate.visualReviewOpen === true;
+        visualSourcesDetails.addEventListener("toggle", () => {
+          candidate.visualReviewOpen = visualSourcesDetails.open;
+        });
         const visualSourcesToggle = document.createElement("summary");
-        visualSourcesToggle.textContent = "Review official asset list";
-        const visualSourcesList = document.createElement("ul");
-        candidate.visualSources.forEach((source) => {
-          const item = document.createElement("li");
+        visualSourcesToggle.textContent = `Review and select official images · ${selectedVisualSourceIDs.size} selected`;
+        const visualSourcesGallery = document.createElement("div");
+        visualSourcesGallery.className = "evidence-visual-source-gallery";
+        candidate.visualSources.forEach((source, sourceIndex) => {
+          const item = document.createElement("label");
+          item.className = "evidence-visual-source-option";
+          item.classList.toggle("is-selected", selectedVisualSourceIDs.has(source.id));
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = selectedVisualSourceIDs.has(source.id);
+          checkbox.disabled = !checkbox.checked && selectedVisualSourceIDs.size >= maximumSelections;
+          checkbox.setAttribute(
+            "aria-label",
+            `Select official visual source ${source.assetName}`
+          );
+          checkbox.addEventListener("change", () => {
+            const nextSelection = new Set(candidate.selectedVisualSourceIDs || []);
+            if (checkbox.checked) {
+              if (nextSelection.size >= maximumSelections) return;
+              nextSelection.add(source.id);
+            } else {
+              nextSelection.delete(source.id);
+            }
+            candidate.selectedVisualSourceIDs = Array.from(nextSelection);
+            candidate.visualReviewConfirmed = false;
+            candidate.visualReviewOpen = true;
+            if (candidate.reviewState === "approved") candidate.reviewState = "candidate";
+            renderResults();
+          });
+          const image = document.createElement("img");
+          image.src = source.assetURL;
+          image.alt = `Official visual source ${sourceIndex + 1}: ${source.assetName}`;
+          image.loading = "lazy";
+          image.decoding = "async";
+          const itemCopy = document.createElement("span");
+          itemCopy.className = "evidence-visual-source-copy";
+          const itemName = document.createElement("strong");
+          itemName.textContent = `Official image ${sourceIndex + 1}`;
+          const metadata = document.createElement("span");
+          metadata.textContent = `${source.assetName} · ${formattedByteLength(source.byteLength)} · integrity ${String(source.contentHash || "").slice(0, 12)}`;
           const link = document.createElement("a");
           link.href = source.assetURL;
           link.target = "_blank";
           link.rel = "noopener noreferrer";
-          link.textContent = source.assetName;
-          const metadata = document.createElement("span");
-          metadata.textContent = ` · ${formattedByteLength(source.byteLength)} · integrity ${String(source.contentHash || "").slice(0, 12)}`;
-          item.append(link, metadata);
-          visualSourcesList.append(item);
+          link.textContent = "Open full-size official image";
+          link.addEventListener("click", (event) => event.stopPropagation());
+          itemCopy.append(itemName, metadata, link);
+          item.append(checkbox, image, itemCopy);
+          visualSourcesGallery.append(item);
         });
-        visualSourcesDetails.append(visualSourcesToggle, visualSourcesList);
-        visualSources.append(visualSourcesHeading, visualSourcesSummary, visualSourcesDetails);
+        const visualReviewConfirmation = document.createElement("label");
+        visualReviewConfirmation.className = "evidence-visual-review-confirmation";
+        const visualReviewCheckbox = document.createElement("input");
+        visualReviewCheckbox.type = "checkbox";
+        visualReviewCheckbox.checked = candidate.visualReviewConfirmed === true;
+        visualReviewCheckbox.disabled = selectedVisualSourceIDs.size === 0;
+        const visualReviewCopy = document.createElement("span");
+        visualReviewCopy.textContent = selectedVisualSourceIDs.size
+          ? `I reviewed the ${selectedVisualSourceIDs.size} selected official ${selectedVisualSourceIDs.size === 1 ? "image" : "images"} and want ${selectedVisualSourceIDs.size === 1 ? "it" : "them"} attached as evidence.`
+          : "Select at least one applicable official image before confirming review.";
+        visualReviewCheckbox.addEventListener("change", () => {
+          candidate.visualReviewConfirmed = visualReviewCheckbox.checked;
+          candidate.visualReviewOpen = true;
+          if (candidate.reviewState === "approved") candidate.reviewState = "candidate";
+          renderResults();
+        });
+        visualReviewConfirmation.append(visualReviewCheckbox, visualReviewCopy);
+        visualSourcesDetails.append(
+          visualSourcesToggle,
+          visualSourcesGallery,
+          visualReviewConfirmation
+        );
+        visualSources.append(
+          visualSourcesHeading,
+          visualSourcesSummary,
+          visualSourcesDetails
+        );
       }
       const signals = document.createElement("p");
       signals.className = "evidence-candidate-signals";
@@ -7645,12 +7739,14 @@ function renderEvidenceDiscovery(container) {
       approveButton.className = "evidence-candidate-approve";
       approveButton.textContent = reviewState === "approved" ? "Approved" : "Approve";
       approveButton.setAttribute("aria-pressed", String(reviewState === "approved"));
-      approveButton.disabled = candidate.preparationEligible === false;
-      if (candidate.preparationEligible === false) {
-        approveButton.title = "Open the source and review its maps, images, or complete tables before using it as evidence.";
+      approveButton.disabled = !preparationReady;
+      if (!preparationReady) {
+        approveButton.title = visualRequirement
+          ? "Select the applicable official visual evidence and confirm your review first."
+          : "Open the source and review its complete supporting material before using it as evidence.";
       }
       approveButton.addEventListener("click", () => {
-        if (candidate.preparationEligible === false) return;
+        if (!evidenceCandidatePreparationReady(candidate)) return;
         candidate.reviewState = reviewState === "approved" ? "candidate" : "approved";
         renderResults();
       });
@@ -7711,13 +7807,17 @@ function renderEvidenceDiscovery(container) {
                 sectionID: candidate.sectionID,
                 selectedText: candidate.selectedText,
                 richSourceIDs: candidate.richSourceIDs || [],
+                visualSourceIDs: candidate.selectedVisualSourceIDs || [],
+                visualReviewConfirmed: candidate.visualReviewConfirmed === true,
                 projectID: discovery.projectID || ""
               })
             : await postResearch("/research/conversations/evidence", {
                 conversationID: payload.conversation.id,
                 sectionID: candidate.sectionID,
                 selectedText: candidate.selectedText,
-                richSourceIDs: candidate.richSourceIDs || []
+                richSourceIDs: candidate.richSourceIDs || [],
+                visualSourceIDs: candidate.selectedVisualSourceIDs || [],
+                visualReviewConfirmed: candidate.visualReviewConfirmed === true
               });
         }
         activeResearchConversation = payload.conversation;
@@ -7928,6 +8028,46 @@ async function renderResearch(paneID = "utility:analysis") {
   return panel;
 }
 
+function visualEvidenceDataURL(source) {
+  return source?.dataBase64 && source?.mediaType
+    ? `data:${source.mediaType};base64,${source.dataBase64}`
+    : source?.assetURL || "";
+}
+
+function renderResearchVisualEvidence(sources, options = {}) {
+  const visualSources = Array.isArray(sources) ? sources : [];
+  if (!visualSources.length) return null;
+  const wrap = document.createElement("section");
+  wrap.className = "research-visual-evidence";
+  const heading = document.createElement("strong");
+  heading.textContent = options.immutable
+    ? "Immutable official visual evidence"
+    : "Reviewed official visual evidence";
+  const gallery = document.createElement("div");
+  gallery.className = "research-visual-evidence-gallery";
+  visualSources.forEach((source, index) => {
+    const card = document.createElement("article");
+    const image = document.createElement("img");
+    image.src = visualEvidenceDataURL(source);
+    image.alt = `Official visual evidence ${index + 1}: ${source.assetName || "image"}`;
+    image.loading = "lazy";
+    image.decoding = "async";
+    const name = document.createElement("strong");
+    name.textContent = source.assetName || `Official image ${index + 1}`;
+    const metadata = document.createElement("span");
+    metadata.textContent = `${formattedByteLength(source.byteLength)} · SHA-256 ${source.contentHash}`;
+    const link = document.createElement("a");
+    link.href = visualEvidenceDataURL(source);
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = "Open preserved image";
+    card.append(image, name, metadata, link);
+    gallery.append(card);
+  });
+  wrap.append(heading, gallery);
+  return wrap;
+}
+
 function renderResearchSource(source) {
   const card = document.createElement("article");
   card.className = `research-source-card is-${source.kind || "related"}`;
@@ -7944,6 +8084,8 @@ function renderResearchSource(source) {
     quote.textContent = source.selectedText;
     card.append(quote);
   }
+  const visualEvidence = renderResearchVisualEvidence(source.visualSources);
+  if (visualEvidence) card.append(visualEvidence);
   const openButton = document.createElement("button");
   openButton.className = "ghost-button";
   openButton.type = "button";
@@ -8007,6 +8149,11 @@ function renderHistoricalResearchRecord(container, answerRecord) {
     const hash = document.createElement("code");
     hash.textContent = `SHA-256 ${evidence.passageTextHash}`;
     evidenceCard.append(citation, evidenceMeta, quote, hash);
+    const visualEvidence = renderResearchVisualEvidence(
+      evidence.visualSources,
+      { immutable: true }
+    );
+    if (visualEvidence) evidenceCard.append(visualEvidence);
     evidenceList.append(evidenceCard);
   });
 

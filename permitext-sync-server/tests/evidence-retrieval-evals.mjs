@@ -315,6 +315,8 @@ try {
       );
       assert(
         visualRequirement?.count > 0 &&
+        visualRequirement.reviewMode === "explicit-selection" &&
+        visualRequirement.maximumSelections === 4 &&
         candidate.visualSources?.length === visualRequirement.count &&
         candidate.visualSourceIDs?.length === candidate.visualSources.length &&
         candidate.visualSources.every((source) =>
