@@ -1040,6 +1040,9 @@ struct ProjectView: View {
     @State private var selectedBookmarkRowIDs: Set<String> = []
     @State private var folderEditorTarget: ProjectFolderEditorTarget?
     @State private var pendingExport: BookmarkExportRequest?
+    @State private var projectHubSnapshot: ProjectHubSnapshot?
+    @State private var isProjectHubLoading = false
+    @State private var projectHubError: String?
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1064,10 +1067,15 @@ struct ProjectView: View {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                 projectHeader
 
+                projectHub
+
                 CodeHairline()
                     .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
                 if !projectBookmarks.isEmpty {
+                    CodeEyebrow(text: "Saved Evidence", accent: accentColor)
+                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+
                     LazyVStack(alignment: .leading, spacing: 0) {
                         ForEach(projectBookmarks, id: \.rowID) { bookmark in
                             projectBookmarkRow(bookmark)
@@ -1117,9 +1125,16 @@ struct ProjectView: View {
             }
         }
         .modifier(BookmarkExportModifier(library: library, progressSheet: { exportProgressSheet }))
+        .refreshable {
+            library.refreshBookmarks()
+            await loadProjectHub()
+        }
         .onAppear {
             library.refreshBookmarks()
             library.noteProjectOpened(folderID)
+        }
+        .task(id: folder?.clientID) {
+            await loadProjectHub()
         }
         .onChange(of: projectBookmarks) { _, _ in
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
@@ -1138,6 +1153,258 @@ struct ProjectView: View {
 
     private var selectedBookmarks: [BookmarkedSection] {
         projectBookmarks.filter { selectedBookmarkRowIDs.contains($0.rowID) }
+    }
+
+    @ViewBuilder
+    private var projectHub: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            CodeEyebrow(text: "Project Hub", accent: accentColor)
+
+            Text("Notebook and Research are read-only on iPhone. Evidence assembly and Workboard editing remain available on the web.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            projectHubMetrics
+
+            if isProjectHubLoading && projectHubSnapshot == nil {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text("Loading synced Project work…")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 8)
+            }
+
+            if let projectHubError {
+                Text(projectHubError)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(Color.secondary.opacity(0.10))
+                    )
+            }
+
+            projectNotebookSummary
+            projectResearchSummary
+            projectWorkboardSummary
+        }
+    }
+
+    private var projectHubMetrics: some View {
+        HStack(spacing: 8) {
+            projectHubMetric(value: "\(projectBookmarks.count)", label: "Saved")
+            projectHubMetric(value: "\(projectHubSnapshot?.notebookCards.count ?? 0)", label: "Notebook")
+            projectHubMetric(value: "\(projectHubSnapshot?.researchAnswers.count ?? 0)", label: "Research")
+        }
+    }
+
+    private func projectHubMetric(value: String, label: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(value)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(.primary)
+            Text(label)
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
+        .padding(.horizontal, 12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(accentColor.opacity(0.12))
+        )
+    }
+
+    @ViewBuilder
+    private var projectNotebookSummary: some View {
+        let cards = projectHubSnapshot?.notebookCards ?? []
+        projectHubSection(title: "Notebook", systemImage: "note.text") {
+            if cards.isEmpty {
+                projectHubEmpty("No synced Notebook cards yet.")
+            } else {
+                ForEach(cards.prefix(5)) { card in
+                    VStack(alignment: .leading, spacing: 5) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text(projectNotebookCardType(card.cardType))
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(accentColor)
+                            Spacer(minLength: 8)
+                            Text(projectHubDate(card.updatedAt))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(card.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        if !card.plainText.isEmpty {
+                            Text(card.plainText)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(3)
+                        }
+                        if card.referenceCount > 0 {
+                            Text("\(card.referenceCount) linked \(card.referenceCount == 1 ? "item" : "items")")
+                                .font(.caption2.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(accentColor.opacity(0.08))
+                    )
+                }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var projectResearchSummary: some View {
+        let answers = projectHubSnapshot?.researchAnswers ?? []
+        projectHubSection(title: "Research History", systemImage: "text.magnifyingglass") {
+            if answers.isEmpty {
+                projectHubEmpty("No immutable Research answers are linked to this Project yet.")
+            } else {
+                ForEach(answers.prefix(5)) { answer in
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("READ ONLY")
+                                .font(.caption2.weight(.bold))
+                                .foregroundStyle(accentColor)
+                            Spacer(minLength: 8)
+                            Text(projectHubDate(answer.createdAt))
+                                .font(.caption2)
+                                .foregroundStyle(.secondary)
+                        }
+                        Text(answer.question)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.primary)
+                        if !answer.conclusion.isEmpty {
+                            Text(answer.conclusion)
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(4)
+                        }
+                        Text("\(answer.evidenceCount) approved \(answer.evidenceCount == 1 ? "source" : "sources") · \(projectReviewStatus(answer.reviewStatus))")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                    }
+                    .padding(12)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(accentColor.opacity(0.08))
+                    )
+                }
+            }
+        }
+    }
+
+    private var projectWorkboardSummary: some View {
+        projectHubSection(title: "Workboard", systemImage: "scribble.variable") {
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Web workspace")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(accentColor)
+                Text("Workboard editing stays on the web. iOS will show a flattened preview here after the web Workboard creates one.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let webURL = permitextWebURL {
+                    Link(destination: webURL) {
+                        Label("Open Permitext Web", systemImage: "arrow.up.right.square")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(accentColor)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(accentColor.opacity(0.14))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(accentColor.opacity(0.08))
+            )
+        }
+    }
+
+    private func projectHubSection<Content: View>(
+        title: String,
+        systemImage: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label(title, systemImage: systemImage)
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(.primary)
+            content()
+        }
+        .padding(.top, 4)
+    }
+
+    private func projectHubEmpty(_ message: String) -> some View {
+        Text(message)
+            .font(.footnote)
+            .foregroundStyle(.secondary)
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color.secondary.opacity(0.08))
+            )
+    }
+
+    private var permitextWebURL: URL? {
+        guard let value = PermitextBackendConfiguration.load().apiBaseURLString else {
+            return nil
+        }
+        return URL(string: value)
+    }
+
+    private func projectNotebookCardType(_ value: String) -> String {
+        switch value {
+        case "missing-information": return "Missing Information"
+        case "coordination-item": return "Coordination Item"
+        case "review-task": return "Review Task"
+        default:
+            return value.replacingOccurrences(of: "-", with: " ").capitalized
+        }
+    }
+
+    private func projectReviewStatus(_ value: String) -> String {
+        value.replacingOccurrences(of: "-", with: " ").capitalized
+    }
+
+    private func projectHubDate(_ value: String) -> String {
+        let fractional = ISO8601DateFormatter()
+        fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        let date = fractional.date(from: value) ?? ISO8601DateFormatter().date(from: value)
+        return date?.formatted(date: .abbreviated, time: .omitted) ?? ""
+    }
+
+    @MainActor
+    private func loadProjectHub() async {
+        guard !isProjectHubLoading else { return }
+        isProjectHubLoading = true
+        defer { isProjectHubLoading = false }
+        do {
+            projectHubSnapshot = try await library.projectHubSnapshot(folderID: folderID)
+            projectHubError = nil
+        } catch {
+            projectHubError = error.localizedDescription
+        }
     }
 
     private var projectHeader: some View {

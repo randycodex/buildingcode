@@ -144,6 +144,14 @@ async function main() {
     new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
     "utf8"
   );
+  const iosCodeModelsSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Models/CodeModels.swift", import.meta.url),
+    "utf8"
+  );
+  const iosBookmarksSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Views/BookmarksView.swift", import.meta.url),
+    "utf8"
+  );
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const researchConfigSource = await readFile(new URL("../research-config.mjs", import.meta.url), "utf8");
@@ -399,6 +407,27 @@ async function main() {
         workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
       "Combined Saved no longer owns the project grid and project-detail flow."
+    );
+    assert(
+      workspaceScript.text.includes("async function activateProjectStudio(project, options = {})") &&
+        workspaceScript.text.includes("state.notebooks = keepNotebookOpen ? [identity] : []") &&
+        workspaceScript.text.includes("state.workboards = keepWorkboardOpen ? [identity] : []") &&
+        workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
+        workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
+        workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
+      "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Workboard as one guarded workspace."
+    );
+    assert(
+      iosSyncEngineSource.includes("async let foundation = transport.projectFoundation") &&
+        iosSyncEngineSource.includes("async let notebook = transport.projectNotebookCards") &&
+        iosCodeModelsSource.includes('post("projects/foundation/state"') &&
+        iosCodeModelsSource.includes('post("notebook/cards/list"') &&
+        iosLibraryViewModelSource.includes("func projectHubSnapshot(folderID: Int64)") &&
+        iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
+        iosBookmarksSource.includes('projectHubSection(title: "Notebook"') &&
+        iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
+        iosBookmarksSource.includes("Workboard editing stays on the web."),
+      "iOS Project Hub no longer provides its read-only Notebook, immutable Research, and web-first Workboard contract."
     );
     const projectMutationSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function projectMutationForRecord"),

@@ -1114,6 +1114,93 @@ struct BackendAppleTransactionVerifyResponse: Codable, Hashable, Sendable {
     let entitlement: AppEntitlement?
 }
 
+struct BackendProjectFoundationRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+}
+
+struct ProjectResearchConversationSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let title: String
+    let createdAt: String
+    let updatedAt: String
+    let sourceCount: Int
+    let messageCount: Int
+    let primaryProjectID: String?
+    let projectContextReviewRequired: Bool
+    let sourceStatus: String
+}
+
+struct ProjectResearchAnswerSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let conversationID: String
+    let projectID: String?
+    let question: String
+    let conclusion: String
+    let evidenceCount: Int
+    let reviewStatus: String
+    let createdAt: String
+}
+
+struct ProjectActivitySummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let projectID: String
+    let actorUserID: String
+    let action: String
+    let objectKind: String
+    let objectID: String
+    let previousStatus: String?
+    let newStatus: String?
+    let createdAt: String
+}
+
+struct BackendProjectFoundationResponse: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let researchConversations: [ProjectResearchConversationSummary]
+    let researchAnswers: [ProjectResearchAnswerSummary]
+    let activity: [ProjectActivitySummary]
+}
+
+struct BackendProjectNotebookCardsRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+}
+
+struct ProjectNotebookCardSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let version: Int
+    let cardType: String
+    let title: String
+    let plainText: String
+    let referenceCount: Int
+    let createdAt: String
+    let updatedAt: String
+}
+
+struct BackendProjectNotebookCardsResponse: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let projectID: String
+    let cards: [ProjectNotebookCardSummary]
+}
+
+struct ProjectHubSnapshot: Hashable, Sendable {
+    let projectID: String
+    let notebookCards: [ProjectNotebookCardSummary]
+    let researchConversations: [ProjectResearchConversationSummary]
+    let researchAnswers: [ProjectResearchAnswerSummary]
+    let activity: [ProjectActivitySummary]
+
+    static func empty(projectID: String) -> ProjectHubSnapshot {
+        ProjectHubSnapshot(
+            projectID: projectID,
+            notebookCards: [],
+            researchConversations: [],
+            researchAnswers: [],
+            activity: []
+        )
+    }
+}
+
 private struct BackendErrorResponse: Codable, Hashable, Sendable {
     let error: String?
 }
@@ -1163,6 +1250,8 @@ protocol PermitextBackendTransport {
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
+    func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
+    func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
 }
@@ -1309,6 +1398,14 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("billing/apple/transactions/verify", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse {
+        try await post("projects/foundation/state", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse {
+        try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
         try await post("sync/push", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -1410,6 +1507,23 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse {
         BackendAppleTransactionVerifyResponse(entitlement: .appleSubscriptionPro)
+    }
+
+    func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse {
+        BackendProjectFoundationResponse(
+            schemaVersion: 1,
+            researchConversations: [],
+            researchAnswers: [],
+            activity: []
+        )
+    }
+
+    func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse {
+        BackendProjectNotebookCardsResponse(
+            schemaVersion: 1,
+            projectID: request.projectID,
+            cards: []
+        )
     }
 
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse {
@@ -2295,6 +2409,7 @@ protocol AccountBackendClient {
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
+    func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot
 }
 
 struct LocalAccountBackendClient: AccountBackendClient {
@@ -2341,6 +2456,10 @@ struct LocalAccountBackendClient: AccountBackendClient {
 
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement? {
         .appleSubscriptionPro
+    }
+
+    func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
+        .empty(projectID: projectID)
     }
 }
 

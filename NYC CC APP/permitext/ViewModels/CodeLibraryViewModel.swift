@@ -20,6 +20,20 @@ func permitextUpgradeCallToActionTitle(
     return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
 }
 
+enum ProjectHubLoadError: LocalizedError {
+    case projectUnavailable
+    case signInRequired
+
+    var errorDescription: String? {
+        switch self {
+        case .projectUnavailable:
+            return "This Project is no longer available."
+        case .signInRequired:
+            return "Sign in from Settings to load the synced Notebook and Research history."
+        }
+    }
+}
+
 @MainActor
 final class CodeLibraryViewModel: ObservableObject {
     private struct AuthoredContentSnapshot: Sendable {
@@ -1698,6 +1712,23 @@ final class CodeLibraryViewModel: ObservableObject {
 
     func bookmarkCount(inFolder folderID: Int64) -> Int {
         bookmarks(inFolder: folderID).count
+    }
+
+    func projectHubSnapshot(folderID: Int64) async throws -> ProjectHubSnapshot {
+        guard let folder = folder(id: folderID) else {
+            throw ProjectHubLoadError.projectUnavailable
+        }
+        guard let signedInAccount else {
+            throw ProjectHubLoadError.signInRequired
+        }
+        let projectID = UserContentProjectIdentity.stable(
+            folder.clientID,
+            userID: signedInAccount.appUserID
+        ) ?? folder.clientID
+        return try await accountBackendClient.projectHub(
+            account: signedInAccount,
+            projectID: projectID
+        )
     }
 
     private func denyIfNeeded(_ decision: EntitlementDecision) -> Bool {

@@ -170,6 +170,29 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         return response.entitlement
     }
 
+    func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
+        async let foundation = transport.projectFoundation(
+            BackendProjectFoundationRequest(
+                auth: authContext(for: account),
+                projectID: projectID
+            )
+        )
+        async let notebook = transport.projectNotebookCards(
+            BackendProjectNotebookCardsRequest(
+                auth: authContext(for: account),
+                projectID: projectID
+            )
+        )
+        let (foundationResponse, notebookResponse) = try await (foundation, notebook)
+        return ProjectHubSnapshot(
+            projectID: projectID,
+            notebookCards: notebookResponse.cards,
+            researchConversations: foundationResponse.researchConversations,
+            researchAnswers: foundationResponse.researchAnswers,
+            activity: foundationResponse.activity
+        )
+    }
+
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
         UserContentSyncPreviewReport(
             pendingCount: items.count,
