@@ -232,22 +232,24 @@ struct SettingsView: View {
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
             .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
-            Button {
-                Task { await library.purchaseResearch() }
-            } label: {
-                Label(researchButtonTitle, systemImage: "text.magnifyingglass")
-                    .font(.subheadline.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .foregroundStyle(.primary)
-                    .padding(.vertical, 12)
-                    .background(
-                        Capsule(style: .continuous)
-                            .fill(Color(uiColor: .secondarySystemGroupedBackground))
-                    )
+            if !library.hasResearchAccess {
+                Button {
+                    Task { await library.purchaseResearch() }
+                } label: {
+                    Label(researchButtonTitle, systemImage: "text.magnifyingglass")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity)
+                        .foregroundStyle(.primary)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule(style: .continuous)
+                                .fill(Color(uiColor: .secondarySystemGroupedBackground))
+                        )
+                }
+                .buttonStyle(.plain)
+                .disabled(!canPurchaseResearch)
+                .opacity(canPurchaseResearch ? 1 : 0.55)
             }
-            .buttonStyle(.plain)
-            .disabled(!canPurchaseResearch)
-            .opacity(canPurchaseResearch ? 1 : 0.55)
 
             if library.currentPlan == .pro {
                 Button {
@@ -615,7 +617,6 @@ struct SettingsView: View {
     }
 
     private var researchButtonTitle: String {
-        if library.hasResearchAccess { return "Research Active" }
         guard library.currentPlan == .pro else { return "Pro Required for Research" }
         if let price = library.researchProductDisplayPrice, !price.isEmpty {
             return "Add Research - \(price)/month"

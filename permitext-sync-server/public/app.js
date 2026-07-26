@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v24";
+} from "./offline-storage.js?v=20260726-web-reliability-v25";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14375,11 +14375,12 @@ function renderSettings() {
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro";
-    researchCheckoutButton.disabled = !account || !pro || (research && !researchAddOn);
+    researchCheckoutButton.hidden = research && !researchAddOn;
+    researchCheckoutButton.disabled = !account || !pro;
     researchCheckoutButton.textContent = !pro
       ? "Pro Required for Research"
       : research
-        ? researchAddOn ? "Manage Research Add-On" : "Research Included"
+        ? researchAddOn ? "Manage Research Add-On" : ""
         : "Add Research";
     planSecondaryButton.hidden = !account || source === "lifetimeGrant";
     planSecondaryButton.textContent = "Restore Purchases";
