@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v35";
+} from "./offline-storage.js?v=20260726-web-reliability-v37";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14246,7 +14246,6 @@ function renderSettings() {
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
   const accountCopy = panel.querySelector(".account-status-copy");
-  const planDetail = panel.querySelector(".account-plan-detail");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
@@ -14397,13 +14396,6 @@ function renderSettings() {
       const indicator = row.querySelector(".settings-feature-icon");
       if (indicator) indicator.textContent = active ? "✓" : "";
     });
-    planDetail.textContent = pro
-      ? source === "lifetimeGrant"
-        ? "Lifetime Pro is active, including Research. This gifted account does not need a subscription."
-        : research
-          ? "Pro and Research are active. Projects, Notebook, Report Draft, professional exports, offline codes, and selected-evidence Research are unlocked."
-          : "Pro is active. Projects, Notebook, Report Draft, professional exports, tags, and web offline downloads are unlocked. Research is available separately."
-      : "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace.";
     checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
     checkoutButton.classList.toggle("is-pro-active", pro);
     checkoutButton.textContent = pro

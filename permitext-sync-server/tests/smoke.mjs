@@ -882,8 +882,15 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v35'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v37'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      !webRoot.text.includes("account-plan-detail") &&
+        !workspaceScript.text.includes("account-plan-detail") &&
+        webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
+        webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and web offline access."),
+      "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
