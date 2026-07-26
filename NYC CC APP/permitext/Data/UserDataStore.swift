@@ -45,6 +45,7 @@ protocol UserContentRepository {
     func markSyncQueueItemFailed(id: Int64, errorMessage: String) throws
     func resetFailedSyncQueueItems() throws
     func retrySyncQueueItems(ids: [Int64], mutationUpdatedAt: Date) throws
+    func deleteAllUserData() throws
     func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate]
     func discardQueuedMutation(recordID: String, account: SignedInAccount) throws
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
@@ -1109,6 +1110,23 @@ final class UserDataStore: UserContentRepository {
         try connection.bind(text: isoFormatter.string(from: Date()), index: 2, to: statement)
         try connection.bind(text: failedQueueState, index: 3, to: statement)
         _ = try connection.step(statement)
+    }
+
+    func deleteAllUserData() throws {
+        try performTransaction {
+            for table in [
+                "folder_sections",
+                "bookmark_tags",
+                "notes",
+                "bookmarks",
+                "folders",
+                "sync_queue"
+            ] {
+                let statement = try connection.prepare("DELETE FROM \(table);")
+                defer { connection.finalize(statement) }
+                _ = try connection.step(statement)
+            }
+        }
     }
 
     func retrySyncQueueItems(ids: [Int64], mutationUpdatedAt: Date) throws {

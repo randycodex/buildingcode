@@ -145,6 +145,15 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
+    func deleteAccount(account: SignedInAccount) async throws {
+        _ = try await transport.deleteAccount(
+            BackendAccountDeleteRequest(
+                auth: authContext(for: account),
+                confirmation: "DELETE"
+            )
+        )
+    }
+
     func health() async throws -> BackendHealthStatus {
         try await transport.health()
     }

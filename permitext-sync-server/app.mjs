@@ -7,7 +7,7 @@ import {
   timingSafeEqual,
   verify as verifySignature
 } from "node:crypto";
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
@@ -133,11 +133,18 @@ const codeAssetCacheControl = "public, max-age=3600, s-maxage=86400, stale-while
 const rateLimitBuckets = new Map();
 const rateLimitPolicies = new Map([
   ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
+  ["account/sign-out", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["account/delete", { limit: 5, windowMs: 60 * 60 * 1000 }],
   ["account/apple/start", { limit: 30, windowMs: 5 * 60 * 1000 }],
   ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
+  ["account/attach-local-data", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["account/link-browser", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
+  ["account/passkeys/link", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
   ["billing/web/portal", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["billing/stripe/restore", { limit: 20, windowMs: 10 * 60 * 1000 }],
+  ["billing/apple/transactions/verify", { limit: 30, windowMs: 10 * 60 * 1000 }],
   ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["research/conversations/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
@@ -191,13 +198,22 @@ const rateLimitPolicies = new Map([
   ["reports/files/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["internal/evaluations/feedback/triage", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
+  ["sync/pull", { limit: 600, windowMs: 60 * 1000 }],
   ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
   ["workboards/assets/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["workboards/previews/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
   ["workboards/previews/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["workboards/previews/clear", { limit: 60, windowMs: 60 * 60 * 1000 }]
+  ["workboards/previews/clear", { limit: 60, windowMs: 60 * 60 * 1000 }],
+  ["admin/lifetime-grants/grant", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["admin/lifetime-grants/revoke", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["admin/accounts/delete-legacy-passkey-users", { limit: 5, windowMs: 60 * 60 * 1000 }],
+  ["admin/accounts/restore-checklist", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["admin/accounts/export", { limit: 30, windowMs: 60 * 60 * 1000 }],
+  ["admin/accounts/grant-summaries", { limit: 120, windowMs: 60 * 60 * 1000 }],
+  ["admin/storage/summary", { limit: 120, windowMs: 60 * 60 * 1000 }]
 ]);
 const canonicalCodeContentPath = join(
   __dirname,
@@ -362,6 +378,73 @@ function createFileStoreAdapter() {
     async write(store) {
       await mkdir(dirname(dataPath), { recursive: true });
       await writeFile(dataPath, JSON.stringify(store, null, 2) + "\n");
+    },
+    async deleteAccount(userID) {
+      const store = await this.read();
+      if (!store.users?.[userID]) return false;
+
+      const ownedOrganizationIDs = new Set(
+        Object.values(store.organizations || {})
+          .filter((organization) => organization.ownerUserID === userID)
+          .map((organization) => organization.id)
+      );
+      const removedProjectIDs = new Set(
+        Object.entries(store.projectOwnerships || {})
+          .filter(([, ownership]) =>
+            ownership.storageOwnerUserID === userID ||
+            (ownership.owner?.kind === "user" && ownership.owner?.id === userID) ||
+            ownedOrganizationIDs.has(ownership.owner?.organizationID)
+          )
+          .map(([projectID]) => projectID)
+      );
+
+      delete store.users[userID];
+      delete store.entitlements[userID];
+      delete store.sessions[userID];
+      delete store.mutationsByUserID[userID];
+      delete store.foundationArtifactsByUserID[userID];
+      delete store.projectLinksByUserID[userID];
+      delete store.researchAnswersByUserID[userID];
+      delete store.activityEventsByUserID[userID];
+      delete store.migrationCheckpointsByUserID[userID];
+      delete store.researchConversationsByUserID[userID];
+      delete store.researchUsageByUserID[userID];
+      delete store.researchFeedbackByUserID[userID];
+
+      for (const [credentialID, ownerUserID] of Object.entries(store.passkeyCredentials || {})) {
+        if (ownerUserID === userID) delete store.passkeyCredentials[credentialID];
+      }
+      for (const organizationID of ownedOrganizationIDs) {
+        delete store.organizations[organizationID];
+        delete store.organizationMembershipsByOrganizationID[organizationID];
+      }
+      for (const [organizationID, memberships] of Object.entries(
+        store.organizationMembershipsByOrganizationID || {}
+      )) {
+        store.organizationMembershipsByOrganizationID[organizationID] =
+          (memberships || []).filter((membership) => membership.userID !== userID);
+      }
+      for (const [invitationID, invitation] of Object.entries(store.organizationInvitationsByID || {})) {
+        if (
+          ownedOrganizationIDs.has(invitation.organizationID) ||
+          invitation.invitedUserID === userID ||
+          invitation.invitedByUserID === userID ||
+          invitation.acceptedByUserID === userID
+        ) {
+          delete store.organizationInvitationsByID[invitationID];
+        }
+      }
+      for (const projectID of removedProjectIDs) {
+        delete store.projectOwnerships[projectID];
+        delete store.projectMembershipsByProjectID[projectID];
+      }
+      for (const [projectID, memberships] of Object.entries(store.projectMembershipsByProjectID || {})) {
+        store.projectMembershipsByProjectID[projectID] =
+          (memberships || []).filter((membership) => membership.userID !== userID);
+      }
+
+      await this.write(store);
+      return true;
     },
     async summary() {
       const store = await this.read();
@@ -1944,6 +2027,92 @@ async function createPostgresStoreAdapter() {
       await migrateLegacyStateIfNeeded();
       return accountRepository.revoke(userID, rawToken);
     },
+    async deleteAccount(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const existingRows = await sql`SELECT id FROM permitext_users WHERE id = ${userID} LIMIT 1`;
+      if (!existingRows.length) return false;
+
+      await sql.transaction([
+        sql`
+          DELETE FROM permitext_project_memberships
+          WHERE user_id = ${userID}
+             OR organization_id IN (
+               SELECT id FROM permitext_organizations WHERE owner_user_id = ${userID}
+             )
+             OR project_id IN (
+               SELECT project_id
+               FROM permitext_project_ownerships
+               WHERE storage_owner_user_id = ${userID}
+                  OR (owner_kind = 'user' AND owner_id = ${userID})
+                  OR organization_id IN (
+                    SELECT id FROM permitext_organizations WHERE owner_user_id = ${userID}
+                  )
+             )
+        `,
+        sql`
+          DELETE FROM permitext_organization_invitations
+          WHERE organization_id IN (
+                  SELECT id FROM permitext_organizations WHERE owner_user_id = ${userID}
+                )
+             OR invited_user_id = ${userID}
+             OR invitation->>'invitedByUserID' = ${userID}
+             OR invitation->>'acceptedByUserID' = ${userID}
+        `,
+        sql`
+          DELETE FROM permitext_organization_memberships
+          WHERE user_id = ${userID}
+             OR organization_id IN (
+               SELECT id FROM permitext_organizations WHERE owner_user_id = ${userID}
+             )
+        `,
+        sql`
+          DELETE FROM permitext_project_ownerships
+          WHERE storage_owner_user_id = ${userID}
+             OR (owner_kind = 'user' AND owner_id = ${userID})
+             OR organization_id IN (
+               SELECT id FROM permitext_organizations WHERE owner_user_id = ${userID}
+             )
+        `,
+        sql`DELETE FROM permitext_organizations WHERE owner_user_id = ${userID}`,
+        sql`DELETE FROM permitext_sync_events WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_saved_items WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_annotations WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_projects WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_project_items WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_comments WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_evidence_snapshots WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_answers WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_project_activity WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_project_links WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_foundation_artifacts WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_migration_checkpoints WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_feedback WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_usage WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_research_conversations WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_user_content_records WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_account_sessions WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_entitlements WHERE user_id = ${userID}`,
+        sql`DELETE FROM permitext_passkey_credentials WHERE user_id = ${userID}`,
+        sql`
+          UPDATE permitext_sync_state
+          SET users = users - ${userID},
+              entitlements = entitlements - ${userID},
+              sessions = sessions - ${userID},
+              mutations_by_user_id = mutations_by_user_id - ${userID},
+              passkey_credentials = COALESCE((
+                SELECT jsonb_object_agg(entry.key, entry.value)
+                FROM jsonb_each(passkey_credentials) AS entry
+                WHERE entry.value #>> '{}' <> ${userID}
+              ), '{}'::jsonb),
+              updated_at = now()
+          WHERE id = 'default'
+        `,
+        sql`DELETE FROM permitext_users WHERE id = ${userID}`
+      ], { isolationLevel: "Serializable" });
+      return true;
+    },
     async listResearchConversations(userID) {
       await ensureSchema();
       const rows = await sql`
@@ -3100,7 +3269,7 @@ function requestClientAddress(request) {
 
 function enforceRateLimit(request, response, path, now = Date.now()) {
   const policy = rateLimitPolicies.get(path);
-  if (!policy || request.method !== "POST") return true;
+  if (!policy || !["POST", "DELETE"].includes(request.method)) return true;
   const key = `${path}:${requestClientAddress(request)}`;
   const current = rateLimitBuckets.get(key);
   const bucket = !current || current.resetAt <= now
@@ -9274,6 +9443,10 @@ async function handleWebIndex(_request, response) {
   sendHTML(response, await readFile(join(webPublicPath, "index.html"), "utf8"));
 }
 
+async function handlePrivacyPolicy(_request, response) {
+  sendHTML(response, await readFile(join(webPublicPath, "privacy.html"), "utf8"));
+}
+
 async function handleServiceWorker(response) {
   const filePath = join(webPublicPath, "service-worker.js");
   sendStatic(
@@ -11601,6 +11774,97 @@ async function handleSignOut(request, response) {
   sendJSON(response, 200, { signedOut: true });
 }
 
+function privateProjectAssetPathname(value) {
+  const pathname = String(value || "").trim();
+  const segments = pathname.split("/");
+  if (
+    segments.some((segment) =>
+      !segment || segment === "." || segment === ".." || !/^[a-zA-Z0-9._-]+$/.test(segment)
+    )
+  ) {
+    return false;
+  }
+  return /^project-assets\/[a-f0-9]{32}\//.test(pathname) ||
+    /^workboards\/[a-f0-9]{32}\/[a-f0-9]{32}\//.test(pathname);
+}
+
+function collectPrivateProjectAssetPathnames(value, pathnames = new Set()) {
+  if (typeof value === "string") {
+    if (privateProjectAssetPathname(value)) pathnames.add(value);
+    return pathnames;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item) => collectPrivateProjectAssetPathnames(item, pathnames));
+    return pathnames;
+  }
+  if (value && typeof value === "object") {
+    Object.values(value).forEach((item) => collectPrivateProjectAssetPathnames(item, pathnames));
+  }
+  return pathnames;
+}
+
+async function privateProjectAssetPathnamesForAccount(userID) {
+  const adapter = await storeAdapter();
+  const values = [await listStoredFoundationArtifacts(userID)];
+  if (typeof adapter.pullUserContent === "function") {
+    const pull = await adapter.pullUserContent(userID, { since: null, sinceEventID: null });
+    values.push(pull.allMutations || pull.mutations || []);
+  } else {
+    const store = await readStore();
+    values.push(store.mutationsByUserID?.[userID] || []);
+  }
+  return Array.from(collectPrivateProjectAssetPathnames(values));
+}
+
+async function deletePrivateProjectAssetPathnames(pathnames) {
+  if (!pathnames.length) return;
+  if (blobStorageConfigured()) {
+    const { del } = await vercelBlob();
+    for (let index = 0; index < pathnames.length; index += 100) {
+      await del(pathnames.slice(index, index + 100));
+    }
+    return;
+  }
+  const root = localPrivateAssetRoot();
+  if (!root) {
+    throw new Error("Private project storage is unavailable for account deletion.");
+  }
+  for (const pathname of pathnames) {
+    try {
+      await unlink(join(root, pathname));
+    } catch (error) {
+      if (error?.code !== "ENOENT") throw error;
+    }
+  }
+}
+
+async function handleAccountDelete(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  if (body.confirmation !== "DELETE") {
+    sendError(response, 400, "Account deletion requires explicit confirmation.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID, body.auth);
+  if (!context) return;
+
+  const pathnames = await privateProjectAssetPathnamesForAccount(userID);
+  await deletePrivateProjectAssetPathnames(pathnames);
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteAccount !== "function" || !await adapter.deleteAccount(userID)) {
+    sendError(response, 404, "Account not found.");
+    return;
+  }
+  sendJSON(response, 200, {
+    deleted: true,
+    deletedPrivateAssetCount: pathnames.length
+  });
+}
+
 function workboardPreviewSummary(artifact) {
   if (!artifact) return null;
   return {
@@ -13142,6 +13406,7 @@ async function handleAppleWebCallback(request, response) {
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/sign-out": handleSignOut,
+  "account/delete": handleAccountDelete,
   "account/apple/start": handleAppleWebStart,
   "account/attach-local-data": handleAttachLocalData,
   "account/link-browser": handleBrowserAccountLink,
@@ -13242,6 +13507,10 @@ export async function handleRequest(request, response) {
       await handleWebIndex(request, response);
       return;
     }
+    if (request.method === "GET" && (path === "privacy" || path === "privacy/")) {
+      await handlePrivacyPolicy(request, response);
+      return;
+    }
     if (request.method === "GET" && (path === "internal" || path === "internal/" || path.startsWith("internal/"))) {
       await handleInternalStatic(request, path, response);
       return;
@@ -13310,7 +13579,8 @@ export async function handleRequest(request, response) {
       handleAppleAppSiteAssociation(request, response);
       return;
     }
-    if (request.method !== "POST") {
+    const isAccountDelete = request.method === "DELETE" && path === "account/delete";
+    if (request.method !== "POST" && !isAccountDelete) {
       sendError(response, 405, "Method not allowed.");
       return;
     }

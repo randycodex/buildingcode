@@ -15,9 +15,12 @@ struct SettingsView: View {
     @State private var pendingClearAction: ClearSettingsAction?
     @State private var selectedProjectIDs = Set<Int64>()
     @State private var showsProjectDeleteWarning = false
+    @State private var showsAccountDeleteWarning = false
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let webWorkspaceURL = URL(string: "https://permitext-sync.vercel.app")!
+    private let privacyPolicyURL = URL(string: "https://permitext-sync.vercel.app/privacy")!
+    private let privacyContactURL = URL(string: "mailto:permitext@gmail.com")!
 
     private var readerPreviewAccent: Color {
         Color(uiColor: library.accentColor())
@@ -101,6 +104,15 @@ struct SettingsView: View {
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 6)
+
+                    HStack(spacing: 8) {
+                        Link("Privacy Policy", destination: privacyPolicyURL)
+                        Text("·")
+                        Link("Contact", destination: privacyContactURL)
+                    }
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(Color.appChrome)
+                    .padding(.horizontal, 6)
 
                     if let statusMessage = library.statusMessage {
                         Text(statusMessage)
@@ -368,20 +380,46 @@ struct SettingsView: View {
                 .opacity(library.isAccountBusy ? 0.55 : 1)
 
             } else {
-                Button {
-                    library.signOut()
-                } label: {
-                    Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .foregroundStyle(.primary)
-                        .background(
-                            Capsule(style: .continuous)
-                                .fill(Color.primary.opacity(0.08))
-                        )
+                VStack(spacing: 10) {
+                    Button {
+                        library.signOut()
+                    } label: {
+                        Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
+                            .font(.subheadline.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .foregroundStyle(.primary)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.primary.opacity(0.08))
+                            )
+                    }
+                    .buttonStyle(.plain)
+
+                    Button(role: .destructive) {
+                        showsAccountDeleteWarning = true
+                    } label: {
+                        Label("Delete Account", systemImage: "person.crop.circle.badge.minus")
+                            .font(.footnote.weight(.semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .foregroundStyle(.red)
+                            .background(
+                                Capsule(style: .continuous)
+                                    .fill(Color.red.opacity(0.10))
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(library.isAccountBusy)
+                    .popover(
+                        isPresented: $showsAccountDeleteWarning,
+                        attachmentAnchor: .rect(.bounds),
+                        arrowEdge: .bottom
+                    ) {
+                        accountDeletePopover
+                            .presentationCompactAdaptation(.popover)
+                    }
                 }
-                .buttonStyle(.plain)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1020,6 +1058,32 @@ struct SettingsView: View {
             .tint(.red)
         }
         .frame(width: 300, alignment: .leading)
+        .padding(24)
+    }
+
+    private var accountDeletePopover: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text("Delete Permitext account?")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text("This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. Apple or Stripe subscriptions do not cancel automatically. This cannot be undone.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button("Delete Account", role: .destructive) {
+                Task {
+                    if await library.deleteAccount() {
+                        showsAccountDeleteWarning = false
+                    }
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+            .disabled(library.isAccountBusy)
+        }
+        .frame(width: 320, alignment: .leading)
         .padding(24)
     }
 

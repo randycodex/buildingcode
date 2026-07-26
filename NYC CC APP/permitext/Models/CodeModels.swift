@@ -1143,6 +1143,16 @@ struct BackendSignOutResponse: Codable, Hashable, Sendable {
     let signedOut: Bool
 }
 
+struct BackendAccountDeleteRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let confirmation: String
+}
+
+struct BackendAccountDeleteResponse: Codable, Hashable, Sendable {
+    let deleted: Bool
+    let deletedPrivateAssetCount: Int
+}
+
 struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
     let account: SignedInAccount
 }
@@ -1801,6 +1811,7 @@ protocol PermitextBackendTransport {
     func health() async throws -> BackendHealthStatus
     func signIn(_ request: BackendSignInRequest) async throws -> BackendAccountRecord
     func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse
+    func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState
     func updateProfile(_ request: BackendProfileUpdateRequest) async throws -> BackendProfileUpdateResponse
     func verifyAppleTransaction(_ request: BackendAppleTransactionVerifyRequest) async throws -> BackendAppleTransactionVerifyResponse
@@ -1949,6 +1960,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
         try await post("account/sign-out", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse {
+        try await post("account/delete", body: request, bearerToken: request.auth.bearerToken)
     }
 
     func health() async throws -> BackendHealthStatus {
@@ -2151,6 +2166,12 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
 
     func signOut(_ request: BackendSignOutRequest) async throws -> BackendSignOutResponse {
         BackendSignOutResponse(signedOut: true)
+    }
+
+    func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse {
+        accountsByUserID.removeValue(forKey: request.auth.accountUserID)
+        userContentByUserID.removeValue(forKey: request.auth.accountUserID)
+        return BackendAccountDeleteResponse(deleted: true, deletedPrivateAssetCount: 0)
     }
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {
@@ -3160,6 +3181,7 @@ protocol AccountBackendClient {
     func health() async throws -> BackendHealthStatus
     func signIn(credential: AccountSignInCredential) async throws -> BackendAccountRecord
     func signOut(account: SignedInAccount) async throws
+    func deleteAccount(account: SignedInAccount) async throws
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState
     func updateProfile(account: SignedInAccount, publicUsername: String?, displayName: String?) async throws -> SignedInAccount
     func verifyAppleTransaction(account: SignedInAccount, signedTransactionInfo: String) async throws -> AppEntitlement?
@@ -3215,6 +3237,8 @@ struct LocalAccountBackendClient: AccountBackendClient {
     }
 
     func signOut(account: SignedInAccount) async throws {}
+
+    func deleteAccount(account: SignedInAccount) async throws {}
 
     func attachLocalData(account: SignedInAccount) async throws -> AccountMigrationState {
         .localDataAttached

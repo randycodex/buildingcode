@@ -24,6 +24,8 @@ const providerUserID = `postgres-integration-${runID}`;
 const userID = `apple:${providerUserID}`;
 const sourceProviderUserID = `postgres-link-source-${runID}`;
 const sourceUserID = `web:${sourceProviderUserID}`;
+const deletionProviderUserID = `postgres-account-deletion-${runID}`;
+const deletionUserID = `apple:${deletionProviderUserID}`;
 const codeVersion = "nyc-2022";
 const sql = neon(databaseURL);
 
@@ -62,7 +64,7 @@ async function waitForServer() {
 }
 
 async function cleanupUser() {
-  for (const cleanupUserID of [sourceUserID, userID]) {
+  for (const cleanupUserID of [sourceUserID, deletionUserID, userID]) {
     await sql`DELETE FROM permitext_sync_events WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_saved_items WHERE user_id = ${cleanupUserID}`;
     await sql`DELETE FROM permitext_annotations WHERE user_id = ${cleanupUserID}`;
@@ -748,6 +750,69 @@ try {
   assert(finalSummary.json.tables.accountSessions >= 1, "Storage summary did not include active hashed sessions.");
   assert(finalSummary.json.tables.legacySessions === 0, "Storage summary reported a plaintext legacy session.");
   assert(finalSummary.json.latestEventID >= push.json.latestEventID, "Storage summary latestEventID is stale.");
+
+  const deletionSignIn = await request("/account/sign-in", {
+    method: "POST",
+    body: {
+      credential: {
+        provider: "apple",
+        providerUserID: deletionProviderUserID,
+        displayName: "Postgres Account Deletion Smoke",
+        signedInAt: new Date().toISOString()
+      }
+    }
+  });
+  assert(deletionSignIn.response.ok, "Postgres account-deletion sign-in failed.");
+  const deletionToken = deletionSignIn.json.account.backendSessionToken;
+  const deletionPush = await request("/sync/push", {
+    method: "POST",
+    token: deletionToken,
+    body: {
+      auth: { accountUserID: deletionUserID },
+      batch: {
+        user: { id: deletionUserID },
+        mutations: [{
+          savedItem: {
+            id: `postgres-deletion-saved-${runID}`,
+            userID: deletionUserID,
+            codeVersion,
+            sectionID: 102,
+            updatedAt: "2026-07-25T00:00:00Z"
+          }
+        }]
+      }
+    }
+  });
+  assert(deletionPush.response.ok, "Postgres account-deletion fixture push failed.");
+  const accountDeletion = await request("/account/delete", {
+    method: "DELETE",
+    token: deletionToken,
+    body: {
+      auth: { accountUserID: deletionUserID },
+      confirmation: "DELETE"
+    }
+  });
+  assert(accountDeletion.response.ok && accountDeletion.json.deleted === true, "Postgres account deletion failed.");
+  const deletedRows = await sql`
+    SELECT
+      (SELECT count(*) FROM permitext_users WHERE id = ${deletionUserID})::int AS users,
+      (SELECT count(*) FROM permitext_user_content_records WHERE user_id = ${deletionUserID})::int AS records,
+      (SELECT count(*) FROM permitext_sync_events WHERE user_id = ${deletionUserID})::int AS events,
+      (SELECT count(*) FROM permitext_account_sessions WHERE user_id = ${deletionUserID})::int AS sessions
+  `;
+  assert(
+    Number(deletedRows[0]?.users || 0) === 0 &&
+      Number(deletedRows[0]?.records || 0) === 0 &&
+      Number(deletedRows[0]?.events || 0) === 0 &&
+      Number(deletedRows[0]?.sessions || 0) === 0,
+    "Postgres account deletion left identity, content, sync event, or session rows behind."
+  );
+  const pullAfterAccountDeletion = await request("/sync/pull", {
+    method: "POST",
+    token: deletionToken,
+    body: { auth: { accountUserID: deletionUserID }, contentMapVersion: 2 }
+  });
+  assert(pullAfterAccountDeletion.response.status === 401, "A deleted Postgres account session remained usable.");
 
   console.log("permitext postgres integration passed");
 } finally {

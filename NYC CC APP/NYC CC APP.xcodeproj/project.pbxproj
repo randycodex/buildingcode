@@ -43,6 +43,7 @@
 		A10000000000000000000027 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000027 /* Assets.xcassets */; };
 		A10000000000000000000028 /* ChapterSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* ChapterSearchSheet.swift */; };
 		A1000000000000000000002B /* OrganizationProjectHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002B /* OrganizationProjectHubView.swift */; };
+		A1000000000000000000002C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002C /* PrivacyInfo.xcprivacy */; };
 		B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -100,6 +101,7 @@
 		A20000000000000000000029 /* Permitext.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Permitext.storekit; sourceTree = "<group>"; };
 		A2000000000000000000002A /* permitext.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = permitext.entitlements; sourceTree = "<group>"; };
 		A2000000000000000000002B /* OrganizationProjectHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationProjectHubView.swift; sourceTree = "<group>"; };
+		A2000000000000000000002C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		B20000000000000000000000 /* permitextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = permitextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementAndSyncContractTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -143,6 +145,7 @@
 				A40000000000000000000008 /* Views */,
 				A40000000000000000000009 /* Resources */,
 				A2000000000000000000002A /* permitext.entitlements */,
+				A2000000000000000000002C /* PrivacyInfo.xcprivacy */,
 			);
 			path = permitext;
 			sourceTree = "<group>";
@@ -337,6 +340,7 @@
 				A10000000000000000000027 /* Assets.xcassets in Resources */,
 				A10000000000000000000017 /* nyc_code_authored.json in Resources */,
 				A1000000000000000000001D /* CodeContent in Resources */,
+				A1000000000000000000002C /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

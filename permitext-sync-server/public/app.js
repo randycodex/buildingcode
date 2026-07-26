@@ -14023,6 +14023,7 @@ function renderSettings() {
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
+  const deleteAccountButton = panel.querySelector(".account-delete");
   const checkoutButton = panel.querySelector(".account-checkout");
   const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
@@ -14253,6 +14254,7 @@ function renderSettings() {
     planSecondaryButton.textContent = "Restore Purchases";
     accountCopy.hidden = Boolean(account);
     signOutButton.hidden = !account;
+    deleteAccountButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
     accountCopy.textContent = "Sign in to attach local saved work to your account and use cross-device sync.";
@@ -14311,6 +14313,74 @@ function renderSettings() {
       stopForegroundSyncLoop();
       saveWorkspaceState();
       await renderWorkspace();
+    }
+  });
+  deleteAccountButton.addEventListener("click", async () => {
+    const account = activeAccount();
+    if (!account) return;
+    const confirmed = await confirmWebWarning(
+      "Delete Permitext account?",
+      "This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. Apple or Stripe subscriptions do not cancel automatically. This cannot be undone.",
+      { confirmLabel: "Delete Account" }
+    );
+    if (!confirmed) return;
+
+    deleteAccountButton.disabled = true;
+    setStatus("Deleting your account and synced data...");
+    try {
+      await postJSON(
+        "/account/delete",
+        {
+          auth: { accountUserID: account.userID },
+          confirmation: "DELETE"
+        },
+        { token: account.sessionToken }
+      );
+
+      const localProjectIDs = new Set([
+        ...(currentContentSummary().projects || []).map((project) => workboardProjectID(projectIdentity(project))),
+        ...(state.localProjects || []).map((project) => workboardProjectID(projectIdentity(project)))
+      ].filter(Boolean));
+      for (const projectID of localProjectIDs) {
+        await deleteLocalWorkboard(projectID).catch(() => {});
+      }
+      await disableOfflineFeature().catch(() => {});
+      state.account = null;
+      state.localProjects = [];
+      state.localSavedItems = [];
+      state.localProjectSections = [];
+      state.localAnnotations = [];
+      state.localBulkClears = [];
+      state.syncOutbox = [];
+      state.syncConflicts = [];
+      state.archivedProjectIDs = [];
+      state.sectionNotes = {};
+      state.localSavedSectionIDs = [];
+      state.recentSearches = [];
+      state.pinnedSearches = [];
+      state.recentlyViewedSections = [];
+      state.continuityAppliedAt = null;
+      setOpenProjectDetails([]);
+      state.workboards = [];
+      state.notebooks = [];
+      state.reportDrafts = [];
+      syncedContent = null;
+      organizationWorkspace = null;
+      organizationLoadPromise = null;
+      researchConversationList = [];
+      activeResearchConversation = null;
+      researchUsage = null;
+      persistAccountSession(null);
+      stopForegroundSyncLoop();
+      Object.keys(localStorage)
+        .filter((key) => key.startsWith(`${baseWorkspaceKey}:detached:`))
+        .forEach((key) => localStorage.removeItem(key));
+      sessionStorage.removeItem(tabWorkspaceKey);
+      saveWorkspaceState();
+      await renderWorkspace();
+    } catch (error) {
+      setStatus(error.message || "Could not delete this account.", true);
+      deleteAccountButton.disabled = false;
     }
   });
   checkoutButton.addEventListener("click", async () => {

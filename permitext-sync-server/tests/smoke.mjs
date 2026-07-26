@@ -176,6 +176,14 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Models/CodeModels.swift", import.meta.url),
     "utf8"
   );
+  const iosPrivacyManifestSource = await readFile(
+    new URL("../../NYC CC APP/permitext/PrivacyInfo.xcprivacy", import.meta.url),
+    "utf8"
+  );
+  const iosInfoPlistSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Info.plist", import.meta.url),
+    "utf8"
+  );
   const iosBookmarksSource = await readFile(
     new URL("../../NYC CC APP/permitext/Views/BookmarksView.swift", import.meta.url),
     "utf8"
@@ -255,6 +263,31 @@ async function main() {
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
+    assert(
+      iosPrivacyManifestSource.includes("<key>NSPrivacyTracking</key>") &&
+        iosPrivacyManifestSource.includes("<key>NSPrivacyAccessedAPITypes</key>") &&
+        iosPrivacyManifestSource.includes("<string>CA92.1</string>") &&
+        iosPrivacyManifestSource.includes("<string>NSPrivacyCollectedDataTypeUserID</string>"),
+      "The iOS privacy manifest no longer declares tracking state and required-reason API use."
+    );
+    assert(
+      iosInfoPlistSource.includes("<key>ITSAppUsesNonExemptEncryption</key>") &&
+        iosInfoPlistSource.includes("<false/>"),
+      "The iOS export-compliance declaration is missing."
+    );
+    const privacyPolicy = await request("/privacy");
+    assert(privacyPolicy.response.ok, "Privacy policy did not load.");
+    assert(
+      privacyPolicy.response.headers.get("content-security-policy")?.includes("frame-ancestors 'none'"),
+      "Privacy policy omitted the HTML security policy."
+    );
+    assert(
+      privacyPolicy.text.includes("Higinio Jimenez Manzano") &&
+        privacyPolicy.text.includes("permitext@gmail.com") &&
+        webRoot.text.includes('href="/privacy"') &&
+        iosSettingsSource.includes("https://permitext-sync.vercel.app/privacy"),
+      "The privacy policy or its web/iOS links no longer identify the operator and contact."
+    );
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
     assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
@@ -5591,6 +5624,87 @@ async function main() {
       body: { auth: { accountUserID: userID } }
     });
     assert(pullAfterSignOut.response.status === 401, "A revoked session remained usable.");
+
+    const deletionSignIn = await request("/account/sign-in", {
+      method: "POST",
+      headers: { "x-forwarded-for": "203.0.113.40" },
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-account-deletion",
+          displayName: "Account Deletion Smoke User"
+        }
+      }
+    });
+    assert(deletionSignIn.response.ok, "Account-deletion smoke sign-in failed.");
+    const deletionUserID = deletionSignIn.json.account.appUserID;
+    const deletionToken = deletionSignIn.json.account.backendSessionToken;
+    const deletionPush = await request("/sync/push", {
+      method: "POST",
+      token: deletionToken,
+      body: {
+        auth: { accountUserID: deletionUserID },
+        batch: {
+          user: { id: deletionUserID },
+          mutations: [{
+            savedItem: {
+              id: "saved-for-account-deletion",
+              userID: deletionUserID,
+              codeVersion: "2022 Construction Codes",
+              sectionID: 900002,
+              createdAt: "2026-07-25T00:00:00Z",
+              updatedAt: "2026-07-25T00:00:00Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(deletionPush.response.ok, "Account-deletion fixture push failed.");
+    const unconfirmedDeletion = await request("/account/delete", {
+      method: "DELETE",
+      token: deletionToken,
+      body: {
+        auth: { accountUserID: deletionUserID },
+        confirmation: "delete"
+      }
+    });
+    assert(unconfirmedDeletion.response.status === 400, "Account deletion accepted an ambiguous confirmation.");
+    const accountDeletion = await request("/account/delete", {
+      method: "DELETE",
+      token: deletionToken,
+      body: {
+        auth: { accountUserID: deletionUserID },
+        confirmation: "DELETE"
+      }
+    });
+    assert(accountDeletion.response.ok && accountDeletion.json.deleted === true, "Account deletion failed.");
+    const pullAfterAccountDeletion = await request("/sync/pull", {
+      method: "POST",
+      token: deletionToken,
+      body: { auth: { accountUserID: deletionUserID } }
+    });
+    assert(pullAfterAccountDeletion.response.status === 401, "A deleted account session remained usable.");
+    const deletionRecreate = await request("/account/sign-in", {
+      method: "POST",
+      headers: { "x-forwarded-for": "203.0.113.40" },
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-account-deletion",
+          displayName: "Recreated Account Deletion Smoke User"
+        }
+      }
+    });
+    assert(deletionRecreate.response.ok, "Deleted account could not be recreated through Sign in with Apple.");
+    const deletionRecreatePull = await request("/sync/pull", {
+      method: "POST",
+      token: deletionRecreate.json.account.backendSessionToken,
+      body: { auth: { accountUserID: deletionRecreate.json.account.appUserID } }
+    });
+    assert(
+      deletionRecreatePull.response.ok && deletionRecreatePull.json.mutations.length === 0,
+      "Deleted synced content reappeared when the account identity was recreated."
+    );
 
     const oversizedBody = await request("/account/profile", {
       method: "POST",

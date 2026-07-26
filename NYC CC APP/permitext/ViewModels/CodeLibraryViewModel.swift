@@ -2619,6 +2619,48 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
+    func deleteAccount() async -> Bool {
+        guard let account = signedInAccount else { return false }
+        guard !isAccountBusy else { return false }
+        isAccountBusy = true
+        defer { isAccountBusy = false }
+
+        do {
+            try await accountBackendClient.deleteAccount(account: account)
+        } catch {
+            statusMessage = error.localizedDescription
+            return false
+        }
+
+        stopForegroundAutomaticSync()
+        do {
+            try userContentRepository?.deleteAllUserData()
+        } catch {
+            statusMessage = "Your Permitext account was deleted, but some on-device saved data could not be cleared."
+        }
+        signedInAccount = nil
+        organizations = []
+        userContentSyncConflicts = []
+        userContentSyncCheckpoint = nil
+        currentCapabilityContract = nil
+        Self.clearSignedInAccount()
+        applyBackendEntitlement(nil)
+        recentSearches = []
+        pinnedSearches = []
+        recentlyViewedSections = []
+        UserDefaults.standard.removeObject(forKey: recentSearchesDefaultsKey)
+        UserDefaults.standard.removeObject(forKey: pinnedSearchesDefaultsKey)
+        persistRecentlyViewedSections()
+        refreshBookmarks()
+        refreshFolders()
+        refreshPendingUserContentSyncCount()
+        if statusMessage?.contains("on-device") != true {
+            statusMessage = "Your Permitext account and synced data were deleted."
+        }
+        return true
+    }
+
+    @discardableResult
     private func handleBackendSessionFailureIfNeeded(_ error: Error) -> Bool {
         guard Self.isBackendAuthenticationFailure(error) else { return false }
         stopForegroundAutomaticSync()
