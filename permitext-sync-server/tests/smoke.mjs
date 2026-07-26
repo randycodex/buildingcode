@@ -785,14 +785,14 @@ async function main() {
       "Four-or-more-column workspaces no longer enforce every pane's default width."
     );
     assert(
-      workspaceScript.text.includes("function isFlexibleFreeDualReaderPaneID(paneID)") &&
-        workspaceScript.text.includes("!isProAccount()") &&
+      workspaceScript.text.includes("function isFlexibleReaderPaneID(paneID)") &&
+        workspaceScript.text.includes("if (isProAccount()) return true;") &&
         workspaceScript.text.includes("(state.readers || []).length === 2") &&
-        workspaceScript.text.includes("if (isFlexibleFreeDualReaderPaneID(paneID)) return false;") &&
-        workspaceScript.text.includes('`${flexibleFreeDualReader ? defaultWidth : width}px`') &&
-        workspaceScript.text.includes("if (flexibleFreeDualReader)") &&
+        workspaceScript.text.includes("if (isFlexibleReaderPaneID(paneID)) return false;") &&
+        workspaceScript.text.includes('`${flexibleReader ? defaultWidth : width}px`') &&
+        workspaceScript.text.includes("if (flexibleReader)") &&
         workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`'),
-      "Free dual Readers should flex into remaining viewport space, preserve divider resizing, and stop shrinking at their default minimum width."
+      "Pro Readers and Free dual Readers should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
       workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
@@ -884,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v39'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v40'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

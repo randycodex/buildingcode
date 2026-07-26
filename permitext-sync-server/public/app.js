@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v39";
+} from "./offline-storage.js?v=20260726-web-reliability-v40";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1374,15 +1374,15 @@ function isFixedWidthPaneID(paneID) {
     paneID?.startsWith("section:detail:");
 }
 
-function isFlexibleFreeDualReaderPaneID(paneID) {
-  return paneID?.startsWith("reader:") &&
-    !isProAccount() &&
-    (state.readers || []).length === 2;
+function isFlexibleReaderPaneID(paneID) {
+  if (!paneID?.startsWith("reader:")) return false;
+  if (isProAccount()) return true;
+  return (state.readers || []).length === 2;
 }
 
 function isFixedWidthReaderPaneID(paneID) {
   if (!paneID?.startsWith("reader:")) return false;
-  if (isFlexibleFreeDualReaderPaneID(paneID)) return false;
+  if (isFlexibleReaderPaneID(paneID)) return false;
   if (activePaneIDs().length >= 4) return true;
   const readerCount = (state.readers || []).length;
   if (readerCount > 3) return true;
@@ -1770,11 +1770,11 @@ function applyPaneWeight(panel, paneID) {
   const defaultWidth = defaultPaneWidthForID(paneID);
   const value = Number(state.paneWeights[paneID]);
   const hasManyColumns = activePaneIDs().length >= 4;
-  const flexibleFreeDualReader = isFlexibleFreeDualReaderPaneID(paneID);
+  const flexibleReader = isFlexibleReaderPaneID(paneID);
   const width = Number.isFinite(value) && value > 40
     ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
     : defaultWidth;
-  panel.style.setProperty("--pane-resized-min-width", `${flexibleFreeDualReader ? defaultWidth : width}px`);
+  panel.style.setProperty("--pane-resized-min-width", `${flexibleReader ? defaultWidth : width}px`);
   panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
@@ -1785,7 +1785,7 @@ function applyPaneWeight(panel, paneID) {
     return;
   }
   if (paneID?.startsWith("reader:")) {
-    if (flexibleFreeDualReader) {
+    if (flexibleReader) {
       panel.style.flex = `1 1 ${width}px`;
       return;
     }
