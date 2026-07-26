@@ -7384,6 +7384,30 @@ button.project-studio-metric:focus-visible {
   display: none;
 }
 
+.settings-panel .settings-card.is-collapsed {
+  display: flex;
+  min-height: 56px;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3);
+}
+
+.settings-panel .settings-card.is-collapsed > .settings-section-title,
+.settings-panel .settings-card.is-collapsed > .settings-card-heading {
+  width: 100%;
+  margin: 0;
+}
+
+.settings-panel .settings-card.is-collapsed .settings-section-title {
+  margin: 0;
+}
+
+.settings-panel .settings-card-toggle > span {
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+}
+
 .settings-panel .settings-card-heading {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
