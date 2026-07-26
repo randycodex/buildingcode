@@ -384,6 +384,10 @@ function createFileStoreAdapter() {
     async write(store) {
       await writeJSONFileAtomically(dataPath, store);
     },
+    async accountExists(userID) {
+      const store = await this.read();
+      return Boolean(store.users?.[userID]);
+    },
     async deleteAccount(userID) {
       const store = await this.read();
       if (!store.users?.[userID]) return false;
@@ -2166,6 +2170,12 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
       return accountRepository.updateAccount(userID, account);
+    },
+    async accountExists(userID) {
+      await ensureSchema();
+      await migrateLegacyStateIfNeeded();
+      const rows = await sql`SELECT id FROM permitext_users WHERE id = ${userID} LIMIT 1`;
+      return rows.length > 0;
     },
     async saveEntitlement(userID, entitlement) {
       await ensureSchema();
@@ -10783,6 +10793,16 @@ async function persistedStripeEntitlementOwner(subscriptionID) {
   return userID ? { userID, entitlement: store.entitlements[userID] } : null;
 }
 
+async function persistedAccountExists(userID) {
+  if (!userID) return false;
+  const adapter = await storeAdapter();
+  if (typeof adapter.accountExists === "function") {
+    return adapter.accountExists(userID);
+  }
+  const store = await readStore();
+  return Boolean(store.users?.[userID]);
+}
+
 export function stripeSecretKeyMode(secretKey = process.env.STRIPE_SECRET_KEY) {
   const normalized = String(secretKey || "").trim();
   if (/^(sk|rk)_live_/.test(normalized)) return "live";
@@ -10930,6 +10950,42 @@ function stripeSubscriptionID(value) {
   return value.id || null;
 }
 
+function entitlementBillingPackages(entitlement) {
+  return [
+    {
+      packageID: entitlementPackageIDs.pro,
+      source: entitlement?.source || null,
+      provider: entitlement?.provider || {}
+    },
+    ...Object.entries(entitlement?.addOns || {}).map(([packageID, addOn]) => ({
+      packageID,
+      source: addOn?.source || null,
+      provider: addOn?.provider || {}
+    }))
+  ];
+}
+
+export function accountDeletionBillingPlan(entitlement) {
+  const packages = entitlementBillingPackages(entitlement);
+  const stripeSubscriptions = packages
+    .filter((entry) => entry.source === "webSubscription")
+    .map((entry) => ({
+      packageID: entry.packageID,
+      subscriptionID: stripeSubscriptionID(entry.provider?.stripeSubscriptionID)
+    }))
+    .filter((entry) => entry.subscriptionID);
+  const deduplicatedStripeSubscriptions = Array.from(
+    new Map(stripeSubscriptions.map((entry) => [entry.subscriptionID, entry])).values()
+  );
+  return {
+    stripeSubscriptions: deduplicatedStripeSubscriptions,
+    appleSubscriptionPresent: packages.some((entry) =>
+      ["appleSubscription", "subscription"].includes(entry.source)
+    ),
+    lifetimeGrantPresent: packages.some((entry) => entry.source === "lifetimeGrant")
+  };
+}
+
 function stripeSubscriptionIDFromObject(object) {
   return stripeSubscriptionID(object?.subscription) ||
     stripeSubscriptionID(object?.parent?.subscription_details?.subscription) ||
@@ -11037,13 +11093,16 @@ function findUserIDForStripeSubscription(store, subscriptionID) {
   )?.[0] || null;
 }
 
-function stripeSubscriptionExpiresAt(object) {
-  const timestamp =
-    object?.current_period_end ||
-    object?.lines?.data?.[0]?.period?.end ||
-    object?.period_end ||
-    null;
-  return Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp) * 1000).toISOString() : null;
+export function stripeSubscriptionExpiresAt(object) {
+  const timestamp = [
+    object?.current_period_end,
+    object?.items?.data?.[0]?.current_period_end,
+    object?.lines?.data?.[0]?.period?.end,
+    object?.period_end
+  ]
+    .map(Number)
+    .find((candidate) => Number.isFinite(candidate) && candidate > 0);
+  return timestamp ? new Date(timestamp * 1000).toISOString() : null;
 }
 
 function stripeCheckoutProvisionalExpiresAt(event) {
@@ -11080,6 +11139,57 @@ async function stripeAPI(path, { method = "GET", body = null } = {}) {
     throw new Error(json.error?.message || "Stripe API request failed.");
   }
   return json;
+}
+
+export async function cancelStripeSubscriptionsForAccount({
+  userID,
+  entitlement,
+  requestStripe = stripeAPI
+} = {}) {
+  const plan = accountDeletionBillingPlan(entitlement);
+  const canceledSubscriptions = [];
+  for (const entry of plan.stripeSubscriptions) {
+    const subscription = await requestStripe(
+      `/v1/subscriptions/${encodeURIComponent(entry.subscriptionID)}`
+    );
+    validateStripeRestoreOwnership({
+      subscription,
+      persistedOwnerUserID: userID,
+      requestedUserID: userID
+    });
+    if (["canceled", "incomplete_expired"].includes(subscription.status)) {
+      canceledSubscriptions.push({
+        ...entry,
+        status: subscription.status,
+        alreadyInactive: true
+      });
+      continue;
+    }
+    const canceled = await requestStripe(
+      `/v1/subscriptions/${encodeURIComponent(entry.subscriptionID)}`,
+      {
+        method: "DELETE",
+        body: encodedFormBody({
+          cancellation_details: {
+            comment: "Permitext account deleted by customer"
+          }
+        })
+      }
+    );
+    if (canceled.status !== "canceled") {
+      throw new Error("Stripe did not confirm subscription cancellation.");
+    }
+    canceledSubscriptions.push({
+      ...entry,
+      status: canceled.status,
+      alreadyInactive: false
+    });
+  }
+  return {
+    canceledSubscriptions,
+    appleSubscriptionPresent: plan.appleSubscriptionPresent,
+    lifetimeGrantPresent: plan.lifetimeGrantPresent
+  };
 }
 
 async function activeStripeSubscriptionForUserID(userID, packageID = entitlementPackageIDs.pro) {
@@ -12383,6 +12493,21 @@ async function handleAccountDelete(request, response) {
   const context = await authenticatedUserContext(request, response, userID, body.auth);
   if (!context) return;
 
+  let billingCancellation;
+  try {
+    billingCancellation = await cancelStripeSubscriptionsForAccount({
+      userID,
+      entitlement: context.entitlement
+    });
+  } catch (error) {
+    console.error("Account deletion stopped because Stripe cancellation failed.", error);
+    sendJSON(response, 502, {
+      error: "Permitext could not confirm that Stripe billing was canceled. Your account and data were not deleted. Try again or manage the subscription from Settings.",
+      code: "STRIPE_CANCELLATION_FAILED"
+    });
+    return;
+  }
+
   const pathnames = await privateProjectAssetPathnamesForAccount(userID);
   await deletePrivateProjectAssetPathnames(pathnames);
   const adapter = await storeAdapter();
@@ -12392,7 +12517,22 @@ async function handleAccountDelete(request, response) {
   }
   sendJSON(response, 200, {
     deleted: true,
-    deletedPrivateAssetCount: pathnames.length
+    deletedPrivateAssetCount: pathnames.length,
+    billingCancellation: {
+      stripe: billingCancellation.canceledSubscriptions.length
+        ? {
+            status: "canceled",
+            subscriptionCount: billingCancellation.canceledSubscriptions.length
+          }
+        : { status: "notApplicable", subscriptionCount: 0 },
+      apple: billingCancellation.appleSubscriptionPresent
+        ? {
+            status: "userManaged",
+            managementURL: "https://apps.apple.com/account/subscriptions"
+          }
+        : { status: "notApplicable" },
+      lifetimeGrantRemoved: billingCancellation.lifetimeGrantPresent
+    }
   });
 }
 
@@ -13266,7 +13406,7 @@ async function handleStripeWebhook(request, response) {
     const completedSubscriptionCheckout =
       object.mode === "subscription" &&
       ["paid", "no_payment_required"].includes(object.payment_status);
-    if (userID && completedSubscriptionCheckout) {
+    if (userID && completedSubscriptionCheckout && await persistedAccountExists(userID)) {
       const packageID = stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
         packageID,
@@ -13287,7 +13427,11 @@ async function handleStripeWebhook(request, response) {
   case "customer.subscription.updated": {
     const userID = stripeUserIDFromObject(object);
     const subscriptionID = stripeSubscriptionID(object);
-    if (userID && ["active", "trialing"].includes(object.status)) {
+    if (
+      userID &&
+      ["active", "trialing"].includes(object.status) &&
+      await persistedAccountExists(userID)
+    ) {
       const packageID = stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
         packageID,
@@ -13332,7 +13476,7 @@ async function handleStripeWebhook(request, response) {
     const subscriptionID = stripeSubscriptionIDFromObject(object);
     const owner = subscriptionID ? await persistedStripeEntitlementOwner(subscriptionID) : null;
     const userID = stripeUserIDFromObject(object) || owner?.userID;
-    if (userID && subscriptionID) {
+    if (userID && subscriptionID && await persistedAccountExists(userID)) {
       const packageID = owner
         ? entitlementPackageForStripeSubscription(owner.entitlement, subscriptionID)
         : stripePackageIDFromObject(object);

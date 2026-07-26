@@ -2716,6 +2716,23 @@ final class CodeLibraryViewModel: ObservableObject {
         pendingUserContentSyncCount > 0 || !userContentSyncConflicts.isEmpty
     }
 
+    var hasAppleManagedBillingForAccountDeletion: Bool {
+        let entitlement = entitlementService.currentEntitlement
+        if entitlement.source.isAppleManagedSubscription { return true }
+        return entitlement.addOns?.values.contains(where: {
+            $0.source == EntitlementSource.appleSubscription.rawValue ||
+                $0.source == EntitlementSource.subscription.rawValue
+        }) == true
+    }
+
+    var hasWebManagedBillingForAccountDeletion: Bool {
+        let entitlement = entitlementService.currentEntitlement
+        if entitlement.source == .webSubscription { return true }
+        return entitlement.addOns?.values.contains(where: {
+            $0.source == EntitlementSource.webSubscription.rawValue
+        }) == true
+    }
+
     @discardableResult
     func deleteAccount() async -> Bool {
         guard let account = signedInAccount else { return false }

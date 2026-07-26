@@ -6262,6 +6262,34 @@ async function main() {
       body: { auth: { accountUserID: deletionUserID } }
     });
     assert(pullAfterAccountDeletion.response.status === 401, "A deleted account session remained usable.");
+    const delayedStripeEvent = JSON.stringify({
+      id: "evt_after_account_deletion",
+      type: "customer.subscription.updated",
+      livemode: false,
+      created: Math.floor(Date.now() / 1000),
+      data: {
+        object: {
+          id: "sub_after_account_deletion",
+          status: "active",
+          customer: "cus_after_account_deletion",
+          metadata: {
+            accountUserID: deletionUserID,
+            permitextPackage: "pro"
+          }
+        }
+      }
+    });
+    const delayedStripeWebhook = await request("/billing/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "stripe-signature": stripeSignature(delayedStripeEvent, stripeWebhookSecret)
+      },
+      rawBody: delayedStripeEvent
+    });
+    assert(
+      delayedStripeWebhook.response.ok && delayedStripeWebhook.json.changed === false,
+      "A delayed Stripe webhook restored billing access after account deletion."
+    );
     const deletionRecreate = await request("/account/sign-in", {
       method: "POST",
       headers: { "x-forwarded-for": "203.0.113.40" },
@@ -6274,6 +6302,10 @@ async function main() {
       }
     });
     assert(deletionRecreate.response.ok, "Deleted account could not be recreated through Sign in with Apple.");
+    assert(
+      !deletionRecreate.json.entitlement,
+      "A recreated deleted account inherited a stale billing entitlement."
+    );
     const deletionRecreatePull = await request("/sync/pull", {
       method: "POST",
       token: deletionRecreate.json.account.backendSessionToken,

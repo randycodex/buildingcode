@@ -1149,8 +1149,25 @@ struct BackendAccountDeleteRequest: Codable, Hashable, Sendable {
 }
 
 struct BackendAccountDeleteResponse: Codable, Hashable, Sendable {
+    struct BillingCancellation: Codable, Hashable, Sendable {
+        struct StripeStatus: Codable, Hashable, Sendable {
+            let status: String
+            let subscriptionCount: Int
+        }
+
+        struct AppleStatus: Codable, Hashable, Sendable {
+            let status: String
+            let managementURL: String?
+        }
+
+        let stripe: StripeStatus
+        let apple: AppleStatus
+        let lifetimeGrantRemoved: Bool
+    }
+
     let deleted: Bool
     let deletedPrivateAssetCount: Int
+    let billingCancellation: BillingCancellation?
 }
 
 struct BackendAttachLocalDataRequest: Codable, Hashable, Sendable {
@@ -2171,7 +2188,11 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
     func deleteAccount(_ request: BackendAccountDeleteRequest) async throws -> BackendAccountDeleteResponse {
         accountsByUserID.removeValue(forKey: request.auth.accountUserID)
         userContentByUserID.removeValue(forKey: request.auth.accountUserID)
-        return BackendAccountDeleteResponse(deleted: true, deletedPrivateAssetCount: 0)
+        return BackendAccountDeleteResponse(
+            deleted: true,
+            deletedPrivateAssetCount: 0,
+            billingCancellation: nil
+        )
     }
 
     func attachLocalData(_ request: BackendAttachLocalDataRequest) async throws -> AccountMigrationState {

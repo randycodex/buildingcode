@@ -14520,9 +14520,28 @@ function renderSettings() {
   deleteAccountButton.addEventListener("click", async () => {
     const account = activeAccount();
     if (!account) return;
+    const entitlement = currentEntitlement();
+    const appleManaged = [
+      entitlement?.source,
+      ...Object.values(entitlement?.addOns || {}).map((addOn) => addOn?.source)
+    ].some((source) => ["appleSubscription", "subscription"].includes(source));
+    const stripeManaged = [
+      entitlement?.source,
+      ...Object.values(entitlement?.addOns || {}).map((addOn) => addOn?.source)
+    ].some((source) => source === "webSubscription");
+    const lifetimeGrant = entitlement?.source === "lifetimeGrant";
+    const billingMessage = appleManaged && stripeManaged
+      ? "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you."
+      : appleManaged
+        ? "Apple billing cannot be canceled by Permitext. Manage your Apple subscription before deleting, or Apple may continue charging you."
+      : stripeManaged
+        ? "Permitext will cancel your Stripe subscription before deleting anything. If Stripe cannot confirm cancellation, your account and data will not be deleted."
+        : lifetimeGrant
+          ? "This account has a lifetime grant and no recurring Permitext subscription. Deleting it permanently removes the grant."
+          : "No recurring Permitext subscription is linked to this account.";
     const confirmed = await confirmWebWarning(
       "Delete Permitext account?",
-      "This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. Apple or Stripe subscriptions do not cancel automatically. This cannot be undone.",
+      `${billingMessage} This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. This cannot be undone.`,
       { confirmLabel: "Delete Account" }
     );
     if (!confirmed) return;

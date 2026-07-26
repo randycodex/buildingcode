@@ -1,10 +1,13 @@
 import {
+  accountDeletionBillingPlan,
   applePackageIDForProductID,
+  cancelStripeSubscriptionsForAccount,
   claimAppleTransactionOwner,
   sameOriginAbsoluteURL,
   stripeConfigurationStatus,
   stripePackageIDFromObject,
   stripeSecretKeyMode,
+  stripeSubscriptionExpiresAt,
   validateAppleTransactionEnvironment,
   validateStripeRestoreOwnership,
   verifyAppleTransactionJWS
@@ -176,6 +179,102 @@ assert(
   stripePackageIDFromObject({ metadata: { permitextPackage: "unknown" } }) === null,
   "Unknown Stripe package metadata was accepted."
 );
+assert(
+  stripeSubscriptionExpiresAt({
+    items: { data: [{ current_period_end: 1_787_768_214 }] }
+  }) === "2026-08-26T18:16:54.000Z",
+  "Stripe's item-level subscription period did not produce the entitlement expiration."
+);
+assert(
+  stripeSubscriptionExpiresAt({}) === null,
+  "A missing Stripe subscription period incorrectly produced an epoch expiration."
+);
+
+const lifetimeDeletionPlan = accountDeletionBillingPlan({
+  plan: "pro",
+  source: "lifetimeGrant",
+  provider: {}
+});
+assert(
+  lifetimeDeletionPlan.lifetimeGrantPresent &&
+    lifetimeDeletionPlan.stripeSubscriptions.length === 0 &&
+    !lifetimeDeletionPlan.appleSubscriptionPresent,
+  "Lifetime account deletion incorrectly scheduled external billing cancellation."
+);
+
+const mixedDeletionPlan = accountDeletionBillingPlan({
+  plan: "pro",
+  source: "webSubscription",
+  provider: { stripeSubscriptionID: "sub_delete_pro" },
+  addOns: {
+    research: {
+      source: "appleSubscription",
+      provider: { appleOriginalTransactionID: "apple-delete-research" }
+    }
+  }
+});
+assert(
+  mixedDeletionPlan.stripeSubscriptions.length === 1 &&
+    mixedDeletionPlan.stripeSubscriptions[0].subscriptionID === "sub_delete_pro" &&
+    mixedDeletionPlan.appleSubscriptionPresent,
+  "Mixed Stripe and Apple billing was not detected for account deletion."
+);
+
+const stripeDeletionRequests = [];
+const stripeDeletionResult = await cancelStripeSubscriptionsForAccount({
+  userID: "apple:delete-owner",
+  entitlement: {
+    plan: "pro",
+    source: "webSubscription",
+    provider: { stripeSubscriptionID: "sub_delete_owned" }
+  },
+  requestStripe: async (path, options = {}) => {
+    stripeDeletionRequests.push({ path, method: options.method || "GET", body: options.body || null });
+    if (options.method === "DELETE") {
+      return { id: "sub_delete_owned", status: "canceled" };
+    }
+    return {
+      id: "sub_delete_owned",
+      status: "active",
+      metadata: { accountUserID: "apple:delete-owner" }
+    };
+  }
+});
+assert(
+  stripeDeletionResult.canceledSubscriptions.length === 1 &&
+    stripeDeletionRequests.length === 2 &&
+    stripeDeletionRequests[0].method === "GET" &&
+    stripeDeletionRequests[1].method === "DELETE",
+  "Account deletion did not verify and immediately cancel its Stripe subscription."
+);
+
+const conflictingStripeDeletionRequests = [];
+try {
+  await cancelStripeSubscriptionsForAccount({
+    userID: "apple:delete-owner",
+    entitlement: {
+      plan: "pro",
+      source: "webSubscription",
+      provider: { stripeSubscriptionID: "sub_delete_conflict" }
+    },
+    requestStripe: async (path, options = {}) => {
+      conflictingStripeDeletionRequests.push({ path, method: options.method || "GET" });
+      return {
+        id: "sub_delete_conflict",
+        status: "active",
+        metadata: { accountUserID: "apple:different-owner" }
+      };
+    }
+  });
+  throw new Error("Conflicting Stripe ownership was accepted during account deletion.");
+} catch (error) {
+  assert(
+    String(error.message || "").includes("ownership records conflict") &&
+      conflictingStripeDeletionRequests.length === 1,
+    "Stripe ownership conflict did not stop account deletion before cancellation."
+  );
+}
+
 assert(
   applePackageIDForProductID("com.randycodex.permitext.pro.monthly") === "pro",
   "The Pro StoreKit product did not map to Pro."

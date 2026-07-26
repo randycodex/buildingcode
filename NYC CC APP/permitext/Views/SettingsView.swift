@@ -1080,10 +1080,20 @@ struct SettingsView: View {
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(.primary)
 
-            Text("This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. Apple or Stripe subscriptions do not cancel automatically. This cannot be undone.")
+            Text(accountDeletionMessage)
                 .font(.body)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            if library.hasAppleManagedBillingForAccountDeletion {
+                Button {
+                    openURL(subscriptionManagementURL)
+                } label: {
+                    Label("Manage Apple Subscription", systemImage: "arrow.up.right.square")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+            }
 
             Button("Delete Account", role: .destructive) {
                 Task {
@@ -1098,6 +1108,24 @@ struct SettingsView: View {
         }
         .frame(width: 320, alignment: .leading)
         .padding(24)
+    }
+
+    private var accountDeletionMessage: String {
+        let dataDeletion = "This permanently deletes your Permitext account, synced saved work, Research history, private Workboard images and reports, and any firm workspace you own. This cannot be undone."
+        if library.hasAppleManagedBillingForAccountDeletion &&
+            library.hasWebManagedBillingForAccountDeletion {
+            return "Permitext will cancel your Stripe subscription first. Apple billing cannot be canceled by Permitext, so manage your Apple subscription before deleting or Apple may continue charging you. \(dataDeletion)"
+        }
+        if library.hasAppleManagedBillingForAccountDeletion {
+            return "Apple billing cannot be canceled by Permitext. Manage your Apple subscription first, or Apple may continue charging you. \(dataDeletion)"
+        }
+        if library.hasWebManagedBillingForAccountDeletion {
+            return "Permitext will cancel your Stripe subscription before deleting anything. If Stripe cannot confirm cancellation, your account and data will not be deleted. \(dataDeletion)"
+        }
+        if library.currentEntitlementSource == .lifetimeGrant {
+            return "This account has a lifetime grant and no recurring Permitext subscription. Deleting it permanently removes the grant. \(dataDeletion)"
+        }
+        return "No recurring Permitext subscription is linked to this account. \(dataDeletion)"
     }
 
     private var signOutWarningPopover: some View {
