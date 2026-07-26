@@ -878,7 +878,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v33'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v34'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1230,7 +1230,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.research-list-panel \.analysis-content \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/) &&
-        workspaceStyles.text.match(/\.research-trust-notice \{[\s\S]*?margin-top: auto;[\s\S]*?font-size: calc\(var\(--chrome-font-size\) \* 0\.72\);/),
+        workspaceStyles.text.match(/\.research-trust-notice \{[\s\S]*?margin-top: auto;[\s\S]*?padding: var\(--space-5\) 0 calc\(var\(--space-2\) \+ 34px\);[\s\S]*?font-size: calc\(var\(--chrome-font-size\) \* 0\.72\);/),
       "Research trust notice should remain small and anchored below the column content."
     );
     assert(

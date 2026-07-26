@@ -3708,7 +3708,7 @@ mark {
 
 .research-trust-notice {
   margin-top: auto;
-  padding: var(--space-5) 0 var(--space-2);
+  padding: var(--space-5) 0 calc(var(--space-2) + 34px);
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.72);
   line-height: 1.35;
