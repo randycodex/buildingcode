@@ -840,6 +840,11 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
+      webRoot.text.includes("settings-footer-links") &&
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v21'),
+      "settings footer links should stay centered with the current stylesheet"
+    );
+    assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
       evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
