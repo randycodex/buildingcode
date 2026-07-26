@@ -2346,8 +2346,8 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func scheduleUserContentAutoSync() {
         guard signedInAccount != nil else { return }
-        // Keep sign-out safety and the Settings sync state current even when
-        // the device is offline and the delayed automatic sync cannot run.
+        // Keep sign-out safety current even when the device is offline and
+        // the delayed automatic sync cannot run.
         refreshPendingUserContentSyncCount()
         userContentAutoSyncTask?.cancel()
         userContentAutoSyncTask = Task { [weak self] in

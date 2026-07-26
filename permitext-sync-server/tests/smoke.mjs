@@ -168,6 +168,10 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url),
     "utf8"
   );
+  const iosAppSource = await readFile(
+    new URL("../../NYC CC APP/permitext/PermitextApp.swift", import.meta.url),
+    "utf8"
+  );
   const iosLibraryViewModelSource = await readFile(
     new URL("../../NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift", import.meta.url),
     "utf8"
@@ -851,6 +855,17 @@ async function main() {
         !iosSettingsSource.includes("codeSectionPicker") &&
         !iosSettingsSource.includes('settingsMenuRow(label: "Code Section")'),
       "Settings should not duplicate the code picker already available in each Reader"
+    );
+    assert(
+      !iosSettingsSource.includes("syncCard") &&
+        !iosSettingsSource.includes('CodeEyebrow(text: "Sync"') &&
+        !iosSettingsSource.includes("Sync Now") &&
+        iosLibraryViewModelSource.includes("private let foregroundAccountSyncInterval: TimeInterval = 30") &&
+        iosLibraryViewModelSource.includes("func startForegroundAutomaticSync()") &&
+        iosLibraryViewModelSource.includes("func performStartupAccountSyncIfNeeded() async") &&
+        iosAppSource.includes("await library.performStartupAccountSyncIfNeeded()") &&
+        iosAppSource.includes("library.startForegroundAutomaticSync()"),
+      "iOS should rely on automatic sync without rendering a redundant Settings card"
     );
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
