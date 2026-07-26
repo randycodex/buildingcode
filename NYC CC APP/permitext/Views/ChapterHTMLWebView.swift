@@ -1,6 +1,34 @@
 import SwiftUI
 import WebKit
 
+@MainActor
+enum ChapterHTMLWebProcessWarmup {
+    private static var warmupWebView: WKWebView?
+    private static var hasStarted = false
+
+    static func startIfNeeded() {
+        guard !hasStarted else { return }
+        hasStarted = true
+
+        let configuration = WKWebViewConfiguration()
+        configuration.defaultWebpagePreferences.allowsContentJavaScript = false
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+        warmupWebView = webView
+        webView.loadHTMLString(
+            "<!doctype html><html><head><meta name=\"viewport\" content=\"width=device-width\"></head><body></body></html>",
+            baseURL: nil
+        )
+        #if DEBUG
+        print("permitext diagnostics: chapterReader WebKit warmup started")
+        #endif
+    }
+
+    static func releaseAfterReaderStarts() {
+        warmupWebView?.stopLoading()
+        warmupWebView = nil
+    }
+}
+
 private enum HTMLAssetPathResolver {
     static func resolveSharedAssetPaths(in html: String, readAccessURL: URL) -> String {
         let assetRoot = readAccessURL
@@ -258,6 +286,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedScrollToTopTrigger = 0
         var appliedScrollProgressSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
+        private var htmlLoadBeganAt: TimeInterval?
         private var lastReportedScrollProgress: CGFloat = -1
         private var visibleAnchorReportPending = false
         private var suppressVisibleAnchorReportsUntil: Date?
@@ -266,6 +295,11 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
             let colorScheme = parent?.colorScheme ?? .light
+            let beganAt = ProcessInfo.processInfo.systemUptime
+            htmlLoadBeganAt = beganAt
+            #if DEBUG
+            print("permitext diagnostics: chapterReader begin file=\(chapterURL.lastPathComponent)")
+            #endif
             htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
                 guard let webView else { return }
                 if let preparedHTML = PreparedChapterHTMLCache.preparedHTML(
@@ -273,6 +307,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     readAccessURL: readAccessURL,
                     colorScheme: colorScheme
                 ) {
+                    #if DEBUG
+                    let prepareMilliseconds = max(
+                        0,
+                        Int((ProcessInfo.processInfo.systemUptime - beganAt) * 1_000)
+                    )
+                    print(
+                        "permitext diagnostics: chapterReader prepared milliseconds=\(prepareMilliseconds) file=\(chapterURL.lastPathComponent)"
+                    )
+                    #endif
                     guard !Task.isCancelled else { return }
                     await MainActor.run { () -> Void in
                         webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)
@@ -286,7 +329,28 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             }
         }
 
+        func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+            ChapterHTMLWebProcessWarmup.releaseAfterReaderStarts()
+            #if DEBUG
+            guard let htmlLoadBeganAt else { return }
+            let elapsedMilliseconds = max(
+                0,
+                Int((ProcessInfo.processInfo.systemUptime - htmlLoadBeganAt) * 1_000)
+            )
+            print("permitext diagnostics: chapterReader firstText milliseconds=\(elapsedMilliseconds)")
+            #endif
+        }
+
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            #if DEBUG
+            if let htmlLoadBeganAt {
+                let elapsedMilliseconds = max(
+                    0,
+                    Int((ProcessInfo.processInfo.systemUptime - htmlLoadBeganAt) * 1_000)
+                )
+                print("permitext diagnostics: chapterReader finished milliseconds=\(elapsedMilliseconds)")
+            }
+            #endif
             applyReaderScripts(to: webView)
             applyBookmarkDecorations(to: webView)
             if let offset = parent?.restoreScrollOffset, offset > 0 {
