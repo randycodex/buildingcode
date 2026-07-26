@@ -878,7 +878,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v26'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v27'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1204,6 +1204,12 @@ async function main() {
         workspaceStyles.text.includes(".custom-select-option.is-indented") &&
         workspaceStyles.text.includes(".custom-select-option.is-group-action"),
       "Reader picker group headings or Construction Code indentation styles are missing."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
+        workspaceStyles.text.includes("--destructive: #ff3b30;") &&
+        workspaceStyles.text.includes("--destructive: #ff453a;"),
+      "Web Delete Account no longer matches the adaptive red iOS destructive treatment."
     );
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),

@@ -13,6 +13,7 @@
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
+  --destructive: #ff3b30;
   --border: rgba(20, 20, 24, 0.105);
   --toolbar-active: rgba(20, 20, 24, 0.08);
   --toolbar-active-text: #111111;
@@ -68,6 +69,7 @@
     --text-primary: #f6f4f1;
     --text-secondary: #a09fa7;
     --text-tertiary: #6f6f78;
+    --destructive: #ff453a;
     --border: rgba(255, 255, 255, 0.12);
     --toolbar-active: rgba(255, 255, 255, 0.12);
     --toolbar-active-text: #ffffff;
@@ -7434,6 +7436,11 @@ button.project-studio-metric:focus-visible {
 
 .settings-panel .settings-destructive-secondary {
   margin-top: 2px;
+}
+
+.settings-panel .settings-destructive-secondary.account-delete {
+  background: color-mix(in srgb, var(--destructive) 10%, transparent);
+  color: var(--destructive);
 }
 
 .settings-panel .reader-preview-card {
