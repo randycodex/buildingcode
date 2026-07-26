@@ -467,7 +467,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("Firm &amp; Collaboration") &&
-        webRoot.text.includes('class="settings-beta-badge"') &&
+        !webRoot.text.includes('class="settings-beta-badge"') &&
         workspaceScript.text.includes('postResearch("/organizations/create"') &&
         workspaceScript.text.includes('postResearch("/organizations/members/invite"') &&
         workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
@@ -889,7 +889,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v34'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v36'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1236,8 +1236,8 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.settings-panel \.settings-section-title \{[\s\S]*?justify-self: center;[\s\S]*?width: 100%;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.settings-panel \.settings-card-heading \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);/) &&
-        workspaceStyles.text.match(/\.settings-panel \.settings-card-heading \.settings-beta-badge \{[\s\S]*?grid-column: 3;[\s\S]*?justify-self: end;/),
-      "Settings card titles should remain centered independently of trailing badges."
+        !workspaceStyles.text.includes(".settings-panel .settings-card-heading .settings-beta-badge"),
+      "Settings card titles should remain centered without the retired beta badge."
     );
     assert(
       workspaceStyles.text.match(/\.research-list-panel \.analysis-content \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/) &&

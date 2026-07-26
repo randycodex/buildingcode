@@ -6434,7 +6434,6 @@ button.project-studio-metric:focus-visible {
   gap: var(--space-2);
 }
 
-.settings-beta-badge,
 .settings-firm-role,
 .project-shared-role {
   display: inline-flex;
@@ -7280,11 +7279,6 @@ button.project-studio-metric:focus-visible {
 .settings-panel .settings-card-heading .settings-section-title {
   grid-column: 2;
   width: auto;
-}
-
-.settings-panel .settings-card-heading .settings-beta-badge {
-  grid-column: 3;
-  justify-self: end;
 }
 
 .settings-panel .settings-card-copy,
