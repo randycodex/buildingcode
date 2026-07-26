@@ -782,6 +782,14 @@ async function main() {
       "Four-or-more-column workspaces no longer enforce every pane's default width."
     );
     assert(
+      workspaceScript.text.includes("function isFlexibleFreeDualReaderPaneID(paneID)") &&
+        workspaceScript.text.includes("!isProAccount()") &&
+        workspaceScript.text.includes("(state.readers || []).length === 2") &&
+        workspaceScript.text.includes("if (isFlexibleFreeDualReaderPaneID(paneID)) return false;") &&
+        workspaceScript.text.includes('`${flexibleFreeDualReader ? defaultWidth : width}px`'),
+      "Free dual Readers should flex into remaining viewport space until their default minimum width."
+    );
+    assert(
       workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
         workspaceScript.text.includes("const pushedScrollDelta = appliedPreviousDelta - delta") &&
         workspaceScript.text.includes("startScrollLeft + pushedScrollDelta"),
@@ -871,7 +879,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v29'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v35'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
