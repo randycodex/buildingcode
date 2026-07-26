@@ -1,6 +1,23 @@
 import SwiftUI
 import WebKit
 
+enum BundledWebViewNavigationPolicy {
+    /// Allows only a top-level file navigation within the supplied bundled
+    /// content root. Reader markup may use relative anchors and local assets;
+    /// it must not replace the reader with a remote or unrelated local page.
+    static func allowsTopLevelNavigation(to url: URL?, under readAccessURL: URL?) -> Bool {
+        guard let url else { return false }
+        if url.scheme?.lowercased() == "about", url.absoluteString == "about:blank" {
+            return true
+        }
+        guard url.isFileURL, let readAccessURL else { return false }
+
+        let candidatePath = url.standardizedFileURL.path
+        let rootPath = readAccessURL.standardizedFileURL.path
+        return candidatePath == rootPath || candidatePath.hasPrefix(rootPath + "/")
+    }
+}
+
 @MainActor
 enum ChapterHTMLWebProcessWarmup {
     private static var warmupWebView: WKWebView?
@@ -263,6 +280,10 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         }
     }
 
+    static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
+        coordinator.teardown(webView: uiView)
+    }
+
     final class Coordinator: NSObject, WKNavigationDelegate, UIScrollViewDelegate, WKScriptMessageHandler {
         static let visibleAnchorMessageName = "nycccVisibleAnchor"
         static let scrollProgressMessageName = "nycccScrollProgress"
@@ -286,6 +307,7 @@ struct ChapterHTMLWebView: UIViewRepresentable {
         var appliedScrollToTopTrigger = 0
         var appliedScrollProgressSyncTrigger = 0
         private var htmlLoadTask: Task<Void, Never>?
+        private var htmlLoadGeneration = 0
         private var htmlLoadBeganAt: TimeInterval?
         private var lastReportedScrollProgress: CGFloat = -1
         private var visibleAnchorReportPending = false
@@ -294,14 +316,15 @@ struct ChapterHTMLWebView: UIViewRepresentable {
 
         func loadHTMLAsync(chapterURL: URL, readAccessURL: URL, into webView: WKWebView) {
             htmlLoadTask?.cancel()
+            htmlLoadGeneration &+= 1
+            let loadGeneration = htmlLoadGeneration
             let colorScheme = parent?.colorScheme ?? .light
             let beganAt = ProcessInfo.processInfo.systemUptime
             htmlLoadBeganAt = beganAt
             #if DEBUG
             print("permitext diagnostics: chapterReader begin file=\(chapterURL.lastPathComponent)")
             #endif
-            htmlLoadTask = Task.detached(priority: .userInitiated) { [weak webView] in
-                guard let webView else { return }
+            htmlLoadTask = Task.detached(priority: .userInitiated) { [weak self, weak webView] in
                 if let preparedHTML = PreparedChapterHTMLCache.preparedHTML(
                     chapterURL: chapterURL,
                     readAccessURL: readAccessURL,
@@ -317,16 +340,56 @@ struct ChapterHTMLWebView: UIViewRepresentable {
                     )
                     #endif
                     guard !Task.isCancelled else { return }
-                    await MainActor.run { () -> Void in
+                    await MainActor.run { [weak self, weak webView] in
+                        guard let self, let webView,
+                              self.htmlLoadGeneration == loadGeneration,
+                              !Task.isCancelled else { return }
                         webView.loadHTMLString(preparedHTML, baseURL: readAccessURL)
                     }
                 } else {
                     guard !Task.isCancelled else { return }
-                    await MainActor.run { () -> Void in
+                    await MainActor.run { [weak self, weak webView] in
+                        guard let self, let webView,
+                              self.htmlLoadGeneration == loadGeneration,
+                              !Task.isCancelled else { return }
                         webView.loadFileURL(chapterURL, allowingReadAccessTo: readAccessURL)
                     }
                 }
             }
+        }
+
+        func teardown(webView: WKWebView) {
+            htmlLoadTask?.cancel()
+            htmlLoadTask = nil
+            htmlLoadGeneration &+= 1
+            parent = nil
+            loadedURL = nil
+            pendingAnchorID = nil
+            webView.stopLoading()
+            webView.navigationDelegate = nil
+            webView.scrollView.delegate = nil
+            let contentController = webView.configuration.userContentController
+            contentController.removeScriptMessageHandler(forName: Self.visibleAnchorMessageName)
+            contentController.removeScriptMessageHandler(forName: Self.scrollProgressMessageName)
+            contentController.removeScriptMessageHandler(forName: Self.openSectionMessageName)
+            contentController.removeAllUserScripts()
+            self.webView = nil
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard navigationAction.targetFrame?.isMainFrame != false else {
+                decisionHandler(.allow)
+                return
+            }
+            let allowed = BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: navigationAction.request.url,
+                under: parent?.readAccessURL
+            )
+            decisionHandler(allowed ? .allow : .cancel)
         }
 
         func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {

@@ -1,6 +1,7 @@
 import { access, open, readFile, readdir, stat } from "node:fs/promises";
 import { basename, dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { constructionHTMLBodyStatusForSection } from "../construction-html-content.mjs";
 
 const serverRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const workspaceRoot = dirname(serverRoot);
@@ -17,6 +18,7 @@ const canonicalRoot = join(
 const canonicalPreparedRoot = join(canonicalRoot, "prepared");
 const chapterRoot = join(canonicalPreparedRoot, "chapters");
 const canonicalSectionRoot = join(canonicalPreparedRoot, "sections");
+const structuralCatalogPath = join(canonicalPreparedRoot, "structural-sections.json");
 const canonicalAssetRoot = join(canonicalRoot, "assets");
 const legacySectionRoot = join(
   workspaceRoot,
@@ -32,8 +34,8 @@ const legacySectionRoot = join(
 );
 const canonicalMapPath = join(serverRoot, "config", "canonical-section-ids.json");
 const xcodeProjectPath = join(workspaceRoot, "NYC CC APP", "NYC CC APP.xcodeproj", "project.pbxproj");
-const minimumAvailableBodyCount = 10_371;
-const minimumAvailableBodyCoverage = 0.80;
+const minimumAvailableBodyCount = 11_610;
+const minimumAvailableBodyCoverage = 0.90;
 const prefixByCodeSectionID = new Map([
   [1, "BC"],
   [3, "AC"],
@@ -102,13 +104,14 @@ async function pngDimensions(path) {
 }
 
 async function main() {
-  const [bundle, manifest, canonicalMap, searchIndex, chapterFiles, canonicalSectionFiles, xcodeProject] = await Promise.all([
+  const [bundle, manifest, canonicalMap, searchIndex, chapterFiles, canonicalSectionFiles, structuralCatalog, xcodeProject] = await Promise.all([
     readJSON(join(canonicalRoot, "bundle.json")),
     readJSON(join(canonicalPreparedRoot, "manifest.json")),
     readJSON(canonicalMapPath),
     readJSON(join(canonicalPreparedRoot, "searchIndex.json")),
     readdir(chapterRoot),
     readdir(canonicalSectionRoot),
+    readJSON(structuralCatalogPath),
     readFile(xcodeProjectPath, "utf8")
   ]);
 
@@ -140,6 +143,7 @@ async function main() {
           chapterNumber: manifestChapter.chapterNumber || chapter.chapterNumber,
           codePrefix: prefix,
           sectionNumber: section.sectionNumber,
+          title: section.title,
           webSectionID: section.id
         };
         row.canonicalKey = canonicalKey(row.codePrefix, row.chapterNumber, row.sectionNumber);
@@ -170,6 +174,7 @@ async function main() {
 
   const indexedSectionIDs = new Set(Object.values(searchIndex.tokens || {}).flat());
   const canonicalSectionIDs = new Set(rows.map((row) => row.canonicalSectionID));
+  const rowsByCanonicalSectionID = new Map(rows.map((row) => [row.canonicalSectionID, row]));
   const missingFromSearch = [...canonicalSectionIDs].filter((id) => !indexedSectionIDs.has(id));
   const unknownSearchIDs = [...indexedSectionIDs].filter((id) => !canonicalSectionIDs.has(id));
   assert(missingFromSearch.length === 0, `Search index is missing ${missingFromSearch.length} canonical sections.`);
@@ -177,12 +182,35 @@ async function main() {
 
   const canonicalOverrideNames = canonicalSectionFiles.filter((name) => /^\d+\.json$/.test(name));
   const canonicalOverrideIDs = new Set(canonicalOverrideNames.map((name) => Number.parseInt(name, 10)));
+  let deterministicHTMLOverrideCount = 0;
   for (const file of canonicalOverrideNames) {
     const expectedID = Number.parseInt(file, 10);
     const payload = await readJSON(join(canonicalSectionRoot, file));
     assert(payload.sectionID === expectedID, `Canonical section file ${file} declares the wrong section ID.`);
     assert(canonicalSectionIDs.has(expectedID), `Canonical section file ${file} is not referenced by chapter content.`);
+    if (payload.sourceHTMLPath) {
+      deterministicHTMLOverrideCount += 1;
+      const row = rowsByCanonicalSectionID.get(expectedID);
+      const status = await constructionHTMLBodyStatusForSection({
+        id: expectedID,
+        webSectionID: row.webSectionID,
+        chapterID: row.chapterID,
+        chapterNumber: row.chapterNumber,
+        codePrefix: row.codePrefix,
+        sectionNumber: row.sectionNumber,
+        title: row.title
+      });
+      assert(status.body, `Prepared HTML body ${expectedID} no longer resolves from its bundled chapter source.`);
+      assert(
+        JSON.stringify(payload) === JSON.stringify(status.body),
+        `Prepared HTML body ${expectedID} no longer exactly matches its authoritative bundled chapter extraction.`
+      );
+    }
   }
+  assert(
+    deterministicHTMLOverrideCount >= 1_239,
+    `Deterministic bundled-HTML body coverage regressed to ${deterministicHTMLOverrideCount}; expected at least 1239.`
+  );
 
   const fuelGasTerms = await readJSON(join(canonicalSectionRoot, "8021.json"));
   const fuelGasTermsText = fuelGasTerms.blocks.map((block) => block.plainText || "").join("\n");
@@ -211,6 +239,7 @@ async function main() {
   }
 
   let availableBodyCount = 0;
+  const unavailableBodyRows = [];
   let referencedImageCount = 0;
   const missingImageAssets = [];
   const emptyImageAssets = [];
@@ -223,7 +252,10 @@ async function main() {
     ];
     const bodyPath = (await Promise.all(candidates.map(async (path) => ((await exists(path)) ? path : null))))
       .find(Boolean);
-    if (!bodyPath) continue;
+    if (!bodyPath) {
+      unavailableBodyRows.push(row);
+      continue;
+    }
 
     availableBodyCount += 1;
     const body = await readJSON(bodyPath);
@@ -262,6 +294,54 @@ async function main() {
     availableBodyCoverage >= minimumAvailableBodyCoverage,
     `Section body coverage regressed to ${(availableBodyCoverage * 100).toFixed(2)}%; expected at least ${(minimumAvailableBodyCoverage * 100).toFixed(0)}%.`
   );
+  assert(structuralCatalog.schemaVersion === 1, "Unsupported structural section catalog schema.");
+  assert(
+    structuralCatalog.source === "authoritative bundled chapter HTML only",
+    "Structural section catalog must be derived only from bundled chapter HTML."
+  );
+  assert(structuralCatalog.totalSections === rows.length, "Structural section catalog has the wrong total section count.");
+  assert(
+    structuralCatalog.availablePreparedBodies === availableBodyCount,
+    "Structural section catalog body coverage does not match published bodies."
+  );
+  assert(
+    structuralCatalog.classifiedStructuralEntries === unavailableBodyRows.length,
+    "Structural section catalog does not classify every unavailable body."
+  );
+  const structuralEntriesByID = new Map(
+    (structuralCatalog.entries || []).map((entry) => [Number(entry.sectionID), entry])
+  );
+  assert(
+    structuralEntriesByID.size === unavailableBodyRows.length,
+    "Structural section catalog contains duplicate or unreferenced section IDs."
+  );
+  for (const row of unavailableBodyRows) {
+    const status = await constructionHTMLBodyStatusForSection({
+      id: row.canonicalSectionID,
+      webSectionID: row.webSectionID,
+      chapterID: row.chapterID,
+      chapterNumber: row.chapterNumber,
+      codePrefix: row.codePrefix,
+      sectionNumber: row.sectionNumber,
+      title: row.title
+    });
+    assert(!status.body, `Structural section ${row.canonicalSectionID} unexpectedly has an HTML body.`);
+    const entry = structuralEntriesByID.get(row.canonicalSectionID);
+    assert(entry, `Unavailable section ${row.canonicalSectionID} is absent from the structural catalog.`);
+    assert(
+      entry.reason === status.reason && entry.sourceHTMLPath === (status.sourceHTMLPath || null),
+      `Structural section ${row.canonicalSectionID} no longer matches the bundled HTML classification.`
+    );
+    const expectedClassification = status.reason === "empty-official-heading"
+      ? "title-only-official-heading"
+      : status.reason === "no-official-heading"
+        ? "nested-or-title-only-catalog-entry"
+        : "unavailable-authoritative-body";
+    assert(
+      entry.classification === expectedClassification,
+      `Structural section ${row.canonicalSectionID} has the wrong explicit classification.`
+    );
+  }
   assert(
     missingImageAssets.length === 0,
     `Published section bodies reference ${missingImageAssets.length} missing image assets:\n${missingImageAssets.join("\n")}`
@@ -289,6 +369,7 @@ async function main() {
     sections: rows.length,
     indexedSections: indexedSectionIDs.size,
     canonicalOverrides: canonicalOverrideIDs.size,
+    deterministicHTMLOverrides: deterministicHTMLOverrideCount,
     availableBodies: availableBodyCount,
     missingBodies: rows.length - availableBodyCount,
     availableBodyCoverage: `${(availableBodyCoverage * 100).toFixed(2)}%`,

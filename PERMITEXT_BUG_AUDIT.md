@@ -3,9 +3,9 @@
 **Branch reviewed:** `codex/New-Changes` (`322a12e4`)
 **Remediation branch:** `main` (work began at `24c91d08`)
 **Workspace:** `/Users/randy/Documents/X_CODING/Building Code`
-**Date:** 2026-07-25
+**Date:** 2026-07-26
 **Scope:** iOS app (`NYC CC APP/permitext/`) and web/backend (`permitext-sync-server/`)
-**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 remediation described below are implemented locally. `npm run check` and `npm run smoke` pass. An iOS `EntitlementAndSyncContractTests` run passed 17 tests, including the account-wide counts and core StoreKit/backend cases; the current app and final added tests build, but a later focused rerun was canceled when the simulator shut down before XCTest launched. PostgreSQL integration was requested but skipped because no database URL is configured. Nothing in this audit proves GitHub, production execution of the new SQL, deployment state, or App Store configuration.
+**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 and hardening remediation described below are implemented locally. `npm run check`, direct server smoke, prepared-content verification, file-storage hardening, and 22 iOS `EntitlementAndSyncContractTests` pass. PostgreSQL integration and the distributed-limiter PostgreSQL test were requested but skipped because no database URL is configured. Nothing in this audit proves GitHub, production execution of the new SQL, deployment state, or App Store configuration.
 
 Severity:
 
@@ -163,9 +163,11 @@ The PostgreSQL comments table is also absent from this compatibility read, but c
 
 ### 7. File-store mutations use unlocked read-modify-write
 
-The JSON file adapter performs `readStore` → merge → `writeStore` without inter-process or cross-request locking. Concurrent requests can overwrite one another.
+**Status:** fixed locally; concurrent mutation and stale-lock recovery coverage passes
 
-This is a real defect for any deployment using file storage. Its production severity is conditional because the shared production architecture is expected to use PostgreSQL; local JSON storage should not be treated as phone↔web production proof.
+The JSON adapter now serializes mutating requests through an inter-process lock with stale-owner recovery and heartbeat renewal, then persists by fsync plus atomic same-directory replacement. Concurrent invitation acceptance/revocation smoke coverage now reaches one terminal outcome without overwriting a competing mutation.
+
+Production phone-to-web sync should still use PostgreSQL; this fix makes the local adapter reliable for its intended development and single-host uses, not a shared serverless database.
 
 ### 8. iOS Free counters are scoped per code version
 
@@ -183,15 +185,15 @@ iOS checks saved-section and note limits with `WHERE code_version = ?`, allowing
 
 ### 9. Legacy SQLite FTS passes raw user syntax to `MATCH`
 
-The legacy SQLite search path binds the raw query directly to FTS `MATCH`. Operators, quotes, punctuation, or malformed FTS syntax can throw; the view model converts that failure into empty results.
+**Status:** fixed locally; SQLite-backed operator, punctuation, and malformed-quote tests pass
 
-The authored-content search path is primary, so this is a legacy compatibility defect.
+The legacy SQLite search path now escapes embedded quotes and binds user input as a literal FTS5 phrase rather than executable FTS syntax.
 
 ### 10. Deep-link code selection depends on a numeric ID threshold
 
-iOS selects Zoning when `sectionID >= 20_000_000` and Construction Codes otherwise. That matches the current ID namespace but is an undocumented coupling.
+**Status:** fixed locally; Construction and Zoning resolution tests pass
 
-Prefer canonical metadata in the link or resolve the section ID through the server/content map.
+iOS now resolves the containing bundled code version through authored-content metadata or the SQLite section catalog. It no longer infers the code from a numeric ID threshold.
 
 ### 11. `setVerifiedPlan(.pro)` can replace package metadata
 
@@ -209,9 +211,11 @@ Preserve verified StoreKit state separately from the backend package record, the
 
 ### 12. Rate limits are advisory rather than distributed controls
 
-Rate-limit buckets are in-memory per process and key by the first `X-Forwarded-For` value. They reset across instances and deployments and depend on the hosting proxy sanitizing the header.
+**Status:** fixed locally; concurrency and fail-closed contracts pass; live PostgreSQL execution remains unverified
 
-Use account-aware, distributed controls for billing, authentication, and administrative endpoints. Keep the in-process limiter as a secondary defense.
+PostgreSQL deployments now atomically increment hashed client, verified-account, and verified-administrator buckets shared across instances. Forwarded addresses are trusted only on Vercel or when an explicit trusted-proxy setting is enabled. PostgreSQL limiter failures return `503` with `Retry-After` rather than silently downgrading to process-local limits.
+
+The bounded in-memory implementation remains only for the intentional JSON-file adapter.
 
 ### 13. Report APIs do not consistently use Project storage ownership
 
@@ -257,9 +261,9 @@ Acceptance and member-reactivation paths should use the same transactional seat 
 
 ### 16. File-store sessions are reused on re-login
 
-The file path uses `existingSession || randomUUID()`, so a new sign-in does not rotate the token. PostgreSQL creates a new hashed, expiring session.
+**Status:** fixed locally; smoke coverage proves old-token rejection and new-token acceptance
 
-Rotate file-store tokens on every successful sign-in or explicitly label file auth as development-only.
+Every successful file-store sign-in now issues a fresh token and invalidates the previous one, including the Apple web callback path.
 
 ### 17. Upgrade copy contradicts the Free entitlement contract
 
@@ -281,12 +285,12 @@ Current content-integrity result:
 |---|---:|
 | Chapters | 118 |
 | Published/indexed sections | 12,891 |
-| Prepared section bodies | 10,371 |
-| Missing prepared bodies | 2,520 (19.55%) |
-| Referenced images | 248 |
+| Prepared section bodies | 11,610 |
+| Explicit structural/title-only entries | 1,281 (9.94%) |
+| Referenced images | 273 |
 | Known duplicate display keys | 8 |
 
-This is specifically **prepared canonical section-body coverage**. It does not mean 19.55% of reader entries necessarily render blank: chapter HTML provides broader rendered coverage, and some catalog entries are title-only or nested structural entries.
+Coverage increased from 80.45% to 90.06% by adding 1,239 exact, deterministically extracted slices of the bundled canonical chapter HTML. The remaining 62 official headings with no body and 1,219 nested/title-only catalog rows are recorded in `prepared/structural-sections.json`; they are no longer an unclassified content gap. Duplicate display numbers require a unique normalized-title match rather than accepting an ambiguous first match.
 
 The gap matters for structured section detail, Research eligibility, rich snippets, and any feature that promises an independently addressable canonical body. Product copy should not imply complete structured-body coverage until the gap is closed.
 
@@ -309,9 +313,9 @@ Split the action into `applyServerDelete` and `keepLocalDeleteAndUpload`, cover 
 
 ### B. WKWebView cleanup and navigation policy
 
-`ChapterHTMLWebView` enables JavaScript for reader behavior, loads local bundled HTML, has no explicit navigation allowlist, and does not remove script message handlers in `dismantleUIView`. `TableWebView` dismantles but also has no navigation policy.
+**Status:** fixed locally; navigation-policy and teardown tests pass
 
-Add cleanup, cancel the HTML load task, nil delegates, remove handlers, and restrict top-level navigation to expected local URLs. These are sound defenses, but local trusted content plus missing teardown does not by itself prove an exploitable navigation issue or retained-memory leak.
+Chapter and table web views now restrict top-level navigation to expected local content (plus `about:blank`). Chapter teardown cancels guarded asynchronous loads, clears delegates, stops loading, and removes script handlers and user scripts.
 
 ### C. Continuity uses whole-snapshot last-write-wins
 
@@ -327,9 +331,9 @@ WAL, a busy timeout, and an explicit repository executor/actor would still make 
 
 ### E. Private local asset helpers lack central containment enforcement
 
-`join(root, pathname)` would escape the configured local root if handed `..` segments. Current Report and Workboard-preview write paths generate hashed server paths, and stored artifacts are the normal read source, so a reachable client-controlled traversal was not demonstrated.
+**Status:** fixed locally; traversal, absolute-path, backslash, and NUL-path tests pass
 
-Centralize pathname validation and verify `resolve(root, pathname)` remains under `resolve(root)` before every local read/write/delete. Do not rely only on caller-specific prefix checks.
+Every local private-asset read, write, and delete now passes through one containment resolver that proves the resolved path remains below the configured root.
 
 ### F. Equal timestamps with different PostgreSQL bodies are rejected
 
@@ -374,8 +378,8 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 | **P0** | iOS pending-delete resurrection; Stripe checkout expiry/order handling |
 | **P1** | Backend lifetime-grant authority on iOS; atomic Research quota reservation; PostgreSQL rejection reasons |
 | **P2** | Completed locally: PostgreSQL Workboard compatibility, account-wide iOS Free counts, Organization Report/Workboard storage ownership, and transactional seat enforcement |
-| **P3** | Completed locally: StoreKit entitlement separation and copy correction. Remaining: file-store locking/session rotation, distributed rate limits, and deep-link metadata |
-| **Hardening/content** | WKWebView teardown/navigation; SQLite pragmas; local path containment; continuity merge policy; timing-safe admin compare; prepared-body expansion; stale docs |
+| **P3** | Completed locally: StoreKit entitlement separation, copy correction, file-store locking/session rotation, distributed rate limits, and metadata-based deep-link resolution |
+| **Hardening/content** | Completed locally: WKWebView teardown/navigation, local path containment, and prepared-body expansion/classification. Remaining: SQLite pragmas, continuity merge policy, timing-safe admin compare, and stale docs |
 
 ---
 
@@ -400,9 +404,11 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 ## Validation posture
 
 - `npm run check` — passed after the fixes; no paid model calls were made.
-- `npm run smoke` — passed after rebuilding both web clients; no paid model calls were made.
-- iOS `EntitlementAndSyncContractTests` — 17 tests passed on an iPhone 17 simulator, including the SQLite-backed pending-delete and account-wide Free-count regressions plus the two core StoreKit/backend separation cases. The current target and later copy/debug-precedence tests build, but a focused rerun was interrupted after the simulator shut down before XCTest launched; this is not counted as a test pass.
-- PostgreSQL integration — requested but skipped because no database URL is configured; the new organization transaction SQL remains unverified against a live database.
+- Direct `node tests/smoke.mjs` — passed, including concurrent file-store mutations, session rotation, and account/IP limiter behavior; no paid model calls were made.
+- `npm run verify:prepared-construction` — passed at 11,610/12,891 prepared bodies (90.06%) with every remaining entry structurally classified.
+- `npm run test:file-storage` — passed concurrent locking, stale-lock recovery, atomic persistence, and private-path containment coverage.
+- iOS `EntitlementAndSyncContractTests` — all 22 tests passed on an iPhone 17 Pro simulator, including the FTS literal-query, metadata deep-link, WebView policy, pending-delete, entitlement, and account-wide Free-count regressions.
+- PostgreSQL integration and distributed rate-limit integration — requested but skipped because no database URL is configured; the new SQL remains unverified against a live database.
 - Content integrity — passed: 118 chapters, 12,891 indexed sections, 10,371 prepared bodies, 248 referenced images, 8 duplicate display keys.
 - Live PostgreSQL concurrency and production webhook delivery were not exercised locally.
 

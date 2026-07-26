@@ -164,28 +164,59 @@ export async function constructionChapterHeadingDetails(codePrefix, chapterNumbe
   }));
 }
 
-export async function constructionHTMLBodyForSection(section) {
-  if (!section?.id || !section?.chapterNumber || !section?.sectionNumber) return null;
+export async function constructionHTMLBodyStatusForSection(section) {
+  if (!section?.id || !section?.chapterNumber || !section?.sectionNumber) {
+    return { body: null, reason: "missing-section-identity" };
+  }
   const source = await constructionChapterHTMLSource(section.codePrefix, section.chapterNumber);
-  if (!source) return null;
+  if (!source) return { body: null, reason: "missing-chapter-html" };
   const headings = chapterHeadings(source);
   const target = normalizedSectionNumber(section.sectionNumber);
   const candidates = headings
     .map((heading, index) => ({ heading, index }))
     .filter(({ heading }) => heading.normalizedSectionNumber === target);
   const expectedTitle = normalizedHeadingTitle(section.title);
-  const selected = candidates.find(
+  const titleCandidates = candidates.filter(
     ({ heading }) => expectedTitle && heading.normalizedHeadingTitle === expectedTitle
-  ) || candidates[0];
+  );
+  // A repeated display number can refer to distinct provisions.  Never use the
+  // first matching heading unless the number itself is unique; a title match
+  // must also be unique before we can associate its body with this catalog row.
+  const selected = titleCandidates.length === 1
+    ? titleCandidates[0]
+    : candidates.length === 1
+      ? candidates[0]
+      : null;
   const index = selected?.index ?? -1;
-  if (index < 0) return null;
+  if (index < 0) {
+    return {
+      body: null,
+      reason: candidates.length ? "ambiguous-official-heading" : "no-official-heading",
+      sourceHTMLPath: relative(constructionContentRoot, source.path),
+      headingCount: candidates.length
+    };
+  }
   const start = headings[index].contentStart;
   const end = index + 1 < headings.length ? headings[index + 1].wrapperStart : source.html.length;
-  if (start >= end) return null;
+  if (start >= end) {
+    return {
+      body: null,
+      reason: "empty-official-heading",
+      sourceHTMLPath: relative(constructionContentRoot, source.path)
+    };
+  }
   const html = source.html.slice(start, end).trim();
   const plainText = decodedPlainText(html);
-  if (!html || !plainText) return null;
+  if (!html || !plainText) {
+    return {
+      body: null,
+      reason: "empty-official-heading",
+      sourceHTMLPath: relative(constructionContentRoot, source.path)
+    };
+  }
   return {
+    reason: null,
+    body: {
     schemaVersion: 2,
     sectionID: Number(section.id),
     chapterID: Number(section.chapterID),
@@ -199,7 +230,12 @@ export async function constructionHTMLBodyForSection(section) {
       html,
       plainText
     }]
+    }
   };
+}
+
+export async function constructionHTMLBodyForSection(section) {
+  return (await constructionHTMLBodyStatusForSection(section)).body;
 }
 
 export async function constructionHTMLCoverage(sections) {

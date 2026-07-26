@@ -64,7 +64,9 @@ Hosted account sessions are multi-device and store only a SHA-256 token hash. Ea
 
 The HTTP perimeter rejects request bodies larger than 1 MiB by default. `PERMITEXT_MAX_REQUEST_BODY_BYTES` can set a limit from 64 KiB through 10 MiB. HTML responses use a Content Security Policy, Apple callback scripts use a per-response nonce, and all responses include baseline anti-framing, MIME-sniffing, referrer, and browser-permission headers.
 
-Sensitive write routes also have in-process burst limits and return HTTP `429` with `Retry-After`. These limits protect an individual Node/Vercel instance; production must also use Vercel Firewall rate limiting for enforcement shared across serverless instances.
+Configured account, billing, Research, organization, owner, admin, sync, and private-file routes return HTTP `429` with `Retry-After` when a fixed-window burst limit is exceeded. PostgreSQL deployments increment hashed client, verified account, and verified administrator buckets atomically, so limits are shared across Node/Vercel instances. PostgreSQL limiter errors fail closed with HTTP `503`; the server never silently downgrades a configured PostgreSQL deployment to process-local enforcement.
+
+The JSON-file development adapter uses a bounded in-memory limiter. When its bucket capacity is exhausted it denies new principals instead of evicting active protection. Forwarded client IP headers are trusted automatically on Vercel, ignored on direct local connections, and can be enabled for an explicitly trusted local reverse proxy with `PERMITEXT_TRUST_PROXY=1` (or disabled with `PERMITEXT_TRUST_PROXY=0`).
 
 The web workspace stores signed-in mutations in a durable browser outbox before sending them. Entries are coalesced by account and record, replay on reload, reconnect, or tab foregrounding, and retry transient failures with bounded exponential delay. Server-newer records move to a separate conflict list instead of retrying forever. Settings shows waiting/conflict counts and requires an explicit **Use server** or **Keep mine** choice for conflicts. Note and tag edits enter the outbox before their network debounce begins.
 

@@ -607,6 +607,7 @@ private struct TableWebView: UIViewRepresentable {
 
     func updateUIView(_ webView: WKWebView, context: Context) {
         context.coordinator.tableID = tableID
+        context.coordinator.readAccessURL = baseURL
         context.coordinator.heightChanged = { newHeight in
             let resolvedHeight = max(80, newHeight)
             TableHTMLHeightCache.setHeight(resolvedHeight, for: tableID)
@@ -628,9 +629,26 @@ private struct TableWebView: UIViewRepresentable {
         var heightChanged: ((CGFloat) -> Void)?
         var loadedHTML: String?
         var tableID: String?
+        var readAccessURL: URL?
 
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             measureHeight(in: webView, remainingPasses: 4)
+        }
+
+        func webView(
+            _ webView: WKWebView,
+            decidePolicyFor navigationAction: WKNavigationAction,
+            decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
+        ) {
+            guard navigationAction.targetFrame?.isMainFrame != false else {
+                decisionHandler(.allow)
+                return
+            }
+            let allowed = BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: navigationAction.request.url,
+                under: readAccessURL
+            )
+            decisionHandler(allowed ? .allow : .cancel)
         }
 
         private func measureHeight(in webView: WKWebView, remainingPasses: Int) {
@@ -654,7 +672,10 @@ private struct TableWebView: UIViewRepresentable {
     static func dismantleUIView(_ uiView: WKWebView, coordinator: Coordinator) {
         uiView.navigationDelegate = nil
         uiView.stopLoading()
-        uiView.loadHTMLString("", baseURL: nil)
+        coordinator.heightChanged = nil
+        coordinator.loadedHTML = nil
+        coordinator.tableID = nil
+        coordinator.readAccessURL = nil
     }
 }
 

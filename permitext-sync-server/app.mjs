@@ -11,8 +11,22 @@ import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import {
+  withFileStoreLock,
+  writeJSONFileAtomically
+} from "./file-store-coordinator.mjs";
 import { createPostgresOrganizationRepository } from "./postgres-organization-repository.mjs";
+import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
+import {
+  accountRateLimitPrincipal,
+  clientRateLimitPrincipal,
+  consumeRateLimit,
+  createLocalRateLimitRepository,
+  rateLimitPolicies,
+  verifiedAdminRateLimitPrincipal
+} from "./rate-limit.mjs";
 import {
   entitlementPackageIDs,
   entitlementWithPackage,
@@ -130,91 +144,6 @@ const maxReportFileBytes = 25 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
 const immutableStaticCacheControl = "public, max-age=31536000, s-maxage=31536000, immutable";
 const codeAssetCacheControl = "public, max-age=3600, s-maxage=86400, stale-while-revalidate=3600";
-const rateLimitBuckets = new Map();
-const rateLimitPolicies = new Map([
-  ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
-  ["account/sign-out", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["account/delete", { limit: 5, windowMs: 60 * 60 * 1000 }],
-  ["account/apple/start", { limit: 30, windowMs: 5 * 60 * 1000 }],
-  ["account/apple/callback", { limit: 60, windowMs: 5 * 60 * 1000 }],
-  ["account/attach-local-data", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["account/link-browser", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["account/profile", { limit: 60, windowMs: 60 * 1000 }],
-  ["account/passkeys/link", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["billing/web/checkout", { limit: 20, windowMs: 10 * 60 * 1000 }],
-  ["billing/web/portal", { limit: 20, windowMs: 10 * 60 * 1000 }],
-  ["billing/stripe/restore", { limit: 20, windowMs: 10 * 60 * 1000 }],
-  ["billing/apple/transactions/verify", { limit: 30, windowMs: 10 * 60 * 1000 }],
-  ["research/interpret", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/create", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/refresh", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/message", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["research/evidence/discover", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/assign-project", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/project-context", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/reuse-evidence", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/conversations/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["research/answers/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/answers/get", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/usage", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["research/feedback", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/foundation/state", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/foundation/link", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/foundation/unlink", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/collaboration/notes/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/collaboration/threads/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["projects/collaboration/comments/save", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["organizations/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["organizations/create", { limit: 10, windowMs: 60 * 60 * 1000 }],
-  ["organizations/update", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["organizations/controls/save", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["organizations/members/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["organizations/members/invite", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["organizations/members/update", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["organizations/invitations/accept", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["organizations/invitations/revoke", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["organizations/projects/transfer", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["organizations/projects/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["organizations/projects/snapshot", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["organizations/evidence/reviews/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["organizations/evidence/reviews/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["notebook/cards/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/sources/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/options", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/drafts/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/generate", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/history/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["reports/manifests/get", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["reports/files/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["reports/files/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["internal/evaluations/data", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["internal/evaluations/review", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["internal/evaluations/feedback/triage", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["sync/push", { limit: 240, windowMs: 60 * 1000 }],
-  ["sync/pull", { limit: 600, windowMs: 60 * 1000 }],
-  ["workboards/assets/upload", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["workboards/assets/read", { limit: 600, windowMs: 60 * 1000 }],
-  ["workboards/assets/delete", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["workboards/previews/upload", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["workboards/previews/read", { limit: 240, windowMs: 60 * 60 * 1000 }],
-  ["workboards/previews/clear", { limit: 60, windowMs: 60 * 60 * 1000 }],
-  ["admin/lifetime-grants/grant", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["admin/lifetime-grants/revoke", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["admin/accounts/delete-legacy-passkey-users", { limit: 5, windowMs: 60 * 60 * 1000 }],
-  ["admin/accounts/restore-checklist", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["admin/accounts/export", { limit: 30, windowMs: 60 * 60 * 1000 }],
-  ["admin/accounts/grant-summaries", { limit: 120, windowMs: 60 * 60 * 1000 }],
-  ["admin/storage/summary", { limit: 120, windowMs: 60 * 60 * 1000 }]
-]);
 const canonicalCodeContentPath = join(
   __dirname,
   "..",
@@ -431,9 +360,14 @@ function fileStoreOrganizationSeatState(store, organizationID) {
 }
 
 function createFileStoreAdapter() {
+  const rateLimitRepository = createLocalRateLimitRepository();
   return {
     kind: "file",
     schema: "json-file",
+    rateLimitMode: "local",
+    async consumeRateLimit(input) {
+      return rateLimitRepository.consume(input);
+    },
     async read() {
       try {
         const raw = await readFile(dataPath, "utf8");
@@ -446,8 +380,7 @@ function createFileStoreAdapter() {
       }
     },
     async write(store) {
-      await mkdir(dirname(dataPath), { recursive: true });
-      await writeFile(dataPath, JSON.stringify(store, null, 2) + "\n");
+      await writeJSONFileAtomically(dataPath, store);
     },
     async deleteAccount(userID) {
       const store = await this.read();
@@ -1078,6 +1011,7 @@ async function createPostgresStoreAdapter() {
   const { neon } = await import("@neondatabase/serverless");
   const sql = neon(databaseURL);
   const organizationRepository = createPostgresOrganizationRepository(sql);
+  const rateLimitRepository = createPostgresRateLimitRepository(sql);
   const accountRepository = createPostgresAccountRepository(sql, {
     mergeUserQueries: (sourceUserID, targetUserID) =>
       organizationRepository.mergeUserQueries(sourceUserID, targetUserID)
@@ -1520,6 +1454,7 @@ async function createPostgresStoreAdapter() {
       ON CONFLICT (id) DO NOTHING
     `;
     await organizationRepository.initialize();
+    await rateLimitRepository.initialize();
     initialized = true;
   }
 
@@ -2181,6 +2116,11 @@ async function createPostgresStoreAdapter() {
   return {
     kind: "postgres",
     schema: "normalized-v4",
+    rateLimitMode: "postgres",
+    async consumeRateLimit(input) {
+      await ensureSchema();
+      return rateLimitRepository.consume(input);
+    },
     async initialize() {
       await ensureSchema();
       await migrateLegacyStateIfNeeded();
@@ -3456,11 +3396,17 @@ async function authenticatedUserContext(request, response, userID, requestAccoun
       sendError(response, 401, "Unauthorized.");
       return null;
     }
+    if (!await enforceAuthenticatedRateLimit(request, response, userID)) {
+      return null;
+    }
     return { ...context, sessionToken: suppliedToken };
   }
 
   const localStore = store || await readStore();
   if (!requireSessionToken(request, response, localStore.sessions[userID], requestAccount)) {
+    return null;
+  }
+  if (!await enforceAuthenticatedRateLimit(request, response, userID)) {
     return null;
   }
   return {
@@ -3577,7 +3523,7 @@ async function storePrivateProjectAsset(pathname, body, contentType) {
   }
   const root = localPrivateAssetRoot();
   if (!root) throw new Error("Private Report file storage is not configured.");
-  const filePath = join(root, pathname);
+  const filePath = resolveContainedPrivatePath(root, pathname);
   await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, body, { flag: "wx" });
   return pathname;
@@ -3600,7 +3546,7 @@ async function readPrivateProjectAsset(pathname) {
   const root = localPrivateAssetRoot();
   if (!root) return null;
   try {
-    return await readFile(join(root, pathname));
+    return await readFile(resolveContainedPrivatePath(root, pathname));
   } catch (error) {
     if (error?.code === "ENOENT") return null;
     throw error;
@@ -3620,37 +3566,57 @@ async function vercelBlob() {
   return blobModulePromise;
 }
 
-function requestClientAddress(request) {
-  const forwarded = String(request.headers["x-forwarded-for"] || "").split(",")[0].trim();
-  return forwarded || String(request.headers["x-real-ip"] || request.socket?.remoteAddress || "unknown");
+async function enforceRateLimitPrincipals(request, response, path, principals) {
+  if (!rateLimitPolicies.has(path)) return true;
+  try {
+    const adapter = await storeAdapter();
+    const decision = await consumeRateLimit({
+      repository: {
+        consume: (input) => adapter.consumeRateLimit(input)
+      },
+      path,
+      principals
+    });
+    if (decision.allowed) return true;
+    sendError(response, 429, "Too many requests. Try again later.", {
+      "retry-after": String(decision.retryAfterSeconds)
+    });
+    return false;
+  } catch (error) {
+    console.error("Rate-limit enforcement failed.", {
+      path,
+      storage: await storageKind().catch(() => "unavailable"),
+      message: error?.message || String(error)
+    });
+    sendError(response, 503, "Request protection is temporarily unavailable.", {
+      "retry-after": "5"
+    });
+    return false;
+  }
 }
 
-function enforceRateLimit(request, response, path, now = Date.now()) {
-  const policy = rateLimitPolicies.get(path);
-  if (!policy || !["POST", "DELETE"].includes(request.method)) return true;
-  const key = `${path}:${requestClientAddress(request)}`;
-  const current = rateLimitBuckets.get(key);
-  const bucket = !current || current.resetAt <= now
-    ? { count: 0, resetAt: now + policy.windowMs }
-    : current;
-  bucket.count += 1;
-  rateLimitBuckets.set(key, bucket);
+async function enforceRateLimit(request, response, path) {
+  const principals = [
+    clientRateLimitPrincipal(request),
+    verifiedAdminRateLimitPrincipal(request, path)
+  ].filter(Boolean);
+  return enforceRateLimitPrincipals(request, response, path, principals);
+}
 
-  if (rateLimitBuckets.size > 2_000) {
-    for (const [candidateKey, candidate] of rateLimitBuckets) {
-      if (candidate.resetAt <= now) rateLimitBuckets.delete(candidateKey);
-    }
-    while (rateLimitBuckets.size > 2_000) {
-      rateLimitBuckets.delete(rateLimitBuckets.keys().next().value);
-    }
+const authenticatedRateLimitAccounts = Symbol("authenticatedRateLimitAccounts");
+
+async function enforceAuthenticatedRateLimit(request, response, userID) {
+  const path = normalizePath(request.url);
+  if (!rateLimitPolicies.has(path)) return true;
+  request[authenticatedRateLimitAccounts] ||= new Map();
+  const accountPrincipal = accountRateLimitPrincipal(userID);
+  const requestKey = `${path}:${accountPrincipal}`;
+  if (request[authenticatedRateLimitAccounts].has(requestKey)) {
+    return request[authenticatedRateLimitAccounts].get(requestKey);
   }
-  if (bucket.count <= policy.limit) return true;
-
-  const retryAfter = Math.max(1, Math.ceil((bucket.resetAt - now) / 1000));
-  sendError(response, 429, "Too many requests. Try again later.", {
-    "retry-after": String(retryAfter)
-  });
-  return false;
+  const allowed = await enforceRateLimitPrincipals(request, response, path, [accountPrincipal]);
+  request[authenticatedRateLimitAccounts].set(requestKey, allowed);
+  return allowed;
 }
 
 async function readJSONFile(path) {
@@ -5958,7 +5924,9 @@ async function handleOrganizationInvitationAccept(request, response) {
       error: state === "expired"
         ? "This firm invitation has expired."
         : "This firm invitation is no longer available.",
-      code: `ORGANIZATION_INVITATION_${state.toUpperCase()}`
+      code: state === "expired"
+        ? "ORGANIZATION_INVITATION_EXPIRED"
+        : "ORGANIZATION_INVITATION_UNAVAILABLE"
     });
     return;
   }
@@ -6080,8 +6048,8 @@ async function handleOrganizationInvitationRevoke(request, response) {
   }
   if (invitationState(invitation) !== "pending") {
     sendJSON(response, 409, {
-      error: "Only a pending invitation can be revoked.",
-      code: "ORGANIZATION_INVITATION_NOT_PENDING"
+      error: "This firm invitation is no longer available.",
+      code: "ORGANIZATION_INVITATION_UNAVAILABLE"
     });
     return;
   }
@@ -12048,7 +12016,7 @@ async function handleSignIn(request, response) {
 
   const store = await readStore();
   account = await canonicalizeAppleAccountForSignIn(store, account);
-  const sessionToken = store.sessions[account.appUserID] || randomUUID();
+  const sessionToken = randomUUID();
   store.sessions[account.appUserID] = sessionToken;
   const existing = store.users[account.appUserID];
   const storedAccount = existing
@@ -12382,7 +12350,7 @@ async function deletePrivateProjectAssetPathnames(pathnames) {
   }
   for (const pathname of pathnames) {
     try {
-      await unlink(join(root, pathname));
+      await unlink(resolveContainedPrivatePath(root, pathname));
     } catch (error) {
       if (error?.code !== "ENOENT") throw error;
     }
@@ -13945,7 +13913,7 @@ async function handleAppleWebCallback(request, response) {
 
     const store = await readStore();
     account = await canonicalizeAppleAccountForSignIn(store, account);
-    const sessionToken = store.sessions[account.appUserID] || randomUUID();
+    const sessionToken = randomUUID();
     store.sessions[account.appUserID] = sessionToken;
     const existing = store.users[account.appUserID];
     const storedAccount = existing
@@ -14066,10 +14034,10 @@ const handlers = {
   "admin/storage/summary": handleStorageSummary
 };
 
-export async function handleRequest(request, response) {
+async function handleRequestUnlocked(request, response) {
   try {
     const path = normalizePath(request.url);
-    if (!enforceRateLimit(request, response, path)) {
+    if (!await enforceRateLimit(request, response, path)) {
       return;
     }
 
@@ -14135,7 +14103,12 @@ export async function handleRequest(request, response) {
       if (typeof adapter.initialize === "function") {
         await adapter.initialize();
       }
-      sendJSON(response, 200, { ok: true, storage: await storageKind(), schema: await storageSchema() });
+      sendJSON(response, 200, {
+        ok: true,
+        storage: await storageKind(),
+        schema: await storageSchema(),
+        rateLimit: adapter.rateLimitMode
+      });
       return;
     }
     if (request.method === "GET" && path === "admin/storage/summary") {
@@ -14151,7 +14124,7 @@ export async function handleRequest(request, response) {
       return;
     }
     if ((request.method === "GET" || request.method === "POST") && path === "account/apple/callback") {
-      handleAppleWebCallback(request, response);
+      await handleAppleWebCallback(request, response);
       return;
     }
     if (request.method === "GET" && path === ".well-known/apple-app-site-association") {
@@ -14181,5 +14154,31 @@ export async function handleRequest(request, response) {
     }
     console.error(error);
     sendError(response, 500, "Internal server error.");
+  }
+}
+
+function requestMutatesFileStore(request) {
+  if (databaseURL) return false;
+  if (request.method === "POST" || request.method === "DELETE") return true;
+  const path = normalizePath(request.url);
+  return request.method === "GET" && path === "account/apple/callback";
+}
+
+export async function handleRequest(request, response) {
+  if (!requestMutatesFileStore(request)) {
+    await handleRequestUnlocked(request, response);
+    return;
+  }
+  try {
+    await withFileStoreLock(dataPath, () => handleRequestUnlocked(request, response));
+  } catch (error) {
+    if (error?.code === "FILE_STORE_LOCK_TIMEOUT") {
+      sendError(response, 503, "Local data storage is busy. Please retry.");
+      return;
+    }
+    console.error(error);
+    if (!response.headersSent) {
+      sendError(response, 500, "Internal server error.");
+    }
   }
 }

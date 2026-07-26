@@ -13,6 +13,116 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         LocalEntitlementService(defaults: isolatedEntitlementDefaults())
     }
 
+    private func temporaryLegacySearchDatabase() throws -> URL {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-legacy-search-\(UUID().uuidString).sqlite")
+        let connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
+        try connection.execute(
+            """
+            CREATE TABLE chapters (
+                id INTEGER PRIMARY KEY,
+                chapter_number TEXT NOT NULL,
+                title TEXT NOT NULL
+            );
+            CREATE TABLE sections (
+                id INTEGER PRIMARY KEY,
+                chapter_id INTEGER NOT NULL,
+                section_number TEXT NOT NULL,
+                title TEXT NOT NULL,
+                sort_key TEXT NOT NULL,
+                official_text TEXT NOT NULL
+            );
+            CREATE VIRTUAL TABLE fts_paragraphs USING fts5(
+                paragraph_text,
+                section_number,
+                chapter_number
+            );
+            INSERT INTO chapters (id, chapter_number, title) VALUES (1, '1', 'General');
+            INSERT INTO sections (id, chapter_id, section_number, title, sort_key, official_text) VALUES
+                (1, 1, '101.1', 'Fire resistance', '101.1', 'fire resistance'),
+                (2, 1, '101.2', 'Operator', '101.2', 'OR'),
+                (3, 1, '101.3', 'Near', '101.3', 'NEAR'),
+                (4, 1, '101.4', 'Punctuation', '101.4', 'foo bar');
+            INSERT INTO fts_paragraphs (paragraph_text, section_number, chapter_number) VALUES
+                ('fire resistance assembly', '101.1', '1'),
+                ('the literal OR operator', '101.2', '1'),
+                ('the literal NEAR token', '101.3', '1'),
+                ('foo bar punctuation', '101.4', '1');
+            """
+        )
+        return databaseURL
+    }
+
+    func testLegacySQLiteFTSSearchTreatsOperatorsAndMalformedSyntaxAsLiteralText() throws {
+        let databaseURL = try temporaryLegacySearchDatabase()
+        defer { try? FileManager.default.removeItem(at: databaseURL) }
+        let database = try CodeDatabase(databaseURL: databaseURL, locator: BundleDatabaseLocator())
+
+        XCTAssertEqual(try database.search(query: "fire-resistance").map(\.id), [1])
+        XCTAssertEqual(try database.search(query: "OR").map(\.id), [2])
+        XCTAssertEqual(try database.search(query: "NEAR(").map(\.id), [3])
+        XCTAssertEqual(try database.search(query: "foo:bar").map(\.id), [4])
+        XCTAssertEqual(try database.search(query: "\"fire resistance").map(\.id), [1])
+        XCTAssertNoThrow(try database.search(query: "*"))
+        XCTAssertNoThrow(try database.search(query: "\""))
+        XCTAssertEqual(CodeDatabase.literalFTSQuery(for: "\""), "\"\"\"\"")
+    }
+
+    @MainActor
+    func testDeepLinksResolveTheirCodeVersionFromBundledSectionMetadata() throws {
+        let versions = BundleDatabaseLocator().availableCodeVersions()
+        let construction = try XCTUnwrap(versions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let zoning = try XCTUnwrap(versions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYCZoning
+        })
+
+        XCTAssertEqual(
+            CodeLibraryViewModel.codeVersion(containingDeepLinkedSectionID: 1, in: versions)?.fileName,
+            construction.fileName
+        )
+        XCTAssertEqual(
+            CodeLibraryViewModel.codeVersion(containingDeepLinkedSectionID: 20_018_455, in: versions)?.fileName,
+            zoning.fileName
+        )
+    }
+
+    func testBundledWebViewNavigationPolicyAllowsOnlyLocalReaderPaths() {
+        let root = URL(fileURLWithPath: "/tmp/permitext-reader", isDirectory: true)
+
+        XCTAssertTrue(
+            BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: root.appendingPathComponent("chapters/1.html"),
+                under: root
+            )
+        )
+        XCTAssertTrue(
+            BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: root.appendingPathComponent("assets/figure.png"),
+                under: root
+            )
+        )
+        XCTAssertTrue(
+            BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: URL(string: "about:blank"),
+                under: root
+            )
+        )
+        XCTAssertFalse(
+            BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: URL(string: "https://example.com/reader"),
+                under: root
+            )
+        )
+        XCTAssertFalse(
+            BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+                to: URL(fileURLWithPath: "/tmp/unrelated.html"),
+                under: root
+            )
+        )
+    }
+
     func testFreePlanIncludesContinuityAndCrossDeviceSync() {
         let service = freeService()
 

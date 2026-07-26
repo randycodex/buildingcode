@@ -207,6 +207,7 @@ async function main() {
       NODE_ENV: "test",
       VERCEL: "",
       VERCEL_ENV: "",
+      PERMITEXT_TRUST_PROXY: "1",
       PERMITEXT_SYNC_DATA_PATH: dataPath,
       PERMITEXT_LOCAL_PRIVATE_ASSET_PATH: privateAssetPath,
       PERMITEXT_EVALUATION_ROOT: evaluationRoot,
@@ -1630,6 +1631,52 @@ async function main() {
       freeEvidenceDiscovery.response.status === 402 &&
         freeEvidenceDiscovery.json.code === "RESEARCH_ADDON_REQUIRED",
       "Free account was allowed to use Find Relevant Evidence."
+    );
+
+    const rotationCredential = {
+      provider: "apple",
+      providerUserID: "smoke-session-rotation-user",
+      displayName: "Session Rotation Smoke User"
+    };
+    const firstRotationSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: { credential: rotationCredential }
+    });
+    const secondRotationSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: { credential: rotationCredential }
+    });
+    assert(
+      firstRotationSignIn.response.ok &&
+        secondRotationSignIn.response.ok &&
+        firstRotationSignIn.json.account.backendSessionToken !==
+          secondRotationSignIn.json.account.backendSessionToken,
+      "File-store sign-in did not rotate the backend session token."
+    );
+    const rotationUserID = secondRotationSignIn.json.account.appUserID;
+    const pullWithOldRotationToken = await request("/sync/pull", {
+      method: "POST",
+      token: firstRotationSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: rotationUserID },
+        syncSchemaVersion: 2
+      }
+    });
+    assert(
+      pullWithOldRotationToken.response.status === 401,
+      "The previous backend session remained valid after re-login."
+    );
+    const pullWithNewRotationToken = await request("/sync/pull", {
+      method: "POST",
+      token: secondRotationSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: rotationUserID },
+        syncSchemaVersion: 2
+      }
+    });
+    assert(
+      pullWithNewRotationToken.response.ok,
+      "The rotated backend session was not accepted."
     );
 
     const grant = await request("/admin/lifetime-grants/grant", {
@@ -4354,6 +4401,7 @@ async function main() {
       profileAfterAttach.json.entitlement?.source === "lifetimeGrant",
       "Re-sign-in did not return the persisted entitlement."
     );
+    const currentSmokeUserToken = profileAfterAttach.json.account.backendSessionToken;
 
     const secondSignIn = await request("/account/sign-in", {
       method: "POST",
@@ -4538,7 +4586,7 @@ async function main() {
     );
     const nativeAfterWebAnnotationPull = await request("/sync/pull", {
       method: "POST",
-      token: nativeAppleToken,
+      token: webAppleSignIn.json.account.backendSessionToken,
       body: { auth: { accountUserID: nativeAppleUserID } }
     });
     assert(
@@ -4572,7 +4620,7 @@ async function main() {
     assert(webAnnotationClearPush.response.ok, "Web Apple annotation clear failed.");
     const nativeAfterWebClearPull = await request("/sync/pull", {
       method: "POST",
-      token: nativeAppleToken,
+      token: webAppleSignIn.json.account.backendSessionToken,
       body: { auth: { accountUserID: nativeAppleUserID } }
     });
     assert(
@@ -4615,7 +4663,7 @@ async function main() {
     assert(webTagPush.json.acceptedMutationIDs.includes(nativeTagID), "Web tags did not use the native canonical tag record.");
     const nativeAfterWebTagPull = await request("/sync/pull", {
       method: "POST",
-      token: nativeAppleToken,
+      token: webAppleSignIn.json.account.backendSessionToken,
       body: { auth: { accountUserID: nativeAppleUserID } }
     });
     assert(
@@ -4838,7 +4886,7 @@ async function main() {
 
     const crossAccountProfile = await request("/account/profile", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: "apple:second-smoke-user" },
         publicUsername: "wrong-token-profile"
@@ -4848,7 +4896,7 @@ async function main() {
 
     const crossAccountPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: "apple:second-smoke-user" },
         batch: {
@@ -4861,14 +4909,14 @@ async function main() {
 
     const crossAccountPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: "apple:second-smoke-user" } }
     });
     assert(crossAccountPull.response.status === 401, "Pull allowed another account's session token.");
 
     const duplicateProfile = await request("/account/profile", {
       method: "POST",
-      token: secondSignIn.json.account.backendSessionToken,
+      token: secondSignInAfterStripeDelete.json.account.backendSessionToken,
       body: {
         auth: { accountUserID: "apple:second-smoke-user" },
         publicUsername: "smoke-pro"
@@ -4878,7 +4926,7 @@ async function main() {
 
     const invalidProfile = await request("/account/profile", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         publicUsername: "bad name"
@@ -4900,7 +4948,7 @@ async function main() {
     const passkeyCredentialID = "smoke-passkey-credential";
     const passkeyLink = await request("/account/passkeys/link", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         credentialID: passkeyCredentialID,
@@ -4986,7 +5034,7 @@ async function main() {
 
     const malformedPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -4999,7 +5047,7 @@ async function main() {
 
     const oversizedPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: { user: { id: userID }, mutations: Array.from({ length: 101 }, () => ({})) }
@@ -5009,7 +5057,7 @@ async function main() {
 
     const mismatchedUserPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5033,7 +5081,7 @@ async function main() {
     const savedSmokeRecordID = `${userID}:saved:${defaultSyncCodeVersion}:900001`;
     const push = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5052,7 +5100,7 @@ async function main() {
 
     const stalePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5072,7 +5120,7 @@ async function main() {
 
     const pull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(pull.response.ok, "Sync pull failed.");
@@ -5086,7 +5134,7 @@ async function main() {
 
     const invalidInlineWorkboardPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5126,7 +5174,7 @@ async function main() {
     const canonicalWorkboardRecordID = `${userID}:workboard:project-client-smoke`;
     const workboardPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: { user: { id: userID }, mutations: [workboardMutation] }
@@ -5140,7 +5188,7 @@ async function main() {
 
     const workboardPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     const pulledWorkboard = workboardPull.json.mutations.find((item) =>
@@ -5161,7 +5209,7 @@ async function main() {
 
     const unconfiguredAssetUpload = await request("/workboards/assets/upload?projectID=project-client-smoke&fileID=image-smoke", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       headers: {
         "content-type": "image/png",
         "x-permitext-user-id": userID
@@ -5172,7 +5220,7 @@ async function main() {
 
     const forgedAssetDelete = await request("/workboards/assets/delete", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5196,7 +5244,7 @@ async function main() {
     };
     const webSavePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5214,7 +5262,7 @@ async function main() {
 
     const iosAfterWebSavePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(iosAfterWebSavePull.response.ok, "iOS pull after web save failed.");
@@ -5232,7 +5280,7 @@ async function main() {
     const zoningNoteRecordID = `${userID}:note:${zoningSyncCodeVersion}:20018521`;
     const zoningContentPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5273,7 +5321,7 @@ async function main() {
     assert(zoningContentPush.json.acceptedMutationIDs.includes(zoningNoteRecordID));
     const zoningContentPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(
@@ -5301,7 +5349,7 @@ async function main() {
     };
     const iosDeletePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5318,7 +5366,7 @@ async function main() {
 
     const webAfterIOSDeletePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(webAfterIOSDeletePull.response.ok, "Web pull after iOS delete failed.");
@@ -5329,7 +5377,7 @@ async function main() {
 
     const iosRestorePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5349,7 +5397,7 @@ async function main() {
     assert(iosRestorePush.response.ok, "iOS restore push failed.");
     const webDeletePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5374,7 +5422,7 @@ async function main() {
     );
     const iosAfterWebDeletePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     const webDeletedSavedRecord = iosAfterWebDeletePull.json.mutations.find((item) =>
@@ -5384,7 +5432,7 @@ async function main() {
 
     const legacyWebAnnotationPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5412,7 +5460,7 @@ async function main() {
 
     const cursorRepairPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         sinceEventID: legacyWebAnnotationPush.json.latestEventID
@@ -5434,7 +5482,7 @@ async function main() {
 
     const cursorPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         sinceEventID: pull.json.latestEventID,
@@ -5485,7 +5533,7 @@ async function main() {
     const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:900001:manual`;
     const projectPush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5499,7 +5547,7 @@ async function main() {
     assert(projectPush.json.acceptedMutationIDs.includes(projectSectionRecordID), "Project section mutation was not accepted.");
     const projectFoundationState = await request("/projects/foundation/state", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
     });
     assert(
@@ -5516,7 +5564,7 @@ async function main() {
     );
     const linkSavedToProject = await request("/projects/foundation/link", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5532,7 +5580,7 @@ async function main() {
     );
     const unlinkSavedFromProject = await request("/projects/foundation/unlink", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5548,7 +5596,7 @@ async function main() {
     );
     const emptyNotebookList = await request("/notebook/cards/list", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
     });
     assert(
@@ -5571,7 +5619,7 @@ async function main() {
     };
     const createNotebookCard = await request("/notebook/cards/save", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5591,7 +5639,7 @@ async function main() {
     const notebookCardID = createNotebookCard.json.card.id;
     const getNotebookCard = await request("/notebook/cards/get", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5606,7 +5654,7 @@ async function main() {
     );
     const staleNotebookSave = await request("/notebook/cards/save", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5625,7 +5673,7 @@ async function main() {
     );
     const reviseNotebookCard = await request("/notebook/cards/save", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5644,7 +5692,7 @@ async function main() {
     );
     const deleteNotebookCard = await request("/notebook/cards/delete", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         projectID: "project-client-smoke",
@@ -5660,7 +5708,7 @@ async function main() {
     );
     const notebookListAfterDelete = await request("/notebook/cards/list", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
     });
     assert(
@@ -5669,7 +5717,7 @@ async function main() {
     );
     const pullAfterFoundationUnlink = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(
@@ -5681,7 +5729,7 @@ async function main() {
 
     const canonicalProjectColorPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     const canonicalProjectColor = canonicalProjectColorPull.json.mutations.find((mutation) =>
@@ -5694,7 +5742,7 @@ async function main() {
     const archivedAt = "2026-06-06T00:30:00Z";
     const projectArchivePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5712,7 +5760,7 @@ async function main() {
     assert(projectArchivePush.response.ok, "Project archive sync push failed.");
     const projectArchivePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     const archivedProject = projectArchivePull.json.mutations.find((mutation) =>
@@ -5722,7 +5770,7 @@ async function main() {
 
     const projectRestorePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5740,7 +5788,7 @@ async function main() {
     assert(projectRestorePush.response.ok, "Project restore sync push failed.");
     const projectRestorePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     const restoredProject = projectRestorePull.json.mutations.find((mutation) =>
@@ -5749,7 +5797,7 @@ async function main() {
     assert(restoredProject && restoredProject.archivedAt === null, "Project restore state did not survive sync.");
     const projectActivityAfterRestore = await request("/projects/foundation/state", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
     });
     assert(
@@ -5761,7 +5809,7 @@ async function main() {
 
     const webProjectSectionDeletePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5784,7 +5832,7 @@ async function main() {
     );
     const iosAfterProjectSectionDeletePull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: { auth: { accountUserID: userID } }
     });
     assert(
@@ -5795,7 +5843,7 @@ async function main() {
     );
     const iosProjectSectionRestorePush = await request("/sync/push", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         batch: {
@@ -5861,7 +5909,7 @@ async function main() {
 
     const projectDependencyPull = await request("/sync/pull", {
       method: "POST",
-      token: signIn.json.account.backendSessionToken,
+      token: currentSmokeUserToken,
       body: {
         auth: { accountUserID: userID },
         since: "2026-06-05T00:00:00Z"
@@ -6091,6 +6139,63 @@ async function main() {
       rawBody: JSON.stringify({ padding: "x".repeat(1024 * 1024) })
     });
     assert(oversizedBody.response.status === 413, "Oversized request body was not rejected.");
+
+    const accountLimitSignIn = await request("/account/sign-in", {
+      method: "POST",
+      headers: { "x-forwarded-for": "203.0.113.41" },
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-account-rate-limit",
+          displayName: "Account Rate Limit Smoke User"
+        }
+      }
+    });
+    assert(accountLimitSignIn.response.ok, "Account rate-limit fixture sign-in failed.");
+    const accountLimitUserID = accountLimitSignIn.json.account.appUserID;
+    const accountLimitToken = accountLimitSignIn.json.account.backendSessionToken;
+    const accountLimitResults = await Promise.all(
+      Array.from({ length: 31 }, (_, index) =>
+        request("/billing/apple/transactions/verify", {
+          method: "POST",
+          token: accountLimitToken,
+          headers: { "x-forwarded-for": `203.0.113.${100 + index}, 10.0.0.9` },
+          body: {
+            auth: { accountUserID: accountLimitUserID },
+            signedTransactionInfo: "not-a-signed-transaction"
+          }
+        })
+      )
+    );
+    assert(
+      accountLimitResults.filter((result) => result.response.status === 422).length === 30 &&
+        accountLimitResults.filter((result) => result.response.status === 429).length === 1,
+      "Verified account rate limiting did not aggregate concurrent requests across forwarded client addresses."
+    );
+
+    const adminLimitResults = await Promise.all(
+      Array.from({ length: 31 }, () =>
+        request("/admin/accounts/restore-checklist", {
+          method: "POST",
+          headers: { "x-forwarded-for": "198.51.100.42, 10.0.0.9" },
+          body: { userID }
+        })
+      )
+    );
+    assert(
+      adminLimitResults.filter((result) => result.response.status === 401).length === 30 &&
+        adminLimitResults.filter((result) => result.response.status === 429).length === 1,
+      "Concurrent forwarded-IP requests did not enforce the exact administrator route allowance."
+    );
+    const differentForwardedClient = await request("/admin/accounts/restore-checklist", {
+      method: "POST",
+      headers: { "x-forwarded-for": "198.51.100.43, 10.0.0.9" },
+      body: { userID }
+    });
+    assert(
+      differentForwardedClient.response.status === 401,
+      "The limiter used a proxy hop instead of the first trusted forwarded client address."
+    );
 
     let rateLimitedResponse = null;
     for (let attempt = 0; attempt < 31; attempt += 1) {

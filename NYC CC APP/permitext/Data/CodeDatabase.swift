@@ -225,6 +225,12 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
             return []
         }
 
+        // FTS5 treats operators, parentheses, colons, and quotes as query
+        // syntax even when they came from a normal search field. Bind values
+        // protect SQL itself, but not MATCH's separate query language. Search
+        // the user's entire input as one literal phrase instead.
+        let ftsQuery = Self.literalFTSQuery(for: query)
+
         let statement = try connection.prepare(
             """
             SELECT DISTINCT sections.id,
@@ -241,7 +247,7 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: query, index: 1, to: statement)
+        try connection.bind(text: ftsQuery, index: 1, to: statement)
 
         var results: [CodeSearchResult] = []
         while try connection.step(statement) == SQLITE_ROW {
@@ -256,6 +262,13 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
             )
         }
         return results
+    }
+
+    /// Produces a valid FTS5 phrase for arbitrary user-provided text. Doubling
+    /// embedded quotes keeps malformed FTS syntax literal rather than allowing
+    /// it to throw (or to be interpreted as an operator).
+    static func literalFTSQuery(for query: String) -> String {
+        "\"\(query.replacingOccurrences(of: "\"", with: "\"\""))\""
     }
 
     func savedSections(

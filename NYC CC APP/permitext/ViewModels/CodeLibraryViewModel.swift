@@ -1431,15 +1431,45 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private func selectVersionForDeepLinkedSection(_ sectionID: Int64) {
-        let targetCodeVersion = sectionID >= 20_000_000
-            ? UserContentSyncCodeVersion.canonicalNYCZoning
-            : UserContentSyncCodeVersion.canonicalNYC2022
-        guard let version = availableVersions.first(where: {
-            UserContentSyncCodeVersion.server($0.codeVersion) == targetCodeVersion
-        }), version.fileName != selectedVersionFileName else {
+        guard let version = Self.codeVersion(containingDeepLinkedSectionID: sectionID, in: availableVersions),
+              version.fileName != selectedVersionFileName else {
             return
         }
         updateSelectedVersion(fileName: version.fileName)
+    }
+
+    /// Resolves a deep link from the IDs actually published in each bundled
+    /// code version. Section IDs are source IDs, not a version namespace; do
+    /// not infer a code book from their numeric range.
+    static func codeVersion(
+        containingDeepLinkedSectionID sectionID: Int64,
+        in versions: [BundledCodeVersion]
+    ) -> BundledCodeVersion? {
+        versions.first { version in
+            switch version.contentKind {
+            case .authored:
+                guard let authoredCodeID = version.authoredCodeID,
+                      let jurisdictionID = version.jurisdictionID,
+                      let store = try? AuthoredCodeStore(
+                        jsonURL: version.fileURL,
+                        codeID: authoredCodeID,
+                        jurisdictionID: jurisdictionID
+                      )
+                else {
+                    return false
+                }
+                return store.sectionDetail(sectionID: sectionID) != nil
+
+            case .sqlite:
+                guard let database = try? CodeDatabase(
+                    databaseURL: version.fileURL,
+                    locator: BundleDatabaseLocator()
+                ) else {
+                    return false
+                }
+                return (try? database.sectionDetail(sectionID: sectionID)) != nil
+            }
+        }
     }
 
     func consumePendingDeepLinkedSectionID() -> Int64? {
