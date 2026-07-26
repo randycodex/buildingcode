@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v26";
+} from "./offline-storage.js?v=20260726-web-reliability-v29";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8115,15 +8115,15 @@ async function renderResearch(paneID = "utility:analysis") {
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const content = panel.querySelector(".analysis-content");
 
-  const trustBanner = document.createElement("aside");
-  trustBanner.className = "research-trust-banner";
-  trustBanner.setAttribute("role", "note");
+  const trustNotice = document.createElement("aside");
+  trustNotice.className = "research-trust-notice";
+  trustNotice.setAttribute("role", "note");
   const trustHeading = document.createElement("strong");
   trustHeading.textContent = "AI-assisted research — not an official interpretation";
   const trustCopy = document.createElement("p");
   trustCopy.textContent = "Select enacted text, then choose Analyze. Questions are answered only from the attached code sources; private notes are excluded.";
-  trustBanner.append(trustHeading, trustCopy);
-  content.append(trustBanner);
+  trustNotice.append(trustHeading, trustCopy);
+  const appendTrustNotice = () => content.append(trustNotice);
 
   if (!activeAccount()) {
     const empty = document.createElement("article");
@@ -8139,6 +8139,7 @@ async function renderResearch(paneID = "utility:analysis") {
     button.addEventListener("click", () => focusUtility("settings"));
     empty.append(heading, copy, button);
     content.append(empty);
+    appendTrustNotice();
     return panel;
   }
 
@@ -8149,6 +8150,7 @@ async function renderResearch(paneID = "utility:analysis") {
     status.className = "research-list-status is-error";
     status.textContent = error.message;
     content.append(status);
+    appendTrustNotice();
     return panel;
   }
 
@@ -8224,6 +8226,7 @@ async function renderResearch(paneID = "utility:analysis") {
     empty.className = "research-conversation-empty";
     empty.textContent = "No research conversations yet.";
     content.append(empty);
+    appendTrustNotice();
     return panel;
   }
 
@@ -8256,6 +8259,7 @@ async function renderResearch(paneID = "utility:analysis") {
     list.append(row);
   });
   content.append(list);
+  appendTrustNotice();
   return panel;
 }
 

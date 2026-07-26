@@ -871,14 +871,14 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v26'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v29'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v28'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v29'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1042,8 +1042,11 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
+        workspaceScript.text.includes('trustNotice.className = "research-trust-notice"') &&
+        workspaceScript.text.includes("const appendTrustNotice = () => content.append(trustNotice);") &&
+        !workspaceScript.text.includes('trustBanner.className = "research-trust-banner"') &&
         !workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
-      "Research trust labeling or the simplified private-note header regressed."
+      "Research trust labeling should remain as a compact footer notice rather than a banner card."
     );
     assert(
       workspaceScript.text.includes("function bindResearchTextSelection") &&
@@ -1214,6 +1217,11 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.settings-panel \.settings-primary-button,[\s\S]*?\.settings-panel \.settings-mini-button \{[\s\S]*?justify-self: center;[\s\S]*?width: 60%;[\s\S]*?margin-inline: auto;[\s\S]*?border-radius: var\(--radius-pill\);/),
       "Large Settings action buttons should remain centered pills at 60% width."
+    );
+    assert(
+      workspaceStyles.text.match(/\.research-list-panel \.analysis-content \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/) &&
+        workspaceStyles.text.match(/\.research-trust-notice \{[\s\S]*?margin-top: auto;[\s\S]*?font-size: calc\(var\(--chrome-font-size\) \* 0\.72\);/),
+      "Research trust notice should remain small and anchored below the column content."
     );
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),

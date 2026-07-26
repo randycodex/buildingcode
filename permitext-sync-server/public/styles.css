@@ -3691,25 +3691,31 @@ mark {
   font-size: var(--chrome-font-size) !important;
 }
 
-.research-trust-banner {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-4);
-  border: 1px solid color-mix(in srgb, var(--ios-accent-building) 42%, var(--border));
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--ios-accent-building) 10%, var(--surface));
+.research-list-panel .analysis-content {
+  display: flex;
+  flex-direction: column;
 }
 
-.research-trust-banner strong {
-  color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 0.94);
-}
-
-.research-trust-banner p {
-  margin: 0;
+.research-trust-notice {
+  margin-top: auto;
+  padding: var(--space-5) 0 var(--space-2);
   color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.86);
-  line-height: 1.4;
+  font-size: calc(var(--chrome-font-size) * 0.72);
+  line-height: 1.35;
+}
+
+.research-trust-notice strong {
+  display: block;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 650;
+}
+
+.research-trust-notice p {
+  margin: 2px 0 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .evidence-discovery {
