@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v37";
+} from "./offline-storage.js?v=20260726-web-reliability-v38";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1785,6 +1785,10 @@ function applyPaneWeight(panel, paneID) {
     return;
   }
   if (paneID?.startsWith("reader:")) {
+    if (flexibleFreeDualReader) {
+      panel.style.flex = `1 1 ${width}px`;
+      return;
+    }
     panel.style.flex = `${Math.max(1, width)} 1 0`;
     return;
   }

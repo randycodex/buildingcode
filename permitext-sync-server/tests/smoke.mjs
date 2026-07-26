@@ -789,8 +789,10 @@ async function main() {
         workspaceScript.text.includes("!isProAccount()") &&
         workspaceScript.text.includes("(state.readers || []).length === 2") &&
         workspaceScript.text.includes("if (isFlexibleFreeDualReaderPaneID(paneID)) return false;") &&
-        workspaceScript.text.includes('`${flexibleFreeDualReader ? defaultWidth : width}px`'),
-      "Free dual Readers should flex into remaining viewport space until their default minimum width."
+        workspaceScript.text.includes('`${flexibleFreeDualReader ? defaultWidth : width}px`') &&
+        workspaceScript.text.includes("if (flexibleFreeDualReader)") &&
+        workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`'),
+      "Free dual Readers should flex into remaining viewport space, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
       workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
@@ -882,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v37'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v38'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
