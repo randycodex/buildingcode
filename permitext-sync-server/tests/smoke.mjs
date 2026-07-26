@@ -884,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v40'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v41'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -898,7 +898,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v39'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v40'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1397,9 +1397,13 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".project-bulk-bar") &&
+        workspaceStyles.text.includes(".project-bulk-bar.is-archive") &&
+        workspaceScript.text.includes('bulkBar.classList.toggle("is-archive", mode === "archive")') &&
+        workspaceScript.text.includes("bulkBar.append(actionButton, cancelButton)") &&
+        workspaceScript.text.includes('mode === "archive" ? "Delete" : `Archive ${selectedCount}`') &&
         workspaceStyles.text.includes(".is-project-selecting .project-selection-check") &&
         workspaceStyles.text.includes(".project-row.is-selected"),
-      "Project bulk selection omitted its toolbar, selection indicators, or selected-card treatment."
+      "Project bulk selection omitted its compact Archive actions, selection indicators, or selected-card treatment."
     );
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&

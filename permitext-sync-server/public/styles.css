@@ -3368,6 +3368,8 @@ mark {
 }
 
 .archive-panel {
+  position: relative;
+  overflow: hidden;
   background: color-mix(in srgb, #ff6b6b 10%, var(--surface-raised));
 }
 
@@ -3402,6 +3404,30 @@ mark {
 
 .project-bulk-bar[hidden] {
   display: none;
+}
+
+.project-bulk-bar.is-archive {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: var(--space-2);
+}
+
+.project-bulk-bar.is-archive[hidden] {
+  display: none;
+}
+
+.project-bulk-bar.is-archive .project-bulk-action,
+.project-bulk-bar.is-archive .project-bulk-link {
+  width: 100%;
+  margin: 0;
+  padding-right: var(--space-3);
+  padding-left: var(--space-3);
+}
+
+.project-bulk-bar.is-archive .project-bulk-link {
+  border-color: transparent;
+  background: var(--surface-muted);
+  color: var(--text-primary);
 }
 
 .project-bulk-count {

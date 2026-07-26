@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v40";
+} from "./offline-storage.js?v=20260726-web-reliability-v41";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8996,6 +8996,7 @@ function createProjectBulkSelectionController(panel, projects, mode) {
 
   const bulkBar = document.createElement("section");
   bulkBar.className = "project-bulk-bar";
+  bulkBar.classList.toggle("is-archive", mode === "archive");
   bulkBar.hidden = true;
   bulkBar.setAttribute("aria-label", mode === "archive" ? "Archived project selection" : "Project selection");
   const countLabel = document.createElement("span");
@@ -9015,9 +9016,13 @@ function createProjectBulkSelectionController(panel, projects, mode) {
   cancelButton.className = "project-bulk-link";
   cancelButton.type = "button";
   cancelButton.textContent = "Cancel";
-  bulkBar.append(countLabel, selectAllButton, actionButton);
-  if (deleteButton) bulkBar.append(deleteButton);
-  bulkBar.append(cancelButton);
+  if (mode === "archive") {
+    bulkBar.append(actionButton, cancelButton);
+  } else {
+    bulkBar.append(countLabel, selectAllButton, actionButton);
+    if (deleteButton) bulkBar.append(deleteButton);
+    bulkBar.append(cancelButton);
+  }
   panel.append(bulkBar);
 
   function update() {
@@ -9030,7 +9035,7 @@ function createProjectBulkSelectionController(panel, projects, mode) {
     countLabel.textContent = `${selectedCount} selected`;
     const allSelected = orderedIDs.length > 0 && selectedCount === orderedIDs.length;
     selectAllButton.textContent = allSelected ? "Clear all" : "Select all";
-    actionButton.textContent = `${mode === "archive" ? "Delete" : "Archive"} ${selectedCount}`;
+    actionButton.textContent = mode === "archive" ? "Delete" : `Archive ${selectedCount}`;
     actionButton.disabled = selectedCount === 0 || busy;
     if (deleteButton) {
       deleteButton.textContent = `Delete ${selectedCount}`;
