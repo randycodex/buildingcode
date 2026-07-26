@@ -2289,7 +2289,6 @@ enum UserContentMergeAction: String, Codable, Hashable, Sendable {
     case applyServer
     case keepLocal
     case uploadLocal
-    case deleteLocal
     case noChange
     case flagConflict
 }
@@ -2347,7 +2346,6 @@ struct UserContentMergePlan: Codable, Hashable, Sendable {
     var applyServerCount: Int { count(.applyServer) }
     var keepLocalCount: Int { count(.keepLocal) }
     var uploadLocalCount: Int { count(.uploadLocal) }
-    var deleteLocalCount: Int { count(.deleteLocal) }
     var conflictCount: Int { count(.flagConflict) }
     var noChangeCount: Int { count(.noChange) }
 
@@ -2384,6 +2382,33 @@ enum UserContentMergeResolver {
 
     static func decision(for candidate: UserContentMergeCandidate) -> UserContentMergeDecision {
         if candidate.localSyncState == .pendingUpload || candidate.localSyncState == .localOnly {
+            if let localDeletedAt = candidate.localDeletedAt {
+                if let serverDeletedAt = candidate.serverDeletedAt {
+                    return UserContentMergeDecision(
+                        recordID: candidate.recordID,
+                        entityKind: candidate.entityKind,
+                        action: serverDeletedAt >= localDeletedAt ? .applyServer : .uploadLocal,
+                        reason: serverDeletedAt >= localDeletedAt
+                            ? "The server already contains this deletion."
+                            : "The queued local deletion is newer than the server deletion."
+                    )
+                }
+                if let serverUpdatedAt = candidate.serverUpdatedAt,
+                   serverUpdatedAt > localDeletedAt {
+                    return UserContentMergeDecision(
+                        recordID: candidate.recordID,
+                        entityKind: candidate.entityKind,
+                        action: .flagConflict,
+                        reason: "The server changed this record after the queued local deletion."
+                    )
+                }
+                return UserContentMergeDecision(
+                    recordID: candidate.recordID,
+                    entityKind: candidate.entityKind,
+                    action: .uploadLocal,
+                    reason: "The queued local deletion must reach the server."
+                )
+            }
             if let localUpdatedAt = candidate.localUpdatedAt,
                let serverUpdatedAt = candidate.serverUpdatedAt,
                serverUpdatedAt > localUpdatedAt {
@@ -2406,7 +2431,7 @@ enum UserContentMergeResolver {
             return UserContentMergeDecision(
                 recordID: candidate.recordID,
                 entityKind: candidate.entityKind,
-                action: .deleteLocal,
+                action: .uploadLocal,
                 reason: "Local delete is authoritative until it uploads."
             )
         }
@@ -2423,7 +2448,7 @@ enum UserContentMergeResolver {
             return UserContentMergeDecision(
                 recordID: candidate.recordID,
                 entityKind: candidate.entityKind,
-                action: .deleteLocal,
+                action: .applyServer,
                 reason: "Server deletion is newer than the synced local record."
             )
         }
@@ -3317,6 +3342,11 @@ struct LocalAccountBackendClient: AccountBackendClient {
 struct LifetimeGrantLookupResult: Codable, Hashable, Sendable {
     let hasLifetimeGrant: Bool
     let grantedUserID: String?
+    let isAuthoritative: Bool
+
+    var authoritativelyDeniesGrant: Bool {
+        isAuthoritative && !hasLifetimeGrant
+    }
 }
 
 enum AccountDefaults {
@@ -3339,10 +3369,24 @@ struct LocalLifetimeGrantLookupClient: LifetimeGrantLookupClient {
         #if DEBUG
         let grantedIDs = Set(defaults.stringArray(forKey: debugGrantedAppleUserIDsKey) ?? [])
         if grantedIDs.contains(appleUserID) {
-            return LifetimeGrantLookupResult(hasLifetimeGrant: true, grantedUserID: appleUserID)
+            return LifetimeGrantLookupResult(
+                hasLifetimeGrant: true,
+                grantedUserID: appleUserID,
+                isAuthoritative: true
+            )
         }
+        return LifetimeGrantLookupResult(
+            hasLifetimeGrant: false,
+            grantedUserID: nil,
+            isAuthoritative: true
+        )
+        #else
+        return LifetimeGrantLookupResult(
+            hasLifetimeGrant: false,
+            grantedUserID: nil,
+            isAuthoritative: false
+        )
         #endif
-        return LifetimeGrantLookupResult(hasLifetimeGrant: false, grantedUserID: nil)
     }
 }
 

@@ -4347,9 +4347,39 @@ async function main() {
       "The server accepted a new Project from a Free account."
     );
 
+    const unpaidStripeCheckoutEvent = JSON.stringify({
+      id: "evt_smoke_checkout_unpaid",
+      type: "checkout.session.completed",
+      created: Math.floor(Date.now() / 1000),
+      data: {
+        object: {
+          id: "cs_smoke_unpaid",
+          mode: "subscription",
+          payment_status: "unpaid",
+          client_reference_id: "apple:second-smoke-user",
+          customer: "cus_smoke",
+          subscription: "sub_smoke_unpaid",
+          metadata: { accountUserID: "apple:second-smoke-user" }
+        }
+      }
+    });
+    const unpaidStripeCheckoutWebhook = await request("/billing/stripe/webhook", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "stripe-signature": stripeSignature(unpaidStripeCheckoutEvent, stripeWebhookSecret)
+      },
+      rawBody: unpaidStripeCheckoutEvent
+    });
+    assert(
+      unpaidStripeCheckoutWebhook.response.ok && unpaidStripeCheckoutWebhook.json.changed === false,
+      "Stripe checkout granted access before payment completed."
+    );
+
     const stripeCheckoutEvent = JSON.stringify({
       id: "evt_smoke_checkout",
       type: "checkout.session.completed",
+      created: Math.floor(Date.now() / 1000),
       data: {
         object: {
           id: "cs_smoke",
@@ -4357,6 +4387,7 @@ async function main() {
           client_reference_id: "apple:second-smoke-user",
           customer: "cus_smoke",
           subscription: "sub_smoke",
+          payment_status: "paid",
           metadata: { accountUserID: "apple:second-smoke-user" }
         }
       }

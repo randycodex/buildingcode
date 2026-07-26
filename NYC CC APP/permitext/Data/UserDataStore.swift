@@ -46,7 +46,10 @@ protocol UserContentRepository {
     func resetFailedSyncQueueItems() throws
     func retrySyncQueueItems(ids: [Int64], mutationUpdatedAt: Date) throws
     func deleteAllUserData() throws
-    func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate]
+    func localMergeCandidates(
+        for mutations: [ServerUserContentMutation],
+        account: SignedInAccount
+    ) throws -> [String: UserContentMergeCandidate]
     func discardQueuedMutation(recordID: String, account: SignedInAccount) throws
     func applyServerUserContentMutation(_ mutation: ServerUserContentMutation) throws
 }
@@ -68,7 +71,7 @@ final class UserDataStore: UserContentRepository {
     private let staleInFlightInterval: TimeInterval = 10 * 60
     private let maximumAutomaticSyncAttempts = 5
 
-    init() throws {
+    convenience init() throws {
         let fileManager = FileManager.default
         let baseSupport = try fileManager.url(
             for: .applicationSupportDirectory,
@@ -86,6 +89,10 @@ final class UserDataStore: UserContentRepository {
 
         try fileManager.createDirectory(at: appSupport, withIntermediateDirectories: true, attributes: nil)
         let databaseURL = appSupport.appendingPathComponent("user_data.sqlite")
+        try self.init(databaseURL: databaseURL)
+    }
+
+    init(databaseURL: URL) throws {
         connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
         try createSchema()
     }
@@ -2066,11 +2073,23 @@ final class UserDataStore: UserContentRepository {
         )
     }
 
-    func localMergeCandidates(for mutations: [ServerUserContentMutation]) throws -> [String: UserContentMergeCandidate] {
+    func localMergeCandidates(
+        for mutations: [ServerUserContentMutation],
+        account: SignedInAccount
+    ) throws -> [String: UserContentMergeCandidate] {
         var candidates: [String: UserContentMergeCandidate] = [:]
         for mutation in mutations {
             let localizedMutation = localizedServerMutation(mutation)
-            let localCandidate = try localMergeCandidate(for: localizedMutation)
+            let rowCandidate = try localMergeCandidate(for: localizedMutation)
+            let queuedCandidate = try queuedRecordMergeCandidate(
+                for: localizedMutation,
+                account: account
+            )
+            let localCandidate = [rowCandidate, queuedCandidate]
+                .compactMap { $0 }
+                .max {
+                    ($0.localUpdatedAt ?? .distantPast) < ($1.localUpdatedAt ?? .distantPast)
+                }
             let pendingClearUpdatedAt = try pendingBulkClearUpdatedAt(for: localizedMutation)
             if let pendingClearUpdatedAt,
                localCandidate?.localUpdatedAt.map({ $0 >= pendingClearUpdatedAt }) != true {
@@ -2093,6 +2112,45 @@ final class UserDataStore: UserContentRepository {
             }
         }
         return candidates
+    }
+
+    private func queuedRecordMergeCandidate(
+        for mutation: ServerUserContentMutation,
+        account: SignedInAccount
+    ) throws -> UserContentMergeCandidate? {
+        let statement = try connection.prepare(
+            """
+            SELECT id, client_id, entity_type, operation_type, payload_json, state,
+                   attempt_count, created_at, updated_at, last_error, mutation_updated_at
+            FROM sync_queue
+            WHERE state != ?
+            ORDER BY mutation_updated_at DESC, id DESC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        try connection.bind(text: syncedQueueState, index: 1, to: statement)
+
+        while try connection.step(statement) == SQLITE_ROW {
+            guard let item = syncQueueItem(from: statement),
+                  let queuedMutation = try? ServerUserContentMutation(
+                    syncQueueItem: item,
+                    account: account
+                  ),
+                  queuedMutation.recordID == mutation.recordID
+            else {
+                continue
+            }
+            return UserContentMergeCandidate(
+                recordID: mutation.recordID,
+                entityKind: mutation.entityKind,
+                localUpdatedAt: queuedMutation.updatedAt,
+                serverUpdatedAt: mutation.updatedAt,
+                localDeletedAt: queuedMutation.deletedAt,
+                serverDeletedAt: mutation.deletedAt,
+                localSyncState: .pendingUpload
+            )
+        }
+        return nil
     }
 
     private func pendingBulkClearUpdatedAt(for mutation: ServerUserContentMutation) throws -> Date? {

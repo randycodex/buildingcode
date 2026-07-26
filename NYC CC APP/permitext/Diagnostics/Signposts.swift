@@ -514,7 +514,10 @@ struct UserContentSyncEngine {
                 sinceEventID: checkpoint.latestEventID
             )
             let resolvedLocalCandidates = try localCandidates.isEmpty
-                ? repository?.localMergeCandidates(for: incoming.mutations) ?? [:]
+                ? repository?.localMergeCandidates(
+                    for: incoming.mutations,
+                    account: account
+                ) ?? [:]
                 : localCandidates
             let mergePlan = try previewMerge(incoming: incoming, localCandidates: resolvedLocalCandidates)
             let appliedCount = try applySafeChanges
@@ -699,14 +702,6 @@ struct UserContentSyncEngine {
                 } else {
                     try repository.applyServerUserContentMutation(applicableMutation)
                 }
-                try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
-                appliedCount += 1
-            case .deleteLocal:
-                guard let applicableMutation = mutation.removingFieldsSuperseded(by: bulkClears) else {
-                    appliedCount += 1
-                    continue
-                }
-                try repository.applyServerUserContentMutation(applicableMutation)
                 try repository.discardQueuedMutation(recordID: mutation.recordID, account: account)
                 appliedCount += 1
             case .noChange:

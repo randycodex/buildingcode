@@ -162,6 +162,109 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "legacy").grantsResearch())
     }
 
+    func testReleaseLifetimeLookupCannotRevokeBackendGrant() async throws {
+        let result = try await LocalLifetimeGrantLookupClient()
+            .lookupLifetimeGrant(appleUserID: "backend-lifetime-user")
+
+        #if DEBUG
+        XCTAssertTrue(result.isAuthoritative)
+        #else
+        XCTAssertFalse(result.hasLifetimeGrant)
+        XCTAssertFalse(result.isAuthoritative)
+        #endif
+
+        XCTAssertFalse(
+            LifetimeGrantLookupResult(
+                hasLifetimeGrant: false,
+                grantedUserID: nil,
+                isAuthoritative: false
+            ).authoritativelyDeniesGrant
+        )
+        XCTAssertTrue(
+            LifetimeGrantLookupResult(
+                hasLifetimeGrant: false,
+                grantedUserID: nil,
+                isAuthoritative: true
+            ).authoritativelyDeniesGrant
+        )
+    }
+
+    func testQueuedBookmarkDeleteSurvivesPullUntilItUploads() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-delete-merge-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: databaseURL) }
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let account = SignedInAccount(
+            appUserID: "apple:delete-test",
+            appleUserID: "delete-test",
+            displayName: "Delete Test",
+            signedInAt: Date()
+        )
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let sectionID: Int64 = 77
+
+        try store.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+        let initialUpsert = try XCTUnwrap(store.pendingSyncQueueItems(limit: 10).first)
+        try store.markSyncQueueItemSynced(id: initialUpsert.id)
+        try store.toggleBookmark(sectionID: sectionID, codeVersion: codeVersion)
+
+        XCTAssertFalse(try store.isBookmarked(sectionID: sectionID, codeVersion: codeVersion))
+        let queuedDelete = try XCTUnwrap(store.pendingSyncQueueItems(limit: 10).first)
+        XCTAssertEqual(queuedDelete.operationType, .delete)
+
+        let serverRecord = ServerSavedItemRecord(
+            id: [
+                account.appUserID,
+                "saved",
+                UserContentSyncCodeVersion.canonicalNYC2022,
+                String(sectionID)
+            ].joined(separator: ":"),
+            userID: account.appUserID,
+            codeVersion: UserContentSyncCodeVersion.canonicalNYC2022,
+            sectionID: sectionID,
+            updatedAt: queuedDelete.mutationUpdatedAt.addingTimeInterval(-10),
+            deletedAt: nil
+        )
+        let mutation = ServerUserContentMutation.savedItem(serverRecord)
+        let candidate = try XCTUnwrap(
+            store.localMergeCandidates(for: [mutation], account: account)[mutation.recordID]
+        )
+
+        XCTAssertEqual(candidate.localSyncState, .pendingUpload)
+        XCTAssertEqual(candidate.localDeletedAt, queuedDelete.mutationUpdatedAt)
+        XCTAssertEqual(UserContentMergeResolver.decision(for: candidate).action, .uploadLocal)
+    }
+
+    func testNewerServerEditConflictsWithQueuedLocalDelete() {
+        let deletionTime = Date()
+        let candidate = UserContentMergeCandidate(
+            recordID: "saved-1",
+            entityKind: .savedItem,
+            localUpdatedAt: deletionTime,
+            serverUpdatedAt: deletionTime.addingTimeInterval(1),
+            localDeletedAt: deletionTime,
+            serverDeletedAt: nil,
+            localSyncState: .pendingUpload
+        )
+
+        XCTAssertEqual(UserContentMergeResolver.decision(for: candidate).action, .flagConflict)
+    }
+
+    func testServerTombstoneUsesApplyServerAction() {
+        let now = Date()
+        let candidate = UserContentMergeCandidate(
+            recordID: "saved-1",
+            entityKind: .savedItem,
+            localUpdatedAt: now.addingTimeInterval(-10),
+            serverUpdatedAt: now,
+            localDeletedAt: nil,
+            serverDeletedAt: now,
+            localSyncState: .synced
+        )
+
+        XCTAssertEqual(UserContentMergeResolver.decision(for: candidate).action, .applyServer)
+    }
+
     @MainActor
     func testOrganizationInvitationUniversalLinkExtractsOnlyPrivateToken() throws {
         let invitationURL = try XCTUnwrap(

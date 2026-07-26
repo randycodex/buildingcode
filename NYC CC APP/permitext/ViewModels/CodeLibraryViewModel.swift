@@ -2589,10 +2589,10 @@ final class CodeLibraryViewModel: ObservableObject {
             if result.hasLifetimeGrant {
                 LocalEntitlementService.setLifetimeGrant(userID: result.grantedUserID ?? signedInAccount.appleUserID)
                 statusMessage = "Lifetime Pro grant applied."
-            } else if currentEntitlementSource == .lifetimeGrant {
+            } else if result.authoritativelyDeniesGrant && currentEntitlementSource == .lifetimeGrant {
                 LocalEntitlementService.clearLifetimeGrant()
                 statusMessage = "No lifetime Pro grant found for this account."
-            } else if announcesMissingGrant {
+            } else if result.authoritativelyDeniesGrant && announcesMissingGrant {
                 statusMessage = "Signed in. No lifetime Pro grant found for this account."
             }
             refreshCurrentEntitlement()

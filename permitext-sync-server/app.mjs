@@ -360,6 +360,35 @@ function canonicalJSONString(value) {
   return JSON.stringify(value);
 }
 
+const researchUsageLocks = new Map();
+const researchUsageReservationTTLMilliseconds = 15 * 60 * 1000;
+
+function activeResearchUsageEntry(entry, now = Date.now()) {
+  if (entry?.mode !== "reservation") return true;
+  const createdAt = Date.parse(entry.createdAt || "");
+  return Number.isFinite(createdAt) &&
+    createdAt > now - researchUsageReservationTTLMilliseconds;
+}
+
+async function withResearchUsageLock(userID, operation) {
+  const previous = researchUsageLocks.get(userID) || Promise.resolve();
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  const tail = previous.then(() => gate);
+  researchUsageLocks.set(userID, tail);
+  await previous;
+  try {
+    return await operation();
+  } finally {
+    release();
+    if (researchUsageLocks.get(userID) === tail) {
+      researchUsageLocks.delete(userID);
+    }
+  }
+}
+
 function createFileStoreAdapter() {
   return {
     kind: "file",
@@ -728,17 +757,65 @@ function createFileStoreAdapter() {
     },
     async researchUsageSince(userID, since) {
       const store = await this.read();
-      return (store.researchUsageByUserID?.[userID] || []).filter((entry) => entry.createdAt >= since);
+      return (store.researchUsageByUserID?.[userID] || []).filter((entry) =>
+        entry.createdAt >= since && activeResearchUsageEntry(entry)
+      );
     },
-    async recordResearchUsage(userID, entry) {
-      const store = await this.read();
-      store.researchUsageByUserID ||= {};
-      const cutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
-      store.researchUsageByUserID[userID] = [
-        ...(store.researchUsageByUserID[userID] || []).filter((item) => item.createdAt >= cutoff),
-        entry
-      ];
-      await this.write(store);
+    async reserveResearchUsage(userID, reservation) {
+      return withResearchUsageLock(userID, async () => {
+        const store = await this.read();
+        const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
+        const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
+          .filter((entry) => entry.createdAt >= retentionCutoff);
+        const entries = retainedEntries
+          .filter((entry) =>
+            entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
+          );
+        if (entries.length >= reservation.limit) return false;
+        store.researchUsageByUserID ||= {};
+        store.researchUsageByUserID[userID] = [
+          ...retainedEntries,
+          {
+            id: reservation.id,
+            model: "pending",
+            mode: "reservation",
+            inputTokens: 0,
+            cachedInputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+            createdAt: reservation.createdAt
+          }
+        ];
+        await this.write(store);
+        return true;
+      });
+    },
+    async completeResearchUsageReservation(userID, reservationID, entry) {
+      return withResearchUsageLock(userID, async () => {
+        const store = await this.read();
+        const entries = store.researchUsageByUserID?.[userID] || [];
+        const index = entries.findIndex((item) =>
+          item.id === reservationID && item.mode === "reservation"
+        );
+        if (index === -1) {
+          throw new Error("Research usage reservation was not found.");
+        }
+        entries[index] = { ...entry, id: reservationID };
+        await this.write(store);
+      });
+    },
+    async releaseResearchUsageReservation(userID, reservationID) {
+      return withResearchUsageLock(userID, async () => {
+        const store = await this.read();
+        const entries = store.researchUsageByUserID?.[userID] || [];
+        const remaining = entries.filter((item) =>
+          item.id !== reservationID || item.mode !== "reservation"
+        );
+        if (remaining.length === entries.length) return false;
+        store.researchUsageByUserID[userID] = remaining;
+        await this.write(store);
+        return true;
+      });
     },
     async listResearchFeedback(userID) {
       const store = await this.read();
@@ -2348,7 +2425,12 @@ async function createPostgresStoreAdapter() {
         SELECT id, model, mode, input_tokens, cached_input_tokens, output_tokens, total_tokens,
                prompt_version, evidence_version, estimated_cost_usd, pricing_version, created_at
         FROM permitext_research_usage
-        WHERE user_id = ${userID} AND created_at >= ${since}::timestamptz
+        WHERE user_id = ${userID}
+          AND created_at >= ${since}::timestamptz
+          AND (
+            mode <> 'reservation'
+            OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+          )
         ORDER BY created_at DESC
       `;
       return rows.map((row) => ({
@@ -2366,22 +2448,74 @@ async function createPostgresStoreAdapter() {
         createdAt: dateToISO(row.created_at)
       }));
     },
-    async recordResearchUsage(userID, entry) {
+    async reserveResearchUsage(userID, reservation) {
       await ensureSchema();
-      await sql`
-        INSERT INTO permitext_research_usage (
-          id, user_id, model, mode, input_tokens, cached_input_tokens, output_tokens, total_tokens,
-          prompt_version, evidence_version, estimated_cost_usd, pricing_version, created_at
-        )
-        VALUES (
-          ${entry.id}, ${userID}, ${entry.model}, ${entry.mode},
-          ${entry.inputTokens}, ${entry.cachedInputTokens || 0}, ${entry.outputTokens}, ${entry.totalTokens},
-          ${entry.promptVersion || null}, ${entry.evidenceVersion || null},
-          ${entry.estimatedCostUSD ?? null}, ${entry.pricingVersion || null},
-          ${entry.createdAt}::timestamptz
-        )
-        ON CONFLICT (id) DO NOTHING
+      for (let attempt = 1; attempt <= 3; attempt += 1) {
+        try {
+          const [rows] = await sql.transaction([
+            sql`
+              INSERT INTO permitext_research_usage (
+                id, user_id, model, mode, input_tokens, cached_input_tokens,
+                output_tokens, total_tokens, created_at
+              )
+              SELECT
+                ${reservation.id}, ${userID}, 'pending', 'reservation', 0, 0, 0, 0,
+                ${reservation.createdAt}::timestamptz
+              WHERE (
+                SELECT count(*)
+                FROM permitext_research_usage
+                WHERE user_id = ${userID}
+                  AND created_at >= ${reservation.since}::timestamptz
+                  AND (
+                    mode <> 'reservation'
+                    OR created_at > CURRENT_TIMESTAMP - INTERVAL '15 minutes'
+                  )
+              ) < ${reservation.limit}
+              ON CONFLICT (id) DO NOTHING
+              RETURNING id
+            `
+          ], { isolationMode: "Serializable" });
+          return Boolean(rows?.length);
+        } catch (error) {
+          if (error?.code !== "40001" || attempt === 3) throw error;
+        }
+      }
+      return false;
+    },
+    async completeResearchUsageReservation(userID, reservationID, entry) {
+      await ensureSchema();
+      const rows = await sql`
+        UPDATE permitext_research_usage
+        SET model = ${entry.model},
+            mode = ${entry.mode},
+            input_tokens = ${entry.inputTokens},
+            cached_input_tokens = ${entry.cachedInputTokens || 0},
+            output_tokens = ${entry.outputTokens},
+            total_tokens = ${entry.totalTokens},
+            prompt_version = ${entry.promptVersion || null},
+            evidence_version = ${entry.evidenceVersion || null},
+            estimated_cost_usd = ${entry.estimatedCostUSD ?? null},
+            pricing_version = ${entry.pricingVersion || null},
+            created_at = ${entry.createdAt}::timestamptz
+        WHERE id = ${reservationID}
+          AND user_id = ${userID}
+          AND mode = 'reservation'
+        RETURNING id
       `;
+      if (!rows.length) {
+        throw new Error("Research usage reservation was not found.");
+      }
+    },
+    async releaseResearchUsageReservation(userID, reservationID) {
+      await ensureSchema();
+      const rows = await sql`
+        DELETE FROM permitext_research_usage
+        WHERE id = ${reservationID}
+          AND user_id = ${userID}
+          AND mode = 'reservation'
+        RETURNING id
+      `;
+      return Boolean(rows.length);
     },
     async listResearchFeedback(userID) {
       await ensureSchema();
@@ -2769,10 +2903,26 @@ async function researchUsageSince(userID, since) {
     : [];
 }
 
-async function recordResearchUsage(userID, entry) {
+async function reserveResearchUsage(userID, reservation) {
   const adapter = await storeAdapter();
-  if (typeof adapter.recordResearchUsage === "function") {
-    await adapter.recordResearchUsage(userID, entry);
+  if (typeof adapter.reserveResearchUsage !== "function") {
+    throw new Error("Atomic Research usage reservations are unavailable.");
+  }
+  return adapter.reserveResearchUsage(userID, reservation);
+}
+
+async function completeResearchUsageReservation(userID, reservationID, entry) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.completeResearchUsageReservation !== "function") {
+    throw new Error("Atomic Research usage reservations are unavailable.");
+  }
+  await adapter.completeResearchUsageReservation(userID, reservationID, entry);
+}
+
+async function releaseResearchUsageReservation(userID, reservationID) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.releaseResearchUsageReservation === "function") {
+    await adapter.releaseResearchUsageReservation(userID, reservationID);
   }
 }
 
@@ -9198,6 +9348,9 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
+  let researchReservationID = null;
+  let researchReservationCreatedAt = null;
+  let researchReservationCompleted = false;
   try {
     const current = await currentResearchEvidence(conversation);
     if (current.stale) {
@@ -9213,13 +9366,25 @@ async function handleResearchConversationMessage(request, response) {
     const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
-    if (!mockMode && usageEntries.length >= requestLimit) {
-      sendJSON(response, 429, {
-        error: "This account reached its monthly AI research limit.",
-        code: "RESEARCH_MONTHLY_LIMIT",
-        usage: researchUsageSummary(usageEntries)
+    if (!mockMode) {
+      researchReservationID = randomUUID();
+      researchReservationCreatedAt = new Date().toISOString();
+      const reserved = await reserveResearchUsage(context.userID, {
+        id: researchReservationID,
+        since: currentMonthStart(),
+        limit: requestLimit,
+        createdAt: researchReservationCreatedAt
       });
-      return;
+      if (!reserved) {
+        researchReservationID = null;
+        const currentUsageEntries = await researchUsageSince(context.userID, currentMonthStart());
+        sendJSON(response, 429, {
+          error: "This account reached its monthly AI research limit.",
+          code: "RESEARCH_MONTHLY_LIMIT",
+          usage: researchUsageSummary(currentUsageEntries)
+        });
+        return;
+      }
     }
     const selections = conversation.sources.filter((source) => source.kind === "selection");
     const selectedEvidence = selectedResearchEvidence(conversation, current.evidence);
@@ -9237,6 +9402,20 @@ async function handleResearchConversationMessage(request, response) {
         });
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
+    if (!mockMode) {
+      await completeResearchUsageReservation(context.userID, researchReservationID, {
+        model: result.model,
+        requestedModel: result.requestedModel || result.model,
+        mode: "openai",
+        ...result.usage,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
+        createdAt: researchReservationCreatedAt
+      });
+      researchReservationCompleted = true;
+    }
     const disclaimer = "AI-generated research assistance, not an official code determination.";
     const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
     const assistantMessage = {
@@ -9311,20 +9490,6 @@ async function handleResearchConversationMessage(request, response) {
         metadata: { conversationID: conversation.id }
       }));
     }
-    if (!mockMode) {
-      await recordResearchUsage(context.userID, {
-        id: randomUUID(),
-        model: result.model,
-        requestedModel: result.requestedModel || result.model,
-        mode: "openai",
-        ...result.usage,
-        promptVersion: result.configuration.promptVersion,
-        evidenceVersion: result.configuration.evidenceVersion,
-        estimatedCostUSD: estimatedCost.estimatedUSD,
-        pricingVersion: estimatedCost.pricingVersion,
-        createdAt: now
-      });
-    }
     console.info(JSON.stringify({
       event: "research_conversation_message",
       user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
@@ -9347,6 +9512,13 @@ async function handleResearchConversationMessage(request, response) {
       ], { mockMode })
     });
   } catch (error) {
+    if (researchReservationID && !researchReservationCompleted) {
+      try {
+        await releaseResearchUsageReservation(context.userID, researchReservationID);
+      } catch (releaseError) {
+        console.error("Failed to release Research usage reservation.", releaseError);
+      }
+    }
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       sendError(response, 422, "A cited code section is incomplete and cannot be analyzed yet.");
       return;
@@ -10538,6 +10710,21 @@ function stripeSubscriptionExpiresAt(object) {
     object?.period_end ||
     null;
   return Number.isFinite(Number(timestamp)) ? new Date(Number(timestamp) * 1000).toISOString() : null;
+}
+
+function stripeCheckoutProvisionalExpiresAt(event) {
+  const eventCreatedAt = Number(event?.created) * 1000;
+  const baseTime = Number.isFinite(eventCreatedAt) && eventCreatedAt > 0
+    ? eventCreatedAt
+    : Date.now();
+  return new Date(baseTime + (15 * 60 * 1000)).toISOString();
+}
+
+function stripeEventCreatedAt(event) {
+  const timestamp = Number(event?.created);
+  return Number.isFinite(timestamp) && timestamp > 0
+    ? new Date(timestamp * 1000).toISOString()
+    : null;
 }
 
 function stripeSearchValue(value) {
@@ -12711,15 +12898,20 @@ async function handleStripeWebhook(request, response) {
   switch (event.type) {
   case "checkout.session.completed": {
     const userID = stripeUserIDFromObject(object);
-    if (userID && (object.mode === "subscription" || object.payment_status === "paid")) {
+    const completedSubscriptionCheckout =
+      object.mode === "subscription" &&
+      ["paid", "no_payment_required"].includes(object.payment_status);
+    if (userID && completedSubscriptionCheckout) {
       const packageID = stripePackageIDFromObject(object);
       await persistServerEntitlement(userID, "webSubscription", {
         packageID,
         explicitPackage: stripePackageIsExplicit(object),
+        expiresAt: stripeCheckoutProvisionalExpiresAt(event),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
           stripeSubscriptionID: stripeSubscriptionID(object.subscription),
-          stripeCheckoutSessionID: object.id
+          stripeCheckoutSessionID: object.id,
+          stripeEventCreatedAt: stripeEventCreatedAt(event)
         }
       });
       changed = true;
@@ -12738,7 +12930,8 @@ async function handleStripeWebhook(request, response) {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
-          stripeSubscriptionID: subscriptionID
+          stripeSubscriptionID: subscriptionID,
+          stripeEventCreatedAt: stripeEventCreatedAt(event)
         }
       });
       changed = true;
@@ -12786,7 +12979,8 @@ async function handleStripeWebhook(request, response) {
         expiresAt: stripeSubscriptionExpiresAt(object),
         provider: {
           stripeCustomerID: stripeSubscriptionID(object.customer),
-          stripeSubscriptionID: subscriptionID
+          stripeSubscriptionID: subscriptionID,
+          stripeEventCreatedAt: stripeEventCreatedAt(event)
         }
       });
       changed = true;

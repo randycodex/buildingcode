@@ -10,6 +10,7 @@ import {
   hasActiveResearchEntitlement,
   researchEntitlementMode
 } from "../entitlement-contract.mjs";
+import { postgresMutationRejectionReason } from "../postgres-sync-repository.mjs";
 
 const userID = "entitlement-contract-user";
 const codeVersion = "nyc-2022";
@@ -185,6 +186,68 @@ const refreshedLegacyPro = entitlementWithPackage(restoredLegacyPro, {
   now: packagedAt
 });
 assert.equal(hasActiveResearchEntitlement(refreshedLegacyPro), true);
+const renewedPackagedPro = entitlementWithPackage(newPackagedPro, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  expiresAt: "2100-01-01T00:00:00.000Z",
+  provider: {
+    stripeSubscriptionID: "sub_pro",
+    stripeEventCreatedAt: "2026-07-24T18:10:00.000Z"
+  },
+  now: packagedAt
+});
+const delayedCheckoutPro = entitlementWithPackage(renewedPackagedPro, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  expiresAt: "2026-07-24T18:15:00.000Z",
+  provider: {
+    stripeSubscriptionID: "sub_pro",
+    stripeCheckoutSessionID: "cs_delayed",
+    stripeEventCreatedAt: "2026-07-24T18:00:00.000Z"
+  },
+  now: packagedAt
+});
+assert.equal(
+  delayedCheckoutPro.expiresAt,
+  "2100-01-01T00:00:00.000Z",
+  "A delayed checkout event must not shorten a newer subscription period."
+);
+assert.equal(
+  delayedCheckoutPro.provider.stripeSubscriptionID,
+  "sub_pro",
+  "An older Stripe event must not replace newer provider metadata."
+);
+const delayedDifferentSubscription = entitlementWithPackage(renewedPackagedPro, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  expiresAt: "2026-07-24T18:15:00.000Z",
+  provider: {
+    stripeSubscriptionID: "sub_old",
+    stripeCheckoutSessionID: "cs_old",
+    stripeEventCreatedAt: "2026-07-24T18:00:00.000Z"
+  },
+  now: packagedAt
+});
+assert.equal(
+  delayedDifferentSubscription,
+  renewedPackagedPro,
+  "An older checkout for a different subscription must not replace newer entitlement state."
+);
+const checkoutWithoutPeriod = entitlementWithPackage(renewedPackagedPro, {
+  userID,
+  packageID: entitlementPackageIDs.pro,
+  source: "webSubscription",
+  provider: { stripeSubscriptionID: "sub_pro", stripeCheckoutSessionID: "cs_missing_period" },
+  now: packagedAt
+});
+assert.equal(
+  checkoutWithoutPeriod.expiresAt,
+  "2100-01-01T00:00:00.000Z",
+  "A same-subscription update without a period must preserve the known expiration."
+);
 const packagedWithResearch = entitlementWithPackage(newPackagedPro, {
   userID,
   packageID: entitlementPackageIDs.research,
@@ -231,6 +294,48 @@ assert.equal(
   hasActiveProEntitlement({ plan: "pro", expiresAt: "2020-01-01T00:00:00.000Z" }),
   false,
   "Expired Pro grants must not unlock server capabilities."
+);
+
+assert.equal(
+  postgresMutationRejectionReason({
+    userID,
+    mutation: savedOverLimit,
+    context: {
+      active_pro: false,
+      saved_item_count: freePlanLimits.savedItems
+    }
+  }).code,
+  "FREE_SAVED_ITEM_LIMIT",
+  "PostgreSQL sync must explain Free-plan quota rejections."
+);
+assert.equal(
+  postgresMutationRejectionReason({
+    userID,
+    mutation: savedUpdate,
+    context: {
+      active_pro: false,
+      existing_user_id: userID,
+      existing_updated_at: "2026-01-03T00:00:00.000Z",
+      existing_deleted_at: null,
+      existing_mutation: newerSavedAtLimit[0]
+    }
+  }).code,
+  "SERVER_NEWER",
+  "PostgreSQL sync must distinguish a stale client write from an entitlement rejection."
+);
+assert.equal(
+  postgresMutationRejectionReason({
+    userID,
+    mutation: savedUpdate,
+    context: {
+      active_pro: true,
+      existing_user_id: "another-user",
+      existing_updated_at: savedUpdate.savedItem.updatedAt,
+      existing_mutation: savedUpdate
+    }
+  }).code,
+  "RECORD_OWNERSHIP_MISMATCH",
+  "PostgreSQL sync must report ownership conflicts explicitly."
 );
 
 console.log("Entitlement contract tests passed.");

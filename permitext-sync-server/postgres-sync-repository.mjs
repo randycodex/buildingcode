@@ -5,6 +5,18 @@ function safeJSON(value, fallback) {
   return typeof value === "string" ? JSON.parse(value) : value;
 }
 
+function canonicalJSONString(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => canonicalJSONString(item)).join(",")}]`;
+  }
+  if (value && typeof value === "object") {
+    return `{${Object.keys(value).sort().map((key) =>
+      `${JSON.stringify(key)}:${canonicalJSONString(value[key])}`
+    ).join(",")}}`;
+  }
+  return JSON.stringify(value);
+}
+
 function mutationEntry(mutation) {
   const [kind, record] = Object.entries(mutation || {})[0] || [];
   return { kind, record };
@@ -46,6 +58,91 @@ function mutationWithServerEventID(mutation, value) {
   const serverEventID = Number(value || 0);
   if (!kind || !record || !Number.isSafeInteger(serverEventID) || serverEventID <= 0) return mutation;
   return { [kind]: { ...record, serverEventID } };
+}
+
+export function postgresMutationRejectionReason({ userID, mutation, context = {} }) {
+  const { kind, record = {} } = mutationEntry(mutation);
+  const ownerUserID = record.userID || userID;
+  const existingUserID = context.existing_user_id || null;
+  const existingActive =
+    existingUserID === ownerUserID &&
+    !normalizedDate(context.existing_deleted_at);
+  const activePro = context.active_pro === true;
+
+  if (existingUserID && existingUserID !== ownerUserID) {
+    return {
+      code: "RECORD_OWNERSHIP_MISMATCH",
+      message: "This sync record belongs to a different Permitext account."
+    };
+  }
+
+  if (!deletedAt(record) && kind !== "continuity" && kind !== "codeVersionClear" && !activePro) {
+    if (
+      kind === "savedItem" &&
+      !existingActive &&
+      Number(context.saved_item_count || 0) >= freePlanLimits.savedItems
+    ) {
+      return {
+        code: "FREE_SAVED_ITEM_LIMIT",
+        message: `Free includes up to ${freePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
+      };
+    }
+    if (
+      kind === "annotation" &&
+      record.tags === undefined &&
+      String(record.noteBody || "").trim() &&
+      !existingActive &&
+      Number(context.note_count || 0) >= freePlanLimits.notes
+    ) {
+      return {
+        code: "FREE_NOTE_LIMIT",
+        message: `Free includes up to ${freePlanLimits.notes} notes. Upgrade to Pro to add more.`
+      };
+    }
+    if (kind === "annotation" && Array.isArray(record.tags) && record.tags.length > 0) {
+      return {
+        code: "PRO_REQUIRED_ORGANIZATION",
+        message: "Tags and advanced organization require Pro."
+      };
+    }
+    if (kind === "project" || kind === "projectSection") {
+      return {
+        code: "PRO_REQUIRED_PROJECTS",
+        message: kind === "project" ? "Projects require Pro." : "Project organization requires Pro."
+      };
+    }
+    if (kind === "workboard") {
+      return {
+        code: "PRO_REQUIRED_WORKBOARDS",
+        message: "Workboards require Pro."
+      };
+    }
+  }
+
+  const incomingUpdatedAt = Date.parse(record.updatedAt || "");
+  const existingUpdatedAt = Date.parse(context.existing_updated_at || "");
+  if (Number.isFinite(existingUpdatedAt) && existingUpdatedAt > incomingUpdatedAt) {
+    return {
+      code: "SERVER_NEWER",
+      message: "A newer version of this item is already on the server. Review it before retrying."
+    };
+  }
+  const existingMutation = safeJSON(context.existing_mutation, null);
+  if (
+    Number.isFinite(existingUpdatedAt) &&
+    existingUpdatedAt === incomingUpdatedAt &&
+    existingMutation &&
+    canonicalJSONString(existingMutation) !== canonicalJSONString(mutation)
+  ) {
+    return {
+      code: "EQUAL_TIMESTAMP_CONFLICT",
+      message: "This item changed in two places at the same time. Review the sync conflict before retrying."
+    };
+  }
+  return {
+    code: "SYNC_MUTATION_REJECTED",
+    message: "The server could not accept this change. Refresh the item and retry."
+  };
 }
 
 export function createPostgresSyncRepository(sql) {
@@ -155,6 +252,50 @@ export function createPostgresSyncRepository(sql) {
           )
         )
       RETURNING record_id
+    `;
+  }
+
+  function rejectionContextQuery(userID, mutation) {
+    const recordID = mutationRecordID(mutation);
+    return sql`
+      SELECT
+        EXISTS (
+          SELECT 1
+          FROM permitext_entitlements
+          WHERE user_id = ${userID}
+            AND lower(plan) = 'pro'
+            AND (expires_at IS NULL OR expires_at > CURRENT_TIMESTAMP)
+        ) AS active_pro,
+        (
+          SELECT user_id FROM permitext_user_content_records
+          WHERE record_id = ${recordID} LIMIT 1
+        ) AS existing_user_id,
+        (
+          SELECT updated_at FROM permitext_user_content_records
+          WHERE record_id = ${recordID} LIMIT 1
+        ) AS existing_updated_at,
+        (
+          SELECT deleted_at FROM permitext_user_content_records
+          WHERE record_id = ${recordID} LIMIT 1
+        ) AS existing_deleted_at,
+        (
+          SELECT mutation FROM permitext_user_content_records
+          WHERE record_id = ${recordID} LIMIT 1
+        ) AS existing_mutation,
+        (
+          SELECT count(*) FROM permitext_user_content_records
+          WHERE user_id = ${userID}
+            AND entity_kind = 'savedItem'
+            AND deleted_at IS NULL
+        )::int AS saved_item_count,
+        (
+          SELECT count(*) FROM permitext_user_content_records
+          WHERE user_id = ${userID}
+            AND entity_kind = 'annotation'
+            AND deleted_at IS NULL
+            AND coalesce(mutation->'annotation'->>'noteBody', '') <> ''
+            AND NOT (mutation->'annotation' ? 'tags')
+        )::int AS note_count
     `;
   }
 
@@ -364,12 +505,15 @@ export function createPostgresSyncRepository(sql) {
   async function push(userID, mutations) {
     const queries = [];
     const acceptanceIndexes = [];
+    const rejectionContextIndexes = [];
     for (const mutation of mutations) {
       acceptanceIndexes.push(queries.length);
       queries.push(compatibilityQuery(userID, mutation));
       const recordQuery = domainQuery(userID, mutation);
       if (recordQuery) queries.push(recordQuery);
       queries.push(eventQuery(userID, mutation));
+      rejectionContextIndexes.push(queries.length);
+      queries.push(rejectionContextQuery(userID, mutation));
     }
     const latestIndex = queries.length;
     queries.push(sql`
@@ -392,14 +536,23 @@ export function createPostgresSyncRepository(sql) {
     }
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];
+    const rejectionReasons = {};
     mutations.forEach((mutation, index) => {
       const recordID = mutationRecordID(mutation);
       if (results[acceptanceIndexes[index]]?.length) acceptedMutationIDs.push(recordID);
-      else rejectedMutationIDs.push(recordID);
+      else {
+        rejectedMutationIDs.push(recordID);
+        rejectionReasons[recordID] = postgresMutationRejectionReason({
+          userID,
+          mutation,
+          context: results[rejectionContextIndexes[index]]?.[0] || {}
+        });
+      }
     });
     return {
       acceptedMutationIDs,
       rejectedMutationIDs,
+      rejectionReasons,
       latestEventID: Number(results[latestIndex]?.[0]?.latest_event_id || 0),
       entitlement: results[entitlementIndex]?.[0]?.entitlement
         ? safeJSON(results[entitlementIndex][0].entitlement, null)

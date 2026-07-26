@@ -74,6 +74,37 @@ function entitlementProviderMatches(provider, expected = {}) {
   return true;
 }
 
+function providerIdentityMatches(existingProvider, incomingProvider) {
+  const identityKeys = [
+    "stripeSubscriptionID",
+    "appleOriginalTransactionID",
+    "originalTransactionID"
+  ];
+  return identityKeys.some((key) =>
+    incomingProvider?.[key] &&
+    existingProvider?.[key] === incomingProvider[key]
+  );
+}
+
+function laterPackageExpiration(existingExpiration, incomingExpiration, preserveExisting) {
+  if (!preserveExisting) return incomingExpiration || null;
+  const existingTime = Date.parse(existingExpiration || "");
+  const incomingTime = Date.parse(incomingExpiration || "");
+  if (!Number.isFinite(existingTime)) return incomingExpiration || null;
+  if (!Number.isFinite(incomingTime) || existingTime > incomingTime) {
+    return existingExpiration;
+  }
+  return incomingExpiration;
+}
+
+function providerEventPrecedes(existingProvider, incomingProvider) {
+  const existingEventTime = Date.parse(existingProvider?.stripeEventCreatedAt || "");
+  const incomingEventTime = Date.parse(incomingProvider?.stripeEventCreatedAt || "");
+  return Number.isFinite(existingEventTime) &&
+    Number.isFinite(incomingEventTime) &&
+    incomingEventTime < existingEventTime;
+}
+
 export function entitlementWithPackage(
   existingEntitlement,
   { userID, packageID, source, expiresAt = null, provider = {}, explicitPackage = true, now = new Date() }
@@ -83,12 +114,30 @@ export function entitlementWithPackage(
     throw new Error("Unsupported Permitext package.");
   }
   const updatedAt = now instanceof Date ? now.toISOString() : new Date(now).toISOString();
-  const packageProvider = {
+  const incomingPackageProvider = {
     ...provider,
     ...(explicitPackage ? { permitextPackage: normalizedPackageID } : {})
   };
+  const existingPackageProvider = normalizedPackageID === entitlementPackageIDs.pro
+    ? existingEntitlement?.provider
+    : existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.provider;
+  const packageProvider = providerIdentityMatches(existingPackageProvider, incomingPackageProvider)
+    ? { ...existingPackageProvider, ...incomingPackageProvider }
+    : incomingPackageProvider;
 
   if (normalizedPackageID === entitlementPackageIDs.pro) {
+    if (
+      existingEntitlement?.source === source &&
+      providerEventPrecedes(existingEntitlement?.provider, packageProvider)
+    ) {
+      return existingEntitlement;
+    }
+    const effectiveExpiresAt = laterPackageExpiration(
+      existingEntitlement?.expiresAt,
+      expiresAt,
+      existingEntitlement?.source === source &&
+        providerIdentityMatches(existingEntitlement?.provider, packageProvider)
+    );
     const entitlement = {
       plan: "pro",
       ...(explicitPackage ? { packageID: entitlementPackageIDs.pro } : {}),
@@ -98,7 +147,7 @@ export function entitlementWithPackage(
       provider: packageProvider,
       ...(existingEntitlement?.addOns ? { addOns: existingEntitlement.addOns } : {})
     };
-    if (expiresAt) entitlement.expiresAt = expiresAt;
+    if (effectiveExpiresAt) entitlement.expiresAt = effectiveExpiresAt;
     if (
       existingEntitlement?.legacyResearchIncluded === true ||
       (!explicitPackage && (
@@ -114,13 +163,31 @@ export function entitlementWithPackage(
   if (!hasActiveProEntitlement(existingEntitlement, Date.parse(updatedAt))) {
     throw new Error("Research requires an active Pro plan.");
   }
+  if (
+    existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.source === source &&
+    providerEventPrecedes(
+      existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.provider,
+      packageProvider
+    )
+  ) {
+    return existingEntitlement;
+  }
   const researchAddOn = {
     enabled: true,
     source,
     updatedAt,
     provider: packageProvider
   };
-  if (expiresAt) researchAddOn.expiresAt = expiresAt;
+  const effectiveExpiresAt = laterPackageExpiration(
+    existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.expiresAt,
+    expiresAt,
+    existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.source === source &&
+      providerIdentityMatches(
+        existingEntitlement?.addOns?.[entitlementPackageIDs.research]?.provider,
+        packageProvider
+      )
+  );
+  if (effectiveExpiresAt) researchAddOn.expiresAt = effectiveExpiresAt;
   return {
     ...existingEntitlement,
     updatedAt,
