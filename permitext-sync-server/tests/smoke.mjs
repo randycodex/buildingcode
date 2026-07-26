@@ -842,7 +842,9 @@ async function main() {
         !workspaceScript.text.includes('New reader') &&
         workspaceScript.text.includes('openSectionDetail(searchInstance.id, detail);') &&
         workspaceScript.text.includes("function updateSearchDock") &&
-        workspaceScript.text.includes('summaryCopy.textContent = `${resultCount.toLocaleString()}'),
+        workspaceScript.text.includes("summary.hidden = !query;") &&
+        workspaceScript.text.includes('`Searching in ${scope}`') &&
+        workspaceScript.text.includes('`${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`'),
       "Search results restored a retired Reader action or omitted their row-level detail action and count."
     );
     assert(
@@ -886,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v48'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v50'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -900,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v45'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v46'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1231,6 +1233,8 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?border-radius: 0;/) &&
+        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip,[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
       "Search code filters no longer render as a vertical full-width list."
     );

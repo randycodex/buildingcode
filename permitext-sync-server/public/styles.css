@@ -2893,6 +2893,28 @@ select option:checked {
   background: color-mix(in srgb, var(--code-accent) 28%, transparent);
 }
 
+.search-code-filter .search-filter-chip,
+.search-code-filter .search-filter-chip:hover,
+.search-code-filter .search-filter-chip[aria-pressed="true"],
+.search-code-filter .search-filter-chip[aria-pressed="true"]:hover {
+  background: transparent;
+}
+
+.search-code-filter .search-filter-chip[aria-pressed="true"] {
+  color: var(--text-primary);
+}
+
+.search-code-filter .search-filter-chip.code-theme-building[aria-pressed="true"],
+.search-code-filter .search-filter-chip.code-theme-administrative[aria-pressed="true"],
+.search-code-filter .search-filter-chip.code-theme-plumbing[aria-pressed="true"],
+.search-code-filter .search-filter-chip.code-theme-mechanical[aria-pressed="true"],
+.search-code-filter .search-filter-chip.code-theme-fuel-gas[aria-pressed="true"],
+.search-code-filter .search-filter-chip.code-theme-zoning[aria-pressed="true"] {
+  background: transparent;
+  color: var(--code-accent);
+  -webkit-text-fill-color: var(--code-accent);
+}
+
 .search-results {
   overflow-y: auto;
   padding: var(--space-2) var(--space-1) var(--space-5) 0;

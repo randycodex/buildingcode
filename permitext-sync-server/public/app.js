@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v48";
+} from "./offline-storage.js?v=20260726-web-reliability-v50";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6395,15 +6395,15 @@ function updateSearchDock(panel, instance, resultCount = null) {
   const clearButton = panel.querySelector(".search-clear-button");
   filterRail.hidden = !query;
   clearButton.hidden = !query;
-  summary.hidden = !query || resultCount === null;
-  if (resultCount !== null) {
-    const scope = selectedPrefixes.length === 0
-      ? "All Codes"
-      : selectedPrefixes.length === 1
-        ? codeDisplayLabel(selectedPrefixes[0])
-        : `${selectedPrefixes.length} code books`;
-    summaryCopy.textContent = `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
-  }
+  summary.hidden = !query;
+  const scope = selectedPrefixes.length === 0
+    ? "All Codes"
+    : selectedPrefixes.length === 1
+      ? codeDisplayLabel(selectedPrefixes[0])
+      : `${selectedPrefixes.length} code books`;
+  summaryCopy.textContent = resultCount === null
+    ? `Searching in ${scope}`
+    : `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
 }
 
 function renderSearchHistory(panel, instance) {
