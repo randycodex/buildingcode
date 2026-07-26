@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v41";
+} from "./offline-storage.js?v=20260726-web-reliability-v43";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13351,7 +13351,7 @@ async function clearSettingsBookmarks() {
   state.localProjectSections = [];
   enqueueSettingsBulkClear("bookmarks");
   saveWorkspaceState();
-  if (account) void flushPendingSyncAndRender().catch(() => {});
+  if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
   return records.length;
 }
 
@@ -13371,7 +13371,7 @@ async function clearSettingsAnnotations(field) {
   if (field === "noteBody") state.sectionNotes = {};
   enqueueSettingsBulkClear(field === "noteBody" ? "notes" : "tags");
   saveWorkspaceState();
-  if (activeAccount()) void flushPendingSyncAndRender().catch(() => {});
+  if (activeAccount()) await flushSyncOutbox({ refresh: true }).catch(() => {});
   return uniqueTargets.size;
 }
 
@@ -13406,7 +13406,7 @@ async function performSettingsClearAction(action) {
       }
     }
     saveWorkspaceState();
-    if (account) void flushPendingSyncAndRender().catch(() => {});
+    if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
     return 0;
   }
   if (action === "bookmarks") return clearSettingsBookmarks();
@@ -14282,6 +14282,20 @@ async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
   container.append(firmStatus);
 }
 
+async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft) {
+  const refreshPaneIDs = activePaneIDs().filter((paneID) => paneID !== "utility:settings");
+  await transitionWorkspace("utility", { refreshPaneIDs });
+  const settingsPanel = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
+  if (settingsPanel) settingsPanel.scrollTop = Math.min(
+    settingsScrollTop,
+    Math.max(0, settingsPanel.scrollHeight - settingsPanel.clientHeight)
+  );
+  track.scrollLeft = Math.min(
+    workspaceScrollLeft,
+    Math.max(0, track.scrollWidth - track.clientWidth)
+  );
+}
+
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
@@ -14798,11 +14812,13 @@ function renderSettings() {
       const [title, message] = clearActionCopy[action];
       const confirmed = await confirmWebWarning(title, message, { confirmLabel: "Confirm" });
       if (!confirmed) return;
+      const settingsScrollTop = panel.scrollTop;
+      const workspaceScrollLeft = track.scrollLeft;
       button.disabled = true;
       try {
         const count = await performSettingsClearAction(action);
         setStatus(action === "searches" ? "Recent searches cleared." : `${count} ${action} cleared.`);
-        await renderWorkspace();
+        await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft);
       } catch (error) {
         setStatus(error.message || `Could not clear ${action}.`, true);
         button.disabled = false;

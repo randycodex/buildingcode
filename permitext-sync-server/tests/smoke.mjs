@@ -884,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v41'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v43'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1404,6 +1404,15 @@ async function main() {
         workspaceStyles.text.includes(".is-project-selecting .project-selection-check") &&
         workspaceStyles.text.includes(".project-row.is-selected"),
       "Project bulk selection omitted its compact Archive actions, selection indicators, or selected-card treatment."
+    );
+    assert(
+      workspaceScript.text.includes("async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft)") &&
+        workspaceScript.text.includes('activePaneIDs().filter((paneID) => paneID !== "utility:settings")') &&
+        workspaceScript.text.includes('track.querySelector(\'.workspace-panel[data-pane-id="utility:settings"]\')') &&
+        workspaceScript.text.includes("settingsPanel.scrollTop = Math.min(") &&
+        workspaceScript.text.includes("await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft)") &&
+        workspaceScript.text.includes("await flushSyncOutbox({ refresh: true }).catch(() => {})"),
+      "Settings clear-all actions no longer preserve the Settings column's position while refreshing affected panes."
     );
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&
