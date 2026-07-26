@@ -834,7 +834,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v20'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v22'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
@@ -843,6 +843,14 @@ async function main() {
       webRoot.text.includes("settings-footer-links") &&
         webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v21'),
       "settings footer links should stay centered with the current stylesheet"
+    );
+    assert(
+      !webRoot.text.includes("settings-code-section-select") &&
+        !webRoot.text.includes(">Code Section</span>") &&
+        !workspaceScript.text.includes("settingsCodePrefix") &&
+        !iosSettingsSource.includes("codeSectionPicker") &&
+        !iosSettingsSource.includes('settingsMenuRow(label: "Code Section")'),
+      "Settings should not duplicate the code picker already available in each Reader"
     );
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&

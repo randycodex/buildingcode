@@ -52,8 +52,6 @@ struct SettingsView: View {
                             jurisdictionPicker
                             Divider()
                             versionPicker
-                            Divider()
-                            codeSectionPicker
                         }
                     }
 
@@ -195,43 +193,6 @@ struct SettingsView: View {
                             Label(
                                 versionOptionTitle(for: version),
                                 systemImage: version.fileName == library.selectedVersionFileName ? "checkmark" : ""
-                            )
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var codeSectionPicker: some View {
-        Group {
-            if library.codeSections.isEmpty {
-                HStack {
-                    Text("All sections are currently shown.")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .padding(CodeScreenMetrics.cardPadding)
-            } else {
-                settingsMenuRow(label: "Code Section") {
-                    Text(selectedCodeSectionName)
-                        .font(SettingsRowTypography.value)
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.trailing)
-                } content: {
-                    Button {
-                        library.updateSelectedCodeSection(id: nil)
-                    } label: {
-                        Label("All Sections", systemImage: library.selectedCodeSectionID == nil ? "checkmark" : "")
-                    }
-
-                    ForEach(library.codeSections) { codeSection in
-                        Button {
-                            library.updateSelectedCodeSection(id: codeSection.id)
-                        } label: {
-                            Label(
-                                CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                                systemImage: codeSection.id == library.selectedCodeSectionID ? "checkmark" : ""
                             )
                         }
                     }
@@ -1183,14 +1144,6 @@ struct SettingsView: View {
 
     private func versionOptionTitle(for version: BundledCodeVersion) -> String {
         CodeLibraryViewModel.displayName(forLibraryName: version.codeVersion)
-    }
-
-    private var selectedCodeSectionName: String {
-        if let selectedCodeSectionID = library.selectedCodeSectionID,
-           let selected = library.codeSections.first(where: { $0.id == selectedCodeSectionID }) {
-            return CodeLibraryViewModel.displayName(forCodeSectionName: selected.name)
-        }
-        return "All Sections"
     }
 
     private func settingsMenuRow<Value: View, Content: View>(

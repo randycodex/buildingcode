@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v20";
+} from "./offline-storage.js?v=20260726-web-reliability-v22";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -242,7 +242,6 @@ function loadWorkspaceState() {
       recentChaptersByCode: saved.recentChaptersByCode && typeof saved.recentChaptersByCode === "object" ? saved.recentChaptersByCode : {},
       continuityAppliedAt: saved.continuityAppliedAt || null,
       readerSettings: normalizeReaderSettings(saved.readerSettings),
-      settingsCodePrefix: typeof saved.settingsCodePrefix === "string" ? saved.settingsCodePrefix : "",
       savedTextSize: clampNumber(saved.savedTextSize, 10, 18, 10),
       researchConversationID: typeof saved.researchConversationID === "string" ? saved.researchConversationID : "",
       workboards: activeProjectDetail && savedWorkboards.some((item) => projectDetailMatches(activeProjectDetail, item))
@@ -291,7 +290,6 @@ function loadWorkspaceState() {
       recentChaptersByCode: {},
       continuityAppliedAt: null,
       readerSettings: { ...defaultReaderSettings },
-      settingsCodePrefix: "",
       savedTextSize: 10,
       researchConversationID: "",
       workboards: [],
@@ -3462,11 +3460,9 @@ function continuityValuesForReader(reader) {
     ...existing,
     selectedJurisdictionKey: "jurisdiction-1",
     selectedVersionFileName: defaultSyncCodeVersion,
-    selectedCodeSectionID: state.settingsCodePrefix === "ALL"
-      ? ""
-      : chapter?.codeSectionID
-        ? String(chapter.codeSectionID)
-        : existing.selectedCodeSectionID || "",
+    selectedCodeSectionID: chapter?.codeSectionID
+      ? String(chapter.codeSectionID)
+      : existing.selectedCodeSectionID || "",
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
@@ -13264,31 +13260,6 @@ async function openSectionDetailForExistingSearch(item, options = {}) {
   await openSectionDetail(searchInstance.id, item, options);
 }
 
-function settingsCodeSectionOptions() {
-  return searchCodeFilterOptions();
-}
-
-function selectedSettingsCodePrefix() {
-  const available = new Set(settingsCodeSectionOptions().map((option) => option.prefix));
-  if (available.has(state.settingsCodePrefix)) return state.settingsCodePrefix;
-  return state.readers?.[0]?.codePrefix || "ALL";
-}
-
-async function updateSettingsCodeSection(prefix) {
-  state.settingsCodePrefix = settingsCodeSectionOptions().some((option) => option.prefix === prefix) ? prefix : "ALL";
-  const primaryReader = state.readers?.[0];
-  if (primaryReader && state.settingsCodePrefix !== "ALL" && primaryReader.codePrefix !== state.settingsCodePrefix) {
-    primaryReader.codePrefix = state.settingsCodePrefix;
-    primaryReader.chapterID = await firstChapterIDForCode(primaryReader.codePrefix);
-    primaryReader.sectionID = "";
-    primaryReader.sectionNumber = "";
-    primaryReader.title = "Reader";
-  }
-  saveWorkspaceState();
-  if (primaryReader?.chapterID) scheduleContinuitySync(primaryReader);
-  await renderWorkspace();
-}
-
 function normalizedPublicUsername(value) {
   const trimmed = String(value || "").trim().replace(/^@/, "").toLowerCase();
   return trimmed || null;
@@ -14240,7 +14211,6 @@ function renderSettings() {
 
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
-  const codeSectionSelect = panel.querySelector(".settings-code-section-select");
   const accountCopy = panel.querySelector(".account-status-copy");
   const planDetail = panel.querySelector(".account-plan-detail");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
@@ -14334,15 +14304,6 @@ function renderSettings() {
 
   jurisdictionSelect.value = "jurisdiction-1";
   versionSelect.value = defaultSyncCodeVersion;
-  settingsCodeSectionOptions().forEach((option) => {
-    const element = document.createElement("option");
-    element.value = option.prefix;
-    element.textContent = option.label;
-    codeSectionSelect.append(element);
-  });
-  codeSectionSelect.value = selectedSettingsCodePrefix();
-  codeSectionSelect.addEventListener("change", () => updateSettingsCodeSection(codeSectionSelect.value));
-
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const account = activeAccount();
