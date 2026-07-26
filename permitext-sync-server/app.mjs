@@ -11547,6 +11547,7 @@ function canonicalMutationRecordID(kind, record) {
       codeVersion,
       syncProjectIdentity(record.folderClientID, userID) || record.localFolderID || null,
       sectionID,
+      normalizedBlockID(record.blockID) || null,
       record.scope || null
     ].filter(Boolean).join(":");
   }
@@ -11621,7 +11622,7 @@ async function canonicalizeSectionRecord(kind, record) {
       ? record.webSectionID || record.sectionID
       : record.webSectionID
   };
-  if (kind === "annotation") {
+  if (kind === "annotation" || kind === "projectSection") {
     normalized.blockID = await canonicalBlockIDFor(normalized.sectionID, normalized.blockID);
   }
   const nextID = canonicalMutationRecordID(kind, normalized);

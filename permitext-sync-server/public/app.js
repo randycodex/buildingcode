@@ -9,7 +9,7 @@ import {
   syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260724-zoning-library-v3";
+} from "./sync-identity.js?v=20260726-paragraph-projects-v4";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v51";
+} from "./offline-storage.js?v=20260726-web-reliability-v52";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -3091,7 +3091,8 @@ function currentContentSummary() {
   });
   const projectSectionIdentity = (item) => [
     item.folderClientID || item.projectID || item.localFolderID || "project",
-    item.sectionID || item.savedSectionID || item.itemID || item.id || "section"
+    item.sectionID || item.savedSectionID || item.itemID || item.id || "section",
+    normalizeAnnotationBlockID(item.blockID)
   ].map(String).join(":");
   const projectSectionsByID = new Map(
     (summary.projectSections || [])
@@ -4027,9 +4028,10 @@ function projectSectionRecordForSection(project, sectionPayload) {
   const account = activeAccount();
   const now = new Date().toISOString();
   const sectionID = String(sectionPayload.sectionID || "");
+  const blockID = normalizeAnnotationBlockID(sectionPayload.blockID);
   const folderClientID = project.clientID || project.id || project.localFolderID || "";
   return {
-    id: `web-project-section-${folderClientID}-${sectionID}`,
+    id: `web-project-section-${folderClientID}-${sectionID}${blockID ? `-${safeAnnotationIDPart(blockID)}` : ""}`,
     userID: account?.userID || "local-web",
     codeVersion: syncCodeVersion(
       sectionPayload.codeVersion || syncCodeVersionForPrefix(sectionPayload.codePrefix)
@@ -4040,6 +4042,8 @@ function projectSectionRecordForSection(project, sectionPayload) {
     folderClientID,
     localFolderID: numericLocalFolderID(project) || null,
     sectionID: Number(sectionID),
+    blockID,
+    blockLabel: sectionPayload.blockLabel || "",
     sectionNumber: sectionPayload.sectionNumber || "",
     title: sectionPayload.title || "Section",
     scope: "manual",
@@ -4057,6 +4061,7 @@ function projectSectionMutationForSection(project, sectionPayload) {
       folderClientID: record.folderClientID,
       localFolderID: record.localFolderID,
       sectionID: record.sectionID,
+      blockID: record.blockID || null,
       scope: record.scope,
       updatedAt: record.updatedAt
     }
@@ -4074,6 +4079,7 @@ function deletedProjectSectionMutationForItem(project, item) {
       folderClientID: item.folderClientID || record.folderClientID,
       localFolderID: item.localFolderID || record.localFolderID,
       sectionID: Number(item.sectionID || item.savedSectionID || item.itemID),
+      blockID: normalizeAnnotationBlockID(item.blockID) || null,
       scope: item.scope || record.scope,
       updatedAt: now,
       deletedAt: now
@@ -4480,6 +4486,7 @@ async function removeSectionFromAllProjects(sectionPayload) {
 
 async function removeSectionFromProject(project, item, options = {}) {
   const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
+  const blockID = normalizeAnnotationBlockID(item.blockID);
   const projectID = projectRecordID(project);
   if (!sectionID || !projectID) return;
 
@@ -4487,6 +4494,7 @@ async function removeSectionFromProject(project, item, options = {}) {
     String(candidate.id || "") === String(item.projectSectionID || item.id || "") ||
     (
       String(candidate.sectionID || candidate.savedSectionID || candidate.itemID || "") === sectionID &&
+      normalizeAnnotationBlockID(candidate.blockID) === blockID &&
       projectSectionBelongsToProject(candidate, project)
     );
 
@@ -4798,6 +4806,81 @@ function renderAnnotationTagEditor(container, target, options = {}) {
   container.append(label, chips, input);
 }
 
+function projectLinkForAnnotationTarget(project, target) {
+  const sectionID = String(target.sectionID || "");
+  const blockID = normalizeAnnotationBlockID(target.blockID);
+  return currentContentSummary().projectSections.find((item) =>
+    String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID &&
+    normalizeAnnotationBlockID(item.blockID) === blockID &&
+    projectSectionBelongsToProject(item, project)
+  );
+}
+
+function renderAnnotationProjectEditor(container, target, sectionPayload, options = {}) {
+  if (!container || !target?.sectionID) return;
+  clear(container);
+
+  const label = document.createElement("p");
+  label.className = "annotation-tags-label";
+  label.textContent = "Projects";
+
+  const chips = document.createElement("div");
+  chips.className = "annotation-project-chips";
+  const projects = hasCapability("projects")
+    ? activeProjectRecords(currentContentSummary().projects || [])
+    : [];
+
+  if (!hasCapability("projects")) {
+    const unavailable = document.createElement("span");
+    unavailable.className = "annotation-projects-empty";
+    unavailable.textContent = "Pro required";
+    chips.append(unavailable);
+  } else if (!projects.length) {
+    const empty = document.createElement("span");
+    empty.className = "annotation-projects-empty";
+    empty.textContent = "No projects";
+    chips.append(empty);
+  } else {
+    projects.forEach((project) => {
+      const existingLink = projectLinkForAnnotationTarget(project, target);
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "annotation-project-chip";
+      button.classList.toggle("is-selected", Boolean(existingLink));
+      button.style.setProperty("--project-color", projectColor(project));
+      button.setAttribute("aria-pressed", String(Boolean(existingLink)));
+      button.setAttribute(
+        "aria-label",
+        `${existingLink ? "Remove from" : "Add to"} ${project.name || project.title || "project"}`
+      );
+      button.textContent = project.name || project.title || "Project";
+      button.addEventListener("click", async () => {
+        button.disabled = true;
+        try {
+          const currentLink = projectLinkForAnnotationTarget(project, target);
+          if (currentLink) {
+            await removeSectionFromProject(project, currentLink, { removeBookmark: false });
+          } else {
+            if (!isSectionSaved(sectionPayload.sectionID)) {
+              const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
+              if (!saved) return;
+              syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+            }
+            await persistSectionInProject(project, { ...sectionPayload, ...target });
+          }
+          renderAnnotationProjectEditor(container, target, sectionPayload, options);
+          options.onChange?.();
+        } finally {
+          button.disabled = false;
+        }
+      });
+      chips.append(button);
+    });
+  }
+
+  container.append(label, chips);
+}
+
 function annotationTargetForSection(section, reader = null, overrides = {}) {
   const codePrefix = reader?.codePrefix || section.codePrefix || "BC";
   return {
@@ -5028,7 +5111,7 @@ function renderAnnotatedCodeBlock(block, section, reader, target, options = {}) 
     if (event.target.closest("a, button, input, textarea, select")) return;
     if (window.getSelection && String(window.getSelection()).trim()) return;
     const panel = wrapper.closest(".reader-panel");
-    openReaderNotesSheet(panel, section, reader, { target });
+    toggleReaderNotesSheet(panel, section, reader, { target });
   });
   return wrapper;
 }
@@ -5150,11 +5233,18 @@ function ensureReaderNotesSheet(panel, reader) {
     syncReaderNoteControls(sectionID, blockID, input.value, { source: input });
   });
 
+  const commentsLabel = document.createElement("p");
+  commentsLabel.className = "annotation-tags-label reader-notes-comments-label";
+  commentsLabel.textContent = "Comments";
+
+  const projectsHost = document.createElement("section");
+  projectsHost.className = "reader-notes-projects";
+
   const tagsHost = document.createElement("section");
   tagsHost.className = "reader-notes-tags";
 
   bindReaderNotesResize(resizer, sheet, panel);
-  sheet.append(resizer, header, input, tagsHost);
+  sheet.append(resizer, header, commentsLabel, input, projectsHost, tagsHost);
   panel.append(sheet);
   return sheet;
 }
@@ -5198,10 +5288,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   pickerHeader.append(label, doneButton);
   picker.append(pickerHeader);
 
-  const projectLink = (project) => currentContentSummary().projectSections.find((item) =>
-    String(item.sectionID || item.savedSectionID || item.itemID || "") === String(sectionPayload.sectionID || "") &&
-    projectSectionBelongsToProject(item, project)
-  );
+  const projectLink = (project) => projectLinkForAnnotationTarget(project, sectionPayload);
 
   const setProjectButtonState = (button, selected) => {
     button.classList.toggle("is-selected", selected);
@@ -5324,15 +5411,20 @@ function bindReaderNotesResize(resizer, sheet, panel) {
   });
 }
 
-function toggleReaderNotesSheet(panel, section, reader) {
+function toggleReaderNotesSheet(panel, section, reader, options = {}) {
   if (!panel || !section) return;
   const sheet = panel.querySelector(".reader-notes-sheet.is-open");
   const sectionID = sectionNoteKey(section.id);
-  if (sheet?.dataset.sectionId === sectionID && !sheet?.dataset.blockId) {
+  const target = options.target || annotationTargetForSection(section, reader);
+  const blockID = normalizeAnnotationBlockID(target.blockID);
+  if (
+    sheet?.dataset.sectionId === sectionID &&
+    normalizeAnnotationBlockID(sheet?.dataset.blockId) === blockID
+  ) {
     closeReaderNotesSheet(panel, reader);
     return;
   }
-  openReaderNotesSheet(panel, section, reader);
+  openReaderNotesSheet(panel, section, reader, { ...options, target });
 }
 
 function setReaderNotesActiveTarget(panel, sectionID = "", blockID = "") {
@@ -5363,12 +5455,15 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const saved = isSectionSaved(section.id);
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
   const sectionPayload = {
+    codeVersion: target.codeVersion,
     sectionID: section.id,
     sectionNumber: section.sectionNumber,
     title: section.title,
     codePrefix: reader?.codePrefix || "BC",
     chapterID: reader?.chapterID || "",
-    chapterNumber: section.chapterNumber || ""
+    chapterNumber: section.chapterNumber || "",
+    blockID,
+    blockLabel: target.blockLabel || ""
   };
   if (bookmarkButton) {
     bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save bookmark"}</span>`;
@@ -5395,6 +5490,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   }
 
   const input = sheet.querySelector(".reader-notes-input");
+  const projectsHost = sheet.querySelector(".reader-notes-projects");
   const tagsHost = sheet.querySelector(".reader-notes-tags");
   sheet.dataset.sectionId = sectionID;
   sheet.dataset.blockId = blockID;
@@ -5403,6 +5499,11 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   removeReaderNotesProjectPicker(sheet);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+  renderAnnotationProjectEditor(projectsHost, target, sectionPayload, {
+    onChange: () => {
+      if (state.utilities.saved) renderWorkspace();
+    }
+  });
   renderAnnotationTagEditor(tagsHost, target, {
     onChange: () => {
       if (state.utilities.saved) renderWorkspace();
@@ -11806,13 +11907,23 @@ async function renderProjectDetail(detail) {
     };
     try {
       const { chapter, section } = await resolveSectionDetail(resolvedDetail);
+      const blockID = normalizeAnnotationBlockID(item.blockID);
+      const block = blockID
+        ? annotatedBlocksForSection(section).find((candidate) =>
+            normalizeAnnotationBlockID(candidate?.id || candidate?.tableID || candidate?.imageID) === blockID
+          )
+        : null;
       return {
         ...item,
         ...resolvedDetail,
+        blockID,
         chapterID: resolvedDetail.chapterID || chapter?.id || "",
         sectionNumber: section?.sectionNumber || resolvedDetail.sectionNumber,
         title: section?.title || resolvedDetail.title,
-        previewText: sectionPlainText(section).replace(/\s+/g, " ").trim().slice(0, 260)
+        previewText: (block?.plainText || block?.text || sectionPlainText(section))
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 260)
       };
     } catch {
       return { ...item, ...resolvedDetail, previewText: "" };

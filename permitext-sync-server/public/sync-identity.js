@@ -93,7 +93,15 @@ export function syncMutationRecordID(mutation) {
   if (kind === "projectSection") {
     const projectID = syncProjectIdentity(record.folderClientID, userID) || nonEmpty(record.localFolderID);
     if (!sectionID) return null;
-    return [userID, "project-section", codeVersion, projectID, sectionID, nonEmpty(record.scope)]
+    return [
+      userID,
+      "project-section",
+      codeVersion,
+      projectID,
+      sectionID,
+      nonEmpty(record.blockID),
+      nonEmpty(record.scope)
+    ]
       .filter(Boolean)
       .join(":");
   }

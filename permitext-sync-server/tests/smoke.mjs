@@ -888,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v51'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v52'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -902,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v47'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v48'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1144,7 +1144,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
-        workspaceScript.text.includes('openReaderNotesSheet(panel, section, reader, { target });') &&
+        workspaceScript.text.includes('toggleReaderNotesSheet(panel, section, reader, { target });') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved projects")') &&
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
         workspaceScript.text.includes('bookmarkButton.hidden = !saved') &&
@@ -1306,6 +1306,15 @@ async function main() {
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
         !workspaceStyles.text.includes(".annotated-code-block:hover .inline-bookmark-toggle"),
       "Reader annotation status icons still appear on hover without a saved note or bookmark."
+    );
+    assert(
+      workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&
+        workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
+        workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
+        workspaceScript.text.includes('label.textContent = "Projects";') &&
+        workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
+        workspaceStyles.text.match(/\.annotation-project-chip,[\s\S]*?border-radius: var\(--radius-pill\);/),
+      "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
@@ -5869,12 +5878,13 @@ async function main() {
         folderClientID: "project-client-smoke",
         localFolderID: 42,
         sectionID: 900001,
+        blockID: "paragraph-smoke",
         scope: "manual",
         updatedAt: "2026-06-06T00:00:00Z"
       }
     };
     const projectRecordID = `${userID}:project:${defaultSyncCodeVersion}:project-client-smoke`;
-    const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:900001:manual`;
+    const projectSectionRecordID = `${userID}:project-section:${defaultSyncCodeVersion}:project-client-smoke:900001:paragraph-smoke:manual`;
     const projectPush = await request("/sync/push", {
       method: "POST",
       token: currentSmokeUserToken,

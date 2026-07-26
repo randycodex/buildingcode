@@ -8,8 +8,8 @@
   --reader-notes-surface: #eeeeee;
   --reader-notes-input-surface: #ffffff;
   --reader-notes-active-text: #00636d;
-  --reader-notes-default-height: 360px;
-  --reader-notes-min-height: 320px;
+  --reader-notes-default-height: 440px;
+  --reader-notes-min-height: 360px;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
@@ -2019,6 +2019,7 @@ select option:checked {
   padding: var(--space-4) var(--space-4) calc(var(--space-5) + var(--space-4));
   flex-direction: column;
   gap: var(--space-4);
+  overflow-y: auto;
   border: 0;
   border-radius: 0;
   background: var(--reader-notes-surface);
@@ -2266,10 +2267,54 @@ select option:checked {
   outline-offset: 0;
 }
 
+.reader-notes-projects,
 .reader-notes-tags,
 .section-detail-tags {
   display: grid;
   gap: var(--space-2);
+}
+
+.reader-notes-comments-label {
+  margin-bottom: calc(-1 * var(--space-2));
+}
+
+.annotation-project-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.annotation-project-chip,
+.annotation-projects-empty {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--project-color, var(--text-primary)) 18%, transparent);
+  color: var(--text-primary);
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.annotation-project-chip {
+  cursor: pointer;
+}
+
+.annotation-project-chip.is-selected {
+  background: color-mix(in srgb, var(--project-color) 44%, transparent);
+}
+
+.annotation-project-chip:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
+.annotation-projects-empty {
+  background: color-mix(in srgb, var(--code-accent) 14%, var(--surface-muted));
+  color: var(--text-secondary);
 }
 
 .annotation-tags-label {

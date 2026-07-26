@@ -143,6 +143,21 @@ assert.equal(
 assert.equal(
   syncMutationRecordID({
     projectSection: {
+      id: "web-project-paragraph-local",
+      folderClientID: "shared-project-id",
+      localFolderID: 42,
+      userID,
+      codeVersion: "nyc-2022",
+      sectionID: 101,
+      blockID: "101-html-2",
+      scope: "manual"
+    }
+  }),
+  `${userID}:project-section:${defaultSyncCodeVersion}:shared-project-id:101:101-html-2:manual`
+);
+assert.equal(
+  syncMutationRecordID({
+    projectSection: {
       id: "remove-section-from-all-projects",
       userID,
       codeVersion: "2022 Construction Codes",
