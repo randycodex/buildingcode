@@ -878,7 +878,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v31'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v32'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1207,6 +1207,10 @@ async function main() {
         workspaceStyles.text.includes(".custom-select-option.is-indented") &&
         workspaceStyles.text.includes(".custom-select-option.is-group-action"),
       "Reader picker group headings or Construction Code indentation styles are missing."
+    );
+    assert(
+      workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible \{[\s\S]*?outline: 0;[\s\S]*?text-decoration: underline;/),
+      "Top toolbar text buttons should use an underline focus cue without a pill outline."
     );
     assert(
       workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
