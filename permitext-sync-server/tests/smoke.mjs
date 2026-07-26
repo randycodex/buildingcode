@@ -323,7 +323,8 @@ async function main() {
       '>Code Preferences</h3>',
       '>Plan</h3>',
       '>Account</h3>',
-      '>Sync</h3>',
+      '>Firm &amp; Collaboration</h3>',
+      '>Offline Access</h3>',
       '>Data &amp; Storage</h3>',
       '>Projects</h4>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
@@ -833,9 +834,11 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v19'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v20'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
+    assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
+    assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
       evidenceDiscoveryClientSource.includes("Candidate · not approved") &&

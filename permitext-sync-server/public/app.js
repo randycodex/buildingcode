@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v19";
+} from "./offline-storage.js?v=20260726-web-reliability-v20";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14250,10 +14250,6 @@ function renderSettings() {
   const checkoutButton = panel.querySelector(".account-checkout");
   const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
-  const syncTitle = panel.querySelector(".account-sync-title");
-  const syncIcon = panel.querySelector(".account-sync-icon");
-  const syncButton = panel.querySelector(".account-sync-now");
-  const syncConflicts = panel.querySelector(".account-sync-conflicts");
   const offlineCopy = panel.querySelector(".settings-offline-copy");
   const offlineStatus = panel.querySelector(".settings-offline-status");
   const offlineProgress = panel.querySelector(".settings-offline-progress");
@@ -14347,54 +14343,6 @@ function renderSettings() {
   codeSectionSelect.value = selectedSettingsCodePrefix();
   codeSectionSelect.addEventListener("change", () => updateSettingsCodeSection(codeSectionSelect.value));
 
-  const renderSyncState = () => {
-    const account = activeAccount();
-    const pending = account ? (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID) : [];
-    const conflicts = account ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID) : [];
-    const offline = navigator.onLine === false || !serverReachable;
-    syncButton.disabled = !account || offline;
-    syncIcon.textContent = !account ? "!" : offline ? "○" : conflicts.length || pending.length ? "↻" : "✓";
-    syncTitle.textContent = !account
-      ? "Not signed in"
-      : offline ? pending.length ? `${pending.length} changes waiting for internet` : "Offline · saved on this device"
-        : conflicts.length ? "Review needed"
-          : pending.length ? "Changes waiting"
-            : "Up to date";
-    clear(syncConflicts);
-    conflicts.slice(0, 5).forEach((entry) => {
-      const { kind, record } = mutationKindAndRecord(entry.mutation);
-      const row = document.createElement("article");
-      row.className = "settings-conflict-row";
-      const heading = document.createElement("strong");
-      heading.textContent = record?.title || record?.name || kind || "Saved change";
-      const message = document.createElement("span");
-      message.textContent = "The server has a newer copy.";
-      const actions = document.createElement("div");
-      actions.className = "connector-actions";
-      [
-        ["Use server", false],
-        ["Keep mine", true]
-      ].forEach(([label, keepLocal]) => {
-        const button = document.createElement("button");
-        button.className = "settings-mini-button";
-        button.type = "button";
-        button.textContent = label;
-        button.addEventListener("click", async () => {
-          button.disabled = true;
-          try {
-            await resolveSyncConflict(entry, keepLocal);
-          } catch (error) {
-            setStatus(error.message || "Could not resolve this sync conflict.", true);
-            button.disabled = false;
-          }
-        });
-        actions.append(button);
-      });
-      row.append(heading, message, actions);
-      syncConflicts.append(row);
-    });
-  };
-
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const account = activeAccount();
@@ -14481,7 +14429,6 @@ function renderSettings() {
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
     accountCopy.textContent = "Sign in to sync saved sections, notes, and Projects across your devices.";
-    renderSyncState();
     void renderOfflineState();
   };
 
@@ -14752,19 +14699,6 @@ function renderSettings() {
       return;
     }
     planSecondaryButton.disabled = false;
-  });
-  syncButton.addEventListener("click", async () => {
-    syncButton.disabled = true;
-    syncButton.textContent = "Syncing...";
-    try {
-      await flushSyncOutbox({ refresh: true });
-      await loadSyncedContent({ force: true });
-      await renderWorkspace();
-    } catch (error) {
-      setStatus(error.message || "Sync failed.", true);
-      syncButton.disabled = false;
-      syncButton.textContent = "Sync Now";
-    }
   });
   offlineDownload.addEventListener("click", async () => {
     const account = activeAccount();

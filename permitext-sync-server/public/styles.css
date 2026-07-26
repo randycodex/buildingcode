@@ -6788,8 +6788,7 @@ button.project-studio-metric:focus-visible {
 .settings-card-copy,
 .settings-disclaimer,
 .settings-status-message,
-.account-profile-helper,
-.account-sync-status p {
+.account-profile-helper {
   margin: 0;
   color: var(--text-secondary);
   line-height: 1.4;
@@ -6912,31 +6911,6 @@ button.project-studio-metric:focus-visible {
   color: #b54708;
 }
 
-.account-sync-status {
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.account-sync-icon {
-  display: grid;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  color: var(--text-secondary);
-  font-weight: 700;
-}
-
-.account-sync-title {
-  font-weight: 400;
-}
-
-.account-sync-conflicts {
-  display: grid;
-  gap: var(--space-2);
-}
-
 .settings-projects-heading {
   display: flex;
   align-items: center;
@@ -7034,19 +7008,6 @@ button.project-studio-metric:focus-visible {
 
 .settings-project-delete:not(:disabled) {
   color: #d92d20;
-}
-
-.settings-conflict-row {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-3);
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, #f79009 9%, transparent);
-}
-
-.settings-conflict-row > span {
-  color: var(--text-secondary);
-  font-size: 10pt !important;
 }
 
 .settings-mini-button {
@@ -7284,8 +7245,7 @@ button.project-studio-metric:focus-visible {
 
 .settings-panel .settings-card-copy,
 .settings-panel .account-profile-helper,
-.settings-panel .connector-status,
-.settings-panel .account-sync-status p {
+.settings-panel .connector-status {
   font-size: 9.5pt !important;
   line-height: 1.35;
 }
@@ -7439,8 +7399,7 @@ button.project-studio-metric:focus-visible {
   margin-top: 2px;
 }
 
-.settings-panel .settings-destructive-secondary,
-.settings-panel .account-sync-now {
+.settings-panel .settings-destructive-secondary {
   border: 0;
   background: var(--text-primary);
   color: var(--surface);
@@ -7448,29 +7407,6 @@ button.project-studio-metric:focus-visible {
 
 .settings-panel .settings-destructive-secondary {
   margin-top: 2px;
-}
-
-.settings-panel .account-sync-status {
-  grid-template-columns: 24px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 44px;
-  padding: 2px 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-
-.settings-panel .account-sync-icon {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--text-primary) 8%, transparent);
-  font-size: 9pt !important;
-}
-
-.settings-panel .account-sync-title {
-  font-size: 9.75pt !important;
 }
 
 .settings-panel .reader-preview-card {
