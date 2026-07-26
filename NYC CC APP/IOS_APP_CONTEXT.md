@@ -1,169 +1,123 @@
-# NYC CC APP iPhone App Context
+# Permitext iPhone app context
 
-Use this file as the handoff note for any new thread focused on the iPhone app at:
+Use this as the current handoff for iOS work in:
 
 - `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP`
 
-## Project purpose
+## Product boundary
 
-`NYC CC APP` is an iPhone SwiftUI app for browsing the NYC Building Code from a bundled SQLite database. The source of truth is SQLite, not PDFs. The importer converts PDFs into SQLite, and the app reads the bundled database plus bundled figure images.
+Permitext is a local-first NYC code-research workspace. The iPhone app reads
+bundled Construction Code and Zoning Resolution content, stores personal work
+locally, and synchronizes supported records through the Permitext backend after
+sign-in.
 
-The core rule is still:
+Search discovers candidate provisions. Research is a separate, selected-evidence
+workflow: it may use only the enacted passages the user selected and must expose
+citations, uncertainty, missing facts, and limitations.
 
-- `sections.official_text` is the immutable extracted official text
-- display styling is applied at render time
-- manual presentation fixes are stored separately as metadata or rich-text overrides
+Free includes reading, search, recent history, bounded saved sections and notes,
+continuity, and cross-device sync. Pro adds unlimited saved work, Projects,
+Notebook, Report Draft, professional exports, tags, and offline access. Research
+is a separate add-on that requires Pro.
 
-## Current data setup
+## Project and build
 
-The app currently bundles both:
+- Xcode project: `NYC CC APP/NYC CC APP.xcodeproj`
+- Scheme: `permitext`
+- App source: `NYC CC APP/permitext`
+- App entry: `NYC CC APP/permitext/PermitextApp.swift`
+- Contract tests: `NYC CC APP/permitextTests/EntitlementAndSyncContractTests.swift`
 
-- `/Users/randy/Documents/X_CODING/Building Code/NYCCode/NYCCode/Resources/nyc_code_2022.sqlite`
-- `/Users/randy/Documents/X_CODING/Building Code/NYCCode/NYCCode/Resources/nyc_code_sample.sqlite`
+Representative simulator command:
 
-Bundled figures are under:
+```sh
+xcodebuild test \
+  -project 'NYC CC APP/NYC CC APP.xcodeproj' \
+  -scheme permitext \
+  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' \
+  CODE_SIGNING_ALLOWED=NO
+```
 
-- `/Users/randy/Documents/X_CODING/Building Code/NYCCode/NYCCode/Resources/Figures`
+A successful build is not visual or runtime proof. Use the simulator or a
+physical device for reader layout, navigation, StoreKit, offline, and
+phone-to-web verification.
 
-The app auto-discovers bundled `nyc_code_<version>.sqlite` files and exposes them in Settings.
+## Content
 
-## Important current behavior
+Bundled authored content lives under:
 
-- The reader prefers `section_rich_text_overrides.rtf_data` when present.
-- If no rich-text override exists, the reader falls back to rule-based styling from `official_text` plus `text_spans`.
-- The macOS editor currently writes directly into the app-bundled `nyc_code_2022.sqlite`.
-- After editor changes, the iPhone app needs to be rebuilt/run again so the updated SQLite file is bundled into the app product.
+- `permitext/Resources/CodeContent/authored/new-york-city/2022-construction-codes`
+- `permitext/Resources/CodeContent/authored/new-york-city/2026-zoning-resolution`
 
-## Main features already implemented
+Construction content includes chapter HTML, prepared section bodies, a prepared
+search index, figures, and a structural/title-only classification catalog. The
+legacy SQLite code database remains a compatibility source and must treat search
+input as literal user text rather than executable FTS syntax.
 
-- Browse by chapter and section
-- Reader view
-- Full-text search via SQLite FTS5
-- Bookmarks
-- Notes
-- Code version selector
-- Settings with disclaimer and reader theme controls
-- Official figures
-- Separate `Practice Diagrams` section for `custom_diagrams`
-- Cross-reference resolution for chapter / section / appendix references
-- Support for rich-text section overrides created by the macOS editor
+Do not describe every catalog entry as having a standalone prepared body.
+Chapter HTML provides broader rendered coverage, while explicitly classified
+structural/title-only entries may not have an independent body.
 
-## Key app files
+## Important source files
 
-- App entry: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/NYCCCApp.swift`
-- Database layer: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Data/CodeDatabase.swift`
-- Bundled DB discovery: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Data/BundleDatabaseLocator.swift`
-- View model: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/ViewModels/CodeLibraryViewModel.swift`
-- Formatting engine: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Formatting/FormattingEngine.swift`
-- Reader UI: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Views/ReaderView.swift`
-- Browse UI: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Views/BrowseView.swift`
-- Search UI: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Views/SearchView.swift`
-- Bookmarks UI: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Views/BookmarksView.swift`
-- Settings UI: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Views/SettingsView.swift`
-- Reference resolver: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Data/CodeReferenceResolver.swift`
-- User data store for bookmarks/notes: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Data/UserDataStore.swift`
-- App plist: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYCCCApp/Info.plist`
-- Xcode project: `/Users/randy/Documents/X_CODING/Building Code/NYC CC APP/NYC CC APP.xcodeproj`
+- Database and legacy search: `permitext/Data/CodeDatabase.swift`
+- SQLite connection policy: `permitext/Data/SQLiteSupport.swift`
+- Local user data: `permitext/Data/UserDataStore.swift`
+- Shared models and merge decisions: `permitext/Models/CodeModels.swift`
+- Main application state: `permitext/ViewModels/CodeLibraryViewModel.swift`
+- Sync diagnostics and transport: `permitext/Diagnostics/Signposts.swift`
+- Reader views: `permitext/Views/ReaderView.swift`,
+  `permitext/Views/ChapterReaderView.swift`, and
+  `permitext/Views/ChapterHTMLReaderView.swift`
+- Saved work: `permitext/Views/BookmarksView.swift`
+- Settings and entitlement presentation: `permitext/Views/SettingsView.swift`
 
-## Database contract the app relies on
+## Data and sync rules
 
-Core tables used by the app:
+- Account identity is the Permitext/Apple account identity, not a Stripe billing
+  email.
+- Preserve pending local deletes until they upload or become an explicit
+  conflict; a pull must not silently consume them.
+- Free saved-section and note limits are account-wide across code versions.
+- StoreKit verification and backend entitlement/package metadata are separate
+  sources; StoreKit refresh must not erase backend package or add-on fields.
+- Continuity histories merge per entry on the server. Pending iOS continuity
+  activity must upload so recent views and searches from multiple devices can
+  converge.
+- Production phone-to-web proof uses `https://permitext-sync.vercel.app` with
+  PostgreSQL. The local JSON adapter is development storage, not production sync
+  proof.
 
-- `code_versions`
-- `chapters`
-- `sections`
-- `paragraphs`
-- `figures`
-- `section_figures`
-- `fts_paragraphs`
-- `text_spans`
-- `custom_diagrams`
-- `section_rich_text_overrides`
+## Reader and navigation rules
 
-The app currently expects the `section_rich_text_overrides` table to exist and uses it if present.
+- Resolve a deep-linked section through bundled content metadata; do not infer
+  Construction versus Zoning from numeric ID ranges.
+- Keep top-level HTML-reader navigation inside bundled local content, with
+  explicit handling for supported in-app code references.
+- On teardown, cancel pending loads, stop the web view, clear delegates, and
+  remove installed message handlers and user scripts.
+- Validate rendered behavior for tables, figures, typography, links, and
+  cross-code navigation. Source inspection alone is insufficient.
 
-## Reader rendering behavior
+## Offline verification
 
-Formatting priority is:
+Offline access is Pro-only. Testing edits while an already-open tab or view loses
+network connectivity is not a complete offline test. Verify:
 
-1. Rich-text override from `section_rich_text_overrides`
-2. Otherwise rule-based `FormattingEngine.render(officialText:spans:theme:)`
+- cached application shell;
+- offline reload/relaunch;
+- persistent code content;
+- figure and media recovery;
+- reconnect and outbox synchronization.
 
-Reader view currently shows:
+## Current release handoffs
 
-- section header
-- formatted text
-- resolved references
-- official figures
-- practice diagrams
-- notes editor
+- Cross-platform bug and hardening status:
+  `../PERMITEXT_BUG_AUDIT.md`
+- Manual release workflow:
+  `../PERMITEXT_RELEASE_WALKTHROUGH.md`
+- Server/web implementation and commands:
+  `../permitext-sync-server/README.md`
 
-## Cross-reference behavior
-
-Cross-reference resolution is implemented and is driven from the section’s official text.
-
-Current destinations supported:
-
-- section links
-- chapter links
-- appendix links
-
-The references appear as a separate `References` panel in the reader, not yet as inline tappable links inside the text body.
-
-## Theme and presentation behavior
-
-Theme controls are stored via `ReaderThemeStore`.
-
-Current adjustable presentation settings:
-
-- font choice
-- font size
-- line spacing
-- accent palette
-
-These affect rule-based rendering. Rich-text overrides may visually diverge from theme-driven formatting because they come from saved RTF.
-
-## Known workflow notes
-
-- If formatting looks wrong in the reader, first check whether that section has a rich-text override from the editor.
-- If the editor updates the database but the iPhone app does not reflect it, rerun the iPhone app so the updated SQLite is copied into the built app.
-- The app bundles figures as individual resources, not as a folder reference blob.
-- The app uses a real `Info.plist` because generated plist/bundle-id behavior caused earlier simulator install issues.
-
-## Recent weekend changes to verify
-
-- Search results should now show content previews.
-- Opening a search result should also show the expected preview text in the destination view.
-- Chapter-only search should stay scoped to the current chapter and should not pull sections from other chapters.
-- Authored HTML image assets should resolve correctly in chapter content.
-- Saved sorter and export flows should feel visually consistent and aligned.
-- Export progress UI and sort menu behavior should be checked together during regression testing.
-
-Suggested verification pass:
-
-- Confirm preview text appears in the search list.
-- Confirm preview text still appears when opening a result.
-- Confirm chapter-only search does not return sections from other chapters.
-- Confirm authored images load correctly inside chapter content.
-- Confirm the Saved export progress UI behaves correctly.
-- Confirm the Saved sort menu behaves correctly and remains aligned with the rest of the flow.
-
-## Known current gaps / likely next tasks
-
-- Inline tappable references inside the body text are not implemented yet.
-- Backlinks such as `Referenced by` are not implemented.
-- Reader polish may still be needed for typography and spacing when a section does not have a manual rich-text override.
-- Chapter titles may still need cleanup for nicer display labels in some cases.
-- Figure caption matching/import quality can still be improved from the importer side.
-
-## Build/run reminder
-
-Open:
-
-- `/Users/randy/Documents/X_CODING/Building Code/NYCCode/NYCCode.xcodeproj`
-
-Then run the `NYCCode` scheme in Xcode.
-
-If a fresh thread is working on the app, reference this file first:
-
-- `/Users/randy/Documents/X_CODING/Building Code/NYCCode/IOS_APP_CONTEXT.md`
+Treat those files, the current source, tests, GitHub state, production
+deployment, and App Store configuration as separate forms of evidence.

@@ -11,6 +11,7 @@ import { mkdir, readFile, readdir, unlink, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPostgresAccountRepository } from "./postgres-account-repository.mjs";
+import { mergeContinuityMutations } from "./continuity-merge.mjs";
 import {
   withFileStoreLock,
   writeJSONFileAtomically
@@ -19,6 +20,7 @@ import { createPostgresOrganizationRepository } from "./postgres-organization-re
 import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
+import { matchesConfiguredAdminToken, timingSafeAdminTokenEqual } from "./admin-token-auth.mjs";
 import {
   accountRateLimitPrincipal,
   clientRateLimitPrincipal,
@@ -3342,7 +3344,7 @@ function requireAdmin(request, response) {
     sendError(response, 403, "Admin API is disabled.");
     return false;
   }
-  if (bearerToken(request) !== adminToken) {
+  if (!timingSafeAdminTokenEqual(bearerToken(request), adminToken)) {
     sendError(response, 401, "Unauthorized.");
     return false;
   }
@@ -3353,12 +3355,12 @@ function requireGrantAdmin(request, response) {
   const configuredTokens = [
     process.env.PERMITEXT_SYNC_ADMIN_TOKEN,
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN
-  ].filter(Boolean);
-  if (!configuredTokens.length) {
+  ];
+  if (!configuredTokens.some(Boolean)) {
     sendError(response, 403, "Grant API is disabled.");
     return false;
   }
-  if (!configuredTokens.includes(bearerToken(request))) {
+  if (!matchesConfiguredAdminToken(bearerToken(request), configuredTokens)) {
     sendError(response, 401, "Unauthorized.");
     return false;
   }
@@ -11626,12 +11628,22 @@ function mergeMutations(existing, incoming) {
     }
 
     const existingMutation = byID.get(id);
-    if (existingMutation && mutationUpdatedAt(mutation) < mutationUpdatedAt(existingMutation)) {
+    const { kind } = mutationKindAndRecord(mutation);
+    if (
+      kind !== "continuity" &&
+      existingMutation &&
+      mutationUpdatedAt(mutation) < mutationUpdatedAt(existingMutation)
+    ) {
       rejectedMutationIDs.push(id);
       continue;
     }
 
-    byID.set(id, mutation);
+    byID.set(
+      id,
+      kind === "continuity" && existingMutation
+        ? mergeContinuityMutations(existingMutation, mutation, { mergedAt: new Date().toISOString() })
+        : mutation
+    );
     acceptedMutationIDs.push(id);
   }
 

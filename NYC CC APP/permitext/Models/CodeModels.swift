@@ -2382,6 +2382,14 @@ enum UserContentMergeResolver {
 
     static func decision(for candidate: UserContentMergeCandidate) -> UserContentMergeDecision {
         if candidate.localSyncState == .pendingUpload || candidate.localSyncState == .localOnly {
+            if candidate.entityKind == .continuity {
+                return UserContentMergeDecision(
+                    recordID: candidate.recordID,
+                    entityKind: candidate.entityKind,
+                    action: .uploadLocal,
+                    reason: "Queued reading activity must reach the server, where histories merge per entry."
+                )
+            }
             if let localDeletedAt = candidate.localDeletedAt {
                 if let serverDeletedAt = candidate.serverDeletedAt {
                     return UserContentMergeDecision(

@@ -5,7 +5,7 @@
 **Workspace:** `/Users/randy/Documents/X_CODING/Building Code`
 **Date:** 2026-07-26
 **Scope:** iOS app (`NYC CC APP/permitext/`) and web/backend (`permitext-sync-server/`)
-**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 and hardening remediation described below are implemented locally. `npm run check`, direct server smoke, prepared-content verification, file-storage hardening, and 22 iOS `EntitlementAndSyncContractTests` pass. PostgreSQL integration and the distributed-limiter PostgreSQL test were requested but skipped because no database URL is configured. Nothing in this audit proves GitHub, production execution of the new SQL, deployment state, or App Store configuration.
+**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 and hardening remediation described below are implemented locally. `npm run check`, direct server smoke, prepared-content verification, file-storage hardening, and all 24 iOS `EntitlementAndSyncContractTests` pass. Production deployment `dpl_DjixmFTPXTMLmUwFh46D1pyAj1jP` is `READY` on commit `4bf190ac4eb9140629200960cc9c07b9d0773315`; its health endpoint reports PostgreSQL `normalized-v4` and PostgreSQL rate limiting, and its web search/reader/deep-link walkthrough passed without browser or runtime errors. The continuity, SQLite, timing-safe-admin, documentation, and copy changes after that commit remain local. Direct PostgreSQL integration could not run because the locally pulled production environment contains no database credential value. Nothing in this audit proves the new local SQL in production or App Store configuration.
 
 Severity:
 
@@ -319,15 +319,19 @@ Chapter and table web views now restrict top-level navigation to expected local 
 
 ### C. Continuity uses whole-snapshot last-write-wins
 
-The merge resolver performs last-write-wins for the continuity record. Applying that winning record then replaces recent searches and recently viewed arrays wholesale rather than merging individual entries.
+**Status:** fixed locally; pure merge, file-backed smoke, iOS resolver, and live-PostgreSQL regression coverage added
 
-This can lose activity from another device, but it is more accurately described as a snapshot-merge policy than “no LWW.” Decide explicitly whether continuity is a device snapshot or a convergent per-entry history.
+Continuity is now an explicitly convergent, bounded per-entry history. Recently viewed sections deduplicate by section ID and retain the newest `viewedAt` entry. Recent searches retain a backward-compatible hidden per-query clock while continuing to publish the legacy string array expected by existing clients. Both histories have deterministic ordering and preserve the existing 20-view and 10-search limits.
+
+The file adapter performs this merge inside its inter-process storage lock. PostgreSQL uses an optimistic row-version compare-and-swap and retries against the latest record, so concurrent or out-of-order device snapshots re-merge instead of falling back to whole-record last-write-wins. The accepted record and its sync event are written by one data-modifying CTE, preventing an unaccepted CAS attempt from emitting an event. iOS also keeps a pending continuity upload authoritative until it reaches this server merge.
 
 ### D. SQLite durability/concurrency pragmas are minimal
 
-`SQLiteConnection` enables foreign keys but not WAL or `busy_timeout`, and `UserDataStore` is not itself an actor. Most use is practically serialized through the `@MainActor` view model, so concurrent corruption is not demonstrated.
+**Status:** fixed locally; SQLite-backed pragma coverage passes
 
-WAL, a busy timeout, and an explicit repository executor/actor would still make the concurrency contract safer and clearer.
+Writable SQLite connections now use WAL so readers can continue during short write transactions, and every connection uses a five-second `busy_timeout` rather than failing a valid local operation immediately during temporary contention. Foreign-key enforcement remains enabled and SQLite's default FULL synchronous durability is unchanged.
+
+`UserDataStore` is not itself an actor, but current access remains practically serialized through the `@MainActor` view model; a separate repository executor is not justified by a demonstrated race at this time.
 
 ### E. Private local asset helpers lack central containment enforcement
 
@@ -343,7 +347,14 @@ Return an explicit `EQUAL_TIMESTAMP_CONFLICT` reason and provide a deterministic
 
 ### G. Administrative bearer comparisons are not timing-safe
 
-Admin bearer tokens are compared with ordinary JavaScript string equality or `includes`. A length-checked `timingSafeEqual` helper is better hygiene, although remote timing exploitation is not demonstrated.
+**Status:** fixed locally; helper contract, rate-limit contract, and server smoke coverage pass
+
+Administrative bearer tokens now use a shared length-checked `timingSafeEqual`
+helper in both route authorization and verified-administrator rate-limit
+principal detection. Grant routes check each configured administrative
+credential without short-circuiting. Remote timing exploitation was not
+demonstrated, but privileged credentials no longer use ordinary JavaScript
+string equality or `includes`.
 
 ### H. Other acknowledged asymmetries
 
@@ -352,7 +363,8 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 - Service-worker `/web/*` caching is cache-first; application assets use query-string versioning.
 - Browser sessions live in `localStorage`, so XSS would expose them.
 - Code HTML uses `innerHTML`; CSP and local content provenance are important controls.
-- Root `README.md` and parts of `IOS_APP_CONTEXT.md` remain stale.
+- The root README and `IOS_APP_CONTEXT.md` now point to the current Permitext
+  app, server, content, product boundaries, and validation entry points.
 - Git contains the malformed remote-tracking ref `refs/remotes/origin/codex/New-Changes 2`.
 
 ---
@@ -379,7 +391,7 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 | **P1** | Backend lifetime-grant authority on iOS; atomic Research quota reservation; PostgreSQL rejection reasons |
 | **P2** | Completed locally: PostgreSQL Workboard compatibility, account-wide iOS Free counts, Organization Report/Workboard storage ownership, and transactional seat enforcement |
 | **P3** | Completed locally: StoreKit entitlement separation, copy correction, file-store locking/session rotation, distributed rate limits, and metadata-based deep-link resolution |
-| **Hardening/content** | Completed locally: WKWebView teardown/navigation, local path containment, and prepared-body expansion/classification. Remaining: SQLite pragmas, continuity merge policy, timing-safe admin compare, and stale docs |
+| **Hardening/content** | Completed locally: WKWebView teardown/navigation, local path containment, prepared-body expansion/classification, SQLite durability pragmas, convergent continuity merging, timing-safe admin comparison, and current backend/root/iOS handoff documentation |
 
 ---
 
@@ -407,10 +419,11 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 - Direct `node tests/smoke.mjs` — passed, including concurrent file-store mutations, session rotation, and account/IP limiter behavior; no paid model calls were made.
 - `npm run verify:prepared-construction` — passed at 11,610/12,891 prepared bodies (90.06%) with every remaining entry structurally classified.
 - `npm run test:file-storage` — passed concurrent locking, stale-lock recovery, atomic persistence, and private-path containment coverage.
-- iOS `EntitlementAndSyncContractTests` — all 22 tests passed on an iPhone 17 Pro simulator, including the FTS literal-query, metadata deep-link, WebView policy, pending-delete, entitlement, and account-wide Free-count regressions.
-- PostgreSQL integration and distributed rate-limit integration — requested but skipped because no database URL is configured; the new SQL remains unverified against a live database.
-- Content integrity — passed: 118 chapters, 12,891 indexed sections, 10,371 prepared bodies, 248 referenced images, 8 duplicate display keys.
-- Live PostgreSQL concurrency and production webhook delivery were not exercised locally.
+- iOS `EntitlementAndSyncContractTests` — all 24 tests passed on an iPhone 17 Pro simulator, including SQLite WAL/busy-timeout, queued-continuity upload, FTS literal-query, metadata deep-link, WebView policy, pending-delete, entitlement, and account-wide Free-count regressions.
+- Admin-auth and continuity merge contracts — passed, including same-length credential mismatch, grant-token scope, convergent histories, explicit-clear watermarks, deterministic bounds, and merge ordering.
+- Content integrity — passed: 118 chapters, 12,891 indexed sections, 11,610 prepared bodies (90.06%), 1,281 explicitly classified structural/title-only entries, 273 referenced images, and 8 duplicate display keys.
+- Production deployment — Vercel `READY` on exact commit `4bf190ac`; `/health` reports PostgreSQL `normalized-v4` with PostgreSQL rate limiting, AASA passed, core content endpoints returned `200`, and no deployment runtime errors or browser console errors were found during the walkthrough.
+- Direct PostgreSQL and distributed-rate-limit integrations — could not run because the pulled local production environment contains empty database credential values. The new continuity CAS/CTE regression is added but remains unverified against live PostgreSQL, and production webhook delivery was not exercised locally.
 
 ---
 

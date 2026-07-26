@@ -463,6 +463,60 @@ try {
     "Concurrent same-record pushes failed."
   );
 
+  const continuityRecord = (updatedAt, sectionID, viewedAt, query) => ({
+    continuity: {
+      userID,
+      codeVersion,
+      values: {
+        recentlyViewedSectionsJSON: JSON.stringify([{
+          sectionID,
+          sectionNumber: String(sectionID),
+          title: `Postgres continuity ${sectionID}`,
+          chapterTitle: "Postgres continuity",
+          codeSectionID: 1,
+          codeSectionName: "Building Code",
+          previewText: "",
+          viewedAt
+        }]),
+        recentSearchesJSON: JSON.stringify([query])
+      },
+      updatedAt
+    }
+  });
+  const concurrentContinuityPushes = await Promise.all([
+    continuityRecord("2026-06-27T00:08:00Z", 501, 804_600_100, "egress"),
+    continuityRecord("2026-06-27T00:08:01Z", 502, 804_600_101, "occupancy")
+  ].map((mutation) => request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: { user: { id: userID }, mutations: [mutation] }
+    }
+  })));
+  assert(
+    concurrentContinuityPushes.every(({ response, json }) =>
+      response.ok && json.acceptedMutationIDs.includes(`${userID}:continuity:${codeVersion}`)
+    ),
+    "Concurrent continuity pushes did not converge through PostgreSQL."
+  );
+  const outOfOrderContinuityPush = await request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: {
+        user: { id: userID },
+        mutations: [continuityRecord("2026-06-27T00:07:59Z", 503, 804_600_099, "sprinklers")]
+      }
+    }
+  });
+  assert(
+    outOfOrderContinuityPush.response.ok &&
+      outOfOrderContinuityPush.json.acceptedMutationIDs.includes(`${userID}:continuity:${codeVersion}`),
+    "An out-of-order continuity history was rejected instead of merged."
+  );
+
   const concurrencyPull = await request("/sync/pull", {
     method: "POST",
     token,
@@ -481,6 +535,23 @@ try {
   assert(
     concurrencySavedItems.some((record) => record.id === sharedRecordID && record.sectionID === 402),
     "The newest concurrent mutation did not win."
+  );
+  const convergedContinuity = concurrencyPull.json.mutations
+    .map((mutation) => mutation.continuity)
+    .find(Boolean);
+  assert(convergedContinuity, "Postgres pull did not return the converged continuity record.");
+  assert(
+    JSON.parse(convergedContinuity.values.recentlyViewedSectionsJSON)
+      .map((entry) => entry.sectionID)
+      .every((sectionID) => [501, 502, 503].includes(sectionID)) &&
+      JSON.parse(convergedContinuity.values.recentlyViewedSectionsJSON).length === 3,
+    "Postgres continuity merge lost activity from a concurrent or out-of-order device."
+  );
+  const convergedSearches = JSON.parse(convergedContinuity.values.recentSearchesJSON);
+  assert(
+    convergedSearches.length === 3 &&
+      ["egress", "occupancy", "sprinklers"].every((query) => convergedSearches.includes(query)),
+    "Postgres continuity merge lost a concurrent recent search."
   );
 
   const savedItemCountBeforeGrant = await countRows("permitext_saved_items");

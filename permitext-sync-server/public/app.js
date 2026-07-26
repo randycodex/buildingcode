@@ -14180,7 +14180,7 @@ function renderSettings() {
     offlineDownload.disabled = false;
     offlineRemove.hidden = !library.available;
     if (!pro) {
-      offlineCopy.textContent = `Offline reading is a Pro feature. The complete searchable code library is about ${offlineFeatureMetadata.estimatedDownload}.`;
+      offlineCopy.textContent = `Offline reading is a Pro feature. The complete searchable code library is ${offlineFeatureMetadata.estimatedDownload}.`;
       offlineStatus.textContent = account ? "Upgrade to Pro to download." : "Sign in and upgrade to Pro to download.";
       offlineDownload.textContent = account ? "Upgrade to Pro" : "Sign In to Continue";
       return;

@@ -1551,6 +1551,22 @@ async function main() {
     const unauthorizedStorageSummary = await request("/admin/storage/summary");
     assert(unauthorizedStorageSummary.response.status === 401, "Storage summary allowed an unauthenticated request.");
 
+    const wrongAdminStorageSummary = await request("/admin/storage/summary", {
+      token: `${adminToken.slice(0, -1)}x`
+    });
+    assert(
+      wrongAdminStorageSummary.response.status === 401,
+      "Storage summary accepted a same-length mismatched administrator credential."
+    );
+
+    const grantAdminStorageSummary = await request("/admin/storage/summary", {
+      token: grantAdminToken
+    });
+    assert(
+      grantAdminStorageSummary.response.status === 401,
+      "Storage summary accepted the grant-only administrator credential."
+    );
+
     const storageSummary = await request("/admin/storage/summary", {
       token: adminToken
     });
@@ -5905,6 +5921,87 @@ async function main() {
     assert(
       fullStatePush.json.acceptedMutationIDs.includes(`${userID}:continuity:${defaultSyncCodeVersion}`),
       "Continuity mutation was not accepted."
+    );
+
+    const continuityHistoryMutation = (updatedAt, sectionID, viewedAt, query) => ({
+      continuity: {
+        userID,
+        codeVersion: "nyc-2022",
+        values: {
+          recentlyViewedSectionsJSON: JSON.stringify([{
+            sectionID,
+            sectionNumber: String(sectionID),
+            title: `Continuity smoke ${sectionID}`,
+            chapterTitle: "Continuity smoke",
+            codeSectionID: 1,
+            codeSectionName: "Building Code",
+            previewText: "",
+            viewedAt
+          }]),
+          recentSearchesJSON: JSON.stringify([query])
+        },
+        updatedAt
+      }
+    });
+    const concurrentContinuityPushes = await Promise.all([
+      continuityHistoryMutation("2026-06-07T23:59:58Z", 910001, 802_000_001, "egress"),
+      continuityHistoryMutation("2026-06-07T23:59:59Z", 910002, 802_000_002, "occupancy")
+    ].map((mutation) => request("/sync/push", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: [mutation] }
+      }
+    })));
+    assert(
+      concurrentContinuityPushes.every(({ response, json }) =>
+        response.ok &&
+        json.acceptedMutationIDs.includes(`${userID}:continuity:${defaultSyncCodeVersion}`)
+      ),
+      "Concurrent file-backed continuity snapshots did not merge."
+    );
+    const staleContinuityPush = await request("/sync/push", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [
+            continuityHistoryMutation("2026-06-07T23:59:57Z", 910003, 802_000_000, "sprinklers")
+          ]
+        }
+      }
+    });
+    assert(
+      staleContinuityPush.response.ok &&
+      staleContinuityPush.json.acceptedMutationIDs.includes(`${userID}:continuity:${defaultSyncCodeVersion}`),
+      "An out-of-order file-backed continuity snapshot was rejected instead of merged."
+    );
+    const convergedContinuityPull = await request("/sync/pull", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const convergedContinuity = convergedContinuityPull.json.mutations
+      .map((mutation) => mutation.continuity)
+      .find(Boolean);
+    const convergedViews = JSON.parse(convergedContinuity.values.recentlyViewedSectionsJSON);
+    const convergedSearches = JSON.parse(convergedContinuity.values.recentSearchesJSON);
+    assert(
+      [910001, 910002, 910003].every((sectionID) =>
+        convergedViews.some((entry) => entry.sectionID === sectionID)
+      ),
+      "File-backed continuity lost a recent view from another device."
+    );
+    assert(
+      ["egress", "occupancy", "sprinklers"].every((query) => convergedSearches.includes(query)),
+      "File-backed continuity lost a recent search from another device."
+    );
+    assert(
+      convergedContinuity.values.activeProjectID === "42",
+      "Merging stale histories replaced newer snapshot-owned continuity fields."
     );
 
     const projectDependencyPull = await request("/sync/pull", {

@@ -31,7 +31,18 @@ final class SQLiteConnection {
             let message = handle.flatMap { String(cString: sqlite3_errmsg($0)) } ?? "Unable to open SQLite database."
             throw AppSQLiteError.openFailed(message)
         }
+
+        // Wait briefly for a concurrent checkpoint or writer instead of failing an
+        // otherwise valid local mutation immediately. This is connection-local.
+        try execute("PRAGMA busy_timeout = 5000;")
         try execute("PRAGMA foreign_keys = ON;")
+
+        // User data is accessed through writable connections. WAL lets readers
+        // proceed while a short write transaction is active; leave SQLite's
+        // default FULL synchronous setting intact for durability.
+        if !readOnly {
+            try execute("PRAGMA journal_mode = WAL;")
+        }
     }
 
     deinit {

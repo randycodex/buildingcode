@@ -1,6 +1,7 @@
 # Permitext Sync Server
 
-Local Phase 5 backend scaffold for the iOS app's account and sync contract.
+Backend service for Permitext's iPhone and web account, sync, Research, billing,
+organization, and private-file contracts.
 
 It now supports two runtime shapes:
 
@@ -256,6 +257,11 @@ Admin routes require:
 ```http
 Authorization: Bearer <PERMITEXT_SYNC_ADMIN_TOKEN>
 ```
+
+Administrative bearer credentials are compared with a shared length-checked
+constant-time helper. Keep `PERMITEXT_SYNC_ADMIN_TOKEN` and
+`PERMITEXT_SYNC_GRANT_ADMIN_TOKEN` distinct, randomly generated secrets; do
+not reuse an account-session token as an administrative credential.
 
 The lifetime-grant routes and grant-account summary also accept
 `PERMITEXT_SYNC_GRANT_ADMIN_TOKEN`. That token does not authorize unrelated

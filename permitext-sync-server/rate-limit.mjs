@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { isIP } from "node:net";
+import { matchesConfiguredAdminToken } from "./admin-token-auth.mjs";
 
 export const rateLimitPolicies = new Map([
   ["account/sign-in", { limit: 30, windowMs: 5 * 60 * 1000 }],
@@ -238,8 +239,10 @@ export function verifiedAdminRateLimitPrincipal(request, path, environment = pro
   const grantToken = String(environment.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN || "");
   const grantRoute = path === "admin/lifetime-grants/grant" ||
     path === "admin/lifetime-grants/revoke";
-  const authorized = suppliedToken &&
-    (suppliedToken === adminToken || (grantRoute && suppliedToken === grantToken));
+  const authorized = matchesConfiguredAdminToken(
+    suppliedToken,
+    grantRoute ? [adminToken, grantToken] : [adminToken]
+  );
   if (!authorized) return null;
   const tokenHash = createHash("sha256").update(suppliedToken).digest("hex");
   return `administrator:${tokenHash}`;

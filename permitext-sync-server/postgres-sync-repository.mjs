@@ -1,4 +1,5 @@
 import { freePlanLimits } from "./entitlement-contract.mjs";
+import { mergeContinuityMutations } from "./continuity-merge.mjs";
 
 function safeJSON(value, fallback) {
   if (value === null || value === undefined) return fallback;
@@ -255,6 +256,43 @@ export function createPostgresSyncRepository(sql) {
     `;
   }
 
+  function continuityCompatibilityQuery(userID, mutation, expectedServerVersion) {
+    const recordID = mutationRecordID(mutation);
+    const { kind, record } = mutationEntry(mutation);
+    const ownerUserID = record.userID || userID;
+    const mutationJSON = JSON.stringify(mutation);
+    return sql`
+      WITH accepted AS (
+        INSERT INTO permitext_user_content_records (
+          record_id, user_id, entity_kind, code_version, mutation,
+          updated_at, deleted_at, server_version
+        )
+        VALUES (
+          ${recordID}, ${ownerUserID}, ${kind}, ${record.codeVersion || null},
+          ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz, NULL, 1
+        )
+        ON CONFLICT (record_id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          entity_kind = EXCLUDED.entity_kind,
+          code_version = EXCLUDED.code_version,
+          mutation = EXCLUDED.mutation,
+          updated_at = EXCLUDED.updated_at,
+          deleted_at = NULL,
+          server_version = permitext_user_content_records.server_version + 1
+        WHERE permitext_user_content_records.user_id = EXCLUDED.user_id
+          AND permitext_user_content_records.server_version = ${expectedServerVersion}
+        RETURNING record_id, user_id, entity_kind, code_version, updated_at, mutation
+      )
+      INSERT INTO permitext_sync_events (
+        record_id, user_id, entity_kind, code_version, mutation_updated_at, mutation
+      )
+      SELECT record_id, user_id, entity_kind, code_version, updated_at, mutation
+      FROM accepted
+      ON CONFLICT (record_id, mutation_updated_at) DO NOTHING
+      RETURNING record_id
+    `;
+  }
+
   function rejectionContextQuery(userID, mutation) {
     const recordID = mutationRecordID(mutation);
     return sql`
@@ -502,11 +540,75 @@ export function createPostgresSyncRepository(sql) {
     `;
   }
 
+  async function pushContinuity(userID, incomingMutation) {
+    const recordID = mutationRecordID(incomingMutation);
+    for (let attempt = 1; attempt <= 10; attempt += 1) {
+      const existingRows = await sql`
+        SELECT user_id, mutation, server_version
+        FROM permitext_user_content_records
+        WHERE record_id = ${recordID}
+        LIMIT 1
+      `;
+      const existingRow = existingRows[0] || null;
+      if (existingRow && existingRow.user_id !== userID) {
+        return {
+          accepted: false,
+          reason: {
+            code: "RECORD_OWNERSHIP_MISMATCH",
+            message: "This sync record belongs to a different Permitext account."
+          }
+        };
+      }
+
+      const existingMutation = existingRow ? safeJSON(existingRow.mutation, null) : null;
+      const newestTimestamp = Math.max(
+        Date.parse(existingMutation?.continuity?.updatedAt || "") || 0,
+        Date.parse(incomingMutation?.continuity?.updatedAt || "") || 0
+      );
+      const mergedAt = new Date(Math.max(Date.now(), newestTimestamp + 1)).toISOString();
+      const mergedMutation = existingMutation
+        ? mergeContinuityMutations(existingMutation, incomingMutation, { mergedAt })
+        : incomingMutation;
+
+      if (
+        existingMutation &&
+        canonicalJSONString(existingMutation) === canonicalJSONString(mergedMutation)
+      ) {
+        return { accepted: true };
+      }
+
+      let acceptedRows;
+      try {
+        acceptedRows = await continuityCompatibilityQuery(
+          userID,
+          mergedMutation,
+          Number(existingRow?.server_version || 0)
+        );
+      } catch (error) {
+        if (error?.code === "40001") continue;
+        throw error;
+      }
+      if (acceptedRows?.length) {
+        return { accepted: true };
+      }
+    }
+
+    return {
+      accepted: false,
+      reason: {
+        code: "CONTINUITY_RETRY_EXHAUSTED",
+        message: "Reading history changed repeatedly during sync. Retry to merge the latest activity."
+      }
+    };
+  }
+
   async function push(userID, mutations) {
+    const continuityMutations = mutations.filter(({ continuity }) => Boolean(continuity));
+    const standardMutations = mutations.filter(({ continuity }) => !continuity);
     const queries = [];
     const acceptanceIndexes = [];
     const rejectionContextIndexes = [];
-    for (const mutation of mutations) {
+    for (const mutation of standardMutations) {
       acceptanceIndexes.push(queries.length);
       queries.push(compatibilityQuery(userID, mutation));
       const recordQuery = domainQuery(userID, mutation);
@@ -537,7 +639,7 @@ export function createPostgresSyncRepository(sql) {
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];
     const rejectionReasons = {};
-    mutations.forEach((mutation, index) => {
+    standardMutations.forEach((mutation, index) => {
       const recordID = mutationRecordID(mutation);
       if (results[acceptanceIndexes[index]]?.length) acceptedMutationIDs.push(recordID);
       else {
@@ -549,13 +651,34 @@ export function createPostgresSyncRepository(sql) {
         });
       }
     });
+
+    for (const mutation of continuityMutations) {
+      const recordID = mutationRecordID(mutation);
+      const result = await pushContinuity(userID, mutation);
+      if (result.accepted) {
+        acceptedMutationIDs.push(recordID);
+      } else {
+        rejectedMutationIDs.push(recordID);
+        rejectionReasons[recordID] = result.reason;
+      }
+    }
+
+    const [finalLatestRows, finalEntitlementRows] = await sql.transaction([
+      sql`
+        SELECT COALESCE(MAX(event_id), 0)::bigint AS latest_event_id
+        FROM permitext_sync_events WHERE user_id = ${userID}
+      `,
+      sql`
+        SELECT entitlement FROM permitext_entitlements WHERE user_id = ${userID} LIMIT 1
+      `
+    ], { isolationMode: "RepeatableRead", readOnly: true });
     return {
       acceptedMutationIDs,
       rejectedMutationIDs,
       rejectionReasons,
-      latestEventID: Number(results[latestIndex]?.[0]?.latest_event_id || 0),
-      entitlement: results[entitlementIndex]?.[0]?.entitlement
-        ? safeJSON(results[entitlementIndex][0].entitlement, null)
+      latestEventID: Number(finalLatestRows?.[0]?.latest_event_id || 0),
+      entitlement: finalEntitlementRows?.[0]?.entitlement
+        ? safeJSON(finalEntitlementRows[0].entitlement, null)
         : null
     };
   }

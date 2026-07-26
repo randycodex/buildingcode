@@ -1,4 +1,5 @@
 import XCTest
+import SQLite3
 @testable import permitext
 
 final class EntitlementAndSyncContractTests: XCTestCase {
@@ -51,6 +52,36 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             """
         )
         return databaseURL
+    }
+
+    private func scalarString(_ sql: String, connection: SQLiteConnection) throws -> String {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        XCTAssertEqual(try connection.step(statement), SQLITE_ROW)
+        return connection.string(at: 0, in: statement)
+    }
+
+    private func scalarInt(_ sql: String, connection: SQLiteConnection) throws -> Int {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
+        XCTAssertEqual(try connection.step(statement), SQLITE_ROW)
+        return connection.int(at: 0, in: statement)
+    }
+
+    func testWritableSQLiteConnectionEnablesWALAndBusyTimeout() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-sqlite-durability-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
+
+        XCTAssertEqual(try scalarString("PRAGMA journal_mode;", connection: connection).lowercased(), "wal")
+        XCTAssertEqual(try scalarInt("PRAGMA busy_timeout;", connection: connection), 5_000)
+        XCTAssertEqual(try scalarInt("PRAGMA foreign_keys;", connection: connection), 1)
     }
 
     func testLegacySQLiteFTSSearchTreatsOperatorsAndMalformedSyntaxAsLiteralText() throws {
@@ -496,6 +527,22 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
 
         XCTAssertEqual(UserContentMergeResolver.decision(for: candidate).action, .flagConflict)
+    }
+
+    func testQueuedContinuityUploadsIntoServerPerEntryMergeEvenWhenServerSnapshotIsNewer() {
+        let now = Date()
+        let candidate = UserContentMergeCandidate(
+            recordID: "apple:continuity-test:continuity:nyc-2022",
+            entityKind: .continuity,
+            localUpdatedAt: now,
+            serverUpdatedAt: now.addingTimeInterval(10),
+            localSyncState: .pendingUpload
+        )
+
+        let decision = UserContentMergeResolver.decision(for: candidate)
+
+        XCTAssertEqual(decision.action, .uploadLocal)
+        XCTAssertTrue(decision.reason.contains("histories merge per entry"))
     }
 
     func testServerTombstoneUsesApplyServerAction() {
