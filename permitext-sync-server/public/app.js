@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v18";
+} from "./offline-storage.js?v=20260726-web-reliability-v19";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -89,12 +89,13 @@ const codeOptions = [
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
 const defaultReaderPaneWidth = 520;
-const defaultUtilityPaneWidth = 320;
-const defaultDetailPaneWidth = 320;
-const defaultWorkboardPaneWidth = 720;
-const defaultNotebookPaneWidth = 760;
-const defaultReportDraftPaneWidth = 760;
-const defaultSettingsPaneWidth = 340;
+const defaultNonReaderPaneWidth = 400;
+const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
+const defaultDetailPaneWidth = defaultNonReaderPaneWidth;
+const defaultWorkboardPaneWidth = defaultNonReaderPaneWidth;
+const defaultNotebookPaneWidth = defaultNonReaderPaneWidth;
+const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
+const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
@@ -1361,7 +1362,7 @@ function defaultPaneWidthForID(paneID) {
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
   if (paneID.startsWith("reader:")) return defaultReaderPaneWidth;
-  return defaultReaderPaneWidth;
+  return defaultNonReaderPaneWidth;
 }
 
 function isFixedWidthPaneID(paneID) {

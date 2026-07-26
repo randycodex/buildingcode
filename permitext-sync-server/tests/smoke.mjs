@@ -833,7 +833,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v18'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v19'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -926,6 +926,18 @@ async function main() {
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("if (!isProAccount() && state.readers.length >= 2)"),
       "Free web accounts can expose or persist more than two Readers."
+    );
+    assert(
+      workspaceScript.text.includes("const defaultReaderPaneWidth = 520") &&
+        workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
+        workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultDetailPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultWorkboardPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultNotebookPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("return defaultNonReaderPaneWidth"),
+      "Non-Reader columns no longer share the 400px default width."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
