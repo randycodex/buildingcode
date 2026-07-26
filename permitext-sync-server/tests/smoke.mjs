@@ -297,7 +297,10 @@ async function main() {
     assert(
         privacyPolicy.text.includes("Higinio Jimenez Manzano") &&
         privacyPolicy.text.includes("permitext@gmail.com") &&
+        !privacyPolicy.text.includes("Return to Permitext") &&
+        !privacyPolicy.text.includes('class="back-link"') &&
         webRoot.text.includes('href="/privacy"') &&
+        webRoot.text.includes('href="/privacy" target="_blank" rel="noopener noreferrer"') &&
         iosSettingsSource.includes("https://permitext.com/privacy"),
       "The privacy policy or its web/iOS links no longer identify the operator and contact."
     );
