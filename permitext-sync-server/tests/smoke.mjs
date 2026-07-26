@@ -878,7 +878,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v32'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v33'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1242,7 +1242,9 @@ async function main() {
       "Restore Purchases is no longer centered beneath the primary plan action."
     );
     assert(
-      workspaceStyles.text.match(/\.account-checkout\.is-pro-active,[\s\S]*?background: #00b9e8;[\s\S]*?color: #001014;[\s\S]*?opacity: 1;/) &&
+      workspaceStyles.text.match(/\.account-checkout\.is-pro-active,[\s\S]*?background: var\(--pro-active-background\);[\s\S]*?color: #001014;[\s\S]*?opacity: 1;/) &&
+        workspaceStyles.text.includes("--pro-active-background: #66d9f2;") &&
+        workspaceStyles.text.includes("--pro-active-background: #00b9e8;") &&
         iosSettingsSource.includes("Color(red: 0, green: 185 / 255, blue: 232 / 255)") &&
         iosSettingsSource.includes(".opacity(library.isStoreKitBusy ? 0.55 : 1)") &&
         iosSettingsSource.includes("if !library.hasResearchAccess {") &&

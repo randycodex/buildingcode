@@ -14,6 +14,7 @@
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
   --destructive: #ff3b30;
+  --pro-active-background: #66d9f2;
   --border: rgba(20, 20, 24, 0.105);
   --toolbar-active: rgba(20, 20, 24, 0.08);
   --toolbar-active-text: #111111;
@@ -70,6 +71,7 @@
     --text-secondary: #a09fa7;
     --text-tertiary: #6f6f78;
     --destructive: #ff453a;
+    --pro-active-background: #00b9e8;
     --border: rgba(255, 255, 255, 0.12);
     --toolbar-active: rgba(255, 255, 255, 0.12);
     --toolbar-active-text: #ffffff;
@@ -7393,7 +7395,7 @@ button.project-studio-metric:focus-visible {
 
 .settings-panel .account-checkout.is-pro-active,
 .settings-panel .account-checkout.is-pro-active:disabled {
-  background: #00b9e8;
+  background: var(--pro-active-background);
   color: #001014;
   opacity: 1;
 }
