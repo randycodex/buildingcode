@@ -878,7 +878,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v30'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v31'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1217,6 +1217,12 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.settings-panel \.settings-primary-button,[\s\S]*?\.settings-panel \.settings-mini-button \{[\s\S]*?justify-self: center;[\s\S]*?width: 60%;[\s\S]*?margin-inline: auto;[\s\S]*?border-radius: var\(--radius-pill\);/),
       "Large Settings action buttons should remain centered pills at 60% width."
+    );
+    assert(
+      workspaceStyles.text.match(/\.settings-panel \.settings-section-title \{[\s\S]*?justify-self: center;[\s\S]*?width: 100%;[\s\S]*?text-align: center;/) &&
+        workspaceStyles.text.match(/\.settings-panel \.settings-card-heading \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.settings-panel \.settings-card-heading \.settings-beta-badge \{[\s\S]*?grid-column: 3;[\s\S]*?justify-self: end;/),
+      "Settings card titles should remain centered independently of trailing badges."
     );
     assert(
       workspaceStyles.text.match(/\.research-list-panel \.analysis-content \{[\s\S]*?display: flex;[\s\S]*?flex-direction: column;/) &&
