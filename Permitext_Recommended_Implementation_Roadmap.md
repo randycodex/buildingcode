@@ -78,6 +78,38 @@ iPhone 17, followed by immediate relaunches of 1,218 ms and 1,146 ms. Simulator
 boot and application-install time are excluded. Physical-device timing remains a
 release-candidate verification item.
 
+### Deferred launch and compliance checklist — July 25, 2026
+
+These items are intentionally deferred. Revisit them before submitting the iOS
+app or describing Permitext as launch-compliant.
+
+- [ ] Choose the production release scope. The current feature branch contains
+  more than the privacy work, so review the complete branch before promoting it
+  to `main`.
+- [ ] Deploy the privacy and account-deletion changes to production, then verify
+  that `https://permitext-sync.vercel.app/privacy` returns the policy and that
+  deletion removes a disposable test account, synchronized content, sessions,
+  and private files from PostgreSQL and Blob storage.
+- [ ] In App Store Connect, add the live privacy-policy URL and complete the App
+  Privacy questionnaire so its answers match the iOS privacy manifest and
+  actual production data flows.
+- [ ] Decide whether Permitext will be distributed commercially in the European
+  Union. If yes, complete Apple's Digital Services Act trader verification only
+  after approving the contact information Apple will display publicly.
+- [ ] Document the legal basis for reproducing each NYC code source, including
+  ICC-derived text, tables, figures, editorial material, and website-sourced
+  presentation. Complete App Store Connect's Content Rights declaration only
+  after that evidence has been reviewed.
+- [ ] Complete Sign in with Apple authorization revocation for account deletion.
+  This requires the appropriate Apple key ID/private key configuration and a
+  tested token-exchange/revocation flow.
+- [ ] Finish remaining App Store submission metadata, including category, age
+  rating, support URL, review contact and access instructions, screenshots, and
+  the current build.
+- [ ] Before enabling paid OpenAI-backed Research in production, configure a
+  project budget/usage alert and reverify application and shared-infrastructure
+  rate limits. Production currently has no OpenAI API key configured.
+
 ### Release 0 gate
 
 Do not begin the unified Project migration until:
