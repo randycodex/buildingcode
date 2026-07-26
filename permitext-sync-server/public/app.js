@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v43";
+} from "./offline-storage.js?v=20260726-web-reliability-v46";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -103,6 +103,7 @@ const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
+const collapsedSettingsCardIDs = new Set();
 const sharedWorkspaceStateKeys = [
   "localProjects",
   "localSavedItems",
@@ -14296,9 +14297,42 @@ async function refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceSc
   );
 }
 
+function wireSettingsCardCollapsing(panel) {
+  panel.querySelectorAll(":scope > .settings-card").forEach((card, index) => {
+    const title = card.querySelector(
+      ":scope > .settings-section-title, :scope > .settings-card-heading > .settings-section-title"
+    );
+    if (!title) return;
+    const cardID = title.id || `settings-card-${index + 1}`;
+    const titleText = title.textContent.trim();
+    const toggle = document.createElement("button");
+    toggle.className = "settings-card-toggle";
+    toggle.type = "button";
+    const label = document.createElement("span");
+    label.textContent = titleText;
+    toggle.append(label);
+    title.replaceChildren(toggle);
+    card.dataset.settingsCardId = cardID;
+
+    const update = () => {
+      const collapsed = collapsedSettingsCardIDs.has(cardID);
+      card.classList.toggle("is-collapsed", collapsed);
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${titleText}`);
+    };
+    toggle.addEventListener("click", () => {
+      if (collapsedSettingsCardIDs.has(cardID)) collapsedSettingsCardIDs.delete(cardID);
+      else collapsedSettingsCardIDs.add(cardID);
+      update();
+    });
+    update();
+  });
+}
+
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
+  wireSettingsCardCollapsing(panel);
   wireReaderFontFamilyControl(panel);
 
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");

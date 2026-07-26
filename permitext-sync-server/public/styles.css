@@ -7296,6 +7296,29 @@ button.project-studio-metric:focus-visible {
   text-transform: uppercase;
 }
 
+.settings-panel .settings-card-toggle {
+  display: block;
+  width: 100%;
+  min-height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary) !important;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 9pt !important;
+  font-weight: 650 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0.085em !important;
+  text-transform: uppercase !important;
+  text-align: center;
+  cursor: pointer;
+}
+
+.settings-panel .settings-card.is-collapsed > :not(.settings-section-title):not(.settings-card-heading) {
+  display: none;
+}
+
 .settings-panel .settings-card-heading {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -7303,8 +7326,8 @@ button.project-studio-metric:focus-visible {
 }
 
 .settings-panel .settings-card-heading .settings-section-title {
-  grid-column: 2;
-  width: auto;
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .settings-panel .settings-card-copy,

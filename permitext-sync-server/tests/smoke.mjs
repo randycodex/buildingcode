@@ -884,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v43'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v46'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -898,7 +898,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v40'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v43'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1413,6 +1413,17 @@ async function main() {
         workspaceScript.text.includes("await refreshWorkspaceAfterSettingsClear(settingsScrollTop, workspaceScrollLeft)") &&
         workspaceScript.text.includes("await flushSyncOutbox({ refresh: true }).catch(() => {})"),
       "Settings clear-all actions no longer preserve the Settings column's position while refreshing affected panes."
+    );
+    assert(
+      workspaceScript.text.includes("function wireSettingsCardCollapsing(panel)") &&
+        workspaceScript.text.includes('panel.querySelectorAll(":scope > .settings-card")') &&
+        workspaceScript.text.includes("collapsedSettingsCardIDs.has(cardID)") &&
+        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!collapsed))') &&
+        workspaceStyles.text.includes(".settings-panel .settings-card-toggle") &&
+        !workspaceStyles.text.includes(".settings-card-toggle::after") &&
+        workspaceStyles.text.match(/\.settings-panel \.settings-card-toggle \{[\s\S]*?font-size: 9pt !important;[\s\S]*?letter-spacing: 0\.085em !important;/) &&
+        workspaceStyles.text.includes(".settings-panel .settings-card.is-collapsed"),
+      "Settings cards no longer provide independent, accessible title toggles."
     );
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&
