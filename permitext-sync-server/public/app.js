@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v47";
+} from "./offline-storage.js?v=20260726-web-reliability-v48";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6579,7 +6579,6 @@ async function renderSearch(instance) {
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
   renderSearchCodeFilter(filterRail, panel, searchInstance);
-  bindHorizontalWheelScroll(filterRail);
   updateSearchDock(panel, searchInstance);
 
   input.addEventListener("input", () => {
@@ -6615,9 +6614,8 @@ async function renderSearch(instance) {
   return panel;
 }
 
-function renderSearchCodeFilter(filterRail, panel, instance, renderOptions = {}) {
+function renderSearchCodeFilter(filterRail, panel, instance) {
   const searchInstance = normalizeSearchInstance(instance);
-  const previousLeft = renderOptions.preserveScroll ? filterRail.scrollLeft : 0;
   clear(filterRail);
   const options = searchCodeFilterOptions();
   const validPrefixes = new Set(options.map((option) => option.prefix));
@@ -6657,13 +6655,6 @@ function renderSearchCodeFilter(filterRail, panel, instance, renderOptions = {})
     });
     filterRail.append(chip);
   });
-  if (renderOptions.preserveScroll) {
-    const restoredLeft = Math.min(previousLeft, filterRail.scrollWidth - filterRail.clientWidth);
-    filterRail.scrollLeft = restoredLeft;
-    requestAnimationFrame(() => {
-      filterRail.scrollLeft = restoredLeft;
-    });
-  }
 }
 
 function updateSearchCodeFilterStates(filterRail, instance) {
