@@ -376,6 +376,7 @@ async function main() {
       settingsTemplateSource.includes('data-plan-option="free"') &&
         settingsTemplateSource.includes('data-plan-option="pro"') &&
         !settingsTemplateSource.includes('data-plan-option="research"') &&
+        !settingsTemplateSource.includes("Upgrade option") &&
         settingsTemplateSource.includes("Optional Research add-on:") &&
         !iosSettingsSource.includes('planFeatureRow("Research Add-On"') &&
         iosSettingsSource.includes("Optional Research add-on:") &&
