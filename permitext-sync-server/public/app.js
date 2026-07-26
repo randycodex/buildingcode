@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v22";
+} from "./offline-storage.js?v=20260726-web-reliability-v23";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14357,9 +14357,7 @@ function renderSettings() {
     planRows.forEach((row) => {
       const active = row.dataset.planOption === "free"
         ? !pro
-        : row.dataset.planOption === "pro"
-          ? pro
-          : row.dataset.planOption === "research" && research;
+        : pro;
       row.classList.toggle("is-active", active);
       row.setAttribute("aria-current", active ? "true" : "false");
       const indicator = row.querySelector(".settings-feature-icon");

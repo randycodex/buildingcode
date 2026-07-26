@@ -212,8 +212,7 @@ struct SettingsView: View {
 
             VStack(alignment: .leading, spacing: 10) {
                 planFeatureRow("Free", details: "Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.")
-                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and offline access.")
-                planFeatureRow("Research Add-On", details: "Selected-evidence Research, verified citations, immutable answer history, conversation history, and a monthly AI allowance. Requires Pro.")
+                planFeatureRow("Pro", details: "Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and offline access. Optional Research add-on: selected-evidence Research, verified citations, immutable answer history, conversation history, and a monthly AI allowance.")
             }
 
             Button {

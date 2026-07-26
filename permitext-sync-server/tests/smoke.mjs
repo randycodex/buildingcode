@@ -367,8 +367,12 @@ async function main() {
     assert(
       settingsTemplateSource.includes('data-plan-option="free"') &&
         settingsTemplateSource.includes('data-plan-option="pro"') &&
+        !settingsTemplateSource.includes('data-plan-option="research"') &&
+        settingsTemplateSource.includes("Optional Research add-on:") &&
+        !iosSettingsSource.includes('planFeatureRow("Research Add-On"') &&
+        iosSettingsSource.includes("Optional Research add-on:") &&
         !settingsTemplateSource.includes('class="settings-billing-line"'),
-      "Web Settings lost active-plan styling or restored the redundant billing summary."
+      "Settings lost the consolidated Pro and optional Research description or restored a separate Research row."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -838,7 +842,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v22'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v23'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
