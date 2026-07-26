@@ -168,7 +168,7 @@ struct SettingsView: View {
 
     private var versionPicker: some View {
         Group {
-            if library.filteredVersions.isEmpty {
+            if settingsVersionOptions.isEmpty {
                 HStack {
                     Text("No bundled code content detected.")
                         .foregroundStyle(.secondary)
@@ -177,12 +177,12 @@ struct SettingsView: View {
                 .padding(CodeScreenMetrics.cardPadding)
             } else {
                 settingsMenuRow(label: "Version") {
-                    Text(selectedVersionPrimaryText)
+                    Text("NYC Zoning Resolution")
                         .font(SettingsRowTypography.value)
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.trailing)
                 } content: {
-                    ForEach(library.filteredVersions) { version in
+                    ForEach(settingsVersionOptions) { version in
                         Button {
                             library.updateSelectedVersion(fileName: version.fileName)
                         } label: {
@@ -1025,9 +1025,10 @@ struct SettingsView: View {
         library.availableJurisdictions.first(where: { $0.id == library.selectedJurisdictionKey })?.name ?? "Not Selected"
     }
 
-    private var selectedVersionPrimaryText: String {
-        guard let version = library.selectedVersion else { return "Not Selected" }
-        return versionOptionTitle(for: version)
+    private var settingsVersionOptions: [BundledCodeVersion] {
+        library.filteredVersions.filter { version in
+            version.codeVersion.localizedCaseInsensitiveContains("zoning")
+        }
     }
 
     private func versionOptionTitle(for version: BundledCodeVersion) -> String {

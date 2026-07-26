@@ -11,6 +11,7 @@ struct BrowseView: View {
     @State private var scrollOffset: CGFloat = 0
     @State private var browseCodeSectionID: Int64?
     @State private var hasSeededBrowseSection = false
+    @State private var pendingReaderCodeSectionName: String?
     @State private var rememberedSectionIDs: [Int64: Int64] = [:]
     @State private var rememberedAnchorIDs: [Int64: String] = [:]
     @State private var rememberedScrollOffsets: [Int64: Double] = [:]
@@ -57,6 +58,12 @@ struct BrowseView: View {
             DispatchQueue.main.async {
                 scrollOffset = newOffset
             }
+        }
+        .onAppear {
+            restoreReaderVersionIfNeeded()
+        }
+        .onChange(of: library.codeSections) { _, _ in
+            resolvePendingReaderCodeSelection()
         }
     }
 
@@ -209,24 +216,38 @@ struct BrowseView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
                 Menu {
-                    Button {
-                        updateCodeSection(nil)
-                    } label: {
-                        codeSectionPickerLabel(
-                            "All Sections",
-                            isSelected: browseCodeSectionID == nil
-                        )
+                    Section("Construction Codes") {
+                        ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
+                            Button {
+                                selectReaderCode(
+                                    version: constructionCodeVersion,
+                                    codeSectionName: codeSectionName
+                                )
+                            } label: {
+                                codeSectionPickerLabel(
+                                    codeSectionName,
+                                    isSelected: isReaderCodeSelected(
+                                        version: constructionCodeVersion,
+                                        codeSectionName: codeSectionName
+                                    )
+                                )
+                            }
+                        }
                     }
 
-                    ForEach(library.codeSections) { codeSection in
-                        Button {
-                            updateCodeSection(codeSection.id)
-                        } label: {
-                            codeSectionPickerLabel(
-                                CodeLibraryViewModel.displayName(forCodeSectionName: codeSection.name),
-                                isSelected: browseCodeSectionID == codeSection.id
+                    Button {
+                        selectReaderCode(
+                            version: zoningResolutionVersion,
+                            codeSectionName: "Zoning Resolution"
+                        )
+                    } label: {
+                        codeSectionPickerLabel(
+                            "Zoning Resolution",
+                            isSelected: isReaderCodeSelected(
+                                version: zoningResolutionVersion,
+                                codeSectionName: "Zoning Resolution"
                             )
-                        }
+                        )
                     }
                 } label: {
                     headerTitle(showPicker: true)
@@ -250,6 +271,82 @@ struct BrowseView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.bottom, 16)
+    }
+
+    private var constructionCodeSectionNames: [String] {
+        [
+            "Building Code",
+            "General Administrative Code",
+            "Plumbing Code",
+            "Mechanical Code",
+            "Fuel Gas Code"
+        ]
+    }
+
+    private var constructionCodeVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            version.codeVersion.localizedCaseInsensitiveContains("construction")
+        }
+    }
+
+    private var zoningResolutionVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            version.codeVersion.localizedCaseInsensitiveContains("zoning")
+        }
+    }
+
+    private func isReaderCodeSelected(
+        version: BundledCodeVersion?,
+        codeSectionName: String
+    ) -> Bool {
+        guard version?.fileName == library.selectedVersionFileName else { return false }
+        return normalizedReaderCodeName(selectedCodeSectionName) == normalizedReaderCodeName(codeSectionName)
+    }
+
+    private func selectReaderCode(
+        version: BundledCodeVersion?,
+        codeSectionName: String
+    ) {
+        guard let version else { return }
+        pendingReaderCodeSectionName = codeSectionName
+        BrowserContextID.persistVersionFileName(version.fileName, for: browserContext)
+        if library.selectedVersionFileName != version.fileName {
+            library.updateSelectedVersion(fileName: version.fileName)
+        } else {
+            resolvePendingReaderCodeSelection()
+        }
+    }
+
+    private func resolvePendingReaderCodeSelection() {
+        guard let pendingReaderCodeSectionName else { return }
+        let targetName = normalizedReaderCodeName(pendingReaderCodeSectionName)
+        guard let codeSection = library.codeSections.first(where: {
+            normalizedReaderCodeName(
+                CodeLibraryViewModel.displayName(forCodeSectionName: $0.name)
+            ) == targetName
+        }) else { return }
+        self.pendingReaderCodeSectionName = nil
+        updateCodeSection(codeSection.id)
+    }
+
+    private func normalizedReaderCodeName(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "General Administrative Provisions", with: "General Administrative Code", options: .caseInsensitive)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+    }
+
+    private func restoreReaderVersionIfNeeded() {
+        guard let storedVersion = BrowserContextID.storedVersionFileName(for: browserContext),
+              storedVersion != library.selectedVersionFileName,
+              library.availableVersions.contains(where: { $0.fileName == storedVersion })
+        else {
+            if let currentVersion = library.selectedVersion {
+                BrowserContextID.persistVersionFileName(currentVersion.fileName, for: browserContext)
+            }
+            return
+        }
+        library.updateSelectedVersion(fileName: storedVersion)
     }
 
     private func headerTitle(showPicker: Bool) -> some View {
@@ -397,7 +494,16 @@ struct BrowseView: View {
 
     private func seedBrowseSectionIfNeeded() {
         guard !hasSeededBrowseSection else { return }
+        if let storedVersion = BrowserContextID.storedVersionFileName(for: browserContext),
+           storedVersion != library.selectedVersionFileName,
+           library.availableVersions.contains(where: { $0.fileName == storedVersion }) {
+            library.updateSelectedVersion(fileName: storedVersion)
+            return
+        }
         hasSeededBrowseSection = true
+        if let currentVersion = library.selectedVersion {
+            BrowserContextID.persistVersionFileName(currentVersion.fileName, for: browserContext)
+        }
 
         let stored = BrowserContextID.storedCodeSectionID(for: browserContext)
 

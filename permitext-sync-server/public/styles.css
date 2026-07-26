@@ -1406,6 +1406,26 @@ label {
   cursor: pointer;
 }
 
+.custom-select-group-label {
+  padding: 0.3rem 0.25rem 0.12rem;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.82em !important;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.custom-select-option.is-indented {
+  padding-left: 1.25rem;
+}
+
+.custom-select-option.is-group-action {
+  padding-top: 0.3rem;
+  font-weight: 700;
+}
+
 .custom-select-option[aria-selected="true"] {
   background: transparent;
   color: inherit;

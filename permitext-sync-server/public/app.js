@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v25";
+} from "./offline-storage.js?v=20260726-web-reliability-v26";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -86,6 +86,8 @@ const codeOptions = [
   { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" },
   { prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }
 ];
+const zoningCodePrefix = "ZR";
+const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
 const defaultReaderPaneWidth = 520;
@@ -2342,12 +2344,19 @@ function populateCodeSelect(panel, reader) {
   if (!codeSelect) return;
   clear(codeSelect);
   reader.codePrefix = reader.codePrefix || "BC";
-  codeOptions.forEach((code) => {
+  const constructionGroup = document.createElement("optgroup");
+  constructionGroup.label = "Construction Codes";
+  codeOptions.filter((code) => code.prefix !== zoningCodePrefix).forEach((code) => {
     const option = document.createElement("option");
     option.value = code.prefix;
     option.textContent = code.label;
-    codeSelect.append(option);
+    constructionGroup.append(option);
   });
+  const zoningOption = document.createElement("option");
+  zoningOption.value = zoningCodePrefix;
+  zoningOption.textContent = "Zoning Resolution";
+  zoningOption.dataset.sectionHeader = "true";
+  codeSelect.append(constructionGroup, zoningOption);
   codeSelect.value = reader.codePrefix;
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
@@ -2393,9 +2402,11 @@ function enhanceSelect(select) {
 
   const renderOptions = () => {
     clear(menu);
-    Array.from(select.options).forEach((option) => {
+    const appendOption = (option, { indented = false } = {}) => {
       const item = document.createElement("button");
       item.className = "custom-select-option";
+      item.classList.toggle("is-indented", indented);
+      item.classList.toggle("is-group-action", option.dataset.sectionHeader === "true");
       item.type = "button";
       item.textContent = option.textContent;
       item.dataset.value = option.value;
@@ -2407,6 +2418,17 @@ function enhanceSelect(select) {
         closeMenu();
       });
       menu.append(item);
+    };
+    Array.from(select.children).forEach((child) => {
+      if (child instanceof HTMLOptGroupElement) {
+        const header = document.createElement("div");
+        header.className = "custom-select-group-label";
+        header.textContent = child.label;
+        menu.append(header);
+        Array.from(child.children).forEach((option) => appendOption(option, { indented: true }));
+        return;
+      }
+      if (child instanceof HTMLOptionElement) appendOption(child);
     });
   };
 
@@ -14303,7 +14325,7 @@ function renderSettings() {
   void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
 
   jurisdictionSelect.value = "jurisdiction-1";
-  versionSelect.value = defaultSyncCodeVersion;
+  versionSelect.value = zoningSyncCodeVersion;
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const account = activeAccount();

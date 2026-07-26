@@ -142,6 +142,15 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
         }
     }
 
+    var versionDefaultsKey: String {
+        switch self {
+        case .primary:
+            return "browseLeftVersionFileName"
+        case .secondary:
+            return "browseRightVersionFileName"
+        }
+    }
+
     func chapterSectionDefaultsKey(for chapterID: Int64) -> String {
         rawValue + ".chapterSection." + String(chapterID)
     }
@@ -163,6 +172,16 @@ enum BrowserContextID: String, Hashable, CaseIterable, Identifiable {
 
     static func persistCodeSectionID(_ id: Int64?, for context: BrowserContextID) {
         UserDefaults.standard.set(id ?? -1, forKey: context.codeSectionDefaultsKey)
+    }
+
+    static func storedVersionFileName(for context: BrowserContextID) -> String? {
+        let value = UserDefaults.standard.string(forKey: context.versionDefaultsKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        return value?.isEmpty == false ? value : nil
+    }
+
+    static func persistVersionFileName(_ fileName: String, for context: BrowserContextID) {
+        UserDefaults.standard.set(fileName, forKey: context.versionDefaultsKey)
     }
 
     static func storedSectionID(for chapterID: Int64, context: BrowserContextID) -> Int64? {

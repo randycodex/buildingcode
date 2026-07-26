@@ -168,6 +168,14 @@ async function main() {
     new URL("../../NYC CC APP/permitext/Views/SettingsView.swift", import.meta.url),
     "utf8"
   );
+  const iosBrowseSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Views/BrowseView.swift", import.meta.url),
+    "utf8"
+  );
+  const iosBrowserContextSource = await readFile(
+    new URL("../../NYC CC APP/permitext/Models/BrowserContext.swift", import.meta.url),
+    "utf8"
+  );
   const iosAppSource = await readFile(
     new URL("../../NYC CC APP/permitext/PermitextApp.swift", import.meta.url),
     "utf8"
@@ -375,6 +383,13 @@ async function main() {
       "Settings lost the consolidated Pro and optional Research description or restored a separate Research row."
     );
     assert(
+      settingsTemplateSource.includes('>NYC Zoning Resolution</option>') &&
+        !settingsTemplateSource.includes('>2022 Construction Codes</option>') &&
+        iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
+        iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'),
+      "Settings should expose only NYC Zoning Resolution in its version picker."
+    );
+    assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
         !settingsTemplateSource.includes("settings-comparison-toggle"),
       "Web Settings still includes the retired Comparison Mode control."
@@ -417,6 +432,16 @@ async function main() {
         workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
         workspaceScript.text.includes(': "Upgrade to Pro"'),
       "Web Settings no longer distinguishes active Free and Pro plan actions."
+    );
+    assert(
+      workspaceScript.text.includes('constructionGroup.label = "Construction Codes"') &&
+        workspaceScript.text.includes('zoningOption.textContent = "Zoning Resolution"') &&
+        workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
+        iosBrowseSource.includes('Section("Construction Codes")') &&
+        iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
+        iosBrowserContextSource.includes("storedVersionFileName") &&
+        iosBrowserContextSource.includes("persistVersionFileName"),
+      "Reader code pickers should group indented Construction Codes and expose selectable Zoning Resolution."
     );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
@@ -845,14 +870,14 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v25'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v26'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v22'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v26'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1173,6 +1198,12 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      workspaceStyles.text.includes(".custom-select-group-label") &&
+        workspaceStyles.text.includes(".custom-select-option.is-indented") &&
+        workspaceStyles.text.includes(".custom-select-option.is-group-action"),
+      "Reader picker group headings or Construction Code indentation styles are missing."
+    );
     assert(
       workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?border: 0;[\s\S]*?background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);[\s\S]*?color: var\(--text-primary\);/),
       "Saved project tiles no longer use a borderless muted project tint with a contrast-safe foreground."
