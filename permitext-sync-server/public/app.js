@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v16";
+} from "./offline-storage.js?v=20260726-web-reliability-v17";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2561,11 +2561,10 @@ function currentPlan() {
 
 function updateTopbarPlanBadge() {
   if (!topbarBrand || !topbarBrandPlan) return;
-  const signedIn = Boolean(activeAccount());
-  const planLabel = currentPlan() === "pro" ? "Pro" : "Free";
-  topbarBrandPlan.hidden = !signedIn;
-  topbarBrandPlan.textContent = planLabel;
-  topbarBrand.setAttribute("aria-label", signedIn ? `permitext ${planLabel} plan` : "permitext");
+  const pro = currentPlan() === "pro";
+  topbarBrandPlan.hidden = !pro;
+  topbarBrandPlan.textContent = pro ? "Pro" : "";
+  topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext");
 }
 
 function isProAccount() {

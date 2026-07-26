@@ -833,7 +833,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v16'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v17'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -912,9 +912,10 @@ async function main() {
       webRoot.text.includes('class="topbar-brand" aria-label="permitext"') &&
         webRoot.text.includes('class="topbar-brand-plan" hidden') &&
         workspaceScript.text.includes("function updateTopbarPlanBadge") &&
-        workspaceScript.text.includes("topbarBrandPlan.hidden = !signedIn") &&
-        workspaceScript.text.includes('topbarBrand.setAttribute("aria-label", signedIn ? `permitext ${planLabel} plan` : "permitext")'),
-      "The topbar plan badge can present a signed-out user as Pro or omit the actual signed-in plan."
+        workspaceScript.text.includes("topbarBrandPlan.hidden = !pro") &&
+        workspaceScript.text.includes('topbarBrandPlan.textContent = pro ? "Pro" : ""') &&
+        workspaceScript.text.includes('topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext")'),
+      "The topbar plan badge must remain hidden unless the account has active Pro access."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
