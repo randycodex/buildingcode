@@ -884,7 +884,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v38'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v39'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -898,7 +898,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v36'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v39'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1233,10 +1233,19 @@ async function main() {
       "Top toolbar text buttons should use an underline focus cue without a pill outline."
     );
     assert(
-      workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
+      workspaceStyles.text.match(/\.settings-destructive-secondary\.account-delete,[\s\S]*?\.settings-destructive-secondary\.settings-firm-delete \{[\s\S]*?background: color-mix\(in srgb, var\(--destructive\) 10%, transparent\);[\s\S]*?color: var\(--destructive\);/) &&
         workspaceStyles.text.includes("--destructive: #ff3b30;") &&
         workspaceStyles.text.includes("--destructive: #ff453a;"),
-      "Web Delete Account no longer matches the adaptive red iOS destructive treatment."
+      "Web account and firm deletion no longer match the adaptive red iOS destructive treatment."
+    );
+    assert(
+      workspaceScript.text.includes('deleteFirmButton.textContent = "Delete Firm Workspace"') &&
+        workspaceScript.text.includes('postResearch("/organizations/delete"') &&
+        workspaceScript.text.includes('confirmation: "delete"') &&
+        workspaceScript.text.includes('confirmLabel: "Delete Firm"') &&
+        serverSource.includes("async function handleOrganizationDelete") &&
+        serverSource.includes('"organizations/delete": handleOrganizationDelete'),
+      "Owners no longer have a confirmed, server-authorized Firm Workspace deletion path."
     );
     assert(
       workspaceStyles.text.match(/\.settings-panel \.settings-primary-button,[\s\S]*?\.settings-panel \.settings-mini-button \{[\s\S]*?justify-self: center;[\s\S]*?width: 60%;[\s\S]*?margin-inline: auto;[\s\S]*?border-radius: var\(--radius-pill\);/),
@@ -4125,6 +4134,76 @@ async function main() {
           createdConversation.json.conversation.sources[0].id &&
         !JSON.stringify(reusedResearchEvidence.json.conversation).includes("When must the owner notify the department?"),
       "Reusing approved evidence did not create a fresh Project-linked conversation with new evidence identities."
+    );
+    const viewerFirmDelete = await request("/organizations/delete", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        organizationID,
+        confirmation: "delete"
+      }
+    });
+    assert(
+      viewerFirmDelete.response.status === 403 &&
+        viewerFirmDelete.json.code === "ORGANIZATION_OWNER_REQUIRED",
+      "A non-owner was allowed to delete a firm workspace."
+    );
+    const unconfirmedFirmDelete = await request("/organizations/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID
+      }
+    });
+    assert(
+      unconfirmedFirmDelete.response.status === 400 &&
+        unconfirmedFirmDelete.json.code === "ORGANIZATION_DELETE_CONFIRMATION_REQUIRED",
+      "Firm workspace deletion did not require explicit confirmation."
+    );
+    const ownerFirmDelete = await request("/organizations/delete", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        confirmation: "delete"
+      }
+    });
+    assert(
+      ownerFirmDelete.response.ok &&
+        ownerFirmDelete.json.deleted === true &&
+        ownerFirmDelete.json.restoredProjectIDs.includes(researchProjectIDs[0]),
+      "The firm Owner could not delete the workspace and return its Project to personal ownership."
+    );
+    const organizationsAfterFirmDelete = await request("/organizations/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: { auth: { accountUserID: userID } }
+    });
+    const personalProjectAfterFirmDelete = await request("/projects/foundation/state", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    const formerViewerAfterFirmDelete = await request("/organizations/projects/snapshot", {
+      method: "POST",
+      token: sharedViewerToken,
+      body: {
+        auth: { accountUserID: sharedViewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      organizationsAfterFirmDelete.response.ok &&
+        !organizationsAfterFirmDelete.json.organizations.some((item) => item.id === organizationID) &&
+        personalProjectAfterFirmDelete.response.ok &&
+        [403, 404].includes(formerViewerAfterFirmDelete.response.status),
+      "Firm deletion did not remove shared access while preserving the Owner's personal Project."
     );
     const researchUsage = await request("/research/usage", {
       method: "POST",

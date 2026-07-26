@@ -429,6 +429,105 @@ export function createPostgresOrganizationRepository(sql) {
       return organization;
     },
 
+    async deleteOrganization(organizationID, ownerUserID, updatedAt) {
+      const results = await sql.transaction([
+        sql`
+          SELECT pg_advisory_xact_lock(
+            hashtextextended(${organizationID}, 20260726)
+          )
+        `,
+        sql`
+          DELETE FROM permitext_project_memberships
+          WHERE project_id IN (
+            SELECT project_id
+            FROM permitext_project_ownerships
+            WHERE organization_id = ${organizationID}
+          )
+            AND EXISTS (
+              SELECT 1
+              FROM permitext_organizations
+              WHERE id = ${organizationID}
+                AND owner_user_id = ${ownerUserID}
+            )
+        `,
+        sql`
+          DELETE FROM permitext_organization_invitations
+          WHERE organization_id = ${organizationID}
+            AND EXISTS (
+              SELECT 1
+              FROM permitext_organizations
+              WHERE id = ${organizationID}
+                AND owner_user_id = ${ownerUserID}
+            )
+        `,
+        sql`
+          DELETE FROM permitext_organization_memberships
+          WHERE organization_id = ${organizationID}
+            AND EXISTS (
+              SELECT 1
+              FROM permitext_organizations
+              WHERE id = ${organizationID}
+                AND owner_user_id = ${ownerUserID}
+            )
+        `,
+        sql`
+          UPDATE permitext_project_ownerships
+          SET owner_kind = 'user',
+              owner_id = COALESCE(
+                NULLIF(ownership->>'originalOwnerUserID', ''),
+                storage_owner_user_id,
+                ${ownerUserID}
+              ),
+              organization_id = NULL,
+              ownership = jsonb_set(
+                jsonb_set(
+                  jsonb_set(
+                    ownership,
+                    '{owner}',
+                    jsonb_build_object(
+                      'kind', 'user',
+                      'id', COALESCE(
+                        NULLIF(ownership->>'originalOwnerUserID', ''),
+                        storage_owner_user_id,
+                        ${ownerUserID}
+                      ),
+                      'organizationID', NULL
+                    ),
+                    true
+                  ),
+                  '{transferredByUserID}',
+                  'null'::jsonb,
+                  true
+                ),
+                '{updatedAt}',
+                to_jsonb(${updatedAt}::text),
+                true
+              ),
+              updated_at = ${updatedAt}::timestamptz
+          WHERE organization_id = ${organizationID}
+            AND EXISTS (
+              SELECT 1
+              FROM permitext_organizations
+              WHERE id = ${organizationID}
+                AND owner_user_id = ${ownerUserID}
+            )
+          RETURNING project_id
+        `,
+        sql`
+          DELETE FROM permitext_organizations
+          WHERE id = ${organizationID}
+            AND owner_user_id = ${ownerUserID}
+          RETURNING id
+        `
+      ]);
+      const restoredProjects = results[4] || [];
+      const deletedOrganizations = results[5] || [];
+      return {
+        outcome: deletedOrganizations.length ? "deleted" : "not_found",
+        restoredProjectIDs: restoredProjects.map((row) => row.project_id)
+      };
+    },
+
     async membership(organizationID, userID) {
       const rows = await sql`
         SELECT membership

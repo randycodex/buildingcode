@@ -7456,9 +7456,14 @@ button.project-studio-metric:focus-visible {
   margin-top: 2px;
 }
 
-.settings-panel .settings-destructive-secondary.account-delete {
+.settings-panel .settings-destructive-secondary.account-delete,
+.settings-panel .settings-destructive-secondary.settings-firm-delete {
   background: color-mix(in srgb, var(--destructive) 10%, transparent);
   color: var(--destructive);
+}
+
+.settings-panel .settings-firm-delete {
+  margin-top: var(--space-2);
 }
 
 .settings-panel .reader-preview-card {

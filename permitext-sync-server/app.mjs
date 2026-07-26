@@ -640,6 +640,52 @@ function createFileStoreAdapter() {
       await this.write(store);
       return organization;
     },
+    async deleteOrganization(organizationID, ownerUserID, updatedAt) {
+      return withOrganizationMutationLock(organizationID, async () => {
+        const store = await this.read();
+        const organization = store.organizations?.[organizationID] || null;
+        if (!organization) return { outcome: "not_found", restoredProjectIDs: [] };
+        if (organization.ownerUserID !== ownerUserID) {
+          return { outcome: "forbidden", restoredProjectIDs: [] };
+        }
+        const restoredProjectIDs = [];
+        for (const [projectID, ownership] of Object.entries(store.projectOwnerships || {})) {
+          if (
+            ownership.owner?.kind !== "organization" ||
+            ownership.owner?.organizationID !== organizationID
+          ) {
+            continue;
+          }
+          const personalOwnerUserID =
+            ownership.originalOwnerUserID ||
+            ownership.storageOwnerUserID ||
+            ownerUserID;
+          store.projectOwnerships[projectID] = {
+            ...ownership,
+            owner: {
+              kind: "user",
+              id: personalOwnerUserID,
+              organizationID: null
+            },
+            transferredByUserID: null,
+            updatedAt
+          };
+          delete store.projectMembershipsByProjectID[projectID];
+          restoredProjectIDs.push(projectID);
+        }
+        delete store.organizations[organizationID];
+        delete store.organizationMembershipsByOrganizationID[organizationID];
+        for (const [invitationID, invitation] of Object.entries(
+          store.organizationInvitationsByID || {}
+        )) {
+          if (invitation.organizationID === organizationID) {
+            delete store.organizationInvitationsByID[invitationID];
+          }
+        }
+        await this.write(store);
+        return { outcome: "deleted", restoredProjectIDs };
+      });
+    },
     async membership(organizationID, userID) {
       const store = await this.read();
       return (store.organizationMembershipsByOrganizationID?.[organizationID] || [])
@@ -2686,6 +2732,10 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       return organizationRepository.saveOrganization(organization);
     },
+    async deleteOrganization(organizationID, ownerUserID, updatedAt) {
+      await ensureSchema();
+      return organizationRepository.deleteOrganization(organizationID, ownerUserID, updatedAt);
+    },
     async membership(organizationID, userID) {
       await ensureSchema();
       return organizationRepository.membership(organizationID, userID);
@@ -2927,6 +2977,14 @@ async function listStoredOrganizationsForUser(userID) {
 async function saveStoredOrganization(organization) {
   const adapter = await storeAdapter();
   return adapter.saveOrganization(organization);
+}
+
+async function deleteStoredOrganization(organizationID, ownerUserID, updatedAt) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.deleteOrganization !== "function") {
+    throw new Error("Firm workspace deletion is unavailable.");
+  }
+  return adapter.deleteOrganization(organizationID, ownerUserID, updatedAt);
 }
 
 async function storedOrganizationMembership(organizationID, userID) {
@@ -5638,6 +5696,47 @@ async function handleOrganizationUpdate(request, response) {
       code: "INVALID_ORGANIZATION"
     });
   }
+}
+
+async function handleOrganizationDelete(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  if (String(context.body.confirmation || "").toLowerCase() !== "delete") {
+    sendJSON(response, 400, {
+      error: "Confirm firm workspace deletion before continuing.",
+      code: "ORGANIZATION_DELETE_CONFIRMATION_REQUIRED"
+    });
+    return;
+  }
+  const organizationID = String(context.body.organizationID || "").trim();
+  const organization = await storedOrganization(organizationID);
+  if (!organization || organization.status !== "active") {
+    sendError(response, 404, "Firm workspace not found.");
+    return;
+  }
+  if (organization.ownerUserID !== context.userID) {
+    sendJSON(response, 403, {
+      error: "Only the firm Owner can delete this workspace.",
+      code: "ORGANIZATION_OWNER_REQUIRED"
+    });
+    return;
+  }
+  const result = await deleteStoredOrganization(
+    organizationID,
+    context.userID,
+    new Date().toISOString()
+  );
+  if (result.outcome !== "deleted") {
+    sendError(response, result.outcome === "forbidden" ? 403 : 404, result.outcome === "forbidden"
+      ? "Only the firm Owner can delete this workspace."
+      : "Firm workspace not found.");
+    return;
+  }
+  sendJSON(response, 200, {
+    deleted: true,
+    organizationID,
+    restoredProjectIDs: result.restoredProjectIDs
+  });
 }
 
 async function organizationResearchAllowanceUsage(organizationID, controls) {
@@ -14145,6 +14244,7 @@ const handlers = {
   "organizations/list": handleOrganizationList,
   "organizations/create": handleOrganizationCreate,
   "organizations/update": handleOrganizationUpdate,
+  "organizations/delete": handleOrganizationDelete,
   "organizations/controls/save": handleOrganizationControlsSave,
   "organizations/members/list": handleOrganizationMemberList,
   "organizations/members/invite": handleOrganizationMemberInvite,

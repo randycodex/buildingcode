@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v38";
+} from "./offline-storage.js?v=20260726-web-reliability-v39";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14225,12 +14225,47 @@ async function renderFirmWorkspaceSettings(panel, settingsProjects, setStatus) {
           void renderFirmMemberManager(memberList, organization, setFirmStatus);
         }
       });
+      const deleteFirmButton = document.createElement("button");
+      deleteFirmButton.className =
+        "settings-secondary-button settings-destructive-secondary settings-firm-delete";
+      deleteFirmButton.type = "button";
+      deleteFirmButton.textContent = "Delete Firm Workspace";
+      deleteFirmButton.addEventListener("click", async () => {
+        const projectCount = organization.projects?.length || 0;
+        const projectMessage = projectCount
+          ? `${projectCount} firm ${projectCount === 1 ? "Project" : "Projects"} will return to their original owners. `
+          : "";
+        const confirmed = await confirmWebWarning(
+          `Delete ${organization.name}?`,
+          `${projectMessage}Members and pending invitations will lose access, and the firm's standards will be deleted. Personal accounts and Project content will remain. This cannot be undone.`,
+          { confirmLabel: "Delete Firm" }
+        );
+        if (!confirmed) return;
+        deleteFirmButton.disabled = true;
+        try {
+          const payload = await postResearch("/organizations/delete", {
+            organizationID: organization.id,
+            confirmation: "delete"
+          });
+          const restoredCount = payload.restoredProjectIDs?.length || 0;
+          setFirmStatus(
+            restoredCount
+              ? `${organization.name} deleted. ${restoredCount} ${restoredCount === 1 ? "Project was" : "Projects were"} returned to personal ownership.`
+              : `${organization.name} deleted.`
+          );
+          await refreshOrganizationWorkspaceUI();
+        } catch (error) {
+          setFirmStatus(error.message || "The firm workspace could not be deleted.", true);
+          deleteFirmButton.disabled = false;
+        }
+      });
       ownerTools.append(
         renderFirmStandardsEditor(organization, setFirmStatus),
         firmControlLabel("Project ownership", transferSelect),
         transferButton,
         inviteForm,
-        members
+        members,
+        deleteFirmButton
       );
       card.append(ownerTools);
     }
