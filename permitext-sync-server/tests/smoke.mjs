@@ -664,6 +664,12 @@ async function main() {
       "Free and Pro capabilities are no longer enforced consistently by the web UI and server."
     );
     assert(
+      serverSource.includes(
+        "WHERE entity_kind IN ('continuity', 'codeVersionClear', 'workboard')"
+      ),
+      "PostgreSQL normalized reads no longer preserve Workboard compatibility records."
+    );
+    assert(
       syncStateScript.response.ok &&
         syncStateScript.text.includes("function bulkClearScope(record)") &&
         syncStateScript.text.includes("function bulkClearEventID(clearRecords, codeVersion, scope)") &&
@@ -2544,19 +2550,26 @@ async function main() {
         !JSON.stringify(inviteViewer.json.invitation).includes("tokenHash"),
       "Project invitation did not return its one-time credential safely."
     );
-    const acceptViewer = await request("/organizations/invitations/accept", {
-      method: "POST",
-      token: sharedViewerToken,
-      body: {
-        auth: { accountUserID: sharedViewerID },
-        invitationToken: inviteViewer.json.invitationToken
-      }
-    });
+    const viewerAcceptanceAttempts = await Promise.all(
+      Array.from({ length: 2 }, () => request("/organizations/invitations/accept", {
+        method: "POST",
+        token: sharedViewerToken,
+        body: {
+          auth: { accountUserID: sharedViewerID },
+          invitationToken: inviteViewer.json.invitationToken
+        }
+      }))
+    );
+    const acceptViewer = viewerAcceptanceAttempts.find(({ response }) => response.ok);
+    const rejectedViewerReuse = viewerAcceptanceAttempts.find(({ json }) =>
+      json?.code === "ORGANIZATION_INVITATION_UNAVAILABLE"
+    );
     assert(
-      acceptViewer.response.ok &&
+      acceptViewer &&
+        rejectedViewerReuse &&
         acceptViewer.json.organization.role === "viewer" &&
         acceptViewer.json.organization.accessScope === "project",
-      "The invited viewer could not accept project-specific access."
+      "Project invitation acceptance was not atomic or allowed token reuse."
     );
     const viewerCapabilityPull = await request("/sync/pull", {
       method: "POST",
@@ -2671,35 +2684,55 @@ async function main() {
       "A Project viewer was allowed to author Notebook content."
     );
     const pendingSeatInvitationIDs = [];
-    for (let index = 1; index <= 3; index += 1) {
-      const seatInvitation = await request("/organizations/members/invite", {
+    const duplicateSeatAttempts = await Promise.all(
+      Array.from({ length: 2 }, () => request("/organizations/members/invite", {
         method: "POST",
         token: signIn.json.account.backendSessionToken,
         body: {
           auth: { accountUserID: userID },
           organizationID,
-          email: `pending-seat-${index}@smoke.test`,
+          email: "pending-seat-duplicate@smoke.test",
           role: "viewer"
         }
-      });
-      assert(seatInvitation.response.status === 201, `Pending firm seat ${index} was not reserved.`);
-      pendingSeatInvitationIDs.push(seatInvitation.json.invitation.id);
-    }
-    const fullSeatInvitation = await request("/organizations/members/invite", {
-      method: "POST",
-      token: signIn.json.account.backendSessionToken,
-      body: {
-        auth: { accountUserID: userID },
-        organizationID,
-        email: "over-seat-limit@smoke.test",
-        role: "viewer"
-      }
-    });
+      }))
+    );
+    const reservedDuplicateSeat = duplicateSeatAttempts.find(({ response }) =>
+      response.status === 201
+    );
+    const rejectedDuplicateSeat = duplicateSeatAttempts.find(({ json }) =>
+      json?.code === "ORGANIZATION_INVITATION_EXISTS"
+    );
     assert(
-      fullSeatInvitation.response.status === 409 &&
-        fullSeatInvitation.json.code === "ORGANIZATION_SEAT_LIMIT" &&
-        fullSeatInvitation.json.seats.used === 5,
-      "Firm seat limits did not count active members and pending invitations."
+      reservedDuplicateSeat && rejectedDuplicateSeat,
+      "Concurrent duplicate firm invitations did not reserve exactly one seat."
+    );
+    pendingSeatInvitationIDs.push(reservedDuplicateSeat.json.invitation.id);
+    const concurrentSeatAttempts = await Promise.all(
+      Array.from({ length: 3 }, (_, index) => request("/organizations/members/invite", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          email: `pending-seat-${index + 1}@smoke.test`,
+          role: "viewer"
+        }
+      }))
+    );
+    const reservedConcurrentSeats = concurrentSeatAttempts.filter(({ response }) =>
+      response.status === 201
+    );
+    const rejectedConcurrentSeats = concurrentSeatAttempts.filter(({ json }) =>
+      json?.code === "ORGANIZATION_SEAT_LIMIT"
+    );
+    assert(
+      reservedConcurrentSeats.length === 2 &&
+        rejectedConcurrentSeats.length === 1 &&
+        rejectedConcurrentSeats[0].json.seats.used === 5,
+      "Concurrent firm invitations exceeded the seat limit."
+    );
+    pendingSeatInvitationIDs.push(
+      ...reservedConcurrentSeats.map(({ json }) => json.invitation.id)
     );
     const releasePendingSeat = await request("/organizations/invitations/revoke", {
       method: "POST",
@@ -2715,6 +2748,189 @@ async function main() {
         releasePendingSeat.json.invitation.status === "revoked",
       "A pending firm seat could not be released for the collaboration workflow."
     );
+    const invitationRaceSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-invitation-race",
+          email: "invitation-race@smoke.test",
+          displayName: "Invitation Race"
+        }
+      }
+    });
+    const invitationRaceUserID = invitationRaceSignIn.json.account.appUserID;
+    const invitationRaceToken = invitationRaceSignIn.json.account.backendSessionToken;
+    const invitationRaceSetup = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        email: "invitation-race@smoke.test",
+        role: "viewer"
+      }
+    });
+    assert(invitationRaceSetup.response.status === 201, "Invitation race setup failed.");
+    const [racedAcceptance, racedRevocation] = await Promise.all([
+      request("/organizations/invitations/accept", {
+        method: "POST",
+        token: invitationRaceToken,
+        body: {
+          auth: { accountUserID: invitationRaceUserID },
+          invitationToken: invitationRaceSetup.json.invitationToken
+        }
+      }),
+      request("/organizations/invitations/revoke", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          invitationID: invitationRaceSetup.json.invitation.id
+        }
+      })
+    ]);
+    assert(
+      Number(racedAcceptance.response.ok) + Number(racedRevocation.response.ok) === 1 &&
+        [racedAcceptance.json.code, racedRevocation.json.code]
+          .filter(Boolean)
+          .includes("ORGANIZATION_INVITATION_UNAVAILABLE"),
+      "Concurrent invitation acceptance and revocation did not produce one terminal outcome."
+    );
+    const invitationRaceDirectory = await request("/organizations/members/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID
+      }
+    });
+    const invitationRaceMembership = invitationRaceDirectory.json.members.find((member) =>
+      member.userID === invitationRaceUserID
+    );
+    const invitationRaceRecord = invitationRaceDirectory.json.invitations.find((candidate) =>
+      candidate.id === invitationRaceSetup.json.invitation.id
+    );
+    assert(
+      racedAcceptance.response.ok
+        ? invitationRaceMembership?.status === "active" &&
+          invitationRaceRecord?.status === "accepted"
+        : !invitationRaceMembership && invitationRaceRecord?.status === "revoked",
+      "Invitation acceptance/revocation race left membership and invitation state inconsistent."
+    );
+    if (invitationRaceMembership?.status === "active") {
+      const deactivateInvitationRaceMember = await request("/organizations/members/update", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          userID: invitationRaceUserID,
+          status: "deactivated"
+        }
+      });
+      assert(
+        deactivateInvitationRaceMember.response.ok,
+        "Accepted invitation race member cleanup failed."
+      );
+    }
+    const reactivationRaceSignIn = await request("/account/sign-in", {
+      method: "POST",
+      body: {
+        credential: {
+          provider: "apple",
+          providerUserID: "smoke-reactivation-race",
+          email: "reactivation-race@smoke.test",
+          displayName: "Reactivation Race"
+        }
+      }
+    });
+    const reactivationRaceUserID = reactivationRaceSignIn.json.account.appUserID;
+    const reactivationRaceSetup = await request("/organizations/members/invite", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        email: "reactivation-race@smoke.test",
+        role: "viewer"
+      }
+    });
+    assert(reactivationRaceSetup.response.status === 201, "Reactivation race setup failed.");
+    const acceptReactivationRaceMember = await request("/organizations/invitations/accept", {
+      method: "POST",
+      token: reactivationRaceSignIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: reactivationRaceUserID },
+        invitationToken: reactivationRaceSetup.json.invitationToken
+      }
+    });
+    assert(acceptReactivationRaceMember.response.ok, "Reactivation race member setup failed.");
+    const deactivateReactivationRaceMember = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        userID: reactivationRaceUserID,
+        status: "deactivated"
+      }
+    });
+    assert(deactivateReactivationRaceMember.response.ok, "Reactivation race reset failed.");
+    const [racedReactivation, racedFinalSeatInvitation] = await Promise.all([
+      request("/organizations/members/update", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          userID: reactivationRaceUserID,
+          status: "active"
+        }
+      }),
+      request("/organizations/members/invite", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          email: "reactivation-final-seat@smoke.test",
+          role: "viewer"
+        }
+      })
+    ]);
+    assert(
+      Number(racedReactivation.response.ok) + Number(racedFinalSeatInvitation.response.ok) === 1 &&
+        [racedReactivation.json.code, racedFinalSeatInvitation.json.code]
+          .filter(Boolean)
+          .includes("ORGANIZATION_SEAT_LIMIT"),
+      "A concurrent reactivation and invitation both consumed the final firm seat."
+    );
+    if (racedReactivation.response.ok) {
+      const releaseReactivatedSeat = await request("/organizations/members/update", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          userID: reactivationRaceUserID,
+          status: "deactivated"
+        }
+      });
+      assert(releaseReactivatedSeat.response.ok, "Reactivated seat cleanup failed.");
+    } else {
+      const releaseRacedInvitation = await request("/organizations/invitations/revoke", {
+        method: "POST",
+        token: signIn.json.account.backendSessionToken,
+        body: {
+          auth: { accountUserID: userID },
+          organizationID,
+          invitationID: racedFinalSeatInvitation.json.invitation.id
+        }
+      });
+      assert(releaseRacedInvitation.response.ok, "Raced invitation cleanup failed.");
+    }
     const deactivateViewer = await request("/organizations/members/update", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -3380,6 +3596,131 @@ async function main() {
           item.sourceID === workboardPreviewID
         ),
       "The Report Manifest endpoint did not restore the immutable semantic snapshot."
+    );
+    const reviewerReportHistory = await request("/reports/history/list", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    const reviewerReportManifest = await request("/reports/manifests/get", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        manifestID: reportManifestID
+      }
+    });
+    const reviewerReportPDF = await requestBinary("/reports/files/read", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        generatedReportID: webGeneratedReportID
+      }
+    });
+    assert(
+      reviewerReportHistory.response.ok &&
+        reviewerReportHistory.json.reports.some((report) => report.id === reportManifestID) &&
+        reviewerReportManifest.response.ok &&
+        reviewerReportManifest.json.manifest.id === reportManifestID &&
+        reviewerReportPDF.response.ok &&
+        reviewerReportPDF.body.equals(storedWebPDF.body),
+      "An authorized Project reviewer could not read organization-owned Report history, manifests, and files."
+    );
+    const reviewerReportDraftWrite = await request("/reports/drafts/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        title: "Unauthorized reviewer draft",
+        reportDate,
+        blocks: []
+      }
+    });
+    assert(
+      reviewerReportDraftWrite.response.status === 403 &&
+        reviewerReportDraftWrite.json.code === "PROJECT_PERMISSION_REQUIRED",
+      "A Project reviewer was allowed to mutate Report Drafts."
+    );
+    const editorReportDraft = await request("/reports/drafts/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        expectedVersion: 0,
+        title: "Editor-owned shared Report Draft",
+        reportDate,
+        blocks: [{
+          id: "editor-shared-heading",
+          kind: "heading",
+          text: "Shared Project coordination"
+        }]
+      }
+    });
+    const ownerDraftListAfterEditorWrite = await request("/reports/drafts/list", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      editorReportDraft.response.status === 201 &&
+        editorReportDraft.json.draft.updatedBy === sharedEditorID &&
+        ownerDraftListAfterEditorWrite.response.ok &&
+        ownerDraftListAfterEditorWrite.json.drafts.some((draft) =>
+          draft.id === editorReportDraft.json.draft.id
+        ),
+      "An authorized Project editor did not write its Report Draft into organization-owned Project storage."
+    );
+    const editorWorkboardPreviewUpload = await request("/workboards/previews/upload?" + new URLSearchParams({
+      projectID: researchProjectIDs[0],
+      workboardUpdatedAt: "2026-07-24T12:30:00.000Z",
+      elementCount: "4"
+    }), {
+      method: "POST",
+      token: sharedEditorToken,
+      headers: {
+        "content-type": "image/png",
+        "x-permitext-user-id": sharedEditorID
+      },
+      rawBody: smokePNG
+    });
+    const ownerFoundationAfterEditorPreview = await request("/projects/foundation/state", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      editorWorkboardPreviewUpload.response.status === 201 &&
+        ownerFoundationAfterEditorPreview.response.ok &&
+        ownerFoundationAfterEditorPreview.json.workboardPreview.id ===
+          editorWorkboardPreviewUpload.json.preview.id,
+      "An authorized Project editor did not write the Workboard preview into organization-owned Project storage."
+    );
+    const reviewerWorkboardPreviewClear = await request("/workboards/previews/clear", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    assert(
+      reviewerWorkboardPreviewClear.response.status === 403 &&
+        reviewerWorkboardPreviewClear.json.code === "PROJECT_PERMISSION_REQUIRED",
+      "A Project reviewer was allowed to clear an organization-owned Workboard preview."
     );
     const clearWorkboardPreview = await request("/workboards/previews/clear", {
       method: "POST",

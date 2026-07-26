@@ -361,6 +361,7 @@ function canonicalJSONString(value) {
 }
 
 const researchUsageLocks = new Map();
+const organizationMutationLocks = new Map();
 const researchUsageReservationTTLMilliseconds = 15 * 60 * 1000;
 
 function activeResearchUsageEntry(entry, now = Date.now()) {
@@ -387,6 +388,46 @@ async function withResearchUsageLock(userID, operation) {
       researchUsageLocks.delete(userID);
     }
   }
+}
+
+async function withOrganizationMutationLock(organizationID, operation) {
+  const previous = organizationMutationLocks.get(organizationID) || Promise.resolve();
+  let release;
+  const gate = new Promise((resolve) => {
+    release = resolve;
+  });
+  const tail = previous.then(() => gate);
+  organizationMutationLocks.set(organizationID, tail);
+  await previous;
+  try {
+    return await operation();
+  } finally {
+    release();
+    if (organizationMutationLocks.get(organizationID) === tail) {
+      organizationMutationLocks.delete(organizationID);
+    }
+  }
+}
+
+function fileStoreOrganizationSeatState(store, organizationID) {
+  const organizationMemberships =
+    store.organizationMembershipsByOrganizationID?.[organizationID] || [];
+  const organizationProjectIDs = new Set(
+    Object.values(store.projectOwnerships || {})
+      .filter((ownership) =>
+        ownership.owner?.kind === "organization" &&
+        ownership.owner.organizationID === organizationID
+      )
+      .map((ownership) => ownership.projectID)
+  );
+  const projectMemberships = Array.from(organizationProjectIDs)
+    .flatMap((projectID) => store.projectMembershipsByProjectID?.[projectID] || []);
+  const invitations = Object.values(store.organizationInvitationsByID || {})
+    .filter((invitation) => invitation.organizationID === organizationID);
+  return organizationSeatUsage(
+    [...organizationMemberships, ...projectMemberships],
+    invitations
+  );
 }
 
 function createFileStoreAdapter() {
@@ -700,6 +741,94 @@ function createFileStoreAdapter() {
       await this.write(store);
       return invitation;
     },
+    async reserveOrganizationInvitation(invitation, seatLimit) {
+      return withOrganizationMutationLock(invitation.organizationID, async () => {
+        const store = await this.read();
+        store.organizationInvitationsByID ||= {};
+        const duplicate = Object.values(store.organizationInvitationsByID)
+          .find((candidate) =>
+            candidate.organizationID === invitation.organizationID &&
+            candidate.projectID === invitation.projectID &&
+            invitationState(candidate) === "pending" &&
+            (
+              (invitation.invitedUserID &&
+                candidate.invitedUserID === invitation.invitedUserID) ||
+              (invitation.invitedEmail &&
+                String(candidate.invitedEmail || "").toLowerCase() ===
+                  invitation.invitedEmail.toLowerCase())
+            )
+          );
+        const seats = fileStoreOrganizationSeatState(store, invitation.organizationID);
+        if (duplicate) {
+          return { outcome: "duplicate", invitation: null, seats };
+        }
+        store.organizationInvitationsByID[invitation.id] = invitation;
+        const reservedSeats = fileStoreOrganizationSeatState(store, invitation.organizationID);
+        if (reservedSeats.used > seatLimit) {
+          return { outcome: "seat_limit", invitation: null, seats };
+        }
+        await this.write(store);
+        return { outcome: "created", invitation, seats };
+      });
+    },
+    async updatePendingOrganizationInvitation(invitation) {
+      return withOrganizationMutationLock(invitation.organizationID, async () => {
+        const store = await this.read();
+        const current = store.organizationInvitationsByID?.[invitation.id] || null;
+        if (!current || invitationState(current) !== "pending") return null;
+        store.organizationInvitationsByID[invitation.id] = invitation;
+        await this.write(store);
+        return invitation;
+      });
+    },
+    async acceptOrganizationInvitation(invitation, membership, seatLimit) {
+      return withOrganizationMutationLock(invitation.organizationID, async () => {
+        const store = await this.read();
+        const current = store.organizationInvitationsByID?.[invitation.id] || null;
+        if (
+          !current ||
+          current.tokenHash !== invitation.tokenHash ||
+          invitationState(current) !== "pending"
+        ) {
+          return {
+            outcome: "unavailable",
+            invitation: null,
+            membership: null
+          };
+        }
+        const seats = fileStoreOrganizationSeatState(store, invitation.organizationID);
+        if (seats.used > seatLimit) {
+          return {
+            outcome: "seat_limit",
+            invitation: null,
+            membership: null
+          };
+        }
+        if (membership.projectID) {
+          store.projectMembershipsByProjectID ||= {};
+          const entries = store.projectMembershipsByProjectID[membership.projectID] || [];
+          const index = entries.findIndex((item) => item.userID === membership.userID);
+          if (index === -1) entries.push(membership);
+          else entries[index] = membership;
+          store.projectMembershipsByProjectID[membership.projectID] = entries;
+        } else {
+          store.organizationMembershipsByOrganizationID ||= {};
+          const entries =
+            store.organizationMembershipsByOrganizationID[membership.organizationID] || [];
+          const index = entries.findIndex((item) => item.userID === membership.userID);
+          if (index === -1) entries.push(membership);
+          else entries[index] = membership;
+          store.organizationMembershipsByOrganizationID[membership.organizationID] = entries;
+        }
+        store.organizationInvitationsByID[invitation.id] = invitation;
+        await this.write(store);
+        return {
+          outcome: "accepted",
+          invitation,
+          membership
+        };
+      });
+    },
     async projectOwnership(projectID) {
       const store = await this.read();
       return store.projectOwnerships?.[projectID] || null;
@@ -742,6 +871,33 @@ function createFileStoreAdapter() {
       store.projectMembershipsByProjectID[membership.projectID] = entries;
       await this.write(store);
       return membership;
+    },
+    async saveMembershipWithinSeatLimit(membership, seatLimit) {
+      return withOrganizationMutationLock(membership.organizationID, async () => {
+        const store = await this.read();
+        if (membership.projectID) {
+          store.projectMembershipsByProjectID ||= {};
+          const entries = store.projectMembershipsByProjectID[membership.projectID] || [];
+          const index = entries.findIndex((item) => item.userID === membership.userID);
+          if (index === -1) entries.push(membership);
+          else entries[index] = membership;
+          store.projectMembershipsByProjectID[membership.projectID] = entries;
+        } else {
+          store.organizationMembershipsByOrganizationID ||= {};
+          const entries =
+            store.organizationMembershipsByOrganizationID[membership.organizationID] || [];
+          const index = entries.findIndex((item) => item.userID === membership.userID);
+          if (index === -1) entries.push(membership);
+          else entries[index] = membership;
+          store.organizationMembershipsByOrganizationID[membership.organizationID] = entries;
+        }
+        const seats = fileStoreOrganizationSeatState(store, membership.organizationID);
+        if (seats.used > seatLimit) {
+          return { outcome: "seat_limit", membership: null, seats };
+        }
+        await this.write(store);
+        return { outcome: "saved", membership, seats };
+      });
     },
     async migrationCheckpoint(userID, checkpointName) {
       const store = await this.read();
@@ -1965,7 +2121,7 @@ async function createPostgresStoreAdapter() {
           SELECT user_id, mutation, record_id FROM permitext_project_items
           UNION ALL
           SELECT user_id, mutation, record_id FROM permitext_user_content_records
-          WHERE entity_kind IN ('continuity', 'codeVersionClear')
+          WHERE entity_kind IN ('continuity', 'codeVersionClear', 'workboard')
         ) AS user_content
         ORDER BY user_id, record_id
       `
@@ -2602,6 +2758,22 @@ async function createPostgresStoreAdapter() {
       await ensureSchema();
       return organizationRepository.saveOrganizationInvitation(invitation);
     },
+    async reserveOrganizationInvitation(invitation, seatLimit) {
+      await ensureSchema();
+      return organizationRepository.reserveOrganizationInvitation(invitation, seatLimit);
+    },
+    async updatePendingOrganizationInvitation(invitation) {
+      await ensureSchema();
+      return organizationRepository.updatePendingOrganizationInvitation(invitation);
+    },
+    async acceptOrganizationInvitation(invitation, membership, seatLimit) {
+      await ensureSchema();
+      return organizationRepository.acceptOrganizationInvitation(
+        invitation,
+        membership,
+        seatLimit
+      );
+    },
     async projectOwnership(projectID) {
       await ensureSchema();
       return organizationRepository.projectOwnership(projectID);
@@ -2629,6 +2801,10 @@ async function createPostgresStoreAdapter() {
     async saveProjectMembership(membership) {
       await ensureSchema();
       return organizationRepository.saveProjectMembership(membership);
+    },
+    async saveMembershipWithinSeatLimit(membership, seatLimit) {
+      await ensureSchema();
+      return organizationRepository.saveMembershipWithinSeatLimit(membership, seatLimit);
     },
     async pushUserContent(userID, mutations) {
       await ensureSchema();
@@ -2839,6 +3015,30 @@ async function saveStoredOrganizationInvitation(invitation) {
   return adapter.saveOrganizationInvitation(invitation);
 }
 
+async function reserveStoredOrganizationInvitation(invitation, seatLimit) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.reserveOrganizationInvitation !== "function") {
+    throw new Error("Atomic organization invitation reservations are unavailable.");
+  }
+  return adapter.reserveOrganizationInvitation(invitation, seatLimit);
+}
+
+async function updateStoredPendingOrganizationInvitation(invitation) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.updatePendingOrganizationInvitation !== "function") {
+    throw new Error("Atomic organization invitation updates are unavailable.");
+  }
+  return adapter.updatePendingOrganizationInvitation(invitation);
+}
+
+async function acceptStoredOrganizationInvitation(invitation, membership, seatLimit) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.acceptOrganizationInvitation !== "function") {
+    throw new Error("Atomic organization invitation acceptance is unavailable.");
+  }
+  return adapter.acceptOrganizationInvitation(invitation, membership, seatLimit);
+}
+
 async function storedProjectOwnership(projectID) {
   const adapter = await storeAdapter();
   return typeof adapter.projectOwnership === "function"
@@ -2882,6 +3082,14 @@ async function listStoredProjectMembershipsForUser(userID) {
 async function saveStoredProjectMembership(membership) {
   const adapter = await storeAdapter();
   return adapter.saveProjectMembership(membership);
+}
+
+async function saveStoredMembershipWithinSeatLimit(membership, seatLimit) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveMembershipWithinSeatLimit !== "function") {
+    throw new Error("Atomic organization seat enforcement is unavailable.");
+  }
+  return adapter.saveMembershipWithinSeatLimit(membership, seatLimit);
 }
 
 async function storedMigrationCheckpoint(userID, checkpointName) {
@@ -4870,6 +5078,31 @@ async function ownsProjectAssetScope(userID, projectID) {
   });
 }
 
+async function workboardEditAccess(response, userID, projectID) {
+  const access = await projectAccessForUser(userID, projectID);
+  if (access) {
+    if (!access.permissions.includes(organizationPermissions.projectEdit)) {
+      sendJSON(response, 403, {
+        error: "Your Project role does not allow this action.",
+        code: "PROJECT_PERMISSION_REQUIRED",
+        requiredPermission: organizationPermissions.projectEdit
+      });
+      return null;
+    }
+    return access;
+  }
+  if (await ownsProjectAssetScope(userID, projectID)) {
+    return {
+      projectID,
+      organization: null,
+      storageOwnerUserID: userID,
+      owner: ownerScope(userID)
+    };
+  }
+  sendError(response, 404, "Project not found.");
+  return null;
+}
+
 async function ownedProjectTargetExists(userID, targetKind, targetID) {
   const normalizedTargetID = String(targetID || "").trim();
   if (targetKind === "canonicalSection") {
@@ -5637,15 +5870,6 @@ async function handleOrganizationMemberInvite(request, response) {
       return;
     }
   }
-  const seats = await organizationSeatState(organizationID);
-  if (seats.used >= access.organization.billingIdentity.seatLimit) {
-    sendJSON(response, 409, {
-      error: "This firm workspace has no available seats.",
-      code: "ORGANIZATION_SEAT_LIMIT",
-      seats
-    });
-    return;
-  }
   try {
     const credentials = invitationToken();
     const now = new Date().toISOString();
@@ -5659,23 +5883,32 @@ async function handleOrganizationMemberInvite(request, response) {
       invitedByUserID: context.userID,
       createdAt: now
     });
-    const pendingInvitations = await listStoredOrganizationInvitations(organizationID);
-    const duplicate = pendingInvitations.find((candidate) =>
-      invitationState(candidate) === "pending" &&
-      candidate.projectID === invitation.projectID &&
-      (
-        (invitation.invitedUserID && candidate.invitedUserID === invitation.invitedUserID) ||
-        (invitation.invitedEmail && candidate.invitedEmail === invitation.invitedEmail)
-      )
+    const reservation = await reserveStoredOrganizationInvitation(
+      invitation,
+      access.organization.billingIdentity.seatLimit
     );
-    if (duplicate) {
+    if (reservation.outcome === "duplicate") {
       sendJSON(response, 409, {
         error: "An active invitation already exists for this person and scope.",
         code: "ORGANIZATION_INVITATION_EXISTS"
       });
       return;
     }
-    await saveStoredOrganizationInvitation(invitation);
+    if (reservation.outcome === "seat_limit") {
+      sendJSON(response, 409, {
+        error: "This firm workspace has no available seats.",
+        code: "ORGANIZATION_SEAT_LIMIT",
+        seats: reservation.seats
+      });
+      return;
+    }
+    if (reservation.outcome !== "created") {
+      sendJSON(response, 409, {
+        error: "The firm invitation could not be reserved. Try again.",
+        code: "ORGANIZATION_INVITATION_CONFLICT"
+      });
+      return;
+    }
     if (projectID) {
       const ownership = await storedProjectOwnership(projectID);
       await saveStoredActivityEvent(ownership.storageOwnerUserID, activityEvent({
@@ -5752,25 +5985,14 @@ async function handleOrganizationInvitationAccept(request, response) {
     sendError(response, 404, "Firm workspace not found.");
     return;
   }
-  const [existingOrganizationMembership, existingProjectMembership, seats] = await Promise.all([
+  const [existingOrganizationMembership, existingProjectMembership] = await Promise.all([
     storedOrganizationMembership(invitation.organizationID, context.userID),
     invitation.projectID
       ? storedProjectMembership(invitation.projectID, context.userID)
-      : Promise.resolve(null),
-    organizationSeatState(invitation.organizationID)
+      : Promise.resolve(null)
   ]);
-  const alreadyUsesSeat =
-    existingOrganizationMembership?.status === "active" ||
-    existingProjectMembership?.status === "active";
-  if (!alreadyUsesSeat && seats.used > organization.billingIdentity.seatLimit) {
-    sendJSON(response, 409, {
-      error: "This firm workspace has no available seats.",
-      code: "ORGANIZATION_SEAT_LIMIT",
-      seats
-    });
-    return;
-  }
   const now = new Date().toISOString();
+  let membership;
   if (invitation.projectID) {
     const ownership = await storedProjectOwnership(invitation.projectID);
     if (
@@ -5780,7 +6002,7 @@ async function handleOrganizationInvitationAccept(request, response) {
       sendError(response, 404, "Organization Project not found.");
       return;
     }
-    await saveStoredProjectMembership(projectMembershipRecord({
+    membership = projectMembershipRecord({
       organizationID: invitation.organizationID,
       projectID: invitation.projectID,
       userID: context.userID,
@@ -5789,9 +6011,9 @@ async function handleOrganizationInvitationAccept(request, response) {
       invitationID: invitation.id,
       createdAt: existingProjectMembership?.createdAt || now,
       updatedAt: now
-    }));
+    });
   } else {
-    await saveStoredOrganizationMembership(organizationMembershipRecord({
+    membership = organizationMembershipRecord({
       organizationID: invitation.organizationID,
       userID: context.userID,
       role: invitation.role,
@@ -5799,7 +6021,7 @@ async function handleOrganizationInvitationAccept(request, response) {
       invitationID: invitation.id,
       createdAt: existingOrganizationMembership?.createdAt || now,
       updatedAt: now
-    }));
+    });
   }
   const acceptedInvitation = organizationInvitationRecord({
     ...invitation,
@@ -5808,14 +6030,33 @@ async function handleOrganizationInvitationAccept(request, response) {
     acceptedAt: now,
     acceptedByUserID: context.userID
   });
-  await saveStoredOrganizationInvitation(acceptedInvitation);
+  const acceptance = await acceptStoredOrganizationInvitation(
+    acceptedInvitation,
+    membership,
+    organization.billingIdentity.seatLimit
+  );
+  if (acceptance.outcome === "seat_limit") {
+    sendJSON(response, 409, {
+      error: "This firm workspace has no available seats.",
+      code: "ORGANIZATION_SEAT_LIMIT",
+      seats: await organizationSeatState(invitation.organizationID)
+    });
+    return;
+  }
+  if (acceptance.outcome !== "accepted") {
+    sendJSON(response, 409, {
+      error: "This firm invitation is no longer available.",
+      code: "ORGANIZATION_INVITATION_UNAVAILABLE"
+    });
+    return;
+  }
   sendJSON(response, 200, {
     organization: organizationForClient(organization, {
       role: invitation.role,
       permissions: rolePermissions(invitation.role),
       accessScope: invitation.projectID ? "project" : "organization"
     }, await organizationSeatState(invitation.organizationID)),
-    invitation: organizationInvitationForClient(acceptedInvitation)
+    invitation: organizationInvitationForClient(acceptance.invitation)
   });
 }
 
@@ -5850,8 +6091,17 @@ async function handleOrganizationInvitationRevoke(request, response) {
     status: "revoked",
     updatedAt: now
   });
-  await saveStoredOrganizationInvitation(revoked);
-  sendJSON(response, 200, { invitation: organizationInvitationForClient(revoked) });
+  const savedInvitation = await updateStoredPendingOrganizationInvitation(revoked);
+  if (!savedInvitation) {
+    sendJSON(response, 409, {
+      error: "This firm invitation is no longer available.",
+      code: "ORGANIZATION_INVITATION_UNAVAILABLE"
+    });
+    return;
+  }
+  sendJSON(response, 200, {
+    invitation: organizationInvitationForClient(savedInvitation)
+  });
 }
 
 async function handleOrganizationMemberUpdate(request, response) {
@@ -5894,17 +6144,6 @@ async function handleOrganizationMemberUpdate(request, response) {
     });
     return;
   }
-  if (status === "active" && current.status !== "active") {
-    const seats = await organizationSeatState(organizationID);
-    if (seats.used >= access.organization.billingIdentity.seatLimit) {
-      sendJSON(response, 409, {
-        error: "This firm workspace has no available seats.",
-        code: "ORGANIZATION_SEAT_LIMIT",
-        seats
-      });
-      return;
-    }
-  }
   try {
     const now = new Date().toISOString();
     const updated = projectID
@@ -5924,8 +6163,24 @@ async function handleOrganizationMemberUpdate(request, response) {
           updatedAt: now,
           deactivatedAt: status === "deactivated" ? now : null
         });
-    if (projectID) await saveStoredProjectMembership(updated);
-    else await saveStoredOrganizationMembership(updated);
+    if (status === "active" && current.status !== "active") {
+      const activation = await saveStoredMembershipWithinSeatLimit(
+        updated,
+        access.organization.billingIdentity.seatLimit
+      );
+      if (activation.outcome !== "saved") {
+        sendJSON(response, 409, {
+          error: "This firm workspace has no available seats.",
+          code: "ORGANIZATION_SEAT_LIMIT",
+          seats: await organizationSeatState(organizationID)
+        });
+        return;
+      }
+    } else if (projectID) {
+      await saveStoredProjectMembership(updated);
+    } else {
+      await saveStoredOrganizationMembership(updated);
+    }
     if (projectID) {
       const ownership = await storedProjectOwnership(projectID);
       await saveStoredActivityEvent(ownership.storageOwnerUserID, activityEvent({
@@ -7254,6 +7509,25 @@ async function authenticatedReportBody(request, response, options = {}) {
   return context;
 }
 
+async function reportProjectAccess(context, response, permission) {
+  const projectID = String(context.body.projectID || "").trim();
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    permission
+  );
+  if (!access) return null;
+  if (!access.organization && !hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Professional Project reports require Pro.",
+      code: "PRO_REQUIRED_EXPORTS"
+    });
+    return null;
+  }
+  return access;
+}
+
 async function linkedProjectArtifact(userID, projectID, targetKind, artifactType, artifactID, options = {}) {
   const normalizedArtifactID = String(artifactID || "").trim();
   const linked = (await listStoredProjectLinks(userID)).some((link) =>
@@ -7434,14 +7708,17 @@ async function handleReportSourceList(request, response) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const sources = await reportSourcesForProject(context.userID, projectID);
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.reportDownload
+  );
+  if (!access) return;
+  const sources = await reportSourcesForProject(access.storageOwnerUserID, access.projectID);
   sendJSON(response, 200, {
     schemaVersion: 1,
-    projectID,
+    projectID: access.projectID,
     sources: sources.map(reportSourceClientSummary)
   });
 }
@@ -7521,15 +7798,18 @@ async function handleReportDraftList(request, response) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const drafts = await projectReportDrafts(context.userID, projectID);
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.reportDownload
+  );
+  if (!access) return;
+  const drafts = await projectReportDrafts(access.storageOwnerUserID, access.projectID);
   sendJSON(response, 200, {
     schemaVersion: 1,
-    projectID,
-    drafts: drafts.map((artifact) => reportDraftForClient(artifact, [projectID]))
+    projectID: access.projectID,
+    drafts: drafts.map((artifact) => reportDraftForClient(artifact, [access.projectID]))
   });
 }
 
@@ -7537,12 +7817,23 @@ async function handleReportDraftGet(request, response) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  const artifact = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.reportDownload
+  );
+  if (!access) return;
+  const artifact = await reportDraftArtifact(
+    access.storageOwnerUserID,
+    access.projectID,
+    context.body.draftID
+  );
   if (!artifact) {
     sendError(response, 404, "Report Draft not found.");
     return;
   }
-  sendJSON(response, 200, { draft: reportDraftForClient(artifact, [projectID]) });
+  sendJSON(response, 200, { draft: reportDraftForClient(artifact, [access.projectID]) });
 }
 
 async function validateReportDraftSources(userID, projectID, draft) {
@@ -7557,16 +7848,19 @@ async function validateReportDraftSources(userID, projectID, draft) {
 }
 
 async function handleReportDraftSave(request, response) {
-  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
+  const access = await reportProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const storageOwnerUserID = access.storageOwnerUserID;
   const requestedDraftID = String(context.body.draftID || "").trim();
   const existing = requestedDraftID
-    ? await reportDraftArtifact(context.userID, projectID, requestedDraftID)
+    ? await reportDraftArtifact(storageOwnerUserID, access.projectID, requestedDraftID)
     : null;
   if (requestedDraftID && !existing) {
     sendError(response, 404, "Report Draft not found.");
@@ -7580,7 +7874,7 @@ async function handleReportDraftSave(request, response) {
     sendJSON(response, 409, {
       error: "This Report Draft changed after you opened it. Review the current version before saving.",
       code: "REPORT_DRAFT_VERSION_CONFLICT",
-      draft: reportDraftForClient(existing, [projectID])
+      draft: reportDraftForClient(existing, [access.projectID])
     });
     return;
   }
@@ -7595,24 +7889,29 @@ async function handleReportDraftSave(request, response) {
       createdBy: existing?.payload?.createdBy || context.userID,
       updatedBy: context.userID
     });
-    await validateReportDraftSources(context.userID, projectID, payload);
+    await validateReportDraftSources(storageOwnerUserID, access.projectID, payload);
     const artifact = {
       envelope: artifactEnvelope({
         id: draftID,
         type: "reportDraft",
-        owner: ownerScope(context.userID),
+        owner: access.owner,
         createdAt: existing?.envelope.createdAt || now,
         updatedAt: now,
         version: Number(existing?.envelope.version || 0) + 1
       }),
       payload
     };
-    await saveStoredFoundationArtifact(context.userID, artifact);
+    await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
     if (!existing) {
-      await saveStoredProjectLink(context.userID, projectLinkRecord({
-        id: deterministicFoundationLinkID(context.userID, projectID, "reportDraft", draftID),
-        owner: ownerScope(context.userID),
-        projectID,
+      await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
+        id: deterministicFoundationLinkID(
+          storageOwnerUserID,
+          access.projectID,
+          "reportDraft",
+          draftID
+        ),
+        owner: access.owner,
+        projectID: access.projectID,
         targetKind: "reportDraft",
         targetID: draftID,
         relationship: "owner",
@@ -7623,7 +7922,7 @@ async function handleReportDraftSave(request, response) {
       }));
     }
     sendJSON(response, existing ? 200 : 201, {
-      draft: reportDraftForClient(artifact, [projectID])
+      draft: reportDraftForClient(artifact, [access.projectID])
     });
   } catch (error) {
     sendJSON(response, 400, {
@@ -7634,10 +7933,21 @@ async function handleReportDraftSave(request, response) {
 }
 
 async function handleReportDraftDelete(request, response) {
-  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  const artifact = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  const access = await reportProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const storageOwnerUserID = access.storageOwnerUserID;
+  const artifact = await reportDraftArtifact(
+    storageOwnerUserID,
+    access.projectID,
+    context.body.draftID
+  );
   if (!artifact) {
     sendError(response, 404, "Report Draft not found.");
     return;
@@ -7647,31 +7957,31 @@ async function handleReportDraftDelete(request, response) {
     sendJSON(response, 409, {
       error: "This Report Draft changed after you opened it. Review the current version before deleting it.",
       code: "REPORT_DRAFT_VERSION_CONFLICT",
-      draft: reportDraftForClient(artifact, [projectID])
+      draft: reportDraftForClient(artifact, [access.projectID])
     });
     return;
   }
   const now = new Date().toISOString();
-  await saveStoredFoundationArtifact(context.userID, {
+  await saveStoredFoundationArtifact(storageOwnerUserID, {
     ...artifact,
     envelope: artifactEnvelope({
       ...artifact.envelope,
-      owner: ownerScope(context.userID),
+      owner: access.owner,
       updatedAt: now,
       deletedAt: now,
       version: artifact.envelope.version + 1
     })
   });
-  const activeLink = (await listStoredProjectLinks(context.userID)).find((link) =>
+  const activeLink = (await listStoredProjectLinks(storageOwnerUserID)).find((link) =>
     !link.deletedAt &&
-    link.projectID === projectID &&
+    link.projectID === access.projectID &&
     link.targetKind === "reportDraft" &&
     link.targetID === artifact.envelope.id
   );
   if (activeLink) {
-    await saveStoredProjectLink(context.userID, projectLinkRecord({
+    await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
       ...activeLink,
-      owner: ownerScope(context.userID),
+      owner: access.owner,
       updatedAt: now,
       deletedAt: now,
       version: activeLink.version + 1
@@ -7782,15 +8092,22 @@ async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
 }
 
 async function handleReportGenerate(request, response) {
-  const context = await authenticatedReportBody(request, response, { requirePro: true });
+  const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  const project = await ownedProjectRecord(context.userID, projectID);
-  if (!project) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const draft = await reportDraftArtifact(context.userID, projectID, context.body.draftID);
+  const access = await reportProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const storageOwnerUserID = access.storageOwnerUserID;
+  const project = access.project;
+  const draft = await reportDraftArtifact(
+    storageOwnerUserID,
+    access.projectID,
+    context.body.draftID
+  );
   if (!draft) {
     sendError(response, 404, "Report Draft not found.");
     return;
@@ -7806,9 +8123,9 @@ async function handleReportGenerate(request, response) {
       reportConfiguration.controls,
       context.body.reportTemplateID
     );
-    const sources = await reportSourcesForProject(context.userID, projectID);
+    const sources = await reportSourcesForProject(storageOwnerUserID, access.projectID);
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
-    const priorManifests = await projectReportManifests(context.userID, projectID);
+    const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID);
     const reportVersion = Math.max(
       0,
       ...priorManifests.map((artifact) => Number(artifact.payload?.reportVersion || 0))
@@ -7818,7 +8135,7 @@ async function handleReportGenerate(request, response) {
     const manifest = immutableReportManifest({
       id: manifestID,
       project: {
-        id: projectID,
+        id: access.projectID,
         name: project.name || "Untitled Project",
         address: project.address || "",
         description: project.description || ""
@@ -7861,8 +8178,8 @@ async function handleReportGenerate(request, response) {
     });
     const generatedReportID = randomUUID();
     const projectMaterialBySourceID = await reportProjectMaterialBySourceID(
-      context.userID,
-      projectID,
+      storageOwnerUserID,
+      access.projectID,
       manifest
     );
     const pdfBody = await renderReportPDF(manifest, { projectMaterialBySourceID });
@@ -7870,7 +8187,7 @@ async function handleReportGenerate(request, response) {
       throw new Error("The generated Report PDF exceeds the supported file size.");
     }
     const requestedPathname = reportFilePathname(
-      projectID,
+      access.projectID,
       manifestID,
       generatedReportID,
       "web-pdf"
@@ -7888,18 +8205,23 @@ async function handleReportGenerate(request, response) {
       envelope: artifactEnvelope({
         id: manifestID,
         type: "reportManifest",
-        owner: ownerScope(context.userID),
+        owner: access.owner,
         createdAt: now,
         updatedAt: now,
         version: 1
       }),
       payload: manifest
     };
-    await saveStoredFoundationArtifact(context.userID, manifestArtifact);
-    await saveStoredProjectLink(context.userID, projectLinkRecord({
-      id: deterministicFoundationLinkID(context.userID, projectID, "reportManifest", manifestID),
-      owner: ownerScope(context.userID),
-      projectID,
+    await saveStoredFoundationArtifact(storageOwnerUserID, manifestArtifact);
+    await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
+      id: deterministicFoundationLinkID(
+        storageOwnerUserID,
+        access.projectID,
+        "reportManifest",
+        manifestID
+      ),
+      owner: access.owner,
+      projectID: access.projectID,
       targetKind: "reportManifest",
       targetID: manifestID,
       relationship: "owner",
@@ -7920,26 +8242,26 @@ async function handleReportGenerate(request, response) {
       createdBy: context.userID,
       createdAt: now
     };
-    await saveStoredFoundationArtifact(context.userID, {
+    await saveStoredFoundationArtifact(storageOwnerUserID, {
       envelope: artifactEnvelope({
         id: generatedReportID,
         type: "generatedReport",
-        owner: ownerScope(context.userID),
+        owner: access.owner,
         createdAt: now,
         updatedAt: now,
         version: 1
       }),
       payload: generatedReport
     });
-    await saveStoredProjectLink(context.userID, projectLinkRecord({
+    await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
       id: deterministicFoundationLinkID(
-        context.userID,
-        projectID,
+        storageOwnerUserID,
+        access.projectID,
         "generatedReport",
         generatedReportID
       ),
-      owner: ownerScope(context.userID),
-      projectID,
+      owner: access.owner,
+      projectID: access.projectID,
       targetKind: "generatedReport",
       targetID: generatedReportID,
       relationship: "owner",
@@ -7949,8 +8271,8 @@ async function handleReportGenerate(request, response) {
       metadata: { manifestID, reportVersion }
     }));
     const event = activityEvent({
-      owner: ownerScope(context.userID),
-      projectID,
+      owner: access.owner,
+      projectID: access.projectID,
       actorUserID: context.userID,
       action: "report.generated",
       objectKind: "reportManifest",
@@ -7964,7 +8286,7 @@ async function handleReportGenerate(request, response) {
         contentHash: manifest.contentHash
       }
     });
-    await saveStoredActivityEvent(context.userID, event);
+    await saveStoredActivityEvent(storageOwnerUserID, event);
     sendJSON(response, 201, {
       manifest,
       generatedReport: {
@@ -7989,15 +8311,18 @@ async function handleReportHistoryList(request, response) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const manifests = await projectReportManifests(context.userID, projectID);
-  const files = await reportFilesForProject(context.userID, projectID);
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.reportDownload
+  );
+  if (!access) return;
+  const manifests = await projectReportManifests(access.storageOwnerUserID, access.projectID);
+  const files = await reportFilesForProject(access.storageOwnerUserID, access.projectID);
   sendJSON(response, 200, {
     schemaVersion: 1,
-    projectID,
+    projectID: access.projectID,
     reports: manifests.map((artifact) => ({
       ...reportManifestSummary(artifact.payload),
       files: files.filter((file) => file.manifestID === artifact.envelope.id)
@@ -8005,25 +8330,55 @@ async function handleReportHistoryList(request, response) {
   });
 }
 
+async function accessibleReportManifest(userID, manifestID) {
+  const normalizedManifestID = String(manifestID || "").trim();
+  if (!normalizedManifestID) return null;
+  const [organizationEntries, projectMemberships] = await Promise.all([
+    listStoredOrganizationsForUser(userID),
+    listStoredProjectMembershipsForUser(userID)
+  ]);
+  const organizationIDs = organizationEntries
+    .filter(({ organization, membership }) =>
+      organization?.status === "active" && membership?.status === "active"
+    )
+    .map(({ organization }) => organization.id);
+  const organizationOwnerships = await listStoredProjectOwnershipsForOrganizations(organizationIDs);
+  const projectIDs = new Set([
+    ...projectMemberships
+      .filter((membership) => membership.status === "active")
+      .map((membership) => membership.projectID),
+    ...organizationOwnerships.map((ownership) => ownership.projectID)
+  ]);
+  const personalArtifact = await reportManifestArtifact(userID, normalizedManifestID);
+  if (personalArtifact?.payload?.project?.id) {
+    projectIDs.add(personalArtifact.payload.project.id);
+  }
+  for (const projectID of projectIDs) {
+    const access = await projectAccessForUser(userID, projectID);
+    if (!access?.permissions.includes(organizationPermissions.reportDownload)) continue;
+    const artifact = await reportManifestArtifact(access.storageOwnerUserID, normalizedManifestID);
+    if (!artifact || artifact.payload.project?.id !== access.projectID) continue;
+    const linked = (await listStoredProjectLinks(access.storageOwnerUserID)).some((link) =>
+      !link.deletedAt &&
+      link.projectID === access.projectID &&
+      link.targetKind === "reportManifest" &&
+      link.targetID === artifact.envelope.id
+    );
+    if (linked) return { access, artifact };
+  }
+  return null;
+}
+
 async function handleReportManifestGet(request, response) {
   const context = await authenticatedReportBody(request, response);
   if (!context) return;
-  const artifact = await reportManifestArtifact(context.userID, context.body.manifestID);
-  if (!artifact) {
+  const result = await accessibleReportManifest(context.userID, context.body.manifestID);
+  if (!result) {
     sendError(response, 404, "Report Manifest not found.");
     return;
   }
-  const linkedProject = (await listStoredProjectLinks(context.userID)).some((link) =>
-    !link.deletedAt &&
-    link.projectID === artifact.payload.project?.id &&
-    link.targetKind === "reportManifest" &&
-    link.targetID === artifact.envelope.id
-  );
-  if (!linkedProject) {
-    sendError(response, 404, "Report Manifest not found.");
-    return;
-  }
-  const files = (await reportFilesForProject(context.userID, artifact.payload.project.id))
+  const { access, artifact } = result;
+  const files = (await reportFilesForProject(access.storageOwnerUserID, access.projectID))
     .filter((file) => file.manifestID === artifact.envelope.id);
   sendJSON(response, 200, { manifest: artifact.payload, files });
 }
@@ -8040,18 +8395,22 @@ async function handleReportFileUpload(request, response) {
   }
   const context = await authenticatedUserContext(request, response, userID);
   if (!context) return;
-  if (!hasActiveProEntitlement(context.entitlement)) {
+  const access = await requireProjectPermission(
+    response,
+    userID,
+    projectID,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
     sendJSON(response, 403, {
       error: "Professional Report files require Pro.",
       code: "PRO_REQUIRED_EXPORTS"
     });
     return;
   }
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const manifestArtifact = await reportManifestArtifact(userID, manifestID);
+  const storageOwnerUserID = access.storageOwnerUserID;
+  const manifestArtifact = await reportManifestArtifact(storageOwnerUserID, manifestID);
   if (!manifestArtifact || manifestArtifact.payload.project?.id !== projectID) {
     sendError(response, 404, "Report Manifest not found.");
     return;
@@ -8108,18 +8467,23 @@ async function handleReportFileUpload(request, response) {
     envelope: artifactEnvelope({
       id: generatedReportID,
       type: "generatedReport",
-      owner: ownerScope(userID),
+      owner: access.owner,
       createdAt: now,
       updatedAt: now,
       version: 1
     }),
     payload: generatedReport
   };
-  await saveStoredFoundationArtifact(userID, artifact);
-  await saveStoredProjectLink(userID, projectLinkRecord({
-    id: deterministicFoundationLinkID(userID, projectID, "generatedReport", generatedReportID),
-    owner: ownerScope(userID),
-    projectID,
+  await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
+  await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
+    id: deterministicFoundationLinkID(
+      storageOwnerUserID,
+      access.projectID,
+      "generatedReport",
+      generatedReportID
+    ),
+    owner: access.owner,
+    projectID: access.projectID,
     targetKind: "generatedReport",
     targetID: generatedReportID,
     relationship: "owner",
@@ -8133,8 +8497,8 @@ async function handleReportFileUpload(request, response) {
     }
   }));
   const event = activityEvent({
-    owner: ownerScope(userID),
-    projectID,
+    owner: access.owner,
+    projectID: access.projectID,
     actorUserID: userID,
     action: "report.export.saved",
     objectKind: "generatedReport",
@@ -8148,7 +8512,7 @@ async function handleReportFileUpload(request, response) {
       contentHash: file.contentHash
     }
   });
-  await saveStoredActivityEvent(userID, event);
+  await saveStoredActivityEvent(storageOwnerUserID, event);
   sendJSON(response, 201, {
     file: generatedReportFileDescriptor(artifact),
     activity: event
@@ -12088,17 +12452,22 @@ async function projectWorkboardPreviews(userID, projectID) {
     );
 }
 
-async function clearActiveWorkboardPreviewLinks(userID, projectID, now = new Date().toISOString()) {
-  const links = (await listStoredProjectLinks(userID))
+async function clearActiveWorkboardPreviewLinks(
+  storageOwnerUserID,
+  owner,
+  projectID,
+  now = new Date().toISOString()
+) {
+  const links = (await listStoredProjectLinks(storageOwnerUserID))
     .filter((link) =>
       !link.deletedAt &&
       link.projectID === projectID &&
       link.targetKind === "workboardPreview"
     );
   for (const link of links) {
-    await saveStoredProjectLink(userID, projectLinkRecord({
+    await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
       ...link,
-      owner: ownerScope(userID),
+      owner,
       updatedAt: now,
       deletedAt: now,
       version: link.version + 1
@@ -12125,17 +12494,16 @@ async function handleWorkboardPreviewUpload(request, response) {
   }
   const context = await authenticatedUserContext(request, response, userID);
   if (!context) return;
-  if (!hasActiveProEntitlement(context.entitlement)) {
+  const access = await workboardEditAccess(response, userID, projectID);
+  if (!access) return;
+  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
     sendJSON(response, 403, {
       error: "Workboard previews require Pro.",
       code: "PRO_REQUIRED_WORKBOARDS"
     });
     return;
   }
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
+  const storageOwnerUserID = access.storageOwnerUserID;
   if (!privateProjectAssetStorageConfigured()) {
     sendError(response, 503, "Private Workboard preview storage is not configured.");
     return;
@@ -12161,7 +12529,7 @@ async function handleWorkboardPreviewUpload(request, response) {
     envelope: artifactEnvelope({
       id: previewID,
       type: "workboardPreview",
-      owner: ownerScope(userID),
+      owner: access.owner,
       createdAt: now,
       updatedAt: now,
       version: 1
@@ -12180,12 +12548,22 @@ async function handleWorkboardPreviewUpload(request, response) {
       createdAt: now
     }
   };
-  await saveStoredFoundationArtifact(userID, artifact);
-  await clearActiveWorkboardPreviewLinks(userID, projectID, now);
-  await saveStoredProjectLink(userID, projectLinkRecord({
-    id: deterministicFoundationLinkID(userID, projectID, "workboardPreview", previewID),
-    owner: ownerScope(userID),
-    projectID,
+  await saveStoredFoundationArtifact(storageOwnerUserID, artifact);
+  await clearActiveWorkboardPreviewLinks(
+    storageOwnerUserID,
+    access.owner,
+    access.projectID,
+    now
+  );
+  await saveStoredProjectLink(storageOwnerUserID, projectLinkRecord({
+    id: deterministicFoundationLinkID(
+      storageOwnerUserID,
+      access.projectID,
+      "workboardPreview",
+      previewID
+    ),
+    owner: access.owner,
+    projectID: access.projectID,
     targetKind: "workboardPreview",
     targetID: previewID,
     relationship: "owner",
@@ -12264,19 +12642,21 @@ async function handleWorkboardPreviewClear(request, response) {
   }
   const context = await authenticatedUserContext(request, response, userID, body.auth);
   if (!context) return;
-  if (!hasActiveProEntitlement(context.entitlement)) {
+  const access = await workboardEditAccess(response, userID, projectID);
+  if (!access) return;
+  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
     sendJSON(response, 403, {
       error: "Workboard previews require Pro.",
       code: "PRO_REQUIRED_WORKBOARDS"
     });
     return;
   }
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const clearedCount = await clearActiveWorkboardPreviewLinks(userID, projectID);
-  sendJSON(response, 200, { projectID, clearedCount });
+  const clearedCount = await clearActiveWorkboardPreviewLinks(
+    access.storageOwnerUserID,
+    access.owner,
+    access.projectID
+  );
+  sendJSON(response, 200, { projectID: access.projectID, clearedCount });
 }
 
 async function handleWorkboardAssetUpload(request, response) {
@@ -12290,15 +12670,13 @@ async function handleWorkboardAssetUpload(request, response) {
   }
   const context = await authenticatedUserContext(request, response, userID);
   if (!context) return;
-  if (!hasActiveProEntitlement(context.entitlement)) {
+  const access = await workboardEditAccess(response, userID, projectID);
+  if (!access) return;
+  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
     sendJSON(response, 403, {
       error: "Workboard image uploads require Pro.",
       code: "PRO_REQUIRED_WORKBOARDS"
     });
-    return;
-  }
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
     return;
   }
   if (!blobStorageConfigured()) {
@@ -12315,7 +12693,12 @@ async function handleWorkboardAssetUpload(request, response) {
     sendError(response, 400, "Workboard image is empty.");
     return;
   }
-  const pathname = workboardAssetPathname(userID, projectID, fileID, contentType);
+  const pathname = workboardAssetPathname(
+    access.storageOwnerUserID,
+    access.projectID,
+    fileID,
+    contentType
+  );
   const { put } = await vercelBlob();
   const blob = await put(pathname, body, {
     access: "private",
@@ -12391,12 +12774,14 @@ async function handleWorkboardAssetDelete(request, response) {
     return;
   }
   if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
-  if (!await ownsProjectAssetScope(userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
+  const access = await workboardEditAccess(response, userID, projectID);
+  if (!access) return;
   if (pathnames.some((pathname) =>
-    !workboardAssetPathBelongsToProject(pathname, userID, projectID)
+    !workboardAssetPathBelongsToProject(
+      pathname,
+      access.storageOwnerUserID,
+      access.projectID
+    )
   )) {
     sendError(response, 403, "One or more Workboard images do not belong to the authenticated project.");
     return;

@@ -3,6 +3,17 @@ function safeJSON(value, fallback) {
   return typeof value === "string" ? JSON.parse(value) : value;
 }
 
+async function withSerializableRetry(operation) {
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      return await operation();
+    } catch (error) {
+      if (error?.code !== "40001" || attempt === 3) throw error;
+    }
+  }
+  throw new Error("Serializable organization mutation did not complete.");
+}
+
 export function createPostgresOrganizationRepository(sql) {
   return {
     mergeUserQueries(sourceUserID, targetUserID) {
@@ -507,6 +518,531 @@ export function createPostgresOrganizationRepository(sql) {
         WHERE permitext_organization_invitations.updated_at <= EXCLUDED.updated_at
       `;
       return invitation;
+    },
+
+    async reserveOrganizationInvitation(invitation, seatLimit) {
+      return withSerializableRetry(async () => {
+        const [, resultRows] = await sql.transaction([
+          sql`
+            SELECT pg_advisory_xact_lock(
+              hashtextextended(${invitation.organizationID}, 20260726)
+            )
+          `,
+          sql`
+            WITH active_users AS (
+              SELECT user_id
+              FROM permitext_organization_memberships
+              WHERE organization_id = ${invitation.organizationID}
+                AND status = 'active'
+              UNION
+              SELECT memberships.user_id
+              FROM permitext_project_memberships AS memberships
+              JOIN permitext_project_ownerships AS ownerships
+                ON ownerships.project_id = memberships.project_id
+              WHERE ownerships.organization_id = ${invitation.organizationID}
+                AND memberships.status = 'active'
+            ),
+            pending_invitees AS (
+              SELECT DISTINCT CASE
+                WHEN invitations.invited_user_id IS NOT NULL
+                  THEN 'user:' || invitations.invited_user_id
+                ELSE 'email:' || lower(invitations.invited_email)
+              END AS identity
+              FROM permitext_organization_invitations AS invitations
+              WHERE invitations.organization_id = ${invitation.organizationID}
+                AND invitations.status = 'pending'
+                AND invitations.expires_at > CURRENT_TIMESTAMP
+                AND (
+                  invitations.invited_user_id IS NULL
+                  OR NOT EXISTS (
+                    SELECT 1
+                    FROM active_users
+                    WHERE active_users.user_id = invitations.invited_user_id
+                  )
+                )
+            ),
+            seat_state AS (
+              SELECT
+                (SELECT count(*)::int FROM active_users) AS active,
+                (SELECT count(*)::int FROM pending_invitees) AS pending
+            ),
+            duplicate_invitation AS (
+              SELECT 1
+              FROM permitext_organization_invitations AS invitations
+              WHERE invitations.organization_id = ${invitation.organizationID}
+                AND invitations.project_id IS NOT DISTINCT FROM ${invitation.projectID}
+                AND invitations.status = 'pending'
+                AND invitations.expires_at > CURRENT_TIMESTAMP
+                AND (
+                  (
+                    ${invitation.invitedUserID}::text IS NOT NULL
+                    AND invitations.invited_user_id = ${invitation.invitedUserID}
+                  )
+                  OR (
+                    ${invitation.invitedEmail}::text IS NOT NULL
+                    AND lower(invitations.invited_email) = lower(${invitation.invitedEmail})
+                  )
+                )
+              LIMIT 1
+            ),
+            candidate AS (
+              SELECT
+                seat_state.*,
+                CASE
+                  WHEN ${invitation.invitedUserID}::text IS NOT NULL
+                    AND EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = ${invitation.invitedUserID}
+                    )
+                    THEN 0
+                  WHEN EXISTS (
+                    SELECT 1 FROM pending_invitees
+                    WHERE pending_invitees.identity = CASE
+                      WHEN ${invitation.invitedUserID}::text IS NOT NULL
+                        THEN 'user:' || ${invitation.invitedUserID}
+                      ELSE 'email:' || lower(${invitation.invitedEmail})
+                    END
+                  )
+                    THEN 0
+                  ELSE 1
+                END AS additional
+              FROM seat_state
+            ),
+            inserted AS (
+              INSERT INTO permitext_organization_invitations (
+                id, organization_id, project_id, token_hash, invited_email,
+                invited_user_id, role, status, invitation, expires_at, created_at, updated_at
+              )
+              SELECT
+                ${invitation.id}, ${invitation.organizationID}, ${invitation.projectID},
+                ${invitation.tokenHash}, ${invitation.invitedEmail}, ${invitation.invitedUserID},
+                ${invitation.role}, ${invitation.status}, ${JSON.stringify(invitation)}::jsonb,
+                ${invitation.expiresAt}::timestamptz, ${invitation.createdAt}::timestamptz,
+                ${invitation.updatedAt}::timestamptz
+              FROM candidate
+              WHERE NOT EXISTS (SELECT 1 FROM duplicate_invitation)
+                AND candidate.active + candidate.pending + candidate.additional <= ${seatLimit}
+              ON CONFLICT (id) DO NOTHING
+              RETURNING invitation
+            )
+            SELECT
+              candidate.active,
+              candidate.pending,
+              candidate.active + candidate.pending AS used,
+              CASE
+                WHEN EXISTS (SELECT 1 FROM duplicate_invitation) THEN 'duplicate'
+                WHEN candidate.active + candidate.pending + candidate.additional > ${seatLimit}
+                  THEN 'seat_limit'
+                WHEN EXISTS (SELECT 1 FROM inserted) THEN 'created'
+                ELSE 'conflict'
+              END AS outcome,
+              (SELECT invitation FROM inserted LIMIT 1) AS invitation
+            FROM candidate
+          `
+        ], { isolationMode: "Serializable" });
+        const result = resultRows?.[0] || {};
+        return {
+          outcome: result.outcome || "conflict",
+          invitation: safeJSON(result.invitation, null),
+          seats: {
+            active: Number(result.active || 0),
+            pending: Number(result.pending || 0),
+            used: Number(result.used || 0)
+          }
+        };
+      });
+    },
+
+    async updatePendingOrganizationInvitation(invitation) {
+      return withSerializableRetry(async () => {
+        const [, rows] = await sql.transaction([
+          sql`
+            SELECT pg_advisory_xact_lock(
+              hashtextextended(${invitation.organizationID}, 20260726)
+            )
+          `,
+          sql`
+            UPDATE permitext_organization_invitations
+            SET status = ${invitation.status},
+                invitation = ${JSON.stringify(invitation)}::jsonb,
+                updated_at = ${invitation.updatedAt}::timestamptz
+            WHERE id = ${invitation.id}
+              AND organization_id = ${invitation.organizationID}
+              AND status = 'pending'
+              AND expires_at > CURRENT_TIMESTAMP
+            RETURNING invitation
+          `
+        ], { isolationMode: "Serializable" });
+        return safeJSON(rows?.[0]?.invitation, null);
+      });
+    },
+
+    async acceptOrganizationInvitation(invitation, membership, seatLimit) {
+      return withSerializableRetry(async () => {
+        const acceptanceMutation = membership.projectID
+          ? sql`
+              WITH current_invitation AS MATERIALIZED (
+                SELECT id
+                FROM permitext_organization_invitations
+                WHERE id = ${invitation.id}
+                  AND token_hash = ${invitation.tokenHash}
+                  AND organization_id = ${invitation.organizationID}
+                  AND status = 'pending'
+                  AND expires_at > CURRENT_TIMESTAMP
+              ),
+              active_users AS (
+                SELECT user_id
+                FROM permitext_organization_memberships
+                WHERE organization_id = ${invitation.organizationID} AND status = 'active'
+                UNION
+                SELECT project_memberships.user_id
+                FROM permitext_project_memberships AS project_memberships
+                JOIN permitext_project_ownerships AS ownerships
+                  ON ownerships.project_id = project_memberships.project_id
+                WHERE ownerships.organization_id = ${invitation.organizationID}
+                  AND project_memberships.status = 'active'
+              ),
+              pending_invitees AS (
+                SELECT DISTINCT CASE
+                  WHEN pending.invited_user_id IS NOT NULL
+                    THEN 'user:' || pending.invited_user_id
+                  ELSE 'email:' || lower(pending.invited_email)
+                END AS identity
+                FROM permitext_organization_invitations AS pending
+                WHERE pending.organization_id = ${invitation.organizationID}
+                  AND pending.status = 'pending'
+                  AND pending.expires_at > CURRENT_TIMESTAMP
+                  AND (
+                    pending.invited_user_id IS NULL
+                    OR NOT EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = pending.invited_user_id
+                    )
+                  )
+              ),
+              seat_state AS (
+                SELECT
+                  (SELECT count(*)::int FROM active_users) AS active,
+                  (SELECT count(*)::int FROM pending_invitees) AS pending
+              ),
+              accepted AS (
+                UPDATE permitext_organization_invitations
+                SET status = ${invitation.status},
+                    invitation = ${JSON.stringify(invitation)}::jsonb,
+                    updated_at = ${invitation.updatedAt}::timestamptz
+                WHERE id IN (SELECT id FROM current_invitation)
+                  AND (SELECT active + pending FROM seat_state) <= ${seatLimit}
+                RETURNING invitation
+              ),
+              saved_membership AS (
+                INSERT INTO permitext_project_memberships (
+                  id, organization_id, project_id, user_id, role, status, membership,
+                  created_at, updated_at, deactivated_at
+                )
+                SELECT
+                  ${membership.id}, ${membership.organizationID}, ${membership.projectID},
+                  ${membership.userID}, ${membership.role}, ${membership.status},
+                  ${JSON.stringify(membership)}::jsonb, ${membership.createdAt}::timestamptz,
+                  ${membership.updatedAt}::timestamptz, ${membership.deactivatedAt}::timestamptz
+                WHERE EXISTS (SELECT 1 FROM accepted)
+                ON CONFLICT (project_id, user_id) DO UPDATE SET
+                  id = EXCLUDED.id,
+                  organization_id = EXCLUDED.organization_id,
+                  role = EXCLUDED.role,
+                  status = EXCLUDED.status,
+                  membership = EXCLUDED.membership,
+                  updated_at = EXCLUDED.updated_at,
+                  deactivated_at = EXCLUDED.deactivated_at
+                RETURNING membership
+              )
+              SELECT
+                CASE
+                  WHEN NOT EXISTS (SELECT 1 FROM current_invitation) THEN 'unavailable'
+                  WHEN (SELECT active + pending FROM seat_state) > ${seatLimit} THEN 'seat_limit'
+                  WHEN EXISTS (SELECT 1 FROM accepted) THEN 'accepted'
+                  ELSE 'unavailable'
+                END AS outcome,
+                (SELECT invitation FROM accepted LIMIT 1) AS invitation,
+                (SELECT membership FROM saved_membership LIMIT 1) AS membership
+            `
+          : sql`
+              WITH current_invitation AS MATERIALIZED (
+                SELECT id
+                FROM permitext_organization_invitations
+                WHERE id = ${invitation.id}
+                  AND token_hash = ${invitation.tokenHash}
+                  AND organization_id = ${invitation.organizationID}
+                  AND status = 'pending'
+                  AND expires_at > CURRENT_TIMESTAMP
+              ),
+              active_users AS (
+                SELECT user_id
+                FROM permitext_organization_memberships
+                WHERE organization_id = ${invitation.organizationID} AND status = 'active'
+                UNION
+                SELECT project_memberships.user_id
+                FROM permitext_project_memberships AS project_memberships
+                JOIN permitext_project_ownerships AS ownerships
+                  ON ownerships.project_id = project_memberships.project_id
+                WHERE ownerships.organization_id = ${invitation.organizationID}
+                  AND project_memberships.status = 'active'
+              ),
+              pending_invitees AS (
+                SELECT DISTINCT CASE
+                  WHEN pending.invited_user_id IS NOT NULL
+                    THEN 'user:' || pending.invited_user_id
+                  ELSE 'email:' || lower(pending.invited_email)
+                END AS identity
+                FROM permitext_organization_invitations AS pending
+                WHERE pending.organization_id = ${invitation.organizationID}
+                  AND pending.status = 'pending'
+                  AND pending.expires_at > CURRENT_TIMESTAMP
+                  AND (
+                    pending.invited_user_id IS NULL
+                    OR NOT EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = pending.invited_user_id
+                    )
+                  )
+              ),
+              seat_state AS (
+                SELECT
+                  (SELECT count(*)::int FROM active_users) AS active,
+                  (SELECT count(*)::int FROM pending_invitees) AS pending
+              ),
+              accepted AS (
+                UPDATE permitext_organization_invitations
+                SET status = ${invitation.status},
+                    invitation = ${JSON.stringify(invitation)}::jsonb,
+                    updated_at = ${invitation.updatedAt}::timestamptz
+                WHERE id IN (SELECT id FROM current_invitation)
+                  AND (SELECT active + pending FROM seat_state) <= ${seatLimit}
+                RETURNING invitation
+              ),
+              saved_membership AS (
+                INSERT INTO permitext_organization_memberships (
+                  id, organization_id, user_id, role, status, membership,
+                  created_at, updated_at, deactivated_at
+                )
+                SELECT
+                  ${membership.id}, ${membership.organizationID}, ${membership.userID},
+                  ${membership.role}, ${membership.status}, ${JSON.stringify(membership)}::jsonb,
+                  ${membership.createdAt}::timestamptz, ${membership.updatedAt}::timestamptz,
+                  ${membership.deactivatedAt}::timestamptz
+                WHERE EXISTS (SELECT 1 FROM accepted)
+                ON CONFLICT (organization_id, user_id) DO UPDATE SET
+                  id = EXCLUDED.id,
+                  role = EXCLUDED.role,
+                  status = EXCLUDED.status,
+                  membership = EXCLUDED.membership,
+                  updated_at = EXCLUDED.updated_at,
+                  deactivated_at = EXCLUDED.deactivated_at
+                RETURNING membership
+              )
+              SELECT
+                CASE
+                  WHEN NOT EXISTS (SELECT 1 FROM current_invitation) THEN 'unavailable'
+                  WHEN (SELECT active + pending FROM seat_state) > ${seatLimit} THEN 'seat_limit'
+                  WHEN EXISTS (SELECT 1 FROM accepted) THEN 'accepted'
+                  ELSE 'unavailable'
+                END AS outcome,
+                (SELECT invitation FROM accepted LIMIT 1) AS invitation,
+                (SELECT membership FROM saved_membership LIMIT 1) AS membership
+            `;
+        const [, resultRows] = await sql.transaction([
+          sql`
+            SELECT pg_advisory_xact_lock(
+              hashtextextended(${invitation.organizationID}, 20260726)
+            )
+          `,
+          acceptanceMutation
+        ], { isolationMode: "Serializable" });
+        const result = resultRows?.[0] || {};
+        return {
+          outcome: result.outcome || "unavailable",
+          invitation: safeJSON(result.invitation, null),
+          membership: safeJSON(result.membership, null)
+        };
+      });
+    },
+
+    async saveMembershipWithinSeatLimit(membership, seatLimit) {
+      return withSerializableRetry(async () => {
+        const membershipMutation = membership.projectID
+          ? sql`
+              WITH active_users AS (
+                SELECT user_id
+                FROM permitext_organization_memberships
+                WHERE organization_id = ${membership.organizationID} AND status = 'active'
+                UNION
+                SELECT project_memberships.user_id
+                FROM permitext_project_memberships AS project_memberships
+                JOIN permitext_project_ownerships AS ownerships
+                  ON ownerships.project_id = project_memberships.project_id
+                WHERE ownerships.organization_id = ${membership.organizationID}
+                  AND project_memberships.status = 'active'
+              ),
+              pending_invitees AS (
+                SELECT DISTINCT CASE
+                  WHEN invitations.invited_user_id IS NOT NULL
+                    THEN 'user:' || invitations.invited_user_id
+                  ELSE 'email:' || lower(invitations.invited_email)
+                END AS identity
+                FROM permitext_organization_invitations AS invitations
+                WHERE invitations.organization_id = ${membership.organizationID}
+                  AND invitations.status = 'pending'
+                  AND invitations.expires_at > CURRENT_TIMESTAMP
+                  AND (
+                    invitations.invited_user_id IS NULL
+                    OR NOT EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = invitations.invited_user_id
+                    )
+                  )
+              ),
+              candidate AS (
+                SELECT
+                  (SELECT count(*)::int FROM active_users) AS active,
+                  (SELECT count(*)::int FROM pending_invitees) AS pending,
+                  CASE
+                    WHEN ${membership.status} <> 'active' THEN 0
+                    WHEN EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = ${membership.userID}
+                    ) THEN 0
+                    WHEN EXISTS (
+                      SELECT 1 FROM pending_invitees
+                      WHERE pending_invitees.identity = 'user:' || ${membership.userID}
+                    ) THEN 0
+                    ELSE 1
+                  END AS additional
+              ),
+              saved AS (
+                INSERT INTO permitext_project_memberships (
+                  id, organization_id, project_id, user_id, role, status, membership,
+                  created_at, updated_at, deactivated_at
+                )
+                SELECT
+                  ${membership.id}, ${membership.organizationID}, ${membership.projectID},
+                  ${membership.userID}, ${membership.role}, ${membership.status},
+                  ${JSON.stringify(membership)}::jsonb, ${membership.createdAt}::timestamptz,
+                  ${membership.updatedAt}::timestamptz, ${membership.deactivatedAt}::timestamptz
+                FROM candidate
+                WHERE candidate.active + candidate.pending + candidate.additional <= ${seatLimit}
+                ON CONFLICT (project_id, user_id) DO UPDATE SET
+                  id = EXCLUDED.id,
+                  organization_id = EXCLUDED.organization_id,
+                  role = EXCLUDED.role,
+                  status = EXCLUDED.status,
+                  membership = EXCLUDED.membership,
+                  updated_at = EXCLUDED.updated_at,
+                  deactivated_at = EXCLUDED.deactivated_at
+                RETURNING membership
+              )
+              SELECT
+                CASE WHEN EXISTS (SELECT 1 FROM saved) THEN 'saved' ELSE 'seat_limit' END AS outcome,
+                (SELECT membership FROM saved LIMIT 1) AS membership,
+                candidate.active,
+                candidate.pending,
+                candidate.active + candidate.pending AS used
+              FROM candidate
+            `
+          : sql`
+              WITH active_users AS (
+                SELECT user_id
+                FROM permitext_organization_memberships
+                WHERE organization_id = ${membership.organizationID} AND status = 'active'
+                UNION
+                SELECT project_memberships.user_id
+                FROM permitext_project_memberships AS project_memberships
+                JOIN permitext_project_ownerships AS ownerships
+                  ON ownerships.project_id = project_memberships.project_id
+                WHERE ownerships.organization_id = ${membership.organizationID}
+                  AND project_memberships.status = 'active'
+              ),
+              pending_invitees AS (
+                SELECT DISTINCT CASE
+                  WHEN invitations.invited_user_id IS NOT NULL
+                    THEN 'user:' || invitations.invited_user_id
+                  ELSE 'email:' || lower(invitations.invited_email)
+                END AS identity
+                FROM permitext_organization_invitations AS invitations
+                WHERE invitations.organization_id = ${membership.organizationID}
+                  AND invitations.status = 'pending'
+                  AND invitations.expires_at > CURRENT_TIMESTAMP
+                  AND (
+                    invitations.invited_user_id IS NULL
+                    OR NOT EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = invitations.invited_user_id
+                    )
+                  )
+              ),
+              candidate AS (
+                SELECT
+                  (SELECT count(*)::int FROM active_users) AS active,
+                  (SELECT count(*)::int FROM pending_invitees) AS pending,
+                  CASE
+                    WHEN ${membership.status} <> 'active' THEN 0
+                    WHEN EXISTS (
+                      SELECT 1 FROM active_users
+                      WHERE active_users.user_id = ${membership.userID}
+                    ) THEN 0
+                    WHEN EXISTS (
+                      SELECT 1 FROM pending_invitees
+                      WHERE pending_invitees.identity = 'user:' || ${membership.userID}
+                    ) THEN 0
+                    ELSE 1
+                  END AS additional
+              ),
+              saved AS (
+                INSERT INTO permitext_organization_memberships (
+                  id, organization_id, user_id, role, status, membership,
+                  created_at, updated_at, deactivated_at
+                )
+                SELECT
+                  ${membership.id}, ${membership.organizationID}, ${membership.userID},
+                  ${membership.role}, ${membership.status}, ${JSON.stringify(membership)}::jsonb,
+                  ${membership.createdAt}::timestamptz, ${membership.updatedAt}::timestamptz,
+                  ${membership.deactivatedAt}::timestamptz
+                FROM candidate
+                WHERE candidate.active + candidate.pending + candidate.additional <= ${seatLimit}
+                ON CONFLICT (organization_id, user_id) DO UPDATE SET
+                  id = EXCLUDED.id,
+                  role = EXCLUDED.role,
+                  status = EXCLUDED.status,
+                  membership = EXCLUDED.membership,
+                  updated_at = EXCLUDED.updated_at,
+                  deactivated_at = EXCLUDED.deactivated_at
+                RETURNING membership
+              )
+              SELECT
+                CASE WHEN EXISTS (SELECT 1 FROM saved) THEN 'saved' ELSE 'seat_limit' END AS outcome,
+                (SELECT membership FROM saved LIMIT 1) AS membership,
+                candidate.active,
+                candidate.pending,
+                candidate.active + candidate.pending AS used
+              FROM candidate
+            `;
+        const [, resultRows] = await sql.transaction([
+          sql`
+            SELECT pg_advisory_xact_lock(
+              hashtextextended(${membership.organizationID}, 20260726)
+            )
+          `,
+          membershipMutation
+        ], { isolationMode: "Serializable" });
+        const result = resultRows?.[0] || {};
+        return {
+          outcome: result.outcome || "seat_limit",
+          membership: safeJSON(result.membership, null),
+          seats: {
+            active: Number(result.active || 0),
+            pending: Number(result.pending || 0),
+            used: Number(result.used || 0)
+          }
+        };
+      });
     },
 
     async projectOwnership(projectID) {

@@ -3475,16 +3475,14 @@ struct LocalEntitlementService: EntitlementService {
     }
 
     var currentEntitlement: AppEntitlement {
-        if let data = defaults.data(forKey: Self.entitlementDefaultsKey),
-           let entitlement = try? JSONDecoder().decode(AppEntitlement.self, from: data) {
-            return entitlement.grantsPro() || entitlement.plan == .free ? entitlement : .free
+        if let entitlement = Self.storedEntitlement(defaults: defaults),
+           entitlement.grantsPro(),
+           !entitlement.source.isAppleManagedSubscription || entitlement.grantedUserID != nil {
+            return entitlement
         }
         if let lifetimeGrantUserID = defaults.string(forKey: Self.lifetimeGrantUserIDDefaultsKey),
            !lifetimeGrantUserID.isEmpty {
             return .lifetimeGrant(userID: lifetimeGrantUserID)
-        }
-        if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
-            return .appleSubscriptionPro
         }
         #if DEBUG
         if let debugPlan = defaults.string(forKey: Self.planDefaultsKey).flatMap(AppPlan.init(rawValue:)) {
@@ -3492,6 +3490,9 @@ struct LocalEntitlementService: EntitlementService {
         }
         #else
         #endif
+        if defaults.string(forKey: Self.verifiedPlanDefaultsKey).flatMap(AppPlan.init(rawValue:)) == .pro {
+            return .appleSubscriptionPro
+        }
         return .free
     }
 
@@ -3556,15 +3557,6 @@ struct LocalEntitlementService: EntitlementService {
 
     static func setVerifiedPlan(_ plan: AppPlan, defaults: UserDefaults = .standard) {
         defaults.set(plan.rawValue, forKey: verifiedPlanDefaultsKey)
-        if plan == .pro {
-            setEntitlement(.appleSubscriptionPro, defaults: defaults)
-        } else {
-            let storedEntitlement = currentStoredEntitlement(defaults: defaults)
-            if storedEntitlement.source.isAppleManagedSubscription,
-               storedEntitlement.grantedUserID == nil {
-                setEntitlement(.free, defaults: defaults)
-            }
-        }
     }
 
     static func setLifetimeGrant(userID: String, defaults: UserDefaults = .standard) {
@@ -3574,8 +3566,8 @@ struct LocalEntitlementService: EntitlementService {
 
     static func clearLifetimeGrant(defaults: UserDefaults = .standard) {
         defaults.removeObject(forKey: lifetimeGrantUserIDDefaultsKey)
-        if currentStoredEntitlement(defaults: defaults).source == .lifetimeGrant {
-            setEntitlement(.free, defaults: defaults)
+        if storedEntitlement(defaults: defaults)?.source == .lifetimeGrant {
+            clearEntitlement(defaults: defaults)
         }
     }
 
@@ -3585,10 +3577,14 @@ struct LocalEntitlementService: EntitlementService {
         }
     }
 
-    private static func currentStoredEntitlement(defaults: UserDefaults) -> AppEntitlement {
+    static func clearEntitlement(defaults: UserDefaults = .standard) {
+        defaults.removeObject(forKey: entitlementDefaultsKey)
+    }
+
+    private static func storedEntitlement(defaults: UserDefaults) -> AppEntitlement? {
         guard let data = defaults.data(forKey: entitlementDefaultsKey),
               let entitlement = try? JSONDecoder().decode(AppEntitlement.self, from: data) else {
-            return .free
+            return nil
         }
         return entitlement
     }

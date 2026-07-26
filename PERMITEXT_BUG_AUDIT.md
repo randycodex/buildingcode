@@ -1,10 +1,11 @@
 # Permitext bug audit (iOS + web)
 
 **Branch reviewed:** `codex/New-Changes` (`322a12e4`)
+**Remediation branch:** `main` (work began at `24c91d08`)
 **Workspace:** `/Users/randy/Documents/X_CODING/Building Code`
 **Date:** 2026-07-25
 **Scope:** iOS app (`NYC CC APP/permitext/`) and web/backend (`permitext-sync-server/`)
-**Current validation:** the calibrated P0/P1 fixes are implemented locally. `npm run check`, `npm run smoke`, and the iOS `EntitlementAndSyncContractTests` simulator run pass. Nothing in this audit proves GitHub or production deployment state.
+**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 remediation described below are implemented locally. `npm run check` and `npm run smoke` pass. An iOS `EntitlementAndSyncContractTests` run passed 17 tests, including the account-wide counts and core StoreKit/backend cases; the current app and final added tests build, but a later focused rerun was canceled when the simulator shut down before XCTest launched. PostgreSQL integration was requested but skipped because no database URL is configured. Nothing in this audit proves GitHub, production execution of the new SQL, deployment state, or App Store configuration.
 
 Severity:
 
@@ -147,11 +148,18 @@ This affects all PostgreSQL rejection causes, not only Free-plan quota failures.
 
 ### 6. PostgreSQL compatibility-store reads omit Workboards
 
+**Status:** fixed locally; source-contract and server smoke coverage pass, while a live PostgreSQL deployment check remains necessary
+
 `readNormalizedStore` reconstructs saved items, annotations, Projects, Project items, continuity, and clear mutations, but omits Workboards. Normal PostgreSQL sync pull uses the dedicated sync repository and can still return Workboards; the defect is narrower than general Workboard sync failure.
 
 Compatibility helpers such as `userContentMutations`, Workboard-target existence checks, legacy migration, and some asset-scope checks can therefore see an incomplete view.
 
 The PostgreSQL comments table is also absent from this compatibility read, but comment mutations are not currently accepted by `allowedMutationKinds`; that is a separate unfinished surface rather than a completed sync contract.
+
+**Implemented**
+
+- PostgreSQL normalized compatibility reads now include `workboard` records.
+- Smoke coverage protects the compatibility query from dropping Workboards again.
 
 ### 7. File-store mutations use unlocked read-modify-write
 
@@ -161,9 +169,17 @@ This is a real defect for any deployment using file storage. Its production seve
 
 ### 8. iOS Free counters are scoped per code version
 
+**Status:** fixed locally; SQLite-backed two-code-version regression coverage passes
+
 iOS checks saved-section and note limits with `WHERE code_version = ?`, allowing 25 saves and 10 notes in each code package. Server enforcement counts across the account.
 
 **Impact:** iOS can allow an action that PostgreSQL later rejects. Align the client preview count with the server account-wide contract.
+
+**Implemented**
+
+- The iOS user-content repository now exposes account-wide saved-section and non-empty-note totals.
+- Free-plan decisions use those totals while code-specific reader counts remain available for their original UI purposes.
+- Regression coverage proves 24 + 1 saved sections and 9 + 1 notes across two code versions reach the account-wide limit.
 
 ### 9. Legacy SQLite FTS passes raw user syntax to `MATCH`
 
@@ -179,9 +195,17 @@ Prefer canonical metadata in the link or resolve the section ID through the serv
 
 ### 11. `setVerifiedPlan(.pro)` can replace package metadata
 
+**Status:** fixed locally; focused entitlement metadata and StoreKit-fallback tests pass
+
 StoreKit verification writes `.appleSubscriptionPro` as the complete local entitlement. That can temporarily remove package, add-on, legacy-Research, and provider fields from a previously stored backend entitlement.
 
 Preserve verified StoreKit state separately from the backend package record, then resolve capabilities without overwriting either source.
+
+**Implemented**
+
+- StoreKit verification persists only the verified Apple plan.
+- Backend entitlement records remain separately encoded with their package, provider, granted-user, and add-on metadata intact.
+- Capability resolution prefers an active authoritative backend record and falls back to verified Apple Pro when no active backend Pro grant exists.
 
 ### 12. Rate limits are advisory rather than distributed controls
 
@@ -191,21 +215,45 @@ Use account-aware, distributed controls for billing, authentication, and adminis
 
 ### 13. Report APIs do not consistently use Project storage ownership
 
+**Status:** fixed locally; shared Editor/Reviewer smoke coverage passes
+
 Several Report draft/generate paths resolve `ownedProjectRecord(context.userID, projectID)` and persist under the personal caller rather than using `requireProjectPermission` plus `access.storageOwnerUserID`.
 
 **Impact:** Organization members can be denied valid shared-project behavior or create fragmented personal artifacts.
 
+**Implemented**
+
+- Report sources, Drafts, history, manifests, generated files, and activity resolve the caller's Project permission.
+- Reads and writes use the Project's stable `storageOwnerUserID` and organization owner scope.
+- Reviewers can read and download; Editors can create organization-owned Drafts; unauthorized mutation returns the Project-permission error.
+
 ### 14. Workboard upload/delete authorization is not aligned with Organization ACLs
+
+**Status:** fixed locally; shared Project read/write/deny smoke coverage passes
 
 Workboard read uses Project permission and storage-owner resolution, while upload/delete still rely on personal `ownsProjectAssetScope` checks.
 
 Align all three operations with the same Project access object, permission, and `storageOwnerUserID`.
 
+**Implemented**
+
+- Preview and image mutations require Project edit permission and use the Project's storage owner.
+- Organization Editors can publish a preview that the Owner sees; Reviewer mutation is denied.
+- The legacy personal Workboard asset scope remains supported for a drawing created before its Project record exists.
+
 ### 15. Organization seat and duplicate-invite checks can race
+
+**Status:** fixed locally for invitation reservation, acceptance, revocation, and reactivation; live PostgreSQL concurrency still needs deployment verification
 
 Seat usage and duplicate invitation checks occur before invitation persistence without one serializable operation or uniqueness constraint. Concurrent invitations can reserve more seats than allowed or create duplicate active invitations.
 
 Acceptance and member-reactivation paths should use the same transactional seat ledger.
+
+**Implemented**
+
+- PostgreSQL uses serializable transactions plus an organization-scoped advisory lock for invitation reservation, invitation state changes, acceptance, and seat-bound reactivation.
+- The local file adapter mirrors the organization lock within one process.
+- Smoke coverage races duplicate invitations, final-seat reservations, and repeated acceptance of one token.
 
 ### 16. File-store sessions are reused on re-login
 
@@ -215,11 +263,15 @@ Rotate file-store tokens on every successful sign-in or explicitly label file au
 
 ### 17. Upgrade copy contradicts the Free entitlement contract
 
+**Status:** fixed locally; a copy regression test is added and builds, but its focused simulator execution was canceled before XCTest launched
+
 Free enables continuity and cross-device sync, and Settings explains that correctly. `professionalWorkspaceRequirement` still says:
 
 > Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and cross-device sync.
 
 Remove continuity and cross-device sync from that Pro-only message.
+
+The corrected message names unlimited saved work and notes, Projects, professional exports, tags, and offline access without presenting Free continuity or cross-device sync as paid features.
 
 ### 18. Prepared section-body coverage is incomplete
 
@@ -321,8 +373,8 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 |---|---|
 | **P0** | iOS pending-delete resurrection; Stripe checkout expiry/order handling |
 | **P1** | Backend lifetime-grant authority on iOS; atomic Research quota reservation; PostgreSQL rejection reasons |
-| **P2** | PostgreSQL compatibility completeness; account-wide iOS Free counts; Organization Report/Workboard storage ownership; transactional seat enforcement |
-| **P3** | StoreKit entitlement separation; file-store locking/session rotation; distributed rate limits; deep-link metadata; copy correction |
+| **P2** | Completed locally: PostgreSQL Workboard compatibility, account-wide iOS Free counts, Organization Report/Workboard storage ownership, and transactional seat enforcement |
+| **P3** | Completed locally: StoreKit entitlement separation and copy correction. Remaining: file-store locking/session rotation, distributed rate limits, and deep-link metadata |
 | **Hardening/content** | WKWebView teardown/navigation; SQLite pragmas; local path containment; continuity merge policy; timing-safe admin compare; prepared-body expansion; stale docs |
 
 ---
@@ -349,7 +401,8 @@ Admin bearer tokens are compared with ordinary JavaScript string equality or `in
 
 - `npm run check` — passed after the fixes; no paid model calls were made.
 - `npm run smoke` — passed after rebuilding both web clients; no paid model calls were made.
-- iOS `EntitlementAndSyncContractTests` — passed on an iPhone 17 simulator, including the SQLite-backed pending-delete regression.
+- iOS `EntitlementAndSyncContractTests` — 17 tests passed on an iPhone 17 simulator, including the SQLite-backed pending-delete and account-wide Free-count regressions plus the two core StoreKit/backend separation cases. The current target and later copy/debug-precedence tests build, but a focused rerun was interrupted after the simulator shut down before XCTest launched; this is not counted as a test pass.
+- PostgreSQL integration — requested but skipped because no database URL is configured; the new organization transaction SQL remains unverified against a live database.
 - Content integrity — passed: 118 chapters, 12,891 indexed sections, 10,371 prepared bodies, 248 referenced images, 8 duplicate display keys.
 - Live PostgreSQL concurrency and production webhook delivery were not exercised locally.
 

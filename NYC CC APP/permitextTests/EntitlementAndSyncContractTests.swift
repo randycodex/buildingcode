@@ -2,11 +2,15 @@ import XCTest
 @testable import permitext
 
 final class EntitlementAndSyncContractTests: XCTestCase {
-    private func freeService() -> LocalEntitlementService {
+    private func isolatedEntitlementDefaults() -> UserDefaults {
         let suiteName = "permitext-tests-\(UUID().uuidString)"
         let defaults = UserDefaults(suiteName: suiteName)!
         defaults.removePersistentDomain(forName: suiteName)
-        return LocalEntitlementService(defaults: defaults)
+        return defaults
+    }
+
+    private func freeService() -> LocalEntitlementService {
+        LocalEntitlementService(defaults: isolatedEntitlementDefaults())
     }
 
     func testFreePlanIncludesContinuityAndCrossDeviceSync() {
@@ -25,6 +29,47 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(service.canCreateNote(currentCount: 9), .allowed)
         XCTAssertNotEqual(service.canCreateNote(currentCount: 10), .allowed)
         XCTAssertNotEqual(service.canCreateProject(currentCount: 0), .allowed)
+    }
+
+    func testFreePlanSavedAndNoteLimitsCountAcrossCodeVersions() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-account-wide-counts-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: databaseURL) }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let firstCodeVersion = "nyc-2022"
+        let secondCodeVersion = "nyc-2014"
+
+        for sectionID in Int64(1)...24 {
+            try store.toggleBookmark(sectionID: sectionID, codeVersion: firstCodeVersion)
+        }
+        try store.toggleBookmark(sectionID: 100, codeVersion: secondCodeVersion)
+
+        for sectionID in Int64(1)...9 {
+            try store.saveNote(
+                sectionID: sectionID,
+                codeVersion: firstCodeVersion,
+                body: "Note \(sectionID)"
+            )
+        }
+        try store.saveNote(sectionID: 100, codeVersion: secondCodeVersion, body: "Tenth note")
+
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: firstCodeVersion), 24)
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: secondCodeVersion), 1)
+        XCTAssertEqual(try store.totalBookmarkCount(), 25)
+        XCTAssertEqual(try store.noteCount(codeVersion: firstCodeVersion), 9)
+        XCTAssertEqual(try store.noteCount(codeVersion: secondCodeVersion), 1)
+        XCTAssertEqual(try store.totalNoteCount(), 10)
+
+        let service = freeService()
+        XCTAssertNotEqual(
+            service.canCreateSavedSection(currentCount: try store.totalBookmarkCount()),
+            .allowed
+        )
+        XCTAssertNotEqual(
+            service.canCreateNote(currentCount: try store.totalNoteCount()),
+            .allowed
+        )
     }
 
     func testUpgradeCallToActionUsesStoreKitLocalizedPrice() {
@@ -46,6 +91,17 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             ),
             "Loading Pro..."
         )
+    }
+
+    func testProfessionalWorkspaceUpgradeCopyOnlyNamesProFeatures() {
+        let message = permitextProfessionalWorkspaceRequirementMessage()
+
+        XCTAssertEqual(
+            message,
+            "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, tags, and offline access."
+        )
+        XCTAssertFalse(message.localizedCaseInsensitiveContains("continuity"))
+        XCTAssertFalse(message.localizedCaseInsensitiveContains("cross-device sync"))
     }
 
     func testNYC2022SyncAliasesUseCanonicalServerIdentity() {
@@ -161,6 +217,88 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(AppEntitlement.lifetimeGrant(userID: "user").grantsResearch())
         XCTAssertTrue(AppEntitlement(plan: .pro, source: .webSubscription, grantedUserID: "legacy").grantsResearch())
     }
+
+    func testStoreKitPlanChangesDoNotReplaceBackendEntitlementMetadata() throws {
+        let defaults = isolatedEntitlementDefaults()
+        let backendEntitlement = AppEntitlement(
+            plan: .pro,
+            source: .webSubscription,
+            grantedUserID: "backend-user",
+            packageID: "pro",
+            provider: .init(permitextPackage: "pro"),
+            addOns: [
+                "research": .init(
+                    enabled: true,
+                    source: "webSubscription",
+                    expiresAt: nil,
+                    provider: .init(permitextPackage: "research")
+                )
+            ]
+        )
+        LocalEntitlementService.setEntitlement(backendEntitlement, defaults: defaults)
+        let storedBackendData = try XCTUnwrap(
+            defaults.data(forKey: LocalEntitlementService.entitlementDefaultsKey)
+        )
+
+        LocalEntitlementService.setVerifiedPlan(.pro, defaults: defaults)
+        XCTAssertEqual(
+            defaults.data(forKey: LocalEntitlementService.entitlementDefaultsKey),
+            storedBackendData
+        )
+        XCTAssertEqual(
+            LocalEntitlementService(defaults: defaults).currentEntitlement,
+            backendEntitlement
+        )
+        XCTAssertTrue(LocalEntitlementService(defaults: defaults).currentEntitlement.grantsResearch())
+
+        LocalEntitlementService.setVerifiedPlan(.free, defaults: defaults)
+        XCTAssertEqual(
+            defaults.data(forKey: LocalEntitlementService.entitlementDefaultsKey),
+            storedBackendData
+        )
+        XCTAssertEqual(
+            LocalEntitlementService(defaults: defaults).currentEntitlement,
+            backendEntitlement
+        )
+    }
+
+    func testStoreKitProIsUsedWhenBackendHasNoActiveProEntitlement() {
+        let defaults = isolatedEntitlementDefaults()
+        let service = LocalEntitlementService(defaults: defaults)
+        LocalEntitlementService.setVerifiedPlan(.pro, defaults: defaults)
+
+        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+
+        LocalEntitlementService.setEntitlement(.free, defaults: defaults)
+        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+
+        LocalEntitlementService.setEntitlement(
+            AppEntitlement(
+                plan: .pro,
+                source: .webSubscription,
+                grantedUserID: "expired-backend-user",
+                expiresAt: Date(timeIntervalSince1970: 1)
+            ),
+            defaults: defaults
+        )
+        XCTAssertEqual(service.currentEntitlement, .appleSubscriptionPro)
+
+        LocalEntitlementService.setVerifiedPlan(.free, defaults: defaults)
+        XCTAssertEqual(service.currentEntitlement, .free)
+    }
+
+    #if DEBUG
+    func testDebugFreeOverrideWinsOverVerifiedStoreKitPro() {
+        let defaults = isolatedEntitlementDefaults()
+        LocalEntitlementService.setVerifiedPlan(.pro, defaults: defaults)
+        LocalEntitlementService.setDebugPlan(.free, defaults: defaults)
+
+        XCTAssertEqual(
+            LocalEntitlementService(defaults: defaults).currentEntitlement,
+            .debugOverride(.free)
+        )
+    }
+    #endif
 
     func testReleaseLifetimeLookupCannotRevokeBackendGrant() async throws {
         let result = try await LocalLifetimeGrantLookupClient()

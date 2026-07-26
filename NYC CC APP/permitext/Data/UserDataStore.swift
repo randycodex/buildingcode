@@ -4,6 +4,7 @@ import SQLite3
 protocol UserContentRepository {
     func bookmarkedSectionIDs(codeVersion: String) throws -> [Int64]
     func bookmarkCount(codeVersion: String) throws -> Int
+    func totalBookmarkCount() throws -> Int
     func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date]
     func isBookmarked(sectionID: Int64, codeVersion: String) throws -> Bool
     func toggleBookmark(sectionID: Int64, codeVersion: String) throws
@@ -11,6 +12,7 @@ protocol UserContentRepository {
     func noteBody(sectionID: Int64, blockID: String, codeVersion: String) throws -> String
     func noteBlockIDs(sectionID: Int64, codeVersion: String) throws -> [String]
     func noteCount(codeVersion: String) throws -> Int
+    func totalNoteCount() throws -> Int
     func noteEntries(codeVersion: String) throws -> [Int64: String]
     func annotationEntries(codeVersion: String) throws -> [UserAnnotationEntry]
     func saveNote(sectionID: Int64, codeVersion: String, body: String) throws
@@ -121,6 +123,10 @@ final class UserDataStore: UserContentRepository {
             sql: "SELECT COUNT(*) FROM bookmarks WHERE code_version = ?;",
             codeVersion: codeVersion
         )
+    }
+
+    func totalBookmarkCount() throws -> Int {
+        try countRows(sql: "SELECT COUNT(*) FROM bookmarks;")
     }
 
     func bookmarkCreatedAtBySectionID(codeVersion: String) throws -> [Int64: Date] {
@@ -289,6 +295,16 @@ final class UserDataStore: UserContentRepository {
             WHERE code_version = ? AND TRIM(body) <> '';
             """,
             codeVersion: codeVersion
+        )
+    }
+
+    func totalNoteCount() throws -> Int {
+        try countRows(
+            sql: """
+            SELECT COUNT(*)
+            FROM notes
+            WHERE TRIM(body) <> '';
+            """
         )
     }
 
@@ -2963,6 +2979,14 @@ final class UserDataStore: UserContentRepository {
         let statement = try connection.prepare(sql)
         defer { connection.finalize(statement) }
         try connection.bind(text: codeVersion, index: 1, to: statement)
+        return try connection.step(statement) == SQLITE_ROW
+            ? Int(connection.int64(at: 0, in: statement))
+            : 0
+    }
+
+    private func countRows(sql: String) throws -> Int {
+        let statement = try connection.prepare(sql)
+        defer { connection.finalize(statement) }
         return try connection.step(statement) == SQLITE_ROW
             ? Int(connection.int64(at: 0, in: statement))
             : 0

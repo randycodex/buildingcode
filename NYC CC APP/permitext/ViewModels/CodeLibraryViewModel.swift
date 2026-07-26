@@ -21,6 +21,10 @@ func permitextUpgradeCallToActionTitle(
     return isStoreKitBusy ? "Loading Pro..." : "Upgrade to Pro"
 }
 
+func permitextProfessionalWorkspaceRequirementMessage() -> String {
+    "Upgrade to Pro to unlock unlimited saved work and notes, Projects, professional exports, tags, and offline access."
+}
+
 enum ProjectHubLoadError: LocalizedError {
     case projectUnavailable
     case signInRequired
@@ -2039,7 +2043,7 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = EntitlementRequirement(
             feature: .unlimitedSavedItems,
             requiredPlan: .pro,
-            message: "Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and cross-device sync."
+            message: permitextProfessionalWorkspaceRequirementMessage()
         )
     }
 
@@ -2731,24 +2735,13 @@ final class CodeLibraryViewModel: ObservableObject {
         if let capabilityContract {
             currentCapabilityContract = capabilityContract
         }
-        let currentEntitlement = entitlementService.currentEntitlement
         let activeBackendEntitlement = entitlement.flatMap { $0.grantsPro() ? $0 : nil }
         hasActiveBackendProEntitlement = activeBackendEntitlement != nil
-        let resolvedEntitlement: AppEntitlement
-        if let activeBackendEntitlement {
-            resolvedEntitlement = activeBackendEntitlement
-        } else if activeStoreKitPlan == .pro {
-            resolvedEntitlement = .appleSubscriptionPro
-        } else if currentEntitlement.source.isAppleManagedSubscription,
-                  currentEntitlement.grantedUserID == nil,
-                  currentEntitlement.grantsPro() {
-            resolvedEntitlement = currentEntitlement
-        } else if currentEntitlement.source == .debugOverride {
-            resolvedEntitlement = currentEntitlement
+        if let entitlement {
+            LocalEntitlementService.setEntitlement(entitlement)
         } else {
-            resolvedEntitlement = .free
+            LocalEntitlementService.clearEntitlement()
         }
-        LocalEntitlementService.setEntitlement(resolvedEntitlement)
         refreshCurrentEntitlement()
     }
 
@@ -2857,12 +2850,12 @@ final class CodeLibraryViewModel: ObservableObject {
         UserDefaults.standard.removeObject(forKey: AccountDefaults.signedInAccountKey)
     }
 
-    private func bookmarkCountForEntitlements(codeVersion: String) throws -> Int {
-        try userContentRepository?.bookmarkCount(codeVersion: codeVersion) ?? bookmarkedSectionIDs.count
+    private func bookmarkCountForEntitlements() throws -> Int {
+        try userContentRepository?.totalBookmarkCount() ?? bookmarkedSectionIDs.count
     }
 
-    private func noteCountForEntitlements(codeVersion: String) throws -> Int {
-        try userContentRepository?.noteCount(codeVersion: codeVersion) ?? bookmarks.filter(\.hasNote).count
+    private func noteCountForEntitlements() throws -> Int {
+        try userContentRepository?.totalNoteCount() ?? bookmarks.filter(\.hasNote).count
     }
 
     private func folderCountForEntitlements(codeVersion: String) throws -> Int {
@@ -2995,7 +2988,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userContentRepository else { return false }
         do {
             if !bookmarkedSectionIDs.contains(sectionID) {
-                let bookmarkCount = try bookmarkCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                let bookmarkCount = try bookmarkCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
                     return false
                 }
@@ -3041,7 +3034,7 @@ final class CodeLibraryViewModel: ObservableObject {
             let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
             let existingBody = try userContentRepository.noteBody(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion)
             if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                let noteCount = try noteCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                let noteCount = try noteCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
                     return
                 }
