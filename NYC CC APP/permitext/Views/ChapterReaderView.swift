@@ -185,6 +185,7 @@ struct ChapterReaderView: View {
                 projects: library.folders,
                 projectMemberIDs: Set(library.folderMembership[detail.id] ?? []),
                 initialTags: library.tags(sectionID: detail.id),
+                isTagEditingAvailable: library.hasTagAccess,
                 isBookmarked: library.isBookmarked(sectionID: detail.id),
                 onToggleBookmark: {
                     let isBookmarked = library.toggleBookmark(sectionID: detail.id)
@@ -203,9 +204,13 @@ struct ChapterReaderView: View {
                     syncVisibleSavedState()
                     return library.tags(sectionID: detail.id)
                 },
+                onRequireTagAccess: {
+                    library.requireTagAccess()
+                },
                 onSave: { body in
-                    library.saveNote(sectionID: detail.id, body: body)
+                    let result = library.saveNote(sectionID: detail.id, body: body)
                     syncVisibleSavedState()
+                    return result
                 }
             )
         }
@@ -774,9 +779,14 @@ struct ChapterNoteSheet: View {
     @State private var selectedProjectIDs: Set<Int64>
     @State private var annotationTags: [String]
     @State private var pendingTag = ""
+    @State private var persistedNoteBody: String
+    @State private var noteSaveFailureMessage: String?
+    @State private var isRestoringRejectedNoteChange = false
+    let isTagEditingAvailable: Bool
     let onToggleBookmark: () -> Bool
     let onToggleProject: (CodeFolder, Bool) -> Void
-    let onSave: (String) -> Void
+    let onRequireTagAccess: () -> Void
+    let onSave: (String) -> NoteSaveResult
 
     @Environment(\.dismiss) private var dismiss
     @State private var isProjectPickerPresented = false
@@ -791,11 +801,13 @@ struct ChapterNoteSheet: View {
         projects: [CodeFolder],
         projectMemberIDs: Set<Int64>,
         initialTags: [String] = [],
+        isTagEditingAvailable: Bool,
         isBookmarked: Bool,
         onToggleBookmark: @escaping () -> Bool,
         onToggleProject: @escaping (CodeFolder, Bool) -> Void,
         onSetTags: @escaping ([String]) -> [String] = { $0 },
-        onSave: @escaping (String) -> Void
+        onRequireTagAccess: @escaping () -> Void,
+        onSave: @escaping (String) -> NoteSaveResult
     ) {
         self.detail = detail
         self.titleOverride = titleOverride
@@ -807,8 +819,12 @@ struct ChapterNoteSheet: View {
         _isBookmarked = State(initialValue: isBookmarked)
         _selectedProjectIDs = State(initialValue: projectMemberIDs)
         _annotationTags = State(initialValue: initialTags)
+        _persistedNoteBody = State(initialValue: noteBody.wrappedValue)
+        _noteSaveFailureMessage = State(initialValue: nil)
+        self.isTagEditingAvailable = isTagEditingAvailable
         self.onToggleBookmark = onToggleBookmark
         self.onToggleProject = onToggleProject
+        self.onRequireTagAccess = onRequireTagAccess
         self.onSave = onSave
     }
 
@@ -840,7 +856,7 @@ struct ChapterNoteSheet: View {
                                 .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
                         )
                         .onChange(of: noteBody) { _, newValue in
-                            onSave(newValue)
+                            saveNote(newValue)
                         }
 
                     if noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -851,6 +867,17 @@ struct ChapterNoteSheet: View {
                             .padding(.vertical, 16)
                             .allowsHitTesting(false)
                     }
+                }
+
+                if let noteSaveFailureMessage {
+                    Label("Not Saved", systemImage: "exclamationmark.triangle")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.orange)
+
+                    Text(noteSaveFailureMessage)
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
 
                 tagsEditor
@@ -916,13 +943,23 @@ struct ChapterNoteSheet: View {
 
     private var tagsEditor: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Tags")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+            HStack {
+                Text("Tags")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+
+                Spacer(minLength: 0)
+
+                if !isTagEditingAvailable {
+                    Label("Pro", systemImage: "lock.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                }
+            }
 
             if annotationTags.isEmpty {
-                Text("No tags")
+                Text(isTagEditingAvailable ? "No tags" : "Adding and editing tags is available with Pro.")
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
             } else {
@@ -932,14 +969,16 @@ struct ChapterNoteSheet: View {
                             Text(tag)
                                 .font(.caption.weight(.semibold))
                                 .foregroundStyle(accentColor)
-                            Button {
-                                removeTag(tag)
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.caption2.weight(.bold))
-                                    .foregroundStyle(accentColor.opacity(0.75))
+                            if isTagEditingAvailable {
+                                Button {
+                                    removeTag(tag)
+                                } label: {
+                                    Image(systemName: "xmark")
+                                        .font(.caption2.weight(.bold))
+                                        .foregroundStyle(accentColor.opacity(0.75))
+                                }
+                                .buttonStyle(.plain)
                             }
-                            .buttonStyle(.plain)
                         }
                         .padding(.horizontal, 10)
                         .padding(.vertical, 5)
@@ -951,33 +990,63 @@ struct ChapterNoteSheet: View {
                 }
             }
 
-            HStack(spacing: 8) {
-                Image(systemName: "tag")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                TextField("Add tag", text: $pendingTag)
-                    .focused($isTagFieldFocused)
-                    .textInputAutocapitalization(.words)
-                    .autocorrectionDisabled()
-                    .submitLabel(.done)
-                    .onSubmit { commitPendingTag() }
-                if !pendingTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Button("Add") {
-                        commitPendingTag()
+            if isTagEditingAvailable {
+                HStack(spacing: 8) {
+                    Image(systemName: "tag")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    TextField("Add tag", text: $pendingTag)
+                        .focused($isTagFieldFocused)
+                        .textInputAutocapitalization(.words)
+                        .autocorrectionDisabled()
+                        .submitLabel(.done)
+                        .onSubmit { commitPendingTag() }
+                    if !pendingTag.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        Button("Add") {
+                            commitPendingTag()
+                        }
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(accentColor)
+                        .buttonStyle(.plain)
                     }
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(accentColor)
-                    .buttonStyle(.plain)
                 }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(Color(uiColor: .secondarySystemGroupedBackground))
+                .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
+                        .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
+                )
+            } else {
+                Button {
+                    onRequireTagAccess()
+                } label: {
+                    Label("Upgrade to Add Tags", systemImage: "sparkles")
+                        .font(.footnote.weight(.semibold))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(accentColor)
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(uiColor: .secondarySystemGroupedBackground))
-            .clipShape(RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: CodeScreenMetrics.cardCornerRadius, style: .continuous)
-                    .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
-            )
+        }
+    }
+
+    private func saveNote(_ proposedBody: String) {
+        guard !isRestoringRejectedNoteChange else {
+            isRestoringRejectedNoteChange = false
+            return
+        }
+        switch onSave(proposedBody) {
+        case .saved:
+            persistedNoteBody = proposedBody
+            noteSaveFailureMessage = nil
+        case .failed(let persistedBody, let message):
+            self.persistedNoteBody = persistedBody
+            noteSaveFailureMessage = message
+            if noteBody != persistedBody {
+                isRestoringRejectedNoteChange = true
+                noteBody = persistedBody
+            }
         }
     }
 

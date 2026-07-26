@@ -561,17 +561,35 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     }
 
     @MainActor
-    func testOrganizationInvitationUniversalLinkExtractsOnlyPrivateToken() throws {
-        let invitationURL = try XCTUnwrap(
-            URL(string: "https://permitext-sync.vercel.app/?organizationInvite=private-token-123")
-        )
+    func testPermitextUniversalLinksAcceptPrimaryAndLegacyHosts() throws {
+        for host in ["permitext.com", "permitext-sync.vercel.app"] {
+            let invitationURL = try XCTUnwrap(
+                URL(string: "https://\(host)/?organizationInvite=private-token-123")
+            )
+            XCTAssertEqual(
+                CodeLibraryViewModel.organizationInvitationToken(from: invitationURL),
+                "private-token-123"
+            )
+            XCTAssertEqual(
+                CodeLibraryViewModel.deepLinkedSectionID(
+                    from: URL(string: "https://\(host)/open/section/101")!
+                ),
+                101
+            )
+        }
+
         XCTAssertEqual(
-            CodeLibraryViewModel.organizationInvitationToken(from: invitationURL),
-            "private-token-123"
+            CodeLibraryViewModel.sharedSectionURL(sectionID: 101).absoluteString,
+            "https://permitext.com/open/section/101"
         )
         XCTAssertNil(
             CodeLibraryViewModel.organizationInvitationToken(
                 from: URL(string: "https://example.com/?organizationInvite=private-token-123")!
+            )
+        )
+        XCTAssertNil(
+            CodeLibraryViewModel.deepLinkedSectionID(
+                from: URL(string: "https://example.com/open/section/101")!
             )
         )
         XCTAssertNil(

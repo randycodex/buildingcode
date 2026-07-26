@@ -6,8 +6,11 @@ struct ReaderView: View {
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var detail: ReaderSectionDetail?
+    @State private var loadState: SectionLoadState = .loading
     @State private var references: [ResolvedCodeReference] = []
     @State private var noteBody = ""
+    @State private var persistedNoteBody = ""
+    @State private var isRestoringRejectedNoteChange = false
     @State private var isBookmarked = false
     @State private var expandedInlineImage: UIImage?
     @State private var noteSaveState: NoteSaveState = .idle
@@ -97,14 +100,7 @@ struct ReaderView: View {
                 .padding(.top, CodeScreenMetrics.topTitlePadding)
                 .padding(.bottom, 28)
             } else {
-                CodeEmptyStateCard(
-                    title: "Loading Section",
-                    systemImage: "doc.text.magnifyingglass",
-                    description: "Preparing the selected code section.",
-                    accent: accentColor
-                )
-                .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
-                .padding(.top, 80)
+                sectionLoadState
             }
         }
         .contentShape(Rectangle())
@@ -320,7 +316,11 @@ struct ReaderView: View {
                             .strokeBorder(Color(uiColor: .separator), lineWidth: 1)
                     )
                     .onChange(of: noteBody) { _, _ in
-                        saveNote()
+                        guard !isRestoringRejectedNoteChange else {
+                            isRestoringRejectedNoteChange = false
+                            return
+                        }
+                        saveNote(noteBody)
                     }
 
                 if noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
@@ -331,6 +331,14 @@ struct ReaderView: View {
                         .padding(.vertical, 16)
                         .allowsHitTesting(false)
                 }
+            }
+
+            if case .failed(let message) = noteSaveState {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel("Note not saved. \(message)")
             }
         }
     }
@@ -370,26 +378,35 @@ struct ReaderView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 0)
-                Button {
-                    withAnimation(.easeInOut(duration: 0.18)) {
-                        isTagComposerOpen.toggle()
-                    }
-                    if isTagComposerOpen {
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                            isTagComposerFocused = true
+                if library.hasTagAccess {
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.18)) {
+                            isTagComposerOpen.toggle()
                         }
+                        if isTagComposerOpen {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                                isTagComposerFocused = true
+                            }
+                        }
+                    } label: {
+                        Label(isTagComposerOpen ? "Done" : "Add", systemImage: isTagComposerOpen ? "checkmark" : "plus")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(accentColor)
                     }
-                } label: {
-                    Label(isTagComposerOpen ? "Done" : "Add", systemImage: isTagComposerOpen ? "checkmark" : "plus")
+                    .buttonStyle(.plain)
+                } else {
+                    Label("Pro", systemImage: "lock.fill")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(accentColor)
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.plain)
             }
 
-            // Tags applied to this section, shown as removable accent chips.
             if sectionTags.isEmpty {
-                Text("No tags yet — tap Add to create one.")
+                Text(
+                    library.hasTagAccess
+                        ? "No tags yet — tap Add to create one."
+                        : "Adding and editing tags is available with Pro."
+                )
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
             } else {
@@ -398,14 +415,16 @@ struct ReaderView: View {
                         Text(tag)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(accentColor)
-                        Button {
-                            removeTag(tag)
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.caption2.weight(.bold))
-                                .foregroundStyle(accentColor.opacity(0.7))
+                        if library.hasTagAccess {
+                            Button {
+                                removeTag(tag)
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.caption2.weight(.bold))
+                                    .foregroundStyle(accentColor.opacity(0.7))
+                            }
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
@@ -418,6 +437,15 @@ struct ReaderView: View {
             if isTagComposerOpen {
                 tagComposer
                     .transition(.opacity.combined(with: .move(edge: .top)))
+            } else if !library.hasTagAccess {
+                Button {
+                    library.requireTagAccess()
+                } label: {
+                    Label("Upgrade to Add Tags", systemImage: "sparkles")
+                        .font(.footnote.weight(.semibold))
+                }
+                .buttonStyle(.plain)
+                .foregroundStyle(accentColor)
             }
         }
     }
@@ -498,17 +526,23 @@ struct ReaderView: View {
     }
 
     private func loadContent() async {
-        let loadedDetail = await library.loadSectionDetailAsync(sectionID: sectionID)
-        detail = loadedDetail
-        if let loadedDetail {
+        loadState = .loading
+        detail = nil
+        references = []
+        switch await library.loadSectionDetailResultAsync(sectionID: sectionID) {
+        case .loaded(let loadedDetail):
+            detail = loadedDetail
+            loadState = .loaded
             library.noteSectionOpened(loadedDetail)
-            references = []
             references = await library.resolveReferencesAsync(for: loadedDetail)
-        } else {
-            references = []
+        case .missing:
+            loadState = .missing
+        case .failed(let message):
+            loadState = .failed(message)
         }
         isBookmarked = library.isBookmarked(sectionID: sectionID)
-        noteBody = library.noteBody(sectionID: sectionID)
+        persistedNoteBody = library.noteBody(sectionID: sectionID)
+        noteBody = persistedNoteBody
         sectionTags = library.tags(sectionID: sectionID)
         noteSaveState = .idle
     }
@@ -523,13 +557,23 @@ struct ReaderView: View {
         }
     }
 
-    private func saveNote() {
-        library.saveNote(sectionID: sectionID, body: noteBody)
-        noteSaveState = .saved
+    private func saveNote(_ proposedBody: String) {
+        switch library.saveNote(sectionID: sectionID, body: proposedBody) {
+        case .saved:
+            persistedNoteBody = proposedBody
+            noteSaveState = .saved
+        case .failed(let persistedBody, let message):
+            persistedNoteBody = persistedBody
+            if noteBody != persistedBody {
+                isRestoringRejectedNoteChange = true
+                noteBody = persistedBody
+            }
+            noteSaveState = .failed(message)
+        }
 
         noteSaveResetTask?.cancel()
         noteSaveResetTask = Task { @MainActor in
-            try? await Task.sleep(for: .seconds(2))
+            try? await Task.sleep(for: noteSaveState == .saved ? .seconds(2) : .seconds(5))
             guard !Task.isCancelled else { return }
             noteSaveState = .idle
         }
@@ -543,6 +587,7 @@ struct ReaderView: View {
     private enum NoteSaveState: Equatable {
         case idle
         case saved
+        case failed(String)
 
         var title: String {
             switch self {
@@ -550,6 +595,8 @@ struct ReaderView: View {
                 return ""
             case .saved:
                 return "Saved"
+            case .failed:
+                return "Not Saved"
             }
         }
 
@@ -559,6 +606,8 @@ struct ReaderView: View {
                 return ""
             case .saved:
                 return "checkmark.circle"
+            case .failed:
+                return "exclamationmark.triangle"
             }
         }
 
@@ -568,8 +617,69 @@ struct ReaderView: View {
                 return ""
             case .saved:
                 return "Note saved"
+            case .failed:
+                return "Note not saved"
             }
         }
+    }
+
+    @ViewBuilder
+    private var sectionLoadState: some View {
+        VStack(spacing: 14) {
+            switch loadState {
+            case .loading:
+                ProgressView()
+                    .tint(accentColor)
+                CodeEmptyStateCard(
+                    title: "Loading Section",
+                    systemImage: "doc.text.magnifyingglass",
+                    description: "Preparing the selected code section.",
+                    accent: accentColor
+                )
+            case .missing:
+                CodeEmptyStateCard(
+                    title: "Section Unavailable",
+                    systemImage: "doc.text.magnifyingglass",
+                    description: "This link does not match a section in the selected code library.",
+                    accent: accentColor
+                )
+                sectionRecoveryActions
+            case .failed(let message):
+                CodeEmptyStateCard(
+                    title: "Couldn’t Load Section",
+                    systemImage: "exclamationmark.triangle",
+                    description: message,
+                    accent: accentColor
+                )
+                sectionRecoveryActions
+            case .loaded:
+                EmptyView()
+            }
+        }
+        .padding(.horizontal, CodeScreenMetrics.readerHorizontalPadding)
+        .padding(.top, 80)
+    }
+
+    private var sectionRecoveryActions: some View {
+        HStack(spacing: 12) {
+            Button("Retry") {
+                Task { await loadContent() }
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(accentColor)
+
+            Button("Browse Codes") {
+                library.selectedTab = .browse
+            }
+            .buttonStyle(.bordered)
+        }
+    }
+
+    private enum SectionLoadState: Equatable {
+        case loading
+        case loaded
+        case missing
+        case failed(String)
     }
 
     private struct ReferenceListSection: View {

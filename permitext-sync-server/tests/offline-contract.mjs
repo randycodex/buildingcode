@@ -65,9 +65,10 @@ assert.equal(
   "Exported offline metadata does not describe the active shell cache."
 );
 assert(
-  html.includes(offlineFeatureMetadata.assetVersion) &&
-    app.includes(`./offline-storage.js?v=${offlineFeatureMetadata.assetVersion}`),
-  "The served app shell does not consistently reference the active offline asset generation."
+  html.includes(offlineFeatureMetadata.shellAssetVersion) &&
+    app.includes(`./offline-storage.js?v=${offlineFeatureMetadata.shellAssetVersion}`) &&
+    offlineStorage.includes(`/web/offline-storage.js?v=${offlineFeatureMetadata.shellAssetVersion}`),
+  "The served app shell does not consistently reference the active shell asset generation."
 );
 assert(
   app.includes("?v=${offlineFeatureMetadata.assetVersion}") &&

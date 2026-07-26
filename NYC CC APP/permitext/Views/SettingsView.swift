@@ -16,10 +16,11 @@ struct SettingsView: View {
     @State private var selectedProjectIDs = Set<Int64>()
     @State private var showsProjectDeleteWarning = false
     @State private var showsAccountDeleteWarning = false
+    @State private var showsSignOutWarning = false
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
-    private let webWorkspaceURL = URL(string: "https://permitext-sync.vercel.app")!
-    private let privacyPolicyURL = URL(string: "https://permitext-sync.vercel.app/privacy")!
+    private let webWorkspaceURL = URL(string: "https://permitext.com")!
+    private let privacyPolicyURL = URL(string: "https://permitext.com/privacy")!
     private let privacyContactURL = URL(string: "mailto:permitext@gmail.com")!
 
     private var readerPreviewAccent: Color {
@@ -382,7 +383,11 @@ struct SettingsView: View {
             } else {
                 VStack(spacing: 10) {
                     Button {
-                        library.signOut()
+                        if library.requiresSignOutConfirmation {
+                            showsSignOutWarning = true
+                        } else {
+                            library.signOut()
+                        }
                     } label: {
                         Label("Sign Out", systemImage: "rectangle.portrait.and.arrow.right")
                             .font(.subheadline.weight(.semibold))
@@ -395,6 +400,14 @@ struct SettingsView: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .popover(
+                        isPresented: $showsSignOutWarning,
+                        attachmentAnchor: .rect(.bounds),
+                        arrowEdge: .bottom
+                    ) {
+                        signOutWarningPopover
+                            .presentationCompactAdaptation(.popover)
+                    }
 
                     Button(role: .destructive) {
                         showsAccountDeleteWarning = true
@@ -770,12 +783,12 @@ struct SettingsView: View {
 
     private var accountSummaryText: String {
         guard let account = library.signedInAccount else {
-            return "Sign in to attach local saved work to your account and test cross-device sync."
+            return "Sign in to sync saved sections, notes, and Projects across your devices."
         }
         if let displayName = account.displayName, !displayName.isEmpty {
-            return "Signed in as \(displayName). Saved work can sync through the connected backend."
+            return "Signed in as \(displayName). Saved sections, notes, and Projects can sync across your devices."
         }
-        return "Signed in with \(account.authProvider.rawValue). Saved work can sync through the connected backend."
+        return "Signed in with \(account.authProvider.rawValue). Saved sections, notes, and Projects can sync across your devices."
     }
 
     private var upgradeButtonTitle: String {
@@ -1082,6 +1095,46 @@ struct SettingsView: View {
             .buttonStyle(.borderedProminent)
             .tint(.red)
             .disabled(library.isAccountBusy)
+        }
+        .frame(width: 320, alignment: .leading)
+        .padding(24)
+    }
+
+    private var signOutWarningPopover: some View {
+        let pendingCount = library.pendingUserContentSyncCount
+        let conflictCount = library.userContentSyncConflicts.count
+        let pendingText = pendingCount == 1 ? "1 local change is waiting to sync" : "\(pendingCount) local changes are waiting to sync"
+        let conflictText = conflictCount == 1 ? "1 conflict needs review" : "\(conflictCount) conflicts need review"
+        let detail: String
+        if pendingCount > 0, conflictCount > 0 {
+            detail = "\(pendingText), and \(conflictText)."
+        } else if pendingCount > 0 {
+            detail = "\(pendingText)."
+        } else {
+            detail = "\(conflictText)."
+        }
+
+        return VStack(alignment: .leading, spacing: 18) {
+            Text("Sign out before syncing?")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text("\(detail) Your work remains on this iPhone, but it will not sync until you sign in again.")
+                .font(.body)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            Button("Sign Out Anyway", role: .destructive) {
+                showsSignOutWarning = false
+                library.signOut()
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(.red)
+
+            Button("Cancel", role: .cancel) {
+                showsSignOutWarning = false
+            }
+            .buttonStyle(.plain)
         }
         .frame(width: 320, alignment: .leading)
         .padding(24)

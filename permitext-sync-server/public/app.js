@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260725-visual-inventory-v13";
+} from "./offline-storage.js?v=20260726-web-reliability-v16";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -68,6 +68,8 @@ const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const connectionStatus = document.querySelector("#connection-status");
+const topbarBrand = document.querySelector(".topbar-brand");
+const topbarBrandPlan = document.querySelector(".topbar-brand-plan");
 const readerTemplate = document.querySelector("#reader-template");
 const projectsTemplate = document.querySelector("#projects-template");
 const searchTemplate = document.querySelector("#search-template");
@@ -1102,7 +1104,7 @@ function updateBrowserSectionURL(sectionID) {
 function sharedSectionURL(sectionID) {
   const normalizedID = String(sectionID || "").trim();
   if (!/^\d+$/.test(normalizedID)) return "";
-  return `https://permitext-sync.vercel.app/open/section/${normalizedID}`;
+  return `https://permitext.com/open/section/${normalizedID}`;
 }
 
 function showShareButtonResult(button, message) {
@@ -1974,6 +1976,132 @@ function showWebNotice(title, message, options = {}) {
   return openWebWarning({ title, message, ...options, confirmLabel: options.confirmLabel || "OK", cancellable: false });
 }
 
+function stripeRestoreIDError(value) {
+  const restoreID = String(value || "").trim();
+  if (!restoreID) return "Enter the Stripe ID from your Permitext receipt.";
+  if (!/^(?:cs_|sub_)[A-Za-z0-9_]+$/.test(restoreID)) {
+    return "Use a Stripe checkout session ID beginning with cs_ or a subscription ID beginning with sub_.";
+  }
+  return "";
+}
+
+function openStripeRestoreDialog(onSubmit) {
+  activeWebWarningClose?.(false);
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const titleID = `stripe-restore-title-${crypto.randomUUID()}`;
+  const messageID = `stripe-restore-message-${crypto.randomUUID()}`;
+  const inputID = `stripe-restore-input-${crypto.randomUUID()}`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("form");
+  dialog.className = "web-warning-dialog web-warning-form";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", titleID);
+  dialog.setAttribute("aria-describedby", messageID);
+  const heading = document.createElement("h2");
+  heading.className = "web-warning-title";
+  heading.id = titleID;
+  heading.textContent = "Restore a Stripe purchase";
+  const body = document.createElement("p");
+  body.className = "web-warning-message";
+  body.id = messageID;
+  body.textContent = "Copy the checkout session or subscription ID from your Permitext Stripe receipt.";
+  const label = document.createElement("label");
+  label.className = "web-warning-field";
+  label.htmlFor = inputID;
+  label.textContent = "Stripe purchase ID";
+  const input = document.createElement("input");
+  input.id = inputID;
+  input.type = "text";
+  input.autocomplete = "off";
+  input.autocapitalize = "none";
+  input.spellcheck = false;
+  input.placeholder = "cs_… or sub_…";
+  input.required = true;
+  const error = document.createElement("p");
+  error.className = "web-warning-form-error";
+  error.setAttribute("role", "alert");
+  error.hidden = true;
+  const actions = document.createElement("div");
+  actions.className = "web-warning-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "web-warning-button web-warning-cancel";
+  cancelButton.textContent = "Cancel";
+  const restoreButton = document.createElement("button");
+  restoreButton.type = "submit";
+  restoreButton.className = "web-warning-button web-warning-confirm";
+  restoreButton.textContent = "Restore";
+  actions.append(cancelButton, restoreButton);
+  label.append(input);
+  dialog.append(heading, body, label, error, actions);
+  backdrop.append(dialog);
+  document.body.append(backdrop);
+
+  return new Promise((resolve) => {
+    let settled = false;
+    const close = (restored) => {
+      if (settled) return;
+      settled = true;
+      backdrop.remove();
+      if (activeWebWarningClose === close) activeWebWarningClose = null;
+      previousFocus?.focus?.({ preventScroll: true });
+      resolve(restored);
+    };
+    const showError = (message) => {
+      error.textContent = message;
+      error.hidden = false;
+    };
+    activeWebWarningClose = close;
+    cancelButton.addEventListener("click", () => close(false));
+    dialog.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const restoreID = input.value.trim();
+      const validationError = stripeRestoreIDError(restoreID);
+      if (validationError) {
+        showError(validationError);
+        input.focus();
+        return;
+      }
+      error.hidden = true;
+      input.disabled = true;
+      cancelButton.disabled = true;
+      restoreButton.disabled = true;
+      restoreButton.textContent = "Restoring…";
+      try {
+        await onSubmit(restoreID);
+        close(true);
+      } catch (submitError) {
+        showError(submitError.message || "Could not restore this purchase.");
+        input.disabled = false;
+        cancelButton.disabled = false;
+        restoreButton.disabled = false;
+        restoreButton.textContent = "Restore";
+        input.focus();
+        input.select();
+      }
+    });
+    backdrop.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!restoreButton.disabled) close(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = [input, cancelButton, restoreButton].filter((element) => !element.disabled);
+      const activeIndex = focusable.indexOf(document.activeElement);
+      const nextIndex = event.shiftKey
+        ? (activeIndex <= 0 ? focusable.length - 1 : activeIndex - 1)
+        : (activeIndex + 1) % focusable.length;
+      event.preventDefault();
+      focusable[nextIndex].focus();
+    });
+    input.focus({ preventScroll: true });
+  });
+}
+
 function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -2354,16 +2482,55 @@ function updateConnectionStatus() {
     ? (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length
     : 0;
   const offline = navigator.onLine === false || !serverReachable;
+  const conflictLabel = conflicts === 1 ? "1 sync conflict" : `${conflicts} sync conflicts`;
+  const pendingLabel = pending === 1 ? "1 pending" : `${pending} pending`;
+  const statusKind = conflicts > 0
+    ? "conflict"
+    : offline
+      ? "offline"
+      : pending > 0
+        ? "pending"
+        : syncFlushPromise
+          ? "syncing"
+          : "clean";
   connectionStatus.classList.toggle("is-offline", offline);
   connectionStatus.classList.toggle("has-pending", pending > 0 || conflicts > 0);
+  connectionStatus.dataset.state = statusKind;
   connectionStatus.hidden = false;
   connectionStatus.textContent = offline
-    ? pending > 0 ? `Offline · ${pending} pending` : "Offline"
-    : conflicts > 0 ? "Review sync"
+    ? conflicts > 0 ? `Offline · ${conflictLabel}`
+      : pending > 0 ? `Offline · ${pendingLabel}`
+        : "Offline"
+    : conflicts > 0 ? conflictLabel
       : syncFlushPromise ? "Syncing"
-        : pending > 0 ? `${pending} pending`
+        : pending > 0 ? pendingLabel
           : account ? "Synced" : "Online";
+  const conflictActionAvailable = statusKind === "conflict";
+  connectionStatus.classList.toggle("is-actionable", conflictActionAvailable);
+  connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status");
+  if (conflictActionAvailable) {
+    connectionStatus.tabIndex = 0;
+    connectionStatus.title = "Review sync conflicts in Settings";
+    connectionStatus.setAttribute("aria-label", `${connectionStatus.textContent}. Review sync conflicts in Settings.`);
+  } else {
+    connectionStatus.removeAttribute("tabindex");
+    connectionStatus.removeAttribute("title");
+    connectionStatus.setAttribute("aria-label", `Sync status: ${connectionStatus.textContent}`);
+  }
+  updateTopbarPlanBadge();
 }
+
+function openConnectionStatusConflictReview() {
+  if (connectionStatus?.dataset.state !== "conflict") return;
+  void focusUtility("settings");
+}
+
+connectionStatus?.addEventListener("click", openConnectionStatusConflictReview);
+connectionStatus?.addEventListener("keydown", (event) => {
+  if (connectionStatus.dataset.state !== "conflict" || !["Enter", " "].includes(event.key)) return;
+  event.preventDefault();
+  openConnectionStatusConflictReview();
+});
 
 function isSessionAuthenticationError(error) {
   return Number(error?.status) === 401;
@@ -2390,6 +2557,15 @@ function currentPlan() {
   if (entitlement?.plan !== "pro") return "free";
   const expiration = Date.parse(entitlement.expiresAt || "");
   return Number.isFinite(expiration) && expiration <= Date.now() ? "free" : "pro";
+}
+
+function updateTopbarPlanBadge() {
+  if (!topbarBrand || !topbarBrandPlan) return;
+  const signedIn = Boolean(activeAccount());
+  const planLabel = currentPlan() === "pro" ? "Pro" : "Free";
+  topbarBrandPlan.hidden = !signedIn;
+  topbarBrandPlan.textContent = planLabel;
+  topbarBrand.setAttribute("aria-label", signedIn ? `permitext ${planLabel} plan` : "permitext");
 }
 
 function isProAccount() {
@@ -11960,6 +12136,16 @@ async function openProjectSavedSection(project, item) {
 }
 
 function showProjectCreateSheet(panel, project = null) {
+  if (!project && !hasCapability("projects")) {
+    const account = activeAccount();
+    void presentPlanLimitNotice(
+      "Projects require Pro",
+      account
+        ? "Upgrade to Pro before creating a Project workspace."
+        : "Sign in and upgrade to Pro before creating a Project workspace."
+    );
+    return;
+  }
   panel.querySelector(".project-sheet-overlay")?.remove();
   const isEditing = Boolean(project);
   const identity = isEditing ? projectIdentity(project) : null;
@@ -14257,7 +14443,7 @@ function renderSettings() {
     deleteAccountButton.hidden = !account;
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
-    accountCopy.textContent = "Sign in to attach local saved work to your account and use cross-device sync.";
+    accountCopy.textContent = "Sign in to sync saved sections, notes, and Projects across your devices.";
     renderSyncState();
     void renderOfflineState();
   };
@@ -14296,6 +14482,22 @@ function renderSettings() {
   });
   signOutButton.addEventListener("click", async () => {
     const account = activeAccount();
+    if (account) {
+      const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length;
+      const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length;
+      if (pending > 0 || conflicts > 0) {
+        const details = [
+          pending > 0 ? `${pending} ${pending === 1 ? "change is" : "changes are"} waiting to sync` : "",
+          conflicts > 0 ? `${conflicts} sync ${conflicts === 1 ? "conflict needs" : "conflicts need"} review` : ""
+        ].filter(Boolean).join(", and ");
+        const confirmed = await confirmWebWarning(
+          "Sign out with unfinished sync?",
+          `${details}. This work will remain on this device and can resume when you sign back in to this account.`,
+          { confirmLabel: "Sign Out" }
+        );
+        if (!confirmed) return;
+      }
+    }
     signOutButton.disabled = true;
     try {
       if (account) {
@@ -14477,20 +14679,23 @@ function renderSettings() {
   planSecondaryButton.addEventListener("click", async () => {
     const account = activeAccount();
     if (!account) return;
-    const restoreID = window.prompt("Enter the Stripe checkout session or subscription ID from your purchase receipt.");
-    if (!restoreID) return;
     planSecondaryButton.disabled = true;
-    try {
-      const payload = await postJSON("/billing/stripe/restore", {
-        auth: { accountUserID: account.userID },
-        restoreID
-      }, { token: account.sessionToken });
+    const restored = await openStripeRestoreDialog(async (restoreID) => {
+      const payload = await postJSON(
+        "/billing/stripe/restore",
+        {
+          auth: { accountUserID: account.userID },
+          restoreID
+        },
+        { token: account.sessionToken }
+      );
       storeAccountEntitlement(payload.entitlement || null);
+    });
+    if (restored) {
       await renderWorkspace();
-    } catch (error) {
-      setStatus(error.message || "Could not restore this purchase.", true);
-      planSecondaryButton.disabled = false;
+      return;
     }
+    planSecondaryButton.disabled = false;
   });
   syncButton.addEventListener("click", async () => {
     syncButton.disabled = true;

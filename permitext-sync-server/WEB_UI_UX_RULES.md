@@ -26,7 +26,8 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Show `permitext` as the brand.
 - Do not show `New York City` in the top menu.
 - Top menu actions should be text/buttons, not large pill bubbles.
-- Keep these actions available and grouped by intent: `Reader`, `Search`, `Saved`, `Projects`, `Research`, and `Settings`.
+- Keep these actions available and grouped by intent: `Reader`, `Search`, `Saved`, `Research`, and `Settings`.
+- Keep Projects inside the `Saved` workspace entry instead of adding a second top-menu action. The Projects summary appears first in Saved and opens Project details as adjacent workspace columns.
 - Search, saved, and settings should stay visually secondary to reader work.
 
 ## Readers
@@ -60,9 +61,9 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Saved sections, projects, tags, and notes should behave consistently with the iOS app.
 - Saved should be available from the top menu.
 - Keep the iOS Saved order: title with sort and PDF export actions, code-book filters, tag filters when tags exist, then code-book and chapter groups.
-- The web Saved column intentionally omits the iOS Projects folder; Projects remains its own adjacent web workspace tool.
+- The web Saved column intentionally includes a compact Projects summary before saved-section controls. Project details, Notebook, Report Draft, and Workboards open as adjacent workspace columns.
 - Saved sorting, filtering, PDF export, notes, tags, bookmark status, and open-item behavior should match their iOS counterparts.
-- Present Saved and Projects as adjacent parts of `Your workspace`: Saved is the inbox for bookmarks, notes, and tags; Projects organize job-specific work and Workboards. Keep their data models distinct.
+- Present Saved and Projects as coordinated parts of `Your workspace`: Saved is the single top-menu entry and inbox for bookmarks, notes, and tags; its Projects summary organizes job-specific work and Workboards. Keep their data models distinct.
 - Project and saved-section interactions should not require learning a separate web-only workflow unless the web layout makes it clearly better.
 
 ## Research
@@ -102,7 +103,7 @@ The web app is a working desk, not a phone screen stretched wider. It should fee
 - Reader and chrome typography can scale independently without a global `!important` lock.
 - Chapter text appears after choosing a chapter.
 - Section selection jumps within chapter text instead of controlling whether text exists.
-- Search, Saved, Projects, Research, and Settings are accessible without disrupting existing readers.
+- Search, Saved (including its Projects summary), Research, and Settings are accessible without disrupting existing readers.
 - Canonical inline section references remain text-identical while becoming keyboard- and pointer-accessible.
 - Research and private notes carry visible authority labels.
 - Opening, closing, adding, removing, reordering, or resizing panes should not flash the workspace empty.

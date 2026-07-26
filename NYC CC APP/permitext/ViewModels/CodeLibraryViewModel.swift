@@ -39,6 +39,17 @@ enum ProjectHubLoadError: LocalizedError {
     }
 }
 
+enum SectionDetailLoadResult {
+    case loaded(ReaderSectionDetail)
+    case missing
+    case failed(String)
+}
+
+enum NoteSaveResult: Equatable {
+    case saved
+    case failed(persistedBody: String, message: String)
+}
+
 @MainActor
 final class CodeLibraryViewModel: ObservableObject {
     private struct AuthoredContentSnapshot: Sendable {
@@ -1228,9 +1239,9 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func loadSectionDetailAsync(sectionID: Int64) async -> ReaderSectionDetail? {
+    func loadSectionDetailResultAsync(sectionID: Int64) async -> SectionDetailLoadResult {
         if let cached = cachedSectionDetail(for: sectionID) {
-            return cached
+            return .loaded(cached)
         }
         if let authoredCodeStore {
             // Move the synchronous JSON read off the MainActor so the
@@ -1240,22 +1251,44 @@ final class CodeLibraryViewModel: ObservableObject {
             }.value
             if let detail {
                 storeSectionDetailInCache(detail, sectionID: sectionID)
+                return .loaded(detail)
             }
-            return detail
+            return .missing
         }
 
-        guard let sqliteChapterLoader else {
-            return loadSectionDetail(sectionID: sectionID)
+        if let sqliteChapterLoader {
+            do {
+                let detail = try await sqliteChapterLoader.sectionDetail(sectionID: sectionID)
+                if let detail {
+                    storeSectionDetailInCache(detail, sectionID: sectionID)
+                    return .loaded(detail)
+                }
+                return .missing
+            } catch {
+                statusMessage = error.localizedDescription
+                return .failed(error.localizedDescription)
+            }
         }
 
+        guard let codeDatabase else { return .missing }
         do {
-            let detail = try await sqliteChapterLoader.sectionDetail(sectionID: sectionID)
+            let detail = try codeDatabase.sectionDetail(sectionID: sectionID)
             if let detail {
                 storeSectionDetailInCache(detail, sectionID: sectionID)
+                return .loaded(detail)
             }
-            return detail
+            return .missing
         } catch {
             statusMessage = error.localizedDescription
+            return .failed(error.localizedDescription)
+        }
+    }
+
+    func loadSectionDetailAsync(sectionID: Int64) async -> ReaderSectionDetail? {
+        switch await loadSectionDetailResultAsync(sectionID: sectionID) {
+        case .loaded(let detail):
+            return detail
+        case .missing, .failed:
             return nil
         }
     }
@@ -1479,7 +1512,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     static func deepLinkedSectionID(from url: URL) -> Int64? {
         guard url.scheme?.lowercased() == "https",
-              url.host?.lowercased() == "permitext-sync.vercel.app" else {
+              isAcceptedWebHost(url.host) else {
             return nil
         }
         let components = url.pathComponents.filter { $0 != "/" }
@@ -1495,7 +1528,7 @@ final class CodeLibraryViewModel: ObservableObject {
 
     static func organizationInvitationToken(from url: URL) -> String? {
         guard url.scheme?.lowercased() == "https",
-              url.host?.lowercased() == "permitext-sync.vercel.app",
+              isAcceptedWebHost(url.host),
               url.path == "/" || url.path.isEmpty,
               let token = URLComponents(url: url, resolvingAgainstBaseURL: false)?
                 .queryItems?
@@ -1509,7 +1542,12 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     static func sharedSectionURL(sectionID: Int64) -> URL {
-        URL(string: "https://permitext-sync.vercel.app/open/section/\(sectionID)")!
+        URL(string: "https://permitext.com/open/section/\(sectionID)")!
+    }
+
+    private static func isAcceptedWebHost(_ host: String?) -> Bool {
+        guard let host = host?.lowercased() else { return false }
+        return host == "permitext.com" || host == "permitext-sync.vercel.app"
     }
 
     static func officialSectionCitation(
@@ -2029,6 +2067,10 @@ final class CodeLibraryViewModel: ObservableObject {
         hasCapability(.projects)
     }
 
+    var hasTagAccess: Bool {
+        currentPlan == .pro
+    }
+
     var hasResearchAccess: Bool {
         hasCapability(.research)
     }
@@ -2067,6 +2109,21 @@ final class CodeLibraryViewModel: ObservableObject {
         entitlementPrompt = requirement
         statusMessage = requirement.message
         return false
+    }
+
+    @discardableResult
+    func requireTagAccess() -> Bool {
+        guard hasTagAccess else {
+            let requirement = EntitlementRequirement(
+                feature: .advancedOrganization,
+                requiredPlan: .pro,
+                message: "Upgrade to Pro to add and edit tags."
+            )
+            entitlementPrompt = requirement
+            statusMessage = requirement.message
+            return false
+        }
+        return true
     }
 
     func showUpgradePlaceholder() {
@@ -2289,6 +2346,9 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func scheduleUserContentAutoSync() {
         guard signedInAccount != nil else { return }
+        // Keep sign-out safety and the Settings sync state current even when
+        // the device is offline and the delayed automatic sync cannot run.
+        refreshPendingUserContentSyncCount()
         userContentAutoSyncTask?.cancel()
         userContentAutoSyncTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 800_000_000)
@@ -2650,6 +2710,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 try? await accountBackendClient.signOut(account: account)
             }
         }
+    }
+
+    var requiresSignOutConfirmation: Bool {
+        pendingUserContentSyncCount > 0 || !userContentSyncConflicts.isEmpty
     }
 
     @discardableResult
@@ -3053,20 +3117,29 @@ final class CodeLibraryViewModel: ObservableObject {
         return (try? userContentRepository.noteBlockIDs(sectionID: sectionID, codeVersion: selectedVersion.codeVersion)) ?? []
     }
 
-    func saveNote(sectionID: Int64, body: String) {
+    @discardableResult
+    func saveNote(sectionID: Int64, body: String) -> NoteSaveResult {
         saveNote(sectionID: sectionID, blockID: "", body: body)
     }
 
-    func saveNote(sectionID: Int64, blockID: String, body: String) {
-        guard let selectedVersion, let userContentRepository else { return }
+    @discardableResult
+    func saveNote(sectionID: Int64, blockID: String, body: String) -> NoteSaveResult {
+        let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let selectedVersion, let userContentRepository else {
+            let message = "The note could not be saved because code content is unavailable."
+            statusMessage = message
+            return .failed(persistedBody: "", message: message)
+        }
         do {
-            let normalizedBlockID = blockID.trimmingCharacters(in: .whitespacesAndNewlines)
             let trimmedBody = body.trimmingCharacters(in: .whitespacesAndNewlines)
             let existingBody = try userContentRepository.noteBody(sectionID: sectionID, blockID: normalizedBlockID, codeVersion: selectedVersion.codeVersion)
             if !trimmedBody.isEmpty && existingBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 let noteCount = try noteCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateNote(currentCount: noteCount)) else {
-                    return
+                    return .failed(
+                        persistedBody: existingBody,
+                        message: statusMessage ?? "The note was not saved."
+                    )
                 }
             }
             // Note edits do not change the bookmark set, so we skip the heavy
@@ -3078,8 +3151,15 @@ final class CodeLibraryViewModel: ObservableObject {
                 bookmarkRevision &+= 1
             }
             scheduleUserContentAutoSync()
+            return .saved
         } catch {
             statusMessage = error.localizedDescription
+            let persistedBody = (try? userContentRepository.noteBody(
+                sectionID: sectionID,
+                blockID: normalizedBlockID,
+                codeVersion: selectedVersion.codeVersion
+            )) ?? ""
+            return .failed(persistedBody: persistedBody, message: error.localizedDescription)
         }
     }
 

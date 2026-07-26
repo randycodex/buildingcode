@@ -396,6 +396,7 @@ struct ChapterHTMLReaderView: View {
                 projects: library.folders,
                 projectMemberIDs: Set(library.folderMembership[target.detail.id] ?? []),
                 initialTags: library.tags(sectionID: target.detail.id, blockID: target.blockID),
+                isTagEditingAvailable: library.hasTagAccess,
                 isBookmarked: library.isBookmarked(sectionID: target.detail.id),
                 onToggleBookmark: {
                     let isBookmarked = library.toggleBookmark(sectionID: target.detail.id)
@@ -414,9 +415,13 @@ struct ChapterHTMLReaderView: View {
                     recomputeSavedDecorations()
                     return library.tags(sectionID: target.detail.id, blockID: target.blockID)
                 },
+                onRequireTagAccess: {
+                    library.requireTagAccess()
+                },
                 onSave: { body in
-                    library.saveNote(sectionID: target.detail.id, blockID: target.blockID, body: body)
+                    let result = library.saveNote(sectionID: target.detail.id, blockID: target.blockID, body: body)
                     recomputeSavedDecorations()
+                    return result
                 }
             )
         }

@@ -182,6 +182,46 @@ body.is-resizing-notes * {
   line-height: 1.5;
 }
 
+.web-warning-field {
+  display: grid;
+  gap: 7px;
+  margin-top: 18px;
+  color: var(--text-primary);
+  font-size: 13px;
+  font-weight: 650;
+  text-transform: none;
+}
+
+.web-warning-field input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.web-warning-field input:focus-visible {
+  border-color: color-mix(in srgb, var(--code-accent) 58%, var(--border));
+  outline: 2px solid color-mix(in srgb, var(--code-accent) 28%, transparent);
+  outline-offset: 1px;
+}
+
+.web-warning-form-error {
+  margin: 8px 0 0;
+  color: #b42318;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.web-warning-form-error[hidden] {
+  display: none;
+}
+
 .web-warning-actions {
   display: flex;
   justify-content: flex-end;
@@ -397,6 +437,21 @@ textarea:focus-visible {
 .connection-status.has-pending:not(.is-offline) {
   background: color-mix(in srgb, var(--code-accent) 13%, var(--surface));
   color: var(--code-accent);
+}
+
+.connection-status.is-actionable {
+  cursor: pointer;
+}
+
+.connection-status.is-actionable:hover,
+.connection-status.is-actionable:focus-visible {
+  background: color-mix(in srgb, var(--code-accent) 19%, var(--surface));
+  color: var(--code-accent);
+}
+
+.connection-status.is-actionable:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--code-accent) 52%, transparent);
+  outline-offset: 2px;
 }
 
 .topbar-brand-name {
@@ -7600,6 +7655,19 @@ button.project-studio-metric:focus-visible {
   }
 
   .topbar-account-state {
+    display: contents;
+  }
+
+  .connection-status {
+    position: fixed;
+    right: max(10px, env(safe-area-inset-right));
+    bottom: calc(var(--header-height) + max(8px, env(safe-area-inset-bottom)));
+    z-index: 900;
+    min-height: 30px;
+    box-shadow: 0 4px 16px color-mix(in srgb, #000000 16%, transparent);
+  }
+
+  .connection-status:not([data-state="offline"]):not([data-state="pending"]):not([data-state="conflict"]) {
     display: none;
   }
 

@@ -1,455 +1,100 @@
-# Permitext bug audit (iOS + web)
-
-**Branch reviewed:** `codex/New-Changes` (`322a12e4`)
-**Remediation branch:** `main` (work began at `24c91d08`)
-**Workspace:** `/Users/randy/Documents/X_CODING/Building Code`
-**Date:** 2026-07-26
-**Scope:** iOS app (`NYC CC APP/permitext/`) and web/backend (`permitext-sync-server/`)
-**Current validation:** the calibrated P0/P1 fixes and the selected P2/P3 and hardening remediation described below are implemented locally. `npm run check`, direct server smoke, prepared-content verification, file-storage hardening, and all 24 iOS `EntitlementAndSyncContractTests` pass. Production deployment `dpl_DjixmFTPXTMLmUwFh46D1pyAj1jP` is `READY` on commit `4bf190ac4eb9140629200960cc9c07b9d0773315`; its health endpoint reports PostgreSQL `normalized-v4` and PostgreSQL rate limiting, and its web search/reader/deep-link walkthrough passed without browser or runtime errors. The continuity, SQLite, timing-safe-admin, documentation, and copy changes after that commit remain local. Direct PostgreSQL integration could not run because the locally pulled production environment contains no database credential value. Nothing in this audit proves the new local SQL in production or App Store configuration.
-
-Severity:
-
-- **Critical:** demonstrated ship, data-integrity, or billing blocker.
-- **High:** demonstrated correctness or cost-control defect that should be fixed before broad release.
-- **Medium:** real reliability, compatibility, or incomplete-product behavior with narrower reach.
-- **Hardening / policy:** worthwhile defense or explicit design decision, but not a demonstrated current exploit or independent production failure.
-
-Passing contract and smoke tests do not disprove an untested ordering, concurrency, or client-runtime defect.
-
----
-
-## Critical
-
-### 1. iOS: a queued delete can be consumed before it uploads
-
-**Platforms:** iOS → server truth
-**Status:** fixed locally; regression-tested for a queued bookmark delete, older live server state, newer competing server state, and server tombstone handling
-
-Local bookmark, note, Project, and Project-membership deletions hard-remove their SQLite rows and enqueue delete mutations. Automatic sync then pulls before pushing.
-
-If that pull contains the still-live server record—for example after a checkpoint reset, a full pull, or a newer server event—the merge path behaves as follows:
-
-1. The deleted row no longer exists.
-2. `localMergeCandidate` does not consult ordinary pending delete queue entries.
-3. The resolver treats the record as “missing locally” and selects `applyServer`.
-4. The live server record is inserted locally.
-5. `discardQueuedMutation` marks the matching queued delete as synced without uploading it.
-
-An ordinary incremental pull with no matching server event will not reproduce this every time; the defect is an ordering-dependent resurrection, not a guarantee that every deletion fails.
-
-**Impact:** A deletion can reappear on the same device and never reach the server.
-
-**Implemented**
-
-- Pending per-record queue mutations now participate in merge-candidate construction even after a local row was hard-deleted.
-- An older live server record leaves the queued delete in place for upload; a newer live server record becomes an explicit conflict.
-- Server tombstones use the normal `applyServer` path instead of sharing an overloaded delete action.
-- Deterministic SQLite-backed coverage proves the bookmark resurrection path. Note, Project, and Project-membership matrix expansion remains worthwhile.
-
-**Primary evidence**
-
-- `UserDataStore.toggleBookmark`, note deletion, and Project deletion hard-remove rows and queue deletes.
-- `CodeLibraryViewModel.performAutomaticUserContentSync` pulls before pushing.
-- `UserDataStore.localMergeCandidates` derives ordinary candidates from rows, not queued per-record deletes.
-- `UserContentMergeResolver.decision` applies a server record when the local row is missing.
-- `UserContentSyncEngine.applySafeRemoteChanges` discards queued mutations after `applyServer`.
-
----
-
-### 2. Web: Stripe checkout can create or restore Pro without an expiry
-
-**Platforms:** Web / billing
-**Status:** fixed locally; contract and smoke coverage pass
-
-`checkout.session.completed` persists a Pro entitlement without `expiresAt`. `hasActiveProEntitlement` treats an absent or invalid expiry as indefinitely active.
-
-This has two failure modes:
-
-- A completed subscription checkout can grant Pro before a dated subscription lifecycle event is processed.
-- A delayed or retried checkout event can arrive after `customer.subscription.updated` and replace a dated entitlement with an undated one.
-
-The checkout condition also accepts every `mode === "subscription"` completion regardless of `payment_status`.
-
-**Impact:** Billing bypass or stale Pro access; legacy Research inclusion rules can amplify the entitlement.
-
-**Implemented**
-
-- Checkout grants only a completed subscription with `paid` or `no_payment_required` status.
-- Checkout creates a 15-minute provisional entitlement rather than an undated grant.
-- Same-subscription updates preserve the later known expiry, and Stripe event timestamps prevent an older event from replacing newer provider state.
-- Unpaid checkout and delayed/out-of-order entitlement cases are covered. Full duplicate/cancel/delete order permutations remain useful integration coverage.
-
-**Primary evidence**
-
-- `permitext-sync-server/app.mjs`: `checkout.session.completed`
-- `permitext-sync-server/entitlement-contract.mjs`: `hasActiveProEntitlement`
-- `entitlementWithPackage` omits `expiresAt` when the caller supplies none.
-
----
-
-## High
-
-### 3. iOS: backend lifetime Pro can be cleared by the local grant lookup
-
-**Status:** fixed locally
-
-`applyBackendEntitlement` does not preserve `.lifetimeGrant` when a later backend response is nil or non-Pro. More directly, the normal sign-in flow applies the backend entitlement and later calls `refreshLifetimeGrant`. Its default `LocalLifetimeGrantLookupClient` returns no grant in release builds, so a currently applied lifetime grant can be cleared immediately.
-
-Cached web Pro should not automatically override authoritative backend revocation, so “web Pro must always be preserved” is not the correct fix.
-
-**Impact:** A valid backend lifetime user can appear Free on iOS.
-
-**Implemented**
-
-- Release-mode local lookup results are explicitly non-authoritative and cannot clear a backend lifetime grant.
-- Debug lookup remains authoritative for local grant testing.
-- The denial-authority contract is covered; the full sign-in/account-switch matrix remains future integration coverage.
-
----
-
-### 4. Web: Research monthly quota is check-then-spend
-
-**Status:** fixed locally; production PostgreSQL execution still needs deployment verification
-
-The Research message path reads monthly usage, checks the limit, performs the paid OpenAI call, and only then inserts usage. Concurrent requests can all pass the same check.
-
-The per-process IP rate limiter reduces some abuse but does not make the monthly account quota atomic across tabs, instances, or regions.
-
-**Impact:** Paid model spend can exceed the configured monthly account limit.
-
-**Implemented**
-
-- PostgreSQL reserves a usage row with a serializable conditional insert and serialization retries before the model call.
-- File storage serializes reservation operations per account within the local process.
-- Successful calls convert the reservation into usage; failures release it; stale crash reservations stop consuming allowance after 15 minutes.
-- A live PostgreSQL parallel-boundary test remains necessary before calling the production behavior verified.
-
----
-
-### 5. PostgreSQL sync rejections omit reason codes
-
-**Status:** fixed locally; pure reason classification is covered and the server suite passes
-
-The PostgreSQL repository returns accepted and rejected IDs but no `rejectionReasons`. The file-store path returns proper plan-limit codes. Web and iOS clients fall back to generic “server has newer data” conflict messaging.
-
-This affects all PostgreSQL rejection causes, not only Free-plan quota failures.
-
-**Impact:** Users cannot distinguish a plan limit from a last-write-wins conflict, and recovery/upgrade guidance is wrong.
-
-**Implemented**
-
-- The PostgreSQL transaction captures rejection context and returns a reason for every rejected mutation.
-- Quota, Pro-required capability, ownership, stale-server, equal-timestamp, and generic rejection codes are distinguished.
-- Contract coverage proves quota, stale-write, and ownership classification. Live PostgreSQL and rendered-client coverage remain follow-ups.
-
----
-
-## Medium
-
-### 6. PostgreSQL compatibility-store reads omit Workboards
-
-**Status:** fixed locally; source-contract and server smoke coverage pass, while a live PostgreSQL deployment check remains necessary
-
-`readNormalizedStore` reconstructs saved items, annotations, Projects, Project items, continuity, and clear mutations, but omits Workboards. Normal PostgreSQL sync pull uses the dedicated sync repository and can still return Workboards; the defect is narrower than general Workboard sync failure.
-
-Compatibility helpers such as `userContentMutations`, Workboard-target existence checks, legacy migration, and some asset-scope checks can therefore see an incomplete view.
-
-The PostgreSQL comments table is also absent from this compatibility read, but comment mutations are not currently accepted by `allowedMutationKinds`; that is a separate unfinished surface rather than a completed sync contract.
-
-**Implemented**
-
-- PostgreSQL normalized compatibility reads now include `workboard` records.
-- Smoke coverage protects the compatibility query from dropping Workboards again.
-
-### 7. File-store mutations use unlocked read-modify-write
-
-**Status:** fixed locally; concurrent mutation and stale-lock recovery coverage passes
-
-The JSON adapter now serializes mutating requests through an inter-process lock with stale-owner recovery and heartbeat renewal, then persists by fsync plus atomic same-directory replacement. Concurrent invitation acceptance/revocation smoke coverage now reaches one terminal outcome without overwriting a competing mutation.
-
-Production phone-to-web sync should still use PostgreSQL; this fix makes the local adapter reliable for its intended development and single-host uses, not a shared serverless database.
-
-### 8. iOS Free counters are scoped per code version
-
-**Status:** fixed locally; SQLite-backed two-code-version regression coverage passes
-
-iOS checks saved-section and note limits with `WHERE code_version = ?`, allowing 25 saves and 10 notes in each code package. Server enforcement counts across the account.
-
-**Impact:** iOS can allow an action that PostgreSQL later rejects. Align the client preview count with the server account-wide contract.
-
-**Implemented**
-
-- The iOS user-content repository now exposes account-wide saved-section and non-empty-note totals.
-- Free-plan decisions use those totals while code-specific reader counts remain available for their original UI purposes.
-- Regression coverage proves 24 + 1 saved sections and 9 + 1 notes across two code versions reach the account-wide limit.
-
-### 9. Legacy SQLite FTS passes raw user syntax to `MATCH`
-
-**Status:** fixed locally; SQLite-backed operator, punctuation, and malformed-quote tests pass
-
-The legacy SQLite search path now escapes embedded quotes and binds user input as a literal FTS5 phrase rather than executable FTS syntax.
-
-### 10. Deep-link code selection depends on a numeric ID threshold
-
-**Status:** fixed locally; Construction and Zoning resolution tests pass
-
-iOS now resolves the containing bundled code version through authored-content metadata or the SQLite section catalog. It no longer infers the code from a numeric ID threshold.
-
-### 11. `setVerifiedPlan(.pro)` can replace package metadata
-
-**Status:** fixed locally; focused entitlement metadata and StoreKit-fallback tests pass
-
-StoreKit verification writes `.appleSubscriptionPro` as the complete local entitlement. That can temporarily remove package, add-on, legacy-Research, and provider fields from a previously stored backend entitlement.
-
-Preserve verified StoreKit state separately from the backend package record, then resolve capabilities without overwriting either source.
-
-**Implemented**
-
-- StoreKit verification persists only the verified Apple plan.
-- Backend entitlement records remain separately encoded with their package, provider, granted-user, and add-on metadata intact.
-- Capability resolution prefers an active authoritative backend record and falls back to verified Apple Pro when no active backend Pro grant exists.
-
-### 12. Rate limits are advisory rather than distributed controls
-
-**Status:** fixed locally; concurrency and fail-closed contracts pass; live PostgreSQL execution remains unverified
-
-PostgreSQL deployments now atomically increment hashed client, verified-account, and verified-administrator buckets shared across instances. Forwarded addresses are trusted only on Vercel or when an explicit trusted-proxy setting is enabled. PostgreSQL limiter failures return `503` with `Retry-After` rather than silently downgrading to process-local limits.
-
-The bounded in-memory implementation remains only for the intentional JSON-file adapter.
-
-### 13. Report APIs do not consistently use Project storage ownership
-
-**Status:** fixed locally; shared Editor/Reviewer smoke coverage passes
-
-Several Report draft/generate paths resolve `ownedProjectRecord(context.userID, projectID)` and persist under the personal caller rather than using `requireProjectPermission` plus `access.storageOwnerUserID`.
-
-**Impact:** Organization members can be denied valid shared-project behavior or create fragmented personal artifacts.
-
-**Implemented**
-
-- Report sources, Drafts, history, manifests, generated files, and activity resolve the caller's Project permission.
-- Reads and writes use the Project's stable `storageOwnerUserID` and organization owner scope.
-- Reviewers can read and download; Editors can create organization-owned Drafts; unauthorized mutation returns the Project-permission error.
-
-### 14. Workboard upload/delete authorization is not aligned with Organization ACLs
-
-**Status:** fixed locally; shared Project read/write/deny smoke coverage passes
-
-Workboard read uses Project permission and storage-owner resolution, while upload/delete still rely on personal `ownsProjectAssetScope` checks.
-
-Align all three operations with the same Project access object, permission, and `storageOwnerUserID`.
-
-**Implemented**
-
-- Preview and image mutations require Project edit permission and use the Project's storage owner.
-- Organization Editors can publish a preview that the Owner sees; Reviewer mutation is denied.
-- The legacy personal Workboard asset scope remains supported for a drawing created before its Project record exists.
-
-### 15. Organization seat and duplicate-invite checks can race
-
-**Status:** fixed locally for invitation reservation, acceptance, revocation, and reactivation; live PostgreSQL concurrency still needs deployment verification
-
-Seat usage and duplicate invitation checks occur before invitation persistence without one serializable operation or uniqueness constraint. Concurrent invitations can reserve more seats than allowed or create duplicate active invitations.
-
-Acceptance and member-reactivation paths should use the same transactional seat ledger.
-
-**Implemented**
-
-- PostgreSQL uses serializable transactions plus an organization-scoped advisory lock for invitation reservation, invitation state changes, acceptance, and seat-bound reactivation.
-- The local file adapter mirrors the organization lock within one process.
-- Smoke coverage races duplicate invitations, final-seat reservations, and repeated acceptance of one token.
-
-### 16. File-store sessions are reused on re-login
-
-**Status:** fixed locally; smoke coverage proves old-token rejection and new-token acceptance
-
-Every successful file-store sign-in now issues a fresh token and invalidates the previous one, including the Apple web callback path.
-
-### 17. Upgrade copy contradicts the Free entitlement contract
-
-**Status:** fixed locally; a copy regression test is added and builds, but its focused simulator execution was canceled before XCTest launched
-
-Free enables continuity and cross-device sync, and Settings explains that correctly. `professionalWorkspaceRequirement` still says:
-
-> Upgrade to Pro to unlock unlimited saved work, PDF export, tags, continuity, and cross-device sync.
-
-Remove continuity and cross-device sync from that Pro-only message.
-
-The corrected message names unlimited saved work and notes, Projects, professional exports, tags, and offline access without presenting Free continuity or cross-device sync as paid features.
-
-### 18. Prepared section-body coverage is incomplete
-
-Current content-integrity result:
-
-| Measure | Count |
-|---|---:|
-| Chapters | 118 |
-| Published/indexed sections | 12,891 |
-| Prepared section bodies | 11,610 |
-| Explicit structural/title-only entries | 1,281 (9.94%) |
-| Referenced images | 273 |
-| Known duplicate display keys | 8 |
-
-Coverage increased from 80.45% to 90.06% by adding 1,239 exact, deterministically extracted slices of the bundled canonical chapter HTML. The remaining 62 official headings with no body and 1,219 nested/title-only catalog rows are recorded in `prepared/structural-sections.json`; they are no longer an unclassified content gap. Duplicate display numbers require a unique normalized-title match rather than accepting an ambiguous first match.
-
-The gap matters for structured section detail, Research eligibility, rich snippets, and any feature that promises an independently addressable canonical body. Product copy should not imply complete structured-body coverage until the gap is closed.
-
----
-
-## Hardening, policy decisions, and intentional asymmetries
-
-These are useful follow-ups, but the current evidence does not support presenting them as independent High-severity production failures.
-
-### A. The `deleteLocal` merge action is overloaded
-
-The resolver uses `deleteLocal` for both:
-
-- “the local deletion should remain and upload,” and
-- “the server tombstone should delete the local record.”
-
-Applying the incoming server mutation is correct for the second case and wrong for the first. Current local delete paths hard-remove rows, so the first branch is not demonstrated as a separate normal production path.
-
-Split the action into `applyServerDelete` and `keepLocalDeleteAndUpload`, cover both in tests, and treat this as part of Critical finding #1 rather than a second P0.
-
-### B. WKWebView cleanup and navigation policy
-
-**Status:** fixed locally; navigation-policy and teardown tests pass
-
-Chapter and table web views now restrict top-level navigation to expected local content (plus `about:blank`). Chapter teardown cancels guarded asynchronous loads, clears delegates, stops loading, and removes script handlers and user scripts.
-
-### C. Continuity uses whole-snapshot last-write-wins
-
-**Status:** fixed locally; pure merge, file-backed smoke, iOS resolver, and live-PostgreSQL regression coverage added
-
-Continuity is now an explicitly convergent, bounded per-entry history. Recently viewed sections deduplicate by section ID and retain the newest `viewedAt` entry. Recent searches retain a backward-compatible hidden per-query clock while continuing to publish the legacy string array expected by existing clients. Both histories have deterministic ordering and preserve the existing 20-view and 10-search limits.
-
-The file adapter performs this merge inside its inter-process storage lock. PostgreSQL uses an optimistic row-version compare-and-swap and retries against the latest record, so concurrent or out-of-order device snapshots re-merge instead of falling back to whole-record last-write-wins. The accepted record and its sync event are written by one data-modifying CTE, preventing an unaccepted CAS attempt from emitting an event. iOS also keeps a pending continuity upload authoritative until it reaches this server merge.
-
-### D. SQLite durability/concurrency pragmas are minimal
-
-**Status:** fixed locally; SQLite-backed pragma coverage passes
-
-Writable SQLite connections now use WAL so readers can continue during short write transactions, and every connection uses a five-second `busy_timeout` rather than failing a valid local operation immediately during temporary contention. Foreign-key enforcement remains enabled and SQLite's default FULL synchronous durability is unchanged.
-
-`UserDataStore` is not itself an actor, but current access remains practically serialized through the `@MainActor` view model; a separate repository executor is not justified by a demonstrated race at this time.
-
-### E. Private local asset helpers lack central containment enforcement
-
-**Status:** fixed locally; traversal, absolute-path, backslash, and NUL-path tests pass
-
-Every local private-asset read, write, and delete now passes through one containment resolver that proves the resolved path remains below the configured root.
-
-### F. Equal timestamps with different PostgreSQL bodies are rejected
-
-PostgreSQL accepts an equal timestamp only when the mutation body is identical. Treating equal timestamps with different bodies as a conflict is conservative and defensible; it is not automatically a bug.
-
-Return an explicit `EQUAL_TIMESTAMP_CONFLICT` reason and provide a deterministic retry/resolution path.
-
-### G. Administrative bearer comparisons are not timing-safe
-
-**Status:** fixed locally; helper contract, rate-limit contract, and server smoke coverage pass
-
-Administrative bearer tokens now use a shared length-checked `timingSafeEqual`
-helper in both route authorization and verified-administrator rate-limit
-principal detection. Grant routes check each configured administrative
-credential without short-circuiting. Remote timing exploitation was not
-demonstrated, but privileged credentials no longer use ordinary JavaScript
-string equality or `includes`.
-
-### H. Other acknowledged asymmetries
-
-- Workboards and Research are web-only; iOS intentionally ignores Workboard application.
-- iOS keeps local navigation when applying continuity and only accepts shared activity fields.
-- Service-worker `/web/*` caching is cache-first; application assets use query-string versioning.
-- Browser sessions live in `localStorage`, so XSS would expose them.
-- Code HTML uses `innerHTML`; CSP and local content provenance are important controls.
-- The root README and `IOS_APP_CONTEXT.md` now point to the current Permitext
-  app, server, content, product boundaries, and validation entry points.
-- Git contains the malformed remote-tracking ref `refs/remotes/origin/codex/New-Changes 2`.
-
----
-
-## What looks solid
-
-- Server-side Free-plan enforcement exists in both contract logic and PostgreSQL quota predicates.
-- Free limits are consistently presented as 25 saved sections and 10 notes, apart from the iOS per-code counting defect.
-- Pro CTA price formatting is covered by tests.
-- Stripe return URLs are same-origin constrained.
-- Apple OAuth fails closed when required secrets are absent and verifies nonce state.
-- Stripe restore ownership uses authenticated Permitext identity rather than billing email.
-- Static/code asset path segments are restricted.
-- Content integrity verifies every published ID is indexed and protects the currently promised prepared-body floor.
-- Research evaluation tooling keeps paid runs behind explicit key, pricing, and spend-cap interlocks.
-
----
-
-## Recommended fix order
-
-| Priority | Work |
-|---|---|
-| **P0** | iOS pending-delete resurrection; Stripe checkout expiry/order handling |
-| **P1** | Backend lifetime-grant authority on iOS; atomic Research quota reservation; PostgreSQL rejection reasons |
-| **P2** | Completed locally: PostgreSQL Workboard compatibility, account-wide iOS Free counts, Organization Report/Workboard storage ownership, and transactional seat enforcement |
-| **P3** | Completed locally: StoreKit entitlement separation, copy correction, file-store locking/session rotation, distributed rate limits, and metadata-based deep-link resolution |
-| **Hardening/content** | Completed locally: WKWebView teardown/navigation, local path containment, prepared-body expansion/classification, SQLite durability pragmas, convergent continuity merging, timing-safe admin comparison, and current backend/root/iOS handoff documentation |
-
----
-
-## Remaining regression expansion after the local P0/P1 fixes
-
-### iOS
-
-- Delete a previously synced bookmark, note, Project, and Project membership.
-- Exercise incremental pull, full pull, reset checkpoint, and a newer competing server upsert.
-- Prove the delete either uploads or becomes an explicit user-visible conflict; it must never be silently discarded.
-- Apply backend lifetime Pro through sign-in, StoreKit refresh, pull, foreground sync, sign-out, and account switch.
-
-### Web/backend
-
-- Deliver Stripe subscription events in every relevant order, including duplicate checkout, delayed checkout, unpaid/incomplete checkout, updated, canceled, and deleted.
-- Prove an undated event cannot replace a dated subscription entitlement.
-- Send parallel Research requests at the monthly boundary and prove only the reserved allowance reaches the model call.
-- Exercise PostgreSQL quota, stale-write, equal-timestamp, ownership, and validation rejections and assert their reason codes.
-
----
-
-## Validation posture
-
-- `npm run check` — passed after the fixes; no paid model calls were made.
-- Direct `node tests/smoke.mjs` — passed, including concurrent file-store mutations, session rotation, and account/IP limiter behavior; no paid model calls were made.
-- `npm run verify:prepared-construction` — passed at 11,610/12,891 prepared bodies (90.06%) with every remaining entry structurally classified.
-- `npm run test:file-storage` — passed concurrent locking, stale-lock recovery, atomic persistence, and private-path containment coverage.
-- iOS `EntitlementAndSyncContractTests` — all 24 tests passed on an iPhone 17 Pro simulator, including SQLite WAL/busy-timeout, queued-continuity upload, FTS literal-query, metadata deep-link, WebView policy, pending-delete, entitlement, and account-wide Free-count regressions.
-- Admin-auth and continuity merge contracts — passed, including same-length credential mismatch, grant-token scope, convergent histories, explicit-clear watermarks, deterministic bounds, and merge ordering.
-- Content integrity — passed: 118 chapters, 12,891 indexed sections, 11,610 prepared bodies (90.06%), 1,281 explicitly classified structural/title-only entries, 273 referenced images, and 8 duplicate display keys.
-- Production deployment — Vercel `READY` on exact commit `4bf190ac`; `/health` reports PostgreSQL `normalized-v4` with PostgreSQL rate limiting, AASA passed, core content endpoints returned `200`, and no deployment runtime errors or browser console errors were found during the walkthrough.
-- Direct PostgreSQL and distributed-rate-limit integrations — could not run because the pulled local production environment contains empty database credential values. The new continuity CAS/CTE regression is added but remains unverified against live PostgreSQL, and production webhook delivery was not exercised locally.
-
----
-
-## Key file anchors
+# Permitext bug + UX/UI audit
+
+**Authoritative as re-checked:** 2026-07-26
+**Implementation base:** local `main` began at `50f01851f` (*Complete Permitext hardening and continuity merge*); this audit and the UX reliability batch are the next local change.
+**Published GitHub branch:** `origin/main` at `4bf190ac4` (*Harden Permitext storage, readers, and rate limits*)
+**Production / live PostgreSQL:** Vercel deployment `dpl_DjixmFTPXTMLmUwFh46D1pyAj1jP` is `READY` on `4bf190ac4`; its health response reports PostgreSQL `normalized-v4`. This does not include the local-only commits.
+**App Store / Apple associated-domain configuration:** not re-verified; local build/configuration is not App Store proof.
+
+Local `main` is ahead of `origin/main`. The audit distinguishes repository evidence from a deployed Vercel function, live PostgreSQL, installed-app universal links, and App Store Connect because each can diverge.
+
+## Executive summary
+
+The prior critical/high engineering findings are resolved in the local hardening line. The remaining release work is primarily trust, truthfulness, recovery, and entitlement UX—not a reason to reopen already-fixed safeguards. The local UX reliability batch implements the iOS false-Saved note fix, truthful plan state, exceptional sync visibility, failed-reader recovery, empty states/accessibility, account copy, early Pro gates, Stripe restore UI, and conditional sign-out confirmation. Integrated local tests and rendered web/native checks pass; installed-app links, external identity/billing configuration, and real multi-device behavior remain separate release evidence.
+
+## Re-verified resolved findings
+
+| Finding | Status | Evidence boundary |
+|---|---|---|
+| Delete resurrection / server upsert on local delete | Resolved | Queued-delete merge and regression coverage in local source; multi-device production behavior still needs live QA. |
+| Stripe checkout could grant forever-Pro | Resolved | Checkout only grants eligible subscriptions with a provisional expiry; lifecycle events preserve correct entitlement. |
+| Lifetime/web Pro demotion | Resolved | Lifetime key and StoreKit fallback avoid non-authoritative demotion. |
+| Research quota TOCTOU | Resolved | Reserve-before-model on PostgreSQL/file-store paths. |
+| WKWebView navigation policy / teardown | Resolved | Policy and teardown implemented in native views. |
+| PostgreSQL push rejection reasons | Resolved | Structured rejection reasons include free-plan codes. |
+| Missing Workboards in normalized store | Resolved | `workboard` is included in the normalized-store union. |
+| File-store R-M-W corruption | Resolved | Inter-process lock and atomic writes covered by tests. |
+| Account-wide Free counts | Resolved | Do not reopen as a per-code-version limit issue. |
+| Metadata deep-link resolution | Resolved | Do not reopen the former magic-section-ID threshold. |
+| Admin bearer comparison | Resolved | Constant-time comparison is in place. |
+
+## Necessary implementation work — implemented locally
+
+| Priority | Finding | Required outcome |
+|---|---|---|
+| P0 | iOS note denial can still present **Saved** | A note save returns success/failure. Show Saved only after persistence; on denial restore the previous text and present the limit/upgrade explanation in context. This is the confirmed UX-1/UX-7 defect. |
+| P0 | Web top bar always says Pro | Bind the badge to actual entitlement (`Free`/`Pro`), or hide it when signed out. |
+| P0 | Mobile sync obscures exceptional states | Do not add a permanent Online label. Surface pending, offline, failed, and conflict states on mobile, with a prominent conflict action when user choice is required. |
+| P1 | iOS reader remains on Loading Section after failure | Distinguish loading from missing/failed content and offer Retry, Browse Codes, or Back. |
+| P1 | Saved/Search empty states and Search accessibility | Add concise explanation and next action; Search needs “Search codes” plus an accessibility label. Decorative art is optional. |
+| P1 | Customer-facing account language | iOS and the signed-out web Account card now describe syncing saved sections, notes, and Projects across devices without test/backend jargon. |
+| P1 | Pro gate timing | Gate Project creation at `+`, and make iOS tag availability explicit before a user fills an apparently usable control. |
+| P1 | Stripe restore | Replace `window.prompt` with the existing web dialog pattern: instructions, validation, Cancel, Restore, and an actionable error. |
+| P1 | Sign out | Confirm only for pending uploads or unresolved conflicts; clean sign-out remains immediate. |
+| P1 | Projects navigation rule | The UI intentionally integrates Projects under Saved. Update the UX rule unless a rendered walkthrough shows the feature is not discoverable; do not add a redundant top-menu action by default. |
+
+## Follow-up validation required after the implementation batch
+
+Integrated local verification completed:
+
+- The full free web `check` and production-style `smoke`/client build pass; no paid model calls were made.
+- All 24 `EntitlementAndSyncContractTests` pass on an iPhone 17 Pro simulator, and the native target builds.
+- Desktop/mobile web rendered with no console errors or error overlay. The Free badge, pre-form Project gate, Stripe restore validation, mobile clean/offline status behavior, immediate clean sign-out, hidden signed-out badge, and account copy were exercised.
+- Native Saved and Search empty states, the Search accessibility label, and Settings account copy rendered in the simulator.
+
+Release/manual evidence still required:
+
+1. Exercise real Free denial for notes and tags and confirm rejected note text is restored with **Not Saved** feedback.
+2. Exercise pending and conflict sync states end-to-end on mobile; the web Offline state and conflict-only action contract are locally covered.
+3. Force a missing/failed native section load and exercise Retry/Browse recovery.
+4. Verify conditional sign-out with actual queued uploads/conflicts, not only the clean path and source contracts.
+5. Record separately: committed local SHA, pushed `origin/main` SHA, deployed Vercel SHA, live PostgreSQL health, installed-app deep links, and App Store Connect status.
+
+## Deferred, accurately scoped
+
+| Item | Status | When to revisit |
+|---|---|---|
+| Content-body coverage | Review individually | Structural/title-only entries must not be fabricated, but official headings without bodies can affect reader detail and Research eligibility. |
+| File-store rejection detail | Deferred engineering | Production uses PostgreSQL; improve JSON-adapter parity only if it blocks local tests or development diagnosis. |
+| Soft-delete tombstones | Deferred architecture | Current queued-delete merge protects the demonstrated resurrection failure. Reconsider only for a new deletion/resurrection class or broader retention needs. |
+| Reader trust notice | Validate rendered experience | Settings/terms plus a restrained first-use or information notice may be sufficient; do not make a disclaimer dominant on every Reader. |
+| Firm workspace on iOS | Product boundary | Full administration parity is not required. Consider better review-on-iPhone framing and an Open on Web action after walkthrough evidence. |
+| Dual-reader labels / destructive-control style | Validate first | Prefer accessibility labels, a tip, and clear safe confirmations before permanent labels or wholesale `confirmationDialog` changes. |
+
+## `permitext.com` migration: staged contract, not a casual string replacement
+
+The apex domain is attached to the production Vercel deployment, `www` redirects to the apex, HTTPS is active, and the apex AASA response advertises the expected app identifier and section-link paths. The local UX batch accepts both hosts, adds the apex associated domains, and generates new public links on `permitext.com`. The iOS backend base remains on the legacy hostname until external identity and billing configuration is proven.
+
+1. In Apple Developer, add and verify `permitext.com` for the web Service ID and `https://permitext.com/account/apple/callback`, while retaining the legacy hostname during transition.
+2. Verify Apple web OAuth, account/session cookies, Stripe Checkout return/webhook behavior, and production PostgreSQL through the apex.
+3. Verify universal links on an installed build; a passing AASA HTTP response and simulator build are necessary but not sufficient.
+4. Keep `permitext-sync.vercel.app` accepted for old installed apps and already-shared links. Retain production tests that can target either host through environment variables.
+
+## Current evidence anchors
 
 | Concern | Path |
 |---|---|
-| iOS entry / sync lifecycle | `NYC CC APP/permitext/PermitextApp.swift` |
-| Pull-before-push + entitlement application | `NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift` |
-| Entitlements + merge resolver | `NYC CC APP/permitext/Models/CodeModels.swift` |
-| Hard deletes + merge candidates | `NYC CC APP/permitext/Data/UserDataStore.swift` |
-| Sync application + continuity | `NYC CC APP/permitext/Diagnostics/Signposts.swift` |
-| HTML reader / WKWebView | `NYC CC APP/permitext/Views/ChapterHTMLWebView.swift` |
-| SQLite wrapper | `NYC CC APP/permitext/Data/SQLiteSupport.swift` |
-| iOS entitlement tests | `NYC CC APP/permitextTests/EntitlementAndSyncContractTests.swift` |
-| API monolith | `permitext-sync-server/app.mjs` |
-| Entitlement contract | `permitext-sync-server/entitlement-contract.mjs` |
-| PostgreSQL sync | `permitext-sync-server/postgres-sync-repository.mjs` |
-| PostgreSQL accounts | `permitext-sync-server/postgres-account-repository.mjs` |
-| PostgreSQL organizations | `permitext-sync-server/postgres-organization-repository.mjs` |
-| Web SPA | `permitext-sync-server/public/app.js` |
-| Service worker | `permitext-sync-server/public/service-worker.js` |
+| Note save / reader recovery | `NYC CC APP/permitext/Views/ReaderView.swift` |
+| Saved/Search UI | `NYC CC APP/permitext/Views/BookmarksView.swift`, `NYC CC APP/permitext/Views/SearchView.swift` |
+| Settings, account copy, conflicts | `NYC CC APP/permitext/Views/SettingsView.swift` |
+| Sync and entitlement contracts | `NYC CC APP/permitext/Data/UserDataStore.swift`, `NYC CC APP/permitext/ViewModels/CodeLibraryViewModel.swift` |
+| Web entitlement, gates, restore | `permitext-sync-server/public/app.js`, `permitext-sync-server/public/index.html` |
+| Mobile sync chrome | `permitext-sync-server/public/styles.css` |
+| Production checks | `permitext-sync-server/tests/production-health.mjs`, `production-aasa.mjs`, `production-identity-restore.mjs` |
+| Domain / Apple configuration | `NYC CC APP/permitext/Info.plist`, `NYC CC APP/permitext/permitext.entitlements` |
 
----
+## Related documents
 
-## Related handoffs
-
-- `PERMITEXT_CROSS_PLATFORM_REVIEW_HANDOFF.md` — broader review, partially outdated relative to this branch.
-- `PERMITEXT_AI_EVALUATION_REVIEW_HANDOFF.md` — Research evaluation and content-integrity context.
+- This is the living audit: `PERMITEXT_BUG_AUDIT.md`.
+- Historical background only: `PERMITEXT_CROSS_PLATFORM_REVIEW_HANDOFF.md`.
+- Release/compliance checklist: `Permitext_Recommended_Implementation_Roadmap.md`.

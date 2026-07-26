@@ -283,10 +283,10 @@ async function main() {
       "Privacy policy omitted the HTML security policy."
     );
     assert(
-      privacyPolicy.text.includes("Higinio Jimenez Manzano") &&
+        privacyPolicy.text.includes("Higinio Jimenez Manzano") &&
         privacyPolicy.text.includes("permitext@gmail.com") &&
         webRoot.text.includes('href="/privacy"') &&
-        iosSettingsSource.includes("https://permitext-sync.vercel.app/privacy"),
+        iosSettingsSource.includes("https://permitext.com/privacy"),
       "The privacy policy or its web/iOS links no longer identify the operator and contact."
     );
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
@@ -833,7 +833,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260725-visual-review-v14'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v16'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -898,12 +898,60 @@ async function main() {
       workspaceScript.text.includes("function openWebWarning") &&
         workspaceScript.text.includes("function confirmWebWarning") &&
         workspaceScript.text.includes("function showWebNotice") &&
+        workspaceScript.text.includes("function openStripeRestoreDialog") &&
+        workspaceScript.text.includes("function stripeRestoreIDError") &&
         workspaceScript.text.includes('dialog.setAttribute("role", "alertdialog")') &&
         workspaceScript.text.includes('dialog.setAttribute("aria-modal", "true")') &&
         workspaceScript.text.includes('confirmButton.className = "web-warning-button web-warning-confirm"') &&
         !workspaceScript.text.includes("window.confirm(") &&
-        !workspaceScript.text.includes("window.alert("),
+        !workspaceScript.text.includes("window.alert(") &&
+        !workspaceScript.text.includes("window.prompt("),
       "Web warnings no longer share the Clear canvas confirmation-dialog pattern."
+    );
+    assert(
+      webRoot.text.includes('class="topbar-brand" aria-label="permitext"') &&
+        webRoot.text.includes('class="topbar-brand-plan" hidden') &&
+        workspaceScript.text.includes("function updateTopbarPlanBadge") &&
+        workspaceScript.text.includes("topbarBrandPlan.hidden = !signedIn") &&
+        workspaceScript.text.includes('topbarBrand.setAttribute("aria-label", signedIn ? `permitext ${planLabel} plan` : "permitext")'),
+      "The topbar plan badge can present a signed-out user as Pro or omit the actual signed-in plan."
+    );
+    assert(
+      workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
+        workspaceScript.text.includes('conflicts === 1 ? "1 sync conflict"') &&
+        workspaceScript.text.includes('pending === 1 ? "1 pending"') &&
+        workspaceScript.text.includes('connectionStatus.setAttribute("role", conflictActionAvailable ? "button" : "status")') &&
+        workspaceScript.text.includes('connectionStatus?.addEventListener("click", openConnectionStatusConflictReview)') &&
+        workspaceScript.text.includes('connectionStatus?.addEventListener("keydown"') &&
+        workspaceScript.text.includes('if (connectionStatus?.dataset.state !== "conflict") return;') &&
+        workspaceScript.text.includes('void focusUtility("settings")') &&
+        webRoot.text.includes('id="connection-status" role="status" aria-live="polite"'),
+      "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
+    );
+    assert(
+      workspaceScript.text.match(/function showProjectCreateSheet\(panel, project = null\) \{\s+if \(!project && !hasCapability\("projects"\)\)/) &&
+        workspaceScript.text.includes('"Sign in and upgrade to Pro before creating a Project workspace."'),
+      "Free or signed-out users can still open the new-Project form before the plan gate."
+    );
+    assert(
+      workspaceScript.text.includes('"Sign out with unfinished sync?"') &&
+        workspaceScript.text.includes("if (pending > 0 || conflicts > 0)") &&
+        workspaceScript.text.includes("if (!confirmed) return;"),
+      "Sign-out no longer warns only when queued changes or unresolved conflicts exist."
+    );
+    assert(
+      workspaceScript.text.includes(
+        '"Sign in to sync saved sections, notes, and Projects across your devices."'
+      ) &&
+        !workspaceScript.text.includes(
+          '"Sign in to attach local saved work to your account and use cross-device sync."'
+        ),
+      "The signed-out account card reverted to internal sync language."
+    );
+    assert(
+      workspaceScript.text.includes("return `https://permitext.com/open/section/${normalizedID}`;") &&
+        !workspaceScript.text.includes("return `https://permitext-sync.vercel.app/open/section/${normalizedID}`;"),
+      "Web share controls no longer generate permitext.com section links."
     );
     assert(
       workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
@@ -1108,6 +1156,8 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".web-warning-backdrop") &&
         workspaceStyles.text.includes(".web-warning-dialog") &&
+        workspaceStyles.text.includes(".web-warning-field") &&
+        workspaceStyles.text.includes(".web-warning-form-error") &&
         workspaceStyles.text.includes("width: min(550px, 100%);") &&
         workspaceStyles.text.includes(".web-warning-title") &&
         workspaceStyles.text.includes("border-bottom: 1px solid var(--border);") &&
@@ -1115,6 +1165,13 @@ async function main() {
         workspaceStyles.text.includes(".web-warning-confirm") &&
         workspaceStyles.text.includes("background: #df6464;"),
       "Web warning-dialog proportions or action styling regressed."
+    );
+    assert(
+      workspaceStyles.text.includes('.connection-status:not([data-state="offline"]):not([data-state="pending"]):not([data-state="conflict"])') &&
+        workspaceStyles.text.match(/@media \(max-width: 760px\)[\s\S]*?\.topbar-account-state \{\s+display: contents;/) &&
+        workspaceStyles.text.includes(".connection-status.is-actionable") &&
+        workspaceStyles.text.includes(".connection-status.is-actionable:focus-visible"),
+      "Mobile web no longer hides routine Online/Synced status while preserving exceptional sync states."
     );
     assert(
       workspaceStyles.text.includes("min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));"),

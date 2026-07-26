@@ -343,11 +343,12 @@ struct SearchView: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            TextField("", text: $query)
+            TextField("Search codes", text: $query)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
                 .focused($isSearchFieldFocused)
+                .accessibilityLabel("Search codes")
                 .onSubmit {
                     library.recordRecentSearch(query)
                 }
@@ -381,7 +382,9 @@ struct SearchView: View {
     @ViewBuilder
     private var emptyQueryHistorySection: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if !library.recentlyViewedSections.isEmpty {
+            if !hasSearchHistoryContent {
+                searchStartState
+            } else if !library.recentlyViewedSections.isEmpty {
                 recentlyViewedSection
                     .padding(.bottom, CodeScreenMetrics.tileGridSectionBottomPadding)
             }
@@ -394,6 +397,33 @@ struct SearchView: View {
                 recentSearchSection
             }
         }
+    }
+
+    private var hasSearchHistoryContent: Bool {
+        !library.recentlyViewedSections.isEmpty ||
+            !library.pinnedSearches.isEmpty ||
+            !unpinnedRecentSearches.isEmpty
+    }
+
+    private var searchStartState: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            CodeEmptyStateCard(
+                title: "Search NYC Codes",
+                systemImage: "text.magnifyingglass",
+                description: "Enter a section number, requirement, or phrase in Search to find matching code text.",
+                accent: accentColor
+            )
+
+            Button {
+                library.selectedTab = .browse
+            } label: {
+                Label("Browse Codes Instead", systemImage: "books.vertical")
+                    .font(.subheadline.weight(.semibold))
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(accentColor)
+        }
+        .padding(.top, 16)
     }
 
     private var jumpBackInTabViewHeight: CGFloat {

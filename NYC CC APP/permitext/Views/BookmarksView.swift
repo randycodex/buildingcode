@@ -124,7 +124,11 @@ struct BookmarksView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     savedScreenHeader
 
-                    if !library.bookmarks.isEmpty {
+                    if library.bookmarks.isEmpty {
+                        savedEmptyState
+                    } else if cachedFilteredBookmarks.isEmpty {
+                        filteredSavedEmptyState
+                    } else {
                         savedBookmarkList
                     }
                 }
@@ -259,6 +263,48 @@ private var savedBookmarkList: some View {
             }
         }
     }
+}
+
+private var savedEmptyState: some View {
+    VStack(alignment: .leading, spacing: 14) {
+        CodeEmptyStateCard(
+            title: "No Saved Sections Yet",
+            systemImage: "bookmark",
+            description: "Save code sections while reading to keep the requirements, notes, and project evidence you need close at hand.",
+            accent: accentColor
+        )
+
+        Button {
+            library.selectedTab = .browse
+        } label: {
+            Label("Browse Codes", systemImage: "books.vertical")
+                .font(.subheadline.weight(.semibold))
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(accentColor)
+    }
+    .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
+}
+
+private var filteredSavedEmptyState: some View {
+    VStack(alignment: .leading, spacing: 14) {
+        CodeEmptyStateCard(
+            title: "No Saved Sections Match",
+            systemImage: "line.3.horizontal.decrease.circle",
+            description: "Clear the active code or tag filters to see all of your saved sections.",
+            accent: accentColor
+        )
+
+        Button("Clear Filters") {
+            savedFilterCodeSectionIDs.removeAll()
+            savedFilterFolderIDs.removeAll()
+            selectedTagFilter = nil
+        }
+        .font(.subheadline.weight(.semibold))
+        .buttonStyle(.plain)
+        .foregroundStyle(accentColor)
+    }
+    .padding(.top, CodeScreenMetrics.contentSpacingBelowTitle)
 }
 
     // MARK: - Export
