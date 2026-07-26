@@ -693,4 +693,40 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(response.project.artifacts?.compactMap(\.notebookCard).first?.title, "Filing sequence")
         XCTAssertEqual(response.project.artifacts?.compactMap(\.generatedReportFile).first?.reportVersion, 3)
     }
+
+    func testPersonalProjectFoundationDecodesWithoutOrganizationAccessFields() throws {
+        let data = Data(
+            """
+            {
+              "schemaVersion": 1,
+              "projects": [{
+                "id": "project-1",
+                "sourceRecordID": "folder-1",
+                "name": "Permitext QA",
+                "address": "QA only",
+                "description": "Cross-device release walkthrough.",
+                "colorHex": "#6678D4",
+                "archivedAt": null,
+                "updatedAt": "2026-07-26T19:00:00.000Z"
+              }],
+              "links": [],
+              "artifacts": [],
+              "researchConversations": [],
+              "researchAnswers": [],
+              "activity": [],
+              "workboardPreview": null
+            }
+            """.utf8
+        )
+
+        let response = try JSONDecoder().decode(
+            BackendProjectFoundationResponse.self,
+            from: data
+        )
+
+        let project = try XCTUnwrap(response.projects?.first)
+        XCTAssertEqual(project.id, "project-1")
+        XCTAssertEqual(project.sourceRecordID, "folder-1")
+        XCTAssertEqual(project.name, "Permitext QA")
+    }
 }

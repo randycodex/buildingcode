@@ -1245,13 +1245,24 @@ struct ProjectWorkboardPreviewSummary: Codable, Hashable, Identifiable, Sendable
     let createdAt: String
 }
 
+struct ProjectFoundationProjectSummary: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let sourceRecordID: String
+    let name: String
+    let address: String
+    let description: String
+    let colorHex: String?
+    let archivedAt: String?
+    let updatedAt: String
+}
+
 struct BackendProjectFoundationResponse: Codable, Hashable, Sendable {
     let schemaVersion: Int
     let researchConversations: [ProjectResearchConversationSummary]
     let researchAnswers: [ProjectResearchAnswerSummary]
     let activity: [ProjectActivitySummary]
     var workboardPreview: ProjectWorkboardPreviewSummary? = nil
-    var projects: [PermitextOrganizationProject]? = nil
+    var projects: [ProjectFoundationProjectSummary]? = nil
     var links: [ProjectFoundationLinkSummary]? = nil
     var artifacts: [ProjectFoundationArtifact]? = nil
 }
