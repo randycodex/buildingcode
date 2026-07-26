@@ -2605,12 +2605,36 @@ select option:checked {
     border: 1px solid rgba(255, 255, 255, 0.36) !important;
   }
 
-  .code-table [style*="background-color:#C0C0C0" i] {
+  .code-table [style*="background-color:white" i],
+  .code-table [style*="background-color: white" i],
+  .code-table [style*="background:white" i],
+  .code-table [style*="background: white" i],
+  .section-html table [style*="background-color:white" i],
+  .section-html table [style*="background-color: white" i],
+  .section-html table [style*="background:white" i],
+  .section-html table [style*="background: white" i] {
+    background-color: var(--surface) !important;
+  }
+
+  .code-table [style*="background-color:#C0C0C0" i],
+  .section-html table [style*="background-color:#C0C0C0" i] {
     background-color: rgba(255, 255, 255, 0.16) !important;
   }
 
-  .code-table [style*="background-color:#808080" i] {
+  .code-table [style*="background-color:#808080" i],
+  .section-html table [style*="background-color:#808080" i] {
     background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .code-table [style*="background-color:#f8cbad" i],
+  .code-table [style*="background-color:#f7caac" i],
+  .code-table [style*="background-color:#fce4d6" i],
+  .code-table [style*="background-color:#fbe4d5" i],
+  .section-html table [style*="background-color:#f8cbad" i],
+  .section-html table [style*="background-color:#f7caac" i],
+  .section-html table [style*="background-color:#fce4d6" i],
+  .section-html table [style*="background-color:#fbe4d5" i] {
+    background-color: color-mix(in srgb, var(--ios-accent-building) 16%, var(--surface)) !important;
   }
 }
 

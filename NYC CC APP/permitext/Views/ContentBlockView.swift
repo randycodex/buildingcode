@@ -762,6 +762,24 @@ private enum TableHTMLRenderer {
                 border-color: #636366;
               }
               th, td { border-color: #636366; }
+              [style*="background-color:white" i],
+              [style*="background-color: white" i],
+              [style*="background:white" i],
+              [style*="background: white" i] {
+                background-color: #1c1c1e !important;
+              }
+              [style*="background-color:#C0C0C0" i] {
+                background-color: #3a3a3c !important;
+              }
+              [style*="background-color:#808080" i] {
+                background-color: #2c2c2e !important;
+              }
+              [style*="background-color:#f8cbad" i],
+              [style*="background-color:#f7caac" i],
+              [style*="background-color:#fce4d6" i],
+              [style*="background-color:#fbe4d5" i] {
+                background-color: #3a281d !important;
+              }
             }
           </style>
         </head>

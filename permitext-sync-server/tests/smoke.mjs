@@ -1163,8 +1163,12 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".code-table :where(table, thead, tbody, tfoot, tr, td, th") &&
         workspaceStyles.text.includes("color: inherit !important;") &&
+        workspaceStyles.text.includes('[style*="background-color:white" i]') &&
+        workspaceStyles.text.includes(".section-html table [style*=\"background-color: white\" i]") &&
         workspaceStyles.text.includes('[style*="background-color:#C0C0C0" i]') &&
-        workspaceStyles.text.includes('[style*="background-color:#808080" i]'),
+        workspaceStyles.text.includes('[style*="background-color:#808080" i]') &&
+        workspaceStyles.text.includes('[style*="background-color:#f8cbad" i]') &&
+        workspaceStyles.text.includes('[style*="background-color:#fbe4d5" i]'),
       "Reader tables no longer override legacy light-theme colors in dark mode."
     );
     assert(
