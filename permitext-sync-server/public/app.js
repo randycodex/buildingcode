@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v46";
+} from "./offline-storage.js?v=20260726-web-reliability-v47";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6392,12 +6392,10 @@ function updateSearchDock(panel, instance, resultCount = null) {
   const filterRail = panel.querySelector(".search-code-filter");
   const summary = panel.querySelector(".search-result-summary");
   const summaryCopy = panel.querySelector(".search-result-summary-copy");
-  const allCodesButton = panel.querySelector(".search-all-codes");
   const clearButton = panel.querySelector(".search-clear-button");
   filterRail.hidden = !query;
   clearButton.hidden = !query;
   summary.hidden = !query || resultCount === null;
-  allCodesButton.hidden = selectedPrefixes.length === 0;
   if (resultCount !== null) {
     const scope = selectedPrefixes.length === 0
       ? "All Codes"
@@ -6577,7 +6575,6 @@ async function renderSearch(instance) {
   const panel = searchTemplate.content.firstElementChild.cloneNode(true);
   const input = panel.querySelector(".search-input");
   const clearButton = panel.querySelector(".search-clear-button");
-  const allCodesButton = panel.querySelector(".search-all-codes");
   const filterRail = panel.querySelector(".search-code-filter");
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
@@ -6611,13 +6608,6 @@ async function renderSearch(instance) {
     updateSearchDock(panel, searchInstance);
     renderSearchHistory(panel, searchInstance);
     input.focus();
-  });
-
-  allCodesButton.addEventListener("click", () => {
-    searchInstance.codeFilters = [];
-    saveWorkspaceState();
-    updateSearchCodeFilterStates(filterRail, searchInstance);
-    renderSearchResults(panel, searchInstance);
   });
 
   await loadSyncedContent();

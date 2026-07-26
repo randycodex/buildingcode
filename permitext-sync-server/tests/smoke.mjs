@@ -856,6 +856,8 @@ async function main() {
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
         searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
         searchTemplateSource.indexOf('class="search-result-summary"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
+        !searchTemplateSource.includes("search-all-codes") &&
+        !workspaceScript.text.includes("search-all-codes") &&
         searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-results"'),
       "Search field no longer sits below the column title and above the summary, filters, and results."
     );
@@ -884,7 +886,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v46'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v47'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -898,7 +900,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v43'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v44'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1222,6 +1224,10 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      !workspaceStyles.text.includes(".search-all-codes"),
+      "Search still styles the retired All Codes button."
+    );
     assert(
       workspaceStyles.text.includes(".custom-select-group-label") &&
         workspaceStyles.text.includes(".custom-select-option.is-indented") &&

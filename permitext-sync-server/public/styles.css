@@ -3043,16 +3043,6 @@ select option:checked {
   font-weight: 600;
 }
 
-.search-all-codes {
-  flex: 0 0 auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--code-accent);
-  font: inherit;
-  font-weight: 650;
-}
-
 .search-history-section {
   display: grid;
   gap: 0;
