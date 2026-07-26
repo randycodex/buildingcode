@@ -888,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v50'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v51'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -902,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v46'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v47'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1232,6 +1232,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
+        workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?border-radius: 0;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip,[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
@@ -1307,8 +1308,8 @@ async function main() {
       "Reader annotation status icons still appear on hover without a saved note or bookmark."
     );
     assert(
-      workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 254px;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
-      "Search field no longer renders at 254 by 42 pixels."
+      workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),
+      "Search field no longer spans the available column width at 42 pixels high."
     );
     assert(
       !workspaceStyles.text.includes(".result-row-actions") &&
