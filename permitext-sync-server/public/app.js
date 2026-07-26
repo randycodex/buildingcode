@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v17";
+} from "./offline-storage.js?v=20260726-web-reliability-v18";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1607,6 +1607,13 @@ function updateLinkedReaderForSearch(searchID, detail, overrides = {}) {
 function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   const existing = updateLinkedReaderForSearch(searchID, detail, overrides);
   if (existing) return existing;
+  if (!isProAccount() && state.readers.length >= 2) {
+    const reader = state.readers[1];
+    Object.assign(reader, readerFieldsForSectionDetail(detail, overrides));
+    searchLinkedReadersBySearch()[searchID] = reader.id;
+    placeLinkedReaderAfterSectionDetail(searchID, reader.id);
+    return reader;
+  }
   const reader = newReaderState(readerFieldsForSectionDetail(detail, overrides));
   state.readers.push(reader);
   searchLinkedReadersBySearch()[searchID] = reader.id;
@@ -2565,10 +2572,33 @@ function updateTopbarPlanBadge() {
   topbarBrandPlan.hidden = !pro;
   topbarBrandPlan.textContent = pro ? "Pro" : "";
   topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext");
+  updateReaderPlanControls();
 }
 
 function isProAccount() {
   return currentPlan() === "pro";
+}
+
+function updateReaderPlanControls() {
+  addReaderButton.hidden = !isProAccount() && state.readers.length >= 2;
+  collapseReadersButton.hidden = state.readers.length <= 1;
+}
+
+function enforceReaderPlanLimit() {
+  if (isProAccount() || state.readers.length <= 2) return false;
+  const reader = state.readers[0] || newReaderState();
+  const secondReader = state.readers[1] || newReaderState();
+  const removedReaderIDs = new Set(state.readers.slice(2).map((item) => item.id));
+  state.readers = [reader, secondReader];
+  Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
+    if (removedReaderIDs.has(readerID)) delete state.searchLinkedReaders[searchID];
+  });
+  removedReaderIDs.forEach((readerID) => {
+    const paneID = paneIDForReader({ id: readerID });
+    delete state.paneWeights[paneID];
+    state.paneOrder = state.paneOrder.filter((item) => item !== paneID);
+  });
+  return true;
 }
 
 function currentCapabilityContract() {
@@ -5791,9 +5821,16 @@ async function resolveInlineCodeSection(codePrefix, sectionNumber) {
 }
 
 async function openReferenceInAdjacentReader(sourceReader, detail) {
-  const targetReader = newReaderState(readerFieldsForSectionDetail(detail));
-  state.readers.push(targetReader);
-  placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader));
+  const canAddReader = isProAccount() || state.readers.length < 2;
+  const targetReader = canAddReader
+    ? newReaderState(readerFieldsForSectionDetail(detail))
+    : state.readers.find((reader) => reader.id !== sourceReader.id) || sourceReader;
+  if (canAddReader) {
+    state.readers.push(targetReader);
+    placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader));
+  } else {
+    Object.assign(targetReader, readerFieldsForSectionDetail(detail));
+  }
   if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
   scheduleContinuitySync(targetReader);
   saveWorkspaceState();
@@ -15170,6 +15207,8 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
 
 async function renderWorkspace() {
   await ensureSyncedContentForRender();
+  enforceReaderPlanLimit();
+  updateReaderPlanControls();
   closeDeletedProjectDetails();
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -15219,6 +15258,8 @@ async function renderWorkspace() {
 }
 
 async function renderUtilityWorkspace(options = {}) {
+  enforceReaderPlanLimit();
+  updateReaderPlanControls();
   closeDeletedProjectDetails();
   const existingPanesByID = new Map(
     Array.from(track.querySelectorAll(".workspace-panel"))
@@ -15426,12 +15467,16 @@ async function focusUtility(key, selector = "") {
 function workspaceCommandDefinitions() {
   return [
     { label: "Open Search", hint: "Find sections across all codes", run: () => focusUtility("search", ".search-input") },
-    { label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() },
+    ...(isProAccount() || state.readers.length < 2
+      ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
+      : []),
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Column Widths", hint: "Fit the current workspace", run: () => fitVisibleColumns() },
-    { label: "Keep One Reader", hint: "Close every other workspace column", run: () => collapseToOneReader() }
+    ...(state.readers.length > 1
+      ? [{ label: "Keep One Reader", hint: "Close every other workspace column", run: () => collapseToOneReader() }]
+      : [])
   ];
 }
 
@@ -15644,6 +15689,11 @@ async function start() {
     localStorage.removeItem("permitext:pendingWorkboardReattach");
   }
   addReaderButton.addEventListener("click", async () => {
+    if (!isProAccount() && state.readers.length >= 2) {
+      enforceReaderPlanLimit();
+      await transitionWorkspace("utility");
+      return;
+    }
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
     state.readers.push(reader);
     saveWorkspaceState();

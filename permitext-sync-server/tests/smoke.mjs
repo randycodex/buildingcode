@@ -833,7 +833,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v17'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v18'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -916,6 +916,16 @@ async function main() {
         workspaceScript.text.includes('topbarBrandPlan.textContent = pro ? "Pro" : ""') &&
         workspaceScript.text.includes('topbarBrand.setAttribute("aria-label", pro ? "permitext Pro plan" : "permitext")'),
       "The topbar plan badge must remain hidden unless the account has active Pro access."
+    );
+    assert(
+      workspaceScript.text.includes("function enforceReaderPlanLimit") &&
+        workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
+        workspaceScript.text.includes("addReaderButton.hidden = !isProAccount() && state.readers.length >= 2") &&
+        workspaceScript.text.includes("collapseReadersButton.hidden = state.readers.length <= 1") &&
+        workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
+        workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
+        workspaceScript.text.includes("if (!isProAccount() && state.readers.length >= 2)"),
+      "Free web accounts can expose or persist more than two Readers."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
