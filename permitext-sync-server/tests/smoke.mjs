@@ -410,6 +410,7 @@ async function main() {
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
     assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
+        workspaceScript.text.includes('checkoutButton.classList.toggle("is-pro-active", pro)') &&
         workspaceScript.text.includes('checkoutButton.textContent = pro') &&
         workspaceScript.text.includes('? "Pro Active" : "Manage Subscription"') &&
         workspaceScript.text.includes(': "Upgrade to Pro"'),
@@ -842,14 +843,14 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v23'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v24'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v21'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v22'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1177,6 +1178,12 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.settings-panel \.account-plan-secondary \{[\s\S]*?justify-self: center;/),
       "Restore Purchases is no longer centered beneath the primary plan action."
+    );
+    assert(
+      workspaceStyles.text.match(/\.account-checkout\.is-pro-active,[\s\S]*?background: #00b9e8;[\s\S]*?color: #001014;[\s\S]*?opacity: 1;/) &&
+        iosSettingsSource.includes("Color(red: 0, green: 185 / 255, blue: 232 / 255)") &&
+        iosSettingsSource.includes(".opacity(library.isStoreKitBusy ? 0.55 : 1)"),
+      "Active Pro buttons no longer share the requested full-opacity cyan treatment on web and iOS."
     );
     assert(
       workspaceStyles.text.match(/\.settings-project-copy strong \{[^}]*color: var\(--project-color\);[^}]*font-weight: 400;[^}]*text-transform: none;/) &&

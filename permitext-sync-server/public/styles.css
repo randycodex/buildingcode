@@ -7347,6 +7347,13 @@ button.project-studio-metric:focus-visible {
   border: 0;
 }
 
+.settings-panel .account-checkout.is-pro-active,
+.settings-panel .account-checkout.is-pro-active:disabled {
+  background: #00b9e8;
+  color: #001014;
+  opacity: 1;
+}
+
 .settings-panel .settings-secondary-button,
 .settings-panel .settings-mini-button {
   border: 0;

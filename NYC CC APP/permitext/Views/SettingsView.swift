@@ -230,7 +230,7 @@ struct SettingsView: View {
             }
             .buttonStyle(.plain)
             .disabled(library.isStoreKitBusy || library.currentPlan == .pro)
-            .opacity(library.isStoreKitBusy || library.currentPlan == .pro ? 0.55 : 1)
+            .opacity(library.isStoreKitBusy ? 0.55 : 1)
 
             Button {
                 Task { await library.purchaseResearch() }
@@ -638,14 +638,20 @@ struct SettingsView: View {
     }
 
     private var upgradeButtonBackgroundColor: Color {
-        if library.currentPlan == .pro || library.isStoreKitBusy {
+        if library.currentPlan == .pro {
+            return Color(red: 0, green: 185 / 255, blue: 232 / 255)
+        }
+        if library.isStoreKitBusy {
             return Color(uiColor: .tertiarySystemGroupedBackground)
         }
         return colorScheme == .dark ? Color.white.opacity(0.96) : Color.appChrome
     }
 
     private var upgradeButtonForegroundColor: Color {
-        if library.currentPlan == .pro || library.isStoreKitBusy {
+        if library.currentPlan == .pro {
+            return Color(red: 0, green: 16 / 255, blue: 20 / 255)
+        }
+        if library.isStoreKitBusy {
             return Color.secondary
         }
         return colorScheme == .dark ? Color.black.opacity(0.9) : Color.white

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v23";
+} from "./offline-storage.js?v=20260726-web-reliability-v24";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14371,6 +14371,7 @@ function renderSettings() {
           : "Pro is active. Projects, Notebook, Report Draft, professional exports, tags, and web offline downloads are unlocked. Research is available separately."
       : "Free includes reading, search, recents, 25 saved sections, 10 notes, continuity, and cross-device sync. Pro unlocks the professional workspace.";
     checkoutButton.disabled = !account || (pro && source === "lifetimeGrant");
+    checkoutButton.classList.toggle("is-pro-active", pro);
     checkoutButton.textContent = pro
       ? source === "lifetimeGrant" ? "Pro Active" : "Manage Subscription"
       : "Upgrade to Pro";
