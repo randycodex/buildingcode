@@ -40,7 +40,7 @@
     "@tiptap/core": "3.29.0",
     "@tiptap/extension-bold": "3.29.0",
     "@tiptap/extension-document": "3.29.0",
-    "@tiptap/extension-italic": "3.29.0",
+    "@tiptap/extension-italic": "3.29.1",
     "@tiptap/extension-paragraph": "3.29.0",
     "@tiptap/extension-text": "3.29.0",
     "@tiptap/extensions": "3.29.0",
