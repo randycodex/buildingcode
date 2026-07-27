@@ -921,7 +921,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v66'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v67'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1280,19 +1280,19 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
         workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
-        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: fit-content;[\s\S]*?min-height: 28px;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;/) &&
+        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
-      "Search code filters should render as two-column 12-pixel regular-weight pills."
+      "Search code filters should render as two equal-width columns of 12-pixel regular-weight pills."
     );
     assert(
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
-        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: fit-content;[\s\S]*?min-height: 28px;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved code filters should match the Search column's two-column 12-pixel pills."
+      "Saved code filters should match the Search column's equal-width two-column pills."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),

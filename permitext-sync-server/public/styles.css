@@ -2890,15 +2890,15 @@ select option:checked {
 }
 
 .search-code-filter .search-filter-chip {
-  width: fit-content;
+  width: 100%;
   min-height: 28px;
-  justify-self: start;
+  justify-self: stretch;
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
   font-size: 12px !important;
   font-weight: 400;
-  text-align: left;
+  text-align: center;
   white-space: normal;
 }
 
@@ -5907,15 +5907,15 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-code-filter .saved-filter-chip {
-  width: fit-content;
+  width: 100%;
   min-height: 28px;
-  justify-self: start;
+  justify-self: stretch;
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
   font-size: 12px !important;
   font-weight: 400;
-  text-align: left;
+  text-align: center;
   white-space: normal;
 }
 
