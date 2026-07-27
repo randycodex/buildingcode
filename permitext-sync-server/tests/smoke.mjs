@@ -904,11 +904,13 @@ async function main() {
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
         workspaceScript.text.includes('return option.prefix === "AC" ? "Gen Administrative Code" : option.label;') &&
+        workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance)") &&
+        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(open))') &&
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v70'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v71'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -922,7 +924,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v67'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v68'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1280,12 +1282,14 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
+        workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
         workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
-      "Search code filters should render as two equal-width columns of 12-pixel regular-weight pills."
+      "Search code filters should expand from a single summary pill into two equal-width columns."
     );
     assert(
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
@@ -1293,7 +1297,7 @@ async function main() {
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved code filters should match the Search column's equal-width two-column pills."
+      "Saved code filters should match the Search column's collapsible equal-width pill menu."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),

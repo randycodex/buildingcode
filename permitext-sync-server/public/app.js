@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v70";
+} from "./offline-storage.js?v=20260726-web-reliability-v71";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1830,6 +1830,42 @@ function searchCodeFilterOptions() {
     options.push({ prefix, label: prefix });
   });
   return options;
+}
+
+function codeFilterMenuLabel(prefixes = []) {
+  const selectedPrefixes = normalizeSearchCodeFilters(prefixes);
+  if (selectedPrefixes.length === 0) return "All Sections";
+  if (selectedPrefixes.length === 1) {
+    return searchCodeFilterOptions().find((option) => option.prefix === selectedPrefixes[0])?.label || selectedPrefixes[0];
+  }
+  return `${selectedPrefixes.length} Sections`;
+}
+
+function updateCodeFilterMenu(filterRail, instance) {
+  const menu = filterRail.closest(".code-filter-menu");
+  const toggle = menu?.querySelector(".code-filter-menu-toggle");
+  const label = toggle?.querySelector(".code-filter-menu-label");
+  if (!menu || !toggle || !label) return;
+  const open = Boolean(instance?.codeFilterMenuOpen);
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} code section filters`);
+  label.textContent = codeFilterMenuLabel(instance?.codeFilters);
+  filterRail.hidden = !open;
+}
+
+function wireCodeFilterMenu(filterRail, instance) {
+  const toggle = filterRail.closest(".code-filter-menu")?.querySelector(".code-filter-menu-toggle");
+  if (!toggle || toggle.dataset.filterMenuReady === "true") {
+    updateCodeFilterMenu(filterRail, instance);
+    return;
+  }
+  toggle.dataset.filterMenuReady = "true";
+  toggle.addEventListener("click", () => {
+    instance.codeFilterMenuOpen = !instance.codeFilterMenuOpen;
+    saveWorkspaceState();
+    updateCodeFilterMenu(filterRail, instance);
+  });
+  updateCodeFilterMenu(filterRail, instance);
 }
 
 async function api(path) {
@@ -6597,10 +6633,12 @@ function updateSearchDock(panel, instance, resultCount = null) {
   const query = String(instance?.query || "").trim();
   const selectedPrefixes = normalizeSearchCodeFilters(instance?.codeFilters);
   const filterRail = panel.querySelector(".search-code-filter");
+  const filterMenu = filterRail.closest(".code-filter-menu");
   const summary = panel.querySelector(".search-result-summary");
   const summaryCopy = panel.querySelector(".search-result-summary-copy");
   const clearButton = panel.querySelector(".search-clear-button");
-  filterRail.hidden = !query;
+  filterMenu.hidden = !query;
+  updateCodeFilterMenu(filterRail, instance);
   clearButton.hidden = !query;
   summary.hidden = !query;
   const scope = selectedPrefixes.length === 0
@@ -6786,6 +6824,7 @@ async function renderSearch(instance) {
   applyPaneWeight(panel, paneID);
   input.value = searchInstance.query || "";
   renderSearchCodeFilter(filterRail, panel, searchInstance);
+  wireCodeFilterMenu(filterRail, searchInstance);
   updateSearchDock(panel, searchInstance);
 
   input.addEventListener("input", () => {
@@ -6857,6 +6896,7 @@ function renderSearchCodeFilter(filterRail, panel, instance) {
       }
       saveWorkspaceState();
       updateSearchCodeFilterStates(filterRail, searchInstance);
+      updateCodeFilterMenu(filterRail, searchInstance);
       updateSearchDock(panel, searchInstance);
       renderSearchResults(panel, searchInstance);
     });
@@ -12846,6 +12886,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     });
     codeRail.append(button);
   });
+  wireCodeFilterMenu(codeRail, instance);
   if (availableTags.length) {
     ["", ...availableTags].forEach((tag) => {
       const button = document.createElement("button");

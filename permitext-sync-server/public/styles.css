@@ -2889,6 +2889,62 @@ select option:checked {
   padding: 0;
 }
 
+.code-filter-menu {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.code-filter-menu[hidden],
+.code-filter-menu .search-code-filter[hidden],
+.code-filter-menu .saved-code-filter[hidden] {
+  display: none !important;
+}
+
+.code-filter-menu-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 32px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px !important;
+  font-weight: 400;
+  text-align: left;
+}
+
+.code-filter-menu-toggle:hover {
+  background: color-mix(in srgb, var(--text-tertiary) 24%, transparent);
+}
+
+.code-filter-menu-icon {
+  display: grid;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+}
+
+.code-filter-menu-icon svg {
+  grid-area: 1 / 1;
+  width: 18px;
+  height: 18px;
+}
+
+.code-filter-chevron-up,
+.code-filter-menu-toggle[aria-expanded="true"] .code-filter-chevron-down {
+  display: none;
+}
+
+.code-filter-menu-toggle[aria-expanded="true"] .code-filter-chevron-up {
+  display: block;
+}
+
 .search-code-filter .search-filter-chip {
   width: 100%;
   min-height: 28px;
@@ -2974,7 +3030,6 @@ select option:checked {
 }
 
 .search-result-summary[hidden],
-.search-code-filter[hidden],
 .search-clear-button[hidden],
 .saved-inline-filters[hidden],
 .saved-tag-filter[hidden] {
