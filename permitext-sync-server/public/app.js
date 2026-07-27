@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-search-history-v73";
+} from "./offline-storage.js?v=20260727-zoning-reader-v75";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -60,6 +60,7 @@ const workspaceKey = detachedProjectWindow
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
 const addReaderButton = document.querySelector("#add-reader");
+const addZoningReaderButton = document.querySelector("#add-zoning-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
@@ -1800,6 +1801,10 @@ function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
+  addZoningReaderButton?.setAttribute(
+    "aria-pressed",
+    String((state.readers || []).some((reader) => reader.codePrefix === zoningCodePrefix))
+  );
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
@@ -2397,19 +2402,24 @@ function populateCodeSelect(panel, reader) {
   if (!codeSelect) return;
   clear(codeSelect);
   reader.codePrefix = reader.codePrefix || "BC";
-  const constructionGroup = document.createElement("optgroup");
-  constructionGroup.label = "Construction Codes";
-  codeOptions.filter((code) => code.prefix !== zoningCodePrefix).forEach((code) => {
-    const option = document.createElement("option");
-    option.value = code.prefix;
-    option.textContent = code.label;
-    constructionGroup.append(option);
-  });
-  const zoningOption = document.createElement("option");
-  zoningOption.value = zoningCodePrefix;
-  zoningOption.textContent = "Zoning Resolution";
-  zoningOption.dataset.sectionHeader = "true";
-  codeSelect.append(constructionGroup, zoningOption);
+  const zoningReader = reader.codePrefix === zoningCodePrefix;
+  codeSelect.disabled = zoningReader;
+  if (zoningReader) {
+    const zoningOption = document.createElement("option");
+    zoningOption.value = zoningCodePrefix;
+    zoningOption.textContent = "Zoning Resolution";
+    codeSelect.append(zoningOption);
+  } else {
+    const constructionGroup = document.createElement("optgroup");
+    constructionGroup.label = "Construction Codes";
+    codeOptions.filter((code) => code.prefix !== zoningCodePrefix).forEach((code) => {
+      const option = document.createElement("option");
+      option.value = code.prefix;
+      option.textContent = code.label;
+      constructionGroup.append(option);
+    });
+    codeSelect.append(constructionGroup);
+  }
   codeSelect.value = reader.codePrefix;
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
@@ -2442,6 +2452,12 @@ function enhanceSelect(select) {
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
+  const staticSelect = select.disabled;
+  trigger.classList.toggle("is-static", staticSelect);
+  if (staticSelect) {
+    trigger.setAttribute("aria-disabled", "true");
+    trigger.tabIndex = -1;
+  }
 
   const syncTrigger = () => {
     trigger.textContent = select.options[select.selectedIndex]?.textContent || "";
@@ -2507,6 +2523,7 @@ function enhanceSelect(select) {
   trigger.setAttribute("aria-expanded", "false");
   trigger.addEventListener("click", (event) => {
     event.stopPropagation();
+    if (staticSelect) return;
     const willOpen = menu.hidden;
     closeActiveCustomSelect();
     renderOptions();
@@ -2655,6 +2672,7 @@ function isProAccount() {
 
 function updateReaderPlanControls() {
   addReaderButton.hidden = !isProAccount() && state.readers.length >= 2;
+  if (addZoningReaderButton) addZoningReaderButton.hidden = false;
   collapseReadersButton.hidden = state.readers.length <= 1;
 }
 
@@ -15934,6 +15952,7 @@ function workspaceCommandDefinitions() {
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
+    { label: "Open ZR Reader", hint: "Open the dedicated Zoning Resolution column", run: () => addZoningReaderButton.click() },
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
@@ -16159,6 +16178,48 @@ async function start() {
       return;
     }
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
+    state.readers.push(reader);
+    saveWorkspaceState();
+    await transitionWorkspace("utility");
+    scrollPaneIntoView(paneIDForReader(reader));
+  });
+  addZoningReaderButton.addEventListener("click", async () => {
+    const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);
+    if (existingReader) {
+      scrollPaneIntoView(paneIDForReader(existingReader));
+      return;
+    }
+    const chapterID = await firstChapterIDForCode(zoningCodePrefix);
+    if (!isProAccount() && state.readers.length >= 2) {
+      const replacementReader = state.readers[state.readers.length - 1];
+      Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
+        if (readerID === replacementReader.id) delete state.searchLinkedReaders[searchID];
+      });
+      delete replacementReader.projectSavedSourceKey;
+      Object.assign(replacementReader, {
+        codePrefix: zoningCodePrefix,
+        codeVersion: zoningSyncCodeVersion,
+        chapterID,
+        sectionID: "",
+        sectionNumber: "",
+        title: "Reader",
+        commentsOpen: false,
+        internalSearchQuery: "",
+        activeNotesSectionID: "",
+        shouldSmoothScrollToSection: false
+      });
+      saveWorkspaceState();
+      await transitionWorkspace("utility", {
+        refreshPaneIDs: [paneIDForReader(replacementReader)]
+      });
+      scrollPaneIntoView(paneIDForReader(replacementReader));
+      return;
+    }
+    const reader = newReaderState({
+      codePrefix: zoningCodePrefix,
+      codeVersion: zoningSyncCodeVersion,
+      chapterID
+    });
     state.readers.push(reader);
     saveWorkspaceState();
     await transitionWorkspace("utility");

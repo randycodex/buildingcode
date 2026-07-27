@@ -1369,6 +1369,10 @@ label {
   outline: 0;
 }
 
+.custom-select-trigger.is-static {
+  cursor: default;
+}
+
 .reader-code-picker .custom-select-trigger {
   color: var(--code-accent);
   font-size: calc(var(--chrome-font-size) * var(--code-title-scale)) !important;

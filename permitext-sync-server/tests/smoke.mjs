@@ -455,14 +455,19 @@ async function main() {
       "Web Settings no longer distinguishes active Free and Pro plan actions."
     );
     assert(
-      workspaceScript.text.includes('constructionGroup.label = "Construction Codes"') &&
-        workspaceScript.text.includes('zoningOption.textContent = "Zoning Resolution"') &&
+      webRoot.text.includes('id="add-zoning-reader"') &&
+        webRoot.text.includes('>ZR</button>') &&
+        workspaceScript.text.includes('constructionGroup.label = "Construction Codes"') &&
+        workspaceScript.text.includes("codeOptions.filter((code) => code.prefix !== zoningCodePrefix)") &&
+        workspaceScript.text.includes("const staticSelect = select.disabled;") &&
+        workspaceScript.text.includes("const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);") &&
+        workspaceScript.text.includes("const replacementReader = state.readers[state.readers.length - 1];") &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
         iosBrowseSource.includes('Section("Construction Codes")') &&
         iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
-      "Reader code pickers should group indented Construction Codes and expose selectable Zoning Resolution."
+      "Web Reader pickers should list only Construction Codes while ZR opens a dedicated reader column."
     );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
@@ -920,7 +925,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-search-history-v73'),
+        webRoot.text.includes('/web/app.js?v=20260727-zoning-reader-v75'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -934,7 +939,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v68'),
+        webRoot.text.includes('/web/styles.css?v=20260727-zoning-reader-v69'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
