@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v66";
+} from "./offline-storage.js?v=20260726-web-reliability-v68";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14609,6 +14609,8 @@ function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   wireSettingsCardCollapsing(panel);
+  wireSettingsSelectControl(panel, ".settings-jurisdiction-select", "Jurisdiction");
+  wireSettingsSelectControl(panel, ".settings-version-select", "Version");
   wireReaderFontFamilyControl(panel);
 
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
@@ -15138,6 +15140,65 @@ function renderSettings() {
   return panel;
 }
 
+function setSettingsInlineControlOpen(toggle, options, open, label) {
+  const optionsInner = options.querySelector(".settings-inline-select-options-inner");
+  if (optionsInner) {
+    options.style.setProperty("--settings-inline-options-height", `${optionsInner.scrollHeight}px`);
+  }
+  options.classList.toggle("is-open", open);
+  options.setAttribute("aria-hidden", String(!open));
+  toggle.setAttribute("aria-expanded", String(open));
+  toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} ${label}`);
+  options.querySelectorAll('button[role="option"]').forEach((button) => {
+    button.tabIndex = open ? 0 : -1;
+  });
+}
+
+function wireSettingsSelectControl(panel, selector, label) {
+  const select = panel.querySelector(selector);
+  const control = select?.closest(".settings-inline-select-control");
+  const toggle = control?.querySelector(".settings-inline-select-toggle");
+  const valueLabel = control?.querySelector(".settings-inline-select-value");
+  const options = control?.querySelector(".settings-inline-select-options");
+  const optionsInner = options?.querySelector(".settings-inline-select-options-inner");
+  if (!select || !toggle || !valueLabel || !options || !optionsInner) return;
+
+  const close = () => setSettingsInlineControlOpen(toggle, options, false, label);
+  const syncControl = () => {
+    const selectedOption = select.options[select.selectedIndex];
+    valueLabel.textContent = selectedOption?.textContent || "";
+    optionsInner.querySelectorAll('button[role="option"]').forEach((button) => {
+      button.setAttribute("aria-selected", String(button.dataset.value === select.value));
+    });
+  };
+  const renderOptions = () => {
+    optionsInner.replaceChildren();
+    Array.from(select.options).forEach((option) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.setAttribute("role", "option");
+      button.dataset.value = option.value;
+      button.textContent = option.textContent;
+      button.addEventListener("click", () => {
+        select.value = option.value;
+        select.dispatchEvent(new Event("change", { bubbles: true }));
+        syncControl();
+        close();
+        toggle.focus();
+      });
+      optionsInner.append(button);
+    });
+    syncControl();
+    close();
+  };
+
+  toggle.addEventListener("click", () => {
+    setSettingsInlineControlOpen(toggle, options, !options.classList.contains("is-open"), label);
+  });
+  select.addEventListener("change", syncControl);
+  renderOptions();
+}
+
 function wireReaderFontFamilyControl(panel) {
   const toggle = panel.querySelector(".settings-font-family-toggle");
   const valueLabel = panel.querySelector(".settings-font-family-value");
@@ -15160,12 +15221,15 @@ function wireReaderFontFamilyControl(panel) {
   };
 
   syncControl();
+  setSettingsInlineControlOpen(toggle, options, false, "Reader Font");
 
   toggle?.addEventListener("click", () => {
-    const willOpen = options.hidden;
-    options.hidden = !willOpen;
-    toggle.setAttribute("aria-expanded", String(willOpen));
-    toggle.setAttribute("aria-label", `${willOpen ? "Collapse" : "Expand"} Reader Font`);
+    setSettingsInlineControlOpen(
+      toggle,
+      options,
+      !options.classList.contains("is-open"),
+      "Reader Font"
+    );
   });
 
   optionButtons.forEach((button) => {
@@ -15173,9 +15237,7 @@ function wireReaderFontFamilyControl(panel) {
       state.readerSettings.fontFamily = button.dataset.readerFontFamily || "system";
       syncControl();
       saveWorkspaceState();
-      options.hidden = true;
-      toggle?.setAttribute("aria-expanded", "false");
-      toggle?.setAttribute("aria-label", "Expand Reader Font");
+      setSettingsInlineControlOpen(toggle, options, false, "Reader Font");
       toggle?.focus();
     });
   });

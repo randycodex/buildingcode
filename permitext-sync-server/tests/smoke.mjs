@@ -406,11 +406,13 @@ async function main() {
       "Web Settings still includes the retired Reader Preview sliders."
     );
     assert(
-      settingsTemplateSource.includes('class="settings-font-family-toggle"') &&
-        settingsTemplateSource.includes('class="settings-font-family-options"') &&
+      settingsTemplateSource.includes("settings-font-family-toggle") &&
+        settingsTemplateSource.includes("settings-font-family-options") &&
+        settingsTemplateSource.includes("settings-jurisdiction-select settings-inline-select-native") &&
+        settingsTemplateSource.includes("settings-version-select settings-inline-select-native") &&
         settingsTemplateSource.includes('data-reader-font-family="monospaced"') &&
         !settingsTemplateSource.includes('class="preview-font-family-select"'),
-      "Reader Font should expand inline in Settings instead of using a dropdown."
+      "Every Code Preferences choice should expand inline in Settings instead of using a dropdown."
     );
     assert(
       webRoot.text.includes('class="reader-spacing-controls"') &&
@@ -905,7 +907,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v66'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v68'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -919,7 +921,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v61'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v63'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1261,11 +1263,14 @@ async function main() {
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
-      workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(willOpen))') &&
+      workspaceScript.text.includes("function wireSettingsSelectControl(panel, selector, label)") &&
+        workspaceScript.text.includes('options.classList.toggle("is-open", open)') &&
         workspaceScript.text.includes('button.dataset.readerFontFamily || "system"') &&
-        workspaceStyles.text.match(/\.settings-font-family-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.settings-font-family-options \{[\s\S]*?display: grid;/),
-      "Reader Font should expand inline without a pill-shaped trigger."
+        workspaceStyles.text.match(/\.settings-inline-select-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.settings-inline-select-options \{[\s\S]*?max-height: 0;[\s\S]*?transition:/) &&
+        workspaceStyles.text.match(/\.settings-inline-select-options\.is-open \{[\s\S]*?max-height: var\(--settings-inline-options-height, 240px\);/) &&
+        workspaceScript.text.includes('"--settings-inline-options-height"'),
+      "Code Preferences should expand smoothly inline without pill-shaped triggers."
     );
     assert(
       !workspaceStyles.text.includes(".search-all-codes"),
