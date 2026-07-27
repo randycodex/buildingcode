@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v55";
+} from "./offline-storage.js?v=20260726-web-reliability-v56";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6426,6 +6426,7 @@ async function renderReader(reader, options = {}) {
     await populateReaderSelectors(panel, reader);
     await renderSectionContent(panel, reader);
   }
+  panel.dataset.readerContentKey = readerContentScrollKey(reader);
 
   return panel;
 }
@@ -15332,7 +15333,56 @@ function scrollPaneIntoView(paneID, behavior = "smooth") {
   }
 }
 
+function readerContentScrollKey(reader) {
+  return [
+    reader?.codePrefix || "BC",
+    reader?.chapterID || "",
+    reader?.sectionID || ""
+  ].join(":");
+}
+
+function captureReaderScrollPositions() {
+  const positions = new Map();
+  track.querySelectorAll('.workspace-panel[data-pane-id^="reader:"]').forEach((panel) => {
+    const content = panel.querySelector(".reader-content");
+    const contentKey = panel.dataset.readerContentKey || "";
+    if (!content || !contentKey) return;
+    positions.set(panel.dataset.paneId, {
+      contentKey,
+      scrollTop: content.scrollTop
+    });
+  });
+  return positions;
+}
+
+function restoreReaderScrollPositions(positions) {
+  if (!positions?.size) return;
+  const restore = () => {
+    positions.forEach((position, paneID) => {
+      const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+      const content = panel?.querySelector(".reader-content");
+      if (
+        !content ||
+        panel.dataset.readerContentKey !== position.contentKey
+      ) {
+        return;
+      }
+      const scrollTop = Math.min(
+        position.scrollTop,
+        Math.max(0, content.scrollHeight - content.clientHeight)
+      );
+      content.scrollTop = scrollTop;
+      const comments = panel.querySelector(".reader-comments");
+      if (comments) comments.scrollTop = scrollTop;
+      updateReaderScrollIndicator(panel);
+    });
+  };
+  restore();
+  requestAnimationFrame(restore);
+}
+
 async function renderWorkspace() {
+  const readerScrollPositions = captureReaderScrollPositions();
   await ensureSyncedContentForRender();
   enforceReaderPlanLimit();
   updateReaderPlanControls();
@@ -15378,6 +15428,7 @@ async function renderWorkspace() {
     panes.push(await renderReader(reader));
   }
   appendPaneSequence(panes);
+  restoreReaderScrollPositions(readerScrollPositions);
   syncAllCommentBoxHeights();
   bindAllReaderCommentScroll();
   enhanceReaderSelects();

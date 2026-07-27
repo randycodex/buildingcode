@@ -888,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v55'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v56'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1050,6 +1050,15 @@ async function main() {
         workspaceScript.text.match(/overlay\.remove\(\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
         workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenReaderNotesProjectEditors\(\);/),
       "Creating or editing a Project no longer preserves open paragraph cards and refreshes their Project pills."
+    );
+    assert(
+      workspaceScript.text.includes("function captureReaderScrollPositions()") &&
+        workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
+        workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
+        workspaceScript.text.match(/async function renderWorkspace\(\) \{\s+const readerScrollPositions = captureReaderScrollPositions\(\);/) &&
+        workspaceScript.text.match(/appendPaneSequence\(panes\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
+        workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
+      "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."
     );
     assert(
       workspaceScript.text.includes('"Sign out with unfinished sync?"') &&
