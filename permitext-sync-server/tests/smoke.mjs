@@ -880,7 +880,9 @@ async function main() {
         workspaceScript.text.includes('appendHistorySection("Pinned"') &&
         workspaceScript.text.includes('appendHistorySection("Recent Searches"') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
-        workspaceScript.text.includes("function pinSearch") &&
+        !workspaceScript.text.includes("function pinSearch") &&
+        !workspaceScript.text.includes('"Pin search"') &&
+        workspaceScript.text.includes('"Unpin search"') &&
         workspaceScript.text.includes("function removeRecentSearch") &&
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
         searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
@@ -918,7 +920,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v72'),
+        webRoot.text.includes('/web/app.js?v=20260727-search-history-v73'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

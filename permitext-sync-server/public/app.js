@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v72";
+} from "./offline-storage.js?v=20260727-search-history-v73";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6587,13 +6587,6 @@ function isSearchPinned(query) {
   return Boolean(trimmed) && (state.pinnedSearches || []).some((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) === 0);
 }
 
-function pinSearch(query) {
-  const trimmed = String(query || "").trim();
-  if (!trimmed || isSearchPinned(trimmed)) return;
-  state.pinnedSearches = normalizeSearchHistory([trimmed, ...(state.pinnedSearches || [])]);
-  saveWorkspaceState();
-}
-
 function unpinSearch(query) {
   const trimmed = String(query || "").trim();
   state.pinnedSearches = (state.pinnedSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0);
@@ -6760,18 +6753,19 @@ function renderSearchHistory(panel, instance) {
         updateSearchDock(panel, instance);
         renderSearchResults(panel, instance);
       });
-      const pinButton = document.createElement("button");
-      pinButton.type = "button";
-      pinButton.className = `search-history-action${pinnedSection ? " is-active" : ""}`;
-      pinButton.setAttribute("aria-label", pinnedSection ? "Unpin search" : "Pin search");
-      pinButton.innerHTML = searchHistoryIconSVG("pin");
-      pinButton.addEventListener("click", () => {
-        if (pinnedSection) unpinSearch(query);
-        else pinSearch(query);
-        renderSearchHistory(panel, instance);
-      });
-      row.append(applyButton, pinButton);
-      if (!pinnedSection) {
+      row.append(applyButton);
+      if (pinnedSection) {
+        const unpinButton = document.createElement("button");
+        unpinButton.type = "button";
+        unpinButton.className = "search-history-action is-active";
+        unpinButton.setAttribute("aria-label", "Unpin search");
+        unpinButton.innerHTML = searchHistoryIconSVG("pin");
+        unpinButton.addEventListener("click", () => {
+          unpinSearch(query);
+          renderSearchHistory(panel, instance);
+        });
+        row.append(unpinButton);
+      } else {
         const removeButton = document.createElement("button");
         removeButton.type = "button";
         removeButton.className = "search-history-action";
