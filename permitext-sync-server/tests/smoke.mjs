@@ -921,7 +921,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v64'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v65'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1286,13 +1286,12 @@ async function main() {
       "Search code filters should render as two-column 12-pixel regular-weight pills."
     );
     assert(
-      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
-        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 34px;[\s\S]*?border-radius: 0;/) &&
-        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip,[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
+      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: fit-content;[\s\S]*?min-height: 28px;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved code filters should match the Search column's vertical text list."
+      "Saved code filters should match the Search column's two-column 12-pixel pills."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
