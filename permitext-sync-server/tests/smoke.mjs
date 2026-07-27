@@ -856,12 +856,12 @@ async function main() {
         workspaceScript.text.includes("function pinSearch") &&
         workspaceScript.text.includes("function removeRecentSearch") &&
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
-        searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
-        searchTemplateSource.indexOf('class="search-result-summary"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
+        searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
+        searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
         !searchTemplateSource.includes("search-all-codes") &&
         !workspaceScript.text.includes("search-all-codes") &&
-        searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-results"'),
-      "Search field no longer sits below the column title and above the summary, filters, and results."
+        searchTemplateSource.indexOf('class="search-result-summary"') < searchTemplateSource.indexOf('class="search-results"'),
+      "Search count no longer sits between the code filter list and the first result."
     );
     assert(
       workspaceScript.text.includes("const savedFilterScrollPositions = new Map();") &&
@@ -902,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v50'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v51'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1245,6 +1245,10 @@ async function main() {
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
       "Search code filters no longer render as a vertical full-width list."
+    );
+    assert(
+      workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
+      "Search result count should remain white and centered below the code filter list."
     );
     assert(
       workspaceStyles.text.includes(".custom-select-group-label") &&
