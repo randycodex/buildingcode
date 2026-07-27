@@ -919,7 +919,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v58'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v59'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1271,13 +1271,13 @@ async function main() {
       "Search still styles the retired All Codes button."
     );
     assert(
-      workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
+      workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
         workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 34px;[\s\S]*?border-radius: 0;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip,[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
-      "Search code filters no longer render as a vertical full-width list."
+      "Search code filters should render as a two-column plain-text list."
     );
     assert(
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
