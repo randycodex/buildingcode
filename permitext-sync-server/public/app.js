@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-zoning-reader-v75";
+} from "./offline-storage.js?v=20260727-reader-resize-v76";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1773,10 +1773,16 @@ function applyPaneWeight(panel, paneID) {
   const value = Number(state.paneWeights[paneID]);
   const hasManyColumns = activePaneIDs().length >= 4;
   const flexibleReader = isFlexibleReaderPaneID(paneID);
+  const explicitlyResizedReader = flexibleReader &&
+    Number.isFinite(value) &&
+    value > defaultWidth + 0.5;
   const width = Number.isFinite(value) && value > 40
     ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
     : defaultWidth;
-  panel.style.setProperty("--pane-resized-min-width", `${flexibleReader ? defaultWidth : width}px`);
+  panel.style.setProperty(
+    "--pane-resized-min-width",
+    `${flexibleReader && !explicitlyResizedReader ? defaultWidth : width}px`
+  );
   panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
@@ -1787,11 +1793,11 @@ function applyPaneWeight(panel, paneID) {
     return;
   }
   if (paneID?.startsWith("reader:")) {
-    if (flexibleReader) {
+    if (flexibleReader && !explicitlyResizedReader) {
       panel.style.flex = `1 1 ${width}px`;
       return;
     }
-    panel.style.flex = `${Math.max(1, width)} 1 0`;
+    panel.style.flex = `0 0 ${width}px`;
     return;
   }
   panel.style.flex = `1 1 ${width}px`;

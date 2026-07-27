@@ -821,9 +821,11 @@ async function main() {
         workspaceScript.text.includes("if (isProAccount()) return true;") &&
         workspaceScript.text.includes("(state.readers || []).length === 2") &&
         workspaceScript.text.includes("if (isFlexibleReaderPaneID(paneID)) return false;") &&
-        workspaceScript.text.includes('`${flexibleReader ? defaultWidth : width}px`') &&
-        workspaceScript.text.includes("if (flexibleReader)") &&
-        workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`'),
+        workspaceScript.text.includes("const explicitlyResizedReader = flexibleReader") &&
+        workspaceScript.text.includes("value > defaultWidth + 0.5") &&
+        workspaceScript.text.includes("if (flexibleReader && !explicitlyResizedReader)") &&
+        workspaceScript.text.includes('panel.style.flex = `1 1 ${width}px`') &&
+        workspaceScript.text.includes('panel.style.flex = `0 0 ${width}px`'),
       "Pro Readers and Free dual Readers should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
@@ -925,7 +927,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-zoning-reader-v75'),
+        webRoot.text.includes('/web/app.js?v=20260727-reader-resize-v76'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
