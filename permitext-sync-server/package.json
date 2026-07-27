@@ -45,7 +45,7 @@
     "@tiptap/extension-text": "3.29.0",
     "@tiptap/extensions": "3.29.0",
     "@tiptap/html": "3.29.0",
-    "@tiptap/pm": "3.29.0",
+    "@tiptap/pm": "3.29.1",
     "@vercel/blob": "^2.6.1",
     "pdfkit": "^0.17.1",
     "react": "^19.2.7",
