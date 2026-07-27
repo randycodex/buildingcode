@@ -921,7 +921,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v65'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v66'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1267,10 +1267,11 @@ async function main() {
         workspaceScript.text.includes('options.classList.toggle("is-open", open)') &&
         workspaceScript.text.includes('button.dataset.readerFontFamily || "system"') &&
         workspaceStyles.text.match(/\.settings-inline-select-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.settings-inline-select-toggle:hover,[\s\S]*?\.settings-inline-select-toggle:focus-visible \{[\s\S]*?text-decoration: none;/) &&
         workspaceStyles.text.match(/\.settings-inline-select-options \{[\s\S]*?max-height: 0;[\s\S]*?transition:/) &&
         workspaceStyles.text.match(/\.settings-inline-select-options\.is-open \{[\s\S]*?max-height: var\(--settings-inline-options-height, 240px\);/) &&
         workspaceScript.text.includes('"--settings-inline-options-height"'),
-      "Code Preferences should expand smoothly inline without pill-shaped triggers."
+      "Code Preferences should expand smoothly inline without pill-shaped triggers or underlined values."
     );
     assert(
       !workspaceStyles.text.includes(".search-all-codes"),

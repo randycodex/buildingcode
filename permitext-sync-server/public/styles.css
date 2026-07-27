@@ -7520,8 +7520,7 @@ button.project-studio-metric:focus-visible {
 .settings-inline-select-toggle:focus-visible {
   color: var(--code-accent);
   outline: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
+  text-decoration: none;
 }
 
 .settings-inline-select-options {
