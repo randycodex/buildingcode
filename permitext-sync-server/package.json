@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.3",
-    "parse5": "^8.0.0",
+    "parse5": "^8.0.1",
     "vite": "^8.1.5"
   }
 }
