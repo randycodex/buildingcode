@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v69";
+} from "./offline-storage.js?v=20260726-web-reliability-v70";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1813,12 +1813,16 @@ function codeDisplayLabel(prefix = "BC") {
   return codeOptionFor(prefix).label;
 }
 
+function codeFilterLabel(option) {
+  return option.prefix === "AC" ? "Gen Administrative Code" : option.label;
+}
+
 function searchCodeFilterOptions() {
   const dynamicPrefixes = new Set(chapters.map((chapter) => chapter.codePrefix).filter(Boolean));
   const options = [{ prefix: "ALL", label: "All Sections" }];
   codeOptions.forEach((option) => {
     if (dynamicPrefixes.size === 0 || dynamicPrefixes.has(option.prefix)) {
-      options.push(option);
+      options.push({ ...option, label: codeFilterLabel(option) });
       dynamicPrefixes.delete(option.prefix);
     }
   });

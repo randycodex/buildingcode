@@ -903,11 +903,12 @@ async function main() {
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
+        workspaceScript.text.includes('return option.prefix === "AC" ? "Gen Administrative Code" : option.label;') &&
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v69'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v70'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
