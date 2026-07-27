@@ -7522,6 +7522,78 @@ button.project-studio-metric:focus-visible {
   min-height: 30px;
 }
 
+.settings-font-family-control {
+  display: grid;
+  min-width: 0;
+}
+
+.settings-font-family-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 30px;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 9.5pt !important;
+  text-align: right;
+  box-shadow: none;
+  appearance: none;
+}
+
+.settings-font-family-toggle:hover,
+.settings-font-family-toggle:focus-visible {
+  color: var(--code-accent);
+  outline: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.settings-font-family-options {
+  display: grid;
+  margin-top: 2px;
+  border-top: 1px solid var(--border);
+}
+
+.settings-font-family-options[hidden] {
+  display: none;
+}
+
+.settings-font-family-options button {
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 9.5pt !important;
+  text-align: right;
+  box-shadow: none;
+  appearance: none;
+}
+
+.settings-font-family-options button:last-child {
+  border-bottom: 0;
+}
+
+.settings-font-family-options button:hover,
+.settings-font-family-options button:focus-visible,
+.settings-font-family-options button[aria-selected="true"] {
+  background: transparent;
+  color: var(--text-primary);
+  outline: 0;
+}
+
+.settings-font-family-options button[aria-selected="true"] {
+  font-weight: 700;
+}
+
 .settings-panel .settings-plan-features {
   gap: var(--space-1);
 }

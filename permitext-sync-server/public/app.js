@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v62";
+} from "./offline-storage.js?v=20260726-web-reliability-v63";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -15123,20 +15123,45 @@ function renderSettings() {
 }
 
 function wireReaderFontFamilyControl(panel) {
-  const fontSelect = panel.querySelector(".preview-font-family-select");
+  const toggle = panel.querySelector(".settings-font-family-toggle");
+  const valueLabel = panel.querySelector(".settings-font-family-value");
+  const options = panel.querySelector(".settings-font-family-options");
+  const optionButtons = Array.from(panel.querySelectorAll("[data-reader-font-family]"));
 
   const syncControl = () => {
     state.readerSettings = normalizeReaderSettings(state.readerSettings);
-    if (fontSelect) fontSelect.value = state.readerSettings.fontFamily;
+    const selectedButton = optionButtons.find(
+      (button) => button.dataset.readerFontFamily === state.readerSettings.fontFamily
+    );
+    if (valueLabel) valueLabel.textContent = selectedButton?.textContent || "System";
+    optionButtons.forEach((button) => {
+      button.setAttribute(
+        "aria-selected",
+        String(button.dataset.readerFontFamily === state.readerSettings.fontFamily)
+      );
+    });
     applyReaderSettings();
   };
 
   syncControl();
 
-  fontSelect?.addEventListener("change", () => {
-    state.readerSettings.fontFamily = fontSelect.value;
-    syncControl();
-    saveWorkspaceState();
+  toggle?.addEventListener("click", () => {
+    const willOpen = options.hidden;
+    options.hidden = !willOpen;
+    toggle.setAttribute("aria-expanded", String(willOpen));
+    toggle.setAttribute("aria-label", `${willOpen ? "Collapse" : "Expand"} Reader Font`);
+  });
+
+  optionButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      state.readerSettings.fontFamily = button.dataset.readerFontFamily || "system";
+      syncControl();
+      saveWorkspaceState();
+      options.hidden = true;
+      toggle?.setAttribute("aria-expanded", "false");
+      toggle?.setAttribute("aria-label", "Expand Reader Font");
+      toggle?.focus();
+    });
   });
 }
 

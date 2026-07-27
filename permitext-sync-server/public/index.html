@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260726-web-reliability-v56">
+    <link rel="stylesheet" href="/web/styles.css?v=20260726-web-reliability-v57">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -366,15 +366,20 @@
               <option value="CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1">NYC Zoning Resolution</option>
             </select>
           </label>
-          <label class="settings-row">
+          <div class="settings-row settings-font-row">
             <span>Reader Font</span>
-            <select class="preview-font-family-select" aria-label="Reader font">
-              <option value="system">System</option>
-              <option value="rounded">Rounded</option>
-              <option value="serif">Serif</option>
-              <option value="monospaced">Monospaced</option>
-            </select>
-          </label>
+            <div class="settings-font-family-control">
+              <button class="settings-font-family-toggle" type="button" aria-label="Expand Reader Font" aria-expanded="false">
+                <span class="settings-font-family-value">System</span>
+              </button>
+              <div class="settings-font-family-options" role="listbox" aria-label="Reader Font" hidden>
+                <button type="button" role="option" data-reader-font-family="system">System</button>
+                <button type="button" role="option" data-reader-font-family="rounded">Rounded</button>
+                <button type="button" role="option" data-reader-font-family="serif">Serif</button>
+                <button type="button" role="option" data-reader-font-family="monospaced">Monospaced</button>
+              </div>
+            </div>
+          </div>
         </section>
         <section class="settings-card settings-plan-card" aria-labelledby="settings-plan-title">
           <h3 id="settings-plan-title" class="section-label settings-section-title">Plan</h3>
@@ -456,6 +461,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260726-web-reliability-v62" type="module"></script>
+    <script src="/web/app.js?v=20260726-web-reliability-v63" type="module"></script>
   </body>
 </html>
