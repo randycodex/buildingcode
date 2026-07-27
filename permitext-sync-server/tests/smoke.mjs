@@ -348,6 +348,10 @@ async function main() {
       "Web Settings groups do not match the iOS Settings order."
     );
     assert(
+      settingsTemplateSource.includes('class="icon-button utility-close settings-close-button"'),
+      "Settings should use the same close-column control as the other workspace columns."
+    );
+    assert(
       !settingsTemplateSource.includes("Destructive Actions") &&
         !settingsTemplateSource.includes("Changes apply to the current code data and synced devices."),
       "Web Settings restored the redundant destructive-actions heading or helper copy."
@@ -430,6 +434,10 @@ async function main() {
     );
 
     const workspaceScript = await request("/web/app.js");
+    assert(
+      workspaceScript.text.includes('panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"))'),
+      "Settings close-column control is not wired to close the Settings pane."
+    );
     const syncStateScript = await request("/web/sync-state.js");
     const evidenceDiscoveryClientSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function renderEvidenceDiscovery"),
@@ -910,7 +918,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v71'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v72'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

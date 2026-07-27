@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v71";
+} from "./offline-storage.js?v=20260726-web-reliability-v72";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14648,6 +14648,7 @@ function wireSettingsCardCollapsing(panel) {
 function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
+  panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   wireSettingsCardCollapsing(panel);
   wireSettingsSelectControl(panel, ".settings-jurisdiction-select", "Jurisdiction");
   wireSettingsSelectControl(panel, ".settings-version-select", "Version");
