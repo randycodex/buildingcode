@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v63";
+} from "./offline-storage.js?v=20260726-web-reliability-v64";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -12950,7 +12950,7 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
   let draggedProjectID = "";
   const clearDropIndicators = () => {
     list.querySelectorAll(".saved-project-tile").forEach((tile) => {
-      tile.classList.remove("is-dragging", "is-drop-before", "is-drop-after");
+      tile.classList.remove("is-drop-before", "is-drop-after");
     });
   };
   const reorderProject = async (sourceID, targetID, placeAfter) => {
@@ -12978,6 +12978,7 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
       tile.dataset.projectId = projectRecordID(project);
       if (!project.sharedOnly) {
         tile.dataset.draggable = "true";
+        tile.draggable = true;
         tile.title = "Drag to reorder · Alt+Arrow keys also move this Project";
         tile.setAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
       }
@@ -13043,65 +13044,52 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
         event.preventDefault();
         open();
       });
-      let pointerStartY = 0;
-      let activePointerID = null;
-      let pointerDragActive = false;
-      tile.addEventListener("pointerdown", (event) => {
-        if (project.sharedOnly || event.button !== 0) return;
-        if (event.target.closest(".saved-project-tile-actions")) return;
-        pointerStartY = event.clientY;
-        activePointerID = event.pointerId;
-        pointerDragActive = false;
-        tile.setPointerCapture(event.pointerId);
-      });
-      tile.addEventListener("pointermove", (event) => {
-        if (activePointerID !== event.pointerId) return;
-        if (!pointerDragActive && Math.abs(event.clientY - pointerStartY) < 6) return;
-        event.preventDefault();
-        pointerDragActive = true;
+      tile.addEventListener("dragstart", (event) => {
+        if (project.sharedOnly || event.target.closest(".saved-project-tile-actions")) {
+          event.preventDefault();
+          return;
+        }
         draggedProjectID = projectRecordID(project);
         tile.dataset.justDragged = "true";
         clearDropIndicators();
+        list.querySelectorAll(".saved-project-tile.is-dragging").forEach((candidate) => {
+          candidate.classList.remove("is-dragging");
+        });
         tile.classList.add("is-dragging");
-        const targets = Array.from(list.querySelectorAll(".saved-project-tile")).filter(
-          (candidate) => candidate !== tile && candidate.dataset.draggable === "true"
-        );
-        const target = targets.find((candidate) => {
-          const bounds = candidate.getBoundingClientRect();
-          return event.clientY >= bounds.top && event.clientY <= bounds.bottom;
-        }) || targets.reduce((closest, candidate) => {
-          if (!closest) return candidate;
-          const candidateBounds = candidate.getBoundingClientRect();
-          const closestBounds = closest.getBoundingClientRect();
-          return Math.abs(event.clientY - candidateBounds.top - (candidateBounds.height / 2))
-            < Math.abs(event.clientY - closestBounds.top - (closestBounds.height / 2))
-            ? candidate
-            : closest;
-        }, null);
-        if (!target) return;
-        const bounds = target.getBoundingClientRect();
-        target.classList.add(event.clientY >= bounds.top + (bounds.height / 2) ? "is-drop-after" : "is-drop-before");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", draggedProjectID);
       });
-      const finishPointerDrag = (event) => {
-        if (activePointerID !== event.pointerId) return;
-        if (tile.hasPointerCapture(event.pointerId)) tile.releasePointerCapture(event.pointerId);
-        activePointerID = null;
-        if (!pointerDragActive) return;
+      tile.addEventListener("dragover", (event) => {
+        const sourceID = draggedProjectID || event.dataTransfer.getData("text/plain");
+        if (!sourceID || sourceID === tile.dataset.projectId || tile.dataset.draggable !== "true") return;
         event.preventDefault();
-        const target = list.querySelector(".saved-project-tile.is-drop-before, .saved-project-tile.is-drop-after");
-        const sourceID = draggedProjectID;
-        const targetID = target?.dataset.projectId || "";
-        const placeAfter = Boolean(target?.classList.contains("is-drop-after"));
-        pointerDragActive = false;
-        draggedProjectID = "";
+        event.dataTransfer.dropEffect = "move";
+        const bounds = tile.getBoundingClientRect();
+        const horizontalDistance = Math.abs(event.clientX - (bounds.left + (bounds.width / 2)));
+        const verticalDistance = Math.abs(event.clientY - (bounds.top + (bounds.height / 2)));
+        const placeAfter = horizontalDistance >= verticalDistance
+          ? event.clientX >= bounds.left + (bounds.width / 2)
+          : event.clientY >= bounds.top + (bounds.height / 2);
         clearDropIndicators();
-        if (sourceID && targetID) void reorderProject(sourceID, targetID, placeAfter);
+        tile.classList.add(placeAfter ? "is-drop-after" : "is-drop-before");
+      });
+      tile.addEventListener("drop", (event) => {
+        const sourceID = draggedProjectID || event.dataTransfer.getData("text/plain");
+        if (!sourceID || sourceID === tile.dataset.projectId) return;
+        event.preventDefault();
+        const placeAfter = tile.classList.contains("is-drop-after");
+        const targetID = tile.dataset.projectId || "";
+        clearDropIndicators();
+        if (targetID) void reorderProject(sourceID, targetID, placeAfter);
+      });
+      tile.addEventListener("dragend", () => {
+        draggedProjectID = "";
+        tile.classList.remove("is-dragging");
+        clearDropIndicators();
         requestAnimationFrame(() => {
           tile.dataset.justDragged = "false";
         });
-      };
-      tile.addEventListener("pointerup", finishPointerDrag);
-      tile.addEventListener("pointercancel", finishPointerDrag);
+      });
       list.append(tile);
     });
 }

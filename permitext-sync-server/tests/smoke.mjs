@@ -562,9 +562,11 @@ async function main() {
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
         workspaceScript.text.includes("sortOrder: nextProjectSortOrder()") &&
-        workspaceScript.text.includes('tile.addEventListener("pointerdown"') &&
-        workspaceScript.text.includes('tile.addEventListener("pointermove"') &&
-        workspaceScript.text.includes('tile.addEventListener("pointerup"') &&
+        workspaceScript.text.includes("tile.draggable = true") &&
+        workspaceScript.text.includes('tile.addEventListener("dragstart"') &&
+        workspaceScript.text.includes('tile.addEventListener("dragover"') &&
+        workspaceScript.text.includes('tile.addEventListener("drop"') &&
+        workspaceScript.text.includes('tile.addEventListener("dragend"') &&
         workspaceScript.text.includes('event.altKey') &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
         workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
@@ -903,7 +905,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v63'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v64'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -917,7 +919,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v57'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v58'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1300,11 +1302,14 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&
-        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;/) &&
+        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
         workspaceStyles.text.includes('.saved-project-tile[data-draggable="true"]') &&
+        workspaceStyles.text.match(/\.saved-project-tile\.is-dragging \{[\s\S]*?opacity: 0\.82;/) &&
         workspaceStyles.text.includes(".saved-project-tile.is-drop-before::before") &&
+        workspaceScript.text.includes("tile.draggable = true") &&
+        workspaceScript.text.includes('tile.addEventListener("dragstart"') &&
         !workspaceStyles.text.includes(".saved-project-page-dots"),
-      "Saved Projects should remain a vertically scrollable, reorderable card stack."
+      "Saved Projects should remain a vertically scrollable, reorderable two-column card grid."
     );
     assert(
       workspaceStyles.text.includes(".custom-select-group-label") &&
