@@ -534,9 +534,11 @@ async function main() {
     assert(
       savedTemplateSource.includes('aria-label="Sort saved sections"') &&
         savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
+        savedTemplateSource.includes('class="saved-column-scroll"') &&
         savedTemplateSource.includes('class="saved-projects-section"') &&
-        savedTemplateSource.includes('class="saved-project-pages"') &&
-        savedTemplateSource.includes('class="saved-project-page-dots"') &&
+        savedTemplateSource.includes('class="saved-project-list"') &&
+        !savedTemplateSource.includes('class="saved-project-pages"') &&
+        !savedTemplateSource.includes('class="saved-project-page-dots"') &&
         savedTemplateSource.includes('aria-label="Add project"') &&
         savedTemplateSource.includes('class="saved-code-filter"') &&
         savedTemplateSource.includes('class="saved-tag-filter"') &&
@@ -551,7 +553,13 @@ async function main() {
       workspaceScript.text.includes("function renderSavedProjects(panel, paneID, projects, projectSections)") &&
         workspaceScript.text.includes("function projectForegroundColor(color)") &&
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
-        workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
+        workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
+        workspaceScript.text.includes("sortOrder: nextProjectSortOrder()") &&
+        workspaceScript.text.includes('tile.addEventListener("pointerdown"') &&
+        workspaceScript.text.includes('tile.addEventListener("pointermove"') &&
+        workspaceScript.text.includes('tile.addEventListener("pointerup"') &&
+        workspaceScript.text.includes('event.altKey') &&
+        !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
         workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
       "Combined Saved no longer owns the project grid and project-detail flow."
@@ -888,7 +896,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v56'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v59'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -902,7 +910,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v52'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v54'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1210,7 +1218,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("{ ...project, updatedAt: deletedAt, deletedAt }") &&
         workspaceScript.text.includes("// Keep the local deletion tombstone while sync recovers.") &&
-        workspaceScript.text.includes("filter((project) => !project.deletedAt).sort"),
+        workspaceScript.text.match(/filter\(\(project\) => !project\.deletedAt\)\s*\.sort/),
       "Project deletion no longer completes locally while account sync is pending."
     );
     assert(
@@ -1258,6 +1266,14 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
       "Search result count should remain white and centered below the code filter list."
+    );
+    assert(
+      workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&
+        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;/) &&
+        workspaceStyles.text.includes('.saved-project-tile[data-draggable="true"]') &&
+        workspaceStyles.text.includes(".saved-project-tile.is-drop-before::before") &&
+        !workspaceStyles.text.includes(".saved-project-page-dots"),
+      "Saved Projects should remain a vertically scrollable, reorderable card stack."
     );
     assert(
       workspaceStyles.text.includes(".custom-select-group-label") &&

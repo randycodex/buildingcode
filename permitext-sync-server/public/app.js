@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v56";
+} from "./offline-storage.js?v=20260726-web-reliability-v59";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4204,6 +4204,23 @@ function projectRecordID(project) {
   return String(project?.id || project?.clientID || project?.localFolderID || "");
 }
 
+function projectSortOrder(project) {
+  const value = Number(project?.sortOrder);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
+}
+
+function compareProjectOrder(left, right) {
+  const orderDifference = projectSortOrder(left) - projectSortOrder(right);
+  if (orderDifference) return orderDifference;
+  const createdDifference = Date.parse(left?.createdAt || 0) - Date.parse(right?.createdAt || 0);
+  if (Number.isFinite(createdDifference) && createdDifference) return createdDifference;
+  return String(left?.name || left?.title || "").localeCompare(
+    String(right?.name || right?.title || ""),
+    undefined,
+    { numeric: true, sensitivity: "base" }
+  );
+}
+
 function archivedProjectIDSet() {
   state.archivedProjectIDs = Array.isArray(state.archivedProjectIDs) ? state.archivedProjectIDs.map(String) : [];
   return new Set(state.archivedProjectIDs);
@@ -4258,12 +4275,9 @@ function visibleProjectRecords(syncedProjects = []) {
       // names and colors cannot drift after another device updates them.
       if (identity) mergeNewestRecord(byIdentity, identity, project);
     });
-  return Array.from(byIdentity.values()).filter((project) => !project.deletedAt).sort((left, right) =>
-    String(left.name || left.title || "").localeCompare(String(right.name || right.title || ""), undefined, {
-      numeric: true,
-      sensitivity: "base"
-    })
-  );
+  return Array.from(byIdentity.values())
+    .filter((project) => !project.deletedAt)
+    .sort(compareProjectOrder);
 }
 
 function activeProjectRecords(syncedProjects = []) {
@@ -4284,6 +4298,11 @@ function nextProjectName() {
   let index = 1;
   while (usedNumbers.has(index)) index += 1;
   return `P${index}`;
+}
+
+function nextProjectSortOrder() {
+  const projects = activeProjectRecords(currentContentSummary().projects || []);
+  return projects.reduce((maximum, project) => Math.max(maximum, projectSortOrder(project)), -1) + 1;
 }
 
 async function createProjectFolder(details = {}) {
@@ -4308,6 +4327,7 @@ async function createProjectFolder(details = {}) {
     address,
     description,
     color: details.color || projectColorOptions[0],
+    sortOrder: nextProjectSortOrder(),
     sortMode: "Code order",
     createdAt: now,
     updatedAt: now
@@ -4327,6 +4347,40 @@ async function createProjectFolder(details = {}) {
     // The local project and queued mutation remain available while sync recovers.
   }
   return project;
+}
+
+async function persistProjectOrder(projects, paneID) {
+  const now = Date.now();
+  const updates = projects.map((project, index) => ({
+    ...project,
+    sortOrder: index,
+    updatedAt: new Date(now + index).toISOString()
+  }));
+  const updateIDs = new Set(updates.map(projectRecordID));
+  state.localProjects = [
+    ...(state.localProjects || []).filter((project) => !updateIDs.has(projectRecordID(project))),
+    ...updates
+  ];
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+
+  const account = activeAccount();
+  if (!account) return;
+  const syncedIDs = new Set();
+  for (const project of updates) {
+    if (project.sharedOnly) continue;
+    try {
+      await pushMutation(projectMutationForRecord(project, account));
+      syncedIDs.add(projectRecordID(project));
+    } catch (error) {
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    }
+  }
+  if (!syncedIDs.size) return;
+  state.localProjects = (state.localProjects || []).filter(
+    (project) => !syncedIDs.has(projectRecordID(project))
+  );
+  saveWorkspaceState();
 }
 
 async function updateProjectFolder(project, details = {}) {
@@ -12432,7 +12486,7 @@ function showProjectCreateSheet(panel, project = null) {
       refreshOpenReaderNotesProjectEditors();
     } catch (error) {
       saveButton.disabled = false;
-      const content = panel.querySelector(".projects-content, .saved-project-pages");
+      const content = panel.querySelector(".projects-content, .saved-project-list");
       if (content) appendMutedRow(content, "Project not synced", error.message || "Could not save the project folder.");
     }
   });
@@ -12862,13 +12916,11 @@ async function renderSaved(instance) {
 }
 
 function renderSavedProjects(panel, paneID, projects, projectSections) {
-  const pages = panel.querySelector(".saved-project-pages");
-  const dots = panel.querySelector(".saved-project-page-dots");
+  const list = panel.querySelector(".saved-project-list");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
   const visibleProjects = activeProjectRecords(projects);
-  clear(pages);
-  clear(dots);
+  clear(list);
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   archiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
   archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);
@@ -12877,19 +12929,29 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
     const empty = document.createElement("p");
     empty.className = "saved-projects-empty";
     empty.textContent = "No projects yet. Use + to create one.";
-    pages.append(empty);
+    list.append(empty);
     return;
   }
 
-  const projectPages = [];
-  for (let index = 0; index < visibleProjects.length; index += 4) {
-    projectPages.push(visibleProjects.slice(index, index + 4));
-  }
-  projectPages.forEach((pageProjects, pageIndex) => {
-    const page = document.createElement("div");
-    page.className = "saved-project-page";
-    page.setAttribute("aria-label", `Projects page ${pageIndex + 1} of ${projectPages.length}`);
-    pageProjects.forEach((project) => {
+  let draggedProjectID = "";
+  const clearDropIndicators = () => {
+    list.querySelectorAll(".saved-project-tile").forEach((tile) => {
+      tile.classList.remove("is-dragging", "is-drop-before", "is-drop-after");
+    });
+  };
+  const reorderProject = async (sourceID, targetID, placeAfter) => {
+    const sourceIndex = visibleProjects.findIndex((project) => projectRecordID(project) === sourceID);
+    const targetIndex = visibleProjects.findIndex((project) => projectRecordID(project) === targetID);
+    if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
+    const reordered = [...visibleProjects];
+    const [movedProject] = reordered.splice(sourceIndex, 1);
+    let insertionIndex = targetIndex - (sourceIndex < targetIndex ? 1 : 0);
+    if (placeAfter) insertionIndex += 1;
+    reordered.splice(insertionIndex, 0, movedProject);
+    await persistProjectOrder(reordered, paneID);
+  };
+
+  visibleProjects.forEach((project) => {
       const tile = document.createElement("article");
       tile.className = "saved-project-tile";
       if (project.sharedOrganizationID) tile.classList.add("is-shared");
@@ -12899,6 +12961,12 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
       tile.tabIndex = 0;
       tile.setAttribute("role", "button");
       tile.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
+      tile.dataset.projectId = projectRecordID(project);
+      if (!project.sharedOnly) {
+        tile.dataset.draggable = "true";
+        tile.title = "Drag to reorder · Alt+Arrow keys also move this Project";
+        tile.setAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
+      }
       const heading = document.createElement("strong");
       heading.textContent = project.name || project.title || "Project";
       const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
@@ -12932,30 +13000,96 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, countLabel, folderIcon, actions);
       const open = () => openProjectDetail(project, { sourcePaneID: paneID });
-      tile.addEventListener("click", open);
+      tile.addEventListener("click", () => {
+        if (tile.dataset.justDragged === "true") return;
+        open();
+      });
       tile.addEventListener("keydown", (event) => {
+        if (
+          !project.sharedOnly &&
+          event.altKey &&
+          (event.key === "ArrowUp" || event.key === "ArrowDown")
+        ) {
+          event.preventDefault();
+          const currentIndex = visibleProjects.findIndex(
+            (candidate) => projectRecordID(candidate) === projectRecordID(project)
+          );
+          const nextIndex = currentIndex + (event.key === "ArrowUp" ? -1 : 1);
+          const target = visibleProjects[nextIndex];
+          if (target) {
+            void reorderProject(
+              projectRecordID(project),
+              projectRecordID(target),
+              event.key === "ArrowDown"
+            );
+          }
+          return;
+        }
         if (event.key !== "Enter" && event.key !== " ") return;
         event.preventDefault();
         open();
       });
-      page.append(tile);
-    });
-    pages.append(page);
-    if (projectPages.length > 1) {
-      const dot = document.createElement("span");
-      dot.className = "saved-project-page-dot";
-      if (pageIndex === 0) dot.classList.add("is-active");
-      dots.append(dot);
-    }
-  });
-  if (projectPages.length > 1) {
-    pages.addEventListener("scroll", () => {
-      const pageIndex = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
-      dots.querySelectorAll(".saved-project-page-dot").forEach((dot, index) => {
-        dot.classList.toggle("is-active", index === pageIndex);
+      let pointerStartY = 0;
+      let activePointerID = null;
+      let pointerDragActive = false;
+      tile.addEventListener("pointerdown", (event) => {
+        if (project.sharedOnly || event.button !== 0) return;
+        if (event.target.closest(".saved-project-tile-actions")) return;
+        pointerStartY = event.clientY;
+        activePointerID = event.pointerId;
+        pointerDragActive = false;
+        tile.setPointerCapture(event.pointerId);
       });
-    }, { passive: true });
-  }
+      tile.addEventListener("pointermove", (event) => {
+        if (activePointerID !== event.pointerId) return;
+        if (!pointerDragActive && Math.abs(event.clientY - pointerStartY) < 6) return;
+        event.preventDefault();
+        pointerDragActive = true;
+        draggedProjectID = projectRecordID(project);
+        tile.dataset.justDragged = "true";
+        clearDropIndicators();
+        tile.classList.add("is-dragging");
+        const targets = Array.from(list.querySelectorAll(".saved-project-tile")).filter(
+          (candidate) => candidate !== tile && candidate.dataset.draggable === "true"
+        );
+        const target = targets.find((candidate) => {
+          const bounds = candidate.getBoundingClientRect();
+          return event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+        }) || targets.reduce((closest, candidate) => {
+          if (!closest) return candidate;
+          const candidateBounds = candidate.getBoundingClientRect();
+          const closestBounds = closest.getBoundingClientRect();
+          return Math.abs(event.clientY - candidateBounds.top - (candidateBounds.height / 2))
+            < Math.abs(event.clientY - closestBounds.top - (closestBounds.height / 2))
+            ? candidate
+            : closest;
+        }, null);
+        if (!target) return;
+        const bounds = target.getBoundingClientRect();
+        target.classList.add(event.clientY >= bounds.top + (bounds.height / 2) ? "is-drop-after" : "is-drop-before");
+      });
+      const finishPointerDrag = (event) => {
+        if (activePointerID !== event.pointerId) return;
+        if (tile.hasPointerCapture(event.pointerId)) tile.releasePointerCapture(event.pointerId);
+        activePointerID = null;
+        if (!pointerDragActive) return;
+        event.preventDefault();
+        const target = list.querySelector(".saved-project-tile.is-drop-before, .saved-project-tile.is-drop-after");
+        const sourceID = draggedProjectID;
+        const targetID = target?.dataset.projectId || "";
+        const placeAfter = Boolean(target?.classList.contains("is-drop-after"));
+        pointerDragActive = false;
+        draggedProjectID = "";
+        clearDropIndicators();
+        if (sourceID && targetID) void reorderProject(sourceID, targetID, placeAfter);
+        requestAnimationFrame(() => {
+          tile.dataset.justDragged = "false";
+        });
+      };
+      tile.addEventListener("pointerup", finishPointerDrag);
+      tile.addEventListener("pointercancel", finishPointerDrag);
+      list.append(tile);
+    });
 }
 
 function consolidatedSavedAnnotations(annotations = []) {
