@@ -7501,16 +7501,29 @@ button.project-studio-metric:focus-visible {
   cursor: pointer;
 }
 
-.settings-panel .settings-card.is-collapsed > :not(.settings-section-title):not(.settings-card-heading) {
-  display: none;
+.settings-panel .settings-card-content {
+  display: grid;
+  max-height: var(--settings-card-content-height, 1200px);
+  min-height: 0;
+  gap: var(--space-2);
+  overflow: hidden;
+  opacity: 1;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
 }
 
 .settings-panel .settings-card.is-collapsed {
-  display: flex;
   min-height: 56px;
   align-items: center;
   justify-content: center;
   padding: var(--space-3);
+}
+
+.settings-panel .settings-card.is-collapsed > .settings-card-content {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .settings-panel .settings-card.is-collapsed > .settings-section-title,
@@ -7527,6 +7540,12 @@ button.project-studio-metric:focus-visible {
   color: inherit;
   font: inherit;
   letter-spacing: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-panel .settings-card-content {
+    transition: none;
+  }
 }
 
 .settings-panel .settings-card-heading {

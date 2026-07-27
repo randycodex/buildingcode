@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-code-filter-motion-v79";
+} from "./offline-storage.js?v=20260727-settings-card-motion-v80";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14686,29 +14686,55 @@ function wireSettingsCardCollapsing(panel) {
       ":scope > .settings-section-title, :scope > .settings-card-heading > .settings-section-title"
     );
     if (!title) return;
+    const heading = title.closest(".settings-card-heading") || title;
     const cardID = title.id || `settings-card-${index + 1}`;
     const titleText = title.textContent.trim();
     const toggle = document.createElement("button");
+    const content = document.createElement("div");
     toggle.className = "settings-card-toggle";
+    content.className = "settings-card-content";
     toggle.type = "button";
     const label = document.createElement("span");
     label.textContent = titleText;
     toggle.append(label);
     title.replaceChildren(toggle);
+    Array.from(card.children).forEach((child) => {
+      if (child !== heading) content.append(child);
+    });
+    card.append(content);
     card.dataset.settingsCardId = cardID;
 
-    const update = () => {
+    const measureContent = () => {
+      card.style.setProperty("--settings-card-content-height", `${content.scrollHeight}px`);
+    };
+    const update = ({ animate = true } = {}) => {
       const collapsed = collapsedSettingsCardIDs.has(cardID);
-      card.classList.toggle("is-collapsed", collapsed);
       toggle.setAttribute("aria-expanded", String(!collapsed));
       toggle.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${titleText}`);
+      content.toggleAttribute("inert", collapsed);
+      content.setAttribute("aria-hidden", String(collapsed));
+      measureContent();
+      if (!animate) {
+        card.classList.toggle("is-collapsed", collapsed);
+        return;
+      }
+      requestAnimationFrame(() => {
+        measureContent();
+        card.classList.toggle("is-collapsed", collapsed);
+      });
     };
     toggle.addEventListener("click", () => {
       if (collapsedSettingsCardIDs.has(cardID)) collapsedSettingsCardIDs.delete(cardID);
       else collapsedSettingsCardIDs.add(cardID);
       update();
     });
-    update();
+    if ("ResizeObserver" in window) {
+      const resizeObserver = new ResizeObserver(() => {
+        if (!collapsedSettingsCardIDs.has(cardID)) measureContent();
+      });
+      Array.from(content.children).forEach((child) => resizeObserver.observe(child));
+    }
+    update({ animate: false });
   });
 }
 

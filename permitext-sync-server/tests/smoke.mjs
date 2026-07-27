@@ -927,7 +927,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-code-filter-motion-v79'),
+        webRoot.text.includes('/web/app.js?v=20260727-settings-card-motion-v80'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -941,7 +941,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-code-filter-motion-v72'),
+        webRoot.text.includes('/web/styles.css?v=20260727-settings-card-motion-v73'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1382,7 +1382,7 @@ async function main() {
       "Settings card titles should remain centered without the retired beta badge."
     );
     assert(
-      workspaceStyles.text.match(/\.settings-panel \.settings-card\.is-collapsed \{[\s\S]*?display: flex;[\s\S]*?min-height: 56px;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;[\s\S]*?padding: var\(--space-3\);/) &&
+      workspaceStyles.text.match(/\.settings-panel \.settings-card\.is-collapsed \{[\s\S]*?min-height: 56px;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;[\s\S]*?padding: var\(--space-3\);/) &&
         workspaceStyles.text.match(/\.settings-panel \.settings-card-toggle > span \{[\s\S]*?color: inherit;[\s\S]*?font: inherit;[\s\S]*?letter-spacing: inherit;/),
       "Collapsed Settings cards no longer share the same height, centered layout, and title typography."
     );
@@ -1574,11 +1574,15 @@ async function main() {
         workspaceScript.text.includes('panel.querySelectorAll(":scope > .settings-card")') &&
         workspaceScript.text.includes("collapsedSettingsCardIDs.has(cardID)") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!collapsed))') &&
+        workspaceScript.text.includes('content.className = "settings-card-content"') &&
+        workspaceScript.text.includes('card.style.setProperty("--settings-card-content-height"') &&
+        workspaceScript.text.includes('content.toggleAttribute("inert", collapsed)') &&
         workspaceStyles.text.includes(".settings-panel .settings-card-toggle") &&
         !workspaceStyles.text.includes(".settings-card-toggle::after") &&
         workspaceStyles.text.match(/\.settings-panel \.settings-card-toggle \{[\s\S]*?font-size: 9pt !important;[\s\S]*?letter-spacing: 0\.085em !important;/) &&
-        workspaceStyles.text.includes(".settings-panel .settings-card.is-collapsed"),
-      "Settings cards no longer provide independent, accessible title toggles."
+        workspaceStyles.text.match(/\.settings-panel \.settings-card-content \{[\s\S]*?max-height: var\(--settings-card-content-height, 1200px\);[\s\S]*?overflow: hidden;[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),[\s\S]*?opacity 260ms ease;/) &&
+        workspaceStyles.text.match(/\.settings-panel \.settings-card\.is-collapsed > \.settings-card-content \{[\s\S]*?max-height: 0;[\s\S]*?opacity: 0;[\s\S]*?pointer-events: none;/),
+      "Settings cards no longer provide independent, accessible title toggles with Saved-filter motion."
     );
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&
