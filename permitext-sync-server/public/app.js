@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v53";
+} from "./offline-storage.js?v=20260726-web-reliability-v54";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4881,6 +4881,19 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   container.append(label, chips);
 }
 
+function refreshOpenReaderNotesProjectEditors() {
+  track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])").forEach((sheet) => {
+    const target = sheet.__annotationTarget;
+    const container = sheet.querySelector(".reader-notes-projects");
+    if (!target?.sectionID || !container) return;
+    renderAnnotationProjectEditor(container, target, target, {
+      onChange: () => {
+        if (state.utilities.saved) renderWorkspace();
+      }
+    });
+  });
+}
+
 function annotationTargetForSection(section, reader = null, overrides = {}) {
   const codePrefix = reader?.codePrefix || section.codePrefix || "BC";
   return {
@@ -5362,6 +5375,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         const project = await createProjectFolder({ name: input.value.trim() });
         await persistSectionInProject(project, sectionPayload);
         showReaderNotesProjectPicker(sheet, sectionPayload);
+        refreshOpenReaderNotesProjectEditors();
       } catch (error) {
         createButton.disabled = false;
         createButton.title = error.message || "Could not create the project.";
@@ -12409,7 +12423,12 @@ function showProjectCreateSheet(panel, project = null) {
         await createProjectFolder(details);
       }
       overlay.remove();
-      await renderWorkspace();
+      await transitionWorkspace("utility", {
+        refreshPaneIDs: projectOverviewRefreshPaneIDs(
+          isEditing ? paneIDForProjectDetail(identity) : ""
+        )
+      });
+      refreshOpenReaderNotesProjectEditors();
     } catch (error) {
       saveButton.disabled = false;
       const content = panel.querySelector(".projects-content, .saved-project-pages");

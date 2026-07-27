@@ -888,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v53'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v54'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1043,6 +1043,13 @@ async function main() {
       workspaceScript.text.match(/function showProjectCreateSheet\(panel, project = null\) \{\s+if \(!project && !hasCapability\("projects"\)\)/) &&
         workspaceScript.text.includes('"Sign in and upgrade to Pro before creating a Project workspace."'),
       "Free or signed-out users can still open the new-Project form before the plan gate."
+    );
+    assert(
+      workspaceScript.text.includes("function refreshOpenReaderNotesProjectEditors()") &&
+        workspaceScript.text.includes('track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])")') &&
+        workspaceScript.text.match(/overlay\.remove\(\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
+        workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenReaderNotesProjectEditors\(\);/),
+      "Creating or editing a Project no longer preserves open paragraph cards and refreshes their Project pills."
     );
     assert(
       workspaceScript.text.includes('"Sign out with unfinished sync?"') &&
