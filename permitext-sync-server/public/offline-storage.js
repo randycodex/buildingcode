@@ -5,7 +5,7 @@ const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v94";
+const shellCacheName = "permitext-pro-shell-v95";
 const shellAssetVersion = "20260727-reader-resize-v76";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -14,7 +14,7 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260727-zoning-reader-v69",
+  "/web/styles.css?v=20260727-reader-search-v70",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
   "/web/app.js?v=20260727-reader-resize-v76",
   "/web/offline-storage.js?v=20260727-reader-resize-v76",

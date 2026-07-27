@@ -1259,8 +1259,11 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .reader-internal-search.search-box {
   position: absolute;
   top: var(--reader-scrollbar-track-top);
+  right: calc(var(--panel-padding) + var(--reader-scrollbar-rail-width));
   left: var(--panel-padding);
   z-index: 9;
+  width: auto;
+  max-width: none;
   margin: 0;
 }
 
