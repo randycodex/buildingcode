@@ -2883,25 +2883,23 @@ select option:checked {
 .search-code-filter {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 var(--space-4);
+  gap: var(--space-2);
   margin: 0;
   overflow: visible;
   padding: 0;
 }
 
 .search-code-filter .search-filter-chip {
-  width: 100%;
-  min-height: 34px;
-  padding: 0;
-  border-radius: 0;
-  border-bottom: 1px solid var(--border);
-  background: transparent;
+  width: fit-content;
+  min-height: 28px;
+  justify-self: start;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-size: 12px !important;
+  font-weight: 400;
   text-align: left;
   white-space: normal;
-}
-
-.search-code-filter .search-filter-chip:last-child {
-  border-bottom: 0;
 }
 
 .search-filter-chip {
@@ -2950,26 +2948,8 @@ select option:checked {
   background: color-mix(in srgb, var(--code-accent) 28%, transparent);
 }
 
-.search-code-filter .search-filter-chip,
-.search-code-filter .search-filter-chip:hover,
-.search-code-filter .search-filter-chip[aria-pressed="true"],
-.search-code-filter .search-filter-chip[aria-pressed="true"]:hover {
-  background: transparent;
-}
-
 .search-code-filter .search-filter-chip[aria-pressed="true"] {
-  color: var(--text-primary);
-}
-
-.search-code-filter .search-filter-chip.code-theme-building[aria-pressed="true"],
-.search-code-filter .search-filter-chip.code-theme-administrative[aria-pressed="true"],
-.search-code-filter .search-filter-chip.code-theme-plumbing[aria-pressed="true"],
-.search-code-filter .search-filter-chip.code-theme-mechanical[aria-pressed="true"],
-.search-code-filter .search-filter-chip.code-theme-fuel-gas[aria-pressed="true"],
-.search-code-filter .search-filter-chip.code-theme-zoning[aria-pressed="true"] {
-  background: transparent;
-  color: var(--code-accent);
-  -webkit-text-fill-color: var(--code-accent);
+  font-weight: 400;
 }
 
 .search-results {
