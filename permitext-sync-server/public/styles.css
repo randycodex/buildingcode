@@ -3210,31 +3210,53 @@ select option:checked {
   text-transform: uppercase;
 }
 
+.search-jump-section .search-history-label,
+.search-history-section.is-recent .search-history-label {
+  font-size: 13.3333px !important;
+}
+
 .search-jump-section {
   gap: var(--space-2);
   padding-bottom: var(--space-2);
 }
 
-.search-jump-pages {
-  display: flex;
-  width: 100%;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+.search-history-list {
+  display: grid;
+  min-height: 0;
 }
 
-.search-jump-page {
+.search-history-scroll-list {
+  max-height: 320px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+}
+
+.search-history-scroll-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.search-history-scroll-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.search-history-scroll-list::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-tertiary) 44%, transparent);
+}
+
+.search-jump-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  flex: 0 0 100%;
   gap: var(--space-2);
-  scroll-snap-align: start;
+  padding-right: var(--space-1);
 }
 
 .search-jump-tile {
   position: relative;
   min-width: 0;
-  min-height: 118px;
+  min-height: 104px;
   overflow: hidden;
   border-radius: var(--radius-card);
   background: var(--surface-muted);
@@ -3245,7 +3267,7 @@ select option:checked {
   align-content: start;
   gap: 4px;
   width: 100%;
-  min-height: 118px;
+  min-height: 104px;
   padding: var(--space-3);
   padding-right: 42px;
   border: 0;
@@ -3307,27 +3329,6 @@ select option:checked {
 .search-jump-bookmark svg {
   width: 17px;
   height: 17px;
-}
-
-.search-jump-dots {
-  display: flex;
-  justify-content: center;
-  gap: var(--space-1);
-}
-
-.search-jump-dot {
-  width: 6px;
-  height: 6px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--text-tertiary);
-  opacity: 0.5;
-}
-
-.search-jump-dot[aria-pressed="true"] {
-  background: var(--text-primary);
-  opacity: 1;
 }
 
 .search-history-row {

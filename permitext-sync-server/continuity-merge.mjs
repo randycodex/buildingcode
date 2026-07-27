@@ -1,5 +1,5 @@
-const recentViewLimit = 20;
-const recentSearchLimit = 10;
+const recentViewLimit = 50;
+const recentSearchLimit = 50;
 const recentSearchHistoryKey = "recentSearchHistoryJSON";
 const historyClearsKey = "continuityHistoryClearsJSON";
 const appleReferenceDateOffsetSeconds = 978_307_200;

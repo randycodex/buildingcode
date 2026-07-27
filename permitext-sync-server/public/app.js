@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-settings-card-motion-v80";
+} from "./offline-storage.js?v=20260727-search-history-lists-v81";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -102,6 +102,8 @@ const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const maxRenderedSearchResults = 250;
+const recentViewLimit = 50;
+const recentSearchLimit = 50;
 const repeatableUtilityKeys = new Set(["search", "saved"]);
 const savedSortModes = new Set(["codeOrder", "recentlySaved", "codeBook", "title", "tag"]);
 const collapsedSettingsCardIDs = new Set();
@@ -207,11 +209,13 @@ function loadWorkspaceState() {
       readers: savedReaders.length > 0 ? savedReaders : [newReaderState()],
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
-      recentSearches: normalizeSearchHistory(saved.recentSearches, 10),
+      recentSearches: normalizeSearchHistory(saved.recentSearches, recentSearchLimit),
       recentActivityUpdatedAt: saved.recentActivityUpdatedAt || null,
       pinnedSearches: normalizeSearchHistory(saved.pinnedSearches),
       recentlyViewedSections: Array.isArray(saved.recentlyViewedSections)
-        ? saved.recentlyViewedSections.filter((item) => item && Number(item.sectionID) > 0).slice(0, 20)
+        ? saved.recentlyViewedSections
+          .filter((item) => item && Number(item.sectionID) > 0)
+          .slice(0, recentViewLimit)
         : [],
       localProjects: Array.isArray(saved.localProjects) ? saved.localProjects.filter((project) => project && typeof project === "object") : [],
       localSavedItems: Array.isArray(saved.localSavedItems) ? saved.localSavedItems.filter((item) => item && typeof item === "object") : [],
@@ -3545,7 +3549,7 @@ function continuityRecentEntries(values = {}) {
 function continuityRecentSearches(values = {}) {
   try {
     const parsed = JSON.parse(values.recentSearchesJSON || "[]");
-    return normalizeSearchHistory(Array.isArray(parsed) ? parsed : [], 10);
+    return normalizeSearchHistory(Array.isArray(parsed) ? parsed : [], recentSearchLimit);
   } catch {
     return [];
   }
@@ -3572,7 +3576,7 @@ function recordRecentlyViewedReader(reader) {
   state.recentlyViewedSections = [
     entry,
     ...(state.recentlyViewedSections || []).filter((item) => Number(item?.sectionID) !== sectionID)
-  ].slice(0, 20);
+  ].slice(0, recentViewLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
 }
@@ -3603,7 +3607,14 @@ function continuityValuesForReader(reader) {
       previewText: "",
       viewedAt: swiftReferenceDateSeconds()
     };
-    recentEntries.splice(0, recentEntries.length, entry, ...recentEntries.filter((item) => Number(item?.sectionID) !== sectionID).slice(0, 19));
+    recentEntries.splice(
+      0,
+      recentEntries.length,
+      entry,
+      ...recentEntries
+        .filter((item) => Number(item?.sectionID) !== sectionID)
+        .slice(0, recentViewLimit - 1)
+    );
   }
   return {
     ...existing,
@@ -3615,8 +3626,8 @@ function continuityValuesForReader(reader) {
     lastOpenedChapterID: reader.chapterID
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
-    recentlyViewedSectionsJSON: JSON.stringify(recentEntries),
-    recentSearchesJSON: JSON.stringify(normalizeSearchHistory(state.recentSearches, 10))
+    recentlyViewedSectionsJSON: JSON.stringify(recentEntries.slice(0, recentViewLimit)),
+    recentSearchesJSON: JSON.stringify(normalizeSearchHistory(state.recentSearches, recentSearchLimit))
   };
 }
 
@@ -3674,7 +3685,7 @@ async function applyRemoteContinuityIfNewer() {
   const recentActivityTimestamp = Date.parse(state.recentActivityUpdatedAt || 0);
   if (!Number.isFinite(recentActivityTimestamp) || remoteTimestamp >= recentActivityTimestamp) {
     const remoteRecentEntries = continuityRecentEntries(record.values);
-    state.recentlyViewedSections = remoteRecentEntries.slice(0, 20);
+    state.recentlyViewedSections = remoteRecentEntries.slice(0, recentViewLimit);
     if (record.values?.recentSearchesJSON !== undefined) {
       state.recentSearches = continuityRecentSearches(record.values);
     }
@@ -6649,7 +6660,7 @@ function recordRecentSearch(query) {
   state.recentSearches = normalizeSearchHistory([
     trimmed,
     ...(state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0)
-  ], 10);
+  ], recentSearchLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
   scheduleRecentSearchContinuitySync();
@@ -6685,7 +6696,7 @@ function searchRecentlyViewedEntries() {
   syncedEntries.forEach((entry) => {
     if (!entries.some((candidate) => Number(candidate?.sectionID) === Number(entry?.sectionID))) entries.push(entry);
   });
-  return entries.filter((entry) => Number(entry?.sectionID) > 0).slice(0, 20);
+  return entries.filter((entry) => Number(entry?.sectionID) > 0).slice(0, recentViewLimit);
 }
 
 function searchHistoryIconSVG(kind) {
@@ -6723,7 +6734,8 @@ function renderSearchHistory(panel, instance) {
   results.classList.add("is-history");
   const recentSections = searchRecentlyViewedEntries();
   const pinned = normalizeSearchHistory(state.pinnedSearches);
-  const recentQueries = normalizeSearchHistory(state.recentSearches, 10).filter((query) => !isSearchPinned(query));
+  const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
+    .filter((query) => !isSearchPinned(query));
 
   if (recentSections.length) {
     const section = document.createElement("section");
@@ -6731,74 +6743,50 @@ function renderSearchHistory(panel, instance) {
     const label = document.createElement("p");
     label.className = "section-label search-history-label";
     label.textContent = "Jump Back In";
-    const pages = document.createElement("div");
-    pages.className = "search-jump-pages";
-    const pageCount = Math.ceil(recentSections.length / 4);
-    for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
-      const page = document.createElement("div");
-      page.className = "search-jump-page";
-      recentSections.slice(pageIndex * 4, pageIndex * 4 + 4).forEach((entry) => {
-        const tile = document.createElement("article");
-        tile.className = `search-jump-tile code-theme-${codeTheme(entry.codePrefix || "BC")}`;
-        const openButton = document.createElement("button");
-        openButton.type = "button";
-        openButton.className = "search-jump-open";
-        const number = document.createElement("span");
-        number.className = "search-jump-number";
-        number.textContent = entry.sectionNumber || "Section";
-        const title = document.createElement("strong");
-        title.textContent = entry.title || "Section";
-        const preview = document.createElement("span");
-        preview.textContent = entry.previewText || entry.chapterTitle || "";
-        if (entry.previewText) markResearchSelectable(preview, entry);
-        const code = document.createElement("small");
-        code.textContent = entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC");
-        openButton.append(number, title, preview, code);
-        openButton.addEventListener("click", () => {
-          if (window.getSelection && String(window.getSelection()).trim()) return;
-          openSectionDetail(instance.id, entry);
-        });
-        const bookmarkButton = document.createElement("button");
-        bookmarkButton.type = "button";
-        bookmarkButton.className = "search-jump-bookmark";
-        const syncBookmarkButton = () => {
-          const saved = isSectionSaved(entry.sectionID);
-          bookmarkButton.classList.toggle("is-saved", saved);
-          bookmarkButton.setAttribute("aria-pressed", String(saved));
-          bookmarkButton.setAttribute("aria-label", saved ? "Remove bookmark" : "Bookmark section");
-          bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-        };
-        syncBookmarkButton();
-        bookmarkButton.addEventListener("click", async () => {
-          bookmarkButton.disabled = true;
-          await persistSectionBookmark(entry, !isSectionSaved(entry.sectionID));
-          syncBookmarkButton();
-          bookmarkButton.disabled = false;
-        });
-        tile.append(openButton, bookmarkButton);
-        page.append(tile);
+    const list = document.createElement("div");
+    list.className = "search-history-list search-history-scroll-list search-jump-list";
+    recentSections.forEach((entry) => {
+      const tile = document.createElement("article");
+      tile.className = `search-jump-tile code-theme-${codeTheme(entry.codePrefix || "BC")}`;
+      const openButton = document.createElement("button");
+      openButton.type = "button";
+      openButton.className = "search-jump-open";
+      const number = document.createElement("span");
+      number.className = "search-jump-number";
+      number.textContent = entry.sectionNumber || "Section";
+      const title = document.createElement("strong");
+      title.textContent = entry.title || "Section";
+      const preview = document.createElement("span");
+      preview.textContent = entry.previewText || entry.chapterTitle || "";
+      if (entry.previewText) markResearchSelectable(preview, entry);
+      const code = document.createElement("small");
+      code.textContent = entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC");
+      openButton.append(number, title, preview, code);
+      openButton.addEventListener("click", () => {
+        if (window.getSelection && String(window.getSelection()).trim()) return;
+        openSectionDetail(instance.id, entry);
       });
-      pages.append(page);
-    }
-    section.append(label, pages);
-    if (pageCount > 1) {
-      const dots = document.createElement("div");
-      dots.className = "search-jump-dots";
-      for (let pageIndex = 0; pageIndex < pageCount; pageIndex += 1) {
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "search-jump-dot";
-        dot.setAttribute("aria-label", `Show recent sections page ${pageIndex + 1}`);
-        dot.setAttribute("aria-pressed", String(pageIndex === 0));
-        dot.addEventListener("click", () => pages.scrollTo({ left: pageIndex * pages.clientWidth, behavior: "smooth" }));
-        dots.append(dot);
-      }
-      pages.addEventListener("scroll", () => {
-        const activeIndex = Math.round(pages.scrollLeft / Math.max(1, pages.clientWidth));
-        dots.querySelectorAll(".search-jump-dot").forEach((dot, index) => dot.setAttribute("aria-pressed", String(index === activeIndex)));
-      }, { passive: true });
-      section.append(dots);
-    }
+      const bookmarkButton = document.createElement("button");
+      bookmarkButton.type = "button";
+      bookmarkButton.className = "search-jump-bookmark";
+      const syncBookmarkButton = () => {
+        const saved = isSectionSaved(entry.sectionID);
+        bookmarkButton.classList.toggle("is-saved", saved);
+        bookmarkButton.setAttribute("aria-pressed", String(saved));
+        bookmarkButton.setAttribute("aria-label", saved ? "Remove bookmark" : "Bookmark section");
+        bookmarkButton.innerHTML = bookmarkIconSVG(saved);
+      };
+      syncBookmarkButton();
+      bookmarkButton.addEventListener("click", async () => {
+        bookmarkButton.disabled = true;
+        await persistSectionBookmark(entry, !isSectionSaved(entry.sectionID));
+        syncBookmarkButton();
+        bookmarkButton.disabled = false;
+      });
+      tile.append(openButton, bookmarkButton);
+      list.append(tile);
+    });
+    section.append(label, list);
     results.append(section);
   }
 
@@ -6807,10 +6795,14 @@ function renderSearchHistory(panel, instance) {
     const section = document.createElement("section");
     section.className = "search-history-section";
     section.classList.toggle("is-pinned", pinnedSection);
+    section.classList.toggle("is-recent", !pinnedSection);
     const label = document.createElement("p");
     label.className = "section-label search-history-label";
     label.textContent = title;
-    section.append(label);
+    const list = document.createElement("div");
+    list.className = "search-history-list";
+    if (!pinnedSection) list.classList.add("search-history-scroll-list");
+    section.append(label, list);
     queries.forEach((query) => {
       const row = document.createElement("article");
       row.className = "search-history-row";
@@ -6850,7 +6842,7 @@ function renderSearchHistory(panel, instance) {
         });
         row.append(removeButton);
       }
-      section.append(row);
+      list.append(row);
     });
     results.append(section);
   };

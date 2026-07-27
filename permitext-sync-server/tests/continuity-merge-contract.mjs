@@ -101,12 +101,14 @@ assert.deepEqual(
 
 const bounded = continuity({
   updatedAt: "2026-07-26T12:00:03.000Z",
-  views: Array.from({ length: 30 }, (_, index) => view(index + 1, 804_600_100 - index)),
-  searches: Array.from({ length: 15 }, (_, index) => `query-${index}`)
+  views: Array.from({ length: 70 }, (_, index) => view(index + 1, 804_600_100 - index)),
+  searches: Array.from({ length: 65 }, (_, index) => `query-${index}`)
 });
 const boundedHistories = histories(mergeContinuityRecords(bounded, deviceA));
 assert.equal(boundedHistories.views.length, continuityMergeContract.recentViewLimit);
 assert.equal(boundedHistories.searches.length, continuityMergeContract.recentSearchLimit);
+assert.equal(continuityMergeContract.recentViewLimit, 50);
+assert.equal(continuityMergeContract.recentSearchLimit, 50);
 
 const serverMerged = mergeContinuityMutations(
   { continuity: deviceB },

@@ -883,9 +883,15 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function renderSearchHistory") &&
+        workspaceScript.text.includes("const recentViewLimit = 50;") &&
+        workspaceScript.text.includes("const recentSearchLimit = 50;") &&
         workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
+        workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
+        !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
+        !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
         workspaceScript.text.includes('appendHistorySection("Pinned"') &&
         workspaceScript.text.includes('appendHistorySection("Recent Searches"') &&
+        workspaceScript.text.includes('list.classList.add("search-history-scroll-list")') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
         !workspaceScript.text.includes("function pinSearch") &&
         !workspaceScript.text.includes('"Pin search"') &&
@@ -927,7 +933,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-settings-card-motion-v80'),
+        webRoot.text.includes('/web/app.js?v=20260727-search-history-lists-v81'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -941,7 +947,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-settings-card-motion-v73'),
+        webRoot.text.includes('/web/styles.css?v=20260727-search-history-lists-v74'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1296,6 +1302,12 @@ async function main() {
     assert(
       !workspaceStyles.text.includes(".search-all-codes"),
       "Search still styles the retired All Codes button."
+    );
+    assert(
+      workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
+        workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/) &&
+        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-2\);/),
+      "Search history lists no longer use the requested heading size and independent vertical scrolling."
     );
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
