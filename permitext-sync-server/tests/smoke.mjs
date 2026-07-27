@@ -905,7 +905,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v65'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v66'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -919,7 +919,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v60'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v61'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1402,6 +1402,13 @@ async function main() {
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
         workspaceStyles.text.match(/\.annotation-project-chip,[\s\S]*?border-radius: var\(--radius-pill\);/),
       "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
+    );
+    assert(
+      workspaceScript.text.includes('sheet.style.setProperty("--reader-notes-input-height", `${inputHeight}px`)') &&
+        workspaceScript.text.includes("const nonInputContentHeight = Math.max(0, sheet.scrollHeight - input.offsetHeight)") &&
+        workspaceStyles.text.includes("--reader-notes-input-min-height: 64px;") &&
+        workspaceStyles.text.includes("flex: 0 0 var(--reader-notes-input-height);"),
+      "Reader note resizing should resize only Comments and keep Projects and Tags visible in place."
     );
     assert(
       workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;[\s\S]*?max-width: 100%;[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;/),

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v65";
+} from "./offline-storage.js?v=20260726-web-reliability-v66";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5473,20 +5473,29 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
 function bindReaderNotesResize(resizer, sheet, panel) {
   resizer.addEventListener("pointerdown", (event) => {
     if (!sheet.classList.contains("is-open")) return;
+    const input = sheet.querySelector(".reader-notes-input");
+    if (!input) return;
     event.preventDefault();
     resizer.classList.add("is-dragging");
     document.body.classList.add("is-resizing-notes");
     sheet.classList.add("is-resizing");
 
     const panelBounds = panel.getBoundingClientRect();
+    const sheetBounds = sheet.getBoundingClientRect();
     const sheetStyles = getComputedStyle(sheet);
-    const minHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-min-height")) || 320;
-    const maxHeight = Math.max(minHeight, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
+    const inputBounds = input.getBoundingClientRect();
+    const cssMinHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-min-height")) || 320;
+    const minInputHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-input-min-height")) || 64;
+    const maxHeight = Math.max(cssMinHeight, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
+    const nonInputContentHeight = Math.max(0, sheet.scrollHeight - input.offsetHeight);
+    const minHeight = Math.min(maxHeight, Math.max(cssMinHeight, nonInputContentHeight + minInputHeight));
 
     const resize = (moveEvent) => {
       const height = panelBounds.bottom - moveEvent.clientY;
       const clampedHeight = Math.min(maxHeight, Math.max(minHeight, height));
+      const inputHeight = Math.max(minInputHeight, inputBounds.height + clampedHeight - sheetBounds.height);
       sheet.style.setProperty("--reader-notes-height", `${clampedHeight}px`);
+      sheet.style.setProperty("--reader-notes-input-height", `${inputHeight}px`);
     };
 
     const stopResize = () => {
@@ -5589,7 +5598,10 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   sheet.dataset.sectionId = sectionID;
   sheet.dataset.blockId = blockID;
   sheet.__annotationTarget = target;
-  if (!wasOpen) sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
+  if (!wasOpen) {
+    sheet.style.setProperty("--reader-notes-height", "var(--reader-notes-default-height)");
+    sheet.style.setProperty("--reader-notes-input-height", "120px");
+  }
   removeReaderNotesProjectPicker(sheet);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);

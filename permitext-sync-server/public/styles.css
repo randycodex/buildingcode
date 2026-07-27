@@ -10,6 +10,8 @@
   --reader-notes-active-text: #00636d;
   --reader-notes-default-height: 440px;
   --reader-notes-min-height: 360px;
+  --reader-notes-input-height: 120px;
+  --reader-notes-input-min-height: 64px;
   --text-primary: #0d0d0f;
   --text-secondary: #8f8f96;
   --text-tertiary: #b7b7bf;
@@ -2245,9 +2247,9 @@ select option:checked {
 
 .reader-notes-input {
   width: 100%;
-  min-height: 120px;
-  max-height: 120px;
-  flex: 0 0 120px;
+  min-height: var(--reader-notes-input-height);
+  max-height: var(--reader-notes-input-height);
+  flex: 0 0 var(--reader-notes-input-height);
   padding: var(--space-3);
   resize: none;
   border: 0;
