@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-reader-resize-v76";
+} from "./offline-storage.js?v=20260727-code-filter-motion-v79";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1861,7 +1861,44 @@ function updateCodeFilterMenu(filterRail, instance) {
   toggle.setAttribute("aria-expanded", String(open));
   toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} code section filters`);
   label.textContent = codeFilterMenuLabel(instance?.codeFilters);
-  filterRail.hidden = !open;
+
+  if (open) {
+    filterRail.hidden = false;
+    const applyExpandedHeight = () => {
+      const filterGap = Number.parseFloat(getComputedStyle(filterRail).getPropertyValue("--space-2")) || 0;
+      const expandedHeight = filterRail.scrollHeight + (menu.classList.contains("is-open") ? 0 : filterGap);
+      const nextHeight = `${expandedHeight}px`;
+      if (menu.style.getPropertyValue("--code-filter-menu-height") !== nextHeight) {
+        menu.style.setProperty("--code-filter-menu-height", nextHeight);
+      }
+    };
+    if (!menu.classList.contains("is-open")) {
+      requestAnimationFrame(() => {
+        if (instance?.codeFilterMenuOpen) {
+          applyExpandedHeight();
+          menu.classList.add("is-open");
+        }
+      });
+    } else {
+      applyExpandedHeight();
+    }
+    return;
+  }
+
+  if (!menu.classList.contains("is-open")) {
+    filterRail.hidden = true;
+    return;
+  }
+
+  menu.classList.remove("is-open");
+  const hideFilterRail = (event) => {
+    if (event && event.target !== filterRail) return;
+    if (event && event.propertyName !== "max-height") return;
+    if (!instance?.codeFilterMenuOpen) filterRail.hidden = true;
+    filterRail.removeEventListener("transitionend", hideFilterRail);
+  };
+  filterRail.addEventListener("transitionend", hideFilterRail);
+  window.setTimeout(hideFilterRail, 500);
 }
 
 function wireCodeFilterMenu(filterRail, instance) {
@@ -1871,6 +1908,18 @@ function wireCodeFilterMenu(filterRail, instance) {
     return;
   }
   toggle.dataset.filterMenuReady = "true";
+  if ("ResizeObserver" in window) {
+    let observedMenuWidth = 0;
+    const resizeObserver = new ResizeObserver((entries) => {
+      const nextWidth = entries[0]?.contentRect.width || 0;
+      if (Math.abs(nextWidth - observedMenuWidth) < 0.5) return;
+      observedMenuWidth = nextWidth;
+      if (instance.codeFilterMenuOpen && toggle.closest(".code-filter-menu")?.classList.contains("is-open")) {
+        updateCodeFilterMenu(filterRail, instance);
+      }
+    });
+    resizeObserver.observe(toggle.closest(".code-filter-menu"));
+  }
   toggle.addEventListener("click", () => {
     instance.codeFilterMenuOpen = !instance.codeFilterMenuOpen;
     saveWorkspaceState();

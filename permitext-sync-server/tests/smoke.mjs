@@ -927,7 +927,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-reader-resize-v76'),
+        webRoot.text.includes('/web/app.js?v=20260727-code-filter-motion-v79'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -941,7 +941,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-reader-search-v70'),
+        webRoot.text.includes('/web/styles.css?v=20260727-code-filter-motion-v72'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1299,12 +1299,19 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu \.search-code-filter,[\s\S]*?max-height: 0;[\s\S]*?max-height 420ms cubic-bezier\(0\.22, 1, 0\.36, 1\),[\s\S]*?opacity 260ms ease,/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.search-code-filter,[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
         workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
+        workspaceScript.text.includes('menu.classList.add("is-open")') &&
+        workspaceScript.text.includes('menu.classList.remove("is-open")') &&
+        workspaceScript.text.includes('menu.style.setProperty("--code-filter-menu-height"') &&
+        workspaceScript.text.includes("resizeObserver.observe(toggle.closest(\".code-filter-menu\"))") &&
+        workspaceScript.text.includes("window.setTimeout(hideFilterRail, 500)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
       "Search code filters should expand from a single summary pill into two equal-width columns."
     );
