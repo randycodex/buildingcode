@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v59";
+} from "./offline-storage.js?v=20260726-web-reliability-v60";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -12786,7 +12786,6 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     button.setAttribute("aria-pressed", String(selected));
     button.addEventListener("click", () => {
       savedFilterScrollPositions.set(instance.id, {
-        code: codeRail.scrollLeft,
         tag: tagRail.scrollLeft
       });
       if (option.prefix === "ALL") instance.codeFilters = [];
@@ -12810,7 +12809,6 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       button.setAttribute("aria-pressed", String(instance.tagFilter === tag));
       button.addEventListener("click", () => {
         savedFilterScrollPositions.set(instance.id, {
-          code: codeRail.scrollLeft,
           tag: tagRail.scrollLeft
         });
         instance.tagFilter = instance.tagFilter === tag && tag ? "" : tag;
@@ -12822,7 +12820,6 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   }
   tagRail.hidden = availableTags.length === 0;
   wrapper.hidden = allItems.length === 0;
-  bindHorizontalWheelScroll(codeRail);
   bindHorizontalWheelScroll(tagRail);
 }
 
@@ -12877,10 +12874,8 @@ async function renderSaved(instance) {
   renderSavedFilters(panel, savedInstance, resolvedItems, refreshSavedPanel);
   const savedFilterScroll = savedFilterScrollPositions.get(savedInstance.id);
   if (savedFilterScroll) {
-    const codeRail = panel.querySelector(".saved-code-filter");
     const tagRail = panel.querySelector(".saved-tag-filter");
     const restoreFilterScroll = () => {
-      codeRail.scrollLeft = Math.min(savedFilterScroll.code, Math.max(0, codeRail.scrollWidth - codeRail.clientWidth));
       tagRail.scrollLeft = Math.min(savedFilterScroll.tag, Math.max(0, tagRail.scrollWidth - tagRail.clientWidth));
     };
     restoreFilterScroll();

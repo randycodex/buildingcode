@@ -896,7 +896,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v59'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v60'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -910,7 +910,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v54'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v55'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1262,6 +1262,15 @@ async function main() {
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),
       "Search code filters no longer render as a vertical full-width list."
+    );
+    assert(
+      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 34px;[\s\S]*?border-radius: 0;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip,[\s\S]*?background: transparent;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
+        workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
+        !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
+      "Saved code filters should match the Search column's vertical text list."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
