@@ -2655,6 +2655,14 @@ select option:checked {
   white-space: normal;
 }
 
+.reader-panel.code-theme-zoning .section-block {
+  margin-bottom: var(--space-2);
+}
+
+.reader-panel.code-theme-zoning .section-html > p {
+  margin: 0;
+}
+
 .section-html div,
 .section-html span {
   color: inherit !important;

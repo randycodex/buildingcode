@@ -896,7 +896,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v60'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v62'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -910,7 +910,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v55'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v56'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1275,6 +1275,14 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
       "Search result count should remain white and centered below the code filter list."
+    );
+    assert(
+      workspaceScript.text.includes("function codeBlockHasVisibleContent(block)") &&
+        workspaceScript.text.includes("isZoningSection ? blocks.filter(codeBlockHasVisibleContent) : blocks") &&
+        workspaceScript.text.includes('startsWith("zr-")') &&
+        workspaceStyles.text.match(/\.reader-panel\.code-theme-zoning \.section-block \{[\s\S]*?margin-bottom: var\(--space-2\);/) &&
+        workspaceStyles.text.match(/\.reader-panel\.code-theme-zoning \.section-html > p \{[\s\S]*?margin: 0;/),
+      "Zoning Reader content should suppress empty source blocks and avoid browser-default paragraph gaps."
     );
     assert(
       workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&

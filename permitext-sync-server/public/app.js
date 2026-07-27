@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v60";
+} from "./offline-storage.js?v=20260726-web-reliability-v62";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4975,7 +4975,26 @@ function annotationTargetForBlock(section, block, reader = null, index = 0) {
 
 function annotatedBlocksForSection(section) {
   const sourceBlocks = Array.isArray(section.blocks) ? section.blocks : [];
-  return sourceBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
+  const blocks = sourceBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
+  const isZoningSection =
+    String(section?.codePrefix || "").toUpperCase() === zoningCodePrefix ||
+    Boolean(section?.zoning) ||
+    sourceBlocks.some((block) => String(block?.id || "").startsWith("zr-"));
+  return isZoningSection ? blocks.filter(codeBlockHasVisibleContent) : blocks;
+}
+
+function codeBlockHasVisibleContent(block) {
+  if (!block) return false;
+  if (block.kind === "image" || block.kind === "table") return true;
+  if (String(block.plainText || block.text || "").replace(/\u00a0/g, " ").trim()) return true;
+  if (!block.html) return false;
+  if (typeof document === "undefined") return /<(?:img|table)\b/i.test(block.html);
+  const wrapper = document.createElement("div");
+  wrapper.innerHTML = rewriteCodeHTML(block.html);
+  return Boolean(
+    String(wrapper.textContent || "").replace(/\u00a0/g, " ").trim() ||
+    wrapper.querySelector("img, table")
+  );
 }
 
 function splitAnnotatedCodeBlock(block, blockIndex = 0) {
