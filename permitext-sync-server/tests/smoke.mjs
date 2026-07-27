@@ -902,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v51'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v52'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1240,7 +1240,7 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?overflow: visible;/) &&
         workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
-        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?border-radius: 0;/) &&
+        workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 34px;[\s\S]*?border-radius: 0;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip,[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?color: var\(--text-primary\);/) &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(filterRail)"),

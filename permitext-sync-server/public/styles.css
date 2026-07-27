@@ -2879,7 +2879,7 @@ select option:checked {
 
 .search-code-filter .search-filter-chip {
   width: 100%;
-  min-height: 38px;
+  min-height: 34px;
   padding: 0;
   border-radius: 0;
   border-bottom: 1px solid var(--border);
