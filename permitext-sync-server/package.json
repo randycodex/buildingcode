@@ -38,7 +38,7 @@
     "@excalidraw/excalidraw": "^0.18.1",
     "@neondatabase/serverless": "^1.0.0",
     "@tiptap/core": "3.29.0",
-    "@tiptap/extension-bold": "3.29.0",
+    "@tiptap/extension-bold": "3.29.1",
     "@tiptap/extension-document": "3.29.0",
     "@tiptap/extension-italic": "3.29.0",
     "@tiptap/extension-paragraph": "3.29.0",
