@@ -907,7 +907,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v68'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v69'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1174,7 +1174,7 @@ async function main() {
         workspaceScript.text.includes("await persistSectionBookmark(sectionPayload, true)") &&
         workspaceScript.text.includes('label.textContent = "Save to project"') &&
         workspaceScript.text.includes("await removeSectionFromProject(project, existingLink, { removeBookmark: false })") &&
-        workspaceScript.text.includes('doneButton.textContent = "Done"') &&
+        !workspaceScript.text.includes('doneButton.className = "reader-notes-project-done"') &&
         !workspaceScript.text.includes('savedOnlyButton.textContent = "Saved items"'),
       "Reader bookmark and project selection no longer follow the iOS save-then-manage flow."
     );

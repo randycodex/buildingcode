@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v68";
+} from "./offline-storage.js?v=20260726-web-reliability-v69";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5373,12 +5373,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   pickerHeader.className = "reader-notes-project-picker-header";
   const label = document.createElement("strong");
   label.textContent = "Save to project";
-  const doneButton = document.createElement("button");
-  doneButton.type = "button";
-  doneButton.className = "reader-notes-project-done";
-  doneButton.textContent = "Done";
-  doneButton.addEventListener("click", () => removeReaderNotesProjectPicker(sheet));
-  pickerHeader.append(label, doneButton);
+  pickerHeader.append(label);
   picker.append(pickerHeader);
 
   const projectLink = (project) => projectLinkForAnnotationTarget(project, sectionPayload);
