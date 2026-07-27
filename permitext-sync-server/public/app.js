@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260726-web-reliability-v64";
+} from "./offline-storage.js?v=20260726-web-reliability-v65";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4935,7 +4935,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   container.append(label, chips);
 }
 
-function refreshOpenReaderNotesProjectEditors() {
+function refreshOpenAnnotationProjectEditors() {
   track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])").forEach((sheet) => {
     const target = sheet.__annotationTarget;
     const container = sheet.querySelector(".reader-notes-projects");
@@ -4945,6 +4945,13 @@ function refreshOpenReaderNotesProjectEditors() {
         if (state.utilities.saved) renderWorkspace();
       }
     });
+  });
+  track.querySelectorAll(".section-detail-panel").forEach((panel) => {
+    const target = panel.__annotationTarget;
+    const sectionPayload = panel.__sectionPayload;
+    const container = panel.querySelector(".section-detail-projects");
+    if (!target?.sectionID || !sectionPayload?.sectionID || !container) return;
+    renderAnnotationProjectEditor(container, target, sectionPayload);
   });
 }
 
@@ -5448,7 +5455,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         const project = await createProjectFolder({ name: input.value.trim() });
         await persistSectionInProject(project, sectionPayload);
         showReaderNotesProjectPicker(sheet, sectionPayload);
-        refreshOpenReaderNotesProjectEditors();
+        refreshOpenAnnotationProjectEditors();
       } catch (error) {
         createButton.disabled = false;
         createButton.title = error.message || "Could not create the project.";
@@ -7275,6 +7282,13 @@ async function renderSectionDetail(searchID, detail) {
   textarea.placeholder = "Add a note";
   textarea.setAttribute("aria-label", `Note for ${sectionDisplayTitle(sectionPayload.sectionNumber, sectionPayload.title)}`);
   textareaWrap.append(textarea);
+  const projectsHost = document.createElement("section");
+  projectsHost.className = "section-detail-projects";
+  renderAnnotationProjectEditor(projectsHost, sectionTarget, sectionPayload, {
+    onChange: () => {
+      saveState.textContent = "Saved locally";
+    }
+  });
   const tagsHost = document.createElement("section");
   tagsHost.className = "section-detail-tags";
   renderAnnotationTagEditor(tagsHost, sectionTarget, {
@@ -7282,7 +7296,9 @@ async function renderSectionDetail(searchID, detail) {
       saveState.textContent = "Saved locally";
     }
   });
-  notes.append(notesHeader, textareaWrap, tagsHost);
+  notes.append(notesHeader, textareaWrap, projectsHost, tagsHost);
+  panel.__annotationTarget = sectionTarget;
+  panel.__sectionPayload = sectionPayload;
 
   backButton.addEventListener("click", () => {
     delete sectionDetailsBySearch()[searchID];
@@ -12502,7 +12518,7 @@ function showProjectCreateSheet(panel, project = null) {
           isEditing ? paneIDForProjectDetail(identity) : ""
         )
       });
-      refreshOpenReaderNotesProjectEditors();
+      refreshOpenAnnotationProjectEditors();
     } catch (error) {
       saveButton.disabled = false;
       const content = panel.querySelector(".projects-content, .saved-project-list");

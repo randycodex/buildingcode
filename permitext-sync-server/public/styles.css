@@ -2269,6 +2269,7 @@ select option:checked {
 
 .reader-notes-projects,
 .reader-notes-tags,
+.section-detail-projects,
 .section-detail-tags {
   display: grid;
   gap: var(--space-2);

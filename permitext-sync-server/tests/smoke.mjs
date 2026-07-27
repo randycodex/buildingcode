@@ -905,7 +905,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v64'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v65'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -919,7 +919,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v59'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v60'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1062,11 +1062,12 @@ async function main() {
       "Free or signed-out users can still open the new-Project form before the plan gate."
     );
     assert(
-      workspaceScript.text.includes("function refreshOpenReaderNotesProjectEditors()") &&
+      workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])")') &&
+        workspaceScript.text.includes('track.querySelectorAll(".section-detail-panel")') &&
         workspaceScript.text.match(/overlay\.remove\(\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
-        workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenReaderNotesProjectEditors\(\);/),
-      "Creating or editing a Project no longer preserves open paragraph cards and refreshes their Project pills."
+        workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenAnnotationProjectEditors\(\);/),
+      "Creating or editing a Project should refresh Project pills in open Reader notes and Search details."
     );
     assert(
       workspaceScript.text.includes("function captureReaderScrollPositions()") &&
@@ -1393,6 +1394,9 @@ async function main() {
     assert(
       workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&
         workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
+        workspaceScript.text.includes('projectsHost.className = "section-detail-projects";') &&
+        workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
+        workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
         workspaceScript.text.includes('label.textContent = "Projects";') &&
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
@@ -1479,8 +1483,9 @@ async function main() {
       "Static Reader section titles still use pointer styling."
     );
     assert(
-      workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input"),
-      "Section-detail tag inputs omitted their pill treatment."
+      workspaceStyles.text.includes(".section-detail-tags .annotation-tag-input") &&
+        workspaceStyles.text.includes(".section-detail-projects,"),
+      "Section-detail organization should expose Projects before its pill-style tag input."
     );
     assert(
       workspaceStyles.text.includes(".reader-notes-tags .annotation-tag-input") &&
