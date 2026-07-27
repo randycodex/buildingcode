@@ -888,7 +888,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v54'),
+        webRoot.text.includes('/web/app.js?v=20260726-web-reliability-v55'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -902,7 +902,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v49'),
+        webRoot.text.includes('/web/styles.css?v=20260726-web-reliability-v50'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1318,6 +1318,12 @@ async function main() {
       !workspaceStyles.text.includes(".annotated-code-block:hover .inline-comment-toggle") &&
         !workspaceStyles.text.includes(".annotated-code-block:hover .inline-bookmark-toggle"),
       "Reader annotation status icons still appear on hover without a saved note or bookmark."
+    );
+    assert(
+      workspaceStyles.text.match(/\.annotated-code-block \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 46px;[\s\S]*?column-gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.chapter-section \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 46px;[\s\S]*?column-gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.inline-comment-toggle \{[\s\S]*?right: 22px;/),
+      "Reader comment and bookmark rail no longer preserves the compact 46-pixel layout."
     );
     assert(
       workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&

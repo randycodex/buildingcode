@@ -1871,8 +1871,8 @@ select option:checked {
 .annotated-code-block {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 58px;
-  column-gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr) 46px;
+  column-gap: var(--space-1);
   align-items: start;
 }
 
@@ -1926,7 +1926,7 @@ select option:checked {
 .inline-comment-toggle {
   position: absolute;
   top: var(--inline-action-icon-offset);
-  right: 28px;
+  right: 22px;
   display: grid;
   width: 22px;
   height: 22px;
@@ -2596,8 +2596,8 @@ select option:checked {
 
 .chapter-section {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 58px;
-  column-gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr) 46px;
+  column-gap: var(--space-1);
   position: relative;
   content-visibility: auto;
   contain-intrinsic-size: auto 600px;
