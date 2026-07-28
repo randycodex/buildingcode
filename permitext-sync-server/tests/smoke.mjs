@@ -943,7 +943,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-jump-history-cleanup-v87'),
+        webRoot.text.includes('/web/app.js?v=20260727-tight-search-history-v88'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -957,7 +957,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-jump-history-cleanup-v79'),
+        webRoot.text.includes('/web/styles.css?v=20260727-tight-search-history-v80'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

@@ -3227,6 +3227,10 @@ select option:checked {
   flex: 1 1 auto;
 }
 
+.search-history-lower .search-history-section {
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
 .search-history-pane .search-history-scroll-list {
   max-height: none;
 }
@@ -3295,7 +3299,13 @@ body.is-resizing-search-history * {
 
 .search-history-list {
   display: grid;
+  align-content: start;
   min-height: 0;
+}
+
+.search-history-section.is-pinned .search-history-list,
+.search-history-section.is-recent .search-history-list {
+  grid-auto-rows: 40px;
 }
 
 .search-history-scroll-list {
@@ -3387,7 +3397,8 @@ body.is-resizing-search-history * {
   grid-template-columns: minmax(0, 1fr) 28px 28px;
   align-items: center;
   gap: var(--space-2);
-  min-height: 48px;
+  height: 40px;
+  min-height: 40px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -3401,7 +3412,8 @@ body.is-resizing-search-history * {
   align-items: center;
   gap: var(--space-2);
   min-width: 0;
-  padding: var(--space-2) 0;
+  height: 40px;
+  padding: var(--space-1) 0;
   border: 0;
   background: transparent;
   color: var(--text-primary);
