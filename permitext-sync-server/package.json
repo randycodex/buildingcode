@@ -32,7 +32,8 @@
     "verify:postgres": "node tests/postgres-integration.mjs",
     "verify:production": "node tests/production-health.mjs",
     "verify:production:aasa": "node tests/production-aasa.mjs",
-    "verify:production:identity": "node tests/production-identity-restore.mjs"
+    "verify:production:identity": "node tests/production-identity-restore.mjs",
+    "inventory:nyc-legal": "node scripts/inventory-nyc-legal-expansion.mjs"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.18.1",
