@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-section-project-sheet-v94";
+} from "./offline-storage.js?v=20260727-safe-escape-v95";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -16336,10 +16336,6 @@ function bindWorkspaceKeyboardNavigation() {
         pane.querySelector("button, input, select, textarea")?.focus({ preventScroll: true });
       }
       return;
-    }
-    if (event.key === "Escape" && !document.querySelector(".command-palette-backdrop")) {
-      const focusedPanel = document.activeElement?.closest?.(".workspace-panel");
-      focusedPanel?.querySelector(".utility-close")?.click();
     }
   });
 }

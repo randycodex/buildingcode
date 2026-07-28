@@ -943,7 +943,8 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-section-project-sheet-v94'),
+        !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
+        webRoot.text.includes('/web/app.js?v=20260727-safe-escape-v95'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
