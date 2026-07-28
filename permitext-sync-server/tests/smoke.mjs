@@ -943,7 +943,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-section-project-create-v89'),
+        webRoot.text.includes('/web/app.js?v=20260727-empty-tags-cleanup-v90'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -957,7 +957,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-section-project-create-v81'),
+        webRoot.text.includes('/web/styles.css?v=20260727-empty-tags-cleanup-v82'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1452,6 +1452,7 @@ async function main() {
     assert(
         workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&
         workspaceScript.text.includes("function renderAnnotationProjectEditor(container, target, sectionPayload") &&
+        !workspaceScript.text.includes('empty.textContent = "No tags";') &&
         workspaceScript.text.includes('projectsHost.className = "section-detail-projects";') &&
         workspaceScript.text.includes('addButton.className = "annotation-project-add";') &&
         workspaceScript.text.includes('form.className = "annotation-project-create-form";') &&

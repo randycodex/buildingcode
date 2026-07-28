@@ -2408,8 +2408,7 @@ select option:checked {
 }
 
 .annotation-tag-chip,
-.saved-row-tag,
-.annotation-tags-empty {
+.saved-row-tag {
   display: inline-flex;
   min-height: 22px;
   align-items: center;
@@ -2424,10 +2423,6 @@ select option:checked {
 
 .annotation-tag-chip {
   cursor: pointer;
-}
-
-.annotation-tags-empty {
-  color: var(--text-secondary);
 }
 
 .annotation-tag-input {

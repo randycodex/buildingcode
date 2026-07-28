@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-section-project-create-v89";
+} from "./offline-storage.js?v=20260727-empty-tags-cleanup-v90";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5038,11 +5038,6 @@ function renderAnnotationTagEditor(container, target, options = {}) {
       });
       chips.append(chip);
     });
-  } else {
-    const empty = document.createElement("span");
-    empty.className = "annotation-tags-empty";
-    empty.textContent = "No tags";
-    chips.append(empty);
   }
 
   const input = document.createElement("input");
@@ -5063,7 +5058,9 @@ function renderAnnotationTagEditor(container, target, options = {}) {
     options.onChange?.();
   });
 
-  container.append(label, chips, input);
+  container.append(label);
+  if (tags.length) container.append(chips);
+  container.append(input);
 }
 
 function projectLinkForAnnotationTarget(project, target) {
