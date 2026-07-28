@@ -273,6 +273,9 @@ async function main() {
 
     const webRoot = await request("/");
     assert(webRoot.response.ok, "Web root did not load.");
+    const boxedChevronSVGs = Array.from(webRoot.text.matchAll(
+      /<svg[^>]*class="[^"]*(?:reader-typography-(?:expand|collapse)-icon|code-filter-chevron-(?:down|up))[^"]*"[^>]*>([\s\S]*?)<\/svg>/g
+    )).filter((match) => match[1].includes("<rect"));
     assert(webRoot.response.headers.get("content-type")?.includes("text/html"), "Web root did not return HTML.");
     assert(webRoot.response.headers.get("x-content-type-options") === "nosniff", "Web root omitted security headers.");
     assert(webRoot.response.headers.get("content-security-policy")?.includes("script-src"), "Web root omitted its CSP.");
@@ -423,8 +426,9 @@ async function main() {
         webRoot.text.includes('class="reader-typography-toggle"') &&
         webRoot.text.includes('class="reader-typography-tools" hidden') &&
         webRoot.text.includes('aria-label="Decrease Reader line spacing"') &&
-        webRoot.text.includes('aria-label="Increase Reader line spacing"'),
-      "Reader headers omitted their line-spacing controls."
+        webRoot.text.includes('aria-label="Increase Reader line spacing"') &&
+        boxedChevronSVGs.length === 0,
+      "Reader headers omitted their line-spacing controls or restored boxed chevrons."
     );
     assert(
       webRoot.text.includes('class="reader-internal-search search-box"') &&
@@ -885,6 +889,9 @@ async function main() {
       workspaceScript.text.includes("function renderSearchHistory") &&
         workspaceScript.text.includes("const recentViewLimit = 50;") &&
         workspaceScript.text.includes("const recentSearchLimit = 50;") &&
+        workspaceScript.text.includes("function outgoingRecentSearchHistory(existingValues, recentSearches)") &&
+        workspaceScript.text.includes("recentSearchHistoryJSON: JSON.stringify(recentSearchHistory)") &&
+        workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
@@ -933,7 +940,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-search-history-lists-v81'),
+        webRoot.text.includes('/web/app.js?v=20260727-search-history-density-v84'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -947,7 +954,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-search-history-lists-v74'),
+        webRoot.text.includes('/web/styles.css?v=20260727-search-history-density-v77'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1306,7 +1313,9 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/) &&
-        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-2\);/),
+        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: 2px;/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 70px;[\s\S]*?min-height: 70px;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 70px;[\s\S]*?min-height: 70px;[\s\S]*?padding: var\(--space-1\);/),
       "Search history lists no longer use the requested heading size and independent vertical scrolling."
     );
     assert(

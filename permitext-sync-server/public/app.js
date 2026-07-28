@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-search-history-lists-v81";
+} from "./offline-storage.js?v=20260727-search-history-density-v84";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -210,6 +210,7 @@ function loadWorkspaceState() {
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       recentSearches: normalizeSearchHistory(saved.recentSearches, recentSearchLimit),
+      recentSearchHistory: normalizeRecentSearchHistory(saved.recentSearchHistory, recentSearchLimit),
       recentActivityUpdatedAt: saved.recentActivityUpdatedAt || null,
       pinnedSearches: normalizeSearchHistory(saved.pinnedSearches),
       recentlyViewedSections: Array.isArray(saved.recentlyViewedSections)
@@ -269,6 +270,7 @@ function loadWorkspaceState() {
       searchQuery: "",
       searchCodeFilters: [],
       recentSearches: [],
+      recentSearchHistory: [],
       recentActivityUpdatedAt: null,
       pinnedSearches: [],
       recentlyViewedSections: [],
@@ -913,6 +915,21 @@ function normalizeSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
     if (!query || seen.has(key)) return;
     seen.add(key);
     normalized.push(query);
+  });
+  return normalized.slice(0, limit);
+}
+
+function normalizeRecentSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const normalized = [];
+  value.forEach((item) => {
+    const query = String(item?.query || "").trim();
+    const searchedAt = Number(item?.searchedAt);
+    const key = query.normalize("NFKC").toLocaleLowerCase("en-US");
+    if (!query || !Number.isFinite(searchedAt) || seen.has(key)) return;
+    seen.add(key);
+    normalized.push({ query, searchedAt });
   });
   return normalized.slice(0, limit);
 }
@@ -3555,6 +3572,38 @@ function continuityRecentSearches(values = {}) {
   }
 }
 
+function continuityRecentSearchHistory(values = {}, fallbackTimestamp = 0) {
+  try {
+    const parsed = JSON.parse(values.recentSearchHistoryJSON || "[]");
+    const explicit = normalizeRecentSearchHistory(parsed, recentSearchLimit);
+    if (explicit.length) return explicit;
+  } catch {
+    // Fall through to the ordered legacy search list.
+  }
+  return continuityRecentSearches(values).map((query, index) => ({
+    query,
+    searchedAt: Math.max(0, fallbackTimestamp - index)
+  }));
+}
+
+function outgoingRecentSearchHistory(existingValues, recentSearches) {
+  const candidates = [
+    ...normalizeRecentSearchHistory(state.recentSearchHistory, recentSearchLimit),
+    ...continuityRecentSearchHistory(existingValues)
+  ];
+  const byQuery = new Map();
+  candidates.forEach((entry) => {
+    const key = entry.query.normalize("NFKC").toLocaleLowerCase("en-US");
+    const current = byQuery.get(key);
+    if (!current || entry.searchedAt > current.searchedAt) byQuery.set(key, entry);
+  });
+  const fallbackTimestamp = Date.now();
+  return recentSearches.map((query, index) => {
+    const key = query.normalize("NFKC").toLocaleLowerCase("en-US");
+    return byQuery.get(key) || { query, searchedAt: fallbackTimestamp - index };
+  });
+}
+
 function recordRecentlyViewedReader(reader) {
   const sectionID = Number(reader?.sectionID || 0);
   if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return;
@@ -3616,6 +3665,8 @@ function continuityValuesForReader(reader) {
         .slice(0, recentViewLimit - 1)
     );
   }
+  const recentSearches = normalizeSearchHistory(state.recentSearches, recentSearchLimit);
+  const recentSearchHistory = outgoingRecentSearchHistory(existing, recentSearches);
   return {
     ...existing,
     selectedJurisdictionKey: "jurisdiction-1",
@@ -3627,7 +3678,8 @@ function continuityValuesForReader(reader) {
       ? String(reader.chapterID)
       : existing.lastOpenedChapterID || "",
     recentlyViewedSectionsJSON: JSON.stringify(recentEntries.slice(0, recentViewLimit)),
-    recentSearchesJSON: JSON.stringify(normalizeSearchHistory(state.recentSearches, recentSearchLimit))
+    recentSearchesJSON: JSON.stringify(recentSearches),
+    recentSearchHistoryJSON: JSON.stringify(recentSearchHistory)
   };
 }
 
@@ -3688,6 +3740,7 @@ async function applyRemoteContinuityIfNewer() {
     state.recentlyViewedSections = remoteRecentEntries.slice(0, recentViewLimit);
     if (record.values?.recentSearchesJSON !== undefined) {
       state.recentSearches = continuityRecentSearches(record.values);
+      state.recentSearchHistory = continuityRecentSearchHistory(record.values, remoteTimestamp);
     }
     state.recentActivityUpdatedAt = record.updatedAt;
   }
@@ -6657,9 +6710,16 @@ function renderSearchPlaceholder(results, message) {
 function recordRecentSearch(query) {
   const trimmed = String(query || "").trim();
   if (!trimmed) return;
+  const searchedAt = Date.now();
   state.recentSearches = normalizeSearchHistory([
     trimmed,
     ...(state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0)
+  ], recentSearchLimit);
+  state.recentSearchHistory = normalizeRecentSearchHistory([
+    { query: trimmed, searchedAt },
+    ...(state.recentSearchHistory || []).filter((item) =>
+      item.query.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0
+    )
   ], recentSearchLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
@@ -6680,6 +6740,9 @@ function unpinSearch(query) {
 function removeRecentSearch(query) {
   const trimmed = String(query || "").trim();
   state.recentSearches = (state.recentSearches || []).filter((item) => item.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0);
+  state.recentSearchHistory = (state.recentSearchHistory || []).filter((item) =>
+    item.query.localeCompare(trimmed, undefined, { sensitivity: "accent" }) !== 0
+  );
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
   scheduleRecentSearchContinuitySync();
@@ -13754,6 +13817,7 @@ async function clearSettingsAnnotations(field) {
 async function performSettingsClearAction(action) {
   if (action === "searches") {
     state.recentSearches = [];
+    state.recentSearchHistory = [];
     state.recentlyViewedSections = [];
     state.recentActivityUpdatedAt = new Date().toISOString();
     const account = activeAccount();
@@ -13768,7 +13832,12 @@ async function performSettingsClearAction(action) {
         continuity: {
           userID: account.userID,
           codeVersion: defaultSyncCodeVersion,
-          values: { ...existing, recentlyViewedSectionsJSON: "[]", recentSearchesJSON: "[]" },
+          values: {
+            ...existing,
+            recentlyViewedSectionsJSON: "[]",
+            recentSearchesJSON: "[]",
+            recentSearchHistoryJSON: "[]"
+          },
           updatedAt
         }
       }, account);
@@ -13776,7 +13845,12 @@ async function performSettingsClearAction(action) {
       if (syncedContent?.summary?.latestContinuity) {
         syncedContent.summary.latestContinuity = {
           ...syncedContent.summary.latestContinuity,
-          values: { ...existing, recentlyViewedSectionsJSON: "[]", recentSearchesJSON: "[]" },
+          values: {
+            ...existing,
+            recentlyViewedSectionsJSON: "[]",
+            recentSearchesJSON: "[]",
+            recentSearchHistoryJSON: "[]"
+          },
           updatedAt
         };
       }
@@ -15045,6 +15119,7 @@ function renderSettings() {
       state.sectionNotes = {};
       state.localSavedSectionIDs = [];
       state.recentSearches = [];
+      state.recentSearchHistory = [];
       state.pinnedSearches = [];
       state.recentlyViewedSections = [];
       state.continuityAppliedAt = null;
