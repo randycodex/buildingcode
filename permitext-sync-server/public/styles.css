@@ -1635,6 +1635,7 @@ select option:checked {
 }
 
 .section-detail-panel {
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   background: var(--search-detail-background);
