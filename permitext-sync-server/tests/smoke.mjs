@@ -943,7 +943,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-settings-collapse-stability-v92'),
+        webRoot.text.includes('/web/app.js?v=20260727-section-project-sheet-v93'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -957,7 +957,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-settings-collapse-stability-v84'),
+        webRoot.text.includes('/web/styles.css?v=20260727-section-project-sheet-v85'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1095,7 +1095,7 @@ async function main() {
       "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
     );
     assert(
-      workspaceScript.text.match(/function showProjectCreateSheet\(panel, project = null\) \{\s+if \(!project && !hasCapability\("projects"\)\)/) &&
+      workspaceScript.text.match(/function showProjectCreateSheet\(panel, project = null, options = \{\}\) \{\s+if \(!project && !hasCapability\("projects"\)\)/) &&
         workspaceScript.text.includes('"Sign in and upgrade to Pro before creating a Project workspace."'),
       "Free or signed-out users can still open the new-Project form before the plan gate."
     );
@@ -1455,8 +1455,11 @@ async function main() {
         !workspaceScript.text.includes('empty.textContent = "No tags";') &&
         workspaceScript.text.includes('projectsHost.className = "section-detail-projects";') &&
         workspaceScript.text.includes('addButton.className = "annotation-project-add";') &&
-        workspaceScript.text.includes('form.className = "annotation-project-create-form";') &&
-        workspaceScript.text.includes("const project = await createProjectFolder({ name });") &&
+        !workspaceScript.text.includes('form.className = "annotation-project-create-form";') &&
+        workspaceScript.text.includes("showProjectCreateSheet(panel, null, {") &&
+        workspaceScript.text.includes("onCreated: async (project)") &&
+        workspaceScript.text.includes("function showProjectCreateSheet(panel, project = null, options = {})") &&
+        workspaceScript.text.includes("await options.onCreated?.(createdProject);") &&
         workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&

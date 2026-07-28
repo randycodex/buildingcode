@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-settings-collapse-stability-v92";
+} from "./offline-storage.js?v=20260727-section-project-sheet-v93";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5104,49 +5104,19 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
       </svg>
     `;
     addButton.addEventListener("click", () => {
-      addButton.hidden = true;
-      const form = document.createElement("form");
-      form.className = "annotation-project-create-form";
-      const input = document.createElement("input");
-      input.type = "text";
-      input.placeholder = "Project name";
-      input.setAttribute("aria-label", "New project name");
-      const createButton = document.createElement("button");
-      createButton.type = "submit";
-      createButton.textContent = "Create";
-      form.append(input, createButton);
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const name = input.value.trim();
-        if (!name) return;
-        input.disabled = true;
-        createButton.disabled = true;
-        try {
-          const project = await createProjectFolder({ name });
-          if (!project) return;
+      const panel = container.closest(".workspace-panel");
+      if (!panel) return;
+      showProjectCreateSheet(panel, null, {
+        onCreated: async (project) => {
           if (!isSectionSaved(sectionPayload.sectionID)) {
             const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
             if (!saved) return;
             syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
           }
           await persistSectionInProject(project, { ...sectionPayload, ...target });
-          renderAnnotationProjectEditor(container, target, sectionPayload, options);
           options.onChange?.();
-        } catch (error) {
-          input.disabled = false;
-          createButton.disabled = false;
-          createButton.title = error.message || "Could not create the project.";
         }
       });
-      input.addEventListener("keydown", (event) => {
-        if (event.key !== "Escape") return;
-        event.preventDefault();
-        form.remove();
-        addButton.hidden = false;
-        addButton.focus();
-      });
-      header.insertAdjacentElement("afterend", form);
-      input.focus();
     });
     header.append(addButton);
   }
@@ -12733,7 +12703,7 @@ async function openProjectSavedSection(project, item) {
   alignReaderSectionAfterLayout(reader);
 }
 
-function showProjectCreateSheet(panel, project = null) {
+function showProjectCreateSheet(panel, project = null, options = {}) {
   if (!project && !hasCapability("projects")) {
     const account = activeAccount();
     void presentPlanLimitNotice(
@@ -12835,7 +12805,9 @@ function showProjectCreateSheet(panel, project = null) {
       if (isEditing) {
         await updateProjectFolder(project, details);
       } else {
-        await createProjectFolder(details);
+        const createdProject = await createProjectFolder(details);
+        if (!createdProject) return;
+        await options.onCreated?.(createdProject);
       }
       overlay.remove();
       await transitionWorkspace("utility", {
