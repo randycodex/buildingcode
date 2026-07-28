@@ -896,8 +896,10 @@ async function main() {
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
         !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
-        workspaceScript.text.includes('appendHistorySection("Pinned"') &&
-        workspaceScript.text.includes('appendHistorySection("Recent Searches"') &&
+        workspaceScript.text.includes('createHistorySection("Pinned"') &&
+        workspaceScript.text.includes('createHistorySection("Recent Searches"') &&
+        workspaceScript.text.includes("function bindSearchHistoryDivider") &&
+        workspaceScript.text.includes('"Resize Jump Back In and Recent Searches"') &&
         workspaceScript.text.includes('list.classList.add("search-history-scroll-list")') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
         !workspaceScript.text.includes("function pinSearch") &&
@@ -940,7 +942,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-cross-code-history-v85'),
+        webRoot.text.includes('/web/app.js?v=20260727-search-history-divider-v86'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -954,7 +956,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-search-history-density-v77'),
+        webRoot.text.includes('/web/styles.css?v=20260727-search-history-divider-v78'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

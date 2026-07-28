@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-cross-code-history-v85";
+} from "./offline-storage.js?v=20260727-search-history-divider-v86";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -344,6 +344,7 @@ function newUtilityInstance(key, overrides = {}) {
   if (key === "search") {
     instance.query = typeof overrides.query === "string" ? overrides.query : "";
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
+    instance.historySplitRatio = normalizeSearchHistorySplitRatio(overrides.historySplitRatio);
   } else if (key === "saved") {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.tagFilter = typeof overrides.tagFilter === "string" ? overrides.tagFilter.trim() : "";
@@ -359,6 +360,7 @@ function normalizeUtilityInstances(saved = {}) {
       id: String(pane?.id || crypto.randomUUID()),
       query: typeof pane?.query === "string" ? pane.query : "",
       codeFilters: pane?.codeFilters,
+      historySplitRatio: pane?.historySplitRatio,
       tagFilter: pane?.tagFilter,
       sortMode: pane?.sortMode
     }))
@@ -903,6 +905,10 @@ function normalizeSearchCodeFilters(value) {
   }
   const prefix = typeof value === "string" ? value.trim().toUpperCase() : "";
   return prefix && prefix !== "ALL" ? [prefix] : [];
+}
+
+function normalizeSearchHistorySplitRatio(value) {
+  return clampNumber(value, 0.2, 0.8, 0.56);
 }
 
 function normalizeSearchHistory(value, limit = Number.POSITIVE_INFINITY) {
@@ -6826,9 +6832,11 @@ function renderSearchHistory(panel, instance) {
   const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
     .filter((query) => !isSearchPinned(query));
 
+  let jumpSection = null;
   if (recentSections.length) {
     const section = document.createElement("section");
     section.className = "search-history-section search-jump-section";
+    section.id = `search-jump-${instance.id}`;
     const label = document.createElement("p");
     label.className = "section-label search-history-label";
     label.textContent = "Jump Back In";
@@ -6876,15 +6884,16 @@ function renderSearchHistory(panel, instance) {
       list.append(tile);
     });
     section.append(label, list);
-    results.append(section);
+    jumpSection = section;
   }
 
-  const appendHistorySection = (title, queries, pinnedSection) => {
-    if (!queries.length) return;
+  const createHistorySection = (title, queries, pinnedSection) => {
+    if (!queries.length) return null;
     const section = document.createElement("section");
     section.className = "search-history-section";
     section.classList.toggle("is-pinned", pinnedSection);
     section.classList.toggle("is-recent", !pinnedSection);
+    if (!pinnedSection) section.id = `search-recent-${instance.id}`;
     const label = document.createElement("p");
     label.className = "section-label search-history-label";
     label.textContent = title;
@@ -6933,11 +6942,84 @@ function renderSearchHistory(panel, instance) {
       }
       list.append(row);
     });
-    results.append(section);
+    return section;
   };
 
-  appendHistorySection("Pinned", pinned, true);
-  appendHistorySection("Recent Searches", recentQueries, false);
+  const pinnedSection = createHistorySection("Pinned", pinned, true);
+  const recentSection = createHistorySection("Recent Searches", recentQueries, false);
+  if (jumpSection && recentSection) {
+    results.classList.add("is-split");
+    const upperPane = document.createElement("div");
+    upperPane.className = "search-history-pane search-history-upper";
+    upperPane.append(jumpSection);
+    if (pinnedSection) upperPane.append(pinnedSection);
+    const divider = document.createElement("div");
+    divider.className = "search-history-divider";
+    divider.setAttribute("role", "separator");
+    divider.setAttribute("aria-label", "Resize Jump Back In and Recent Searches");
+    divider.setAttribute("aria-orientation", "horizontal");
+    divider.setAttribute("aria-controls", `${jumpSection.id} ${recentSection.id}`);
+    divider.tabIndex = 0;
+    const lowerPane = document.createElement("div");
+    lowerPane.className = "search-history-pane search-history-lower";
+    lowerPane.append(recentSection);
+    results.append(upperPane, divider, lowerPane);
+    bindSearchHistoryDivider(results, divider, instance);
+  } else {
+    if (jumpSection) results.append(jumpSection);
+    if (pinnedSection) results.append(pinnedSection);
+    if (recentSection) results.append(recentSection);
+  }
+}
+
+function bindSearchHistoryDivider(results, divider, instance) {
+  const applyRatio = (value) => {
+    const ratio = normalizeSearchHistorySplitRatio(value);
+    instance.historySplitRatio = ratio;
+    results.style.setProperty("--search-history-upper-size", `${ratio * 100}%`);
+    divider.setAttribute("aria-valuemin", "20");
+    divider.setAttribute("aria-valuemax", "80");
+    divider.setAttribute("aria-valuenow", String(Math.round(ratio * 100)));
+  };
+  applyRatio(instance.historySplitRatio);
+
+  const resize = (event) => {
+    const bounds = results.getBoundingClientRect();
+    if (!bounds.height) return;
+    applyRatio((event.clientY - bounds.top) / bounds.height);
+  };
+  const endResize = (event) => {
+    divider.classList.remove("is-dragging");
+    document.body.classList.remove("is-resizing-search-history");
+    divider.releasePointerCapture?.(event.pointerId);
+    saveWorkspaceState();
+    window.removeEventListener("pointermove", resize);
+    window.removeEventListener("pointerup", endResize);
+    window.removeEventListener("pointercancel", endResize);
+  };
+
+  divider.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    divider.setPointerCapture?.(event.pointerId);
+    divider.classList.add("is-dragging");
+    document.body.classList.add("is-resizing-search-history");
+    resize(event);
+    window.addEventListener("pointermove", resize);
+    window.addEventListener("pointerup", endResize);
+    window.addEventListener("pointercancel", endResize);
+  });
+  divider.addEventListener("keydown", (event) => {
+    const direction = event.key === "ArrowUp" ? -1 : event.key === "ArrowDown" ? 1 : 0;
+    if (!direction && event.key !== "Home" && event.key !== "End") return;
+    event.preventDefault();
+    const ratio = event.key === "Home"
+      ? 0.2
+      : event.key === "End"
+        ? 0.8
+        : normalizeSearchHistorySplitRatio(instance.historySplitRatio) + direction * 0.04;
+    applyRatio(ratio);
+    saveWorkspaceState();
+  });
 }
 
 function bindHorizontalWheelScroll(element) {
