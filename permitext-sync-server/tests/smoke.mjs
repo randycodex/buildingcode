@@ -951,8 +951,14 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-project-archive-order-v104'),
+        webRoot.text.includes('/web/app.js?v=20260728-existing-building-code-v105'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      workspaceScript.text.includes('prefix: "EBC"') &&
+        workspaceScript.text.includes("The NYC Existing Building Code becomes effective July 17, 2027.") &&
+        webRoot.text.includes('class="reader-code-status"'),
+      "The enacted Existing Building Code should be available in the Reader with its future effective date."
     );
     assert(
       workspaceScript.text.includes("function closeLinkedReaderForSearch(searchID)") &&
@@ -973,7 +979,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-project-tile-focus-v94'),
+        webRoot.text.includes('/web/styles.css?v=20260728-existing-building-code-v95'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

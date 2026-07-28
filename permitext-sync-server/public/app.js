@@ -9,7 +9,7 @@ import {
   syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260726-paragraph-projects-v4";
+} from "./sync-identity.js?v=20260728-existing-building-code-v5";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
@@ -85,9 +85,15 @@ const codeOptions = [
   { prefix: "PC", label: "Plumbing Code", theme: "plumbing" },
   { prefix: "MC", label: "Mechanical Code", theme: "mechanical" },
   { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" },
+  {
+    prefix: "EBC",
+    label: "Existing Building Code (effective July 17, 2027)",
+    theme: "existing-building"
+  },
   { prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }
 ];
 const zoningCodePrefix = "ZR";
+const existingBuildingCodePrefix = "EBC";
 const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
@@ -2569,6 +2575,14 @@ function populateCodeSelect(panel, reader) {
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
   resizeCodeSelect(codeSelect);
+  const status = panel.querySelector(".reader-code-status");
+  if (status) {
+    const isExistingBuildingCode = reader.codePrefix === existingBuildingCodePrefix;
+    status.hidden = !isExistingBuildingCode;
+    status.textContent = isExistingBuildingCode
+      ? "Enacted, not yet effective. The NYC Existing Building Code becomes effective July 17, 2027."
+      : "";
+  }
 }
 
 function closeActiveCustomSelect() {

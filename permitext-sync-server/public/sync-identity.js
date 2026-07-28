@@ -1,5 +1,7 @@
 export const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 export const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
+export const existingBuildingSyncCodeVersion =
+  "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1";
 
 export function syncCodeVersion(value) {
   const candidate = String(value || "").trim();
@@ -16,13 +18,21 @@ export function syncCodeVersion(value) {
     normalized === "nyc zoning resolution — text through 2026-07-16" ||
     normalized === zoningSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return zoningSyncCodeVersion;
+  if (
+    normalized === "nyc-existing-building-code" ||
+    normalized === "nyc existing building code" ||
+    normalized ===
+      "nyc existing building code - enacted 2026-01-17; effective 2027-07-17" ||
+    normalized === existingBuildingSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return existingBuildingSyncCodeVersion;
   return candidate;
 }
 
 export function syncCodeVersionForPrefix(prefix) {
-  return String(prefix || "").trim().toUpperCase() === "ZR"
-    ? zoningSyncCodeVersion
-    : defaultSyncCodeVersion;
+  const normalized = String(prefix || "").trim().toUpperCase();
+  if (normalized === "ZR") return zoningSyncCodeVersion;
+  if (normalized === "EBC") return existingBuildingSyncCodeVersion;
+  return defaultSyncCodeVersion;
 }
 
 function nonEmpty(value) {

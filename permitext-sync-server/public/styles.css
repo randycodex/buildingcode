@@ -1634,6 +1634,16 @@ select option:checked {
   padding-top: calc(var(--reader-scrollbar-track-top) + var(--reader-internal-search-height) + var(--space-3));
 }
 
+.reader-code-status {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  background: color-mix(in srgb, #d89a2b 18%, var(--surface));
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  line-height: 1.4;
+}
+
 .section-detail-panel {
   position: relative;
   display: grid;
