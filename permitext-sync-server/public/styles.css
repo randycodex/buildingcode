@@ -2954,6 +2954,13 @@ select option:checked {
   pointer-events: auto;
 }
 
+.code-filter-menu.is-restoring .search-code-filter,
+.code-filter-menu.is-restoring .saved-code-filter,
+.code-filter-menu.is-restoring .saved-project-list,
+.code-filter-menu.is-restoring .saved-tag-filter {
+  transition: none;
+}
+
 .code-filter-menu[hidden],
 .code-filter-menu .search-code-filter[hidden],
 .code-filter-menu .saved-code-filter[hidden],

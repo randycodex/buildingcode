@@ -1935,6 +1935,16 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
         menu.style.setProperty("--code-filter-menu-height", nextHeight);
       }
     };
+    if (options.instant && !menu.classList.contains("is-open")) {
+      menu.classList.add("is-restoring");
+      applyExpandedHeight();
+      menu.classList.add("is-open");
+      void filterRail.offsetHeight;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => menu.classList.remove("is-restoring"));
+      });
+      return;
+    }
     if (!menu.classList.contains("is-open")) {
       requestAnimationFrame(() => {
         if (instance?.[stateKey]) {
@@ -1989,7 +1999,8 @@ function wireCodeFilterMenu(filterRail, instance, options = {}) {
     saveWorkspaceState();
     updateCodeFilterMenu(filterRail, instance, options);
   });
-  updateCodeFilterMenu(filterRail, instance, options);
+  const initialOptions = instance[stateKey] ? { ...options, instant: true } : options;
+  updateCodeFilterMenu(filterRail, instance, initialOptions);
 }
 
 async function api(path) {

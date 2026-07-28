@@ -939,7 +939,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-saved-filter-grid-v98'),
+        webRoot.text.includes('/web/app.js?v=20260727-saved-filter-restore-v100'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -961,7 +961,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-saved-filter-grid-v88'),
+        webRoot.text.includes('/web/styles.css?v=20260727-saved-filter-restore-v89'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1349,6 +1349,7 @@ async function main() {
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
         workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter \{[\s\S]*?max-height: 0;/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.saved-tag-filter \{[\s\S]*?transition: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?padding: var\(--space-2\) 0 0;/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
@@ -1356,6 +1357,9 @@ async function main() {
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 28px;[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
         workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
+        workspaceScript.text.includes('menu.classList.add("is-restoring")') &&
+        workspaceScript.text.includes("void filterRail.offsetHeight") &&
+        workspaceScript.text.includes("instant: true") &&
         !workspaceScript.text.includes("savedFilterScrollPositions") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
