@@ -5965,6 +5965,10 @@ button.project-studio-metric:focus-visible {
   outline-offset: -3px;
 }
 
+.saved-project-tile[data-pointer-focus="true"]:focus-visible {
+  outline: 0;
+}
+
 .saved-project-tile strong,
 .saved-project-tile > span {
   min-width: 0;

@@ -13372,8 +13372,19 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, countLabel, actions);
       const open = () => openProjectDetail(project, { sourcePaneID: paneID });
-      tile.addEventListener("click", () => {
+      tile.addEventListener("pointerdown", (event) => {
+        if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
+        tile.dataset.pointerFocus = "true";
+      });
+      tile.addEventListener("pointercancel", () => {
+        delete tile.dataset.pointerFocus;
+      });
+      tile.addEventListener("click", (event) => {
         if (tile.dataset.justDragged === "true") return;
+        if (event.detail > 0) {
+          tile.blur();
+          delete tile.dataset.pointerFocus;
+        }
         open();
       });
       tile.addEventListener("keydown", (event) => {
@@ -13441,6 +13452,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       tile.addEventListener("dragend", () => {
         draggedProjectID = "";
+        delete tile.dataset.pointerFocus;
         tile.classList.remove("is-dragging");
         clearDropIndicators();
         requestAnimationFrame(() => {
