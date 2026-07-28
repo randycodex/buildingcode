@@ -2284,6 +2284,69 @@ select option:checked {
   gap: var(--space-2);
 }
 
+.annotation-projects-header {
+  display: flex;
+  min-height: 24px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.annotation-project-add {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.annotation-project-add:hover,
+.annotation-project-add:focus-visible {
+  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.annotation-project-add svg {
+  width: 16px;
+  height: 16px;
+}
+
+.annotation-project-create-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+}
+
+.annotation-project-create-form input {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  outline: 0;
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.annotation-project-create-form button {
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--code-accent) 24%, var(--surface-muted));
+  color: var(--text-primary);
+}
+
+.annotation-project-create-form button:disabled,
+.annotation-project-create-form input:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}
+
 .reader-notes-comments-label {
   margin-bottom: calc(-1 * var(--space-2));
 }

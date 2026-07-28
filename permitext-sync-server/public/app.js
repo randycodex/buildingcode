@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-tight-search-history-v88";
+} from "./offline-storage.js?v=20260727-section-project-create-v89";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5083,14 +5083,78 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
   const label = document.createElement("p");
   label.className = "annotation-tags-label";
   label.textContent = "Projects";
+  const header = document.createElement("div");
+  header.className = "annotation-projects-header";
+  header.append(label);
 
   const chips = document.createElement("div");
   chips.className = "annotation-project-chips";
-  const projects = hasCapability("projects")
+  const canUseProjects = hasCapability("projects");
+  const projects = canUseProjects
     ? activeProjectRecords(currentContentSummary().projects || [])
     : [];
 
-  if (!hasCapability("projects")) {
+  if (canUseProjects && container.classList.contains("section-detail-projects")) {
+    const addButton = document.createElement("button");
+    addButton.type = "button";
+    addButton.className = "annotation-project-add";
+    addButton.title = "Create project";
+    addButton.setAttribute("aria-label", "Create project");
+    addButton.innerHTML = `
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+    `;
+    addButton.addEventListener("click", () => {
+      addButton.hidden = true;
+      const form = document.createElement("form");
+      form.className = "annotation-project-create-form";
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Project name";
+      input.setAttribute("aria-label", "New project name");
+      const createButton = document.createElement("button");
+      createButton.type = "submit";
+      createButton.textContent = "Create";
+      form.append(input, createButton);
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const name = input.value.trim();
+        if (!name) return;
+        input.disabled = true;
+        createButton.disabled = true;
+        try {
+          const project = await createProjectFolder({ name });
+          if (!project) return;
+          if (!isSectionSaved(sectionPayload.sectionID)) {
+            const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
+            if (!saved) return;
+            syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+          }
+          await persistSectionInProject(project, { ...sectionPayload, ...target });
+          renderAnnotationProjectEditor(container, target, sectionPayload, options);
+          options.onChange?.();
+        } catch (error) {
+          input.disabled = false;
+          createButton.disabled = false;
+          createButton.title = error.message || "Could not create the project.";
+        }
+      });
+      input.addEventListener("keydown", (event) => {
+        if (event.key !== "Escape") return;
+        event.preventDefault();
+        form.remove();
+        addButton.hidden = false;
+        addButton.focus();
+      });
+      header.insertAdjacentElement("afterend", form);
+      input.focus();
+    });
+    header.append(addButton);
+  }
+
+  if (!canUseProjects) {
     const unavailable = document.createElement("span");
     unavailable.className = "annotation-projects-empty";
     unavailable.textContent = "Pro required";
@@ -5138,7 +5202,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     });
   }
 
-  container.append(label, chips);
+  container.append(header, chips);
 }
 
 function refreshOpenAnnotationProjectEditors() {
