@@ -943,7 +943,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-empty-tags-cleanup-v90'),
+        webRoot.text.includes('/web/app.js?v=20260727-settings-collapse-stability-v92'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -957,7 +957,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-empty-tags-cleanup-v82'),
+        webRoot.text.includes('/web/styles.css?v=20260727-settings-collapse-stability-v84'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1406,7 +1406,7 @@ async function main() {
       "Settings card titles should remain centered without the retired beta badge."
     );
     assert(
-      workspaceStyles.text.match(/\.settings-panel \.settings-card\.is-collapsed \{[\s\S]*?min-height: 56px;[\s\S]*?align-items: center;[\s\S]*?justify-content: center;[\s\S]*?padding: var\(--space-3\);/) &&
+      workspaceStyles.text.match(/\.settings-panel \.settings-card\.is-collapsed \{[\s\S]*?min-height: 56px;[\s\S]*?padding: var\(--space-3\);/) &&
         workspaceStyles.text.match(/\.settings-panel \.settings-card-toggle > span \{[\s\S]*?color: inherit;[\s\S]*?font: inherit;[\s\S]*?letter-spacing: inherit;/),
       "Collapsed Settings cards no longer share the same height, centered layout, and title typography."
     );

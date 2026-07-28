@@ -7593,7 +7593,7 @@ button.project-studio-metric:focus-visible {
 .settings-panel .settings-section-title {
   justify-self: center;
   width: 100%;
-  margin: 0 0 2px;
+  margin: 0;
   color: var(--text-secondary);
   font-family: Helvetica, Arial, sans-serif;
   font-size: 9pt !important;
@@ -7637,8 +7637,6 @@ button.project-studio-metric:focus-visible {
 
 .settings-panel .settings-card.is-collapsed {
   min-height: 56px;
-  align-items: center;
-  justify-content: center;
   padding: var(--space-3);
 }
 
