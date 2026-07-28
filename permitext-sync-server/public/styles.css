@@ -6134,7 +6134,10 @@ button.project-studio-metric:focus-visible {
 }
 
 .code-filter-menu.is-open .saved-tag-filter {
-  overflow: hidden;
+  max-height: min(var(--code-filter-menu-height, 240px), 152px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
   padding: var(--space-2) 0 0;
 }
 

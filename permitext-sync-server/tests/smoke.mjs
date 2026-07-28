@@ -961,7 +961,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-borderless-search-v90'),
+        webRoot.text.includes('/web/styles.css?v=20260727-scrollable-tags-v91'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1355,6 +1355,7 @@ async function main() {
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 240px\), 152px\);[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 28px;[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
         workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
