@@ -594,6 +594,9 @@ async function main() {
         workspaceScript.text.includes('tile.dataset.pointerFocus = "true"') &&
         workspaceScript.text.includes("tile.blur()") &&
         workspaceScript.text.includes("delete tile.dataset.pointerFocus") &&
+        workspaceScript.text.includes("restoreProjectsStackOrder(options.sourcePaneID)") &&
+        workspaceScript.text.includes("const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] :") &&
+        workspaceScript.text.includes('sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID)') &&
         workspaceScript.text.includes("tile.append(heading, countLabel, actions)") &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
@@ -946,7 +949,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-project-tile-focus-v103'),
+        webRoot.text.includes('/web/app.js?v=20260727-project-archive-order-v104'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

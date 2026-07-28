@@ -1392,7 +1392,7 @@ async function activateProjectStudio(project, options = {}) {
       : defaultReportDraftPaneWidth;
   }
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
-  restoreProjectsStackOrder();
+  restoreProjectsStackOrder(options.sourcePaneID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(detailID);
@@ -1539,17 +1539,22 @@ function activePaneIDs() {
     !isProjectWorkboardPaneID(id)
   );
   if (openProjectDetails().length) {
-    const savedIndex = paired.indexOf(primarySavedPaneID());
     const detailIDs = openProjectDetails().flatMap((detail) => [
       paneIDForProjectDetail(detail),
       ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
       ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
       ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
     ]);
-    if (savedIndex === -1) {
+    const firstDetailIndex = ordered.findIndex((id) => detailIDs.includes(id));
+    const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] : "";
+    const projectAnchorID = paired.includes(orderedAnchorID)
+      ? orderedAnchorID
+      : primarySavedPaneID();
+    const projectAnchorIndex = paired.indexOf(projectAnchorID);
+    if (projectAnchorIndex === -1) {
       paired.push(...detailIDs);
     } else {
-      paired.splice(savedIndex + 1, 0, ...detailIDs);
+      paired.splice(projectAnchorIndex + 1, 0, ...detailIDs);
     }
   }
   (state.utilityInstances || []).forEach((instance) => {
@@ -1762,8 +1767,7 @@ function placeArchiveAfterProjectsStack() {
   state.paneOrder = ordered;
 }
 
-function restoreProjectsStackOrder() {
-  const projectID = "utility:projects";
+function restoreProjectsStackOrder(sourcePaneID = "") {
   const detailIDs = openProjectDetails().flatMap((detail) => [
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
@@ -1773,6 +1777,17 @@ function restoreProjectsStackOrder() {
   const archiveID = "utility:archive";
   const activeIDs = defaultActivePaneIDs();
   const ordered = (state.paneOrder || []).filter((id) => activeIDs.includes(id) && !detailIDs.includes(id) && id !== archiveID);
+  const savedIDs = savedPaneIDs();
+  const sourceIsProjectAnchor = sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID);
+  const projectID = sourceIsProjectAnchor && activeIDs.includes(sourcePaneID)
+    ? sourcePaneID
+    : state.utilities.projects && activeIDs.includes("utility:projects")
+      ? "utility:projects"
+      : savedIDs.find((id) => activeIDs.includes(id)) || "";
+  if (!projectID) {
+    state.paneOrder = ordered;
+    return;
+  }
   if (!ordered.includes(projectID)) ordered.unshift(projectID);
   const projectIndex = ordered.indexOf(projectID);
   let insertIndex = projectIndex + 1;
