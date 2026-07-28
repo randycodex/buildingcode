@@ -3344,7 +3344,6 @@ body.is-resizing-search-history * {
   height: 70px;
   min-height: 70px;
   padding: var(--space-1);
-  padding-right: 30px;
   border: 0;
   background: transparent;
   color: var(--text-primary);
@@ -3381,29 +3380,6 @@ body.is-resizing-search-history * {
   font-size: calc(var(--chrome-font-size) * 0.62);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.search-jump-bookmark {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: var(--text-secondary);
-}
-
-.search-jump-bookmark.is-saved {
-  color: var(--code-accent);
-}
-
-.search-jump-bookmark svg {
-  width: 17px;
-  height: 17px;
 }
 
 .search-history-row {

@@ -894,6 +894,7 @@ async function main() {
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
+        !workspaceScript.text.includes('bookmarkButton.className = "search-jump-bookmark"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
         !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
         workspaceScript.text.includes('createHistorySection("Pinned"') &&
@@ -942,7 +943,7 @@ async function main() {
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
-        webRoot.text.includes('/web/app.js?v=20260727-search-history-divider-v86'),
+        webRoot.text.includes('/web/app.js?v=20260727-jump-history-cleanup-v87'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -956,7 +957,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-search-history-divider-v78'),
+        webRoot.text.includes('/web/styles.css?v=20260727-jump-history-cleanup-v79'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

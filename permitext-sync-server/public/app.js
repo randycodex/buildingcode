@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-search-history-divider-v86";
+} from "./offline-storage.js?v=20260727-jump-history-cleanup-v87";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6863,24 +6863,7 @@ function renderSearchHistory(panel, instance) {
         if (window.getSelection && String(window.getSelection()).trim()) return;
         openSectionDetail(instance.id, entry);
       });
-      const bookmarkButton = document.createElement("button");
-      bookmarkButton.type = "button";
-      bookmarkButton.className = "search-jump-bookmark";
-      const syncBookmarkButton = () => {
-        const saved = isSectionSaved(entry.sectionID);
-        bookmarkButton.classList.toggle("is-saved", saved);
-        bookmarkButton.setAttribute("aria-pressed", String(saved));
-        bookmarkButton.setAttribute("aria-label", saved ? "Remove bookmark" : "Bookmark section");
-        bookmarkButton.innerHTML = bookmarkIconSVG(saved);
-      };
-      syncBookmarkButton();
-      bookmarkButton.addEventListener("click", async () => {
-        bookmarkButton.disabled = true;
-        await persistSectionBookmark(entry, !isSectionSaved(entry.sectionID));
-        syncBookmarkButton();
-        bookmarkButton.disabled = false;
-      });
-      tile.append(openButton, bookmarkButton);
+      tile.append(openButton);
       list.append(tile);
     });
     section.append(label, list);
