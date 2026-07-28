@@ -6,7 +6,7 @@ const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
 const shellCacheName = "permitext-pro-shell-v103";
-const shellAssetVersion = "20260727-project-tile-cleanup-v103";
+const shellAssetVersion = "20260727-project-tile-count-v104";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
@@ -14,10 +14,10 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260727-project-tile-cleanup-v92",
+  "/web/styles.css?v=20260727-project-tile-count-v93",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
-  "/web/app.js?v=20260727-project-tile-cleanup-v101",
-  "/web/offline-storage.js?v=20260727-project-tile-cleanup-v103",
+  "/web/app.js?v=20260727-project-tile-count-v102",
+  "/web/offline-storage.js?v=20260727-project-tile-count-v104",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260726-paragraph-projects-v4",
   "/web/sync-state.js?v=20260721-causal-clear-v4"

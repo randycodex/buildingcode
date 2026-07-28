@@ -589,6 +589,8 @@ async function main() {
         workspaceScript.text.includes('tile.addEventListener("drop"') &&
         workspaceScript.text.includes('tile.addEventListener("dragend"') &&
         workspaceScript.text.includes('event.altKey') &&
+        workspaceScript.text.includes('countLabel.className = "saved-project-count"') &&
+        workspaceScript.text.includes("countLabel.textContent = String(count)") &&
         workspaceScript.text.includes("tile.append(heading, countLabel, actions)") &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
@@ -941,7 +943,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-project-tile-cleanup-v101'),
+        webRoot.text.includes('/web/app.js?v=20260727-project-tile-count-v102'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -963,7 +965,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-project-tile-cleanup-v92'),
+        webRoot.text.includes('/web/styles.css?v=20260727-project-tile-count-v93'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1384,6 +1386,11 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&
         workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?grid-template-rows: auto 1fr;/) &&
+        workspaceStyles.text.match(/\.saved-project-count \{[\s\S]*?grid-column: 2;[\s\S]*?grid-row: 1;/) &&
+        workspaceStyles.text.match(/\.saved-project-tile-actions \{[\s\S]*?bottom: 4px;[\s\S]*?pointer-events: none;/) &&
+        workspaceStyles.text.includes(".saved-project-tile-actions:focus-within") &&
+        !workspaceStyles.text.includes(".saved-project-tile:focus-within .saved-project-tile-actions") &&
         workspaceStyles.text.includes('.saved-project-tile[data-draggable="true"]') &&
         workspaceStyles.text.match(/\.saved-project-tile\.is-dragging \{[\s\S]*?opacity: 0\.82;/) &&
         workspaceStyles.text.includes(".saved-project-tile.is-drop-before::before") &&

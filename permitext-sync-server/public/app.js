@@ -13345,9 +13345,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       heading.textContent = project.name || project.title || "Project";
       const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
       const countLabel = document.createElement("span");
-      countLabel.textContent = project.sharedOrganizationID
-        ? `${project.sharedRole || "viewer"} · ${project.sharedOrganizationName || "Firm"}`
-        : count === 1 ? "1 saved" : `${count} saved`;
+      countLabel.className = "saved-project-count";
+      countLabel.textContent = String(count);
+      countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
+      countLabel.setAttribute("aria-label", countLabel.title);
       const actions = document.createElement("div");
       actions.className = "saved-project-tile-actions";
       const editButton = document.createElement("button");

@@ -5918,11 +5918,11 @@ button.project-studio-metric:focus-visible {
 .saved-project-tile {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr;
   min-width: 0;
   min-height: 57px;
-  gap: 3px var(--space-1);
+  gap: 0 var(--space-1);
   padding: var(--space-2);
   border: 0;
   border-radius: var(--radius-control);
@@ -5974,11 +5974,15 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-project-tile strong {
-  align-self: end;
+  align-self: start;
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
 }
 
-.saved-project-tile > span {
+.saved-project-count {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  justify-self: end;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.66) !important;
 }
@@ -5986,9 +5990,10 @@ button.project-studio-metric:focus-visible {
 .saved-project-tile-actions {
   position: absolute;
   right: 2px;
-  bottom: 0;
+  bottom: 4px;
   display: flex;
   opacity: 0;
+  pointer-events: none;
   transition: opacity 120ms ease;
 }
 
@@ -5999,8 +6004,9 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-project-tile:hover .saved-project-tile-actions,
-.saved-project-tile:focus-within .saved-project-tile-actions {
+.saved-project-tile-actions:focus-within {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .saved-projects-empty {
