@@ -946,8 +946,16 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-saved-collapsible-menus-v96'),
+        webRoot.text.includes('/web/app.js?v=20260727-section-linked-reader-close-v97'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      workspaceScript.text.includes("function closeLinkedReaderForSearch(searchID)") &&
+        workspaceScript.text.includes("closeLinkedReaderForSearch(searchID);") &&
+        workspaceScript.text.includes("if (instance.key === \"search\") closeLinkedReaderForSearch(instance.id);") &&
+        workspaceScript.text.includes("delete state.paneWeights[readerPaneID]") &&
+        workspaceScript.text.includes("paneID !== readerPaneID"),
+      "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
       !webRoot.text.includes("account-plan-detail") &&

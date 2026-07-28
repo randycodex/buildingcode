@@ -1676,6 +1676,20 @@ function openOrUpdateLinkedReaderForSearch(searchID, detail, overrides = {}) {
   return reader;
 }
 
+function closeLinkedReaderForSearch(searchID) {
+  state.searchLinkedReaders = state.searchLinkedReaders && typeof state.searchLinkedReaders === "object"
+    ? state.searchLinkedReaders
+    : {};
+  const readerID = state.searchLinkedReaders[searchID];
+  if (!readerID) return;
+  const readerPaneID = `reader:${readerID}`;
+  delete state.searchLinkedReaders[searchID];
+  state.readers = (state.readers || []).filter((reader) => reader.id !== readerID);
+  delete state.paneWeights[readerPaneID];
+  state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
+  if (state.readers.length === 0) state.readers = [newReaderState()];
+}
+
 function searchResultDetail(result) {
   const codePrefix = result.codePrefix || "BC";
   return {
@@ -7620,6 +7634,7 @@ async function renderSectionDetail(searchID, detail) {
   panel.__sectionPayload = sectionPayload;
 
   backButton.addEventListener("click", () => {
+    closeLinkedReaderForSearch(searchID);
     delete sectionDetailsBySearch()[searchID];
     delete sectionDetailAnchorsBySearch()[searchID];
     saveWorkspaceState();
@@ -7695,11 +7710,11 @@ function renderUtility(template, paneID) {
 function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
+  if (instance.key === "search") closeLinkedReaderForSearch(instance.id);
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (instance.key === "search") {
     delete sectionDetailsBySearch()[instance.id];
     delete sectionDetailAnchorsBySearch()[instance.id];
-    delete searchLinkedReadersBySearch()[instance.id];
   }
   delete state.paneWeights[paneID];
   if (detailID) delete state.paneWeights[detailID];
