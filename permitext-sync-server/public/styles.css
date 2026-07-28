@@ -5822,10 +5822,11 @@ button.project-studio-metric:focus-visible {
 .saved-projects-section {
   display: grid;
   gap: 0;
-  padding: var(--space-2) 0 var(--space-3);
+  padding: var(--space-2) 0 0;
 }
 
 .saved-projects-heading {
+  position: relative;
   display: flex;
   min-height: var(--panel-title-control-size);
   align-items: center;
@@ -5838,9 +5839,18 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-projects-actions {
-  display: flex;
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-3) + 18px + var(--space-2));
+  z-index: 1;
+  display: none;
   align-items: center;
   gap: var(--space-2);
+  transform: translateY(-50%);
+}
+
+.saved-projects-menu.is-open .saved-projects-actions {
+  display: flex;
 }
 
 .saved-projects-actions button {
@@ -6100,28 +6110,31 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-tag-filter {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
-  overscroll-behavior-x: contain;
-  -webkit-overflow-scrolling: touch;
+  margin: 0;
+  padding: 0;
 }
 
 .code-filter-menu.is-open .saved-tag-filter {
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow: hidden;
   padding: var(--space-2) 0 0;
 }
 
 .saved-tag-filter-chip {
-  flex: 0 0 auto;
-  min-height: 32px;
+  width: 100%;
+  min-height: 28px;
+  justify-self: stretch;
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
   color: var(--text-secondary);
-  font-weight: 650;
-  white-space: nowrap;
+  font-size: 12px !important;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
 }
 
 .saved-tag-filter-chip::before {
@@ -6133,6 +6146,7 @@ button.project-studio-metric:focus-visible {
 .saved-tag-filter-chip[aria-pressed="true"] {
   background: color-mix(in srgb, var(--text-primary) 60%, transparent);
   color: var(--surface);
+  font-weight: 400;
 }
 
 .saved-print-frame {
