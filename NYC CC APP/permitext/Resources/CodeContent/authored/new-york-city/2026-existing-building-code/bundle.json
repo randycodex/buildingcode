@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 5,
+  "chapterStructureSchemaVersion": 1,
+  "sectionContentSchemaVersion": 2,
+  "jurisdictions": [
+    {
+      "id": 1,
+      "name": "New York City"
+    }
+  ],
+  "codes": [
+    {
+      "id": 1,
+      "jurisdictionID": 1,
+      "name": "NYC Existing Building Code - enacted 2026-01-17; effective 2027-07-17"
+    }
+  ],
+  "codeSections": [
+    {
+      "id": 1,
+      "codeID": 1,
+      "name": "EXISTING BUILDING CODE"
+    }
+  ],
+  "chapters": [
+    {
+      "id": 25000001,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "1",
+      "title": "CHAPTER 1 - ADMINISTRATION"
+    },
+    {
+      "id": 25000002,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "2",
+      "title": "CHAPTER 2 - DEFINITIONS"
+    },
+    {
+      "id": 25000003,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "3",
+      "title": "CHAPTER 3 - APPLICABILITY AND GENERAL PROVISIONS"
+    },
+    {
+      "id": 25000004,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "4",
+      "title": "CHAPTER 4 - RESERVED"
+    },
+    {
+      "id": 25000005,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "5",
+      "title": "CHAPTER 5 - LIMITED ALTERATIONS"
+    },
+    {
+      "id": 25000006,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "6",
+      "title": "CHAPTER 6 - CLASSIFICATION OF WORK"
+    },
+    {
+      "id": 25000007,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "7",
+      "title": "CHAPTER 7 - STRUCTURAL"
+    },
+    {
+      "id": 25000008,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "8",
+      "title": "CHAPTER 8 - ALTERATIONS—LEVEL 1"
+    },
+    {
+      "id": 25000009,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "9",
+      "title": "CHAPTER 9 - ALTERATIONS—LEVEL 2"
+    },
+    {
+      "id": 25000010,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "10",
+      "title": "CHAPTER 10 - CHANGE OF OCCUPANCY"
+    },
+    {
+      "id": 25000011,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "11",
+      "title": "CHAPTER 11 - ADDITIONS"
+    },
+    {
+      "id": 25000012,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "12",
+      "title": "CHAPTER 12 - RESERVED"
+    },
+    {
+      "id": 25000013,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "13",
+      "title": "CHAPTER 13 - BUILDING SAFETY PERFORMANCE AND SCORING METHOD"
+    },
+    {
+      "id": 25000014,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "14",
+      "title": "CHAPTER 14 - RELOCATED, MOVED, OR RAISED BUILDINGS"
+    },
+    {
+      "id": 25000015,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "15",
+      "title": "CHAPTER 15 - ADDITIONAL SAFEGUARDS DURING CONSTRUCTION OR DEMOLITION FOR"
+    },
+    {
+      "id": 25000016,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "16",
+      "title": "CHAPTER 16 - REFERENCED STANDARDS"
+    },
+    {
+      "id": 25000017,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "A1",
+      "title": "APPENDIX A - STRENGTHENING PROVISIONS FOR UNREINFORCED MASONRY WALLS,"
+    },
+    {
+      "id": 25000018,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "A2",
+      "title": "APPENDIX A - RESERVED"
+    },
+    {
+      "id": 25000019,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "A3",
+      "title": "APPENDIX A - PRESCRIPTIVE AND SCHEMATIC PROVISIONS FOR STRENGTHENING"
+    },
+    {
+      "id": 25000020,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "A4",
+      "title": "APPENDIX A - STRENGTHENING PROVISIONS FOR UNREINFORCED MASONRY WALL"
+    },
+    {
+      "id": 25000021,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D1",
+      "title": "APPENDIX D - GENERAL"
+    },
+    {
+      "id": 25000022,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D2",
+      "title": "APPENDIX D - DEFINITIONS"
+    },
+    {
+      "id": 25000023,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D3",
+      "title": "APPENDIX D - GENERAL PROVISIONS FOR ALL MULTIPLE DWELLINGS"
+    },
+    {
+      "id": 25000024,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D4",
+      "title": "APPENDIX D - PRE-1968 HEREAFTER ERECTED FIREPROOF MULTIPLE DWELLINGS"
+    },
+    {
+      "id": 25000025,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D5",
+      "title": "APPENDIX D - PRE-1968 HEREAFTER ERECTED NON-FIREPROOF MULTIPLE DWELLINGS"
+    },
+    {
+      "id": 25000026,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D6",
+      "title": "APPENDIX D - CONVERTED DWELLINGS"
+    },
+    {
+      "id": 25000027,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D7",
+      "title": "APPENDIX D - TENEMENTS"
+    },
+    {
+      "id": 25000028,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D8",
+      "title": "APPENDIX D - RESERVED"
+    },
+    {
+      "id": 25000029,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D9",
+      "title": "APPENDIX D - LODGING HOUSES"
+    },
+    {
+      "id": 25000030,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "D10",
+      "title": "APPENDIX D - HERETOFORE ERECTED EXISTING CLASS A AND CLASS B MULTIPLE"
+    },
+    {
+      "id": 25000031,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "H",
+      "title": "APPENDIX H - IN-PLACE MATERIAL, COMPONENT PROPERTIES, AND ARCHAIC"
+    }
+  ],
+  "tables": [],
+  "nextJurisdictionID": 2,
+  "nextCodeID": 2,
+  "nextCodeSectionID": 2,
+  "nextChapterID": 25000032,
+  "nextSectionID": 26000170,
+  "lastStructuredImportPaths": [],
+  "existingBuildingCodeContract": {
+    "libraryID": "nyc-existing-building-code",
+    "codePrefix": "EBC",
+    "sourceURL": "https://legistar.council.nyc.gov/View.ashx?GUID=90ED7A3B-B000-43BE-ACC0-117D267BFBDE&ID=15436471&M=F",
+    "sourceSHA256": "27c0844c8dfdefa849a392ae626bf42853f5af916e7da3dd68191a270d59306b",
+    "sourcePageCount": 270,
+    "localLaw": "Local Law 33 of 2026",
+    "enactedDate": "2026-01-17",
+    "effectiveDate": "2027-07-17",
+    "effectiveDateAuthority": "Local Law 42 of 2026",
+    "effectiveDateSourceURL": "https://www.nyc.gov/site/buildings/codes/existing-building-code.page",
+    "effectiveStatus": "enacted-not-yet-effective"
+  }
+}

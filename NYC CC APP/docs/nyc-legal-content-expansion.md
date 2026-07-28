@@ -12,8 +12,10 @@ Permitext already bundles:
 - NYC Plumbing Code
 - NYC Mechanical Code
 - NYC Fuel Gas Code
+- NYC Existing Building Code, enacted January 17, 2026 and effective July 17,
+  2027
 
-These six collections must not be duplicated. The current Administrative Code
+These seven collections must not be duplicated. The current Administrative Code
 Title 28 collection may be used to reconcile later enacted amendments with the
 existing General Administrative Provisions.
 
@@ -23,8 +25,6 @@ The authorized missing corpus is:
 
 - 2025 NYC Energy Conservation Code, effective March 30, 2026
 - NYC Electrical Code
-- NYC Existing Building Code, enacted January 17, 2026 and effective July 17,
-  2027
 - NYC Fire Code
 - 1968 NYC Building Code, retained as historical enacted text
 - NYC Housing Maintenance Code

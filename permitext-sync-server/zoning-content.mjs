@@ -42,7 +42,7 @@ export function isZoningChapterID(value) {
 
 export function isZoningSectionID(value) {
   const parsed = Number.parseInt(value, 10);
-  return Number.isSafeInteger(parsed) && parsed >= 20_000_000;
+  return Number.isSafeInteger(parsed) && parsed >= 20_000_000 && parsed < 25_000_000;
 }
 
 export async function zoningBundle() {

@@ -433,6 +433,10 @@ enum UserContentSyncCodeVersion {
     static let canonicalNYCZoning =
         "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1"
     static let localNYCZoning = "NYC Zoning Resolution — text through 2026-07-16"
+    static let canonicalNYCExistingBuilding =
+        "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1"
+    static let localNYCExistingBuilding =
+        "NYC Existing Building Code - enacted 2026-01-17; effective 2027-07-17"
 
     private static let nyc2022Aliases = [
         "nyc-2022",
@@ -445,6 +449,12 @@ enum UserContentSyncCodeVersion {
         localNYCZoning,
         canonicalNYCZoning
     ]
+    private static let nycExistingBuildingAliases = [
+        "nyc-existing-building-code",
+        "NYC Existing Building Code",
+        localNYCExistingBuilding,
+        canonicalNYCExistingBuilding
+    ]
 
     private static func isNYC2022Alias(_ value: String) -> Bool {
         nyc2022Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
@@ -454,10 +464,15 @@ enum UserContentSyncCodeVersion {
         nycZoningAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
     }
 
+    private static func isNYCExistingBuildingAlias(_ value: String) -> Bool {
+        nycExistingBuildingAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
     static func server(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) { return canonicalNYC2022 }
         if isNYCZoningAlias(candidate) { return canonicalNYCZoning }
+        if isNYCExistingBuildingAlias(candidate) { return canonicalNYCExistingBuilding }
         return candidate
     }
 
@@ -465,6 +480,7 @@ enum UserContentSyncCodeVersion {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) { return localNYC2022 }
         if isNYCZoningAlias(candidate) { return localNYCZoning }
+        if isNYCExistingBuildingAlias(candidate) { return localNYCExistingBuilding }
         return candidate
     }
 
@@ -475,6 +491,14 @@ enum UserContentSyncCodeVersion {
         }
         if isNYCZoningAlias(candidate) {
             return [localNYCZoning, "NYC Zoning Resolution", "nyc-zoning-resolution", canonicalNYCZoning]
+        }
+        if isNYCExistingBuildingAlias(candidate) {
+            return [
+                localNYCExistingBuilding,
+                "NYC Existing Building Code",
+                "nyc-existing-building-code",
+                canonicalNYCExistingBuilding
+            ]
         }
         return [candidate]
     }

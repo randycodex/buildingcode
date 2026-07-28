@@ -13,6 +13,8 @@ const stripeWebhookSecret = "whsec_smoke";
 const userID = "apple:smoke-user";
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
+const existingBuildingSyncCodeVersion =
+  "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1";
 const smokePNG = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAF/gL+VnweAAAAAElFTkSuQmCC",
   "base64"
@@ -1866,6 +1868,44 @@ async function main() {
     assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
     assert(zoningLibrary.textChangesThrough === "2026-07-16", "Zoning library returned the wrong source cutoff.");
     assert(zoningLibrary.researchEligibility === false, "Zoning Research was enabled before its approval gate.");
+    const existingBuildingLibrary = codeLibraries.json.libraries.find(
+      (library) => library.id === "nyc-existing-building-code"
+    );
+    assert(existingBuildingLibrary, "Code-library metadata omitted the Existing Building Code.");
+    assert(
+      existingBuildingLibrary.syncCodeVersion === existingBuildingSyncCodeVersion,
+      "Existing Building Code returned the wrong sync identity."
+    );
+    assert(
+      existingBuildingLibrary.effectiveDate === "2027-07-17" &&
+        existingBuildingLibrary.effectiveStatus === "enacted-not-yet-effective",
+      "Existing Building Code omitted its future effective status."
+    );
+
+    const existingBuildingChapters = await request("/code/chapters?code=EBC");
+    assert(existingBuildingChapters.response.ok, "Existing Building Code chapter index did not load.");
+    assert(
+      existingBuildingChapters.json.chapters.length === 31 &&
+        existingBuildingChapters.json.chapters.every((chapter) => chapter.codePrefix === "EBC"),
+      "Existing Building Code chapter index was incomplete."
+    );
+    const existingBuildingSection = await request("/code/sections/26000000");
+    assert(existingBuildingSection.response.ok, "Existing Building Code section 101 did not load.");
+    assert(
+      existingBuildingSection.json.section.sectionNumber === "101" &&
+        existingBuildingSection.json.section.codeVersion === existingBuildingSyncCodeVersion &&
+        existingBuildingSection.json.section.existingBuildingCode.effectiveStatus ===
+          "enacted-not-yet-effective",
+      "Existing Building Code section 101 lost its source or effective-date identity."
+    );
+    const existingBuildingSearch = await request(
+      "/code/search?q=repair%20alteration%20occupancy&code=EBC&limit=20"
+    );
+    assert(
+      existingBuildingSearch.response.ok &&
+        existingBuildingSearch.json.results.some((result) => result.id === 26_000_000),
+      "Existing Building Code search did not return section 101."
+    );
 
     const zoningChapters = await request("/code/chapters?code=ZR");
     assert(zoningChapters.response.ok, "Zoning chapter index did not load.");

@@ -227,11 +227,15 @@
       "itemNumber": 9,
       "id": "nyc-existing-building-code",
       "name": "NYC Existing Building Code",
-      "permitextStatus": "missing-future-effective",
-      "sourceType": "enacted-local-law-and-official-nyc-dob",
-      "sourceURL": "https://www.nyc.gov/site/buildings/codes/existing-building-code.page",
+      "permitextStatus": "bundled-enacted-not-yet-effective",
+      "sourceType": "official-nyc-council-enacted-local-law",
+      "sourceURL": "https://legistar.council.nyc.gov/View.ashx?GUID=90ED7A3B-B000-43BE-ACC0-117D267BFBDE&ID=15436471&M=F",
+      "localLaw": "Local Law 33 of 2026",
       "enactedDate": "2026-01-17",
-      "effectiveDate": "2027-07-17"
+      "effectiveDate": "2027-07-17",
+      "sourceSHA256": "27c0844c8dfdefa849a392ae626bf42853f5af916e7da3dd68191a270d59306b",
+      "chapterCount": 31,
+      "sectionCount": 170
     },
     {
       "itemNumber": 16,
