@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-search-history-density-v84";
+} from "./offline-storage.js?v=20260727-cross-code-history-v85";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -3563,6 +3563,24 @@ function continuityRecentEntries(values = {}) {
   }
 }
 
+function recentViewCodePrefix(entry) {
+  const explicitPrefix = String(entry?.codePrefix || "").trim().toUpperCase();
+  if (codeOptions.some((option) => option.prefix === explicitPrefix)) return explicitPrefix;
+  const codeSectionID = String(entry?.codeSectionID || "").trim();
+  const chapter = codeSectionID
+    ? chapters.find((item) => String(item.codeSectionID || "") === codeSectionID)
+    : null;
+  if (chapter?.codePrefix) return chapter.codePrefix;
+  const codeSectionName = String(entry?.codeSectionName || "").trim();
+  return codeOptions.find((option) => option.label === codeSectionName)?.prefix || "BC";
+}
+
+function recentViewIdentity(entry) {
+  const sectionID = Number(entry?.sectionID);
+  if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return "";
+  return `${recentViewCodePrefix(entry)}:${sectionID}`;
+}
+
 function continuityRecentSearches(values = {}) {
   try {
     const parsed = JSON.parse(values.recentSearchesJSON || "[]");
@@ -3622,9 +3640,10 @@ function recordRecentlyViewedReader(reader) {
     previewText: "",
     viewedAt: swiftReferenceDateSeconds()
   };
+  const identity = recentViewIdentity(entry);
   state.recentlyViewedSections = [
     entry,
-    ...(state.recentlyViewedSections || []).filter((item) => Number(item?.sectionID) !== sectionID)
+    ...(state.recentlyViewedSections || []).filter((item) => recentViewIdentity(item) !== identity)
   ].slice(0, recentViewLimit);
   state.recentActivityUpdatedAt = new Date().toISOString();
   saveWorkspaceState();
@@ -3642,7 +3661,7 @@ function continuityValuesForReader(reader) {
   const syncedRecentEntries = continuityRecentEntries(existing);
   const recentEntries = [...(state.recentlyViewedSections || [])];
   syncedRecentEntries.forEach((entry) => {
-    if (!recentEntries.some((candidate) => Number(candidate?.sectionID) === Number(entry?.sectionID))) recentEntries.push(entry);
+    if (!recentEntries.some((candidate) => recentViewIdentity(candidate) === recentViewIdentity(entry))) recentEntries.push(entry);
   });
   if (Number.isSafeInteger(sectionID) && sectionID > 0) {
     const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || chapter?.codePrefix));
@@ -3653,15 +3672,19 @@ function continuityValuesForReader(reader) {
       chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
       codeSectionID: chapter?.codeSectionID || null,
       codeSectionName: codeOption?.label || reader.codePrefix || "",
+      codePrefix: reader.codePrefix || chapter?.codePrefix || "BC",
+      chapterID: reader.chapterID || chapter?.id || "",
+      chapterNumber: chapter?.chapterNumber || "",
       previewText: "",
       viewedAt: swiftReferenceDateSeconds()
     };
+    const identity = recentViewIdentity(entry);
     recentEntries.splice(
       0,
       recentEntries.length,
       entry,
       ...recentEntries
-        .filter((item) => Number(item?.sectionID) !== sectionID)
+        .filter((item) => recentViewIdentity(item) !== identity)
         .slice(0, recentViewLimit - 1)
     );
   }
@@ -6757,9 +6780,12 @@ function searchRecentlyViewedEntries() {
   const syncedEntries = continuityRecentEntries(pendingRecord?.values || syncedContent?.summary?.latestContinuity?.values || {});
   const entries = [...(state.recentlyViewedSections || [])];
   syncedEntries.forEach((entry) => {
-    if (!entries.some((candidate) => Number(candidate?.sectionID) === Number(entry?.sectionID))) entries.push(entry);
+    if (!entries.some((candidate) => recentViewIdentity(candidate) === recentViewIdentity(entry))) entries.push(entry);
   });
-  return entries.filter((entry) => Number(entry?.sectionID) > 0).slice(0, recentViewLimit);
+  return entries
+    .filter((entry) => Number(entry?.sectionID) > 0)
+    .map((entry) => ({ ...entry, codePrefix: recentViewCodePrefix(entry) }))
+    .slice(0, recentViewLimit);
 }
 
 function searchHistoryIconSVG(kind) {

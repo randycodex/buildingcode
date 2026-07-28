@@ -3,6 +3,22 @@ const recentSearchLimit = 50;
 const recentSearchHistoryKey = "recentSearchHistoryJSON";
 const historyClearsKey = "continuityHistoryClearsJSON";
 const appleReferenceDateOffsetSeconds = 978_307_200;
+const recentViewCodePrefixes = new Set(["BC", "AC", "PC", "MC", "FGC", "ZR"]);
+const recentViewCodePrefixesByCodeSectionID = new Map([
+  [1, "BC"],
+  [3, "AC"],
+  [4, "FGC"],
+  [5, "PC"],
+  [6, "MC"]
+]);
+const recentViewCodePrefixesByName = new Map([
+  ["building code", "BC"],
+  ["general administrative code", "AC"],
+  ["plumbing code", "PC"],
+  ["mechanical code", "MC"],
+  ["fuel gas code", "FGC"],
+  ["zoning resolution", "ZR"]
+]);
 
 function safeArray(rawValue) {
   try {
@@ -41,7 +57,15 @@ function viewedAtTimestamp(entry) {
 
 function recentViewIdentity(entry) {
   const sectionID = Number(entry?.sectionID);
-  return Number.isSafeInteger(sectionID) && sectionID > 0 ? String(sectionID) : null;
+  if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return null;
+  const explicitPrefix = String(entry?.codePrefix || "").trim().toUpperCase();
+  const codeSectionID = Number(entry?.codeSectionID);
+  const codeSectionName = String(entry?.codeSectionName || "").trim().toLocaleLowerCase("en-US");
+  const codePrefix = (recentViewCodePrefixes.has(explicitPrefix) ? explicitPrefix : "") ||
+    recentViewCodePrefixesByCodeSectionID.get(codeSectionID) ||
+    recentViewCodePrefixesByName.get(codeSectionName) ||
+    "BC";
+  return `${codePrefix}:${sectionID}`;
 }
 
 function preferredRecentView(left, right) {

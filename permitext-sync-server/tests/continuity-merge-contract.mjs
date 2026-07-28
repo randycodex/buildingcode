@@ -24,14 +24,15 @@ function continuity({
   };
 }
 
-function view(sectionID, viewedAt, title = `Section ${sectionID}`) {
+function view(sectionID, viewedAt, title = `Section ${sectionID}`, code = {}) {
   return {
     sectionID,
     sectionNumber: String(sectionID),
     title,
     chapterTitle: "Contract chapter",
-    codeSectionID: 1,
-    codeSectionName: "Building Code",
+    codeSectionID: code.codeSectionID ?? 1,
+    codeSectionName: code.codeSectionName || "Building Code",
+    ...(code.codePrefix ? { codePrefix: code.codePrefix } : {}),
     previewText: "",
     viewedAt
   };
@@ -70,6 +71,22 @@ assert.equal(
   histories(mergedAB).views.find((entry) => entry.sectionID === 101).title,
   "Section 101",
   "The newest version of a duplicate viewed section must win."
+);
+const crossCodeA = continuity({
+  updatedAt: "2026-07-26T12:00:01.500Z",
+  views: [view(101, 804_600_010)]
+});
+const crossCodeB = continuity({
+  updatedAt: "2026-07-26T12:00:01.600Z",
+  views: [view(101, 804_600_011, "Plumbing section 101", {
+    codeSectionID: 5,
+    codeSectionName: "Plumbing Code"
+  })]
+});
+assert.deepEqual(
+  histories(mergeContinuityRecords(crossCodeA, crossCodeB)).views.map((entry) => entry.codeSectionName),
+  ["Plumbing Code", "Building Code"],
+  "Sections with the same numeric ID in different code books must remain separate history entries."
 );
 assert.deepEqual(
   histories(mergedAB).searches,
