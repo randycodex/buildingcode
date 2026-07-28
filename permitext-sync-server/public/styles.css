@@ -2859,6 +2859,15 @@ select option:checked {
   background: var(--surface-muted);
 }
 
+.search-panel .search-box {
+  border: 0;
+}
+
+.search-panel .search-box:has(.search-input:focus-visible) {
+  outline: 2px solid color-mix(in srgb, var(--text-secondary) 46%, transparent);
+  outline-offset: 2px;
+}
+
 .search-box span {
   position: absolute;
   width: 1px;

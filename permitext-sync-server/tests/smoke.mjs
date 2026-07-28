@@ -961,7 +961,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-saved-filter-restore-v89'),
+        webRoot.text.includes('/web/styles.css?v=20260727-borderless-search-v90'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1331,7 +1331,8 @@ async function main() {
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.search-code-filter,[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle \{[\s\S]*?justify-content: space-between;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu-toggle\[aria-expanded="true"\] \.code-filter-chevron-up \{[\s\S]*?display: block;/) &&
-        workspaceStyles.text.match(/\.search-box \{[\s\S]*?width: 100%;/) &&
+        workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border: 0;/) &&
+        workspaceStyles.text.match(/\.search-panel \.search-box:has\(\.search-input:focus-visible\) \{[\s\S]*?outline: 2px solid/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.search-filter-chip \{[\s\S]*?background: color-mix\(in srgb, var\(--text-tertiary\) 16%, transparent\);/) &&
         workspaceStyles.text.match(/\.search-code-filter \.search-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
