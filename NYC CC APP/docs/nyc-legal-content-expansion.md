@@ -1,84 +1,103 @@
-# NYC legal-content expansion inventory
+# NYC enacted-text expansion inventory
 
-Permitext currently bundles the 2022 Building, General Administrative
-Provisions, Fuel Gas, Plumbing, and Mechanical Codes, plus the NYC Zoning
-Resolution. Those collections must not be duplicated.
+Permitext's legal-content expansion is limited to text enacted by New York
+City. RCNY agency rules and all guidance or reference material are outside
+this scope.
 
-The City-contracted code library exposes complete Bulk XML downloads for the
-New York City Administrative Code and the Rules of the City of New York. The
-inventory script at
-`permitext-sync-server/scripts/inventory-nyc-legal-expansion.mjs` uses record
-boundaries in those archives to identify the requested missing collections
-without downloading sections individually.
+Permitext already bundles:
 
-## Confirmed missing collections in the Bulk XML
+- NYC Zoning Resolution
+- NYC General Administrative Provisions
+- NYC Building Code
+- NYC Plumbing Code
+- NYC Mechanical Code
+- NYC Fuel Gas Code
 
-Administrative Code:
+These six collections must not be duplicated. The current Administrative Code
+Title 28 collection may be used to reconcile later enacted amendments with the
+existing General Administrative Provisions.
 
-- Title 24 — Environmental Protection and Utilities, including the Noise Code
-- Title 25 — Land Use, including the Landmarks Preservation Law
-- Title 26 — Housing and Buildings
-- Title 27 — Construction and Maintenance, including the 1968 Building Code
-  and Housing Maintenance Code
-- Title 28 — current consolidated Construction Codes provisions; reconcile
-  against Permitext's existing General Administrative Provisions instead of
-  creating a duplicate
-- Title 29 — New York City Fire Code
-- Appendix A — Unconsolidated Local Laws
+## Missing NYC-enacted text
 
-Binding agency rules:
-
-- Title 1 RCNY — Department of Buildings
-- Title 2 RCNY — Board of Standards and Appeals
-- Title 3 RCNY — Fire Department
-- Title 15 RCNY — Department of Environmental Protection
-- Title 28 RCNY — Housing Preservation and Development
-- Title 29 RCNY — Loft Board
-- Title 34 RCNY — Department of Transportation
-- Title 62 RCNY — City Planning
-- Title 63 RCNY — Landmarks Preservation Commission
-
-## Missing collections published separately
+The authorized missing corpus is:
 
 - 2025 NYC Energy Conservation Code, effective March 30, 2026
 - NYC Electrical Code
 - NYC Existing Building Code, enacted January 17, 2026 and effective July 17,
   2027
-- Historical 1938, 1968, 2008, and 2014 codes from DOB's Past Codes collection
-- Construction-related Local Laws from DOB and the New York City Council
+- NYC Fire Code
+- 1968 NYC Building Code, retained as historical enacted text
+- NYC Housing Maintenance Code
+- NYC Noise Control Code
+- NYC Landmarks Preservation Law
+- Other construction-related provisions of Administrative Code Titles 24–28
+- NYC Local Laws that amend or supplement these codes
+- Unconsolidated enactment, transition, applicability, and effective-date
+  provisions
 
-The Fire Code and FDNY rules also have first-party FDNY publications. The
-Housing Maintenance Code has a first-party HPD/DOB PDF. Those sources should
-be preferred for publication validation even when the Bulk XML is used to
-discover structure and changes.
+## Administrative Code Bulk XML coverage
+
+The City-contracted code library exposes a complete Bulk XML download for the
+New York City Administrative Code. The inventory script at
+`permitext-sync-server/scripts/inventory-nyc-legal-expansion.mjs` identifies
+the relevant enacted collections without downloading individual sections:
+
+- Title 24 — Environmental Protection and Utilities, including the Noise
+  Control Code
+- Title 25 — Land Use, including the Landmarks Preservation Law
+- Title 26 — Housing and Buildings
+- Title 27 — Construction and Maintenance, including the 1968 Building Code
+  and Housing Maintenance Code
+- Title 28 — New York City Construction Codes; amendment reconciliation only
+  for content already in Permitext
+- Title 29 — New York City Fire Code
+- Appendix A — Unconsolidated Local Laws
+
+The Energy Conservation, Electrical, and Existing Building Codes have separate
+enacted-code or Local Law sources maintained by NYC Department of Buildings.
+Construction-related Local Laws should be verified against the enacted text
+published by DOB and the New York City Council.
+
+## Explicit exclusions
+
+Do not add:
+
+- Any Rules of the City of New York or RCNY agency rules
+- DOB, FDNY, or other agency guidance, bulletins, manuals, interpretations, or
+  FAQs
+- State or federal law that was not enacted into the NYC text
+- Referenced model codes, technical standards, or private standards that were
+  not enacted into the NYC text
+- Publisher annotations, highlighters, front matter, styling, or editorial
+  material
+
+First-party agency publications may be used to verify enacted text, adoption
+dates, effective dates, and repeal status, but explanatory agency material
+does not become part of the Permitext legal corpus.
 
 ## Source and publication boundary
 
-The code-library archive is suitable for identifying collections, extracting
-hierarchy, tracking the stated current-through date, and comparing
-amendments. Do not carry American Legal editorial notes, highlighters,
-publisher front matter, styling, or other added material into Permitext.
+The Administrative Code archive is suitable for identifying enacted
+collections, extracting hierarchy, tracking its stated current-through date,
+and comparing amendments. Before publishing legal text derived from the Bulk
+XML, confirm that Permitext has permission to republish that source or replace
+it with the corresponding enacted Local Law or first-party NYC publication.
 
-Before shipping legal text derived from the Bulk XML, confirm that Permitext
-has permission to republish that source or replace the text with the
-corresponding enacted law or first-party NYC agency publication. Every
-published package should record source authority, source URL, archive hash,
-adoption date, effective date, repeal status, stated currency, extraction
-date, and verification status.
+Every published package should record source authority, source URL, archive
+hash, adoption date, effective date, repeal status, stated currency,
+extraction date, and verification status.
 
 ## Refresh command
 
-After downloading and expanding the two Bulk XML archives:
+After downloading and expanding the Administrative Code Bulk XML:
 
 ```sh
 node permitext-sync-server/scripts/inventory-nyc-legal-expansion.mjs \
   --admin-dir /path/to/Admin/XML \
-  --rules-dir /path/to/Rules/XML \
   --admin-zip /path/to/Admin/XML.zip \
-  --rules-zip /path/to/Rules/XML.zip \
   --write "NYC CC APP/docs/nyc-legal-content-expansion-catalog.json"
 ```
 
 The generated catalog contains no legal text. It records only source
-currency, collection boundaries, document/record/section counts, and hashes
-needed for repeatable refreshes and change detection.
+currency, enacted-text scope, collection boundaries, document/record/section
+counts, and hashes needed for repeatable refreshes and change detection.

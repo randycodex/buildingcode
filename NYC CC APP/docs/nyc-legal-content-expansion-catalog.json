@@ -1,12 +1,23 @@
 {
-  "schemaVersion": 1,
-  "generatedAt": "2026-07-28T23:08:15.592Z",
-  "purpose": "Inventory requested NYC construction-related enacted law and binding rules not already bundled in Permitext.",
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-28T23:15:03.366Z",
+  "purpose": "Inventory the 17 authorized NYC-enacted construction-related text categories without duplicating Permitext's existing libraries.",
+  "enactedTextScope": {
+    "inclusionRule": "Include only text enacted by New York City as a code, Administrative Code provision, Local Law, or unconsolidated enactment.",
+    "excludedMaterial": [
+      "Rules of the City of New York and all RCNY agency rules",
+      "DOB, FDNY, and other agency guidance, bulletins, manuals, interpretations, and FAQs",
+      "New York State laws and regulations unless enacted into the NYC text itself",
+      "Federal laws and regulations unless enacted into the NYC text itself",
+      "Referenced model codes, technical standards, and private standards not enacted into the NYC text itself",
+      "Publisher annotations, highlighters, front matter, styling, and editorial material"
+    ]
+  },
   "sourcePolicy": {
     "codeLibraryRole": "Discovery, hierarchy extraction, currency tracking, and verification. Do not publish American Legal editorial material, styling, or annotations.",
-    "enactedTextPublicationGate": "Before publishing text derived from an American Legal bulk archive, confirm reuse rights or replace it with an official agency or enacted-law source."
+    "enactedTextPublicationGate": "Before publishing text derived from an American Legal bulk archive, confirm reuse rights or replace it with the corresponding enacted law or first-party NYC publication."
   },
-  "snapshots": {
+  "snapshot": {
     "administrativeCode": {
       "overviewURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
       "archiveURL": "https://files.amlegal.com/pdffiles/NewYorkCity/Admin/XML.zip",
@@ -14,61 +25,54 @@
       "archiveSHA256": "331b3a52072f1da6d65265eaf2fe95ecbcc5954ff9bf6de2bfa5912831ddc06e",
       "statedCurrency": "Current through Local Law 2026/116, enacted July 11, 2026, and includes amendments effective through July 25, 2026.",
       "xmlDocumentCount": 396
-    },
-    "rules": {
-      "overviewURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
-      "archiveURL": "https://files.amlegal.com/pdffiles/NewYorkCity/Rules/XML.zip",
-      "archiveFileName": "NYC-RCNY-Rules-XML.zip",
-      "archiveSHA256": "330c12de38c298b9dfc2d8b0fb106bd6a922ab6a907f3baad46b647028ff9ac6",
-      "statedCurrency": "Current through rules effective July 23, 2026.",
-      "xmlDocumentCount": 764
     }
   },
   "alreadyPresentInPermitext": [
     {
       "itemNumber": 1,
-      "name": "General Administrative Provisions",
+      "name": "NYC Zoning Resolution",
       "permitextStatus": "present"
     },
     {
       "itemNumber": 2,
+      "name": "NYC General Administrative Provisions",
+      "permitextStatus": "present-reconcile-current-amendments"
+    },
+    {
+      "itemNumber": 3,
       "name": "NYC Building Code",
       "permitextStatus": "present"
     },
     {
-      "itemNumber": 3,
+      "itemNumber": 4,
       "name": "NYC Plumbing Code",
       "permitextStatus": "present"
     },
     {
-      "itemNumber": 4,
+      "itemNumber": 5,
       "name": "NYC Mechanical Code",
       "permitextStatus": "present"
     },
     {
-      "itemNumber": 5,
+      "itemNumber": 6,
       "name": "NYC Fuel Gas Code",
-      "permitextStatus": "present"
-    },
-    {
-      "itemNumber": 11,
-      "name": "NYC Zoning Resolution",
       "permitextStatus": "present"
     }
   ],
-  "missingCollections": [
+  "missingEnactedText": [
     {
       "id": "nyc-admin-title-24",
       "itemNumbers": [
-        14,
+        13,
         15
       ],
       "name": "Administrative Code Title 24 — Environmental Protection and Utilities",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-42985",
       "sourceNodeID": 42985,
       "importMode": "new-library",
+      "scopeNotes": "Includes the enacted Noise Control Code and other construction-related Title 24 provisions.",
       "startRecordNumber": 55486,
       "endRecordNumber": 58661,
       "documentCount": 11,
@@ -80,15 +84,16 @@
     {
       "id": "nyc-admin-title-25",
       "itemNumbers": [
-        13,
-        16
+        14,
+        15
       ],
       "name": "Administrative Code Title 25 — Land Use",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-45639",
       "sourceNodeID": 45639,
       "importMode": "new-library",
+      "scopeNotes": "Includes the enacted Landmarks Preservation Law and other construction-related Title 25 provisions.",
       "startRecordNumber": 58661,
       "endRecordNumber": 60198,
       "documentCount": 8,
@@ -100,14 +105,15 @@
     {
       "id": "nyc-admin-title-26",
       "itemNumbers": [
-        17
+        15
       ],
       "name": "Administrative Code Title 26 — Housing and Buildings",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-46907",
       "sourceNodeID": 46907,
       "importMode": "new-library",
+      "scopeNotes": null,
       "startRecordNumber": 60198,
       "endRecordNumber": 62329,
       "documentCount": 39,
@@ -119,15 +125,17 @@
     {
       "id": "nyc-admin-title-27",
       "itemNumbers": [
+        11,
         12,
-        18
+        15
       ],
       "name": "Administrative Code Title 27 — Construction and Maintenance",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-48176",
       "sourceNodeID": 48176,
       "importMode": "new-library",
+      "scopeNotes": "Includes the historical 1968 Building Code, Housing Maintenance Code, and remaining enacted Title 27 construction provisions.",
       "startRecordNumber": 62329,
       "endRecordNumber": 76010,
       "documentCount": 4,
@@ -139,15 +147,16 @@
     {
       "id": "nyc-admin-title-28",
       "itemNumbers": [
-        19,
-        35
+        2,
+        15
       ],
       "name": "Administrative Code Title 28 — New York City Construction Codes",
       "permitextStatus": "missing-current-consolidation",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-207300",
       "sourceNodeID": 207300,
       "importMode": "reconcile-with-existing",
+      "scopeNotes": "Reconcile enacted amendments with Permitext's existing General Administrative Provisions; do not create a duplicate code library.",
       "startRecordNumber": 76010,
       "endRecordNumber": 129327,
       "documentCount": 13,
@@ -159,15 +168,15 @@
     {
       "id": "nyc-admin-title-29",
       "itemNumbers": [
-        8,
-        20
+        10
       ],
       "name": "Administrative Code Title 29 — New York City Fire Code",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-230271",
       "sourceNodeID": 230271,
       "importMode": "new-library",
+      "scopeNotes": null,
       "startRecordNumber": 129327,
       "endRecordNumber": 143786,
       "documentCount": 3,
@@ -179,17 +188,16 @@
     {
       "id": "nyc-admin-appendix-a",
       "itemNumbers": [
-        31,
-        32,
-        33,
-        34
+        16,
+        17
       ],
       "name": "Administrative Code Appendix A — Unconsolidated Local Laws",
       "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
+      "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-115120",
       "sourceNodeID": 115120,
       "importMode": "new-library",
+      "scopeNotes": "Filter to enacted construction-related amendments, supplements, transition clauses, applicability provisions, and effective-date provisions.",
       "startRecordNumber": 144308,
       "endRecordNumber": null,
       "documentCount": 43,
@@ -199,191 +207,20 @@
       "sourceSetHash": "5d6aaee09f537f10abc1b5da0caee7acb8059460170b96658e58357eade7f4f6"
     },
     {
-      "id": "nyc-rcny-title-1",
-      "itemNumbers": [
-        21
-      ],
-      "name": "Title 1 RCNY — Department of Buildings",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-5",
-      "sourceNodeID": 5,
-      "importMode": "new-library",
-      "startRecordNumber": 4,
-      "endRecordNumber": 8634,
-      "documentCount": 68,
-      "recordCount": 8630,
-      "sectionCount": 316,
-      "sourceBytes": 11806934,
-      "sourceSetHash": "75f44bf390f66888e7323c1311da741d1efc10fa0bb3d8a2e458c08b1595e1fb"
-    },
-    {
-      "id": "nyc-rcny-title-2",
-      "itemNumbers": [
-        22
-      ],
-      "name": "Title 2 RCNY — Board of Standards and Appeals",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-6178",
-      "sourceNodeID": 6178,
-      "importMode": "new-library",
-      "startRecordNumber": 8634,
-      "endRecordNumber": 10270,
-      "documentCount": 30,
-      "recordCount": 1636,
-      "sectionCount": 42,
-      "sourceBytes": 1237691,
-      "sourceSetHash": "31052526fe496afb51c1cfd1a144abb1a3e5d63f910a1c764c610596a334f789"
-    },
-    {
-      "id": "nyc-rcny-title-3",
-      "itemNumbers": [
-        23
-      ],
-      "name": "Title 3 RCNY — Fire Department",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-155659",
-      "sourceNodeID": 155659,
-      "importMode": "new-library",
-      "startRecordNumber": 10270,
-      "endRecordNumber": 18497,
-      "documentCount": 85,
-      "recordCount": 8227,
-      "sectionCount": 462,
-      "sourceBytes": 6965689,
-      "sourceSetHash": "de9f4e8a5c2fb743d31b0ea204d28002edbcbf3dd0bc87ea0021faa0910e4b78"
-    },
-    {
-      "id": "nyc-rcny-title-15",
-      "itemNumbers": [
-        24
-      ],
-      "name": "Title 15 RCNY — Department of Environmental Protection",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-23189",
-      "sourceNodeID": 23189,
-      "importMode": "new-library",
-      "startRecordNumber": 27248,
-      "endRecordNumber": 36972,
-      "documentCount": 67,
-      "recordCount": 9724,
-      "sectionCount": 558,
-      "sourceBytes": 20091750,
-      "sourceSetHash": "dd1dd5c03da8a13e2ca0c88afed263916e3b5d8d477d7405a93b401b9423db41"
-    },
-    {
-      "id": "nyc-rcny-title-28",
-      "itemNumbers": [
-        25
-      ],
-      "name": "Title 28 RCNY — Housing Preservation and Development",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-53382",
-      "sourceNodeID": 53382,
-      "importMode": "new-library",
-      "startRecordNumber": 61591,
-      "endRecordNumber": 68912,
-      "documentCount": 63,
-      "recordCount": 7321,
-      "sectionCount": 506,
-      "sourceBytes": 4983218,
-      "sourceSetHash": "f06816314cd051d67b932888f8e603f04fbfe530533cc2d70e89b7fb53cb9a4a"
-    },
-    {
-      "id": "nyc-rcny-title-29",
-      "itemNumbers": [
-        26
-      ],
-      "name": "Title 29 RCNY — Loft Board",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-59441",
-      "sourceNodeID": 59441,
-      "importMode": "new-library",
-      "startRecordNumber": 68912,
-      "endRecordNumber": 70778,
-      "documentCount": 2,
-      "recordCount": 1866,
-      "sectionCount": 53,
-      "sourceBytes": 1353740,
-      "sourceSetHash": "c79b7c19274972b58b55164fcfddc84c3a71c157c8e089d614c178248c6cd818"
-    },
-    {
-      "id": "nyc-rcny-title-34",
-      "itemNumbers": [
-        27
-      ],
-      "name": "Title 34 RCNY — Department of Transportation",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-61009",
-      "sourceNodeID": 61009,
-      "importMode": "new-library",
-      "startRecordNumber": 71627,
-      "endRecordNumber": 76671,
-      "documentCount": 8,
-      "recordCount": 5044,
-      "sectionCount": 93,
-      "sourceBytes": 3604041,
-      "sourceSetHash": "02a61e60bfcc27c7a5b754cb323e64e67d31e3d3c1d92c36f8714c44a0d4af36"
-    },
-    {
-      "id": "nyc-rcny-title-62",
-      "itemNumbers": [
-        28
-      ],
-      "name": "Title 62 RCNY — City Planning",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-89143",
-      "sourceNodeID": 89143,
-      "importMode": "new-library",
-      "startRecordNumber": 106723,
-      "endRecordNumber": 107834,
-      "documentCount": 14,
-      "recordCount": 1111,
-      "sectionCount": 115,
-      "sourceBytes": 773038,
-      "sourceSetHash": "b8e590bba857d0510ada14882e7d10aa4ccbe25034d0e27c299e045caa59eb2a"
-    },
-    {
-      "id": "nyc-rcny-title-63",
-      "itemNumbers": [
-        29
-      ],
-      "name": "Title 63 RCNY — Landmarks Preservation Commission",
-      "permitextStatus": "missing",
-      "sourceType": "nyc-law-department-contracted-code-library",
-      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCrules/0-0-0-89924",
-      "sourceNodeID": 89924,
-      "importMode": "new-library",
-      "startRecordNumber": 107834,
-      "endRecordNumber": 109845,
-      "documentCount": 14,
-      "recordCount": 2011,
-      "sectionCount": 95,
-      "sourceBytes": 1319504,
-      "sourceSetHash": "f018569686815d7c9f3ca0dfc5f10378435e56d03eff0d72afa54f1605711eb0"
-    },
-    {
-      "itemNumber": 6,
+      "itemNumber": 7,
       "id": "nyc-energy-conservation-code",
       "name": "2025 NYC Energy Conservation Code",
       "permitextStatus": "missing",
-      "sourceType": "official-nyc-dob",
+      "sourceType": "official-nyc-dob-enacted-code",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
       "effectiveDate": "2026-03-30"
     },
     {
-      "itemNumber": 7,
+      "itemNumber": 8,
       "id": "nyc-electrical-code",
       "name": "NYC Electrical Code",
       "permitextStatus": "missing",
-      "sourceType": "official-nyc-dob",
+      "sourceType": "official-nyc-dob-enacted-code",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/electrical-code.page"
     },
     {
@@ -397,26 +234,17 @@
       "effectiveDate": "2027-07-17"
     },
     {
-      "itemNumber": 10,
-      "id": "nyc-prior-construction-codes",
-      "name": "Historical NYC construction codes",
-      "permitextStatus": "missing-partially-available-in-title-27",
-      "sourceType": "official-nyc-dob",
-      "sourceURL": "https://www.nyc.gov/site/buildings/codes/prior-codes.page",
-      "notes": "The Bulk XML Title 27 collection supplies the 1968 Building Code. Use DOB's Past Codes collection for the 1938, 2008, and 2014 editions."
-    },
-    {
-      "itemNumber": 30,
+      "itemNumber": 16,
       "id": "nyc-construction-local-laws",
-      "name": "Construction-related NYC Local Laws",
+      "name": "NYC Local Laws that amend or supplement the enacted codes",
       "permitextStatus": "missing-index",
-      "sourceType": "official-nyc-dob-and-nyc-council",
+      "sourceType": "official-nyc-dob-and-nyc-council-enactments",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/local-laws.page"
     }
   ],
   "requestedItemCoverage": {
-    "requestedRange": "1-35",
-    "coveredItemCount": 35,
+    "requestedRange": "1-17",
+    "coveredItemCount": 17,
     "uncoveredItemNumbers": []
   }
 }
