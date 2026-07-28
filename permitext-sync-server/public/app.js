@@ -13348,9 +13348,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       countLabel.textContent = project.sharedOrganizationID
         ? `${project.sharedRole || "viewer"} · ${project.sharedOrganizationName || "Firm"}`
         : count === 1 ? "1 saved" : `${count} saved`;
-      const folderIcon = document.createElement("span");
-      folderIcon.className = "saved-project-folder-icon";
-      folderIcon.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path></svg>`;
       const actions = document.createElement("div");
       actions.className = "saved-project-tile-actions";
       const editButton = document.createElement("button");
@@ -13372,7 +13369,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         void archiveProject(project);
       });
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
-      tile.append(heading, countLabel, folderIcon, actions);
+      tile.append(heading, countLabel, actions);
       const open = () => openProjectDetail(project, { sourcePaneID: paneID });
       tile.addEventListener("click", () => {
         if (tile.dataset.justDragged === "true") return;

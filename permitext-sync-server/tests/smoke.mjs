@@ -589,6 +589,8 @@ async function main() {
         workspaceScript.text.includes('tile.addEventListener("drop"') &&
         workspaceScript.text.includes('tile.addEventListener("dragend"') &&
         workspaceScript.text.includes('event.altKey') &&
+        workspaceScript.text.includes("tile.append(heading, countLabel, actions)") &&
+        !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
         workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
@@ -939,7 +941,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-saved-filter-restore-v100'),
+        webRoot.text.includes('/web/app.js?v=20260727-project-tile-cleanup-v101'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -961,7 +963,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-scrollable-tags-v91'),
+        webRoot.text.includes('/web/styles.css?v=20260727-project-tile-cleanup-v92'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

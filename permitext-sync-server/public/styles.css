@@ -5918,7 +5918,7 @@ button.project-studio-metric:focus-visible {
 .saved-project-tile {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto auto;
   min-width: 0;
   min-height: 57px;
@@ -5966,7 +5966,7 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-project-tile strong,
-.saved-project-tile > span:not(.saved-project-folder-icon) {
+.saved-project-tile > span {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5978,20 +5978,9 @@ button.project-studio-metric:focus-visible {
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
 }
 
-.saved-project-tile > span:not(.saved-project-folder-icon) {
+.saved-project-tile > span {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.66) !important;
-}
-
-.saved-project-folder-icon {
-  grid-column: 2;
-  grid-row: 1;
-  color: color-mix(in srgb, var(--project-color) 72%, var(--text-primary));
-}
-
-.saved-project-folder-icon svg {
-  width: 14px;
-  height: 14px;
 }
 
 .saved-project-tile-actions {
