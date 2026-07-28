@@ -2929,7 +2929,9 @@ select option:checked {
 }
 
 .code-filter-menu .search-code-filter,
-.code-filter-menu .saved-code-filter {
+.code-filter-menu .saved-code-filter,
+.code-filter-menu .saved-project-list,
+.code-filter-menu .saved-tag-filter {
   max-height: 0;
   min-height: 0;
   overflow: hidden;
@@ -2943,7 +2945,9 @@ select option:checked {
 }
 
 .code-filter-menu.is-open .search-code-filter,
-.code-filter-menu.is-open .saved-code-filter {
+.code-filter-menu.is-open .saved-code-filter,
+.code-filter-menu.is-open .saved-project-list,
+.code-filter-menu.is-open .saved-tag-filter {
   max-height: var(--code-filter-menu-height, 240px);
   padding-top: var(--space-2);
   opacity: 1;
@@ -2952,7 +2956,9 @@ select option:checked {
 
 .code-filter-menu[hidden],
 .code-filter-menu .search-code-filter[hidden],
-.code-filter-menu .saved-code-filter[hidden] {
+.code-filter-menu .saved-code-filter[hidden],
+.code-filter-menu .saved-project-list[hidden],
+.code-filter-menu .saved-tag-filter[hidden] {
   display: none !important;
 }
 
@@ -5815,7 +5821,7 @@ button.project-studio-metric:focus-visible {
 
 .saved-projects-section {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
   padding: var(--space-2) 0 var(--space-3);
 }
 
@@ -5827,13 +5833,8 @@ button.project-studio-metric:focus-visible {
   gap: var(--space-2);
 }
 
-.saved-projects-heading .section-label {
-  margin: 0;
-  color: var(--code-accent);
-  font-size: calc(var(--chrome-font-size) * 0.72) !important;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.saved-projects-menu-toggle {
+  flex: 1 1 auto;
 }
 
 .saved-projects-actions {
@@ -6101,10 +6102,14 @@ button.project-studio-metric:focus-visible {
 .saved-tag-filter {
   display: flex;
   gap: var(--space-2);
-  overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: 2px 0;
   -webkit-overflow-scrolling: touch;
+}
+
+.code-filter-menu.is-open .saved-tag-filter {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: var(--space-2) 0 0;
 }
 
 .saved-tag-filter-chip {

@@ -349,6 +349,9 @@ function newUtilityInstance(key, overrides = {}) {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.tagFilter = typeof overrides.tagFilter === "string" ? overrides.tagFilter.trim() : "";
     instance.sortMode = normalizeSavedSortMode(overrides.sortMode);
+    instance.projectsMenuOpen = Boolean(overrides.projectsMenuOpen);
+    instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
+    instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
   }
   return instance;
 }
@@ -362,7 +365,10 @@ function normalizeUtilityInstances(saved = {}) {
       codeFilters: pane?.codeFilters,
       historySplitRatio: pane?.historySplitRatio,
       tagFilter: pane?.tagFilter,
-      sortMode: pane?.sortMode
+      sortMode: pane?.sortMode,
+      projectsMenuOpen: pane?.projectsMenuOpen,
+      codeFilterMenuOpen: pane?.codeFilterMenuOpen,
+      tagsMenuOpen: pane?.tagsMenuOpen
     }))
     .filter((pane) => repeatableUtilityKeys.has(pane.key));
 
@@ -945,10 +951,22 @@ function normalizeSavedSortMode(value) {
 }
 
 function normalizeSavedInstance(instance) {
-  if (!instance || typeof instance !== "object") return { codeFilters: [], tagFilter: "", sortMode: "codeOrder" };
+  if (!instance || typeof instance !== "object") {
+    return {
+      codeFilters: [],
+      tagFilter: "",
+      sortMode: "codeOrder",
+      projectsMenuOpen: false,
+      codeFilterMenuOpen: false,
+      tagsMenuOpen: false
+    };
+  }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
   instance.tagFilter = typeof instance.tagFilter === "string" ? instance.tagFilter.trim() : "";
   instance.sortMode = normalizeSavedSortMode(instance.sortMode);
+  instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
+  instance.codeFilterMenuOpen = Boolean(instance.codeFilterMenuOpen);
+  instance.tagsMenuOpen = Boolean(instance.tagsMenuOpen);
   return instance;
 }
 
@@ -1879,15 +1897,20 @@ function codeFilterMenuLabel(prefixes = []) {
   return `${selectedPrefixes.length} Sections`;
 }
 
-function updateCodeFilterMenu(filterRail, instance) {
+function updateCodeFilterMenu(filterRail, instance, options = {}) {
   const menu = filterRail.closest(".code-filter-menu");
   const toggle = menu?.querySelector(".code-filter-menu-toggle");
   const label = toggle?.querySelector(".code-filter-menu-label");
   if (!menu || !toggle || !label) return;
-  const open = Boolean(instance?.codeFilterMenuOpen);
+  const stateKey = options.stateKey || "codeFilterMenuOpen";
+  const menuName = options.menuName || "code section filters";
+  const menuLabel = typeof options.label === "function"
+    ? options.label(instance)
+    : options.label || codeFilterMenuLabel(instance?.codeFilters);
+  const open = Boolean(instance?.[stateKey]);
   toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} code section filters`);
-  label.textContent = codeFilterMenuLabel(instance?.codeFilters);
+  toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} ${menuName}`);
+  label.textContent = menuLabel;
 
   if (open) {
     filterRail.hidden = false;
@@ -1901,7 +1924,7 @@ function updateCodeFilterMenu(filterRail, instance) {
     };
     if (!menu.classList.contains("is-open")) {
       requestAnimationFrame(() => {
-        if (instance?.codeFilterMenuOpen) {
+        if (instance?.[stateKey]) {
           applyExpandedHeight();
           menu.classList.add("is-open");
         }
@@ -1921,19 +1944,20 @@ function updateCodeFilterMenu(filterRail, instance) {
   const hideFilterRail = (event) => {
     if (event && event.target !== filterRail) return;
     if (event && event.propertyName !== "max-height") return;
-    if (!instance?.codeFilterMenuOpen) filterRail.hidden = true;
+    if (!instance?.[stateKey]) filterRail.hidden = true;
     filterRail.removeEventListener("transitionend", hideFilterRail);
   };
   filterRail.addEventListener("transitionend", hideFilterRail);
   window.setTimeout(hideFilterRail, 500);
 }
 
-function wireCodeFilterMenu(filterRail, instance) {
+function wireCodeFilterMenu(filterRail, instance, options = {}) {
   const toggle = filterRail.closest(".code-filter-menu")?.querySelector(".code-filter-menu-toggle");
   if (!toggle || toggle.dataset.filterMenuReady === "true") {
-    updateCodeFilterMenu(filterRail, instance);
+    updateCodeFilterMenu(filterRail, instance, options);
     return;
   }
+  const stateKey = options.stateKey || "codeFilterMenuOpen";
   toggle.dataset.filterMenuReady = "true";
   if ("ResizeObserver" in window) {
     let observedMenuWidth = 0;
@@ -1941,18 +1965,18 @@ function wireCodeFilterMenu(filterRail, instance) {
       const nextWidth = entries[0]?.contentRect.width || 0;
       if (Math.abs(nextWidth - observedMenuWidth) < 0.5) return;
       observedMenuWidth = nextWidth;
-      if (instance.codeFilterMenuOpen && toggle.closest(".code-filter-menu")?.classList.contains("is-open")) {
-        updateCodeFilterMenu(filterRail, instance);
+      if (instance[stateKey] && toggle.closest(".code-filter-menu")?.classList.contains("is-open")) {
+        updateCodeFilterMenu(filterRail, instance, options);
       }
     });
     resizeObserver.observe(toggle.closest(".code-filter-menu"));
   }
   toggle.addEventListener("click", () => {
-    instance.codeFilterMenuOpen = !instance.codeFilterMenuOpen;
+    instance[stateKey] = !instance[stateKey];
     saveWorkspaceState();
-    updateCodeFilterMenu(filterRail, instance);
+    updateCodeFilterMenu(filterRail, instance, options);
   });
-  updateCodeFilterMenu(filterRail, instance);
+  updateCodeFilterMenu(filterRail, instance, options);
 }
 
 async function api(path) {
@@ -13097,6 +13121,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   const wrapper = panel.querySelector(".saved-inline-filters");
   const codeRail = panel.querySelector(".saved-code-filter");
   const tagRail = panel.querySelector(".saved-tag-filter");
+  const tagMenu = panel.querySelector(".saved-tag-filter-menu");
   const tagCounts = new Map();
   allItems.forEach((item) => {
     new Set(savedItemTags(item)).forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1));
@@ -13151,7 +13176,14 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       tagRail.append(button);
     });
   }
-  tagRail.hidden = availableTags.length === 0;
+  tagMenu.hidden = availableTags.length === 0;
+  if (availableTags.length) {
+    wireCodeFilterMenu(tagRail, instance, {
+      stateKey: "tagsMenuOpen",
+      menuName: "tag filters",
+      label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
+    });
+  }
   wrapper.hidden = allItems.length === 0;
   bindHorizontalWheelScroll(tagRail);
 }
@@ -13186,7 +13218,7 @@ async function renderSaved(instance) {
   const data = await loadSyncedContent();
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
-  renderSavedProjects(panel, paneID, workspaceProjects, summary.projectSections || []);
+  renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
@@ -13243,7 +13275,7 @@ async function renderSaved(instance) {
   return panel;
 }
 
-function renderSavedProjects(panel, paneID, projects, projectSections) {
+function renderSavedProjects(panel, instance, paneID, projects, projectSections) {
   const list = panel.querySelector(".saved-project-list");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
@@ -13252,6 +13284,11 @@ function renderSavedProjects(panel, paneID, projects, projectSections) {
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   archiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
   archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);
+  wireCodeFilterMenu(list, instance, {
+    stateKey: "projectsMenuOpen",
+    menuName: "projects",
+    label: "Projects"
+  });
 
   if (!visibleProjects.length) {
     const empty = document.createElement("p");

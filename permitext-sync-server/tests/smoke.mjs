@@ -561,14 +561,16 @@ async function main() {
       savedTemplateSource.includes('aria-label="Sort saved sections"') &&
         savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
         savedTemplateSource.includes('class="saved-column-scroll"') &&
-        savedTemplateSource.includes('class="saved-projects-section"') &&
+        savedTemplateSource.includes('class="saved-projects-section code-filter-menu saved-projects-menu"') &&
         savedTemplateSource.includes('class="saved-project-list"') &&
+        savedTemplateSource.includes('class="code-filter-menu-toggle saved-projects-menu-toggle"') &&
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
         savedTemplateSource.includes('aria-label="Add project"') &&
         savedTemplateSource.includes('class="saved-code-filter"') &&
+        savedTemplateSource.includes('class="code-filter-menu saved-tag-filter-menu"') &&
         savedTemplateSource.includes('class="saved-tag-filter"') &&
-        savedTemplateSource.indexOf('class="saved-projects-section"') < savedTemplateSource.indexOf('class="saved-inline-filters"') &&
+        savedTemplateSource.indexOf('class="saved-projects-section code-filter-menu saved-projects-menu"') < savedTemplateSource.indexOf('class="saved-inline-filters"') &&
         savedTemplateSource.indexOf('class="saved-inline-filters"') < savedTemplateSource.indexOf('class="saved-content"') &&
         !topbarSource.includes('id="toggle-projects"') &&
         !savedTemplateSource.includes('aria-label="Saved text size"') &&
@@ -576,7 +578,7 @@ async function main() {
       "Saved and Projects no longer follow the combined iOS hierarchy."
     );
     assert(
-      workspaceScript.text.includes("function renderSavedProjects(panel, paneID, projects, projectSections)") &&
+      workspaceScript.text.includes("function renderSavedProjects(panel, instance, paneID, projects, projectSections)") &&
         workspaceScript.text.includes("function projectForegroundColor(color)") &&
         workspaceScript.text.includes('tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor))') &&
         workspaceScript.text.includes("async function persistProjectOrder(projects, paneID)") &&
@@ -937,14 +939,14 @@ async function main() {
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
         workspaceScript.text.includes('return option.prefix === "AC" ? "Gen Administrative Code" : option.label;') &&
-        workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance)") &&
+        workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance, options = {})") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(open))') &&
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
         workspaceScript.text.includes("Project facts are user-provided context only") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260727-safe-escape-v95'),
+        webRoot.text.includes('/web/app.js?v=20260727-saved-collapsible-menus-v96'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -958,7 +960,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260727-section-project-sheet-v86'),
+        webRoot.text.includes('/web/styles.css?v=20260727-saved-collapsible-menus-v87'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1344,9 +1346,13 @@ async function main() {
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: var\(--radius-pill\);[\s\S]*?font-size: 12px !important;[\s\S]*?font-weight: 400;[\s\S]*?text-align: center;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 400;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter \{[\s\S]*?max-height: 0;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
+        workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
+        workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
         workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved code filters should match the Search column's collapsible equal-width pill menu."
+      "Saved Projects, Sections, and Tags should share the collapsible pill-menu behavior."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),

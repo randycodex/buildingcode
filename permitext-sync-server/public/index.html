@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260727-section-project-sheet-v86">
+    <link rel="stylesheet" href="/web/styles.css?v=20260727-saved-collapsible-menus-v87">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -285,9 +285,15 @@
           </div>
         </header>
         <section class="saved-column-scroll">
-          <section class="saved-projects-section" aria-label="Projects">
+          <section class="saved-projects-section code-filter-menu saved-projects-menu" aria-label="Projects">
             <div class="saved-projects-heading">
-              <p class="section-label">Projects</p>
+              <button class="code-filter-menu-toggle saved-projects-menu-toggle" type="button" aria-label="Expand projects" aria-expanded="false">
+                <span class="code-filter-menu-label">Projects</span>
+                <span class="code-filter-menu-icon" aria-hidden="true">
+                  <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+                  <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+                </span>
+              </button>
               <div class="saved-projects-actions">
                 <button class="saved-projects-archive-button" type="button" title="Open project archive" aria-label="Open project archive">
                   <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg>
@@ -310,7 +316,16 @@
               </button>
               <div class="saved-code-filter" aria-label="Filter saved sections by code section" hidden></div>
             </div>
-            <div class="saved-tag-filter" aria-label="Filter saved sections by tag"></div>
+            <div class="code-filter-menu saved-tag-filter-menu">
+              <button class="code-filter-menu-toggle" type="button" aria-label="Expand tag filters" aria-expanded="false">
+                <span class="code-filter-menu-label">All Tags</span>
+                <span class="code-filter-menu-icon" aria-hidden="true">
+                  <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+                  <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+                </span>
+              </button>
+              <div class="saved-tag-filter" aria-label="Filter saved sections by tag" hidden></div>
+            </div>
           </section>
           <section class="saved-content">
           </section>
@@ -503,6 +518,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260727-safe-escape-v95" type="module"></script>
+    <script src="/web/app.js?v=20260727-saved-collapsible-menus-v96" type="module"></script>
   </body>
 </html>
