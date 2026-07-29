@@ -2427,8 +2427,10 @@ function flashSearchMatchInSection(content, sectionID, sectionNumber, query) {
   const needle = String(query || "").trim();
   if (!content || needle.length < 2) return;
   const idSelector = sectionID ? `[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
+  const aliasSelector = sectionID ? `[data-section-aliases~="${CSS.escape(String(sectionID))}"]` : "";
   const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
   const section = (idSelector ? content.querySelector(idSelector) : null) ||
+    (aliasSelector ? content.querySelector(aliasSelector) : null) ||
     (numberSelector ? content.querySelector(numberSelector) : null);
   if (!section) return;
 
@@ -5325,6 +5327,50 @@ function annotatedBlocksForSection(section) {
   return isZoningSection ? blocks.filter(codeBlockHasVisibleContent) : blocks;
 }
 
+function normalizedReaderProvisionText(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00ad\u200b-\u200d\ufeff]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
+}
+
+function readerSectionsWithoutRepeatedCatalogAliases(sections) {
+  const rendered = [];
+  let latestBodySection = null;
+  let latestBodyText = "";
+
+  for (const section of sections || []) {
+    const blocks = annotatedBlocksForSection(section);
+    if (blocks.length > 0) {
+      const renderedSection = {
+        ...section,
+        readerAliasSectionIDs: []
+      };
+      rendered.push(renderedSection);
+      latestBodySection = renderedSection;
+      latestBodyText = normalizedReaderProvisionText(sectionPlainText(section));
+      continue;
+    }
+
+    const catalogTitle = normalizedReaderProvisionText(section.title);
+    if (catalogTitle && latestBodySection && latestBodyText.includes(catalogTitle)) {
+      latestBodySection.readerAliasSectionIDs.push(String(section.id));
+      continue;
+    }
+
+    rendered.push({
+      ...section,
+      readerAliasSectionIDs: []
+    });
+    latestBodySection = null;
+    latestBodyText = "";
+  }
+
+  return rendered;
+}
+
 function codeBlockHasVisibleContent(block) {
   if (!block) return false;
   if (block.kind === "image" || block.kind === "table") return true;
@@ -5416,7 +5462,7 @@ async function renderSectionContent(panel, reader) {
 
   clear(content);
   const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
-  const sections = chapter.sections || [];
+  const sections = readerSectionsWithoutRepeatedCatalogAliases(chapter.sections || []);
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
 
   sections.forEach((section) => {
@@ -5424,6 +5470,9 @@ async function renderSectionContent(panel, reader) {
     sectionWrapper.className = "chapter-section";
     sectionWrapper.dataset.sectionId = String(section.id);
     sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
+    if (section.readerAliasSectionIDs.length > 0) {
+      sectionWrapper.dataset.sectionAliases = section.readerAliasSectionIDs.join(" ");
+    }
     markResearchSelectable(sectionWrapper, {
       sectionID: section.id,
       sectionNumber: section.sectionNumber,
@@ -5487,8 +5536,11 @@ async function renderSectionContent(panel, reader) {
 
 function scrollReaderContentToSection(content, sectionID, behavior = "auto", sectionNumber = "") {
   const idSelector = sectionID ? `[data-section-id="${CSS.escape(String(sectionID))}"]` : "";
+  const aliasSelector = sectionID ? `[data-section-aliases~="${CSS.escape(String(sectionID))}"]` : "";
   const numberSelector = sectionNumber ? `[data-section-number="${CSS.escape(String(sectionNumber))}"]` : "";
-  const target = (idSelector ? content?.querySelector(idSelector) : null) || (numberSelector ? content?.querySelector(numberSelector) : null);
+  const target = (idSelector ? content?.querySelector(idSelector) : null) ||
+    (aliasSelector ? content?.querySelector(aliasSelector) : null) ||
+    (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
   stabilizeReaderSectionAtHeader(content, target, behavior);
 }
@@ -5515,6 +5567,7 @@ async function navigateReaderToSection(panel, reader, behavior = "auto") {
   const isSearchMode = content?.classList.contains("is-searching-reader");
   const hasRenderedTarget = reader.sectionID && (
     content?.querySelector(`[data-section-id="${CSS.escape(String(reader.sectionID))}"]`) ||
+    content?.querySelector(`[data-section-aliases~="${CSS.escape(String(reader.sectionID))}"]`) ||
     (reader.sectionNumber
       ? content?.querySelector(`[data-section-number="${CSS.escape(String(reader.sectionNumber))}"]`)
       : null)

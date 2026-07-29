@@ -952,8 +952,15 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-visible-search-count-v111'),
+        webRoot.text.includes('/web/app.js?v=20260728-reader-alias-dedup-v112'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      workspaceScript.text.includes("function readerSectionsWithoutRepeatedCatalogAliases") &&
+        workspaceScript.text.includes("latestBodyText.includes(catalogTitle)") &&
+        workspaceScript.text.includes("sectionWrapper.dataset.sectionAliases") &&
+        workspaceScript.text.includes('[data-section-aliases~="${CSS.escape(String(sectionID))}"]'),
+      "The Reader should render imported nested-list aliases only once while preserving their jump targets."
     );
     assert(
       workspaceScript.text.includes('prefix: "EBC"') &&
