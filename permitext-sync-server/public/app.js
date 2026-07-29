@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-columns-v127";
+} from "./offline-storage.js?v=20260728-saved-filter-resize-v128";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -368,6 +368,8 @@ function newUtilityInstance(key, overrides = {}) {
     instance.projectsMenuOpen = Boolean(overrides.projectsMenuOpen);
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
     instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
+    instance.codeFilterHeight = normalizeSavedFilterHeight(overrides.codeFilterHeight);
+    instance.tagsFilterHeight = normalizeSavedFilterHeight(overrides.tagsFilterHeight);
   }
   return instance;
 }
@@ -384,7 +386,9 @@ function normalizeUtilityInstances(saved = {}) {
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
       codeFilterMenuOpen: pane?.codeFilterMenuOpen,
-      tagsMenuOpen: pane?.tagsMenuOpen
+      tagsMenuOpen: pane?.tagsMenuOpen,
+      codeFilterHeight: pane?.codeFilterHeight,
+      tagsFilterHeight: pane?.tagsFilterHeight
     }))
     .filter((pane) => repeatableUtilityKeys.has(pane.key));
 
@@ -966,6 +970,13 @@ function normalizeSavedSortMode(value) {
   return savedSortModes.has(value) ? value : "codeOrder";
 }
 
+function normalizeSavedFilterHeight(value) {
+  const height = Number(value);
+  return Number.isFinite(height) && height >= 96
+    ? Math.min(Math.round(height), 640)
+    : 0;
+}
+
 function normalizeSavedInstance(instance) {
   if (!instance || typeof instance !== "object") {
     return {
@@ -974,7 +985,9 @@ function normalizeSavedInstance(instance) {
       sortMode: "codeOrder",
       projectsMenuOpen: false,
       codeFilterMenuOpen: false,
-      tagsMenuOpen: false
+      tagsMenuOpen: false,
+      codeFilterHeight: 0,
+      tagsFilterHeight: 0
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
@@ -983,6 +996,8 @@ function normalizeSavedInstance(instance) {
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
   instance.codeFilterMenuOpen = Boolean(instance.codeFilterMenuOpen);
   instance.tagsMenuOpen = Boolean(instance.tagsMenuOpen);
+  instance.codeFilterHeight = normalizeSavedFilterHeight(instance.codeFilterHeight);
+  instance.tagsFilterHeight = normalizeSavedFilterHeight(instance.tagsFilterHeight);
   return instance;
 }
 
@@ -1974,6 +1989,16 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
     ? options.label(instance)
     : options.label || codeFilterMenuLabel(instance?.codeFilters);
   const open = Boolean(instance?.[stateKey]);
+  const resizeHeightStateKey = options.resizeHeightStateKey || "";
+  const savedResizeHeight = resizeHeightStateKey
+    ? normalizeSavedFilterHeight(instance?.[resizeHeightStateKey])
+    : 0;
+  menu.classList.toggle("is-user-resized", open && savedResizeHeight > 0);
+  if (savedResizeHeight > 0) {
+    menu.style.setProperty("--saved-filter-user-height", `${savedResizeHeight}px`);
+  } else {
+    menu.style.removeProperty("--saved-filter-user-height");
+  }
   toggle.setAttribute("aria-expanded", String(open));
   toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} ${menuName}`);
   label.textContent = menuLabel;
@@ -2029,8 +2054,67 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
   window.setTimeout(hideFilterRail, 500);
 }
 
+function wireSavedFilterResizeHandle(filterRail, instance, options = {}) {
+  const menu = filterRail.closest(".code-filter-menu");
+  const resizeHeightStateKey = options.resizeHeightStateKey || "";
+  if (!menu?.closest(".saved-inline-filters") || !resizeHeightStateKey) return;
+  let handle = menu.querySelector(".saved-filter-resize-handle");
+  if (!handle) {
+    handle = document.createElement("button");
+    handle.type = "button";
+    handle.className = "saved-filter-resize-handle";
+    handle.setAttribute("aria-label", `Resize ${options.menuName || "filter"} list`);
+    menu.append(handle);
+  }
+  if (handle.dataset.resizeReady === "true") return;
+  handle.dataset.resizeReady = "true";
+  handle.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || !menu.classList.contains("is-open")) return;
+    event.preventDefault();
+    const startY = event.clientY;
+    const startHeight = filterRail.getBoundingClientRect().height;
+    const availableHeight = window.innerHeight - menu.getBoundingClientRect().top - 32;
+    const maximumHeight = Math.max(96, Math.min(640, availableHeight));
+    const pointerID = event.pointerId;
+    menu.classList.add("is-resizing", "is-user-resized");
+    handle.setPointerCapture(pointerID);
+
+    const resize = (pointerEvent) => {
+      const nextHeight = Math.min(
+        maximumHeight,
+        Math.max(96, startHeight + pointerEvent.clientY - startY)
+      );
+      instance[resizeHeightStateKey] = Math.round(nextHeight);
+      menu.style.setProperty("--saved-filter-user-height", `${Math.round(nextHeight)}px`);
+    };
+    const finish = () => {
+      handle.removeEventListener("pointermove", resize);
+      handle.removeEventListener("pointerup", finish);
+      handle.removeEventListener("pointercancel", finish);
+      menu.classList.remove("is-resizing");
+      if (handle.hasPointerCapture(pointerID)) handle.releasePointerCapture(pointerID);
+      saveWorkspaceState();
+    };
+    handle.addEventListener("pointermove", resize);
+    handle.addEventListener("pointerup", finish);
+    handle.addEventListener("pointercancel", finish);
+  });
+  handle.addEventListener("keydown", (event) => {
+    if (!menu.classList.contains("is-open") || !["ArrowUp", "ArrowDown"].includes(event.key)) return;
+    event.preventDefault();
+    const currentHeight = normalizeSavedFilterHeight(instance[resizeHeightStateKey]) ||
+      Math.round(filterRail.getBoundingClientRect().height);
+    const nextHeight = Math.min(640, Math.max(96, currentHeight + (event.key === "ArrowDown" ? 24 : -24)));
+    instance[resizeHeightStateKey] = nextHeight;
+    menu.classList.add("is-user-resized");
+    menu.style.setProperty("--saved-filter-user-height", `${nextHeight}px`);
+    saveWorkspaceState();
+  });
+}
+
 function wireCodeFilterMenu(filterRail, instance, options = {}) {
   const toggle = filterRail.closest(".code-filter-menu")?.querySelector(".code-filter-menu-toggle");
+  wireSavedFilterResizeHandle(filterRail, instance, options);
   if (!toggle || toggle.dataset.filterMenuReady === "true") {
     updateCodeFilterMenu(filterRail, instance, options);
     return;
@@ -13553,7 +13637,8 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
           chip.setAttribute("aria-pressed", String(isSelected));
         });
         updateCodeFilterMenu(codeRail, instance, {
-          label: savedCodeFilterMenuLabel
+          label: savedCodeFilterMenuLabel,
+          resizeHeightStateKey: "codeFilterHeight"
         });
         onChange();
         saveWorkspaceState();
@@ -13561,7 +13646,8 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       codeRail.append(button);
     });
   wireCodeFilterMenu(codeRail, instance, {
-    label: savedCodeFilterMenuLabel
+    label: savedCodeFilterMenuLabel,
+    resizeHeightStateKey: "codeFilterHeight"
   });
   if (availableTags.length) {
     ["", ...availableTags].forEach((tag) => {
@@ -13578,7 +13664,8 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
         updateCodeFilterMenu(tagRail, instance, {
           stateKey: "tagsMenuOpen",
           menuName: "tag filters",
-          label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
+          label: (savedInstance) => savedInstance?.tagFilter || "All Tags",
+          resizeHeightStateKey: "tagsFilterHeight"
         });
         onChange();
         saveWorkspaceState();
@@ -13591,7 +13678,8 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     wireCodeFilterMenu(tagRail, instance, {
       stateKey: "tagsMenuOpen",
       menuName: "tag filters",
-      label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
+      label: (savedInstance) => savedInstance?.tagFilter || "All Tags",
+      resizeHeightStateKey: "tagsFilterHeight"
     });
   }
   wrapper.hidden = allItems.length === 0;
