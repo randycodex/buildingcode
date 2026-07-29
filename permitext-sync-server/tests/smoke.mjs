@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-motion-v126'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-columns-v127'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1032,7 +1032,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-motion-v113'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-columns-v114'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1481,7 +1481,7 @@ async function main() {
       "Search code filters should expand from a single summary pill into two equal-width columns."
     );
     assert(
-      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?overflow: visible;/) &&
+      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: linear-gradient\(/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 600;/) &&
         workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter \{[\s\S]*?max-height: 0;/) &&
@@ -1490,7 +1490,7 @@ async function main() {
         workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?padding: var\(--space-2\) 0 0;/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?background-image: linear-gradient\(/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 240px\), 152px\);[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 0;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{[\s\S]*?content: none;/) &&
@@ -1707,9 +1707,9 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
-        workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{\s*content: none;/) &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
