@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-heading-alignment-v138";
+} from "./offline-storage.js?v=20260728-archive-column-stability-v139";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1744,6 +1744,12 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   return Array.from(new Set([...savedPaneIDs(), ...additionalPaneIDs.filter(Boolean)]));
 }
 
+function syncSavedArchiveButtonStates() {
+  track.querySelectorAll(".saved-projects-archive-button, .projects-archive-button").forEach((button) => {
+    button.setAttribute("aria-pressed", String(state.utilities.archive));
+  });
+}
+
 async function refreshProjectMembershipPanes(project) {
   const identity = projectIdentity(project);
   await transitionWorkspace("utility", {
@@ -1827,8 +1833,9 @@ async function openArchiveAfterProjectsStack() {
   state.utilities.archive = true;
   state.paneWeights["utility:archive"] = defaultPaneWidthForID("utility:archive");
   placeArchiveAfterProjectsStack();
+  syncSavedArchiveButtonStates();
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
+  await transitionWorkspace("utility");
   scrollPaneIntoView("utility:archive");
 }
 
@@ -1844,8 +1851,9 @@ async function closeArchiveColumn() {
   state.utilities.archive = false;
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   delete state.paneWeights["utility:archive"];
+  syncSavedArchiveButtonStates();
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
+  await transitionWorkspace("utility");
 }
 
 function normalizePaneWeights(ids) {
@@ -16731,10 +16739,9 @@ async function toggleUtilityPane(key) {
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID && !id.startsWith("research:conversation:"));
     Object.keys(state.paneWeights).filter((id) => id.startsWith("research:conversation:")).forEach((id) => delete state.paneWeights[id]);
   }
+  if (key === "archive") syncSavedArchiveButtonStates();
   saveWorkspaceState();
-  await transitionWorkspace("utility", {
-    refreshPaneIDs: key === "archive" ? projectOverviewRefreshPaneIDs() : []
-  });
+  await transitionWorkspace("utility");
   if (willOpen) {
     track.scrollTo({ left: 0, behavior: "smooth" });
   }

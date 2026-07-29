@@ -955,8 +955,15 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-heading-alignment-v138'),
+        webRoot.text.includes('/web/app.js?v=20260728-archive-column-stability-v139'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
+    );
+    assert(
+      workspaceScript.text.includes("function syncSavedArchiveButtonStates()") &&
+        workspaceScript.text.includes('track.querySelectorAll(".saved-projects-archive-button, .projects-archive-button")') &&
+        workspaceScript.text.includes('await transitionWorkspace("utility");\n  scrollPaneIntoView("utility:archive");') &&
+        !workspaceScript.text.includes('await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });\n  scrollPaneIntoView("utility:archive");'),
+      "Opening and closing Archive should preserve the rendered Saved column instead of rebuilding its project and filter cards."
     );
     assert(
       workspaceScript.text.includes("function readerSectionsWithoutRepeatedCatalogAliases") &&
