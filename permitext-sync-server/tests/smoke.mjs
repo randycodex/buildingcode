@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-search-jump-preview-v110'),
+        webRoot.text.includes('/web/app.js?v=20260728-visible-search-count-v111'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1216,6 +1216,11 @@ async function main() {
         workspaceScript.text.includes("selectedPrefixes.includes(result.codePrefix || \"BC\")") &&
         workspaceScript.text.includes("searchResultMatchesExactQuery(result, query)"),
       "Search results no longer require an exact whole-word or phrase match."
+    );
+    assert(
+      workspaceScript.text.includes("const resultCount = filteredResults.length;") &&
+        !workspaceScript.text.includes("const reportedTotal = Number(payload.totalResults);"),
+      "Search summary count should match the exact results actually rendered."
     );
     assert(
       workspaceScript.text.includes("function createSavedBulkSelectionController") &&

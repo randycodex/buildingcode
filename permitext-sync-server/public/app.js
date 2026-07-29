@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-search-jump-preview-v110";
+} from "./offline-storage.js?v=20260728-visible-search-count-v111";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7333,8 +7333,7 @@ async function renderSearchResults(panel, instance) {
     return;
   }
 
-  const reportedTotal = Number(payload.totalResults);
-  const resultCount = Number.isFinite(reportedTotal) ? reportedTotal : filteredResults.length;
+  const resultCount = filteredResults.length;
   updateSearchDock(panel, searchInstance, resultCount);
 
   const groups = new Map();
