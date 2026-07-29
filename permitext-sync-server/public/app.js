@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-horizontal-trackpad-v113";
+} from "./offline-storage.js?v=20260728-specialty-provisions-v114";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5319,12 +5319,131 @@ function annotationTargetForBlock(section, block, reader = null, index = 0) {
 
 function annotatedBlocksForSection(section) {
   const sourceBlocks = Array.isArray(section.blocks) ? section.blocks : [];
-  const blocks = sourceBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
+  const organizedBlocks = organizedSpecialtyProvisionBlocks(section, sourceBlocks);
+  const blocks = organizedBlocks.flatMap((block, blockIndex) => splitAnnotatedCodeBlock(block, blockIndex));
   const isZoningSection =
     String(section?.codePrefix || "").toUpperCase() === zoningCodePrefix ||
     Boolean(section?.zoning) ||
     sourceBlocks.some((block) => String(block?.id || "").startsWith("zr-"));
   return isZoningSection ? blocks.filter(codeBlockHasVisibleContent) : blocks;
+}
+
+function normalizedSpecialtySectionRoot(sectionNumber) {
+  const value = String(sectionNumber || "")
+    .replace(/^§\s*/i, "")
+    .replace(/\.$/, "")
+    .trim()
+    .toUpperCase();
+  if (/^ARTICLE-\d+$/.test(value)) return `28-${value.slice("ARTICLE-".length)}`;
+  if (/^ASHRAE-\d+$/.test(value)) return value.slice("ASHRAE-".length);
+  return value;
+}
+
+function specialtyProvisionMarker(line, sectionRoot, allowSubdivisions) {
+  const value = String(line || "").replace(/\s+/g, " ").trim();
+  const numbered = value.match(
+    /^(§\s*)?([A-Z]?\d+(?:-\d+)?(?:\.\d+)+(?:\([A-Za-z0-9]+\))*)\s+([A-Z][\s\S]*)$/
+  );
+  if (numbered) {
+    const number = numbered[2].toUpperCase();
+    const belongsToSection =
+      number === sectionRoot ||
+      number.startsWith(`${sectionRoot}.`) ||
+      number.startsWith(`${sectionRoot}(`);
+    if (belongsToSection) {
+      return {
+        displayNumber: `${numbered[1] || ""}${numbered[2]}`.trim(),
+        bodyStart: numbered[3]
+      };
+    }
+  }
+  if (allowSubdivisions) {
+    const subdivision = value.match(/^(\([A-Z]\))\s+([A-Z][\s\S]*)$/);
+    if (subdivision) {
+      return {
+        displayNumber: subdivision[1],
+        bodyStart: subdivision[2]
+      };
+    }
+  }
+  return null;
+}
+
+function specialtyProvisionHeading(segmentText, marker) {
+  const normalized = String(segmentText || "").replace(/\s+/g, " ").trim();
+  const markerPattern = new RegExp(
+    `^(?:§\\s*)?${escapeRegExp(marker.displayNumber.replace(/^§\\s*/i, ""))}\\s+`,
+    "i"
+  );
+  const remainder = normalized.replace(markerPattern, "");
+  const titleMatch = remainder.match(/^(.{1,160}?\.)($|\s+)([\s\S]*)$/);
+  if (!titleMatch) return null;
+  return {
+    heading: `${marker.displayNumber} ${titleMatch[1]}`.trim(),
+    body: String(titleMatch[3] || "").trim()
+  };
+}
+
+function specialtyProvisionHTML(heading, body) {
+  const paragraph = document.createElement("p");
+  paragraph.className = "specialty-provision";
+  const strong = document.createElement("strong");
+  strong.className = "specialty-provision-heading";
+  strong.textContent = heading;
+  paragraph.append(strong);
+  if (body) paragraph.append(document.createTextNode(` ${body}`));
+  return paragraph.outerHTML;
+}
+
+function organizedSpecialtyProvisionBlocks(section, sourceBlocks) {
+  const codePrefix = String(section?.codePrefix || "").toUpperCase();
+  if (!["ECC", "EC"].includes(codePrefix) || sourceBlocks.length !== 1) return sourceBlocks;
+  const source = sourceBlocks[0];
+  if (source.kind !== "html" || !String(source.plainText || "").trim()) return sourceBlocks;
+
+  const sectionRoot = normalizedSpecialtySectionRoot(section.sectionNumber);
+  if (!sectionRoot || sectionRoot.includes("APPENDIX")) return sourceBlocks;
+  const lines = String(source.plainText).split(/\r?\n/);
+  const starts = [];
+  lines.forEach((line, index) => {
+    const marker = specialtyProvisionMarker(line, sectionRoot, codePrefix === "EC");
+    if (marker) starts.push({ index, marker });
+  });
+  if (!starts.length) return sourceBlocks;
+
+  const blocks = [];
+  const appendPlainBlock = (text, suffix) => {
+    const plainText = String(text || "").replace(/\s+/g, " ").trim();
+    if (!plainText) return;
+    const paragraph = document.createElement("p");
+    paragraph.textContent = plainText;
+    blocks.push({
+      ...source,
+      id: `${source.id || `specialty-${section.id}`}-${suffix}`,
+      html: paragraph.outerHTML,
+      plainText
+    });
+  };
+
+  if (starts[0].index > 0) {
+    appendPlainBlock(lines.slice(0, starts[0].index).join("\n"), "preamble");
+  }
+  starts.forEach((entry, markerIndex) => {
+    const end = starts[markerIndex + 1]?.index ?? lines.length;
+    const segmentText = lines.slice(entry.index, end).join("\n");
+    const provision = specialtyProvisionHeading(segmentText, entry.marker);
+    if (!provision) {
+      appendPlainBlock(segmentText, `provision-${markerIndex + 1}`);
+      return;
+    }
+    blocks.push({
+      ...source,
+      id: `${source.id || `specialty-${section.id}`}-provision-${markerIndex + 1}`,
+      html: specialtyProvisionHTML(provision.heading, provision.body),
+      plainText: String(segmentText).replace(/\s+/g, " ").trim()
+    });
+  });
+  return blocks.length ? blocks : sourceBlocks;
 }
 
 function normalizedReaderProvisionText(value) {
@@ -5462,7 +5581,12 @@ async function renderSectionContent(panel, reader) {
 
   clear(content);
   const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
-  const sections = readerSectionsWithoutRepeatedCatalogAliases(chapter.sections || []);
+  const sections = readerSectionsWithoutRepeatedCatalogAliases(
+    (chapter.sections || []).map((section) => ({
+      ...section,
+      codePrefix: section.codePrefix || chapter.codePrefix
+    }))
+  );
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
 
   sections.forEach((section) => {

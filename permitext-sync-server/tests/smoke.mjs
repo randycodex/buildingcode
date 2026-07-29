@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-horizontal-trackpad-v113'),
+        webRoot.text.includes('/web/app.js?v=20260728-specialty-provisions-v114'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -997,7 +997,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-horizontal-trackpad-v99'),
+        webRoot.text.includes('/web/styles.css?v=20260728-specialty-provisions-v100'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1409,6 +1409,13 @@ async function main() {
       workspaceScript.text.includes("if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;") &&
         workspaceScript.text.includes("bindHorizontalWheelScroll(track);"),
       "Horizontal trackpad gestures over nested Search lists should continue moving the workspace without taking over vertical list scrolling."
+    );
+    assert(
+      workspaceScript.text.includes("function organizedSpecialtyProvisionBlocks") &&
+        workspaceScript.text.includes('if (!["ECC", "EC"].includes(codePrefix)') &&
+        workspaceScript.text.includes('strong.className = "specialty-provision-heading"') &&
+        workspaceStyles.text.match(/\.section-html \.specialty-provision-heading \{[\s\S]*?display: block;[\s\S]*?margin-bottom: var\(--space-2\);[\s\S]*?font-weight: 700;/),
+      "Energy and Electrical Code subsection titles should be separated and emphasized like the established construction-code hierarchy."
     );
     assert(
       workspaceStyles.text.match(/\.search-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?overflow: visible;/) &&

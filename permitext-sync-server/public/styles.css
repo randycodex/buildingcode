@@ -2855,6 +2855,19 @@ select option:checked {
   -webkit-text-fill-color: currentColor;
 }
 
+.section-html .specialty-provision {
+  margin: 0;
+}
+
+.section-html .specialty-provision-heading {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
 .authored-section-label {
   display: block;
   grid-column: 1 / -1;
