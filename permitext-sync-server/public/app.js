@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-specialty-provisions-v114";
+} from "./offline-storage.js?v=20260728-saved-row-dedup-v115";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13506,7 +13506,7 @@ async function renderSaved(instance) {
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
-  const resolvedItems = await hydrateSavedColumnItems(combinedItems);
+  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
   renderSavedFilters(panel, savedInstance, resolvedItems, refreshSavedPanel);
   const filteredItems = resolvedItems.filter((item) => {
     const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
@@ -13788,6 +13788,7 @@ async function hydrateSavedColumnItems(items = []) {
       const codePrefix = detail.codePrefix || chapter?.codePrefix || item.codePrefix || "BC";
       const chapterID = detail.chapterID || chapter?.id || item.chapterID || "";
       const chapterNumber = detail.chapterNumber || chapter?.chapterNumber || item.chapterNumber || "";
+      const savedContentComparisonText = String(rawPreview).replace(/\s+/g, " ").trim();
       return {
         ...item,
         blockID,
@@ -13797,12 +13798,48 @@ async function hydrateSavedColumnItems(items = []) {
         chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || item.chapterTitle || "",
         sectionNumber: section?.sectionNumber || detail.sectionNumber || item.sectionNumber || "",
         title: section?.title || detail.title || item.title || "Section",
-        previewText: String(rawPreview).replace(/\s+/g, " ").trim().slice(0, 240)
+        savedContentComparisonText,
+        previewText: savedContentComparisonText.slice(0, 240)
       };
     } catch {
       return { ...item, previewText: String(item.previewText || "").replace(/\s+/g, " ").trim().slice(0, 240) };
     }
   }));
+}
+
+function mergeEquivalentSavedColumnRows(items = []) {
+  const normalizedPreview = (item) => String(item?.savedContentComparisonText || item?.previewText || "")
+    .replace(/\s+/g, " ")
+    .replace(/(["“‘])\s+/g, "$1")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .trim();
+  const targetKey = (item) => [
+    syncCodeVersion(item?.codeVersion),
+    String(item?.sectionID || "")
+  ].join(":");
+  const bookmarksByTarget = new Map(
+    items
+      .filter((item) => item?.savedColumnKind === "bookmark")
+      .map((item) => [targetKey(item), item])
+  );
+  const mergedAnnotations = new Set();
+
+  items.forEach((item) => {
+    const blockID = normalizeAnnotationBlockID(item?.blockID);
+    if (!blockID || item?.savedColumnKind !== "annotation") return;
+    const bookmark = bookmarksByTarget.get(targetKey(item));
+    const bookmarkPreview = normalizedPreview(bookmark);
+    if (!bookmark || !bookmarkPreview || bookmarkPreview !== normalizedPreview(item)) return;
+    bookmark.annotationBlockID = blockID;
+    bookmark.noteBody = String(item.noteBody || bookmark.noteBody || "").trim();
+    bookmark.tags = normalizeAnnotationTags([
+      ...savedItemTags(bookmark),
+      ...savedItemTags(item)
+    ]);
+    mergedAnnotations.add(item);
+  });
+
+  return items.filter((item) => !mergedAnnotations.has(item));
 }
 
 async function refreshOpenSavedPanes() {
@@ -14100,7 +14137,10 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           if (options.selectionController?.isActive()) {
             if (selectableSavedItem) options.selectionController.toggle(item);
           } else {
-            openSectionDetailForExistingSearch(item, { anchorPaneID: paneID });
+            const openItem = item.annotationBlockID
+              ? { ...item, blockID: item.annotationBlockID }
+              : item;
+            openSectionDetailForExistingSearch(openItem, { anchorPaneID: paneID });
           }
         });
         row.append(openButton);

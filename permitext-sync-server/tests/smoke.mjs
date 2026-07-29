@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-specialty-provisions-v114'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-row-dedup-v115'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1240,7 +1240,11 @@ async function main() {
       workspaceScript.text.includes("function consolidatedSavedAnnotations") &&
         workspaceScript.text.includes("function mergeSavedColumnItems") &&
         workspaceScript.text.includes("async function hydrateSavedColumnItems") &&
-        workspaceScript.text.includes("previewText: String(rawPreview)") &&
+        workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
+        workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
+        workspaceScript.text.includes("item.annotationBlockID") &&
+        workspaceScript.text.includes("savedContentComparisonText") &&
+        workspaceScript.text.includes("previewText: savedContentComparisonText.slice(0, 240)") &&
         workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
         workspaceScript.text.includes("function sortSavedItems") &&
         workspaceScript.text.includes('chapterHeader.className = "saved-chapter-header"') &&
