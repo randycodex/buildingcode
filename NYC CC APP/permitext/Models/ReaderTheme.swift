@@ -140,6 +140,17 @@ enum CodeSectionThemeProfile: Sendable {
     case mechanical
     case plumbing
     case zoning
+    case energy
+    case electrical
+    case existingBuilding
+    case fire
+    case historical
+    case housing
+    case environmental
+    case landUse
+    case housingBuildings
+    case currentConsolidation
+    case localLaw
 
     init(codeSectionName: String?) {
         let normalizedName = (codeSectionName ?? "")
@@ -147,6 +158,28 @@ enum CodeSectionThemeProfile: Sendable {
             .uppercased()
 
         switch normalizedName {
+        case let name where name.contains("ENERGY CONSERVATION"):
+            self = .energy
+        case let name where name.contains("ELECTRICAL"):
+            self = .electrical
+        case let name where name.contains("EXISTING BUILDING"):
+            self = .existingBuilding
+        case let name where name.contains("FIRE CODE"):
+            self = .fire
+        case let name where name.contains("1968 BUILDING"):
+            self = .historical
+        case let name where name.contains("HOUSING MAINTENANCE"):
+            self = .housing
+        case let name where name.contains("TITLE 24"):
+            self = .environmental
+        case let name where name.contains("TITLE 25"):
+            self = .landUse
+        case let name where name.contains("TITLE 26"):
+            self = .housingBuildings
+        case let name where name.contains("TITLE 28"):
+            self = .currentConsolidation
+        case let name where name.contains("LOCAL LAW"):
+            self = .localLaw
         case let name where name.contains("FUEL GAS"):
             self = .fuelGas
         case let name where name.contains("GENERAL ADMIN"):
@@ -176,6 +209,28 @@ enum CodeSectionThemeProfile: Sendable {
             return "#0891B2"
         case .zoning:
             return "#2F6F68"
+        case .energy:
+            return "#A15C00"
+        case .electrical:
+            return "#4338CA"
+        case .existingBuilding:
+            return "#A33A7C"
+        case .fire:
+            return "#BE123C"
+        case .historical:
+            return "#7A5A2E"
+        case .housing:
+            return "#2563A6"
+        case .environmental:
+            return "#087F5B"
+        case .landUse:
+            return "#6D28D9"
+        case .housingBuildings:
+            return "#475569"
+        case .currentConsolidation:
+            return "#1D4ED8"
+        case .localLaw:
+            return "#9A3412"
         }
     }
 
@@ -193,6 +248,28 @@ enum CodeSectionThemeProfile: Sendable {
             return "#67E8F9"
         case .zoning:
             return "#70C9BD"
+        case .energy:
+            return "#FFC857"
+        case .electrical:
+            return "#9CA8FF"
+        case .existingBuilding:
+            return "#FF8DCF"
+        case .fire:
+            return "#FB7185"
+        case .historical:
+            return "#D6B27A"
+        case .housing:
+            return "#7CB7FF"
+        case .environmental:
+            return "#5EE0B0"
+        case .landUse:
+            return "#BFA3FF"
+        case .housingBuildings:
+            return "#A9B6C8"
+        case .currentConsolidation:
+            return "#7DA6FF"
+        case .localLaw:
+            return "#FB9B72"
         }
     }
 

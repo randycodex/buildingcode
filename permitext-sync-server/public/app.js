@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-enacted-code-expansion-v107";
+} from "./offline-storage.js?v=20260728-enacted-code-accents-v108";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -96,10 +96,10 @@ const codeOptions = [
   { prefix: "FC", label: "Fire Code", theme: "fire", group: "Construction Codes" },
   { prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical", group: "Historical and Housing Codes" },
   { prefix: "HMC", label: "Housing Maintenance Code", theme: "housing", group: "Historical and Housing Codes" },
-  { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "administrative", group: "Administrative Code Titles" },
-  { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "administrative", group: "Administrative Code Titles" },
-  { prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "administrative", group: "Administrative Code Titles" },
-  { prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "administrative", group: "Administrative Code Titles" },
+  { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "environmental", group: "Administrative Code Titles" },
+  { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "land-use", group: "Administrative Code Titles" },
+  { prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "housing-buildings", group: "Administrative Code Titles" },
+  { prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "current-consolidation", group: "Administrative Code Titles" },
   { prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law", group: "Local Laws and Transitions" },
   { prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use" }
 ];

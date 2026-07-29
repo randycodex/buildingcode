@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-enacted-code-expansion-v107'),
+        webRoot.text.includes('/web/app.js?v=20260728-enacted-code-accents-v108'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -989,7 +989,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-existing-building-code-v95'),
+        webRoot.text.includes('/web/styles.css?v=20260728-enacted-code-accents-v97'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1330,6 +1330,39 @@ async function main() {
 
     const workspaceStyles = await request("/web/styles.css");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    const enactedAccentVariables = [
+      "energy",
+      "electrical",
+      "existing-building",
+      "fire",
+      "historical",
+      "housing",
+      "environmental",
+      "land-use",
+      "housing-buildings",
+      "current-consolidation",
+      "local-law"
+    ];
+    const enactedAccentValues = enactedAccentVariables.map((name) =>
+      workspaceStyles.text.match(new RegExp(`--ios-accent-${name}:\\s*(#[0-9a-f]{6});`, "i"))?.[1]
+    );
+    assert(
+      workspaceScript.text.includes('prefix: "ECC", label: "Energy Conservation Code (2025)", theme: "energy"') &&
+        workspaceScript.text.includes('prefix: "EC", label: "Electrical Code — NYC amendments (2025)", theme: "electrical"') &&
+        workspaceScript.text.includes('theme: "existing-building"') &&
+        workspaceScript.text.includes('prefix: "FC", label: "Fire Code", theme: "fire"') &&
+        workspaceScript.text.includes('prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical"') &&
+        workspaceScript.text.includes('prefix: "HMC", label: "Housing Maintenance Code", theme: "housing"') &&
+        workspaceScript.text.includes('prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "environmental"') &&
+        workspaceScript.text.includes('prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "land-use"') &&
+        workspaceScript.text.includes('prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "housing-buildings"') &&
+        workspaceScript.text.includes('prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "current-consolidation"') &&
+        workspaceScript.text.includes('prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law"') &&
+        enactedAccentVariables.every((theme) => workspaceStyles.text.includes(`.code-theme-${theme} {`)) &&
+        enactedAccentValues.every(Boolean) &&
+        new Set(enactedAccentValues.map((value) => value.toLowerCase())).size === enactedAccentVariables.length,
+      "Each enacted code collection should retain its own reader accent theme."
+    );
     assert(
       workspaceScript.text.includes("function wireSettingsSelectControl(panel, selector, label)") &&
         workspaceScript.text.includes('options.classList.toggle("is-open", open)') &&

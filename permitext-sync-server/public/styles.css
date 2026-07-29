@@ -28,6 +28,17 @@
   --ios-accent-administrative: #7c3aed;
   --ios-accent-mechanical: #2f8f4e;
   --ios-accent-plumbing: #0891b2;
+  --ios-accent-energy: #a15c00;
+  --ios-accent-electrical: #4338ca;
+  --ios-accent-existing-building: #a33a7c;
+  --ios-accent-fire: #be123c;
+  --ios-accent-historical: #7a5a2e;
+  --ios-accent-housing: #2563a6;
+  --ios-accent-environmental: #087f5b;
+  --ios-accent-land-use: #6d28d9;
+  --ios-accent-housing-buildings: #475569;
+  --ios-accent-current-consolidation: #1d4ed8;
+  --ios-accent-local-law: #9a3412;
   --accent-building: var(--ios-accent-building);
   --accent-general: var(--ios-accent-administrative);
   --accent-soft: rgba(201, 100, 16, 0.105);
@@ -85,6 +96,17 @@
     --ios-accent-administrative: #c4a1ff;
     --ios-accent-mechanical: #6edc8c;
     --ios-accent-plumbing: #67e8f9;
+    --ios-accent-energy: #ffc857;
+    --ios-accent-electrical: #9ca8ff;
+    --ios-accent-existing-building: #ff8dcf;
+    --ios-accent-fire: #fb7185;
+    --ios-accent-historical: #d6b27a;
+    --ios-accent-housing: #7cb7ff;
+    --ios-accent-environmental: #5ee0b0;
+    --ios-accent-land-use: #bfa3ff;
+    --ios-accent-housing-buildings: #a9b6c8;
+    --ios-accent-current-consolidation: #7da6ff;
+    --ios-accent-local-law: #fb9b72;
     --accent-building: var(--ios-accent-building);
     --accent-general: var(--ios-accent-administrative);
     --accent-soft: rgba(255, 176, 103, 0.13);
@@ -742,6 +764,61 @@ body.is-detached-workboard-window .detached-workboard-error p {
   --code-accent-soft: rgba(47, 111, 104, 0.13);
 }
 
+.code-theme-energy {
+  --code-accent: var(--ios-accent-energy);
+  --code-accent-soft: rgba(161, 92, 0, 0.12);
+}
+
+.code-theme-electrical {
+  --code-accent: var(--ios-accent-electrical);
+  --code-accent-soft: rgba(67, 56, 202, 0.12);
+}
+
+.code-theme-existing-building {
+  --code-accent: var(--ios-accent-existing-building);
+  --code-accent-soft: rgba(163, 58, 124, 0.12);
+}
+
+.code-theme-fire {
+  --code-accent: var(--ios-accent-fire);
+  --code-accent-soft: rgba(190, 18, 60, 0.12);
+}
+
+.code-theme-historical {
+  --code-accent: var(--ios-accent-historical);
+  --code-accent-soft: rgba(122, 90, 46, 0.12);
+}
+
+.code-theme-housing {
+  --code-accent: var(--ios-accent-housing);
+  --code-accent-soft: rgba(37, 99, 166, 0.12);
+}
+
+.code-theme-environmental {
+  --code-accent: var(--ios-accent-environmental);
+  --code-accent-soft: rgba(8, 127, 91, 0.12);
+}
+
+.code-theme-land-use {
+  --code-accent: var(--ios-accent-land-use);
+  --code-accent-soft: rgba(109, 40, 217, 0.12);
+}
+
+.code-theme-housing-buildings {
+  --code-accent: var(--ios-accent-housing-buildings);
+  --code-accent-soft: rgba(71, 85, 105, 0.12);
+}
+
+.code-theme-current-consolidation {
+  --code-accent: var(--ios-accent-current-consolidation);
+  --code-accent-soft: rgba(29, 78, 216, 0.12);
+}
+
+.code-theme-local-law {
+  --code-accent: var(--ios-accent-local-law);
+  --code-accent-soft: rgba(154, 52, 18, 0.12);
+}
+
 @media (prefers-color-scheme: dark) {
   .workspace-panel,
   .code-theme-building {
@@ -772,6 +849,61 @@ body.is-detached-workboard-window .detached-workboard-error p {
   .code-theme-zoning {
     --code-accent: #70c9bd;
     --code-accent-soft: rgba(112, 201, 189, 0.16);
+  }
+
+  .code-theme-energy {
+    --code-accent: var(--ios-accent-energy);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-electrical {
+    --code-accent: var(--ios-accent-electrical);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-existing-building {
+    --code-accent: var(--ios-accent-existing-building);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-fire {
+    --code-accent: var(--ios-accent-fire);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-historical {
+    --code-accent: var(--ios-accent-historical);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-housing {
+    --code-accent: var(--ios-accent-housing);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-environmental {
+    --code-accent: var(--ios-accent-environmental);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-land-use {
+    --code-accent: var(--ios-accent-land-use);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-housing-buildings {
+    --code-accent: var(--ios-accent-housing-buildings);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-current-consolidation {
+    --code-accent: var(--ios-accent-current-consolidation);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
+  }
+
+  .code-theme-local-law {
+    --code-accent: var(--ios-accent-local-law);
+    --code-accent-soft: color-mix(in srgb, var(--code-accent) 16%, transparent);
   }
 }
 
@@ -3069,6 +3201,17 @@ select option:checked {
 .search-filter-chip.code-theme-plumbing[aria-pressed="true"],
 .search-filter-chip.code-theme-mechanical[aria-pressed="true"],
 .search-filter-chip.code-theme-fuel-gas[aria-pressed="true"],
+.search-filter-chip.code-theme-energy[aria-pressed="true"],
+.search-filter-chip.code-theme-electrical[aria-pressed="true"],
+.search-filter-chip.code-theme-existing-building[aria-pressed="true"],
+.search-filter-chip.code-theme-fire[aria-pressed="true"],
+.search-filter-chip.code-theme-historical[aria-pressed="true"],
+.search-filter-chip.code-theme-housing[aria-pressed="true"],
+.search-filter-chip.code-theme-environmental[aria-pressed="true"],
+.search-filter-chip.code-theme-land-use[aria-pressed="true"],
+.search-filter-chip.code-theme-housing-buildings[aria-pressed="true"],
+.search-filter-chip.code-theme-current-consolidation[aria-pressed="true"],
+.search-filter-chip.code-theme-local-law[aria-pressed="true"],
 .search-filter-chip.code-theme-zoning[aria-pressed="true"] {
   background: color-mix(in srgb, var(--code-accent) 22%, transparent);
   color: var(--code-accent);
@@ -3088,6 +3231,17 @@ select option:checked {
 .search-filter-chip.code-theme-plumbing[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-mechanical[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-fuel-gas[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-energy[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-electrical[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-existing-building[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-fire[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-historical[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-housing[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-environmental[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-land-use[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-housing-buildings[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-current-consolidation[aria-pressed="true"]:hover,
+.search-filter-chip.code-theme-local-law[aria-pressed="true"]:hover,
 .search-filter-chip.code-theme-zoning[aria-pressed="true"]:hover {
   background: color-mix(in srgb, var(--code-accent) 28%, transparent);
 }
