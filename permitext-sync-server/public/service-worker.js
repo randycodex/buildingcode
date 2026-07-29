@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v139";
+const shellCacheName = "permitext-pro-shell-v140";
 
 self.addEventListener("install", () => {
   self.skipWaiting();

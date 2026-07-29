@@ -955,7 +955,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-tag-clear-v137'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-heading-alignment-v138'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -997,6 +997,8 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
         workspaceScript.text.includes("function alignSavedReaderTargetAtTop(reader, item)") &&
         workspaceScript.text.includes('const savedTitle = String(item.title || "").replace(/\\s+/g, " ")') &&
+        workspaceScript.text.includes("readerSectionTitleNode(sectionTarget)?.textContent") &&
+        workspaceScript.text.includes("sectionTitle.includes(savedTitle) || savedTitle.includes(sectionTitle)") &&
         workspaceScript.text.includes('(sectionTarget || content).querySelectorAll(".annotated-code-block")') &&
         workspaceScript.text.includes("candidateText.includes(savedTitle) || savedTitle.includes(candidateText)") &&
         workspaceScript.text.includes('scrollReaderContentToNode(content, target, "auto")') &&

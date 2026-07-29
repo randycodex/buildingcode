@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-tag-clear-v137";
+} from "./offline-storage.js?v=20260728-saved-heading-alignment-v138";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5691,15 +5691,6 @@ function savedReaderTarget(content, item) {
   const sectionID = String(item.sectionID || item.id || "").trim();
   const sectionNumber = String(item.sectionNumber || "").trim();
   const blockID = normalizeAnnotationBlockID(item.blockID || item.annotationBlockID);
-  if (blockID) {
-    const sectionBlockSelector = sectionID
-      ? `.annotated-code-block[data-section-id="${CSS.escape(sectionID)}"][data-block-id="${CSS.escape(blockID)}"]`
-      : "";
-    const blockSelector = `.annotated-code-block[data-block-id="${CSS.escape(blockID)}"]`;
-    const blockTarget = (sectionBlockSelector ? content.querySelector(sectionBlockSelector) : null) ||
-      content.querySelector(blockSelector);
-    if (blockTarget) return blockTarget;
-  }
   const idSelector = sectionID
     ? `.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`
     : "";
@@ -5713,6 +5704,26 @@ function savedReaderTarget(content, item) {
     (aliasSelector ? content.querySelector(aliasSelector) : null) ||
     (numberSelector ? content.querySelector(numberSelector) : null);
   const savedTitle = String(item.title || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
+  const sectionTitle = String(
+    readerSectionTitleNode(sectionTarget)?.textContent || sectionTarget?.dataset.sectionTitle || ""
+  ).replace(/\s+/g, " ").trim().toLocaleLowerCase();
+  if (
+    sectionTarget &&
+    savedTitle.length >= 12 &&
+    sectionTitle.length >= 12 &&
+    (sectionTitle.includes(savedTitle) || savedTitle.includes(sectionTitle))
+  ) {
+    return readerSectionTitleNode(sectionTarget);
+  }
+  if (blockID) {
+    const sectionBlockSelector = sectionID
+      ? `.annotated-code-block[data-section-id="${CSS.escape(sectionID)}"][data-block-id="${CSS.escape(blockID)}"]`
+      : "";
+    const blockSelector = `.annotated-code-block[data-block-id="${CSS.escape(blockID)}"]`;
+    const blockTarget = (sectionBlockSelector ? content.querySelector(sectionBlockSelector) : null) ||
+      content.querySelector(blockSelector);
+    if (blockTarget) return blockTarget;
+  }
   if (savedTitle.length >= 12) {
     const exactTextBlock = Array.from(
       (sectionTarget || content).querySelectorAll(".annotated-code-block")
