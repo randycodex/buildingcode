@@ -974,9 +974,10 @@ async function main() {
         !workspaceScript.text.includes('archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);\n  wireCodeFilterMenu(list, instance') &&
         webRoot.text.indexOf('class="saved-projects-add-button"') <
           webRoot.text.indexOf('class="saved-projects-archive-button"') &&
-        workspaceStyles.text.includes(".saved-project-list.is-switching") &&
+        workspaceStyles.text.includes("transition: opacity 150ms ease;") &&
+        workspaceStyles.text.includes(".saved-project-list.is-switching {\n  opacity: 0;\n}") &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v126'),
+        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v127'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1065,7 +1066,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v126'),
+        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v127'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
