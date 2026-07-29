@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-list-v118'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-text-v119'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -999,7 +999,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-list-v104'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-text-v105'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1675,6 +1675,7 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
         workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
         workspaceStyles.text.includes(".saved-project-tile.is-opening") &&
         workspaceStyles.text.includes(".project-detail-loading-status") &&

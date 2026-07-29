@@ -6279,19 +6279,49 @@ button.project-studio-metric:focus-visible {
 
 .saved-code-filter .saved-filter-chip {
   width: 100%;
-  min-height: 28px;
+  min-height: 0;
   justify-self: stretch;
-  padding: 0 var(--space-3);
+  padding: var(--space-1) 0;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: 0;
+  background: transparent !important;
+  color: var(--text-secondary);
   font-size: 12px !important;
   font-weight: 400;
   text-align: left;
   white-space: normal;
+  -webkit-text-fill-color: currentColor;
 }
 
 .saved-code-filter .saved-filter-chip[aria-pressed="true"] {
-  font-weight: 400;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.saved-code-filter .saved-filter-chip.code-theme-building[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-administrative[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-plumbing[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-mechanical[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-fuel-gas[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-energy[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-electrical[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-existing-building[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-fire[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-historical[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-housing[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-environmental[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-land-use[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-housing-buildings[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-current-consolidation[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-local-law[aria-pressed="true"],
+.saved-code-filter .saved-filter-chip.code-theme-zoning[aria-pressed="true"] {
+  color: var(--code-accent);
+  -webkit-text-fill-color: var(--code-accent);
+}
+
+.saved-code-filter .saved-filter-chip:hover {
+  background: transparent !important;
+  color: var(--text-primary);
 }
 
 .saved-tag-filter {
