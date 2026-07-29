@@ -955,7 +955,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-archive-column-stability-v139'),
+        webRoot.text.includes('/web/app.js?v=20260728-inline-project-archive-v141'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -964,6 +964,18 @@ async function main() {
         workspaceScript.text.includes('await transitionWorkspace("utility");\n  scrollPaneIntoView("utility:archive");') &&
         !workspaceScript.text.includes('await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });\n  scrollPaneIntoView("utility:archive");'),
       "Opening and closing Archive should preserve the rendered Saved column instead of rebuilding its project and filter cards."
+    );
+    assert(
+      workspaceScript.text.includes("instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode)") &&
+        workspaceScript.text.includes('savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"') &&
+        workspaceScript.text.includes('list.classList.add("is-switching")') &&
+        workspaceScript.text.includes("showingArchived = !showingArchived") &&
+        workspaceScript.text.includes("archivedProjectRecords(projects)") &&
+        !workspaceScript.text.includes('archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);\n  wireCodeFilterMenu(list, instance') &&
+        workspaceStyles.text.includes(".saved-project-list.is-switching") &&
+        workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
+        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v126'),
+      "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
       workspaceScript.text.includes("function readerSectionsWithoutRepeatedCatalogAliases") &&
@@ -999,8 +1011,10 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
-      workspaceScript.text.includes("function openSavedItemInNewReader(item, savedPaneID)") &&
-        workspaceScript.text.includes("void openSavedItemInNewReader(openItem, paneID);") &&
+      workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID)") &&
+        workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
+        workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
+        workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
         workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
         workspaceScript.text.includes("function alignSavedReaderTargetAtTop(reader, item)") &&
         workspaceScript.text.includes('const savedTitle = String(item.title || "").replace(/\\s+/g, " ")') &&
@@ -1049,7 +1063,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-tag-spacing-v124'),
+        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v126'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

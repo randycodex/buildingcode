@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-archive-column-stability-v139";
+} from "./offline-storage.js?v=20260728-inline-project-archive-v141";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -366,6 +366,7 @@ function newUtilityInstance(key, overrides = {}) {
     instance.tagFilter = typeof overrides.tagFilter === "string" ? overrides.tagFilter.trim() : "";
     instance.sortMode = normalizeSavedSortMode(overrides.sortMode);
     instance.projectsMenuOpen = Boolean(overrides.projectsMenuOpen);
+    instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode);
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
     instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
   }
@@ -383,6 +384,7 @@ function normalizeUtilityInstances(saved = {}) {
       tagFilter: pane?.tagFilter,
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
+      projectsArchiveMode: pane?.projectsArchiveMode,
       codeFilterMenuOpen: pane?.codeFilterMenuOpen,
       tagsMenuOpen: pane?.tagsMenuOpen
     }))
@@ -13724,46 +13726,67 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const list = panel.querySelector(".saved-project-list");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
-  const visibleProjects = activeProjectRecords(projects);
-  clear(list);
+  let showingArchived = Boolean(instance.projectsArchiveMode);
+  let switchTimer = null;
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
-  archiveButton.setAttribute("aria-pressed", String(state.utilities.archive));
-  archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);
   wireCodeFilterMenu(list, instance, {
     stateKey: "projectsMenuOpen",
     menuName: "projects",
-    label: "Projects"
+    label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
   });
 
-  if (!visibleProjects.length) {
-    const empty = document.createElement("p");
-    empty.className = "saved-projects-empty";
-    empty.textContent = "No projects yet. Use + to create one.";
-    list.append(empty);
-    return;
-  }
-
-  let draggedProjectID = "";
-  const clearDropIndicators = () => {
-    list.querySelectorAll(".saved-project-tile").forEach((tile) => {
-      tile.classList.remove("is-drop-before", "is-drop-after");
-    });
-  };
-  const reorderProject = async (sourceID, targetID, placeAfter) => {
-    const sourceIndex = visibleProjects.findIndex((project) => projectRecordID(project) === sourceID);
-    const targetIndex = visibleProjects.findIndex((project) => projectRecordID(project) === targetID);
-    if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
-    const reordered = [...visibleProjects];
-    const [movedProject] = reordered.splice(sourceIndex, 1);
-    let insertionIndex = targetIndex - (sourceIndex < targetIndex ? 1 : 0);
-    if (placeAfter) insertionIndex += 1;
-    reordered.splice(insertionIndex, 0, movedProject);
-    await persistProjectOrder(reordered, paneID);
+  const syncProjectModeControls = () => {
+    archiveButton.setAttribute("aria-pressed", String(showingArchived));
+    archiveButton.title = showingArchived ? "Show active projects" : "Show archived projects";
+    archiveButton.setAttribute("aria-label", archiveButton.title);
+    addButton.hidden = showingArchived;
+    addButton.disabled = showingArchived;
   };
 
-  visibleProjects.forEach((project) => {
+  const renderProjectCards = () => {
+    const visibleProjects = showingArchived
+      ? archivedProjectRecords(projects)
+      : activeProjectRecords(projects);
+    clear(list);
+    list.classList.toggle("is-showing-archive", showingArchived);
+    if (!visibleProjects.length) {
+      const empty = document.createElement("p");
+      empty.className = "saved-projects-empty";
+      empty.textContent = showingArchived
+        ? "No archived projects."
+        : "No projects yet. Use + to create one.";
+      list.append(empty);
+      updateCodeFilterMenu(list, instance, {
+        stateKey: "projectsMenuOpen",
+        menuName: "projects",
+        label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+      });
+      return;
+    }
+
+    let draggedProjectID = "";
+    const clearDropIndicators = () => {
+      list.querySelectorAll(".saved-project-tile").forEach((tile) => {
+        tile.classList.remove("is-drop-before", "is-drop-after");
+      });
+    };
+    const reorderProject = async (sourceID, targetID, placeAfter) => {
+      if (showingArchived) return;
+      const sourceIndex = visibleProjects.findIndex((project) => projectRecordID(project) === sourceID);
+      const targetIndex = visibleProjects.findIndex((project) => projectRecordID(project) === targetID);
+      if (sourceIndex === -1 || targetIndex === -1 || sourceIndex === targetIndex) return;
+      const reordered = [...visibleProjects];
+      const [movedProject] = reordered.splice(sourceIndex, 1);
+      let insertionIndex = targetIndex - (sourceIndex < targetIndex ? 1 : 0);
+      if (placeAfter) insertionIndex += 1;
+      reordered.splice(insertionIndex, 0, movedProject);
+      await persistProjectOrder(reordered, paneID);
+    };
+
+    visibleProjects.forEach((project) => {
       const tile = document.createElement("article");
       tile.className = "saved-project-tile";
+      if (showingArchived) tile.classList.add("is-archived");
       if (project.sharedOrganizationID) tile.classList.add("is-shared");
       const tileColor = projectColor(project);
       tile.style.setProperty("--project-color", tileColor);
@@ -13772,7 +13795,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.setAttribute("role", "button");
       tile.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
       tile.dataset.projectId = projectRecordID(project);
-      if (!project.sharedOnly) {
+      if (!showingArchived && !project.sharedOnly) {
         tile.dataset.draggable = "true";
         tile.draggable = true;
         tile.title = "Drag to reorder · Alt+Arrow keys also move this Project";
@@ -13790,21 +13813,23 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       actions.className = "saved-project-tile-actions";
       const editButton = document.createElement("button");
       editButton.type = "button";
-      editButton.title = "Edit project";
-      editButton.setAttribute("aria-label", `Edit ${heading.textContent}`);
-      editButton.innerHTML = pencilIconSVG();
+      editButton.title = showingArchived ? "Restore project" : "Edit project";
+      editButton.setAttribute("aria-label", `${editButton.title}: ${heading.textContent}`);
+      editButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : pencilIconSVG();
       editButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        showProjectCreateSheet(panel, project);
+        if (showingArchived) restoreArchivedProject(project);
+        else showProjectCreateSheet(panel, project);
       });
       const archiveProjectButton = document.createElement("button");
       archiveProjectButton.type = "button";
-      archiveProjectButton.title = "Archive project";
-      archiveProjectButton.setAttribute("aria-label", `Archive ${heading.textContent}`);
-      archiveProjectButton.innerHTML = archiveIconSVG();
+      archiveProjectButton.title = showingArchived ? "Delete project" : "Archive project";
+      archiveProjectButton.setAttribute("aria-label", `${archiveProjectButton.title}: ${heading.textContent}`);
+      archiveProjectButton.innerHTML = showingArchived ? trashIconSVG() : archiveIconSVG();
       archiveProjectButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        void archiveProject(project);
+        if (showingArchived) void deleteArchivedProject(project);
+        else void archiveProject(project);
       });
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, countLabel, actions);
@@ -13836,6 +13861,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       tile.addEventListener("keydown", (event) => {
         if (
+          !showingArchived &&
           !project.sharedOnly &&
           event.altKey &&
           (event.key === "ArrowUp" || event.key === "ArrowDown")
@@ -13860,7 +13886,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         open();
       });
       tile.addEventListener("dragstart", (event) => {
-        if (project.sharedOnly || event.target.closest(".saved-project-tile-actions")) {
+        if (showingArchived || project.sharedOnly || event.target.closest(".saved-project-tile-actions")) {
           event.preventDefault();
           return;
         }
@@ -13908,6 +13934,35 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       list.append(tile);
     });
+    updateCodeFilterMenu(list, instance, {
+      stateKey: "projectsMenuOpen",
+      menuName: "projects",
+      label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+    });
+  };
+
+  archiveButton.addEventListener("click", () => {
+    if (switchTimer !== null) return;
+    list.classList.add("is-switching");
+    archiveButton.disabled = true;
+    switchTimer = window.setTimeout(() => {
+      showingArchived = !showingArchived;
+      instance.projectsArchiveMode = showingArchived;
+      syncProjectModeControls();
+      renderProjectCards();
+      saveWorkspaceState();
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          list.classList.remove("is-switching");
+          archiveButton.disabled = false;
+          switchTimer = null;
+        });
+      });
+    }, 130);
+  });
+
+  syncProjectModeControls();
+  renderProjectCards();
 }
 
 function consolidatedSavedAnnotations(annotations = []) {
@@ -14334,7 +14389,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             const openItem = item.annotationBlockID
               ? { ...item, blockID: item.annotationBlockID }
               : item;
-            void openSavedItemInNewReader(openItem, paneID);
+            void openSavedItemInReader(openItem, paneID);
           }
         });
         row.append(openButton);
@@ -14422,7 +14477,7 @@ function closeSavedItemDetailsForPane(savedPaneID) {
   });
 }
 
-async function openSavedItemInNewReader(item, savedPaneID) {
+async function openSavedItemInReader(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
   const detail = {
@@ -14435,14 +14490,24 @@ async function openSavedItemInNewReader(item, savedPaneID) {
     title: item.title || "Section"
   };
   closeSavedItemDetailsForPane(savedPaneID);
+  const readerFields = readerFieldsForSectionDetail(detail, {
+    shouldSmoothScrollToSection: false,
+    savedSourcePaneID: savedPaneID
+  });
   const canAddReader = isProAccount() || state.readers.length < 2;
-  const reader = canAddReader
-    ? newReaderState(readerFieldsForSectionDetail(detail, { shouldSmoothScrollToSection: false }))
-    : state.readers[1] || state.readers[0];
-  if (canAddReader) {
+  let reader = (state.readers || []).find((candidate) => candidate.savedSourcePaneID === savedPaneID);
+  if (reader) {
+    Object.assign(reader, readerFields);
+  } else if (canAddReader) {
+    reader = newReaderState(readerFields);
     state.readers.push(reader);
   } else {
-    Object.assign(reader, readerFieldsForSectionDetail(detail, { shouldSmoothScrollToSection: false }));
+    reader = state.readers[1] || state.readers[0];
+    Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
+      if (readerID === reader.id) delete state.searchLinkedReaders[searchID];
+    });
+    delete reader.projectSavedSourceKey;
+    Object.assign(reader, readerFields);
   }
   const readerPaneID = paneIDForReader(reader);
   placePaneAfter(savedPaneID, readerPaneID);
