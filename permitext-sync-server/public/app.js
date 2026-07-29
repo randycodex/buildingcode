@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-instant-controls-v116";
+} from "./offline-storage.js?v=20260728-reader-clean-header-v117";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2600,16 +2600,6 @@ function populateCodeSelect(panel, reader) {
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
   resizeCodeSelect(codeSelect);
-  const status = panel.querySelector(".reader-code-status");
-  if (status) {
-    const notices = {
-      EC: "NYC-enacted amendments are included. The adopted 2020 NFPA 70 text is referenced but is not reproduced.",
-      BC68: "Historical enacted text. Applicability depends on the project date, permit history, and transition provisions.",
-      LL: "Construction-related unconsolidated enactments, including transition, applicability, and effective-date provisions."
-    };
-    status.textContent = notices[reader.codePrefix] || "";
-    status.hidden = !status.textContent;
-  }
 }
 
 function closeActiveCustomSelect() {

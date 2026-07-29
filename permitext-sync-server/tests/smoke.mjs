@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-instant-controls-v116'),
+        webRoot.text.includes('/web/app.js?v=20260728-reader-clean-header-v117'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -966,7 +966,7 @@ async function main() {
       workspaceScript.text.includes('prefix: "EBC"') &&
         workspaceScript.text.includes('label: "Existing Building Code (effective July 17, 2027)"') &&
         !workspaceScript.text.includes("Enacted, not yet effective.") &&
-        webRoot.text.includes('class="reader-code-status"'),
+        !webRoot.text.includes('class="reader-code-status"'),
       "The Existing Building Code should retain its effective date in the title without an inline status notice."
     );
     assert(
@@ -975,7 +975,9 @@ async function main() {
       ) &&
         workspaceScript.text.includes('group: "Administrative Code Titles"') &&
         workspaceScript.text.includes('group: "Historical and Housing Codes"') &&
-        workspaceScript.text.includes("The adopted 2020 NFPA 70 text is referenced but is not reproduced."),
+        !workspaceScript.text.includes("The adopted 2020 NFPA 70 text is referenced but is not reproduced.") &&
+        !workspaceScript.text.includes("Historical enacted text. Applicability depends on the project date") &&
+        !workspaceScript.text.includes("Construction-related unconsolidated enactments, including transition"),
       "Every enacted-code expansion library should be organized and available in the Reader."
     );
     assert(
@@ -997,7 +999,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-instant-controls-v102'),
+        webRoot.text.includes('/web/styles.css?v=20260728-reader-clean-header-v103'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
