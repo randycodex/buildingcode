@@ -6269,17 +6269,10 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-inline-filters > .code-filter-menu {
+  --saved-filter-card-radius: 22px;
   overflow: hidden;
-  border-radius: var(--radius-pill);
+  border-radius: var(--saved-filter-card-radius);
   background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
-  transition:
-    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
-    padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.saved-inline-filters > .code-filter-menu.is-open {
-  padding-bottom: var(--space-2);
-  border-radius: var(--radius-control);
 }
 
 .saved-inline-filters > .code-filter-menu > .code-filter-menu-toggle {
@@ -6297,6 +6290,10 @@ button.project-studio-metric:focus-visible {
   margin: 0;
   overflow: visible;
   padding: 0 var(--space-3);
+}
+
+.code-filter-menu.is-open .saved-code-filter {
+  padding: var(--space-2) var(--space-3);
 }
 
 .saved-code-filter .saved-filter-chip {
@@ -6359,7 +6356,7 @@ button.project-studio-metric:focus-visible {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding: var(--space-2) var(--space-3) 0;
+  padding: var(--space-2) var(--space-3);
 }
 
 .saved-tag-filter-chip {

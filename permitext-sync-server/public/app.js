@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-target-top-v125";
+} from "./offline-storage.js?v=20260728-saved-filter-motion-v126";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1982,7 +1982,9 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
     filterRail.hidden = false;
     const applyExpandedHeight = () => {
       const filterGap = Number.parseFloat(getComputedStyle(filterRail).getPropertyValue("--space-2")) || 0;
-      const expandedHeight = filterRail.scrollHeight + (menu.classList.contains("is-open") ? 0 : filterGap);
+      const openingPadding = menu.closest(".saved-inline-filters") ? filterGap * 2 : filterGap;
+      const expandedHeight = filterRail.scrollHeight +
+        (menu.classList.contains("is-open") ? 0 : openingPadding);
       const nextHeight = `${expandedHeight}px`;
       if (menu.style.getPropertyValue("--code-filter-menu-height") !== nextHeight) {
         menu.style.setProperty("--code-filter-menu-height", nextHeight);
