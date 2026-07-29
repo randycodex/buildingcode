@@ -463,7 +463,8 @@ async function main() {
     assert(
       webRoot.text.includes('id="add-zoning-reader"') &&
         webRoot.text.includes('>ZR</button>') &&
-        workspaceScript.text.includes('constructionGroup.label = "Construction Codes"') &&
+        workspaceScript.text.includes('const optionsByGroup = new Map();') &&
+        workspaceScript.text.includes('group.label = groupLabel;') &&
         workspaceScript.text.includes("codeOptions.filter((code) => code.prefix !== zoningCodePrefix)") &&
         workspaceScript.text.includes("const staticSelect = select.disabled;") &&
         workspaceScript.text.includes("const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);") &&
@@ -473,14 +474,14 @@ async function main() {
         iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
-      "Web Reader pickers should list only Construction Codes while ZR opens a dedicated reader column."
+      "Web Reader pickers should organize enacted code collections while ZR opens a dedicated reader column."
     );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
       "Web workspace script returned the wrong content type."
     );
     assert(
-      workspaceScript.text.includes('{ prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }') &&
+      workspaceScript.text.includes('{ prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use" }') &&
         workspaceScript.text.includes("syncCodeVersionForPrefix") &&
         workspaceScript.text.includes('toUpperCase() === "ZR"'),
       "Web workspace omitted the Zoning Resolution library or its Research exclusion."
@@ -951,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-existing-building-code-v105'),
+        webRoot.text.includes('/web/app.js?v=20260728-enacted-code-expansion-v107'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -959,6 +960,15 @@ async function main() {
         workspaceScript.text.includes("The NYC Existing Building Code becomes effective July 17, 2027.") &&
         webRoot.text.includes('class="reader-code-status"'),
       "The enacted Existing Building Code should be available in the Reader with its future effective date."
+    );
+    assert(
+      ["ECC", "EC", "FC", "BC68", "HMC", "T24", "T25", "T26", "T28", "LL"].every((prefix) =>
+        workspaceScript.text.includes(`prefix: "${prefix}"`)
+      ) &&
+        workspaceScript.text.includes('group: "Administrative Code Titles"') &&
+        workspaceScript.text.includes('group: "Historical and Housing Codes"') &&
+        workspaceScript.text.includes("The adopted 2020 NFPA 70 text is referenced but is not reproduced."),
+      "Every enacted-code expansion library should be organized and available in the Reader."
     );
     assert(
       workspaceScript.text.includes("function closeLinkedReaderForSearch(searchID)") &&

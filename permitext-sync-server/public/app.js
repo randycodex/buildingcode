@@ -9,7 +9,7 @@ import {
   syncCodeVersionForPrefix,
   syncProjectIdentity,
   syncMutationRecordID
-} from "./sync-identity.js?v=20260728-existing-building-code-v5";
+} from "./sync-identity.js?v=20260728-enacted-code-expansion-v6";
 import {
   annotationAfterBulkClears,
   bulkClearKey,
@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260727-safe-escape-v95";
+} from "./offline-storage.js?v=20260728-enacted-code-expansion-v107";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -80,17 +80,28 @@ const settingsTemplate = document.querySelector("#settings-template");
 if (detachedWorkboardRoute) document.body.classList.add("is-detached-workboard-window");
 
 const codeOptions = [
-  { prefix: "BC", label: "Building Code", theme: "building" },
-  { prefix: "AC", label: "General Administrative Code", theme: "administrative" },
-  { prefix: "PC", label: "Plumbing Code", theme: "plumbing" },
-  { prefix: "MC", label: "Mechanical Code", theme: "mechanical" },
-  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas" },
+  { prefix: "BC", label: "Building Code", theme: "building", group: "Construction Codes" },
+  { prefix: "AC", label: "General Administrative Code (2022 edition)", theme: "administrative", group: "Construction Codes" },
+  { prefix: "PC", label: "Plumbing Code", theme: "plumbing", group: "Construction Codes" },
+  { prefix: "MC", label: "Mechanical Code", theme: "mechanical", group: "Construction Codes" },
+  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas", group: "Construction Codes" },
+  { prefix: "ECC", label: "Energy Conservation Code (2025)", theme: "energy", group: "Construction Codes" },
+  { prefix: "EC", label: "Electrical Code — NYC amendments (2025)", theme: "electrical", group: "Construction Codes" },
   {
     prefix: "EBC",
     label: "Existing Building Code (effective July 17, 2027)",
-    theme: "existing-building"
+    theme: "existing-building",
+    group: "Construction Codes"
   },
-  { prefix: "ZR", label: "Zoning Resolution", theme: "zoning" }
+  { prefix: "FC", label: "Fire Code", theme: "fire", group: "Construction Codes" },
+  { prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical", group: "Historical and Housing Codes" },
+  { prefix: "HMC", label: "Housing Maintenance Code", theme: "housing", group: "Historical and Housing Codes" },
+  { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "administrative", group: "Administrative Code Titles" },
+  { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "administrative", group: "Administrative Code Titles" },
+  { prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "administrative", group: "Administrative Code Titles" },
+  { prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "administrative", group: "Administrative Code Titles" },
+  { prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law", group: "Local Laws and Transitions" },
+  { prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use" }
 ];
 const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
@@ -2561,15 +2572,23 @@ function populateCodeSelect(panel, reader) {
     zoningOption.textContent = "Zoning Resolution";
     codeSelect.append(zoningOption);
   } else {
-    const constructionGroup = document.createElement("optgroup");
-    constructionGroup.label = "Construction Codes";
+    const optionsByGroup = new Map();
     codeOptions.filter((code) => code.prefix !== zoningCodePrefix).forEach((code) => {
-      const option = document.createElement("option");
-      option.value = code.prefix;
-      option.textContent = code.label;
-      constructionGroup.append(option);
+      const group = code.group || "Other Enacted Codes";
+      if (!optionsByGroup.has(group)) optionsByGroup.set(group, []);
+      optionsByGroup.get(group).push(code);
     });
-    codeSelect.append(constructionGroup);
+    optionsByGroup.forEach((codes, groupLabel) => {
+      const group = document.createElement("optgroup");
+      group.label = groupLabel;
+      codes.forEach((code) => {
+        const option = document.createElement("option");
+        option.value = code.prefix;
+        option.textContent = code.label;
+        group.append(option);
+      });
+      codeSelect.append(group);
+    });
   }
   codeSelect.value = reader.codePrefix;
   codeSelect.setAttribute("aria-label", "Code section");
@@ -2577,11 +2596,14 @@ function populateCodeSelect(panel, reader) {
   resizeCodeSelect(codeSelect);
   const status = panel.querySelector(".reader-code-status");
   if (status) {
-    const isExistingBuildingCode = reader.codePrefix === existingBuildingCodePrefix;
-    status.hidden = !isExistingBuildingCode;
-    status.textContent = isExistingBuildingCode
-      ? "Enacted, not yet effective. The NYC Existing Building Code becomes effective July 17, 2027."
-      : "";
+    const notices = {
+      EBC: "Enacted, not yet effective. The NYC Existing Building Code becomes effective July 17, 2027.",
+      EC: "NYC-enacted amendments are included. The adopted 2020 NFPA 70 text is referenced but is not reproduced.",
+      BC68: "Historical enacted text. Applicability depends on the project date, permit history, and transition provisions.",
+      LL: "Construction-related unconsolidated enactments, including transition, applicability, and effective-date provisions."
+    };
+    status.textContent = notices[reader.codePrefix] || "";
+    status.hidden = !status.textContent;
   }
 }
 

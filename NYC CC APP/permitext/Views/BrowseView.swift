@@ -218,35 +218,60 @@ struct BrowseView: View {
                 Menu {
                     Section("Construction Codes") {
                         ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
-                            Button {
-                                selectReaderCode(
-                                    version: constructionCodeVersion,
-                                    codeSectionName: codeSectionName
-                                )
-                            } label: {
-                                codeSectionPickerLabel(
-                                    codeSectionName,
-                                    isSelected: isReaderCodeSelected(
-                                        version: constructionCodeVersion,
-                                        codeSectionName: codeSectionName
-                                    )
-                                )
-                            }
+                            readerCodePickerButton(
+                                version: constructionCodeVersion,
+                                codeSectionName: codeSectionName
+                            )
+                        }
+                        readerCodePickerButton(
+                            version: specialtyCodeVersion,
+                            codeSectionName: "2025 Energy Conservation Code"
+                        )
+                        readerCodePickerButton(
+                            version: specialtyCodeVersion,
+                            codeSectionName: "2025 Electrical Code — NYC Amendments"
+                        )
+                        readerCodePickerButton(
+                            version: existingBuildingCodeVersion,
+                            codeSectionName: "Existing Building Code"
+                        )
+                        readerCodePickerButton(
+                            version: enactedAdministrativeCodeVersion,
+                            codeSectionName: "Fire Code"
+                        )
+                    }
+
+                    Section("Historical and Housing Codes") {
+                        readerCodePickerButton(
+                            version: enactedAdministrativeCodeVersion,
+                            codeSectionName: "1968 Building Code"
+                        )
+                        readerCodePickerButton(
+                            version: enactedAdministrativeCodeVersion,
+                            codeSectionName: "Housing Maintenance Code"
+                        )
+                    }
+
+                    Section("Administrative Code Titles") {
+                        ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
+                            readerCodePickerButton(
+                                version: enactedAdministrativeCodeVersion,
+                                codeSectionName: codeSectionName
+                            )
                         }
                     }
 
-                    Button {
-                        selectReaderCode(
+                    Section("Local Laws and Transitions") {
+                        readerCodePickerButton(
+                            version: enactedAdministrativeCodeVersion,
+                            codeSectionName: "Construction-Related Local Laws"
+                        )
+                    }
+
+                    Section("Land Use") {
+                        readerCodePickerButton(
                             version: zoningResolutionVersion,
                             codeSectionName: "Zoning Resolution"
-                        )
-                    } label: {
-                        codeSectionPickerLabel(
-                            "Zoning Resolution",
-                            isSelected: isReaderCodeSelected(
-                                version: zoningResolutionVersion,
-                                codeSectionName: "Zoning Resolution"
-                            )
                         )
                     }
                 } label: {
@@ -289,6 +314,33 @@ struct BrowseView: View {
         }
     }
 
+    private var existingBuildingCodeVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            version.codeVersion.localizedCaseInsensitiveContains("existing building")
+        }
+    }
+
+    private var specialtyCodeVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            version.codeVersion.localizedCaseInsensitiveContains("energy conservation and electrical")
+        }
+    }
+
+    private var enactedAdministrativeCodeVersion: BundledCodeVersion? {
+        library.availableVersions.first { version in
+            version.codeVersion.localizedCaseInsensitiveContains("enacted administrative code")
+        }
+    }
+
+    private var enactedAdministrativeCodeSectionNames: [String] {
+        [
+            "Administrative Code Title 24",
+            "Administrative Code Title 25",
+            "Administrative Code Title 26",
+            "Administrative Code Title 28"
+        ]
+    }
+
     private var zoningResolutionVersion: BundledCodeVersion? {
         library.availableVersions.first { version in
             version.codeVersion.localizedCaseInsensitiveContains("zoning")
@@ -301,6 +353,25 @@ struct BrowseView: View {
     ) -> Bool {
         guard version?.fileName == library.selectedVersionFileName else { return false }
         return normalizedReaderCodeName(selectedCodeSectionName) == normalizedReaderCodeName(codeSectionName)
+    }
+
+    @ViewBuilder
+    private func readerCodePickerButton(
+        version: BundledCodeVersion?,
+        codeSectionName: String
+    ) -> some View {
+        Button {
+            selectReaderCode(version: version, codeSectionName: codeSectionName)
+        } label: {
+            codeSectionPickerLabel(
+                codeSectionName,
+                isSelected: isReaderCodeSelected(
+                    version: version,
+                    codeSectionName: codeSectionName
+                )
+            )
+        }
+        .disabled(version == nil)
     }
 
     private func selectReaderCode(

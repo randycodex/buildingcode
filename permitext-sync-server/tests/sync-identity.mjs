@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import {
   defaultSyncCodeVersion,
+  enactedAdministrativeSyncCodeVersion,
   existingBuildingSyncCodeVersion,
+  specialtyCodesSyncCodeVersion,
   syncCodeVersion,
   syncCodeVersionForPrefix,
   syncProjectIdentity,
@@ -28,6 +30,15 @@ assert.equal(syncCodeVersion("nyc-existing-building-code"), existingBuildingSync
 assert.equal(syncCodeVersion("NYC Existing Building Code"), existingBuildingSyncCodeVersion);
 assert.equal(syncCodeVersionForPrefix("EBC"), existingBuildingSyncCodeVersion);
 assert.equal(syncCodeVersionForPrefix("ebc"), existingBuildingSyncCodeVersion);
+assert.equal(syncCodeVersion("nyc-enacted-administrative-code"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("T24"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("BC68"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("HMC"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("FC"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("LL"), enactedAdministrativeSyncCodeVersion);
+assert.equal(syncCodeVersion("nyc-2025-specialty-codes"), specialtyCodesSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("ECC"), specialtyCodesSyncCodeVersion);
+assert.equal(syncCodeVersionForPrefix("EC"), specialtyCodesSyncCodeVersion);
 
 const legacyProjectID = `${userID}:project:2022 CONSTRUCTION CODES:2`;
 const repeatedProjectID = `${userID}:project:2022 CONSTRUCTION CODES:${userID}:project:2022 CONSTRUCTION CODES:${legacyProjectID}`;

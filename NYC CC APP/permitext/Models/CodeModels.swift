@@ -437,6 +437,14 @@ enum UserContentSyncCodeVersion {
         "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1"
     static let localNYCExistingBuilding =
         "NYC Existing Building Code - enacted 2026-01-17; effective 2027-07-17"
+    static let canonicalNYCEnactedAdministrative =
+        "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1"
+    static let localNYCEnactedAdministrative =
+        "NYC Enacted Administrative Code — current through 2026-07-25"
+    static let canonicalNYC2025Specialty =
+        "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1"
+    static let localNYC2025Specialty =
+        "2025 NYC Energy Conservation and Electrical Codes"
 
     private static let nyc2022Aliases = [
         "nyc-2022",
@@ -455,6 +463,17 @@ enum UserContentSyncCodeVersion {
         localNYCExistingBuilding,
         canonicalNYCExistingBuilding
     ]
+    private static let nycEnactedAdministrativeAliases = [
+        "nyc-enacted-administrative-code",
+        "NYC Enacted Administrative Code",
+        localNYCEnactedAdministrative,
+        canonicalNYCEnactedAdministrative
+    ]
+    private static let nyc2025SpecialtyAliases = [
+        "nyc-2025-specialty-codes",
+        localNYC2025Specialty,
+        canonicalNYC2025Specialty
+    ]
 
     private static func isNYC2022Alias(_ value: String) -> Bool {
         nyc2022Aliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
@@ -468,11 +487,21 @@ enum UserContentSyncCodeVersion {
         nycExistingBuildingAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
     }
 
+    private static func isNYCEnactedAdministrativeAlias(_ value: String) -> Bool {
+        nycEnactedAdministrativeAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
+    private static func isNYC2025SpecialtyAlias(_ value: String) -> Bool {
+        nyc2025SpecialtyAliases.contains { $0.caseInsensitiveCompare(value) == .orderedSame }
+    }
+
     static func server(_ value: String) -> String {
         let candidate = value.trimmingCharacters(in: .whitespacesAndNewlines)
         if candidate.isEmpty || isNYC2022Alias(candidate) { return canonicalNYC2022 }
         if isNYCZoningAlias(candidate) { return canonicalNYCZoning }
         if isNYCExistingBuildingAlias(candidate) { return canonicalNYCExistingBuilding }
+        if isNYCEnactedAdministrativeAlias(candidate) { return canonicalNYCEnactedAdministrative }
+        if isNYC2025SpecialtyAlias(candidate) { return canonicalNYC2025Specialty }
         return candidate
     }
 
@@ -481,6 +510,8 @@ enum UserContentSyncCodeVersion {
         if candidate.isEmpty || isNYC2022Alias(candidate) { return localNYC2022 }
         if isNYCZoningAlias(candidate) { return localNYCZoning }
         if isNYCExistingBuildingAlias(candidate) { return localNYCExistingBuilding }
+        if isNYCEnactedAdministrativeAlias(candidate) { return localNYCEnactedAdministrative }
+        if isNYC2025SpecialtyAlias(candidate) { return localNYC2025Specialty }
         return candidate
     }
 
@@ -498,6 +529,21 @@ enum UserContentSyncCodeVersion {
                 "NYC Existing Building Code",
                 "nyc-existing-building-code",
                 canonicalNYCExistingBuilding
+            ]
+        }
+        if isNYCEnactedAdministrativeAlias(candidate) {
+            return [
+                localNYCEnactedAdministrative,
+                "NYC Enacted Administrative Code",
+                "nyc-enacted-administrative-code",
+                canonicalNYCEnactedAdministrative
+            ]
+        }
+        if isNYC2025SpecialtyAlias(candidate) {
+            return [
+                localNYC2025Specialty,
+                "nyc-2025-specialty-codes",
+                canonicalNYC2025Specialty
             ]
         }
         return [candidate]
@@ -2751,7 +2797,7 @@ struct CodeSectionGroup: Identifiable, Hashable, Sendable {
 }
 
 enum CodeSectionHeaderFormatting {
-    private static let knownPrefixes = ["BC", "FGC", "MC", "PC"]
+    private static let knownPrefixes = ["BC", "EBC", "ECC", "EC", "FC", "FGC", "MC", "PC"]
 
     private static func defaultPrefix(for codeSectionName: String?) -> String {
         let name = (codeSectionName ?? "")
@@ -2760,6 +2806,18 @@ enum CodeSectionHeaderFormatting {
 
         if name.contains("FUEL GAS") {
             return "FGC"
+        }
+        if name.contains("EXISTING BUILDING") {
+            return "EBC"
+        }
+        if name.contains("ENERGY") {
+            return "ECC"
+        }
+        if name.contains("ELECTRICAL") {
+            return "EC"
+        }
+        if name.contains("FIRE") {
+            return "FC"
         }
         if name.contains("MECHANICAL") {
             return "MC"

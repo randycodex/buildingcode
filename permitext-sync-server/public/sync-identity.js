@@ -2,6 +2,14 @@ export const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-c
 export const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 export const existingBuildingSyncCodeVersion =
   "CodeContent/authored/new-york-city/2026-existing-building-code/bundle.json#1";
+export const enactedAdministrativeSyncCodeVersion =
+  "CodeContent/authored/new-york-city/2026-enacted-administrative-code/bundle.json#1";
+export const specialtyCodesSyncCodeVersion =
+  "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1";
+const enactedAdministrativePrefixes = new Set([
+  "T24", "T25", "T26", "BC68", "HMC", "T28", "FC", "LL"
+]);
+const specialtyCodePrefixes = new Set(["ECC", "EC"]);
 
 export function syncCodeVersion(value) {
   const candidate = String(value || "").trim();
@@ -25,6 +33,16 @@ export function syncCodeVersion(value) {
       "nyc existing building code - enacted 2026-01-17; effective 2027-07-17" ||
     normalized === existingBuildingSyncCodeVersion.toLocaleLowerCase("en-US")
   ) return existingBuildingSyncCodeVersion;
+  if (
+    normalized === "nyc-enacted-administrative-code" ||
+    normalized === "nyc enacted administrative code" ||
+    normalized === enactedAdministrativeSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return enactedAdministrativeSyncCodeVersion;
+  if (
+    normalized === "nyc-2025-specialty-codes" ||
+    normalized === "2025 nyc energy conservation and electrical codes" ||
+    normalized === specialtyCodesSyncCodeVersion.toLocaleLowerCase("en-US")
+  ) return specialtyCodesSyncCodeVersion;
   return candidate;
 }
 
@@ -32,6 +50,8 @@ export function syncCodeVersionForPrefix(prefix) {
   const normalized = String(prefix || "").trim().toUpperCase();
   if (normalized === "ZR") return zoningSyncCodeVersion;
   if (normalized === "EBC") return existingBuildingSyncCodeVersion;
+  if (enactedAdministrativePrefixes.has(normalized)) return enactedAdministrativeSyncCodeVersion;
+  if (specialtyCodePrefixes.has(normalized)) return specialtyCodesSyncCodeVersion;
   return defaultSyncCodeVersion;
 }
 

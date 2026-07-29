@@ -772,7 +772,13 @@ final class CodeLibraryViewModel: ObservableObject {
         "building",
         "fuel gas",
         "mechanical",
-        "plumbing"
+        "plumbing",
+        "energy",
+        "electrical",
+        "fire",
+        "housing maintenance",
+        "administrative code title",
+        "local laws"
     ]
 
     nonisolated static func codeSectionOrderRank(forName name: String) -> Int {

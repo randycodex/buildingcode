@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 5,
+  "chapterStructureSchemaVersion": 1,
+  "sectionContentSchemaVersion": 2,
+  "jurisdictions": [
+    {
+      "id": 1,
+      "name": "New York City"
+    }
+  ],
+  "codes": [
+    {
+      "id": 1,
+      "jurisdictionID": 1,
+      "name": "2025 NYC Energy Conservation and Electrical Codes"
+    }
+  ],
+  "codeSections": [
+    {
+      "id": 1,
+      "codeID": 1,
+      "name": "2025 ENERGY CONSERVATION CODE"
+    },
+    {
+      "id": 2,
+      "codeID": 1,
+      "name": "2025 ELECTRICAL CODE — NYC AMENDMENTS"
+    }
+  ],
+  "chapters": [
+    {
+      "id": 32000001,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "1",
+      "title": "CHAPTER 1 — ADMINISTRATION"
+    },
+    {
+      "id": 32000002,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "R2",
+      "title": "CHAPTER R2 — DEFINITIONS"
+    },
+    {
+      "id": 32000003,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "R3",
+      "title": "CHAPTER R3 — GENERAL REQUIREMENTS"
+    },
+    {
+      "id": 32000004,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "R4",
+      "title": "CHAPTER R4 — RESIDENTIAL ENERGY EFFICIENCY"
+    },
+    {
+      "id": 32000005,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "R5",
+      "title": "CHAPTER R5 — EXISTING BUILDINGS"
+    },
+    {
+      "id": 32000006,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "R6",
+      "title": "CHAPTER R6 — REFERENCED STANDARDS"
+    },
+    {
+      "id": 32000007,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "RF",
+      "title": "APPENDIX RF — ALTERNATIVE BUILDING THERMAL ENVELOPE INSULATION R-VALUE OPTIONS"
+    },
+    {
+      "id": 32000008,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "C2",
+      "title": "CHAPTER C2 — DEFINITIONS"
+    },
+    {
+      "id": 32000009,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "C3",
+      "title": "CHAPTER C3 — GENERAL REQUIREMENTS"
+    },
+    {
+      "id": 32000010,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "C4",
+      "title": "CHAPTER C4 — COMMERCIAL ENERGY EFFICIENCY"
+    },
+    {
+      "id": 32000011,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "C5",
+      "title": "CHAPTER C5 — EXISTING BUILDINGS"
+    },
+    {
+      "id": 32000012,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "C6",
+      "title": "CHAPTER C6 — REFERENCED STANDARDS"
+    },
+    {
+      "id": 32000013,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "ASHRAE",
+      "title": "2025 NYC ASHRAE 90.1 — MODIFIED ENERGY STANDARD"
+    },
+    {
+      "id": 32000014,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "ADMIN",
+      "title": "ARTICLE 1101 — ENACTMENT AND NYC ADMINISTRATIVE PROVISIONS"
+    },
+    {
+      "id": 32000015,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "1",
+      "title": "CHAPTER 1 — GENERAL"
+    },
+    {
+      "id": 32000016,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "2",
+      "title": "CHAPTER 2 — WIRING AND PROTECTION"
+    },
+    {
+      "id": 32000017,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "3",
+      "title": "CHAPTER 3 — WIRING METHODS AND MATERIALS"
+    },
+    {
+      "id": 32000018,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "4",
+      "title": "CHAPTER 4 — EQUIPMENT FOR GENERAL USE"
+    },
+    {
+      "id": 32000019,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "5",
+      "title": "CHAPTER 5 — SPECIAL OCCUPANCIES"
+    },
+    {
+      "id": 32000020,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "6",
+      "title": "CHAPTER 6 — SPECIAL EQUIPMENT"
+    },
+    {
+      "id": 32000021,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "7",
+      "title": "CHAPTER 7 — SPECIAL CONDITIONS"
+    },
+    {
+      "id": 32000022,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "8",
+      "title": "CHAPTER 8 — COMMUNICATIONS SYSTEMS"
+    }
+  ],
+  "tables": [],
+  "nextJurisdictionID": 2,
+  "nextCodeID": 2,
+  "nextCodeSectionID": 3,
+  "nextChapterID": 32000023,
+  "nextSectionID": 33000361,
+  "lastStructuredImportPaths": [],
+  "specialtyCodeContract": {
+    "libraryID": "nyc-2025-specialty-codes",
+    "energySourceURL": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
+    "energyEffectiveDate": "2026-03-30",
+    "electricalSourceURL": "https://www.nyc.gov/site/buildings/codes/electrical-code.page",
+    "electricalEffectiveDate": "2025-12-21",
+    "electricalBoundary": "NYC-enacted amendments only; adopted NFPA 70 text is not reproduced."
+  }
+}

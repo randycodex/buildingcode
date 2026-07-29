@@ -1,0 +1,1213 @@
+{
+  "schemaVersion": 1,
+  "libraryID": "nyc-enacted-administrative-code",
+  "codeVersion": "NYC Enacted Administrative Code — current through 2026-07-25",
+  "chapters": [
+    {
+      "chapterID": 30000001,
+      "chapterNumber": "1",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 115,
+      "preparedSectionCount": 115,
+      "blockCount": 115
+    },
+    {
+      "chapterID": 30000002,
+      "chapterNumber": "2",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 77,
+      "preparedSectionCount": 77,
+      "blockCount": 77
+    },
+    {
+      "chapterID": 30000003,
+      "chapterNumber": "3",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 69,
+      "preparedSectionCount": 69,
+      "blockCount": 69
+    },
+    {
+      "chapterID": 30000004,
+      "chapterNumber": "4",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 24,
+      "preparedSectionCount": 24,
+      "blockCount": 24
+    },
+    {
+      "chapterID": 30000005,
+      "chapterNumber": "5",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 43,
+      "preparedSectionCount": 43,
+      "blockCount": 43
+    },
+    {
+      "chapterID": 30000006,
+      "chapterNumber": "5-A",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 30,
+      "preparedSectionCount": 30,
+      "blockCount": 30
+    },
+    {
+      "chapterID": 30000007,
+      "chapterNumber": "6",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 12,
+      "preparedSectionCount": 12,
+      "blockCount": 12
+    },
+    {
+      "chapterID": 30000008,
+      "chapterNumber": "7",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 18,
+      "preparedSectionCount": 18,
+      "blockCount": 18
+    },
+    {
+      "chapterID": 30000009,
+      "chapterNumber": "8",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000010,
+      "chapterNumber": "9",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000011,
+      "chapterNumber": "10",
+      "codeSectionID": 1,
+      "codePrefix": "T24",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000012,
+      "chapterNumber": "1",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 22,
+      "preparedSectionCount": 22,
+      "blockCount": 22
+    },
+    {
+      "chapterID": 30000013,
+      "chapterNumber": "2",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 30000014,
+      "chapterNumber": "3",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 24,
+      "preparedSectionCount": 24,
+      "blockCount": 24
+    },
+    {
+      "chapterID": 30000015,
+      "chapterNumber": "4",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 17,
+      "preparedSectionCount": 17,
+      "blockCount": 17
+    },
+    {
+      "chapterID": 30000016,
+      "chapterNumber": "5",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 174,
+      "preparedSectionCount": 174,
+      "blockCount": 174
+    },
+    {
+      "chapterID": 30000017,
+      "chapterNumber": "6",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 7,
+      "preparedSectionCount": 7,
+      "blockCount": 7
+    },
+    {
+      "chapterID": 30000018,
+      "chapterNumber": "7",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000019,
+      "chapterNumber": "8",
+      "codeSectionID": 2,
+      "codePrefix": "T25",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000020,
+      "chapterNumber": "2",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000021,
+      "chapterNumber": "3",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 22,
+      "preparedSectionCount": 22,
+      "blockCount": 22
+    },
+    {
+      "chapterID": 30000022,
+      "chapterNumber": "4",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 25,
+      "preparedSectionCount": 25,
+      "blockCount": 25
+    },
+    {
+      "chapterID": 30000023,
+      "chapterNumber": "5",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 30000024,
+      "chapterNumber": "6",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000025,
+      "chapterNumber": "7",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 22,
+      "preparedSectionCount": 22,
+      "blockCount": 22
+    },
+    {
+      "chapterID": 30000026,
+      "chapterNumber": "8",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000027,
+      "chapterNumber": "9",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 13,
+      "preparedSectionCount": 13,
+      "blockCount": 13
+    },
+    {
+      "chapterID": 30000028,
+      "chapterNumber": "10",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000029,
+      "chapterNumber": "11",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000030,
+      "chapterNumber": "12",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000031,
+      "chapterNumber": "13",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000032,
+      "chapterNumber": "13",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000033,
+      "chapterNumber": "15",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000034,
+      "chapterNumber": "16",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000035,
+      "chapterNumber": "17",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000036,
+      "chapterNumber": "18",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000037,
+      "chapterNumber": "19",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000038,
+      "chapterNumber": "20",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000039,
+      "chapterNumber": "21",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000040,
+      "chapterNumber": "21",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000041,
+      "chapterNumber": "22",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000042,
+      "chapterNumber": "24",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000043,
+      "chapterNumber": "25",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000044,
+      "chapterNumber": "26",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000045,
+      "chapterNumber": "27",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000046,
+      "chapterNumber": "28",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000047,
+      "chapterNumber": "29",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000048,
+      "chapterNumber": "30",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 7,
+      "preparedSectionCount": 7,
+      "blockCount": 7
+    },
+    {
+      "chapterID": 30000049,
+      "chapterNumber": "31",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000050,
+      "chapterNumber": "32",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000051,
+      "chapterNumber": "33",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 20,
+      "preparedSectionCount": 20,
+      "blockCount": 20
+    },
+    {
+      "chapterID": 30000052,
+      "chapterNumber": "34",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000053,
+      "chapterNumber": "35",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000054,
+      "chapterNumber": "36",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000055,
+      "chapterNumber": "37",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000056,
+      "chapterNumber": "37",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000057,
+      "chapterNumber": "38",
+      "codeSectionID": 3,
+      "codePrefix": "T26",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000058,
+      "chapterNumber": "1",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 45,
+      "preparedSectionCount": 45,
+      "blockCount": 45
+    },
+    {
+      "chapterID": 30000059,
+      "chapterNumber": "2",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000060,
+      "chapterNumber": "3",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 55,
+      "preparedSectionCount": 55,
+      "blockCount": 55
+    },
+    {
+      "chapterID": 30000061,
+      "chapterNumber": "4",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 54,
+      "preparedSectionCount": 54,
+      "blockCount": 54
+    },
+    {
+      "chapterID": 30000062,
+      "chapterNumber": "5",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 40,
+      "preparedSectionCount": 40,
+      "blockCount": 40
+    },
+    {
+      "chapterID": 30000063,
+      "chapterNumber": "6",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 51,
+      "preparedSectionCount": 51,
+      "blockCount": 51
+    },
+    {
+      "chapterID": 30000064,
+      "chapterNumber": "7",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 147,
+      "preparedSectionCount": 147,
+      "blockCount": 147
+    },
+    {
+      "chapterID": 30000065,
+      "chapterNumber": "8",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 29,
+      "preparedSectionCount": 29,
+      "blockCount": 29
+    },
+    {
+      "chapterID": 30000066,
+      "chapterNumber": "9",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 30,
+      "preparedSectionCount": 30,
+      "blockCount": 30
+    },
+    {
+      "chapterID": 30000067,
+      "chapterNumber": "10",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 75,
+      "preparedSectionCount": 75,
+      "blockCount": 75
+    },
+    {
+      "chapterID": 30000068,
+      "chapterNumber": "11",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 74,
+      "preparedSectionCount": 74,
+      "blockCount": 74
+    },
+    {
+      "chapterID": 30000069,
+      "chapterNumber": "12",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 46,
+      "preparedSectionCount": 46,
+      "blockCount": 46
+    },
+    {
+      "chapterID": 30000070,
+      "chapterNumber": "13",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 18,
+      "preparedSectionCount": 18,
+      "blockCount": 18
+    },
+    {
+      "chapterID": 30000071,
+      "chapterNumber": "14",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 75,
+      "preparedSectionCount": 75,
+      "blockCount": 75
+    },
+    {
+      "chapterID": 30000072,
+      "chapterNumber": "15",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 51,
+      "preparedSectionCount": 51,
+      "blockCount": 51
+    },
+    {
+      "chapterID": 30000073,
+      "chapterNumber": "16",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 31,
+      "preparedSectionCount": 31,
+      "blockCount": 31
+    },
+    {
+      "chapterID": 30000074,
+      "chapterNumber": "17",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 63,
+      "preparedSectionCount": 63,
+      "blockCount": 63
+    },
+    {
+      "chapterID": 30000075,
+      "chapterNumber": "18",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 27,
+      "preparedSectionCount": 27,
+      "blockCount": 27
+    },
+    {
+      "chapterID": 30000076,
+      "chapterNumber": "Appendix: Reference Standards",
+      "codeSectionID": 4,
+      "codePrefix": "BC68",
+      "sectionCount": 33,
+      "preparedSectionCount": 33,
+      "blockCount": 33
+    },
+    {
+      "chapterID": 30000077,
+      "chapterNumber": "1",
+      "codeSectionID": 5,
+      "codePrefix": "HMC",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000078,
+      "chapterNumber": "2",
+      "codeSectionID": 5,
+      "codePrefix": "HMC",
+      "sectionCount": 102,
+      "preparedSectionCount": 102,
+      "blockCount": 102
+    },
+    {
+      "chapterID": 30000079,
+      "chapterNumber": "3",
+      "codeSectionID": 5,
+      "codePrefix": "HMC",
+      "sectionCount": 33,
+      "preparedSectionCount": 33,
+      "blockCount": 33
+    },
+    {
+      "chapterID": 30000080,
+      "chapterNumber": "4",
+      "codeSectionID": 5,
+      "codePrefix": "HMC",
+      "sectionCount": 27,
+      "preparedSectionCount": 27,
+      "blockCount": 27
+    },
+    {
+      "chapterID": 30000081,
+      "chapterNumber": "5",
+      "codeSectionID": 5,
+      "codePrefix": "HMC",
+      "sectionCount": 45,
+      "preparedSectionCount": 45,
+      "blockCount": 45
+    },
+    {
+      "chapterID": 30000082,
+      "chapterNumber": "1",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 414,
+      "preparedSectionCount": 414,
+      "blockCount": 414
+    },
+    {
+      "chapterID": 30000083,
+      "chapterNumber": "2",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 207,
+      "preparedSectionCount": 207,
+      "blockCount": 207
+    },
+    {
+      "chapterID": 30000084,
+      "chapterNumber": "3",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 285,
+      "preparedSectionCount": 285,
+      "blockCount": 285
+    },
+    {
+      "chapterID": 30000085,
+      "chapterNumber": "4",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 262,
+      "preparedSectionCount": 262,
+      "blockCount": 262
+    },
+    {
+      "chapterID": 30000086,
+      "chapterNumber": "5",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 103,
+      "preparedSectionCount": 103,
+      "blockCount": 103
+    },
+    {
+      "chapterID": 30000087,
+      "chapterNumber": "6",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 155,
+      "preparedSectionCount": 155,
+      "blockCount": 155
+    },
+    {
+      "chapterID": 30000088,
+      "chapterNumber": "7",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 490,
+      "preparedSectionCount": 490,
+      "blockCount": 490
+    },
+    {
+      "chapterID": 30000089,
+      "chapterNumber": "8",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 154,
+      "preparedSectionCount": 154,
+      "blockCount": 154
+    },
+    {
+      "chapterID": 30000090,
+      "chapterNumber": "9",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 128,
+      "preparedSectionCount": 128,
+      "blockCount": 128
+    },
+    {
+      "chapterID": 30000091,
+      "chapterNumber": "10",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 10,
+      "preparedSectionCount": 10,
+      "blockCount": 10
+    },
+    {
+      "chapterID": 30000092,
+      "chapterNumber": "11",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 225,
+      "preparedSectionCount": 225,
+      "blockCount": 225
+    },
+    {
+      "chapterID": 30000093,
+      "chapterNumber": "12",
+      "codeSectionID": 6,
+      "codePrefix": "T28",
+      "sectionCount": 169,
+      "preparedSectionCount": 169,
+      "blockCount": 169
+    },
+    {
+      "chapterID": 30000094,
+      "chapterNumber": "1",
+      "codeSectionID": 7,
+      "codePrefix": "FC",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000095,
+      "chapterNumber": "2",
+      "codeSectionID": 7,
+      "codePrefix": "FC",
+      "sectionCount": 411,
+      "preparedSectionCount": 411,
+      "blockCount": 411
+    },
+    {
+      "chapterID": 30000096,
+      "chapterNumber": "1985",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000097,
+      "chapterNumber": "1986",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000098,
+      "chapterNumber": "1987",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000099,
+      "chapterNumber": "1989",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000100,
+      "chapterNumber": "1990",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000101,
+      "chapterNumber": "1991",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000102,
+      "chapterNumber": "1992",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000103,
+      "chapterNumber": "1993",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000104,
+      "chapterNumber": "1995",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000105,
+      "chapterNumber": "1996",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000106,
+      "chapterNumber": "1997",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000107,
+      "chapterNumber": "1998",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 30000108,
+      "chapterNumber": "1999",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 30000109,
+      "chapterNumber": "2001",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000110,
+      "chapterNumber": "2002",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000111,
+      "chapterNumber": "2003",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000112,
+      "chapterNumber": "2004",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000113,
+      "chapterNumber": "2005",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000114,
+      "chapterNumber": "2006",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000115,
+      "chapterNumber": "2007",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000116,
+      "chapterNumber": "2008",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000117,
+      "chapterNumber": "2009",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 7,
+      "preparedSectionCount": 7,
+      "blockCount": 7
+    },
+    {
+      "chapterID": 30000118,
+      "chapterNumber": "2010",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000119,
+      "chapterNumber": "2011",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 30000120,
+      "chapterNumber": "2012",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 30000121,
+      "chapterNumber": "2013",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000122,
+      "chapterNumber": "2014",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 30000123,
+      "chapterNumber": "2015",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000124,
+      "chapterNumber": "2016",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 11,
+      "preparedSectionCount": 11,
+      "blockCount": 11
+    },
+    {
+      "chapterID": 30000125,
+      "chapterNumber": "2017",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000126,
+      "chapterNumber": "2018",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 30,
+      "preparedSectionCount": 30,
+      "blockCount": 30
+    },
+    {
+      "chapterID": 30000127,
+      "chapterNumber": "2019",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 7,
+      "preparedSectionCount": 7,
+      "blockCount": 7
+    },
+    {
+      "chapterID": 30000128,
+      "chapterNumber": "2020",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 6,
+      "preparedSectionCount": 6,
+      "blockCount": 6
+    },
+    {
+      "chapterID": 30000129,
+      "chapterNumber": "2021",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 21,
+      "preparedSectionCount": 21,
+      "blockCount": 21
+    },
+    {
+      "chapterID": 30000130,
+      "chapterNumber": "2022",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 30000131,
+      "chapterNumber": "2023",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 30000132,
+      "chapterNumber": "2024",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 4,
+      "preparedSectionCount": 4,
+      "blockCount": 4
+    },
+    {
+      "chapterID": 30000133,
+      "chapterNumber": "2025",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 30000134,
+      "chapterNumber": "2026",
+      "codeSectionID": 8,
+      "codePrefix": "LL",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    }
+  ]
+}

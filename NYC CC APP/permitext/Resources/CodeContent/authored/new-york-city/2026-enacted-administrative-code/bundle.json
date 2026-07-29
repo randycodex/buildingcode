@@ -1,0 +1,1017 @@
+{
+  "schemaVersion": 5,
+  "chapterStructureSchemaVersion": 1,
+  "sectionContentSchemaVersion": 2,
+  "jurisdictions": [
+    {
+      "id": 1,
+      "name": "New York City"
+    }
+  ],
+  "codes": [
+    {
+      "id": 1,
+      "jurisdictionID": 1,
+      "name": "NYC Enacted Administrative Code — current through 2026-07-25"
+    }
+  ],
+  "codeSections": [
+    {
+      "id": 1,
+      "codeID": 1,
+      "name": "ADMINISTRATIVE CODE TITLE 24"
+    },
+    {
+      "id": 2,
+      "codeID": 1,
+      "name": "ADMINISTRATIVE CODE TITLE 25"
+    },
+    {
+      "id": 3,
+      "codeID": 1,
+      "name": "ADMINISTRATIVE CODE TITLE 26"
+    },
+    {
+      "id": 4,
+      "codeID": 1,
+      "name": "1968 BUILDING CODE"
+    },
+    {
+      "id": 5,
+      "codeID": 1,
+      "name": "HOUSING MAINTENANCE CODE"
+    },
+    {
+      "id": 6,
+      "codeID": 1,
+      "name": "ADMINISTRATIVE CODE TITLE 28"
+    },
+    {
+      "id": 7,
+      "codeID": 1,
+      "name": "FIRE CODE"
+    },
+    {
+      "id": 8,
+      "codeID": 1,
+      "name": "CONSTRUCTION-RELATED LOCAL LAWS"
+    }
+  ],
+  "chapters": [
+    {
+      "id": 30000001,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "1",
+      "title": "Chapter 1: Air Pollution Control"
+    },
+    {
+      "id": 30000002,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "2",
+      "title": "Chapter 2: Noise Control"
+    },
+    {
+      "id": 30000003,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "3",
+      "title": "Chapter 3: Water Supply"
+    },
+    {
+      "id": 30000004,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "4",
+      "title": "Chapter 4: Gas and Electric Lines"
+    },
+    {
+      "id": 30000005,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "5",
+      "title": "Chapter 5: Drainage and Sewer Control"
+    },
+    {
+      "id": 30000006,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "5-A",
+      "title": "Chapter 5-A: Water Pollution Control"
+    },
+    {
+      "id": 30000007,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "6",
+      "title": "Chapter 6: Hazardous Substance Emergencies"
+    },
+    {
+      "id": 30000008,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "7",
+      "title": "Chapter 7: Community Right-to-Know Law"
+    },
+    {
+      "id": 30000009,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "8",
+      "title": "Chapter 8: New York City Climate Protection Act"
+    },
+    {
+      "id": 30000010,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "9",
+      "title": "Chapter 9: Local Brownfield Cleanup Program"
+    },
+    {
+      "id": 30000011,
+      "codeID": 1,
+      "codeSectionID": 1,
+      "chapterNumber": "10",
+      "title": "Chapter 10: Environmental Hazard Remediation."
+    },
+    {
+      "id": 30000012,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "1",
+      "title": "Chapter 1: City Planning"
+    },
+    {
+      "id": 30000013,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "2",
+      "title": "Chapter 2: Board of Standards and Appeals"
+    },
+    {
+      "id": 30000014,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "3",
+      "title": "Chapter 3: Landmarks Preservation and Historic Districts"
+    },
+    {
+      "id": 30000015,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "4",
+      "title": "Chapter 4: City Business Improvement Districts"
+    },
+    {
+      "id": 30000016,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "5",
+      "title": "Chapter 5: Establishment, Extension and Amendment of City Business Improvement Districts"
+    },
+    {
+      "id": 30000017,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "6",
+      "title": "Chapter 6: Authorization of Increased Expenditure in Special Assessment Districts"
+    },
+    {
+      "id": 30000018,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "7",
+      "title": "Chapter 7: Conversion of Hotel Space"
+    },
+    {
+      "id": 30000019,
+      "codeID": 1,
+      "codeSectionID": 2,
+      "chapterNumber": "8",
+      "title": "Chapter 8: Deed Restrictions"
+    },
+    {
+      "id": 30000020,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "2",
+      "title": "Chapter 2: Relocation Services"
+    },
+    {
+      "id": 30000021,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "3",
+      "title": "Chapter 3: Rent Control"
+    },
+    {
+      "id": 30000022,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "4",
+      "title": "Chapter 4: Rent Stabilization"
+    },
+    {
+      "id": 30000023,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "5",
+      "title": "Chapter 5: Unlawful Eviction"
+    },
+    {
+      "id": 30000024,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "6",
+      "title": "Chapter 6: Increase of Rentals"
+    },
+    {
+      "id": 30000025,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "7",
+      "title": "Chapter 7: Rent Increase Exemption for Low Income Elderly Persons and Persons with Disabilities"
+    },
+    {
+      "id": 30000026,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "8",
+      "title": "Chapter 8: Cooperative and Condominium Conversions"
+    },
+    {
+      "id": 30000027,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "9",
+      "title": "Chapter 9: Right of First Refusal and First Opportunity to Purchase"
+    },
+    {
+      "id": 30000028,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "10",
+      "title": "Chapter 10: Housing Development Project Reporting Requirements"
+    },
+    {
+      "id": 30000029,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "11",
+      "title": "Chapter 11: Housing Information Guide for Tenants and Owners"
+    },
+    {
+      "id": 30000030,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "12",
+      "title": "Chapter 12: Improperly Conditioning Residential Occupancy on Medical Treatment"
+    },
+    {
+      "id": 30000031,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "13",
+      "title": "Chapter 13: Certification of Certain Rent Payment*"
+    },
+    {
+      "id": 30000032,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "13",
+      "title": "Chapter 13: Provision of Legal Services in Eviction Proceedings*"
+    },
+    {
+      "id": 30000033,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "15",
+      "title": "Chapter 15: Audits for Compliance with 421-a Tax Exemption Affordability Requirements"
+    },
+    {
+      "id": 30000034,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "16",
+      "title": "Chapter 16: Audits for Compliance with 421-a Tax Exemption Rent Registration Requirements"
+    },
+    {
+      "id": 30000035,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "17",
+      "title": "Chapter 17: Periodic Reports on Inclusionary Housing Programs"
+    },
+    {
+      "id": 30000036,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "18",
+      "title": "Chapter 18: Housing Portal"
+    },
+    {
+      "id": 30000037,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "19",
+      "title": "Chapter 19: City-Owned Vacant Property That May Be Suitable for the Development of Affordable Housing"
+    },
+    {
+      "id": 30000038,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "20",
+      "title": "Chapter 20: Community Land Trust Regulatory Agreements"
+    },
+    {
+      "id": 30000039,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "21",
+      "title": "Chapter 21: Affordable Housing Plan Report*"
+    },
+    {
+      "id": 30000040,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "21",
+      "title": "Chapter 21: Short-Term Residential Rentals*"
+    },
+    {
+      "id": 30000041,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "22",
+      "title": "Chapter 22: Expiring Affordable Housing"
+    },
+    {
+      "id": 30000042,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "24",
+      "title": "Chapter 24: Buyout Agreement Filing Requirements"
+    },
+    {
+      "id": 30000043,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "25",
+      "title": "Chapter 25: Audits of Certifications of Correction"
+    },
+    {
+      "id": 30000044,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "26",
+      "title": "Chapter 26: Affordable Housing Placements"
+    },
+    {
+      "id": 30000045,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "27",
+      "title": "Chapter 27: Mitchell-Lama Development Reporting Requirements"
+    },
+    {
+      "id": 30000046,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "28",
+      "title": "Chapter 28: Set Asides in Housing Development Projects for Homeless Individuals and Families"
+    },
+    {
+      "id": 30000047,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "29",
+      "title": "Chapter 29: Consumer Credit History"
+    },
+    {
+      "id": 30000048,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "30",
+      "title": "Chapter 30: Tenant Data Privacy"
+    },
+    {
+      "id": 30000049,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "31",
+      "title": "Chapter 31: Registration Requirements for Short-Term Rentals"
+    },
+    {
+      "id": 30000050,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "32",
+      "title": "Chapter 32: Requirements for Booking Services with Respect to Short-Term Rentals"
+    },
+    {
+      "id": 30000051,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "33",
+      "title": "Chapter 33: Enforcement of Zoning Resolution Provisions Related to Eligibility Requirements Regarding the Development, Acquisition, Rehabilitation, Preservation, Sale or Rental of Affordable Housing Administered by the Department*"
+    },
+    {
+      "id": 30000052,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "34",
+      "title": "Chapter 34: Fees Associated with Vacating a Premises"
+    },
+    {
+      "id": 30000053,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "35",
+      "title": "Chapter 35: Universal Design Units"
+    },
+    {
+      "id": 30000054,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "36",
+      "title": "Chapter 36: Flooding Adaptation Information Sessions"
+    },
+    {
+      "id": 30000055,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "37",
+      "title": "Chapter 37: Creation of Homeownership Opportunity Units*"
+    },
+    {
+      "id": 30000056,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "37",
+      "title": "Chapter 37: Sales of Cooperative Apartments*"
+    },
+    {
+      "id": 30000057,
+      "codeID": 1,
+      "codeSectionID": 3,
+      "chapterNumber": "38",
+      "title": "Chapter 38: Community Hiring and Compensation Standards on City-Assisted Housing Development Projects"
+    },
+    {
+      "id": 30000058,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "1",
+      "title": "Subchapter 1: Administration and Enforcement"
+    },
+    {
+      "id": 30000059,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "2",
+      "title": "Subchapter 2: Definitions"
+    },
+    {
+      "id": 30000060,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "3",
+      "title": "Subchapter 3: Occupancy and Construction Classification"
+    },
+    {
+      "id": 30000061,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "4",
+      "title": "Subchapter 4: Building Limitations"
+    },
+    {
+      "id": 30000062,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "5",
+      "title": "Subchapter 5: Fire Protection Construction Requirements"
+    },
+    {
+      "id": 30000063,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "6",
+      "title": "Subchapter 6: Means of Egress"
+    },
+    {
+      "id": 30000064,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "7",
+      "title": "Subchapter 7: Special Uses and Occupancies"
+    },
+    {
+      "id": 30000065,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "8",
+      "title": "Subchapter 8: Places of Assembly"
+    },
+    {
+      "id": 30000066,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "9",
+      "title": "Subchapter 9: Loads"
+    },
+    {
+      "id": 30000067,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "10",
+      "title": "Subchapter 10: Structural Work"
+    },
+    {
+      "id": 30000068,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "11",
+      "title": "Subchapter 11: Foundations"
+    },
+    {
+      "id": 30000069,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "12",
+      "title": "Subchapter 12: Light, Heat, Ventilation and Noise Control"
+    },
+    {
+      "id": 30000070,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "13",
+      "title": "Subchapter 13: Mechanical Ventilation, Air Conditioning, and Refrigeration Systems"
+    },
+    {
+      "id": 30000071,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "14",
+      "title": "Subchapter 14: Heating and Combustion Equipment"
+    },
+    {
+      "id": 30000072,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "15",
+      "title": "Subchapter 15: Chimneys and Gas Vents"
+    },
+    {
+      "id": 30000073,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "16",
+      "title": "Subchapter 16: Plumbing and Gas Piping"
+    },
+    {
+      "id": 30000074,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "17",
+      "title": "Subchapter 17: Fire Alarm, Detection and Extinguishing Equipment"
+    },
+    {
+      "id": 30000075,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "18",
+      "title": "Subchapter 18: Elevators and Conveyors"
+    },
+    {
+      "id": 30000076,
+      "codeID": 1,
+      "codeSectionID": 4,
+      "chapterNumber": "Appendix: Reference Standards",
+      "title": "Appendix: Reference Standards"
+    },
+    {
+      "id": 30000077,
+      "codeID": 1,
+      "codeSectionID": 5,
+      "chapterNumber": "1",
+      "title": "Subchapter 1: General Provisions"
+    },
+    {
+      "id": 30000078,
+      "codeID": 1,
+      "codeSectionID": 5,
+      "chapterNumber": "2",
+      "title": "Subchapter 2: Maintenance, Services, and Utilities"
+    },
+    {
+      "id": 30000079,
+      "codeID": 1,
+      "codeSectionID": 5,
+      "chapterNumber": "3",
+      "title": "Subchapter 3: Physical and Occupancy Standards for Dwelling Units"
+    },
+    {
+      "id": 30000080,
+      "codeID": 1,
+      "codeSectionID": 5,
+      "chapterNumber": "4",
+      "title": "Subchapter 4: Administration"
+    },
+    {
+      "id": 30000081,
+      "codeID": 1,
+      "codeSectionID": 5,
+      "chapterNumber": "5",
+      "title": "Subchapter 5: Legal Remedies and Enforcement"
+    },
+    {
+      "id": 30000082,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "1",
+      "title": "Chapter 1: Administration"
+    },
+    {
+      "id": 30000083,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "2",
+      "title": "Chapter 2: Enforcement"
+    },
+    {
+      "id": 30000084,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "3",
+      "title": "Chapter 3: Maintenance of Buildings"
+    },
+    {
+      "id": 30000085,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "4",
+      "title": "Chapter 4: Licensing and Registration of Businesses, Trades and Occupations Engaged in Building Work"
+    },
+    {
+      "id": 30000086,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "5",
+      "title": "Chapter 5: Miscellaneous Provisions"
+    },
+    {
+      "id": 30000087,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "6",
+      "title": "Chapter 6: New York City Plumbing Code"
+    },
+    {
+      "id": 30000088,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "7",
+      "title": "Chapter 7: New York City Building Code"
+    },
+    {
+      "id": 30000089,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "8",
+      "title": "Chapter 8: New York City Mechanical Code"
+    },
+    {
+      "id": 30000090,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "9",
+      "title": "Chapter 9: New York City Fuel Gas Code"
+    },
+    {
+      "id": 30000091,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "10",
+      "title": "Chapter 10: New York City Energy Code"
+    },
+    {
+      "id": 30000092,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "11",
+      "title": "Chapter 11: The New York City Electrical Code"
+    },
+    {
+      "id": 30000093,
+      "codeID": 1,
+      "codeSectionID": 6,
+      "chapterNumber": "12",
+      "title": "Chapter 12: The New York City Existing Building Code (effective July 17, 2027)"
+    },
+    {
+      "id": 30000094,
+      "codeID": 1,
+      "codeSectionID": 7,
+      "chapterNumber": "1",
+      "title": "Chapter 1: Enactment of the New York City Fire Code"
+    },
+    {
+      "id": 30000095,
+      "codeID": 1,
+      "codeSectionID": 7,
+      "chapterNumber": "2",
+      "title": "Chapter 2: New York City Fire Code"
+    },
+    {
+      "id": 30000096,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1985",
+      "title": "1985"
+    },
+    {
+      "id": 30000097,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1986",
+      "title": "1986"
+    },
+    {
+      "id": 30000098,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1987",
+      "title": "1987"
+    },
+    {
+      "id": 30000099,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1989",
+      "title": "1989"
+    },
+    {
+      "id": 30000100,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1990",
+      "title": "1990"
+    },
+    {
+      "id": 30000101,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1991",
+      "title": "1991"
+    },
+    {
+      "id": 30000102,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1992",
+      "title": "1992"
+    },
+    {
+      "id": 30000103,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1993",
+      "title": "1993"
+    },
+    {
+      "id": 30000104,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1995",
+      "title": "1995"
+    },
+    {
+      "id": 30000105,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1996",
+      "title": "1996"
+    },
+    {
+      "id": 30000106,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1997",
+      "title": "1997"
+    },
+    {
+      "id": 30000107,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1998",
+      "title": "1998"
+    },
+    {
+      "id": 30000108,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "1999",
+      "title": "1999"
+    },
+    {
+      "id": 30000109,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2001",
+      "title": "2001"
+    },
+    {
+      "id": 30000110,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2002",
+      "title": "2002"
+    },
+    {
+      "id": 30000111,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2003",
+      "title": "2003"
+    },
+    {
+      "id": 30000112,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2004",
+      "title": "2004"
+    },
+    {
+      "id": 30000113,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2005",
+      "title": "2005"
+    },
+    {
+      "id": 30000114,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2006",
+      "title": "2006"
+    },
+    {
+      "id": 30000115,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2007",
+      "title": "2007"
+    },
+    {
+      "id": 30000116,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2008",
+      "title": "2008"
+    },
+    {
+      "id": 30000117,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2009",
+      "title": "2009"
+    },
+    {
+      "id": 30000118,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2010",
+      "title": "2010"
+    },
+    {
+      "id": 30000119,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2011",
+      "title": "2011"
+    },
+    {
+      "id": 30000120,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2012",
+      "title": "2012"
+    },
+    {
+      "id": 30000121,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2013",
+      "title": "2013"
+    },
+    {
+      "id": 30000122,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2014",
+      "title": "2014"
+    },
+    {
+      "id": 30000123,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2015",
+      "title": "2015"
+    },
+    {
+      "id": 30000124,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2016",
+      "title": "2016"
+    },
+    {
+      "id": 30000125,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2017",
+      "title": "2017"
+    },
+    {
+      "id": 30000126,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2018",
+      "title": "2018"
+    },
+    {
+      "id": 30000127,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2019",
+      "title": "2019"
+    },
+    {
+      "id": 30000128,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2020",
+      "title": "2020"
+    },
+    {
+      "id": 30000129,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2021",
+      "title": "2021"
+    },
+    {
+      "id": 30000130,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2022",
+      "title": "2022"
+    },
+    {
+      "id": 30000131,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2023",
+      "title": "2023"
+    },
+    {
+      "id": 30000132,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2024",
+      "title": "2024"
+    },
+    {
+      "id": 30000133,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2025",
+      "title": "2025"
+    },
+    {
+      "id": 30000134,
+      "codeID": 1,
+      "codeSectionID": 8,
+      "chapterNumber": "2026",
+      "title": "2026"
+    }
+  ],
+  "tables": [],
+  "nextJurisdictionID": 2,
+  "nextCodeID": 2,
+  "nextCodeSectionID": 9,
+  "nextChapterID": 30000135,
+  "nextSectionID": 31005299,
+  "lastStructuredImportPaths": [],
+  "enactedAdministrativeCodeContract": {
+    "libraryID": "nyc-enacted-administrative-code",
+    "sourceAuthority": "New York City Administrative Code",
+    "overviewURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
+    "archiveURL": "https://files.amlegal.com/pdffiles/NewYorkCity/Admin/XML.zip",
+    "archiveSHA256": "331b3a52072f1da6d65265eaf2fe95ecbcc5954ff9bf6de2bfa5912831ddc06e",
+    "statedCurrency": "Current through Local Law 2026/116, enacted July 11, 2026, including amendments effective through July 25, 2026.",
+    "extractionBoundary": "Enacted text only; publisher editorial notes and highlighters excluded.",
+    "verificationStatus": "source-extracted; republication-rights review required before production publication"
+  }
+}

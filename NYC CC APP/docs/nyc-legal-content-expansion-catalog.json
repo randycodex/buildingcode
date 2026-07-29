@@ -59,7 +59,7 @@
       "permitextStatus": "present"
     }
   ],
-  "missingEnactedText": [
+  "importedEnactedText": [
     {
       "id": "nyc-admin-title-24",
       "itemNumbers": [
@@ -67,7 +67,7 @@
         15
       ],
       "name": "Administrative Code Title 24 — Environmental Protection and Utilities",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-42985",
       "sourceNodeID": 42985,
@@ -88,7 +88,7 @@
         15
       ],
       "name": "Administrative Code Title 25 — Land Use",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-45639",
       "sourceNodeID": 45639,
@@ -108,7 +108,7 @@
         15
       ],
       "name": "Administrative Code Title 26 — Housing and Buildings",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-46907",
       "sourceNodeID": 46907,
@@ -130,7 +130,7 @@
         15
       ],
       "name": "Administrative Code Title 27 — Construction and Maintenance",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-48176",
       "sourceNodeID": 48176,
@@ -151,7 +151,7 @@
         15
       ],
       "name": "Administrative Code Title 28 — New York City Construction Codes",
-      "permitextStatus": "missing-current-consolidation",
+      "permitextStatus": "bundled-current-consolidation",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-207300",
       "sourceNodeID": 207300,
@@ -171,7 +171,7 @@
         10
       ],
       "name": "Administrative Code Title 29 — New York City Fire Code",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-230271",
       "sourceNodeID": 230271,
@@ -192,7 +192,7 @@
         17
       ],
       "name": "Administrative Code Appendix A — Unconsolidated Local Laws",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-filtered-source-extracted",
       "sourceType": "nyc-law-department-contracted-administrative-code-library",
       "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-115120",
       "sourceNodeID": 115120,
@@ -210,7 +210,7 @@
       "itemNumber": 7,
       "id": "nyc-energy-conservation-code",
       "name": "2025 NYC Energy Conservation Code",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-official-source",
       "sourceType": "official-nyc-dob-enacted-code",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
       "effectiveDate": "2026-03-30"
@@ -219,7 +219,7 @@
       "itemNumber": 8,
       "id": "nyc-electrical-code",
       "name": "NYC Electrical Code",
-      "permitextStatus": "missing",
+      "permitextStatus": "bundled-official-nyc-amendments-only",
       "sourceType": "official-nyc-dob-enacted-code",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/electrical-code.page"
     },
@@ -241,7 +241,7 @@
       "itemNumber": 16,
       "id": "nyc-construction-local-laws",
       "name": "NYC Local Laws that amend or supplement the enacted codes",
-      "permitextStatus": "missing-index",
+      "permitextStatus": "bundled-filtered-source-extracted",
       "sourceType": "official-nyc-dob-and-nyc-council-enactments",
       "sourceURL": "https://www.nyc.gov/site/buildings/codes/local-laws.page"
     }

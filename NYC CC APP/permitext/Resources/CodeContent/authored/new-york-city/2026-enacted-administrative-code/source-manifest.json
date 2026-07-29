@@ -1,0 +1,920 @@
+{
+  "schemaVersion": 1,
+  "libraryID": "nyc-enacted-administrative-code",
+  "codeVersion": "NYC Enacted Administrative Code — current through 2026-07-25",
+  "sourceAuthority": "New York City Administrative Code",
+  "sourcePublisher": "American Legal Publishing contracted code library",
+  "overviewURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/overview",
+  "archiveURL": "https://files.amlegal.com/pdffiles/NewYorkCity/Admin/XML.zip",
+  "archiveSHA256": "331b3a52072f1da6d65265eaf2fe95ecbcc5954ff9bf6de2bfa5912831ddc06e",
+  "statedCurrency": "Current through Local Law 2026/116, enacted July 11, 2026, including amendments effective through July 25, 2026.",
+  "extractionBoundary": "Enacted text only; publisher editorial notes and highlighters excluded.",
+  "verificationStatus": "source-extracted; republication-rights review required before production publication",
+  "documents": [
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-42985.xml",
+      "firstRecordNumber": 55486,
+      "sha256": "a76adaed7753f37878998293db1115a195891624a1997aa0504990a598d24525",
+      "sectionCount": 115
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-44060.xml",
+      "firstRecordNumber": 56626,
+      "sha256": "8900d02023e4c26e581b3eaa5a4ef8c19a01bc3c7b02e7f3b908cda02760fcfb",
+      "sectionCount": 77
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-129769.xml",
+      "firstRecordNumber": 57229,
+      "sha256": "745c3dbffc6376098647692bcffc04061f684efab9abb668377d13a0bacdcd7a",
+      "sectionCount": 69
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-135844.xml",
+      "firstRecordNumber": 57527,
+      "sha256": "2fb962fc91a46fb3db08efb39716a6f01ea80e574d5821607f809b43673e1a51",
+      "sectionCount": 24
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-44888.xml",
+      "firstRecordNumber": 57596,
+      "sha256": "d0447b0efa8833445691cfd7c0480ab2e9813294607dd6914471a07f390afc24",
+      "sectionCount": 43
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-233809.xml",
+      "firstRecordNumber": 58068,
+      "sha256": "b6dc6f1b94e40caa4180df83e8b37b3be69fa3783c04e770ef8fd209ba0fdbfc",
+      "sectionCount": 30
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-112271.xml",
+      "firstRecordNumber": 58267,
+      "sha256": "5eb53954c0baa0a7663b4a4de6d903452aeb4d06b03fadcb20a8a6a226849ecc",
+      "sectionCount": 12
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-222480.xml",
+      "firstRecordNumber": 58356,
+      "sha256": "caf7f36871991b638f3f51f654e2246a3f3dc67cb354cca53930039dbe141c31",
+      "sectionCount": 18
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-218116.xml",
+      "firstRecordNumber": 58482,
+      "sha256": "ae9f8c419f45de00141a5c8aef172b6d9dba2940c536466b28b235fe26f91ce9",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-229820.xml",
+      "firstRecordNumber": 58553,
+      "sha256": "fbf91ea8b0a387e517bace0fae38a344bc880d395a3a6e5d87ce134b6a763c60",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Title 24",
+      "fileName": "0-0-0-206152.xml",
+      "firstRecordNumber": 58633,
+      "sha256": "54fe0527050ac5e9c3532a52d64ad07b1c7dc51b1d6ab518d76538e04adbc294",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-45639.xml",
+      "firstRecordNumber": 58661,
+      "sha256": "c425cc55b29d334e63ea8aa22cf66cce810907f6c6e825c01d7a200acc57c52d",
+      "sectionCount": 22
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-226524.xml",
+      "firstRecordNumber": 58865,
+      "sha256": "9f77f6e9ce7beef0da6fa5dae2829c2514987946cbb1251e91394b91fd1659c0",
+      "sectionCount": 9
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-133896.xml",
+      "firstRecordNumber": 58973,
+      "sha256": "139fd86ac1f4ec1df780e9669b3276495f23dc495ac0f6062e21f3c7bb2139fd",
+      "sectionCount": 24
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-46097.xml",
+      "firstRecordNumber": 59236,
+      "sha256": "eadae7e7f54226450954c3508fd86d6059bcc3096fb202dfaff022f00e7bbb6f",
+      "sectionCount": 17
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-220219.xml",
+      "firstRecordNumber": 59356,
+      "sha256": "7383c2ef0b68b4d6adcc5bac0b9319e620f5087644507391f5505d21898b61a5",
+      "sectionCount": 174
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-46781.xml",
+      "firstRecordNumber": 60064,
+      "sha256": "cd2c082c032d943dee6bb5b01ec5940842fecb5f6fbd56cde1a77f1afe33e319",
+      "sectionCount": 7
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-154647.xml",
+      "firstRecordNumber": 60090,
+      "sha256": "c44b23eaf70e4f7305f65fc7c2c16043943bbb6bcb8043df460a2c38727bdb88",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 25",
+      "fileName": "0-0-0-130281.xml",
+      "firstRecordNumber": 60124,
+      "sha256": "62c26a46d822b7421e7fa9aa5589488a02887eadd74a9fdab690ef0b6b1d1233",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-46907.xml",
+      "firstRecordNumber": 60198,
+      "sha256": "214cc0eb7aadeeaea656c6da285f1e413f2978037ccdbbc34aec8963652149d4",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-46909.xml",
+      "firstRecordNumber": 60201,
+      "sha256": "d823302b2cba62846a48ee8b47b43e9f1b4d008bfecea754788e2664d689affc",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-228764.xml",
+      "firstRecordNumber": 60269,
+      "sha256": "d3dfd08b878289cbc74d117816bfa3e8ef4f0c60065e9784bb3411f344b40334",
+      "sectionCount": 22
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-201924.xml",
+      "firstRecordNumber": 60620,
+      "sha256": "99a48be4b1ff1d70f8ffeb708744330a207531e2c8e57fb262b650f16a3bb56f",
+      "sectionCount": 25
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47504.xml",
+      "firstRecordNumber": 60895,
+      "sha256": "cd03ef5e282ded360395d85542f51f97005488877ccd8454ee9ae77ecb979b24",
+      "sectionCount": 9
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47532.xml",
+      "firstRecordNumber": 60923,
+      "sha256": "d4b69f8457d2095cebc6482b9f99e89125bb8a47b5eb940ecbbc5f4cd02e922a",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47537.xml",
+      "firstRecordNumber": 60928,
+      "sha256": "026eb3868d58ad79cb613c1f537002052fa025e847027cee60d6287b0a0f041c",
+      "sectionCount": 22
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-235043.xml",
+      "firstRecordNumber": 61060,
+      "sha256": "bfe0a3fc9e95d926124725ad7eaedd9ab4bd5a587c765694bc7357eb084cc037",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47632.xml",
+      "firstRecordNumber": 61095,
+      "sha256": "aefd062a52d67f5961b98e7a14358ad0e15c6942de0f25d6876fec1799e9e9a1",
+      "sectionCount": 13
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-209435.xml",
+      "firstRecordNumber": 61196,
+      "sha256": "05cbaf4f8a28f548ce3cc1bb279eb6642d7197b982b67cea97d635bf5605da7d",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47782.xml",
+      "firstRecordNumber": 61277,
+      "sha256": "ecd6cc6cbc0b80297a2a8d033790752321a4da55241cb70c910234aa67e05c49",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47807.xml",
+      "firstRecordNumber": 61302,
+      "sha256": "d46781bcb6791863ae611b981fbdaf6cec9d96eeab74bcecf02fe10ab59194b8",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47826.xml",
+      "firstRecordNumber": 61321,
+      "sha256": "91a1b9985f4f1821aa90a88368d98328e3334be80b58f4da76c0311183940a15",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47894.xml",
+      "firstRecordNumber": 61394,
+      "sha256": "3909e1acb5c14aa5c3f4d0d2c054f922710ca107cc2978335ef6ed2d1a6fc872",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47905.xml",
+      "firstRecordNumber": 61405,
+      "sha256": "cf5b105c64bdf2b74e2061c95eed9464689b67ac9f97d3c0bf4d4fc863d114b5",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47917.xml",
+      "firstRecordNumber": 61417,
+      "sha256": "21927082e91acfd3d2ffa6b57d0a7797d017a2bfd57962dc91267416263a069a",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47930.xml",
+      "firstRecordNumber": 61430,
+      "sha256": "7b95fa1e4cb23376160bc607d212f60817c238ed6a355679d890fcb548ec1a13",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-47948.xml",
+      "firstRecordNumber": 61448,
+      "sha256": "83549d52be5341d1f0f680db0df30d48002d70b283370c884094ca616909d7a4",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-48030.xml",
+      "firstRecordNumber": 61532,
+      "sha256": "8e55694b946d45d0a13f14d28215bb9b500229e507e47753dd1a22a9da39b737",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-48034.xml",
+      "firstRecordNumber": 61536,
+      "sha256": "371990b345a4f8f4b1a1b691aa8044bb8bb0736cad7a2af2e1483c7556aa3638",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-48043.xml",
+      "firstRecordNumber": 61544,
+      "sha256": "7cd5179778bc63e896c6559ed39191cbe802c3218c5a37a97a9bdcd6778998c6",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-48092.xml",
+      "firstRecordNumber": 61593,
+      "sha256": "ce1ad0451eedf79ddf9102dd15112950317758ab66e1be7cd618d418ff43ea73",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-128933.xml",
+      "firstRecordNumber": 61640,
+      "sha256": "53fa6fbe6e2987afc3f94c977c61c08329e21ead95942c2a6185e2f56d026bd2",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-112503.xml",
+      "firstRecordNumber": 61683,
+      "sha256": "349aabe3809b33a2b783676e9f021f0b0308edd1a5c3f8bc0e8b0d6ff49aaf7a",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-112624.xml",
+      "firstRecordNumber": 61710,
+      "sha256": "cc758479c7c2bd3f3ce55150c3605df942f7656a887aa94dc75c1d405b4a99cc",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-114041.xml",
+      "firstRecordNumber": 61724,
+      "sha256": "2b82645f6ced20a427e800c1a33330f21460918d8eb0fea57099110ef6225008",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-114071.xml",
+      "firstRecordNumber": 61756,
+      "sha256": "00716c0665f46abf759a61d2b0c3cb818e3ed14cb0185491b1857ed66ff97f41",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-114772.xml",
+      "firstRecordNumber": 61774,
+      "sha256": "7ce52967c0c731e79f4e0f74c7d69c688688dbbbd743f4683de9ac5616851fa0",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-130946.xml",
+      "firstRecordNumber": 61800,
+      "sha256": "34b65b38ba4d8f737ca35ddb11a75788de3abe7370bda021ff20a635ce30b5fb",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-130977.xml",
+      "firstRecordNumber": 61822,
+      "sha256": "bb05169e03104cfd8538174ac94dc2a1bf64aeb656a455d5fda64238feaf876a",
+      "sectionCount": 7
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-133488.xml",
+      "firstRecordNumber": 61917,
+      "sha256": "7c83b9f64f21b1715fe15f2b7f0988a2c8fbf1633cf9e4fc4182003772ecb0ab",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-137273.xml",
+      "firstRecordNumber": 61988,
+      "sha256": "748a538f0fc8e31c902f4e19d5507eb6cc2b96834d72cb863414b7939c38faae",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-136419.xml",
+      "firstRecordNumber": 62013,
+      "sha256": "9931836aa07d481c2d3c7f8281bc36483923a28b475dffbb163de3da49d44cf1",
+      "sectionCount": 20
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-137673.xml",
+      "firstRecordNumber": 62115,
+      "sha256": "f72e8ae49eab44f0e0de82f866e9a2044929f26ab856106297eb1e95381a8e09",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-203187.xml",
+      "firstRecordNumber": 62125,
+      "sha256": "9478865f2b968971792e20066e4a2a4e8c3c8a2b0482a3ae4452b208b4fa9ace",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-203188.xml",
+      "firstRecordNumber": 62149,
+      "sha256": "64b877ebbdfb41b25093689b1beaf534549d632663a080604e467cb1ce20181f",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-236257.xml",
+      "firstRecordNumber": 62169,
+      "sha256": "77dcf4fb8533a1df028ad13c6a9ead110236f192ff3376dd05ed3435d2c0c187",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-240280.xml",
+      "firstRecordNumber": 62191,
+      "sha256": "026e4a3d030fb69a44b109aab27a5913aeb19191f17ae2409ef3750ef8c3460b",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Title 26",
+      "fileName": "0-0-0-240260.xml",
+      "firstRecordNumber": 62236,
+      "sha256": "8c426fc84b051c38851ed560ec5080f611cc0dc7c77e8a048bf7e1a2a501bc86",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Title 27",
+      "fileName": "0-0-0-48176.xml",
+      "firstRecordNumber": 62329,
+      "sha256": "89c31e2c5dd627db0f1c5fd8b342a7c9c684e355fbc5c0cc1327b77567d1eb30",
+      "sectionCount": 949
+    },
+    {
+      "collection": "Administrative Code Title 27",
+      "fileName": "0-0-0-60027.xml",
+      "firstRecordNumber": 74174,
+      "sha256": "da8a8ea417ea37b770d70b4abd5093f68e3f948cbfa3631411f98a3123bc0974",
+      "sectionCount": 211
+    },
+    {
+      "collection": "Administrative Code Title 27",
+      "fileName": "0-0-0-61575.xml",
+      "firstRecordNumber": 76005,
+      "sha256": "38d6b3b51b34a9a7434ab928cbdc61ef3b5583f72b34e969788405f6eb17b262",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Title 27",
+      "fileName": "0-0-0-208109.xml",
+      "firstRecordNumber": 76008,
+      "sha256": "8dd09febb9993c3379dd4fbcef0b7e81dff4241585b8f2e30bbe0999252c0a40",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-207300.xml",
+      "firstRecordNumber": 76010,
+      "sha256": "dec6c8e9395dc671e98bcb143da3a612f5e3cfdf1724306c5ad344fd95e3732e",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-237170.xml",
+      "firstRecordNumber": 76012,
+      "sha256": "e2c8ed3f3340f81136ab40ef8f28172f3e2b5a035817a3603d571628c6c099a0",
+      "sectionCount": 414
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-157215.xml",
+      "firstRecordNumber": 77954,
+      "sha256": "118e4ee3e6aa44ecde30d6f0fd5030b324c991a7c4bb7e1e03b39eed568f8a46",
+      "sectionCount": 207
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-231478.xml",
+      "firstRecordNumber": 78770,
+      "sha256": "f38c42bbb86adfa0874ce812e221a80d647f941bb79f06421400b40590332a7b",
+      "sectionCount": 285
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-228130.xml",
+      "firstRecordNumber": 80196,
+      "sha256": "e1da78032c13b2fc343465e2db78d871a9ef205539d4e0de7e3351e1a22fa061",
+      "sectionCount": 262
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-233174.xml",
+      "firstRecordNumber": 81506,
+      "sha256": "c93b437d16ecb11a6e8854d8e5aae63d747f0772a49288fabf1068453afcffb6",
+      "sectionCount": 103
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-229857.xml",
+      "firstRecordNumber": 81905,
+      "sha256": "5f5f2029232c861b6bef3ac653edd0073424943436b621c8b0e0237506d3153c",
+      "sectionCount": 155
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-164231.xml",
+      "firstRecordNumber": 85560,
+      "sha256": "a6eadbdc2cd9cdaf427d9b3d9edb360054aa769d501d2a677eba81a1d5b75038",
+      "sectionCount": 490
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-230002.xml",
+      "firstRecordNumber": 114298,
+      "sha256": "42e7d615e8a83945b9992634bec04f18ac35db785684b058631c44e58e897190",
+      "sectionCount": 154
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-196826.xml",
+      "firstRecordNumber": 118912,
+      "sha256": "07bba4e1e1f2ddf6f1ff9c281c80817be79a6dee8eafc3db3979b78837932a91",
+      "sectionCount": 128
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-199605.xml",
+      "firstRecordNumber": 121745,
+      "sha256": "38d3bf6fc89312e2343f1ad63ecd03d4b0630f6b8fd3e81e802411c422f6df9b",
+      "sectionCount": 10
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-139887.xml",
+      "firstRecordNumber": 123833,
+      "sha256": "0c62603baf9af06e09cd46b32aab344525c784ea96ecf09e0e527eb2fc3a8018",
+      "sectionCount": 225
+    },
+    {
+      "collection": "Administrative Code Title 28",
+      "fileName": "0-0-0-236654.xml",
+      "firstRecordNumber": 125227,
+      "sha256": "ec982c79b260d735e55deaba132126a20167f27c803d593a3fdbdf662a6b33b0",
+      "sectionCount": 169
+    },
+    {
+      "collection": "NYC Fire Code — Title 29",
+      "fileName": "0-0-0-230271.xml",
+      "firstRecordNumber": 129327,
+      "sha256": "977cdd9c49a82c80969c2c0c913050912a60477321320c632aebe12687e3ebab",
+      "sectionCount": 0
+    },
+    {
+      "collection": "NYC Fire Code — Title 29",
+      "fileName": "0-0-0-207301.xml",
+      "firstRecordNumber": 129329,
+      "sha256": "7461de5f89c7c71e6c6df4961aacae9b96d58498cc44279cbfa262920e40c6f9",
+      "sectionCount": 4
+    },
+    {
+      "collection": "NYC Fire Code — Title 29",
+      "fileName": "0-0-0-139898.xml",
+      "firstRecordNumber": 129339,
+      "sha256": "ad7db685fc3c33392bb9a1090fe78d56ed1c50c4e808f40171cc89988b8fd41c",
+      "sectionCount": 411
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-115120.xml",
+      "firstRecordNumber": 144308,
+      "sha256": "7c7e07ac61738f82329a79843b02b8b1d6dbe36140a76b30c2bdbdbc2b07e0f2",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-210463.xml",
+      "firstRecordNumber": 144310,
+      "sha256": "9355616d00d7c0377fe0bd6686ea53c47e75fa0948cb060f9ab5608ad3f50d3b",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-222795.xml",
+      "firstRecordNumber": 144658,
+      "sha256": "c90de3d1b8859c9737aab0185e6ea380d39a902b91e3f6e9d6351864a453657d",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-222268.xml",
+      "firstRecordNumber": 145310,
+      "sha256": "42455feb520bc8259445eb7b491e3145c00dfe872e436cb422520716c8c7fe3a",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-221739.xml",
+      "firstRecordNumber": 145740,
+      "sha256": "c7a384a469bf507f27eea4d27b1b9afe7ded313f33a7b74a11f483f2643ca8c1",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-220875.xml",
+      "firstRecordNumber": 146213,
+      "sha256": "6fc91a512ba5c6d6bd438ee0a3af11dfb963b1c24892c6a374294afff22eb6ee",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-220176.xml",
+      "firstRecordNumber": 147000,
+      "sha256": "6266709a813c78387b80edb117094fd470562d056137f802a02f858ad0487643",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-219460.xml",
+      "firstRecordNumber": 147643,
+      "sha256": "680861d77bbe27facd268813a5e8b1c005f57445e0ea545a5e47ffda5184d374",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-218649.xml",
+      "firstRecordNumber": 148226,
+      "sha256": "07fe05c723f5da434028420175fec53c5b87e9ff345d9628d2b0693dec64b704",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-217870.xml",
+      "firstRecordNumber": 148959,
+      "sha256": "79a190cff9e60f66043596e41228bc1253510cf724c646a3b7c157d0d854457e",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-217451.xml",
+      "firstRecordNumber": 149627,
+      "sha256": "d24a4a453dd00b6ae877dea9010d56de8cca2199c39e946515d186101e71cde7",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-216574.xml",
+      "firstRecordNumber": 149993,
+      "sha256": "fb216578ae14e4f6a5ca5187cf2cc7b5d0f0932d5dcae6f3c5e2483522f087d1",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-215748.xml",
+      "firstRecordNumber": 150737,
+      "sha256": "cadf1ef3cdcfb6a235ee1aae062fbfe1a497e7cb693455a0f132670e5e6e2a9c",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-215008.xml",
+      "firstRecordNumber": 151461,
+      "sha256": "2024bc8ce2635d397089b241dac11e144e8cd484c2ececdb0f517d2fc4668f44",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-214454.xml",
+      "firstRecordNumber": 152121,
+      "sha256": "18998cc01b0ad45bae8dfaa9fa0595497069aa2feb9ccf57dfc7b533b1a462ff",
+      "sectionCount": 1
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-213853.xml",
+      "firstRecordNumber": 152526,
+      "sha256": "5c72f218268a936216fd215bcc0bd6fa5f23f41316fec4f3201e1480ae6b3391",
+      "sectionCount": 2
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-213275.xml",
+      "firstRecordNumber": 153104,
+      "sha256": "2065d1a4cc8cd2b91226c387ee32f5f0c97e0d85d513ef4acb0d49f30440b7cc",
+      "sectionCount": 0
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-212574.xml",
+      "firstRecordNumber": 153651,
+      "sha256": "23ed4e0073ced6a69b685cea7055365627d369514d2d870ae3769fecc016451d",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-212012.xml",
+      "firstRecordNumber": 154317,
+      "sha256": "a4797cd8929bef3e242850fbbc9457fb66945f323b0afded5a7709ebe428c06f",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-210803.xml",
+      "firstRecordNumber": 154850,
+      "sha256": "3d40636b4fd35c7ff2e6d37ae838014adcc50bcd267d102e7cca49c7e93810ef",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-210462.xml",
+      "firstRecordNumber": 155996,
+      "sha256": "994602ee6b0903d82b8614758da642bbdd18b789094971507107810e515f237c",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-210109.xml",
+      "firstRecordNumber": 156623,
+      "sha256": "511a18edeac1049a313f88b32fd6d0006dbd3203464fc8ed2977927544710287",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-208704.xml",
+      "firstRecordNumber": 157828,
+      "sha256": "61650eaf8b5622e8b1f0d49075bf445543d304044009dfdd0c60878defee2c1c",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-207901.xml",
+      "firstRecordNumber": 158555,
+      "sha256": "b6f07f1496a4b61703d1815a1304d811b8ffef635465039abcd19fe941750fce",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-206793.xml",
+      "firstRecordNumber": 158892,
+      "sha256": "36157a22e058647e83c0e0095331d8b6c10fd070c10974c69f62641b1503ec72",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-206794.xml",
+      "firstRecordNumber": 159521,
+      "sha256": "244ed202deba46f95ccd42fe052406a0068f40f67f0d0708acae58cdaeabef4b",
+      "sectionCount": 7
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-205445.xml",
+      "firstRecordNumber": 160246,
+      "sha256": "6acf00b83a38a99a60a4737874b5c7566be0ca1195803f24bce18f5a85402e9f",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-205202.xml",
+      "firstRecordNumber": 160437,
+      "sha256": "f23e3184a9be567b926073d2e2e985f0732a2894ff692549d82657828e43e22e",
+      "sectionCount": 9
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-204641.xml",
+      "firstRecordNumber": 160947,
+      "sha256": "9b2a81ee856b1b3e19df05847999a77241aee94452cf42202b77946e3083d02e",
+      "sectionCount": 5
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-204127.xml",
+      "firstRecordNumber": 161422,
+      "sha256": "d20921a06d86b6d5fc7ea43362658bdf557469e68a4645c7ec89dc6eaa299173",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-203213.xml",
+      "firstRecordNumber": 162219,
+      "sha256": "651da0b044b75f214b8a9747f697918440b5d7498d97a03b5c8af8395e612acf",
+      "sectionCount": 9
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-202194.xml",
+      "firstRecordNumber": 162693,
+      "sha256": "74a41d8eb3a723053fd4257edbe6cf9fd33ac66f4efaff441ebeedc019f609b7",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-124549.xml",
+      "firstRecordNumber": 163381,
+      "sha256": "f14822f5ecdace91137cb8c239bb61679e8ded469bbc048631dc3c332862288c",
+      "sectionCount": 11
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-124551.xml",
+      "firstRecordNumber": 164149,
+      "sha256": "f90b4c80f4e04ad303035c4a9e4362693556f1bde240e546a02459a121b01276",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-124553.xml",
+      "firstRecordNumber": 165183,
+      "sha256": "80a47f4b0ac1e9251eb55ff7e4f7a5c86cb75030abdee3f438bdd75638d49c3f",
+      "sectionCount": 30
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-124555.xml",
+      "firstRecordNumber": 166171,
+      "sha256": "f51da4c8e99bf97eeba4542f79dec4b7458ce69c8c29539b75187c37db0decbc",
+      "sectionCount": 7
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-124557.xml",
+      "firstRecordNumber": 167377,
+      "sha256": "2de33526a0f5748478f14021298a35e6740e1a29fd74609b361c1f8af2637db0",
+      "sectionCount": 6
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-131228.xml",
+      "firstRecordNumber": 168195,
+      "sha256": "6e177108ac4cc2cfcd2bd604c76366a7902283190cced2f9c248d2928763d18d",
+      "sectionCount": 21
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-136493.xml",
+      "firstRecordNumber": 169594,
+      "sha256": "af74758b7365d81f6921354f970e47df7e622405094a3d52f0abf1486722fbe8",
+      "sectionCount": 3
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-202030.xml",
+      "firstRecordNumber": 170673,
+      "sha256": "ca0d602fb88edb92e3ce1e4a2e9fad816b38c2e81e51187579ac0fd89a372067",
+      "sectionCount": 9
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-226506.xml",
+      "firstRecordNumber": 171582,
+      "sha256": "61b18aad2f4f2682a8a91cc821bc8a943ee81a76d29636f80d06bfa7978e2b3f",
+      "sectionCount": 4
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-230350.xml",
+      "firstRecordNumber": 172554,
+      "sha256": "6aa9b12c6d0138ed8b501f0174d9bcb5797a79f52d702abe236ae82f60cfb150",
+      "sectionCount": 8
+    },
+    {
+      "collection": "Administrative Code Appendix A",
+      "fileName": "0-0-0-236047.xml",
+      "firstRecordNumber": 173589,
+      "sha256": "db1330b951856cd4b8442800054816755815f014bf54595fdc9f0ee619a1aacf",
+      "sectionCount": 9
+    }
+  ],
+  "codeSections": [
+    {
+      "prefix": "T24",
+      "name": "Administrative Code Title 24 — Environmental Protection and Utilities",
+      "chapterCount": 11,
+      "sectionCount": 408,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-42985"
+    },
+    {
+      "prefix": "T25",
+      "name": "Administrative Code Title 25 — Land Use",
+      "chapterCount": 8,
+      "sectionCount": 261,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-45639"
+    },
+    {
+      "prefix": "T26",
+      "name": "Administrative Code Title 26 — Housing and Buildings",
+      "chapterCount": 38,
+      "sectionCount": 228,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-46907"
+    },
+    {
+      "prefix": "BC68",
+      "name": "1968 NYC Building Code — historical",
+      "chapterCount": 19,
+      "sectionCount": 949,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-48176"
+    },
+    {
+      "prefix": "HMC",
+      "name": "NYC Housing Maintenance Code",
+      "chapterCount": 5,
+      "sectionCount": 211,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-48176"
+    },
+    {
+      "prefix": "T28",
+      "name": "Administrative Code Title 28 — NYC Construction Codes",
+      "chapterCount": 12,
+      "sectionCount": 2602,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-207300"
+    },
+    {
+      "prefix": "FC",
+      "name": "NYC Fire Code — Administrative Code Title 29",
+      "chapterCount": 2,
+      "sectionCount": 415,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-230271"
+    },
+    {
+      "prefix": "LL",
+      "name": "NYC Construction-Related Unconsolidated Local Laws",
+      "chapterCount": 39,
+      "sectionCount": 225,
+      "sourceURL": "https://codelibrary.amlegal.com/codes/newyorkcity/latest/NYCadmin/0-0-0-115120"
+    }
+  ]
+}

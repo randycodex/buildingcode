@@ -118,6 +118,19 @@ import {
   isExistingBuildingChapterID,
   isExistingBuildingSectionID
 } from "./existing-building-content.mjs";
+import {
+  enactedChapter,
+  enactedChapterIndex,
+  enactedCodePrefixes,
+  enactedContentMetadata,
+  enactedSearchIndex,
+  enactedSection,
+  enactedSectionCatalog,
+  enactedSectionSummary,
+  enactedSyncCodeVersionForPrefix,
+  isEnactedCodeChapterID,
+  isEnactedCodeSectionID
+} from "./enacted-code-content.mjs";
 import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
 import {
   normalizeProjectNotePayload,
@@ -10167,7 +10180,8 @@ async function handleCodeLibraries(_request, response) {
         researchEligibility: true
       },
       await zoningContentMetadata(),
-      await existingBuildingContentMetadata()
+      await existingBuildingContentMetadata(),
+      ...await enactedContentMetadata()
     ]
   });
 }
@@ -10175,9 +10189,11 @@ async function handleCodeLibraries(_request, response) {
 async function handleCodeChapters(request, response) {
   const codePrefix = requestURL(request).searchParams.get("code")?.trim().toUpperCase();
   const chapters = [
-    ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ? [] : await chapterIndex()),
+    ...([zoningCodePrefix, existingBuildingCodePrefix].includes(codePrefix) ||
+      enactedCodePrefixes.has(codePrefix) ? [] : await chapterIndex()),
     ...(codePrefix && codePrefix !== zoningCodePrefix ? [] : await zoningChapterIndex()),
-    ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex())
+    ...(codePrefix && codePrefix !== existingBuildingCodePrefix ? [] : await existingBuildingChapterIndex()),
+    ...(codePrefix && !enactedCodePrefixes.has(codePrefix) ? [] : await enactedChapterIndex())
   ];
   sendJSON(response, 200, {
     chapters: codePrefix ? chapters.filter((chapter) => chapter.codePrefix === codePrefix) : chapters
@@ -10191,6 +10207,39 @@ async function handleCodeChapter(request, path, response) {
     return;
   }
   const includeBody = requestURL(request).searchParams.get("include") === "body";
+  if (isEnactedCodeChapterID(chapterID)) {
+    const [chapter, chapterSummary] = await Promise.all([
+      enactedChapter(chapterID),
+      enactedChapterIndex().then((entries) =>
+        entries.find((entry) => String(entry.id) === chapterID)
+      )
+    ]);
+    if (!chapter || !chapterSummary) {
+      sendNotFound(response);
+      return;
+    }
+    const sections = flattenChapterSections(chapter);
+    const sectionPayload = includeBody
+      ? await Promise.all(sections.map(async (section) => ({
+          ...section,
+          blocks: (await enactedSection(section.id))?.blocks || []
+        })))
+      : sections;
+    sendJSON(response, 200, {
+      chapter: {
+        id: chapter.chapterID,
+        codePrefix: chapterSummary.codePrefix,
+        codeSectionID: chapterSummary.codeSectionID,
+        codeVersion: chapterSummary.codeVersion,
+        chapterNumber: chapter.chapterNumber,
+        displayTitle: chapterSummary.displayTitle,
+        fullTitle: chapterSummary.fullTitle,
+        groups: chapter.groups || [],
+        sections: sectionPayload
+      }
+    });
+    return;
+  }
   if (isExistingBuildingChapterID(chapterID)) {
     const [chapter, chapterSummary] = await Promise.all([
       existingBuildingChapter(chapterID),
@@ -10298,6 +10347,30 @@ async function handleCodeSection(path, response) {
     sendError(response, 400, "Invalid section ID.");
     return;
   }
+  if (isEnactedCodeSectionID(sectionID)) {
+    const [summary, body] = await Promise.all([
+      enactedSectionSummary(sectionID),
+      enactedSection(sectionID)
+    ]);
+    if (!summary || !body) {
+      sendNotFound(response);
+      return;
+    }
+    sendJSON(response, 200, {
+      section: {
+        ...body,
+        chapterID: summary.chapterID,
+        chapterNumber: summary.chapterNumber,
+        codePrefix: summary.codePrefix,
+        codeVersion: summary.codeVersion,
+        sectionID: Number(summary.id),
+        sectionNumber: summary.sectionNumber,
+        title: summary.title,
+        webSectionID: null
+      }
+    });
+    return;
+  }
   if (isZoningSectionID(sectionID)) {
     const [summary, body] = await Promise.all([
       zoningSectionSummary(sectionID),
@@ -10396,7 +10469,8 @@ async function handleCodeSections(request, response) {
   const catalog = [
     ...await sectionCatalog(),
     ...await zoningSectionCatalog(),
-    ...await existingBuildingSectionCatalog()
+    ...await existingBuildingSectionCatalog(),
+    ...await enactedSectionCatalog()
   ];
   const byID = new Map();
   catalog.forEach((section) => {
@@ -10429,6 +10503,12 @@ function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
 }
 
 async function searchableSectionBody(section) {
+  if (
+    enactedCodePrefixes.has(section.codePrefix) ||
+    isEnactedCodeSectionID(section.id)
+  ) {
+    return await enactedSection(section.id) || { blocks: [] };
+  }
   if (
     section.codePrefix === existingBuildingCodePrefix ||
     isExistingBuildingSectionID(section.id)
@@ -10469,11 +10549,14 @@ async function handleCodeSearch(request, response) {
   }
 
   const includeConstruction = codeFilter.size === 0 || [...codeFilter].some((prefix) =>
-    ![zoningCodePrefix, existingBuildingCodePrefix].includes(prefix)
+    ![zoningCodePrefix, existingBuildingCodePrefix].includes(prefix) &&
+    !enactedCodePrefixes.has(prefix)
   );
   const includeZoning = codeFilter.size === 0 || codeFilter.has(zoningCodePrefix);
   const includeExistingBuilding =
     codeFilter.size === 0 || codeFilter.has(existingBuildingCodePrefix);
+  const includeEnacted = codeFilter.size === 0 ||
+    [...codeFilter].some((prefix) => enactedCodePrefixes.has(prefix));
   const candidates = [];
   if (includeConstruction) {
     const index = await shippedSearchIndex();
@@ -10494,6 +10577,16 @@ async function handleCodeSearch(request, response) {
     candidates.push(
       ...(await existingBuildingSectionCatalog()).filter((section) =>
         candidateIDs.has(section.id)
+      )
+    );
+  }
+  if (includeEnacted) {
+    const index = await enactedSearchIndex();
+    const candidateIDs = candidateSectionIDs(index, queryTokens, normalizedQuery, query);
+    candidates.push(
+      ...(await enactedSectionCatalog()).filter((section) =>
+        candidateIDs.has(section.id) &&
+        (codeFilter.size === 0 || codeFilter.has(section.codePrefix))
       )
     );
   }
@@ -10534,6 +10627,8 @@ async function handleCodeSearch(request, response) {
           ? zoningSyncCodeVersion
           : section.codePrefix === existingBuildingCodePrefix
             ? existingBuildingSyncCodeVersion
+            : enactedCodePrefixes.has(section.codePrefix)
+              ? enactedSyncCodeVersionForPrefix(section.codePrefix)
             : defaultSyncCodeVersion),
       chapterNumber: section.chapterNumber,
       sectionNumber: section.sectionNumber,

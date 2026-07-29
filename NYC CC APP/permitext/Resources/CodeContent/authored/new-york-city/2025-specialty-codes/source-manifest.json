@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "libraryID": "nyc-2025-specialty-codes",
+  "codeVersion": "2025 NYC Energy Conservation and Electrical Codes",
+  "sourceAuthority": "New York City Department of Buildings",
+  "energySourceURL": "https://www.nyc.gov/site/buildings/codes/2025-energy-conservation-code.page",
+  "energyEffectiveDate": "2026-03-30",
+  "electricalSourceURL": "https://www.nyc.gov/site/buildings/codes/electrical-code.page",
+  "electricalEffectiveDate": "2025-12-21",
+  "electricalBoundary": "NYC-enacted amendments only; adopted NFPA 70 text is not reproduced.",
+  "files": [
+    {
+      "fileName": "2025nycecc_c1.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c1.pdf",
+      "sha256": "6e58a5e2dc077b06e8e21483e372933d93095f67d0d7f35c63124af112cd0980",
+      "pageCount": 8,
+      "sectionCount": 5
+    },
+    {
+      "fileName": "2025nycecc_r2.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_r2.pdf",
+      "sha256": "ef02e205400a6b925c1b27413e245d5dcd3cd16075f415f0101705fd8fc5a401",
+      "pageCount": 11,
+      "sectionCount": 2
+    },
+    {
+      "fileName": "2025nycecc_r3.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_r3.pdf",
+      "sha256": "9ca0a7d5d354b2a0b6576a09e390fb2c5b791892752e43b0ca14d38066359b9b",
+      "pageCount": 5,
+      "sectionCount": 3
+    },
+    {
+      "fileName": "2025nycecc_r4.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_r4.pdf",
+      "sha256": "26e8f963aa3339f3c56f4dc1baf640abe42700edf4f42d2119faad3248394432",
+      "pageCount": 55,
+      "sectionCount": 8
+    },
+    {
+      "fileName": "2025nycecc_r5.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_r5.pdf",
+      "sha256": "612a23420e2c020b3f93c8bd61add974c1faf8d83e33f524b7b3a6837876ca00",
+      "pageCount": 6,
+      "sectionCount": 5
+    },
+    {
+      "fileName": "2025nycecc_r6.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_r6.pdf",
+      "sha256": "e1a57806803104e0c5b146f4cda1fbbdcaac56545f95e4f61c7be6bf03c5b1e2",
+      "pageCount": 5,
+      "sectionCount": 1
+    },
+    {
+      "fileName": "2025nycecc_appendix_rf.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_appendix_rf.pdf",
+      "sha256": "94b5b727aee7a35aee1ef47b506ea7273ca16a0519944a0a0ed3354219a644f3",
+      "pageCount": 14,
+      "sectionCount": 5
+    },
+    {
+      "fileName": "2025nycecc_c2.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c2.pdf",
+      "sha256": "97c862245c034dfe830d755ebcd180f78fc6688e4ff3d023cf4b79000ddb1db4",
+      "pageCount": 19,
+      "sectionCount": 2
+    },
+    {
+      "fileName": "2025nycecc_c3.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c3.pdf",
+      "sha256": "56fca32152a03d8015a150be4b45a28dd63b9ca8f6064d2698399805dcabbea3",
+      "pageCount": 5,
+      "sectionCount": 3
+    },
+    {
+      "fileName": "2025nycecc_c4.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c4.pdf",
+      "sha256": "c0f2d98f85d94b7cf7adf85d5b83f276bdc83d975bb5b17bc69227b4c03a1d67",
+      "pageCount": 203,
+      "sectionCount": 9
+    },
+    {
+      "fileName": "2025nycecc_c5.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c5.pdf",
+      "sha256": "a05b4820d9219cbc085bf099519a566374ec05420d9ac786fa233d698b8fe1e8",
+      "pageCount": 11,
+      "sectionCount": 5
+    },
+    {
+      "fileName": "2025nycecc_c6.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nycecc_c6.pdf",
+      "sha256": "23eafe89d2f992f646765420eb416b79acfd4c73a1f8251c80608e88a9ab6e69",
+      "pageCount": 8,
+      "sectionCount": 1
+    },
+    {
+      "fileName": "2025nyc_ashrae.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/energy_code_2025/2025nyc_ashrae.pdf",
+      "sha256": "615a632344d1e781d2d0f24713fdbdbb406ab83944d1ac034e843fa3528d65e1",
+      "pageCount": 409,
+      "sectionCount": 19
+    },
+    {
+      "fileName": "electrical.pdf",
+      "sourceURL": "https://www.nyc.gov/assets/buildings/codes-pdf/2025electrical_code.pdf",
+      "sha256": "f8a333dbf2093f57cb66ae312a2d77b33f8cac8d103cc3b3828ef31fd0ec69ad",
+      "pageCount": 67,
+      "sectionCount": 293
+    }
+  ]
+}

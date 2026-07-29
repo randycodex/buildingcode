@@ -1,0 +1,205 @@
+{
+  "schemaVersion": 1,
+  "libraryID": "nyc-2025-specialty-codes",
+  "codeVersion": "2025 NYC Energy Conservation and Electrical Codes",
+  "chapters": [
+    {
+      "chapterID": 32000001,
+      "chapterNumber": "1",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 32000002,
+      "chapterNumber": "R2",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 32000003,
+      "chapterNumber": "R3",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 32000004,
+      "chapterNumber": "R4",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 8,
+      "preparedSectionCount": 8,
+      "blockCount": 8
+    },
+    {
+      "chapterID": 32000005,
+      "chapterNumber": "R5",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 32000006,
+      "chapterNumber": "R6",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 32000007,
+      "chapterNumber": "RF",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 32000008,
+      "chapterNumber": "C2",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 2,
+      "preparedSectionCount": 2,
+      "blockCount": 2
+    },
+    {
+      "chapterID": 32000009,
+      "chapterNumber": "C3",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 3,
+      "preparedSectionCount": 3,
+      "blockCount": 3
+    },
+    {
+      "chapterID": 32000010,
+      "chapterNumber": "C4",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 32000011,
+      "chapterNumber": "C5",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 5,
+      "preparedSectionCount": 5,
+      "blockCount": 5
+    },
+    {
+      "chapterID": 32000012,
+      "chapterNumber": "C6",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 1,
+      "preparedSectionCount": 1,
+      "blockCount": 1
+    },
+    {
+      "chapterID": 32000013,
+      "chapterNumber": "ASHRAE",
+      "codeSectionID": 1,
+      "codePrefix": "ECC",
+      "sectionCount": 19,
+      "preparedSectionCount": 19,
+      "blockCount": 19
+    },
+    {
+      "chapterID": 32000014,
+      "chapterNumber": "ADMIN",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 9,
+      "preparedSectionCount": 9,
+      "blockCount": 9
+    },
+    {
+      "chapterID": 32000015,
+      "chapterNumber": "1",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 10,
+      "preparedSectionCount": 10,
+      "blockCount": 10
+    },
+    {
+      "chapterID": 32000016,
+      "chapterNumber": "2",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 44,
+      "preparedSectionCount": 44,
+      "blockCount": 44
+    },
+    {
+      "chapterID": 32000017,
+      "chapterNumber": "3",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 44,
+      "preparedSectionCount": 44,
+      "blockCount": 44
+    },
+    {
+      "chapterID": 32000018,
+      "chapterNumber": "4",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 26,
+      "preparedSectionCount": 26,
+      "blockCount": 26
+    },
+    {
+      "chapterID": 32000019,
+      "chapterNumber": "5",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 37,
+      "preparedSectionCount": 37,
+      "blockCount": 37
+    },
+    {
+      "chapterID": 32000020,
+      "chapterNumber": "6",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 42,
+      "preparedSectionCount": 42,
+      "blockCount": 42
+    },
+    {
+      "chapterID": 32000021,
+      "chapterNumber": "7",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 69,
+      "preparedSectionCount": 69,
+      "blockCount": 69
+    },
+    {
+      "chapterID": 32000022,
+      "chapterNumber": "8",
+      "codeSectionID": 2,
+      "codePrefix": "EC",
+      "sectionCount": 12,
+      "preparedSectionCount": 12,
+      "blockCount": 12
+    }
+  ]
+}
