@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260728-saved-filter-bottom-v120">
+    <link rel="stylesheet" href="/web/styles.css?v=20260728-saved-filter-clear-v121">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -307,13 +307,23 @@
           </section>
           <section class="saved-inline-filters" hidden>
             <div class="code-filter-menu saved-code-filter-menu">
-              <button class="code-filter-menu-toggle" type="button" aria-label="Expand code section filters" aria-expanded="false">
-                <span class="code-filter-menu-label">All Sections</span>
-                <span class="code-filter-menu-icon" aria-hidden="true">
-                  <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-                  <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-                </span>
-              </button>
+              <div class="saved-code-filter-heading">
+                <button class="code-filter-menu-toggle saved-code-filter-menu-toggle" type="button" aria-label="Expand code section filters" aria-expanded="false">
+                  <span class="code-filter-menu-label">All Sections</span>
+                  <span class="code-filter-menu-icon" aria-hidden="true">
+                    <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+                    <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+                  </span>
+                </button>
+                <div class="saved-code-filter-actions">
+                  <button class="saved-code-filter-clear" type="button" title="Clear section filters" aria-label="Clear section filters">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="m8 8 8 8"></path>
+                      <path d="m16 8-8 8"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
               <div class="saved-code-filter" aria-label="Filter saved sections by code section" hidden></div>
             </div>
             <div class="code-filter-menu saved-tag-filter-menu">
@@ -518,6 +528,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260728-saved-filter-bottom-v134" type="module"></script>
+    <script src="/web/app.js?v=20260728-saved-filter-clear-v135" type="module"></script>
   </body>
 </html>

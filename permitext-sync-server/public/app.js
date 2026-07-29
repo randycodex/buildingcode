@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-bottom-v134";
+} from "./offline-storage.js?v=20260728-saved-filter-clear-v135";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13538,6 +13538,7 @@ function printSavedItemsAsPDF(items, scopeLabel) {
 function renderSavedFilters(panel, instance, allItems, onChange) {
   const wrapper = panel.querySelector(".saved-inline-filters");
   const codeRail = panel.querySelector(".saved-code-filter");
+  const codeClearButton = panel.querySelector(".saved-code-filter-clear");
   const tagRail = panel.querySelector(".saved-tag-filter");
   const tagMenu = panel.querySelector(".saved-tag-filter-menu");
   const tagCounts = new Map();
@@ -13555,7 +13556,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   clear(codeRail);
   clear(tagRail);
   searchCodeFilterOptions()
-    .filter((option) => option.prefix === "ALL" || availableCodePrefixes.has(option.prefix))
+    .filter((option) => option.prefix !== "ALL" && availableCodePrefixes.has(option.prefix))
     .forEach((option) => {
       const button = document.createElement("button");
       button.type = "button";
@@ -13563,23 +13564,19 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       button.textContent = option.label;
       button.dataset.prefix = option.prefix;
       if (option.prefix !== "ALL") button.classList.add(`code-theme-${codeTheme(option.prefix)}`);
-      const selected = option.prefix === "ALL" ? instance.codeFilters.length === 0 : instance.codeFilters.includes(option.prefix);
+      const selected = instance.codeFilters.includes(option.prefix);
       button.setAttribute("aria-pressed", String(selected));
       button.addEventListener("click", () => {
-        if (option.prefix === "ALL") instance.codeFilters = [];
-        else {
-          const selectedPrefixes = new Set(instance.codeFilters);
-          if (selectedPrefixes.has(option.prefix)) selectedPrefixes.delete(option.prefix);
-          else selectedPrefixes.add(option.prefix);
-          instance.codeFilters = [...selectedPrefixes];
-        }
+        const selectedPrefixes = new Set(instance.codeFilters);
+        if (selectedPrefixes.has(option.prefix)) selectedPrefixes.delete(option.prefix);
+        else selectedPrefixes.add(option.prefix);
+        instance.codeFilters = [...selectedPrefixes];
         codeRail.querySelectorAll(".saved-filter-chip").forEach((chip) => {
-          const prefix = chip.dataset.prefix || "ALL";
-          const isSelected = prefix === "ALL"
-            ? instance.codeFilters.length === 0
-            : instance.codeFilters.includes(prefix);
+          const prefix = chip.dataset.prefix || "";
+          const isSelected = instance.codeFilters.includes(prefix);
           chip.setAttribute("aria-pressed", String(isSelected));
         });
+        codeClearButton.disabled = instance.codeFilters.length === 0;
         updateCodeFilterMenu(codeRail, instance, {
           label: savedCodeFilterMenuLabel
         });
@@ -13588,6 +13585,19 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       });
       codeRail.append(button);
     });
+  codeClearButton.disabled = instance.codeFilters.length === 0;
+  codeClearButton.addEventListener("click", () => {
+    instance.codeFilters = [];
+    codeRail.querySelectorAll(".saved-filter-chip").forEach((chip) => {
+      chip.setAttribute("aria-pressed", "false");
+    });
+    codeClearButton.disabled = true;
+    updateCodeFilterMenu(codeRail, instance, {
+      label: savedCodeFilterMenuLabel
+    });
+    onChange();
+    saveWorkspaceState();
+  });
   wireCodeFilterMenu(codeRail, instance, {
     label: savedCodeFilterMenuLabel
   });
