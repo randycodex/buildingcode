@@ -3524,7 +3524,8 @@ body.is-resizing-search-history * {
 .search-history-scroll-list {
   max-height: 320px;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-x: auto;
+  overscroll-behavior-y: contain;
   scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
   scrollbar-gutter: stable;
   scrollbar-width: thin;

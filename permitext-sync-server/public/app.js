@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-visible-search-count-v111";
+} from "./offline-storage.js?v=20260728-horizontal-trackpad-v113";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7219,9 +7219,10 @@ function bindHorizontalWheelScroll(element) {
   element.addEventListener(
     "wheel",
     (event) => {
+      if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
       const canScroll = element.scrollWidth > element.clientWidth;
       if (!canScroll) return;
-      const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
+      const delta = event.deltaX;
       if (!delta) return;
       const nextLeft = element.scrollLeft + delta;
       const maxLeft = element.scrollWidth - element.clientWidth;
@@ -16590,6 +16591,7 @@ async function start() {
   });
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
+  bindHorizontalWheelScroll(track);
   if (detachedProjectWindow) {
     if (!detachedProject) throw new Error("This detached Workboard no longer has a project session.");
     window.addEventListener("pagehide", () => {
