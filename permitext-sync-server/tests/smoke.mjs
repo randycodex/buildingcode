@@ -997,7 +997,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-specialty-provisions-v100'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-chapter-accent-v101'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1663,6 +1663,7 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
+        workspaceStyles.text.match(/\.saved-chapter-header strong,\s*\.saved-chapter-header span \{\s*color: var\(--code-accent\);/) &&
         workspaceStyles.text.includes(".saved-inline-filters") &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&

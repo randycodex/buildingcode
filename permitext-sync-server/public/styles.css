@@ -6646,6 +6646,7 @@ button.project-studio-metric:focus-visible {
 
 .saved-chapter-header strong,
 .saved-chapter-header span {
+  color: var(--code-accent);
   font-size: calc(var(--saved-font-size) * 0.82) !important;
   line-height: 1.25;
 }
