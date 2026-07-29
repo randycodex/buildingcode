@@ -972,6 +972,8 @@ async function main() {
         workspaceScript.text.includes("showingArchived = !showingArchived") &&
         workspaceScript.text.includes("archivedProjectRecords(projects)") &&
         !workspaceScript.text.includes('archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);\n  wireCodeFilterMenu(list, instance') &&
+        webRoot.text.indexOf('class="saved-projects-add-button"') <
+          webRoot.text.indexOf('class="saved-projects-archive-button"') &&
         workspaceStyles.text.includes(".saved-project-list.is-switching") &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v126'),
