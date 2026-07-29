@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-clear-v135";
+} from "./offline-storage.js?v=20260728-saved-filter-flow-v136";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1983,7 +1983,7 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
     const applyExpandedHeight = () => {
       const filterStyles = getComputedStyle(filterRail);
       const filterGap = Number.parseFloat(filterStyles.getPropertyValue("--space-2")) || 0;
-      const savedCodeBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-3")) || filterGap;
+      const savedCodeBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-4")) || filterGap;
       const openingPadding = menu.closest(".saved-inline-filters")
         ? filterGap + (filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap)
         : filterGap;
