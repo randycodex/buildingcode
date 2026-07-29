@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-row-dedup-v115";
+} from "./offline-storage.js?v=20260728-saved-instant-controls-v116";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1411,7 +1411,11 @@ async function activateProjectStudio(project, options = {}) {
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
   restoreProjectsStackOrder(options.sourcePaneID);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
+  mountProjectOpeningPane(identity, {
+    sourcePaneID: options.sourcePaneID,
+    replacingPaneID: currentDetailID
+  });
+  await transitionWorkspace("utility", { refreshPaneIDs: [detailID] });
   scrollPaneIntoView(detailID);
   return true;
 }
@@ -10041,6 +10045,47 @@ function projectSectionBelongsToProject(item, project) {
   return itemIDs.some((id) => projectIDs.includes(id));
 }
 
+function mountProjectOpeningPane(project, options = {}) {
+  const identity = projectIdentity(project);
+  const paneID = paneIDForProjectDetail(identity);
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel project-detail-panel project-detail-loading";
+  panel.dataset.paneId = paneID;
+  panel.style.setProperty("--project-color", identity.color);
+  panel.setAttribute("aria-busy", "true");
+  applyPaneWeight(panel, paneID);
+
+  const chrome = document.createElement("header");
+  chrome.className = "project-detail-chrome";
+  const heading = document.createElement("div");
+  heading.className = "project-detail-heading";
+  const title = document.createElement("h2");
+  title.textContent = identity.name;
+  const status = document.createElement("p");
+  status.textContent = "Opening Project…";
+  heading.append(title, status);
+  chrome.append(heading);
+
+  const content = document.createElement("section");
+  content.className = "project-detail-content";
+  const loading = document.createElement("p");
+  loading.className = "project-detail-loading-status";
+  loading.textContent = "Loading saved evidence, notes, and research history…";
+  content.append(loading);
+  panel.append(chrome, content);
+
+  const replacingPane = options.replacingPaneID
+    ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(options.replacingPaneID)}"]`)
+    : null;
+  const sourcePane = options.sourcePaneID
+    ? track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(options.sourcePaneID)}"]`)
+    : null;
+  if (replacingPane) replacingPane.replaceWith(panel);
+  else if (sourcePane) sourcePane.after(panel);
+  else track.prepend(panel);
+  requestAnimationFrame(() => scrollPaneIntoView(paneID));
+}
+
 async function openProjectDetail(project, options = {}) {
   if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
     openDetachedWindow(project);
@@ -13427,8 +13472,16 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
         else selectedPrefixes.add(option.prefix);
         instance.codeFilters = [...selectedPrefixes];
       }
-      saveWorkspaceState();
+      codeRail.querySelectorAll(".saved-filter-chip").forEach((chip) => {
+        const prefix = chip.dataset.prefix || "ALL";
+        const isSelected = prefix === "ALL"
+          ? instance.codeFilters.length === 0
+          : instance.codeFilters.includes(prefix);
+        chip.setAttribute("aria-pressed", String(isSelected));
+      });
+      updateCodeFilterMenu(codeRail, instance);
       onChange();
+      saveWorkspaceState();
     });
     codeRail.append(button);
   });
@@ -13442,8 +13495,16 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
       button.setAttribute("aria-pressed", String(instance.tagFilter === tag));
       button.addEventListener("click", () => {
         instance.tagFilter = instance.tagFilter === tag && tag ? "" : tag;
-        saveWorkspaceState();
+        tagRail.querySelectorAll(".saved-tag-filter-chip").forEach((chip) => {
+          chip.setAttribute("aria-pressed", String(chip.textContent === (instance.tagFilter || "All Tags")));
+        });
+        updateCodeFilterMenu(tagRail, instance, {
+          stateKey: "tagsMenuOpen",
+          menuName: "tag filters",
+          label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
+        });
         onChange();
+        saveWorkspaceState();
       });
       tagRail.append(button);
     });
@@ -13468,7 +13529,7 @@ async function renderSaved(instance) {
   const content = panel.querySelector(".saved-content");
   const sortButton = panel.querySelector(".saved-sort-button");
   const exportButton = panel.querySelector(".saved-export-button");
-  const refreshSavedPanel = () => transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  let applySavedView = () => {};
   const sortOptions = [
     ["codeOrder", "Code Order"],
     ["recentlySaved", "Recent"],
@@ -13482,7 +13543,7 @@ async function renderSaved(instance) {
     action: () => {
       savedInstance.sortMode = value;
       saveWorkspaceState();
-      refreshSavedPanel();
+      applySavedView();
     }
   }))));
   clear(content);
@@ -13507,13 +13568,26 @@ async function renderSaved(instance) {
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
   const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
-  renderSavedFilters(panel, savedInstance, resolvedItems, refreshSavedPanel);
-  const filteredItems = resolvedItems.filter((item) => {
-    const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
-    const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
-    return prefixMatches && tagMatches;
-  });
-  const orderedItems = sortSavedItems(filteredItems, savedInstance.sortMode);
+  let filteredItems = [];
+  let orderedItems = [];
+  applySavedView = () => {
+    filteredItems = resolvedItems.filter((item) => {
+      const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
+      const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
+      return prefixMatches && tagMatches;
+    });
+    orderedItems = sortSavedItems(filteredItems, savedInstance.sortMode);
+    clear(content);
+    if (orderedItems.length > 0) {
+      renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true });
+    } else if (resolvedItems.length > 0) {
+      appendEmptySaved(content, "No saved items match", "Try another code book or tag filter.");
+    } else {
+      appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");
+    }
+  };
+  renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
+  applySavedView();
 
   exportButton.disabled = resolvedItems.length === 0;
   exportButton.addEventListener("click", () => {
@@ -13524,14 +13598,6 @@ async function renderSaved(instance) {
     options.push({ label: `Export all saved (${resolvedItems.length})`, action: () => printSavedItemsAsPDF(sortSavedItems(resolvedItems, savedInstance.sortMode), "All saved sections") });
     openSavedActionMenu(panel, exportButton, options);
   });
-
-  if (orderedItems.length > 0) {
-    renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true });
-  } else if (resolvedItems.length > 0) {
-    appendEmptySaved(content, "No saved items match", "Try another code book or tag filter.");
-  } else {
-    appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");
-  }
 
   return panel;
 }
@@ -13624,7 +13690,17 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, countLabel, actions);
-      const open = () => openProjectDetail(project, { sourcePaneID: paneID });
+      const open = () => {
+        if (tile.dataset.opening === "true") return;
+        tile.dataset.opening = "true";
+        tile.classList.add("is-opening");
+        tile.setAttribute("aria-busy", "true");
+        void openProjectDetail(project, { sourcePaneID: paneID }).finally(() => {
+          tile.classList.remove("is-opening");
+          tile.removeAttribute("aria-busy");
+          delete tile.dataset.opening;
+        });
+      };
       tile.addEventListener("pointerdown", (event) => {
         if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
         tile.dataset.pointerFocus = "true";

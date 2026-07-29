@@ -5432,6 +5432,16 @@ mark {
   background: var(--project-detail-background);
 }
 
+.project-detail-loading-status {
+  margin: 0;
+  padding: var(--space-5) 0;
+  color: var(--text-secondary);
+}
+
+.saved-project-tile.is-opening {
+  background: color-mix(in srgb, var(--project-color) 22%, var(--surface));
+}
+
 @media (prefers-color-scheme: dark) {
   .project-detail-panel {
     --project-detail-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));

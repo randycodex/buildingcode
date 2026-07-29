@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-row-dedup-v115'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-instant-controls-v116'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -997,7 +997,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-chapter-accent-v101'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-instant-controls-v102'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1243,6 +1243,10 @@ async function main() {
         workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
+        workspaceScript.text.includes("applySavedView = () =>") &&
+        workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance)") &&
+        workspaceScript.text.includes("function mountProjectOpeningPane") &&
+        workspaceScript.text.includes('panel.className = "workspace-panel project-detail-panel project-detail-loading"') &&
         workspaceScript.text.includes("savedContentComparisonText") &&
         workspaceScript.text.includes("previewText: savedContentComparisonText.slice(0, 240)") &&
         workspaceScript.text.includes("/code/sections/${encodeURIComponent(detail.sectionID)}") &&
@@ -1667,6 +1671,8 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
+        workspaceStyles.text.includes(".saved-project-tile.is-opening") &&
+        workspaceStyles.text.includes(".project-detail-loading-status") &&
         workspaceStyles.text.match(/\.saved-chapter-header strong,\s*\.saved-chapter-header span \{\s*color: var\(--code-accent\);/) &&
         workspaceStyles.text.includes(".saved-inline-filters") &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
