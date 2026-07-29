@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-reader-clean-header-v117'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-list-v118'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -999,7 +999,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-reader-clean-header-v103'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-list-v104'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1246,6 +1246,8 @@ async function main() {
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
         workspaceScript.text.includes("applySavedView = () =>") &&
+        workspaceScript.text.includes("const availableCodePrefixes = new Set") &&
+        workspaceScript.text.includes('option.prefix === "ALL" || availableCodePrefixes.has(option.prefix)') &&
         workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance)") &&
         workspaceScript.text.includes("function mountProjectOpeningPane") &&
         workspaceScript.text.includes('panel.className = "workspace-panel project-detail-panel project-detail-loading"') &&
@@ -1672,6 +1674,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
+        workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
         workspaceStyles.text.includes(".saved-project-tile.is-opening") &&
         workspaceStyles.text.includes(".project-detail-loading-status") &&
