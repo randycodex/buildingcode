@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-saved-paragraph-style-v142";
+} from "./offline-storage.js?v=20260729-project-back-position-v143";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -12857,6 +12857,8 @@ async function renderProjectDetail(detail) {
 
   const chrome = document.createElement("header");
   chrome.className = "project-detail-chrome";
+  const headerActions = document.createElement("div");
+  headerActions.className = "panel-actions project-detail-header-actions";
   const actions = document.createElement("div");
   actions.className = "project-detail-actions";
   const notebookButton = document.createElement("button");
@@ -12923,7 +12925,7 @@ async function renderProjectDetail(detail) {
       workboardButton.setAttribute("aria-pressed", "true");
     }
   });
-  const backButton = appendDetailIconButton(actions, {
+  const backButton = appendDetailIconButton(headerActions, {
     title: "Back",
     label: "Back to projects",
     className: "project-detail-back",
@@ -12953,7 +12955,7 @@ async function renderProjectDetail(detail) {
     description.textContent = descriptionText;
     headingGroup.append(description);
   }
-  chrome.append(headingGroup, actions);
+  chrome.append(headingGroup, headerActions, actions);
 
   const content = document.createElement("section");
   content.className = "project-detail-content";

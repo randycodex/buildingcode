@@ -955,7 +955,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-saved-paragraph-style-v142'),
+        webRoot.text.includes('/web/app.js?v=20260729-project-back-position-v143'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -980,7 +980,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-non-reader-text-v130'),
+        webRoot.text.includes('/web/styles.css?v=20260729-project-back-position-v131'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1069,7 +1069,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-non-reader-text-v130'),
+        webRoot.text.includes('/web/styles.css?v=20260729-project-back-position-v131'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1377,6 +1377,13 @@ async function main() {
         workspaceScript.text.includes('rowTitle.className = "project-detail-section-title"') &&
         !workspaceScript.text.includes('const rowBody = document.createElement("span")'),
       "Project saved rows no longer keep one inline section number and title."
+    );
+    assert(
+      workspaceScript.text.includes('headerActions.className = "panel-actions project-detail-header-actions"') &&
+        workspaceScript.text.includes("const backButton = appendDetailIconButton(headerActions, {") &&
+        workspaceScript.text.includes("chrome.append(headingGroup, headerActions, actions);") &&
+        workspaceStyles.text.match(/\.project-detail-header-actions \{[\s\S]*?grid-column: 2;[\s\S]*?grid-row: 1;/),
+      "Project Back should stay in the standard top-right column action position."
     );
     assert(
       workspaceScript.text.includes("const deletion = deletedProjectSectionMutationForItem(project, item)") &&
