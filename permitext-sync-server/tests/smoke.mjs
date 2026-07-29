@@ -955,7 +955,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-flow-v136'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-tag-clear-v137'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1019,8 +1019,13 @@ async function main() {
         !workspaceStyles.text.includes("clip-path: ellipse(") &&
         workspaceStyles.text.includes(".code-filter-menu.is-open .saved-code-filter {") &&
         workspaceStyles.text.includes("padding: var(--space-2) var(--space-3) var(--space-4);") &&
-        workspaceStyles.text.match(/\.saved-code-filter-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
+        workspaceStyles.text.match(/\.saved-code-filter-actions,\s*\.saved-tag-filter-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.includes(".saved-code-filter-menu.is-open .saved-code-filter-actions") &&
+        workspaceStyles.text.includes(".saved-tag-filter-menu.is-open .saved-tag-filter-actions") &&
+        webRoot.text.includes('class="saved-tag-filter-clear"') &&
+        workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")') &&
+        workspaceScript.text.includes("availableTags.forEach((tag) => {") &&
+        !workspaceScript.text.includes('["", ...availableTags].forEach((tag) => {') &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);"),
       "Saved code and tag filters should expand inside one growing card and summarize multiple codes by initials."
     );
@@ -1035,7 +1040,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-flow-v122'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-tag-clear-v123'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

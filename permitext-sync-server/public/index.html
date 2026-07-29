@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260728-saved-filter-flow-v122">
+    <link rel="stylesheet" href="/web/styles.css?v=20260728-saved-tag-clear-v123">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -317,9 +317,10 @@
                 </button>
                 <div class="saved-code-filter-actions">
                   <button class="saved-code-filter-clear" type="button" title="Clear section filters" aria-label="Clear section filters">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                      <path d="m8 8 8 8"></path>
-                      <path d="m16 8-8 8"></path>
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m7 21-4.3-4.3c-.9-.9-.9-2.3 0-3.2L13.4 2.8c.9-.9 2.3-.9 3.2 0l4.6 4.6c.9.9.9 2.3 0 3.2L11.8 20"></path>
+                      <path d="m5 11 9 9"></path>
+                      <path d="M22 21H7"></path>
                     </svg>
                   </button>
                 </div>
@@ -327,13 +328,24 @@
               <div class="saved-code-filter" aria-label="Filter saved sections by code section" hidden></div>
             </div>
             <div class="code-filter-menu saved-tag-filter-menu">
-              <button class="code-filter-menu-toggle" type="button" aria-label="Expand tag filters" aria-expanded="false">
-                <span class="code-filter-menu-label">All Tags</span>
-                <span class="code-filter-menu-icon" aria-hidden="true">
-                  <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-                  <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-                </span>
-              </button>
+              <div class="saved-tag-filter-heading">
+                <button class="code-filter-menu-toggle saved-tag-filter-menu-toggle" type="button" aria-label="Expand tag filters" aria-expanded="false">
+                  <span class="code-filter-menu-label">All Tags</span>
+                  <span class="code-filter-menu-icon" aria-hidden="true">
+                    <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+                    <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+                  </span>
+                </button>
+                <div class="saved-tag-filter-actions">
+                  <button class="saved-tag-filter-clear" type="button" title="Clear tag filter" aria-label="Clear tag filter">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="m7 21-4.3-4.3c-.9-.9-.9-2.3 0-3.2L13.4 2.8c.9-.9 2.3-.9 3.2 0l4.6 4.6c.9.9.9 2.3 0 3.2L11.8 20"></path>
+                      <path d="m5 11 9 9"></path>
+                      <path d="M22 21H7"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
               <div class="saved-tag-filter" aria-label="Filter saved sections by tag" hidden></div>
             </div>
           </section>
@@ -528,6 +540,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260728-saved-filter-flow-v136" type="module"></script>
+    <script src="/web/app.js?v=20260728-saved-tag-clear-v137" type="module"></script>
   </body>
 </html>

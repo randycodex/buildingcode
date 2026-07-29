@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-flow-v136";
+} from "./offline-storage.js?v=20260728-saved-tag-clear-v137";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13541,6 +13541,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   const codeClearButton = panel.querySelector(".saved-code-filter-clear");
   const tagRail = panel.querySelector(".saved-tag-filter");
   const tagMenu = panel.querySelector(".saved-tag-filter-menu");
+  const tagClearButton = panel.querySelector(".saved-tag-filter-clear");
   const tagCounts = new Map();
   allItems.forEach((item) => {
     new Set(savedItemTags(item)).forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1));
@@ -13602,7 +13603,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     label: savedCodeFilterMenuLabel
   });
   if (availableTags.length) {
-    ["", ...availableTags].forEach((tag) => {
+    availableTags.forEach((tag) => {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "saved-tag-filter-chip";
@@ -13613,6 +13614,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
         tagRail.querySelectorAll(".saved-tag-filter-chip").forEach((chip) => {
           chip.setAttribute("aria-pressed", String(chip.textContent === (instance.tagFilter || "All Tags")));
         });
+        tagClearButton.disabled = !instance.tagFilter;
         updateCodeFilterMenu(tagRail, instance, {
           stateKey: "tagsMenuOpen",
           menuName: "tag filters",
@@ -13622,6 +13624,21 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
         saveWorkspaceState();
       });
       tagRail.append(button);
+    });
+    tagClearButton.disabled = !instance.tagFilter;
+    tagClearButton.addEventListener("click", () => {
+      instance.tagFilter = "";
+      tagRail.querySelectorAll(".saved-tag-filter-chip").forEach((chip) => {
+        chip.setAttribute("aria-pressed", "false");
+      });
+      tagClearButton.disabled = true;
+      updateCodeFilterMenu(tagRail, instance, {
+        stateKey: "tagsMenuOpen",
+        menuName: "tag filters",
+        label: (savedInstance) => savedInstance?.tagFilter || "All Tags"
+      });
+      onChange();
+      saveWorkspaceState();
     });
   }
   tagMenu.hidden = availableTags.length === 0;

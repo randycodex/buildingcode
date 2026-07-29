@@ -6345,16 +6345,19 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-inline-filters > .code-filter-menu > .code-filter-menu-toggle,
-.saved-code-filter-heading > .code-filter-menu-toggle {
+.saved-code-filter-heading > .code-filter-menu-toggle,
+.saved-tag-filter-heading > .code-filter-menu-toggle {
   background: transparent;
 }
 
 .saved-inline-filters > .code-filter-menu > .code-filter-menu-toggle:hover,
-.saved-code-filter-heading > .code-filter-menu-toggle:hover {
+.saved-code-filter-heading > .code-filter-menu-toggle:hover,
+.saved-tag-filter-heading > .code-filter-menu-toggle:hover {
   background: color-mix(in srgb, var(--text-tertiary) 10%, transparent);
 }
 
-.saved-code-filter-heading {
+.saved-code-filter-heading,
+.saved-tag-filter-heading {
   position: relative;
   display: flex;
   min-height: var(--panel-title-control-size);
@@ -6363,11 +6366,13 @@ button.project-studio-metric:focus-visible {
   gap: var(--space-2);
 }
 
-.saved-code-filter-menu-toggle {
+.saved-code-filter-menu-toggle,
+.saved-tag-filter-menu-toggle {
   flex: 1 1 auto;
 }
 
-.saved-code-filter-actions {
+.saved-code-filter-actions,
+.saved-tag-filter-actions {
   position: absolute;
   top: 50%;
   right: calc(var(--space-3) + 18px + var(--space-2));
@@ -6377,11 +6382,13 @@ button.project-studio-metric:focus-visible {
   transform: translateY(-50%);
 }
 
-.saved-code-filter-menu.is-open .saved-code-filter-actions {
+.saved-code-filter-menu.is-open .saved-code-filter-actions,
+.saved-tag-filter-menu.is-open .saved-tag-filter-actions {
   display: flex;
 }
 
-.saved-code-filter-actions button {
+.saved-code-filter-actions button,
+.saved-tag-filter-actions button {
   display: grid;
   width: 28px;
   height: 28px;
@@ -6393,16 +6400,20 @@ button.project-studio-metric:focus-visible {
 }
 
 .saved-code-filter-actions button:hover,
-.saved-code-filter-actions button:focus-visible {
+.saved-code-filter-actions button:focus-visible,
+.saved-tag-filter-actions button:hover,
+.saved-tag-filter-actions button:focus-visible {
   color: var(--text-primary);
 }
 
-.saved-code-filter-actions button:disabled {
+.saved-code-filter-actions button:disabled,
+.saved-tag-filter-actions button:disabled {
   opacity: 0.32;
   cursor: default;
 }
 
-.saved-code-filter-actions svg {
+.saved-code-filter-actions svg,
+.saved-tag-filter-actions svg {
   width: 14px;
   height: 14px;
 }
