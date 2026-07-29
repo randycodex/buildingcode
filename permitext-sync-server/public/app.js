@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-fixed-v130";
+} from "./offline-storage.js?v=20260728-reader-progress-inner-v133";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6384,13 +6384,33 @@ function bindReaderCommentScroll(panel) {
 function updateReaderScrollIndicator(panel) {
   if (!readerPanelIntersectsTrack(panel)) {
     panel?.classList.remove("is-scrolling");
+    const offscreenToTopButton = panel?.querySelector(".reader-to-top");
+    offscreenToTopButton?.classList.remove("is-visible");
+    offscreenToTopButton?.setAttribute("aria-hidden", "true");
+    if (offscreenToTopButton) offscreenToTopButton.tabIndex = -1;
     return;
   }
   const content = panel.querySelector(".reader-content");
   const indicator = panel.querySelector(".reader-scroll-indicator");
   const thumb = panel.querySelector(".reader-scroll-thumb");
-  if (!content || !indicator || !thumb) return;
+  const progress = panel.querySelector(".reader-reading-progress");
+  const progressValue = panel.querySelector(".reader-reading-progress-value");
+  const toTopButton = panel.querySelector(".reader-to-top");
+  if (!content) return;
   const scrollable = Math.max(0, content.scrollHeight - content.clientHeight);
+  const scrollProgress = scrollable > 1
+    ? Math.min(Math.max(content.scrollTop / scrollable, 0), 1)
+    : 0;
+  progressValue?.style.setProperty("--reader-reading-progress", String(scrollProgress));
+  progress?.setAttribute("aria-valuenow", String(Math.round(scrollProgress * 100)));
+  const showToTop = scrollable > 1 &&
+    content.scrollTop > Math.min(240, Math.max(120, content.clientHeight * 0.25));
+  if (toTopButton) {
+    toTopButton.classList.toggle("is-visible", showToTop);
+    toTopButton.setAttribute("aria-hidden", String(!showToTop));
+    toTopButton.tabIndex = showToTop ? 0 : -1;
+  }
+  if (!indicator || !thumb) return;
   const trackHeight = indicator.clientHeight;
   if (scrollable <= 1 || trackHeight <= 0) {
     thumb.hidden = true;
@@ -6407,6 +6427,7 @@ function updateReaderScrollIndicator(panel) {
 
 function bindReaderScrollIndicator(panel) {
   const content = panel.querySelector(".reader-content");
+  const toTopButton = panel.querySelector(".reader-to-top");
   if (!content || panel.dataset.scrollIndicatorBound === "true") return;
   panel.dataset.scrollIndicatorBound = "true";
   let hideTimer = null;
@@ -6418,6 +6439,9 @@ function bindReaderScrollIndicator(panel) {
     hideTimer = window.setTimeout(() => panel.classList.remove("is-scrolling"), 700);
   };
   content.addEventListener("scroll", reveal, { passive: true });
+  toTopButton?.addEventListener("click", () => {
+    content.scrollTo({ top: 0, behavior: "smooth" });
+  });
   requestAnimationFrame(update);
 }
 
@@ -16324,6 +16348,7 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
     const appliedPreviousDelta = widths[previousIndex] - paneData[previousIndex].startWidth;
     const pushedScrollDelta = appliedPreviousDelta - delta;
     track.scrollLeft = Math.max(0, startScrollLeft + pushedScrollDelta);
+    scheduleVisibleReaderScrollIndicatorUpdates();
   };
 
   const applyPendingResize = () => {
@@ -16877,6 +16902,7 @@ async function start() {
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
+  track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates);
   bindWorkspaceKeyboardNavigation();
   bindResearchTextSelection();
   window.addEventListener("storage", (event) => {

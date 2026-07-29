@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-fixed-v130'),
+        webRoot.text.includes('/web/app.js?v=20260728-reader-progress-inner-v133'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1032,7 +1032,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-fixed-v117'),
+        webRoot.text.includes('/web/styles.css?v=20260728-reader-progress-inner-v119'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1814,6 +1814,20 @@ async function main() {
       workspaceStyles.text.includes(".reader-scroll-indicator") &&
         workspaceStyles.text.includes("display: none;"),
       "Reader workspace still renders its custom scroll indicator."
+    );
+    assert(
+      webRoot.text.includes('class="reader-reading-progress"') &&
+        webRoot.text.includes('class="reader-reading-progress-value"') &&
+        webRoot.text.includes('class="reader-to-top"') &&
+        workspaceStyles.text.match(/\.reader-reading-progress \{[\s\S]*?right: calc\(var\(--panel-padding\) \+ var\(--reader-scrollbar-rail-width\)\);[\s\S]*?left: var\(--panel-padding\);[\s\S]*?height: 3px;[\s\S]*?background: color-mix\(in srgb, var\(--code-accent\) 22%, transparent\);/) &&
+        workspaceStyles.text.match(/\.reader-reading-progress-value \{[\s\S]*?transform: scaleX\(var\(--reader-reading-progress, 0\)\);[\s\S]*?transition: transform 50ms linear;/) &&
+        workspaceStyles.text.match(/\.reader-to-top \{[\s\S]*?right: var\(--panel-padding\);[\s\S]*?bottom: calc\(var\(--panel-padding\) \+ var\(--space-3\)\);/) &&
+        workspaceScript.text.includes("content.scrollTop / scrollable") &&
+        workspaceScript.text.includes('progress?.setAttribute("aria-valuenow"') &&
+        workspaceScript.text.includes('toTopButton.classList.toggle("is-visible", showToTop)') &&
+        workspaceScript.text.includes('content.scrollTo({ top: 0, behavior: "smooth" })') &&
+        workspaceScript.text.includes('track.addEventListener("permitext:workspace-layout-change", scheduleVisibleReaderScrollIndicatorUpdates)'),
+      "Reader chapter progress or the contextual Back to top control is missing."
     );
     assert(
       workspaceStyles.text.match(/\.reader-panel \.panel-actions \{[\s\S]*?align-items: center;[\s\S]*?gap: var\(--space-2\);/) &&

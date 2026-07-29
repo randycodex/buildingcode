@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260728-saved-filter-fixed-v117">
+    <link rel="stylesheet" href="/web/styles.css?v=20260728-reader-progress-inner-v119">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -109,6 +109,9 @@
             </button>
           </div>
         </header>
+        <div class="reader-reading-progress" role="progressbar" aria-label="Chapter reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="reader-reading-progress-value"></div>
+        </div>
         <div class="selector-stack">
           <label>
             Chapter
@@ -145,6 +148,13 @@
             </section>
           </aside>
         </section>
+        <button class="reader-to-top" type="button" title="Back to top" aria-label="Back to top" aria-hidden="true" tabindex="-1">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 5h14"></path>
+            <path d="m8 12 4-4 4 4"></path>
+            <path d="M12 8v11"></path>
+          </svg>
+        </button>
       </article>
     </template>
 
@@ -508,6 +518,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260728-saved-filter-fixed-v130" type="module"></script>
+    <script src="/web/app.js?v=20260728-reader-progress-inner-v133" type="module"></script>
   </body>
 </html>

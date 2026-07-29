@@ -1011,6 +1011,75 @@ body.is-detached-workboard-window .detached-workboard-error p {
   background: transparent;
 }
 
+.reader-reading-progress {
+  position: absolute;
+  top: calc(var(--reader-scrollbar-track-top) - 3px);
+  right: calc(var(--panel-padding) + var(--reader-scrollbar-rail-width));
+  left: var(--panel-padding);
+  z-index: 10;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--code-accent) 22%, transparent);
+  pointer-events: none;
+}
+
+.reader-reading-progress-value {
+  width: 100%;
+  height: 100%;
+  background: var(--code-accent);
+  transform: scaleX(var(--reader-reading-progress, 0));
+  transform-origin: left center;
+  transition: transform 50ms linear;
+}
+
+.reader-to-top {
+  position: absolute;
+  right: var(--panel-padding);
+  bottom: calc(var(--panel-padding) + var(--space-3));
+  z-index: 9;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-raised) 86%, var(--code-accent) 14%);
+  color: var(--code-accent);
+  opacity: 0;
+  visibility: hidden;
+  cursor: pointer;
+  pointer-events: none;
+  transform: translateY(8px);
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 22%, transparent);
+  transition:
+    opacity 180ms ease,
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0s linear 220ms;
+}
+
+.reader-to-top.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition-delay: 0s;
+}
+
+.reader-to-top svg {
+  width: 20px;
+  height: 20px;
+}
+
+.reader-to-top:hover {
+  background: color-mix(in srgb, var(--surface-raised) 74%, var(--code-accent) 26%);
+}
+
+.reader-to-top:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--code-accent) 72%, transparent);
+  outline-offset: 2px;
+}
+
 .reader-panel .panel-header > div:first-child {
   display: block;
   min-width: 0;
