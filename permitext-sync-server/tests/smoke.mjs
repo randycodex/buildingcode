@@ -561,8 +561,8 @@ async function main() {
       webRoot.text.indexOf('<template id="analysis-template"')
     );
     assert(
-      savedTemplateSource.includes('aria-label="Sort saved sections"') &&
-        savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
+      !savedTemplateSource.includes('aria-label="Sort saved sections"') &&
+        !savedTemplateSource.includes('aria-label="Export saved sections as PDF"') &&
         savedTemplateSource.includes('class="saved-column-scroll"') &&
         savedTemplateSource.includes('class="saved-projects-section code-filter-menu saved-projects-menu"') &&
         savedTemplateSource.includes('class="saved-project-list"') &&
@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-tag-text-v120'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-header-clean-v121'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1245,7 +1245,7 @@ async function main() {
         workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
-        workspaceScript.text.includes("applySavedView = () =>") &&
+        workspaceScript.text.includes("const applySavedView = () =>") &&
         workspaceScript.text.includes("const availableCodePrefixes = new Set") &&
         workspaceScript.text.includes('option.prefix === "ALL" || availableCodePrefixes.has(option.prefix)') &&
         workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance)") &&
@@ -1258,9 +1258,9 @@ async function main() {
         workspaceScript.text.includes('chapterHeader.className = "saved-chapter-header"') &&
         workspaceScript.text.includes('preview.className = "saved-paragraph-preview"') &&
         workspaceScript.text.includes('title.className = "saved-section-title"') &&
-        workspaceScript.text.includes("function printSavedItemsAsPDF") &&
+        workspaceScript.text.includes('sortSavedItems(filteredItems, "codeOrder")') &&
         workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true })'),
-      "Saved rows no longer match the iOS code, chapter, row, sort, and export structure."
+      "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&

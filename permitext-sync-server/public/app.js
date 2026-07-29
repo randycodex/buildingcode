@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-tag-text-v120";
+} from "./offline-storage.js?v=20260728-saved-header-clean-v121";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13523,25 +13523,6 @@ async function renderSaved(instance) {
   panel.classList.add("saved-panel");
   applyPaneWeight(panel, paneID);
   const content = panel.querySelector(".saved-content");
-  const sortButton = panel.querySelector(".saved-sort-button");
-  const exportButton = panel.querySelector(".saved-export-button");
-  let applySavedView = () => {};
-  const sortOptions = [
-    ["codeOrder", "Code Order"],
-    ["recentlySaved", "Recent"],
-    ["codeBook", "Code Book"],
-    ["title", "Title"],
-    ["tag", "Tag"]
-  ];
-  sortButton.addEventListener("click", () => openSavedActionMenu(panel, sortButton, sortOptions.map(([value, label]) => ({
-    label,
-    selected: savedInstance.sortMode === value,
-    action: () => {
-      savedInstance.sortMode = value;
-      saveWorkspaceState();
-      applySavedView();
-    }
-  }))));
   clear(content);
   const data = await loadSyncedContent();
   const summary = currentContentSummary();
@@ -13550,12 +13531,10 @@ async function renderSaved(instance) {
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
-    exportButton.disabled = true;
     return panel;
   }
   if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sync error", data.error || "Could not load saved content.");
-    exportButton.disabled = true;
     return panel;
   }
 
@@ -13564,15 +13543,13 @@ async function renderSaved(instance) {
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
   const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
-  let filteredItems = [];
-  let orderedItems = [];
-  applySavedView = () => {
-    filteredItems = resolvedItems.filter((item) => {
+  const applySavedView = () => {
+    const filteredItems = resolvedItems.filter((item) => {
       const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
       const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
       return prefixMatches && tagMatches;
     });
-    orderedItems = sortSavedItems(filteredItems, savedInstance.sortMode);
+    const orderedItems = sortSavedItems(filteredItems, "codeOrder");
     clear(content);
     if (orderedItems.length > 0) {
       renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true });
@@ -13584,16 +13561,6 @@ async function renderSaved(instance) {
   };
   renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
   applySavedView();
-
-  exportButton.disabled = resolvedItems.length === 0;
-  exportButton.addEventListener("click", () => {
-    const options = [];
-    if (filteredItems.length > 0 && filteredItems.length < resolvedItems.length) {
-      options.push({ label: `Export current filter (${filteredItems.length})`, action: () => printSavedItemsAsPDF(orderedItems, "Current filter") });
-    }
-    options.push({ label: `Export all saved (${resolvedItems.length})`, action: () => printSavedItemsAsPDF(sortSavedItems(resolvedItems, savedInstance.sortMode), "All saved sections") });
-    openSavedActionMenu(panel, exportButton, options);
-  });
 
   return panel;
 }
