@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-header-clean-v121";
+} from "./offline-storage.js?v=20260728-saved-reader-target-v122";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5661,6 +5661,108 @@ function scrollReaderContentToSection(content, sectionID, behavior = "auto", sec
     (numberSelector ? content?.querySelector(numberSelector) : null);
   if (!content || !target) return;
   stabilizeReaderSectionAtHeader(content, target, behavior);
+}
+
+function savedReaderTarget(content, item) {
+  if (!content || !item) return null;
+  const sectionID = String(item.sectionID || item.id || "").trim();
+  const sectionNumber = String(item.sectionNumber || "").trim();
+  const blockID = normalizeAnnotationBlockID(item.blockID || item.annotationBlockID);
+  if (blockID) {
+    const sectionBlockSelector = sectionID
+      ? `.annotated-code-block[data-section-id="${CSS.escape(sectionID)}"][data-block-id="${CSS.escape(blockID)}"]`
+      : "";
+    const blockSelector = `.annotated-code-block[data-block-id="${CSS.escape(blockID)}"]`;
+    const blockTarget = (sectionBlockSelector ? content.querySelector(sectionBlockSelector) : null) ||
+      content.querySelector(blockSelector);
+    if (blockTarget) return blockTarget;
+  }
+  const idSelector = sectionID
+    ? `.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`
+    : "";
+  const aliasSelector = sectionID
+    ? `.chapter-section[data-section-aliases~="${CSS.escape(sectionID)}"]`
+    : "";
+  const numberSelector = sectionNumber
+    ? `.chapter-section[data-section-number="${CSS.escape(sectionNumber)}"]`
+    : "";
+  return (idSelector ? content.querySelector(idSelector) : null) ||
+    (aliasSelector ? content.querySelector(aliasSelector) : null) ||
+    (numberSelector ? content.querySelector(numberSelector) : null);
+}
+
+function centerReaderTarget(content, target, behavior = "auto") {
+  if (!content || !target) return;
+  const contentRect = content.getBoundingClientRect();
+  const targetRect = target.getBoundingClientRect();
+  const targetHeight = Math.min(targetRect.height, content.clientHeight);
+  const centeredTop = content.scrollTop +
+    targetRect.top -
+    contentRect.top -
+    (content.clientHeight - targetHeight) / 2;
+  const maxTop = Math.max(0, content.scrollHeight - content.clientHeight);
+  content.scrollTo({
+    top: Math.min(maxTop, Math.max(0, centeredTop)),
+    behavior
+  });
+}
+
+function flashSavedReaderTarget(target) {
+  if (!target) return;
+  const textRoot = target.matches(".annotated-code-block")
+    ? target.querySelector(":scope > .section-block, :scope > .section-html, :scope > .code-table, :scope > .code-media") || target
+    : target;
+  const walker = document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT);
+  const textNodes = [];
+  let textNode = walker.nextNode();
+  while (textNode) {
+    const parent = textNode.parentElement;
+    if (
+      textNode.nodeValue?.trim() &&
+      parent &&
+      !parent.closest("script, style, input, textarea, select, .inline-comment, .saved-reader-target-flash")
+    ) {
+      textNodes.push(textNode);
+    }
+    textNode = walker.nextNode();
+  }
+  const highlights = textNodes.map((node) => {
+    const highlight = document.createElement("span");
+    highlight.className = "saved-reader-target-flash";
+    highlight.textContent = node.nodeValue;
+    node.replaceWith(highlight);
+    return highlight;
+  });
+  window.setTimeout(() => {
+    const parents = new Set();
+    highlights.forEach((highlight) => {
+      if (!highlight.isConnected) return;
+      const parent = highlight.parentNode;
+      parents.add(parent);
+      highlight.replaceWith(document.createTextNode(highlight.textContent || ""));
+    });
+    parents.forEach((parent) => parent?.normalize());
+  }, readerSearchFlashDurationMS + 80);
+}
+
+function centerAndFlashSavedReaderTarget(reader, item) {
+  const paneID = paneIDForReader(reader);
+  let highlighted = false;
+  [0, 80, 220].forEach((delay) => {
+    window.setTimeout(() => {
+      const panel = track.querySelector(
+        `.reader-panel[data-pane-id="${CSS.escape(paneID)}"]`
+      );
+      const content = panel?.querySelector(".reader-content");
+      const target = savedReaderTarget(content, item);
+      if (!content || !target) return;
+      centerReaderTarget(content, target);
+      if (!highlighted) {
+        highlighted = true;
+        flashSavedReaderTarget(target);
+      }
+    }, delay);
+  });
 }
 
 function alignReaderSectionAfterLayout(reader) {
@@ -14179,7 +14281,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             const openItem = item.annotationBlockID
               ? { ...item, blockID: item.annotationBlockID }
               : item;
-            openSectionDetailForExistingSearch(openItem, { anchorPaneID: paneID });
+            void openSavedItemInNewReader(openItem, paneID);
           }
         });
         row.append(openButton);
@@ -14251,6 +14353,54 @@ async function openSectionDetailForExistingSearch(item, options = {}) {
     state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
   }
   await openSectionDetail(searchInstance.id, item, options);
+}
+
+function closeSavedItemDetailsForPane(savedPaneID) {
+  const details = sectionDetailsBySearch();
+  const anchors = sectionDetailAnchorsBySearch();
+  Object.entries(anchors).forEach(([searchID, anchorPaneID]) => {
+    if (anchorPaneID !== savedPaneID || !details[searchID]) return;
+    const detailPaneID = paneIDForSectionDetail(searchID);
+    closeLinkedReaderForSearch(searchID);
+    delete details[searchID];
+    delete anchors[searchID];
+    delete state.paneWeights[detailPaneID];
+    state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== detailPaneID);
+  });
+}
+
+async function openSavedItemInNewReader(item, savedPaneID) {
+  const sectionID = String(item?.sectionID || item?.id || "").trim();
+  if (!sectionID) return;
+  const detail = {
+    codePrefix: item.codePrefix || "BC",
+    codeVersion: item.codeVersion || syncCodeVersionForPrefix(item.codePrefix || "BC"),
+    chapterID: item.chapterID || "",
+    chapterNumber: item.chapterNumber || "",
+    sectionID,
+    sectionNumber: item.sectionNumber || "",
+    title: item.title || "Section"
+  };
+  closeSavedItemDetailsForPane(savedPaneID);
+  const canAddReader = isProAccount() || state.readers.length < 2;
+  const reader = canAddReader
+    ? newReaderState(readerFieldsForSectionDetail(detail, { shouldSmoothScrollToSection: false }))
+    : state.readers[1] || state.readers[0];
+  if (canAddReader) {
+    state.readers.push(reader);
+  } else {
+    Object.assign(reader, readerFieldsForSectionDetail(detail, { shouldSmoothScrollToSection: false }));
+  }
+  const readerPaneID = paneIDForReader(reader);
+  placePaneAfter(savedPaneID, readerPaneID);
+  updateBrowserSectionURL(sectionID);
+  scheduleContinuitySync(reader);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [readerPaneID] });
+  scrollPaneIntoView(readerPaneID);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => centerAndFlashSavedReaderTarget(reader, item));
+  });
 }
 
 function normalizedPublicUsername(value) {

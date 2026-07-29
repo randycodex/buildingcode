@@ -440,6 +440,8 @@ async function main() {
     );
 
     const workspaceScript = await request("/web/app.js");
+    const workspaceStyles = await request("/web/styles.css");
+    assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(
       workspaceScript.text.includes('panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"))'),
       "Settings close-column control is not wired to close the Settings pane."
@@ -952,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-header-clean-v121'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-reader-target-v122'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -989,6 +991,19 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
+      workspaceScript.text.includes("function openSavedItemInNewReader(item, savedPaneID)") &&
+        workspaceScript.text.includes("void openSavedItemInNewReader(openItem, paneID);") &&
+        workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
+        workspaceScript.text.includes("function centerAndFlashSavedReaderTarget(reader, item)") &&
+        workspaceScript.text.includes("function centerReaderTarget(content, target, behavior = \"auto\")") &&
+        workspaceScript.text.includes("document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT)") &&
+        workspaceScript.text.includes('highlight.className = "saved-reader-target-flash"') &&
+        workspaceScript.text.includes("highlight.replaceWith(document.createTextNode") &&
+        workspaceStyles.text.includes("@keyframes saved-reader-target-flash") &&
+        workspaceStyles.text.includes("background: transparent;"),
+      "Saved items should open directly in a centered Reader with a temporary fading target highlight."
+    );
+    assert(
       !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
@@ -999,7 +1014,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-tag-text-v106'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-reader-target-v107'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1353,8 +1368,6 @@ async function main() {
       "Reader notes no longer close immediately when the code or chapter changes."
     );
 
-    const workspaceStyles = await request("/web/styles.css");
-    assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     const enactedAccentVariables = [
       "energy",
       "electrical",
