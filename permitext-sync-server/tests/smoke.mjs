@@ -912,6 +912,8 @@ async function main() {
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
+        workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));") &&
+        !workspaceScript.text.includes("openSectionDetail(instance.id, entry);") &&
         !workspaceScript.text.includes('bookmarkButton.className = "search-jump-bookmark"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
         !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
@@ -955,7 +957,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-project-back-position-v143'),
+        webRoot.text.includes('/web/app.js?v=20260729-jump-back-reader-v144'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

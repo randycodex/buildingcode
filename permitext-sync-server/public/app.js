@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-project-back-position-v143";
+} from "./offline-storage.js?v=20260729-jump-back-reader-v144";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7313,7 +7313,7 @@ async function renderSearchHistory(panel, instance) {
       openButton.append(code, title, preview);
       openButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
-        openSectionDetail(instance.id, entry);
+        void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));
       });
       tile.append(openButton);
       list.append(tile);
