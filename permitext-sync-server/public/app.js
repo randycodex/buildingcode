@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-reader-target-v122";
+} from "./offline-storage.js?v=20260728-saved-filter-cards-v123";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1944,6 +1944,23 @@ function codeFilterMenuLabel(prefixes = []) {
     return searchCodeFilterOptions().find((option) => option.prefix === selectedPrefixes[0])?.label || selectedPrefixes[0];
   }
   return `${selectedPrefixes.length} Sections`;
+}
+
+function savedCodeFilterMenuLabel(instance) {
+  const selectedPrefixes = normalizeSearchCodeFilters(instance?.codeFilters);
+  if (selectedPrefixes.length < 2) return codeFilterMenuLabel(selectedPrefixes);
+  const optionsByPrefix = new Map(
+    searchCodeFilterOptions().map((option) => [option.prefix, option.label])
+  );
+  return selectedPrefixes.map((prefix) => {
+    const label = String(optionsByPrefix.get(prefix) || prefix)
+      .replace(/\([^)]*\)/g, " ")
+      .replace(/[—–-].*$/, " ");
+    const initials = (label.match(/[A-Za-z]+/g) || [])
+      .map((word) => word[0].toUpperCase())
+      .join("");
+    return initials || prefix;
+  }).join(", ");
 }
 
 function updateCodeFilterMenu(filterRail, instance, options = {}) {
@@ -13577,13 +13594,17 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
             : instance.codeFilters.includes(prefix);
           chip.setAttribute("aria-pressed", String(isSelected));
         });
-        updateCodeFilterMenu(codeRail, instance);
+        updateCodeFilterMenu(codeRail, instance, {
+          label: savedCodeFilterMenuLabel
+        });
         onChange();
         saveWorkspaceState();
       });
       codeRail.append(button);
     });
-  wireCodeFilterMenu(codeRail, instance);
+  wireCodeFilterMenu(codeRail, instance, {
+    label: savedCodeFilterMenuLabel
+  });
   if (availableTags.length) {
     ["", ...availableTags].forEach((tag) => {
       const button = document.createElement("button");

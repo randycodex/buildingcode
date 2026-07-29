@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-reader-target-v122'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-cards-v123'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1004,6 +1004,17 @@ async function main() {
       "Saved items should open directly in a centered Reader with a temporary fading target highlight."
     );
     assert(
+      workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
+        workspaceScript.text.includes(".map((word) => word[0].toUpperCase())") &&
+        workspaceScript.text.includes('}).join(", ");') &&
+        workspaceScript.text.includes("label: savedCodeFilterMenuLabel") &&
+        workspaceStyles.text.includes(".saved-inline-filters > .code-filter-menu {") &&
+        workspaceStyles.text.includes(".saved-inline-filters > .code-filter-menu.is-open {") &&
+        workspaceStyles.text.includes("padding-bottom: var(--space-2);") &&
+        workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);"),
+      "Saved code and tag filters should expand inside one growing card and summarize multiple codes by initials."
+    );
+    assert(
       !webRoot.text.includes("account-plan-detail") &&
         !workspaceScript.text.includes("account-plan-detail") &&
         webRoot.text.includes("Read codes, search, recent history, 25 saved sections, 10 notes, continuity, and cross-device sync.") &&
@@ -1014,7 +1025,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-reader-target-v107'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-cards-v108'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1263,7 +1274,8 @@ async function main() {
         workspaceScript.text.includes("const applySavedView = () =>") &&
         workspaceScript.text.includes("const availableCodePrefixes = new Set") &&
         workspaceScript.text.includes('option.prefix === "ALL" || availableCodePrefixes.has(option.prefix)') &&
-        workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance)") &&
+        workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance, {") &&
+        workspaceScript.text.includes("label: savedCodeFilterMenuLabel") &&
         workspaceScript.text.includes("function mountProjectOpeningPane") &&
         workspaceScript.text.includes('panel.className = "workspace-panel project-detail-panel project-detail-loading"') &&
         workspaceScript.text.includes("savedContentComparisonText") &&
