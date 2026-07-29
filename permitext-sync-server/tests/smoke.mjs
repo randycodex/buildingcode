@@ -980,7 +980,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-saved-paragraph-style-v129'),
+        webRoot.text.includes('/web/styles.css?v=20260729-non-reader-text-v130'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1069,8 +1069,14 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-saved-paragraph-style-v129'),
+        webRoot.text.includes('/web/styles.css?v=20260729-non-reader-text-v130'),
       "settings footer links should stay centered with the current stylesheet"
+    );
+    assert(
+      workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel),") &&
+        workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel) * {") &&
+        workspaceStyles.text.includes("font-size: 14px !important;"),
+      "Non-Reader workspace columns should use a consistent 14px text size."
     );
     assert(
       !webRoot.text.includes("settings-code-section-select") &&

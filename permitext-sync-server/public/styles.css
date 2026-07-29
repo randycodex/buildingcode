@@ -9350,3 +9350,8 @@ button.project-studio-metric:focus-visible {
     width: 100%;
   }
 }
+
+body .panel-track > article.workspace-panel:not(.reader-panel),
+body .panel-track > article.workspace-panel:not(.reader-panel) * {
+  font-size: 14px !important;
+}
