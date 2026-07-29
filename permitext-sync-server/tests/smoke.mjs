@@ -952,7 +952,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-hide-existing-code-notice-v109'),
+        webRoot.text.includes('/web/app.js?v=20260728-search-jump-preview-v110'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -990,7 +990,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-enacted-code-accents-v97'),
+        webRoot.text.includes('/web/styles.css?v=20260728-search-jump-preview-v98'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1383,8 +1383,14 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: 2px;/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 70px;[\s\S]*?min-height: 70px;/) &&
-        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 70px;[\s\S]*?min-height: 70px;[\s\S]*?padding: var\(--space-1\);/),
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;/) &&
+        workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?padding: var\(--space-1\);/) &&
+        workspaceScript.text.includes('code.className = "search-jump-code"') &&
+        workspaceScript.text.includes('title.textContent = sectionDisplayTitle(entry.sectionNumber, entry.title, "Section")') &&
+        workspaceScript.text.includes('preview.className = "search-jump-preview"') &&
+        workspaceScript.text.includes("openButton.append(code, title, preview)") &&
+        workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?-webkit-line-clamp: 3;/) &&
+        !workspaceScript.text.includes('number.className = "search-jump-number"'),
       "Search history lists no longer use the requested heading size and independent vertical scrolling."
     );
     assert(

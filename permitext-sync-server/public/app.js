@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-hide-existing-code-notice-v109";
+} from "./offline-storage.js?v=20260728-search-jump-preview-v110";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6952,14 +6952,41 @@ function updateSearchDock(panel, instance, resultCount = null) {
     : `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
 }
 
-function renderSearchHistory(panel, instance) {
+async function hydrateSearchRecentlyViewedEntries(entries) {
+  return Promise.all(entries.map(async (entry) => {
+    if (String(entry.previewText || "").trim()) return entry;
+    try {
+      const detail = { ...entry };
+      const { chapter, section } = await resolveSectionDetail(detail);
+      const rawPreview = sectionPlainText(section);
+      return {
+        ...entry,
+        codePrefix: detail.codePrefix || chapter?.codePrefix || entry.codePrefix || "BC",
+        chapterID: detail.chapterID || chapter?.id || entry.chapterID || "",
+        chapterNumber: detail.chapterNumber || chapter?.chapterNumber || entry.chapterNumber || "",
+        sectionNumber: section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "",
+        title: section?.title || detail.title || entry.title || "Section",
+        previewText: snippetWithoutDuplicateTitle({
+          sectionNumber: section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "",
+          title: section?.title || detail.title || entry.title || "",
+          snippet: rawPreview
+        }).replace(/\s+/g, " ").trim().slice(0, 360)
+      };
+    } catch {
+      return entry;
+    }
+  }));
+}
+
+async function renderSearchHistory(panel, instance) {
   const results = panel.querySelector(".search-results");
-  clear(results);
-  results.classList.add("is-history");
-  const recentSections = searchRecentlyViewedEntries();
+  const recentSections = await hydrateSearchRecentlyViewedEntries(searchRecentlyViewedEntries());
+  if (String(instance?.query || "").trim()) return;
   const pinned = normalizeSearchHistory(state.pinnedSearches);
   const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
     .filter((query) => !isSearchPinned(query));
+  clear(results);
+  results.classList.add("is-history");
 
   let jumpSection = null;
   if (recentSections.length) {
@@ -6977,17 +7004,16 @@ function renderSearchHistory(panel, instance) {
       const openButton = document.createElement("button");
       openButton.type = "button";
       openButton.className = "search-jump-open";
-      const number = document.createElement("span");
-      number.className = "search-jump-number";
-      number.textContent = entry.sectionNumber || "Section";
-      const title = document.createElement("strong");
-      title.textContent = entry.title || "Section";
-      const preview = document.createElement("span");
-      preview.textContent = entry.previewText || entry.chapterTitle || "";
-      if (entry.previewText) markResearchSelectable(preview, entry);
-      const code = document.createElement("small");
+      const code = document.createElement("span");
+      code.className = "search-jump-code";
       code.textContent = entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC");
-      openButton.append(number, title, preview, code);
+      const title = document.createElement("strong");
+      title.textContent = sectionDisplayTitle(entry.sectionNumber, entry.title, "Section");
+      const preview = document.createElement("span");
+      preview.className = "search-jump-preview";
+      preview.textContent = entry.previewText || "";
+      if (entry.previewText) markResearchSelectable(preview, entry);
+      openButton.append(code, title, preview);
       openButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
         openSectionDetail(instance.id, entry);
@@ -7263,7 +7289,7 @@ async function renderSearchResults(panel, instance) {
   results.classList.remove("is-history");
   updateSearchDock(panel, searchInstance);
   if (query.length < 2) {
-    if (!query) renderSearchHistory(panel, searchInstance);
+    if (!query) await renderSearchHistory(panel, searchInstance);
     else renderSearchPlaceholder(results, { title: "Keep typing", body: "Enter at least two characters to search the code text." });
     return;
   }
