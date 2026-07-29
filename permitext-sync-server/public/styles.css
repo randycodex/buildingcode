@@ -6454,6 +6454,11 @@ button.project-studio-metric:focus-visible {
   color: var(--text-primary);
 }
 
+.saved-code-filter .saved-filter-chip:nth-child(even),
+.saved-tag-filter-chip:nth-child(even) {
+  padding-left: var(--space-2);
+}
+
 .saved-print-frame {
   position: fixed;
   top: 0;
