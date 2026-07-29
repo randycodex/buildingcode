@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-inline-project-archive-v141";
+} from "./offline-storage.js?v=20260729-saved-paragraph-style-v142";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14004,6 +14004,23 @@ function mergeSavedColumnItems(savedItems = [], annotatedItems = []) {
   return [...bookmarks, ...annotations];
 }
 
+function savedSectionIsNestedListParagraph(chapter, section) {
+  const sectionID = String(section?.id || "");
+  const sectionNumber = String(section?.sectionNumber || "").trim().replace(/\.$/, "");
+  if (!sectionID || !/^\d+(?:\.\d+)*$/.test(sectionNumber)) return false;
+
+  const parentGroup = (chapter?.groups || []).find((group) =>
+    (group?.sections || []).some((candidate) =>
+      String(candidate?.id ?? candidate) === sectionID
+    )
+  );
+  const parentNumber = String(parentGroup?.headerLine || parentGroup?.headingLine || "")
+    .match(/\b(\d+(?:\.\d+)*)\b/)?.[1];
+  if (!parentNumber) return false;
+
+  return sectionNumber !== parentNumber && !sectionNumber.startsWith(`${parentNumber}.`);
+}
+
 async function hydrateSavedColumnItems(items = []) {
   const sectionPromises = new Map();
   const resolveItemSection = (item) => {
@@ -14047,6 +14064,7 @@ async function hydrateSavedColumnItems(items = []) {
         chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || item.chapterTitle || "",
         sectionNumber: section?.sectionNumber || detail.sectionNumber || item.sectionNumber || "",
         title: section?.title || detail.title || item.title || "Section",
+        isNestedListParagraph: savedSectionIsNestedListParagraph(chapter, section),
         savedContentComparisonText,
         previewText: savedContentComparisonText.slice(0, 240)
       };
@@ -14308,6 +14326,9 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
       const item = entry.item;
       const row = document.createElement("article");
       row.className = "saved-row saved-section-row";
+      if (item.isNestedListParagraph) {
+        row.classList.add("is-list-paragraph");
+      }
       const removableSavedItem = typeof options.removableSavedItems === "function"
           ? options.removableSavedItems(item)
           : Boolean(options.removableSavedItems);
@@ -14324,7 +14345,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         heading.className = "saved-section-heading";
         const meta = document.createElement("span");
         meta.className = "saved-section-meta";
-        meta.textContent = normalizeAnnotationBlockID(item.blockID)
+        meta.textContent = normalizeAnnotationBlockID(item.blockID) || item.isNestedListParagraph
           ? ["Paragraph", sectionNumber].filter(Boolean).join(" · ")
           : item.kind === "textBlock"
             ? ["Text Block", sectionNumber].filter(Boolean).join(" · ")
@@ -14345,7 +14366,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           bookmarkIcon.innerHTML = bookmarkIconSVG(true);
           status.append(bookmarkIcon);
         }
-        const title = document.createElement("strong");
+        const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
         title.className = "saved-section-title";
         title.textContent = titleText;
         const metaLine = document.createElement("span");

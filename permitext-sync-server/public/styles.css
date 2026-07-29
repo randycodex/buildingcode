@@ -6093,6 +6093,10 @@ button.project-studio-metric:focus-visible {
   flex: 1 1 auto;
 }
 
+.saved-projects-menu-toggle[aria-expanded="true"]:hover {
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+}
+
 .saved-projects-actions {
   position: absolute;
   top: 50%;
@@ -6367,6 +6371,11 @@ button.project-studio-metric:focus-visible {
 .saved-code-filter-heading > .code-filter-menu-toggle:hover,
 .saved-tag-filter-heading > .code-filter-menu-toggle:hover {
   background: color-mix(in srgb, var(--text-tertiary) 10%, transparent);
+}
+
+.saved-code-filter-menu-toggle[aria-expanded="true"]:hover,
+.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover {
+  background: transparent;
 }
 
 .saved-code-filter-heading,
@@ -6982,6 +6991,11 @@ button.project-studio-metric:focus-visible {
   font-size: calc(var(--saved-font-size) * 0.946) !important;
   font-weight: 650;
   line-height: 1.25;
+}
+
+.saved-section-row.is-list-paragraph .saved-section-title {
+  color: var(--text-secondary);
+  font-weight: 450;
 }
 
 .saved-row-button {

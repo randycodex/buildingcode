@@ -955,7 +955,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-inline-project-archive-v141'),
+        webRoot.text.includes('/web/app.js?v=20260729-saved-paragraph-style-v142'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -976,8 +976,11 @@ async function main() {
           webRoot.text.indexOf('class="saved-projects-archive-button"') &&
         workspaceStyles.text.includes("transition: opacity 150ms ease;") &&
         workspaceStyles.text.includes(".saved-project-list.is-switching {\n  opacity: 0;\n}") &&
+        workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"]:hover') &&
+        workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
+        workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v127'),
+        webRoot.text.includes('/web/styles.css?v=20260729-saved-paragraph-style-v129'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1066,7 +1069,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-inline-project-archive-v127'),
+        webRoot.text.includes('/web/styles.css?v=20260729-saved-paragraph-style-v129'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1309,6 +1312,8 @@ async function main() {
       workspaceScript.text.includes("function consolidatedSavedAnnotations") &&
         workspaceScript.text.includes("function mergeSavedColumnItems") &&
         workspaceScript.text.includes("async function hydrateSavedColumnItems") &&
+        workspaceScript.text.includes("function savedSectionIsNestedListParagraph") &&
+        workspaceScript.text.includes("isNestedListParagraph: savedSectionIsNestedListParagraph(chapter, section)") &&
         workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
@@ -1328,6 +1333,8 @@ async function main() {
         workspaceScript.text.includes('chapterHeader.className = "saved-chapter-header"') &&
         workspaceScript.text.includes('preview.className = "saved-paragraph-preview"') &&
         workspaceScript.text.includes('title.className = "saved-section-title"') &&
+        workspaceScript.text.includes('row.classList.add("is-list-paragraph")') &&
+        workspaceStyles.text.includes(".saved-section-row.is-list-paragraph .saved-section-title") &&
         workspaceScript.text.includes('sortSavedItems(filteredItems, "codeOrder")') &&
         workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true })'),
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
