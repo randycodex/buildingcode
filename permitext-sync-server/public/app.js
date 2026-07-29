@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-saved-filter-cards-v123";
+} from "./offline-storage.js?v=20260728-saved-target-top-v125";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5703,68 +5703,28 @@ function savedReaderTarget(content, item) {
   const numberSelector = sectionNumber
     ? `.chapter-section[data-section-number="${CSS.escape(sectionNumber)}"]`
     : "";
-  return (idSelector ? content.querySelector(idSelector) : null) ||
+  const sectionTarget = (idSelector ? content.querySelector(idSelector) : null) ||
     (aliasSelector ? content.querySelector(aliasSelector) : null) ||
     (numberSelector ? content.querySelector(numberSelector) : null);
-}
-
-function centerReaderTarget(content, target, behavior = "auto") {
-  if (!content || !target) return;
-  const contentRect = content.getBoundingClientRect();
-  const targetRect = target.getBoundingClientRect();
-  const targetHeight = Math.min(targetRect.height, content.clientHeight);
-  const centeredTop = content.scrollTop +
-    targetRect.top -
-    contentRect.top -
-    (content.clientHeight - targetHeight) / 2;
-  const maxTop = Math.max(0, content.scrollHeight - content.clientHeight);
-  content.scrollTo({
-    top: Math.min(maxTop, Math.max(0, centeredTop)),
-    behavior
-  });
-}
-
-function flashSavedReaderTarget(target) {
-  if (!target) return;
-  const textRoot = target.matches(".annotated-code-block")
-    ? target.querySelector(":scope > .section-block, :scope > .section-html, :scope > .code-table, :scope > .code-media") || target
-    : target;
-  const walker = document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT);
-  const textNodes = [];
-  let textNode = walker.nextNode();
-  while (textNode) {
-    const parent = textNode.parentElement;
-    if (
-      textNode.nodeValue?.trim() &&
-      parent &&
-      !parent.closest("script, style, input, textarea, select, .inline-comment, .saved-reader-target-flash")
-    ) {
-      textNodes.push(textNode);
-    }
-    textNode = walker.nextNode();
-  }
-  const highlights = textNodes.map((node) => {
-    const highlight = document.createElement("span");
-    highlight.className = "saved-reader-target-flash";
-    highlight.textContent = node.nodeValue;
-    node.replaceWith(highlight);
-    return highlight;
-  });
-  window.setTimeout(() => {
-    const parents = new Set();
-    highlights.forEach((highlight) => {
-      if (!highlight.isConnected) return;
-      const parent = highlight.parentNode;
-      parents.add(parent);
-      highlight.replaceWith(document.createTextNode(highlight.textContent || ""));
+  const savedTitle = String(item.title || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
+  if (savedTitle.length >= 12) {
+    const exactTextBlock = Array.from(
+      (sectionTarget || content).querySelectorAll(".annotated-code-block")
+    ).find((candidate) => {
+      const codeBody = candidate.querySelector(
+        ":scope > .section-block, :scope > .section-html, :scope > .code-table, :scope > .code-media"
+      ) || candidate;
+      const candidateText = String(codeBody.textContent || "").replace(/\s+/g, " ").trim().toLocaleLowerCase();
+      return candidateText.length >= 12 &&
+        (candidateText.includes(savedTitle) || savedTitle.includes(candidateText));
     });
-    parents.forEach((parent) => parent?.normalize());
-  }, readerSearchFlashDurationMS + 80);
+    if (exactTextBlock) return exactTextBlock;
+  }
+  return sectionTarget;
 }
 
-function centerAndFlashSavedReaderTarget(reader, item) {
+function alignSavedReaderTargetAtTop(reader, item) {
   const paneID = paneIDForReader(reader);
-  let highlighted = false;
   [0, 80, 220].forEach((delay) => {
     window.setTimeout(() => {
       const panel = track.querySelector(
@@ -5773,11 +5733,7 @@ function centerAndFlashSavedReaderTarget(reader, item) {
       const content = panel?.querySelector(".reader-content");
       const target = savedReaderTarget(content, item);
       if (!content || !target) return;
-      centerReaderTarget(content, target);
-      if (!highlighted) {
-        highlighted = true;
-        flashSavedReaderTarget(target);
-      }
+      scrollReaderContentToNode(content, target, "auto");
     }, delay);
   });
 }
@@ -14420,7 +14376,7 @@ async function openSavedItemInNewReader(item, savedPaneID) {
   await transitionWorkspace("utility", { refreshPaneIDs: [readerPaneID] });
   scrollPaneIntoView(readerPaneID);
   requestAnimationFrame(() => {
-    requestAnimationFrame(() => centerAndFlashSavedReaderTarget(reader, item));
+    requestAnimationFrame(() => alignSavedReaderTargetAtTop(reader, item));
   });
 }
 

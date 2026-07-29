@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-cards-v123'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-target-top-v125'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -994,14 +994,15 @@ async function main() {
       workspaceScript.text.includes("function openSavedItemInNewReader(item, savedPaneID)") &&
         workspaceScript.text.includes("void openSavedItemInNewReader(openItem, paneID);") &&
         workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
-        workspaceScript.text.includes("function centerAndFlashSavedReaderTarget(reader, item)") &&
-        workspaceScript.text.includes("function centerReaderTarget(content, target, behavior = \"auto\")") &&
-        workspaceScript.text.includes("document.createTreeWalker(textRoot, NodeFilter.SHOW_TEXT)") &&
-        workspaceScript.text.includes('highlight.className = "saved-reader-target-flash"') &&
-        workspaceScript.text.includes("highlight.replaceWith(document.createTextNode") &&
-        workspaceStyles.text.includes("@keyframes saved-reader-target-flash") &&
-        workspaceStyles.text.includes("background: transparent;"),
-      "Saved items should open directly in a centered Reader with a temporary fading target highlight."
+        workspaceScript.text.includes("function alignSavedReaderTargetAtTop(reader, item)") &&
+        workspaceScript.text.includes('const savedTitle = String(item.title || "").replace(/\\s+/g, " ")') &&
+        workspaceScript.text.includes('(sectionTarget || content).querySelectorAll(".annotated-code-block")') &&
+        workspaceScript.text.includes("candidateText.includes(savedTitle) || savedTitle.includes(candidateText)") &&
+        workspaceScript.text.includes('scrollReaderContentToNode(content, target, "auto")') &&
+        !workspaceScript.text.includes("flashSavedReaderTarget") &&
+        !workspaceScript.text.includes("saved-reader-target-flash") &&
+        !workspaceStyles.text.includes("@keyframes saved-reader-target-flash"),
+      "Saved items should open directly in a Reader with the exact target aligned at the top and no highlight."
     );
     assert(
       workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
@@ -1025,7 +1026,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-cards-v108'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-target-top-v109'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

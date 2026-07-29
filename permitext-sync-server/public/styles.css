@@ -3728,28 +3728,6 @@ mark {
   }
 }
 
-.saved-reader-target-flash {
-  --saved-reader-target-flash-color: color-mix(in srgb, var(--code-accent) 34%, #ffe76b);
-  color: inherit;
-  border-radius: 0.12em;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-  animation: saved-reader-target-flash 2000ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-
-@keyframes saved-reader-target-flash {
-  0%,
-  38% {
-    background: color-mix(in srgb, var(--saved-reader-target-flash-color) 82%, transparent);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--saved-reader-target-flash-color) 54%, transparent);
-  }
-
-  100% {
-    background: transparent;
-    box-shadow: 0 0 0 0 transparent;
-  }
-}
-
 .saved-content,
 .projects-content {
   display: grid;
