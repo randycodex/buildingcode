@@ -1040,7 +1040,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-tag-clear-v123'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-tag-spacing-v124'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

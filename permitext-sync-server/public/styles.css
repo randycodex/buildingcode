@@ -6513,7 +6513,7 @@ button.project-studio-metric:focus-visible {
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-4);
 }
 
 .saved-tag-filter-chip {
