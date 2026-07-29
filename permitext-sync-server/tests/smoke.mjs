@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-reader-progress-inner-v133'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-bottom-v134'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1009,7 +1009,7 @@ async function main() {
         workspaceScript.text.includes(".map((word) => word[0].toUpperCase())") &&
         workspaceScript.text.includes('}).join(", ");') &&
         workspaceScript.text.includes("label: savedCodeFilterMenuLabel") &&
-        workspaceScript.text.includes('const openingPadding = menu.closest(".saved-inline-filters") ? filterGap * 2 : filterGap;') &&
+        workspaceScript.text.includes('filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap') &&
         workspaceStyles.text.includes(".saved-inline-filters > .code-filter-menu {") &&
         workspaceStyles.text.includes("--saved-filter-card-radius: 22px;") &&
         workspaceStyles.text.includes("border-radius: var(--saved-filter-card-radius);") &&
@@ -1017,7 +1017,7 @@ async function main() {
         !workspaceStyles.text.includes("saved-filter-bubble") &&
         !workspaceStyles.text.includes("clip-path: ellipse(") &&
         workspaceStyles.text.includes(".code-filter-menu.is-open .saved-code-filter {") &&
-        workspaceStyles.text.includes("padding: var(--space-2) var(--space-3);") &&
+        workspaceStyles.text.includes("padding: var(--space-2) var(--space-3) var(--space-3);") &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);"),
       "Saved code and tag filters should expand inside one growing card and summarize multiple codes by initials."
     );
@@ -1032,7 +1032,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-reader-progress-inner-v119'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-bottom-v120'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

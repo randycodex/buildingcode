@@ -6372,7 +6372,7 @@ button.project-studio-metric:focus-visible {
 }
 
 .code-filter-menu.is-open .saved-code-filter {
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-2) var(--space-3) var(--space-3);
 }
 
 .saved-code-filter .saved-filter-chip {
