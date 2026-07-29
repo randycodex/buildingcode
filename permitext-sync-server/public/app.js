@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260728-enacted-code-accents-v108";
+} from "./offline-storage.js?v=20260728-hide-existing-code-notice-v109";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2597,7 +2597,6 @@ function populateCodeSelect(panel, reader) {
   const status = panel.querySelector(".reader-code-status");
   if (status) {
     const notices = {
-      EBC: "Enacted, not yet effective. The NYC Existing Building Code becomes effective July 17, 2027.",
       EC: "NYC-enacted amendments are included. The adopted 2020 NFPA 70 text is referenced but is not reproduced.",
       BC68: "Historical enacted text. Applicability depends on the project date, permit history, and transition provisions.",
       LL: "Construction-related unconsolidated enactments, including transition, applicability, and effective-date provisions."

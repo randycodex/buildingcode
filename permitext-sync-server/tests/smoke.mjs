@@ -952,14 +952,15 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-enacted-code-accents-v108'),
+        webRoot.text.includes('/web/app.js?v=20260728-hide-existing-code-notice-v109'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
       workspaceScript.text.includes('prefix: "EBC"') &&
-        workspaceScript.text.includes("The NYC Existing Building Code becomes effective July 17, 2027.") &&
+        workspaceScript.text.includes('label: "Existing Building Code (effective July 17, 2027)"') &&
+        !workspaceScript.text.includes("Enacted, not yet effective.") &&
         webRoot.text.includes('class="reader-code-status"'),
-      "The enacted Existing Building Code should be available in the Reader with its future effective date."
+      "The Existing Building Code should retain its effective date in the title without an inline status notice."
     );
     assert(
       ["ECC", "EC", "FC", "BC68", "HMC", "T24", "T25", "T26", "T28", "LL"].every((prefix) =>
