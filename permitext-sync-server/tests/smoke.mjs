@@ -954,7 +954,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-spacing-v129'),
+        webRoot.text.includes('/web/app.js?v=20260728-saved-filter-fixed-v130'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1032,7 +1032,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-spacing-v116'),
+        webRoot.text.includes('/web/styles.css?v=20260728-saved-filter-fixed-v117'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1495,13 +1495,8 @@ async function main() {
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 0;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{[\s\S]*?content: none;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip:nth-child\(even\),[\s\S]*?\.saved-tag-filter-chip:nth-child\(even\) \{[\s\S]*?padding-left: var\(--space-2\);/) &&
-        workspaceStyles.text.includes(".saved-inline-filters > .code-filter-menu.is-user-resized .saved-code-filter") &&
-        workspaceStyles.text.match(/\.saved-filter-resize-handle \{[\s\S]*?cursor: ns-resize;[\s\S]*?touch-action: none;/) &&
-        workspaceScript.text.includes("function wireSavedFilterResizeHandle(") &&
-        workspaceScript.text.includes('resizeHeightStateKey: "codeFilterHeight"') &&
-        workspaceScript.text.includes('resizeHeightStateKey: "tagsFilterHeight"') &&
-        workspaceScript.text.includes('handle.setPointerCapture(pointerID)') &&
-        workspaceScript.text.includes('["ArrowUp", "ArrowDown"].includes(event.key)') &&
+        !workspaceStyles.text.includes(".saved-filter-resize-handle") &&
+        !workspaceScript.text.includes("wireSavedFilterResizeHandle") &&
         workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
         workspaceScript.text.includes('stateKey: "tagsMenuOpen"') &&
         workspaceScript.text.includes('menu.classList.add("is-restoring")') &&
@@ -1510,7 +1505,7 @@ async function main() {
         !workspaceScript.text.includes("savedFilterScrollPositions") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved Sections and Tags should use resizable two-column text lists within the shared collapsible menu behavior."
+      "Saved Sections and Tags should use fixed two-column text lists within the shared collapsible menu behavior."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
