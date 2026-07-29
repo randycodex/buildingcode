@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-jump-back-reader-v144";
+} from "./offline-storage.js?v=20260729-linked-reader-width-v145";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -109,6 +109,7 @@ const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-re
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
 const defaultReaderPaneWidth = 520;
+const defaultSourceLinkedReaderPaneWidth = 400;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultDetailPaneWidth = defaultNonReaderPaneWidth;
@@ -1430,7 +1431,11 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
-  if (paneID.startsWith("reader:")) return defaultReaderPaneWidth;
+  if (paneID.startsWith("reader:")) {
+    const readerID = paneID.replace("reader:", "");
+    const reader = (state.readers || []).find((candidate) => candidate.id === readerID);
+    return reader?.savedSourcePaneID ? defaultSourceLinkedReaderPaneWidth : defaultReaderPaneWidth;
+  }
   return defaultNonReaderPaneWidth;
 }
 
@@ -1877,6 +1882,8 @@ function applyPaneWeight(panel, paneID) {
   const value = Number(state.paneWeights[paneID]);
   const hasManyColumns = activePaneIDs().length >= 4;
   const flexibleReader = isFlexibleReaderPaneID(paneID);
+  const sourceLinkedReader = paneID?.startsWith("reader:") &&
+    (state.readers || []).some((reader) => `reader:${reader.id}` === paneID && reader.savedSourcePaneID);
   const explicitlyResizedReader = flexibleReader &&
     Number.isFinite(value) &&
     value > defaultWidth + 0.5;
@@ -1890,6 +1897,10 @@ function applyPaneWeight(panel, paneID) {
   panel.style.setProperty("--pane-default-min-width", hasManyColumns ? `${defaultWidth}px` : "0px");
   if (detachedProjectWindow && isProjectWorkboardPaneID(paneID)) {
     panel.style.flex = `1 1 ${width}px`;
+    return;
+  }
+  if (sourceLinkedReader) {
+    panel.style.flex = `0 0 ${width}px`;
     return;
   }
   if (isFixedWidthPaneID(paneID) || isFixedWidthReaderPaneID(paneID)) {
@@ -14533,6 +14544,10 @@ async function openSavedItemInReader(item, savedPaneID) {
     Object.assign(reader, readerFields);
   }
   const readerPaneID = paneIDForReader(reader);
+  if (!reader.sourceLinkedDefaultWidthApplied) {
+    state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;
+    reader.sourceLinkedDefaultWidthApplied = true;
+  }
   placePaneAfter(savedPaneID, readerPaneID);
   updateBrowserSectionURL(sectionID);
   scheduleContinuitySync(reader);

@@ -957,7 +957,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-jump-back-reader-v144'),
+        webRoot.text.includes('/web/app.js?v=20260729-linked-reader-width-v145'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1023,6 +1023,10 @@ async function main() {
         workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
         workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
         workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
+        workspaceScript.text.includes("const defaultSourceLinkedReaderPaneWidth = 400;") &&
+        workspaceScript.text.includes("state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;") &&
+        workspaceScript.text.includes("reader.sourceLinkedDefaultWidthApplied = true;") &&
+        workspaceScript.text.includes("if (sourceLinkedReader)") &&
         workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
         workspaceScript.text.includes("function alignSavedReaderTargetAtTop(reader, item)") &&
         workspaceScript.text.includes('const savedTitle = String(item.title || "").replace(/\\s+/g, " ")') &&
