@@ -965,7 +965,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-research-list-cleanup-v157'),
+        webRoot.text.includes('/web/app.js?v=20260729-research-composer-v158'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -990,7 +990,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-list-cleanup-v139'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-composer-v140'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1083,7 +1083,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-list-cleanup-v139'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-composer-v140'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

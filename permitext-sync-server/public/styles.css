@@ -5281,12 +5281,15 @@ mark {
 .research-composer {
   position: sticky;
   bottom: 0;
+  z-index: 5;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: end;
-  padding: var(--space-3) 0 0;
+  margin: 0 calc(var(--panel-padding) * -1) calc(var(--panel-padding) * -1);
+  padding: var(--space-3) var(--panel-padding) var(--panel-padding);
   background: var(--surface);
+  isolation: isolate;
 }
 
 .research-composer .research-question-input {
@@ -5303,6 +5306,10 @@ mark {
   margin: 0;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.82) !important;
+}
+
+.research-composer-status:empty {
+  display: none;
 }
 
 .research-selection-menu {
