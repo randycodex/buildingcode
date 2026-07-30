@@ -4958,6 +4958,7 @@ mark {
 }
 
 .research-evidence-pane {
+  grid-row: 1;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
@@ -5031,6 +5032,7 @@ mark {
 }
 
 .research-evidence-divider {
+  grid-row: 2;
   position: relative;
   z-index: 6;
   min-height: 11px;
@@ -5072,6 +5074,7 @@ body.is-resizing-research-evidence * {
 }
 
 .research-dialogue-pane {
+  grid-row: 3;
   display: grid;
   grid-template-rows: minmax(0, 1fr) auto;
   min-height: 0;
