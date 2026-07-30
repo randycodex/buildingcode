@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-feedback-layout-v197'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-evidence-header-v198'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-feedback-layout-v171'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-evidence-header-v172'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1147,16 +1147,15 @@ async function main() {
       "Research composer should match the Research conversation column background."
     );
     assert(
-      workspaceScript.text.includes("function bindResearchEvidenceDivider") &&
+        workspaceScript.text.includes("function bindResearchEvidenceDivider") &&
         workspaceScript.text.includes("researchEvidenceSplitRatios") &&
-        workspaceScript.text.includes("researchEvidenceCollapsed") &&
         workspaceScript.text.includes("delete state.researchEvidenceSplitRatios[conversation.id]") &&
-        workspaceScript.text.includes("delete state.researchEvidenceCollapsed[conversation.id]") &&
         researchConversationRendererSource.includes('evidencePane.className = "research-evidence-pane"') &&
         researchConversationRendererSource.includes('dialoguePane.className = "research-dialogue-pane"') &&
         researchConversationRendererSource.includes('divider.className = "research-evidence-divider"') &&
         researchConversationRendererSource.includes('divider.setAttribute("aria-orientation", "horizontal")') &&
-        researchConversationRendererSource.includes('evidenceCollapse.setAttribute("aria-controls", evidenceScroll.id)') &&
+        !researchConversationRendererSource.includes('evidenceHeading.className = "research-evidence-heading"') &&
+        !researchConversationRendererSource.includes('evidenceCollapse.className = "icon-button research-evidence-collapse"') &&
         researchConversationRendererSource.includes('divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`)') &&
         researchConversationRendererSource.includes("thread.scrollTop = thread.scrollHeight") &&
         workspaceStyles.text.includes("var(--research-evidence-size, 36%)") &&
@@ -1232,7 +1231,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-feedback-layout-v171'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-evidence-header-v172'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

@@ -4953,82 +4953,17 @@ mark {
   overflow: hidden;
 }
 
-.research-conversation-content.is-evidence-collapsed {
-  grid-template-rows: auto 0 minmax(128px, 1fr);
-}
-
 .research-evidence-pane {
   grid-row: 1;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
-}
-
-.research-evidence-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-height: 40px;
-  padding: 0 0 var(--space-2);
-  border-bottom: 1px solid var(--border);
-}
-
-.research-evidence-heading > div {
-  display: flex;
-  min-width: 0;
-  align-items: baseline;
-  gap: var(--space-2);
-}
-
-.research-evidence-heading strong {
-  flex: 0 0 auto;
-}
-
-.research-evidence-heading span {
-  min-width: 0;
-  overflow: hidden;
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.76) !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.research-evidence-collapse {
-  flex: 0 0 auto;
-}
-
-.research-evidence-collapse svg {
-  grid-area: 1 / 1;
-  width: 18px;
-  height: 18px;
-}
-
-.research-evidence-collapse .research-chevron-down,
-.research-evidence-collapse[aria-expanded="false"] .research-chevron-up {
-  display: none;
-}
-
-.research-evidence-collapse .research-chevron-up,
-.research-evidence-collapse[aria-expanded="false"] .research-chevron-down {
-  display: block;
 }
 
 .research-evidence-scroll {
+  height: 100%;
   min-height: 0;
-  padding-top: var(--space-3);
   overflow-y: auto;
   scrollbar-gutter: stable;
-}
-
-.research-conversation-content.is-evidence-collapsed .research-evidence-heading {
-  padding-bottom: 0;
-  border-bottom: 0;
-}
-
-.research-conversation-content.is-evidence-collapsed .research-evidence-scroll {
-  display: none;
 }
 
 .research-evidence-divider {

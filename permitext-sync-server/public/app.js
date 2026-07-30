@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-feedback-layout-v197";
+} from "./offline-storage.js?v=20260730-research-evidence-header-v198";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -278,14 +278,6 @@ function loadWorkspaceState() {
               .map(([conversationID, ratio]) => [conversationID, normalizeResearchEvidenceSplitRatio(ratio)])
           )
         : {},
-      researchEvidenceCollapsed: saved.researchEvidenceCollapsed && typeof saved.researchEvidenceCollapsed === "object"
-        ? Object.fromEntries(
-            Object.entries(saved.researchEvidenceCollapsed)
-              .filter(([conversationID, collapsed]) =>
-                typeof conversationID === "string" && conversationID && collapsed === true
-              )
-          )
-        : {},
       workboards: activeProjectDetail && savedWorkboards.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
@@ -336,7 +328,6 @@ function loadWorkspaceState() {
       savedTextSize: 10,
       researchConversationID: "",
       researchEvidenceSplitRatios: {},
-      researchEvidenceCollapsed: {},
       workboards: [],
       notebooks: [],
       reportDrafts: [],
@@ -8862,9 +8853,6 @@ async function deleteResearchConversationFromList(conversation, button) {
     if (state.researchEvidenceSplitRatios) {
       delete state.researchEvidenceSplitRatios[conversation.id];
     }
-    if (state.researchEvidenceCollapsed) {
-      delete state.researchEvidenceCollapsed[conversation.id];
-    }
     await refreshResearchConversationList();
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
@@ -9975,25 +9963,7 @@ function researchEvidenceSplitRatio(conversationID) {
   return normalizeResearchEvidenceSplitRatio(state.researchEvidenceSplitRatios?.[conversationID]);
 }
 
-function researchEvidenceIsCollapsed(conversationID) {
-  return state.researchEvidenceCollapsed?.[conversationID] === true;
-}
-
-function setResearchEvidenceCollapsed(layout, divider, toggle, conversationID, collapsed) {
-  state.researchEvidenceCollapsed ||= {};
-  if (collapsed) {
-    state.researchEvidenceCollapsed[conversationID] = true;
-  } else {
-    delete state.researchEvidenceCollapsed[conversationID];
-  }
-  layout.classList.toggle("is-evidence-collapsed", collapsed);
-  divider.hidden = collapsed;
-  toggle.setAttribute("aria-expanded", String(!collapsed));
-  toggle.setAttribute("aria-label", collapsed ? "Expand context and evidence" : "Collapse context and evidence");
-  toggle.title = collapsed ? "Expand context and evidence" : "Collapse context and evidence";
-}
-
-function bindResearchEvidenceDivider(layout, divider, toggle, conversationID) {
+function bindResearchEvidenceDivider(layout, divider, conversationID) {
   const applyRatio = (value) => {
     const desiredRatio = normalizeResearchEvidenceSplitRatio(value);
     state.researchEvidenceSplitRatios ||= {};
@@ -10021,20 +9991,10 @@ function bindResearchEvidenceDivider(layout, divider, toggle, conversationID) {
   };
   applyRatio(researchEvidenceSplitRatio(conversationID));
   requestAnimationFrame(() => applyRatio(researchEvidenceSplitRatio(conversationID)));
-  setResearchEvidenceCollapsed(
-    layout,
-    divider,
-    toggle,
-    conversationID,
-    researchEvidenceIsCollapsed(conversationID)
-  );
 
   const resize = (event) => {
     const bounds = layout.getBoundingClientRect();
     if (!bounds.height) return;
-    if (researchEvidenceIsCollapsed(conversationID)) {
-      setResearchEvidenceCollapsed(layout, divider, toggle, conversationID, false);
-    }
     applyRatio((event.clientY - bounds.top) / bounds.height);
   };
   const endResize = (event) => {
@@ -10062,7 +10022,6 @@ function bindResearchEvidenceDivider(layout, divider, toggle, conversationID) {
   });
   divider.addEventListener("dblclick", () => {
     applyRatio(0.36);
-    setResearchEvidenceCollapsed(layout, divider, toggle, conversationID, false);
     saveWorkspaceState();
   });
   divider.addEventListener("keydown", (event) => {
@@ -10075,17 +10034,6 @@ function bindResearchEvidenceDivider(layout, divider, toggle, conversationID) {
         ? 0.7
         : researchEvidenceSplitRatio(conversationID) + direction * 0.04;
     applyRatio(ratio);
-    setResearchEvidenceCollapsed(layout, divider, toggle, conversationID, false);
-    saveWorkspaceState();
-  });
-  toggle.addEventListener("click", () => {
-    setResearchEvidenceCollapsed(
-      layout,
-      divider,
-      toggle,
-      conversationID,
-      !researchEvidenceIsCollapsed(conversationID)
-    );
     saveWorkspaceState();
   });
 }
@@ -10136,28 +10084,10 @@ async function renderResearchConversation(conversationID) {
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
   const evidencePane = document.createElement("section");
   evidencePane.className = "research-evidence-pane";
-  const evidenceHeading = document.createElement("header");
-  evidenceHeading.className = "research-evidence-heading";
-  const evidenceHeadingCopy = document.createElement("div");
-  const evidenceTitle = document.createElement("strong");
-  evidenceTitle.textContent = `Context & evidence (${selectedSources.length} ${selectedSources.length === 1 ? "passage" : "passages"})`;
-  const evidenceSummary = document.createElement("span");
-  evidenceSummary.textContent = selectedSources
-    .slice(0, 3)
-    .map((source) => `${source.codePrefix || source.codeBook || "Code"} ${source.sectionNumber}`)
-    .concat(selectedSources.length > 3 ? [`+${selectedSources.length - 3}`] : [])
-    .join(", ");
-  evidenceHeadingCopy.append(evidenceTitle, evidenceSummary);
-  const evidenceCollapse = document.createElement("button");
-  evidenceCollapse.type = "button";
-  evidenceCollapse.className = "icon-button research-evidence-collapse";
-  evidenceCollapse.innerHTML = researchChevronIconsSVG();
-  evidenceHeading.append(evidenceHeadingCopy, evidenceCollapse);
   const evidenceScroll = document.createElement("section");
   evidenceScroll.className = "research-evidence-scroll";
   evidenceScroll.id = `research-evidence-${conversation.id}`;
-  evidenceCollapse.setAttribute("aria-controls", evidenceScroll.id);
-  evidencePane.append(evidenceHeading, evidenceScroll);
+  evidencePane.append(evidenceScroll);
 
   const divider = document.createElement("div");
   divider.className = "research-evidence-divider";
@@ -10313,7 +10243,7 @@ async function renderResearchConversation(conversationID) {
   });
   composer.append(input, sendButton, status);
   dialoguePane.append(composer);
-  bindResearchEvidenceDivider(content, divider, evidenceCollapse, conversation.id);
+  bindResearchEvidenceDivider(content, divider, conversation.id);
   requestAnimationFrame(() => {
     thread.scrollTop = thread.scrollHeight;
   });
