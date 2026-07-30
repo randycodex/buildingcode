@@ -3010,6 +3010,10 @@ async function main() {
     assert(createdConversation.response.status === 201, "Research conversation creation failed.");
     assert(createdConversation.json.conversation.messages.length === 0, "Creating research unexpectedly generated an AI message.");
     assert(
+      /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(createdConversation.json.conversation.title),
+      "New Research conversations should use their New York creation date and time as the default title."
+    );
+    assert(
         createdConversation.json.conversation.sources[0].selectedText === selectedResearchText &&
         createdConversation.json.conversation.sources[0].sectionTextHash &&
         createdConversation.json.conversation.primaryProjectID === researchProjectIDs[0] &&
@@ -4662,6 +4666,9 @@ async function main() {
         reusedResearchEvidence.json.conversation.primaryProjectID === researchProjectIDs[1] &&
         reusedResearchEvidence.json.conversation.messages.length === 0 &&
         reusedResearchEvidence.json.conversation.origin.answerID === answerID &&
+        /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(
+          reusedResearchEvidence.json.conversation.title
+        ) &&
         reusedResearchEvidence.json.conversation.sources[0].id !==
           createdConversation.json.conversation.sources[0].id &&
         !JSON.stringify(reusedResearchEvidence.json.conversation).includes("When must the owner notify the department?"),

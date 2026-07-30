@@ -1019,6 +1019,10 @@ async function createEvaluationConversation(baseURL, account, testCase) {
     created.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
     `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
   );
+  assert(
+    /^[A-Z][a-z]{2} \d{1,2}, \d{4} · \d{1,2}:\d{2} [AP]M$/.test(created.conversation.title),
+    `${testCase.id} did not receive a creation-date default conversation title.`
+  );
   return created.conversation.id;
 }
 

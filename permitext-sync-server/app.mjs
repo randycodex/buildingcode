@@ -4633,6 +4633,24 @@ function researchConversationSummary(conversation) {
   };
 }
 
+function defaultResearchConversationTitle(timestamp) {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "America/New_York"
+    })
+      .formatToParts(new Date(timestamp))
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, part.value])
+  );
+  return `${parts.month} ${parts.day}, ${parts.year} · ${parts.hour}:${parts.minute} ${parts.dayPeriod}`;
+}
+
 function researchSourceFromEvidence(evidence, options = {}) {
   const selectedText = readableResearchSelectionText(
     options.selectedText,
@@ -9326,11 +9344,10 @@ async function handleResearchConversationReuseEvidence(request, response) {
     sendError(response, 422, "The historical answer has no reusable approved evidence.");
     return;
   }
-  const primary = sources.find((source) => source.kind === "selection");
   const now = new Date().toISOString();
   const conversation = {
     id: randomUUID(),
-    title: `${primary.codePrefix || "Code"} ${primary.sectionNumber || primary.sectionID} — Reused evidence`.slice(0, 140),
+    title: defaultResearchConversationTitle(now),
     createdAt: now,
     updatedAt: now,
     codeVersion: defaultSyncCodeVersion,
@@ -9383,11 +9400,10 @@ async function handleResearchConversationCreate(request, response) {
     }
     assertResearchConversationVisualLimits(resolved.sources);
     const sources = resolved.sources;
-    const primary = resolved.addedSelections[0];
     const now = new Date().toISOString();
     const conversation = {
       id: randomUUID(),
-      title: `${primary.codePrefix || "Code"} ${primary.sectionNumber || primary.sectionID} — ${primary.title}`.slice(0, 140),
+      title: defaultResearchConversationTitle(now),
       createdAt: now,
       updatedAt: now,
       codeVersion: defaultSyncCodeVersion,
