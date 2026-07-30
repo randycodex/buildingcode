@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-collapse-motion-mounted-v182";
+} from "./offline-storage.js?v=20260730-research-usage-v183";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9370,18 +9370,7 @@ async function renderResearch(paneID = "utility:analysis") {
     primary.textContent = `${researchUsage.requestsUsed} of ${researchUsage.requestLimit} AI requests used this month`;
     const reset = document.createElement("p");
     reset.textContent = `Allowance resets ${researchRelativeDate(researchUsage.resetDate)}.`;
-    const details = document.createElement("details");
-    const summary = document.createElement("summary");
-    summary.textContent = "Technical usage details";
-    const tokens = document.createElement("p");
-    tokens.textContent = `${Number(researchUsage.tokens?.totalTokens || 0).toLocaleString()} tokens used.`;
-    details.append(summary, tokens);
-    if (Number.isFinite(researchUsage.estimatedCostUSD)) {
-      const cost = document.createElement("p");
-      cost.textContent = `Estimated usage cost: $${researchUsage.estimatedCostUSD.toFixed(4)}.`;
-      details.append(cost);
-    }
-    usage.append(primary, reset, details);
+    usage.append(primary, reset);
     content.append(usage);
   }
 

@@ -4761,11 +4761,6 @@ mark {
   font-size: calc(var(--chrome-font-size) * 0.82) !important;
 }
 
-.research-usage summary {
-  cursor: pointer;
-  margin-top: var(--space-2);
-}
-
 .research-usage > strong {
   color: var(--text-primary);
 }
