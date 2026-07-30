@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-drafting-v185";
+} from "./offline-storage.js?v=20260730-research-source-copy-v186";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9630,17 +9630,14 @@ function renderResearchSource(source) {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
     setResearchSourceCardExpanded(card, !expanded);
   });
-  const relationship = document.createElement("p");
-  relationship.textContent = source.kind === "selection"
-    ? source.relationship || "Passage selected by you"
-    : "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
   if (source.kind !== "selection") {
     const label = document.createElement("p");
     label.className = "section-label";
     label.textContent = "Suggested related section — not included in analysis";
-    body.append(label);
+    const relationship = document.createElement("p");
+    relationship.textContent = "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
+    body.append(label, relationship);
   }
-  body.append(relationship);
   if (source.selectedText) {
     const quote = document.createElement("blockquote");
     quote.textContent = source.selectedText;
