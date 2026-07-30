@@ -1015,7 +1015,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-project-picker-v150'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-content-width-v151'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1132,7 +1132,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-project-picker-v150'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-content-width-v151'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1155,6 +1155,10 @@ async function main() {
         workspaceScript.text.includes('list.className = "saved-project-list research-project-list"') &&
         workspaceScript.text.includes('toggle.className = "code-filter-menu-toggle saved-projects-menu-toggle"') &&
         workspaceScript.text.includes('label: "Projects"') &&
+        workspaceStyles.text.includes(".research-conversation-content {\\n  display: grid;") &&
+        workspaceStyles.text.includes("padding: 0 0 var(--panel-padding);") &&
+        workspaceStyles.text.includes("margin: 0 0 calc(var(--panel-padding) * -1);") &&
+        workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
         !workspaceScript.text.includes("research-project-picker saved-projects-actions"),
       "Project context should reuse the Saved Projects pill and expanded project cards without add or archive controls."
     );
