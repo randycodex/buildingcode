@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-source-cleanup-v159";
+} from "./offline-storage.js?v=20260729-research-context-autosave-v160";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9582,7 +9582,7 @@ function renderResearchProjectContext(container, conversation) {
     unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Assign Research conversation to Project"
   });
-  heading.append(titleWrap, projectSelect);
+  heading.append(projectSelect, titleWrap);
   section.append(heading);
 
   const status = document.createElement("p");
@@ -9661,22 +9661,21 @@ function renderResearchProjectContext(container, conversation) {
       warning.append(warningTitle, warningCopy);
       section.append(warning);
     }
-    const form = document.createElement("form");
+    const form = document.createElement("section");
     form.className = "research-project-context-form";
     const label = document.createElement("label");
-    label.textContent = "Additional Research facts — one per line";
+    label.textContent = "Additional research facts — one per line";
     const facts = document.createElement("textarea");
     facts.rows = 4;
     facts.maxLength = 10_000;
     facts.placeholder = "Example: Existing building is Type I-B construction";
     facts.value = (conversation.projectContext?.facts || []).join("\n");
     label.append(facts);
-    const saveButton = document.createElement("button");
-    saveButton.className = "ghost-button";
-    saveButton.type = "submit";
-    saveButton.textContent = conversation.projectContextReviewRequired ? "Confirm reviewed context" : "Save Project context";
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
+    let autosaveTimer = 0;
+    let saveSequence = 0;
+    let lastSavedFacts = JSON.stringify(conversation.projectContext?.facts || []);
+    const saveProjectContextAutomatically = async () => {
+      window.clearTimeout(autosaveTimer);
       const normalizedFacts = facts.value
         .split(/\n+/)
         .map((item) => item.trim())
@@ -9685,25 +9684,35 @@ function renderResearchProjectContext(container, conversation) {
         status.textContent = "Use no more than 20 facts and 500 characters per fact.";
         return;
       }
-      facts.disabled = true;
-      saveButton.disabled = true;
-      status.textContent = "Saving reviewed Project context…";
+      const serializedFacts = JSON.stringify(normalizedFacts);
+      if (serializedFacts === lastSavedFacts && !conversation.projectContextReviewRequired) return;
+      const requestedSave = ++saveSequence;
+      status.textContent = "Saving Project context…";
       try {
         const payload = await postResearch("/research/conversations/project-context", {
           conversationID: conversation.id,
           projectID: conversation.primaryProjectID,
           facts: normalizedFacts
         });
+        if (requestedSave !== saveSequence) return;
+        conversation = payload.conversation;
         activeResearchConversation = payload.conversation;
-        await refreshResearchConversationList();
-        await openResearchConversation(conversation.id, { refreshList: true });
+        lastSavedFacts = serializedFacts;
+        status.textContent = "Project context saved";
+        window.setTimeout(() => {
+          if (status.textContent === "Project context saved") status.textContent = "";
+        }, 1400);
       } catch (error) {
+        if (requestedSave !== saveSequence) return;
         status.textContent = error.message;
-        facts.disabled = false;
-        saveButton.disabled = false;
       }
+    };
+    facts.addEventListener("input", () => {
+      window.clearTimeout(autosaveTimer);
+      autosaveTimer = window.setTimeout(saveProjectContextAutomatically, 650);
     });
-    form.append(label, saveButton);
+    facts.addEventListener("blur", saveProjectContextAutomatically);
+    form.append(label);
     section.append(form);
   } else {
     const unassigned = document.createElement("p");

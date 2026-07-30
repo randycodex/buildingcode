@@ -5011,7 +5011,7 @@ mark {
 
 .research-project-context-heading {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(150px, 42%);
+  grid-template-columns: 1fr;
   gap: var(--space-3);
   align-items: start;
 }
@@ -5032,7 +5032,7 @@ mark {
 }
 
 .research-project-select {
-  width: 100%;
+  width: min(100%, 240px);
   min-height: 38px;
   padding: 0 var(--space-3);
   border: 0;
@@ -5090,6 +5090,7 @@ mark {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
   font-weight: 650;
+  text-transform: none;
 }
 
 .research-project-context-form textarea {
@@ -5103,12 +5104,6 @@ mark {
   font: inherit;
   font-weight: 400;
   line-height: 1.45;
-}
-
-.research-project-context-form .ghost-button {
-  justify-self: start;
-  background: var(--text-primary);
-  color: var(--surface);
 }
 
 .research-project-context-status:empty {
