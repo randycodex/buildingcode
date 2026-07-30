@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-usage-v183";
+} from "./offline-storage.js?v=20260730-reader-chapters-v184";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5642,10 +5642,6 @@ async function populateReaderSelectors(panel, reader) {
   clear(sectionSelect);
   reader.codePrefix = reader.codePrefix || "BC";
 
-  const blankChapter = document.createElement("option");
-  blankChapter.value = "";
-  blankChapter.textContent = "Select a chapter";
-  chapterSelect.append(blankChapter);
   const readerChapters = await fetchChapterList(reader.codePrefix);
   if (!reader.chapterID) {
     reader.chapterID = readerChapters[0]?.id || "";
