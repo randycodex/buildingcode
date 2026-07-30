@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-row-flat-v161";
+} from "./offline-storage.js?v=20260730-research-pane-group-v162";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -16517,6 +16517,9 @@ function resetDividerPanes(previousPaneID, nextPaneID) {
 function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
+  if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) {
+    return ["utility:analysis", paneIDForResearchConversation()].filter((id) => active.has(id));
+  }
   if (
     paneID === primarySavedPaneID() ||
     isProjectDetailPaneID(paneID) ||

@@ -1302,6 +1302,15 @@ async function main() {
       "Web Research no longer exposes selection-first, persistent conversations without an eager model call."
     );
     assert(
+      workspaceScript.text.includes(
+        'if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:"))'
+      ) &&
+        workspaceScript.text.includes(
+          '["utility:analysis", paneIDForResearchConversation()]'
+        ),
+      "Research and its open conversation no longer move as one draggable pane group."
+    );
+    assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),
       "Project archiving still requires confirmation."
     );
