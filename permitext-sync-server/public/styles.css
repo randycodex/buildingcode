@@ -4904,7 +4904,7 @@ mark {
 
 .research-sources {
   border-bottom: 1px solid var(--border);
-  padding: var(--space-4) 0;
+  padding: var(--space-2) 0 var(--space-4);
 }
 
 .research-sources summary {

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-project-context-footer-v166";
+} from "./offline-storage.js?v=20260730-research-sources-top-v167";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9397,18 +9397,19 @@ function renderResearchVisualEvidence(sources, options = {}) {
 function renderResearchSource(source) {
   const card = document.createElement("article");
   card.className = `research-source-card is-${source.kind || "related"}`;
-  const label = document.createElement("p");
-  label.className = "section-label";
-  label.textContent = source.kind === "selection"
-    ? "Selected passage"
-    : "Suggested related section — not included in analysis";
   const citation = document.createElement("strong");
   citation.textContent = officialSectionCitation(source);
   const relationship = document.createElement("p");
   relationship.textContent = source.kind === "selection"
     ? source.relationship || "Passage selected by you"
     : "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
-  card.append(label, citation, relationship);
+  if (source.kind !== "selection") {
+    const label = document.createElement("p");
+    label.className = "section-label";
+    label.textContent = "Suggested related section — not included in analysis";
+    card.append(label);
+  }
+  card.append(citation, relationship);
   if (source.selectedText) {
     const quote = document.createElement("blockquote");
     quote.textContent = source.selectedText;
@@ -9677,6 +9678,7 @@ function renderResearchProjectContext(container, conversation) {
   }
   section.append(status);
   container.append(section);
+  return section;
 }
 
 async function renderResearchConversation(conversationID) {
@@ -9722,7 +9724,7 @@ async function renderResearchConversation(conversationID) {
 
   const conversation = activeResearchConversation;
   panelTitle.textContent = conversation.title;
-  renderResearchProjectContext(content, conversation);
+  const projectContextSection = renderResearchProjectContext(content, conversation);
   const sources = document.createElement("details");
   sources.className = "research-sources";
   sources.open = conversation.messages.length === 0 || conversation.sourceStatus === "changed";
@@ -9734,7 +9736,7 @@ async function renderResearchConversation(conversationID) {
   sourceList.className = "research-source-list";
   conversation.sources.forEach((source) => sourceList.append(renderResearchSource(source)));
   sources.append(sourceSummary, sourceList);
-  content.append(sources);
+  projectContextSection.querySelector(".research-project-context-heading").after(sources);
 
   if (conversation.sourceStatus === "changed") {
     const warning = document.createElement("aside");

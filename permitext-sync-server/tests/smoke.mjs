@@ -455,6 +455,14 @@ async function main() {
       workspaceScript.text.indexOf("function renderResearchProjectContext"),
       workspaceScript.text.indexOf("async function renderResearchConversation")
     );
+    const researchSourceRendererSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("function renderResearchSource"),
+      workspaceScript.text.indexOf("function appendHistoricalResearchList")
+    );
+    const researchConversationRendererSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("async function renderResearchConversation"),
+      workspaceScript.text.indexOf("function closeResearchSelectionMenu")
+    );
     const projectResearchContextSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("function appendProjectResearchContextEditor"),
       workspaceScript.text.indexOf("function appendProjectResearchHistory")
@@ -1007,8 +1015,20 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-project-context-footer-v147'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-sources-top-v148'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
+    );
+    assert(
+      !researchSourceRendererSource.includes('"Selected passage"') &&
+        researchSourceRendererSource.includes('if (source.kind !== "selection")') &&
+        researchConversationRendererSource.includes(
+          "const projectContextSection = renderResearchProjectContext(content, conversation);"
+        ) &&
+        researchConversationRendererSource.includes(
+          'projectContextSection.querySelector(".research-project-context-heading").after(sources);'
+        ) &&
+        !researchConversationRendererSource.includes("content.append(sources);"),
+      "Selected Research sources should sit directly under the Project picker without a redundant card label."
     );
     assert(
       workspaceScript.text.includes("function readerSectionsWithoutRepeatedCatalogAliases") &&
@@ -1112,7 +1132,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-project-context-footer-v147'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-sources-top-v148'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
