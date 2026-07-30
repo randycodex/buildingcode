@@ -989,30 +989,22 @@ function selectedPassages(testCase) {
 
 async function createEvaluationConversation(baseURL, account, testCase) {
   const passages = selectedPassages(testCase);
-  const [first, ...remaining] = passages;
   const created = await jsonRequest(baseURL, "/research/conversations/create", {
     method: "POST",
     token: account.backendSessionToken,
     body: {
       auth: { accountUserID: account.appUserID },
-      sectionID: first.source.sectionID,
-      selectedText: first.selectedText
-    }
-  });
-  const conversationID = created.conversation.id;
-  for (const passage of remaining) {
-    await jsonRequest(baseURL, "/research/conversations/evidence", {
-      method: "POST",
-      token: account.backendSessionToken,
-      body: {
-        auth: { accountUserID: account.appUserID },
-        conversationID,
+      selections: passages.map((passage) => ({
         sectionID: passage.source.sectionID,
         selectedText: passage.selectedText
-      }
-    });
-  }
-  return conversationID;
+      }))
+    }
+  });
+  assert(
+    created.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
+    `${testCase.id} did not preserve every passage supplied through the multi-selection request contract.`
+  );
+  return created.conversation.id;
 }
 
 async function askEvaluationQuestion(baseURL, account, conversationID, question) {
@@ -1027,27 +1019,193 @@ async function askEvaluationQuestion(baseURL, account, conversationID, question)
     }
   });
   const answerTimeMilliseconds = Math.round(performance.now() - startedAt);
-  const answer = [...(payload.conversation.messages || [])].reverse().find((message) => message.role === "assistant")?.answer;
+  const assistantMessage = [...(payload.conversation.messages || [])].reverse()
+    .find((message) => message.role === "assistant");
+  const answer = assistantMessage?.answer;
   assert(answer, "Permitext returned no assistant answer for the evaluation conversation.");
-  return { answer, answerTimeMilliseconds, answeredAt: new Date().toISOString() };
+  return {
+    answer,
+    answerID: assistantMessage.id,
+    conversation: payload.conversation,
+    answerTimeMilliseconds,
+    answeredAt: new Date().toISOString()
+  };
+}
+
+async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
+  const testCase = checkedCases[0];
+  const passages = selectedPassages(testCase);
+  const [passage, legacyAddedPassage, ...batchAddedPassages] = passages;
+  const legacy = await jsonRequest(baseURL, "/research/conversations/create", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      sectionID: passage.source.sectionID,
+      selectedText: passage.selectedText
+    }
+  });
+  assert(
+    legacy.conversation.sources.filter((source) => source.kind === "selection").length === 1 &&
+      legacy.conversation.sources.find((source) => source.kind === "selection")?.selectedText === passage.selectedText,
+    "Research conversation creation no longer accepts the legacy single-selection request contract."
+  );
+  assert(
+    legacyAddedPassage && batchAddedPassages.length,
+    "Research workflow contract fixture needs at least three selected passages."
+  );
+  const legacyEvidence = await jsonRequest(baseURL, "/research/conversations/evidence", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      conversationID: legacy.conversation.id,
+      sectionID: legacyAddedPassage.source.sectionID,
+      selectedText: legacyAddedPassage.selectedText
+    }
+  });
+  assert(
+    legacyEvidence.conversation.sources.filter((source) => source.kind === "selection").length === 2,
+    "Research evidence addition no longer accepts the legacy single-selection request contract."
+  );
+  const batchEvidence = await jsonRequest(baseURL, "/research/conversations/evidence", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      conversationID: legacy.conversation.id,
+      selections: batchAddedPassages.map((item) => ({
+        sectionID: item.source.sectionID,
+        selectedText: item.selectedText
+      }))
+    }
+  });
+  assert(
+    batchEvidence.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
+    "Research evidence addition did not preserve every passage supplied through the multi-selection request contract."
+  );
+
+  const projectID = `research-eval-project-${Date.now()}`;
+  const projectRecord = {
+    id: `research-eval-project-record-${Date.now()}`,
+    userID: account.appUserID,
+    codeVersion: "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1",
+    clientID: projectID,
+    name: "Research context contract",
+    address: "100 Initial Avenue",
+    description: "Initial Project description.",
+    colorHex: "#6674c8",
+    sortOrder: 0,
+    updatedAt: new Date().toISOString()
+  };
+  await jsonRequest(baseURL, "/sync/push", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      batch: {
+        user: { id: account.appUserID },
+        mutations: [{ project: projectRecord }]
+      }
+    }
+  });
+  const projectConversation = await jsonRequest(baseURL, "/research/conversations/create", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      projectID,
+      selections: [{
+        sectionID: passage.source.sectionID,
+        selectedText: passage.selectedText
+      }]
+    }
+  });
+
+  const currentAddress = "200 Current Avenue";
+  const currentDescription = "Existing Group R-2 building with alteration work proposed.";
+  await jsonRequest(baseURL, "/sync/push", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      batch: {
+        user: { id: account.appUserID },
+        mutations: [{
+          project: {
+            ...projectRecord,
+            address: currentAddress,
+            description: currentDescription,
+            updatedAt: new Date(Date.now() + 1_000).toISOString()
+          }
+        }]
+      }
+    }
+  });
+  const currentConversation = await jsonRequest(baseURL, "/research/conversations/get", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      conversationID: projectConversation.conversation.id
+    }
+  });
+  const currentProjectFacts = currentConversation.conversation.projectInformation?.facts || [];
+  assert(
+    currentProjectFacts.includes(`Project address: ${currentAddress}`) &&
+      currentProjectFacts.includes(`Project description: ${currentDescription}`) &&
+      !currentProjectFacts.some((fact) => fact.includes("100 Initial Avenue")),
+    "Research did not refresh current Project address and description from the Project record."
+  );
+  const { answerID } = await askEvaluationQuestion(
+    baseURL,
+    account,
+    projectConversation.conversation.id,
+    "What does the selected enacted text establish for this Project?"
+  );
+  const historicalAnswer = await jsonRequest(baseURL, "/research/answers/get", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      answerID
+    }
+  });
+  const snapshot = historicalAnswer.answer.projectContextSnapshot;
+  assert(
+    snapshot?.projectInformation?.facts?.includes(`Project address: ${currentAddress}`) &&
+      snapshot?.projectInformation?.facts?.includes(`Project description: ${currentDescription}`) &&
+      snapshot?.combinedFacts?.includes(`Project address: ${currentAddress}`) &&
+      snapshot?.combinedFacts?.includes(`Project description: ${currentDescription}`),
+    "Research did not use and preserve the current Project information as non-authoritative model context."
+  );
 }
 
 async function runMockConversationCases(baseURL, checkedCases) {
   const account = await signInEvalUser(baseURL);
+  await verifyResearchWorkflowContracts(baseURL, account, checkedCases);
   for (const testCase of checkedCases) {
     const conversationID = await createEvaluationConversation(baseURL, account, testCase);
-    const { answer } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
+    const { answer, conversation } = await askEvaluationQuestion(baseURL, account, conversationID, testCase.question);
     assert(answer.mode === "mock" && answer.model === "permitext-mock", `${testCase.id} unexpectedly called a live model during preflight.`);
     const expectedPassageCount = selectedPassages(testCase).length;
+    const relatedSourceIDs = new Set(
+      conversation.sources
+        .filter((source) => source.kind === "related")
+        .map((source) => source.id)
+    );
     assert(
       answer.evidenceSourceIDs?.length === expectedPassageCount &&
+        answer.evidenceSourceIDs.every((sourceID) => !relatedSourceIDs.has(sourceID)) &&
         (answer.citations || []).every((citation) =>
-          (citation.sourceIDs || []).every((sourceID) => answer.evidenceSourceIDs.includes(sourceID))
+          (citation.sourceIDs || []).every((sourceID) =>
+            answer.evidenceSourceIDs.includes(sourceID) && !relatedSourceIDs.has(sourceID)
+          )
         ),
       `${testCase.id} allowed a related or unselected source into verified answer evidence.`
     );
   }
-  console.log(`Verified ${checkedCases.length}/${checkedCases.length} cases through Permitext's selection and conversation flow in mock mode.`);
+  console.log(`Verified the legacy and multi-selection Research contracts, current Project context, and ${checkedCases.length}/${checkedCases.length} cases through Permitext's conversation flow in mock mode.`);
 }
 
 async function currentGitCommit() {
@@ -1688,6 +1846,37 @@ function selfTestAnswer(testCase) {
 }
 
 async function runSelfTest(dataset, datasetText) {
+  const numberedListPassage = [
+    "Exceptions:",
+    "1. The first numbered condition remains on its own line.",
+    "2. The second numbered condition remains on its own line."
+  ].join("\n");
+  const numberedListInput = researchInputForEvidence(
+    "Which numbered conditions apply?",
+    [{
+      sourceID: "numbered-list-source",
+      sectionID: "numbered-list-section",
+      codePrefix: "BC",
+      sectionNumber: "101.1",
+      title: "Numbered list fixture",
+      text: numberedListPassage
+    }]
+  );
+  assert(
+    numberedListInput.includes(`EXACT SELECTED PASSAGE: ${numberedListPassage}`),
+    "Research model input collapsed a selected numbered list instead of preserving readable line breaks."
+  );
+  const [workspaceScript, workspaceStyles] = await Promise.all([
+    readFile(join(serverRoot, "public", "app.js"), "utf8"),
+    readFile(join(serverRoot, "public", "styles.css"), "utf8")
+  ]);
+  assert(
+    workspaceScript.includes('.replace(/ *\\n */g, "\\n")') &&
+      workspaceScript.includes('.replace(/\\n{3,}/g, "\\n\\n")') &&
+      /\.research-source-card blockquote\s*\{[^}]*white-space:\s*pre-line;/s.test(workspaceStyles),
+    "The Reader-to-Research presentation contract no longer preserves numbered-list line breaks in selected passages."
+  );
+
   const citationClaimFixture = dataset.cases.find(
     (item) => (item.requiredCitationClaims || []).length >= 2
   );
@@ -2447,7 +2636,9 @@ async function main() {
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
     process.env.PERMITEXT_RESEARCH_MOCK = liveMode ? "" : "1";
-    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(selectedCases.length * repeat);
+    process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(
+      selectedCases.length * repeat + (liveMode ? 0 : 1)
+    );
     const { handleRequest } = await import(`../app.mjs?research-evals=${Date.now()}`);
     server = createServer(handleRequest);
     await new Promise((resolveListening, rejectListening) => {

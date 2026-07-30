@@ -4880,6 +4880,7 @@ mark {
   color: var(--text-primary);
   font-size: 0.95rem;
   line-height: 1.5;
+  white-space: pre-line;
 }
 
 .research-source-card .ghost-button {
@@ -5007,6 +5008,28 @@ mark {
   padding: var(--space-3);
   border-radius: var(--radius-card);
   background: color-mix(in srgb, #f79009 16%, var(--surface));
+}
+
+.research-project-information {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--text-primary) 6%, var(--surface));
+}
+
+.research-project-information ul {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.research-project-information p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  line-height: 1.45;
 }
 
 .research-project-context-form {
@@ -5283,6 +5306,13 @@ mark {
   padding: 2px var(--space-2) 5px;
   color: color-mix(in srgb, var(--surface) 74%, transparent);
   font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+.research-selection-hint {
+  padding: 0 var(--space-2) 2px;
+  color: color-mix(in srgb, var(--surface) 74%, transparent);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  line-height: 1.35;
 }
 
 @media (max-width: 560px) {

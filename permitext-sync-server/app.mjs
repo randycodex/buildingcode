@@ -4194,6 +4194,17 @@ function normalizedResearchText(value, maxLength) {
   return String(value || "").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
+function readableResearchSelectionText(value, maxLength) {
+  return String(value || "")
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\t\f\v ]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, maxLength)
+    .trimEnd();
+}
+
 function comparableResearchText(value) {
   return String(value || "")
     .normalize("NFKC")
@@ -4211,15 +4222,16 @@ function comparableResearchText(value) {
 }
 
 const maximumResearchSelectionCharacters = 12_000;
+const maximumResearchSelectionSetCharacters = 48_000;
 
 function matchingCanonicalResearchSelection(value, canonicalText) {
-  const normalized = normalizedResearchText(value, maximumResearchSelectionCharacters);
-  const withoutReaderChrome = normalized
-    .replace(/(?:^|\s)(?:Has note|Bookmarked)(?=\s|$)/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  const readable = readableResearchSelectionText(value, maximumResearchSelectionCharacters);
+  const withoutReaderChrome = readableResearchSelectionText(
+    readable.replace(/(?:^|\s)(?:Has note|Bookmarked)(?=\s|$)/gi, " "),
+    maximumResearchSelectionCharacters
+  );
   const canonicalComparable = comparableResearchText(canonicalText);
-  for (const candidate of Array.from(new Set([normalized, withoutReaderChrome]))) {
+  for (const candidate of Array.from(new Set([readable, withoutReaderChrome]))) {
     if (candidate.length >= 2 && canonicalComparable.includes(comparableResearchText(candidate))) {
       return candidate;
     }
@@ -4622,7 +4634,7 @@ function researchConversationSummary(conversation) {
 }
 
 function researchSourceFromEvidence(evidence, options = {}) {
-  const selectedText = normalizedResearchText(
+  const selectedText = readableResearchSelectionText(
     options.selectedText,
     maximumResearchSelectionCharacters
   );
@@ -4752,7 +4764,7 @@ function requestedVisualSourceIDs(value, reviewConfirmed) {
 }
 
 async function researchSourcesForSelection(sectionID, selectedText, options = {}) {
-  const normalizedSelection = normalizedResearchText(
+  const normalizedSelection = readableResearchSelectionText(
     selectedText,
     maximumResearchSelectionCharacters
   );
@@ -4797,7 +4809,11 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     throw error;
   }
   if (primary.visualSources.length && !visualSourceIDs.length) {
-    const error = new Error("Review and select the applicable official visual evidence before preparing this passage.");
+    const error = new Error(
+      "Permitext detected official visual evidence elsewhere in this enacted section. " +
+      "Use Find Relevant Evidence to review and explicitly select any applicable visuals before analysis; " +
+      "Permitext will not silently include unselected visual material."
+    );
     error.code = "RESEARCH_VISUAL_REVIEW_REQUIRED";
     throw error;
   }
@@ -4855,9 +4871,180 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
   ];
 }
 
+function requestedResearchSelections(body) {
+  let selections;
+  if (body.selections !== undefined) {
+    if (!Array.isArray(body.selections) || body.selections.length < 1 || body.selections.length > 24) {
+      const error = new Error("Research selections must contain between 1 and 24 passages.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
+    if (body.selections.some((selection) =>
+      !selection || typeof selection !== "object" || Array.isArray(selection)
+    )) {
+      const error = new Error("Each Research selection must be an object.");
+      error.code = "INVALID_RESEARCH_SELECTION";
+      throw error;
+    }
+    selections = body.selections.map((selection) => ({
+      sectionID: selection.sectionID,
+      selectedText: selection.selectedText,
+      richSourceIDs: selection.richSourceIDs ?? (body.selections.length === 1 ? body.richSourceIDs : undefined),
+      visualSourceIDs: selection.visualSourceIDs ?? (body.selections.length === 1 ? body.visualSourceIDs : undefined),
+      visualReviewConfirmed: selection.visualReviewConfirmed ??
+        (body.selections.length === 1 ? body.visualReviewConfirmed : undefined),
+      savedItemID: String(
+        selection.savedItemID || (body.selections.length === 1 ? body.savedItemID : "") || ""
+      ).trim()
+    }));
+  } else {
+    selections = [{
+      sectionID: body.sectionID,
+      selectedText: body.selectedText,
+      richSourceIDs: body.richSourceIDs,
+      visualSourceIDs: body.visualSourceIDs,
+      visualReviewConfirmed: body.visualReviewConfirmed,
+      savedItemID: String(body.savedItemID || "").trim()
+    }];
+  }
+  const selectionLengths = selections.map((selection) =>
+    readableResearchSelectionText(
+      selection.selectedText,
+      maximumResearchSelectionCharacters + 1
+    ).length
+  );
+  if (selectionLengths.some((length) => length > maximumResearchSelectionCharacters)) {
+    const error = new Error(
+      `Each Research passage may contain no more than ${maximumResearchSelectionCharacters.toLocaleString("en-US")} readable characters.`
+    );
+    error.code = "INVALID_RESEARCH_SELECTION";
+    throw error;
+  }
+  const aggregateCharacters = selectionLengths.reduce((total, length) => total + length, 0);
+  if (aggregateCharacters > maximumResearchSelectionSetCharacters) {
+    const error = new Error(
+      `Research selections may contain no more than ${maximumResearchSelectionSetCharacters.toLocaleString("en-US")} characters in total.`
+    );
+    error.code = "INVALID_RESEARCH_SELECTION";
+    throw error;
+  }
+  return selections;
+}
+
+async function researchSourcesForSelections(selections, existingSources = []) {
+  const resolvedBatches = [];
+  for (const selection of selections) {
+    resolvedBatches.push(await researchSourcesForSelection(
+      selection.sectionID,
+      selection.selectedText,
+      {
+        richSourceIDs: selection.richSourceIDs,
+        visualSourceIDs: selection.visualSourceIDs,
+        visualReviewConfirmed: selection.visualReviewConfirmed
+      }
+    ));
+  }
+  const existingSelections = existingSources.filter((source) => source.kind === "selection");
+  const addedSelections = resolvedBatches.flatMap((sources) =>
+    sources.filter((source) => source.kind === "selection")
+  );
+  const selectedSectionIDs = new Set(
+    [...existingSelections, ...addedSelections].map((source) => source.sectionID)
+  );
+  const relatedSectionIDs = new Set();
+  const relatedSources = [];
+  for (const source of [
+    ...existingSources.filter((item) => item.kind === "related"),
+    ...resolvedBatches.flatMap((sources) => sources.filter((item) => item.kind === "related"))
+  ]) {
+    if (
+      selectedSectionIDs.has(source.sectionID) ||
+      relatedSectionIDs.has(source.sectionID)
+    ) continue;
+    relatedSectionIDs.add(source.sectionID);
+    relatedSources.push(source);
+  }
+  return {
+    addedSelections,
+    sources: [...existingSelections, ...addedSelections, ...relatedSources]
+  };
+}
+
+function assertResearchConversationVisualLimits(sources) {
+  const visualSources = sources.flatMap((source) => source.visualSources || []);
+  if (
+    visualSources.length > maximumResearchConversationVisualSources ||
+    visualSources.reduce((total, source) => total + Number(source.byteLength || 0), 0) >
+      maximumResearchConversationVisualEvidenceBytes
+  ) {
+    const error = new Error("The selected evidence exceeds the Research conversation visual-evidence limit.");
+    error.code = "RESEARCH_CONVERSATION_VISUAL_LIMIT";
+    throw error;
+  }
+}
+
+async function validateResearchSavedSelections(userID, selections) {
+  const savedSelections = selections.filter((selection) => selection.savedItemID);
+  if (!savedSelections.length) return;
+  const savedItems = (await userContentMutations(userID))
+    .map((mutation) => mutationKindAndRecord(mutation))
+    .filter(({ kind, record }) =>
+      kind === "savedItem" &&
+      !Number.isFinite(Date.parse(record?.deletedAt || ""))
+    )
+    .map(({ record }) => record);
+  for (const selection of savedSelections) {
+    const savedItem = savedItems.find((record) =>
+      [record?.id, normalizedMutationRecordID({ savedItem: record })]
+        .filter(Boolean)
+        .includes(selection.savedItemID)
+    );
+    if (!savedItem) {
+      const error = new Error("Saved section not found.");
+      error.code = "RESEARCH_SAVED_ITEM_NOT_FOUND";
+      throw error;
+    }
+    if (String(savedItem.sectionID) !== String(selection.sectionID)) {
+      const error = new Error("The selected passage does not belong to the saved section.");
+      error.code = "RESEARCH_SAVED_ITEM_SECTION_MISMATCH";
+      throw error;
+    }
+  }
+}
+
+function researchOriginForSelections(selections) {
+  const savedItemIDs = selections.map((selection) => selection.savedItemID).filter(Boolean);
+  if (selections.length === 1 && savedItemIDs.length === 1) {
+    return { kind: "savedItem", savedItemID: savedItemIDs[0] };
+  }
+  if (selections.length === 1) return { kind: "selectedPassage" };
+  return {
+    kind: "selectedPassages",
+    savedItemIDs: Array.from(new Set(savedItemIDs))
+  };
+}
+
 async function currentResearchEvidence(conversation) {
-  const sectionIDs = Array.from(new Set((conversation.sources || []).map((source) => source.sectionID).filter(Boolean)));
-  const evidence = await researchEvidenceForSectionIDs(sectionIDs);
+  const selectedSectionIDs = Array.from(new Set(
+    (conversation.sources || [])
+      .filter((source) => source.kind === "selection")
+      .map((source) => source.sectionID)
+      .filter(Boolean)
+  ));
+  const relatedSectionIDs = Array.from(new Set(
+    (conversation.sources || [])
+      .filter((source) => source.kind === "related" && !selectedSectionIDs.includes(source.sectionID))
+      .map((source) => source.sectionID)
+      .filter(Boolean)
+  ));
+  const evidence = await researchEvidenceForSectionIDs(selectedSectionIDs);
+  for (const sectionID of relatedSectionIDs) {
+    try {
+      evidence.push(...await researchEvidenceForSectionIDs([sectionID]));
+    } catch (error) {
+      if (!["INCOMPLETE_RESEARCH_SECTION", "INVALID_RESEARCH_SECTION", "ENOENT"].includes(error.code)) throw error;
+    }
+  }
   const evidenceByID = new Map(evidence.map((item) => [item.sectionID, item]));
   const sourceStatuses = await Promise.all((conversation.sources || []).map(async (source) => {
     const current = evidenceByID.get(source.sectionID);
@@ -4903,6 +5090,8 @@ async function currentResearchEvidence(conversation) {
     return {
       sourceID: source.id,
       sectionID: source.sectionID,
+      kind: source.kind,
+      blocking: source.kind === "selection",
       current: Boolean(current && current.sectionTextHash === source.sectionTextHash && selectionPresent),
       selectionPresent,
       visualSelectionPresent
@@ -4911,7 +5100,7 @@ async function currentResearchEvidence(conversation) {
   return {
     evidence,
     sourceStatuses,
-    stale: sourceStatuses.some((status) => !status.current)
+    stale: sourceStatuses.some((status) => status.blocking && !status.current)
   };
 }
 
@@ -4943,13 +5132,25 @@ function selectedResearchEvidence(conversation, currentEvidence) {
 }
 
 async function researchConversationForClient(conversation, options = {}) {
-  if (!options.checkSources) return conversation;
-  const current = await currentResearchEvidence(conversation);
-  return {
-    ...conversation,
-    sourceStatus: current.stale ? "changed" : "current",
-    sourceStatuses: current.sourceStatuses
-  };
+  let clientConversation = conversation;
+  if (options.checkSources) {
+    const current = await currentResearchEvidence(conversation);
+    clientConversation = {
+      ...clientConversation,
+      sourceStatus: current.stale ? "changed" : "current",
+      sourceStatuses: current.sourceStatuses
+    };
+  }
+  if (options.userID) {
+    clientConversation = {
+      ...clientConversation,
+      projectInformation: await currentResearchProjectInformation(
+        options.userID,
+        conversation.primaryProjectID
+      )
+    };
+  }
+  return clientConversation;
 }
 
 async function authenticatedResearchBody(request, response, options = {}) {
@@ -4994,6 +5195,37 @@ async function ownedProjectRecord(userID, projectID) {
       .some((candidate) => String(candidate) === normalizedProjectID);
   });
   return projectMutation ? mutationKindAndRecord(projectMutation).record : null;
+}
+
+function researchProjectInformation(projectID, project) {
+  if (!projectID || !project) return null;
+  const address = String(project.address || "").trim();
+  const description = String(project.description || "").trim();
+  const facts = [];
+  if (address) facts.push(`Project address: ${normalizedResearchText(address, 1_000)}`);
+  if (description) facts.push(`Project description: ${normalizedResearchText(description, 4_000)}`);
+  return {
+    projectID,
+    address,
+    description,
+    facts,
+    source: "project-record",
+    updatedAt: project.updatedAt || null
+  };
+}
+
+async function currentResearchProjectInformation(userID, projectID) {
+  const normalizedProjectID = String(projectID || "").trim();
+  if (!normalizedProjectID) return null;
+  const project = await ownedProjectRecord(userID, normalizedProjectID);
+  return researchProjectInformation(normalizedProjectID, project);
+}
+
+function combinedResearchProjectFacts(projectInformation, manualFacts) {
+  return Array.from(new Set([
+    ...(projectInformation?.facts || []),
+    ...(Array.isArray(manualFacts) ? manualFacts : [])
+  ].filter(Boolean)));
 }
 
 function rolePermissions(role) {
@@ -8705,7 +8937,10 @@ async function handleResearchConversationGet(request, response) {
   const feedbackByAnswerID = new Map(
     (await listStoredResearchFeedback(context.userID)).map((feedback) => [feedback.answerID, feedback])
   );
-  const clientConversation = await researchConversationForClient(conversation, { checkSources: true });
+  const clientConversation = await researchConversationForClient(conversation, {
+    checkSources: true,
+    userID: context.userID
+  });
   sendJSON(response, 200, {
     conversation: {
       ...clientConversation,
@@ -9100,34 +9335,16 @@ async function handleResearchConversationCreate(request, response) {
     }
     const projectID = String(context.body.projectID || "").trim() || null;
     if (projectID && !await requireResearchProject(context, response, projectID)) return;
-    const savedItemID = String(context.body.savedItemID || "").trim();
-    if (savedItemID) {
-      const savedItem = (await userContentMutations(context.userID))
-        .map((mutation) => mutationKindAndRecord(mutation))
-        .find(({ kind, record }) =>
-          kind === "savedItem" &&
-          !Number.isFinite(Date.parse(record?.deletedAt || "")) &&
-          [record?.id, normalizedMutationRecordID({ savedItem: record })].includes(savedItemID)
-        )?.record;
-      if (!savedItem) {
-        sendError(response, 404, "Saved section not found.");
-        return;
-      }
-      if (String(savedItem.sectionID) !== String(context.body.sectionID)) {
-        sendError(response, 400, "The selected passage does not belong to the saved section.");
-        return;
-      }
+    const selections = requestedResearchSelections(context.body);
+    await validateResearchSavedSelections(context.userID, selections);
+    const resolved = await researchSourcesForSelections(selections);
+    if (resolved.addedSelections.length > 24) {
+      sendError(response, 409, "This conversation would exceed the maximum of 24 selected passages.");
+      return;
     }
-    const sources = await researchSourcesForSelection(
-      context.body.sectionID,
-      context.body.selectedText,
-      {
-        richSourceIDs: context.body.richSourceIDs,
-        visualSourceIDs: context.body.visualSourceIDs,
-        visualReviewConfirmed: context.body.visualReviewConfirmed
-      }
-    );
-    const primary = sources[0];
+    assertResearchConversationVisualLimits(resolved.sources);
+    const sources = resolved.sources;
+    const primary = resolved.addedSelections[0];
     const now = new Date().toISOString();
     const conversation = {
       id: randomUUID(),
@@ -9144,12 +9361,7 @@ async function handleResearchConversationCreate(request, response) {
         updatedAt: now
       } : null,
       projectContextReviewRequired: false,
-      origin: savedItemID ? {
-        kind: "savedItem",
-        savedItemID
-      } : {
-        kind: "selectedPassage"
-      },
+      origin: researchOriginForSelections(selections),
       sourceStatus: "current",
       sources,
       messages: []
@@ -9182,6 +9394,18 @@ async function handleResearchConversationCreate(request, response) {
       sendError(response, 400, error.message);
       return;
     }
+    if (error.code === "RESEARCH_CONVERSATION_VISUAL_LIMIT") {
+      sendError(response, 409, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_SAVED_ITEM_NOT_FOUND") {
+      sendError(response, 404, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_SAVED_ITEM_SECTION_MISMATCH") {
+      sendError(response, 400, error.message);
+      return;
+    }
     if (["INCOMPLETE_RESEARCH_SECTION", "ENOENT"].includes(error.code)) {
       sendError(response, 422, "This code section is incomplete and cannot be analyzed yet.");
       return;
@@ -9200,37 +9424,21 @@ async function handleResearchConversationEvidence(request, response) {
       sendError(response, 409, "This conversation already has the maximum of 24 selected passages.");
       return;
     }
-    const addedSources = await researchSourcesForSelection(
-      context.body.sectionID,
-      context.body.selectedText,
-      {
-        richSourceIDs: context.body.richSourceIDs,
-        visualSourceIDs: context.body.visualSourceIDs,
-        visualReviewConfirmed: context.body.visualReviewConfirmed
-      }
+    const selections = requestedResearchSelections(context.body);
+    await validateResearchSavedSelections(context.userID, selections);
+    const resolved = await researchSourcesForSelections(
+      selections,
+      conversation.sources || []
     );
     const existingSelectionCount = (conversation.sources || [])
       .filter((source) => source.kind === "selection").length;
-    const addedSelectionCount = addedSources
-      .filter((source) => source.kind === "selection").length;
+    const addedSelectionCount = resolved.addedSelections.length;
     if (existingSelectionCount + addedSelectionCount > 24) {
       sendError(response, 409, "Adding this evidence would exceed the maximum of 24 selected passages.");
       return;
     }
-    const combinedVisualSources = [
-      ...(conversation.sources || []),
-      ...addedSources
-    ].flatMap((source) => source.visualSources || []);
-    if (
-      combinedVisualSources.length > maximumResearchConversationVisualSources ||
-      combinedVisualSources.reduce((total, source) => total + Number(source.byteLength || 0), 0) >
-        maximumResearchConversationVisualEvidenceBytes
-    ) {
-      sendError(response, 409, "Adding this evidence would exceed the Research conversation visual-evidence limit.");
-      return;
-    }
-    const existingRelatedIDs = new Set((conversation.sources || []).filter((source) => source.kind === "related").map((source) => source.sectionID));
-    conversation.sources.push(...addedSources.filter((source) => source.kind === "selection" || !existingRelatedIDs.has(source.sectionID)));
+    assertResearchConversationVisualLimits(resolved.sources);
+    conversation.sources = resolved.sources;
     conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
     conversation.updatedAt = new Date().toISOString();
     conversation.sourceStatus = "current";
@@ -9244,6 +9452,18 @@ async function handleResearchConversationEvidence(request, response) {
       "INVALID_RESEARCH_VISUAL_SOURCE",
       "RESEARCH_VISUAL_REVIEW_REQUIRED"
     ].includes(error.code)) {
+      sendError(response, 400, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_CONVERSATION_VISUAL_LIMIT") {
+      sendError(response, 409, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_SAVED_ITEM_NOT_FOUND") {
+      sendError(response, 404, error.message);
+      return;
+    }
+    if (error.code === "RESEARCH_SAVED_ITEM_SECTION_MISMATCH") {
       sendError(response, 400, error.message);
       return;
     }
@@ -9262,11 +9482,14 @@ async function handleResearchConversationRefresh(request, response) {
   if (!conversation) return;
   const current = await currentResearchEvidence(conversation);
   const evidenceByID = new Map(current.evidence.map((item) => [item.sectionID, item]));
-  if (current.sourceStatuses.some((status) => !status.selectionPresent)) {
+  if (current.sourceStatuses.some((status) => status.blocking && !status.selectionPresent)) {
     sendJSON(response, 409, {
       error: "A selected passage, structured source, or visual attachment no longer matches the enacted library. Start a new research selection from the current code.",
       code: "RESEARCH_SELECTION_CHANGED",
-      conversation: await researchConversationForClient(conversation, { checkSources: true })
+      conversation: await researchConversationForClient(conversation, {
+        checkSources: true,
+        userID: context.userID
+      })
     });
     return;
   }
@@ -9857,6 +10080,16 @@ async function handleResearchConversationMessage(request, response) {
     }
     const selections = conversation.sources.filter((source) => source.kind === "selection");
     const selectedEvidence = selectedResearchEvidence(conversation, current.evidence);
+    const projectInformation = await currentResearchProjectInformation(
+      context.userID,
+      conversation.primaryProjectID
+    );
+    const manualProjectFacts = conversation.projectContext?.facts || [];
+    const combinedProjectFacts = combinedResearchProjectFacts(
+      projectInformation,
+      manualProjectFacts
+    );
+    const projectContextCapturedAt = new Date().toISOString();
     const result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence), selectedEvidence),
@@ -9867,7 +10100,7 @@ async function handleResearchConversationMessage(request, response) {
         : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
           selections,
           messages: conversation.messages,
-          projectContextFacts: conversation.projectContext?.facts || []
+          projectContextFacts: combinedProjectFacts
         });
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
@@ -9914,22 +10147,31 @@ async function handleResearchConversationMessage(request, response) {
       evidenceSetVersion: Number(conversation.evidenceSetVersion || 1),
       sourceLibraryVersion: source.codeVersion || conversation.codeVersion
     }));
-    const answerRecord = immutableResearchAnswer({
-      id: assistantMessage.id,
-      owner: ownerScope(context.userID),
-      conversationID: conversation.id,
-      projectID: conversation.primaryProjectID || null,
-      question,
-      answer: assistantMessage.answer,
-      evidence: evidenceSnapshots,
-      citations: assistantMessage.answer.citations || [],
-      model: assistantMessage.answer.model,
-      researchSystemVersion: [
-        assistantMessage.answer.promptVersion,
-        assistantMessage.answer.evidenceVersion
-      ].filter(Boolean).join(":"),
-      createdAt: now
-    });
+    const answerRecord = {
+      ...immutableResearchAnswer({
+        id: assistantMessage.id,
+        owner: ownerScope(context.userID),
+        conversationID: conversation.id,
+        projectID: conversation.primaryProjectID || null,
+        question,
+        answer: assistantMessage.answer,
+        evidence: evidenceSnapshots,
+        citations: assistantMessage.answer.citations || [],
+        model: assistantMessage.answer.model,
+        researchSystemVersion: [
+          assistantMessage.answer.promptVersion,
+          assistantMessage.answer.evidenceVersion
+        ].filter(Boolean).join(":"),
+        createdAt: now
+      }),
+      projectContextSnapshot: {
+        projectID: conversation.primaryProjectID || null,
+        projectInformation,
+        manualFacts: [...manualProjectFacts],
+        combinedFacts: combinedProjectFacts,
+        capturedAt: projectContextCapturedAt
+      }
+    };
     await saveStoredResearchAnswer(context.userID, answerRecord);
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-recent-preview-repair-v153";
+} from "./offline-storage.js?v=20260729-research-workflow-v154";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1761,7 +1761,15 @@ function primarySavedPaneID() {
 }
 
 function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
-  return Array.from(new Set([...savedPaneIDs(), ...additionalPaneIDs.filter(Boolean)]));
+  const researchPaneIDs = [
+    state.utilities.analysis ? "utility:analysis" : "",
+    paneIDForResearchConversation()
+  ].filter(Boolean);
+  return Array.from(new Set([
+    ...savedPaneIDs(),
+    ...researchPaneIDs,
+    ...additionalPaneIDs.filter(Boolean)
+  ]));
 }
 
 function syncSavedArchiveButtonStates() {
@@ -5661,12 +5669,14 @@ async function renderSectionContent(panel, reader) {
       sectionWrapper.classList.add("starts-group");
       const groupHeading = document.createElement("div");
       groupHeading.className = "authored-section-label";
+      groupHeading.dataset.researchSelectionExclude = "true";
       groupHeading.textContent = groupLabel;
       sectionWrapper.append(groupHeading);
     }
 
     const sectionHeading = document.createElement("h3");
     sectionHeading.className = "reader-section-title";
+    sectionHeading.dataset.researchSelectionExclude = "true";
     sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
     sectionWrapper.append(sectionHeading);
 
@@ -8552,7 +8562,7 @@ function preferredResearchProjectID(conversation = activeResearchConversation) {
 function createResearchProjectSelect({
   value = "",
   includeUnassigned = true,
-  unassignedLabel = "No Project",
+  unassignedLabel = "Unassigned — no Project context",
   ariaLabel = "Project"
 } = {}) {
   const select = document.createElement("select");
@@ -8681,7 +8691,7 @@ function renderEvidenceDiscovery(container) {
   controls.className = "evidence-discovery-form-controls";
   const projectSelect = createResearchProjectSelect({
     value: activeEvidenceDiscovery?.projectID || preferredResearchProjectID(),
-    unassignedLabel: "No Project",
+    unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Project for candidate evidence"
   });
   const findButton = document.createElement("button");
@@ -9096,7 +9106,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const trustHeading = document.createElement("strong");
   trustHeading.textContent = "AI-assisted research — not an official interpretation";
   const trustCopy = document.createElement("p");
-  trustCopy.textContent = "Select enacted text, then choose Analyze. Questions are answered only from the attached code sources; private notes are excluded.";
+  trustCopy.textContent = "Select enacted text, then choose Start Research. No AI request is made until you ask a question and choose Analyze; private notes are excluded.";
   trustNotice.append(trustHeading, trustCopy);
   const appendTrustNotice = () => content.append(trustNotice);
 
@@ -9283,11 +9293,15 @@ function renderResearchSource(source) {
   card.className = `research-source-card is-${source.kind || "related"}`;
   const label = document.createElement("p");
   label.className = "section-label";
-  label.textContent = source.kind === "selection" ? "Selected passage" : "Related enacted section";
+  label.textContent = source.kind === "selection"
+    ? "Selected passage"
+    : "Suggested related section — not included in analysis";
   const citation = document.createElement("strong");
   citation.textContent = officialSectionCitation(source);
   const relationship = document.createElement("p");
-  relationship.textContent = source.relationship || "Included as disclosed context";
+  relationship.textContent = source.kind === "selection"
+    ? source.relationship || "Passage selected by you"
+    : "Suggested because it is explicitly referenced by this enacted section. Open it and select the relevant passage to include it in analysis.";
   card.append(label, citation, relationship);
   if (source.selectedText) {
     const quote = document.createElement("blockquote");
@@ -9391,7 +9405,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   const reuseHeading = document.createElement("strong");
   reuseHeading.textContent = "Start fresh from this approved evidence";
   const reuseCopy = document.createElement("p");
-  reuseCopy.textContent = "This creates a new, empty Research conversation. It rechecks the passage against the current enacted library and does not copy the old question, answer, assumptions, or Project facts.";
+  reuseCopy.textContent = "This creates a new, empty Research conversation. It rechecks the passage against the current enacted library and does not copy the old question, answer, assumptions, or additional Research facts.";
   const reuseControls = document.createElement("div");
   reuseControls.className = "research-historical-reuse-controls";
   const projectSelect = createResearchProjectSelect({
@@ -9479,11 +9493,11 @@ function renderResearchProjectContext(container, conversation) {
   const title = document.createElement("strong");
   title.textContent = "Project context";
   const copy = document.createElement("p");
-  copy.textContent = "Project facts are user-provided context only. They are never treated as code authority or cited evidence.";
+  copy.textContent = "Project information and additional facts are context only. They are never treated as code authority or cited evidence.";
   titleWrap.append(title, copy);
   const projectSelect = createResearchProjectSelect({
     value: conversation.primaryProjectID || "",
-    unassignedLabel: "Unassigned",
+    unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Assign Research conversation to Project"
   });
   heading.append(titleWrap, projectSelect);
@@ -9508,7 +9522,7 @@ function renderResearchProjectContext(container, conversation) {
         const confirmed = await confirmWebWarning(
           targetProjectID ? "Move Research to this Project?" : "Unassign this Research?",
           targetProjectID
-            ? "Existing answers remain immutable in their original Project history. Project facts will be cleared, and you must review the new context before asking another question."
+            ? "Existing answers remain immutable in their original Project history. Additional Research facts will be cleared, and you must review the new Project context before asking another question."
             : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
           { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
         );
@@ -9535,20 +9549,40 @@ function renderResearchProjectContext(container, conversation) {
   });
 
   if (conversation.primaryProjectID) {
+    const projectInformation = conversation.projectInformation || {};
+    const automaticFacts = Array.isArray(projectInformation.facts)
+      ? projectInformation.facts
+      : [];
+    if (automaticFacts.length) {
+      const projectInfo = document.createElement("section");
+      projectInfo.className = "research-project-information";
+      const projectInfoHeading = document.createElement("strong");
+      projectInfoHeading.textContent = "From the Project folder";
+      const projectInfoList = document.createElement("ul");
+      automaticFacts.forEach((fact) => {
+        const row = document.createElement("li");
+        row.textContent = fact;
+        projectInfoList.append(row);
+      });
+      const projectInfoCopy = document.createElement("p");
+      projectInfoCopy.textContent = "Permitext uses this current Project information automatically. Edit the Project folder to change it.";
+      projectInfo.append(projectInfoHeading, projectInfoList, projectInfoCopy);
+      section.append(projectInfo);
+    }
     if (conversation.projectContextReviewRequired) {
       const warning = document.createElement("aside");
       warning.className = "research-project-context-warning";
       const warningTitle = document.createElement("strong");
       warningTitle.textContent = "Context review required";
       const warningCopy = document.createElement("p");
-      warningCopy.textContent = "Review or replace the Project facts below before generating another answer.";
+      warningCopy.textContent = "Review or replace the additional Research facts below before generating another answer.";
       warning.append(warningTitle, warningCopy);
       section.append(warning);
     }
     const form = document.createElement("form");
     form.className = "research-project-context-form";
     const label = document.createElement("label");
-    label.textContent = "Project facts — one per line";
+    label.textContent = "Additional Research facts — one per line";
     const facts = document.createElement("textarea");
     facts.rows = 4;
     facts.maxLength = 10_000;
@@ -9655,7 +9689,7 @@ async function renderResearchConversation(conversationID) {
   const sourceSummary = document.createElement("summary");
   const selectedCount = conversation.sources.filter((source) => source.kind === "selection").length;
   const relatedCount = conversation.sources.length - selectedCount;
-  sourceSummary.textContent = `${selectedCount} selected ${selectedCount === 1 ? "passage" : "passages"}${relatedCount ? ` + ${relatedCount} related ${relatedCount === 1 ? "section" : "sections"}` : ""}`;
+  sourceSummary.textContent = `${selectedCount} selected ${selectedCount === 1 ? "passage" : "passages"}${relatedCount ? ` + ${relatedCount} suggested ${relatedCount === 1 ? "section" : "sections"} not included` : ""}`;
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
   conversation.sources.forEach((source) => sourceList.append(renderResearchSource(source)));
@@ -9666,7 +9700,7 @@ async function renderResearchConversation(conversationID) {
     const warning = document.createElement("aside");
     warning.className = "research-source-warning";
     const warningText = document.createElement("p");
-    warningText.textContent = "The enacted source changed after this conversation began. Existing answers remain visible as historical research, but new analysis is paused.";
+    warningText.textContent = "The enacted source changed after this conversation began. Rechecking updates the source metadata only when the exact selected words still exist. If the selected words changed or disappeared, start a new selection from the current Reader.";
     const refreshButton = document.createElement("button");
     refreshButton.className = "ghost-button";
     refreshButton.type = "button";
@@ -9793,11 +9827,12 @@ function researchSelectionTextFromRange(selection, range) {
     "figcaption", "figure", "footer", "h1", "h2", "h3", "h4", "h5", "h6",
     "header", "hr", "li", "main", "nav", "ol", "p", "pre", "section", "table",
     "tbody", "td", "tfoot", "th", "thead", "tr", "ul"
-  ].join(",")).forEach((element) => element.append(document.createTextNode(" ")));
+  ].join(",")).forEach((element) => element.append(document.createTextNode("\n")));
   return String(container.textContent || selection)
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 4_000);
+    .replace(/[ \t\f\v]+/g, " ")
+    .replace(/ *\n */g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 }
 
 function researchSelectionFromWindow() {
@@ -9806,20 +9841,46 @@ function researchSelectionFromWindow() {
   const range = selection.getRangeAt(0);
   const start = range.startContainer.nodeType === Node.ELEMENT_NODE ? range.startContainer : range.startContainer.parentElement;
   const end = range.endContainer.nodeType === Node.ELEMENT_NODE ? range.endContainer : range.endContainer.parentElement;
-  const source = start?.closest?.(".research-selectable-text");
-  if (!source || source !== end?.closest?.(".research-selectable-text")) return null;
-  if (source.closest(".research-conversation-panel")) return null;
-  const selectedText = researchSelectionTextFromRange(selection, range);
-  if (selectedText.length < 2) return null;
+  const startSource = start?.closest?.(".research-selectable-text");
+  const endSource = end?.closest?.(".research-selectable-text");
+  const panel = startSource?.closest?.(".workspace-panel");
+  if (!startSource || !endSource || !panel || panel !== endSource.closest(".workspace-panel")) return null;
+  if (panel.closest(".research-conversation-panel")) return null;
+  const sources = Array.from(panel.querySelectorAll(".research-selectable-text"))
+    .filter((source) => {
+      try {
+        return range.intersectsNode(source);
+      } catch {
+        return false;
+      }
+    })
+    .filter((source) => !source.parentElement?.closest(".research-selectable-text"));
+  if (!sources.length || sources.length > 24) return null;
+  const passages = sources.map((source) => {
+    const sourceRange = document.createRange();
+    sourceRange.selectNodeContents(source);
+    if (source.contains(range.startContainer)) {
+      sourceRange.setStart(range.startContainer, range.startOffset);
+    }
+    if (source.contains(range.endContainer)) {
+      sourceRange.setEnd(range.endContainer, range.endOffset);
+    }
+    const selectedText = researchSelectionTextFromRange(selection, sourceRange);
+    return {
+      sectionID: source.dataset.researchSectionId,
+      sectionNumber: source.dataset.researchSectionNumber,
+      title: source.dataset.researchSectionTitle,
+      codePrefix: source.dataset.researchCodePrefix,
+      savedItemID: source.dataset.researchSavedItemId || "",
+      selectedText
+    };
+  }).filter((passage) => passage.sectionID && passage.selectedText.length >= 2);
+  if (!passages.length) return null;
   const rect = range.getBoundingClientRect();
   if (!rect.width && !rect.height) return null;
   return {
-    sectionID: source.dataset.researchSectionId,
-    sectionNumber: source.dataset.researchSectionNumber,
-    title: source.dataset.researchSectionTitle,
-    codePrefix: source.dataset.researchCodePrefix,
-    savedItemID: source.dataset.researchSavedItemId || "",
-    selectedText,
+    ...passages[0],
+    passages,
     rect
   };
 }
@@ -9843,17 +9904,26 @@ async function saveResearchSelection(mode, button, status) {
     return;
   }
   button.disabled = true;
-  status.textContent = mode === "current" ? "Adding passage…" : "Starting research…";
+  const passages = selection.passages || [selection];
+  status.textContent = mode === "current"
+    ? `Adding ${passages.length === 1 ? "passage" : `${passages.length} passages`}…`
+    : "Starting research…";
   try {
     const payload = mode === "current"
       ? await postResearch("/research/conversations/evidence", {
           conversationID: state.researchConversationID,
-          sectionID: selection.sectionID,
-          selectedText: selection.selectedText
+          selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
+            sectionID,
+            selectedText,
+            savedItemID
+          }))
         })
       : await postResearch("/research/conversations/create", {
-          sectionID: selection.sectionID,
-          selectedText: selection.selectedText,
+          selections: passages.map(({ sectionID, selectedText, savedItemID }) => ({
+            sectionID,
+            selectedText,
+            savedItemID
+          })),
           projectID: selection.projectID || "",
           savedItemID: selection.savedItemID || ""
         });
@@ -9879,7 +9949,7 @@ function showResearchSelectionMenu() {
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
-  menu.setAttribute("aria-label", "Analyze selected enacted text");
+  menu.setAttribute("aria-label", "Start Research with selected enacted text");
   menu.addEventListener("pointerdown", (event) => event.preventDefault());
   const actions = document.createElement("div");
   actions.className = "research-selection-actions";
@@ -9889,7 +9959,7 @@ function showResearchSelectionMenu() {
   if (activeAccount() && projects.length) {
     const projectSelect = createResearchProjectSelect({
       value: preferredResearchProjectID(),
-      unassignedLabel: "No Project",
+      unassignedLabel: "Unassigned — no Project context",
       ariaLabel: "Project for new Research"
     });
     projectSelect.classList.add("research-selection-project");
@@ -9908,10 +9978,14 @@ function showResearchSelectionMenu() {
   }
   const analyzeButton = document.createElement("button");
   analyzeButton.type = "button";
-  analyzeButton.textContent = state.researchConversationID ? "Analyze in new research" : "Analyze";
+  analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
   analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
   actions.append(analyzeButton);
-  menu.append(actions, status);
+  const hint = document.createElement("span");
+  hint.className = "research-selection-hint";
+  const passageCount = captured.passages?.length || 1;
+  hint.textContent = `Attaches ${passageCount === 1 ? "this passage" : `${passageCount} passages`} as evidence only. No AI request yet.${projects.length ? " The Project choice assigns the Research conversation; it does not save the code section." : ""}`;
+  menu.append(actions, hint, status);
   document.body.append(menu);
   const menuRect = menu.getBoundingClientRect();
   const left = Math.min(
@@ -13305,7 +13379,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   descriptionLabel.className = "project-sheet-field";
   const descriptionInput = document.createElement("textarea");
   descriptionInput.className = "project-description-input";
-  descriptionInput.placeholder = "Description";
+  descriptionInput.placeholder = "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
   descriptionInput.autocomplete = "off";
   descriptionInput.rows = 3;
   if (identity) descriptionInput.value = identity.description;
