@@ -964,7 +964,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-recently-viewed-dividers-v149'),
+        webRoot.text.includes('/web/app.js?v=20260729-search-pill-alignment-v150'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -989,7 +989,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-recently-viewed-dividers-v132'),
+        webRoot.text.includes('/web/styles.css?v=20260729-search-pill-alignment-v133'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1082,7 +1082,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-recently-viewed-dividers-v132'),
+        webRoot.text.includes('/web/styles.css?v=20260729-search-pill-alignment-v133'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1503,6 +1503,11 @@ async function main() {
     assert(
       !workspaceStyles.text.includes(".search-all-codes"),
       "Search still styles the retired All Codes button."
+    );
+    assert(
+      workspaceStyles.text.match(/\.search-panel \.search-box \{[\s\S]*?border-radius: var\(--radius-pill\);/) &&
+        workspaceStyles.text.match(/\.search-dock \{[\s\S]*?padding: var\(--space-2\) var\(--panel-padding\) var\(--space-3\);/),
+      "The Search field should align with the Saved Projects pill and retain fully rounded sides."
     );
     assert(
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
