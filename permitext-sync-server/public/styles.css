@@ -5018,10 +5018,11 @@ mark {
 .research-project-context {
   display: grid;
   gap: var(--space-3);
-  margin-top: var(--space-4);
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--ios-accent-building) 9%, var(--surface-muted));
+  margin-top: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .research-project-context-heading {
@@ -5047,19 +5048,21 @@ mark {
 }
 
 .research-project-select {
-  width: min(100%, 240px);
-  min-height: 38px;
+  width: 100%;
+  min-height: 32px;
   padding: 0 var(--space-3);
   border: 0;
-  border-radius: var(--radius-card);
-  background: var(--surface);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
   color: var(--text-primary);
   font: inherit;
-  font-size: calc(var(--chrome-font-size) * 0.84) !important;
+  font-size: var(--chrome-font-size) !important;
+  box-shadow: none;
 }
 
 .research-project-select:focus-visible,
-.research-project-context textarea:focus-visible {
+.research-project-context textarea:focus-visible,
+.project-research-context-editor textarea:focus-visible {
   outline: 2px solid var(--text-primary);
   outline-offset: 2px;
 }
@@ -5070,6 +5073,10 @@ mark {
   padding: var(--space-3);
   border-radius: var(--radius-card);
   background: color-mix(in srgb, #f79009 16%, var(--surface));
+}
+
+.research-project-context-warning[hidden] {
+  display: none;
 }
 
 .research-project-information {
@@ -5734,6 +5741,29 @@ mark {
   border-radius: var(--radius-card);
   background: color-mix(in srgb, #c78220 16%, var(--surface));
   color: var(--text-primary);
+}
+
+.project-research-context-editor {
+  margin-top: 0;
+  margin-bottom: var(--space-5);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--project-color) 12%, var(--surface));
+  box-shadow: none;
+}
+
+.project-research-context-conversation {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-research-context-editor .research-project-context-form textarea {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
 }
 
 .project-studio-metrics {

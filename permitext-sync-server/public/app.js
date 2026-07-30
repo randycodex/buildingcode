@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-recently-viewed-reader-v164";
+} from "./offline-storage.js?v=20260730-project-research-context-v165";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8513,6 +8513,7 @@ async function refreshResearchConversationList() {
 }
 
 async function closeResearchWorkspace() {
+  const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.utilities.analysis = false;
   state.researchConversationID = "";
   activeResearchConversation = null;
@@ -8520,17 +8521,18 @@ async function closeResearchWorkspace() {
   Object.keys(state.paneWeights).filter((id) => id.startsWith("research:conversation:")).forEach((id) => delete state.paneWeights[id]);
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:analysis" && !id.startsWith("research:conversation:"));
   saveWorkspaceState();
-  await transitionWorkspace("utility");
+  await transitionWorkspace("utility", { refreshPaneIDs: projectPaneIDs });
 }
 
 async function closeResearchConversation() {
   const paneID = paneIDForResearchConversation();
+  const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.researchConversationID = "";
   activeResearchConversation = null;
   if (paneID) delete state.paneWeights[paneID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
   saveWorkspaceState();
-  await transitionWorkspace("utility");
+  await transitionWorkspace("utility", { refreshPaneIDs: projectPaneIDs });
 }
 
 async function openResearchConversation(conversationID, options = {}) {
@@ -8541,8 +8543,11 @@ async function openResearchConversation(conversationID, options = {}) {
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   placePaneAfter("utility:analysis", paneID);
   saveWorkspaceState();
+  const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   await transitionWorkspace("utility", {
-    refreshPaneIDs: options.refreshList ? ["utility:analysis", paneID] : [paneID]
+    refreshPaneIDs: options.refreshList
+      ? ["utility:analysis", paneID, ...projectPaneIDs]
+      : [paneID, ...projectPaneIDs]
   });
   scrollPaneIntoView(paneID);
 }
@@ -9664,69 +9669,6 @@ function renderResearchProjectContext(container, conversation) {
       projectInfo.append(projectInfoHeading, projectInfoList, projectInfoCopy);
       section.append(projectInfo);
     }
-    if (conversation.projectContextReviewRequired) {
-      const warning = document.createElement("aside");
-      warning.className = "research-project-context-warning";
-      const warningTitle = document.createElement("strong");
-      warningTitle.textContent = "Context review required";
-      const warningCopy = document.createElement("p");
-      warningCopy.textContent = "Review or replace the additional Research facts below before generating another answer.";
-      warning.append(warningTitle, warningCopy);
-      section.append(warning);
-    }
-    const form = document.createElement("section");
-    form.className = "research-project-context-form";
-    const label = document.createElement("label");
-    label.textContent = "Additional research facts — one per line";
-    const facts = document.createElement("textarea");
-    facts.rows = 4;
-    facts.maxLength = 10_000;
-    facts.placeholder = "Example: Existing building is Type I-B construction";
-    facts.value = (conversation.projectContext?.facts || []).join("\n");
-    label.append(facts);
-    let autosaveTimer = 0;
-    let saveSequence = 0;
-    let lastSavedFacts = JSON.stringify(conversation.projectContext?.facts || []);
-    const saveProjectContextAutomatically = async () => {
-      window.clearTimeout(autosaveTimer);
-      const normalizedFacts = facts.value
-        .split(/\n+/)
-        .map((item) => item.trim())
-        .filter(Boolean);
-      if (normalizedFacts.length > 20 || normalizedFacts.some((item) => item.length > 500)) {
-        status.textContent = "Use no more than 20 facts and 500 characters per fact.";
-        return;
-      }
-      const serializedFacts = JSON.stringify(normalizedFacts);
-      if (serializedFacts === lastSavedFacts && !conversation.projectContextReviewRequired) return;
-      const requestedSave = ++saveSequence;
-      status.textContent = "Saving Project context…";
-      try {
-        const payload = await postResearch("/research/conversations/project-context", {
-          conversationID: conversation.id,
-          projectID: conversation.primaryProjectID,
-          facts: normalizedFacts
-        });
-        if (requestedSave !== saveSequence) return;
-        conversation = payload.conversation;
-        activeResearchConversation = payload.conversation;
-        lastSavedFacts = serializedFacts;
-        status.textContent = "Project context saved";
-        window.setTimeout(() => {
-          if (status.textContent === "Project context saved") status.textContent = "";
-        }, 1400);
-      } catch (error) {
-        if (requestedSave !== saveSequence) return;
-        status.textContent = error.message;
-      }
-    };
-    facts.addEventListener("input", () => {
-      window.clearTimeout(autosaveTimer);
-      autosaveTimer = window.setTimeout(saveProjectContextAutomatically, 650);
-    });
-    facts.addEventListener("blur", saveProjectContextAutomatically);
-    form.append(label);
-    section.append(form);
   } else {
     const unassigned = document.createElement("p");
     unassigned.className = "research-project-context-unassigned";
@@ -12272,6 +12214,109 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
   content.append(section);
 }
 
+function appendProjectResearchContextEditor(content, identity, initialConversation) {
+  if (
+    !initialConversation?.id ||
+    initialConversation.primaryProjectID !== projectDetailKey(identity)
+  ) {
+    return;
+  }
+  let conversation = initialConversation;
+  const section = document.createElement("section");
+  section.className = "project-studio-section project-research-context-editor";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Additional research facts";
+  const conversationLabel = document.createElement("span");
+  conversationLabel.className = "project-research-context-conversation";
+  conversationLabel.textContent = conversation.title || "Active Research conversation";
+  heading.append(title, conversationLabel);
+  const copy = document.createElement("p");
+  copy.className = "project-studio-copy";
+  copy.textContent = "One fact per line. These facts are context only and are never treated as code authority or cited evidence.";
+  const warning = document.createElement("aside");
+  warning.className = "research-project-context-warning";
+  const warningTitle = document.createElement("strong");
+  warningTitle.textContent = "Context review required";
+  const warningCopy = document.createElement("p");
+  warningCopy.textContent = "Review or replace these additional Research facts before generating another answer.";
+  warning.append(warningTitle, warningCopy);
+  warning.hidden = !conversation.projectContextReviewRequired;
+  const form = document.createElement("section");
+  form.className = "research-project-context-form";
+  const label = document.createElement("label");
+  label.textContent = "Additional research facts — one per line";
+  const facts = document.createElement("textarea");
+  facts.rows = 4;
+  facts.maxLength = 10_000;
+  facts.placeholder = "Example: Existing building is Type I-B construction";
+  facts.value = (conversation.projectContext?.facts || []).join("\n");
+  label.append(facts);
+  const status = document.createElement("p");
+  status.className = "research-project-context-status";
+  let autosaveTimer = 0;
+  let saveSequence = 0;
+  let lastSavedFacts = JSON.stringify(conversation.projectContext?.facts || []);
+  const saveProjectContextAutomatically = async () => {
+    window.clearTimeout(autosaveTimer);
+    const normalizedFacts = facts.value
+      .split(/\n+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+    if (normalizedFacts.length > 20 || normalizedFacts.some((item) => item.length > 500)) {
+      status.textContent = "Use no more than 20 facts and 500 characters per fact.";
+      return;
+    }
+    const serializedFacts = JSON.stringify(normalizedFacts);
+    if (serializedFacts === lastSavedFacts && !conversation.projectContextReviewRequired) return;
+    const requestedSave = ++saveSequence;
+    status.textContent = "Saving Project context…";
+    try {
+      const payload = await postResearch("/research/conversations/project-context", {
+        conversationID: conversation.id,
+        projectID: conversation.primaryProjectID,
+        facts: normalizedFacts
+      });
+      if (requestedSave !== saveSequence) return;
+      conversation = payload.conversation;
+      if (activeResearchConversation?.id === conversation.id) {
+        activeResearchConversation = conversation;
+      }
+      lastSavedFacts = serializedFacts;
+      warning.hidden = true;
+      status.textContent = "Project context saved";
+      if (state.researchConversationID === conversation.id) {
+        await transitionWorkspace("utility", {
+          refreshPaneIDs: [paneIDForResearchConversation(conversation.id)]
+        });
+      }
+      window.setTimeout(() => {
+        if (status.textContent === "Project context saved") status.textContent = "";
+      }, 1400);
+    } catch (error) {
+      if (requestedSave !== saveSequence) return;
+      status.textContent = error.message;
+    }
+  };
+  facts.addEventListener("input", () => {
+    window.clearTimeout(autosaveTimer);
+    autosaveTimer = window.setTimeout(saveProjectContextAutomatically, 650);
+  });
+  facts.addEventListener("blur", saveProjectContextAutomatically);
+  const readOnly = identity.sharedOnly || !hasCapability("research");
+  facts.disabled = readOnly;
+  if (readOnly) {
+    status.textContent = identity.sharedOnly
+      ? "Read-only Project access."
+      : "Research Add-On required to change Project context.";
+  }
+  form.append(label);
+  section.append(heading, copy, warning, form, status);
+  content.append(section);
+}
+
 function appendProjectResearchHistory(content, identity, foundation) {
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
@@ -13061,6 +13106,23 @@ async function renderProjectDetail(detail) {
       foundationError = error.message || "Project history is temporarily unavailable.";
     }
   }
+  let projectResearchConversation = null;
+  const activeProjectConversation = (foundation?.researchConversations || [])
+    .find((conversation) => conversation.id === state.researchConversationID);
+  if (activeProjectConversation) {
+    if (activeResearchConversation?.id === activeProjectConversation.id) {
+      projectResearchConversation = activeResearchConversation;
+    } else {
+      try {
+        const payload = await postResearch("/research/conversations/get", {
+          conversationID: activeProjectConversation.id
+        });
+        projectResearchConversation = payload.conversation;
+      } catch {
+        projectResearchConversation = null;
+      }
+    }
+  }
   if (identity.sharedOrganizationID && foundation) {
     const existingSectionIDs = new Set(
       previewItems.map((item) => String(item.sectionID || item.savedSectionID || item.itemID || ""))
@@ -13328,6 +13390,7 @@ async function renderProjectDetail(detail) {
   });
 
   appendProjectStudioOverview(content, identity, previewItems, foundation);
+  appendProjectResearchContextEditor(content, identity, projectResearchConversation);
   if (foundationError) {
     const warning = document.createElement("p");
     warning.className = "project-studio-warning";
