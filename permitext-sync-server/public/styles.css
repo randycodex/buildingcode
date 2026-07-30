@@ -4945,7 +4945,7 @@ mark {
   display: grid;
   grid-template-rows:
     minmax(72px, var(--research-evidence-size, 36%))
-    11px
+    17px
     minmax(128px, 1fr);
   min-height: 0;
   gap: 0;
@@ -5035,14 +5035,14 @@ mark {
   grid-row: 2;
   position: relative;
   z-index: 6;
-  min-height: 11px;
+  min-height: 17px;
   cursor: row-resize;
   touch-action: none;
 }
 
 .research-evidence-divider::before {
   position: absolute;
-  top: 5px;
+  top: 8px;
   right: 0;
   left: 0;
   height: 1px;

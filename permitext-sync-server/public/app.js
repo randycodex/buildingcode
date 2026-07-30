@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-collapse-layout-v195";
+} from "./offline-storage.js?v=20260730-research-divider-spacing-v196";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9999,7 +9999,7 @@ function bindResearchEvidenceDivider(layout, divider, toggle, conversationID) {
     state.researchEvidenceSplitRatios ||= {};
     state.researchEvidenceSplitRatios[conversationID] = desiredRatio;
     const bounds = layout.getBoundingClientRect();
-    const dividerHeight = divider.offsetHeight || 11;
+    const dividerHeight = divider.offsetHeight || 17;
     const availableHeight = Math.max(0, bounds.height - dividerHeight);
     const composerHeight = layout.querySelector(".research-composer")?.offsetHeight || 0;
     const minimumEvidenceHeight = Math.min(96, Math.max(56, availableHeight * 0.2));

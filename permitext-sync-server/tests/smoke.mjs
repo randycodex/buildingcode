@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-collapse-layout-v195'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-divider-spacing-v196'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-collapse-layout-v169'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-divider-spacing-v170'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1161,6 +1161,8 @@ async function main() {
         workspaceStyles.text.includes(".research-evidence-pane {\n  grid-row: 1;") &&
         workspaceStyles.text.includes(".research-evidence-divider {\n  grid-row: 2;") &&
         workspaceStyles.text.includes(".research-dialogue-pane {\n  grid-row: 3;") &&
+        workspaceStyles.text.includes("min-height: 17px;") &&
+        workspaceStyles.text.includes("top: 8px;") &&
         workspaceStyles.text.includes("cursor: row-resize;") &&
         workspaceStyles.text.includes(".research-message-thread {\n  display: grid;\n  min-height: 0;"),
       "Research evidence and conversation should use independently scrollable panes with a persistent horizontal divider."
@@ -1227,7 +1229,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-collapse-layout-v169'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-divider-spacing-v170'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
