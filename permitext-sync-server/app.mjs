@@ -4242,6 +4242,7 @@ function matchingCanonicalResearchSelection(value, canonicalText) {
 async function researchEvidenceForSectionIDs(sectionIDs) {
   const evidence = [];
   const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
+  const chapterSummaries = await chapterIndex();
   for (const requestedID of sectionIDs) {
     const summary = await sectionSummaryByID(requestedID);
     if (!summary) {
@@ -4273,12 +4274,19 @@ async function researchEvidenceForSectionIDs(sectionIDs) {
         constructionVisualSourceMetadata(reference)
       )
     )).filter(Boolean);
+    const chapterSummary = chapterSummaries.find((chapter) =>
+      chapter.codePrefix === String(summary.codePrefix || body.codePrefix || "") &&
+      String(chapter.chapterNumber) === String(summary.chapterNumber || body.chapterNumber || "")
+    );
     evidence.push({
       sectionID: canonicalID,
       sectionNumber: String(summary.sectionNumber || body.sectionNumber || ""),
       title: String(summary.title || body.title || "Section"),
       codePrefix: String(summary.codePrefix || body.codePrefix || ""),
       chapterNumber: String(summary.chapterNumber || body.chapterNumber || ""),
+      chapterTitle: String(chapterSummary?.fullTitle || chapterSummary?.displayTitle || ""),
+      sectionGroupLabel: String(summary.headerLine || body.headerLine || ""),
+      sectionGroupTitle: String(summary.headingLine || body.headingLine || ""),
       text,
       canonicalText,
       sectionTextHash: createHash("sha256").update(canonicalText).digest("hex"),
@@ -4678,6 +4686,9 @@ function researchSourceFromEvidence(evidence, options = {}) {
     title: evidence.title,
     codePrefix: evidence.codePrefix,
     chapterNumber: evidence.chapterNumber,
+    chapterTitle: evidence.chapterTitle,
+    sectionGroupLabel: evidence.sectionGroupLabel,
+    sectionGroupTitle: evidence.sectionGroupTitle,
     selectedText,
     selectedTextHash: selectedText
       ? createHash("sha256").update(selectedText).digest("hex")
@@ -5153,10 +5164,22 @@ async function researchConversationForClient(conversation, options = {}) {
   let clientConversation = conversation;
   if (options.checkSources) {
     const current = await currentResearchEvidence(conversation);
+    const evidenceBySectionID = new Map(
+      current.evidence.map((evidence) => [String(evidence.sectionID), evidence])
+    );
     clientConversation = {
       ...clientConversation,
       sourceStatus: current.stale ? "changed" : "current",
-      sourceStatuses: current.sourceStatuses
+      sourceStatuses: current.sourceStatuses,
+      sources: (clientConversation.sources || []).map((source) => {
+        const evidence = evidenceBySectionID.get(String(source.sectionID));
+        return evidence ? {
+          ...source,
+          chapterTitle: evidence.chapterTitle,
+          sectionGroupLabel: evidence.sectionGroupLabel,
+          sectionGroupTitle: evidence.sectionGroupTitle
+        } : source;
+      })
     };
   }
   if (options.userID) {
@@ -9556,6 +9579,9 @@ async function handleResearchConversationRefresh(request, response) {
       title: evidence.title,
       codePrefix: evidence.codePrefix,
       chapterNumber: evidence.chapterNumber,
+      chapterTitle: evidence.chapterTitle,
+      sectionGroupLabel: evidence.sectionGroupLabel,
+      sectionGroupTitle: evidence.sectionGroupTitle,
       sectionTextHash: evidence.sectionTextHash,
       codeVersion: defaultSyncCodeVersion
     } : source;

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-opaque-reader-header-v172";
+} from "./offline-storage.js?v=20260730-research-source-hierarchy-v173";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1256,6 +1256,57 @@ function officialSectionCitation(section) {
     "(2022)"
   ].filter(Boolean).join(" ");
   return title ? `${citation} — ${title}` : citation;
+}
+
+function researchHierarchyLabel(value) {
+  const label = String(value || "").replace(/\s+/g, " ").trim();
+  if (!label || label !== label.toUpperCase()) return label;
+  const sentenceCase = label.toLocaleLowerCase("en-US");
+  return sentenceCase.charAt(0).toLocaleUpperCase("en-US") + sentenceCase.slice(1);
+}
+
+function researchSourceCitation(source) {
+  const edition = [
+    String(source?.codeEdition || ""),
+    String(source?.codeVersion || "")
+  ].find((value) => /\b(?:19|20)\d{2}\b/.test(value)) || "";
+  const year = edition.match(/\b((?:19|20)\d{2})\b/)?.[1] || "2022";
+  const codePrefix = String(source?.codePrefix || "BC").trim().toUpperCase();
+  const chapterNumber = String(source?.chapterNumber || "").trim();
+  const chapterTitle = String(source?.chapterTitle || "")
+    .replace(/^(?:Chapter|Appendix)\s+\S+\s*:?\s*/i, "")
+    .replace(/[.\s]+$/, "")
+    .trim();
+  const sectionNumber = String(source?.sectionNumber || "").trim();
+  const sectionTitle = String(source?.title || "")
+    .replace(
+      sectionNumber
+        ? new RegExp(`^(?:§\\s*)?${escapeRegExp(sectionNumber)}(?:\\b|[\\s.:;-]+)`, "i")
+        : /$^/,
+      ""
+    )
+    .replace(/[.\s]+$/, "")
+    .trim();
+  const groupNumber = String(source?.sectionGroupLabel || "")
+    .match(/\b(?:SECTION\s+)?(?:[A-Z]+\s+)?([A-Z]?\d+[A-Z]?)\b/i)?.[1] ||
+    sectionNumber.match(/^([A-Z]?\d{3}[A-Z]?)/i)?.[1] ||
+    "";
+  const groupTitle = String(source?.sectionGroupTitle || "")
+    .replace(/[.\s]+$/, "")
+    .trim();
+  const chapter = chapterNumber
+    ? `C.${chapterNumber}${chapterTitle ? `: ${researchHierarchyLabel(chapterTitle)}` : ""}`
+    : "";
+  const sectionGroup = groupNumber
+    ? `${codePrefix} ${groupNumber}${groupTitle ? `: ${researchHierarchyLabel(groupTitle)}` : ""}`
+    : "";
+  const subsection = [sectionNumber, sectionTitle].filter(Boolean).join(" ");
+  return [
+    `NYC ${year}`,
+    codePrefix,
+    chapter,
+    [sectionGroup, subsection].filter(Boolean).join(", ")
+  ].filter(Boolean).join(" / ");
 }
 
 function paneIDForReader(reader, options = {}) {
@@ -9517,7 +9568,7 @@ function renderResearchSource(source) {
   const card = document.createElement("article");
   card.className = `research-source-card is-${source.kind || "related"}`;
   const citation = document.createElement("strong");
-  citation.textContent = officialSectionCitation(source);
+  citation.textContent = researchSourceCitation(source);
   const relationship = document.createElement("p");
   relationship.textContent = source.kind === "selection"
     ? source.relationship || "Passage selected by you"

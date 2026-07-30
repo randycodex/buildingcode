@@ -1086,6 +1086,13 @@ async function main() {
       "Saved items should open directly in a Reader with the exact target aligned at the top and no highlight."
     );
     assert(
+      workspaceScript.text.includes("function researchSourceCitation(source)") &&
+        workspaceScript.text.includes("sectionGroupLabel") &&
+        workspaceScript.text.includes("sectionGroupTitle") &&
+        workspaceScript.text.includes("citation.textContent = researchSourceCitation(source)"),
+      "Research selected passages no longer show their hierarchical code citation."
+    );
+    assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
         workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&
