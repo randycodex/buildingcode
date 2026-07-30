@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-conversation-background-v163";
+} from "./offline-storage.js?v=20260730-recently-viewed-reader-v164";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1537,6 +1537,7 @@ function readerFieldsForSectionDetail(detail, overrides = {}) {
     sectionNumber: detail.sectionNumber || "",
     title: detail.title || "Section",
     shouldSmoothScrollToSection: true,
+    recentlyViewedSourceSearchID: "",
     ...overrides
   };
 }
@@ -7029,6 +7030,7 @@ async function renderReader(reader, options = {}) {
   const panel = readerTemplate.content.firstElementChild.cloneNode(true);
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
+  const dragHandle = panel.querySelector(".pane-drag-handle");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
   const decreaseTextButton = panel.querySelector(".reader-text-decrease");
   const increaseTextButton = panel.querySelector(".reader-text-increase");
@@ -7045,8 +7047,14 @@ async function renderReader(reader, options = {}) {
   const codeSelect = panel.querySelector(".code-select");
   const chapterSelect = panel.querySelector(".chapter-select");
   const sectionSelect = panel.querySelector(".section-select");
+  const recentlyViewedSearchID = String(reader.recentlyViewedSourceSearchID || "").trim();
+  const isRecentlyViewedLinkedReader = Boolean(
+    recentlyViewedSearchID &&
+    searchLinkedReadersBySearch()[recentlyViewedSearchID] === reader.id
+  );
 
   panel.dataset.readerId = reader.id;
+  panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader);
   reader.codePrefix = reader.codePrefix || "BC";
   applyCodeTheme(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
@@ -7059,6 +7067,9 @@ async function renderReader(reader, options = {}) {
   readerBody.classList.remove("comments-open");
   commentsPanel.hidden = true;
   commentsButton.hidden = true;
+  typographyToggle.closest(".reader-typography-menu").hidden = isRecentlyViewedLinkedReader;
+  internalSearchButton.hidden = isRecentlyViewedLinkedReader;
+  dragHandle.hidden = isRecentlyViewedLinkedReader;
   internalSearchBox.hidden = true;
   internalSearchInput.value = reader.internalSearchQuery || "";
   internalSearchClearButton.hidden = !internalSearchInput.value.trim();
@@ -7362,7 +7373,9 @@ async function renderSearchHistory(panel, instance, options = {}) {
       openButton.append(code, title, preview);
       openButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
-        void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));
+        void openSavedItemInReader(entry, paneIDForUtilityInstance(instance), {
+          recentlyViewedSearchID: instance.id
+        });
       });
       tile.append(openButton);
       list.append(tile);
@@ -14737,9 +14750,10 @@ function closeSavedItemDetailsForPane(savedPaneID) {
   });
 }
 
-async function openSavedItemInReader(item, savedPaneID) {
+async function openSavedItemInReader(item, savedPaneID, options = {}) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
+  const recentlyViewedSearchID = String(options.recentlyViewedSearchID || "").trim();
   const detail = {
     codePrefix: item.codePrefix || "BC",
     codeVersion: item.codeVersion || syncCodeVersionForPrefix(item.codePrefix || "BC"),
@@ -14752,7 +14766,8 @@ async function openSavedItemInReader(item, savedPaneID) {
   closeSavedItemDetailsForPane(savedPaneID);
   const readerFields = readerFieldsForSectionDetail(detail, {
     shouldSmoothScrollToSection: false,
-    savedSourcePaneID: savedPaneID
+    savedSourcePaneID: savedPaneID,
+    recentlyViewedSourceSearchID: recentlyViewedSearchID
   });
   const canAddReader = isProAccount() || state.readers.length < 2;
   let reader = (state.readers || []).find((candidate) => candidate.savedSourcePaneID === savedPaneID);
@@ -14773,6 +14788,14 @@ async function openSavedItemInReader(item, savedPaneID) {
   if (!reader.sourceLinkedDefaultWidthApplied) {
     state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;
     reader.sourceLinkedDefaultWidthApplied = true;
+  }
+  if (recentlyViewedSearchID) {
+    Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
+      if (readerID === reader.id && searchID !== recentlyViewedSearchID) {
+        delete state.searchLinkedReaders[searchID];
+      }
+    });
+    state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;
   }
   placePaneAfter(savedPaneID, readerPaneID);
   updateBrowserSectionURL(sectionID);

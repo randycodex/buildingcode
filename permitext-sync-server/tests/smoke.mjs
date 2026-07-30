@@ -995,7 +995,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-conversation-background-v144'),
+        webRoot.text.includes('/web/styles.css?v=20260730-recently-viewed-reader-v145'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1032,7 +1032,7 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
-      workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID)") &&
+      workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID, options = {})") &&
         workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
         workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
         workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
@@ -1052,6 +1052,18 @@ async function main() {
         !workspaceScript.text.includes("saved-reader-target-flash") &&
         !workspaceStyles.text.includes("@keyframes saved-reader-target-flash"),
       "Saved items should open directly in a Reader with the exact target aligned at the top and no highlight."
+    );
+    assert(
+      workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
+        workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
+        workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&
+        workspaceScript.text.includes('panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader)') &&
+        workspaceScript.text.includes('typographyToggle.closest(".reader-typography-menu").hidden = isRecentlyViewedLinkedReader;') &&
+        workspaceScript.text.includes("internalSearchButton.hidden = isRecentlyViewedLinkedReader;") &&
+        workspaceScript.text.includes("dragHandle.hidden = isRecentlyViewedLinkedReader;") &&
+        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader {") &&
+        workspaceStyles.text.includes("background: var(--recently-viewed-reader-background);"),
+      "A Recently Viewed Reader should move with Search, retain only Close in its header, and use its own background."
     );
     assert(
       workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
@@ -1088,7 +1100,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-conversation-background-v144'),
+        webRoot.text.includes('/web/styles.css?v=20260730-recently-viewed-reader-v145'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
