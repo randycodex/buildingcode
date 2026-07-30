@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-project-research-context-v165";
+} from "./offline-storage.js?v=20260730-project-context-footer-v166";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9589,18 +9589,12 @@ function renderResearchProjectContext(container, conversation) {
   section.className = "research-project-context";
   const heading = document.createElement("div");
   heading.className = "research-project-context-heading";
-  const titleWrap = document.createElement("div");
-  const title = document.createElement("strong");
-  title.textContent = "Project context";
-  const copy = document.createElement("p");
-  copy.textContent = "Project information and additional facts are context only. They are never treated as code authority or cited evidence.";
-  titleWrap.append(title, copy);
   const projectSelect = createResearchProjectSelect({
     value: conversation.primaryProjectID || "",
     unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Assign Research conversation to Project"
   });
-  heading.append(projectSelect, titleWrap);
+  heading.append(projectSelect);
   section.append(heading);
 
   const status = document.createElement("p");
@@ -13030,6 +13024,18 @@ function appendProjectActivity(content, foundation) {
   content.append(section);
 }
 
+function appendProjectContextNotice(content) {
+  const notice = document.createElement("aside");
+  notice.className = "project-context-notice";
+  notice.setAttribute("role", "note");
+  const heading = document.createElement("strong");
+  heading.textContent = "Project context";
+  const copy = document.createElement("p");
+  copy.textContent = "Project information and additional facts are context only. They are never treated as code authority or cited evidence.";
+  notice.append(heading, copy);
+  content.append(notice);
+}
+
 async function renderProjectDetail(detail) {
   const data = await loadSyncedContent();
   const projects = visibleProjectRecords(data.summary?.projects || []);
@@ -13404,6 +13410,7 @@ async function renderProjectDetail(detail) {
   appendProjectReviewThreads(content, identity, foundation);
   appendProjectReportExports(content, identity, foundation);
   appendProjectActivity(content, foundation);
+  if (projectResearchConversation) appendProjectContextNotice(content);
   panel.append(chrome, content);
   return panel;
 }

@@ -459,6 +459,10 @@ async function main() {
       workspaceScript.text.indexOf("function appendProjectResearchContextEditor"),
       workspaceScript.text.indexOf("function appendProjectResearchHistory")
     );
+    const projectContextNoticeSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("function appendProjectContextNotice"),
+      workspaceScript.text.indexOf("async function renderProjectDetail")
+    );
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
     assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
@@ -1003,7 +1007,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-project-research-context-v146'),
+        webRoot.text.includes('/web/styles.css?v=20260730-project-context-footer-v147'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1108,7 +1112,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-project-research-context-v146'),
+        webRoot.text.includes('/web/styles.css?v=20260730-project-context-footer-v147'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1129,6 +1133,21 @@ async function main() {
         workspaceStyles.text.includes("border-radius: var(--radius-pill);") &&
         workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);"),
       "Project context should use the Saved-column picker dimensions, remain flat, and edit additional facts from Project Studio."
+    );
+    assert(
+      !researchProjectContextSource.includes(
+        "Project information and additional facts are context only."
+      ) &&
+        projectContextNoticeSource.includes('heading.textContent = "Project context"') &&
+        projectContextNoticeSource.includes(
+          "Project information and additional facts are context only. They are never treated as code authority or cited evidence."
+        ) &&
+        workspaceScript.text.includes(
+          "if (projectResearchConversation) appendProjectContextNotice(content);"
+        ) &&
+        workspaceStyles.text.includes(".project-detail-content {\\n  display: flex;\\n  flex-direction: column;") &&
+        workspaceStyles.text.includes(".project-context-notice {\\n  margin-top: auto;"),
+      "Project context guidance should live at the bottom of its active Project Studio rather than in Research Conversation."
     );
     assert(
       workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel),") &&

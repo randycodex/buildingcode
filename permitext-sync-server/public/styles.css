@@ -5711,9 +5711,37 @@ mark {
 }
 
 .project-detail-content {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow-y: auto;
   padding: var(--space-4) 0 108px;
+}
+
+.project-detail-content > * {
+  flex: 0 0 auto;
+}
+
+.project-context-notice {
+  margin-top: auto;
+  padding: var(--space-5) 0 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72);
+  line-height: 1.35;
+}
+
+.project-context-notice strong {
+  display: block;
+  color: inherit;
+  font-size: inherit;
+  font-weight: 650;
+}
+
+.project-context-notice p {
+  margin: 2px 0 0;
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
 }
 
 .project-studio-overview,
