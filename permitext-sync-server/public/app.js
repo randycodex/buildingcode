@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-divider-spacing-v196";
+} from "./offline-storage.js?v=20260730-research-feedback-layout-v197";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8475,8 +8475,8 @@ function renderResearchInterpretation(container, result, options = {}) {
   disclaimer.className = "research-disclaimer";
   disclaimer.textContent = result.disclaimer;
   card.append(disclaimer);
-  if (options.message) renderResearchFeedback(card, options.message, options.conversationID);
   container.append(card);
+  if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }
 
 async function renderUtilityInstance(instance) {

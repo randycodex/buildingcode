@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-divider-spacing-v196'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-feedback-layout-v197'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-divider-spacing-v170'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-feedback-layout-v171'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1138,8 +1138,11 @@ async function main() {
       "Research passages should provide a single chevron to collapse or expand every passage."
     );
     assert(
-      workspaceStyles.text.includes(".research-composer {") &&
+        workspaceStyles.text.includes(".research-composer {") &&
         workspaceStyles.text.includes(".research-dialogue-pane {") &&
+        workspaceStyles.text.includes(".research-message.is-assistant {\n  display: grid;\n  gap: var(--space-3);") &&
+        workspaceScript.text.includes("renderResearchFeedback(container, options.message, options.conversationID)") &&
+        !workspaceScript.text.includes("renderResearchFeedback(card, options.message, options.conversationID)") &&
         workspaceStyles.text.includes("background: var(--research-conversation-background);"),
       "Research composer should match the Research conversation column background."
     );
@@ -1229,7 +1232,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-divider-spacing-v170'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-feedback-layout-v171'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
