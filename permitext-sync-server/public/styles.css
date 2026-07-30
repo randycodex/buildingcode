@@ -5382,7 +5382,7 @@ mark {
   align-items: end;
   margin: 0 0 calc(var(--panel-padding) * -1);
   padding: var(--space-3) 0 var(--panel-padding);
-  background: var(--surface);
+  background: var(--research-conversation-background);
   isolation: isolate;
 }
 

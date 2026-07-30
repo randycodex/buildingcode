@@ -1118,6 +1118,11 @@ async function main() {
       "Research passages should provide a single chevron to collapse or expand every passage."
     );
     assert(
+      workspaceStyles.text.includes(".research-composer {") &&
+        workspaceStyles.text.includes("background: var(--research-conversation-background);"),
+      "Research composer should match the Research conversation column background."
+    );
+    assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
         workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&
