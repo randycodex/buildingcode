@@ -996,7 +996,11 @@ async function main() {
         workspaceScript.text.includes('facts.addEventListener("input"') &&
         workspaceScript.text.includes('facts.addEventListener("blur", saveProjectContextAutomatically)') &&
         !workspaceScript.text.includes("Save Project context") &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-audit-hidden-v190'),
+        !workspaceScript.text.slice(
+          workspaceScript.text.indexOf("function renderResearchInterpretation"),
+          workspaceScript.text.indexOf("async function renderUtilityInstance")
+        ).includes('citationsHeading.textContent = "Sources"') &&
+        webRoot.text.includes('/web/app.js?v=20260730-research-public-clean-v191'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1028,6 +1032,7 @@ async function main() {
     assert(
       !researchSourceRendererSource.includes('"Selected passage"') &&
         researchSourceRendererSource.includes('if (source.kind !== "selection")') &&
+        researchConversationRendererSource.includes('.filter((source) => source.kind === "selection")') &&
         researchConversationRendererSource.includes(
           "const projectContextSection = renderResearchProjectContext(content, conversation);"
         ) &&

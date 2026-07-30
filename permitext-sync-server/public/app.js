@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-audit-hidden-v190";
+} from "./offline-storage.js?v=20260730-research-public-clean-v191";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8450,35 +8450,6 @@ function renderResearchInterpretation(container, result, options = {}) {
   appendResearchUnresolved(card, result);
   appendResearchList(card, "Related evidence to add", result.additionalEvidenceNeeded);
 
-  const citationsHeading = document.createElement("strong");
-  citationsHeading.className = "research-result-subheading";
-  citationsHeading.textContent = "Sources";
-  card.append(citationsHeading);
-  result.citations.forEach((citation) => {
-    const citationRow = document.createElement("div");
-    citationRow.className = "research-result-citation";
-    const citationText = document.createElement("span");
-    citationText.textContent = officialSectionCitation(citation);
-    const relevance = document.createElement("p");
-    relevance.textContent = researchDisplayText(citation.relevance);
-    const passageDetails = document.createElement("details");
-    passageDetails.className = "research-citation-passages";
-    const passageSummary = document.createElement("summary");
-    passageSummary.textContent = "Show supporting selected passage";
-    passageDetails.append(passageSummary);
-    (citation.supportingPassages || []).forEach((passage) => {
-      const quote = document.createElement("blockquote");
-      quote.textContent = passage.selectedText;
-      passageDetails.append(quote);
-    });
-    const openButton = document.createElement("button");
-    openButton.className = "ghost-button";
-    openButton.type = "button";
-    openButton.textContent = "Open cited section";
-    openButton.addEventListener("click", () => openSectionDetailForExistingSearch(citation));
-    citationRow.append(citationText, relevance, passageDetails, openButton);
-    card.append(citationRow);
-  });
   const disclaimer = document.createElement("p");
   disclaimer.className = "research-disclaimer";
   disclaimer.textContent = result.disclaimer;
@@ -10030,7 +10001,9 @@ async function renderResearchConversation(conversationID) {
   sourceToggle.append(sourceDisclosure);
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
-  conversation.sources.forEach((source) => sourceList.append(renderResearchSource(source)));
+  conversation.sources
+    .filter((source) => source.kind === "selection")
+    .forEach((source) => sourceList.append(renderResearchSource(source)));
   sources.append(sourceToggle, sourceList);
   projectContextSection.querySelector(".research-project-context-heading").after(sources);
   sourceList.querySelectorAll(".research-source-card").forEach((card) =>
