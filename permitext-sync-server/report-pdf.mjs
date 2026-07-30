@@ -43,6 +43,19 @@ function stringList(value) {
     .filter(Boolean);
 }
 
+function researchDisplayText(value) {
+  return String(value || "")
+    .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
+    .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[;,]\s*$/, "")
+    .trim();
+}
+
+function researchDisplayList(value) {
+  return stringList(value).map(researchDisplayText).filter(Boolean);
+}
+
 function reportPresentation(manifest) {
   const accent = String(manifest.presentation?.branding?.accentColorHex || "").trim().toLowerCase();
   return {
@@ -159,14 +172,32 @@ function drawSourceItem(document, item, projectMaterialBySourceID, presentation)
     document
       .font("Helvetica")
       .fontSize(9.5)
-      .text(item.conclusion, { lineGap: 2, paragraphGap: 7 });
+      .text(researchDisplayText(item.conclusion), { lineGap: 2, paragraphGap: 7 });
+    drawList(
+      document,
+      "What the selected evidence establishes",
+      (item.supportedPoints || []).map((point) =>
+        [researchDisplayText(point.heading), researchDisplayText(point.explanation)]
+          .filter(Boolean)
+          .join(": ")
+      )
+    );
     if (item.explanation) {
-      document.text(item.explanation, { lineGap: 2, paragraphGap: 7 });
+      document
+        .font("Helvetica-Bold")
+        .fontSize(9.5)
+        .text(item.supportedPoints?.length ? "Practical application" : "Explanation", {
+          paragraphGap: 3
+        });
+      document
+        .font("Helvetica")
+        .fontSize(9.5);
+      document.text(researchDisplayText(item.explanation), { lineGap: 2, paragraphGap: 7 });
     }
-    drawList(document, "Assumptions", item.assumptions);
-    drawList(document, "Missing Project facts", item.missingFacts);
-    drawList(document, "Limitations", item.limitations);
-    drawList(document, "Additional evidence needed", item.additionalEvidenceNeeded);
+    drawList(document, "Assumptions", researchDisplayList(item.assumptions));
+    drawList(document, "Project facts to verify", researchDisplayList(item.missingFacts));
+    drawList(document, "Limits of this answer", researchDisplayList(item.limitations));
+    drawList(document, "Related evidence to add", researchDisplayList(item.additionalEvidenceNeeded));
     drawList(
       document,
       "Citations",

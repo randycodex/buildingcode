@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-source-copy-v186";
+} from "./offline-storage.js?v=20260730-readable-research-v187";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8252,10 +8252,71 @@ function appendResearchList(container, title, items) {
   list.className = "research-result-list";
   items.forEach((item) => {
     const row = document.createElement("li");
-    row.textContent = item;
+    row.textContent = researchDisplayText(item);
     list.append(row);
   });
   container.append(heading, list);
+}
+
+function researchDisplayText(value) {
+  return String(value || "")
+    .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
+    .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[;,]\s*$/, "")
+    .trim();
+}
+
+function researchDisplayList(values) {
+  return (values || []).map(researchDisplayText).filter(Boolean);
+}
+
+function appendResearchSupportedPoints(container, points) {
+  if (!points?.length) return;
+  const heading = document.createElement("strong");
+  heading.className = "research-result-subheading";
+  heading.textContent = "What the selected evidence establishes";
+  const list = document.createElement("ol");
+  list.className = "research-supported-points";
+  points.forEach((point) => {
+    const row = document.createElement("li");
+    const title = document.createElement("strong");
+    title.textContent = researchDisplayText(point.heading);
+    const explanation = document.createElement("p");
+    explanation.textContent = researchDisplayText(point.explanation);
+    row.append(title, explanation);
+    list.append(row);
+  });
+  container.append(heading, list);
+}
+
+function appendResearchUnresolved(container, result) {
+  const groups = [
+    ["Project facts to verify", result.missingFacts],
+    ["Limits of this answer", result.evidenceLimitations]
+  ].filter(([, items]) => items?.length);
+  if (!groups.length) return;
+
+  const heading = document.createElement("strong");
+  heading.className = "research-result-subheading";
+  heading.textContent = "What remains unresolved";
+  const section = document.createElement("section");
+  section.className = "research-unresolved";
+  groups.forEach(([title, items]) => {
+    const group = document.createElement("div");
+    const groupHeading = document.createElement("strong");
+    groupHeading.textContent = title;
+    const list = document.createElement("ul");
+    list.className = "research-result-list";
+    items.forEach((item) => {
+      const row = document.createElement("li");
+      row.textContent = researchDisplayText(item);
+      list.append(row);
+    });
+    group.append(groupHeading, list);
+    section.append(group);
+  });
+  container.append(heading, section);
 }
 
 function renderResearchFeedback(container, message, conversationID) {
@@ -8371,19 +8432,30 @@ function renderResearchInterpretation(container, result, options = {}) {
   const label = document.createElement("p");
   label.className = "section-label";
   label.textContent = result.mode === "mock" ? "Prototype response" : "Supported by selected evidence";
-  const heading = document.createElement("h3");
-  heading.textContent = result.conclusion;
+  const answerHeading = document.createElement("strong");
+  answerHeading.className = "research-result-subheading";
+  answerHeading.textContent = "Answer";
+  const answer = document.createElement("p");
+  answer.className = "research-result-answer";
+  answer.textContent = researchDisplayText(result.conclusion);
   const explanation = document.createElement("p");
-  explanation.textContent = result.explanation;
-  card.append(label, heading, explanation);
-  appendResearchList(card, "Assumptions", result.assumptions);
-  appendResearchList(card, "Missing project facts", result.missingFacts);
-  appendResearchList(card, "Limits of the selected evidence", result.evidenceLimitations);
-  appendResearchList(card, "Additional evidence needed", result.additionalEvidenceNeeded);
+  explanation.className = "research-result-application";
+  explanation.textContent = researchDisplayText(result.explanation);
+  card.append(label, answerHeading, answer);
+  appendResearchSupportedPoints(card, result.supportedPoints);
+  const explanationHeading = document.createElement("strong");
+  explanationHeading.className = "research-result-subheading";
+  explanationHeading.textContent = result.supportedPoints?.length
+    ? "Practical application"
+    : "Explanation";
+  card.append(explanationHeading, explanation);
+  appendResearchList(card, "Assumptions used", result.assumptions);
+  appendResearchUnresolved(card, result);
+  appendResearchList(card, "Related evidence to add", result.additionalEvidenceNeeded);
 
   const citationsHeading = document.createElement("strong");
   citationsHeading.className = "research-result-subheading";
-  citationsHeading.textContent = "Cited code sections";
+  citationsHeading.textContent = "Sources";
   card.append(citationsHeading);
   result.citations.forEach((citation) => {
     const citationRow = document.createElement("div");
@@ -8391,7 +8463,7 @@ function renderResearchInterpretation(container, result, options = {}) {
     const citationText = document.createElement("span");
     citationText.textContent = officialSectionCitation(citation);
     const relevance = document.createElement("p");
-    relevance.textContent = citation.relevance;
+    relevance.textContent = researchDisplayText(citation.relevance);
     const passageDetails = document.createElement("details");
     passageDetails.className = "research-citation-passages";
     const passageSummary = document.createElement("summary");
@@ -11408,17 +11480,49 @@ function printReportManifestAsPDF(manifest) {
         const conclusion = documentRoot.createElement("p");
         const conclusionLabel = documentRoot.createElement("strong");
         conclusionLabel.textContent = "Supported conclusion: ";
-        conclusion.append(conclusionLabel, documentRoot.createTextNode(item.conclusion));
+        conclusion.append(conclusionLabel, documentRoot.createTextNode(researchDisplayText(item.conclusion)));
         article.append(heading, conclusion);
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "What the selected evidence establishes",
+          (item.supportedPoints || []).map((point) =>
+            [researchDisplayText(point.heading), researchDisplayText(point.explanation)]
+              .filter(Boolean)
+              .join(": ")
+          )
+        );
         if (item.explanation) {
           const explanation = documentRoot.createElement("p");
-          explanation.textContent = item.explanation;
+          const explanationLabel = documentRoot.createElement("strong");
+          explanationLabel.textContent = item.supportedPoints?.length
+            ? "Practical application: "
+            : "Explanation: ";
+          explanation.append(
+            explanationLabel,
+            documentRoot.createTextNode(researchDisplayText(item.explanation))
+          );
           article.append(explanation);
         }
-        appendReportPDFList(documentRoot, article, "Assumptions", item.assumptions);
-        appendReportPDFList(documentRoot, article, "Missing Project facts", item.missingFacts);
-        appendReportPDFList(documentRoot, article, "Limitations", item.limitations);
-        appendReportPDFList(documentRoot, article, "Additional evidence needed", item.additionalEvidenceNeeded);
+        appendReportPDFList(documentRoot, article, "Assumptions", researchDisplayList(item.assumptions));
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Project facts to verify",
+          researchDisplayList(item.missingFacts)
+        );
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Limits of this answer",
+          researchDisplayList(item.limitations)
+        );
+        appendReportPDFList(
+          documentRoot,
+          article,
+          "Related evidence to add",
+          researchDisplayList(item.additionalEvidenceNeeded)
+        );
         appendReportPDFList(
           documentRoot,
           article,

@@ -220,6 +220,20 @@ function normalizeResearchManifestItem(item, base) {
     conversationID: requiredText(item.conversationID, "Report Research conversation ID", 256),
     question: requiredText(item.question, "Report Research question", 2_000),
     conclusion: requiredText(item.conclusion, "Report Research conclusion", maximumAuthoredTextLength),
+    supportedPoints: (Array.isArray(item.supportedPoints) ? item.supportedPoints : [])
+      .slice(0, 20)
+      .map((point) => ({
+        heading: requiredText(point.heading, "Report Research supported-point heading", 500),
+        explanation: requiredText(
+          point.explanation,
+          "Report Research supported-point explanation",
+          maximumAuthoredTextLength
+        ),
+        sectionID: requiredText(point.sectionID, "Report Research supported-point section", 256),
+        sourceIDs: (Array.isArray(point.sourceIDs) ? point.sourceIDs : [])
+          .slice(0, 100)
+          .map((value) => requiredText(value, "Report Research supported-point source", 256))
+      })),
     explanation: optionalText(item.explanation, maximumAuthoredTextLength),
     assumptions: (Array.isArray(item.assumptions) ? item.assumptions : []).map((value) => optionalText(value, 2_000)),
     missingFacts: (Array.isArray(item.missingFacts) ? item.missingFacts : []).map((value) => optionalText(value, 2_000)),

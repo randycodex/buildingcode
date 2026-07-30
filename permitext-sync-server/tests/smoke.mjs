@@ -932,7 +932,8 @@ async function main() {
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
-        workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));") &&
+        workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance), {") &&
+        workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
         workspaceScript.text.includes("if (attempt < 120)") &&
@@ -981,7 +982,7 @@ async function main() {
         workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance, options = {})") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(open))') &&
         workspaceScript.text.includes('postResearch("/research/conversations/reuse-evidence"') &&
-        workspaceScript.text.includes("Project facts are user-provided context only") &&
+        workspaceScript.text.includes("Project information and additional facts are context only.") &&
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
@@ -989,7 +990,7 @@ async function main() {
         workspaceScript.text.includes('facts.addEventListener("input"') &&
         workspaceScript.text.includes('facts.addEventListener("blur", saveProjectContextAutomatically)') &&
         !workspaceScript.text.includes("Save Project context") &&
-        webRoot.text.includes('/web/app.js?v=20260729-research-row-flat-v161'),
+        webRoot.text.includes('/web/app.js?v=20260730-readable-research-v187'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1014,8 +1015,8 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-opaque-reader-header-v153'),
+        workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
+        webRoot.text.includes('/web/styles.css?v=20260730-readable-research-v164'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1144,15 +1145,16 @@ async function main() {
         workspaceScript.text.includes("dragHandle.hidden = isRecentlyViewedLinkedReader;") &&
         workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader {") &&
         workspaceStyles.text.includes("background: var(--recently-viewed-reader-background);") &&
-        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader::before {\\n  right: 0;\\n  background: var(--recently-viewed-reader-background);"),
+        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader::before {\n  right: 0;\n  background: var(--recently-viewed-reader-background);"),
       "A Recently Viewed Reader should move with Search, retain only Close in its header, and carry its background through the full header."
     );
+    const readerHeaderStyleSource =
+      workspaceStyles.text.match(/\.reader-panel::before \{[\s\S]*?\n\}/)?.[0] || "";
     assert(
-      workspaceStyles.text.includes(".reader-panel::before {") &&
-        workspaceStyles.text.includes("background: var(--surface-raised);") &&
-        workspaceStyles.text.includes("-webkit-backdrop-filter: none;") &&
-        workspaceStyles.text.includes("backdrop-filter: none;") &&
-        !workspaceStyles.text.includes("background: color-mix(in srgb, var(--surface) 68%, transparent);"),
+      readerHeaderStyleSource.includes("background: var(--surface-raised);") &&
+        readerHeaderStyleSource.includes("-webkit-backdrop-filter: none;") &&
+        readerHeaderStyleSource.includes("backdrop-filter: none;") &&
+        !readerHeaderStyleSource.includes("color-mix("),
       "Regular Reader headers should be fully opaque without a backdrop blur."
     );
     assert(
@@ -1190,7 +1192,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-opaque-reader-header-v153'),
+        webRoot.text.includes('/web/styles.css?v=20260730-readable-research-v164'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1205,15 +1207,15 @@ async function main() {
         projectResearchContextSource.includes("Additional research facts — one per line") &&
         projectResearchContextSource.includes('postResearch("/research/conversations/project-context"') &&
         workspaceScript.text.includes("appendProjectResearchContextEditor(content, identity, projectResearchConversation);") &&
-        workspaceStyles.text.includes(".research-project-context {\\n  display: grid;") &&
-        workspaceStyles.text.includes("background: transparent;\\n  box-shadow: none;") &&
+        workspaceStyles.text.includes(".research-project-context {\n  display: grid;") &&
+        workspaceStyles.text.includes("background: transparent;\n  box-shadow: none;") &&
         researchProjectContextSource.includes("createResearchConversationProjectPicker") &&
         !researchProjectContextSource.includes("createResearchProjectSelect") &&
         workspaceScript.text.includes('picker.className = "research-project-picker saved-projects-section code-filter-menu saved-projects-menu"') &&
         workspaceScript.text.includes('list.className = "saved-project-list research-project-list"') &&
         workspaceScript.text.includes('toggle.className = "code-filter-menu-toggle saved-projects-menu-toggle"') &&
         workspaceScript.text.includes('label: "Projects"') &&
-        workspaceStyles.text.includes(".research-conversation-content {\\n  display: grid;") &&
+        workspaceStyles.text.includes(".research-conversation-content {\n  display: grid;") &&
         workspaceStyles.text.includes("padding: 0 0 var(--panel-padding);") &&
         workspaceStyles.text.includes("margin: 0 0 calc(var(--panel-padding) * -1);") &&
         workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
@@ -1231,8 +1233,8 @@ async function main() {
         workspaceScript.text.includes(
           "if (projectResearchConversation) appendProjectContextNotice(content);"
         ) &&
-        workspaceStyles.text.includes(".project-detail-content {\\n  display: flex;\\n  flex-direction: column;") &&
-        workspaceStyles.text.includes(".project-context-notice {\\n  margin-top: auto;"),
+        workspaceStyles.text.includes(".project-detail-content {\n  display: flex;\n  flex-direction: column;") &&
+        workspaceStyles.text.includes(".project-context-notice {\n  margin-top: auto;"),
       "Project context guidance should live at the bottom of its active Project Studio rather than in Research Conversation."
     );
     assert(
@@ -2839,7 +2841,7 @@ async function main() {
     });
     assert(
       unreviewedVisualConversation.response.status === 400 &&
-        unreviewedVisualConversation.json.error?.includes("Review and select"),
+        /review and explicitly select/i.test(unreviewedVisualConversation.json.error || ""),
       "Research accepted a map-dependent passage without explicit visual-source review."
     );
     const forgedVisualConversation = await request("/research/conversations/create", {
@@ -3235,6 +3237,9 @@ async function main() {
     assert(conversationMessage.json.usage.mockMode === true, "Mock research did not disclose its zero-call mode.");
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
+        conversationMessage.json.conversation.messages[1].answer.supportedPoints.length === 1 &&
+        conversationMessage.json.conversation.messages[1].answer.supportedPoints[0].sourceIDs[0] ===
+          conversationMessage.json.conversation.messages[1].answer.citations[0].sourceIDs[0] &&
         conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881" &&
         conversationMessage.json.conversation.messages[1].answer.citations[0].supportingPassages[0].selectedText === selectedResearchText &&
         conversationMessage.json.conversation.messages[1].answer.evidenceSourceIDs.length === 1,

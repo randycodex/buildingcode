@@ -404,6 +404,9 @@ function answerText(result) {
   const answer = result?.answer;
   return answer ? [
     answer.conclusion,
+    ...(answer.supportedPoints || []).map((point, index) =>
+      `${index + 1}. ${point.heading}: ${point.explanation}`
+    ),
     answer.explanation,
     ...(answer.assumptions || []).map((item) => `Assumption: ${item}`),
     ...(answer.missingFacts || []).map((item) => `Missing fact: ${item}`),
@@ -564,6 +567,9 @@ function renderFeedbackItem(feedback) {
     element("h3", { text: "Immutable generated answer" }),
     element("div", { className: "answer evidence", text: [
       feedback.answer?.conclusion,
+      ...(feedback.answer?.supportedPoints || []).map((point, index) =>
+        `${index + 1}. ${point.heading}: ${point.explanation}`
+      ),
       feedback.answer?.explanation
     ].filter(Boolean).join("\n\n") || "Answer unavailable." })
   );

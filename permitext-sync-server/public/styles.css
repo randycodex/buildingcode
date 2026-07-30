@@ -4115,6 +4115,55 @@ mark {
   color: var(--text-primary);
 }
 
+.research-result-answer,
+.research-result-application {
+  margin: 0;
+  color: var(--text-primary);
+  line-height: 1.55;
+}
+
+.research-result-answer {
+  font-weight: 500;
+}
+
+.research-supported-points {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding-left: 1.4rem;
+  color: var(--text-primary);
+}
+
+.research-supported-points li {
+  padding-left: var(--space-1);
+}
+
+.research-supported-points li::marker {
+  color: var(--code-accent, var(--text-primary));
+  font-weight: 700;
+}
+
+.research-supported-points p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.research-unresolved {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.research-unresolved > div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.research-unresolved > div > strong {
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.88) !important;
+}
+
 .research-result-list {
   display: grid;
   gap: var(--space-1);

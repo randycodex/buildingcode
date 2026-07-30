@@ -328,6 +328,7 @@ function judgeSchemaForRubric(concepts, forbidden, uncertainty) {
 function answerForJudge(answer) {
   return {
     conclusion: answer.conclusion,
+    supportedPoints: answer.supportedPoints || [],
     explanation: answer.explanation,
     assumptions: answer.assumptions || [],
     missingFacts: answer.missingFacts || [],
@@ -440,6 +441,10 @@ async function judgeAnswer(testCase, answer) {
 function answerProseStrings(answer) {
   return [
     answer?.conclusion,
+    ...(answer?.supportedPoints || []).flatMap((point) => [
+      point?.heading,
+      point?.explanation
+    ]),
     answer?.explanation,
     ...(answer?.assumptions || []),
     ...(answer?.missingFacts || []),
@@ -911,6 +916,12 @@ function reviewMarkdown(dataset, results, createdAt, configuration) {
       "",
       `**Conclusion:** ${answer.conclusion}`,
       "",
+      "**What the selected evidence establishes**",
+      "",
+      markdownList((answer.supportedPoints || []).map((point) =>
+        `${point.heading}: ${point.explanation}`
+      )),
+      "",
       answer.explanation,
       "",
       "**Assumptions**",
@@ -1374,6 +1385,10 @@ function answerComparisonText(result) {
   return answer
     ? [
         answer.conclusion,
+        ...(answer.supportedPoints || []).flatMap((point) => [
+          point.heading,
+          point.explanation
+        ]),
         answer.explanation,
         ...(answer.missingFacts || []),
         ...(answer.evidenceLimitations || []),
@@ -2289,6 +2304,12 @@ async function runSelfTest(dataset, datasetText) {
   ];
   const interpretation = {
     conclusion: "Conclusion.",
+    supportedPoints: [{
+      heading: "Selected rule",
+      explanation: "Selected passage A establishes the rule.",
+      sectionID: "101",
+      sourceIDs: ["source-a"]
+    }],
     explanation: "Explanation.",
     assumptions: [],
     missingFacts: [],
@@ -2296,7 +2317,40 @@ async function runSelfTest(dataset, datasetText) {
     additionalEvidenceNeeded: [],
     citations: [{ sectionID: "101", sourceIDs: ["source-a"], relevance: "Relevant." }]
   };
-  validateResearchInterpretation(interpretation, validationEvidence);
+  const validatedInterpretation = validateResearchInterpretation({
+    ...interpretation,
+    conclusion: `${interpretation.conclusion} SECTION_ID 101; PASSAGE_ID source-a`,
+    supportedPoints: interpretation.supportedPoints.map((point) => ({
+      ...point,
+      explanation: `${point.explanation} (SECTION_ID 101; PASSAGE_ID source-a)`
+    })),
+    assumptions: ["Assumption. PASSAGE_ID source-a"],
+    citations: interpretation.citations.map((citation) => ({
+      ...citation,
+      relevance: `${citation.relevance} SECTION_ID 101`
+    }))
+  }, validationEvidence);
+  assert(
+    validatedInterpretation.conclusion === "Conclusion." &&
+      validatedInterpretation.supportedPoints[0].explanation ===
+        "Selected passage A establishes the rule." &&
+      validatedInterpretation.assumptions[0] === "Assumption." &&
+      validatedInterpretation.citations[0].relevance === "Relevant.",
+    "Production Research validation exposed internal evidence identifiers in user-facing prose."
+  );
+  let excessiveSupportedPointsRejected = false;
+  try {
+    validateResearchInterpretation({
+      ...interpretation,
+      supportedPoints: Array.from({ length: 9 }, () => interpretation.supportedPoints[0])
+    }, validationEvidence);
+  } catch (error) {
+    excessiveSupportedPointsRejected = error.code === "INVALID_RESEARCH_RESPONSE";
+  }
+  assert(
+    excessiveSupportedPointsRejected,
+    "Production Research validation accepted more numbered points than the response schema allows."
+  );
   let missingEvidenceLimitationRejected = false;
   try {
     validateResearchInterpretation({ ...interpretation, evidenceLimitations: [] }, validationEvidence);
@@ -2307,6 +2361,34 @@ async function runSelfTest(dataset, datasetText) {
     missingEvidenceLimitationRejected,
     "Production Research validation accepted an answer with no explicit evidence limitation."
   );
+  for (const [label, supportedPoints, citations] of [
+    [
+      "point source from another section",
+      [{
+        ...interpretation.supportedPoints[0],
+        sourceIDs: ["source-b"]
+      }],
+      interpretation.citations
+    ],
+    [
+      "point not covered by returned citations",
+      [{
+        heading: "Second selected rule",
+        explanation: "Selected passage B establishes another rule.",
+        sectionID: "202",
+        sourceIDs: ["source-b"]
+      }],
+      interpretation.citations
+    ]
+  ]) {
+    let rejected = false;
+    try {
+      validateResearchInterpretation({ ...interpretation, supportedPoints, citations }, validationEvidence);
+    } catch (error) {
+      rejected = error.code === "INVALID_RESEARCH_CITATION";
+    }
+    assert(rejected, `Production Research validation accepted ${label}.`);
+  }
   for (const [label, citations] of [
     ["source from another section", [{ sectionID: "101", sourceIDs: ["source-b"], relevance: "Wrong." }]],
     ["unknown section", [{ sectionID: "999", sourceIDs: ["source-a"], relevance: "Wrong." }]],

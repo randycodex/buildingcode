@@ -1,4 +1,5 @@
 export const supportedResearchPromptVersions = [
+  "20260730-readable-grounded-answer-v9",
   "20260725-grounded-visual-evidence-v8",
   "20260722-grounded-passages-v7"
 ];

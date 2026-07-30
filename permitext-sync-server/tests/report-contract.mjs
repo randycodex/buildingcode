@@ -84,6 +84,12 @@ const manifestInput = {
       conversationID: "conversation-1",
       question: "What occupant load applies?",
       conclusion: "The selected evidence supports calculating occupant load from the applicable table.",
+      supportedPoints: [{
+        heading: "Table method",
+        explanation: "Use the selected table.",
+        sectionID: "BC-1004.1",
+        sourceIDs: ["source-1"]
+      }],
       explanation: "The exact factor depends on the Project facts.",
       assumptions: [],
       missingFacts: ["Proposed occupancy"],
@@ -189,8 +195,8 @@ assert.equal(
 );
 assert.equal(
   pdfPageCount(renderedPDF),
-  2,
-  "Report footer rendering must not create blank trailing pages when a Workboard preview is included."
+  pdfPageCount(renderedWithoutPreview) + 1,
+  "The expanded Research result and Workboard preview should add exactly one populated page."
 );
 
 console.log("Permitext Report contract passed.");

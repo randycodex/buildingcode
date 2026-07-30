@@ -263,6 +263,22 @@ const researchInterpretationSchema = {
   additionalProperties: false,
   properties: {
     conclusion: { type: "string" },
+    supportedPoints: {
+      type: "array",
+      minItems: 1,
+      maxItems: 8,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          heading: { type: "string" },
+          explanation: { type: "string" },
+          sectionID: { type: "string" },
+          sourceIDs: { type: "array", items: { type: "string" }, minItems: 1 }
+        },
+        required: ["heading", "explanation", "sectionID", "sourceIDs"]
+      }
+    },
     explanation: { type: "string" },
     assumptions: { type: "array", items: { type: "string" } },
     missingFacts: { type: "array", items: { type: "string" } },
@@ -283,15 +299,28 @@ const researchInterpretationSchema = {
       }
     }
   },
-  required: ["conclusion", "explanation", "assumptions", "missingFacts", "evidenceLimitations", "additionalEvidenceNeeded", "citations"]
+  required: [
+    "conclusion",
+    "supportedPoints",
+    "explanation",
+    "assumptions",
+    "missingFacts",
+    "evidenceLimitations",
+    "additionalEvidenceNeeded",
+    "citations"
+  ]
 };
 
 function researchInterpretationSchemaForEvidence(evidence) {
   const schema = structuredClone(researchInterpretationSchema);
-  schema.properties.citations.items.properties.sectionID.enum =
-    Array.from(new Set(evidence.map((item) => String(item.sectionID))));
-  schema.properties.citations.items.properties.sourceIDs.items.enum =
-    Array.from(new Set(evidence.map((item) => String(item.sourceID || `section-${item.sectionID}`))));
+  const sectionIDs = Array.from(new Set(evidence.map((item) => String(item.sectionID))));
+  const sourceIDs = Array.from(new Set(
+    evidence.map((item) => String(item.sourceID || `section-${item.sectionID}`))
+  ));
+  schema.properties.supportedPoints.items.properties.sectionID.enum = sectionIDs;
+  schema.properties.supportedPoints.items.properties.sourceIDs.items.enum = sourceIDs;
+  schema.properties.citations.items.properties.sectionID.enum = sectionIDs;
+  schema.properties.citations.items.properties.sourceIDs.items.enum = sourceIDs;
   return schema;
 }
 
@@ -4329,7 +4358,14 @@ function researchPrompt(question, evidence, options = {}) {
   }).join("\n\n---\n\n");
   const history = (options.messages || []).slice(-8).map((message) => {
     if (message.role === "user") return `USER: ${message.question || ""}`;
-    return `ASSISTANT: ${message.answer?.conclusion || ""}\n${message.answer?.explanation || ""}`;
+    const supportedPoints = (message.answer?.supportedPoints || [])
+      .map((point, index) => `${index + 1}. ${point.heading}: ${point.explanation}`)
+      .join("\n");
+    return [
+      `ASSISTANT: ${message.answer?.conclusion || ""}`,
+      supportedPoints,
+      message.answer?.explanation || ""
+    ].filter(Boolean).join("\n");
   }).join("\n\n");
   const projectFacts = (options.projectContextFacts || [])
     .map((fact, index) => `${index + 1}. ${fact}`)
@@ -4400,6 +4436,12 @@ function mockResearchInterpretation(question, evidence) {
     : `the ${evidence.length} selected provisions`;
   return {
     conclusion: `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
+    supportedPoints: evidence.slice(0, 8).map((section) => ({
+      heading: section.title || section.sectionNumber || "Selected requirement",
+      explanation: `The selected passage from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
+      sectionID: section.sectionID,
+      sourceIDs: [section.sourceID || `section-${section.sectionID}`]
+    })),
     explanation: "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
     assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
@@ -4438,6 +4480,9 @@ export function validateResearchInterpretation(value, evidence) {
   }
   if (!value || typeof value !== "object" ||
       typeof value.conclusion !== "string" || !value.conclusion.trim() ||
+      !Array.isArray(value.supportedPoints) ||
+      value.supportedPoints.length === 0 ||
+      value.supportedPoints.length > 8 ||
       typeof value.explanation !== "string" || !value.explanation.trim() ||
       !Array.isArray(value.assumptions) || !value.assumptions.every((item) => typeof item === "string") ||
       !Array.isArray(value.missingFacts) || !value.missingFacts.every((item) => typeof item === "string") ||
@@ -4448,6 +4493,27 @@ export function validateResearchInterpretation(value, evidence) {
     error.code = "INVALID_RESEARCH_RESPONSE";
     throw error;
   }
+  const supportedPoints = value.supportedPoints.map((point) => {
+    const heading = String(point?.heading || "").trim();
+    const explanation = String(point?.explanation || "").trim();
+    const sectionID = String(point?.sectionID || "").trim();
+    const sourceIDs = Array.isArray(point?.sourceIDs)
+      ? point.sourceIDs.map((item) => String(item || "").trim()).filter(Boolean)
+      : [];
+    if (
+      !heading ||
+      !explanation ||
+      !allowedSections.has(sectionID) ||
+      !sourceIDs.length ||
+      new Set(sourceIDs).size !== sourceIDs.length ||
+      sourceIDs.some((sourceID) => allowedSources.get(sourceID)?.sectionID !== sectionID)
+    ) {
+      const error = new Error("The model tied an explanation to evidence outside the selected code sections.");
+      error.code = "INVALID_RESEARCH_CITATION";
+      throw error;
+    }
+    return { heading, explanation, sectionID, sourceIDs };
+  });
   if (!value.evidenceLimitations.some((item) => item.trim())) {
     const error = new Error("The model omitted the required selected-evidence limitation.");
     error.code = "INVALID_RESEARCH_RESPONSE";
@@ -4503,14 +4569,67 @@ export function validateResearchInterpretation(value, evidence) {
     error.code = "INVALID_RESEARCH_CITATION";
     throw error;
   }
+  for (const point of supportedPoints) {
+    const supportingCitation = citations.find((citation) =>
+      String(citation.sectionID) === point.sectionID &&
+      point.sourceIDs.every((sourceID) => citation.sourceIDs.includes(sourceID))
+    );
+    if (!supportingCitation) {
+      const error = new Error("A numbered Research point was not covered by the cited selected evidence.");
+      error.code = "INVALID_RESEARCH_CITATION";
+      throw error;
+    }
+  }
+  const cleanNarrative = (text) => String(text || "")
+    .replace(/\s*[\[(][^)\]]*\b(?:SECTION_ID|PASSAGE_IDS?)\b[^)\]]*[\])]/gi, "")
+    .replace(/\s*(?:[;,]\s*)?\b(?:SECTION_ID|PASSAGE_IDS?)\s*:?\s*[A-Za-z0-9._:-]+(?:\s*,\s*[A-Za-z0-9._:-]+)*/gi, "")
+    .replace(/\s+([,.;:!?])/g, "$1")
+    .replace(/[;,]\s*$/, "")
+    .trim();
+  const conclusion = cleanNarrative(value.conclusion);
+  const explanation = cleanNarrative(value.explanation);
+  const cleanedSupportedPoints = supportedPoints.map((point) => ({
+    ...point,
+    heading: cleanNarrative(point.heading),
+    explanation: cleanNarrative(point.explanation)
+  }));
+  const cleanList = (items) => items.map(cleanNarrative).filter(Boolean);
+  const assumptions = cleanList(value.assumptions);
+  const missingFacts = cleanList(value.missingFacts);
+  const evidenceLimitations = cleanList(value.evidenceLimitations);
+  const additionalEvidenceNeeded = cleanList(value.additionalEvidenceNeeded);
+  const cleanedCitations = citations.map((citation) => ({
+    ...citation,
+    relevance: cleanNarrative(citation.relevance)
+  }));
+  if (
+    !conclusion ||
+    !explanation ||
+    !evidenceLimitations.length ||
+    cleanedSupportedPoints.some((point) => !point.heading || !point.explanation) ||
+    cleanedCitations.some((citation) => !citation.relevance)
+  ) {
+    const error = new Error("The model returned an empty interpretation after evidence markers were removed.");
+    error.code = "INVALID_RESEARCH_RESPONSE";
+    throw error;
+  }
+  if (
+    [conclusion, explanation, ...cleanedSupportedPoints.flatMap((point) => [point.heading, point.explanation])]
+      .some((text) => /\b(?:SECTION_ID|PASSAGE_IDS?)\b/i.test(text))
+  ) {
+    const error = new Error("The model exposed an internal evidence identifier in user-facing prose.");
+    error.code = "INVALID_RESEARCH_RESPONSE";
+    throw error;
+  }
   return {
-    conclusion: value.conclusion.trim(),
-    explanation: value.explanation.trim(),
-    assumptions: value.assumptions.map((item) => item.trim()).filter(Boolean),
-    missingFacts: value.missingFacts.map((item) => item.trim()).filter(Boolean),
-    evidenceLimitations: value.evidenceLimitations.map((item) => item.trim()).filter(Boolean),
-    additionalEvidenceNeeded: value.additionalEvidenceNeeded.map((item) => item.trim()).filter(Boolean),
-    citations
+    conclusion,
+    supportedPoints: cleanedSupportedPoints,
+    explanation,
+    assumptions,
+    missingFacts,
+    evidenceLimitations,
+    additionalEvidenceNeeded,
+    citations: cleanedCitations
   };
 }
 
@@ -4543,7 +4662,12 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Treat maps and figures as evidence that can be misread. State any illegible label, uncertain boundary, missing lot location, or other visual ambiguity explicitly instead of guessing.",
         "Do not use outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
-        "Separate the supported conclusion, missing project facts, limitations of the selected evidence, and additional evidence needed.",
+        "Write the conclusion as a concise professional answer of one to three sentences.",
+        "Do not print SECTION_ID or PASSAGE_ID markers in the conclusion, supported-point prose, or practical explanation; those identifiers belong only in the structured mapping fields.",
+        "Break the material rules established by the selected evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
+        "Do not add an example, consequence, code category, or practical requirement unless the selected evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unselected legal premise.",
+        "Use explanation for the practical application of the supported points to the question and user-provided Project facts. Do not merely repeat the numbered points.",
+        "Separate the supported answer, missing project facts, limitations of the selected evidence, and additional evidence needed.",
           "Treat occupancy, construction type, location, existing conditions, building height, and occupant load as unknown unless stated in the question or selected evidence.",
           "Facts stated by the user may support a conditional answer, but restate any fact material to an exception or numerical threshold as a project fact to verify before final reliance.",
           "Do not resolve a missing material fact by listing it as an assumption; put it in missingFacts and make the conclusion conditional.",
@@ -4554,7 +4678,7 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
           "For plumbing-fixture questions, when a final count could depend on facilities serving more than one space, ask whether existing or shared facilities are proposed to serve the space and request selected provisions governing that sharing. Do not assume those facilities qualify.",
           "If the question attributes a requirement to an agency, funding program, or other authority not represented in the selected evidence, explicitly request that authority's applicable design standard, funding or program requirements, or official guidance. Do not substitute additional Building Code text for the missing outside authority.",
           "If the question cannot be answered from the selected evidence, say so directly.",
-        "Every major conclusion must cite supplied SECTION_ID and PASSAGE_ID values."
+        "Every major conclusion and every supportedPoint must be covered by citations using the supplied SECTION_ID and PASSAGE_ID values."
       ].join(" "),
       input: researchInputForEvidence(question, passageEvidence, options),
       text: {
@@ -8030,6 +8154,7 @@ async function reportSourcesForProject(userID, projectID) {
           conversationID: answer.conversationID,
           question: answer.question,
           conclusion: answer.answer?.conclusion || "No supported conclusion was recorded.",
+          supportedPoints: answer.answer?.supportedPoints || [],
           explanation: answer.answer?.explanation || "",
           assumptions: answer.assumptions || answer.answer?.assumptions || [],
           missingFacts: answer.missingFacts || answer.answer?.missingFacts || [],
