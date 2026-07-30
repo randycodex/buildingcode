@@ -93,6 +93,21 @@ async function jsonRequest(baseURL, path, options = {}) {
   return payload;
 }
 
+async function expectJSONRequestFailure(baseURL, path, options, status, messageFragment) {
+  let failure = null;
+  try {
+    await jsonRequest(baseURL, path, options);
+  } catch (error) {
+    failure = error;
+  }
+  assert(failure, `${options.method || "GET"} ${path} unexpectedly succeeded.`);
+  assert(
+    failure.message.includes(`failed (${status})`) &&
+      (!messageFragment || failure.message.includes(messageFragment)),
+    `${options.method || "GET"} ${path} failed for an unexpected reason: ${failure.message}`
+  );
+}
+
 async function resolveSource(baseURL, source) {
   const parameters = new URLSearchParams({
     q: source.sectionNumber,
@@ -162,7 +177,7 @@ function printPreflight(checkedCases) {
 }
 
 async function signInEvalUser(baseURL) {
-  const credentialID = `research-eval-${Date.now()}`;
+  const credentialID = `research-eval-${randomUUID()}`;
   const result = await jsonRequest(baseURL, "/account/sign-in", {
     method: "POST",
     body: {
@@ -1050,6 +1065,57 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
       legacy.conversation.sources.find((source) => source.kind === "selection")?.selectedText === passage.selectedText,
     "Research conversation creation no longer accepts the legacy single-selection request contract."
   );
+  const otherAccount = await signInEvalUser(baseURL);
+  await expectJSONRequestFailure(
+    baseURL,
+    "/research/conversations/rename",
+    {
+      method: "POST",
+      token: otherAccount.backendSessionToken,
+      body: {
+        auth: { accountUserID: otherAccount.appUserID },
+        conversationID: legacy.conversation.id,
+        title: "Unauthorized rename"
+      }
+    },
+    404,
+    "Research conversation not found."
+  );
+  for (const [title, message] of [
+    ["   ", "Enter a Research title."],
+    ["x".repeat(121), "no more than 120 characters"]
+  ]) {
+    await expectJSONRequestFailure(
+      baseURL,
+      "/research/conversations/rename",
+      {
+        method: "POST",
+        token: account.backendSessionToken,
+        body: {
+          auth: { accountUserID: account.appUserID },
+          conversationID: legacy.conversation.id,
+          title
+        }
+      },
+      400,
+      message
+    );
+  }
+  const researchTitle = "Egress Strategy Research";
+  const renamed = await jsonRequest(baseURL, "/research/conversations/rename", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      conversationID: legacy.conversation.id,
+      title: "  Egress   Strategy Research  "
+    }
+  });
+  assert(
+    renamed.conversation.id === legacy.conversation.id &&
+      renamed.conversation.title === researchTitle,
+    "Research rename did not normalize and return the owned conversation title."
+  );
   assert(
     legacyAddedPassage && batchAddedPassages.length,
     "Research workflow contract fixture needs at least three selected passages."
@@ -1065,8 +1131,9 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
     }
   });
   assert(
-    legacyEvidence.conversation.sources.filter((source) => source.kind === "selection").length === 2,
-    "Research evidence addition no longer accepts the legacy single-selection request contract."
+    legacyEvidence.conversation.sources.filter((source) => source.kind === "selection").length === 2 &&
+      legacyEvidence.conversation.title === researchTitle,
+    "Research evidence addition no longer accepts the legacy single-selection request contract or changed its title."
   );
   const batchEvidence = await jsonRequest(baseURL, "/research/conversations/evidence", {
     method: "POST",
@@ -1081,8 +1148,38 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
     }
   });
   assert(
-    batchEvidence.conversation.sources.filter((source) => source.kind === "selection").length === passages.length,
-    "Research evidence addition did not preserve every passage supplied through the multi-selection request contract."
+    batchEvidence.conversation.sources.filter((source) => source.kind === "selection").length === passages.length &&
+      batchEvidence.conversation.title === researchTitle,
+    "Research evidence addition did not preserve every batch passage or changed the conversation title."
+  );
+  const persistedRename = await jsonRequest(baseURL, "/research/conversations/get", {
+    method: "POST",
+    token: account.backendSessionToken,
+    body: {
+      auth: { accountUserID: account.appUserID },
+      conversationID: legacy.conversation.id
+    }
+  });
+  assert(
+    persistedRename.conversation.title === researchTitle,
+    "Research rename was not persisted after subsequent evidence additions."
+  );
+  await expectJSONRequestFailure(
+    baseURL,
+    "/research/conversations/create",
+    {
+      method: "POST",
+      token: account.backendSessionToken,
+      body: {
+        auth: { accountUserID: account.appUserID },
+        selections: Array.from({ length: 5 }, () => ({
+          sectionID: passage.source.sectionID,
+          selectedText: "x".repeat(10_000)
+        }))
+      }
+    },
+    400,
+    "48,000 characters in total"
   );
 
   const projectID = `research-eval-project-${Date.now()}`;
@@ -1109,6 +1206,9 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
       }
     }
   });
+  const numberedListText = batchAddedPassages[0].selectedText
+    .replace(": 3.1.", ":\n3.1.")
+    .replace("; and 3.2.", "; and\n3.2.");
   const projectConversation = await jsonRequest(baseURL, "/research/conversations/create", {
     method: "POST",
     token: account.backendSessionToken,
@@ -1116,11 +1216,17 @@ async function verifyResearchWorkflowContracts(baseURL, account, checkedCases) {
       auth: { accountUserID: account.appUserID },
       projectID,
       selections: [{
-        sectionID: passage.source.sectionID,
-        selectedText: passage.selectedText
+        sectionID: batchAddedPassages[0].source.sectionID,
+        selectedText: numberedListText
       }]
     }
   });
+  assert(
+    numberedListText.includes("\n3.1.") &&
+      numberedListText.includes("\n3.2.") &&
+      projectConversation.conversation.sources.find((source) => source.kind === "selection")?.selectedText === numberedListText,
+    "Research creation did not preserve readable numbered-list line breaks after canonical matching."
+  );
 
   const currentAddress = "200 Current Avenue";
   const currentDescription = "Existing Group R-2 building with alteration work proposed.";

@@ -8924,7 +8924,10 @@ async function handleResearchConversationList(request, response) {
   const conversations = await listStoredResearchConversations(context.userID);
   sendJSON(response, 200, {
     conversations: conversations
-      .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)))
+      .sort((left, right) =>
+        String(right.createdAt).localeCompare(String(left.createdAt)) ||
+        String(left.id).localeCompare(String(right.id))
+      )
       .map(researchConversationSummary)
   });
 }
@@ -8960,6 +8963,42 @@ async function handleResearchConversationGet(request, response) {
         };
       })
     }
+  });
+}
+
+async function handleResearchConversationRename(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const conversation = await requiredResearchConversation(
+    response,
+    context.userID,
+    context.body.conversationID
+  );
+  if (!conversation) return;
+  if (typeof context.body.title !== "string") {
+    sendError(response, 400, "Research title must be text.");
+    return;
+  }
+  const title = context.body.title.replace(/\s+/g, " ").trim();
+  if (!title) {
+    sendError(response, 400, "Enter a Research title.");
+    return;
+  }
+  if (title.length > 120) {
+    sendError(response, 400, "Research title must contain no more than 120 characters.");
+    return;
+  }
+  conversation.title = title;
+  const updatedAt = new Date().toISOString();
+  conversation.updatedAt = updatedAt > String(conversation.updatedAt || "")
+    ? updatedAt
+    : new Date(Date.parse(conversation.updatedAt) + 1).toISOString();
+  await saveStoredResearchConversation(context.userID, conversation);
+  sendJSON(response, 200, {
+    conversation: await researchConversationForClient(conversation, {
+      checkSources: true,
+      userID: context.userID
+    })
   });
 }
 
@@ -14666,6 +14705,7 @@ const handlers = {
   "research/interpret": handleResearchInterpretation,
   "research/conversations/list": handleResearchConversationList,
   "research/conversations/get": handleResearchConversationGet,
+  "research/conversations/rename": handleResearchConversationRename,
   "research/conversations/create": handleResearchConversationCreate,
   "research/conversations/evidence": handleResearchConversationEvidence,
   "research/conversations/refresh": handleResearchConversationRefresh,

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-workflow-v154";
+} from "./offline-storage.js?v=20260729-research-conversations-v155";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -183,6 +183,7 @@ let researchUsage = null;
 let researchQuestionDraft = "";
 let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
+let researchSelectionMenuInteracting = false;
 let activeWebWarningClose = null;
 
 applyReaderSettings();
@@ -8490,7 +8491,10 @@ async function refreshResearchConversationList() {
     postResearch("/research/conversations/list"),
     postResearch("/research/usage")
   ]);
-  researchConversationList = payload.conversations || [];
+  researchConversationList = (payload.conversations || []).slice().sort((left, right) =>
+    String(right.createdAt || "").localeCompare(String(left.createdAt || "")) ||
+    String(left.id || "").localeCompare(String(right.id || ""))
+  );
   researchUsage = usagePayload.usage || null;
   return researchConversationList;
 }
@@ -9217,30 +9221,125 @@ async function renderResearch(paneID = "utility:analysis") {
 
   const list = document.createElement("section");
   list.className = "research-conversation-list";
-  researchConversationList.forEach((conversation) => {
+  researchConversationList.forEach((initialConversation) => {
+    let conversation = initialConversation;
     const row = document.createElement("article");
     row.className = "research-conversation-row";
-    row.classList.toggle("is-active", state.researchConversationID === conversation.id);
-    const openButton = document.createElement("button");
-    openButton.className = "research-conversation-open";
-    openButton.type = "button";
-    const title = document.createElement("strong");
-    title.textContent = conversation.title;
-    const meta = document.createElement("span");
-    const projectLabel = conversation.primaryProjectID
-      ? `${researchProjectName(conversation.primaryProjectID)} · `
-      : "";
-    meta.textContent = `${projectLabel}${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
-    openButton.append(title, meta);
-    openButton.addEventListener("click", () => openResearchConversation(conversation.id));
-    const deleteButton = document.createElement("button");
-    deleteButton.className = "research-conversation-delete";
-    deleteButton.type = "button";
-    deleteButton.title = "Delete conversation";
-    deleteButton.setAttribute("aria-label", `Delete ${conversation.title}`);
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", () => deleteResearchConversationFromList(conversation, deleteButton));
-    row.append(openButton, deleteButton);
+    const renderRow = () => {
+      clear(row);
+      row.classList.toggle("is-active", state.researchConversationID === conversation.id);
+      const openButton = document.createElement("button");
+      openButton.className = "research-conversation-open";
+      openButton.type = "button";
+      const title = document.createElement("strong");
+      title.textContent = conversation.title;
+      const meta = document.createElement("span");
+      const projectLabel = conversation.primaryProjectID
+        ? `${researchProjectName(conversation.primaryProjectID)} · `
+        : "";
+      meta.textContent = `${projectLabel}${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
+      openButton.append(title, meta);
+      openButton.addEventListener("click", () => openResearchConversation(conversation.id));
+
+      const actions = document.createElement("div");
+      actions.className = "research-conversation-row-actions";
+      if (researchEnabled) {
+        const renameButton = document.createElement("button");
+        renameButton.className = "research-conversation-rename";
+        renameButton.type = "button";
+        renameButton.title = "Rename conversation";
+        renameButton.setAttribute("aria-label", `Rename ${conversation.title}`);
+        renameButton.innerHTML = pencilIconSVG();
+        renameButton.addEventListener("click", () => {
+          clear(row);
+          row.classList.add("is-renaming");
+          const form = document.createElement("form");
+          form.className = "research-conversation-rename-form";
+          const input = document.createElement("input");
+          input.className = "research-conversation-rename-input";
+          input.type = "text";
+          input.maxLength = 120;
+          input.value = conversation.title;
+          input.setAttribute("aria-label", "Research conversation name");
+          const saveButton = document.createElement("button");
+          saveButton.type = "submit";
+          saveButton.textContent = "Save";
+          const cancelButton = document.createElement("button");
+          cancelButton.type = "button";
+          cancelButton.textContent = "Cancel";
+          const status = document.createElement("span");
+          status.className = "research-conversation-rename-status";
+          const cancel = () => {
+            row.classList.remove("is-renaming");
+            renderRow();
+          };
+          cancelButton.addEventListener("click", cancel);
+          input.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+              event.preventDefault();
+              cancel();
+            }
+          });
+          form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const nextTitle = input.value.replace(/\s+/g, " ").trim();
+            if (!nextTitle) {
+              status.textContent = "Enter a conversation name.";
+              input.focus();
+              return;
+            }
+            input.disabled = true;
+            saveButton.disabled = true;
+            cancelButton.disabled = true;
+            status.textContent = "Saving…";
+            try {
+              const payload = await postResearch("/research/conversations/rename", {
+                conversationID: conversation.id,
+                title: nextTitle
+              });
+              conversation = { ...conversation, ...payload.conversation };
+              researchConversationList = researchConversationList.map((item) =>
+                item.id === conversation.id ? { ...item, ...conversation } : item
+              );
+              if (state.researchConversationID === conversation.id) {
+                activeResearchConversation = {
+                  ...(activeResearchConversation || {}),
+                  ...payload.conversation
+                };
+                track.querySelector(
+                  `.research-conversation-panel[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .panel-title`
+                )?.replaceChildren(document.createTextNode(conversation.title));
+              }
+              row.classList.remove("is-renaming");
+              renderRow();
+            } catch (error) {
+              status.textContent = error.message;
+              input.disabled = false;
+              saveButton.disabled = false;
+              cancelButton.disabled = false;
+              input.focus();
+            }
+          });
+          form.append(input, saveButton, cancelButton, status);
+          row.append(form);
+          requestAnimationFrame(() => {
+            input.focus();
+            input.select();
+          });
+        });
+        actions.append(renameButton);
+      }
+      const deleteButton = document.createElement("button");
+      deleteButton.className = "research-conversation-delete";
+      deleteButton.type = "button";
+      deleteButton.title = "Delete conversation";
+      deleteButton.setAttribute("aria-label", `Delete ${conversation.title}`);
+      deleteButton.textContent = "Delete";
+      deleteButton.addEventListener("click", () => deleteResearchConversationFromList(conversation, deleteButton));
+      actions.append(deleteButton);
+      row.append(openButton, actions);
+    };
+    renderRow();
     list.append(row);
   });
   content.append(list);
@@ -9815,6 +9914,7 @@ async function renderResearchConversation(conversationID) {
 function closeResearchSelectionMenu() {
   document.querySelector(".research-selection-menu")?.remove();
   pendingResearchSelection = null;
+  researchSelectionMenuInteracting = false;
 }
 
 function researchSelectionTextFromRange(selection, range) {
@@ -9950,7 +10050,13 @@ function showResearchSelectionMenu() {
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
   menu.setAttribute("aria-label", "Start Research with selected enacted text");
-  menu.addEventListener("pointerdown", (event) => event.preventDefault());
+  menu.addEventListener("pointerdown", (event) => {
+    if (event.target.closest?.("select, option")) {
+      researchSelectionMenuInteracting = true;
+      return;
+    }
+    event.preventDefault();
+  });
   const actions = document.createElement("div");
   actions.className = "research-selection-actions";
   const status = document.createElement("span");
@@ -9966,6 +10072,14 @@ function showResearchSelectionMenu() {
     pendingResearchSelection.projectID = projectSelect.value;
     projectSelect.addEventListener("change", () => {
       if (pendingResearchSelection) pendingResearchSelection.projectID = projectSelect.value;
+      window.setTimeout(() => {
+        researchSelectionMenuInteracting = false;
+      }, 0);
+    });
+    projectSelect.addEventListener("blur", () => {
+      window.setTimeout(() => {
+        researchSelectionMenuInteracting = false;
+      }, 0);
     });
     menu.append(projectSelect);
   }
@@ -10006,7 +10120,9 @@ function bindResearchTextSelection() {
     if (event.key.startsWith("Arrow") || event.key === "Shift") window.setTimeout(showResearchSelectionMenu, 0);
   });
   document.addEventListener("selectionchange", () => {
-    if (window.getSelection?.().isCollapsed) closeResearchSelectionMenu();
+    if (window.getSelection?.().isCollapsed && !researchSelectionMenuInteracting) {
+      closeResearchSelectionMenu();
+    }
   });
   window.addEventListener("scroll", closeResearchSelectionMenu, true);
   window.addEventListener("resize", closeResearchSelectionMenu);

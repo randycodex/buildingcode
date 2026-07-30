@@ -4785,6 +4785,7 @@ mark {
 }
 
 .research-conversation-open,
+.research-conversation-rename,
 .research-conversation-delete {
   border: 0;
   background: transparent;
@@ -4811,6 +4812,31 @@ mark {
   white-space: nowrap;
 }
 
+.research-conversation-row-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.research-conversation-rename {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  place-items: center;
+  color: var(--text-secondary);
+}
+
+.research-conversation-rename svg {
+  width: 16px;
+  height: 16px;
+}
+
+.research-conversation-rename:hover,
+.research-conversation-rename:focus-visible {
+  color: var(--text-primary);
+}
+
 .research-conversation-delete {
   padding: var(--space-2);
   color: var(--text-secondary);
@@ -4820,6 +4846,43 @@ mark {
 .research-conversation-delete:hover,
 .research-conversation-delete:focus-visible {
   color: #b42318;
+}
+
+.research-conversation-row.is-renaming {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.research-conversation-rename-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 62px;
+  padding: var(--space-2) 0;
+}
+
+.research-conversation-rename-input {
+  min-width: 0;
+  height: 34px;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.research-conversation-rename-form button {
+  border: 0;
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.research-conversation-rename-status {
+  grid-column: 1 / -1;
+  min-height: 1em;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
 }
 
 .research-conversation-panel {

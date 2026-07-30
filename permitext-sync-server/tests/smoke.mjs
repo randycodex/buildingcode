@@ -965,7 +965,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-research-workflow-v154'),
+        webRoot.text.includes('/web/app.js?v=20260729-research-conversations-v155'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -990,7 +990,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-workflow-v136'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-conversations-v137'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1083,7 +1083,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-workflow-v136'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-conversations-v137'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1285,6 +1285,10 @@ async function main() {
         workspaceScript.text.includes("selections: passages.map") &&
         workspaceScript.text.includes('groupHeading.dataset.researchSelectionExclude = "true"') &&
         workspaceScript.text.includes('sectionHeading.dataset.researchSelectionExclude = "true"') &&
+        workspaceScript.text.includes('postResearch("/research/conversations/rename"') &&
+        workspaceScript.text.includes('renameButton.title = "Rename conversation"') &&
+        workspaceScript.text.includes("String(right.createdAt || \"\").localeCompare(String(left.createdAt || \"\"))") &&
+        workspaceScript.text.includes("researchSelectionMenuInteracting = true") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
         workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
         workspaceScript.text.includes("opening this conversation has not called an AI model"),
