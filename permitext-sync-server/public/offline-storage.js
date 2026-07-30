@@ -5,7 +5,7 @@ const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v180";
+const shellCacheName = "permitext-pro-shell-v181";
 const shellAssetVersion = "20260730-research-source-hierarchy-v173";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -14,7 +14,7 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260730-opaque-reader-header-v153",
+  "/web/styles.css?v=20260730-research-source-dividers-v154",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
   "/web/app.js?v=20260730-research-source-hierarchy-v173",
   "/web/offline-storage.js?v=20260730-research-source-hierarchy-v173",

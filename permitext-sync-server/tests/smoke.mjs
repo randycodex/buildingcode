@@ -1093,6 +1093,12 @@ async function main() {
       "Research selected passages no longer show their hierarchical code citation."
     );
     assert(
+      workspaceStyles.text.includes(".research-source-card + .research-source-card {") &&
+        workspaceStyles.text.includes("border-top: 1px solid var(--border);") &&
+        workspaceStyles.text.includes("background: transparent;"),
+      "Research source passages should remain flat and separated by thin dividers."
+    );
+    assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
         workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&
