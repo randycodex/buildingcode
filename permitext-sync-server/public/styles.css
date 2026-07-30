@@ -4729,18 +4729,6 @@ mark {
   flex-wrap: wrap;
 }
 
-.research-list-header {
-  display: grid;
-  gap: var(--space-1);
-  padding: var(--space-5) 0 var(--space-3);
-}
-
-.research-list-header h3,
-.research-list-header p {
-  margin: 0;
-}
-
-.research-list-header p,
 .research-conversation-empty,
 .research-list-status {
   color: var(--text-secondary);

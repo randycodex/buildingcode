@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-popup-theme-v156";
+} from "./offline-storage.js?v=20260729-research-list-cleanup-v157";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9161,17 +9161,6 @@ async function renderResearch(paneID = "utility:analysis") {
     upgrade.append(upgradeHeading, upgradeCopy, upgradeButton);
     content.append(upgrade);
   }
-
-  const listHeader = document.createElement("div");
-  listHeader.className = "research-list-header";
-  const heading = document.createElement("h3");
-  heading.textContent = "Conversations";
-  const instruction = document.createElement("p");
-  instruction.textContent = researchEnabled
-    ? "Highlight enacted text in any Reader, search detail, or project section to begin."
-    : "Historical conversations stay available in read-only form.";
-  listHeader.append(heading, instruction);
-  content.append(listHeader);
 
   if (researchQuestionDraft) {
     const carriedDraft = document.createElement("article");

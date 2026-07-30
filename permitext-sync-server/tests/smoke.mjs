@@ -965,7 +965,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-research-popup-theme-v156'),
+        webRoot.text.includes('/web/app.js?v=20260729-research-list-cleanup-v157'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -990,7 +990,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-popup-theme-v138'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-list-cleanup-v139'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1083,7 +1083,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-popup-theme-v138'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-list-cleanup-v139'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1289,6 +1289,8 @@ async function main() {
         workspaceScript.text.includes('renameButton.title = "Rename conversation"') &&
         workspaceScript.text.includes("String(right.createdAt || \"\").localeCompare(String(left.createdAt || \"\"))") &&
         workspaceScript.text.includes("researchSelectionMenuInteracting = true") &&
+        !workspaceScript.text.includes('heading.textContent = "Conversations"') &&
+        !workspaceScript.text.includes("Highlight enacted text in any Reader, search detail, or project section to begin.") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
         workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
         workspaceScript.text.includes("opening this conversation has not called an AI model"),
