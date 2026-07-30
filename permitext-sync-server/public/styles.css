@@ -929,9 +929,9 @@ body.is-detached-workboard-window .detached-workboard-error p {
   height: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   content: "";
   pointer-events: none;
-  background: color-mix(in srgb, var(--surface) 68%, transparent);
-  -webkit-backdrop-filter: blur(16px);
-  backdrop-filter: blur(16px);
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
 }
 
 .search-panel,

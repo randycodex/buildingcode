@@ -1015,7 +1015,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-recent-reader-header-v152'),
+        webRoot.text.includes('/web/styles.css?v=20260730-opaque-reader-header-v153'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1099,6 +1099,14 @@ async function main() {
       "A Recently Viewed Reader should move with Search, retain only Close in its header, and carry its background through the full header."
     );
     assert(
+      workspaceStyles.text.includes(".reader-panel::before {") &&
+        workspaceStyles.text.includes("background: var(--surface-raised);") &&
+        workspaceStyles.text.includes("-webkit-backdrop-filter: none;") &&
+        workspaceStyles.text.includes("backdrop-filter: none;") &&
+        !workspaceStyles.text.includes("background: color-mix(in srgb, var(--surface) 68%, transparent);"),
+      "Regular Reader headers should be fully opaque without a backdrop blur."
+    );
+    assert(
       workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
         workspaceScript.text.includes(".map((word) => word[0].toUpperCase())") &&
         workspaceScript.text.includes('}).join(", ");') &&
@@ -1133,7 +1141,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-recent-reader-header-v152'),
+        webRoot.text.includes('/web/styles.css?v=20260730-opaque-reader-header-v153'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
