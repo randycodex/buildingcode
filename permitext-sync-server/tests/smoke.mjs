@@ -969,7 +969,7 @@ async function main() {
         workspaceScript.text.includes('facts.addEventListener("input"') &&
         workspaceScript.text.includes('facts.addEventListener("blur", saveProjectContextAutomatically)') &&
         !workspaceScript.text.includes("Save Project context") &&
-        webRoot.text.includes('/web/app.js?v=20260729-research-context-autosave-v160'),
+        webRoot.text.includes('/web/app.js?v=20260729-research-row-flat-v161'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -994,7 +994,8 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-context-autosave-v142'),
+        workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
+        webRoot.text.includes('/web/styles.css?v=20260729-research-row-flat-v143'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1087,7 +1088,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-context-autosave-v142'),
+        webRoot.text.includes('/web/styles.css?v=20260729-research-row-flat-v143'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

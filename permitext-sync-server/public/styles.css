@@ -4769,7 +4769,8 @@ mark {
 }
 
 .research-conversation-row.is-active {
-  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: transparent;
+  box-shadow: none;
 }
 
 .research-conversation-open,
