@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-split-view-v193";
+} from "./offline-storage.js?v=20260730-research-passage-toggle-v194";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10192,10 +10192,10 @@ async function renderResearchConversation(conversationID) {
   );
   const updateSourceToggle = () => {
     const passageToggles = Array.from(sourceList.querySelectorAll(".research-source-toggle"));
-    const allExpanded = passageToggles.every((toggle) => toggle.getAttribute("aria-expanded") === "true");
-    sourceToggle.setAttribute("aria-expanded", String(allExpanded));
-    sourceToggle.setAttribute("aria-label", allExpanded ? "Collapse all passages" : "Expand all passages");
-    sourceToggle.title = allExpanded ? "Collapse all passages" : "Expand all passages";
+    const anyExpanded = passageToggles.some((toggle) => toggle.getAttribute("aria-expanded") === "true");
+    sourceToggle.setAttribute("aria-expanded", String(anyExpanded));
+    sourceToggle.setAttribute("aria-label", anyExpanded ? "Collapse all passages" : "Expand all passages");
+    sourceToggle.title = anyExpanded ? "Collapse all passages" : "Expand all passages";
   };
   sourceToggle.addEventListener("click", () => {
     const expandAll = sourceToggle.getAttribute("aria-expanded") !== "true";
