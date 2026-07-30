@@ -4912,11 +4912,18 @@ mark {
   padding: var(--space-2) 0 var(--space-4);
 }
 
-.research-sources summary {
+.research-sources-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
   cursor: pointer;
   color: var(--text-secondary);
-  font-size: var(--chrome-font-size) !important;
-  font-weight: 650;
+  font: inherit;
 }
 
 .research-source-list {

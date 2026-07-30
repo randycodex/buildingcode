@@ -1100,10 +1100,18 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes('toggle.className = "research-source-toggle"') &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!expanded))') &&
-        workspaceScript.text.includes("body.hidden = expanded;") &&
+        workspaceScript.text.includes("setResearchSourceCardExpanded(card, !expanded)") &&
+        workspaceScript.text.includes("body.hidden = !expanded;") &&
         workspaceStyles.text.includes(".research-source-body[hidden]"),
       "Research passage titles should expand and collapse their passage content."
+    );
+    assert(
+      workspaceScript.text.includes('sourceToggle.className = "research-sources-toggle"') &&
+        workspaceScript.text.includes('"Collapse all passages"') &&
+        workspaceScript.text.includes('"Expand all passages"') &&
+        workspaceScript.text.includes("setResearchSourceCardExpanded(card, expandAll)") &&
+        workspaceStyles.text.includes(".research-sources-toggle {"),
+      "Research passages should provide a single chevron to collapse or expand every passage."
     );
     assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&

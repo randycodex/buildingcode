@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-source-collapse-v174";
+} from "./offline-storage.js?v=20260730-research-source-collapse-all-v175";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9564,6 +9564,16 @@ function renderResearchVisualEvidence(sources, options = {}) {
   return wrap;
 }
 
+function setResearchSourceCardExpanded(card, expanded) {
+  const toggle = card.querySelector(".research-source-toggle");
+  const disclosure = card.querySelector(".research-source-disclosure");
+  const body = card.querySelector(".research-source-body");
+  if (!toggle || !body) return;
+  toggle.setAttribute("aria-expanded", String(expanded));
+  if (disclosure) disclosure.textContent = expanded ? "▾" : "▸";
+  body.hidden = !expanded;
+}
+
 function renderResearchSource(source) {
   const card = document.createElement("article");
   card.className = `research-source-card is-${source.kind || "related"}`;
@@ -9582,9 +9592,7 @@ function renderResearchSource(source) {
   toggle.append(citation, disclosure);
   toggle.addEventListener("click", () => {
     const expanded = toggle.getAttribute("aria-expanded") === "true";
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    disclosure.textContent = expanded ? "▸" : "▾";
-    body.hidden = expanded;
+    setResearchSourceCardExpanded(card, !expanded);
   });
   const relationship = document.createElement("p");
   relationship.textContent = source.kind === "selection"
@@ -9912,17 +9920,39 @@ async function renderResearchConversation(conversationID) {
   const conversation = activeResearchConversation;
   panelTitle.textContent = conversation.title;
   const projectContextSection = renderResearchProjectContext(content, conversation);
-  const sources = document.createElement("details");
+  const sources = document.createElement("section");
   sources.className = "research-sources";
-  sources.open = conversation.messages.length === 0 || conversation.sourceStatus === "changed";
-  const sourceSummary = document.createElement("summary");
-  const selectedCount = conversation.sources.filter((source) => source.kind === "selection").length;
-  const relatedCount = conversation.sources.length - selectedCount;
-  sourceSummary.textContent = `${selectedCount} selected ${selectedCount === 1 ? "passage" : "passages"}${relatedCount ? ` + ${relatedCount} suggested ${relatedCount === 1 ? "section" : "sections"} not included` : ""}`;
+  const sourceToggle = document.createElement("button");
+  sourceToggle.type = "button";
+  sourceToggle.className = "research-sources-toggle";
+  sourceToggle.setAttribute("aria-expanded", "true");
+  const sourceDisclosure = document.createElement("span");
+  sourceDisclosure.setAttribute("aria-hidden", "true");
+  sourceDisclosure.textContent = "▾";
+  sourceToggle.append(sourceDisclosure);
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
   conversation.sources.forEach((source) => sourceList.append(renderResearchSource(source)));
-  sources.append(sourceSummary, sourceList);
+  const updateSourceToggle = () => {
+    const passageToggles = Array.from(sourceList.querySelectorAll(".research-source-toggle"));
+    const allExpanded = passageToggles.every((toggle) => toggle.getAttribute("aria-expanded") === "true");
+    sourceToggle.setAttribute("aria-expanded", String(allExpanded));
+    sourceToggle.setAttribute("aria-label", allExpanded ? "Collapse all passages" : "Expand all passages");
+    sourceToggle.title = allExpanded ? "Collapse all passages" : "Expand all passages";
+    sourceDisclosure.textContent = allExpanded ? "▾" : "▸";
+  };
+  sourceToggle.addEventListener("click", () => {
+    const expandAll = sourceToggle.getAttribute("aria-expanded") !== "true";
+    sourceList.querySelectorAll(".research-source-card").forEach((card) =>
+      setResearchSourceCardExpanded(card, expandAll)
+    );
+    updateSourceToggle();
+  });
+  sourceList.addEventListener("click", (event) => {
+    if (event.target.closest(".research-source-toggle")) requestAnimationFrame(updateSourceToggle);
+  });
+  updateSourceToggle();
+  sources.append(sourceToggle, sourceList);
   projectContextSection.querySelector(".research-project-context-heading").after(sources);
 
   if (conversation.sourceStatus === "changed") {
