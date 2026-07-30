@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-linked-reader-width-v145";
+} from "./offline-storage.js?v=20260729-fast-search-open-v148";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -428,6 +428,19 @@ function saveWorkspaceState() {
   } catch {
     // The detached board can keep working from its scoped state if the shared state is unavailable.
   }
+}
+
+let workspaceStateSaveAfterPaintScheduled = false;
+
+function scheduleWorkspaceStateSaveAfterPaint() {
+  if (workspaceStateSaveAfterPaintScheduled) return;
+  workspaceStateSaveAfterPaintScheduled = true;
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      workspaceStateSaveAfterPaintScheduled = false;
+      saveWorkspaceState();
+    }, 0);
+  });
 }
 
 function applySharedWorkspaceState(serializedState) {
@@ -7286,9 +7299,12 @@ async function hydrateSearchRecentlyViewedEntries(entries) {
   }));
 }
 
-async function renderSearchHistory(panel, instance) {
+async function renderSearchHistory(panel, instance, options = {}) {
   const results = panel.querySelector(".search-results");
-  const recentSections = await hydrateSearchRecentlyViewedEntries(searchRecentlyViewedEntries());
+  const recentEntries = searchRecentlyViewedEntries();
+  const recentSections = options.hydrate === false
+    ? recentEntries
+    : await hydrateSearchRecentlyViewedEntries(recentEntries);
   if (String(instance?.query || "").trim()) return;
   const pinned = normalizeSearchHistory(state.pinnedSearches);
   const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
@@ -7532,8 +7548,21 @@ async function renderSearch(instance) {
     input.focus();
   });
 
-  await loadSyncedContent();
-  await renderSearchResults(panel, searchInstance);
+  if (String(searchInstance.query || "").trim()) {
+    renderSearchPlaceholder(panel.querySelector(".search-results"), {
+      title: "Searching",
+      body: "Checking section titles and code text."
+    });
+  } else {
+    await renderSearchHistory(panel, searchInstance, { hydrate: false });
+  }
+  requestAnimationFrame(() => {
+    void (async () => {
+      await loadSyncedContent();
+      if (!panel.isConnected) return;
+      await renderSearchResults(panel, searchInstance);
+    })();
+  });
   return panel;
 }
 
@@ -16782,7 +16811,11 @@ async function renderUtilityWorkspace(options = {}) {
   syncAllCommentBoxHeights();
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
-  saveWorkspaceState();
+  if (options.deferStateSave) {
+    scheduleWorkspaceStateSaveAfterPaint();
+  } else {
+    saveWorkspaceState();
+  }
 }
 
 async function transitionWorkspace(mode = "default", options = {}) {
@@ -16801,9 +16834,13 @@ async function toggleUtilityPane(key) {
     state.utilities[key] = false;
     state.paneWeights[paneID] = defaultPaneWidthForID(paneID);
     movePaneToFront(paneID);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-    track.scrollTo({ left: 0, behavior: "smooth" });
+    if (key === "search") {
+      await transitionWorkspace("utility", { deferStateSave: true });
+    } else {
+      saveWorkspaceState();
+      await transitionWorkspace("utility");
+    }
+    track.scrollTo({ left: 0, behavior: key === "search" ? "auto" : "smooth" });
     return;
   }
 

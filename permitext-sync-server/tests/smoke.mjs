@@ -913,6 +913,13 @@ async function main() {
         workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));") &&
+        workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
+        workspaceScript.text.includes("requestAnimationFrame(() => {") &&
+        workspaceScript.text.includes("if (!panel.isConnected) return;") &&
+        workspaceScript.text.includes("function scheduleWorkspaceStateSaveAfterPaint()") &&
+        workspaceScript.text.includes('if (key === "search")') &&
+        workspaceScript.text.includes('await transitionWorkspace("utility", { deferStateSave: true });') &&
+        workspaceScript.text.includes('behavior: key === "search" ? "auto" : "smooth"') &&
         !workspaceScript.text.includes("openSectionDetail(instance.id, entry);") &&
         !workspaceScript.text.includes('bookmarkButton.className = "search-jump-bookmark"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
@@ -957,7 +964,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-linked-reader-width-v145'),
+        webRoot.text.includes('/web/app.js?v=20260729-fast-search-open-v148'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
