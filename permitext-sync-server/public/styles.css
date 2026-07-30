@@ -4934,11 +4934,16 @@ mark {
 
 .research-source-card {
   display: grid;
-  gap: var(--space-2);
+  gap: 0;
   padding: var(--space-3) 0;
   border: 0;
   border-radius: 0;
   background: transparent;
+  transition: row-gap 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.research-source-card.is-open {
+  row-gap: var(--space-2);
 }
 
 .research-source-card + .research-source-card {
@@ -5007,11 +5012,16 @@ mark {
   transition: none;
 }
 
+.research-source-card.is-restoring {
+  transition: none;
+}
+
 .research-source-body[hidden] {
   display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .research-source-card,
   .research-source-body {
     transition: none;
   }
