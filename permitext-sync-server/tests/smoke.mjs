@@ -1126,6 +1126,11 @@ async function main() {
       "Research composer should match the Research conversation column background."
     );
     assert(
+      !workspaceScript.text.includes("Assign this conversation when its research belongs to a specific Project.") &&
+        !workspaceScript.text.includes("research-project-context-unassigned"),
+      "Unassigned Research conversations should not show redundant Project-assignment helper copy."
+    );
+    assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
         workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&

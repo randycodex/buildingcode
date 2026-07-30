@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-citation-colors-fix-v178";
+} from "./offline-storage.js?v=20260730-remove-unassigned-research-copy-v179";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9864,11 +9864,6 @@ function renderResearchProjectContext(container, conversation) {
       projectInfo.append(projectInfoHeading, projectInfoList, projectInfoCopy);
       section.append(projectInfo);
     }
-  } else {
-    const unassigned = document.createElement("p");
-    unassigned.className = "research-project-context-unassigned";
-    unassigned.textContent = "Assign this conversation when its research belongs to a specific Project.";
-    section.append(unassigned);
   }
   if (!hasCapability("research")) {
     section.querySelectorAll("button, select, textarea").forEach((control) => {
