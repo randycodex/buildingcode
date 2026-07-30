@@ -910,7 +910,7 @@ async function main() {
         workspaceScript.text.includes("function outgoingRecentSearchHistory(existingValues, recentSearches)") &&
         workspaceScript.text.includes("recentSearchHistoryJSON: JSON.stringify(recentSearchHistory)") &&
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
-        workspaceScript.text.includes('label.textContent = "Jump Back In"') &&
+        workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
@@ -927,7 +927,7 @@ async function main() {
         workspaceScript.text.includes('createHistorySection("Pinned"') &&
         workspaceScript.text.includes('createHistorySection("Recent Searches"') &&
         workspaceScript.text.includes("function bindSearchHistoryDivider") &&
-        workspaceScript.text.includes('"Resize Jump Back In and Recent Searches"') &&
+        workspaceScript.text.includes('"Resize Recently Viewed and Recent Searches"') &&
         workspaceScript.text.includes('list.classList.add("search-history-scroll-list")') &&
         workspaceScript.text.includes("function recordRecentSearch") &&
         !workspaceScript.text.includes("function pinSearch") &&
@@ -964,7 +964,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-fast-search-open-v148'),
+        webRoot.text.includes('/web/app.js?v=20260729-recently-viewed-dividers-v149'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -989,7 +989,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-project-back-position-v131'),
+        webRoot.text.includes('/web/styles.css?v=20260729-recently-viewed-dividers-v132'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1082,7 +1082,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-project-back-position-v131'),
+        webRoot.text.includes('/web/styles.css?v=20260729-recently-viewed-dividers-v132'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1508,7 +1508,7 @@ async function main() {
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: 2px;/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?border-bottom: 1px solid var\(--border\);/) &&
         workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?padding: var\(--space-1\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
         workspaceScript.text.includes('title.textContent = sectionDisplayTitle(entry.sectionNumber, entry.title, "Section")') &&

@@ -3628,6 +3628,7 @@ body.is-resizing-search-history * {
   min-width: 0;
   min-height: 92px;
   overflow: hidden;
+  border-bottom: 1px solid var(--border);
   border-radius: var(--radius-card);
   background: var(--surface-muted);
 }

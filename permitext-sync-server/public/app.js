@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-fast-search-open-v148";
+} from "./offline-storage.js?v=20260729-recently-viewed-dividers-v149";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7319,7 +7319,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
     section.id = `search-jump-${instance.id}`;
     const label = document.createElement("p");
     label.className = "section-label search-history-label";
-    label.textContent = "Jump Back In";
+    label.textContent = "Recently Viewed";
     const list = document.createElement("div");
     list.className = "search-history-list search-history-scroll-list search-jump-list";
     recentSections.forEach((entry) => {
@@ -7418,7 +7418,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
     const divider = document.createElement("div");
     divider.className = "search-history-divider";
     divider.setAttribute("role", "separator");
-    divider.setAttribute("aria-label", "Resize Jump Back In and Recent Searches");
+    divider.setAttribute("aria-label", "Resize Recently Viewed and Recent Searches");
     divider.setAttribute("aria-orientation", "horizontal");
     divider.setAttribute("aria-controls", `${jumpSection.id} ${recentSection.id}`);
     divider.tabIndex = 0;
@@ -16160,7 +16160,7 @@ function renderSettings() {
   });
 
   const clearActionCopy = {
-    searches: ["Clear recent searches", "This will remove recent search history and Jump Back In from this browser. Pinned searches will remain. Are you sure?"],
+    searches: ["Clear recent searches", "This will remove recent search history and Recently Viewed sections from this browser. Pinned searches will remain. Are you sure?"],
     bookmarks: ["Clear all bookmarks", "This will remove every bookmark saved for the current code version. Are you sure?"],
     notes: ["Clear all notes", "This will remove every note saved for the current code version. Are you sure?"],
     tags: ["Clear all tags", "This will remove every tag from saved sections. Bookmarks and notes will not be affected. Are you sure?"]
