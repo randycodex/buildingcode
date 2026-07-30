@@ -5047,8 +5047,12 @@ mark {
   line-height: 1.45;
 }
 
+.research-project-picker,
 .research-project-select {
   width: 100%;
+}
+
+.research-project-select {
   min-height: 32px;
   padding: 0 var(--space-3);
   border: 0;
@@ -5058,6 +5062,28 @@ mark {
   font: inherit;
   font-size: var(--chrome-font-size) !important;
   box-shadow: none;
+}
+
+.research-project-picker.saved-projects-section {
+  padding-top: var(--space-2);
+}
+
+.research-project-picker .saved-project-tile {
+  cursor: pointer;
+}
+
+.research-project-picker .saved-project-tile.is-selected {
+  outline: 2px solid color-mix(in srgb, var(--project-color) 64%, var(--text-primary));
+  outline-offset: -3px;
+}
+
+.research-project-picker .saved-project-tile.is-unassigned {
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+}
+
+.research-project-picker .saved-project-tile[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.62;
 }
 
 .research-project-select:focus-visible,

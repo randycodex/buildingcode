@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-prompt-removed-v168";
+} from "./offline-storage.js?v=20260730-research-project-picker-v169";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8618,6 +8618,125 @@ function createResearchProjectSelect({
   return select;
 }
 
+function createResearchConversationProjectPicker({
+  value = "",
+  ariaLabel = "Assign Research conversation to Project"
+} = {}) {
+  const picker = document.createElement("section");
+  picker.className = "research-project-picker saved-projects-section code-filter-menu saved-projects-menu";
+  picker.setAttribute("aria-label", ariaLabel);
+  const heading = document.createElement("div");
+  heading.className = "saved-projects-heading";
+  const toggle = document.createElement("button");
+  toggle.className = "code-filter-menu-toggle saved-projects-menu-toggle";
+  toggle.type = "button";
+  toggle.innerHTML = `
+    <span class="code-filter-menu-label">Projects</span>
+    <span class="code-filter-menu-icon" aria-hidden="true">
+      <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+      <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+    </span>
+  `;
+  const list = document.createElement("div");
+  list.className = "saved-project-list research-project-list";
+  heading.append(toggle);
+  picker.append(heading, list);
+
+  const pickerState = { researchProjectsMenuOpen: false };
+  const projectSections = currentContentSummary().projectSections || [];
+  let selectedProjectID = String(value || "");
+  let disabled = false;
+
+  const renderProjectCards = () => {
+    clear(list);
+    const projects = researchProjects();
+    const choices = [{ project: null, id: "", name: "Unassigned", count: null }, ...projects.map((project) => ({
+      project,
+      id: researchProjectID(project),
+      name: readableProjectName(project),
+      count: projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length
+    }))];
+    choices.forEach(({ project, id, name, count }) => {
+      const tile = document.createElement("article");
+      tile.className = "saved-project-tile research-project-tile";
+      tile.classList.toggle("is-unassigned", !project);
+      tile.classList.toggle("is-selected", id === selectedProjectID);
+      const tileColor = project ? projectColor(project) : "var(--text-tertiary)";
+      tile.style.setProperty("--project-color", tileColor);
+      tile.style.setProperty("--project-on-color", project ? projectForegroundColor(tileColor) : "var(--text-primary)");
+      tile.tabIndex = disabled ? -1 : 0;
+      tile.setAttribute("role", "button");
+      tile.setAttribute("aria-pressed", String(id === selectedProjectID));
+      tile.setAttribute("aria-label", project ? `Assign to ${name}` : "Unassign from Project");
+      tile.setAttribute("aria-disabled", String(disabled));
+      tile.dataset.projectId = id;
+      const tileHeading = document.createElement("strong");
+      tileHeading.textContent = name;
+      tile.append(tileHeading);
+      if (count !== null) {
+        const countLabel = document.createElement("span");
+        countLabel.className = "saved-project-count";
+        countLabel.textContent = String(count);
+        countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
+        countLabel.setAttribute("aria-label", countLabel.title);
+        tile.append(countLabel);
+      }
+      const choose = () => {
+        if (disabled) return;
+        if (id === selectedProjectID) {
+          pickerState.researchProjectsMenuOpen = false;
+          updateCodeFilterMenu(list, pickerState, {
+            stateKey: "researchProjectsMenuOpen",
+            menuName: "projects",
+            label: "Projects"
+          });
+          return;
+        }
+        selectedProjectID = id;
+        renderProjectCards();
+        picker.dispatchEvent(new Event("change"));
+      };
+      tile.addEventListener("click", choose);
+      tile.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        choose();
+      });
+      list.append(tile);
+    });
+    updateCodeFilterMenu(list, pickerState, {
+      stateKey: "researchProjectsMenuOpen",
+      menuName: "projects",
+      label: "Projects"
+    });
+  };
+
+  Object.defineProperties(picker, {
+    value: {
+      get: () => selectedProjectID,
+      set: (nextValue) => {
+        selectedProjectID = String(nextValue || "");
+        renderProjectCards();
+      }
+    },
+    disabled: {
+      get: () => disabled,
+      set: (nextValue) => {
+        disabled = Boolean(nextValue);
+        toggle.disabled = disabled;
+        renderProjectCards();
+      }
+    }
+  });
+  wireCodeFilterMenu(list, pickerState, {
+    stateKey: "researchProjectsMenuOpen",
+    menuName: "projects",
+    label: "Projects"
+  });
+  renderProjectCards();
+  return picker;
+}
+
 async function deleteResearchConversationFromList(conversation, button) {
   const confirmed = await confirmWebWarning(
     "Delete research conversation?",
@@ -9590,20 +9709,19 @@ function renderResearchProjectContext(container, conversation) {
   section.className = "research-project-context";
   const heading = document.createElement("div");
   heading.className = "research-project-context-heading";
-  const projectSelect = createResearchProjectSelect({
+  const projectPicker = createResearchConversationProjectPicker({
     value: conversation.primaryProjectID || "",
-    unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Assign Research conversation to Project"
   });
-  heading.append(projectSelect);
+  heading.append(projectPicker);
   section.append(heading);
 
   const status = document.createElement("p");
   status.className = "research-project-context-status";
-  projectSelect.addEventListener("change", async () => {
+  projectPicker.addEventListener("change", async () => {
     const previousProjectID = conversation.primaryProjectID || "";
-    const targetProjectID = projectSelect.value;
-    projectSelect.disabled = true;
+    const targetProjectID = projectPicker.value;
+    projectPicker.disabled = true;
     status.textContent = "Updating Project assignment…";
     try {
       let payload;
@@ -9622,7 +9740,7 @@ function renderResearchProjectContext(container, conversation) {
           { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
         );
         if (!confirmed) {
-          projectSelect.value = previousProjectID;
+          projectPicker.value = previousProjectID;
           status.textContent = "";
           return;
         }
@@ -9636,10 +9754,10 @@ function renderResearchProjectContext(container, conversation) {
       await refreshResearchConversationList();
       await openResearchConversation(conversation.id, { refreshList: true });
     } catch (error) {
-      projectSelect.value = previousProjectID;
+      projectPicker.value = previousProjectID;
       status.textContent = error.message;
     } finally {
-      projectSelect.disabled = false;
+      projectPicker.disabled = false;
     }
   });
 
