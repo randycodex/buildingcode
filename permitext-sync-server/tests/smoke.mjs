@@ -1099,6 +1099,13 @@ async function main() {
       "Research source passages should remain flat and separated by thin dividers."
     );
     assert(
+      workspaceScript.text.includes('toggle.className = "research-source-toggle"') &&
+        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!expanded))') &&
+        workspaceScript.text.includes("body.hidden = expanded;") &&
+        workspaceStyles.text.includes(".research-source-body[hidden]"),
+      "Research passage titles should expand and collapse their passage content."
+    );
+    assert(
       workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
         workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&

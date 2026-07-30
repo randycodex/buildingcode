@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-source-hierarchy-v173";
+} from "./offline-storage.js?v=20260730-research-source-collapse-v174";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9567,8 +9567,25 @@ function renderResearchVisualEvidence(sources, options = {}) {
 function renderResearchSource(source) {
   const card = document.createElement("article");
   card.className = `research-source-card is-${source.kind || "related"}`;
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "research-source-toggle";
+  toggle.setAttribute("aria-expanded", "true");
   const citation = document.createElement("strong");
   citation.textContent = researchSourceCitation(source);
+  const disclosure = document.createElement("span");
+  disclosure.className = "research-source-disclosure";
+  disclosure.setAttribute("aria-hidden", "true");
+  disclosure.textContent = "▾";
+  const body = document.createElement("div");
+  body.className = "research-source-body";
+  toggle.append(citation, disclosure);
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    disclosure.textContent = expanded ? "▸" : "▾";
+    body.hidden = expanded;
+  });
   const relationship = document.createElement("p");
   relationship.textContent = source.kind === "selection"
     ? source.relationship || "Passage selected by you"
@@ -9577,16 +9594,17 @@ function renderResearchSource(source) {
     const label = document.createElement("p");
     label.className = "section-label";
     label.textContent = "Suggested related section — not included in analysis";
-    card.append(label);
+    body.append(label);
   }
-  card.append(citation, relationship);
+  body.append(relationship);
   if (source.selectedText) {
     const quote = document.createElement("blockquote");
     quote.textContent = source.selectedText;
-    card.append(quote);
+    body.append(quote);
   }
   const visualEvidence = renderResearchVisualEvidence(source.visualSources);
-  if (visualEvidence) card.append(visualEvidence);
+  if (visualEvidence) body.append(visualEvidence);
+  card.append(toggle, body);
   return card;
 }
 
