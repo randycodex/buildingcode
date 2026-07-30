@@ -4986,11 +4986,35 @@ mark {
 
 .research-source-body {
   display: grid;
+  max-height: 0;
+  min-height: 0;
   gap: var(--space-2);
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease;
+}
+
+.research-source-card.is-open > .research-source-body {
+  max-height: var(--research-source-body-height, 1000px);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.research-source-card.is-restoring > .research-source-body {
+  transition: none;
 }
 
 .research-source-body[hidden] {
   display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-source-body {
+    transition: none;
+  }
 }
 
 .research-source-toggle > strong,

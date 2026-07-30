@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-remove-unassigned-research-copy-v179";
+} from "./offline-storage.js?v=20260730-research-collapse-motion-mounted-v182";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9571,12 +9571,58 @@ function researchChevronIconsSVG() {
   `;
 }
 
-function setResearchSourceCardExpanded(card, expanded) {
+function setResearchSourceCardExpanded(card, expanded, options = {}) {
   const toggle = card.querySelector(".research-source-toggle");
   const body = card.querySelector(".research-source-body");
   if (!toggle || !body) return;
   toggle.setAttribute("aria-expanded", String(expanded));
-  body.hidden = !expanded;
+  if (expanded) {
+    body.hidden = false;
+    const applyExpandedHeight = () => {
+      card.style.setProperty("--research-source-body-height", `${body.scrollHeight}px`);
+    };
+    if (options.instant && !card.classList.contains("is-open")) {
+      card.classList.add("is-restoring");
+      const restoreWhenMounted = (remainingFrames = 4) => {
+        if (toggle.getAttribute("aria-expanded") !== "true") return;
+        if ((!body.isConnected || body.offsetWidth === 0) && remainingFrames > 0) {
+          requestAnimationFrame(() => restoreWhenMounted(remainingFrames - 1));
+          return;
+        }
+        applyExpandedHeight();
+        card.classList.add("is-open");
+        void body.offsetHeight;
+        requestAnimationFrame(() => card.classList.remove("is-restoring"));
+      };
+      requestAnimationFrame(() => restoreWhenMounted());
+      return;
+    }
+    if (!card.classList.contains("is-open")) {
+      requestAnimationFrame(() => {
+        if (toggle.getAttribute("aria-expanded") === "true") {
+          applyExpandedHeight();
+          card.classList.add("is-open");
+        }
+      });
+    } else {
+      applyExpandedHeight();
+    }
+    return;
+  }
+  if (!card.classList.contains("is-open")) {
+    body.hidden = true;
+    return;
+  }
+  card.style.setProperty("--research-source-body-height", `${body.scrollHeight}px`);
+  card.classList.remove("is-open");
+  const hideBody = (event) => {
+    if (event && event.target !== body) return;
+    if (event && event.propertyName !== "max-height") return;
+    if (toggle.getAttribute("aria-expanded") !== "true") body.hidden = true;
+    body.removeEventListener("transitionend", hideBody);
+  };
+  body.addEventListener("transitionend", hideBody);
+  window.setTimeout(hideBody, 500);
 }
 
 function renderResearchSource(source) {
@@ -9934,6 +9980,11 @@ async function renderResearchConversation(conversationID) {
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
   conversation.sources.forEach((source) => sourceList.append(renderResearchSource(source)));
+  sources.append(sourceToggle, sourceList);
+  projectContextSection.querySelector(".research-project-context-heading").after(sources);
+  sourceList.querySelectorAll(".research-source-card").forEach((card) =>
+    setResearchSourceCardExpanded(card, true, { instant: true })
+  );
   const updateSourceToggle = () => {
     const passageToggles = Array.from(sourceList.querySelectorAll(".research-source-toggle"));
     const allExpanded = passageToggles.every((toggle) => toggle.getAttribute("aria-expanded") === "true");
@@ -9952,8 +10003,6 @@ async function renderResearchConversation(conversationID) {
     if (event.target.closest(".research-source-toggle")) requestAnimationFrame(updateSourceToggle);
   });
   updateSourceToggle();
-  sources.append(sourceToggle, sourceList);
-  projectContextSection.querySelector(".research-project-context-heading").after(sources);
 
   if (conversation.sourceStatus === "changed") {
     const warning = document.createElement("aside");

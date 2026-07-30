@@ -1104,7 +1104,11 @@ async function main() {
     assert(
       workspaceScript.text.includes('toggle.className = "research-source-toggle"') &&
         workspaceScript.text.includes("setResearchSourceCardExpanded(card, !expanded)") &&
-        workspaceScript.text.includes("body.hidden = !expanded;") &&
+        workspaceScript.text.includes('card.style.setProperty("--research-source-body-height"') &&
+        workspaceScript.text.includes('event.propertyName !== "max-height"') &&
+        workspaceStyles.text.includes("max-height 420ms cubic-bezier(0.22, 1, 0.36, 1)") &&
+        workspaceStyles.text.includes("opacity 260ms ease") &&
+        workspaceStyles.text.includes(".research-source-card.is-open > .research-source-body") &&
         workspaceStyles.text.includes(".research-source-body[hidden]"),
       "Research passage titles should expand and collapse their passage content."
     );
