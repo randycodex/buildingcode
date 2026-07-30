@@ -995,7 +995,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-row-flat-v143'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-conversation-background-v144'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1088,8 +1088,15 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-research-row-flat-v143'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-conversation-background-v144'),
       "settings footer links should stay centered with the current stylesheet"
+    );
+    assert(
+      workspaceStyles.text.includes(
+        "--research-conversation-background: color-mix(in srgb, var(--ios-accent-administrative) 10%, var(--background));"
+      ) &&
+        workspaceStyles.text.includes("background: var(--research-conversation-background);"),
+      "Research Conversation should retain its distinct theme-aware column background."
     );
     assert(
       workspaceStyles.text.includes("body .panel-track > article.workspace-panel:not(.reader-panel),") &&

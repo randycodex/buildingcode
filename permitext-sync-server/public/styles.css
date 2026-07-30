@@ -23,6 +23,7 @@
   --select-highlight: rgba(20, 20, 24, 0.08);
   --search-detail-background: color-mix(in srgb, #8fc7ff 16%, var(--background));
   --project-detail-background: color-mix(in srgb, #8fd8a8 16%, var(--background));
+  --research-conversation-background: color-mix(in srgb, var(--ios-accent-administrative) 10%, var(--background));
   --ios-accent-building: #c96410;
   --ios-accent-fuel-gas: #c62828;
   --ios-accent-administrative: #7c3aed;
@@ -4876,6 +4877,7 @@ mark {
 
 .research-conversation-panel {
   --pane-min-width: clamp(360px, 34vw, 560px);
+  background: var(--research-conversation-background);
 }
 
 .research-conversation-content {
