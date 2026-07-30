@@ -5324,11 +5324,11 @@ mark {
   gap: 5px;
   max-width: min(92vw, 430px);
   padding: 6px;
-  border: 1px solid color-mix(in srgb, var(--text-primary) 22%, transparent);
+  border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--text-primary);
+  background: var(--surface-raised);
   box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
-  color: var(--surface);
+  color: var(--text-primary);
 }
 
 .research-selection-actions {
@@ -5340,7 +5340,7 @@ mark {
 .research-selection-project {
   min-height: 34px;
   border-radius: calc(var(--radius-card) - 3px);
-  background: rgb(255 255 255 / 14%);
+  background: color-mix(in srgb, var(--text-primary) 8%, var(--surface));
   color: inherit;
 }
 
@@ -5362,20 +5362,13 @@ mark {
 
 .research-selection-menu button:hover,
 .research-selection-menu button:focus-visible {
-  background: rgb(255 255 255 / 16%);
+  background: var(--toolbar-active);
 }
 
 .research-selection-status:not(:empty) {
   padding: 2px var(--space-2) 5px;
-  color: color-mix(in srgb, var(--surface) 74%, transparent);
+  color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.72) !important;
-}
-
-.research-selection-hint {
-  padding: 0 var(--space-2) 2px;
-  color: color-mix(in srgb, var(--surface) 74%, transparent);
-  font-size: calc(var(--chrome-font-size) * 0.72) !important;
-  line-height: 1.35;
 }
 
 @media (max-width: 560px) {

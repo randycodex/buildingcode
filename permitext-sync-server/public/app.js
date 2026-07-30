@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-conversations-v155";
+} from "./offline-storage.js?v=20260729-research-popup-theme-v156";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10095,11 +10095,7 @@ function showResearchSelectionMenu() {
   analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research";
   analyzeButton.addEventListener("click", () => saveResearchSelection("new", analyzeButton, status));
   actions.append(analyzeButton);
-  const hint = document.createElement("span");
-  hint.className = "research-selection-hint";
-  const passageCount = captured.passages?.length || 1;
-  hint.textContent = `Attaches ${passageCount === 1 ? "this passage" : `${passageCount} passages`} as evidence only. No AI request yet.${projects.length ? " The Project choice assigns the Research conversation; it does not save the code section." : ""}`;
-  menu.append(actions, hint, status);
+  menu.append(actions, status);
   document.body.append(menu);
   const menuRect = menu.getBoundingClientRect();
   const left = Math.min(
