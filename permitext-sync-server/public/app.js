@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-composer-cover-v189";
+} from "./offline-storage.js?v=20260730-research-audit-hidden-v190";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10094,7 +10094,6 @@ async function renderResearchConversation(conversationID) {
     const bubble = document.createElement("article");
     bubble.className = "research-message is-assistant";
     renderResearchInterpretation(bubble, message.answer, { message, conversationID });
-    renderHistoricalResearchControl(bubble, message);
     thread.append(bubble);
   });
   if (thread.childElementCount) content.append(thread);

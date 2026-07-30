@@ -983,6 +983,7 @@ async function main() {
         workspaceScript.text.includes("function researchSelectionTextFromRange") &&
         workspaceScript.text.includes("function renderResearchProjectContext") &&
         workspaceScript.text.includes("function renderHistoricalResearchRecord") &&
+        !researchConversationRendererSource.includes("renderHistoricalResearchControl") &&
         workspaceScript.text.includes('return option.prefix === "AC" ? "Gen Administrative Code" : option.label;') &&
         workspaceScript.text.includes("function wireCodeFilterMenu(filterRail, instance, options = {})") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(open))') &&
@@ -995,7 +996,7 @@ async function main() {
         workspaceScript.text.includes('facts.addEventListener("input"') &&
         workspaceScript.text.includes('facts.addEventListener("blur", saveProjectContextAutomatically)') &&
         !workspaceScript.text.includes("Save Project context") &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-composer-cover-v189'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-audit-hidden-v190'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
