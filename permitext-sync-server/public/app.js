@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-sources-top-v167";
+} from "./offline-storage.js?v=20260730-research-prompt-removed-v168";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9766,12 +9766,6 @@ async function renderResearchConversation(conversationID) {
 
   const thread = document.createElement("section");
   thread.className = "research-message-thread";
-  if (!conversation.messages.length) {
-    const prompt = document.createElement("p");
-    prompt.className = "research-conversation-prompt";
-    prompt.textContent = "The passage is attached. Ask a question when you are ready—opening this conversation has not called an AI model.";
-    thread.append(prompt);
-  }
   conversation.messages.forEach((message) => {
     if (message.role === "user") {
       const bubble = document.createElement("article");
@@ -9786,7 +9780,7 @@ async function renderResearchConversation(conversationID) {
     renderHistoricalResearchControl(bubble, message);
     thread.append(bubble);
   });
-  content.append(thread);
+  if (thread.childElementCount) content.append(thread);
 
   const composer = document.createElement("form");
   composer.className = "research-composer";

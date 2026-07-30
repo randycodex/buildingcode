@@ -5137,15 +5137,6 @@ mark {
   gap: var(--space-4);
 }
 
-.research-conversation-prompt {
-  margin: 0;
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: var(--surface-muted);
-  color: var(--text-secondary);
-  line-height: 1.45;
-}
-
 .research-message {
   min-width: 0;
 }

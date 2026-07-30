@@ -1015,7 +1015,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-sources-top-v148'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-prompt-removed-v149'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1132,7 +1132,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-sources-top-v148'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-prompt-removed-v149'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1376,7 +1376,9 @@ async function main() {
         !workspaceScript.text.includes("Highlight enacted text in any Reader, search detail, or project section to begin.") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
         workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
-        workspaceScript.text.includes("opening this conversation has not called an AI model"),
+        workspaceScript.text.includes("if (thread.childElementCount) content.append(thread);") &&
+        !workspaceScript.text.includes("opening this conversation has not called an AI model") &&
+        !workspaceScript.text.includes("research-conversation-prompt"),
       "Web Research no longer exposes selection-first, persistent conversations without an eager model call."
     );
     assert(
