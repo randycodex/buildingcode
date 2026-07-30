@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-public-clean-v191'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-split-view-v193'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-composer-cover-v165'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-split-view-v167'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1034,7 +1034,7 @@ async function main() {
         researchSourceRendererSource.includes('if (source.kind !== "selection")') &&
         researchConversationRendererSource.includes('.filter((source) => source.kind === "selection")') &&
         researchConversationRendererSource.includes(
-          "const projectContextSection = renderResearchProjectContext(content, conversation);"
+          "const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);"
         ) &&
         researchConversationRendererSource.includes(
           'projectContextSection.querySelector(".research-project-context-heading").after(sources);'
@@ -1138,8 +1138,28 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".research-composer {") &&
+        workspaceStyles.text.includes(".research-dialogue-pane {") &&
         workspaceStyles.text.includes("background: var(--research-conversation-background);"),
       "Research composer should match the Research conversation column background."
+    );
+    assert(
+      workspaceScript.text.includes("function bindResearchEvidenceDivider") &&
+        workspaceScript.text.includes("researchEvidenceSplitRatios") &&
+        workspaceScript.text.includes("researchEvidenceCollapsed") &&
+        workspaceScript.text.includes("delete state.researchEvidenceSplitRatios[conversation.id]") &&
+        workspaceScript.text.includes("delete state.researchEvidenceCollapsed[conversation.id]") &&
+        researchConversationRendererSource.includes('evidencePane.className = "research-evidence-pane"') &&
+        researchConversationRendererSource.includes('dialoguePane.className = "research-dialogue-pane"') &&
+        researchConversationRendererSource.includes('divider.className = "research-evidence-divider"') &&
+        researchConversationRendererSource.includes('divider.setAttribute("aria-orientation", "horizontal")') &&
+        researchConversationRendererSource.includes('evidenceCollapse.setAttribute("aria-controls", evidenceScroll.id)') &&
+        researchConversationRendererSource.includes('divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`)') &&
+        researchConversationRendererSource.includes("thread.scrollTop = thread.scrollHeight") &&
+        workspaceStyles.text.includes("var(--research-evidence-size, 36%)") &&
+        workspaceStyles.text.includes(".research-evidence-divider {") &&
+        workspaceStyles.text.includes("cursor: row-resize;") &&
+        workspaceStyles.text.includes(".research-message-thread {\n  display: grid;\n  min-height: 0;"),
+      "Research evidence and conversation should use independently scrollable panes with a persistent horizontal divider."
     );
     assert(
       !workspaceScript.text.includes("Assign this conversation when its research belongs to a specific Project.") &&
@@ -1203,7 +1223,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-composer-cover-v165'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-split-view-v167'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1228,7 +1248,7 @@ async function main() {
         workspaceScript.text.includes('label: "Projects"') &&
         workspaceStyles.text.includes(".research-conversation-content {\n  display: grid;") &&
         workspaceStyles.text.includes("padding: 0;") &&
-        workspaceStyles.text.includes(".research-composer {\n  position: sticky;") &&
+        workspaceStyles.text.includes(".research-composer {\n  position: relative;") &&
         workspaceStyles.text.includes("margin: 0;") &&
         workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
         !workspaceScript.text.includes("research-project-picker saved-projects-actions"),
@@ -1442,7 +1462,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("function bindResearchTextSelection") &&
         workspaceScript.text.includes('analyzeButton.textContent = state.researchConversationID ? "Start new Research" : "Start Research"') &&
-        workspaceScript.text.includes('addButton.textContent = "Add to current research"') &&
+        workspaceScript.text.includes('addButton.textContent = "Add as supporting evidence"') &&
         !workspaceScript.text.includes('hint.className = "research-selection-hint"') &&
         workspaceScript.text.includes('unassignedLabel: "Unassigned — no Project context"') &&
         workspaceScript.text.includes("selections: passages.map") &&
@@ -1456,7 +1476,8 @@ async function main() {
         !workspaceScript.text.includes("Highlight enacted text in any Reader, search detail, or project section to begin.") &&
         workspaceScript.text.includes('postResearch("/research/conversations/create"') &&
         workspaceScript.text.includes('postResearch("/research/conversations/message"') &&
-        workspaceScript.text.includes("if (thread.childElementCount) content.append(thread);") &&
+        researchConversationRendererSource.includes("dialoguePane.append(thread)") &&
+        researchConversationRendererSource.includes("dialoguePane.append(composer)") &&
         !workspaceScript.text.includes("opening this conversation has not called an AI model") &&
         !workspaceScript.text.includes("research-conversation-prompt"),
       "Web Research no longer exposes selection-first, persistent conversations without an eager model call."
