@@ -4934,10 +4934,6 @@ mark {
   white-space: pre-line;
 }
 
-.research-source-card .ghost-button {
-  justify-self: start;
-}
-
 .research-visual-evidence {
   display: grid;
   gap: var(--space-2);

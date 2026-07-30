@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-research-composer-v158";
+} from "./offline-storage.js?v=20260729-research-source-cleanup-v159";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9398,12 +9398,6 @@ function renderResearchSource(source) {
   }
   const visualEvidence = renderResearchVisualEvidence(source.visualSources);
   if (visualEvidence) card.append(visualEvidence);
-  const openButton = document.createElement("button");
-  openButton.className = "ghost-button";
-  openButton.type = "button";
-  openButton.textContent = "Open enacted section";
-  openButton.addEventListener("click", () => openSectionDetailForExistingSearch(source));
-  card.append(openButton);
   return card;
 }
 
