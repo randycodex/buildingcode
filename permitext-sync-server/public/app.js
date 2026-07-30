@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260729-search-pill-alignment-v150";
+} from "./offline-storage.js?v=20260729-recent-preview-repair-v153";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -7275,22 +7275,31 @@ function updateSearchDock(panel, instance, resultCount = null) {
 
 async function hydrateSearchRecentlyViewedEntries(entries) {
   return Promise.all(entries.map(async (entry) => {
-    if (String(entry.previewText || "").trim()) return entry;
     try {
       const detail = { ...entry };
       const { chapter, section } = await resolveSectionDetail(detail);
       const rawPreview = sectionPlainText(section);
+      const sectionNumber = section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "";
+      const sectionTitle = section?.title || detail.title || entry.title || "";
+      const titleWithoutNumber = stripLeadingSectionNumber(sectionTitle, sectionNumber);
+      const isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber);
+      const previewSource = rawPreview || (
+        isNestedListParagraph
+          ? titleWithoutNumber
+          : entry.previewText || ""
+      );
       return {
         ...entry,
         codePrefix: detail.codePrefix || chapter?.codePrefix || entry.codePrefix || "BC",
         chapterID: detail.chapterID || chapter?.id || entry.chapterID || "",
         chapterNumber: detail.chapterNumber || chapter?.chapterNumber || entry.chapterNumber || "",
-        sectionNumber: section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "",
-        title: section?.title || detail.title || entry.title || "Section",
+        sectionNumber,
+        title: sectionTitle || "Section",
+        isNestedListParagraph,
         previewText: snippetWithoutDuplicateTitle({
-          sectionNumber: section?.sectionNumber || detail.sectionNumber || entry.sectionNumber || "",
-          title: section?.title || detail.title || entry.title || "",
-          snippet: rawPreview
+          sectionNumber,
+          title: sectionTitle,
+          snippet: previewSource
         }).replace(/\s+/g, " ").trim().slice(0, 360)
       };
     } catch {
@@ -7332,7 +7341,9 @@ async function renderSearchHistory(panel, instance, options = {}) {
       code.className = "search-jump-code";
       code.textContent = entry.codeSectionName || codeDisplayLabel(entry.codePrefix || "BC");
       const title = document.createElement("strong");
-      title.textContent = sectionDisplayTitle(entry.sectionNumber, entry.title, "Section");
+      title.textContent = entry.isNestedListParagraph
+        ? String(entry.sectionNumber || "Paragraph").trim()
+        : sectionDisplayTitle(entry.sectionNumber, entry.title, "Section");
       const preview = document.createElement("span");
       preview.className = "search-jump-preview";
       preview.textContent = entry.previewText || "";
@@ -7432,6 +7443,20 @@ async function renderSearchHistory(panel, instance, options = {}) {
     if (pinnedSection) results.append(pinnedSection);
     if (recentSection) results.append(recentSection);
   }
+}
+
+function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0) {
+  if (!panel.isConnected) {
+    if (attempt < 120) {
+      requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance, attempt + 1));
+    }
+    return;
+  }
+  void (async () => {
+    await loadSyncedContent();
+    if (!panel.isConnected) return;
+    await renderSearchResults(panel, searchInstance);
+  })();
 }
 
 function bindSearchHistoryDivider(results, divider, instance) {
@@ -7556,13 +7581,7 @@ async function renderSearch(instance) {
   } else {
     await renderSearchHistory(panel, searchInstance, { hydrate: false });
   }
-  requestAnimationFrame(() => {
-    void (async () => {
-      await loadSyncedContent();
-      if (!panel.isConnected) return;
-      await renderSearchResults(panel, searchInstance);
-    })();
-  });
+  requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance));
   return panel;
 }
 

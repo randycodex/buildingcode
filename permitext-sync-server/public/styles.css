@@ -3619,7 +3619,7 @@ body.is-resizing-search-history * {
 
 .search-jump-list {
   display: grid;
-  gap: 2px;
+  gap: var(--space-1);
   padding-right: var(--space-1);
 }
 
@@ -3630,8 +3630,8 @@ body.is-resizing-search-history * {
   min-height: 92px;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  background: var(--surface-muted);
+  border-radius: 0;
+  background: transparent;
 }
 
 .search-jump-open {

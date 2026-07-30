@@ -914,8 +914,9 @@ async function main() {
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
         workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance));") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
-        workspaceScript.text.includes("requestAnimationFrame(() => {") &&
-        workspaceScript.text.includes("if (!panel.isConnected) return;") &&
+        workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
+        workspaceScript.text.includes("if (attempt < 120)") &&
+        workspaceScript.text.includes("requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance))") &&
         workspaceScript.text.includes("function scheduleWorkspaceStateSaveAfterPaint()") &&
         workspaceScript.text.includes('if (key === "search")') &&
         workspaceScript.text.includes('await transitionWorkspace("utility", { deferStateSave: true });') &&
@@ -964,7 +965,7 @@ async function main() {
         workspaceScript.text.includes('researchSavedItemID: item.savedColumnKind === "bookmark" ? item.id : ""') &&
         workspaceScript.text.includes('data-research-selection-exclude="true"') &&
         !workspaceScript.text.includes('focusedPanel?.querySelector(".utility-close")?.click();') &&
-        webRoot.text.includes('/web/app.js?v=20260729-search-pill-alignment-v150'),
+        webRoot.text.includes('/web/app.js?v=20260729-recent-preview-repair-v153'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -989,7 +990,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-search-pill-alignment-v133'),
+        webRoot.text.includes('/web/styles.css?v=20260729-recent-preview-repair-v135'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1082,7 +1083,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260729-search-pill-alignment-v133'),
+        webRoot.text.includes('/web/styles.css?v=20260729-recent-preview-repair-v135'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1512,11 +1513,12 @@ async function main() {
     assert(
       workspaceStyles.text.match(/\.search-jump-section \.search-history-label,[\s\S]*?\.search-history-section\.is-recent \.search-history-label \{[\s\S]*?font-size: 13\.3333px !important;/) &&
         workspaceStyles.text.match(/\.search-history-scroll-list \{[\s\S]*?max-height: 320px;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-x: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
-        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: 2px;/) &&
-        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?border-bottom: 1px solid var\(--border\);/) &&
+        workspaceStyles.text.match(/\.search-jump-list \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile \{[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.search-jump-open \{[\s\S]*?gap: 1px;[\s\S]*?height: 92px;[\s\S]*?min-height: 92px;[\s\S]*?padding: var\(--space-1\);/) &&
         workspaceScript.text.includes('code.className = "search-jump-code"') &&
-        workspaceScript.text.includes('title.textContent = sectionDisplayTitle(entry.sectionNumber, entry.title, "Section")') &&
+        workspaceScript.text.includes("isNestedListParagraph = !rawPreview && Boolean(titleWithoutNumber)") &&
+        workspaceScript.text.includes('String(entry.sectionNumber || "Paragraph").trim()') &&
         workspaceScript.text.includes('preview.className = "search-jump-preview"') &&
         workspaceScript.text.includes("openButton.append(code, title, preview)") &&
         workspaceStyles.text.match(/\.search-jump-preview \{[\s\S]*?-webkit-line-clamp: 3;/) &&
