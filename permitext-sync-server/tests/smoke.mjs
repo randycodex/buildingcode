@@ -473,6 +473,11 @@ async function main() {
     );
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
     assert(
+      !workspaceScript.text.includes("Supported by selected evidence") &&
+        !workspaceScript.text.includes("Prototype response"),
+      "Research answer cards still render the removed status label."
+    );
+    assert(
       workspaceScript.text.includes('row.classList.toggle("is-active", active)') &&
         workspaceScript.text.includes('checkoutButton.classList.toggle("is-pro-active", pro)') &&
         workspaceScript.text.includes("researchCheckoutButton.hidden = research && !researchAddOn;") &&
@@ -990,7 +995,7 @@ async function main() {
         workspaceScript.text.includes('facts.addEventListener("input"') &&
         workspaceScript.text.includes('facts.addEventListener("blur", saveProjectContextAutomatically)') &&
         !workspaceScript.text.includes("Save Project context") &&
-        webRoot.text.includes('/web/app.js?v=20260730-readable-research-v187'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-answer-clean-v188'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

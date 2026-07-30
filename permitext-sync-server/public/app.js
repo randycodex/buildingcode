@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-readable-research-v187";
+} from "./offline-storage.js?v=20260730-research-answer-clean-v188";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8429,9 +8429,6 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
-  const label = document.createElement("p");
-  label.className = "section-label";
-  label.textContent = result.mode === "mock" ? "Prototype response" : "Supported by selected evidence";
   const answerHeading = document.createElement("strong");
   answerHeading.className = "research-result-subheading";
   answerHeading.textContent = "Answer";
@@ -8441,7 +8438,7 @@ function renderResearchInterpretation(container, result, options = {}) {
   const explanation = document.createElement("p");
   explanation.className = "research-result-application";
   explanation.textContent = researchDisplayText(result.explanation);
-  card.append(label, answerHeading, answer);
+  card.append(answerHeading, answer);
   appendResearchSupportedPoints(card, result.supportedPoints);
   const explanationHeading = document.createElement("strong");
   explanationHeading.className = "research-result-subheading";
