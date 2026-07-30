@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-reader-chapters-v184";
+} from "./offline-storage.js?v=20260730-research-drafting-v185";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10055,12 +10055,11 @@ async function renderResearchConversation(conversationID) {
     input.disabled = true;
     input.placeholder = "Research Add-On required to continue this conversation…";
   }
-  if (projectContextBlocked) {
-    input.disabled = true;
-    input.placeholder = "Review the Project context above before continuing…";
-  }
   const status = document.createElement("p");
   status.className = "research-composer-status";
+  if (projectContextBlocked) {
+    status.textContent = "Review the Project context in the Project column before analyzing.";
+  }
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
     sendButton.disabled = !researchEnabled ||
