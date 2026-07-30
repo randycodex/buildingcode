@@ -1110,6 +1110,10 @@ async function main() {
         workspaceScript.text.includes('"Collapse all passages"') &&
         workspaceScript.text.includes('"Expand all passages"') &&
         workspaceScript.text.includes("setResearchSourceCardExpanded(card, expandAll)") &&
+        workspaceScript.text.includes('class="research-chevron-down"') &&
+        workspaceScript.text.includes('class="research-chevron-up"') &&
+        !workspaceScript.text.includes('disclosure.textContent = "▾"') &&
+        !workspaceScript.text.includes('disclosure.textContent = "▸"') &&
         workspaceStyles.text.includes(".research-sources-toggle {"),
       "Research passages should provide a single chevron to collapse or expand every passage."
     );

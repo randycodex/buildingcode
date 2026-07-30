@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-source-collapse-all-v175";
+} from "./offline-storage.js?v=20260730-standard-research-chevrons-v176";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9564,13 +9564,18 @@ function renderResearchVisualEvidence(sources, options = {}) {
   return wrap;
 }
 
+function researchChevronIconsSVG() {
+  return `
+    <svg class="research-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+    <svg class="research-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+  `;
+}
+
 function setResearchSourceCardExpanded(card, expanded) {
   const toggle = card.querySelector(".research-source-toggle");
-  const disclosure = card.querySelector(".research-source-disclosure");
   const body = card.querySelector(".research-source-body");
   if (!toggle || !body) return;
   toggle.setAttribute("aria-expanded", String(expanded));
-  if (disclosure) disclosure.textContent = expanded ? "▾" : "▸";
   body.hidden = !expanded;
 }
 
@@ -9586,7 +9591,7 @@ function renderResearchSource(source) {
   const disclosure = document.createElement("span");
   disclosure.className = "research-source-disclosure";
   disclosure.setAttribute("aria-hidden", "true");
-  disclosure.textContent = "▾";
+  disclosure.innerHTML = researchChevronIconsSVG();
   const body = document.createElement("div");
   body.className = "research-source-body";
   toggle.append(citation, disclosure);
@@ -9927,8 +9932,9 @@ async function renderResearchConversation(conversationID) {
   sourceToggle.className = "research-sources-toggle";
   sourceToggle.setAttribute("aria-expanded", "true");
   const sourceDisclosure = document.createElement("span");
+  sourceDisclosure.className = "research-source-disclosure";
   sourceDisclosure.setAttribute("aria-hidden", "true");
-  sourceDisclosure.textContent = "▾";
+  sourceDisclosure.innerHTML = researchChevronIconsSVG();
   sourceToggle.append(sourceDisclosure);
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
@@ -9939,7 +9945,6 @@ async function renderResearchConversation(conversationID) {
     sourceToggle.setAttribute("aria-expanded", String(allExpanded));
     sourceToggle.setAttribute("aria-label", allExpanded ? "Collapse all passages" : "Expand all passages");
     sourceToggle.title = allExpanded ? "Collapse all passages" : "Expand all passages";
-    sourceDisclosure.textContent = allExpanded ? "▾" : "▸";
   };
   sourceToggle.addEventListener("click", () => {
     const expandAll = sourceToggle.getAttribute("aria-expanded") !== "true";

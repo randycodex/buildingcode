@@ -4961,8 +4961,27 @@ mark {
 }
 
 .research-source-disclosure {
-  flex: 0 0 auto;
+  display: grid;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  place-items: center;
   color: var(--text-secondary);
+}
+
+.research-source-disclosure svg {
+  grid-area: 1 / 1;
+  width: 18px;
+  height: 18px;
+}
+
+.research-chevron-up,
+[aria-expanded="true"] > .research-source-disclosure .research-chevron-down {
+  display: none;
+}
+
+[aria-expanded="true"] > .research-source-disclosure .research-chevron-up {
+  display: block;
 }
 
 .research-source-body {
