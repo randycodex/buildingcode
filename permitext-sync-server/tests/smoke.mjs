@@ -1015,7 +1015,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\\n  background: transparent;\\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-content-width-v151'),
+        webRoot.text.includes('/web/styles.css?v=20260730-recent-reader-header-v152'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1094,8 +1094,9 @@ async function main() {
         workspaceScript.text.includes("internalSearchButton.hidden = isRecentlyViewedLinkedReader;") &&
         workspaceScript.text.includes("dragHandle.hidden = isRecentlyViewedLinkedReader;") &&
         workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader {") &&
-        workspaceStyles.text.includes("background: var(--recently-viewed-reader-background);"),
-      "A Recently Viewed Reader should move with Search, retain only Close in its header, and use its own background."
+        workspaceStyles.text.includes("background: var(--recently-viewed-reader-background);") &&
+        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader::before {\\n  right: 0;\\n  background: var(--recently-viewed-reader-background);"),
+      "A Recently Viewed Reader should move with Search, retain only Close in its header, and carry its background through the full header."
     );
     assert(
       workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
@@ -1132,7 +1133,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-content-width-v151'),
+        webRoot.text.includes('/web/styles.css?v=20260730-recent-reader-header-v152'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

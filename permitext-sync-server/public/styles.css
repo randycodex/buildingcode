@@ -1136,6 +1136,11 @@ body.is-detached-workboard-window .detached-workboard-error p {
   background: var(--recently-viewed-reader-background);
 }
 
+.reader-panel.is-recently-viewed-linked-reader::before {
+  right: 0;
+  background: var(--recently-viewed-reader-background);
+}
+
 .reader-panel.is-recently-viewed-linked-reader .reader-typography-menu,
 .reader-panel.is-recently-viewed-linked-reader .reader-internal-search-toggle,
 .reader-panel.is-recently-viewed-linked-reader .pane-drag-handle {
