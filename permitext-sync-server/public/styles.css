@@ -4999,6 +4999,10 @@ mark {
   margin: 0;
 }
 
+.research-source-toggle > strong {
+  color: var(--code-accent);
+}
+
 .research-source-body > p:not(.section-label) {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.84) !important;

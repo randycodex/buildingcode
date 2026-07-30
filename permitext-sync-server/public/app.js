@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-standard-research-chevrons-v176";
+} from "./offline-storage.js?v=20260730-research-citation-colors-fix-v178";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9581,7 +9581,7 @@ function setResearchSourceCardExpanded(card, expanded) {
 
 function renderResearchSource(source) {
   const card = document.createElement("article");
-  card.className = `research-source-card is-${source.kind || "related"}`;
+  card.className = `research-source-card is-${source.kind || "related"} code-theme-${codeTheme(source.codePrefix || "BC")}`;
   const toggle = document.createElement("button");
   toggle.type = "button";
   toggle.className = "research-source-toggle";

@@ -1089,7 +1089,10 @@ async function main() {
       workspaceScript.text.includes("function researchSourceCitation(source)") &&
         workspaceScript.text.includes("sectionGroupLabel") &&
         workspaceScript.text.includes("sectionGroupTitle") &&
-        workspaceScript.text.includes("citation.textContent = researchSourceCitation(source)"),
+        workspaceScript.text.includes("citation.textContent = researchSourceCitation(source)") &&
+        workspaceScript.text.includes('code-theme-${codeTheme(source.codePrefix || "BC")}') &&
+        workspaceStyles.text.includes(".research-source-toggle > strong {") &&
+        workspaceStyles.text.includes("color: var(--code-accent);"),
       "Research selected passages no longer show their hierarchical code citation."
     );
     assert(
