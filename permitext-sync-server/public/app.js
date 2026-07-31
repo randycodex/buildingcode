@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-menu-inset-v248";
+} from "./offline-storage.js?v=20260731-notebook-list-v249";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11570,18 +11570,6 @@ function emptyNotebookDocument() {
   };
 }
 
-function notebookCardTypeLabel(cardType) {
-  return {
-    question: "Question",
-    finding: "Finding",
-    assumption: "Assumption",
-    "missing-information": "Missing information",
-    decision: "Decision",
-    "coordination-item": "Coordination item",
-    "review-task": "Review task"
-  }[cardType] || "Note";
-}
-
 function notebookReferenceCandidates(projectID, foundation, cards) {
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
@@ -11981,13 +11969,11 @@ async function renderProjectNotebook(project) {
         button.className = "notebook-card-tile";
         button.type = "button";
         button.setAttribute("aria-pressed", String(activeCard?.id === card.id));
-        const type = document.createElement("span");
-        type.textContent = notebookCardTypeLabel(card.cardType);
         const cardTitle = document.createElement("strong");
         cardTitle.textContent = card.title;
         const meta = document.createElement("small");
         meta.textContent = `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`;
-        button.append(type, cardTitle, meta);
+        button.append(cardTitle, meta);
         button.addEventListener("click", () => {
           void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
         });

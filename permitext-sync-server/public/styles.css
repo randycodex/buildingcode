@@ -9836,7 +9836,7 @@ button.project-studio-metric:focus-visible {
 
 .notebook-card-tile {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: baseline;
   column-gap: var(--space-2);
   width: 100%;
@@ -9882,7 +9882,6 @@ button.project-studio-metric:focus-visible {
   color: var(--project-color);
 }
 
-.notebook-card-tile > span,
 .notebook-card-tile small {
   color: var(--text-secondary);
   font-size: 10px;
