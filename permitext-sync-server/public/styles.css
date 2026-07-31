@@ -9820,6 +9820,10 @@ button.project-studio-metric:focus-visible {
   margin-bottom: var(--space-2);
 }
 
+.notebook-toolbar button {
+  border-radius: var(--radius-pill);
+}
+
 .notebook-toolbar button[aria-pressed="true"] {
   background: color-mix(in srgb, var(--project-color) 32%, var(--surface));
 }
