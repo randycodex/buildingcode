@@ -9609,6 +9609,8 @@ button.project-studio-metric:focus-visible {
 
 .notebook-header {
   display: flex;
+  min-height: var(--panel-title-row-height);
+  align-items: flex-start;
   justify-content: flex-end;
   margin-bottom: var(--space-3);
 }
@@ -9618,7 +9620,6 @@ button.project-studio-metric:focus-visible {
   margin: 0;
 }
 
-.notebook-close,
 .notebook-toolbar button,
 .notebook-primary-action,
 .notebook-secondary-action,
@@ -9632,7 +9633,6 @@ button.project-studio-metric:focus-visible {
   font-weight: 650;
 }
 
-.notebook-close:hover,
 .notebook-toolbar button:hover,
 .notebook-secondary-action:hover {
   background: color-mix(in srgb, var(--project-color) 18%, var(--surface));
@@ -9912,7 +9912,6 @@ button.project-studio-metric:focus-visible {
 .notebook-reference-chip:focus-visible,
 .notebook-card-tile:focus-visible,
 .notebook-card-delete:focus-visible,
-.notebook-close:focus-visible,
 .notebook-toolbar button:focus-visible,
 .notebook-primary-action:focus-visible,
 .notebook-secondary-action:focus-visible,

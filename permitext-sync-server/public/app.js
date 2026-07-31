@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-notebook-list-v239";
+} from "./offline-storage.js?v=20260731-notebook-close-v240";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11671,9 +11671,11 @@ async function renderProjectNotebook(project) {
   const header = document.createElement("header");
   header.className = "notebook-header";
   const closeButton = document.createElement("button");
-  closeButton.className = "notebook-close";
+  closeButton.className = "icon-button utility-close notebook-close";
   closeButton.type = "button";
-  closeButton.textContent = "Close";
+  closeButton.title = "Close notebook";
+  closeButton.setAttribute("aria-label", "Close notebook");
+  closeButton.innerHTML = circleXIconSVG();
   closeButton.addEventListener("click", () => {
     void closeProjectNotebook(identity);
   });

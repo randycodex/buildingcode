@@ -679,7 +679,7 @@ async function main() {
         !workspaceScript.text.includes('eyebrow.className = "notebook-eyebrow"') &&
         !workspaceScript.text.includes('title.textContent = "Notebook"') &&
         !workspaceStyles.text.includes(".notebook-eyebrow") &&
-        workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  justify-content: flex-end;") &&
+        workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);\n  align-items: flex-start;\n  justify-content: flex-end;") &&
         workspaceScript.text.includes("cardType: cardAtStart.cardType") &&
         workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-notebook-list-v239'),
+        webRoot.text.includes('/web/app.js?v=20260731-notebook-close-v240'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1131,13 +1131,17 @@ async function main() {
         workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
+        workspaceScript.text.includes('closeButton.className = "icon-button utility-close notebook-close";') &&
+        workspaceScript.text.includes('closeButton.setAttribute("aria-label", "Close notebook");') &&
+        workspaceScript.text.includes("closeButton.innerHTML = circleXIconSVG();") &&
+        workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
         workspaceStyles.text.includes("width: 100%;\n  gap: var(--space-1);") &&
         workspaceStyles.text.includes("overflow-y: auto;\n  background-image: none;") &&
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: auto minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-notebook-list-v239'),
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-close-v240'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1348,7 +1352,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-notebook-list-v239'),
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-close-v240'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
