@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v232";
+} from "./offline-storage.js?v=20260731-notebook-cards-v233";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11783,7 +11783,7 @@ async function renderProjectNotebook(project) {
     cardList.className = "notebook-card-list";
     rail.append(railHeader, cardList);
     const cardMenuState = {
-      cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) === true
+      cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
     };
     const cardMenuOptions = {
       stateKey: "cardsMenuOpen",

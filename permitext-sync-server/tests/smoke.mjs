@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v232'),
+        webRoot.text.includes('/web/app.js?v=20260731-notebook-cards-v233'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1129,10 +1129,10 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
         workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
-        workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) === true") &&
+        workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v232'),
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-cards-v233'),
       "The Saved Projects and Notebook Project notes pills no longer preserve their compact card-grid behavior."
     );
     assert(
@@ -1343,7 +1343,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v232'),
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-cards-v233'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
