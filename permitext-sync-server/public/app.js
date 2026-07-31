@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-note-meta-v246";
+} from "./offline-storage.js?v=20260731-reader-menu-inset-v248";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2962,9 +2962,16 @@ function enhanceSelect(select) {
   const positionMenu = () => {
     const rect = trigger.getBoundingClientRect();
     const viewportPadding = 8;
-    const panelRect = trigger.closest(".workspace-panel")?.getBoundingClientRect();
-    const boundaryLeft = Math.max(viewportPadding, panelRect?.left ?? viewportPadding);
-    const boundaryRight = Math.min(window.innerWidth - viewportPadding, panelRect?.right ?? window.innerWidth - viewportPadding);
+    const panel = trigger.closest(".workspace-panel");
+    const panelRect = panel?.getBoundingClientRect();
+    const panelInset = panel?.classList.contains("reader-panel")
+      ? Number.parseFloat(getComputedStyle(panel).paddingLeft) || 0
+      : 0;
+    const boundaryLeft = Math.max(viewportPadding, (panelRect?.left ?? viewportPadding) + panelInset);
+    const boundaryRight = Math.min(
+      window.innerWidth - viewportPadding,
+      (panelRect?.right ?? window.innerWidth - viewportPadding) - panelInset
+    );
     const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
     const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
     const naturalWidth = Math.max(rect.width, ...optionWidths);
