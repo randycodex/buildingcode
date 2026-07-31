@@ -438,9 +438,6 @@ function Workboard({
   return (
     <section className="permitext-workboard" data-element-count={elementCount}>
       <header className="permitext-workboard-header">
-        <div>
-          <h2>{projectName}</h2>
-        </div>
         <div className="permitext-workboard-header-actions">
           <span className="permitext-workboard-save-state" role="status">{status}</span>
           <div className="permitext-workboard-zoom-controls" aria-label="Workboard zoom controls">

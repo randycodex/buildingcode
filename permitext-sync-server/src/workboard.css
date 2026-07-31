@@ -13,23 +13,10 @@
   display: flex;
   min-height: 68px;
   align-items: center;
-  justify-content: space-between;
-  gap: 16px;
+  justify-content: flex-end;
   padding: 10px 16px 10px 20px;
   border-bottom: 1px solid var(--border, #d9d9dc);
   background: color-mix(in srgb, var(--surface-raised, #fff) 94%, var(--project-color, #c96410));
-}
-
-.permitext-workboard-header h2 {
-  margin: 0;
-}
-
-.permitext-workboard-header h2 {
-  overflow: hidden;
-  font-size: 15px !important;
-  font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .permitext-workboard-header-actions {
