@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-column-warning-v202";
+} from "./offline-storage.js?v=20260730-research-project-list-v203";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2112,7 +2112,9 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
       const savedCodeBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-4")) || filterGap;
       const openingPadding = menu.closest(".saved-inline-filters")
         ? filterGap + (filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap)
-        : filterGap;
+        : filterRail.classList.contains("research-conversation-project-options")
+          ? filterGap + savedCodeBottomGap
+          : filterGap;
       const expandedHeight = filterRail.scrollHeight +
         (menu.classList.contains("is-open") ? 0 : openingPadding);
       const nextHeight = `${expandedHeight}px`;
@@ -8709,6 +8711,34 @@ function preferredResearchProjectID(conversation = activeResearchConversation) {
   ) || "";
 }
 
+function researchProjectChoices({
+  value = "",
+  includeUnassigned = true,
+  unassignedLabel = "Unassigned — no Project context"
+} = {}) {
+  const choices = [];
+  if (includeUnassigned) {
+    choices.push({ value: "", label: unassignedLabel });
+  }
+  researchProjects().forEach((project) => {
+    choices.push({
+      value: researchProjectID(project),
+      label: readableProjectName(project)
+    });
+  });
+  if (value && !choices.some((choice) => choice.value === value)) {
+    const historicalProject = visibleProjectRecords(currentContentSummary().projects || [])
+      .find((project) => researchProjectID(project) === value);
+    if (historicalProject) {
+      choices.push({
+        value,
+        label: `${readableProjectName(historicalProject)} (Archived)`
+      });
+    }
+  }
+  return choices;
+}
+
 function createResearchProjectSelect({
   value = "",
   includeUnassigned = true,
@@ -8718,31 +8748,14 @@ function createResearchProjectSelect({
   const select = document.createElement("select");
   select.className = "research-project-select";
   select.setAttribute("aria-label", ariaLabel);
-  if (includeUnassigned) {
+  const choices = researchProjectChoices({ value, includeUnassigned, unassignedLabel });
+  choices.forEach((choice) => {
     const option = document.createElement("option");
-    option.value = "";
-    option.textContent = unassignedLabel;
-    select.append(option);
-  }
-  researchProjects().forEach((project) => {
-    const option = document.createElement("option");
-    option.value = researchProjectID(project);
-    option.textContent = readableProjectName(project);
+    option.value = choice.value;
+    option.textContent = choice.label;
     select.append(option);
   });
-  if (value && ![...select.options].some((option) => option.value === value)) {
-    const historicalProject = visibleProjectRecords(currentContentSummary().projects || [])
-      .find((project) => researchProjectID(project) === value);
-    if (historicalProject) {
-      const option = document.createElement("option");
-      option.value = value;
-      option.textContent = `${readableProjectName(historicalProject)} (Archived)`;
-      select.append(option);
-    }
-  }
-  select.value = value && [...select.options].some((option) => option.value === value)
-    ? value
-    : "";
+  select.value = value && choices.some((choice) => choice.value === value) ? value : "";
   return select;
 }
 
@@ -9394,37 +9407,73 @@ async function renderResearch(paneID = "utility:analysis") {
 
       const actions = document.createElement("div");
       actions.className = "research-conversation-row-actions";
-      const projectSelect = createResearchProjectSelect({
+      const projectChoices = researchProjectChoices({
         value: conversation.primaryProjectID || "",
-        unassignedLabel: "Unassigned",
-        ariaLabel: `Project for ${conversation.title}`
+        unassignedLabel: "Unassigned"
       });
-      projectSelect.classList.add("research-conversation-project-select");
       const projectSelectWrap = document.createElement("div");
-      projectSelectWrap.className = "research-conversation-project-picker";
-      const projectSelectChevron = document.createElement("span");
-      projectSelectChevron.className = "research-conversation-project-chevron";
-      projectSelectChevron.setAttribute("aria-hidden", "true");
-      projectSelectChevron.innerHTML = `
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+      projectSelectWrap.className = "code-filter-menu research-conversation-project-picker";
+      const projectToggle = document.createElement("button");
+      projectToggle.className = "code-filter-menu-toggle research-conversation-project-toggle";
+      projectToggle.type = "button";
+      const projectLabel = document.createElement("span");
+      projectLabel.className = "code-filter-menu-label";
+      projectLabel.textContent = researchProjectName(conversation.primaryProjectID || "");
+      const projectMenuIcon = document.createElement("span");
+      projectMenuIcon.className = "code-filter-menu-icon";
+      projectMenuIcon.setAttribute("aria-hidden", "true");
+      projectMenuIcon.innerHTML = `
+        <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+        <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
       `;
-      projectSelectWrap.append(projectSelect, projectSelectChevron);
-      projectSelect.title = conversation.primaryProjectID
+      projectToggle.append(projectLabel, projectMenuIcon);
+      projectToggle.title = conversation.primaryProjectID
         ? `Assigned to ${researchProjectName(conversation.primaryProjectID)}`
         : "Assign conversation to a Project";
-      projectSelect.disabled = !researchEnabled;
-      if (researchEnabled) {
-        projectSelect.addEventListener("change", async () => {
+      projectToggle.disabled = !researchEnabled;
+      const projectOptions = document.createElement("div");
+      projectOptions.className = "research-conversation-project-options";
+      projectOptions.setAttribute("aria-label", `Project for ${conversation.title}`);
+      projectOptions.hidden = true;
+      const projectMenuState = { projectMenuOpen: false };
+      const setProjectMenuEnabled = (enabled) => {
+        projectToggle.disabled = !enabled;
+        projectOptions.querySelectorAll("button").forEach((button) => {
+          button.disabled = !enabled;
+        });
+      };
+      projectChoices.forEach((choice) => {
+        const optionButton = document.createElement("button");
+        optionButton.type = "button";
+        optionButton.className = "research-conversation-project-option";
+        optionButton.textContent = choice.label;
+        optionButton.dataset.projectId = choice.value;
+        optionButton.setAttribute("aria-pressed", String(choice.value === (conversation.primaryProjectID || "")));
+        optionButton.addEventListener("click", async () => {
           const previousProjectID = conversation.primaryProjectID || "";
-          const targetProjectID = projectSelect.value;
-          projectSelect.disabled = true;
-          projectSelect.setAttribute("aria-busy", "true");
+          const targetProjectID = choice.value;
+          if (targetProjectID === previousProjectID) {
+            projectMenuState.projectMenuOpen = false;
+            updateCodeFilterMenu(projectOptions, projectMenuState, {
+              stateKey: "projectMenuOpen",
+              menuName: `Projects for ${conversation.title}`,
+              label: () => researchProjectName(previousProjectID)
+            });
+            return;
+          }
+          projectMenuState.projectMenuOpen = false;
+          updateCodeFilterMenu(projectOptions, projectMenuState, {
+            stateKey: "projectMenuOpen",
+            menuName: `Projects for ${conversation.title}`,
+            label: () => researchProjectName(previousProjectID)
+          });
+          setProjectMenuEnabled(false);
+          projectSelectWrap.setAttribute("aria-busy", "true");
           try {
             const payload = await assignResearchConversationProject(conversation, targetProjectID, {
-              warningContainer: projectSelect.closest(".workspace-panel")
+              warningContainer: projectSelectWrap.closest(".workspace-panel")
             });
             if (!payload) {
-              projectSelect.value = previousProjectID;
               return;
             }
             conversation = { ...conversation, ...payload.conversation };
@@ -9448,14 +9497,20 @@ async function renderResearch(paneID = "utility:analysis") {
               ]
             });
           } catch (error) {
-            projectSelect.value = previousProjectID;
             await showWebNotice("Project not changed", error.message);
           } finally {
-            projectSelect.disabled = !researchEnabled;
-            projectSelect.removeAttribute("aria-busy");
+            setProjectMenuEnabled(researchEnabled);
+            projectSelectWrap.removeAttribute("aria-busy");
           }
         });
-      }
+        projectOptions.append(optionButton);
+      });
+      projectSelectWrap.append(projectToggle, projectOptions);
+      wireCodeFilterMenu(projectOptions, projectMenuState, {
+        stateKey: "projectMenuOpen",
+        menuName: `Projects for ${conversation.title}`,
+        label: () => researchProjectName(conversation.primaryProjectID || "")
+      });
       if (researchEnabled) {
         const renameButton = document.createElement("button");
         renameButton.className = "research-conversation-rename";

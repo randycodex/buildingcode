@@ -3184,7 +3184,8 @@ select option:checked {
 .code-filter-menu .search-code-filter,
 .code-filter-menu .saved-code-filter,
 .code-filter-menu .saved-project-list,
-.code-filter-menu .saved-tag-filter {
+.code-filter-menu .saved-tag-filter,
+.code-filter-menu .research-conversation-project-options {
   max-height: 0;
   min-height: 0;
   overflow: hidden;
@@ -3200,7 +3201,8 @@ select option:checked {
 .code-filter-menu.is-open .search-code-filter,
 .code-filter-menu.is-open .saved-code-filter,
 .code-filter-menu.is-open .saved-project-list,
-.code-filter-menu.is-open .saved-tag-filter {
+.code-filter-menu.is-open .saved-tag-filter,
+.code-filter-menu.is-open .research-conversation-project-options {
   max-height: var(--code-filter-menu-height, 240px);
   padding-top: var(--space-2);
   opacity: 1;
@@ -3210,7 +3212,8 @@ select option:checked {
 .code-filter-menu.is-restoring .search-code-filter,
 .code-filter-menu.is-restoring .saved-code-filter,
 .code-filter-menu.is-restoring .saved-project-list,
-.code-filter-menu.is-restoring .saved-tag-filter {
+.code-filter-menu.is-restoring .saved-tag-filter,
+.code-filter-menu.is-restoring .research-conversation-project-options {
   transition: none;
 }
 
@@ -3218,7 +3221,8 @@ select option:checked {
 .code-filter-menu .search-code-filter[hidden],
 .code-filter-menu .saved-code-filter[hidden],
 .code-filter-menu .saved-project-list[hidden],
-.code-filter-menu .saved-tag-filter[hidden] {
+.code-filter-menu .saved-tag-filter[hidden],
+.code-filter-menu .research-conversation-project-options[hidden] {
   display: none !important;
 }
 
@@ -4881,41 +4885,74 @@ mark {
 }
 
 .research-conversation-project-picker {
-  position: relative;
   grid-column: 1 / -1;
   width: 100%;
   margin: 0 0 var(--space-3);
-}
-
-.research-conversation-project-select {
-  display: block;
-  width: 100%;
-  min-height: 30px;
-  padding: 0 40px 0 var(--space-3);
   overflow: hidden;
-  appearance: none;
-  -webkit-appearance: none;
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+}
+
+.research-conversation-project-toggle {
+  min-height: 30px;
+  background: transparent;
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.research-conversation-project-chevron {
-  position: absolute;
-  top: 50%;
-  right: var(--space-3);
+.research-conversation-project-toggle:hover,
+.research-conversation-project-toggle[aria-expanded="true"]:hover {
+  background: transparent;
+}
+
+.research-conversation-project-options {
   display: grid;
-  width: 18px;
-  height: 18px;
-  color: var(--text-secondary);
-  pointer-events: none;
-  place-items: center;
-  transform: translateY(-50%);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-flow: row;
+  column-gap: calc(var(--space-3) * 2);
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0 var(--space-3);
+  background-image: linear-gradient(
+    to right,
+    transparent calc(50% - 0.5px),
+    color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% - 0.5px),
+    color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
-.research-conversation-project-chevron svg {
-  width: 18px;
-  height: 18px;
+.code-filter-menu.is-open .research-conversation-project-options {
+  padding: var(--space-2) var(--space-3) var(--space-4);
+}
+
+.research-conversation-project-option {
+  width: 100%;
+  min-height: 0;
+  padding: var(--space-1) 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  font-weight: 400;
+  text-align: left;
+  white-space: normal;
+}
+
+.research-conversation-project-option:nth-child(even) {
+  padding-left: var(--space-2);
+}
+
+.research-conversation-project-option[aria-pressed="true"] {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.research-conversation-project-option:hover,
+.research-conversation-project-option:focus-visible {
+  color: var(--text-primary);
 }
 
 .research-conversation-rename {

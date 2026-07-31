@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-column-warning-v202'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-project-list-v203'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-saved-final-divider-v178'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-project-list-v179'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1235,7 +1235,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-saved-final-divider-v178'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-project-list-v179'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1253,16 +1253,19 @@ async function main() {
         workspaceStyles.text.includes(".research-project-context {\n  display: grid;") &&
         workspaceStyles.text.includes("background: transparent;\n  box-shadow: none;") &&
         !researchProjectContextSource.includes("createResearchProjectSelect") &&
-        !workspaceScript.text.includes("createResearchConversationProjectPicker") &&
-        workspaceScript.text.includes('projectSelect.classList.add("research-conversation-project-select");') &&
-        workspaceScript.text.includes('projectSelectWrap.className = "research-conversation-project-picker";') &&
-        workspaceScript.text.includes('projectSelectChevron.className = "research-conversation-project-chevron";') &&
+        workspaceScript.text.includes("function researchProjectChoices({") &&
+        workspaceScript.text.includes('projectSelectWrap.className = "code-filter-menu research-conversation-project-picker";') &&
+        workspaceScript.text.includes('projectToggle.className = "code-filter-menu-toggle research-conversation-project-toggle";') &&
+        workspaceScript.text.includes('projectOptions.className = "research-conversation-project-options";') &&
+        workspaceScript.text.includes('optionButton.className = "research-conversation-project-option";') &&
+        workspaceScript.text.includes("wireCodeFilterMenu(projectOptions, projectMenuState, {") &&
         workspaceScript.text.includes("assignResearchConversationProject(conversation, targetProjectID, {") &&
-        workspaceScript.text.includes('warningContainer: projectSelect.closest(".workspace-panel")') &&
+        workspaceScript.text.includes('warningContainer: projectSelectWrap.closest(".workspace-panel")') &&
         workspaceScript.text.includes("container: options.warningContainer") &&
         workspaceScript.text.includes('postResearch("/research/conversations/assign-project"') &&
         workspaceStyles.text.includes(".research-conversation-project-picker {") &&
-        workspaceStyles.text.includes(".research-conversation-project-chevron {") &&
+        workspaceStyles.text.includes(".research-conversation-project-options {") &&
+        workspaceStyles.text.includes(".research-conversation-project-option[aria-pressed=\"true\"] {") &&
         workspaceStyles.text.includes(".web-warning-backdrop.is-column-scoped {") &&
         workspaceStyles.text.includes(".research-list-panel {\n  position: relative;") &&
         workspaceStyles.text.includes(".saved-panel .saved-content > .saved-code-group:last-child .saved-row:last-child {\n  border-bottom: 0;") &&
@@ -1786,9 +1789,9 @@ async function main() {
       workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: linear-gradient\(/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 600;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter \{[\s\S]*?max-height: 0;/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
-        workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.saved-tag-filter \{[\s\S]*?transition: none;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter,[\s\S]*?\.code-filter-menu \.research-conversation-project-options \{[\s\S]*?max-height: 0;/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-open \.research-conversation-project-options \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
+        workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.research-conversation-project-options \{[\s\S]*?transition: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?padding: var\(--space-2\) 0 0;/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
