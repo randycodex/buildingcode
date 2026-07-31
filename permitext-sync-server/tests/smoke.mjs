@@ -2304,8 +2304,8 @@ async function main() {
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-status-v21";') &&
         workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61"') &&
-        !webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
-      "Web workspace omitted the current Workboard preview assets."
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
+      "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),
