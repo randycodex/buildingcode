@@ -5618,8 +5618,10 @@ body.is-resizing-research-evidence * {
   right: var(--space-2);
   bottom: var(--space-2);
   min-height: 42px;
-  border-radius: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
   color: #ffffff;
+  box-shadow: none;
 }
 
 .research-composer-status {

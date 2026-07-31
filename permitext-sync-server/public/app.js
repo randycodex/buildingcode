@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-composer-box-v204";
+} from "./offline-storage.js?v=20260730-research-refresh-disclosure-v205";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9673,15 +9673,18 @@ function setResearchSourceCardExpanded(card, expanded, options = {}) {
       card.style.setProperty("--research-source-body-height", `${body.scrollHeight}px`);
     };
     if (options.instant && !card.classList.contains("is-open")) {
-      card.classList.add("is-restoring");
-      const restoreWhenMounted = (remainingFrames = 4) => {
-        if (toggle.getAttribute("aria-expanded") !== "true") return;
+      card.classList.add("is-restoring", "is-open");
+      card.style.setProperty("--research-source-body-height", "10000px");
+      const restoreWhenMounted = (remainingFrames = 60) => {
+        if (toggle.getAttribute("aria-expanded") !== "true") {
+          card.classList.remove("is-restoring");
+          return;
+        }
         if ((!body.isConnected || body.offsetWidth === 0) && remainingFrames > 0) {
           requestAnimationFrame(() => restoreWhenMounted(remainingFrames - 1));
           return;
         }
-        applyExpandedHeight();
-        card.classList.add("is-open");
+        if (body.isConnected && body.offsetWidth > 0) applyExpandedHeight();
         void body.offsetHeight;
         requestAnimationFrame(() => card.classList.remove("is-restoring"));
       };
