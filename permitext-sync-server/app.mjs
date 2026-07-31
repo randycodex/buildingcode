@@ -3571,8 +3571,12 @@ function safeWorkboardPathHash(value) {
   return createHash("sha256").update(String(value || "")).digest("hex").slice(0, 32);
 }
 
+function privateProjectPrefix(userID, projectID) {
+  return `project-assets/${safeWorkboardPathHash(userID)}/${safeWorkboardPathHash(projectID)}/`;
+}
+
 function workboardAssetPrefix(userID, projectID) {
-  return `project-assets/${safeWorkboardPathHash(projectID)}/workboards/`;
+  return `${privateProjectPrefix(userID, projectID)}workboards/`;
 }
 
 function legacyWorkboardAssetPrefix(userID, projectID) {
@@ -3593,21 +3597,43 @@ function workboardAssetExtension(contentType) {
   }[contentType] || "";
 }
 
+function workboardAssetMatchesContentType(body, contentType) {
+  if (!Buffer.isBuffer(body) || !body.length) return false;
+  if (contentType === "image/png") {
+    return body.length >= 8 && body.subarray(0, 8).toString("hex") === "89504e470d0a1a0a";
+  }
+  if (contentType === "image/jpeg") {
+    return body.length >= 4 &&
+      body[0] === 0xff && body[1] === 0xd8 &&
+      body[body.length - 2] === 0xff && body[body.length - 1] === 0xd9;
+  }
+  if (contentType === "image/gif") {
+    const signature = body.subarray(0, 6).toString("ascii");
+    return signature === "GIF87a" || signature === "GIF89a";
+  }
+  if (contentType === "image/webp") {
+    return body.length >= 12 &&
+      body.subarray(0, 4).toString("ascii") === "RIFF" &&
+      body.subarray(8, 12).toString("ascii") === "WEBP";
+  }
+  return false;
+}
+
 function workboardAssetPathname(userID, projectID, fileID, contentType) {
   const extension = workboardAssetExtension(contentType);
   return `${workboardAssetPrefix(userID, projectID)}${safeWorkboardPathHash(fileID)}.${extension}`;
 }
 
-function workboardPreviewPrefix(projectID) {
-  return `project-assets/${safeWorkboardPathHash(projectID)}/workboard-previews/`;
+function workboardPreviewPrefix(userID, projectID) {
+  return `${privateProjectPrefix(userID, projectID)}workboard-previews/`;
 }
 
-function workboardPreviewPathname(projectID, previewID) {
-  return `${workboardPreviewPrefix(projectID)}${safeWorkboardPathHash(previewID)}.png`;
+function workboardPreviewPathname(userID, projectID, previewID) {
+  return `${workboardPreviewPrefix(userID, projectID)}${safeWorkboardPathHash(previewID)}.png`;
 }
 
-function workboardPreviewPathBelongsToProject(pathname, projectID) {
-  return pathname.startsWith(workboardPreviewPrefix(projectID)) && pathname.endsWith(".png");
+function workboardPreviewPathBelongsToProject(pathname, userID, projectID) {
+  return pathname.startsWith(workboardPreviewPrefix(userID, projectID)) && pathname.endsWith(".png");
 }
 
 function localPrivateAssetRoot() {
@@ -3618,13 +3644,13 @@ function privateProjectAssetStorageConfigured() {
   return blobStorageConfigured() || Boolean(localPrivateAssetRoot());
 }
 
-function reportFilePrefix(projectID) {
-  return `project-assets/${safeWorkboardPathHash(projectID)}/reports/`;
+function reportFilePrefix(userID, projectID) {
+  return `${privateProjectPrefix(userID, projectID)}reports/`;
 }
 
-function reportFilePathname(projectID, manifestID, generatedReportID, format) {
+function reportFilePathname(userID, projectID, manifestID, generatedReportID, format) {
   return [
-    reportFilePrefix(projectID),
+    reportFilePrefix(userID, projectID),
     safeWorkboardPathHash(manifestID),
     "/",
     safeWorkboardPathHash(generatedReportID),
@@ -3634,9 +3660,19 @@ function reportFilePathname(projectID, manifestID, generatedReportID, format) {
   ].join("");
 }
 
-function reportFilePathBelongsToProject(pathname, projectID) {
-  return pathname.startsWith(reportFilePrefix(projectID)) && pathname.endsWith(".pdf");
+function reportFilePathBelongsToProject(pathname, userID, projectID) {
+  return pathname.startsWith(reportFilePrefix(userID, projectID)) && pathname.endsWith(".pdf");
 }
+
+export const privateAssetPathContract = Object.freeze({
+  workboardAssetPathname,
+  workboardAssetPathBelongsToProject,
+  workboardPreviewPathname,
+  workboardPreviewPathBelongsToProject,
+  reportFilePathname,
+  reportFilePathBelongsToProject,
+  workboardAssetMatchesContentType
+});
 
 async function storePrivateProjectAsset(pathname, body, contentType) {
   if (blobStorageConfigured()) {
@@ -8588,7 +8624,7 @@ async function reportProjectMaterialBySourceID(userID, projectID, manifest) {
       !requestedIDs.has(artifact.envelope?.id) ||
       artifact.envelope?.type !== "workboardPreview" ||
       artifact.payload?.projectID !== projectID ||
-      !workboardPreviewPathBelongsToProject(artifact.payload?.pathname || "", projectID)
+      !workboardPreviewPathBelongsToProject(artifact.payload?.pathname || "", userID, projectID)
     ) {
       continue;
     }
@@ -8703,6 +8739,7 @@ async function handleReportGenerate(request, response) {
       throw new Error("The generated Report PDF exceeds the supported file size.");
     }
     const requestedPathname = reportFilePathname(
+      storageOwnerUserID,
       access.projectID,
       manifestID,
       generatedReportID,
@@ -8954,6 +8991,7 @@ async function handleReportFileUpload(request, response) {
   const now = new Date().toISOString();
   const generatedReportID = randomUUID();
   const requestedPathname = reportFilePathname(
+    storageOwnerUserID,
     projectID,
     manifestID,
     generatedReportID,
@@ -9058,7 +9096,7 @@ async function handleReportFileRead(request, response) {
     !artifact ||
     !file?.pathname ||
     file.contentType !== "application/pdf" ||
-    !reportFilePathBelongsToProject(file.pathname, projectID)
+    !reportFilePathBelongsToProject(file.pathname, access.storageOwnerUserID, projectID)
   ) {
     sendError(response, 404, "Report PDF not found.");
     return;
@@ -10565,8 +10603,21 @@ async function handleServiceWorker(response) {
   );
 }
 
+export function decodePublicPath(value) {
+  try {
+    return decodeURIComponent(String(value || ""));
+  } catch (error) {
+    if (error instanceof URIError) return null;
+    throw error;
+  }
+}
+
 async function handleWebStatic(path, response) {
-  const fileName = decodeURIComponent(path.replace(/^web\//, ""));
+  const fileName = decodePublicPath(path.replace(/^web\//, ""));
+  if (fileName === null) {
+    sendNotFound(response);
+    return;
+  }
   const segments = fileName.split("/");
   if (
     !segments.length ||
@@ -10594,7 +10645,11 @@ async function handleInternalStatic(request, path, response) {
   }
   const fileName = path === "internal" || path === "internal/"
     ? "index.html"
-    : decodeURIComponent(path.replace(/^internal\//, ""));
+    : decodePublicPath(path.replace(/^internal\//, ""));
+  if (fileName === null) {
+    sendNotFound(response);
+    return;
+  }
   if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
     sendNotFound(response);
     return;
@@ -10616,7 +10671,11 @@ async function handleInternalStatic(request, path, response) {
 }
 
 async function handleCodeAsset(path, response) {
-  const fileName = decodeURIComponent(path.replace(/^code\/assets\//, ""));
+  const fileName = decodePublicPath(path.replace(/^code\/assets\//, ""));
+  if (fileName === null) {
+    sendNotFound(response);
+    return;
+  }
   if (!/^[a-zA-Z0-9._-]+$/.test(fileName)) {
     sendNotFound(response);
     return;
@@ -13283,7 +13342,7 @@ function privateProjectAssetPathname(value) {
   ) {
     return false;
   }
-  return /^project-assets\/[a-f0-9]{32}\//.test(pathname) ||
+  return /^project-assets\/[a-f0-9]{32}\/[a-f0-9]{32}\//.test(pathname) ||
     /^workboards\/[a-f0-9]{32}\/[a-f0-9]{32}\//.test(pathname);
 }
 
@@ -13501,7 +13560,7 @@ async function handleWorkboardPreviewUpload(request, response) {
   }
   const now = new Date().toISOString();
   const previewID = randomUUID();
-  const requestedPathname = workboardPreviewPathname(projectID, previewID);
+  const requestedPathname = workboardPreviewPathname(storageOwnerUserID, projectID, previewID);
   const pathname = await storePrivateProjectAsset(requestedPathname, body, contentType);
   const artifact = {
     envelope: artifactEnvelope({
@@ -13580,7 +13639,7 @@ async function handleWorkboardPreviewRead(request, response) {
     candidate.payload?.projectID === projectID
   );
   const pathname = artifact?.payload?.pathname;
-  if (!pathname || !workboardPreviewPathBelongsToProject(pathname, projectID)) {
+  if (!pathname || !workboardPreviewPathBelongsToProject(pathname, access.storageOwnerUserID, projectID)) {
     sendError(response, 404, "Workboard preview not found.");
     return;
   }
@@ -13667,8 +13726,8 @@ async function handleWorkboardAssetUpload(request, response) {
     return;
   }
   const body = await readBody(request, maxWorkboardAssetBytes);
-  if (!body.length) {
-    sendError(response, 400, "Workboard image is empty.");
+  if (!workboardAssetMatchesContentType(body, contentType)) {
+    sendError(response, 400, "The Workboard image does not match its declared file type.");
     return;
   }
   const pathname = workboardAssetPathname(
@@ -15173,10 +15232,36 @@ async function handleRequestUnlocked(request, response) {
   }
 }
 
-function requestMutatesFileStore(request) {
+const readOnlyPostPaths = new Set([
+  "notebook/cards/get",
+  "notebook/cards/list",
+  "organizations/evidence/reviews/list",
+  "organizations/list",
+  "organizations/members/list",
+  "organizations/projects/list",
+  "organizations/projects/snapshot",
+  "reports/drafts/get",
+  "reports/drafts/list",
+  "reports/files/read",
+  "reports/history/list",
+  "reports/manifests/get",
+  "reports/options",
+  "reports/sources/list",
+  "research/answers/get",
+  "research/answers/list",
+  "research/conversations/get",
+  "research/conversations/list",
+  "research/usage",
+  "sync/pull",
+  "workboards/assets/read",
+  "workboards/previews/read"
+]);
+
+export function requestMutatesFileStore(request) {
   if (databaseURL) return false;
-  if (request.method === "POST" || request.method === "DELETE") return true;
   const path = normalizePath(request.url);
+  if (request.method === "POST") return !readOnlyPostPaths.has(path);
+  if (request.method === "DELETE") return true;
   return request.method === "GET" && path === "account/apple/callback";
 }
 
