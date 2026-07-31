@@ -995,7 +995,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .reader-panel {
   --pane-min-width: clamp(380px, 30vw, 560px);
-  --reader-header-overlay-height: clamp(116px, 11vh, 132px);
+  --reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);
   --reader-scrollbar-rail-width: 0px;
   --reader-scrollbar-track-top: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   --reader-internal-search-height: 42px;
@@ -1559,6 +1559,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .reader-trust {
+  display: none;
   position: absolute;
   top: calc(var(--panel-control-row-top) + 32px);
   right: var(--panel-padding);

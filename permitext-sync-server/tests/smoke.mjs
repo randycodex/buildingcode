@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v231'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v232'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1116,6 +1116,8 @@ async function main() {
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
         workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
         workspaceStyles.text.includes(".reader-trust-details {\n  margin-top: var(--space-1);\n  margin-right: calc(-1 * var(--panel-padding));") &&
+        workspaceStyles.text.includes("--reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);") &&
+        workspaceStyles.text.includes(".reader-trust {\n  display: none;") &&
         workspaceStyles.text.includes("box-shadow: none;") &&
         workspaceStyles.text.includes(".project-studio-metrics {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 0;") &&
         workspaceStyles.text.includes(".project-studio-metric strong {\n  order: 2;") &&
@@ -1130,7 +1132,7 @@ async function main() {
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) === true") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v231'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v232'),
       "The Saved Projects and Notebook Project notes pills no longer preserve their compact card-grid behavior."
     );
     assert(
@@ -1341,7 +1343,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v231'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v232'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
