@@ -617,16 +617,6 @@ export function createPostgresSyncRepository(sql) {
       rejectionContextIndexes.push(queries.length);
       queries.push(rejectionContextQuery(userID, mutation));
     }
-    const latestIndex = queries.length;
-    queries.push(sql`
-      SELECT COALESCE(MAX(event_id), 0)::bigint AS latest_event_id
-      FROM permitext_sync_events WHERE user_id = ${userID}
-    `);
-    const entitlementIndex = queries.length;
-    queries.push(sql`
-      SELECT entitlement FROM permitext_entitlements WHERE user_id = ${userID} LIMIT 1
-    `);
-
     let results;
     for (let attempt = 1; attempt <= 3; attempt += 1) {
       try {

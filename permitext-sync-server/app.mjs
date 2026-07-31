@@ -218,6 +218,8 @@ const cachedCanonicalBlockIDsBySectionID = new Map();
 let cachedSectionCatalog = null;
 let cachedSectionCatalogPromise = null;
 let cachedShippedSearchIndex = null;
+let cachedAllSectionCatalogByID = null;
+let cachedAllSectionCatalogByIDPromise = null;
 let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 let blobModulePromise = null;
@@ -10981,17 +10983,7 @@ async function handleCodeSections(request, response) {
     return;
   }
   const uniqueIDs = Array.from(new Set(ids));
-  const catalog = [
-    ...await sectionCatalog(),
-    ...await zoningSectionCatalog(),
-    ...await existingBuildingSectionCatalog(),
-    ...await enactedSectionCatalog()
-  ];
-  const byID = new Map();
-  catalog.forEach((section) => {
-    byID.set(String(section.id), section);
-    if (section.webSectionID) byID.set(String(section.webSectionID), section);
-  });
+  const byID = await allSectionCatalogByID();
   sendJSON(response, 200, {
     sections: uniqueIDs
       .map((id) => {
@@ -11000,6 +10992,34 @@ async function handleCodeSections(request, response) {
       })
       .filter(Boolean)
   });
+}
+
+export async function allSectionCatalogByID() {
+  if (cachedAllSectionCatalogByID) {
+    return cachedAllSectionCatalogByID;
+  }
+  if (cachedAllSectionCatalogByIDPromise) {
+    return cachedAllSectionCatalogByIDPromise;
+  }
+  cachedAllSectionCatalogByIDPromise = Promise.all([
+    sectionCatalog(),
+    zoningSectionCatalog(),
+    existingBuildingSectionCatalog(),
+    enactedSectionCatalog()
+  ]).then((catalogs) => {
+    const byID = new Map();
+    for (const section of catalogs.flat()) {
+      byID.set(String(section.id), section);
+      if (section.webSectionID) byID.set(String(section.webSectionID), section);
+    }
+    cachedAllSectionCatalogByID = byID;
+    return byID;
+  });
+  try {
+    return await cachedAllSectionCatalogByIDPromise;
+  } finally {
+    cachedAllSectionCatalogByIDPromise = null;
+  }
 }
 
 function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
