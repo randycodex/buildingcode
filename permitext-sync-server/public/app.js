@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v211";
+} from "./offline-storage.js?v=20260731-reader-trust-v212";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -6034,113 +6034,6 @@ function selectReaderSectionForResearch(sectionWrapper) {
   showResearchSelectionMenu({ ...passage, passages: [passage], rect }, { pinned: true });
 }
 
-function renderReaderSectionToolbar(panel, reader, section, sectionWrapper) {
-  const toolbar = document.createElement("div");
-  toolbar.className = "reader-section-toolbar";
-  toolbar.dataset.researchSelectionExclude = "true";
-  toolbar.setAttribute("role", "toolbar");
-  toolbar.setAttribute("aria-label", `Actions for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
-  const payload = readerSectionPayload(section, reader);
-
-  const saveButton = document.createElement("button");
-  saveButton.type = "button";
-  saveButton.className = "reader-section-action";
-  const syncSaveState = () => {
-    const saved = isSectionSaved(section.id);
-    saveButton.textContent = saved ? "Saved" : "Save";
-    saveButton.classList.toggle("is-active", saved);
-    saveButton.setAttribute("aria-pressed", String(saved));
-    saveButton.title = saved ? "Manage saved section" : "Save section";
-  };
-  syncSaveState();
-  saveButton.addEventListener("click", async () => {
-    saveButton.disabled = true;
-    try {
-      if (isSectionSaved(section.id)) {
-        const sheet = ensureReaderNotesSheet(panel, reader);
-        openReaderNotesSheet(panel, section, reader);
-        await openReaderNotesProjectPicker(sheet, payload);
-      } else {
-        const saved = await persistSectionBookmark(payload, true);
-        if (saved) syncReaderNoteBookmarkButtons(section.id, true);
-      }
-      syncSaveState();
-      refreshReaderSectionProjectContexts(section.id);
-    } catch (error) {
-      presentWorkspaceIssue(error.message || "Could not update this saved section.");
-    } finally {
-      saveButton.disabled = false;
-    }
-  });
-
-  const projectButton = document.createElement("button");
-  projectButton.type = "button";
-  projectButton.className = "reader-section-action";
-  projectButton.textContent = "Project";
-  projectButton.title = "Add section to a Project";
-  projectButton.addEventListener("click", async () => {
-    if (!hasCapability("projects")) {
-      await presentPlanLimitNotice(
-        "Projects require Pro",
-        "Upgrade to Pro to organize saved code in Project workspaces."
-      );
-      return;
-    }
-    projectButton.disabled = true;
-    try {
-      const sheet = ensureReaderNotesSheet(panel, reader);
-      openReaderNotesSheet(panel, section, reader);
-      await openReaderNotesProjectPicker(sheet, payload);
-      refreshReaderSectionProjectContexts(section.id);
-    } catch (error) {
-      presentWorkspaceIssue(error.message || "Could not open Projects.");
-    } finally {
-      projectButton.disabled = false;
-    }
-  });
-
-  const noteButton = document.createElement("button");
-  noteButton.type = "button";
-  noteButton.className = "reader-section-action";
-  noteButton.textContent = "Note";
-  noteButton.title = "Add a note";
-  noteButton.addEventListener("click", () => openReaderNotesSheet(panel, section, reader));
-
-  const linkButton = document.createElement("button");
-  linkButton.type = "button";
-  linkButton.className = "reader-section-action";
-  linkButton.textContent = "Copy link";
-  const sectionURL = sharedSectionURL(section.id);
-  linkButton.disabled = !sectionURL;
-  linkButton.title = sectionURL ? "Copy shareable section link" : "No shareable link is available for this section";
-  linkButton.addEventListener("click", async () => {
-    if (!sectionURL) return;
-    linkButton.disabled = true;
-    const copied = await copyTextToClipboard(sectionURL).catch(() => false);
-    linkButton.textContent = copied ? "Copied" : "Copy failed";
-    linkButton.title = copied ? "Section link copied" : "Could not copy section link";
-    window.setTimeout(() => {
-      if (!linkButton.isConnected) return;
-      linkButton.textContent = "Copy link";
-      linkButton.title = "Copy shareable section link";
-      linkButton.disabled = false;
-    }, 1600);
-  });
-
-  const researchButton = document.createElement("button");
-  researchButton.type = "button";
-  researchButton.className = "reader-section-action";
-  researchButton.textContent = "Research";
-  researchButton.disabled = String(reader.codePrefix || "").toUpperCase() === zoningCodePrefix;
-  researchButton.title = researchButton.disabled
-    ? "Research requires enacted code text with stable section identifiers"
-    : "Start Research with this section as selected evidence";
-  researchButton.addEventListener("click", () => selectReaderSectionForResearch(sectionWrapper));
-
-  toolbar.append(saveButton, projectButton, noteButton, linkButton, researchButton);
-  return toolbar;
-}
-
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
   const sectionWrapper = document.createElement("section");
   sectionWrapper.className = "chapter-section";
@@ -6174,7 +6067,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   const headingRow = document.createElement("div");
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
-  headingRow.append(sectionHeading, renderReaderSectionToolbar(panel, reader, section, sectionWrapper));
+  headingRow.append(sectionHeading);
   sectionWrapper.append(headingRow);
 
   const projectContext = document.createElement("div");
@@ -6621,6 +6514,27 @@ function ensureReaderNotesSheet(panel, reader) {
   bookmarkButton.className = "reader-notes-bookmark";
   bookmarkButton.type = "button";
 
+  const projectButton = document.createElement("button");
+  projectButton.className = "reader-notes-card-action reader-notes-project-action";
+  projectButton.type = "button";
+  projectButton.textContent = "Project";
+
+  const linkButton = document.createElement("button");
+  linkButton.className = "reader-notes-card-action reader-notes-link-action";
+  linkButton.type = "button";
+  linkButton.textContent = "Copy link";
+
+  const researchButton = document.createElement("button");
+  researchButton.className = "reader-notes-card-action reader-notes-research-action";
+  researchButton.type = "button";
+  researchButton.textContent = "Research";
+
+  const leadingActions = document.createElement("div");
+  leadingActions.className = "reader-notes-leading-actions";
+  leadingActions.setAttribute("role", "toolbar");
+  leadingActions.setAttribute("aria-label", "Section actions");
+  leadingActions.append(bookmarkButton, projectButton, linkButton, researchButton);
+
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
   doneButton.type = "button";
@@ -6631,7 +6545,7 @@ function ensureReaderNotesSheet(panel, reader) {
   actions.className = "reader-notes-actions";
   actions.append(doneButton);
 
-  header.append(bookmarkButton, actions);
+  header.append(leadingActions, actions);
 
   const input = document.createElement("textarea");
   input.className = "reader-notes-input";
@@ -6886,6 +6800,10 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
 
   const saved = isSectionSaved(section.id);
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
+  const projectButton = sheet.querySelector(".reader-notes-project-action");
+  const linkButton = sheet.querySelector(".reader-notes-link-action");
+  const researchButton = sheet.querySelector(".reader-notes-research-action");
+  const sectionWrapper = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`);
   const sectionPayload = {
     codeVersion: target.codeVersion,
     sectionID: section.id,
@@ -6922,6 +6840,55 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
         bookmarkButton.disabled = false;
       }
     };
+  }
+  if (projectButton) {
+    projectButton.disabled = false;
+    projectButton.title = "Add section to a Project";
+    projectButton.onclick = async () => {
+      projectButton.disabled = true;
+      try {
+        if (!hasCapability("projects")) {
+          await presentPlanLimitNotice(
+            "Projects require Pro",
+            "Upgrade to Pro to organize saved code in Project workspaces."
+          );
+          return;
+        }
+        await openReaderNotesProjectPicker(sheet, sectionPayload);
+        refreshReaderSectionProjectContexts(section.id);
+      } catch (error) {
+        presentWorkspaceIssue(error.message || "Could not open Projects.");
+      } finally {
+        projectButton.disabled = false;
+      }
+    };
+  }
+  if (linkButton) {
+    const sectionURL = sharedSectionURL(section.id);
+    linkButton.textContent = "Copy link";
+    linkButton.disabled = !sectionURL;
+    linkButton.title = sectionURL ? "Copy shareable section link" : "No shareable link is available for this section";
+    linkButton.onclick = async () => {
+      if (!sectionURL) return;
+      linkButton.disabled = true;
+      const copied = await copyTextToClipboard(sectionURL).catch(() => false);
+      linkButton.textContent = copied ? "Copied" : "Copy failed";
+      linkButton.title = copied ? "Section link copied" : "Could not copy section link";
+      window.setTimeout(() => {
+        if (!linkButton.isConnected || sheet.dataset.sectionId !== sectionID) return;
+        linkButton.textContent = "Copy link";
+        linkButton.title = "Copy shareable section link";
+        linkButton.disabled = false;
+      }, 1600);
+    };
+  }
+  if (researchButton) {
+    researchButton.disabled = !sectionWrapper ||
+      String(reader?.codePrefix || "").toUpperCase() === zoningCodePrefix;
+    researchButton.title = researchButton.disabled
+      ? "Research requires enacted code text with stable section identifiers"
+      : "Start Research with this section as selected evidence";
+    researchButton.onclick = () => selectReaderSectionForResearch(sectionWrapper);
   }
 
   const input = sheet.querySelector(".reader-notes-input");
@@ -11174,7 +11141,7 @@ function bindResearchTextSelection() {
   document.addEventListener("pointerup", (event) => {
     if (
       event.target.closest?.(".research-selection-menu") ||
-      event.target.closest?.(".reader-section-action")
+      event.target.closest?.(".reader-notes-card-action")
     ) return;
     window.setTimeout(showResearchSelectionMenu, 0);
   });

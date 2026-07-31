@@ -886,16 +886,18 @@ async function main() {
     assert(
       workspaceScript.text.includes("function renderReaderTrust") &&
         workspaceScript.text.includes("codeTrustProfiles = libraryPayload.codeTrustProfiles || []") &&
-        workspaceScript.text.includes("function renderReaderSectionToolbar") &&
-        workspaceScript.text.includes('saveButton.textContent = saved ? "Saved" : "Save"') &&
+        !workspaceScript.text.includes("function renderReaderSectionToolbar") &&
+        workspaceScript.text.includes('leadingActions.className = "reader-notes-leading-actions"') &&
+        workspaceScript.text.includes('projectButton.className = "reader-notes-card-action reader-notes-project-action"') &&
         workspaceScript.text.includes('projectButton.textContent = "Project"') &&
-        workspaceScript.text.includes('noteButton.textContent = "Note"') &&
         workspaceScript.text.includes('linkButton.textContent = "Copy link"') &&
         workspaceScript.text.includes('researchButton.textContent = "Research"') &&
+        workspaceScript.text.includes("await openReaderNotesProjectPicker(sheet, sectionPayload)") &&
+        workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
         workspaceScript.text.includes('label.textContent = "Project record"'),
-      "Reader trust, section actions, or exact Project membership context is no longer wired."
+      "Reader trust, note-card actions, or exact Project membership context is no longer wired."
     );
     assert(
       workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
@@ -1063,7 +1065,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v211'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v212'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1089,7 +1091,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v211'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v212'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1300,7 +1302,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v211'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v212'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
