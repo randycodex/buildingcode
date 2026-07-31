@@ -3494,6 +3494,7 @@ select option:checked {
 .code-filter-menu .search-code-filter,
 .code-filter-menu .saved-code-filter,
 .code-filter-menu .saved-project-list,
+.code-filter-menu .notebook-card-list,
 .code-filter-menu .saved-tag-filter,
 .code-filter-menu .research-conversation-project-options {
   max-height: 0;
@@ -3511,6 +3512,7 @@ select option:checked {
 .code-filter-menu.is-open .search-code-filter,
 .code-filter-menu.is-open .saved-code-filter,
 .code-filter-menu.is-open .saved-project-list,
+.code-filter-menu.is-open .notebook-card-list,
 .code-filter-menu.is-open .saved-tag-filter,
 .code-filter-menu.is-open .research-conversation-project-options {
   max-height: var(--code-filter-menu-height, 240px);
@@ -3522,6 +3524,7 @@ select option:checked {
 .code-filter-menu.is-restoring .search-code-filter,
 .code-filter-menu.is-restoring .saved-code-filter,
 .code-filter-menu.is-restoring .saved-project-list,
+.code-filter-menu.is-restoring .notebook-card-list,
 .code-filter-menu.is-restoring .saved-tag-filter,
 .code-filter-menu.is-restoring .research-conversation-project-options {
   transition: none;
@@ -3531,6 +3534,7 @@ select option:checked {
 .code-filter-menu .search-code-filter[hidden],
 .code-filter-menu .saved-code-filter[hidden],
 .code-filter-menu .saved-project-list[hidden],
+.code-filter-menu .notebook-card-list[hidden],
 .code-filter-menu .saved-tag-filter[hidden],
 .code-filter-menu .research-conversation-project-options[hidden] {
   display: none !important;
@@ -9645,7 +9649,7 @@ button.project-studio-metric:focus-visible {
 
 .notebook-shell {
   display: grid;
-  grid-template-columns: minmax(190px, 0.72fr) minmax(360px, 1.55fr);
+  grid-template-rows: auto minmax(0, 1fr);
   min-height: 0;
   overflow: hidden;
   border-radius: calc(var(--radius-card) + 4px);
@@ -9661,28 +9665,65 @@ button.project-studio-metric:focus-visible {
 
 .notebook-card-rail {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
   padding: var(--space-3);
   background: color-mix(in srgb, var(--project-color) 10%, var(--surface-muted));
 }
 
 .notebook-card-rail-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.notebook-card-menu-toggle {
+  width: 100%;
+}
+
+.notebook-card-add-action {
+  position: absolute;
+  top: 50%;
+  right: calc(var(--space-3) + 18px + var(--space-2));
+  z-index: 1;
+  display: none;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  transform: translateY(-50%);
+}
+
+.notebook-card-menu.is-open .notebook-card-add-action {
   display: grid;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
+}
+
+.notebook-card-add-action:hover,
+.notebook-card-add-action:focus-visible {
+  color: var(--text-primary);
+}
+
+.notebook-card-add-action svg {
+  width: 14px;
+  height: 14px;
 }
 
 .notebook-card-list {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-content: start;
+  width: 100%;
   gap: var(--space-2);
   min-height: 0;
   overflow-y: auto;
 }
 
 .notebook-card-list-empty {
+  grid-column: 1 / -1;
   margin: 0;
   padding: var(--space-3);
   color: var(--text-secondary);
@@ -9906,12 +9947,12 @@ button.project-studio-metric:focus-visible {
 @container (max-width: 620px) {
   .notebook-shell {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(150px, 0.42fr) minmax(360px, 1fr);
+    grid-template-rows: auto minmax(360px, 1fr);
     overflow-y: auto;
   }
 
   .notebook-card-rail {
-    min-height: 150px;
+    min-height: 0;
   }
 
   .notebook-focus {

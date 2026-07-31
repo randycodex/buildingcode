@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v229'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v230'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1125,8 +1125,12 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v229'),
-      "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
+        workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
+        workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
+        workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
+        workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));") &&
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v230'),
+      "The Saved Projects and Notebook Project notes pills no longer preserve their compact card-grid behavior."
     );
     assert(
       !researchSourceRendererSource.includes('"Selected passage"') &&
@@ -1336,7 +1340,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v229'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v230'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1523,7 +1527,7 @@ async function main() {
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultDetailPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultWorkboardPaneWidth = 700") &&
-        workspaceScript.text.includes("const defaultNotebookPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultNotebookPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("return defaultNonReaderPaneWidth"),

@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v229";
+} from "./offline-storage.js?v=20260731-reader-trust-v230";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -118,7 +118,7 @@ const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultDetailPaneWidth = defaultNonReaderPaneWidth;
 const defaultWorkboardPaneWidth = 700;
-const defaultNotebookPaneWidth = defaultNonReaderPaneWidth;
+const defaultNotebookPaneWidth = 400;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
@@ -183,6 +183,7 @@ let workboardPreloadHandle = null;
 const workboardMounts = new Map();
 let notebookModulePromise = null;
 const notebookMounts = new Map();
+const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
@@ -11748,20 +11749,51 @@ async function renderProjectNotebook(project) {
     }
 
     const rail = document.createElement("aside");
-    rail.className = "notebook-card-rail";
+    rail.className = "notebook-card-rail code-filter-menu notebook-card-menu";
     const railHeader = document.createElement("div");
     railHeader.className = "notebook-card-rail-header";
-    const railTitle = document.createElement("h3");
-    railTitle.textContent = "Project notes";
+    const railToggle = document.createElement("button");
+    railToggle.className = "code-filter-menu-toggle notebook-card-menu-toggle";
+    railToggle.type = "button";
+    const railLabel = document.createElement("span");
+    railLabel.className = "code-filter-menu-label";
+    railLabel.textContent = "Project notes";
+    const railIcon = document.createElement("span");
+    railIcon.className = "code-filter-menu-icon";
+    railIcon.setAttribute("aria-hidden", "true");
+    railIcon.innerHTML = `
+      <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+      <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+    `;
+    railToggle.append(railLabel, railIcon);
     const newButton = document.createElement("button");
-    newButton.className = "notebook-primary-action";
+    newButton.className = "notebook-card-add-action";
     newButton.type = "button";
-    newButton.textContent = "New card";
+    newButton.title = "New card";
+    newButton.setAttribute("aria-label", "New card");
+    newButton.innerHTML = `
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14"></path>
+        <path d="M5 12h14"></path>
+      </svg>
+    `;
     newButton.disabled = notebookReadOnly;
-    railHeader.append(railTitle, newButton);
+    railHeader.append(railToggle, newButton);
     const cardList = document.createElement("div");
     cardList.className = "notebook-card-list";
     rail.append(railHeader, cardList);
+    const cardMenuState = {
+      cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false
+    };
+    const cardMenuOptions = {
+      stateKey: "cardsMenuOpen",
+      menuName: "Project notes",
+      label: "Project notes"
+    };
+    wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
+    railToggle.addEventListener("click", () => {
+      notebookCardMenuOpenByProject.set(projectID, cardMenuState.cardsMenuOpen);
+    });
 
     const focus = document.createElement("section");
     focus.className = "notebook-focus";
@@ -11930,6 +11962,7 @@ async function renderProjectNotebook(project) {
         empty.className = "notebook-card-list-empty";
         empty.textContent = "Create a card for a question, finding, decision, or coordination item.";
         cardList.append(empty);
+        updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
         return;
       }
       cards.forEach((card) => {
@@ -11966,6 +11999,7 @@ async function renderProjectNotebook(project) {
         }
         cardList.append(row);
       });
+      updateCodeFilterMenu(cardList, cardMenuState, cardMenuOptions);
     }
 
     async function renderFocusedCard() {
