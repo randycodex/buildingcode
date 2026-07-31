@@ -738,7 +738,7 @@ export function createPostgresOrganizationRepository(sql) {
               (SELECT invitation FROM inserted LIMIT 1) AS invitation
             FROM candidate
           `
-        ], { isolationMode: "Serializable" });
+        ], { isolationLevel: "Serializable" });
         const result = resultRows?.[0] || {};
         return {
           outcome: result.outcome || "conflict",
@@ -771,7 +771,7 @@ export function createPostgresOrganizationRepository(sql) {
               AND expires_at > CURRENT_TIMESTAMP
             RETURNING invitation
           `
-        ], { isolationMode: "Serializable" });
+        ], { isolationLevel: "Serializable" });
         return safeJSON(rows?.[0]?.invitation, null);
       });
     },
@@ -955,7 +955,7 @@ export function createPostgresOrganizationRepository(sql) {
             )
           `,
           acceptanceMutation
-        ], { isolationMode: "Serializable" });
+        ], { isolationLevel: "Serializable" });
         const result = resultRows?.[0] || {};
         return {
           outcome: result.outcome || "unavailable",
@@ -1130,7 +1130,7 @@ export function createPostgresOrganizationRepository(sql) {
             )
           `,
           membershipMutation
-        ], { isolationMode: "Serializable" });
+        ], { isolationLevel: "Serializable" });
         const result = resultRows?.[0] || {};
         return {
           outcome: result.outcome || "seat_limit",

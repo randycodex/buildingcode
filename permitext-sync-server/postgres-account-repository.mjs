@@ -611,7 +611,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       queries.splice(queries.length - 1, 0, ...additionalMergeQueries);
     }
 
-    const results = await sql.transaction(queries, { isolationMode: "Serializable" });
+    const results = await sql.transaction(queries, { isolationLevel: "Serializable" });
     const sourceRows = results[0] || [];
     const acceptedMutationIDs = sourceRows.map(({ record_id: recordID }) =>
       recordID.startsWith(`${sourceUserID}:`)
@@ -812,7 +812,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
           updated_at = now()
         RETURNING entitlement
       `
-    ], { isolationMode: "ReadCommitted" });
+    ], { isolationLevel: "ReadCommitted" });
     if (!ownerRows.length || !entitlementRows.length) return null;
     return safeJSON(entitlementRows[0].entitlement, entitlement);
   }

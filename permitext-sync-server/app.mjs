@@ -165,6 +165,7 @@ const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construc
 const defaultResearchCodeEdition = "2022 New York City Construction Codes";
 const maxSyncMutationsPerBatch = 100;
 const maxSyncRecordIDCharacters = 512;
+const maxSyncFutureClockSkewMilliseconds = 24 * 60 * 60 * 1_000;
 const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
@@ -226,6 +227,7 @@ let cachedAppleJWKSExpiresAt = 0;
 let blobModulePromise = null;
 const constructionVisualAssetMetadataCache = new Map();
 const searchableSectionPlainTextCache = new Map();
+const maxSearchableSectionPlainTextCacheEntries = 2_000;
 const maximumResearchVisualEvidenceBytes = 4 * 1024 * 1024;
 const maximumResearchConversationVisualSources = 8;
 const maximumResearchConversationVisualEvidenceBytes = 8 * 1024 * 1024;
@@ -2688,7 +2690,7 @@ async function createPostgresStoreAdapter() {
               ON CONFLICT (id) DO NOTHING
               RETURNING id
             `
-          ], { isolationMode: "Serializable" });
+          ], { isolationLevel: "Serializable" });
           return Boolean(rows?.length);
         } catch (error) {
           if (error?.code !== "40001" || attempt === 3) throw error;
@@ -11060,31 +11062,54 @@ async function searchableSectionBody(section) {
   });
 }
 
+export function setBoundedLRUCacheValue(cache, key, value, maximumEntries) {
+  cache.delete(key);
+  cache.set(key, value);
+  while (cache.size > maximumEntries) {
+    cache.delete(cache.keys().next().value);
+  }
+  return value;
+}
+
 function searchableSectionPlainText(section) {
   const cacheKey = [
     section.codeVersion || "",
     section.codePrefix || "",
     section.webSectionID || section.id
   ].join(":");
-  if (!searchableSectionPlainTextCache.has(cacheKey)) {
-    const pending = searchableSectionBody(section)
-      .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
-      .catch((error) => {
-        searchableSectionPlainTextCache.delete(cacheKey);
-        throw error;
-      });
-    searchableSectionPlainTextCache.set(cacheKey, pending);
+  if (searchableSectionPlainTextCache.has(cacheKey)) {
+    return setBoundedLRUCacheValue(
+      searchableSectionPlainTextCache,
+      cacheKey,
+      searchableSectionPlainTextCache.get(cacheKey),
+      maxSearchableSectionPlainTextCacheEntries
+    );
   }
-  return searchableSectionPlainTextCache.get(cacheKey);
+  const pending = searchableSectionBody(section)
+    .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
+    .catch((error) => {
+      searchableSectionPlainTextCache.delete(cacheKey);
+      throw error;
+    });
+  return setBoundedLRUCacheValue(
+    searchableSectionPlainTextCache,
+    cacheKey,
+    pending,
+    maxSearchableSectionPlainTextCacheEntries
+  );
 }
 
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
   const query = url.searchParams.get("q")?.trim() || "";
+  if (query.length > 200) {
+    sendError(response, 400, "Search queries are limited to 200 characters.");
+    return;
+  }
   const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
   const resultLimit = Number.isFinite(requestedLimit) && requestedLimit > 0
     ? Math.min(requestedLimit, 250)
-    : 250;
+    : 25;
   const requestedOffset = Number.parseInt(url.searchParams.get("offset") || "", 10);
   const resultOffset = Number.isFinite(requestedOffset) && requestedOffset > 0
     ? requestedOffset
@@ -11652,6 +11677,14 @@ async function deletePersistedEntitlement(userID, expected = {}) {
   );
   if (changed) await writeStore(store);
   return changed;
+}
+
+export function entitlementAfterPackageRemoval(entitlement, packageID, expected, changed) {
+  if (!changed) return entitlement || null;
+  if (packageID === entitlementPackageIDs.research) {
+    return entitlementWithoutPackage(entitlement, packageID, expected).entitlement;
+  }
+  return null;
 }
 
 async function persistedStripeEntitlementOwner(subscriptionID) {
@@ -12598,8 +12631,12 @@ function validateMutation(mutation, userID) {
   if (kind === "codeVersionClear" && !allowedCodeVersionClearScopes.has(String(record.values?.scope || ""))) {
     return validationError("Code-version clear mutations require a supported scope.");
   }
-  if (!Number.isFinite(mutationUpdatedAt(mutation))) {
+  const updatedAt = mutationUpdatedAt(mutation);
+  if (!Number.isFinite(updatedAt)) {
     return validationError("Mutation record is missing a valid updatedAt timestamp.");
+  }
+  if (updatedAt > Date.now() + maxSyncFutureClockSkewMilliseconds) {
+    return validationError("Mutation updatedAt is too far in the future.");
   }
   if (kind === "workboard") {
     return validateWorkboardRecord(record);
@@ -14454,14 +14491,20 @@ async function handleAppleTransactionVerify(request, response) {
   };
 
   if (!appleTransactionActive(payload)) {
-    const removed = await deletePersistedEntitlement(userID, {
+    const removalExpectation = {
       packageID,
       source: "appleSubscription",
       providerKey: "appleOriginalTransactionID",
       providerValue: originalTransactionID
-    });
+    };
+    const removed = await deletePersistedEntitlement(userID, removalExpectation);
     sendJSON(response, 200, {
-      entitlement: removed ? null : accountContext.entitlement || null,
+      entitlement: entitlementAfterPackageRemoval(
+        accountContext.entitlement,
+        packageID,
+        removalExpectation,
+        removed
+      ),
       transaction: { active: false }
     });
     return;

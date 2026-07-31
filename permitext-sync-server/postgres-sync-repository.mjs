@@ -620,7 +620,7 @@ export function createPostgresSyncRepository(sql) {
     let results;
     for (let attempt = 1; attempt <= 3; attempt += 1) {
       try {
-        results = await sql.transaction(queries, { isolationMode: "Serializable" });
+        results = await sql.transaction(queries, { isolationLevel: "Serializable" });
         break;
       } catch (error) {
         if (error?.code !== "40001" || attempt === 3) throw error;
@@ -661,7 +661,7 @@ export function createPostgresSyncRepository(sql) {
       sql`
         SELECT entitlement FROM permitext_entitlements WHERE user_id = ${userID} LIMIT 1
       `
-    ], { isolationMode: "RepeatableRead", readOnly: true });
+    ], { isolationLevel: "RepeatableRead", readOnly: true });
     return {
       acceptedMutationIDs,
       rejectedMutationIDs,
@@ -744,7 +744,7 @@ export function createPostgresSyncRepository(sql) {
       sql`
         SELECT entitlement FROM permitext_entitlements WHERE user_id = ${userID} LIMIT 1
       `
-    ], { isolationMode: "RepeatableRead", readOnly: true });
+    ], { isolationLevel: "RepeatableRead", readOnly: true });
 
     return {
       mutations: filteredRows.map((row) => mutationWithServerEventID(safeJSON(row.mutation, {}), row.server_event_id)),

@@ -3,6 +3,7 @@ import {
   applePackageIDForProductID,
   cancelStripeSubscriptionsForAccount,
   claimAppleTransactionOwner,
+  entitlementAfterPackageRemoval,
   sameOriginAbsoluteURL,
   stripeConfigurationStatus,
   stripePackageIDFromObject,
@@ -282,6 +283,33 @@ assert(
 assert(
   applePackageIDForProductID("com.randycodex.permitext.research.monthly") === "research",
   "The Research StoreKit product did not map to the Research Add-On."
+);
+
+const packagedAppleEntitlement = {
+  userID: "apple:billing-owner",
+  plan: "pro",
+  source: "appleSubscription",
+  provider: { appleOriginalTransactionID: "pro-original" },
+  addOns: {
+    research: {
+      source: "appleSubscription",
+      provider: { appleOriginalTransactionID: "research-original" }
+    }
+  }
+};
+const remainingApplePro = entitlementAfterPackageRemoval(
+  packagedAppleEntitlement,
+  "research",
+  {
+    source: "appleSubscription",
+    providerKey: "appleOriginalTransactionID",
+    providerValue: "research-original"
+  },
+  true
+);
+assert(
+  remainingApplePro?.plan === "pro" && !remainingApplePro.addOns?.research,
+  "Expiring the Apple Research add-on incorrectly reports that Pro was removed."
 );
 
 const xcodeTransaction = [
