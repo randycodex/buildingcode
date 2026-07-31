@@ -5,7 +5,7 @@ Audit date: 2026-07-31
 Repository: `Building Code`
 
 Starting commit: `ea2baf79f`
-Audit result: 35 supported findings; 23 fixed; 12 documented for architectural, product-policy, or external-infrastructure follow-up. All three Critical findings and 12 High findings were fixed. Five High findings remain blocked on schema/architecture work that cannot be safely validated in this checkout.
+Audit result: 36 supported findings; 24 fixed; 12 documented for architectural, product-policy, or external-infrastructure follow-up. All three Critical findings and 13 High findings were fixed. Five High findings remain blocked on schema/architecture work that cannot be safely validated in this checkout.
 
 ## 1. Architecture summary
 
@@ -214,13 +214,13 @@ The baseline Vite Notebook build exposed a destructive build defect: its `emptyO
 - **Tests and validation:** source/VM contract requires cursor use and checks offline behavior; check/smoke passed.
 - **Commit / residual risk:** `795415abb`. Search remains linear in installed records; a compact indexed projection is the next scaling step.
 
-### F-022 — Workboard JavaScript and CSS loaded for every web session
+### F-022 — Workboard JavaScript loaded for every web session
 
 - **Severity / area:** Medium, web startup performance.
-- **Root cause and impact:** global idle preload fetched the Workboard graph and `index.html` always loaded its large CSS, even when the user never opened Workboard.
-- **Correction / files:** `public/app.js` loads both on first Workboard intent; `public/index.html` no longer includes the unconditional stylesheet.
-- **Tests and validation:** smoke asserts lazy CSS injection and absence from the initial shell; production Vite build passed.
-- **Commit / residual risk:** `795415abb`. First Workboard open pays the deferred download; route-level prefetch can be considered with field telemetry.
+- **Root cause and impact:** global idle preload fetched the Workboard JavaScript graph even when the user never opened Workboard.
+- **Correction / files:** `public/app.js` loads the JavaScript module on first Workboard intent. The initial attempt also deferred CSS, but that was reverted by F-024 because immutable `app.js` caching made mixed-version clients unsafe.
+- **Tests and validation:** smoke asserts the module remains deferred and the cache-safe stylesheet is present in the shell; production Vite build passed.
+- **Commit / residual risk:** `795415abb`, corrected by `54004c898`. First Workboard open pays the deferred JavaScript download; CSS remains an initial-shell cost.
 
 ### F-023 — Public search used an unbounded plaintext cache and oversized defaults
 
@@ -230,6 +230,14 @@ The baseline Vite Notebook build exposed a destructive build defect: its `emptyO
 - **Tests and validation:** backend performance contract verifies LRU recency/eviction; check/smoke passed.
 - **Commit / residual risk:** `8d4410317`. Offset remains available and unwindowed chapter-body calls still deserve production traffic/rate-limit telemetry.
 
+### F-024 — Mixed cached assets rendered Workboard without Excalidraw styles
+
+- **Severity / area:** High, web deployment/cache reliability.
+- **Root cause and impact:** F-022 removed the static stylesheet and added an on-demand loader inside `app.js`, but `index.html` retained the same one-year immutable `app.js?v=20260731-topbar-pills-v259` URL. An existing browser could combine new HTML without CSS and old cached JavaScript without the loader, producing an unstyled 33,554,432-pixel-tall canvas with oversized toolbar icons.
+- **Correction / files:** `public/index.html` restores the Workboard stylesheet to the initial shell; `public/service-worker.js` precaches it under shell generation v224; `public/offline-storage.js` uses the same generation.
+- **Tests and validation:** smoke now requires the stylesheet in served HTML, the offline contract requires matching shell generations, the local server returned the CSS with HTTP 200, and full `npm run check`/`smoke` passed.
+- **Commit / residual risk:** `54004c898`. Workboard CSS is again an eager transfer, deliberately trading approximately 106 kB gzip for deterministic rendering across cached client generations.
+
 The audit also removed the baseline iOS unnecessary-`await` warning while touching the relevant transaction-observer path.
 
 ## 4. Performance improvements
@@ -238,7 +246,7 @@ The audit also removed the baseline iOS unnecessary-`await` warning while touchi
 | --- | --- | --- | --- | --- |
 | Section lookup | Rebuilt a >18k-entry map; 250 sequential lookups averaged 3.873 ms/request. | Cache immutable combined catalog. | 1.612 ms/request, approximately 58.4% lower request time in the same benchmark. Work becomes O(1) lookup after one process-level build. | Cold build remains. |
 | PostgreSQL sync push | Six statements in the write transaction plus two final reads. | Remove duplicated cursor/entitlement reads. | Four write statements plus two authoritative final reads, a 25% reduction in statements for the measured standard push shape. | No live DB latency/query plan without credentials. |
-| Web initial Workboard cost | Every session could fetch a 470,040-byte gzip JS graph at idle and always fetched 106,251-byte gzip CSS. | Lazy-load JS and CSS on Workboard intent. | Initial Workboard-specific transfer is zero for sessions that never open it. Built entry remains about 267.35 kB gzip; dependency chunk remains large but deferred. | First-open cost remains; deeper Excalidraw splitting is upstream-constrained. |
+| Web initial Workboard cost | Every session could fetch a 470,040-byte gzip JS graph at idle and fetched 106,251-byte gzip CSS. | Lazy-load the JavaScript graph; retain CSS in the shell for cache-version safety. | Sessions that never open Workboard avoid the JavaScript graph. The approximately 106 kB gzip stylesheet remains eager after F-024. | First-open JS cost and initial CSS cost remain; deeper Excalidraw splitting is upstream-constrained. |
 | Offline search heap | `getAll` materialized 22,789 full records; source corpus measured 119,424,632 raw bytes before JS object overhead. | Cursor scan and compact result summaries. | No longer retains the full record set; memory grows mainly with result count rather than corpus size. | Runtime remains linear; browser heap was not directly profiled. |
 | Public search memory/response | Unlimited successful body cache, default 250 results, unbounded query string. | 2,000-entry LRU, default 25, 200-character query maximum. | Cache is O(2,000) instead of O(all touched sections); default response work is one tenth of baseline. | Public traffic telemetry and route-level rate limits remain advisable. |
 | Offline asset churn | Shell version changes deleted code figures regardless of content version. | Stable asset-version cache. | Shell deployments no longer force figure re-download or leave a false installed state. | Browser quota eviction remains outside application control. |
@@ -369,8 +377,10 @@ Validation not completed:
 4. `f293a194f` — Harden iOS entitlement and sync recovery
 5. `8d4410317` — Harden server transaction and entitlement handling
 6. `795415abb` — Protect web drafts and offline recovery
+7. `cda3a986e` — Document Permitext reliability audit
+8. `54004c898` — Restore cache-safe Workboard styling
 
-The report itself is committed separately after final verification.
+This report update is committed separately after the Workboard regression repair.
 
 ### Grouped file summary
 
@@ -381,11 +391,11 @@ The report itself is committed separately after final verification.
 
 ## Completion summary
 
-- **Total supported issues found:** 35
-- **Total fixed:** 23
+- **Total supported issues found:** 36
+- **Total fixed:** 24
 - **Critical fixed:** 3 of 3
-- **High fixed:** 12
-- **Critical and High fixed:** 15
+- **High fixed:** 13
+- **Critical and High fixed:** 16
 - **Unresolved:** 12, including five High items requiring durable schema/API/concurrency work
 
-The repository is locally six implementation commits ahead of the starting branch before this report commit. No push or deployment was performed, and unrelated untracked user files were preserved.
+The original audit commits through `cda3a986e` were pushed to `origin/main`. The Workboard repair `54004c898` and this report update are local until explicitly pushed; no production deployment of the repair is claimed. Unrelated untracked user files were preserved.
