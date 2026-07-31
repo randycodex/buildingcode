@@ -164,6 +164,7 @@ const evaluationReviewsPath = join(evaluationRootPath, "reviews.json");
 const defaultSyncCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const defaultResearchCodeEdition = "2022 New York City Construction Codes";
 const maxSyncMutationsPerBatch = 100;
+const maxSyncRecordIDCharacters = 512;
 const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
@@ -12419,7 +12420,7 @@ async function canonicalizeMutationBatch(mutations) {
     const recordID = mutationRecordID(mutation);
     if (!recordID) return;
     const sourceRecordID = mutationRecordID(source[index]);
-    if (sourceRecordID && sourceRecordID !== recordID) {
+    if (typeof sourceRecordID === "string" && sourceRecordID !== recordID) {
       const aliases = aliasesByCanonicalID.get(recordID) || new Set();
       aliases.add(sourceRecordID);
       aliasesByCanonicalID.set(recordID, aliases);
@@ -12572,8 +12573,27 @@ function validateMutation(mutation, userID) {
   if (record.userID !== userID) {
     return validationError("Mutation userID must match the authenticated user.");
   }
-  if (!mutationRecordID(mutation)) {
+  const computedRecordID = mutationRecordID(mutation);
+  if (!computedRecordID) {
     return validationError("Mutation record is missing a stable ID.");
+  }
+  if (
+    kind !== "continuity" &&
+    kind !== "codeVersionClear" &&
+    (
+      typeof record.id !== "string" ||
+      !record.id.trim() ||
+      record.id.length > maxSyncRecordIDCharacters
+    )
+  ) {
+    return validationError(
+      `Mutation record IDs must be non-empty strings up to ${maxSyncRecordIDCharacters} characters.`
+    );
+  }
+  if (typeof computedRecordID !== "string" || computedRecordID.length > maxSyncRecordIDCharacters) {
+    return validationError(
+      `Mutation record IDs must be non-empty strings up to ${maxSyncRecordIDCharacters} characters.`
+    );
   }
   if (kind === "codeVersionClear" && !allowedCodeVersionClearScopes.has(String(record.values?.scope || ""))) {
     return validationError("Code-version clear mutations require a supported scope.");
@@ -13862,7 +13882,14 @@ async function handlePush(request, response) {
     return;
   }
 
-  const canonicalizedBatch = await canonicalizeMutationBatch(body.batch?.mutations || []);
+  const submittedMutations = body.batch?.mutations || [];
+  const submittedValidation = validateMutations(submittedMutations, userID);
+  if (!submittedValidation.ok) {
+    sendError(response, 400, submittedValidation.message);
+    return;
+  }
+
+  const canonicalizedBatch = await canonicalizeMutationBatch(submittedMutations);
   const incoming = canonicalizedBatch.mutations;
   const validation = validateMutations(incoming, userID);
   if (!validation.ok) {

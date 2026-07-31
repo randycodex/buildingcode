@@ -6328,6 +6328,32 @@ async function main() {
     });
     assert(malformedPush.response.status === 400, "Push accepted an unsupported mutation kind.");
 
+    for (const invalidID of [{}, [], 123, "x".repeat(513)]) {
+      const invalidRecordIDPush = await request("/sync/push", {
+        method: "POST",
+        token: currentSmokeUserToken,
+        body: {
+          auth: { accountUserID: userID },
+          batch: {
+            user: { id: userID },
+            mutations: [{
+              savedItem: {
+                id: invalidID,
+                userID,
+                codeVersion: defaultSyncCodeVersion,
+                sectionID: 1,
+                updatedAt: "2026-06-04T00:00:00Z"
+              }
+            }]
+          }
+        }
+      });
+      assert(
+        invalidRecordIDPush.response.status === 400,
+        `Push accepted malformed record ID ${JSON.stringify(invalidID)}.`
+      );
+    }
+
     const oversizedPush = await request("/sync/push", {
       method: "POST",
       token: currentSmokeUserToken,
