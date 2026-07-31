@@ -23,7 +23,7 @@
   display: flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-2, 10px);
 }
 
 .permitext-workboard-save-state {
@@ -32,41 +32,16 @@
   white-space: nowrap;
 }
 
-.permitext-workboard-zoom-controls {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-  padding: 2px;
-  border: 1px solid var(--border, #d9d9dc);
-  border-radius: 999px;
-  background: var(--surface-raised, #fff);
-}
-
-.permitext-workboard-header .permitext-workboard-zoom-controls button {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  font-size: 17px;
-  line-height: 1;
-}
-
-.permitext-workboard-header .permitext-workboard-zoom-controls button[aria-label="Reset zoom"] {
-  width: 44px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-}
-
 .permitext-workboard-header button {
   display: grid;
-  width: 30px;
-  height: 30px;
+  width: var(--panel-title-control-size, 18px);
+  height: var(--panel-title-control-size, 18px);
   place-items: center;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 0;
   background: transparent;
-  color: inherit;
+  color: var(--text-secondary, #8f8f96);
 }
 
 .permitext-workboard-header button:hover,
@@ -75,8 +50,8 @@
 }
 
 .permitext-workboard-header button svg {
-  width: 22px;
-  height: 22px;
+  width: var(--panel-title-icon-size, 16px);
+  height: var(--panel-title-icon-size, 16px);
 }
 
 .permitext-workboard-canvas {

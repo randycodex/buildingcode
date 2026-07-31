@@ -191,7 +191,6 @@ function Workboard({
   const [boardView, setBoardView] = useState(null);
   const [elementCount, setElementCount] = useState(0);
   const [status, setStatus] = useState("Loading…");
-  const [zoomPercent, setZoomPercent] = useState(100);
   const changeTimer = useRef(null);
   const saveTimer = useRef(null);
   const pendingScene = useRef(null);
@@ -215,28 +214,8 @@ function Workboard({
   const captureExcalidrawAPI = useCallback((api) => {
     excalidrawAPI.current = api;
     api.toggleSidebar({ name: null, force: false });
-    setZoomPercent(Math.round(api.getAppState().zoom.value * 100));
     refreshCanvasOrigin();
   }, [refreshCanvasOrigin]);
-
-  const setWorkboardZoom = useCallback((requestedZoom) => {
-    const api = excalidrawAPI.current;
-    if (!api) return;
-    const appState = api.getAppState();
-    const currentZoom = appState.zoom.value;
-    const nextZoom = Math.max(0.1, Math.min(30, Math.round(requestedZoom * 10) / 10));
-    if (nextZoom === currentZoom) return;
-    const appLayerX = appState.width / 2;
-    const appLayerY = appState.height / 2;
-    api.updateScene({
-      appState: {
-        scrollX: appState.scrollX + (appLayerX - appLayerX / currentZoom) - (appLayerX - appLayerX / nextZoom),
-        scrollY: appState.scrollY + (appLayerY - appLayerY / currentZoom) - (appLayerY - appLayerY / nextZoom),
-        zoom: { value: nextZoom }
-      }
-    });
-    setZoomPercent(Math.round(nextZoom * 100));
-  }, []);
 
   const flushSave = useCallback(async () => {
     window.clearTimeout(saveTimer.current);
@@ -423,7 +402,6 @@ function Workboard({
 
   const handleChange = useCallback((elements, appState, files) => {
     if (!boardView || boardView.projectID !== projectID) return;
-    setZoomPercent(Math.round(appState.zoom.value * 100));
     if (ignoreInitialChange.current) {
       ignoreInitialChange.current = false;
       lastChangeSignature.current = boardChangeSignature(elements, appState, files);
@@ -440,23 +418,6 @@ function Workboard({
       <header className="permitext-workboard-header">
         <div className="permitext-workboard-header-actions">
           <span className="permitext-workboard-save-state" role="status">{status}</span>
-          <div className="permitext-workboard-zoom-controls" aria-label="Workboard zoom controls">
-            <button
-              type="button"
-              onClick={() => setWorkboardZoom((excalidrawAPI.current?.getAppState().zoom.value || 1) - 0.1)}
-              aria-label="Zoom out"
-              title="Zoom out"
-            >−</button>
-            <button type="button" onClick={() => setWorkboardZoom(1)} aria-label="Reset zoom" title="Reset zoom">
-              {zoomPercent}%
-            </button>
-            <button
-              type="button"
-              onClick={() => setWorkboardZoom((excalidrawAPI.current?.getAppState().zoom.value || 1) + 0.1)}
-              aria-label="Zoom in"
-              title="Zoom in"
-            >+</button>
-          </div>
           {onDetach ? (
             <button type="button" onClick={onDetach} aria-label={detachLabel} title={detachLabel}>
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

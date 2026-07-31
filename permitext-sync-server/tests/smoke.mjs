@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-notebook-cards-v233'),
+        webRoot.text.includes('/web/app.js?v=20260731-workboard-header-v234'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1132,7 +1132,7 @@ async function main() {
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
         workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-notebook-cards-v233'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workboard-header-v234'),
       "The Saved Projects and Notebook Project notes pills no longer preserve their compact card-grid behavior."
     );
     assert(
@@ -1343,7 +1343,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-notebook-cards-v233'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workboard-header-v234'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2263,8 +2263,8 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260731-project-workspace-v19";') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-project-workspace-v59'),
+      workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-header-v20";') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-header-v60'),
       "Web workspace omitted the current Workboard preview assets."
     );
     assert(
@@ -2297,11 +2297,12 @@ async function main() {
       "Workboard wheel panning guard no longer preserves trackpad and modified-wheel zoom gestures."
     );
     assert(
-      workboardSource.includes("const setWorkboardZoom = useCallback") &&
-        workboardSource.includes('aria-label="Zoom out"') &&
-        workboardSource.includes('aria-label="Reset zoom"') &&
-        workboardSource.includes('aria-label="Zoom in"'),
-      "Workboard omitted its compact zoom controls."
+      !workboardSource.includes("permitext-workboard-zoom-controls") &&
+        !workboardSource.includes('aria-label="Reset zoom"') &&
+        workboardStyleSource.includes("width: var(--panel-title-control-size, 18px);") &&
+        workboardStyleSource.includes("color: var(--text-secondary, #8f8f96);") &&
+        workboardStyleSource.includes("width: var(--panel-title-icon-size, 16px);"),
+      "Workboard header controls no longer match the shared workspace icon metrics."
     );
     assert(
       workboardSource.includes("exportToBlob") &&
