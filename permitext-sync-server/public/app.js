@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-activity-row-v250";
+} from "./offline-storage.js?v=20260731-project-empty-copy-v251";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -48,7 +48,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260731-workboard-header-v20";
+const workboardClientVersion = "20260731-workboard-status-v21";
 const notebookClientVersion = "20260724-project-notebook-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -13430,12 +13430,7 @@ function appendProjectResearchHistory(content, identity, foundation) {
 
   const answers = [...(foundation?.researchAnswers || [])]
     .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
-  if (!answers.length) {
-    const empty = document.createElement("p");
-    empty.className = "project-studio-empty";
-    empty.textContent = "No immutable Research answers are linked to this Project yet.";
-    section.append(empty);
-  } else {
+  if (answers.length) {
     answers.slice(0, 8).forEach((answer) => {
       const card = document.createElement(identity.sharedOnly ? "article" : "button");
       card.className = "project-research-history-card";
@@ -13744,12 +13739,6 @@ function appendProjectNotes(content, identity, foundation) {
   title.addEventListener("click", toggleExpanded);
   toggle.addEventListener("click", toggleExpanded);
   section.append(heading, body);
-  if (!notes.length) {
-    const empty = document.createElement("p");
-    empty.className = "project-studio-empty";
-    empty.textContent = "No standalone Project notes have been recorded yet.";
-    body.append(empty);
-  }
   notes.slice(0, 12).forEach((note) => {
     const card = document.createElement("article");
     card.className = "project-collaboration-card project-note-card";
@@ -13947,13 +13936,6 @@ function appendProjectReviewThreads(content, identity, foundation) {
   }
   heading.append(title, requestActions);
   section.append(heading, editorSlot);
-  if (!threads.length) {
-    const empty = document.createElement("p");
-    empty.className = "project-studio-empty";
-    empty.textContent = "No revision or missing-information requests are open.";
-    section.append(empty);
-  }
-
   threads.forEach((thread) => {
     const card = document.createElement("article");
     card.className = `project-collaboration-card project-review-thread is-${thread.status}`;
@@ -14500,13 +14482,6 @@ async function renderProjectDetail(detail) {
     });
     savedSection.append(codeGroup);
   });
-  if (!previewItems.length) {
-    const empty = document.createElement("p");
-    empty.className = "project-studio-empty";
-    empty.textContent = "No enacted code sections are linked to this Project yet.";
-    savedSection.append(empty);
-  }
-
   backButton.addEventListener("click", async () => {
     if (detachedProjectWindow) {
       window.close();

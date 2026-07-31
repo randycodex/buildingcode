@@ -340,7 +340,7 @@ function Workboard({
           setStatus("Syncing…");
           void flushSave();
         } else {
-          setStatus(board ? "Saved locally" : "New local board");
+          setStatus(board ? "Saved locally" : "");
         }
       })
       .catch((error) => {
@@ -417,7 +417,7 @@ function Workboard({
     <section className="permitext-workboard" data-element-count={elementCount}>
       <header className="permitext-workboard-header">
         <div className="permitext-workboard-header-actions">
-          <span className="permitext-workboard-save-state" role="status">{status}</span>
+          {status ? <span className="permitext-workboard-save-state" role="status">{status}</span> : null}
           {onDetach ? (
             <button type="button" onClick={onDetach} aria-label={detachLabel} title={detachLabel}>
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

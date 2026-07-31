@@ -657,6 +657,10 @@ async function main() {
         workspaceStyles.text.includes(".project-studio-activity li:first-child") &&
         workspaceStyles.text.includes(".project-studio-activity li {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes("font-size: 10px !important;\n  text-align: right;\n  white-space: nowrap;") &&
+        !workspaceScript.text.includes("No enacted code sections are linked to this Project yet.") &&
+        !workspaceScript.text.includes("No standalone Project notes have been recorded yet.") &&
+        !workspaceScript.text.includes("No immutable Research answers are linked to this Project yet.") &&
+        !workspaceScript.text.includes("No revision or missing-information requests are open.") &&
         workspaceScript.text.includes('headingActions.className = "project-notes-heading-actions"') &&
         workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project notes`)') &&
         workspaceScript.text.includes("meta.textContent = researchRelativeDate(note.updatedAt)") &&
@@ -695,8 +699,7 @@ async function main() {
         !workspaceScript.text.includes('title.textContent = "Notebook"') &&
         !workspaceStyles.text.includes(".notebook-eyebrow") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);\n  align-items: flex-start;\n  justify-content: flex-end;") &&
-        workspaceScript.text.includes("cardType: cardAtStart.cardType") &&
-        workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
+        workspaceScript.text.includes("cardType: cardAtStart.cardType"),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
     );
     assert(
@@ -1103,7 +1106,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-activity-row-v250'),
+        webRoot.text.includes('/web/app.js?v=20260731-project-empty-copy-v251'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1157,7 +1160,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-activity-row-v250'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-empty-copy-v251'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1368,7 +1371,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-activity-row-v250'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-empty-copy-v251'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2287,7 +2290,7 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-header-v20";') &&
+      workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-status-v21";') &&
         webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
       "Web workspace omitted the current Workboard preview assets."
     );
@@ -2323,6 +2326,8 @@ async function main() {
     assert(
       !workboardSource.includes("permitext-workboard-zoom-controls") &&
         !workboardSource.includes('aria-label="Reset zoom"') &&
+        !workboardSource.includes("New local board") &&
+        workboardSource.includes('status ? <span className="permitext-workboard-save-state"') &&
         workboardStyleSource.includes("width: var(--panel-title-control-size, 18px);") &&
         workboardStyleSource.includes("color: var(--text-secondary, #8f8f96);") &&
         workboardStyleSource.includes("width: var(--panel-title-icon-size, 16px);") &&
