@@ -439,7 +439,6 @@ function Workboard({
     <section className="permitext-workboard" data-element-count={elementCount}>
       <header className="permitext-workboard-header">
         <div>
-          <p>Project Workboard</p>
           <h2>{projectName}</h2>
         </div>
         <div className="permitext-workboard-header-actions">

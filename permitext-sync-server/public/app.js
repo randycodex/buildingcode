@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v225";
+} from "./offline-storage.js?v=20260731-reader-trust-v226";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -48,7 +48,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260724-workboard-preview-v17";
+const workboardClientVersion = "20260731-project-workspace-v18";
 const notebookClientVersion = "20260724-project-notebook-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -1639,6 +1639,15 @@ function defaultActivePaneIDs() {
   return ids;
 }
 
+function projectWorkspacePaneIDs(detail) {
+  return [
+    paneIDForProjectDetail(detail),
+    ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
+    ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
+    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+  ];
+}
+
 function activePaneIDs() {
   const ids = defaultActivePaneIDs();
   const active = new Set(ids);
@@ -1654,12 +1663,7 @@ function activePaneIDs() {
     !isProjectWorkboardPaneID(id)
   );
   if (openProjectDetails().length) {
-    const detailIDs = openProjectDetails().flatMap((detail) => [
-      paneIDForProjectDetail(detail),
-      ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
-      ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
-      ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
-    ]);
+    const detailIDs = openProjectDetails().flatMap(projectWorkspacePaneIDs);
     const firstDetailIndex = ordered.findIndex((id) => detailIDs.includes(id));
     const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] : "";
     const projectAnchorID = paired.includes(orderedAnchorID)
@@ -17851,12 +17855,7 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   ) {
     return [
       primarySavedPaneID(),
-      ...openProjectDetails().flatMap((detail) => [
-        paneIDForProjectDetail(detail),
-        ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
-        ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
-        ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
-      ]),
+      ...openProjectDetails().flatMap(projectWorkspacePaneIDs),
       "utility:archive"
     ].filter((id) => active.has(id));
   }

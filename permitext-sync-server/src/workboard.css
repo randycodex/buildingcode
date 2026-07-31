@@ -20,21 +20,11 @@
   background: color-mix(in srgb, var(--surface-raised, #fff) 94%, var(--project-color, #c96410));
 }
 
-.permitext-workboard-header p,
 .permitext-workboard-header h2 {
   margin: 0;
 }
 
-.permitext-workboard-header p {
-  color: var(--text-secondary, #63666a);
-  font-size: 10px !important;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
 .permitext-workboard-header h2 {
-  margin-top: 3px;
   overflow: hidden;
   font-size: 15px !important;
   font-weight: 600;

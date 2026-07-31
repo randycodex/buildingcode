@@ -1084,7 +1084,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v225'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v226'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1121,7 +1121,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v225'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v226'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1332,7 +1332,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v225'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v226'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2252,8 +2252,8 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260724-workboard-preview-v17";') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57'),
+      workspaceScript.text.includes('const workboardClientVersion = "20260731-project-workspace-v18";') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-project-workspace-v58'),
       "Web workspace omitted the current Workboard preview assets."
     );
     assert(
@@ -2269,6 +2269,13 @@ async function main() {
         workboardSource.includes('mediaQuery.addEventListener("change", updateTheme)') &&
         workboardSource.includes("theme={theme}"),
       "Workboard no longer follows live system appearance changes."
+    );
+    assert(
+      !workboardSource.includes("<p>Project Workboard</p>") &&
+        workboardSource.includes("<h2>{projectName}</h2>") &&
+        workspaceScript.text.includes("function projectWorkspacePaneIDs(detail)") &&
+        workspaceScript.text.includes("...openProjectDetails().flatMap(projectWorkspacePaneIDs)"),
+      "Workboard should use the Project name only and move with the Project workspace panes."
     );
     assert(
       workboardSource.includes("const preventWheelPanning = (event) =>") &&
