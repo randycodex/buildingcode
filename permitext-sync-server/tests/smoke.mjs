@@ -475,6 +475,9 @@ async function main() {
         workspaceScript.text.includes("localStorage.setItem(toolbarOrderKey") &&
         workspaceScript.text.includes("function renderWorkspaceTabs()") &&
         workspaceScript.text.includes("async function switchWorkspace") &&
+        workspaceScript.text.includes("function startPaneEdgeResize(event, paneID)") &&
+        workspaceScript.text.includes('createDivider(lastPaneID, "")') &&
+        workspaceScript.text.includes('"Resize right edge of last column"') &&
         workspaceScript.text.includes("function renderWorkspaceTransitionState") &&
         workspaceScript.text.includes('track.setAttribute("aria-busy", "true")') &&
         workspaceScript.text.includes("await waitForWorkspaceTransitionPaint()") &&
@@ -490,6 +493,7 @@ async function main() {
         workspaceStyles.text.match(/\.workspace-tab:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
+        workspaceStyles.text.includes(".pane-edge-resizer {") &&
         workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
         workspaceStateScript.text.includes("export function emptyWorkspaceLayout()") &&
         workspaceStateScript.text.includes("export function duplicateWorkspace"),
@@ -1160,7 +1164,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-smooth-project-mode-v271'),
+        webRoot.text.includes('/web/app.js?v=20260731-right-edge-resize-v273'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1225,7 +1229,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-smooth-project-mode-v271'),
+        webRoot.text.includes('/web/styles.css?v=20260731-right-edge-resize-v273'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1436,7 +1440,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-smooth-project-mode-v271'),
+        webRoot.text.includes('/web/styles.css?v=20260731-right-edge-resize-v273'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

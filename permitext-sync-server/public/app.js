@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-smooth-project-mode-v271";
+} from "./offline-storage.js?v=20260731-right-edge-resize-v273";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18457,12 +18457,26 @@ function wireReaderFontFamilyControl(panel) {
 function createDivider(previousPaneID, nextPaneID) {
   const divider = document.createElement("div");
   divider.className = "pane-divider";
+  if (!nextPaneID) divider.classList.add("pane-edge-resizer");
   divider.dataset.previousPaneId = previousPaneID;
-  divider.dataset.nextPaneId = nextPaneID;
+  divider.dataset.nextPaneId = nextPaneID || "";
   divider.role = "separator";
   divider.tabIndex = 0;
   divider.setAttribute("aria-orientation", "vertical");
-  divider.addEventListener("pointerdown", (event) => startPaneResize(event, previousPaneID, nextPaneID));
+  divider.setAttribute("aria-label", nextPaneID ? "Resize adjacent columns" : "Resize right edge of last column");
+  if (!nextPaneID) {
+    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(previousPaneID))));
+    divider.addEventListener("keydown", (event) => {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      event.preventDefault();
+      const step = event.shiftKey ? 80 : 24;
+      resizePaneEdgeBy(previousPaneID, event.key === "ArrowRight" ? step : -step, divider);
+    });
+  }
+  divider.addEventListener("pointerdown", (event) => {
+    if (nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
+    else startPaneEdgeResize(event, previousPaneID);
+  });
   divider.addEventListener("dblclick", () => resetDividerPanes(previousPaneID, nextPaneID));
   return divider;
 }
@@ -18725,6 +18739,78 @@ function startPaneResize(event, previousPaneID, nextPaneID) {
   window.addEventListener("pointercancel", onUp, { once: true });
 }
 
+function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
+  const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!pane) return;
+  const minWidth = defaultPaneWidthForID(paneID);
+  const currentWidth = pane.getBoundingClientRect().width;
+  const nextWidth = Math.max(minWidth, currentWidth + delta);
+  state.paneWeights[paneID] = nextWidth;
+  applyPaneWeight(pane, paneID);
+  resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
+  notifyWorkspaceLayoutChange();
+  saveWorkspaceState();
+}
+
+function startPaneEdgeResize(event, paneID) {
+  const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  if (!pane) return;
+
+  event.preventDefault();
+  const resizeHandle = event.currentTarget;
+  resizeHandle?.setPointerCapture?.(event.pointerId);
+  track.classList.add("is-resizing");
+  const startX = event.clientX;
+  const startWidth = pane.getBoundingClientRect().width;
+  const minWidth = defaultPaneWidthForID(paneID);
+  let pendingClientX = startX;
+  let resizeFrame = null;
+  let lastAppliedWidth = startWidth;
+
+  const applyResizeAt = (clientX) => {
+    const nextWidth = Math.max(minWidth, startWidth + clientX - startX);
+    if (Math.abs(nextWidth - lastAppliedWidth) < 0.25) return;
+    state.paneWeights[paneID] = nextWidth;
+    applyPaneWeight(pane, paneID);
+    resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
+    lastAppliedWidth = nextWidth;
+    const handleRect = resizeHandle.getBoundingClientRect();
+    const trackRect = track.getBoundingClientRect();
+    const overflow = handleRect.right - trackRect.right;
+    if (overflow > 0) track.scrollLeft = Math.min(track.scrollLeft + overflow, track.scrollWidth - track.clientWidth);
+    scheduleVisibleReaderScrollIndicatorUpdates();
+  };
+
+  const applyPendingResize = () => {
+    resizeFrame = null;
+    applyResizeAt(pendingClientX);
+  };
+
+  const onMove = (moveEvent) => {
+    pendingClientX = moveEvent.clientX;
+    if (resizeFrame === null) resizeFrame = window.requestAnimationFrame(applyPendingResize);
+  };
+
+  const onUp = (upEvent) => {
+    window.removeEventListener("pointermove", onMove);
+    window.removeEventListener("pointerup", onUp);
+    window.removeEventListener("pointercancel", onUp);
+    if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+    pendingClientX = Number.isFinite(upEvent.clientX) ? upEvent.clientX : pendingClientX;
+    applyResizeAt(pendingClientX);
+    if (resizeHandle?.hasPointerCapture?.(upEvent.pointerId)) {
+      resizeHandle.releasePointerCapture(upEvent.pointerId);
+    }
+    track.classList.remove("is-resizing");
+    notifyWorkspaceLayoutChange();
+    saveWorkspaceState();
+  };
+
+  window.addEventListener("pointermove", onMove);
+  window.addEventListener("pointerup", onUp, { once: true });
+  window.addEventListener("pointercancel", onUp, { once: true });
+}
+
 function notifyWorkspaceLayoutChange() {
   track.dispatchEvent(new Event("permitext:workspace-layout-change"));
 }
@@ -18753,6 +18839,11 @@ function appendPaneSequence(panes) {
     }
     nodes.push(pane);
   });
+  if (orderedPanes.length) {
+    const lastPaneID = orderedPanes.at(-1).dataset.paneId;
+    const edgeResizer = existingDividers.get(dividerKey(lastPaneID, "")) || createDivider(lastPaneID, "");
+    nodes.push(edgeResizer);
+  }
   if (!orderedPanes.length && !detachedProjectWindow) {
     const emptyState = track.querySelector(":scope > .workspace-empty-state") || document.createElement("section");
     emptyState.className = "workspace-empty-state";
@@ -18772,6 +18863,11 @@ function appendPaneSequence(panes) {
     const currentNode = track.children[index] || null;
     if (currentNode !== node) track.insertBefore(node, currentNode);
   });
+  const edgeResizer = track.querySelector(":scope > .pane-edge-resizer");
+  const lastPane = orderedPanes.at(-1);
+  if (edgeResizer && lastPane) {
+    edgeResizer.setAttribute("aria-valuenow", String(Math.round(lastPane.getBoundingClientRect().width)));
+  }
   const activeSelectMenus = new Set(
     Array.from(track.querySelectorAll("select.native-select-hidden"))
       .map((select) => select._customSelectMenu)

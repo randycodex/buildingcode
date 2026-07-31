@@ -1249,6 +1249,10 @@ body.is-detached-workboard-window .detached-workboard-error p {
   background: transparent;
 }
 
+.pane-edge-resizer {
+  z-index: 13;
+}
+
 .panel-header {
   display: flex;
   align-items: start;
