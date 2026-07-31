@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-section-counts-v277";
+} from "./offline-storage.js?v=20260731-project-derived-colors-v278";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -80,7 +80,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260731-workboard-status-v21";
+const workboardClientVersion = "20260731-project-tone-v22";
 const notebookClientVersion = "20260724-project-notebook-v4";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -1266,7 +1266,7 @@ function loadWorkboardStyles() {
     }
     const link = existing || document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61";
+    link.href = "/web/workboard-assets/workboard.css?v=20260731-project-tone-v62";
     link.dataset.permitextWorkboardStyles = "true";
     link.addEventListener("load", resolve, { once: true });
     link.addEventListener("error", () => {
@@ -2551,6 +2551,9 @@ function refreshOpenProjectPaneTheme(project) {
       .querySelectorAll(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`)
       .forEach((panel) => panel.style.setProperty("--project-color", color));
   });
+  track
+    .querySelectorAll(`.workspace-panel[data-project-id="${CSS.escape(projectDetailKey(identity))}"]`)
+    .forEach((panel) => panel.style.setProperty("--project-color", color));
 }
 
 function syncSavedArchiveButtonStates() {
@@ -10122,6 +10125,18 @@ function researchProjectName(projectID) {
   return project ? readableProjectName(project) : "Unassigned";
 }
 
+function applyProjectDerivedPaneTheme(panel, projectID) {
+  const normalizedProjectID = String(projectID || "");
+  if (!normalizedProjectID) return false;
+  const project = visibleProjectRecords(currentContentSummary().projects || [])
+    .find((item) => researchProjectID(item) === normalizedProjectID);
+  if (!project) return false;
+  panel.classList.add("project-derived-panel");
+  panel.dataset.projectId = normalizedProjectID;
+  panel.style.setProperty("--project-color", projectColor(project));
+  return true;
+}
+
 function preferredResearchProjectID(conversation = activeResearchConversation) {
   if (conversation?.primaryProjectID) return conversation.primaryProjectID;
   const projects = researchProjects();
@@ -10710,6 +10725,7 @@ function renderEvidenceDiscovery(container) {
 async function renderResearch(paneID = "utility:analysis") {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
+  applyProjectDerivedPaneTheme(panel, preferredResearchProjectID());
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const content = panel.querySelector(".analysis-content");
 
@@ -11494,6 +11510,7 @@ async function renderResearchConversation(conversationID) {
   }
 
   const conversation = activeResearchConversation;
+  applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID);
   panelTitle.textContent = conversation.title;
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
   const evidencePane = document.createElement("section");

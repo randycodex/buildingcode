@@ -744,6 +744,12 @@ async function main() {
         workspaceScript.text.includes('fetch("/reports/files/read"') &&
         workspaceScript.text.includes("function refreshOpenProjectPaneTheme(project)") &&
         workspaceScript.text.includes('.forEach((panel) => panel.style.setProperty("--project-color", color))') &&
+        workspaceScript.text.includes("function applyProjectDerivedPaneTheme(panel, projectID)") &&
+        workspaceScript.text.includes('panel.classList.add("project-derived-panel")') &&
+        workspaceScript.text.includes("applyProjectDerivedPaneTheme(panel, preferredResearchProjectID())") &&
+        workspaceScript.text.includes("applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID)") &&
+        workspaceStyles.text.includes(".analysis-panel.project-derived-panel,\n.research-conversation-panel.project-derived-panel {") &&
+        workspaceStyles.text.includes("background: color-mix(in srgb, var(--project-color) 8%, var(--surface-raised));") &&
         workspaceScript.text.includes("refreshOpenProjectPaneTheme(updated)") &&
         workspaceScript.text.includes("function scheduleNotebookAutosave") &&
         workspaceScript.text.includes("flushNotebookAutosave = async () =>") &&
@@ -1172,7 +1178,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-section-counts-v277'),
+        webRoot.text.includes('/web/app.js?v=20260731-project-derived-colors-v278'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1241,7 +1247,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-section-counts-v277'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-derived-colors-v278'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1452,7 +1458,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-section-counts-v277'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-derived-colors-v278'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2374,9 +2380,9 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-status-v21";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
+      workspaceScript.text.includes('const workboardClientVersion = "20260731-project-tone-v22";') &&
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260731-project-tone-v62"') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-project-tone-v62'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(
@@ -2438,6 +2444,11 @@ async function main() {
       workboardStyleSource.includes("--color-surface-primary-container:") &&
         workboardStyleSource.includes("--color-brand-active: var(--project-color"),
       "Workboard active tools no longer inherit the project color."
+    );
+    assert(
+      workboardStyleSource.includes("background: color-mix(in srgb, var(--project-color, #c96410) 7%, var(--surface-raised, #fff));") &&
+        workboardStyleSource.includes("background: color-mix(in srgb, var(--project-color, #c96410) 5%, var(--surface-raised, #fff));"),
+      "Workboard surfaces no longer share the owning Project color tone."
     );
     const workboardFont = await request(
       "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"
