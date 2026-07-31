@@ -33,8 +33,14 @@ assert.deepEqual(
   Object.keys(expectedSectionCounts).sort()
 );
 assert.equal(metadata[0].verificationStatus.includes("republication-rights review required"), true);
+assert.equal(Array.isArray(metadata[0].codeSections), true);
+assert.equal(metadata[0].codeSections.some((section) => section.prefix === "FC"), true);
+assert.match(metadata[0].sourceURL, /^https:\/\//);
 assert.equal(metadata[1].energyEffectiveDate, "2026-03-30");
 assert.equal(metadata[1].electricalEffectiveDate, "2025-12-21");
+assert.match(metadata[1].energySourceURL, /^https:\/\//);
+assert.match(metadata[1].electricalSourceURL, /^https:\/\//);
+assert.match(metadata[1].extractionBoundary, /NFPA 70|amendments/i);
 
 const chapters = await enactedChapterIndex();
 assert.equal(chapters.length, 156);

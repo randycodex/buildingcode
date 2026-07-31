@@ -27,9 +27,17 @@ assert(
 );
 assert(
   offlineStorage.includes('fetchJSON("/code/chapters"') &&
+    offlineStorage.includes('fetchJSON("/code/libraries"') &&
     offlineStorage.includes("?include=body") &&
     offlineStorage.includes("cacheOfflineAssets([...referencedAssetNames].sort()"),
-  "Offline installation does not download the complete chapter library and its figures."
+  "Offline installation does not download the code index, trust metadata, and complete figure library."
+);
+assert(
+  offlineStorage.includes("codeTrustProfiles: librariesPayload.codeTrustProfiles || []") &&
+    offlineStorage.includes("librarySchemaVersion: offlineLibrarySchemaVersion") &&
+    offlineStorage.includes('if (url.pathname === "/code/libraries")') &&
+    offlineStorage.includes("codeTrustProfiles: metadata.codeTrustProfiles || []"),
+  "Cold offline startup cannot recover the installed legal-source trust metadata."
 );
 assert(
   offlineStorage.includes("disableOfflineFeature") &&
@@ -64,6 +72,11 @@ assert.equal(
   offlineFeatureMetadata.shellCacheName,
   constantValue(serviceWorker, "shellCacheName"),
   "Exported offline metadata does not describe the active shell cache."
+);
+assert.equal(
+  offlineFeatureMetadata.librarySchemaVersion,
+  2,
+  "Offline packages do not advertise the legal-source metadata schema."
 );
 assert(
   html.includes(offlineFeatureMetadata.shellAssetVersion) &&

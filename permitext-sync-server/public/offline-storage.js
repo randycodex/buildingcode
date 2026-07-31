@@ -1,12 +1,13 @@
 const databaseName = "permitext-offline";
 const databaseVersion = 2;
+const offlineLibrarySchemaVersion = 2;
 const metadataStoreName = "metadata";
 const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v222";
-const shellAssetVersion = "20260731-design-improvements-v210";
+const shellCacheName = "permitext-pro-shell-v223";
+const shellAssetVersion = "20260731-reader-trust-v211";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
@@ -14,10 +15,10 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260731-design-improvements-v210",
+  "/web/styles.css?v=20260731-reader-trust-v211",
   "/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57",
-  "/web/app.js?v=20260731-design-improvements-v210",
-  "/web/offline-storage.js?v=20260731-design-improvements-v210",
+  "/web/app.js?v=20260731-reader-trust-v211",
+  "/web/offline-storage.js?v=20260731-reader-trust-v211",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
   "/web/sync-state.js?v=20260721-causal-clear-v4"
@@ -293,7 +294,10 @@ export async function downloadOfflineLibrary(options = {}) {
   try {
     options.onProgress?.({ completed: 0, total: 1, percent: 0, phase: "Preparing offline app" });
     await prepareOfflineShell();
-    const indexPayload = await fetchJSON("/code/chapters", options.signal);
+    const [indexPayload, librariesPayload] = await Promise.all([
+      fetchJSON("/code/chapters", options.signal),
+      fetchJSON("/code/libraries", options.signal)
+    ]);
     const chapters = indexPayload.chapters || [];
     if (!chapters.length) throw new Error("No code chapters were available for offline download.");
     options.onProgress?.({
@@ -329,12 +333,15 @@ export async function downloadOfflineLibrary(options = {}) {
     const sectionCount = chapters.reduce((count, chapter) => count + Number(chapter.sectionCount || 0), 0);
     await activateInstall({
       installID,
+      librarySchemaVersion: offlineLibrarySchemaVersion,
       codeVersion: options.codeVersion || defaultCodeVersion,
       assetVersion: offlineAssetVersion,
       downloadedAt,
       chapterCount: chapters.length,
       sectionCount,
-      downloadedBytes
+      downloadedBytes,
+      libraries: librariesPayload.libraries || [],
+      codeTrustProfiles: librariesPayload.codeTrustProfiles || []
     });
     try {
       await navigator.storage?.persist?.();
@@ -622,6 +629,12 @@ export async function offlineAPI(path) {
   const metadata = await metadataRecord();
   if (!metadata?.installID) return null;
   const url = new URL(path, window.location.origin);
+  if (url.pathname === "/code/libraries") {
+    return {
+      libraries: metadata.libraries || [],
+      codeTrustProfiles: metadata.codeTrustProfiles || []
+    };
+  }
   if (url.pathname === "/code/chapters") {
     const codePrefix = url.searchParams.get("code")?.trim().toUpperCase();
     const chapters = (await activeChapterRecords(metadata.installID))
@@ -677,6 +690,7 @@ export async function offlineAPI(path) {
 
 export const offlineFeatureMetadata = {
   assetVersion: offlineAssetVersion,
+  librarySchemaVersion: offlineLibrarySchemaVersion,
   estimatedDownload: "about 70 MB",
   shellAssetVersion,
   shellCacheName

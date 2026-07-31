@@ -68,6 +68,7 @@ import {
   notebookCardTypes,
   normalizeNotebookCardPayload
 } from "./notebook-contract.mjs";
+import { codeTrustProfilesForLibraries } from "./code-trust-contract.mjs";
 import {
   immutableReportManifest,
   normalizeReportDraftPayload,
@@ -4759,6 +4760,12 @@ function researchConversationSummary(conversation) {
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
     sourceCount: conversation.sources?.filter((source) => source.kind === "selection").length || 0,
+    sourceSectionIDs: Array.from(new Set(
+      (conversation.sources || [])
+        .filter((source) => source.kind === "selection")
+        .map((source) => String(source.sectionID || "").trim())
+        .filter(Boolean)
+    )),
     messageCount: conversation.messages?.length || 0,
     primaryProjectID: conversation.primaryProjectID || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
@@ -5800,6 +5807,11 @@ async function projectFoundationStateForStorageOwner(
       question: answer.question,
       conclusion: answer.answer?.conclusion || "",
       evidenceCount: answer.evidence?.length || 0,
+      sectionIDs: Array.from(new Set(
+        (answer.evidence || [])
+          .map((evidence) => String(evidence.sectionID || "").trim())
+          .filter(Boolean)
+      )),
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
@@ -9186,6 +9198,11 @@ async function handleResearchAnswerList(request, response) {
       question: answer.question,
       conclusion: answer.answer?.conclusion || "",
       evidenceCount: answer.evidence?.length || 0,
+      sectionIDs: Array.from(new Set(
+        (answer.evidence || [])
+          .map((evidence) => String(evidence.sectionID || "").trim())
+          .filter(Boolean)
+      )),
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
@@ -10618,20 +10635,25 @@ async function handleCodeAsset(path, response) {
 }
 
 async function handleCodeLibraries(_request, response) {
+  const libraries = [
+    {
+      id: "nyc-2022-construction-codes",
+      codeVersion: defaultResearchCodeEdition,
+      syncCodeVersion: defaultSyncCodeVersion,
+      displayName: "2022 Construction Codes",
+      codePrefixes: [...codeSectionIDPrefixMap.values()],
+      sourceAuthority: "New York City Department of Buildings",
+      sourceURL: "https://www.nyc.gov/site/buildings/codes/2022-construction-codes.page",
+      effectiveDate: "2022-11-07",
+      researchEligibility: true
+    },
+    await zoningContentMetadata(),
+    await existingBuildingContentMetadata(),
+    ...await enactedContentMetadata()
+  ];
   sendJSON(response, 200, {
-    libraries: [
-      {
-        id: "nyc-2022-construction-codes",
-        codeVersion: defaultResearchCodeEdition,
-        syncCodeVersion: defaultSyncCodeVersion,
-        displayName: "2022 Construction Codes",
-        codePrefixes: [...codeSectionIDPrefixMap.values()],
-        researchEligibility: true
-      },
-      await zoningContentMetadata(),
-      await existingBuildingContentMetadata(),
-      ...await enactedContentMetadata()
-    ]
+    libraries,
+    codeTrustProfiles: codeTrustProfilesForLibraries(libraries)
   });
 }
 

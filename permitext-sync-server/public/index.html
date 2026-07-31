@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260731-design-improvements-v210">
+    <link rel="stylesheet" href="/web/styles.css?v=20260731-reader-trust-v211">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260722-workboard-zoom-v57">
   </head>
   <body>
@@ -63,6 +63,7 @@
             <h2 class="panel-title">Reader</h2>
           </div>
           <div class="panel-actions">
+            <button class="ghost-button reader-reference-source" type="button" hidden>Source</button>
             <button class="ghost-button reader-comments-toggle" type="button" aria-pressed="false">Comments</button>
             <div class="reader-typography-menu">
               <div class="reader-typography-tools" hidden>
@@ -129,6 +130,37 @@
             <select class="section-select"></select>
           </label>
         </div>
+        <details class="reader-trust" hidden>
+          <summary>
+            <span class="reader-trust-status"></span>
+            <span class="reader-trust-currency"></span>
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m9 18 6-6-6-6"></path>
+            </svg>
+          </summary>
+          <div class="reader-trust-details">
+            <dl>
+              <div class="reader-trust-edition-row">
+                <dt>Edition</dt>
+                <dd class="reader-trust-edition"></dd>
+              </div>
+              <div class="reader-trust-authority-row">
+                <dt>Authority</dt>
+                <dd class="reader-trust-authority"></dd>
+              </div>
+              <div class="reader-trust-basis-row">
+                <dt>Basis</dt>
+                <dd class="reader-trust-basis"></dd>
+              </div>
+              <div class="reader-trust-verified-row">
+                <dt>Verified</dt>
+                <dd class="reader-trust-verified"></dd>
+              </div>
+            </dl>
+            <p class="reader-trust-boundary"></p>
+            <a class="reader-trust-source" target="_blank" rel="noopener noreferrer">Open source</a>
+          </div>
+        </details>
         <label class="reader-internal-search search-box" hidden>
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"></circle>
@@ -549,6 +581,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260731-design-improvements-v210" type="module"></script>
+    <script src="/web/app.js?v=20260731-reader-trust-v211" type="module"></script>
   </body>
 </html>

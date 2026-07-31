@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-design-improvements-v210";
+} from "./offline-storage.js?v=20260731-reader-trust-v211";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -150,6 +150,7 @@ const defaultReaderSettings = {
 };
 
 let chapters = [];
+let codeTrustProfiles = [];
 let state = loadWorkspaceState();
 if (absorbBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
@@ -190,6 +191,7 @@ let researchQuestionDraft = "";
 let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
 let researchSelectionMenuInteracting = false;
+let researchSelectionMenuPinned = false;
 let activeWebWarningClose = null;
 let activeWorkspaceIssueAction = null;
 
@@ -2049,6 +2051,61 @@ function codeOptionFor(prefix = "BC") {
 
 function codeDisplayLabel(prefix = "BC") {
   return codeOptionFor(prefix).label;
+}
+
+function codeTrustProfile(prefix = "BC") {
+  const normalizedPrefix = String(prefix || "BC").toUpperCase();
+  return codeTrustProfiles.find((profile) => profile.codePrefix === normalizedPrefix) || null;
+}
+
+function formatCodeTrustDate(value) {
+  const normalized = String(value || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized;
+  const date = new Date(`${normalized}T12:00:00Z`);
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC"
+  }).format(date);
+}
+
+function codeTrustCurrencyLabel(profile) {
+  if (!profile) return "";
+  if (profile.statusKind === "future-effective" && profile.effectiveDate) {
+    return `Effective ${formatCodeTrustDate(profile.effectiveDate)}`;
+  }
+  if (profile.currentThrough) return profile.currentThrough;
+  if (profile.effectiveDate) return `Effective ${formatCodeTrustDate(profile.effectiveDate)}`;
+  if (profile.enactedDate) return `Enacted ${formatCodeTrustDate(profile.enactedDate)}`;
+  return "";
+}
+
+function renderReaderTrust(panel, reader) {
+  const trust = panel.querySelector(".reader-trust");
+  const profile = codeTrustProfile(reader.codePrefix);
+  if (!trust || !profile) {
+    if (trust) trust.hidden = true;
+    return;
+  }
+  trust.hidden = false;
+  trust.dataset.statusKind = profile.statusKind;
+  trust.querySelector(".reader-trust-status").textContent = profile.statusLabel;
+  trust.querySelector(".reader-trust-currency").textContent = codeTrustCurrencyLabel(profile);
+  trust.querySelector(".reader-trust-edition").textContent = profile.editionLabel;
+  trust.querySelector(".reader-trust-authority").textContent = profile.authority;
+  const basisRow = trust.querySelector(".reader-trust-basis-row");
+  const basis = String(profile.basis || "").trim();
+  basisRow.hidden = !basis;
+  trust.querySelector(".reader-trust-basis").textContent = basis;
+  trust.querySelector(".reader-trust-verified").textContent = [
+    profile.verificationLabel,
+    formatCodeTrustDate(profile.verifiedOn)
+  ].filter(Boolean).join(" · ");
+  trust.querySelector(".reader-trust-boundary").textContent = profile.boundary;
+  const source = trust.querySelector(".reader-trust-source");
+  source.href = profile.sourceURL;
+  source.textContent = `Open ${profile.sourceLabel}`;
 }
 
 function codeFilterLabel(option) {
@@ -5851,6 +5908,239 @@ function readerSectionWithWindowBody(section, windowChapter) {
     : section;
 }
 
+function readerSectionPayload(section, reader, blockID = "") {
+  const target = annotationTargetForSection(section, reader);
+  return {
+    codeVersion: target.codeVersion,
+    sectionID: section.id,
+    sectionNumber: section.sectionNumber,
+    title: section.title,
+    codePrefix: reader?.codePrefix || "BC",
+    chapterID: reader?.chapterID || "",
+    chapterNumber: section.chapterNumber || "",
+    blockID: normalizeAnnotationBlockID(blockID),
+    blockLabel: ""
+  };
+}
+
+function readerSectionIdentityValues(section) {
+  return new Set([
+    section?.id,
+    section?.sectionID,
+    ...(section?.readerAliasSectionIDs || [])
+  ].filter(Boolean).map(String));
+}
+
+function readerProjectsForSection(section) {
+  const sectionIDs = readerSectionIdentityValues(section);
+  const summary = currentContentSummary();
+  const links = (summary.projectSections || []).filter((item) =>
+    sectionIDs.has(String(item.sectionID || item.savedSectionID || item.itemID || ""))
+  );
+  const seen = new Set();
+  return visibleProjectRecords(summary.projects || []).filter((project) => {
+    const key = projectDetailKey(project);
+    if (!key || seen.has(key) || !links.some((link) => projectSectionBelongsToProject(link, project))) {
+      return false;
+    }
+    seen.add(key);
+    return true;
+  });
+}
+
+function readerSectionHasNote(section) {
+  const sectionIDs = readerSectionIdentityValues(section);
+  if ([...sectionIDs].some((sectionID) => noteValueForSection(sectionID).trim())) return true;
+  return (currentContentSummary().annotations || []).some((annotation) =>
+    sectionIDs.has(String(annotation.sectionID || "")) &&
+    String(annotation.noteBody || "").trim()
+  );
+}
+
+function renderReaderSectionProjectContext(host, section, reader, panel) {
+  if (!host) return;
+  clear(host);
+  const selectedSectionID = String(reader?.sectionID || "");
+  if (!selectedSectionID || !readerSectionIdentityValues(section).has(selectedSectionID)) {
+    host.hidden = true;
+    return;
+  }
+  const projects = readerProjectsForSection(section);
+  const saved = [...readerSectionIdentityValues(section)].some(isSectionSaved);
+  if (!saved && projects.length === 0) {
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  const label = document.createElement("span");
+  label.className = "reader-section-project-context-label";
+  label.textContent = "Project record";
+  host.append(label);
+  const hasNote = readerSectionHasNote(section);
+  if (!projects.length) {
+    const status = document.createElement("span");
+    status.className = "reader-section-project-context-status";
+    status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence · Not linked to a Project";
+    host.append(status);
+    return;
+  }
+  projects.forEach((project) => {
+    const projectButton = document.createElement("button");
+    projectButton.type = "button";
+    projectButton.className = "reader-section-project-chip";
+    projectButton.style.setProperty("--project-color", projectColor(project));
+    const archived = projectIsArchived(project);
+    projectButton.textContent = `${project.name || project.title || "Project"}${archived ? " · Archived" : ""}`;
+    projectButton.title = "Open Project record";
+    projectButton.addEventListener("click", () => {
+      void openProjectDetail(project, { sourcePaneID: paneIDForReader(reader) });
+    });
+    host.append(projectButton);
+  });
+  const status = document.createElement("span");
+  status.className = "reader-section-project-context-status";
+  status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence";
+  host.append(status);
+}
+
+function refreshReaderSectionProjectContexts(sectionID = "") {
+  const sectionKey = String(sectionID || "");
+  track.querySelectorAll(".reader-section-project-context").forEach((host) => {
+    const context = host.__readerProjectContext;
+    if (!context || (sectionKey && !readerSectionIdentityValues(context.section).has(sectionKey))) return;
+    renderReaderSectionProjectContext(host, context.section, context.reader, context.panel);
+  });
+}
+
+function selectReaderSectionForResearch(sectionWrapper) {
+  const selection = window.getSelection?.();
+  if (!selection || !sectionWrapper) return;
+  const range = document.createRange();
+  range.selectNodeContents(sectionWrapper);
+  selection.removeAllRanges();
+  selection.addRange(range);
+  const selectedText = researchSelectionTextFromRange(selection, range);
+  if (!selectedText) return;
+  const rect = sectionWrapper.querySelector(".reader-section-title")?.getBoundingClientRect() ||
+    sectionWrapper.getBoundingClientRect();
+  const passage = {
+    sectionID: sectionWrapper.dataset.researchSectionId,
+    sectionNumber: sectionWrapper.dataset.researchSectionNumber,
+    title: sectionWrapper.dataset.researchSectionTitle,
+    codePrefix: sectionWrapper.dataset.researchCodePrefix,
+    savedItemID: sectionWrapper.dataset.researchSavedItemId || "",
+    selectedText
+  };
+  showResearchSelectionMenu({ ...passage, passages: [passage], rect }, { pinned: true });
+}
+
+function renderReaderSectionToolbar(panel, reader, section, sectionWrapper) {
+  const toolbar = document.createElement("div");
+  toolbar.className = "reader-section-toolbar";
+  toolbar.dataset.researchSelectionExclude = "true";
+  toolbar.setAttribute("role", "toolbar");
+  toolbar.setAttribute("aria-label", `Actions for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
+  const payload = readerSectionPayload(section, reader);
+
+  const saveButton = document.createElement("button");
+  saveButton.type = "button";
+  saveButton.className = "reader-section-action";
+  const syncSaveState = () => {
+    const saved = isSectionSaved(section.id);
+    saveButton.textContent = saved ? "Saved" : "Save";
+    saveButton.classList.toggle("is-active", saved);
+    saveButton.setAttribute("aria-pressed", String(saved));
+    saveButton.title = saved ? "Manage saved section" : "Save section";
+  };
+  syncSaveState();
+  saveButton.addEventListener("click", async () => {
+    saveButton.disabled = true;
+    try {
+      if (isSectionSaved(section.id)) {
+        const sheet = ensureReaderNotesSheet(panel, reader);
+        openReaderNotesSheet(panel, section, reader);
+        await openReaderNotesProjectPicker(sheet, payload);
+      } else {
+        const saved = await persistSectionBookmark(payload, true);
+        if (saved) syncReaderNoteBookmarkButtons(section.id, true);
+      }
+      syncSaveState();
+      refreshReaderSectionProjectContexts(section.id);
+    } catch (error) {
+      presentWorkspaceIssue(error.message || "Could not update this saved section.");
+    } finally {
+      saveButton.disabled = false;
+    }
+  });
+
+  const projectButton = document.createElement("button");
+  projectButton.type = "button";
+  projectButton.className = "reader-section-action";
+  projectButton.textContent = "Project";
+  projectButton.title = "Add section to a Project";
+  projectButton.addEventListener("click", async () => {
+    if (!hasCapability("projects")) {
+      await presentPlanLimitNotice(
+        "Projects require Pro",
+        "Upgrade to Pro to organize saved code in Project workspaces."
+      );
+      return;
+    }
+    projectButton.disabled = true;
+    try {
+      const sheet = ensureReaderNotesSheet(panel, reader);
+      openReaderNotesSheet(panel, section, reader);
+      await openReaderNotesProjectPicker(sheet, payload);
+      refreshReaderSectionProjectContexts(section.id);
+    } catch (error) {
+      presentWorkspaceIssue(error.message || "Could not open Projects.");
+    } finally {
+      projectButton.disabled = false;
+    }
+  });
+
+  const noteButton = document.createElement("button");
+  noteButton.type = "button";
+  noteButton.className = "reader-section-action";
+  noteButton.textContent = "Note";
+  noteButton.title = "Add a note";
+  noteButton.addEventListener("click", () => openReaderNotesSheet(panel, section, reader));
+
+  const linkButton = document.createElement("button");
+  linkButton.type = "button";
+  linkButton.className = "reader-section-action";
+  linkButton.textContent = "Copy link";
+  const sectionURL = sharedSectionURL(section.id);
+  linkButton.disabled = !sectionURL;
+  linkButton.title = sectionURL ? "Copy shareable section link" : "No shareable link is available for this section";
+  linkButton.addEventListener("click", async () => {
+    if (!sectionURL) return;
+    linkButton.disabled = true;
+    const copied = await copyTextToClipboard(sectionURL).catch(() => false);
+    linkButton.textContent = copied ? "Copied" : "Copy failed";
+    linkButton.title = copied ? "Section link copied" : "Could not copy section link";
+    window.setTimeout(() => {
+      if (!linkButton.isConnected) return;
+      linkButton.textContent = "Copy link";
+      linkButton.title = "Copy shareable section link";
+      linkButton.disabled = false;
+    }, 1600);
+  });
+
+  const researchButton = document.createElement("button");
+  researchButton.type = "button";
+  researchButton.className = "reader-section-action";
+  researchButton.textContent = "Research";
+  researchButton.disabled = String(reader.codePrefix || "").toUpperCase() === zoningCodePrefix;
+  researchButton.title = researchButton.disabled
+    ? "Research requires enacted code text with stable section identifiers"
+    : "Start Research with this section as selected evidence";
+  researchButton.addEventListener("click", () => selectReaderSectionForResearch(sectionWrapper));
+
+  toolbar.append(saveButton, projectButton, noteButton, linkButton, researchButton);
+  return toolbar;
+}
+
 function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
   const sectionWrapper = document.createElement("section");
   sectionWrapper.className = "chapter-section";
@@ -5881,7 +6171,18 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   sectionHeading.className = "reader-section-title";
   sectionHeading.dataset.researchSelectionExclude = "true";
   sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
-  sectionWrapper.append(sectionHeading);
+  const headingRow = document.createElement("div");
+  headingRow.className = "reader-section-heading-row";
+  headingRow.dataset.researchSelectionExclude = "true";
+  headingRow.append(sectionHeading, renderReaderSectionToolbar(panel, reader, section, sectionWrapper));
+  sectionWrapper.append(headingRow);
+
+  const projectContext = document.createElement("div");
+  projectContext.className = "reader-section-project-context";
+  projectContext.dataset.researchSelectionExclude = "true";
+  projectContext.__readerProjectContext = { section, reader, panel };
+  renderReaderSectionProjectContext(projectContext, section, reader, panel);
+  sectionWrapper.append(projectContext);
 
   const blocks = annotatedBlocksForSection(section);
   const bookmarkedBlockIndex = isSectionSaved(section.id)
@@ -6443,6 +6744,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
           await persistSectionInProject(project, sectionPayload);
           setProjectButtonState(button, true);
         }
+        refreshReaderSectionProjectContexts(sectionPayload.sectionID);
       } catch (error) {
         const message = error.message || "Could not update this project.";
         button.classList.add("has-error");
@@ -6480,6 +6782,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         await persistSectionInProject(project, sectionPayload);
         showReaderNotesProjectPicker(sheet, sectionPayload);
         refreshOpenAnnotationProjectEditors();
+        refreshReaderSectionProjectContexts(sectionPayload.sectionID);
       } catch (error) {
         const message = error.message || "Could not create the project.";
         createButton.disabled = false;
@@ -6760,6 +7063,7 @@ async function refreshReaderContent(panel, reader) {
   const saveButton = panel.querySelector(".reader-save");
   const commentsPanel = panel.querySelector(".reader-comments");
   applyCodeTheme(panel, reader);
+  renderReaderTrust(panel, reader);
   populateCodeSelect(panel, reader);
   resetEnhancedSelects(panel);
   await populateReaderSelectors(panel, reader);
@@ -7113,16 +7417,33 @@ async function resolveInlineCodeSection(codePrefix, sectionNumber) {
 }
 
 async function openReferenceInAdjacentReader(sourceReader, detail) {
+  let targetReader = state.readers.find((reader) =>
+    reader.id !== sourceReader.id &&
+    reader.referenceSourceReaderID === sourceReader.id
+  );
   const canAddReader = isProAccount() || state.readers.length < 2;
-  const targetReader = canAddReader
-    ? newReaderState(readerFieldsForSectionDetail(detail))
-    : state.readers.find((reader) => reader.id !== sourceReader.id) || sourceReader;
-  if (canAddReader) {
+  if (!targetReader && canAddReader) {
+    targetReader = newReaderState({
+      ...readerFieldsForSectionDetail(detail),
+      referenceSourceReaderID: sourceReader.id
+    });
     state.readers.push(targetReader);
-    placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader));
   } else {
-    Object.assign(targetReader, readerFieldsForSectionDetail(detail));
+    targetReader = targetReader ||
+      state.readers.find((reader) => reader.id !== sourceReader.id) ||
+      sourceReader;
+    Object.assign(targetReader, readerFieldsForSectionDetail(detail), {
+      referenceSourceReaderID: sourceReader.id,
+      savedSourcePaneID: "",
+      projectSavedSourceKey: ""
+    });
+    Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
+      if (state.searchLinkedReaders[searchID] === targetReader.id) {
+        delete state.searchLinkedReaders[searchID];
+      }
+    });
   }
+  placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader));
   if (targetReader.sectionID) updateBrowserSectionURL(targetReader.sectionID);
   scheduleContinuitySync(targetReader);
   saveWorkspaceState();
@@ -7421,6 +7742,7 @@ async function renderReader(reader, options = {}) {
   const selector = panel.querySelector(".selector-stack");
   const closeButton = panel.querySelector(".reader-close");
   const dragHandle = panel.querySelector(".pane-drag-handle");
+  const referenceSourceButton = panel.querySelector(".reader-reference-source");
   const commentsButton = panel.querySelector(".reader-comments-toggle");
   const decreaseTextButton = panel.querySelector(".reader-text-decrease");
   const increaseTextButton = panel.querySelector(".reader-text-increase");
@@ -7442,11 +7764,13 @@ async function renderReader(reader, options = {}) {
     recentlyViewedSearchID &&
     searchLinkedReadersBySearch()[recentlyViewedSearchID] === reader.id
   );
+  const referenceSourceReader = state.readers.find((item) => item.id === reader.referenceSourceReaderID);
 
   panel.dataset.readerId = reader.id;
   panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader);
   reader.codePrefix = reader.codePrefix || "BC";
   applyCodeTheme(panel, reader);
+  renderReaderTrust(panel, reader);
   applyPaneWeight(panel, paneIDForReader(reader, options));
   applyReaderTextSize(panel, reader);
   applyReaderSpacing(panel, reader);
@@ -7457,6 +7781,17 @@ async function renderReader(reader, options = {}) {
   readerBody.classList.remove("comments-open");
   commentsPanel.hidden = true;
   commentsButton.hidden = true;
+  referenceSourceButton.hidden = !referenceSourceReader;
+  if (referenceSourceReader) {
+    referenceSourceButton.title = "Return to source Reader";
+    referenceSourceButton.addEventListener("click", () => {
+      const sourcePaneID = paneIDForReader(referenceSourceReader);
+      scrollPaneIntoView(sourcePaneID);
+      track
+        .querySelector(`.workspace-panel[data-pane-id="${CSS.escape(sourcePaneID)}"] .code-select`)
+        ?.focus({ preventScroll: true });
+    });
+  }
   typographyToggle.closest(".reader-typography-menu").hidden = isRecentlyViewedLinkedReader;
   internalSearchButton.hidden = isRecentlyViewedLinkedReader;
   dragHandle.hidden = isRecentlyViewedLinkedReader;
@@ -7535,6 +7870,9 @@ async function renderReader(reader, options = {}) {
       state.sectionDetails = {};
     } else {
       state.readers = state.readers.filter((item) => item.id !== reader.id);
+      state.readers.forEach((item) => {
+        if (item.referenceSourceReaderID === reader.id) item.referenceSourceReaderID = "";
+      });
       Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
         if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
       });
@@ -10638,6 +10976,7 @@ function closeResearchSelectionMenu() {
   document.querySelector(".research-selection-menu")?.remove();
   pendingResearchSelection = null;
   researchSelectionMenuInteracting = false;
+  researchSelectionMenuPinned = false;
 }
 
 function researchSelectionTextFromRange(selection, range) {
@@ -10761,14 +11100,15 @@ async function saveResearchSelection(mode, button, status) {
   }
 }
 
-function showResearchSelectionMenu() {
-  const captured = researchSelectionFromWindow();
+function showResearchSelectionMenu(selectionOverride = null, options = {}) {
+  const captured = selectionOverride || researchSelectionFromWindow();
   if (!captured) {
     closeResearchSelectionMenu();
     return;
   }
   closeResearchSelectionMenu();
   pendingResearchSelection = captured;
+  researchSelectionMenuPinned = options.pinned === true;
   const menu = document.createElement("div");
   menu.className = "research-selection-menu";
   menu.setAttribute("role", "toolbar");
@@ -10832,14 +11172,21 @@ function showResearchSelectionMenu() {
 
 function bindResearchTextSelection() {
   document.addEventListener("pointerup", (event) => {
-    if (event.target.closest?.(".research-selection-menu")) return;
+    if (
+      event.target.closest?.(".research-selection-menu") ||
+      event.target.closest?.(".reader-section-action")
+    ) return;
     window.setTimeout(showResearchSelectionMenu, 0);
   });
   document.addEventListener("keyup", (event) => {
     if (event.key.startsWith("Arrow") || event.key === "Shift") window.setTimeout(showResearchSelectionMenu, 0);
   });
   document.addEventListener("selectionchange", () => {
-    if (window.getSelection?.().isCollapsed && !researchSelectionMenuInteracting) {
+    if (
+      window.getSelection?.().isCollapsed &&
+      !researchSelectionMenuInteracting &&
+      !researchSelectionMenuPinned
+    ) {
       closeResearchSelectionMenu();
     }
   });
@@ -16892,7 +17239,10 @@ function renderSettings() {
       offlineDownload.disabled = navigator.onLine === false;
       return;
     }
-    if (library.assetVersion !== offlineFeatureMetadata.assetVersion) {
+    if (
+      library.librarySchemaVersion !== offlineFeatureMetadata.librarySchemaVersion ||
+      library.assetVersion !== offlineFeatureMetadata.assetVersion
+    ) {
       offlineStatus.textContent = navigator.onLine
         ? "An updated offline code package is available."
         : "Your offline package works, but must be updated when you reconnect.";
@@ -18208,8 +18558,12 @@ async function start() {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
   if (!detachedProjectWindow) {
-    const payload = await api("/code/chapters");
-    chapters = payload.chapters || [];
+    const [chapterPayload, libraryPayload] = await Promise.all([
+      api("/code/chapters"),
+      api("/code/libraries")
+    ]);
+    chapters = chapterPayload.chapters || [];
+    codeTrustProfiles = libraryPayload.codeTrustProfiles || [];
   }
   updateConnectionStatus();
   void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});

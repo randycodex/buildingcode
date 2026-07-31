@@ -438,6 +438,14 @@ async function main() {
         webRoot.text.includes('class="reader-internal-search-clear search-clear-button"'),
       "Reader search no longer shares the Search column field treatment."
     );
+    assert(
+      webRoot.text.includes('class="reader-trust" hidden') &&
+        webRoot.text.includes('class="reader-trust-status"') &&
+        webRoot.text.includes('class="reader-trust-boundary"') &&
+        webRoot.text.includes('class="reader-trust-source"') &&
+        webRoot.text.includes("reader-reference-source"),
+      "Reader chrome no longer exposes legal-source status or a return-to-source control."
+    );
 
     const workspaceScript = await request("/web/app.js");
     const workspaceStyles = await request("/web/styles.css");
@@ -876,6 +884,20 @@ async function main() {
       "Pro Readers and Free dual Readers should share the remaining viewport, preserve divider resizing, and stop shrinking at their default minimum width."
     );
     assert(
+      workspaceScript.text.includes("function renderReaderTrust") &&
+        workspaceScript.text.includes("codeTrustProfiles = libraryPayload.codeTrustProfiles || []") &&
+        workspaceScript.text.includes("function renderReaderSectionToolbar") &&
+        workspaceScript.text.includes('saveButton.textContent = saved ? "Saved" : "Save"') &&
+        workspaceScript.text.includes('projectButton.textContent = "Project"') &&
+        workspaceScript.text.includes('noteButton.textContent = "Note"') &&
+        workspaceScript.text.includes('linkButton.textContent = "Copy link"') &&
+        workspaceScript.text.includes('researchButton.textContent = "Research"') &&
+        workspaceScript.text.includes("function readerProjectsForSection") &&
+        workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
+        workspaceScript.text.includes('label.textContent = "Project record"'),
+      "Reader trust, section actions, or exact Project membership context is no longer wired."
+    );
+    assert(
       workspaceScript.text.includes("minWidth: defaultPaneWidthForID(pane.dataset.paneId)") &&
         workspaceScript.text.includes("const pushedScrollDelta = appliedPreviousDelta - delta") &&
         workspaceScript.text.includes("startScrollLeft + pushedScrollDelta"),
@@ -1012,6 +1034,8 @@ async function main() {
       workspaceScript.text.includes("function linkInlineCodeReferences") &&
         workspaceScript.text.includes("function openInlineCodeReference") &&
         workspaceScript.text.includes("function openReferenceInAdjacentReader") &&
+        workspaceScript.text.includes("reader.referenceSourceReaderID === sourceReader.id") &&
+        workspaceScript.text.includes("referenceSourceReaderID: sourceReader.id") &&
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
@@ -1039,7 +1063,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-design-improvements-v210'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v211'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1065,7 +1089,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-design-improvements-v210'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v211'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1276,7 +1300,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-design-improvements-v210'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v211'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2391,6 +2415,26 @@ async function main() {
 
     const codeLibraries = await request("/code/libraries");
     assert(codeLibraries.response.ok, "Code-library metadata did not load.");
+    const trustProfiles = codeLibraries.json.codeTrustProfiles || [];
+    const trustProfilesByPrefix = new Map(
+      trustProfiles.map((profile) => [profile.codePrefix, profile])
+    );
+    assert(
+      trustProfiles.length === 17 && trustProfilesByPrefix.size === 17,
+      "Code-library metadata did not return one normalized trust profile per supported code."
+    );
+    assert(
+      trustProfilesByPrefix.get("BC")?.statusKind === "enacted-edition" &&
+        trustProfilesByPrefix.get("BC")?.effectiveDate === "2022-11-07" &&
+        trustProfilesByPrefix.get("EC")?.statusKind === "amendments-only" &&
+        /NFPA 70 text is not reproduced/i.test(trustProfilesByPrefix.get("EC")?.boundary || "") &&
+        trustProfilesByPrefix.get("EBC")?.statusKind === "future-effective" &&
+        trustProfilesByPrefix.get("EBC")?.effectiveDate === "2027-07-17" &&
+        trustProfilesByPrefix.get("BC68")?.statusKind === "historical" &&
+        trustProfilesByPrefix.get("ZR")?.statusKind === "continuously-amended" &&
+        /2026-07-16/.test(trustProfilesByPrefix.get("ZR")?.currentThrough || ""),
+      "Normalized trust metadata lost a material legal status distinction."
+    );
     const zoningLibrary = codeLibraries.json.libraries.find((library) => library.id === "nyc-zoning-resolution");
     assert(zoningLibrary, "Code-library metadata omitted the Zoning Resolution.");
     assert(zoningLibrary.syncCodeVersion === zoningSyncCodeVersion, "Zoning library returned the wrong sync identity.");
@@ -3437,8 +3481,14 @@ async function main() {
       projectFoundationWithPreview.response.ok &&
         projectFoundationWithPreview.json.workboardPreview.id === workboardPreviewID &&
         projectFoundationWithPreview.json.workboardPreview.contentHash ===
-          workboardPreviewUpload.json.preview.contentHash,
-      "The iOS Project Hub foundation response omitted the current Workboard preview."
+          workboardPreviewUpload.json.preview.contentHash &&
+        projectFoundationWithPreview.json.researchAnswers.some((answer) =>
+          answer.id === answerID && answer.sectionIDs.includes("8881")
+        ) &&
+        projectFoundationWithPreview.json.researchConversations.some((conversation) =>
+          conversation.id === conversationID && conversation.sourceSectionIDs.includes("8881")
+        ),
+      "The Project foundation response omitted its Workboard preview or exact Research-to-section lineage."
     );
 
     const createOrganization = await request("/organizations/create", {

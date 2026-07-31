@@ -72,6 +72,7 @@ export async function zoningContentMetadata() {
     sourceAuthority: source.sourceAuthority,
     sourceURL: source.sourceHomepageURL,
     researchEligibility: source.researchEligibility === true,
+    researchBlockedReason: source.researchBlockedReason || null,
     validationSummary: source.validationSummary
   };
 }
