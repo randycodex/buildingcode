@@ -666,6 +666,10 @@ async function main() {
         workspaceScript.text.includes('setNotebookSaveStatus("Saving…", "saving")') &&
         workspaceScript.text.includes('saveStatus.setAttribute("aria-live", "polite")') &&
         workspaceScript.text.includes("if (dirty && !(await flushNotebookAutosave())) return;") &&
+        workspaceScript.text.includes('referenceSelect.setAttribute("aria-label", "Insert reference")') &&
+        workspaceScript.text.includes('placeholder.textContent = "Insert reference…"') &&
+        workspaceScript.text.includes('referenceSelect.addEventListener("change", () => {') &&
+        !workspaceScript.text.includes('addReferenceButton.textContent = "Add link"') &&
         !workspaceScript.text.includes('saveButton.textContent = "Save card"') &&
         !workspaceScript.text.includes('typeSelect.setAttribute("aria-label", "Notebook card type")') &&
         workspaceScript.text.includes("cardType: cardAtStart.cardType") &&
@@ -1076,7 +1080,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v219'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v220'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1109,7 +1113,7 @@ async function main() {
         workspaceStyles.text.includes(".project-studio-metrics {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 0;") &&
         workspaceStyles.text.includes(".project-studio-metric strong {\n  order: 2;") &&
         workspaceStyles.text.includes(".project-studio-metric span {\n  order: 1;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v219'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v220'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1320,7 +1324,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v219'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v220'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

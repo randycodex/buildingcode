@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v219";
+} from "./offline-storage.js?v=20260731-reader-trust-v220";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11993,10 +11993,10 @@ async function renderProjectNotebook(project) {
       redoButton.type = "button";
       redoButton.textContent = "Redo";
       const referenceSelect = document.createElement("select");
-      referenceSelect.setAttribute("aria-label", "Project item to link");
+      referenceSelect.setAttribute("aria-label", "Insert reference");
       const placeholder = document.createElement("option");
       placeholder.value = "";
-      placeholder.textContent = "Link Project item…";
+      placeholder.textContent = "Insert reference…";
       referenceSelect.append(placeholder);
       const candidates = notebookReferenceCandidates(projectID, foundation, cards)
         .filter((reference) =>
@@ -12009,20 +12009,12 @@ async function renderProjectNotebook(project) {
         option.textContent = reference.label;
         referenceSelect.append(option);
       });
-      const addReferenceButton = document.createElement("button");
-      addReferenceButton.type = "button";
-      addReferenceButton.textContent = "Add link";
-      addReferenceButton.disabled = true;
-      referenceSelect.addEventListener("change", () => {
-        addReferenceButton.disabled = referenceSelect.value === "";
-      });
       toolbar.append(
         boldButton,
         italicButton,
         undoButton,
         redoButton,
-        referenceSelect,
-        addReferenceButton
+        referenceSelect
       );
       if (notebookReadOnly) {
         toolbar.querySelectorAll("button, select").forEach((control) => {
@@ -12107,12 +12099,11 @@ async function renderProjectNotebook(project) {
       italicButton.addEventListener("click", () => editorMount?.toggleItalic());
       undoButton.addEventListener("click", () => editorMount?.undo());
       redoButton.addEventListener("click", () => editorMount?.redo());
-      addReferenceButton.addEventListener("click", () => {
+      referenceSelect.addEventListener("change", () => {
         const reference = candidates[Number(referenceSelect.value)];
         if (!reference) return;
         editorMount?.insertReference(reference);
         referenceSelect.value = "";
-        addReferenceButton.disabled = true;
       });
 
       deleteButton.addEventListener("click", async () => {
