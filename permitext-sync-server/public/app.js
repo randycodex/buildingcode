@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-overview-v243";
+} from "./offline-storage.js?v=20260731-project-activity-v244";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -14108,9 +14108,17 @@ function appendProjectActivity(content, foundation) {
   if (!events.length) return;
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-activity";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  const toggle = document.createElement("button");
+  toggle.className = "project-studio-activity-toggle section-label";
+  toggle.type = "button";
+  toggle.setAttribute("aria-expanded", "true");
+  const title = document.createElement("span");
   title.textContent = "Recent activity";
+  const chevron = document.createElement("span");
+  chevron.className = "project-studio-activity-chevron";
+  chevron.setAttribute("aria-hidden", "true");
+  chevron.innerHTML = researchChevronIconsSVG();
+  toggle.append(title, chevron);
   const list = document.createElement("ol");
   events.slice(0, 10).forEach((event) => {
     const row = document.createElement("li");
@@ -14124,7 +14132,12 @@ function appendProjectActivity(content, foundation) {
     row.append(label, meta);
     list.append(row);
   });
-  section.append(title, list);
+  toggle.addEventListener("click", () => {
+    const expanded = toggle.getAttribute("aria-expanded") !== "false";
+    toggle.setAttribute("aria-expanded", String(!expanded));
+    list.hidden = expanded;
+  });
+  section.append(toggle, list);
   content.append(section);
 }
 

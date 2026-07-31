@@ -6582,18 +6582,54 @@ button.project-studio-metric:focus-visible {
 
 .project-studio-activity ol {
   display: grid;
-  gap: var(--space-1);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.project-studio-activity ol[hidden] {
+  display: none;
+}
+
+.project-studio-activity-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.project-studio-activity-toggle:hover,
+.project-studio-activity-toggle:focus-visible {
+  color: var(--text-primary);
+}
+
+.project-studio-activity-chevron,
+.project-studio-activity-chevron svg {
+  display: grid;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+  place-items: center;
+}
+
+.project-studio-activity-toggle[aria-expanded="true"] .research-chevron-down,
+.project-studio-activity-toggle[aria-expanded="false"] .research-chevron-up {
+  display: none;
+}
+
 .project-studio-activity li {
   display: grid;
   gap: 2px;
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-control);
-  background: color-mix(in srgb, var(--project-color) 8%, var(--surface));
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--project-color) 24%, transparent);
+}
+
+.project-studio-activity li:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--project-color) 24%, transparent);
 }
 
 .project-studio-activity li strong {
