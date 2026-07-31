@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-header-v242";
+} from "./offline-storage.js?v=20260731-project-overview-v243";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13264,9 +13264,6 @@ async function focusProjectResearch(project) {
 function appendProjectStudioOverview(content, identity, previewItems, foundation) {
   const section = document.createElement("section");
   section.className = "project-studio-overview";
-  const eyebrow = document.createElement("p");
-  eyebrow.className = "section-label";
-  eyebrow.textContent = "Project Studio";
   const metrics = document.createElement("div");
   metrics.className = "project-studio-metrics";
   const notebookCards = (foundation?.artifacts || []).filter((artifact) =>
@@ -13311,7 +13308,7 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
     element.append(value, label);
     metrics.append(element);
   });
-  section.append(eyebrow, metrics);
+  section.append(metrics);
   content.append(section);
 }
 
