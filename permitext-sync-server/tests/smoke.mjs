@@ -453,6 +453,10 @@ async function main() {
     const workspaceScript = await request("/web/app.js");
     const workspaceStyles = await request("/web/styles.css");
     const workspaceStateScript = await request("/web/workspace-state.js");
+    const workspaceStartupSource = workspaceScript.text.slice(
+      workspaceScript.text.indexOf("async function start()"),
+      workspaceScript.text.indexOf("start().catch")
+    );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(
@@ -506,6 +510,14 @@ async function main() {
       workspaceScript.text.indexOf("async function renderProjectDetail")
     );
     assert(workspaceScript.response.ok, "Web workspace script did not load.");
+    assert(
+      workspaceScript.text.includes("function bindImmediateUtilityControls()") &&
+        workspaceScript.text.includes("function hydrateSavedPanelWhenConnected") &&
+        workspaceScript.text.includes('appendMutedRow(content, "Loading saved content"') &&
+        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") >= 0 &&
+        workspaceStartupSource.indexOf("bindImmediateUtilityControls();") < workspaceStartupSource.indexOf('api("/code/chapters")'),
+      "Search and Saved must bind before cold-start catalogs load, and Saved must hydrate after its shell is mounted."
+    );
     assert(
       !workspaceScript.text.includes("Supported by selected evidence") &&
         !workspaceScript.text.includes("Prototype response"),
@@ -1133,7 +1145,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-hide-empty-layout-v262'),
+        webRoot.text.includes('/web/app.js?v=20260731-search-cold-open-v265'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(

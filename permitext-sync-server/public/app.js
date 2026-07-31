@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-hide-empty-layout-v262";
+} from "./offline-storage.js?v=20260731-search-cold-open-v265";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -15593,28 +15593,24 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   wrapper.hidden = allItems.length === 0;
 }
 
-async function renderSaved(instance) {
-  const savedInstance = normalizeSavedInstance(instance);
-  const paneID = paneIDForUtilityInstance(savedInstance);
-  const panel = renderTemplate(savedTemplate);
-  panel.classList.add("saved-panel");
-  applyPaneWeight(panel, paneID);
+async function hydrateSavedPanel(panel, savedInstance, paneID) {
   const content = panel.querySelector(".saved-content");
-  clear(content);
   const data = await loadSyncedContent();
+  if (!panel.isConnected) return;
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
+  if (!panel.isConnected) return;
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
-  const planUsage = panel.querySelector(".saved-plan-usage");
-  renderSavedPlanUsage(planUsage);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
+    clear(content);
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
-    return panel;
+    return;
   }
   if (data.status === "error" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
+    clear(content);
     appendEmptySaved(content, "Sync error", data.error || "Could not load saved content.");
-    return panel;
+    return;
   }
 
   const { savedItems, annotations } = summary;
@@ -15622,6 +15618,7 @@ async function renderSaved(instance) {
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
   const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
+  if (!panel.isConnected) return;
   const applySavedView = () => {
     const filteredItems = resolvedItems.filter((item) => {
       const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
@@ -15640,6 +15637,29 @@ async function renderSaved(instance) {
   };
   renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
   applySavedView();
+}
+
+function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {
+  if (!panel.isConnected) {
+    if (attempt < 120) {
+      requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt + 1));
+    }
+    return;
+  }
+  void hydrateSavedPanel(panel, savedInstance, paneID);
+}
+
+async function renderSaved(instance) {
+  const savedInstance = normalizeSavedInstance(instance);
+  const paneID = paneIDForUtilityInstance(savedInstance);
+  const panel = renderTemplate(savedTemplate);
+  panel.classList.add("saved-panel");
+  applyPaneWeight(panel, paneID);
+  const content = panel.querySelector(".saved-content");
+  clear(content);
+  appendMutedRow(content, "Loading saved content", "Projects, bookmarks, notes, and tags will appear here.");
+  renderSavedPlanUsage(panel.querySelector(".saved-plan-usage"));
+  requestAnimationFrame(() => hydrateSavedPanelWhenConnected(panel, savedInstance, paneID));
 
   return panel;
 }
@@ -19044,11 +19064,26 @@ function bindWorkspaceKeyboardNavigation() {
   });
 }
 
+function bindImmediateUtilityControls() {
+  if (toggleSearchButton.dataset.coldStartBound !== "true") {
+    toggleSearchButton.dataset.coldStartBound = "true";
+    toggleSearchButton.addEventListener("click", () => {
+      void focusUtility("search", ".search-input");
+    });
+  }
+  if (toggleSavedButton.dataset.coldStartBound === "true") return;
+  toggleSavedButton.dataset.coldStartBound = "true";
+  toggleSavedButton.addEventListener("click", () => {
+    void focusUtility("saved");
+  });
+}
+
 async function start() {
   if (detachedWorkboardRoute && !detachedProjectWindow) {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
   if (!detachedProjectWindow) {
+    bindImmediateUtilityControls();
     const [chapterPayload, libraryPayload] = await Promise.all([
       api("/code/chapters"),
       api("/code/libraries")
@@ -19231,12 +19266,6 @@ async function start() {
   });
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
-  });
-  toggleSearchButton.addEventListener("click", () => {
-    focusUtility("search", ".search-input");
-  });
-  toggleSavedButton.addEventListener("click", () => {
-    focusUtility("saved");
   });
   toggleAnalysisButton.addEventListener("click", () => {
     focusUtility("analysis");
