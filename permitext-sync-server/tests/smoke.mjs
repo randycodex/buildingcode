@@ -1109,7 +1109,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-topbar-pills-v258'),
+        webRoot.text.includes('/web/app.js?v=20260731-topbar-pills-v259'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1169,7 +1169,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v258'),
+        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v259'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1380,7 +1380,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v258'),
+        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v259'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2001,7 +2001,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".topbar .toolbar-button {\n  display: inline-flex;") &&
-        workspaceStyles.text.includes("border-radius: var(--radius-pill);\n  background: color-mix(in srgb, var(--text-primary) 5%, transparent);") &&
+        workspaceStyles.text.includes("border-radius: var(--radius-pill);\n  background: color-mix(in srgb, var(--text-primary) 10%, transparent);") &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible \{[\s\S]*?outline: 2px solid[\s\S]*?text-decoration: none;/) &&
         workspaceStyles.text.includes('.topbar .toolbar-button[aria-pressed="true"] {'),
       "Top toolbar controls should preserve their pill shape, focus ring, and active state."

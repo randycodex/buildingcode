@@ -1363,7 +1363,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   padding: 0 12px;
   border: 0;
   border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
   color: var(--text-primary);
   font-size: var(--chrome-font-size) !important;
   font-weight: 400;
@@ -1371,7 +1371,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .topbar .toolbar-button:hover {
-  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  background: color-mix(in srgb, var(--text-primary) 16%, transparent);
 }
 
 .topbar .toolbar-button:focus-visible {
@@ -1381,7 +1381,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .topbar .toolbar-button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--code-accent) 15%, transparent);
+  background: color-mix(in srgb, var(--code-accent) 20%, transparent);
   color: var(--toolbar-active-text);
 }
 
