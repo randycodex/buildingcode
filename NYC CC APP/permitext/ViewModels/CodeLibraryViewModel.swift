@@ -2163,7 +2163,7 @@ final class CodeLibraryViewModel: ObservableObject {
         storeKitUpdatesTask = Task { [weak self] in
             let updates = await service.transactionUpdates()
             for await snapshot in updates {
-                await self?.applyStoreKitSnapshot(snapshot)
+                self?.applyStoreKitSnapshot(snapshot)
                 await self?.syncAppleTransactionIfPossible(snapshot)
             }
         }
@@ -2928,7 +2928,18 @@ final class CodeLibraryViewModel: ObservableObject {
     private static func loadSignedInAccount() -> SignedInAccount? {
         guard let data = UserDefaults.standard.data(forKey: AccountDefaults.signedInAccountKey) else { return nil }
         guard let account = try? JSONDecoder().decode(SignedInAccount.self, from: data) else { return nil }
-        let token = AccountSessionTokenStore.loadToken(accountUserID: account.appUserID)
+        var token = AccountSessionTokenStore.loadToken(accountUserID: account.appUserID)
+        if token == nil,
+           let legacyToken = account.backendSessionToken,
+           !legacyToken.isEmpty,
+           AccountSessionTokenStore.saveToken(legacyToken, accountUserID: account.appUserID) {
+            token = legacyToken
+            if let sanitizedData = try? JSONEncoder().encode(
+                SignedInAccountPersistence.removingBackendSessionToken(from: account)
+            ) {
+                UserDefaults.standard.set(sanitizedData, forKey: AccountDefaults.signedInAccountKey)
+            }
+        }
         return SignedInAccount(
             appUserID: account.appUserID,
             authProvider: account.authProvider,
@@ -2943,18 +2954,11 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     private static func saveSignedInAccount(_ account: SignedInAccount) {
-        AccountSessionTokenStore.saveToken(account.backendSessionToken, accountUserID: account.appUserID)
-        let persistedAccount = SignedInAccount(
-            appUserID: account.appUserID,
-            authProvider: account.authProvider,
-            authProviderUserID: account.authProviderUserID,
-            appleUserID: account.appleUserID,
-            publicUsername: account.publicUsername,
-            displayName: account.displayName,
-            signedInAt: account.signedInAt,
-            migrationState: account.migrationState,
-            backendSessionToken: nil
-        )
+        guard AccountSessionTokenStore.saveToken(
+            account.backendSessionToken,
+            accountUserID: account.appUserID
+        ) else { return }
+        let persistedAccount = SignedInAccountPersistence.removingBackendSessionToken(from: account)
         if let data = try? JSONEncoder().encode(persistedAccount) {
             UserDefaults.standard.set(data, forKey: AccountDefaults.signedInAccountKey)
         }
@@ -4159,6 +4163,22 @@ private final class CachedReaderSectionDetail: NSObject {
     }
 }
 
+enum SignedInAccountPersistence {
+    static func removingBackendSessionToken(from account: SignedInAccount) -> SignedInAccount {
+        SignedInAccount(
+            appUserID: account.appUserID,
+            authProvider: account.authProvider,
+            authProviderUserID: account.authProviderUserID,
+            appleUserID: account.appleUserID,
+            publicUsername: account.publicUsername,
+            displayName: account.displayName,
+            signedInAt: account.signedInAt,
+            migrationState: account.migrationState,
+            backendSessionToken: nil
+        )
+    }
+}
+
 private enum AccountSessionTokenStore {
     private static let service = "com.randycodex.permitext.backend-session"
 
@@ -4173,10 +4193,11 @@ private enum AccountSessionTokenStore {
         return String(data: data, encoding: .utf8)
     }
 
-    static func saveToken(_ token: String?, accountUserID: String) {
+    @discardableResult
+    static func saveToken(_ token: String?, accountUserID: String) -> Bool {
         guard let token, let data = token.data(using: .utf8) else {
             deleteToken(accountUserID: accountUserID)
-            return
+            return true
         }
 
         let query = baseQuery(accountUserID: accountUserID)
@@ -4186,8 +4207,9 @@ private enum AccountSessionTokenStore {
             var item = query
             item[kSecValueData as String] = data
             item[kSecAttrAccessible as String] = kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
-            SecItemAdd(item as CFDictionary, nil)
+            return SecItemAdd(item as CFDictionary, nil) == errSecSuccess
         }
+        return status == errSecSuccess
     }
 
     static func deleteToken(accountUserID: String) {

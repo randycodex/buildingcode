@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import WebKit
 
 enum BundledWebViewNavigationPolicy {
@@ -15,6 +16,24 @@ enum BundledWebViewNavigationPolicy {
         let candidatePath = url.standardizedFileURL.path
         let rootPath = readAccessURL.standardizedFileURL.path
         return candidatePath == rootPath || candidatePath.hasPrefix(rootPath + "/")
+    }
+
+    static func allowsNavigation(
+        to url: URL?,
+        under readAccessURL: URL?,
+        isMainFrame: Bool?
+    ) -> Bool {
+        guard isMainFrame == true else { return false }
+        return allowsTopLevelNavigation(to: url, under: readAccessURL)
+    }
+
+    static func externalURLForUserActivatedNavigation(
+        to url: URL?,
+        isUserActivated: Bool,
+        isMainFrame: Bool?
+    ) -> URL? {
+        guard isUserActivated, isMainFrame != false, let url, url.host != nil else { return nil }
+        return ["http", "https"].contains(url.scheme?.lowercased() ?? "") ? url : nil
     }
 }
 
@@ -381,13 +400,19 @@ struct ChapterHTMLWebView: UIViewRepresentable {
             decidePolicyFor navigationAction: WKNavigationAction,
             decisionHandler: @escaping (WKNavigationActionPolicy) -> Void
         ) {
-            guard navigationAction.targetFrame?.isMainFrame != false else {
-                decisionHandler(.allow)
+            if let externalURL = BundledWebViewNavigationPolicy.externalURLForUserActivatedNavigation(
+                to: navigationAction.request.url,
+                isUserActivated: navigationAction.navigationType == .linkActivated,
+                isMainFrame: navigationAction.targetFrame?.isMainFrame
+            ) {
+                UIApplication.shared.open(externalURL)
+                decisionHandler(.cancel)
                 return
             }
-            let allowed = BundledWebViewNavigationPolicy.allowsTopLevelNavigation(
+            let allowed = BundledWebViewNavigationPolicy.allowsNavigation(
                 to: navigationAction.request.url,
-                under: parent?.readAccessURL
+                under: parent?.readAccessURL,
+                isMainFrame: navigationAction.targetFrame?.isMainFrame
             )
             decisionHandler(allowed ? .allow : .cancel)
         }

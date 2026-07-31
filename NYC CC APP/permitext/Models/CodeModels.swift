@@ -1960,7 +1960,11 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
         let apiBaseURLString = trimmedDefaultsBaseURL?.isEmpty == false
             ? trimmedDefaultsBaseURL
             : (trimmedBundleBaseURL?.isEmpty == false ? trimmedBundleBaseURL : nil)
+        #if DEBUG
         let mode = apiBaseURLString == nil ? (storedMode ?? .localDev) : .http
+        #else
+        let mode: PermitextBackendMode = .http
+        #endif
 
         return PermitextBackendConfiguration(
             mode: mode,
@@ -1971,14 +1975,45 @@ struct PermitextBackendConfiguration: Codable, Hashable, Sendable {
     func makeTransport() -> PermitextBackendTransport {
         switch mode {
         case .http:
-            guard let apiBaseURLString, let baseURL = URL(string: apiBaseURLString) else {
-                return LocalPermitextBackendTransport()
-            }
+            #if DEBUG
+            let allowsInsecureLocalhost = true
+            #else
+            let allowsInsecureLocalhost = false
+            #endif
+            guard let baseURL = Self.validatedHTTPBaseURL(
+                apiBaseURLString,
+                allowsInsecureLocalhost: allowsInsecureLocalhost
+            ) else { return PermitextBackendHTTPTransport(baseURL: Self.configurationFailureURL) }
             return PermitextBackendHTTPTransport(baseURL: baseURL)
         case .localDev:
+            #if DEBUG
             return LocalPermitextBackendTransport()
+            #else
+            return PermitextBackendHTTPTransport(baseURL: Self.configurationFailureURL)
+            #endif
         }
     }
+
+    static func validatedHTTPBaseURL(
+        _ value: String?,
+        allowsInsecureLocalhost: Bool
+    ) -> URL? {
+        guard let value,
+              let url = URL(string: value),
+              let scheme = url.scheme?.lowercased(),
+              let host = url.host,
+              !host.isEmpty
+        else { return nil }
+        if scheme == "https" { return url }
+        if allowsInsecureLocalhost,
+           scheme == "http",
+           host == "localhost" || host == "127.0.0.1" || host == "::1" {
+            return url
+        }
+        return nil
+    }
+
+    private static let configurationFailureURL = URL(string: "https://permitext-backend-not-configured.invalid")!
 
     #if DEBUG
     static func setDebugHTTPBaseURL(_ baseURLString: String?, defaults: UserDefaults = .standard) {
@@ -3717,6 +3752,23 @@ enum StoreKitProductID {
     static let researchMonthly = "com.randycodex.permitext.research.monthly"
 }
 
+enum StoreKitTransactionPolicy {
+    static func isKnownProductID(_ productID: String) -> Bool {
+        productID == StoreKitProductID.proMonthly || productID == StoreKitProductID.researchMonthly
+    }
+
+    static func isActive(
+        productID: String,
+        expectedProductID: String,
+        revocationDate: Date?,
+        expirationDate: Date?,
+        now: Date = Date()
+    ) -> Bool {
+        guard productID == expectedProductID, revocationDate == nil else { return false }
+        return expirationDate.map { $0 > now } ?? true
+    }
+}
+
 struct StoreKitSubscriptionSnapshot: Sendable {
     let plan: AppPlan
     let researchActive: Bool
@@ -3847,10 +3899,10 @@ actor StoreKitSubscriptionService {
             let task = Task {
                 for await result in Transaction.updates {
                     guard case .verified(let transaction) = result else { continue }
+                    guard StoreKitTransactionPolicy.isKnownProductID(transaction.productID) else { continue }
                     if isActiveProTransaction(transaction) {
                         LocalEntitlementService.setVerifiedPlan(.pro)
                     }
-                    guard isTrackedTransaction(transaction) else { continue }
                     await transaction.finish()
                     continuation.yield(
                         await snapshot(
@@ -3900,28 +3952,24 @@ actor StoreKitSubscriptionService {
     }
 
     private nonisolated func isActiveProTransaction(_ transaction: Transaction) -> Bool {
-        guard transaction.productID == StoreKitProductID.proMonthly, transaction.revocationDate == nil else {
-            return false
-        }
-        if let expirationDate = transaction.expirationDate, expirationDate <= Date() {
-            return false
-        }
-        return true
+        StoreKitTransactionPolicy.isActive(
+            productID: transaction.productID,
+            expectedProductID: StoreKitProductID.proMonthly,
+            revocationDate: transaction.revocationDate,
+            expirationDate: transaction.expirationDate
+        )
     }
 
     private nonisolated func isActiveResearchTransaction(_ transaction: Transaction) -> Bool {
-        guard transaction.productID == StoreKitProductID.researchMonthly,
-              transaction.revocationDate == nil
-        else {
-            return false
-        }
-        if let expirationDate = transaction.expirationDate, expirationDate <= Date() {
-            return false
-        }
-        return true
+        StoreKitTransactionPolicy.isActive(
+            productID: transaction.productID,
+            expectedProductID: StoreKitProductID.researchMonthly,
+            revocationDate: transaction.revocationDate,
+            expirationDate: transaction.expirationDate
+        )
     }
 
-    private nonisolated func isTrackedTransaction(_ transaction: Transaction) -> Bool {
+    private nonisolated func isActiveOwnedTransaction(_ transaction: Transaction) -> Bool {
         isActiveProTransaction(transaction) || isActiveResearchTransaction(transaction)
     }
 
@@ -3971,7 +4019,7 @@ actor StoreKitSubscriptionService {
         for await entitlement in Transaction.currentEntitlements {
             switch entitlement {
             case .verified(let transaction):
-                let activeText = isTrackedTransaction(transaction) ? "active" : "inactive"
+                let activeText = isActiveOwnedTransaction(transaction) ? "active" : "inactive"
                 currentEntitlementDescriptions.append("\(transaction.productID) \(activeText)")
             case .unverified(let transaction, _):
                 currentEntitlementDescriptions.append("\(transaction.productID) unverified")

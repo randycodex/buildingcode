@@ -423,13 +423,13 @@ struct UserContentSyncEngine {
         guard let repository, let account else { return [] }
         var conflictsByRecordID: [String: UserContentSyncConflict] = [:]
         for item in try repository.failedSyncQueueItems(limit: 500) {
-            guard item.lastError?.contains("Server has newer data") == true,
+            guard let conflictMessage = UserContentSyncConflictError.message(from: item.lastError),
                   let mutation = try? ServerUserContentMutation(syncQueueItem: item, account: account)
             else { continue }
             conflictsByRecordID[mutation.recordID] = UserContentSyncConflict(
                 recordID: mutation.recordID,
                 entityKind: mutation.entityKind,
-                message: item.lastError ?? "Server has a newer copy."
+                message: conflictMessage
             )
         }
         return conflictsByRecordID.values.sorted { $0.recordID < $1.recordID }
@@ -610,7 +610,8 @@ struct UserContentSyncEngine {
                     if acceptedIDs.contains(mutation.recordID) {
                         try markCompleted(item)
                     } else if rejectedIDs.contains(mutation.recordID) {
-                        let message = report.rejectionReasons[mutation.recordID]?.message ??
+                        let message = report.rejectionReasons[mutation.recordID]
+                            .map(UserContentSyncConflictError.persistedDescription) ??
                             "Server has newer data for this record. Pull latest changes before retrying."
                         try? markFailed(item, error: UserContentSyncError.rejectedByServer(message))
                     } else {
@@ -754,6 +755,31 @@ struct UserContentSyncEngine {
                 recentlyViewedSections: recentlyViewedSections
             )
         )
+    }
+}
+
+enum UserContentSyncConflictError {
+    private static let conflictCodes = ["SERVER_NEWER", "EQUAL_TIMESTAMP_CONFLICT"]
+
+    static func persistedDescription(for rejection: BackendUserContentRejection) -> String {
+        "[\(rejection.code)] \(rejection.message)"
+    }
+
+    static func message(from lastError: String?) -> String? {
+        guard let lastError else { return nil }
+        for code in conflictCodes {
+            let prefix = "[\(code)]"
+            if lastError.hasPrefix(prefix) {
+                let message = lastError.dropFirst(prefix.count).trimmingCharacters(in: .whitespacesAndNewlines)
+                return message.isEmpty ? "This change conflicts with a server copy." : message
+            }
+        }
+
+        let normalized = lastError.lowercased()
+        let isLegacyServerNewer = normalized.contains("server has newer data")
+        let isCurrentServerNewer = normalized.contains("newer version") && normalized.contains("server")
+        let isCurrentEqualTimestamp = normalized.contains("changed in two places") && normalized.contains("sync conflict")
+        return isLegacyServerNewer || isCurrentServerNewer || isCurrentEqualTimestamp ? lastError : nil
     }
 }
 

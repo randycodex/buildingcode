@@ -152,6 +152,155 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 under: root
             )
         )
+        XCTAssertFalse(
+            BundledWebViewNavigationPolicy.allowsNavigation(
+                to: URL(string: "https://example.com/embedded"),
+                under: root,
+                isMainFrame: false
+            )
+        )
+        XCTAssertFalse(
+            BundledWebViewNavigationPolicy.allowsNavigation(
+                to: root.appendingPathComponent("chapters/embedded.html"),
+                under: root,
+                isMainFrame: nil
+            )
+        )
+        XCTAssertEqual(
+            BundledWebViewNavigationPolicy.externalURLForUserActivatedNavigation(
+                to: URL(string: "https://zr.planning.nyc.gov/article-i/chapter-1"),
+                isUserActivated: true,
+                isMainFrame: nil
+            )?.scheme,
+            "https"
+        )
+        XCTAssertNil(
+            BundledWebViewNavigationPolicy.externalURLForUserActivatedNavigation(
+                to: URL(string: "javascript:alert(1)"),
+                isUserActivated: true,
+                isMainFrame: true
+            )
+        )
+        XCTAssertNil(
+            BundledWebViewNavigationPolicy.externalURLForUserActivatedNavigation(
+                to: URL(string: "https://example.com/iframe"),
+                isUserActivated: true,
+                isMainFrame: false
+            )
+        )
+    }
+
+    func testSyncConflictErrorsRecognizeProductionCodesAndLegacyMessages() {
+        let serverNewer = BackendUserContentRejection(
+            code: "SERVER_NEWER",
+            message: "A newer version of this item is already on the server. Review it before retrying."
+        )
+        let equalTimestamp = BackendUserContentRejection(
+            code: "EQUAL_TIMESTAMP_CONFLICT",
+            message: "This item changed in two places at the same time. Review the sync conflict before retrying."
+        )
+
+        XCTAssertEqual(
+            UserContentSyncConflictError.message(
+                from: UserContentSyncConflictError.persistedDescription(for: serverNewer)
+            ),
+            serverNewer.message
+        )
+        XCTAssertEqual(
+            UserContentSyncConflictError.message(
+                from: UserContentSyncConflictError.persistedDescription(for: equalTimestamp)
+            ),
+            equalTimestamp.message
+        )
+        XCTAssertNotNil(UserContentSyncConflictError.message(from: serverNewer.message))
+        XCTAssertNotNil(UserContentSyncConflictError.message(from: equalTimestamp.message))
+        XCTAssertNotNil(UserContentSyncConflictError.message(from: "Server has newer data for this record."))
+        XCTAssertNil(
+            UserContentSyncConflictError.message(
+                from: "[PRO_REQUIRED_PROJECTS] Projects require Pro."
+            )
+        )
+    }
+
+    func testStoreKitTransactionPolicyTracksInactiveOwnedProducts() {
+        let now = Date(timeIntervalSince1970: 2_000_000)
+        XCTAssertTrue(StoreKitTransactionPolicy.isKnownProductID(StoreKitProductID.proMonthly))
+        XCTAssertTrue(StoreKitTransactionPolicy.isKnownProductID(StoreKitProductID.researchMonthly))
+        XCTAssertFalse(StoreKitTransactionPolicy.isKnownProductID("unrelated.product"))
+
+        XCTAssertTrue(
+            StoreKitTransactionPolicy.isActive(
+                productID: StoreKitProductID.proMonthly,
+                expectedProductID: StoreKitProductID.proMonthly,
+                revocationDate: nil,
+                expirationDate: now.addingTimeInterval(60),
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            StoreKitTransactionPolicy.isActive(
+                productID: StoreKitProductID.proMonthly,
+                expectedProductID: StoreKitProductID.proMonthly,
+                revocationDate: now,
+                expirationDate: nil,
+                now: now
+            )
+        )
+        XCTAssertFalse(
+            StoreKitTransactionPolicy.isActive(
+                productID: StoreKitProductID.researchMonthly,
+                expectedProductID: StoreKitProductID.researchMonthly,
+                revocationDate: nil,
+                expirationDate: now,
+                now: now
+            )
+        )
+    }
+
+    func testSignedInAccountPersistenceRemovesLegacySessionToken() {
+        let account = SignedInAccount(
+            appUserID: "apple:persistence-test",
+            authProvider: .apple,
+            authProviderUserID: "persistence-test",
+            appleUserID: "persistence-test",
+            publicUsername: "permitext-test",
+            displayName: "Persistence Test",
+            signedInAt: Date(timeIntervalSince1970: 100),
+            migrationState: .localDataAttached,
+            backendSessionToken: "sensitive-session-token"
+        )
+        let sanitized = SignedInAccountPersistence.removingBackendSessionToken(from: account)
+
+        XCTAssertNil(sanitized.backendSessionToken)
+        XCTAssertEqual(sanitized.appUserID, account.appUserID)
+        XCTAssertEqual(sanitized.migrationState, account.migrationState)
+    }
+
+    func testReleaseBackendURLPolicyFailsClosed() {
+        XCTAssertNotNil(
+            PermitextBackendConfiguration.validatedHTTPBaseURL(
+                "https://permitext.com",
+                allowsInsecureLocalhost: false
+            )
+        )
+        XCTAssertNil(
+            PermitextBackendConfiguration.validatedHTTPBaseURL(
+                "http://permitext.com",
+                allowsInsecureLocalhost: false
+            )
+        )
+        XCTAssertNil(
+            PermitextBackendConfiguration.validatedHTTPBaseURL(
+                "not a URL",
+                allowsInsecureLocalhost: false
+            )
+        )
+        XCTAssertNotNil(
+            PermitextBackendConfiguration.validatedHTTPBaseURL(
+                "http://localhost:8787",
+                allowsInsecureLocalhost: true
+            )
+        )
     }
 
     func testFreePlanIncludesContinuityAndCrossDeviceSync() {
