@@ -1554,6 +1554,8 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .reader-code-heading {
+  position: relative;
+  z-index: 30;
   display: flex;
   min-width: 0;
   align-items: center;
@@ -1562,12 +1564,19 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .reader-code-heading .reader-code-picker {
   flex: 0 1 auto;
+  width: max-content;
   min-width: 0;
+  max-width: calc(100% - var(--panel-title-control-size) - var(--space-2));
+}
+
+.reader-code-heading .reader-code-picker .custom-select,
+.reader-code-heading .reader-code-picker .custom-select-trigger {
+  width: max-content;
+  max-width: 100%;
 }
 
 .reader-trust {
-  position: relative;
-  z-index: 30;
+  position: static;
   flex: 0 0 var(--panel-title-control-size);
   color: var(--text-primary);
   font-family: var(--chrome-font-family);
@@ -1596,17 +1605,6 @@ body.is-detached-workboard-window .detached-workboard-error p {
   display: none;
 }
 
-.reader-trust summary::after {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 5px;
-  height: 5px;
-  border-radius: 999px;
-  content: "";
-  background: var(--code-accent);
-}
-
 .reader-trust summary:hover,
 .reader-trust summary:focus-visible,
 .reader-trust[open] summary {
@@ -1621,10 +1619,10 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .reader-trust-details {
   position: absolute;
   top: calc(100% + var(--space-2));
-  right: 0;
-  left: auto;
+  right: auto;
+  left: 0;
   z-index: 31;
-  width: min(360px, calc(100vw - (2 * var(--panel-padding))));
+  width: min(360px, 100%);
   max-height: min(440px, calc(100vh - 96px));
   overflow: auto;
   padding: var(--space-4);
