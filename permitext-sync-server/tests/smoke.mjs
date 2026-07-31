@@ -1084,7 +1084,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v224'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v225'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1121,7 +1121,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v224'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v225'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1332,7 +1332,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v224'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v225'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1518,12 +1518,12 @@ async function main() {
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultDetailPaneWidth = defaultNonReaderPaneWidth") &&
-        workspaceScript.text.includes("const defaultWorkboardPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultWorkboardPaneWidth = 700") &&
         workspaceScript.text.includes("const defaultNotebookPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("return defaultNonReaderPaneWidth"),
-      "Non-Reader columns no longer share the 400px default width."
+      "Non-Reader columns no longer preserve their intended default widths."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
