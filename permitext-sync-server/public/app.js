@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-notebook-list-v249";
+} from "./offline-storage.js?v=20260731-project-activity-row-v250";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([

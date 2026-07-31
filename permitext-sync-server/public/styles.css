@@ -6698,7 +6698,9 @@ button.project-studio-metric:focus-visible {
 
 .project-studio-activity li {
   display: grid;
-  gap: 2px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--space-2);
   padding: var(--space-2) 0;
   border-bottom: 1px solid color-mix(in srgb, var(--project-color) 24%, transparent);
 }
@@ -6708,12 +6710,18 @@ button.project-studio-metric:focus-visible {
 }
 
 .project-studio-activity li strong {
+  min-width: 0;
+  overflow: hidden;
   font-size: calc(var(--chrome-font-size) * 0.75) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .project-studio-activity li span {
   color: var(--text-secondary);
   font-size: 10px !important;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .project-review-scope {
