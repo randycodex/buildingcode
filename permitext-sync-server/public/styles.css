@@ -7283,6 +7283,10 @@ button.project-studio-metric:focus-visible {
   border-bottom: 1px solid var(--border);
 }
 
+.saved-panel .saved-content > .saved-code-group:last-child .saved-row:last-child {
+  border-bottom: 0;
+}
+
 .saved-chapter-header {
   display: flex;
   align-items: baseline;
