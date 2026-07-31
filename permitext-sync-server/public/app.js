@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-multi-workspace-v260";
+} from "./offline-storage.js?v=20260731-hide-empty-layout-v262";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -89,6 +89,7 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
+const workspaceLayoutControls = fitColumnsButton?.closest(".topbar-action-group");
 const workspaceTabs = document.querySelector("#workspace-tabs");
 const addWorkspaceButton = document.querySelector("#add-workspace");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
@@ -943,6 +944,7 @@ function renderWorkspaceTabs() {
 
 function updateWorkspaceLayoutControls() {
   const hasColumns = defaultActivePaneIDs().length > 0;
+  if (workspaceLayoutControls) workspaceLayoutControls.hidden = !hasColumns;
   fitColumnsButton.disabled = !hasColumns;
   collapseReadersButton.disabled = !hasColumns;
 }
