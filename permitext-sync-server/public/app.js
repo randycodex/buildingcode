@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-project-list-v203";
+} from "./offline-storage.js?v=20260730-research-composer-box-v204";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -10187,6 +10187,8 @@ async function renderResearchConversation(conversationID) {
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
   sendButton.textContent = "Analyze";
+  const composerBox = document.createElement("div");
+  composerBox.className = "research-composer-box";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
   const researchEnabled = hasCapability("research");
   sendButton.disabled = !researchEnabled ||
@@ -10232,7 +10234,8 @@ async function renderResearchConversation(conversationID) {
       }
     }
   });
-  composer.append(input, sendButton, status);
+  composerBox.append(input, sendButton);
+  composer.append(composerBox, status);
   dialoguePane.append(composer);
   bindResearchEvidenceDivider(content, divider, conversation.id);
   requestAnimationFrame(() => {

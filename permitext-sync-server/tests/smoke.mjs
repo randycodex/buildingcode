@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-project-list-v203'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-composer-box-v204'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-project-list-v179'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-composer-box-v180'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1235,7 +1235,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-project-list-v179'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-composer-box-v180'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1272,9 +1272,13 @@ async function main() {
         workspaceStyles.text.includes(".research-conversation-content {\n  display: grid;") &&
         workspaceStyles.text.includes("padding: 0;") &&
         workspaceStyles.text.includes(".research-composer {\n  position: relative;") &&
+        workspaceScript.text.includes('composerBox.className = "research-composer-box";') &&
+        workspaceScript.text.includes("composerBox.append(input, sendButton);") &&
+        workspaceStyles.text.includes(".research-composer-box {\n  position: relative;\n  width: 100%;") &&
         workspaceStyles.text.includes("margin: 0;") &&
         workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
-        workspaceStyles.text.includes(".research-send-button {\n  min-height: 42px;\n  border-radius: 0;\n  color: #ffffff;"),
+        workspaceStyles.text.includes(".research-send-button {\n  position: absolute;\n  right: var(--space-2);\n  bottom: var(--space-2);") &&
+        workspaceStyles.text.includes("min-height: 42px;\n  border-radius: 0;\n  color: #ffffff;"),
       "Project assignment should live on each Research row while the conversation pane remains context-only."
     );
     assert(
