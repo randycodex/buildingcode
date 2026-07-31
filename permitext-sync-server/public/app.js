@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-row-chevron-v200";
+} from "./offline-storage.js?v=20260730-saved-reader-close-v201";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1797,6 +1797,25 @@ function closeLinkedReaderForSearch(searchID) {
   state.readers = (state.readers || []).filter((reader) => reader.id !== readerID);
   delete state.paneWeights[readerPaneID];
   state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
+  if (state.readers.length === 0) state.readers = [newReaderState()];
+}
+
+function closeLinkedReaderForSavedPane(savedPaneID) {
+  const linkedReaderIDs = new Set(
+    (state.readers || [])
+      .filter((reader) => reader.savedSourcePaneID === savedPaneID)
+      .map((reader) => reader.id)
+  );
+  if (!linkedReaderIDs.size) return;
+  state.readers = (state.readers || []).filter((reader) => !linkedReaderIDs.has(reader.id));
+  Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
+    if (linkedReaderIDs.has(readerID)) delete state.searchLinkedReaders[searchID];
+  });
+  linkedReaderIDs.forEach((readerID) => {
+    const readerPaneID = `reader:${readerID}`;
+    delete state.paneWeights[readerPaneID];
+    state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
+  });
   if (state.readers.length === 0) state.readers = [newReaderState()];
 }
 
@@ -8236,6 +8255,7 @@ function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   if (instance.key === "search") closeLinkedReaderForSearch(instance.id);
+  if (instance.key === "saved") closeLinkedReaderForSavedPane(paneID);
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (instance.key === "search") {
     delete sectionDetailsBySearch()[instance.id];

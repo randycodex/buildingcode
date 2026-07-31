@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-row-chevron-v200'),
+        webRoot.text.includes('/web/app.js?v=20260730-saved-reader-close-v201'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1077,6 +1077,10 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID, options = {})") &&
+        workspaceScript.text.includes("function closeLinkedReaderForSavedPane(savedPaneID)") &&
+        workspaceScript.text.includes('if (instance.key === "saved") closeLinkedReaderForSavedPane(paneID);') &&
+        workspaceScript.text.includes("reader.savedSourcePaneID === savedPaneID") &&
+        workspaceScript.text.includes("linkedReaderIDs.has(reader.id)") &&
         workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
         workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
         workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
