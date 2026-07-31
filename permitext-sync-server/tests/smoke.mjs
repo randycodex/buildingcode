@@ -661,8 +661,14 @@ async function main() {
         workspaceScript.text.includes("function refreshOpenProjectPaneTheme(project)") &&
         workspaceScript.text.includes('.forEach((panel) => panel.style.setProperty("--project-color", color))') &&
         workspaceScript.text.includes("refreshOpenProjectPaneTheme(updated)") &&
+        workspaceScript.text.includes("function scheduleNotebookAutosave") &&
+        workspaceScript.text.includes("flushNotebookAutosave = async () =>") &&
+        workspaceScript.text.includes('setNotebookSaveStatus("Saving…", "saving")') &&
+        workspaceScript.text.includes('saveStatus.setAttribute("aria-live", "polite")') &&
+        workspaceScript.text.includes("if (dirty && !(await flushNotebookAutosave())) return;") &&
+        !workspaceScript.text.includes('saveButton.textContent = "Save card"') &&
         !workspaceScript.text.includes('typeSelect.setAttribute("aria-label", "Notebook card type")') &&
-        workspaceScript.text.includes("cardType: activeCard.cardType") &&
+        workspaceScript.text.includes("cardType: cardAtStart.cardType") &&
         workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
     );
@@ -1070,7 +1076,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v216'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v217'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1097,7 +1103,8 @@ async function main() {
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
         workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v216'),
+        workspaceStyles.text.includes('.notebook-card-footer > span[data-state="saved"]') &&
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v217'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1308,7 +1315,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v216'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v217'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

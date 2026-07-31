@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v216";
+} from "./offline-storage.js?v=20260731-reader-trust-v217";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11699,11 +11699,14 @@ async function renderProjectNotebook(project) {
   let dirty = false;
   let notebookReadOnly = false;
   let disposed = false;
+  let notebookAutosaveTimer = null;
+  let flushNotebookAutosave = async () => !dirty;
 
   const mountState = {
     panel,
     async confirmDiscardIfNeeded() {
       if (!dirty || !activeCard) return true;
+      if (await flushNotebookAutosave()) return true;
       return confirmWebWarning(
         "Discard unsaved Notebook changes?",
         `Your edits to “${activeCard.title || "Untitled card"}” have not been saved.`,
@@ -11712,6 +11715,7 @@ async function renderProjectNotebook(project) {
     },
     dispose() {
       disposed = true;
+      window.clearTimeout(notebookAutosaveTimer);
       editorRenderSequence += 1;
       editorMount?.destroy?.();
       editorMount = null;
@@ -11766,8 +11770,129 @@ async function renderProjectNotebook(project) {
     focus.className = "notebook-focus";
     shell.append(rail, focus);
 
+    let notebookAutosaveTask = null;
+    let notebookRevision = 0;
+    let notebookSaveStatus = null;
+    let notebookDeleteButton = null;
+
+    const setNotebookSaveStatus = (message, state = "") => {
+      if (!notebookSaveStatus?.isConnected) return;
+      notebookSaveStatus.textContent = message;
+      notebookSaveStatus.dataset.state = state;
+    };
+
+    const notebookSummaryForCard = (card, savedCard = card) => ({
+      id: card.id,
+      version: card.version,
+      cardType: card.cardType,
+      title: card.title,
+      plainText: savedCard.plainText,
+      referenceCount: savedCard.references?.length || 0,
+      createdAt: savedCard.createdAt,
+      updatedAt: savedCard.updatedAt
+    });
+
+    function scheduleNotebookAutosave(delay = 700) {
+      window.clearTimeout(notebookAutosaveTimer);
+      if (notebookReadOnly || disposed || !dirty || !activeCard) return;
+      if (!String(activeCard.title || "").trim()) {
+        setNotebookSaveStatus("Add a title to save", "waiting");
+        return;
+      }
+      setNotebookSaveStatus("Saving…", "saving");
+      notebookAutosaveTimer = window.setTimeout(() => {
+        notebookAutosaveTimer = null;
+        void saveActiveNotebookCard();
+      }, delay);
+    }
+
+    function markNotebookDirty() {
+      dirty = true;
+      notebookRevision += 1;
+      scheduleNotebookAutosave();
+    }
+
+    async function saveActiveNotebookCard() {
+      if (notebookAutosaveTask) return notebookAutosaveTask;
+      if (notebookReadOnly || disposed || !dirty || !activeCard) return true;
+      const title = String(activeCard.title || "").trim();
+      if (!title) {
+        setNotebookSaveStatus("Add a title to save", "waiting");
+        return false;
+      }
+      const revisionAtStart = notebookRevision;
+      const documentAtStart = editorMount?.getDocument?.() || draftDocument;
+      const cardAtStart = activeCard;
+      setNotebookSaveStatus("Saving…", "saving");
+      const saveTask = (async () => {
+        try {
+          const payload = await postResearch("/notebook/cards/save", {
+            projectID,
+            cardID: cardAtStart.id || undefined,
+            expectedVersion: cardAtStart.version || 0,
+            cardType: cardAtStart.cardType,
+            title,
+            document: documentAtStart
+          });
+          if (disposed || activeCard !== cardAtStart) return true;
+          const changedDuringSave = notebookRevision !== revisionAtStart;
+          const localTitle = activeCard.title;
+          const localDocument = draftDocument;
+          activeCard = changedDuringSave
+            ? { ...payload.card, title: localTitle, document: localDocument }
+            : payload.card;
+          draftDocument = changedDuringSave ? localDocument : payload.card.document;
+          dirty = changedDuringSave;
+          const summary = notebookSummaryForCard(activeCard, payload.card);
+          cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
+          foundation.artifacts = [
+            ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== payload.card.id),
+            { envelope: { id: payload.card.id, type: "notebookCard" }, payload: payload.card }
+          ];
+          notebookDeleteButton?.toggleAttribute("hidden", !activeCard.id || notebookReadOnly);
+          renderCardList();
+          if (changedDuringSave) {
+            scheduleNotebookAutosave(180);
+          } else {
+            setNotebookSaveStatus(`Saved · Version ${activeCard.version}`, "saved");
+          }
+          return true;
+        } catch (error) {
+          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT" && error.payload.card) {
+            activeCard = error.payload.card;
+            draftDocument = activeCard.document;
+            dirty = false;
+            await renderFocusedCard();
+            await showWebNotice(
+              "Newer Notebook version loaded",
+              "Another edit was saved first. Permitext loaded the current version so you can review it before editing again."
+            );
+          } else {
+            setNotebookSaveStatus("Save failed", "error");
+            await showWebNotice("Card not saved", error.message);
+          }
+          return false;
+        }
+      })();
+      notebookAutosaveTask = saveTask.finally(() => {
+        notebookAutosaveTask = null;
+      });
+      return notebookAutosaveTask;
+    }
+
+    flushNotebookAutosave = async () => {
+      window.clearTimeout(notebookAutosaveTimer);
+      notebookAutosaveTimer = null;
+      while (dirty) {
+        if (!(await saveActiveNotebookCard())) return false;
+        window.clearTimeout(notebookAutosaveTimer);
+        notebookAutosaveTimer = null;
+      }
+      return true;
+    };
+
     async function loadCard(cardID) {
-      if (dirty && activeCard) {
+      if (dirty && activeCard && !(await flushNotebookAutosave())) {
         const confirmed = await confirmWebWarning(
           "Discard unsaved Notebook changes?",
           "Your edits to the focused card have not been saved.",
@@ -11818,6 +11943,8 @@ async function renderProjectNotebook(project) {
       const renderSequence = editorRenderSequence;
       editorMount?.destroy?.();
       editorMount = null;
+      notebookSaveStatus = null;
+      notebookDeleteButton = null;
       focus.replaceChildren();
 
       if (!activeCard) {
@@ -11930,7 +12057,13 @@ async function renderProjectNotebook(project) {
       const footer = document.createElement("div");
       footer.className = "notebook-card-footer";
       const saveStatus = document.createElement("span");
-      saveStatus.textContent = activeCard.id ? `Version ${activeCard.version}` : "New card";
+      saveStatus.setAttribute("role", "status");
+      saveStatus.setAttribute("aria-live", "polite");
+      saveStatus.textContent = activeCard.id
+        ? `Saved · Version ${activeCard.version}`
+        : "Add a title to save";
+      saveStatus.dataset.state = activeCard.id ? "saved" : "waiting";
+      notebookSaveStatus = saveStatus;
       const footerActions = document.createElement("div");
       const researchButton = document.createElement("button");
       researchButton.className = "notebook-secondary-action";
@@ -11942,20 +12075,15 @@ async function renderProjectNotebook(project) {
       deleteButton.type = "button";
       deleteButton.textContent = "Delete";
       deleteButton.hidden = !activeCard.id || notebookReadOnly;
-      const saveButton = document.createElement("button");
-      saveButton.className = "notebook-primary-action";
-      saveButton.type = "button";
-      saveButton.textContent = "Save card";
-      saveButton.hidden = notebookReadOnly;
+      notebookDeleteButton = deleteButton;
       researchButton.hidden = notebookReadOnly;
-      footerActions.append(researchButton, deleteButton, saveButton);
+      footerActions.append(researchButton, deleteButton);
       footer.append(saveStatus, footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
       titleInput.addEventListener("input", () => {
         activeCard.title = titleInput.value;
-        dirty = true;
-        saveStatus.textContent = "Unsaved changes";
+        markNotebookDirty();
       });
 
       const module = await loadNotebookModule();
@@ -11967,8 +12095,7 @@ async function renderProjectNotebook(project) {
         onChange(document) {
           if (notebookReadOnly) return;
           draftDocument = document;
-          dirty = true;
-          saveStatus.textContent = "Unsaved changes";
+          markNotebookDirty();
         },
         onSelectionChange(selection) {
           boldButton.setAttribute("aria-pressed", String(selection.bold));
@@ -11988,56 +12115,8 @@ async function renderProjectNotebook(project) {
         addReferenceButton.disabled = true;
       });
 
-      saveButton.addEventListener("click", async () => {
-        saveButton.disabled = true;
-        try {
-          const payload = await postResearch("/notebook/cards/save", {
-            projectID,
-            cardID: activeCard.id || undefined,
-            expectedVersion: activeCard.version || 0,
-            cardType: activeCard.cardType,
-            title: titleInput.value,
-            document: editorMount.getDocument()
-          });
-          activeCard = payload.card;
-          draftDocument = activeCard.document;
-          dirty = false;
-          const summary = {
-            id: activeCard.id,
-            version: activeCard.version,
-            cardType: activeCard.cardType,
-            title: activeCard.title,
-            plainText: activeCard.plainText,
-            referenceCount: activeCard.references?.length || 0,
-            createdAt: activeCard.createdAt,
-            updatedAt: activeCard.updatedAt
-          };
-          cards = [summary, ...cards.filter((card) => card.id !== summary.id)];
-          foundation.artifacts = [
-            ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== activeCard.id),
-            { envelope: { id: activeCard.id, type: "notebookCard" }, payload: activeCard }
-          ];
-          renderCardList();
-          await renderFocusedCard();
-        } catch (error) {
-          if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT" && error.payload.card) {
-            activeCard = error.payload.card;
-            draftDocument = activeCard.document;
-            dirty = false;
-            await renderFocusedCard();
-            await showWebNotice(
-              "Newer Notebook version loaded",
-              "Another edit was saved first. Permitext loaded the current version so you can review it before editing again."
-            );
-          } else {
-            await showWebNotice("Card not saved", error.message);
-          }
-        } finally {
-          saveButton.disabled = false;
-        }
-      });
-
       deleteButton.addEventListener("click", async () => {
+        if (dirty && !(await flushNotebookAutosave())) return;
         const confirmed = await confirmWebWarning(
           "Delete Notebook card?",
           `“${activeCard.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
@@ -12076,7 +12155,7 @@ async function renderProjectNotebook(project) {
     }
 
     newButton.addEventListener("click", async () => {
-      if (dirty && activeCard) {
+      if (dirty && activeCard && !(await flushNotebookAutosave())) {
         const confirmed = await confirmWebWarning(
           "Discard unsaved Notebook changes?",
           "Your edits to the focused card have not been saved.",
