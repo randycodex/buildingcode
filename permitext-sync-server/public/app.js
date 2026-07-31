@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-row-project-v199";
+} from "./offline-storage.js?v=20260730-research-row-chevron-v200";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -9368,6 +9368,15 @@ async function renderResearch(paneID = "utility:analysis") {
         ariaLabel: `Project for ${conversation.title}`
       });
       projectSelect.classList.add("research-conversation-project-select");
+      const projectSelectWrap = document.createElement("div");
+      projectSelectWrap.className = "research-conversation-project-picker";
+      const projectSelectChevron = document.createElement("span");
+      projectSelectChevron.className = "research-conversation-project-chevron";
+      projectSelectChevron.setAttribute("aria-hidden", "true");
+      projectSelectChevron.innerHTML = `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+      `;
+      projectSelectWrap.append(projectSelect, projectSelectChevron);
       projectSelect.title = conversation.primaryProjectID
         ? `Assigned to ${researchProjectName(conversation.primaryProjectID)}`
         : "Assign conversation to a Project";
@@ -9507,7 +9516,7 @@ async function renderResearch(paneID = "utility:analysis") {
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", () => deleteResearchConversationFromList(conversation, deleteButton));
       actions.append(deleteButton);
-      row.append(openButton, actions, projectSelect);
+      row.append(openButton, actions, projectSelectWrap);
     };
     renderRow();
     list.append(row);

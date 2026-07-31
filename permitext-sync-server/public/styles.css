@@ -4869,16 +4869,42 @@ mark {
   gap: var(--space-1);
 }
 
-.research-conversation-project-select {
+.research-conversation-project-picker {
+  position: relative;
   grid-column: 1 / -1;
   width: 100%;
-  min-height: 30px;
   margin: 0 0 var(--space-3);
-  padding: 0 var(--space-6) 0 var(--space-3);
+}
+
+.research-conversation-project-select {
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  padding: 0 40px 0 var(--space-3);
   overflow: hidden;
+  appearance: none;
+  -webkit-appearance: none;
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.research-conversation-project-chevron {
+  position: absolute;
+  top: 50%;
+  right: var(--space-3);
+  display: grid;
+  width: 18px;
+  height: 18px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  place-items: center;
+  transform: translateY(-50%);
+}
+
+.research-conversation-project-chevron svg {
+  width: 18px;
+  height: 18px;
 }
 
 .research-conversation-rename {

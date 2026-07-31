@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-row-project-v199'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-row-chevron-v200'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-row-project-v173'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-row-chevron-v174'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1231,7 +1231,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-row-project-v173'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-row-chevron-v174'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1251,9 +1251,12 @@ async function main() {
         !researchProjectContextSource.includes("createResearchProjectSelect") &&
         !workspaceScript.text.includes("createResearchConversationProjectPicker") &&
         workspaceScript.text.includes('projectSelect.classList.add("research-conversation-project-select");') &&
+        workspaceScript.text.includes('projectSelectWrap.className = "research-conversation-project-picker";') &&
+        workspaceScript.text.includes('projectSelectChevron.className = "research-conversation-project-chevron";') &&
         workspaceScript.text.includes("assignResearchConversationProject(conversation, targetProjectID)") &&
         workspaceScript.text.includes('postResearch("/research/conversations/assign-project"') &&
-        workspaceStyles.text.includes(".research-conversation-project-select {") &&
+        workspaceStyles.text.includes(".research-conversation-project-picker {") &&
+        workspaceStyles.text.includes(".research-conversation-project-chevron {") &&
         workspaceStyles.text.includes(".research-conversation-content {\n  display: grid;") &&
         workspaceStyles.text.includes("padding: 0;") &&
         workspaceStyles.text.includes(".research-composer {\n  position: relative;") &&
