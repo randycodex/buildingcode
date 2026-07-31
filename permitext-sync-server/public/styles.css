@@ -6466,22 +6466,29 @@ body.is-resizing-research-evidence * {
 
 .project-studio-metrics {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-2);
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
 }
 
 .project-studio-metric {
-  display: grid;
+  display: flex;
+  width: 100%;
   min-width: 0;
-  min-height: 70px;
-  align-content: center;
-  gap: 2px;
-  padding: var(--space-3);
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-1);
   border: 0;
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--project-color) 16%, var(--surface));
+  border-bottom: 1px solid color-mix(in srgb, var(--project-color) 22%, transparent);
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   text-align: left;
+}
+
+.project-studio-metric:last-child {
+  border-bottom: 0;
 }
 
 button.project-studio-metric {
@@ -6490,15 +6497,17 @@ button.project-studio-metric {
 
 button.project-studio-metric:hover,
 button.project-studio-metric:focus-visible {
-  background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
+  background: color-mix(in srgb, var(--project-color) 14%, transparent);
 }
 
 .project-studio-metric strong {
+  order: 2;
   font-size: 1.05rem;
   line-height: 1;
 }
 
 .project-studio-metric span {
+  order: 1;
   color: var(--text-secondary);
   font-size: 10px;
   font-weight: 650;
