@@ -54,6 +54,10 @@
   height: var(--panel-title-icon-size, 16px);
 }
 
+.permitext-workboard .help-icon {
+  display: none !important;
+}
+
 .permitext-workboard-canvas {
   position: relative;
   min-width: 0;
