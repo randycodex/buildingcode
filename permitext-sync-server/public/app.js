@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-empty-copy-v251";
+} from "./offline-storage.js?v=20260731-reader-authority-v253";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2126,6 +2126,15 @@ function renderReaderTrust(panel, reader) {
   const source = trust.querySelector(".reader-trust-source");
   source.href = profile.sourceURL;
   source.textContent = `Open ${profile.sourceLabel}`;
+  if (trust.dataset.interactionBound !== "true") {
+    trust.dataset.interactionBound = "true";
+    trust.addEventListener("toggle", () => {
+      if (!trust.open) return;
+      document.querySelectorAll(".reader-trust[open]").forEach((otherTrust) => {
+        if (otherTrust !== trust) otherTrust.open = false;
+      });
+    });
+  }
 }
 
 function codeFilterLabel(option) {
@@ -18458,6 +18467,15 @@ function openWorkspaceCommandPalette() {
 
 function bindWorkspaceKeyboardNavigation() {
   document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      const openTrust = document.querySelector(".reader-trust[open]");
+      if (openTrust) {
+        event.preventDefault();
+        openTrust.open = false;
+        openTrust.querySelector("summary")?.focus();
+        return;
+      }
+    }
     const commandModifier = event.metaKey || event.ctrlKey;
     if (commandModifier && event.key.toLowerCase() === "k") {
       event.preventDefault();
@@ -18508,6 +18526,9 @@ async function start() {
     ) {
       closeActiveCustomSelect();
     }
+    document.querySelectorAll(".reader-trust[open]").forEach((trust) => {
+      if (!trust.contains(event.target)) trust.open = false;
+    });
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });

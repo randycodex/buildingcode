@@ -440,6 +440,9 @@ async function main() {
     );
     assert(
       webRoot.text.includes('class="reader-trust" hidden') &&
+        webRoot.text.includes('class="reader-code-heading"') &&
+        webRoot.text.includes('aria-label="Code authority and source"') &&
+        webRoot.text.includes('class="reader-trust-state"') &&
         webRoot.text.includes('class="reader-trust-status"') &&
         webRoot.text.includes('class="reader-trust-boundary"') &&
         webRoot.text.includes('class="reader-trust-source"') &&
@@ -1106,7 +1109,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-empty-copy-v251'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-authority-v253'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1133,9 +1136,12 @@ async function main() {
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
         workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
-        workspaceStyles.text.includes(".reader-trust-details {\n  margin-top: var(--space-1);\n  margin-right: calc(-1 * var(--panel-padding));") &&
+        workspaceStyles.text.includes(".reader-code-heading {\n  display: flex;") &&
+        workspaceStyles.text.includes(".reader-trust {\n  position: relative;") &&
+        workspaceStyles.text.includes(".reader-trust-details {\n  position: absolute;") &&
         workspaceStyles.text.includes("--reader-header-overlay-height: calc(var(--panel-control-row-top) + 40px);") &&
-        workspaceStyles.text.includes(".reader-trust {\n  display: none;") &&
+        !workspaceStyles.text.includes(".reader-trust {\n  display: none;") &&
+        workspaceScript.text.includes('document.querySelectorAll(".reader-trust[open]")') &&
         workspaceStyles.text.includes("box-shadow: none;") &&
         workspaceStyles.text.includes(".project-studio-metrics {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 0;") &&
         workspaceStyles.text.includes(".project-studio-metric strong {\n  order: 2;") &&
@@ -1160,7 +1166,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-empty-copy-v251'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-authority-v253'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1371,7 +1377,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-empty-copy-v251'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-authority-v253'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

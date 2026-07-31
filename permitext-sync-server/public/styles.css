@@ -1093,7 +1093,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   min-height: var(--panel-title-row-height);
   margin-bottom: 0;
   padding-bottom: 0;
-  overflow: hidden;
+  overflow: visible;
   background: transparent;
 }
 
@@ -1170,7 +1170,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   display: block;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .panel-header > div:first-child {
@@ -1553,13 +1553,22 @@ body.is-detached-workboard-window .detached-workboard-error p {
   margin-bottom: 0;
 }
 
+.reader-code-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.reader-code-heading .reader-code-picker {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
 .reader-trust {
-  display: none;
-  position: absolute;
-  top: calc(var(--panel-control-row-top) + 32px);
-  right: var(--panel-padding);
-  left: var(--panel-padding);
-  z-index: 9;
+  position: relative;
+  z-index: 30;
+  flex: 0 0 var(--panel-title-control-size);
   color: var(--text-primary);
   font-family: var(--chrome-font-family);
 }
@@ -1569,15 +1578,16 @@ body.is-detached-workboard-window .detached-workboard-error p {
 }
 
 .reader-trust summary {
+  position: relative;
   display: grid;
-  grid-template-columns: 7px auto minmax(0, 1fr) 18px;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 30px;
-  padding: 5px 9px;
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  place-items: center;
+  padding: 0;
   border: 0;
-  border-radius: var(--radius-tile);
-  background: color-mix(in srgb, var(--code-accent) 10%, var(--surface-raised));
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
   cursor: pointer;
   list-style: none;
 }
@@ -1586,12 +1596,52 @@ body.is-detached-workboard-window .detached-workboard-error p {
   display: none;
 }
 
-.reader-trust summary::before {
-  width: 7px;
-  height: 7px;
+.reader-trust summary::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 5px;
+  height: 5px;
   border-radius: 999px;
   content: "";
   background: var(--code-accent);
+}
+
+.reader-trust summary:hover,
+.reader-trust summary:focus-visible,
+.reader-trust[open] summary {
+  color: var(--code-accent);
+}
+
+.reader-trust summary svg {
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+}
+
+.reader-trust-details {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  left: auto;
+  z-index: 31;
+  width: min(360px, calc(100vw - (2 * var(--panel-padding))));
+  max-height: min(440px, calc(100vh - 96px));
+  overflow: auto;
+  padding: var(--space-4);
+  border: 0;
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--surface-raised) 94%, var(--code-accent));
+  box-shadow: none;
+}
+
+.reader-trust-state {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid color-mix(in srgb, var(--code-accent) 22%, transparent);
 }
 
 .reader-trust-status {
@@ -1604,29 +1654,9 @@ body.is-detached-workboard-window .detached-workboard-error p {
   overflow: hidden;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.72);
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.reader-trust summary svg {
-  width: 16px;
-  height: 16px;
-  color: var(--text-secondary);
-  transition: transform 160ms ease;
-}
-
-.reader-trust[open] summary svg {
-  transform: rotate(90deg);
-}
-
-.reader-trust-details {
-  margin-top: var(--space-1);
-  margin-right: calc(-1 * var(--panel-padding));
-  padding: var(--space-3) calc(var(--space-3) + var(--panel-padding)) var(--space-3) var(--space-3);
-  border: 0;
-  border-radius: var(--radius-tile);
-  background: color-mix(in srgb, var(--surface-raised) 94%, var(--code-accent));
-  box-shadow: none;
 }
 
 .reader-trust-details dl {
@@ -1673,7 +1703,6 @@ body.is-detached-workboard-window .detached-workboard-error p {
   text-decoration: none;
 }
 
-.reader-trust summary:focus-visible,
 .reader-trust-source:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--code-accent) 66%, transparent);
   outline-offset: 3px;
