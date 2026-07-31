@@ -1625,11 +1625,12 @@ body.is-detached-workboard-window .detached-workboard-error p {
 
 .reader-trust-details {
   margin-top: var(--space-1);
-  padding: var(--space-3);
+  margin-right: calc(-1 * var(--panel-padding));
+  padding: var(--space-3) calc(var(--space-3) + var(--panel-padding)) var(--space-3) var(--space-3);
   border: 0;
   border-radius: var(--radius-tile);
   background: color-mix(in srgb, var(--surface-raised) 94%, var(--code-accent));
-  box-shadow: 0 14px 34px color-mix(in srgb, var(--text-primary) 10%, transparent);
+  box-shadow: none;
 }
 
 .reader-trust-details dl {
