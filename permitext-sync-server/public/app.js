@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v226";
+} from "./offline-storage.js?v=20260731-reader-trust-v227";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11670,12 +11670,9 @@ async function renderProjectNotebook(project) {
   const header = document.createElement("header");
   header.className = "notebook-header";
   const heading = document.createElement("div");
-  const eyebrow = document.createElement("span");
-  eyebrow.className = "notebook-eyebrow";
-  eyebrow.textContent = identity.name;
   const title = document.createElement("h2");
   title.textContent = "Notebook";
-  heading.append(eyebrow, title);
+  heading.append(title);
   const closeButton = document.createElement("button");
   closeButton.className = "notebook-close";
   closeButton.type = "button";

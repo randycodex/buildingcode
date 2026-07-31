@@ -676,6 +676,8 @@ async function main() {
         !workspaceScript.text.includes('addReferenceButton.textContent = "Add link"') &&
         !workspaceScript.text.includes('saveButton.textContent = "Save card"') &&
         !workspaceScript.text.includes('typeSelect.setAttribute("aria-label", "Notebook card type")') &&
+        !workspaceScript.text.includes('eyebrow.className = "notebook-eyebrow"') &&
+        !workspaceStyles.text.includes(".notebook-eyebrow") &&
         workspaceScript.text.includes("cardType: cardAtStart.cardType") &&
         workspaceScript.text.includes("No immutable Research answers are linked to this Project yet."),
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
@@ -1084,7 +1086,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v226'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v227'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1121,7 +1123,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v226'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v227'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1332,7 +1334,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v226'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v227'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
