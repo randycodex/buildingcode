@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-row-chevron-v174'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-source-end-v175'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1231,7 +1231,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-row-chevron-v174'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-source-end-v175'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

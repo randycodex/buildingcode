@@ -5055,7 +5055,6 @@ body.is-resizing-research-evidence * {
 }
 
 .research-sources {
-  border-bottom: 1px solid var(--border);
   padding: var(--space-2) 0 var(--space-4);
 }
 
