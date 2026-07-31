@@ -9745,6 +9745,9 @@ button.project-studio-metric:focus-visible {
 }
 
 .notebook-card-title {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   font-size: 16px;
   font-weight: 700;
 }
@@ -9866,10 +9869,6 @@ button.project-studio-metric:focus-visible {
 }
 
 @container (max-width: 400px) {
-  .notebook-card-fields {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .notebook-card-footer {
     align-items: stretch;
     flex-direction: column;
