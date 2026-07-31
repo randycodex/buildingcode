@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-saved-reader-close-v201";
+} from "./offline-storage.js?v=20260730-research-column-warning-v202";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2275,13 +2275,22 @@ function clear(element) {
   }
 }
 
-function openWebWarning({ title, message, confirmLabel = "Confirm", cancelLabel = "Cancel", cancellable = true }) {
+function openWebWarning({
+  title,
+  message,
+  confirmLabel = "Confirm",
+  cancelLabel = "Cancel",
+  cancellable = true,
+  container = null
+}) {
   activeWebWarningClose?.(false);
   const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   const titleID = `web-warning-title-${crypto.randomUUID()}`;
   const messageID = `web-warning-message-${crypto.randomUUID()}`;
   const backdrop = document.createElement("div");
   backdrop.className = "web-warning-backdrop";
+  const warningContainer = container instanceof HTMLElement ? container : null;
+  backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
   const dialog = document.createElement("section");
   dialog.className = "web-warning-dialog";
   dialog.tabIndex = -1;
@@ -2314,7 +2323,7 @@ function openWebWarning({ title, message, confirmLabel = "Confirm", cancelLabel 
   actions.append(confirmButton);
   dialog.append(heading, body, actions);
   backdrop.append(dialog);
-  document.body.append(backdrop);
+  (warningContainer || document.body).append(backdrop);
 
   return new Promise((resolve) => {
     let settled = false;
@@ -8737,7 +8746,7 @@ function createResearchProjectSelect({
   return select;
 }
 
-async function assignResearchConversationProject(conversation, targetProjectID) {
+async function assignResearchConversationProject(conversation, targetProjectID, options = {}) {
   try {
     return await postResearch("/research/conversations/assign-project", {
       conversationID: conversation.id,
@@ -8750,7 +8759,10 @@ async function assignResearchConversationProject(conversation, targetProjectID) 
       targetProjectID
         ? "Existing answers remain immutable in their original Project history. Additional Research facts will be cleared, and you must review the new Project context before asking another question."
         : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
-      { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
+      {
+        confirmLabel: targetProjectID ? "Move and review" : "Unassign",
+        container: options.warningContainer
+      }
     );
     if (!confirmed) return null;
     return postResearch("/research/conversations/assign-project", {
@@ -9408,7 +9420,9 @@ async function renderResearch(paneID = "utility:analysis") {
           projectSelect.disabled = true;
           projectSelect.setAttribute("aria-busy", "true");
           try {
-            const payload = await assignResearchConversationProject(conversation, targetProjectID);
+            const payload = await assignResearchConversationProject(conversation, targetProjectID, {
+              warningContainer: projectSelect.closest(".workspace-panel")
+            });
             if (!payload) {
               projectSelect.value = previousProjectID;
               return;

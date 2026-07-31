@@ -182,6 +182,17 @@ body.is-resizing-notes * {
   backdrop-filter: blur(2px);
 }
 
+.web-warning-backdrop.is-column-scoped {
+  position: absolute;
+  z-index: 20;
+  padding: var(--panel-padding);
+}
+
+.web-warning-backdrop.is-column-scoped .web-warning-dialog {
+  width: 100%;
+  padding: clamp(24px, 7cqw, 40px);
+}
+
 .web-warning-dialog {
   width: min(550px, 100%);
   padding: 40px 40px 40px;
@@ -4979,6 +4990,10 @@ mark {
   background: var(--research-conversation-background);
 }
 
+.research-list-panel {
+  position: relative;
+}
+
 .research-conversation-content {
   display: grid;
   grid-template-rows:
@@ -5543,6 +5558,8 @@ body.is-resizing-research-evidence * {
 
 .research-send-button {
   min-height: 42px;
+  border-radius: 0;
+  color: #ffffff;
 }
 
 .research-composer-status {
