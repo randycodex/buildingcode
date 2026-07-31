@@ -1080,7 +1080,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v220'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v221'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1113,7 +1113,9 @@ async function main() {
         workspaceStyles.text.includes(".project-studio-metrics {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 0;") &&
         workspaceStyles.text.includes(".project-studio-metric strong {\n  order: 2;") &&
         workspaceStyles.text.includes(".project-studio-metric span {\n  order: 1;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v220'),
+        workspaceStyles.text.includes(".notebook-toolbar {\n  display: grid;\n  grid-template-columns: repeat(4, max-content);") &&
+        workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v221'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1324,7 +1326,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v220'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v221'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

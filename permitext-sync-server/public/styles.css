@@ -9782,8 +9782,8 @@ button.project-studio-metric:focus-visible {
 }
 
 .notebook-toolbar {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, max-content);
   gap: var(--space-1);
   margin-bottom: var(--space-2);
 }
@@ -9793,7 +9793,8 @@ button.project-studio-metric:focus-visible {
 }
 
 .notebook-toolbar select {
-  flex: 1 1 180px;
+  grid-column: 1 / -1;
+  width: 100%;
 }
 
 .notebook-editor-surface {
