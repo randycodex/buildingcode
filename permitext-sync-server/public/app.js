@@ -26,12 +26,25 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-topbar-pills-v259";
+} from "./offline-storage.js?v=20260731-multi-workspace-v260";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
   shouldUseOfflineFallback
 } from "./client-reliability.js?v=20260731-debug-audit-v1";
+import {
+  applyWorkspaceLayout,
+  captureWorkspaceLayout,
+  createWorkspace,
+  deleteWorkspace,
+  duplicateWorkspace,
+  emptyWorkspaceLayout,
+  normalizeWorkspaceLayout,
+  normalizeWorkspaceRegistry,
+  renameWorkspace,
+  reorderWorkspace,
+  workspaceLayoutHasVisiblePanes
+} from "./workspace-state.js?v=20260731-multi-workspace-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -49,6 +62,9 @@ const permitextClientCapabilities = Object.freeze([
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
 const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
+const workspaceRegistryKey = "permitext:webWorkspaces:v2";
+const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
+const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
@@ -73,6 +89,9 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
+const workspaceTabs = document.querySelector("#workspace-tabs");
+const addWorkspaceButton = document.querySelector("#add-workspace");
+const workspaceActionsButton = document.querySelector("#workspace-actions");
 const connectionStatus = document.querySelector("#connection-status");
 const workspaceIssue = document.querySelector("#workspace-issue");
 const workspaceIssueCopy = workspaceIssue?.querySelector(".workspace-issue-copy");
@@ -149,6 +168,20 @@ const sharedWorkspaceStateKeys = [
   "localSavedSectionIDs",
   "continuityAppliedAt"
 ];
+const globalWorkspaceStateKeys = [
+  ...sharedWorkspaceStateKeys,
+  "recentSearches",
+  "recentSearchHistory",
+  "recentActivityUpdatedAt",
+  "pinnedSearches",
+  "recentlyViewedSections",
+  "browserCredentialID",
+  "recentChaptersByCode",
+  "readerSettings",
+  "savedTextSize",
+  "researchEvidenceSplitRatios",
+  "detachedWorkboards"
+];
 
 const defaultReaderSettings = {
   fontFamily: "system"
@@ -156,6 +189,12 @@ const defaultReaderSettings = {
 
 let chapters = [];
 let codeTrustProfiles = [];
+let workspaceRegistry = null;
+let activeWorkspaceID = "";
+let suppressReaderScrollRestore = false;
+let draggedWorkspaceID = "";
+let workspaceContextMenu = null;
+let workspaceLongPressTimer = null;
 let state = loadWorkspaceState();
 if (absorbBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
@@ -212,7 +251,7 @@ function loadWorkspaceState() {
     const detachedState = detachedProjectWindow
       ? JSON.parse(localStorage.getItem(workspaceKey) || "{}")
       : null;
-    const saved = detachedState
+    const legacySaved = detachedState
       ? {
           ...sharedState,
           paneWeights: detachedState.paneWeights,
@@ -223,8 +262,34 @@ function loadWorkspaceState() {
         : sharedState;
     if (!detachedState && tabState && typeof tabState === "object") {
       sharedWorkspaceStateKeys.forEach((key) => {
+        if (sharedState[key] !== undefined) legacySaved[key] = sharedState[key];
+      });
+    }
+    let saved = legacySaved;
+    if (!detachedProjectWindow) {
+      const storedRegistry = JSON.parse(localStorage.getItem(workspaceRegistryKey) || "null");
+      const requestedWorkspaceID = sessionStorage.getItem(activeWorkspaceSessionKey) || storedRegistry?.activeWorkspaceID || "";
+      workspaceRegistry = normalizeWorkspaceRegistry(storedRegistry, { activeWorkspaceID: requestedWorkspaceID });
+      activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+      let storedLayout = null;
+      try {
+        storedLayout = JSON.parse(localStorage.getItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`) || "null");
+      } catch {
+        storedLayout = null;
+      }
+      if (!storedRegistry) {
+        storedLayout = workspaceLayoutHasVisiblePanes(legacySaved)
+          ? captureWorkspaceLayout(legacySaved)
+          : emptyWorkspaceLayout();
+        localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
+        localStorage.setItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`, JSON.stringify(storedLayout));
+      }
+      const activeLayout = normalizeWorkspaceLayout(storedLayout || emptyWorkspaceLayout());
+      saved = { ...sharedState, ...activeLayout };
+      sharedWorkspaceStateKeys.forEach((key) => {
         if (sharedState[key] !== undefined) saved[key] = sharedState[key];
       });
+      sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
     }
     const utilityInstances = normalizeUtilityInstances(saved);
     const projectDetails = (Array.isArray(saved.projectDetails)
@@ -239,7 +304,7 @@ function loadWorkspaceState() {
       ? saved.readers.filter((reader) => reader && typeof reader === "object" && !reader.comparisonManaged)
       : [];
     return {
-      readers: savedReaders.length > 0 ? savedReaders : [newReaderState()],
+      readers: savedReaders,
       searchQuery: saved.searchQuery || "",
       searchCodeFilters: normalizeSearchCodeFilters(saved.searchCodeFilters ?? saved.searchCodeFilter),
       recentSearches: normalizeSearchHistory(saved.recentSearches, recentSearchLimit),
@@ -261,8 +326,8 @@ function loadWorkspaceState() {
       archivedProjectIDs: Array.isArray(saved.archivedProjectIDs) ? saved.archivedProjectIDs.map(String) : [],
       searchResultReader: null,
       sectionDetail: null,
-      sectionDetails: {},
-      sectionDetailAnchors: {},
+      sectionDetails: saved.sectionDetails && typeof saved.sectionDetails === "object" ? saved.sectionDetails : {},
+      sectionDetailAnchors: saved.sectionDetailAnchors && typeof saved.sectionDetailAnchors === "object" ? saved.sectionDetailAnchors : {},
       searchLinkedReaders: saved.searchLinkedReaders && typeof saved.searchLinkedReaders === "object" ? saved.searchLinkedReaders : {},
       projectDetail: activeProjectDetail,
       projectDetails,
@@ -302,11 +367,23 @@ function loadWorkspaceState() {
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
-      detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards)
+      detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards),
+      trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0
     };
   } catch {
+    if (!detachedProjectWindow) {
+      workspaceRegistry = normalizeWorkspaceRegistry(null);
+      activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+      try {
+        localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
+        localStorage.setItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`, JSON.stringify(emptyWorkspaceLayout()));
+        sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
+      } catch {
+        // The in-memory blank workspace remains usable if storage is unavailable.
+      }
+    }
     return {
-      readers: [newReaderState()],
+      readers: [],
       searchQuery: "",
       searchCodeFilters: [],
       recentSearches: [],
@@ -346,7 +423,8 @@ function loadWorkspaceState() {
       workboards: [],
       notebooks: [],
       reportDrafts: [],
-      detachedWorkboards: []
+      detachedWorkboards: [],
+      trackScrollLeft: 0
     };
   }
 }
@@ -424,7 +502,57 @@ function normalizeUtilityInstances(saved = {}) {
   return instances;
 }
 
+function workspaceSnapshotKey(workspaceID) {
+  return `${workspaceStateKeyPrefix}${workspaceID}`;
+}
+
+function activeWorkspaceRecord() {
+  return workspaceRegistry?.workspaces?.find((workspace) => workspace.id === activeWorkspaceID) || null;
+}
+
+function persistWorkspaceRegistry() {
+  if (detachedProjectWindow || !workspaceRegistry) return;
+  workspaceRegistry = normalizeWorkspaceRegistry(workspaceRegistry, { activeWorkspaceID });
+  activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+  localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
+  sessionStorage.setItem(activeWorkspaceSessionKey, activeWorkspaceID);
+}
+
+function loadWorkspaceSnapshot(workspaceID) {
+  try {
+    return normalizeWorkspaceLayout(
+      JSON.parse(localStorage.getItem(workspaceSnapshotKey(workspaceID)) || "null") || emptyWorkspaceLayout()
+    );
+  } catch {
+    return emptyWorkspaceLayout();
+  }
+}
+
 function saveWorkspaceState() {
+  if (!detachedProjectWindow) {
+    const layout = captureWorkspaceLayout(state, {
+      trackScrollLeft: track?.scrollLeft ?? state.trackScrollLeft ?? 0
+    });
+    state.trackScrollLeft = layout.trackScrollLeft;
+    localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(layout));
+    if (workspaceRegistry) {
+      const now = new Date().toISOString();
+      workspaceRegistry = {
+        ...workspaceRegistry,
+        activeWorkspaceID,
+        workspaces: workspaceRegistry.workspaces.map((workspace) => workspace.id === activeWorkspaceID
+          ? { ...workspace, updatedAt: now }
+          : workspace)
+      };
+      persistWorkspaceRegistry();
+    }
+    const globalState = Object.fromEntries(globalWorkspaceStateKeys.map((key) => [key, state[key]]));
+    localStorage.setItem(baseWorkspaceKey, JSON.stringify(globalState));
+    sessionStorage.removeItem(tabWorkspaceKey);
+    updateConnectionStatus();
+    return;
+  }
+
   const persistableState = {
     ...state,
     searchResultReader: null,
@@ -437,12 +565,8 @@ function saveWorkspaceState() {
     )
   };
   const { account: _account, ...persistableWorkspaceState } = persistableState;
-  if (!detachedProjectWindow) {
-    sessionStorage.setItem(tabWorkspaceKey, JSON.stringify(persistableWorkspaceState));
-  }
   localStorage.setItem(workspaceKey, JSON.stringify(persistableWorkspaceState));
   updateConnectionStatus();
-  if (!detachedProjectWindow) return;
   try {
     const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
     sharedWorkspaceStateKeys.forEach((key) => {
@@ -476,6 +600,351 @@ function applySharedWorkspaceState(serializedState) {
   } catch {
     // Ignore malformed cross-window state and keep the current in-memory data.
   }
+}
+
+function clearWorkspaceTransientRuntime() {
+  searchTimers.forEach((timer) => clearTimeout(timer));
+  readerSearchTimers.forEach((timer) => clearTimeout(timer));
+  searchTimers.clear();
+  readerSearchTimers.clear();
+  activeResearchConversation = null;
+  researchQuestionDraft = "";
+  activeEvidenceDiscovery = null;
+  pendingResearchSelection = null;
+  researchSelectionMenuInteracting = false;
+  researchSelectionMenuPinned = false;
+  closeActiveCustomSelect();
+}
+
+async function confirmWorkspaceTransition() {
+  for (const project of openProjectDetails()) {
+    if (projectHasOpenNotebook(project) && !(await confirmNotebookDiscard(project))) return false;
+    if (projectHasOpenReportDraft(project) && !(await confirmReportDraftDiscard(project))) return false;
+  }
+  return true;
+}
+
+function applyStoredWorkspaceLayout(layout) {
+  applyWorkspaceLayout(state, layout);
+  state.utilityInstances = normalizeUtilityInstances(state);
+  setOpenProjectDetails(state.projectDetails);
+  state.workboards = normalizeProjectIdentities(state.workboards);
+  state.notebooks = normalizeProjectIdentities(state.notebooks);
+  state.reportDrafts = normalizeProjectIdentities(state.reportDrafts);
+  clearWorkspaceTransientRuntime();
+}
+
+async function switchWorkspace(workspaceID, options = {}) {
+  const target = workspaceRegistry?.workspaces?.find((workspace) => workspace.id === workspaceID);
+  if (!target) return false;
+  if (workspaceID === activeWorkspaceID) {
+    renderWorkspaceTabs();
+    if (options.focus !== false) focusActiveWorkspaceTab();
+    return true;
+  }
+  if (!(await confirmWorkspaceTransition())) {
+    renderWorkspaceTabs();
+    return false;
+  }
+  saveWorkspaceState();
+  activeWorkspaceID = workspaceID;
+  workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
+  applyStoredWorkspaceLayout(loadWorkspaceSnapshot(workspaceID));
+  persistWorkspaceRegistry();
+  suppressReaderScrollRestore = true;
+  try {
+    await renderWorkspace();
+  } finally {
+    suppressReaderScrollRestore = false;
+  }
+  const scrollLeft = Number(state.trackScrollLeft) || 0;
+  track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
+  if (options.focus !== false) focusActiveWorkspaceTab();
+  return true;
+}
+
+async function createNewWorkspace() {
+  if (!(await confirmWorkspaceTransition())) return;
+  saveWorkspaceState();
+  const creation = createWorkspace(workspaceRegistry);
+  workspaceRegistry = creation.registry;
+  activeWorkspaceID = creation.workspace.id;
+  localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(creation.layout));
+  applyStoredWorkspaceLayout(creation.layout);
+  persistWorkspaceRegistry();
+  suppressReaderScrollRestore = true;
+  try {
+    await renderWorkspace();
+  } finally {
+    suppressReaderScrollRestore = false;
+  }
+  beginWorkspaceRename(activeWorkspaceID);
+}
+
+function commitWorkspaceRename(workspaceID, name) {
+  workspaceRegistry = renameWorkspace(workspaceRegistry, workspaceID, name);
+  persistWorkspaceRegistry();
+  renderWorkspaceTabs();
+  focusActiveWorkspaceTab();
+}
+
+function beginWorkspaceRename(workspaceID) {
+  closeWorkspaceContextMenu();
+  const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(workspaceID)}"]`);
+  const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
+  if (!tab || !workspace) return;
+  const input = document.createElement("input");
+  input.className = "workspace-name-input";
+  input.value = workspace.name;
+  input.maxLength = 40;
+  input.setAttribute("aria-label", `Rename ${workspace.name}`);
+  tab.replaceWith(input);
+  let finished = false;
+  const finish = (commit) => {
+    if (finished) return;
+    finished = true;
+    if (commit) commitWorkspaceRename(workspaceID, input.value);
+    else renderWorkspaceTabs();
+  };
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finish(true);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      finish(false);
+    }
+  });
+  input.addEventListener("blur", () => finish(true), { once: true });
+  input.focus();
+  input.select();
+}
+
+async function duplicateNamedWorkspace(workspaceID) {
+  if (!(await confirmWorkspaceTransition())) return;
+  if (workspaceID === activeWorkspaceID) saveWorkspaceState();
+  const duplication = duplicateWorkspace(
+    workspaceRegistry,
+    workspaceID,
+    loadWorkspaceSnapshot(workspaceID)
+  );
+  if (!duplication) return;
+  workspaceRegistry = duplication.registry;
+  activeWorkspaceID = duplication.workspace.id;
+  localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(duplication.layout));
+  applyStoredWorkspaceLayout(duplication.layout);
+  persistWorkspaceRegistry();
+  suppressReaderScrollRestore = true;
+  try {
+    await renderWorkspace();
+  } finally {
+    suppressReaderScrollRestore = false;
+  }
+  beginWorkspaceRename(activeWorkspaceID);
+}
+
+async function removeNamedWorkspace(workspaceID) {
+  const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
+  if (!workspace) return;
+  const confirmed = await confirmWebWarning(
+    `Delete “${workspace.name}”?`,
+    "This removes its column arrangement only. Projects, notes, saved evidence, and Research will not be deleted.",
+    { confirmLabel: "Delete Workspace" }
+  );
+  if (!confirmed) return;
+  const deletingActiveWorkspace = workspaceID === activeWorkspaceID;
+  if (deletingActiveWorkspace && !(await confirmWorkspaceTransition())) return;
+  if (deletingActiveWorkspace) saveWorkspaceState();
+  const removal = deleteWorkspace(workspaceRegistry, workspaceID);
+  workspaceRegistry = removal.registry;
+  if (removal.deletedWorkspaceID) {
+    localStorage.removeItem(workspaceSnapshotKey(removal.deletedWorkspaceID));
+  }
+  if (!deletingActiveWorkspace) {
+    persistWorkspaceRegistry();
+    renderWorkspaceTabs();
+    return;
+  }
+  activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+  const nextLayout = removal.replacementLayout || loadWorkspaceSnapshot(activeWorkspaceID);
+  if (removal.replacementLayout) {
+    localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(nextLayout));
+  }
+  applyStoredWorkspaceLayout(nextLayout);
+  persistWorkspaceRegistry();
+  suppressReaderScrollRestore = true;
+  try {
+    await renderWorkspace();
+  } finally {
+    suppressReaderScrollRestore = false;
+  }
+  focusActiveWorkspaceTab();
+}
+
+function moveNamedWorkspace(workspaceID, direction) {
+  const workspaces = workspaceRegistry?.workspaces || [];
+  const index = workspaces.findIndex((workspace) => workspace.id === workspaceID);
+  const target = workspaces[index + direction];
+  if (index === -1 || !target) return;
+  workspaceRegistry = reorderWorkspace(
+    workspaceRegistry,
+    workspaceID,
+    target.id,
+    direction < 0 ? "before" : "after"
+  );
+  persistWorkspaceRegistry();
+  renderWorkspaceTabs();
+  focusActiveWorkspaceTab();
+}
+
+function closeWorkspaceContextMenu() {
+  workspaceContextMenu?.remove();
+  workspaceContextMenu = null;
+  workspaceActionsButton?.setAttribute("aria-expanded", "false");
+}
+
+function openWorkspaceContextMenu(workspaceID, anchor) {
+  closeWorkspaceContextMenu();
+  const workspace = workspaceRegistry?.workspaces?.find((item) => item.id === workspaceID);
+  if (!workspace) return;
+  const workspaces = workspaceRegistry.workspaces;
+  const index = workspaces.findIndex((item) => item.id === workspaceID);
+  const menu = document.createElement("div");
+  menu.className = "workspace-context-menu";
+  menu.setAttribute("role", "menu");
+  menu.setAttribute("aria-label", `${workspace.name} actions`);
+  const actions = [
+    { label: "Rename", run: () => beginWorkspaceRename(workspaceID) },
+    { label: "Duplicate", run: () => void duplicateNamedWorkspace(workspaceID) },
+    { label: "Move left", disabled: index <= 0, run: () => moveNamedWorkspace(workspaceID, -1) },
+    { label: "Move right", disabled: index >= workspaces.length - 1, run: () => moveNamedWorkspace(workspaceID, 1) },
+    { label: "Delete", danger: true, run: () => void removeNamedWorkspace(workspaceID) }
+  ];
+  actions.forEach((action) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "menuitem");
+    button.textContent = action.label;
+    button.disabled = Boolean(action.disabled);
+    button.classList.toggle("is-danger", Boolean(action.danger));
+    button.addEventListener("click", () => {
+      closeWorkspaceContextMenu();
+      action.run();
+    });
+    menu.append(button);
+  });
+  document.body.append(menu);
+  workspaceContextMenu = menu;
+  workspaceActionsButton?.setAttribute("aria-expanded", "true");
+  const rect = anchor?.getBoundingClientRect?.() || workspaceActionsButton?.getBoundingClientRect();
+  const menuRect = menu.getBoundingClientRect();
+  const left = Math.min(
+    Math.max(8, (rect?.right || window.innerWidth) - menuRect.width),
+    window.innerWidth - menuRect.width - 8
+  );
+  const top = Math.min((rect?.bottom || 0) + 6, window.innerHeight - menuRect.height - 8);
+  menu.style.left = `${left}px`;
+  menu.style.top = `${Math.max(8, top)}px`;
+  menu.querySelector("button:not(:disabled)")?.focus();
+}
+
+function focusActiveWorkspaceTab() {
+  requestAnimationFrame(() => {
+    const tab = workspaceTabs?.querySelector(`[data-workspace-id="${CSS.escape(activeWorkspaceID)}"]`);
+    tab?.scrollIntoView({ inline: "nearest", block: "nearest" });
+    tab?.focus({ preventScroll: true });
+  });
+}
+
+function renderWorkspaceTabs() {
+  const container = workspaceTabs?.closest(".topbar-workspaces");
+  if (!workspaceTabs || !container) return;
+  container.hidden = detachedProjectWindow;
+  if (detachedProjectWindow) return;
+  clear(workspaceTabs);
+  (workspaceRegistry?.workspaces || []).forEach((workspace) => {
+    const tab = document.createElement("button");
+    tab.type = "button";
+    tab.className = "workspace-tab";
+    tab.dataset.workspaceId = workspace.id;
+    tab.setAttribute("role", "tab");
+    tab.setAttribute("aria-selected", String(workspace.id === activeWorkspaceID));
+    tab.tabIndex = workspace.id === activeWorkspaceID ? 0 : -1;
+    tab.title = `${workspace.name}. Double-click to rename; right-click for actions.`;
+    const label = document.createElement("span");
+    label.textContent = workspace.name;
+    tab.append(label);
+    tab.draggable = true;
+    tab.addEventListener("click", () => void switchWorkspace(workspace.id));
+    tab.addEventListener("dblclick", (event) => {
+      event.preventDefault();
+      beginWorkspaceRename(workspace.id);
+    });
+    tab.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+      openWorkspaceContextMenu(workspace.id, tab);
+    });
+    tab.addEventListener("keydown", (event) => {
+      if (event.key === "F2") {
+        event.preventDefault();
+        beginWorkspaceRename(workspace.id);
+      } else if (event.key === "ContextMenu" || (event.shiftKey && event.key === "F10")) {
+        event.preventDefault();
+        openWorkspaceContextMenu(workspace.id, tab);
+      } else if (["ArrowLeft", "ArrowRight"].includes(event.key)) {
+        const tabs = Array.from(workspaceTabs.querySelectorAll(".workspace-tab"));
+        const currentIndex = tabs.indexOf(tab);
+        const direction = event.key === "ArrowLeft" ? -1 : 1;
+        const next = tabs[(currentIndex + direction + tabs.length) % tabs.length];
+        if (next) {
+          event.preventDefault();
+          next.focus();
+        }
+      }
+    });
+    tab.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") return;
+      clearTimeout(workspaceLongPressTimer);
+      workspaceLongPressTimer = window.setTimeout(() => openWorkspaceContextMenu(workspace.id, tab), 520);
+    });
+    ["pointerup", "pointercancel", "pointerleave"].forEach((eventName) => {
+      tab.addEventListener(eventName, () => clearTimeout(workspaceLongPressTimer));
+    });
+    tab.addEventListener("dragstart", (event) => {
+      draggedWorkspaceID = workspace.id;
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", workspace.id);
+      tab.classList.add("is-dragging");
+    });
+    tab.addEventListener("dragend", () => {
+      draggedWorkspaceID = "";
+      tab.classList.remove("is-dragging");
+    });
+    tab.addEventListener("dragover", (event) => {
+      if (!draggedWorkspaceID || draggedWorkspaceID === workspace.id) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+    });
+    tab.addEventListener("drop", (event) => {
+      const sourceID = draggedWorkspaceID || event.dataTransfer.getData("text/plain");
+      if (!sourceID || sourceID === workspace.id) return;
+      event.preventDefault();
+      const rect = tab.getBoundingClientRect();
+      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
+      workspaceRegistry = reorderWorkspace(workspaceRegistry, sourceID, workspace.id, position);
+      persistWorkspaceRegistry();
+      renderWorkspaceTabs();
+      focusActiveWorkspaceTab();
+    });
+    workspaceTabs.append(tab);
+  });
+  workspaceActionsButton.disabled = !activeWorkspaceRecord();
+}
+
+function updateWorkspaceLayoutControls() {
+  const hasColumns = defaultActivePaneIDs().length > 0;
+  fitColumnsButton.disabled = !hasColumns;
+  collapseReadersButton.disabled = !hasColumns;
 }
 
 function normalizeProjectIdentities(value, legacyWorkboard = null) {
@@ -1444,7 +1913,6 @@ function clearProjectSpecificReaders(project) {
   state.readers = (state.readers || []).filter((reader) =>
     reader.projectSavedSourceKey !== projectKey
   );
-  if (!state.readers.length) state.readers = [newReaderState()];
 }
 
 function clearProjectSpecificResearch(project) {
@@ -1829,7 +2297,6 @@ function closeLinkedReaderForSearch(searchID) {
   state.readers = (state.readers || []).filter((reader) => reader.id !== readerID);
   delete state.paneWeights[readerPaneID];
   state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
-  if (state.readers.length === 0) state.readers = [newReaderState()];
 }
 
 function closeLinkedReaderForSavedPane(savedPaneID) {
@@ -1848,7 +2315,6 @@ function closeLinkedReaderForSavedPane(savedPaneID) {
     delete state.paneWeights[readerPaneID];
     state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== readerPaneID);
   });
-  if (state.readers.length === 0) state.readers = [newReaderState()];
 }
 
 function searchResultDetail(result) {
@@ -3170,7 +3636,8 @@ function isProAccount() {
 function updateReaderPlanControls() {
   addReaderButton.hidden = !isProAccount() && state.readers.length >= 2;
   if (addZoningReaderButton) addZoningReaderButton.hidden = false;
-  collapseReadersButton.hidden = state.readers.length <= 1;
+  collapseReadersButton.hidden = false;
+  updateWorkspaceLayoutControls();
 }
 
 function enforceReaderPlanLimit() {
@@ -7848,7 +8315,7 @@ async function renderReader(reader, options = {}) {
   if (options.isSearchResult) {
     closeButton.hidden = false;
   } else {
-    closeButton.hidden = state.readers.length <= 1;
+    closeButton.hidden = false;
   }
 
   populateCodeSelect(panel, reader);
@@ -7923,9 +8390,6 @@ async function renderReader(reader, options = {}) {
       Object.keys(searchLinkedReadersBySearch()).forEach((searchID) => {
         if (state.searchLinkedReaders[searchID] === reader.id) delete state.searchLinkedReaders[searchID];
       });
-      if (state.readers.length === 0) {
-        state.readers = [newReaderState()];
-      }
     }
     saveWorkspaceState();
     void transitionWorkspace("utility");
@@ -15942,6 +16406,29 @@ async function openSectionDetailForExistingSearch(item, options = {}) {
   await openSectionDetail(searchInstance.id, item, options);
 }
 
+async function openDeepLinkedSectionInReader(item) {
+  const detail = searchResultDetail(item);
+  let reader = (state.readers || []).find((candidate) => candidate.codePrefix === detail.codePrefix);
+  if (!reader) {
+    reader = newReaderState(readerFieldsForSectionDetail(detail, {
+      shouldSmoothScrollToSection: false
+    }));
+    state.readers.push(reader);
+  } else {
+    Object.assign(reader, readerFieldsForSectionDetail(detail, {
+      shouldSmoothScrollToSection: false
+    }));
+  }
+  const paneID = paneIDForReader(reader);
+  state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
+  appendPaneIfMissing(paneID);
+  scheduleContinuitySync(reader);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  alignReaderSectionAfterLayout(reader);
+  scrollPaneIntoView(paneID);
+}
+
 function closeSavedItemDetailsForPane(savedPaneID) {
   const details = sectionDetailsBySearch();
   const anchors = sectionDetailAnchorsBySearch();
@@ -17433,9 +17920,17 @@ function renderSettings() {
       persistAccountSession(null);
       stopForegroundSyncLoop();
       Object.keys(localStorage)
-        .filter((key) => key.startsWith(`${baseWorkspaceKey}:detached:`))
+        .filter((key) =>
+          key.startsWith(`${baseWorkspaceKey}:detached:`) ||
+          key.startsWith(workspaceStateKeyPrefix)
+        )
         .forEach((key) => localStorage.removeItem(key));
+      localStorage.removeItem(workspaceRegistryKey);
       sessionStorage.removeItem(tabWorkspaceKey);
+      sessionStorage.removeItem(activeWorkspaceSessionKey);
+      workspaceRegistry = normalizeWorkspaceRegistry(null);
+      activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
+      applyStoredWorkspaceLayout(emptyWorkspaceLayout());
       saveWorkspaceState();
       await renderWorkspace();
     } catch (error) {
@@ -18040,6 +18535,17 @@ function appendPaneSequence(panes) {
     }
     nodes.push(pane);
   });
+  if (!orderedPanes.length && !detachedProjectWindow) {
+    const emptyState = track.querySelector(":scope > .workspace-empty-state") || document.createElement("section");
+    emptyState.className = "workspace-empty-state";
+    emptyState.setAttribute("aria-label", "Empty workspace");
+    if (!emptyState.firstElementChild) {
+      const message = document.createElement("p");
+      message.textContent = "Open a Reader, Search, Saved, or a Project to begin.";
+      emptyState.append(message);
+    }
+    nodes.push(emptyState);
+  }
   const desiredNodes = new Set(nodes);
   Array.from(track.children).forEach((node) => {
     if (!desiredNodes.has(node)) node.remove();
@@ -18130,10 +18636,11 @@ function restoreReaderScrollPositions(positions) {
 }
 
 async function renderWorkspace() {
-  const readerScrollPositions = captureReaderScrollPositions();
+  const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   await ensureSyncedContentForRender();
   enforceReaderPlanLimit();
   updateReaderPlanControls();
+  renderWorkspaceTabs();
   closeDeletedProjectDetails();
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
@@ -18186,6 +18693,7 @@ async function renderWorkspace() {
 async function renderUtilityWorkspace(options = {}) {
   enforceReaderPlanLimit();
   updateReaderPlanControls();
+  renderWorkspaceTabs();
   closeDeletedProjectDetails();
   const existingPanesByID = new Map(
     Array.from(track.querySelectorAll(".workspace-panel"))
@@ -18252,7 +18760,7 @@ async function renderUtilityWorkspace(options = {}) {
     const paneID = paneIDForReader(reader);
     const pane = await reuseOrRenderPane(paneID, () => renderReader(reader));
     const closeButton = pane?.querySelector(".reader-close");
-    if (closeButton) closeButton.hidden = state.readers.length <= 1;
+    if (closeButton) closeButton.hidden = false;
     if (pane) panes.push(pane);
   }
 
@@ -18337,42 +18845,42 @@ async function toggleUtilityPane(key) {
 }
 
 async function fitVisibleColumns() {
+  state.paneOrder = [];
   const paneIDs = activePaneIDs();
   state.paneWeights = paneIDs.reduce((weights, paneID) => {
     weights[paneID] = defaultPaneWidthForID(paneID);
     return weights;
   }, {});
   saveWorkspaceState();
-  track.querySelectorAll(".workspace-panel").forEach((pane) => {
-    if (pane.dataset.paneId) {
-      applyPaneWeight(pane, pane.dataset.paneId);
-    }
-  });
+  await transitionWorkspace("utility");
   track.scrollTo({ left: 0, behavior: "smooth" });
 }
 
-async function collapseToOneReader() {
-  const reader = state.readers[0] || newReaderState();
-  state.readers = [reader];
+async function closeAllColumns() {
+  if (!(await confirmWorkspaceTransition())) return false;
+  state.readers = [];
   state.searchResultReader = null;
   state.sectionDetail = null;
   state.sectionDetails = {};
+  state.sectionDetailAnchors = {};
   state.searchLinkedReaders = {};
   setOpenProjectDetails([]);
   state.workboards = [];
   state.notebooks = [];
+  state.reportDrafts = [];
   Object.keys(state.utilities).forEach((key) => {
     state.utilities[key] = false;
   });
   state.utilityInstances = [];
   state.researchConversationID = "";
   activeResearchConversation = null;
-  const readerPaneID = paneIDForReader(reader);
-  state.paneOrder = [readerPaneID];
-  state.paneWeights = { [readerPaneID]: defaultPaneWidthForID(readerPaneID) };
+  state.paneOrder = [];
+  state.paneWeights = {};
+  state.trackScrollLeft = 0;
   saveWorkspaceState();
   await transitionWorkspace("utility");
   track.scrollTo({ left: 0, behavior: "smooth" });
+  return true;
 }
 
 async function focusUtility(key, selector = "") {
@@ -18407,9 +18915,9 @@ function workspaceCommandDefinitions() {
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
-    { label: "Reset Column Widths", hint: "Fit the current workspace", run: () => fitVisibleColumns() },
-    ...(state.readers.length > 1
-      ? [{ label: "Keep One Reader", hint: "Close every other workspace column", run: () => collapseToOneReader() }]
+    { label: "Reset Columns", hint: "Restore the current workspace order and widths", run: () => fitVisibleColumns() },
+    ...(defaultActivePaneIDs().length
+      ? [{ label: "Close All", hint: "Close every column in the current workspace", run: () => closeAllColumns() }]
       : [])
   ];
 }
@@ -18492,6 +19000,12 @@ function openWorkspaceCommandPalette() {
 function bindWorkspaceKeyboardNavigation() {
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
+      if (workspaceContextMenu) {
+        event.preventDefault();
+        closeWorkspaceContextMenu();
+        workspaceActionsButton?.focus();
+        return;
+      }
       const openTrust = document.querySelector(".reader-trust[open]");
       if (openTrust) {
         event.preventDefault();
@@ -18552,6 +19066,13 @@ async function start() {
     document.querySelectorAll(".reader-trust[open]").forEach((trust) => {
       if (!trust.contains(event.target)) trust.open = false;
     });
+    if (
+      workspaceContextMenu &&
+      !workspaceContextMenu.contains(event.target) &&
+      !event.target.closest(".workspace-tab, .workspace-actions-button")
+    ) {
+      closeWorkspaceContextMenu();
+    }
   });
   window.addEventListener("resize", repositionActiveCustomSelect);
   window.addEventListener("resize", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
@@ -18575,6 +19096,23 @@ async function start() {
       return;
     }
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
+    if (!detachedProjectWindow && event.key === workspaceRegistryKey && event.newValue) {
+      try {
+        const nextRegistry = normalizeWorkspaceRegistry(JSON.parse(event.newValue), {
+          activeWorkspaceID
+        });
+        const activeStillExists = nextRegistry.workspaces.some((workspace) => workspace.id === activeWorkspaceID);
+        workspaceRegistry = nextRegistry;
+        if (activeStillExists) {
+          workspaceRegistry.activeWorkspaceID = activeWorkspaceID;
+          renderWorkspaceTabs();
+        } else {
+          void switchWorkspace(nextRegistry.activeWorkspaceID);
+        }
+      } catch {
+        // Ignore malformed registry updates from another tab.
+      }
+    }
     if (!detachedProjectWindow && event.key === "permitext:pendingWorkboardReattach" && event.newValue) {
       try {
         void reattachProjectWorkboard(JSON.parse(event.newValue));
@@ -18693,22 +19231,32 @@ async function start() {
     toggleUtilityPane("archive");
   });
   toggleSearchButton.addEventListener("click", () => {
-    toggleUtilityPane("search");
+    focusUtility("search", ".search-input");
   });
   toggleSavedButton.addEventListener("click", () => {
-    toggleUtilityPane("saved");
+    focusUtility("saved");
   });
   toggleAnalysisButton.addEventListener("click", () => {
-    toggleUtilityPane("analysis");
+    focusUtility("analysis");
   });
   toggleSettingsButton.addEventListener("click", () => {
-    toggleUtilityPane("settings");
+    focusUtility("settings");
+  });
+  addWorkspaceButton?.addEventListener("click", () => {
+    void createNewWorkspace();
+  });
+  workspaceActionsButton?.addEventListener("click", () => {
+    if (workspaceContextMenu) {
+      closeWorkspaceContextMenu();
+      return;
+    }
+    openWorkspaceContextMenu(activeWorkspaceID, workspaceActionsButton);
   });
   fitColumnsButton.addEventListener("click", () => {
     fitVisibleColumns();
   });
   collapseReadersButton.addEventListener("click", () => {
-    collapseToOneReader();
+    closeAllColumns();
   });
   const deepLinkedSectionID = deepLinkedSectionIDFromLocation();
   consumeBrowserSectionURL();
@@ -18717,10 +19265,14 @@ async function start() {
     saveWorkspaceState();
   }
   await renderWorkspace();
+  track.scrollLeft = Math.min(
+    Number(state.trackScrollLeft) || 0,
+    Math.max(0, track.scrollWidth - track.clientWidth)
+  );
   if (deepLinkedSectionID) {
     try {
       const payload = await api(`/code/sections/${deepLinkedSectionID}`);
-      await openSectionDetailForExistingSearch(payload.section, { updateURL: false });
+      await openDeepLinkedSectionInReader(payload.section);
     } catch (error) {
       console.warn("Could not open shared section link.", error);
       window.history.replaceState({}, "", "/");

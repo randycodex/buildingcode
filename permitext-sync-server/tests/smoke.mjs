@@ -452,7 +452,26 @@ async function main() {
 
     const workspaceScript = await request("/web/app.js");
     const workspaceStyles = await request("/web/styles.css");
+    const workspaceStateScript = await request("/web/workspace-state.js");
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
+    assert(
+      webRoot.text.includes('id="workspace-tabs"') &&
+        webRoot.text.includes('id="add-workspace"') &&
+        webRoot.text.includes('id="workspace-actions"') &&
+        webRoot.text.includes(">Close All</button>") &&
+        !webRoot.text.includes(">One Reader</button>") &&
+        workspaceScript.text.includes('const workspaceRegistryKey = "permitext:webWorkspaces:v2"') &&
+        workspaceScript.text.includes("function renderWorkspaceTabs()") &&
+        workspaceScript.text.includes("async function switchWorkspace") &&
+        workspaceScript.text.includes("async function closeAllColumns()") &&
+        workspaceScript.text.includes("async function openDeepLinkedSectionInReader") &&
+        workspaceStyles.text.includes(".topbar-workspaces {") &&
+        workspaceStyles.text.includes(".workspace-empty-state {") &&
+        workspaceStateScript.text.includes("export function emptyWorkspaceLayout()") &&
+        workspaceStateScript.text.includes("export function duplicateWorkspace"),
+      "Blank-start named workspaces, single-row pills, Close All, or direct-link Reader wiring is missing."
+    );
     assert(
       workspaceScript.text.includes('panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"))'),
       "Settings close-column control is not wired to close the Settings pane."
@@ -860,7 +879,8 @@ async function main() {
         workspaceScript.text.includes("saved.browserCredentialID") &&
         workspaceScript.text.includes('const accountSessionKey = "permitext:webAccount:v1"') &&
         workspaceScript.text.includes('const tabWorkspaceKey = "permitext:webWorkspaceTab:v1"') &&
-        workspaceScript.text.includes("sessionStorage.setItem(tabWorkspaceKey") &&
+        workspaceScript.text.includes("sessionStorage.getItem(tabWorkspaceKey)") &&
+        workspaceScript.text.includes("sessionStorage.setItem(activeWorkspaceSessionKey") &&
         workspaceScript.text.includes("persistAccountSession(null)") &&
         workspaceScript.text.includes("recentSearchesJSON"),
       "Web foreground sync no longer applies iOS bulk clears or recent-search continuity."
@@ -1109,7 +1129,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-topbar-pills-v259'),
+        webRoot.text.includes('/web/app.js?v=20260731-multi-workspace-v260'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1169,7 +1189,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v259'),
+        webRoot.text.includes('/web/styles.css?v=20260731-multi-workspace-v260'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1380,7 +1400,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-pills-v259'),
+        webRoot.text.includes('/web/styles.css?v=20260731-multi-workspace-v260'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1555,7 +1575,7 @@ async function main() {
       workspaceScript.text.includes("function enforceReaderPlanLimit") &&
         workspaceScript.text.includes("if (isProAccount() || state.readers.length <= 2) return false") &&
         workspaceScript.text.includes("addReaderButton.hidden = !isProAccount() && state.readers.length >= 2") &&
-        workspaceScript.text.includes("collapseReadersButton.hidden = state.readers.length <= 1") &&
+        workspaceScript.text.includes("collapseReadersButton.disabled = !hasColumns") &&
         workspaceScript.text.includes("const canAddReader = isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("isProAccount() || state.readers.length < 2") &&
         workspaceScript.text.includes("if (!isProAccount() && state.readers.length >= 2)"),
@@ -1602,7 +1622,7 @@ async function main() {
       workspaceScript.text.includes("function captureReaderScrollPositions()") &&
         workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
         workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
-        workspaceScript.text.match(/async function renderWorkspace\(\) \{\s+const readerScrollPositions = captureReaderScrollPositions\(\);/) &&
+        workspaceScript.text.match(/async function renderWorkspace\(\) \{\s+const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
         workspaceScript.text.match(/appendPaneSequence\(panes\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
         workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
       "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."
