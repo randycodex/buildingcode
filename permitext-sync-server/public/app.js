@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v215";
+} from "./offline-storage.js?v=20260731-reader-trust-v216";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -2374,6 +2374,28 @@ function clear(element) {
   }
 }
 
+function resolveWebWarningContainer(container, previousFocus = document.activeElement) {
+  const explicitContainer = container instanceof HTMLElement ? container : null;
+  return explicitContainer?.closest(".workspace-panel") ||
+    explicitContainer ||
+    (previousFocus instanceof HTMLElement ? previousFocus.closest(".workspace-panel") : null);
+}
+
+function mountWebWarningBackdrop(backdrop, container, previousFocus) {
+  const warningContainer = resolveWebWarningContainer(container, previousFocus);
+  backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
+  warningContainer?.classList.add("has-web-warning");
+  (warningContainer || document.body).append(backdrop);
+  return warningContainer;
+}
+
+function unmountWebWarningBackdrop(backdrop, warningContainer) {
+  backdrop.remove();
+  if (!warningContainer?.querySelector(".web-warning-backdrop.is-column-scoped")) {
+    warningContainer?.classList.remove("has-web-warning");
+  }
+}
+
 function openWebWarning({
   title,
   message,
@@ -2388,8 +2410,6 @@ function openWebWarning({
   const messageID = `web-warning-message-${crypto.randomUUID()}`;
   const backdrop = document.createElement("div");
   backdrop.className = "web-warning-backdrop";
-  const warningContainer = container instanceof HTMLElement ? container : null;
-  backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
   const dialog = document.createElement("section");
   dialog.className = "web-warning-dialog";
   dialog.tabIndex = -1;
@@ -2422,14 +2442,14 @@ function openWebWarning({
   actions.append(confirmButton);
   dialog.append(heading, body, actions);
   backdrop.append(dialog);
-  (warningContainer || document.body).append(backdrop);
+  const warningContainer = mountWebWarningBackdrop(backdrop, container, previousFocus);
 
   return new Promise((resolve) => {
     let settled = false;
     const close = (confirmed) => {
       if (settled) return;
       settled = true;
-      backdrop.remove();
+      unmountWebWarningBackdrop(backdrop, warningContainer);
       if (activeWebWarningClose === close) activeWebWarningClose = null;
       previousFocus?.focus?.({ preventScroll: true });
       resolve(confirmed);
@@ -2526,14 +2546,14 @@ function openStripeRestoreDialog(onSubmit) {
   label.append(input);
   dialog.append(heading, body, label, error, actions);
   backdrop.append(dialog);
-  document.body.append(backdrop);
+  const warningContainer = mountWebWarningBackdrop(backdrop, null, previousFocus);
 
   return new Promise((resolve) => {
     let settled = false;
     const close = (restored) => {
       if (settled) return;
       settled = true;
-      backdrop.remove();
+      unmountWebWarningBackdrop(backdrop, warningContainer);
       if (activeWebWarningClose === close) activeWebWarningClose = null;
       previousFocus?.focus?.({ preventScroll: true });
       resolve(restored);

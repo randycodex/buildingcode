@@ -1070,7 +1070,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v215'),
+        webRoot.text.includes('/web/app.js?v=20260731-reader-trust-v216'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1097,7 +1097,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
         workspaceStyles.text.includes(".notebook-card-title {\n  display: block;\n  width: 100%;") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v215'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v216'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1308,7 +1308,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v215'),
+        webRoot.text.includes('/web/styles.css?v=20260731-reader-trust-v216'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1456,6 +1456,10 @@ async function main() {
       workspaceScript.text.includes("function openWebWarning") &&
         workspaceScript.text.includes("function confirmWebWarning") &&
         workspaceScript.text.includes("function showWebNotice") &&
+        workspaceScript.text.includes("function resolveWebWarningContainer") &&
+        workspaceScript.text.includes('previousFocus.closest(".workspace-panel")') &&
+        workspaceScript.text.includes("mountWebWarningBackdrop(backdrop, container, previousFocus)") &&
+        workspaceScript.text.includes("mountWebWarningBackdrop(backdrop, null, previousFocus)") &&
         workspaceScript.text.includes("function openStripeRestoreDialog") &&
         workspaceScript.text.includes("function stripeRestoreIDError") &&
         workspaceScript.text.includes('dialog.setAttribute("role", "alertdialog")') &&
@@ -2049,6 +2053,9 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes(".web-warning-backdrop") &&
+        workspaceStyles.text.includes(".web-warning-backdrop.is-column-scoped") &&
+        workspaceStyles.text.includes(".has-web-warning") &&
+        workspaceStyles.text.includes("@container (max-width: 340px)") &&
         workspaceStyles.text.includes(".web-warning-dialog") &&
         workspaceStyles.text.includes(".web-warning-field") &&
         workspaceStyles.text.includes(".web-warning-form-error") &&

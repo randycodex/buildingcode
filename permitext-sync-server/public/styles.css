@@ -188,6 +188,10 @@ body.is-resizing-notes * {
   padding: var(--panel-padding);
 }
 
+.has-web-warning {
+  position: relative;
+}
+
 .web-warning-backdrop.is-column-scoped .web-warning-dialog {
   width: 100%;
   padding: clamp(24px, 7cqw, 40px);
@@ -330,6 +334,21 @@ body.is-resizing-notes * {
 
   .web-warning-button {
     min-width: 92px;
+  }
+}
+
+@container (max-width: 340px) {
+  .web-warning-backdrop.is-column-scoped .web-warning-dialog {
+    padding: 24px 16px;
+  }
+
+  .web-warning-backdrop.is-column-scoped .web-warning-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .web-warning-backdrop.is-column-scoped .web-warning-button {
+    width: 100%;
   }
 }
 
