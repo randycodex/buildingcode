@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-fast-workspace-switch-v269";
+} from "./offline-storage.js?v=20260731-smooth-project-mode-v271";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -15851,7 +15851,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
   let showingArchived = Boolean(instance.projectsArchiveMode);
-  let switchTimer = null;
+  let switchCleanupTimer = null;
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   wireCodeFilterMenu(list, instance, {
     stateKey: "projectsMenuOpen",
@@ -16066,23 +16066,37 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   };
 
   archiveButton.addEventListener("click", () => {
-    if (switchTimer !== null) return;
-    list.classList.add("is-switching");
+    if (switchCleanupTimer !== null) return;
+    const previousHeight = list.getBoundingClientRect().height;
     archiveButton.disabled = true;
-    switchTimer = window.setTimeout(() => {
-      showingArchived = !showingArchived;
-      instance.projectsArchiveMode = showingArchived;
-      syncProjectModeControls();
-      renderProjectCards();
-      saveWorkspaceState();
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          list.classList.remove("is-switching");
-          archiveButton.disabled = false;
-          switchTimer = null;
-        });
-      });
-    }, 130);
+    showingArchived = !showingArchived;
+    instance.projectsArchiveMode = showingArchived;
+    syncProjectModeControls();
+    renderProjectCards();
+    saveWorkspaceState();
+
+    const finishSwitch = () => {
+      if (switchCleanupTimer !== null) window.clearTimeout(switchCleanupTimer);
+      list.classList.remove("is-mode-switching");
+      list.style.removeProperty("--saved-project-list-from-height");
+      list.style.removeProperty("--saved-project-list-to-height");
+      list.style.removeProperty("--saved-project-list-entry-offset");
+      archiveButton.disabled = false;
+      switchCleanupTimer = null;
+    };
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      finishSwitch();
+      return;
+    }
+
+    const nextHeight = list.getBoundingClientRect().height;
+    const entryOffset = showingArchived ? "6px" : "-6px";
+    list.style.setProperty("--saved-project-list-from-height", `${previousHeight}px`);
+    list.style.setProperty("--saved-project-list-to-height", `${nextHeight}px`);
+    list.style.setProperty("--saved-project-list-entry-offset", entryOffset);
+    list.classList.add("is-mode-switching");
+    list.addEventListener("animationend", finishSwitch, { once: true });
+    switchCleanupTimer = window.setTimeout(finishSwitch, 240);
   });
 
   syncProjectModeControls();
