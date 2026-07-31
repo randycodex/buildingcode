@@ -6541,6 +6541,81 @@ button.project-studio-metric:focus-visible {
   font-weight: 650;
 }
 
+.project-notes-heading {
+  gap: var(--space-2);
+}
+
+.project-studio-section-heading > .project-notes-toggle-label {
+  flex: 1 1 auto;
+  justify-content: flex-start;
+  min-height: 32px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.project-notes-toggle-label:hover,
+.project-notes-toggle-label:focus-visible {
+  color: var(--text-primary);
+}
+
+.project-notes-heading-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.project-note-add {
+  min-height: 32px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--project-color) 18%, var(--surface));
+  color: var(--text-primary);
+  font-size: 10px !important;
+  font-weight: 650;
+}
+
+.project-notes-toggle-chevron {
+  display: grid;
+  flex: 0 0 var(--panel-title-control-size);
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.project-notes-toggle-chevron:hover,
+.project-notes-toggle-chevron:focus-visible {
+  color: var(--text-primary);
+}
+
+.project-notes-toggle-chevron svg {
+  grid-area: 1 / 1;
+  width: var(--panel-title-icon-size);
+  height: var(--panel-title-icon-size);
+}
+
+.project-notes-toggle-chevron[aria-expanded="true"] .research-chevron-down,
+.project-notes-toggle-chevron[aria-expanded="false"] .research-chevron-up {
+  display: none;
+}
+
+.project-collaboration-notes-body {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.project-collaboration-notes-body[hidden] {
+  display: none;
+}
+
 .project-research-history-card {
   display: grid;
   gap: 4px;

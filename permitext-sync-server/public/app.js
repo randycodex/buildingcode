@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-activity-v244";
+} from "./offline-storage.js?v=20260731-project-notes-v245";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13704,15 +13704,20 @@ function appendProjectNotes(content, identity, foundation) {
   const section = document.createElement("section");
   section.className = "project-studio-section project-collaboration-notes";
   const heading = document.createElement("div");
-  heading.className = "project-studio-section-heading";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  heading.className = "project-studio-section-heading project-notes-heading";
+  const title = document.createElement("button");
+  title.className = "project-notes-toggle-label section-label";
+  title.type = "button";
   title.textContent = "Project notes";
+  title.setAttribute("aria-expanded", "true");
   heading.append(title);
+  const headingActions = document.createElement("div");
+  headingActions.className = "project-notes-heading-actions";
   const editorSlot = document.createElement("div");
   editorSlot.className = "project-collaboration-editor-slot";
   if (canEdit) {
     const add = document.createElement("button");
+    add.className = "project-note-add";
     add.type = "button";
     add.textContent = "Add note";
     add.addEventListener("click", () => {
@@ -13723,14 +13728,34 @@ function appendProjectNotes(content, identity, foundation) {
       }));
       editorSlot.querySelector("input")?.focus();
     });
-    heading.append(add);
+    headingActions.append(add);
   }
-  section.append(heading, editorSlot);
+  const toggle = document.createElement("button");
+  toggle.className = "project-notes-toggle-chevron";
+  toggle.type = "button";
+  toggle.setAttribute("aria-label", "Collapse Project notes");
+  toggle.setAttribute("aria-expanded", "true");
+  toggle.innerHTML = researchChevronIconsSVG();
+  headingActions.append(toggle);
+  heading.append(headingActions);
+  const body = document.createElement("div");
+  body.className = "project-collaboration-notes-body";
+  body.append(editorSlot);
+  const setExpanded = (expanded) => {
+    title.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project notes`);
+    body.hidden = !expanded;
+  };
+  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
+  title.addEventListener("click", toggleExpanded);
+  toggle.addEventListener("click", toggleExpanded);
+  section.append(heading, body);
   if (!notes.length) {
     const empty = document.createElement("p");
     empty.className = "project-studio-empty";
     empty.textContent = "No standalone Project notes have been recorded yet.";
-    section.append(empty);
+    body.append(empty);
   }
   notes.slice(0, 12).forEach((note) => {
     const card = document.createElement("article");
@@ -13766,7 +13791,7 @@ function appendProjectNotes(content, identity, foundation) {
       body.textContent = note.body;
       card.append(body);
     }
-    section.append(card);
+    body.append(card);
   });
   content.append(section);
 }
