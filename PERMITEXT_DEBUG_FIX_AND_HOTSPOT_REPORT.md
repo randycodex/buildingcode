@@ -355,6 +355,7 @@ Final validation after implementation:
 | `npm run verify:postgres` | Skipped by the project because no database URL was configured. No query-plan or live concurrent-transaction claim is made. |
 | `npm run verify:production` | Passed against `https://permitext-sync.vercel.app`; live service reported PostgreSQL `normalized-v4`. This verifies current production health, not deployment of the unpushed audit commits. |
 | `npm run verify:production:aasa` | Passed; published app association includes `57BY95X97H.com.randycodex.permitext`. |
+| Production Workboard regression verification | Deployment `dpl_5KgmLYhdm7AXK5LbDPBGADSbsUJs` reached READY for commit `c7c63d84c`. `permitext.com` served the restored stylesheet; live computed layout showed a 48 px toolbar, 20×20 px lock icon, bounded 1,218 px canvas, and no browser warnings/errors. |
 | `npm audit --omit=dev --audit-level=high` | Passed with zero vulnerabilities. |
 | Notebook sibling hash check | Passed before/after final check and smoke runs for the present `notebook 2.js`, `notebook 3.js`, and `notebook 4.js` copies. |
 
@@ -365,7 +366,6 @@ Validation not completed:
 - Real PostgreSQL concurrency, constraint, migration, and query-plan tests: no database URL.
 - Signed distribution archive, StoreKit sandbox/device flow, App Store Connect, and physical-device offline/relaunch checks: external credentials/hardware/configuration required.
 - Direct browser heap profiling: the offline hotspot was measured from corpus bytes and implementation behavior, then guarded by cursor-based contracts.
-- Production verification of these commits: they were not pushed or deployed by this task.
 
 ## 7. Changed files and commits
 
@@ -379,8 +379,9 @@ Validation not completed:
 6. `795415abb` — Protect web drafts and offline recovery
 7. `cda3a986e` — Document Permitext reliability audit
 8. `54004c898` — Restore cache-safe Workboard styling
+9. `c7c63d84c` — Update audit for Workboard cache regression
 
-This report update is committed separately after the Workboard regression repair.
+The final production-status amendment to this report is committed separately after live verification.
 
 ### Grouped file summary
 
@@ -398,4 +399,4 @@ This report update is committed separately after the Workboard regression repair
 - **Critical and High fixed:** 16
 - **Unresolved:** 12, including five High items requiring durable schema/API/concurrency work
 
-The original audit commits through `cda3a986e` were pushed to `origin/main`. The Workboard repair `54004c898` and this report update are local until explicitly pushed; no production deployment of the repair is claimed. Unrelated untracked user files were preserved.
+The audit and Workboard repair commits through `c7c63d84c` were pushed to `origin/main`. Vercel deployment `dpl_5KgmLYhdm7AXK5LbDPBGADSbsUJs` reached READY and the repaired Workboard was verified on `permitext.com`. Unrelated untracked user files were preserved.
