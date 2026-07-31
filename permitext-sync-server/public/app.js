@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-authority-v253";
+} from "./offline-storage.js?v=20260731-workboard-width-v254";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -117,7 +117,7 @@ const defaultSourceLinkedReaderPaneWidth = 400;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultDetailPaneWidth = defaultNonReaderPaneWidth;
-const defaultWorkboardPaneWidth = 700;
+const defaultWorkboardPaneWidth = 750;
 const defaultNotebookPaneWidth = 400;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;

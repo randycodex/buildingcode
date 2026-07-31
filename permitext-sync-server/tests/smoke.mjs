@@ -1109,7 +1109,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-reader-authority-v253'),
+        webRoot.text.includes('/web/app.js?v=20260731-workboard-width-v254'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1166,7 +1166,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-authority-v253'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workboard-width-v254'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1377,7 +1377,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-reader-authority-v253'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workboard-width-v254'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1563,7 +1563,7 @@ async function main() {
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultDetailPaneWidth = defaultNonReaderPaneWidth") &&
-        workspaceScript.text.includes("const defaultWorkboardPaneWidth = 700") &&
+        workspaceScript.text.includes("const defaultWorkboardPaneWidth = 750") &&
         workspaceScript.text.includes("const defaultNotebookPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
