@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-workboard-help-v235";
+} from "./offline-storage.js?v=20260731-notebook-list-v239";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11976,11 +11976,9 @@ async function renderProjectNotebook(project) {
         type.textContent = notebookCardTypeLabel(card.cardType);
         const cardTitle = document.createElement("strong");
         cardTitle.textContent = card.title;
-        const preview = document.createElement("p");
-        preview.textContent = card.plainText || "Empty card";
         const meta = document.createElement("small");
         meta.textContent = `${card.referenceCount || 0} linked · ${researchRelativeDate(card.updatedAt)}`;
-        button.append(type, cardTitle, preview, meta);
+        button.append(type, cardTitle, meta);
         button.addEventListener("click", () => {
           void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
         });

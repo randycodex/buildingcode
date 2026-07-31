@@ -9715,12 +9715,14 @@ button.project-studio-metric:focus-visible {
 
 .notebook-card-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-flow: row;
   align-content: start;
   width: 100%;
-  gap: var(--space-2);
+  gap: var(--space-1);
   min-height: 0;
   overflow-y: auto;
+  background-image: none;
 }
 
 .notebook-card-list-empty {
@@ -9738,20 +9740,22 @@ button.project-studio-metric:focus-visible {
 
 .notebook-card-tile {
   display: grid;
-  gap: 4px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: var(--space-2);
   width: 100%;
-  padding: var(--space-3) 42px var(--space-3) var(--space-3);
+  padding: var(--space-1) 30px var(--space-1) 0;
   border: 0;
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--surface) 82%, var(--project-color));
+  border-radius: 0;
+  background: transparent;
   color: var(--text-primary);
   text-align: left;
 }
 
 .notebook-card-delete {
   position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
+  top: 50%;
+  right: 0;
   display: grid;
   width: 28px;
   height: 28px;
@@ -9762,6 +9766,7 @@ button.project-studio-metric:focus-visible {
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
+  transform: translateY(-50%);
 }
 
 .notebook-card-delete:hover,
@@ -9777,7 +9782,8 @@ button.project-studio-metric:focus-visible {
 
 .notebook-card-tile:hover,
 .notebook-card-tile[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--project-color) 28%, var(--surface));
+  background: transparent;
+  color: var(--project-color);
 }
 
 .notebook-card-tile > span,
@@ -9787,15 +9793,15 @@ button.project-studio-metric:focus-visible {
   font-weight: 650;
 }
 
-.notebook-card-tile p {
-  display: -webkit-box;
-  margin: 0;
+.notebook-card-tile strong {
+  min-width: 0;
   overflow: hidden;
-  color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.35;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notebook-card-tile small {
+  white-space: nowrap;
 }
 
 .notebook-focus {

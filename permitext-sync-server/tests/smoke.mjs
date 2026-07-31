@@ -1088,7 +1088,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-workboard-help-v235'),
+        webRoot.text.includes('/web/app.js?v=20260731-notebook-list-v239'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1131,9 +1131,14 @@ async function main() {
         workspaceScript.text.includes('railLabel.textContent = "Project notes"') &&
         workspaceScript.text.includes("cardsMenuOpen: notebookCardMenuOpenByProject.get(projectID) !== false") &&
         workspaceScript.text.includes("wireCodeFilterMenu(cardList, cardMenuState, cardMenuOptions)") &&
-        workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-workboard-help-v235'),
-      "The Saved Projects and Notebook Project notes pills no longer preserve their compact card-grid behavior."
+        workspaceStyles.text.includes(".notebook-card-list {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  grid-auto-flow: row;") &&
+        workspaceStyles.text.includes("width: 100%;\n  gap: var(--space-1);") &&
+        workspaceStyles.text.includes("overflow-y: auto;\n  background-image: none;") &&
+        workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: auto minmax(0, 1fr) auto;") &&
+        workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
+        !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-list-v239'),
+      "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
       !researchSourceRendererSource.includes('"Selected passage"') &&
@@ -1343,7 +1348,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-workboard-help-v235'),
+        webRoot.text.includes('/web/styles.css?v=20260731-notebook-list-v239'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
