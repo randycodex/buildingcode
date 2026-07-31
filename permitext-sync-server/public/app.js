@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-section-collapse-v276";
+} from "./offline-storage.js?v=20260731-project-section-counts-v277";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -13935,55 +13935,12 @@ async function focusProjectResearch(project) {
   }
 }
 
-function appendProjectStudioOverview(content, identity, previewItems, foundation) {
-  const section = document.createElement("section");
-  section.className = "project-studio-overview";
-  const metrics = document.createElement("div");
-  metrics.className = "project-studio-metrics";
-  const notebookCards = (foundation?.artifacts || []).filter((artifact) =>
-    artifact.envelope?.type === "notebookCard" && !artifact.envelope?.deletedAt
-  );
-  const researchAnswers = foundation?.researchAnswers || [];
-  const reportManifests = (foundation?.artifacts || []).filter((artifact) =>
-    artifact.envelope?.type === "reportManifest" && !artifact.envelope?.deletedAt
-  );
-  const workboard = syncedWorkboardForProject(workboardProjectID(identity));
-  [
-    { label: "Saved evidence", value: previewItems.length },
-    { label: "Notebook cards", value: notebookCards.length, action: () => openProjectNotebook(identity) },
-    {
-      label: "Research answers",
-      value: researchAnswers.length,
-      action: identity.sharedOnly ? null : () => focusProjectResearch(identity)
-    },
-    {
-      label: "Reports",
-      value: reportManifests.length,
-      action: identity.sharedOnly ? null : () => openProjectReportDraft(identity)
-    },
-    {
-      label: "Workboard",
-      value: workboard ? "Saved" : "New",
-      action: identity.sharedOnly ? null : () => openProjectWorkboard(identity)
-    }
-  ].forEach((metric) => {
-    const element = document.createElement(metric.action ? "button" : "div");
-    element.className = "project-studio-metric";
-    if (metric.action) {
-      element.type = "button";
-      element.addEventListener("click", () => {
-        void metric.action();
-      });
-    }
-    const value = document.createElement("strong");
-    value.textContent = String(metric.value);
-    const label = document.createElement("span");
-    label.textContent = metric.label;
-    element.append(value, label);
-    metrics.append(element);
-  });
-  section.append(metrics);
-  content.append(section);
+function projectSectionCount(value, label) {
+  const count = document.createElement("span");
+  count.className = "project-section-count";
+  count.textContent = String(value);
+  count.setAttribute("aria-label", `${value} ${label}`);
+  return count;
 }
 
 function appendProjectResearchContextEditor(content, identity, initialConversation) {
@@ -14101,6 +14058,10 @@ function appendProjectResearchHistory(content, identity, foundation) {
   title.setAttribute("aria-expanded", "false");
   const headingActions = document.createElement("div");
   headingActions.className = "project-section-heading-actions";
+  headingActions.append(projectSectionCount(
+    foundation?.researchAnswers?.length || 0,
+    "Research answers"
+  ));
   const openResearch = document.createElement("button");
   openResearch.type = "button";
   openResearch.textContent = identity.sharedOnly ? "Read-only history" : "Open Research";
@@ -14205,7 +14166,10 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
   const scope = document.createElement("span");
   scope.className = "project-review-scope";
   scope.textContent = "Immutable Research evidence";
-  heading.append(title, scope);
+  const headingMeta = document.createElement("div");
+  headingMeta.className = "project-section-heading-actions";
+  headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"));
+  heading.append(title, headingMeta);
   section.append(heading);
 
   answers.slice(0, 8).forEach((answer) => {
@@ -14405,6 +14369,7 @@ function appendProjectNotes(content, identity, foundation) {
   heading.append(title);
   const headingActions = document.createElement("div");
   headingActions.className = "project-notes-heading-actions";
+  headingActions.append(projectSectionCount(notes.length, "Project notes"));
   const editorSlot = document.createElement("div");
   editorSlot.className = "project-collaboration-editor-slot";
   if (canEdit) {
@@ -14610,6 +14575,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
   title.setAttribute("aria-expanded", "false");
   const requestActions = document.createElement("div");
   requestActions.className = "project-review-request-actions project-section-heading-actions";
+  requestActions.append(projectSectionCount(threads.length, "Review and coordination items"));
   const editorSlot = document.createElement("div");
   editorSlot.className = "project-collaboration-editor-slot";
   if (canRequest) {
@@ -14780,10 +14746,13 @@ function appendProjectReportExports(content, identity, foundation) {
 
   const section = document.createElement("section");
   section.className = "project-studio-section project-report-exports";
+  const heading = document.createElement("div");
+  heading.className = "project-studio-section-heading";
   const title = document.createElement("p");
   title.className = "section-label";
   title.textContent = "Report exports";
-  section.append(title);
+  heading.append(title, projectSectionCount(reports.length, "Report exports"));
+  section.append(heading);
   reports.slice(0, 8).forEach((artifact) => {
     const row = document.createElement("article");
     row.className = "project-report-export";
@@ -14835,11 +14804,15 @@ function appendProjectActivity(content, foundation) {
   toggle.setAttribute("aria-expanded", "false");
   const title = document.createElement("span");
   title.textContent = "Recent activity";
+  const actions = document.createElement("span");
+  actions.className = "project-activity-heading-actions";
+  actions.append(projectSectionCount(events.length, "Recent activity items"));
   const chevron = document.createElement("span");
   chevron.className = "project-studio-activity-chevron";
   chevron.setAttribute("aria-hidden", "true");
   chevron.innerHTML = researchChevronIconsSVG();
-  toggle.append(title, chevron);
+  actions.append(chevron);
+  toggle.append(title, actions);
   const list = document.createElement("ol");
   list.hidden = true;
   events.slice(0, 10).forEach((event) => {
@@ -15133,9 +15106,12 @@ async function renderProjectDetail(detail) {
 
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section project-studio-section";
-  const savedHeading = document.createElement("p");
-  savedHeading.className = "section-label";
-  savedHeading.textContent = "Saved evidence";
+  const savedHeading = document.createElement("div");
+  savedHeading.className = "project-studio-section-heading";
+  const savedTitle = document.createElement("p");
+  savedTitle.className = "section-label";
+  savedTitle.textContent = "Saved evidence";
+  savedHeading.append(savedTitle, projectSectionCount(previewItems.length, "Saved evidence items"));
   savedSection.append(savedHeading);
   const codeGroups = new Map();
   previewItems.forEach((item) => {
@@ -15222,7 +15198,6 @@ async function renderProjectDetail(detail) {
     void transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   });
 
-  appendProjectStudioOverview(content, identity, previewItems, foundation);
   appendProjectResearchContextEditor(content, identity, projectResearchConversation);
   if (foundationError) {
     const warning = document.createElement("p");

@@ -1172,7 +1172,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-section-collapse-v276'),
+        webRoot.text.includes('/web/app.js?v=20260731-project-section-counts-v277'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1209,9 +1209,13 @@ async function main() {
         !workspaceStyles.text.includes(".reader-trust {\n  display: none;") &&
         workspaceScript.text.includes('document.querySelectorAll(".reader-trust[open]")') &&
         workspaceStyles.text.includes("box-shadow: none;") &&
-        workspaceStyles.text.includes(".project-studio-metrics {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr);\n  gap: 0;") &&
-        workspaceStyles.text.includes(".project-studio-metric strong {\n  order: 2;") &&
-        workspaceStyles.text.includes(".project-studio-metric span {\n  order: 1;") &&
+        !workspaceScript.text.includes("function appendProjectStudioOverview") &&
+        !workspaceStyles.text.includes(".project-studio-metrics {") &&
+        workspaceScript.text.includes('count.className = "project-section-count"') &&
+        workspaceScript.text.includes('headingActions.append(projectSectionCount(notes.length, "Project notes"))') &&
+        workspaceScript.text.includes('savedHeading.append(savedTitle, projectSectionCount(previewItems.length, "Saved evidence items"))') &&
+        workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
+        workspaceStyles.text.includes(".project-section-count {") &&
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: grid;\n  grid-template-columns: repeat(4, max-content);") &&
         workspaceStyles.text.includes(".notebook-toolbar button {\n  border-radius: var(--radius-pill);") &&
         workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
@@ -1237,7 +1241,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-section-collapse-v276'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-section-counts-v277'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1448,7 +1452,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-section-collapse-v276'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-section-counts-v277'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
