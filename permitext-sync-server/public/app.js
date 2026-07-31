@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-collapsed-activity-v274";
+} from "./offline-storage.js?v=20260731-project-section-collapse-v276";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -14093,10 +14093,14 @@ function appendProjectResearchHistory(content, identity, foundation) {
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-research";
   const heading = document.createElement("div");
-  heading.className = "project-studio-section-heading";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  heading.className = "project-studio-section-heading project-collapsible-heading";
+  const title = document.createElement("button");
+  title.className = "project-section-toggle-label section-label";
+  title.type = "button";
   title.textContent = "Research history";
+  title.setAttribute("aria-expanded", "false");
+  const headingActions = document.createElement("div");
+  headingActions.className = "project-section-heading-actions";
   const openResearch = document.createElement("button");
   openResearch.type = "button";
   openResearch.textContent = identity.sharedOnly ? "Read-only history" : "Open Research";
@@ -14106,8 +14110,27 @@ function appendProjectResearchHistory(content, identity, foundation) {
       void focusProjectResearch(identity);
     });
   }
-  heading.append(title, openResearch);
-  section.append(heading);
+  const toggle = document.createElement("button");
+  toggle.className = "project-section-toggle-chevron";
+  toggle.type = "button";
+  toggle.setAttribute("aria-label", "Expand Research history");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = researchChevronIconsSVG();
+  headingActions.append(openResearch, toggle);
+  heading.append(title, headingActions);
+  const body = document.createElement("div");
+  body.className = "project-studio-collapsible-body project-research-history-body";
+  body.hidden = true;
+  const setExpanded = (expanded) => {
+    title.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Research history`);
+    body.hidden = !expanded;
+  };
+  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
+  title.addEventListener("click", toggleExpanded);
+  toggle.addEventListener("click", toggleExpanded);
+  section.append(heading, body);
 
   const answers = [...(foundation?.researchAnswers || [])]
     .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
@@ -14132,7 +14155,7 @@ function appendProjectResearchHistory(content, identity, foundation) {
           if (answer.conversationID) void openResearchConversation(answer.conversationID);
         });
       }
-      section.append(card);
+      body.append(card);
     });
   }
   content.append(section);
@@ -14579,12 +14602,14 @@ function appendProjectReviewThreads(content, identity, foundation) {
   const section = document.createElement("section");
   section.className = "project-studio-section project-review-threads";
   const heading = document.createElement("div");
-  heading.className = "project-studio-section-heading project-review-thread-heading";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  heading.className = "project-studio-section-heading project-review-thread-heading project-collapsible-heading";
+  const title = document.createElement("button");
+  title.className = "project-section-toggle-label section-label";
+  title.type = "button";
   title.textContent = "Review & coordination";
+  title.setAttribute("aria-expanded", "false");
   const requestActions = document.createElement("div");
-  requestActions.className = "project-review-request-actions";
+  requestActions.className = "project-review-request-actions project-section-heading-actions";
   const editorSlot = document.createElement("div");
   editorSlot.className = "project-collaboration-editor-slot";
   if (canRequest) {
@@ -14596,6 +14621,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
       button.type = "button";
       button.textContent = label;
       button.addEventListener("click", () => {
+        setExpanded(true);
         requestActions.querySelectorAll("button").forEach((control) => {
           control.disabled = true;
         });
@@ -14615,8 +14641,28 @@ function appendProjectReviewThreads(content, identity, foundation) {
       requestActions.append(button);
     });
   }
+  const toggle = document.createElement("button");
+  toggle.className = "project-section-toggle-chevron";
+  toggle.type = "button";
+  toggle.setAttribute("aria-label", "Expand Review & coordination");
+  toggle.setAttribute("aria-expanded", "false");
+  toggle.innerHTML = researchChevronIconsSVG();
+  requestActions.append(toggle);
   heading.append(title, requestActions);
-  section.append(heading, editorSlot);
+  const body = document.createElement("div");
+  body.className = "project-studio-collapsible-body project-review-threads-body";
+  body.hidden = true;
+  body.append(editorSlot);
+  const setExpanded = (expanded) => {
+    title.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-expanded", String(expanded));
+    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Review & coordination`);
+    body.hidden = !expanded;
+  };
+  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
+  title.addEventListener("click", toggleExpanded);
+  toggle.addEventListener("click", toggleExpanded);
+  section.append(heading, body);
   threads.forEach((thread) => {
     const card = document.createElement("article");
     card.className = `project-collaboration-card project-review-thread is-${thread.status}`;
@@ -14713,7 +14759,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
       });
       card.append(form);
     }
-    section.append(card);
+    body.append(card);
   });
   content.append(section);
 }
