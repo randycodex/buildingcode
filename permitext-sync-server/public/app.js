@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v221";
+} from "./offline-storage.js?v=20260731-reader-trust-v222";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11772,14 +11772,7 @@ async function renderProjectNotebook(project) {
 
     let notebookAutosaveTask = null;
     let notebookRevision = 0;
-    let notebookSaveStatus = null;
     let notebookDeleteButton = null;
-
-    const setNotebookSaveStatus = (message, state = "") => {
-      if (!notebookSaveStatus?.isConnected) return;
-      notebookSaveStatus.textContent = message;
-      notebookSaveStatus.dataset.state = state;
-    };
 
     const notebookSummaryForCard = (card, savedCard = card) => ({
       id: card.id,
@@ -11795,11 +11788,7 @@ async function renderProjectNotebook(project) {
     function scheduleNotebookAutosave(delay = 700) {
       window.clearTimeout(notebookAutosaveTimer);
       if (notebookReadOnly || disposed || !dirty || !activeCard) return;
-      if (!String(activeCard.title || "").trim()) {
-        setNotebookSaveStatus("Add a title to save", "waiting");
-        return;
-      }
-      setNotebookSaveStatus("Saving…", "saving");
+      if (!String(activeCard.title || "").trim()) return;
       notebookAutosaveTimer = window.setTimeout(() => {
         notebookAutosaveTimer = null;
         void saveActiveNotebookCard();
@@ -11816,14 +11805,10 @@ async function renderProjectNotebook(project) {
       if (notebookAutosaveTask) return notebookAutosaveTask;
       if (notebookReadOnly || disposed || !dirty || !activeCard) return true;
       const title = String(activeCard.title || "").trim();
-      if (!title) {
-        setNotebookSaveStatus("Add a title to save", "waiting");
-        return false;
-      }
+      if (!title) return false;
       const revisionAtStart = notebookRevision;
       const documentAtStart = editorMount?.getDocument?.() || draftDocument;
       const cardAtStart = activeCard;
-      setNotebookSaveStatus("Saving…", "saving");
       const saveTask = (async () => {
         try {
           const payload = await postResearch("/notebook/cards/save", {
@@ -11853,8 +11838,6 @@ async function renderProjectNotebook(project) {
           renderCardList();
           if (changedDuringSave) {
             scheduleNotebookAutosave(180);
-          } else {
-            setNotebookSaveStatus(`Saved · Version ${activeCard.version}`, "saved");
           }
           return true;
         } catch (error) {
@@ -11868,7 +11851,6 @@ async function renderProjectNotebook(project) {
               "Another edit was saved first. Permitext loaded the current version so you can review it before editing again."
             );
           } else {
-            setNotebookSaveStatus("Save failed", "error");
             await showWebNotice("Card not saved", error.message);
           }
           return false;
@@ -11943,7 +11925,6 @@ async function renderProjectNotebook(project) {
       const renderSequence = editorRenderSequence;
       editorMount?.destroy?.();
       editorMount = null;
-      notebookSaveStatus = null;
       notebookDeleteButton = null;
       focus.replaceChildren();
 
@@ -12048,14 +12029,6 @@ async function renderProjectNotebook(project) {
       }, true);
       const footer = document.createElement("div");
       footer.className = "notebook-card-footer";
-      const saveStatus = document.createElement("span");
-      saveStatus.setAttribute("role", "status");
-      saveStatus.setAttribute("aria-live", "polite");
-      saveStatus.textContent = activeCard.id
-        ? `Saved · Version ${activeCard.version}`
-        : "Add a title to save";
-      saveStatus.dataset.state = activeCard.id ? "saved" : "waiting";
-      notebookSaveStatus = saveStatus;
       const footerActions = document.createElement("div");
       const researchButton = document.createElement("button");
       researchButton.className = "notebook-secondary-action";
@@ -12070,7 +12043,7 @@ async function renderProjectNotebook(project) {
       notebookDeleteButton = deleteButton;
       researchButton.hidden = notebookReadOnly;
       footerActions.append(researchButton, deleteButton);
-      footer.append(saveStatus, footerActions);
+      footer.append(footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
       titleInput.addEventListener("input", () => {

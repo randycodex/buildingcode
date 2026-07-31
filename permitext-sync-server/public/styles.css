@@ -9850,22 +9850,9 @@ button.project-studio-metric:focus-visible {
 .notebook-card-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: var(--space-3);
   padding-top: var(--space-3);
-}
-
-.notebook-card-footer > span {
-  color: var(--text-secondary);
-  font-size: 11px;
-}
-
-.notebook-card-footer > span[data-state="saved"] {
-  color: color-mix(in srgb, var(--project-color) 74%, var(--text-primary));
-}
-
-.notebook-card-footer > span[data-state="error"] {
-  color: #df6464;
 }
 
 .notebook-card-footer > div {
