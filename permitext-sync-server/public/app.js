@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-notebook-close-v240";
+} from "./offline-storage.js?v=20260731-project-studio-v241";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13388,9 +13388,6 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
   const eyebrow = document.createElement("p");
   eyebrow.className = "section-label";
   eyebrow.textContent = "Project Studio";
-  const copy = document.createElement("p");
-  copy.className = "project-studio-copy";
-  copy.textContent = "This active Project controls every Project-specific workspace. Notebook, Research history, Report Draft, and Workboard switch together.";
   const metrics = document.createElement("div");
   metrics.className = "project-studio-metrics";
   const notebookCards = (foundation?.artifacts || []).filter((artifact) =>
@@ -13435,7 +13432,7 @@ function appendProjectStudioOverview(content, identity, previewItems, foundation
     element.append(value, label);
     metrics.append(element);
   });
-  section.append(eyebrow, copy, metrics);
+  section.append(eyebrow, metrics);
   content.append(section);
 }
 
