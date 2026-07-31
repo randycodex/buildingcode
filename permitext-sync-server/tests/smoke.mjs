@@ -475,6 +475,7 @@ async function main() {
         workspaceStyles.text.includes(".topbar-action-group[hidden] {") &&
         workspaceStyles.text.match(/\.workspace-tab\s*\{[^}]*font-size:\s*14px;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
+        workspaceStyles.text.match(/\.workspace-tab:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStateScript.text.includes("export function emptyWorkspaceLayout()") &&
         workspaceStateScript.text.includes("export function duplicateWorkspace"),
@@ -1205,7 +1206,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-text-v264'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workspace-pill-focus-v266'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1416,7 +1417,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-text-v264'),
+        webRoot.text.includes('/web/styles.css?v=20260731-workspace-pill-focus-v266'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

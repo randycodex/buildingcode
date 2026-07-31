@@ -668,12 +668,22 @@ textarea:focus-visible {
   color: var(--text-primary);
 }
 
-.workspace-tab:focus-visible,
 .workspace-add-button:focus-visible,
 .workspace-actions-button:focus-visible,
 .workspace-name-input:focus-visible {
   outline: 2px solid color-mix(in srgb, var(--code-accent) 58%, transparent);
   outline-offset: 2px;
+}
+
+.workspace-tab:focus-visible {
+  outline: 0;
+  outline-offset: 0;
+  background: color-mix(in srgb, var(--text-primary) 15%, transparent);
+  box-shadow: none;
+}
+
+.workspace-tab[aria-selected="true"]:focus-visible {
+  background: color-mix(in srgb, var(--code-accent) 22%, var(--surface-raised));
 }
 
 .workspace-tab.is-dragging {
