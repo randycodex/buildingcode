@@ -184,7 +184,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260731-topbar-drag-v267"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260731-fast-workspace-switch-v269"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;

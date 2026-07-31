@@ -475,6 +475,10 @@ async function main() {
         workspaceScript.text.includes("localStorage.setItem(toolbarOrderKey") &&
         workspaceScript.text.includes("function renderWorkspaceTabs()") &&
         workspaceScript.text.includes("async function switchWorkspace") &&
+        workspaceScript.text.includes("function renderWorkspaceTransitionState") &&
+        workspaceScript.text.includes('track.setAttribute("aria-busy", "true")') &&
+        workspaceScript.text.includes("await waitForWorkspaceTransitionPaint()") &&
+        workspaceScript.text.includes('track.removeAttribute("aria-busy")') &&
         workspaceScript.text.includes("async function closeAllColumns()") &&
         workspaceScript.text.includes("fitColumnsButton.hidden = !hasColumns") &&
         workspaceScript.text.includes("collapseReadersButton.hidden = !hasColumns") &&
@@ -486,6 +490,7 @@ async function main() {
         workspaceStyles.text.match(/\.workspace-tab:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
+        workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
         workspaceStateScript.text.includes("export function emptyWorkspaceLayout()") &&
         workspaceStateScript.text.includes("export function duplicateWorkspace"),
       "Blank-start named workspaces, single-row pills, Close All, or direct-link Reader wiring is missing."
@@ -1155,7 +1160,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-topbar-drag-v267'),
+        webRoot.text.includes('/web/app.js?v=20260731-fast-workspace-switch-v269'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1215,7 +1220,7 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-drag-v267'),
+        webRoot.text.includes('/web/styles.css?v=20260731-fast-workspace-switch-v269'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1426,7 +1431,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-topbar-drag-v267'),
+        webRoot.text.includes('/web/styles.css?v=20260731-fast-workspace-switch-v269'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

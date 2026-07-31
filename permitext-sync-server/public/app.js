@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-topbar-drag-v267";
+} from "./offline-storage.js?v=20260731-fast-workspace-switch-v269";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -637,6 +637,54 @@ async function confirmWorkspaceTransition() {
   return true;
 }
 
+function workspaceTransitionPaneLabel(paneID) {
+  if (paneID.startsWith("reader:")) return "Reader";
+  if (paneID.startsWith("utility:search:")) return "Search";
+  if (paneID.startsWith("utility:saved:")) return "Saved";
+  if (paneID === "utility:archive") return "Saved archive";
+  if (paneID === "utility:analysis") return "Research";
+  if (paneID === "utility:settings") return "Settings";
+  if (paneID.startsWith("research:conversation:")) return "Research conversation";
+  if (paneID.startsWith("section:detail:")) return "Code section";
+  if (paneID.startsWith("project:notebook:")) return "Notebook";
+  if (paneID.startsWith("project:report-draft:")) return "Report draft";
+  if (paneID.startsWith("project:workboard:")) return "Workboard";
+  if (paneID.startsWith("project:detail:")) return "Project";
+  return "Workspace";
+}
+
+function renderWorkspaceTransitionState(workspaceName = "workspace") {
+  renderWorkspaceTabs();
+  closeDeletedProjectDetails();
+  const paneIDs = activePaneIDs();
+  normalizePaneWeights(paneIDs);
+  setUtilityButtonStates();
+  track.setAttribute("aria-busy", "true");
+  const panes = paneIDs.map((paneID) => {
+    const panel = document.createElement("article");
+    const label = workspaceTransitionPaneLabel(paneID);
+    panel.className = "workspace-panel workspace-switch-placeholder";
+    panel.dataset.paneId = paneID;
+    panel.setAttribute("aria-label", `Opening ${label}`);
+    const header = document.createElement("div");
+    header.className = "workspace-switch-placeholder-header";
+    header.textContent = label;
+    const status = document.createElement("div");
+    status.className = "workspace-switch-placeholder-status";
+    status.textContent = `Opening ${workspaceName}...`;
+    panel.append(header, status);
+    applyPaneWeight(panel, paneID);
+    return panel;
+  });
+  appendPaneSequence(panes);
+}
+
+function waitForWorkspaceTransitionPaint() {
+  return new Promise((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(resolve));
+  });
+}
+
 function applyStoredWorkspaceLayout(layout) {
   applyWorkspaceLayout(state, layout);
   state.utilityInstances = normalizeUtilityInstances(state);
@@ -664,15 +712,18 @@ async function switchWorkspace(workspaceID, options = {}) {
   workspaceRegistry = { ...workspaceRegistry, activeWorkspaceID };
   applyStoredWorkspaceLayout(loadWorkspaceSnapshot(workspaceID));
   persistWorkspaceRegistry();
+  renderWorkspaceTransitionState(target.name);
+  if (options.focus !== false) focusActiveWorkspaceTab();
+  await waitForWorkspaceTransitionPaint();
   suppressReaderScrollRestore = true;
   try {
     await renderWorkspace();
   } finally {
     suppressReaderScrollRestore = false;
+    track.removeAttribute("aria-busy");
   }
   const scrollLeft = Number(state.trackScrollLeft) || 0;
   track.scrollLeft = Math.min(scrollLeft, Math.max(0, track.scrollWidth - track.clientWidth));
-  if (options.focus !== false) focusActiveWorkspaceTab();
   return true;
 }
 

@@ -861,6 +861,23 @@ textarea:focus-visible {
   font-size: calc(var(--chrome-font-size) * 0.94);
 }
 
+.workspace-switch-placeholder {
+  align-content: start;
+  color: var(--text-secondary);
+}
+
+.workspace-switch-placeholder-header {
+  color: var(--text-primary);
+  font-size: var(--chrome-font-size);
+  font-weight: 700;
+}
+
+.workspace-switch-placeholder-status {
+  align-self: center;
+  justify-self: center;
+  font-size: calc(var(--chrome-font-size) * 0.94);
+}
+
 .panel-track.is-resizing {
   cursor: col-resize;
   user-select: none;
