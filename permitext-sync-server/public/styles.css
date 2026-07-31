@@ -645,6 +645,7 @@ textarea:focus-visible {
   align-items: center;
   padding: 0 11px;
   cursor: pointer;
+  font-size: 14px;
 }
 
 .workspace-tab span {
