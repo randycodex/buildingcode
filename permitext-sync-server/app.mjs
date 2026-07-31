@@ -221,6 +221,7 @@ let cachedAppleJWKS = null;
 let cachedAppleJWKSExpiresAt = 0;
 let blobModulePromise = null;
 const constructionVisualAssetMetadataCache = new Map();
+const searchableSectionPlainTextCache = new Map();
 const maximumResearchVisualEvidenceBytes = 4 * 1024 * 1024;
 const maximumResearchConversationVisualSources = 8;
 const maximumResearchConversationVisualEvidenceBytes = 8 * 1024 * 1024;
@@ -10648,13 +10649,57 @@ async function handleCodeChapters(request, response) {
   });
 }
 
+function requestedChapterBodyRange(request, sectionCount) {
+  const includeBody = requestURL(request).searchParams.get("include") === "body";
+  if (!includeBody) {
+    return { includeBody: false, start: 0, end: 0, complete: false };
+  }
+  const rawStart = Number.parseInt(requestURL(request).searchParams.get("bodyStart") || "", 10);
+  const rawLimit = Number.parseInt(requestURL(request).searchParams.get("bodyLimit") || "", 10);
+  const windowed = Number.isFinite(rawLimit) && rawLimit > 0;
+  const start = windowed && Number.isFinite(rawStart)
+    ? Math.min(Math.max(0, rawStart), sectionCount)
+    : 0;
+  const end = windowed
+    ? Math.min(sectionCount, start + Math.min(rawLimit, 50))
+    : sectionCount;
+  return {
+    includeBody: true,
+    start,
+    end,
+    complete: start === 0 && end === sectionCount
+  };
+}
+
+async function chapterSectionsWithRequestedBodies(request, sections, readBody) {
+  const range = requestedChapterBodyRange(request, sections.length);
+  if (!range.includeBody) {
+    return { sections, bodyRange: null };
+  }
+  const bodies = await Promise.all(
+    sections.slice(range.start, range.end).map((section) => readBody(section))
+  );
+  return {
+    sections: sections.map((section, index) =>
+      index >= range.start && index < range.end
+        ? { ...section, blocks: bodies[index - range.start]?.blocks || [] }
+        : section
+    ),
+    bodyRange: {
+      start: range.start,
+      end: range.end,
+      total: sections.length,
+      complete: range.complete
+    }
+  };
+}
+
 async function handleCodeChapter(request, path, response) {
   const chapterID = path.split("/").at(-1);
   if (!/^[a-zA-Z0-9_-]+$/.test(chapterID || "")) {
     sendError(response, 400, "Invalid chapter ID.");
     return;
   }
-  const includeBody = requestURL(request).searchParams.get("include") === "body";
   if (isEnactedCodeChapterID(chapterID)) {
     const [chapter, chapterSummary] = await Promise.all([
       enactedChapter(chapterID),
@@ -10667,12 +10712,11 @@ async function handleCodeChapter(request, path, response) {
       return;
     }
     const sections = flattenChapterSections(chapter);
-    const sectionPayload = includeBody
-      ? await Promise.all(sections.map(async (section) => ({
-          ...section,
-          blocks: (await enactedSection(section.id))?.blocks || []
-        })))
-      : sections;
+    const hydrated = await chapterSectionsWithRequestedBodies(
+      request,
+      sections,
+      (section) => enactedSection(section.id)
+    );
     sendJSON(response, 200, {
       chapter: {
         id: chapter.chapterID,
@@ -10683,7 +10727,8 @@ async function handleCodeChapter(request, path, response) {
         displayTitle: chapterSummary.displayTitle,
         fullTitle: chapterSummary.fullTitle,
         groups: chapter.groups || [],
-        sections: sectionPayload
+        sections: hydrated.sections,
+        ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
     });
     return;
@@ -10700,12 +10745,11 @@ async function handleCodeChapter(request, path, response) {
       return;
     }
     const sections = flattenChapterSections(chapter);
-    const sectionPayload = includeBody
-      ? await Promise.all(sections.map(async (section) => ({
-          ...section,
-          blocks: (await existingBuildingSection(section.id))?.blocks || []
-        })))
-      : sections;
+    const hydrated = await chapterSectionsWithRequestedBodies(
+      request,
+      sections,
+      (section) => existingBuildingSection(section.id)
+    );
     sendJSON(response, 200, {
       chapter: {
         id: chapter.chapterID,
@@ -10716,7 +10760,8 @@ async function handleCodeChapter(request, path, response) {
         displayTitle: chapterSummary.displayTitle,
         fullTitle: chapterSummary.fullTitle,
         groups: chapter.groups || [],
-        sections: sectionPayload
+        sections: hydrated.sections,
+        ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
     });
     return;
@@ -10731,12 +10776,11 @@ async function handleCodeChapter(request, path, response) {
       return;
     }
     const sections = flattenChapterSections(chapter);
-    const sectionPayload = includeBody
-      ? await Promise.all(sections.map(async (section) => ({
-          ...section,
-          blocks: (await zoningSection(section.id))?.blocks || []
-        })))
-      : sections;
+    const hydrated = await chapterSectionsWithRequestedBodies(
+      request,
+      sections,
+      (section) => zoningSection(section.id)
+    );
     sendJSON(response, 200, {
       chapter: {
         id: chapter.chapterID,
@@ -10747,7 +10791,8 @@ async function handleCodeChapter(request, path, response) {
         displayTitle: chapterSummary.displayTitle,
         fullTitle: chapterSummary.fullTitle,
         groups: chapter.groups || [],
-        sections: sectionPayload
+        sections: hydrated.sections,
+        ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
       }
     });
     return;
@@ -10763,15 +10808,14 @@ async function handleCodeChapter(request, path, response) {
     codePrefix,
     chapterNumber
   });
-  const sectionPayload = includeBody
-    ? await Promise.all(canonicalSections.map(async (section) => ({
-        ...section,
-        blocks: (await sectionBody(section.webSectionID || section.id, {
+  const hydrated = await chapterSectionsWithRequestedBodies(
+    request,
+    canonicalSections,
+    (section) => sectionBody(section.webSectionID || section.id, {
           allowMissing: true,
           canonicalSectionID: section.id
-        })).blocks || []
-      })))
-    : canonicalSections;
+        })
+  );
 
   sendJSON(response, 200, {
     chapter: {
@@ -10784,7 +10828,8 @@ async function handleCodeChapter(request, path, response) {
         chapterNumber
       }),
       groups,
-      sections: sectionPayload
+      sections: hydrated.sections,
+      ...(hydrated.bodyRange ? { bodyRange: hydrated.bodyRange } : {})
     }
   });
 }
@@ -10972,6 +11017,24 @@ async function searchableSectionBody(section) {
   });
 }
 
+function searchableSectionPlainText(section) {
+  const cacheKey = [
+    section.codeVersion || "",
+    section.codePrefix || "",
+    section.webSectionID || section.id
+  ].join(":");
+  if (!searchableSectionPlainTextCache.has(cacheKey)) {
+    const pending = searchableSectionBody(section)
+      .then((body) => body.blocks?.map((block) => block.plainText || "").join("\n\n") || "")
+      .catch((error) => {
+        searchableSectionPlainTextCache.delete(cacheKey);
+        throw error;
+      });
+    searchableSectionPlainTextCache.set(cacheKey, pending);
+  }
+  return searchableSectionPlainTextCache.get(cacheKey);
+}
+
 async function handleCodeSearch(request, response) {
   const url = requestURL(request);
   const query = url.searchParams.get("q")?.trim() || "";
@@ -10979,6 +11042,10 @@ async function handleCodeSearch(request, response) {
   const resultLimit = Number.isFinite(requestedLimit) && requestedLimit > 0
     ? Math.min(requestedLimit, 250)
     : 250;
+  const requestedOffset = Number.parseInt(url.searchParams.get("offset") || "", 10);
+  const resultOffset = Number.isFinite(requestedOffset) && requestedOffset > 0
+    ? requestedOffset
+    : 0;
   const codeFilter = new Set(
     (url.searchParams.get("code") || url.searchParams.get("codes") || "")
       .split(",")
@@ -10986,13 +11053,29 @@ async function handleCodeSearch(request, response) {
       .filter(Boolean)
   );
   if (query.length < 2) {
-    sendJSON(response, 200, { query, results: [] });
+    sendJSON(response, 200, {
+      query,
+      results: [],
+      totalResults: 0,
+      offset: 0,
+      nextOffset: 0,
+      hasMore: false,
+      limited: false
+    });
     return;
   }
   const normalizedQuery = query.toLowerCase();
   const queryTokens = tokenizeSearchText(query);
   if (!queryTokens.length) {
-    sendJSON(response, 200, { query, results: [] });
+    sendJSON(response, 200, {
+      query,
+      results: [],
+      totalResults: 0,
+      offset: 0,
+      nextOffset: 0,
+      hasMore: false,
+      limited: false
+    });
     return;
   }
 
@@ -11062,10 +11145,9 @@ async function handleCodeSearch(request, response) {
   );
 
   const totalResults = hits.length;
-  const selectedHits = resultLimit ? hits.slice(0, resultLimit) : hits;
+  const selectedHits = hits.slice(resultOffset, resultOffset + resultLimit);
   const results = await Promise.all(selectedHits.map(async ({ section }) => {
-    const body = await searchableSectionBody(section);
-    const plainText = body.blocks?.map((block) => block.plainText || "").join("\n\n") || "";
+    const plainText = await searchableSectionPlainText(section);
     return {
       id: section.id,
       chapterID: section.chapterID,
@@ -11086,11 +11168,16 @@ async function handleCodeSearch(request, response) {
       snippet: searchSnippet(plainText || section.title || "", query)
     };
   }));
+  const nextOffset = resultOffset + results.length;
+  const hasMore = nextOffset < totalResults;
   sendJSON(response, 200, {
     query,
     results,
     totalResults,
-    limited: Boolean(resultLimit && totalResults > results.length)
+    offset: resultOffset,
+    nextOffset,
+    hasMore,
+    limited: hasMore
   });
 }
 

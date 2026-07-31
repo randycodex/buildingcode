@@ -914,6 +914,45 @@ async function main() {
       "Search results still include the retired capped-results notice."
     );
     assert(
+      workspaceScript.text.includes("const searchResultPageSize = 25;") &&
+        workspaceScript.text.includes("function appendSearchLoadMore") &&
+        workspaceScript.text.includes("&limit=${searchResultPageSize}&offset=0") &&
+        workspaceScript.text.includes("offset=${encodeURIComponent(String(options.nextOffset))}"),
+      "Search no longer opens with 25 results and supports explicit pagination."
+    );
+    assert(
+      workspaceScript.text.includes("const readerInitialSectionWindowSize = 5;") &&
+        workspaceScript.text.includes("function fetchChapterBodyWindow") &&
+        workspaceScript.text.includes("function progressivelyRenderReaderChapter") &&
+        workspaceScript.text.includes('content.dataset.chapterFullyLoaded = "true"'),
+      "Reader chapters no longer open with a selected-section window before progressive loading."
+    );
+    const readerContentRendererStart = workspaceScript.text.indexOf("async function renderSectionContent");
+    const readerScrollHelperStart = workspaceScript.text.indexOf(
+      "function scrollReaderContentToSection",
+      readerContentRendererStart
+    );
+    assert(
+      readerContentRendererStart >= 0 &&
+        readerScrollHelperStart > readerContentRendererStart &&
+        !workspaceScript.text
+          .slice(readerContentRendererStart, readerScrollHelperStart)
+          .includes("!panel.isConnected"),
+      "Reader startup once again rejects its initial detached render panel as stale."
+    );
+    assert(
+      webRoot.text.includes('id="workspace-issue"') &&
+        webRoot.text.includes('class="saved-plan-usage"') &&
+        webRoot.text.includes('class="settings-plan-usage"') &&
+        workspaceScript.text.includes("function renderPlanUsageRows") &&
+        workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
+        workspaceScript.text.includes("scheduleAnnotationPush(record);\n  refreshVisiblePlanUsage();") &&
+        workspaceScript.text.includes('card.style.removeProperty("--settings-card-content-height");') &&
+        workspaceScript.text.includes("syncAccountState();\n  wireSettingsCardCollapsing(panel);") &&
+        workspaceScript.text.includes("function presentWorkspaceIssue"),
+      "Plan usage or persistent workspace failure feedback is no longer rendered."
+    );
+    assert(
       !workspaceScript.text.includes('activeReaderButton') &&
         !workspaceScript.text.includes('Open in reader') &&
         !workspaceScript.text.includes('Open Section ${detail.sectionNumber} in active reader') &&
@@ -1000,7 +1039,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-refresh-disclosure-v205'),
+        webRoot.text.includes('/web/app.js?v=20260731-design-improvements-v210'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1065,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-refresh-disclosure-v181'),
+        webRoot.text.includes('/web/styles.css?v=20260731-design-improvements-v210'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1237,7 +1276,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-refresh-disclosure-v181'),
+        webRoot.text.includes('/web/styles.css?v=20260731-design-improvements-v210'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2286,6 +2325,19 @@ async function main() {
       ),
       "Administrative Chapter 4 did not expose its corrected section body in chapter reading."
     );
+    const administrativeChapter4Window = await request(
+      "/code/chapters/77?include=body&bodyStart=1&bodyLimit=1"
+    );
+    assert(
+      administrativeChapter4Window.response.ok &&
+        administrativeChapter4Window.json.chapter.bodyRange?.start === 1 &&
+        administrativeChapter4Window.json.chapter.bodyRange?.end === 2 &&
+        administrativeChapter4Window.json.chapter.bodyRange?.complete === false &&
+        administrativeChapter4Window.json.chapter.sections.filter((section) =>
+          Array.isArray(section.blocks)
+        ).length === 1,
+      "Windowed chapter loading returned the wrong body range."
+    );
 
     const ancillaryDwellingUnitRules = await request("/code/sections/25651");
     assert(ancillaryDwellingUnitRules.response.ok, "Newly cataloged BC U101.5 did not load.");
@@ -2305,6 +2357,21 @@ async function main() {
       ancillaryDwellingUnitRulesSearch.response.ok &&
         ancillaryDwellingUnitRulesSearch.json.results.some((result) => result.id === 25651),
       "Construction search omitted newly cataloged BC U101.5."
+    );
+    const firstSearchPage = await request("/code/search?q=egress&code=BC&limit=2&offset=0");
+    const secondSearchPage = await request("/code/search?q=egress&code=BC&limit=2&offset=2");
+    assert(
+      firstSearchPage.response.ok &&
+        secondSearchPage.response.ok &&
+        firstSearchPage.json.results.length === 2 &&
+        secondSearchPage.json.results.length === 2 &&
+        firstSearchPage.json.totalResults > 4 &&
+        firstSearchPage.json.offset === 0 &&
+        firstSearchPage.json.nextOffset === 2 &&
+        firstSearchPage.json.hasMore === true &&
+        secondSearchPage.json.offset === 2 &&
+        secondSearchPage.json.results[0].id !== firstSearchPage.json.results[0].id,
+      "Search pagination did not return stable, non-overlapping result pages."
     );
     const missingSharedSection = await request("/code/sections/999999999");
     assert(missingSharedSection.response.status === 404, "Unknown shared section did not return 404.");

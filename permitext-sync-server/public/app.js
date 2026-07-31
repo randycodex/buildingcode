@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-refresh-disclosure-v205";
+} from "./offline-storage.js?v=20260731-design-improvements-v210";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -69,6 +69,10 @@ const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
 const connectionStatus = document.querySelector("#connection-status");
+const workspaceIssue = document.querySelector("#workspace-issue");
+const workspaceIssueCopy = workspaceIssue?.querySelector(".workspace-issue-copy");
+const workspaceIssueAction = workspaceIssue?.querySelector(".workspace-issue-action");
+const workspaceIssueDismiss = workspaceIssue?.querySelector(".workspace-issue-dismiss");
 const topbarBrand = document.querySelector(".topbar-brand");
 const topbarBrandPlan = document.querySelector(".topbar-brand-plan");
 const readerTemplate = document.querySelector("#reader-template");
@@ -119,7 +123,9 @@ const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
-const maxRenderedSearchResults = 250;
+const readerInitialSectionWindowSize = 5;
+const readerProgressiveSectionBatchSize = 12;
+const searchResultPageSize = 25;
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
 const repeatableUtilityKeys = new Set(["search", "saved"]);
@@ -185,6 +191,7 @@ let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
 let researchSelectionMenuInteracting = false;
 let activeWebWarningClose = null;
+let activeWorkspaceIssueAction = null;
 
 applyReaderSettings();
 
@@ -2238,6 +2245,24 @@ async function fetchChapter(chapterID, options = {}) {
   return chapterCache.get(cacheKey);
 }
 
+async function fetchChapterBodyWindow(chapterID, start, limit) {
+  const normalizedStart = Math.max(0, Number(start) || 0);
+  const normalizedLimit = Math.max(1, Number(limit) || readerProgressiveSectionBatchSize);
+  const cacheKey = `${chapterID}:body:${normalizedStart}:${normalizedLimit}`;
+  if (!chapterCache.has(cacheKey)) {
+    const params = new URLSearchParams({
+      include: "body",
+      bodyStart: String(normalizedStart),
+      bodyLimit: String(normalizedLimit)
+    });
+    chapterCache.set(
+      cacheKey,
+      api(`/code/chapters/${chapterID}?${params}`).then((payload) => payload.chapter)
+    );
+  }
+  return chapterCache.get(cacheKey);
+}
+
 async function postJSON(path, body, options = {}) {
   const headers = { "Content-Type": "application/json" };
   if (options.token) {
@@ -3086,6 +3111,93 @@ function webFreePlanUsage() {
     notes: noteTargets.size
   };
 }
+
+function planUsageRows() {
+  const usage = webFreePlanUsage();
+  const rows = isProAccount()
+    ? [
+        { label: "Saved sections", value: "Unlimited" },
+        { label: "Notes", value: "Unlimited" }
+      ]
+    : [
+        {
+          label: "Saved sections",
+          value: `${usage.savedItems.toLocaleString()} of ${webFreePlanLimits.savedItems}`
+        },
+        {
+          label: "Notes",
+          value: `${usage.notes.toLocaleString()} of ${webFreePlanLimits.notes}`
+        }
+      ];
+  if (hasCapability("research")) {
+    const used = Number(researchUsage?.requestsUsed);
+    const limit = Number(researchUsage?.requestLimit);
+    rows.push({
+      label: "Research",
+      value: Number.isFinite(used) && Number.isFinite(limit)
+        ? `${Math.max(0, limit - used).toLocaleString()} of ${limit.toLocaleString()} remaining`
+        : "Checking allowance…"
+    });
+  } else if (isProAccount()) {
+    rows.push({ label: "Research", value: "Add-on not active" });
+  }
+  return rows;
+}
+
+function renderPlanUsageRows(container) {
+  if (!container) return;
+  clear(container);
+  planUsageRows().forEach((row) => {
+    const item = document.createElement("p");
+    const label = document.createElement("span");
+    label.textContent = row.label;
+    const value = document.createElement("strong");
+    value.textContent = row.value;
+    item.append(label, value);
+    container.append(item);
+  });
+}
+
+function renderSavedPlanUsage(container) {
+  if (!container) return;
+  if (isProAccount()) {
+    container.hidden = true;
+    return;
+  }
+  const usage = webFreePlanUsage();
+  container.textContent =
+    `${usage.savedItems.toLocaleString()} of ${webFreePlanLimits.savedItems} saved sections · ` +
+    `${usage.notes.toLocaleString()} of ${webFreePlanLimits.notes} notes`;
+  container.hidden = false;
+}
+
+function refreshVisiblePlanUsage() {
+  document.querySelectorAll(".settings-plan-usage").forEach(renderPlanUsageRows);
+  document.querySelectorAll(".saved-plan-usage").forEach(renderSavedPlanUsage);
+}
+
+function presentWorkspaceIssue(message, options = {}) {
+  if (!workspaceIssue || !workspaceIssueCopy || !message) return;
+  workspaceIssueCopy.textContent = message;
+  activeWorkspaceIssueAction = typeof options.onAction === "function" ? options.onAction : null;
+  if (workspaceIssueAction) {
+    workspaceIssueAction.hidden = !activeWorkspaceIssueAction;
+    workspaceIssueAction.textContent = options.actionLabel || "Review";
+  }
+  workspaceIssue.hidden = false;
+}
+
+function dismissWorkspaceIssue() {
+  if (!workspaceIssue) return;
+  workspaceIssue.hidden = true;
+  activeWorkspaceIssueAction = null;
+}
+
+workspaceIssueAction?.addEventListener("click", () => {
+  activeWorkspaceIssueAction?.();
+  dismissWorkspaceIssue();
+});
+workspaceIssueDismiss?.addEventListener("click", dismissWorkspaceIssue);
 
 function presentPlanLimitNotice(title, message) {
   if (planLimitNoticePromise) return planLimitNoticePromise;
@@ -5242,6 +5354,7 @@ function setAnnotationNoteValue(target, value) {
   });
   upsertLocalAnnotation(record);
   scheduleAnnotationPush(record);
+  refreshVisiblePlanUsage();
   return true;
 }
 
@@ -5719,6 +5832,187 @@ async function populateReaderSelectors(panel, reader) {
   sectionSelect.value = reader.sectionID || "";
 }
 
+function readerTargetSectionIndex(sections, reader) {
+  const sectionID = String(reader.sectionID || "");
+  const sectionNumber = String(reader.sectionNumber || "");
+  return sections.findIndex((section) =>
+    (sectionID && String(section.id) === sectionID) ||
+    (sectionID && section.readerAliasSectionIDs.includes(sectionID)) ||
+    (sectionNumber && String(section.sectionNumber || "") === sectionNumber)
+  );
+}
+
+function readerSectionWithWindowBody(section, windowChapter) {
+  const bodySection = (windowChapter.sections || []).find((candidate) =>
+    String(candidate.id) === String(section.id)
+  );
+  return bodySection && Array.isArray(bodySection.blocks)
+    ? { ...section, blocks: bodySection.blocks }
+    : section;
+}
+
+function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSection) {
+  const sectionWrapper = document.createElement("section");
+  sectionWrapper.className = "chapter-section";
+  sectionWrapper.dataset.sectionId = String(section.id);
+  sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
+  if (section.readerAliasSectionIDs.length > 0) {
+    sectionWrapper.dataset.sectionAliases = section.readerAliasSectionIDs.join(" ");
+  }
+  markResearchSelectable(sectionWrapper, {
+    sectionID: section.id,
+    sectionNumber: section.sectionNumber,
+    title: section.title,
+    codePrefix: reader.codePrefix,
+    chapterID: reader.chapterID
+  });
+
+  const groupLabel = groupLabelsByFirstSection.get(String(section.id));
+  if (groupLabel) {
+    sectionWrapper.classList.add("starts-group");
+    const groupHeading = document.createElement("div");
+    groupHeading.className = "authored-section-label";
+    groupHeading.dataset.researchSelectionExclude = "true";
+    groupHeading.textContent = groupLabel;
+    sectionWrapper.append(groupHeading);
+  }
+
+  const sectionHeading = document.createElement("h3");
+  sectionHeading.className = "reader-section-title";
+  sectionHeading.dataset.researchSelectionExclude = "true";
+  sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
+  sectionWrapper.append(sectionHeading);
+
+  const blocks = annotatedBlocksForSection(section);
+  const bookmarkedBlockIndex = isSectionSaved(section.id)
+    ? Math.max(0, blocks.findIndex((block, blockIndex) => {
+        const blockTarget = annotationTargetForBlock(section, block, reader, blockIndex);
+        return Boolean(noteValueForTarget(blockTarget.sectionID, blockTarget.blockID).trim());
+      }))
+    : -1;
+  blocks.forEach((block, index) => {
+    const target = annotationTargetForBlock(section, block, reader, index);
+    sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
+      showBookmark: index === bookmarkedBlockIndex
+    }));
+  });
+  linkInlineCodeReferences(sectionWrapper, panel, reader);
+  return sectionWrapper;
+}
+
+function collapseRepeatedReaderCatalogAliases(content) {
+  let latestBodySection = null;
+  let latestBodyText = "";
+  content.querySelectorAll(".chapter-section").forEach((section) => {
+    const blocks = section.querySelectorAll(".annotated-code-block");
+    if (blocks.length > 0) {
+      latestBodySection = section;
+      latestBodyText = normalizedReaderProvisionText(
+        Array.from(blocks).map((block) => block.textContent || "").join(" ")
+      );
+      return;
+    }
+    const title = normalizedReaderProvisionText(
+      section.querySelector(".reader-section-title")?.textContent || ""
+    );
+    if (!title || !latestBodySection || !latestBodyText.includes(title)) {
+      latestBodySection = null;
+      latestBodyText = "";
+      return;
+    }
+    const aliasID = String(section.dataset.sectionId || "").trim();
+    const aliases = new Set(
+      String(latestBodySection.dataset.sectionAliases || "").split(/\s+/).filter(Boolean)
+    );
+    if (aliasID) aliases.add(aliasID);
+    if (aliases.size > 0) {
+      latestBodySection.dataset.sectionAliases = Array.from(aliases).join(" ");
+    }
+    section.remove();
+  });
+}
+
+function nextReaderProgressiveFrame() {
+  return new Promise((resolve) => {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(resolve, { timeout: 180 });
+      return;
+    }
+    window.setTimeout(resolve, 16);
+  });
+}
+
+async function progressivelyRenderReaderChapter(
+  panel,
+  reader,
+  content,
+  sections,
+  groupLabelsByFirstSection,
+  initialStart,
+  initialEnd,
+  renderToken
+) {
+  let beforeCursor = initialStart;
+  let afterCursor = initialEnd;
+  let loadAfter = true;
+  const status = document.createElement("p");
+  status.className = "reader-progressive-status";
+  status.dataset.researchSelectionExclude = "true";
+  status.setAttribute("role", "status");
+  status.textContent = "Loading the rest of this chapter…";
+  content.append(status);
+
+  while (beforeCursor > 0 || afterCursor < sections.length) {
+    await nextReaderProgressiveFrame();
+    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
+    const canLoadAfter = afterCursor < sections.length;
+    const canLoadBefore = beforeCursor > 0;
+    const shouldLoadAfter = (loadAfter && canLoadAfter) || !canLoadBefore;
+    const start = shouldLoadAfter
+      ? afterCursor
+      : Math.max(0, beforeCursor - readerProgressiveSectionBatchSize);
+    const end = shouldLoadAfter
+      ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
+      : beforeCursor;
+    try {
+      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
+      const fragment = document.createDocumentFragment();
+      sections.slice(start, end).forEach((section) => {
+        fragment.append(
+          renderReaderChapterSection(
+            panel,
+            reader,
+            readerSectionWithWindowBody(section, windowChapter),
+            groupLabelsByFirstSection
+          )
+        );
+      });
+      if (shouldLoadAfter) {
+        content.insertBefore(fragment, status);
+        afterCursor = end;
+      } else {
+        const previousHeight = content.scrollHeight;
+        const previousTop = content.scrollTop;
+        content.insertBefore(fragment, content.querySelector(".chapter-section") || status);
+        content.scrollTop = previousTop + (content.scrollHeight - previousHeight);
+        beforeCursor = start;
+      }
+      collapseRepeatedReaderCatalogAliases(content);
+      status.textContent = `${afterCursor - beforeCursor} of ${sections.length} sections loaded`;
+      loadAfter = !shouldLoadAfter;
+      requestAnimationFrame(() => updateReaderScrollIndicator(panel));
+    } catch {
+      status.classList.add("is-error");
+      status.textContent = "The current section is available, but the rest of this chapter could not be loaded.";
+      return;
+    }
+  }
+  status.remove();
+  content.dataset.chapterFullyLoaded = "true";
+  requestAnimationFrame(() => updateReaderScrollIndicator(panel));
+}
+
 async function renderSectionContent(panel, reader) {
   const content = panel.querySelector(".reader-content");
   const commentsList = panel.querySelector(".comments-list");
@@ -5729,66 +6023,49 @@ async function renderSectionContent(panel, reader) {
     return;
   }
 
+  const renderToken = `${reader.chapterID}:${reader.sectionID || "start"}:${Date.now()}`;
+  panel.dataset.readerRenderToken = renderToken;
   clear(content);
-  const chapter = await fetchChapter(reader.chapterID, { includeBody: true });
+  emptyReader(content, "Loading section", "Opening the selected code text first.");
+  const chapter = await fetchChapter(reader.chapterID);
+  if (panel.dataset.readerRenderToken !== renderToken) return;
   const sections = readerSectionsWithoutRepeatedCatalogAliases(
     (chapter.sections || []).map((section) => ({
       ...section,
       codePrefix: section.codePrefix || chapter.codePrefix
     }))
   );
+  if (!sections.length) {
+    emptyReader(content, "No sections", "This chapter does not contain readable sections.");
+    clear(commentsList);
+    return;
+  }
+  const targetIndex = Math.max(0, readerTargetSectionIndex(sections, reader));
+  const maximumInitialStart = Math.max(0, sections.length - readerInitialSectionWindowSize);
+  const initialStart = Math.min(
+    Math.max(0, targetIndex - Math.floor(readerInitialSectionWindowSize / 2)),
+    maximumInitialStart
+  );
+  const initialEnd = Math.min(sections.length, initialStart + readerInitialSectionWindowSize);
+  const initialChapter = await fetchChapterBodyWindow(
+    reader.chapterID,
+    initialStart,
+    initialEnd - initialStart
+  );
+  if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
-
-  sections.forEach((section) => {
-    const sectionWrapper = document.createElement("section");
-    sectionWrapper.className = "chapter-section";
-    sectionWrapper.dataset.sectionId = String(section.id);
-    sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
-    if (section.readerAliasSectionIDs.length > 0) {
-      sectionWrapper.dataset.sectionAliases = section.readerAliasSectionIDs.join(" ");
-    }
-    markResearchSelectable(sectionWrapper, {
-      sectionID: section.id,
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      codePrefix: reader.codePrefix,
-      chapterID: reader.chapterID
-    });
-
-    const groupLabel = groupLabelsByFirstSection.get(String(section.id));
-    if (groupLabel) {
-      sectionWrapper.classList.add("starts-group");
-      const groupHeading = document.createElement("div");
-      groupHeading.className = "authored-section-label";
-      groupHeading.dataset.researchSelectionExclude = "true";
-      groupHeading.textContent = groupLabel;
-      sectionWrapper.append(groupHeading);
-    }
-
-    const sectionHeading = document.createElement("h3");
-    sectionHeading.className = "reader-section-title";
-    sectionHeading.dataset.researchSelectionExclude = "true";
-    sectionHeading.textContent = sectionDisplayTitle(section.sectionNumber, section.title);
-    sectionWrapper.append(sectionHeading);
-
-    const blocks = annotatedBlocksForSection(section);
-    const bookmarkedBlockIndex = isSectionSaved(section.id)
-      ? Math.max(0, blocks.findIndex((block, blockIndex) => {
-          const blockTarget = annotationTargetForBlock(section, block, reader, blockIndex);
-          return Boolean(noteValueForTarget(blockTarget.sectionID, blockTarget.blockID).trim());
-        }))
-      : -1;
-    blocks.forEach((block, index) => {
-      const target = annotationTargetForBlock(section, block, reader, index);
-      sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-        showBookmark: index === bookmarkedBlockIndex
-      }));
-    });
-
-    linkInlineCodeReferences(sectionWrapper, panel, reader);
-
-    content.append(sectionWrapper);
+  clear(content);
+  sections.slice(initialStart, initialEnd).forEach((section) => {
+    content.append(
+      renderReaderChapterSection(
+        panel,
+        reader,
+        readerSectionWithWindowBody(section, initialChapter),
+        groupLabelsByFirstSection
+      )
+    );
   });
+  collapseRepeatedReaderCatalogAliases(content);
   // Notes now open from each block in the reader notes sheet. Do not build the
   // retired, permanently hidden sidebar editor for every block in the chapter.
   clear(commentsList);
@@ -5808,6 +6085,16 @@ async function renderSectionContent(panel, reader) {
       reader.shouldSmoothScrollToSection = false;
     });
   }
+  void progressivelyRenderReaderChapter(
+    panel,
+    reader,
+    content,
+    sections,
+    groupLabelsByFirstSection,
+    initialStart,
+    initialEnd,
+    renderToken
+  );
 }
 
 function scrollReaderContentToSection(content, sectionID, behavior = "auto", sectionNumber = "") {
@@ -6080,16 +6367,23 @@ function removeReaderNotesProjectPicker(sheet) {
 }
 
 async function openReaderNotesProjectPicker(sheet, sectionPayload) {
-  if (!hasCapability("projects")) {
-    void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to organize saved code in Project workspaces.");
-    return;
-  }
-  if (!isSectionSaved(sectionPayload.sectionID)) {
+  const wasAlreadySaved = isSectionSaved(sectionPayload.sectionID);
+  if (!wasAlreadySaved) {
     const saved = await persistSectionBookmark(sectionPayload, true);
-    if (!saved) return;
+    if (!saved) return false;
     syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
   }
+  if (!hasCapability("projects")) {
+    if (wasAlreadySaved) {
+      void presentPlanLimitNotice(
+        "Projects require Pro",
+        "Upgrade to Pro to organize saved code in Project workspaces."
+      );
+    }
+    return true;
+  }
   showReaderNotesProjectPicker(sheet, sectionPayload);
+  return true;
 }
 
 function showReaderNotesProjectPicker(sheet, sectionPayload) {
@@ -6150,8 +6444,10 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
           setProjectButtonState(button, true);
         }
       } catch (error) {
+        const message = error.message || "Could not update this project.";
         button.classList.add("has-error");
-        button.title = error.message || "Could not update this project.";
+        button.title = message;
+        presentWorkspaceIssue(message);
       } finally {
         button.disabled = false;
       }
@@ -6185,8 +6481,10 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
         showReaderNotesProjectPicker(sheet, sectionPayload);
         refreshOpenAnnotationProjectEditors();
       } catch (error) {
+        const message = error.message || "Could not create the project.";
         createButton.disabled = false;
-        createButton.title = error.message || "Could not create the project.";
+        createButton.title = message;
+        presentWorkspaceIssue(message);
       }
     });
     picker.append(form);
@@ -6305,15 +6603,18 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
       bookmarkButton.disabled = true;
       bookmarkButton.classList.remove("has-error");
       try {
-        await openReaderNotesProjectPicker(sheet, sectionPayload);
+        const opened = await openReaderNotesProjectPicker(sheet, sectionPayload);
+        if (!opened) return;
         bookmarkButton.classList.add("is-saved");
         bookmarkButton.setAttribute("aria-pressed", "true");
         bookmarkButton.setAttribute("aria-label", "Manage saved projects");
         bookmarkButton.title = "Manage saved projects";
         bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Manage saved projects</span>`;
       } catch (error) {
-        bookmarkButton.title = error.message;
+        const message = error.message || "Could not update this saved section.";
+        bookmarkButton.title = message;
         bookmarkButton.classList.add("has-error");
+        presentWorkspaceIssue(message);
       } finally {
         bookmarkButton.disabled = false;
       }
@@ -7379,9 +7680,12 @@ function updateSearchDock(panel, instance, resultCount = null) {
     : selectedPrefixes.length === 1
       ? codeDisplayLabel(selectedPrefixes[0])
       : `${selectedPrefixes.length} code books`;
-  summaryCopy.textContent = resultCount === null
-    ? `Searching in ${scope}`
-    : `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
+  if (resultCount === null) {
+    summaryCopy.textContent = `Searching in ${scope}`;
+    return;
+  }
+  const countLabel = `${resultCount.toLocaleString()} ${resultCount === 1 ? "result" : "results"} in ${scope}`;
+  summaryCopy.textContent = countLabel;
 }
 
 async function hydrateSearchRecentlyViewedEntries(entries) {
@@ -7767,7 +8071,7 @@ async function renderSearchResults(panel, instance) {
   renderSearchPlaceholder(results, { title: "Searching", body: "Checking section titles and code text." });
   const codeQuery = selectedPrefixes.length ? `&code=${encodeURIComponent(selectedPrefixes.join(","))}` : "";
   const payload = await api(
-    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&limit=${encodeURIComponent(String(maxRenderedSearchResults))}`
+    `/code/search?q=${encodeURIComponent(query)}${codeQuery}&limit=${searchResultPageSize}&offset=0`
   );
   if (
     searchInstance.query.trim() !== query ||
@@ -7804,23 +8108,43 @@ async function renderSearchResults(panel, instance) {
   }
 
   const resultCount = filteredResults.length;
+  const totalResults = Number(payload.totalResults) || resultCount;
   updateSearchDock(panel, searchInstance, resultCount);
+  appendSearchResultGroups(results, filteredResults, query, searchInstance);
+  appendSearchLoadMore(results, {
+    query,
+    selectedPrefixes,
+    nextOffset: Number(payload.nextOffset) || (payload.results || []).length,
+    totalResults,
+    hasMore: Boolean(payload.hasMore),
+    searchInstance,
+    panel
+  });
+}
 
+function appendSearchResultGroups(results, searchResults, query, searchInstance) {
   const groups = new Map();
-  filteredResults.forEach((result) => {
+  searchResults.forEach((result) => {
     const prefix = result.codePrefix || "BC";
     if (!groups.has(prefix)) groups.set(prefix, []);
     groups.get(prefix).push(result);
   });
 
   Array.from(groups.entries()).forEach(([prefix, groupResults]) => {
-    const group = document.createElement("section");
-    group.className = "search-result-group";
-    group.classList.add(`code-theme-${codeTheme(prefix)}`);
-    const label = document.createElement("p");
-    label.className = "section-label search-group-label";
-    label.textContent = codeDisplayLabel(prefix);
-    group.append(label);
+    let group = results.querySelector(
+      `.search-result-group[data-code-prefix="${CSS.escape(prefix)}"]`
+    );
+    if (!group) {
+      group = document.createElement("section");
+      group.className = "search-result-group";
+      group.classList.add(`code-theme-${codeTheme(prefix)}`);
+      group.dataset.codePrefix = prefix;
+      const label = document.createElement("p");
+      label.className = "section-label search-group-label";
+      label.textContent = codeDisplayLabel(prefix);
+      group.append(label);
+      results.append(group);
+    }
     groupResults.forEach((result) => {
       const detail = searchResultDetail(result);
       const row = document.createElement("article");
@@ -7852,8 +8176,61 @@ async function renderSearchResults(panel, instance) {
       row.append(mainButton);
       group.append(row);
     });
-    results.append(group);
   });
+}
+
+function appendSearchLoadMore(results, options) {
+  results.querySelector(".search-load-more")?.remove();
+  if (!options.hasMore) return;
+  const footer = document.createElement("section");
+  footer.className = "search-load-more";
+  const status = document.createElement("p");
+  const visibleCount = results.querySelectorAll(".result-row").length;
+  status.textContent = `${visibleCount.toLocaleString()} shown`;
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "search-load-more-button";
+  button.textContent = "Show more";
+  button.addEventListener("click", async () => {
+    button.disabled = true;
+    button.textContent = "Loading…";
+    const codeQuery = options.selectedPrefixes.length
+      ? `&code=${encodeURIComponent(options.selectedPrefixes.join(","))}`
+      : "";
+    try {
+      const payload = await api(
+        `/code/search?q=${encodeURIComponent(options.query)}${codeQuery}` +
+        `&limit=${searchResultPageSize}&offset=${encodeURIComponent(String(options.nextOffset))}`
+      );
+      if (
+        options.searchInstance.query.trim() !== options.query ||
+        normalizeSearchCodeFilters(options.searchInstance.codeFilters).join(",") !== options.selectedPrefixes.join(",")
+      ) {
+        return;
+      }
+      const nextResults = (payload.results || []).filter((result) =>
+        (options.selectedPrefixes.length === 0 || options.selectedPrefixes.includes(result.codePrefix || "BC")) &&
+        searchResultMatchesExactQuery(result, options.query)
+      );
+      footer.remove();
+      appendSearchResultGroups(results, nextResults, options.query, options.searchInstance);
+      const nextVisibleCount = results.querySelectorAll(".result-row").length;
+      const totalResults = Number(payload.totalResults) || options.totalResults;
+      updateSearchDock(options.panel, options.searchInstance, nextVisibleCount);
+      appendSearchLoadMore(results, {
+        ...options,
+        nextOffset: Number(payload.nextOffset) || (options.nextOffset + (payload.results || []).length),
+        totalResults,
+        hasMore: Boolean(payload.hasMore)
+      });
+    } catch {
+      button.disabled = false;
+      button.textContent = "Try again";
+      status.textContent = "More results could not be loaded.";
+    }
+  });
+  footer.append(status, button);
+  results.append(footer);
 }
 
 async function openSectionDetail(searchID, section, options = {}) {
@@ -7900,15 +8277,7 @@ function annotationForSection(sectionID) {
 async function resolveSectionDetail(detail) {
   let chapter = null;
   let section = null;
-  if (detail.chapterID) {
-    try {
-      chapter = await fetchChapter(detail.chapterID, { includeBody: true });
-      section = sectionTitleFromID(detail.sectionID, chapter);
-    } catch {
-      chapter = null;
-    }
-  }
-  if (!section && detail.sectionID) {
+  if (detail.sectionID) {
     try {
       const payload = await api(`/code/sections/${encodeURIComponent(detail.sectionID)}`);
       const resolvedSection = payload.section;
@@ -7919,15 +8288,23 @@ async function resolveSectionDetail(detail) {
         detail.sectionNumber = resolvedSection.sectionNumber || detail.sectionNumber || "";
         detail.title = resolvedSection.title || detail.title || "Section";
         if (detail.chapterID) {
-          chapter = await fetchChapter(detail.chapterID, { includeBody: true });
+          chapter = await fetchChapter(detail.chapterID);
         }
-        section = sectionTitleFromID(detail.sectionID, chapter) || {
+        section = {
           ...resolvedSection,
           id: resolvedSection.id || resolvedSection.sectionID || Number(detail.sectionID)
         };
       }
     } catch {
       // Fall through to text search for legacy records that are not addressable by ID.
+    }
+  }
+  if (!section && detail.chapterID) {
+    try {
+      chapter = await fetchChapter(detail.chapterID, { includeBody: true });
+      section = sectionTitleFromID(detail.sectionID, chapter);
+    } catch {
+      chapter = null;
     }
   }
   if (!section) {
@@ -8206,15 +8583,25 @@ async function renderSectionDetail(searchID, detail) {
     saveButton.setAttribute("aria-label", saveButton.title);
     saveButton.innerHTML = bookmarkIconSVG(!shouldRemove);
     try {
-      await persistSectionBookmark(sectionPayload, !shouldRemove);
+      const persisted = await persistSectionBookmark(sectionPayload, !shouldRemove);
+      if (persisted === false) {
+        saveButton.classList.toggle("is-saved", shouldRemove);
+        saveButton.setAttribute("aria-pressed", String(shouldRemove));
+        saveButton.title = shouldRemove ? "Remove bookmark" : "Save bookmark";
+        saveButton.setAttribute("aria-label", saveButton.title);
+        saveButton.innerHTML = bookmarkIconSVG(shouldRemove);
+        return;
+      }
       await renderWorkspace();
     } catch (error) {
       saveButton.classList.toggle("is-saved", shouldRemove);
       saveButton.setAttribute("aria-pressed", String(shouldRemove));
       saveButton.innerHTML = bookmarkIconSVG(shouldRemove);
       saveButton.classList.add("has-error");
-      saveButton.title = error.message;
-      saveButton.setAttribute("aria-label", error.message);
+      const message = error.message || "Could not update this saved section.";
+      saveButton.title = message;
+      saveButton.setAttribute("aria-label", message);
+      presentWorkspaceIssue(message);
     } finally {
       saveButton.disabled = false;
     }
@@ -14434,6 +14821,8 @@ async function renderSaved(instance) {
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+  const planUsage = panel.querySelector(".saved-plan-usage");
+  renderSavedPlanUsage(planUsage);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     appendEmptySaved(content, "Sign in to sync", "Open Settings and sign in to show synced bookmarks, tags, and notes.");
@@ -15179,9 +15568,11 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
               await persistSectionBookmark(item, false);
               await renderWorkspace();
             } catch (error) {
-              removeButton.title = error.message || "Could not remove saved section";
+              const message = error.message || "Could not remove saved section";
+              removeButton.title = message;
               removeButton.classList.add("has-error");
               row.classList.remove("is-removing");
+              presentWorkspaceIssue(message);
             } finally {
               removeButton.disabled = false;
             }
@@ -16334,6 +16725,11 @@ function wireSettingsCardCollapsing(panel) {
     card.dataset.settingsCardId = cardID;
 
     const measureContent = () => {
+      if (!card.isConnected) {
+        card.style.removeProperty("--settings-card-content-height");
+        return;
+      }
+      card.style.removeProperty("--settings-card-content-height");
       card.style.setProperty("--settings-card-content-height", `${content.scrollHeight}px`);
     };
     const update = ({ animate = true } = {}) => {
@@ -16371,7 +16767,6 @@ function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
-  wireSettingsCardCollapsing(panel);
   wireSettingsSelectControl(panel, ".settings-jurisdiction-select", "Jurisdiction");
   wireSettingsSelectControl(panel, ".settings-version-select", "Version");
   wireReaderFontFamilyControl(panel);
@@ -16380,6 +16775,7 @@ function renderSettings() {
   const versionSelect = panel.querySelector(".settings-version-select");
   const accountCopy = panel.querySelector(".account-status-copy");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
+  const planUsage = panel.querySelector(".settings-plan-usage");
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const deleteAccountButton = panel.querySelector(".account-delete");
@@ -16549,10 +16945,27 @@ function renderSettings() {
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
     accountCopy.textContent = "Sign in to sync saved sections, notes, and Projects across your devices.";
+    renderPlanUsageRows(planUsage);
     void renderOfflineState();
   };
 
   syncAccountState();
+  wireSettingsCardCollapsing(panel);
+  if (activeAccount() && hasCapability("research") && !researchUsage) {
+    void postResearch("/research/usage")
+      .then((payload) => {
+        researchUsage = payload.usage || null;
+        if (panel.isConnected) renderPlanUsageRows(planUsage);
+      })
+      .catch(() => {
+        if (!panel.isConnected || !planUsage) return;
+        const researchRow = Array.from(planUsage.querySelectorAll("p"))
+          .find((row) => row.querySelector("span")?.textContent === "Research");
+        if (researchRow?.querySelector("strong")) {
+          researchRow.querySelector("strong").textContent = "Allowance unavailable";
+        }
+      });
+  }
   appleWebSignInConfig().then((config) => {
     const account = activeAccount();
     if (account && state.account?.authProvider === "web") {
