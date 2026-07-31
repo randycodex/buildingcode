@@ -1533,7 +1533,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   border-radius: var(--radius-pill);
   background: color-mix(in srgb, var(--text-primary) 10%, transparent);
   color: var(--text-primary);
-  font-size: var(--chrome-font-size) !important;
+  font-size: 14px !important;
   font-weight: 400;
   box-shadow: none;
 }
