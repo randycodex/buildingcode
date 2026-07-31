@@ -27,6 +27,11 @@ import {
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
 } from "./offline-storage.js?v=20260731-topbar-pills-v259";
+import {
+  cacheRetryablePromise,
+  resolveNotebookVersionConflict,
+  shouldUseOfflineFallback
+} from "./client-reliability.js?v=20260731-debug-audit-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -179,7 +184,7 @@ const annotationPushTimers = new Map();
 let appleWebConfigPromise = null;
 let appleIDScriptPromise = null;
 let workboardModulePromise = null;
-let workboardPreloadHandle = null;
+let workboardStylesPromise = null;
 const workboardMounts = new Map();
 let notebookModulePromise = null;
 const notebookMounts = new Map();
@@ -585,13 +590,39 @@ function projectHasDetachedWorkboard(project) {
 
 function loadWorkboardModule() {
   if (!workboardModulePromise) {
-    workboardModulePromise = import(`/web/workboard-assets/workboard.js?v=${workboardClientVersion}`)
+    workboardModulePromise = Promise.all([
+      loadWorkboardStyles(),
+      import(`/web/workboard-assets/workboard.js?v=${workboardClientVersion}`)
+    ])
+      .then(([, module]) => module)
       .catch((error) => {
         workboardModulePromise = null;
         throw error;
       });
   }
   return workboardModulePromise;
+}
+
+function loadWorkboardStyles() {
+  if (workboardStylesPromise) return workboardStylesPromise;
+  workboardStylesPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector('link[data-permitext-workboard-styles="true"]');
+    if (existing?.sheet) {
+      resolve();
+      return;
+    }
+    const link = existing || document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61";
+    link.dataset.permitextWorkboardStyles = "true";
+    link.addEventListener("load", resolve, { once: true });
+    link.addEventListener("error", () => {
+      workboardStylesPromise = null;
+      reject(new Error("Could not load Workboard styles."));
+    }, { once: true });
+    if (!existing) document.head.append(link);
+  });
+  return workboardStylesPromise;
 }
 
 function loadNotebookModule() {
@@ -603,19 +634,6 @@ function loadNotebookModule() {
       });
   }
   return notebookModulePromise;
-}
-
-function scheduleWorkboardModulePreload() {
-  if (workboardModulePromise || workboardPreloadHandle !== null) return;
-  const preload = () => {
-    workboardPreloadHandle = null;
-    void loadWorkboardModule().catch(() => {});
-  };
-  if (typeof window.requestIdleCallback === "function") {
-    workboardPreloadHandle = window.requestIdleCallback(preload);
-  } else {
-    workboardPreloadHandle = window.setTimeout(preload, 8_000);
-  }
 }
 
 async function closeProjectWorkboard(project) {
@@ -2287,8 +2305,6 @@ async function api(path) {
   let response;
   try {
     response = await fetch(path);
-    serverReachable = true;
-    updateConnectionStatus();
   } catch (networkError) {
     serverReachable = false;
     updateConnectionStatus();
@@ -2298,19 +2314,29 @@ async function api(path) {
     }
     throw networkError;
   }
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+  if (!response.ok) {
+    if (shouldUseOfflineFallback(response.status) && hasCapability("offline-access")) {
+      serverReachable = false;
+      updateConnectionStatus();
+      const payload = await offlineAPI(path).catch(() => null);
+      if (payload) return payload;
+    }
+    serverReachable = response.status < 500;
+    updateConnectionStatus();
+    throw new Error(`Request failed: ${response.status}`);
+  }
+  serverReachable = true;
+  updateConnectionStatus();
   return response.json();
 }
 
 async function fetchChapterList(codePrefix = "BC") {
   const cacheKey = codePrefix || "BC";
-  if (!chapterListCache.has(cacheKey)) {
-    chapterListCache.set(
-      cacheKey,
-      api(`/code/chapters?code=${encodeURIComponent(cacheKey)}`).then((payload) => payload.chapters || [])
-    );
-  }
-  return chapterListCache.get(cacheKey);
+  return cacheRetryablePromise(
+    chapterListCache,
+    cacheKey,
+    () => api(`/code/chapters?code=${encodeURIComponent(cacheKey)}`).then((payload) => payload.chapters || [])
+  );
 }
 
 async function firstChapterIDForCode(codePrefix = "BC") {
@@ -2324,29 +2350,26 @@ async function fetchChapter(chapterID, options = {}) {
   if (!options.includeBody && chapterCache.has(bodyCacheKey)) {
     return chapterCache.get(bodyCacheKey);
   }
-  if (!chapterCache.has(cacheKey)) {
-    const suffix = options.includeBody ? "?include=body" : "";
-    chapterCache.set(cacheKey, api(`/code/chapters/${chapterID}${suffix}`).then((payload) => payload.chapter));
-  }
-  return chapterCache.get(cacheKey);
+  const suffix = options.includeBody ? "?include=body" : "";
+  return cacheRetryablePromise(
+    chapterCache,
+    cacheKey,
+    () => api(`/code/chapters/${chapterID}${suffix}`).then((payload) => payload.chapter)
+  );
 }
 
 async function fetchChapterBodyWindow(chapterID, start, limit) {
   const normalizedStart = Math.max(0, Number(start) || 0);
   const normalizedLimit = Math.max(1, Number(limit) || readerProgressiveSectionBatchSize);
   const cacheKey = `${chapterID}:body:${normalizedStart}:${normalizedLimit}`;
-  if (!chapterCache.has(cacheKey)) {
+  return cacheRetryablePromise(chapterCache, cacheKey, () => {
     const params = new URLSearchParams({
       include: "body",
       bodyStart: String(normalizedStart),
       bodyLimit: String(normalizedLimit)
     });
-    chapterCache.set(
-      cacheKey,
-      api(`/code/chapters/${chapterID}?${params}`).then((payload) => payload.chapter)
-    );
-  }
-  return chapterCache.get(cacheKey);
+    return api(`/code/chapters/${chapterID}?${params}`).then((payload) => payload.chapter);
+  });
 }
 
 async function postJSON(path, body, options = {}) {
@@ -11875,13 +11898,14 @@ async function renderProjectNotebook(project) {
           return true;
         } catch (error) {
           if (error.payload?.code === "NOTEBOOK_VERSION_CONFLICT" && error.payload.card) {
-            activeCard = error.payload.card;
-            draftDocument = activeCard.document;
-            dirty = false;
+            const resolution = resolveNotebookVersionConflict(activeCard, draftDocument, error.payload.card);
+            activeCard = resolution.activeCard;
+            draftDocument = resolution.draftDocument;
+            dirty = resolution.dirty;
             await renderFocusedCard();
             await showWebNotice(
-              "Newer Notebook version loaded",
-              "Another edit was saved first. Permitext loaded the current version so you can review it before editing again."
+              "Notebook save conflict",
+              "Another edit was saved first. Your local draft is preserved; review it before retrying the save."
             );
           } else {
             await showWebNotice("Card not saved", error.message);
@@ -18517,7 +18541,6 @@ async function start() {
     codeTrustProfiles = libraryPayload.codeTrustProfiles || [];
   }
   updateConnectionStatus();
-  void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
   document.addEventListener("click", (event) => {
     if (
       activeCustomSelect &&
@@ -18694,7 +18717,6 @@ async function start() {
     saveWorkspaceState();
   }
   await renderWorkspace();
-  scheduleWorkboardModulePreload();
   if (deepLinkedSectionID) {
     try {
       const payload = await api(`/code/sections/${deepLinkedSectionID}`);

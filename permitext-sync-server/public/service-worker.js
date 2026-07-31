@@ -1,7 +1,26 @@
 const shellCacheName = "permitext-pro-shell-v223";
+const offlineAssetVersion = "20260725-visual-inventory-v13";
+const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
+const shellURLs = [
+  "/",
+  "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
+  "/web/icons/permitext-192.png",
+  "/web/icons/permitext-512.png",
+  "/web/styles.css?v=20260731-topbar-pills-v259",
+  "/web/app.js?v=20260731-topbar-pills-v259",
+  "/web/client-reliability.js?v=20260731-debug-audit-v1",
+  "/web/offline-storage.js?v=20260731-topbar-pills-v259",
+  "/web/code-references.js?v=20260720-code-reference-links-v18",
+  "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
+  "/web/sync-state.js?v=20260721-causal-clear-v4"
+];
 
-self.addEventListener("install", () => {
-  self.skipWaiting();
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(shellCacheName)
+      .then((cache) => cache.addAll(shellURLs))
+      .then(() => self.skipWaiting())
+  );
 });
 
 self.addEventListener("activate", (event) => {
@@ -20,6 +39,7 @@ async function networkFirstNavigation(request) {
   try {
     const response = await fetch(request);
     if (response.ok) await cache.put("/", response.clone());
+    if (response.status >= 500) return (await cache.match("/")) || response;
     return response;
   } catch (error) {
     return (await cache.match("/")) || Promise.reject(error);
@@ -27,7 +47,10 @@ async function networkFirstNavigation(request) {
 }
 
 async function cacheFirstAsset(request) {
-  const cache = await caches.open(shellCacheName);
+  const url = new URL(request.url);
+  const cache = await caches.open(
+    url.pathname.startsWith("/code/assets/") ? offlineAssetCacheName : shellCacheName
+  );
   const cached = await cache.match(request);
   if (cached) return cached;
   const response = await fetch(request);

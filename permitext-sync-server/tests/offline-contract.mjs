@@ -56,6 +56,17 @@ assert(
     app.includes('status: "offline"'),
   "Cold offline startup does not preserve the last synced Pro account snapshot."
 );
+assert(
+  offlineFeatureMetadata.assetCacheName.includes(offlineFeatureMetadata.assetVersion) &&
+    offlineStorage.includes("caches.open(offlineAssetCacheName)") &&
+    serviceWorker.includes("offlineAssetCacheName"),
+  "Downloaded code figures are not isolated from disposable app-shell cache generations."
+);
+assert(
+  serviceWorker.includes("cache.addAll(shellURLs)") &&
+    serviceWorker.includes("event.waitUntil"),
+  "A service-worker update can activate before its replacement shell is cached."
+);
 assert(serviceWorker.includes('cache.match("/")'), "Service worker has no cached app-shell fallback.");
 assert.equal(JSON.parse(manifest).display, "standalone", "Manifest is not installable as a standalone app.");
 
@@ -117,9 +128,16 @@ assert.deepEqual(
 
 const listeners = new Map();
 const navigationCacheWrites = [];
+const shellPrecacheURLs = [];
+const deletedCacheNames = [];
+let cachedNavigationResponse = null;
+let nextNetworkResponse = null;
 const navigationCache = {
-  async match() {
-    return null;
+  async addAll(urls) {
+    shellPrecacheURLs.push(...urls);
+  },
+  async match(key) {
+    return String(key) === "/" ? cachedNavigationResponse : null;
   },
   async put(key) {
     navigationCacheWrites.push(String(key));
@@ -133,15 +151,17 @@ vm.runInNewContext(serviceWorker, {
       return navigationCache;
     },
     async keys() {
-      return [];
+      return ["permitext-pro-shell-v222", offlineFeatureMetadata.assetCacheName];
     },
-    async delete() {
+    async delete(name) {
+      deletedCacheNames.push(name);
       return true;
     }
   },
   async fetch() {
-    return {
+    return nextNetworkResponse || {
       ok: true,
+      status: 200,
       clone() {
         return this;
       }
@@ -156,6 +176,24 @@ vm.runInNewContext(serviceWorker, {
     }
   }
 });
+
+let installCompletion;
+listeners.get("install")({
+  waitUntil(value) {
+    installCompletion = Promise.resolve(value);
+  }
+});
+await installCompletion;
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260731-topbar-pills-v259"));
+
+let activationCompletion;
+listeners.get("activate")({
+  waitUntil(value) {
+    activationCompletion = Promise.resolve(value);
+  }
+});
+await activationCompletion;
+assert.deepEqual(deletedCacheNames, ["permitext-pro-shell-v222"]);
 
 function navigationResponse(path) {
   let response;
@@ -186,5 +224,8 @@ assert.deepEqual(
   ["/", "/"],
   "Public app navigation does not refresh only the cached public app shell."
 );
+cachedNavigationResponse = { source: "cached-shell" };
+nextNetworkResponse = { ok: false, status: 503 };
+assert.equal((await navigationResponse("/")).source, "cached-shell", "Resolved 503 navigation bypassed the offline shell.");
 
 console.log("permitext offline contract passed");

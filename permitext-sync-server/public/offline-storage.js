@@ -9,6 +9,7 @@ const activeLibraryKey = "active-library";
 const shellCacheName = "permitext-pro-shell-v223";
 const shellAssetVersion = "20260731-topbar-pills-v259";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
+const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const shellURLs = [
   "/",
@@ -16,16 +17,13 @@ const shellURLs = [
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
   "/web/styles.css?v=20260731-topbar-pills-v259",
-  "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61",
   "/web/app.js?v=20260731-topbar-pills-v259",
+  "/web/client-reliability.js?v=20260731-debug-audit-v1",
   "/web/offline-storage.js?v=20260731-topbar-pills-v259",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
   "/web/sync-state.js?v=20260721-causal-clear-v4"
 ];
-
-let cachedSearchInstallID = "";
-let cachedSearchSections = null;
 
 function requestResult(request, fallbackMessage) {
   return new Promise((resolve, reject) => {
@@ -183,8 +181,6 @@ async function activateInstall(record) {
   } finally {
     database.close();
   }
-  cachedSearchInstallID = "";
-  cachedSearchSections = null;
   if (previous?.installID && previous.installID !== record.installID) {
     await deleteInstall(previous.installID);
   }
@@ -242,7 +238,7 @@ function offlineAssetURL(name) {
 
 async function cacheOfflineAssets(assetNames, options = {}) {
   if (!assetNames.length) return 0;
-  const cache = await caches.open(shellCacheName);
+  const cache = await caches.open(offlineAssetCacheName);
   let completed = 0;
   let downloadedBytes = 0;
   options.onProgress?.({
@@ -413,8 +409,6 @@ export async function loadOfflineSyncSnapshot(userID) {
 }
 
 export async function removeOfflineLibrary() {
-  cachedSearchInstallID = "";
-  cachedSearchSections = null;
   if (typeof indexedDB !== "undefined") {
     await new Promise((resolve, reject) => {
       const request = indexedDB.deleteDatabase(databaseName);
@@ -468,18 +462,52 @@ async function activeChapterRecords(installID) {
   }
 }
 
-async function activeSectionRecords(installID) {
-  if (cachedSearchInstallID === installID && cachedSearchSections) return cachedSearchSections;
+async function matchingOfflineSearchResults(installID, { codeFilter, normalizedQuery, query, tokens }) {
   const database = await openDatabase();
   try {
     const transaction = database.transaction(sectionsStoreName, "readonly");
-    const records = await requestResult(
-      transaction.objectStore(sectionsStoreName).index("installID").getAll(installID),
-      "Could not read offline sections."
-    ) || [];
-    cachedSearchInstallID = installID;
-    cachedSearchSections = records;
-    return records;
+    const request = transaction.objectStore(sectionsStoreName)
+      .index("installID")
+      .openCursor(IDBKeyRange.only(installID));
+    return await new Promise((resolve, reject) => {
+      const matches = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) {
+          resolve(matches);
+          return;
+        }
+        const section = cursor.value;
+        if (
+          (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
+          tokens.every((token) => section.searchText.includes(token))
+        ) {
+          const number = String(section.sectionNumber || "").toLowerCase();
+          const title = String(section.title || "").toLowerCase();
+          const rank = number === normalizedQuery
+            ? 0
+            : number.startsWith(normalizedQuery)
+              ? 1
+              : title.includes(normalizedQuery) ? 2 : 3;
+          matches.push({
+            rank,
+            result: {
+              id: section.id,
+              chapterID: section.chapterID,
+              codePrefix: section.codePrefix,
+              chapterNumber: section.chapterNumber,
+              sectionNumber: section.sectionNumber,
+              title: section.title,
+              headerLine: section.headerLine,
+              headingLine: section.headingLine,
+              snippet: searchSnippet(section.plainText || section.title, query)
+            }
+          });
+        }
+        cursor.continue();
+      };
+      request.onerror = () => reject(request.error || new Error("Could not search offline sections."));
+    });
   } finally {
     database.close();
   }
@@ -585,25 +613,20 @@ async function offlineSearch(installID, url) {
   const requestedLimit = Number.parseInt(url.searchParams.get("limit") || "", 10);
   const limit = Number.isFinite(requestedLimit) && requestedLimit > 0 ? Math.min(requestedLimit, 500) : 0;
   const normalizedQuery = query.toLowerCase();
-  const matches = (await activeSectionRecords(installID))
-    .filter((section) =>
-      (codeFilter.size === 0 || codeFilter.has(section.codePrefix)) &&
-      tokens.every((token) => section.searchText.includes(token))
-    )
-    .map((section) => {
-      const number = String(section.sectionNumber || "").toLowerCase();
-      const title = String(section.title || "").toLowerCase();
-      const rank = number === normalizedQuery ? 0 : number.startsWith(normalizedQuery) ? 1 : title.includes(normalizedQuery) ? 2 : 3;
-      return { section, rank };
-    })
+  const matches = (await matchingOfflineSearchResults(installID, {
+    codeFilter,
+    normalizedQuery,
+    query,
+    tokens
+  }))
     .sort((left, right) =>
       left.rank - right.rank ||
-      compareChapterNumbers(left.section.chapterNumber, right.section.chapterNumber) ||
-      String(left.section.sectionNumber).localeCompare(String(right.section.sectionNumber), undefined, {
+      compareChapterNumbers(left.result.chapterNumber, right.result.chapterNumber) ||
+      String(left.result.sectionNumber).localeCompare(String(right.result.sectionNumber), undefined, {
         numeric: true,
         sensitivity: "base"
       }) ||
-      Number(left.section.id) - Number(right.section.id)
+      Number(left.result.id) - Number(right.result.id)
     );
   const totalResults = matches.length;
   const selected = limit ? matches.slice(0, limit) : matches;
@@ -611,17 +634,7 @@ async function offlineSearch(installID, url) {
     query,
     totalResults,
     limited: Boolean(limit && totalResults > selected.length),
-    results: selected.map(({ section }) => ({
-      id: section.id,
-      chapterID: section.chapterID,
-      codePrefix: section.codePrefix,
-      chapterNumber: section.chapterNumber,
-      sectionNumber: section.sectionNumber,
-      title: section.title,
-      headerLine: section.headerLine,
-      headingLine: section.headingLine,
-      snippet: searchSnippet(section.plainText || section.title, query)
-    }))
+    results: selected.map(({ result }) => result)
   };
 }
 
@@ -689,6 +702,7 @@ export async function offlineAPI(path) {
 }
 
 export const offlineFeatureMetadata = {
+  assetCacheName: offlineAssetCacheName,
   assetVersion: offlineAssetVersion,
   librarySchemaVersion: offlineLibrarySchemaVersion,
   estimatedDownload: "about 70 MB",

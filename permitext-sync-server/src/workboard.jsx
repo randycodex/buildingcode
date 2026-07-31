@@ -6,6 +6,11 @@ import {
   exportToBlob,
   hashElementsVersion
 } from "@excalidraw/excalidraw";
+import {
+  boardToRetry,
+  localBoardNeedsSync,
+  shouldUseRemoteBoard
+} from "./workboard-reliability.js";
 import "@excalidraw/excalidraw/index.css";
 import "./workboard.css";
 
@@ -130,11 +135,6 @@ function usePreferredTheme() {
   }, []);
 
   return theme;
-}
-
-function updatedAtTime(board) {
-  const timestamp = Date.parse(board?.updatedAt || "");
-  return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
 function filesWithoutInlineData(files = {}) {
@@ -266,7 +266,7 @@ function Workboard({
       }
       setStatus(previewSaved ? "Synced" : "Synced · Preview pending");
     } catch (error) {
-      pendingBoard.current = board;
+      pendingBoard.current = boardToRetry(pendingBoard.current, board);
       setStatus(syncEnabled ? "Saved locally · Sync pending" : error.message || "Could not save");
     }
   }, [savePreview, saveSyncedBoard, syncEnabled, uploadAsset]);
@@ -311,7 +311,7 @@ function Workboard({
       .then(async ([localBoard, remoteBoard]) => {
         if (!active) return;
         remoteUpdatedAt.current = remoteBoard?.updatedAt || null;
-        const useRemote = remoteBoard && (!localBoard || updatedAtTime(remoteBoard) >= updatedAtTime(localBoard));
+        const useRemote = shouldUseRemoteBoard(localBoard, remoteBoard);
         const board = useRemote ? await hydrateRemoteFiles(remoteBoard, loadAsset) : localBoard;
         assets.current = { ...(board?.assets || {}) };
         const loadedData = {
@@ -335,7 +335,7 @@ function Workboard({
         if (useRemote) {
           await writeBoard({ ...remoteBoard, files: loadedData.files, syncedAt: remoteBoard.updatedAt });
           setStatus("Synced");
-        } else if (board && syncEnabled && saveSyncedBoard && updatedAtTime(board) > updatedAtTime(remoteBoard)) {
+        } else if (syncEnabled && saveSyncedBoard && localBoardNeedsSync(board, remoteBoard)) {
           pendingBoard.current = board;
           setStatus("Syncing…");
           void flushSave();

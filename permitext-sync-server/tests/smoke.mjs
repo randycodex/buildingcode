@@ -2303,7 +2303,8 @@ async function main() {
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260731-workboard-status-v21";') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61"') &&
+        !webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-workboard-help-v61'),
       "Web workspace omitted the current Workboard preview assets."
     );
     assert(
@@ -6353,6 +6354,27 @@ async function main() {
         `Push accepted malformed record ID ${JSON.stringify(invalidID)}.`
       );
     }
+
+    const futureDatedPush = await request("/sync/push", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: {
+          user: { id: userID },
+          mutations: [{
+            savedItem: {
+              id: `${userID}:saved:future-pinned`,
+              userID,
+              codeVersion: defaultSyncCodeVersion,
+              sectionID: 1,
+              updatedAt: "9999-12-31T23:59:59.000Z"
+            }
+          }]
+        }
+      }
+    });
+    assert(futureDatedPush.response.status === 400, "Push accepted a record timestamp that can pin future updates.");
 
     const oversizedPush = await request("/sync/push", {
       method: "POST",
