@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-search-cold-open-v265";
+} from "./offline-storage.js?v=20260731-topbar-drag-v267";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -63,6 +63,17 @@ const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
 const tabWorkspaceKey = "permitext:webWorkspaceTab:v1";
 const workspaceRegistryKey = "permitext:webWorkspaces:v2";
+const toolbarOrderKey = "permitext:webToolbarOrder:v1";
+const defaultToolbarButtonIDs = Object.freeze([
+  "add-reader",
+  "add-zoning-reader",
+  "toggle-search",
+  "toggle-saved",
+  "toggle-analysis",
+  "toggle-settings",
+  "fit-columns",
+  "collapse-readers"
+]);
 const workspaceStateKeyPrefix = "permitext:webWorkspace:v2:";
 const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const detachedWorkboardPath = "/detached-workboard";
@@ -80,6 +91,7 @@ const workspaceKey = detachedProjectWindow
   ? `${baseWorkspaceKey}:detached:${detachedProjectSessionID}`
   : baseWorkspaceKey;
 const track = document.querySelector("#panel-track");
+const topbarActions = document.querySelector(".topbar-actions");
 const addReaderButton = document.querySelector("#add-reader");
 const addZoningReaderButton = document.querySelector("#add-zoning-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
@@ -89,7 +101,6 @@ const toggleAnalysisButton = document.querySelector("#toggle-analysis");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
-const workspaceLayoutControls = fitColumnsButton?.closest(".topbar-action-group");
 const workspaceTabs = document.querySelector("#workspace-tabs");
 const addWorkspaceButton = document.querySelector("#add-workspace");
 const workspaceActionsButton = document.querySelector("#workspace-actions");
@@ -194,6 +205,7 @@ let workspaceRegistry = null;
 let activeWorkspaceID = "";
 let suppressReaderScrollRestore = false;
 let draggedWorkspaceID = "";
+let draggedToolbarButtonID = "";
 let workspaceContextMenu = null;
 let workspaceLongPressTimer = null;
 let state = loadWorkspaceState();
@@ -857,6 +869,124 @@ function focusActiveWorkspaceTab() {
   });
 }
 
+function normalizedToolbarOrder(value) {
+  const requested = Array.isArray(value) ? value.map(String) : [];
+  const valid = new Set(defaultToolbarButtonIDs);
+  const ordered = requested.filter((id, index) => valid.has(id) && requested.indexOf(id) === index);
+  defaultToolbarButtonIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  return ordered;
+}
+
+function storedToolbarOrder() {
+  try {
+    return normalizedToolbarOrder(JSON.parse(localStorage.getItem(toolbarOrderKey) || "null"));
+  } catch {
+    return normalizedToolbarOrder([]);
+  }
+}
+
+function applyToolbarOrder(order) {
+  if (!topbarActions) return;
+  normalizedToolbarOrder(order).forEach((id) => {
+    const button = document.getElementById(id);
+    if (button) topbarActions.append(button);
+  });
+}
+
+function persistToolbarOrder() {
+  if (!topbarActions) return;
+  const order = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button"))
+    .map((button) => button.id)
+    .filter(Boolean);
+  localStorage.setItem(toolbarOrderKey, JSON.stringify(normalizedToolbarOrder(order)));
+}
+
+function clearToolbarDropIndicators() {
+  topbarActions?.querySelectorAll(".toolbar-button").forEach((button) => {
+    button.classList.remove("is-drop-before", "is-drop-after");
+  });
+}
+
+function reorderToolbarButton(sourceID, targetID, position = "before") {
+  if (!topbarActions || sourceID === targetID) return false;
+  const source = document.getElementById(sourceID);
+  const target = document.getElementById(targetID);
+  if (!source?.classList.contains("toolbar-button") || !target?.classList.contains("toolbar-button")) return false;
+  target.insertAdjacentElement(position === "after" ? "afterend" : "beforebegin", source);
+  persistToolbarOrder();
+  return true;
+}
+
+function bindToolbarReordering() {
+  if (!topbarActions || topbarActions.dataset.reorderBound === "true") return;
+  topbarActions.dataset.reorderBound = "true";
+  applyToolbarOrder(storedToolbarOrder());
+  const buttons = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button"));
+  buttons.forEach((button) => {
+    button.draggable = true;
+    button.setAttribute("aria-keyshortcuts", "Alt+ArrowLeft Alt+ArrowRight");
+    button.title = `${button.title || button.textContent.trim()}. Drag to reorder.`;
+    button.addEventListener("dragstart", (event) => {
+      draggedToolbarButtonID = button.id;
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("application/x-permitext-toolbar", button.id);
+      event.dataTransfer.setData("text/plain", button.id);
+      button.classList.add("is-dragging");
+    });
+    button.addEventListener("dragend", () => {
+      draggedToolbarButtonID = "";
+      button.classList.remove("is-dragging");
+      clearToolbarDropIndicators();
+    });
+    button.addEventListener("dragover", (event) => {
+      if (!draggedToolbarButtonID || draggedToolbarButtonID === button.id) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "move";
+      const rect = button.getBoundingClientRect();
+      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
+      clearToolbarDropIndicators();
+      button.classList.add(position === "after" ? "is-drop-after" : "is-drop-before");
+    });
+    button.addEventListener("dragleave", () => clearToolbarDropIndicators());
+    button.addEventListener("drop", (event) => {
+      const sourceID = draggedToolbarButtonID || event.dataTransfer.getData("application/x-permitext-toolbar");
+      if (!sourceID || sourceID === button.id) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const rect = button.getBoundingClientRect();
+      const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
+      reorderToolbarButton(sourceID, button.id, position);
+      clearToolbarDropIndicators();
+      document.getElementById(sourceID)?.focus({ preventScroll: true });
+    });
+    button.addEventListener("keydown", (event) => {
+      if (!event.altKey || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      const orderedButtons = Array.from(topbarActions.querySelectorAll(":scope > .toolbar-button:not([hidden])"));
+      const index = orderedButtons.indexOf(button);
+      const target = orderedButtons[index + (event.key === "ArrowLeft" ? -1 : 1)];
+      if (!target) return;
+      event.preventDefault();
+      reorderToolbarButton(button.id, target.id, event.key === "ArrowLeft" ? "before" : "after");
+      button.focus({ preventScroll: true });
+    });
+  });
+  topbarActions.addEventListener("dragover", (event) => {
+    if (!draggedToolbarButtonID || event.target.closest(".toolbar-button")) return;
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  });
+  topbarActions.addEventListener("drop", (event) => {
+    if (!draggedToolbarButtonID || event.target.closest(".toolbar-button")) return;
+    event.preventDefault();
+    const source = document.getElementById(draggedToolbarButtonID);
+    if (source) topbarActions.append(source);
+    persistToolbarOrder();
+    clearToolbarDropIndicators();
+  });
+}
+
 function renderWorkspaceTabs() {
   const container = workspaceTabs?.closest(".topbar-workspaces");
   if (!workspaceTabs || !container) return;
@@ -944,7 +1074,8 @@ function renderWorkspaceTabs() {
 
 function updateWorkspaceLayoutControls() {
   const hasColumns = defaultActivePaneIDs().length > 0;
-  if (workspaceLayoutControls) workspaceLayoutControls.hidden = !hasColumns;
+  fitColumnsButton.hidden = !hasColumns;
+  collapseReadersButton.hidden = !hasColumns;
   fitColumnsButton.disabled = !hasColumns;
   collapseReadersButton.disabled = !hasColumns;
 }
@@ -19083,6 +19214,7 @@ async function start() {
     throw new Error("This detached Workboard session expired. Close this window and detach the Workboard again.");
   }
   if (!detachedProjectWindow) {
+    bindToolbarReordering();
     bindImmediateUtilityControls();
     const [chapterPayload, libraryPayload] = await Promise.all([
       api("/code/chapters"),
