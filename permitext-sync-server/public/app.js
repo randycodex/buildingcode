@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-right-edge-resize-v273";
+} from "./offline-storage.js?v=20260731-collapsed-activity-v274";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -14786,7 +14786,7 @@ function appendProjectActivity(content, foundation) {
   const toggle = document.createElement("button");
   toggle.className = "project-studio-activity-toggle section-label";
   toggle.type = "button";
-  toggle.setAttribute("aria-expanded", "true");
+  toggle.setAttribute("aria-expanded", "false");
   const title = document.createElement("span");
   title.textContent = "Recent activity";
   const chevron = document.createElement("span");
@@ -14795,6 +14795,7 @@ function appendProjectActivity(content, foundation) {
   chevron.innerHTML = researchChevronIconsSVG();
   toggle.append(title, chevron);
   const list = document.createElement("ol");
+  list.hidden = true;
   events.slice(0, 10).forEach((event) => {
     const row = document.createElement("li");
     const label = document.createElement("strong");

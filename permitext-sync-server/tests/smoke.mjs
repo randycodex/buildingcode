@@ -710,6 +710,8 @@ async function main() {
         !workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
         !workspaceScript.text.includes('eyebrow.textContent = "Project Studio"') &&
         workspaceScript.text.includes('toggle.className = "project-studio-activity-toggle section-label"') &&
+        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", "false")') &&
+        workspaceScript.text.includes("const list = document.createElement(\"ol\");\n  list.hidden = true;") &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!expanded))') &&
         workspaceStyles.text.includes(".project-studio-activity li:first-child") &&
         workspaceStyles.text.includes(".project-studio-activity li {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
@@ -1164,7 +1166,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-right-edge-resize-v273'),
+        webRoot.text.includes('/web/app.js?v=20260731-collapsed-activity-v274'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1229,7 +1231,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-right-edge-resize-v273'),
+        webRoot.text.includes('/web/styles.css?v=20260731-collapsed-activity-v274'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1440,7 +1442,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-right-edge-resize-v273'),
+        webRoot.text.includes('/web/styles.css?v=20260731-collapsed-activity-v274'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
