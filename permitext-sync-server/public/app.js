@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-notes-v245";
+} from "./offline-storage.js?v=20260731-project-note-meta-v246";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13764,13 +13764,7 @@ function appendProjectNotes(content, identity, foundation) {
     const noteTitle = document.createElement("strong");
     noteTitle.textContent = note.title;
     const meta = document.createElement("span");
-    meta.textContent = [
-      `By ${projectCollaborationActor(note)}`,
-      note.updatedByUserID !== note.createdByUserID
-        ? `updated by ${projectCollaborationActor(note, "updatedBy")}`
-        : "",
-      researchRelativeDate(note.updatedAt)
-    ].filter(Boolean).join(" · ");
+    meta.textContent = researchRelativeDate(note.updatedAt);
     cardHeading.append(noteTitle, meta);
     if (canEdit) {
       const edit = document.createElement("button");
