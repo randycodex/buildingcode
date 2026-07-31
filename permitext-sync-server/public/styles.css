@@ -1097,6 +1097,10 @@ body.is-detached-workboard-window .detached-workboard-error p {
   background: transparent;
 }
 
+.reader-panel .panel-header:has(.reader-trust[open]) {
+  z-index: 11;
+}
+
 .reader-reading-progress {
   position: absolute;
   top: calc(var(--reader-scrollbar-track-top) - 3px);
