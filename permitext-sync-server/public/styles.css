@@ -9700,16 +9700,48 @@ button.project-studio-metric:focus-visible {
   line-height: 1.45;
 }
 
+.notebook-card-row {
+  position: relative;
+  min-width: 0;
+}
+
 .notebook-card-tile {
   display: grid;
   gap: 4px;
   width: 100%;
-  padding: var(--space-3);
+  padding: var(--space-3) 42px var(--space-3) var(--space-3);
   border: 0;
   border-radius: var(--radius-card);
   background: color-mix(in srgb, var(--surface) 82%, var(--project-color));
   color: var(--text-primary);
   text-align: left;
+}
+
+.notebook-card-delete {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.notebook-card-delete:hover,
+.notebook-card-delete:focus-visible {
+  background: color-mix(in srgb, #d43b32 16%, transparent);
+  color: color-mix(in srgb, #d43b32 78%, var(--text-primary));
+}
+
+.notebook-card-delete svg {
+  width: 14px;
+  height: 14px;
 }
 
 .notebook-card-tile:hover,
@@ -9838,6 +9870,7 @@ button.project-studio-metric:focus-visible {
 
 .notebook-reference-chip:focus-visible,
 .notebook-card-tile:focus-visible,
+.notebook-card-delete:focus-visible,
 .notebook-close:focus-visible,
 .notebook-toolbar button:focus-visible,
 .notebook-primary-action:focus-visible,

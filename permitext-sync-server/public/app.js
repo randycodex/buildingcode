@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v222";
+} from "./offline-storage.js?v=20260731-reader-trust-v223";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11772,7 +11772,6 @@ async function renderProjectNotebook(project) {
 
     let notebookAutosaveTask = null;
     let notebookRevision = 0;
-    let notebookDeleteButton = null;
 
     const notebookSummaryForCard = (card, savedCard = card) => ({
       id: card.id,
@@ -11834,7 +11833,6 @@ async function renderProjectNotebook(project) {
             ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== payload.card.id),
             { envelope: { id: payload.card.id, type: "notebookCard" }, payload: payload.card }
           ];
-          notebookDeleteButton?.toggleAttribute("hidden", !activeCard.id || notebookReadOnly);
           renderCardList();
           if (changedDuringSave) {
             scheduleNotebookAutosave(180);
@@ -11890,6 +11888,44 @@ async function renderProjectNotebook(project) {
       await renderFocusedCard();
     }
 
+    async function deleteNotebookCard(card, trigger) {
+      let target = card;
+      if (activeCard?.id === card.id) {
+        if (dirty && !(await flushNotebookAutosave())) return;
+        target = activeCard;
+      }
+      const confirmed = await confirmWebWarning(
+        "Delete Notebook card?",
+        `“${target.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
+        { confirmLabel: "Delete card" }
+      );
+      if (!confirmed) return;
+      trigger.disabled = true;
+      try {
+        await postResearch("/notebook/cards/delete", {
+          projectID,
+          cardID: target.id,
+          expectedVersion: target.version
+        });
+        cards = cards.filter((candidate) => candidate.id !== target.id);
+        foundation.artifacts = (foundation.artifacts || []).filter(
+          (artifact) => artifact.envelope?.id !== target.id
+        );
+        if (activeCard?.id === target.id) {
+          activeCard = null;
+          draftDocument = emptyNotebookDocument();
+          dirty = false;
+          renderCardList();
+          await renderFocusedCard();
+        } else {
+          renderCardList();
+        }
+      } catch (error) {
+        trigger.disabled = false;
+        await showWebNotice("Card not deleted", error.message);
+      }
+    }
+
     function renderCardList() {
       cardList.replaceChildren();
       if (!cards.length) {
@@ -11900,6 +11936,8 @@ async function renderProjectNotebook(project) {
         return;
       }
       cards.forEach((card) => {
+        const row = document.createElement("article");
+        row.className = "notebook-card-row";
         const button = document.createElement("button");
         button.className = "notebook-card-tile";
         button.type = "button";
@@ -11916,7 +11954,20 @@ async function renderProjectNotebook(project) {
         button.addEventListener("click", () => {
           void loadCard(card.id).catch((error) => showWebNotice("Card not opened", error.message));
         });
-        cardList.append(button);
+        row.append(button);
+        if (!notebookReadOnly) {
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "notebook-card-delete";
+          deleteButton.type = "button";
+          deleteButton.title = "Delete card";
+          deleteButton.setAttribute("aria-label", `Delete ${card.title}`);
+          deleteButton.innerHTML = trashIconSVG();
+          deleteButton.addEventListener("click", () => {
+            void deleteNotebookCard(card, deleteButton);
+          });
+          row.append(deleteButton);
+        }
+        cardList.append(row);
       });
     }
 
@@ -11925,7 +11976,6 @@ async function renderProjectNotebook(project) {
       const renderSequence = editorRenderSequence;
       editorMount?.destroy?.();
       editorMount = null;
-      notebookDeleteButton = null;
       focus.replaceChildren();
 
       if (!activeCard) {
@@ -12035,14 +12085,8 @@ async function renderProjectNotebook(project) {
       researchButton.type = "button";
       researchButton.textContent = "Start Research";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
-      const deleteButton = document.createElement("button");
-      deleteButton.className = "notebook-danger-action";
-      deleteButton.type = "button";
-      deleteButton.textContent = "Delete";
-      deleteButton.hidden = !activeCard.id || notebookReadOnly;
-      notebookDeleteButton = deleteButton;
       researchButton.hidden = notebookReadOnly;
-      footerActions.append(researchButton, deleteButton);
+      footerActions.append(researchButton);
       footer.append(footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
@@ -12077,33 +12121,6 @@ async function renderProjectNotebook(project) {
         if (!reference) return;
         editorMount?.insertReference(reference);
         referenceSelect.value = "";
-      });
-
-      deleteButton.addEventListener("click", async () => {
-        if (dirty && !(await flushNotebookAutosave())) return;
-        const confirmed = await confirmWebWarning(
-          "Delete Notebook card?",
-          `“${activeCard.title}” will be removed from its linked Projects. Its tombstone remains in sync history.`,
-          { confirmLabel: "Delete card" }
-        );
-        if (!confirmed) return;
-        deleteButton.disabled = true;
-        try {
-          await postResearch("/notebook/cards/delete", {
-            projectID,
-            cardID: activeCard.id,
-            expectedVersion: activeCard.version
-          });
-          cards = cards.filter((card) => card.id !== activeCard.id);
-          activeCard = null;
-          draftDocument = emptyNotebookDocument();
-          dirty = false;
-          renderCardList();
-          await renderFocusedCard();
-        } catch (error) {
-          deleteButton.disabled = false;
-          await showWebNotice("Card not deleted", error.message);
-        }
       });
 
       researchButton.addEventListener("click", async () => {
