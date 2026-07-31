@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-studio-v241";
+} from "./offline-storage.js?v=20260731-project-header-v242";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -13221,127 +13221,6 @@ async function deleteArchivedProjectData(project) {
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(project, item));
 }
 
-function createProjectSectionSelectionController(panel, actions, content, project, items) {
-  const recordByID = new Map(items.map((item) => [savedItemSelectionID(item), item]));
-  const orderedIDs = [...recordByID.keys()];
-  const selectedIDs = new Set();
-  const rows = new Map();
-  let active = false;
-  let busy = false;
-
-  const selectButton = document.createElement("button");
-  selectButton.className = "project-detail-select";
-  selectButton.type = "button";
-  selectButton.title = "Select saved project items";
-  selectButton.setAttribute("aria-label", selectButton.title);
-  selectButton.setAttribute("aria-pressed", "false");
-  selectButton.innerHTML = selectionModeIconSVG();
-  actions.prepend(selectButton);
-
-  const bulkBar = document.createElement("section");
-  bulkBar.className = "project-bulk-bar project-section-bulk-bar";
-  bulkBar.hidden = true;
-  const countLabel = document.createElement("span");
-  countLabel.className = "project-bulk-count";
-  const selectAllButton = document.createElement("button");
-  selectAllButton.className = "project-bulk-link";
-  selectAllButton.type = "button";
-  const removeButton = document.createElement("button");
-  removeButton.className = "project-bulk-action is-delete";
-  removeButton.type = "button";
-  const cancelButton = document.createElement("button");
-  cancelButton.className = "project-bulk-link";
-  cancelButton.type = "button";
-  cancelButton.textContent = "Cancel";
-  bulkBar.append(countLabel, selectAllButton, removeButton, cancelButton);
-  content.prepend(bulkBar);
-
-  const update = () => {
-    panel.classList.toggle("is-project-section-selecting", active);
-    selectButton.setAttribute("aria-pressed", String(active));
-    bulkBar.hidden = !active;
-    const count = selectedIDs.size;
-    countLabel.textContent = `${count} selected`;
-    selectAllButton.textContent = count === orderedIDs.length ? "Clear all" : "Select all";
-    removeButton.textContent = `Remove ${count}`;
-    removeButton.disabled = count === 0 || busy;
-    selectAllButton.disabled = busy;
-    cancelButton.disabled = busy;
-    selectButton.disabled = busy;
-    rows.forEach((row, id) => {
-      const selected = selectedIDs.has(id);
-      row.classList.toggle("is-selected", selected);
-      row.setAttribute("aria-selected", String(active && selected));
-    });
-  };
-  const setActive = (nextActive) => {
-    active = nextActive;
-    selectedIDs.clear();
-    update();
-  };
-  const controller = {
-    isActive: () => active,
-    register(row, item) {
-      const id = savedItemSelectionID(item);
-      rows.set(id, row);
-      const indicator = document.createElement("span");
-      indicator.className = "saved-selection-check";
-      indicator.setAttribute("aria-hidden", "true");
-      indicator.innerHTML = selectionIndicatorIconSVG();
-      row.prepend(indicator);
-      update();
-    },
-    toggle(item) {
-      if (!active || busy) return;
-      const id = savedItemSelectionID(item);
-      if (selectedIDs.has(id)) selectedIDs.delete(id);
-      else selectedIDs.add(id);
-      update();
-    }
-  };
-  selectButton.addEventListener("click", () => setActive(!active));
-  selectAllButton.addEventListener("click", () => {
-    if (selectedIDs.size === orderedIDs.length) selectedIDs.clear();
-    else orderedIDs.forEach((id) => selectedIDs.add(id));
-    update();
-  });
-  cancelButton.addEventListener("click", () => setActive(false));
-  removeButton.addEventListener("click", async () => {
-    const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
-    const count = selectedItems.length;
-    if (!count) return;
-    const confirmed = await confirmWebWarning(
-      "Remove saved items",
-      `This will remove ${count} saved ${count === 1 ? "item" : "items"} from ${project.name}. Are you sure?`,
-      { confirmLabel: "Remove" }
-    );
-    if (!confirmed) return;
-    busy = true;
-    update();
-    let removedCount = 0;
-    try {
-      for (const item of selectedItems) {
-        await removeSectionFromProject(project, item);
-        removedCount += 1;
-      }
-      await showWebNotice(
-        "Saved items removed",
-        `${removedCount} ${removedCount === 1 ? "item was" : "items were"} removed from ${project.name}.`
-      );
-      await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
-    } catch (error) {
-      await showWebNotice(
-        "Could not remove saved items",
-        `${error.message || "The selected project items could not be removed."} Removed ${removedCount} of ${count}.`
-      );
-      busy = false;
-      update();
-    }
-  });
-  update();
-  return controller;
-}
-
 function projectActivityLabel(event) {
   return {
     "item.linked": "Project item linked",
@@ -14526,9 +14405,6 @@ async function renderProjectDetail(detail) {
   savedHeading.className = "section-label";
   savedHeading.textContent = "Saved evidence";
   savedSection.append(savedHeading);
-  const selectionController = previewItems.length && !identity.sharedOnly
-    ? createProjectSectionSelectionController(panel, actions, content, identity, previewItems)
-    : null;
   const codeGroups = new Map();
   previewItems.forEach((item) => {
     const prefix = item.codePrefix || "BC";
@@ -14578,8 +14454,7 @@ async function renderProjectDetail(detail) {
         openButton.append(preview);
       }
       openButton.addEventListener("click", () => {
-        if (selectionController?.isActive()) selectionController.toggle(item);
-        else void openProjectSavedSection(identity, item);
+        void openProjectSavedSection(identity, item);
       });
       const removeButton = document.createElement("button");
       removeButton.className = "project-detail-section-remove";
@@ -14599,7 +14474,6 @@ async function renderProjectDetail(detail) {
       });
       row.append(openButton);
       if (!identity.sharedOnly) row.append(removeButton);
-      selectionController?.register(row, item);
       codeGroup.append(row);
     });
     savedSection.append(codeGroup);

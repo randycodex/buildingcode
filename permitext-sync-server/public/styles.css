@@ -1454,8 +1454,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .projects-panel .projects-select-button,
 .archive-panel .projects-select-button,
 .archive-panel .archive-close-button,
-.saved-panel .saved-select-button,
-.project-detail-select {
+.saved-panel .saved-select-button {
   display: grid;
   width: var(--panel-title-control-size);
   height: var(--panel-title-control-size);
@@ -1483,10 +1482,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .archive-panel .archive-close-button:focus-visible,
 .saved-panel .saved-select-button:hover,
 .saved-panel .saved-select-button:focus-visible,
-.saved-panel .saved-select-button[aria-pressed="true"],
-.project-detail-select:hover,
-.project-detail-select:focus-visible,
-.project-detail-select[aria-pressed="true"] {
+.saved-panel .saved-select-button[aria-pressed="true"] {
   border-color: transparent;
   background: transparent;
   color: var(--text-primary);
@@ -1499,8 +1495,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
 .projects-panel .projects-select-button svg,
 .archive-panel .projects-select-button svg,
 .archive-panel .archive-close-button svg,
-.saved-panel .saved-select-button svg,
-.project-detail-select svg {
+.saved-panel .saved-select-button svg {
   width: var(--panel-title-icon-size);
   height: var(--panel-title-icon-size);
 }
@@ -6873,10 +6868,6 @@ button.project-studio-metric:focus-visible {
   -webkit-line-clamp: 2;
 }
 
-.project-detail-select {
-  flex: 0 0 auto;
-}
-
 .saved-panel {
   --saved-font-size: var(--reader-font-size);
   position: relative;
@@ -7436,8 +7427,7 @@ button.project-studio-metric:focus-visible {
   pointer-events: none;
 }
 
-.saved-panel.is-saved-selecting .saved-content,
-.project-detail-panel.is-project-section-selecting .project-detail-content {
+.saved-panel.is-saved-selecting .saved-content {
   padding-bottom: calc(var(--panel-padding) + 118px);
 }
 
@@ -7771,29 +7761,24 @@ button.project-studio-metric:focus-visible {
   height: 20px;
 }
 
-.is-saved-selecting .saved-section-row,
-.is-project-section-selecting .project-detail-saved-row {
+.is-saved-selecting .saved-section-row {
   padding-right: 40px;
   cursor: pointer;
 }
 
-.is-saved-selecting .saved-section-row .saved-selection-check,
-.is-project-section-selecting .project-detail-saved-row .saved-selection-check {
+.is-saved-selecting .saved-section-row .saved-selection-check {
   display: grid;
 }
 
-.is-saved-selecting .saved-section-row.is-selected,
-.is-project-section-selecting .project-detail-saved-row.is-selected {
+.is-saved-selecting .saved-section-row.is-selected {
   background: color-mix(in srgb, var(--code-accent, var(--project-color)) 12%, transparent);
 }
 
-.is-saved-selecting .saved-section-row.is-selected .project-selection-checkmark,
-.is-project-section-selecting .project-detail-saved-row.is-selected .project-selection-checkmark {
+.is-saved-selecting .saved-section-row.is-selected .project-selection-checkmark {
   opacity: 1;
 }
 
-.is-saved-selecting .saved-row-remove,
-.is-project-section-selecting .project-detail-section-remove {
+.is-saved-selecting .saved-row-remove {
   display: none;
 }
 

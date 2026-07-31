@@ -651,6 +651,8 @@ async function main() {
         workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
         workspaceScript.text.includes("Discard unsaved Report Draft changes?") &&
         !workspaceScript.text.includes("This active Project controls every Project-specific workspace.") &&
+        !workspaceScript.text.includes("Select saved project items") &&
+        !workspaceScript.text.includes("createProjectSectionSelectionController") &&
         workspaceScript.text.includes("function printReportManifestAsPDF(manifest)") &&
         workspaceScript.text.includes("function renderFirmStandardsEditor") &&
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
@@ -1088,7 +1090,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-studio-v241'),
+        webRoot.text.includes('/web/app.js?v=20260731-project-header-v242'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1141,7 +1143,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-card-tile {\n  display: grid;\n  grid-template-columns: auto minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-studio-v241'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-header-v242'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1352,7 +1354,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-studio-v241'),
+        webRoot.text.includes('/web/styles.css?v=20260731-project-header-v242'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1677,10 +1679,9 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function createSavedBulkSelectionController") &&
-        workspaceScript.text.includes("function createProjectSectionSelectionController") &&
         workspaceScript.text.includes('newProjectButton.textContent = "New project…"') &&
         workspaceScript.text.includes('button.className = "reader-notes-project-option"'),
-      "Saved and project panes omitted selection removal or new-project saving controls."
+      "Saved pane selection removal or new-project saving controls are missing."
     );
     assert(
       workspaceScript.text.includes("function consolidatedSavedAnnotations") &&
