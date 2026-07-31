@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v212";
+} from "./offline-storage.js?v=20260731-reader-trust-v213";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -11803,25 +11803,6 @@ async function renderProjectNotebook(project) {
 
       const fields = document.createElement("div");
       fields.className = "notebook-card-fields";
-      const typeSelect = document.createElement("select");
-      typeSelect.className = "notebook-card-type";
-      typeSelect.setAttribute("aria-label", "Notebook card type");
-      [
-        "question",
-        "finding",
-        "assumption",
-        "missing-information",
-        "decision",
-        "coordination-item",
-        "review-task"
-      ].forEach((cardType) => {
-        const option = document.createElement("option");
-        option.value = cardType;
-        option.textContent = notebookCardTypeLabel(cardType);
-        typeSelect.append(option);
-      });
-      typeSelect.value = activeCard.cardType;
-      typeSelect.disabled = notebookReadOnly;
       const titleInput = document.createElement("input");
       titleInput.className = "notebook-card-title";
       titleInput.type = "text";
@@ -11830,7 +11811,7 @@ async function renderProjectNotebook(project) {
       titleInput.setAttribute("aria-label", "Notebook card title");
       titleInput.value = activeCard.title;
       titleInput.disabled = notebookReadOnly;
-      fields.append(typeSelect, titleInput);
+      fields.append(titleInput);
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar";
@@ -11935,11 +11916,6 @@ async function renderProjectNotebook(project) {
       footer.append(saveStatus, footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
-      typeSelect.addEventListener("change", () => {
-        activeCard.cardType = typeSelect.value;
-        dirty = true;
-        saveStatus.textContent = "Unsaved changes";
-      });
       titleInput.addEventListener("input", () => {
         activeCard.title = titleInput.value;
         dirty = true;
@@ -11983,7 +11959,7 @@ async function renderProjectNotebook(project) {
             projectID,
             cardID: activeCard.id || undefined,
             expectedVersion: activeCard.version || 0,
-            cardType: typeSelect.value,
+            cardType: activeCard.cardType,
             title: titleInput.value,
             document: editorMount.getDocument()
           });
