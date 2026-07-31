@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-reader-trust-v214";
+} from "./offline-storage.js?v=20260731-reader-trust-v215";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -1863,6 +1863,21 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
     ...researchPaneIDs,
     ...additionalPaneIDs.filter(Boolean)
   ]));
+}
+
+function refreshOpenProjectPaneTheme(project) {
+  const identity = projectIdentity(project);
+  const color = identity.color || projectColorOptions[0];
+  [
+    paneIDForProjectDetail(identity),
+    paneIDForProjectNotebook(identity),
+    paneIDForProjectReportDraft(identity),
+    paneIDForProjectWorkboard(identity)
+  ].forEach((paneID) => {
+    track
+      .querySelectorAll(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`)
+      .forEach((panel) => panel.style.setProperty("--project-color", color));
+  });
 }
 
 function syncSavedArchiveButtonStates() {
@@ -5047,6 +5062,7 @@ async function updateProjectFolder(project, details = {}) {
   state.localProjects = nextProjects;
   setOpenProjectDetails(openProjectDetails().map((detail) => projectDetailMatches(project, detail) ? projectIdentity(updated) : detail));
   saveWorkspaceState();
+  refreshOpenProjectPaneTheme(updated);
 
   if (account) {
     try {
