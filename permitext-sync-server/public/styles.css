@@ -9604,13 +9604,10 @@ button.project-studio-metric:focus-visible {
 
 .notebook-header {
   display: flex;
-  align-items: start;
-  justify-content: space-between;
-  gap: var(--space-3);
+  justify-content: flex-end;
   margin-bottom: var(--space-3);
 }
 
-.notebook-header h2,
 .notebook-card-rail h3,
 .notebook-welcome h3 {
   margin: 0;
