@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260730-research-evidence-header-v198";
+} from "./offline-storage.js?v=20260730-research-row-project-v199";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -8717,123 +8717,28 @@ function createResearchProjectSelect({
   return select;
 }
 
-function createResearchConversationProjectPicker({
-  value = "",
-  ariaLabel = "Assign Research conversation to Project"
-} = {}) {
-  const picker = document.createElement("section");
-  picker.className = "research-project-picker saved-projects-section code-filter-menu saved-projects-menu";
-  picker.setAttribute("aria-label", ariaLabel);
-  const heading = document.createElement("div");
-  heading.className = "saved-projects-heading";
-  const toggle = document.createElement("button");
-  toggle.className = "code-filter-menu-toggle saved-projects-menu-toggle";
-  toggle.type = "button";
-  toggle.innerHTML = `
-    <span class="code-filter-menu-label">Projects</span>
-    <span class="code-filter-menu-icon" aria-hidden="true">
-      <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-      <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-    </span>
-  `;
-  const list = document.createElement("div");
-  list.className = "saved-project-list research-project-list";
-  heading.append(toggle);
-  picker.append(heading, list);
-
-  const pickerState = { researchProjectsMenuOpen: false };
-  const projectSections = currentContentSummary().projectSections || [];
-  let selectedProjectID = String(value || "");
-  let disabled = false;
-
-  const renderProjectCards = () => {
-    clear(list);
-    const projects = researchProjects();
-    const choices = [{ project: null, id: "", name: "Unassigned", count: null }, ...projects.map((project) => ({
-      project,
-      id: researchProjectID(project),
-      name: readableProjectName(project),
-      count: projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length
-    }))];
-    choices.forEach(({ project, id, name, count }) => {
-      const tile = document.createElement("article");
-      tile.className = "saved-project-tile research-project-tile";
-      tile.classList.toggle("is-unassigned", !project);
-      tile.classList.toggle("is-selected", id === selectedProjectID);
-      const tileColor = project ? projectColor(project) : "var(--text-tertiary)";
-      tile.style.setProperty("--project-color", tileColor);
-      tile.style.setProperty("--project-on-color", project ? projectForegroundColor(tileColor) : "var(--text-primary)");
-      tile.tabIndex = disabled ? -1 : 0;
-      tile.setAttribute("role", "button");
-      tile.setAttribute("aria-pressed", String(id === selectedProjectID));
-      tile.setAttribute("aria-label", project ? `Assign to ${name}` : "Unassign from Project");
-      tile.setAttribute("aria-disabled", String(disabled));
-      tile.dataset.projectId = id;
-      const tileHeading = document.createElement("strong");
-      tileHeading.textContent = name;
-      tile.append(tileHeading);
-      if (count !== null) {
-        const countLabel = document.createElement("span");
-        countLabel.className = "saved-project-count";
-        countLabel.textContent = String(count);
-        countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
-        countLabel.setAttribute("aria-label", countLabel.title);
-        tile.append(countLabel);
-      }
-      const choose = () => {
-        if (disabled) return;
-        if (id === selectedProjectID) {
-          pickerState.researchProjectsMenuOpen = false;
-          updateCodeFilterMenu(list, pickerState, {
-            stateKey: "researchProjectsMenuOpen",
-            menuName: "projects",
-            label: "Projects"
-          });
-          return;
-        }
-        selectedProjectID = id;
-        renderProjectCards();
-        picker.dispatchEvent(new Event("change"));
-      };
-      tile.addEventListener("click", choose);
-      tile.addEventListener("keydown", (event) => {
-        if (event.key !== "Enter" && event.key !== " ") return;
-        event.preventDefault();
-        choose();
-      });
-      list.append(tile);
+async function assignResearchConversationProject(conversation, targetProjectID) {
+  try {
+    return await postResearch("/research/conversations/assign-project", {
+      conversationID: conversation.id,
+      projectID: targetProjectID
     });
-    updateCodeFilterMenu(list, pickerState, {
-      stateKey: "researchProjectsMenuOpen",
-      menuName: "projects",
-      label: "Projects"
+  } catch (error) {
+    if (error.payload?.code !== "RESEARCH_PROJECT_REVIEW_REQUIRED") throw error;
+    const confirmed = await confirmWebWarning(
+      targetProjectID ? "Move Research to this Project?" : "Unassign this Research?",
+      targetProjectID
+        ? "Existing answers remain immutable in their original Project history. Additional Research facts will be cleared, and you must review the new Project context before asking another question."
+        : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
+      { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
+    );
+    if (!confirmed) return null;
+    return postResearch("/research/conversations/assign-project", {
+      conversationID: conversation.id,
+      projectID: targetProjectID,
+      confirmMove: true
     });
-  };
-
-  Object.defineProperties(picker, {
-    value: {
-      get: () => selectedProjectID,
-      set: (nextValue) => {
-        selectedProjectID = String(nextValue || "");
-        renderProjectCards();
-      }
-    },
-    disabled: {
-      get: () => disabled,
-      set: (nextValue) => {
-        disabled = Boolean(nextValue);
-        toggle.disabled = disabled;
-        renderProjectCards();
-      }
-    }
-  });
-  wireCodeFilterMenu(list, pickerState, {
-    stateKey: "researchProjectsMenuOpen",
-    menuName: "projects",
-    label: "Projects"
-  });
-  renderProjectCards();
-  return picker;
+  }
 }
 
 async function deleteResearchConversationFromList(conversation, button) {
@@ -9451,15 +9356,63 @@ async function renderResearch(paneID = "utility:analysis") {
       const title = document.createElement("strong");
       title.textContent = conversation.title;
       const meta = document.createElement("span");
-      const projectLabel = conversation.primaryProjectID
-        ? `${researchProjectName(conversation.primaryProjectID)} · `
-        : "";
-      meta.textContent = `${projectLabel}${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
+      meta.textContent = `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
       openButton.append(title, meta);
       openButton.addEventListener("click", () => openResearchConversation(conversation.id));
 
       const actions = document.createElement("div");
       actions.className = "research-conversation-row-actions";
+      const projectSelect = createResearchProjectSelect({
+        value: conversation.primaryProjectID || "",
+        unassignedLabel: "Unassigned",
+        ariaLabel: `Project for ${conversation.title}`
+      });
+      projectSelect.classList.add("research-conversation-project-select");
+      projectSelect.title = conversation.primaryProjectID
+        ? `Assigned to ${researchProjectName(conversation.primaryProjectID)}`
+        : "Assign conversation to a Project";
+      projectSelect.disabled = !researchEnabled;
+      if (researchEnabled) {
+        projectSelect.addEventListener("change", async () => {
+          const previousProjectID = conversation.primaryProjectID || "";
+          const targetProjectID = projectSelect.value;
+          projectSelect.disabled = true;
+          projectSelect.setAttribute("aria-busy", "true");
+          try {
+            const payload = await assignResearchConversationProject(conversation, targetProjectID);
+            if (!payload) {
+              projectSelect.value = previousProjectID;
+              return;
+            }
+            conversation = { ...conversation, ...payload.conversation };
+            researchConversationList = researchConversationList.map((item) =>
+              item.id === conversation.id ? { ...item, ...conversation } : item
+            );
+            if (state.researchConversationID === conversation.id) {
+              activeResearchConversation = {
+                ...(activeResearchConversation || {}),
+                ...payload.conversation
+              };
+            }
+            const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
+            await transitionWorkspace("utility", {
+              refreshPaneIDs: [
+                "utility:analysis",
+                ...(state.researchConversationID === conversation.id
+                  ? [paneIDForResearchConversation(conversation.id)]
+                  : []),
+                ...projectPaneIDs
+              ]
+            });
+          } catch (error) {
+            projectSelect.value = previousProjectID;
+            await showWebNotice("Project not changed", error.message);
+          } finally {
+            projectSelect.disabled = !researchEnabled;
+            projectSelect.removeAttribute("aria-busy");
+          }
+        });
+      }
       if (researchEnabled) {
         const renameButton = document.createElement("button");
         renameButton.className = "research-conversation-rename";
@@ -9554,7 +9507,7 @@ async function renderResearch(paneID = "utility:analysis") {
       deleteButton.textContent = "Delete";
       deleteButton.addEventListener("click", () => deleteResearchConversationFromList(conversation, deleteButton));
       actions.append(deleteButton);
-      row.append(openButton, actions);
+      row.append(openButton, actions, projectSelect);
     };
     renderRow();
     list.append(row);
@@ -9872,59 +9825,6 @@ function renderHistoricalResearchControl(container, message) {
 function renderResearchProjectContext(container, conversation) {
   const section = document.createElement("section");
   section.className = "research-project-context";
-  const heading = document.createElement("div");
-  heading.className = "research-project-context-heading";
-  const projectPicker = createResearchConversationProjectPicker({
-    value: conversation.primaryProjectID || "",
-    ariaLabel: "Assign Research conversation to Project"
-  });
-  heading.append(projectPicker);
-  section.append(heading);
-
-  const status = document.createElement("p");
-  status.className = "research-project-context-status";
-  projectPicker.addEventListener("change", async () => {
-    const previousProjectID = conversation.primaryProjectID || "";
-    const targetProjectID = projectPicker.value;
-    projectPicker.disabled = true;
-    status.textContent = "Updating Project assignment…";
-    try {
-      let payload;
-      try {
-        payload = await postResearch("/research/conversations/assign-project", {
-          conversationID: conversation.id,
-          projectID: targetProjectID
-        });
-      } catch (error) {
-        if (error.payload?.code !== "RESEARCH_PROJECT_REVIEW_REQUIRED") throw error;
-        const confirmed = await confirmWebWarning(
-          targetProjectID ? "Move Research to this Project?" : "Unassign this Research?",
-          targetProjectID
-            ? "Existing answers remain immutable in their original Project history. Additional Research facts will be cleared, and you must review the new Project context before asking another question."
-            : "Existing answers remain immutable in their original Project history. The conversation will no longer contribute new activity to a Project.",
-          { confirmLabel: targetProjectID ? "Move and review" : "Unassign" }
-        );
-        if (!confirmed) {
-          projectPicker.value = previousProjectID;
-          status.textContent = "";
-          return;
-        }
-        payload = await postResearch("/research/conversations/assign-project", {
-          conversationID: conversation.id,
-          projectID: targetProjectID,
-          confirmMove: true
-        });
-      }
-      activeResearchConversation = payload.conversation;
-      await refreshResearchConversationList();
-      await openResearchConversation(conversation.id, { refreshList: true });
-    } catch (error) {
-      projectPicker.value = previousProjectID;
-      status.textContent = error.message;
-    } finally {
-      projectPicker.disabled = false;
-    }
-  });
 
   if (conversation.primaryProjectID) {
     const projectInformation = conversation.projectInformation || {};
@@ -9948,13 +9848,6 @@ function renderResearchProjectContext(container, conversation) {
       section.append(projectInfo);
     }
   }
-  if (!hasCapability("research")) {
-    section.querySelectorAll("button, select, textarea").forEach((control) => {
-      control.disabled = true;
-    });
-    status.textContent = "Read-only history · Research Add-On required to change Project context.";
-  }
-  section.append(status);
   container.append(section);
   return section;
 }
@@ -10116,7 +10009,7 @@ async function renderResearchConversation(conversationID) {
   sourceList.className = "research-source-list";
   selectedSources.forEach((source) => sourceList.append(renderResearchSource(source)));
   sources.append(sourceToggle, sourceList);
-  projectContextSection.querySelector(".research-project-context-heading").after(sources);
+  projectContextSection.prepend(sources);
   sourceList.querySelectorAll(".research-source-card").forEach((card) =>
     setResearchSourceCardExpanded(card, true, { instant: true })
   );

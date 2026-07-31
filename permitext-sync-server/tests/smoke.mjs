@@ -1000,7 +1000,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260730-research-evidence-header-v198'),
+        webRoot.text.includes('/web/app.js?v=20260730-research-row-project-v199'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1026,7 +1026,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes(".saved-projects-add-button[hidden]") &&
         workspaceStyles.text.includes(".research-conversation-row.is-active {\n  background: transparent;\n  box-shadow: none;") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-evidence-header-v172'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-row-project-v173'),
       "The Saved Projects pill should switch smoothly between active and archived project cards without opening Archive."
     );
     assert(
@@ -1037,10 +1037,10 @@ async function main() {
           "const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);"
         ) &&
         researchConversationRendererSource.includes(
-          'projectContextSection.querySelector(".research-project-context-heading").after(sources);'
+          "projectContextSection.prepend(sources);"
         ) &&
         !researchConversationRendererSource.includes("content.append(sources);"),
-      "Selected Research sources should sit directly under the Project picker without a redundant card label."
+      "Selected Research sources should lead the context pane without a redundant card label."
     );
     assert(
       workspaceScript.text.includes("function readerSectionsWithoutRepeatedCatalogAliases") &&
@@ -1231,7 +1231,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260730-research-evidence-header-v172'),
+        webRoot.text.includes('/web/styles.css?v=20260730-research-row-project-v173'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1248,19 +1248,18 @@ async function main() {
         workspaceScript.text.includes("appendProjectResearchContextEditor(content, identity, projectResearchConversation);") &&
         workspaceStyles.text.includes(".research-project-context {\n  display: grid;") &&
         workspaceStyles.text.includes("background: transparent;\n  box-shadow: none;") &&
-        researchProjectContextSource.includes("createResearchConversationProjectPicker") &&
         !researchProjectContextSource.includes("createResearchProjectSelect") &&
-        workspaceScript.text.includes('picker.className = "research-project-picker saved-projects-section code-filter-menu saved-projects-menu"') &&
-        workspaceScript.text.includes('list.className = "saved-project-list research-project-list"') &&
-        workspaceScript.text.includes('toggle.className = "code-filter-menu-toggle saved-projects-menu-toggle"') &&
-        workspaceScript.text.includes('label: "Projects"') &&
+        !workspaceScript.text.includes("createResearchConversationProjectPicker") &&
+        workspaceScript.text.includes('projectSelect.classList.add("research-conversation-project-select");') &&
+        workspaceScript.text.includes("assignResearchConversationProject(conversation, targetProjectID)") &&
+        workspaceScript.text.includes('postResearch("/research/conversations/assign-project"') &&
+        workspaceStyles.text.includes(".research-conversation-project-select {") &&
         workspaceStyles.text.includes(".research-conversation-content {\n  display: grid;") &&
         workspaceStyles.text.includes("padding: 0;") &&
         workspaceStyles.text.includes(".research-composer {\n  position: relative;") &&
         workspaceStyles.text.includes("margin: 0;") &&
-        workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);") &&
-        !workspaceScript.text.includes("research-project-picker saved-projects-actions"),
-      "Project context should reuse the Saved Projects pill and expanded project cards without add or archive controls."
+        workspaceStyles.text.includes("padding: var(--space-3) 0 var(--panel-padding);"),
+      "Project assignment should live on each Research row while the conversation pane remains context-only."
     );
     assert(
       !researchProjectContextSource.includes(

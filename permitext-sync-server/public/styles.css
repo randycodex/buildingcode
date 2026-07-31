@@ -4869,6 +4869,18 @@ mark {
   gap: var(--space-1);
 }
 
+.research-conversation-project-select {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-height: 30px;
+  margin: 0 0 var(--space-3);
+  padding: 0 var(--space-6) 0 var(--space-3);
+  overflow: hidden;
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .research-conversation-rename {
   display: grid;
   width: 30px;
@@ -5236,20 +5248,6 @@ body.is-resizing-research-evidence * {
   box-shadow: none;
 }
 
-.research-project-context-heading {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-3);
-  align-items: start;
-}
-
-.research-project-context-heading > div {
-  display: grid;
-  gap: var(--space-1);
-}
-
-.research-project-context-heading p,
-.research-project-context-status,
 .research-project-context-warning p {
   margin: 0;
   color: var(--text-secondary);
@@ -5257,7 +5255,6 @@ body.is-resizing-research-evidence * {
   line-height: 1.45;
 }
 
-.research-project-picker,
 .research-project-select {
   width: 100%;
 }
@@ -5272,28 +5269,6 @@ body.is-resizing-research-evidence * {
   font: inherit;
   font-size: var(--chrome-font-size) !important;
   box-shadow: none;
-}
-
-.research-project-picker.saved-projects-section {
-  padding-top: var(--space-2);
-}
-
-.research-project-picker .saved-project-tile {
-  cursor: pointer;
-}
-
-.research-project-picker .saved-project-tile.is-selected {
-  outline: 2px solid color-mix(in srgb, var(--project-color) 64%, var(--text-primary));
-  outline-offset: -3px;
-}
-
-.research-project-picker .saved-project-tile.is-unassigned {
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
-}
-
-.research-project-picker .saved-project-tile[aria-disabled="true"] {
-  cursor: default;
-  opacity: 0.62;
 }
 
 .research-project-select:focus-visible,
@@ -5362,10 +5337,6 @@ body.is-resizing-research-evidence * {
   font: inherit;
   font-weight: 400;
   line-height: 1.45;
-}
-
-.research-project-context-status:empty {
-  display: none;
 }
 
 .research-message-thread {
@@ -5626,7 +5597,6 @@ body.is-resizing-research-evidence * {
 }
 
 @media (max-width: 560px) {
-  .research-project-context-heading,
   .research-historical-reuse-controls {
     grid-template-columns: 1fr;
   }
