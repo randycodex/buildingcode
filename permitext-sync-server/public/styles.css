@@ -6920,7 +6920,7 @@ body.is-resizing-research-evidence * {
   overflow: auto;
   resize: vertical;
   border-radius: var(--radius-card);
-  background: #000;
+  background: color-mix(in srgb, var(--surface) 92%, var(--project-color));
 }
 
 .project-note-editor-surface {
@@ -10352,7 +10352,7 @@ body.is-resizing-research-evidence * {
   min-height: 0;
   overflow: hidden;
   padding: var(--space-4);
-  background: #000;
+  background: color-mix(in srgb, var(--surface) 92%, var(--project-color));
 }
 
 .notebook-welcome {

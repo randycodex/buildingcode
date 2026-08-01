@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-notebook-images-v300"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-light-notebook-v301"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;
