@@ -81,7 +81,7 @@ const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260731-project-tone-v22";
-const notebookClientVersion = "20260724-project-notebook-v4";
+const notebookClientVersion = "20260731-blocknote-notebook-v2";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -239,6 +239,7 @@ let workboardModulePromise = null;
 let workboardStylesPromise = null;
 const workboardMounts = new Map();
 let notebookModulePromise = null;
+let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
@@ -1280,13 +1281,39 @@ function loadWorkboardStyles() {
 
 function loadNotebookModule() {
   if (!notebookModulePromise) {
-    notebookModulePromise = import(`/web/notebook-assets/notebook.js?v=${notebookClientVersion}`)
+    notebookModulePromise = Promise.all([
+      loadNotebookStyles(),
+      import(`/web/notebook-assets/notebook.js?v=${notebookClientVersion}`)
+    ])
+      .then(([, module]) => module)
       .catch((error) => {
         notebookModulePromise = null;
         throw error;
       });
   }
   return notebookModulePromise;
+}
+
+function loadNotebookStyles() {
+  if (notebookStylesPromise) return notebookStylesPromise;
+  notebookStylesPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector('link[data-permitext-notebook-styles="true"]');
+    if (existing?.sheet) {
+      resolve();
+      return;
+    }
+    const link = existing || document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = `/web/notebook-assets/notebook.css?v=${notebookClientVersion}`;
+    link.dataset.permitextNotebookStyles = "true";
+    link.addEventListener("load", resolve, { once: true });
+    link.addEventListener("error", () => {
+      notebookStylesPromise = null;
+      reject(new Error("Could not load Notebook styles."));
+    }, { once: true });
+    if (!existing) document.head.append(link);
+  });
+  return notebookStylesPromise;
 }
 
 async function closeProjectWorkboard(project) {
@@ -4650,6 +4677,55 @@ async function uploadWorkboardAsset(projectID, fileID, file) {
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Workboard image."));
   return payload.asset;
+}
+
+async function uploadNotebookAsset(projectID, file) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to upload Notebook images.");
+  if (!(file instanceof File) || !file.type.startsWith("image/")) {
+    throw new Error("The Notebook accepts PNG, JPEG, WebP, and GIF images.");
+  }
+  const blob = await optimizedWorkboardImageBlob(file);
+  const url = new URL("/notebook/assets/upload", window.location.origin);
+  url.searchParams.set("projectID", projectID);
+  url.searchParams.set("assetID", crypto.randomUUID());
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": blob.type || file.type,
+      "x-permitext-user-id": account.userID
+    },
+    body: blob
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Notebook image."));
+  return payload.asset.url;
+}
+
+async function resolveNotebookAsset(projectID, assetURL) {
+  const value = String(assetURL || "");
+  if (!value.startsWith("permitext-notebook-asset:")) return value;
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to load this Notebook image.");
+  const pathname = decodeURIComponent(value.slice("permitext-notebook-asset:".length));
+  const response = await fetch("/notebook/assets/read", {
+    method: "POST",
+    headers: {
+      authorization: `Bearer ${account.sessionToken}`,
+      "content-type": "application/json"
+    },
+    body: JSON.stringify({
+      auth: { accountUserID: account.userID },
+      projectID,
+      pathname
+    })
+  });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(responseErrorMessage(payload, "Could not load this Notebook image."));
+  }
+  return URL.createObjectURL(await response.blob());
 }
 
 async function saveWorkboardPreview(projectID, blob, metadata = {}) {
@@ -12341,9 +12417,9 @@ function projectDetailMatches(project, detail) {
 function emptyNotebookDocument() {
   return {
     schema: "permitext-notebook-card",
-    schemaVersion: 1,
-    format: "tiptap-json",
-    document: { type: "doc", content: [{ type: "paragraph" }] }
+    schemaVersion: 2,
+    format: "blocknote-json",
+    document: [{ type: "paragraph", content: [] }]
   };
 }
 
@@ -12471,6 +12547,7 @@ async function renderProjectNotebook(project) {
   let dirty = false;
   let notebookReadOnly = false;
   let disposed = false;
+  const notebookObjectURLs = new Set();
   let notebookAutosaveTimer = null;
   let flushNotebookAutosave = async () => !dirty;
 
@@ -12491,6 +12568,8 @@ async function renderProjectNotebook(project) {
       editorRenderSequence += 1;
       editorMount?.destroy?.();
       editorMount = null;
+      notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
+      notebookObjectURLs.clear();
     }
   };
   notebookMounts.set(projectID, mountState);
@@ -12778,6 +12857,8 @@ async function renderProjectNotebook(project) {
       const renderSequence = editorRenderSequence;
       editorMount?.destroy?.();
       editorMount = null;
+      notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
+      notebookObjectURLs.clear();
       focus.replaceChildren();
 
       if (!activeCard) {
@@ -12811,20 +12892,7 @@ async function renderProjectNotebook(project) {
 
       const toolbar = document.createElement("div");
       toolbar.className = "notebook-toolbar";
-      toolbar.setAttribute("role", "toolbar");
-      toolbar.setAttribute("aria-label", "Notebook formatting and references");
-      const boldButton = document.createElement("button");
-      boldButton.type = "button";
-      boldButton.textContent = "Bold";
-      const italicButton = document.createElement("button");
-      italicButton.type = "button";
-      italicButton.textContent = "Italic";
-      const undoButton = document.createElement("button");
-      undoButton.type = "button";
-      undoButton.textContent = "Undo";
-      const redoButton = document.createElement("button");
-      redoButton.type = "button";
-      redoButton.textContent = "Redo";
+      toolbar.setAttribute("aria-label", "Notebook references");
       const referenceSelect = document.createElement("select");
       referenceSelect.setAttribute("aria-label", "Insert reference");
       const placeholder = document.createElement("option");
@@ -12842,13 +12910,7 @@ async function renderProjectNotebook(project) {
         option.textContent = reference.label;
         referenceSelect.append(option);
       });
-      toolbar.append(
-        boldButton,
-        italicButton,
-        undoButton,
-        redoButton,
-        referenceSelect
-      );
+      toolbar.append(referenceSelect);
       if (notebookReadOnly) {
         toolbar.querySelectorAll("button, select").forEach((control) => {
           control.disabled = true;
@@ -12903,21 +12965,19 @@ async function renderProjectNotebook(project) {
         document: draftDocument,
         autofocus: !notebookReadOnly && !activeCard.id,
         editable: !notebookReadOnly,
+        uploadFile: (file) => uploadNotebookAsset(projectID, file),
+        async resolveFileUrl(url) {
+          const resolved = await resolveNotebookAsset(projectID, url);
+          if (resolved.startsWith("blob:")) notebookObjectURLs.add(resolved);
+          return resolved;
+        },
         onChange(document) {
           if (notebookReadOnly) return;
           draftDocument = document;
           markNotebookDirty();
         },
-        onSelectionChange(selection) {
-          boldButton.setAttribute("aria-pressed", String(selection.bold));
-          italicButton.setAttribute("aria-pressed", String(selection.italic));
-        },
         onOpenReference: null
       });
-      boldButton.addEventListener("click", () => editorMount?.toggleBold());
-      italicButton.addEventListener("click", () => editorMount?.toggleItalic());
-      undoButton.addEventListener("click", () => editorMount?.undo());
-      redoButton.addEventListener("click", () => editorMount?.redo());
       referenceSelect.addEventListener("change", () => {
         const reference = candidates[Number(referenceSelect.value)];
         if (!reference) return;

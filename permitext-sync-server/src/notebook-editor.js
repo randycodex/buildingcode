@@ -1,117 +1,198 @@
-import { Editor } from "@tiptap/core";
-import { notebookEditorExtensions } from "./notebook-schema.js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  BlockNoteSchema,
+  defaultBlockSpecs,
+  defaultInlineContentSpecs,
+  defaultStyleSpecs
+} from "@blocknote/core";
+import { BlockNoteView } from "@blocknote/mantine";
+import "@blocknote/mantine/style.css";
+import {
+  createReactInlineContentSpec,
+  useCreateBlockNote
+} from "@blocknote/react";
+import {
+  emptyNotebookDocument,
+  notebookBlockTypes,
+  notebookDocumentFormat,
+  notebookReferenceKinds,
+  notebookSchemaName,
+  notebookSchemaVersion
+} from "./notebook-schema.js";
+
+const allowedBlockTypeSet = new Set(notebookBlockTypes);
+
+const PermitextReference = createReactInlineContentSpec(
+  {
+    type: "permitextReference",
+    propSchema: {
+      referenceKind: {
+        default: "canonicalSection",
+        values: [...notebookReferenceKinds]
+      },
+      referenceID: { default: "" },
+      label: { default: "Linked Permitext item" }
+    },
+    content: "none"
+  },
+  {
+    render: ({ inlineContent }) => React.createElement(
+      "button",
+      {
+        type: "button",
+        className: "notebook-reference-chip",
+        "data-permitext-reference": "true",
+        "data-reference-kind": inlineContent.props.referenceKind,
+        "data-reference-id": inlineContent.props.referenceID,
+        "data-reference-label": inlineContent.props.label,
+        "aria-label": `Open ${inlineContent.props.label}`
+      },
+      inlineContent.props.label
+    ),
+    toExternalHTML: ({ inlineContent }) => React.createElement(
+      "span",
+      {
+        className: "notebook-reference-chip",
+        "data-permitext-reference": "true",
+        "data-reference-kind": inlineContent.props.referenceKind,
+        "data-reference-id": inlineContent.props.referenceID,
+        "data-reference-label": inlineContent.props.label
+      },
+      inlineContent.props.label
+    )
+  }
+);
+
+const notebookBlockSpecs = Object.fromEntries(
+  Object.entries(defaultBlockSpecs).filter(([type]) => allowedBlockTypeSet.has(type))
+);
+
+export const permitextNotebookSchema = BlockNoteSchema.create({
+  blockSpecs: notebookBlockSpecs,
+  inlineContentSpecs: {
+    ...defaultInlineContentSpecs,
+    permitextReference: PermitextReference
+  },
+  styleSpecs: defaultStyleSpecs
+});
 
 function normalizedReference(reference) {
   const referenceKind = String(reference?.referenceKind || "").trim();
   const referenceID = String(reference?.referenceID || "").trim();
   const label = String(reference?.label || "").trim();
-  if (!referenceKind || !referenceID || !label) {
-    throw new Error("A Notebook reference requires a kind, ID, and label.");
+  if (!notebookReferenceKinds.includes(referenceKind) || !referenceID || !label) {
+    throw new Error("A Notebook reference requires a supported kind, ID, and label.");
   }
   return { referenceKind, referenceID, label };
+}
+
+function wrappedDocument(blocks) {
+  return {
+    schema: notebookSchemaName,
+    schemaVersion: notebookSchemaVersion,
+    format: notebookDocumentFormat,
+    document: blocks
+  };
+}
+
+function preferredNotebookTheme() {
+  const explicitTheme = document.documentElement.dataset.theme;
+  if (explicitTheme === "dark" || explicitTheme === "light") return explicitTheme;
+  return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function PermitextNotebookEditor({ options, controllerRef }) {
+  const [theme, setTheme] = useState(preferredNotebookTheme);
+  const initialContent = useMemo(
+    () => options.document?.document || emptyNotebookDocument().document,
+    []
+  );
+  const editor = useCreateBlockNote({
+    schema: permitextNotebookSchema,
+    initialContent,
+    uploadFile: options.uploadFile,
+    resolveFileUrl: options.resolveFileUrl
+  });
+  const lastDocumentRef = useRef(options.document);
+
+  useEffect(() => {
+    const updateTheme = () => setTheme(preferredNotebookTheme());
+    const observer = new MutationObserver(updateTheme);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme"]
+    });
+    const media = window.matchMedia?.("(prefers-color-scheme: dark)");
+    media?.addEventListener?.("change", updateTheme);
+    return () => {
+      observer.disconnect();
+      media?.removeEventListener?.("change", updateTheme);
+    };
+  }, []);
+
+  useEffect(() => {
+    controllerRef.current = editor;
+    options.onReady?.(editor);
+    if (options.autofocus) window.requestAnimationFrame(() => editor.focus());
+    return () => {
+      if (controllerRef.current === editor) controllerRef.current = null;
+    };
+  }, [editor]);
+
+  useEffect(() => {
+    const incoming = options.document;
+    if (!incoming || incoming === lastDocumentRef.current) return;
+    lastDocumentRef.current = incoming;
+    editor.replaceBlocks(editor.document, incoming.document || incoming);
+  }, [editor, options.document]);
+
+  return React.createElement(BlockNoteView, {
+    editor,
+    editable: options.editable !== false,
+    theme,
+    onChange: () => options.onChange?.(wrappedDocument(editor.document)),
+    "aria-label": options.ariaLabel || "Notebook card"
+  });
 }
 
 export function mountPermitextNotebookEditor(element, options = {}) {
   if (!(element instanceof HTMLElement)) {
     throw new Error("A Notebook editor mount element is required.");
   }
-
-  function activateReference(target) {
-    const referenceElement = target.closest?.("[data-permitext-reference]");
-    if (!referenceElement || !element.contains(referenceElement)) return false;
-    options.onOpenReference?.({
-      referenceKind: referenceElement.dataset.referenceKind,
-      referenceID: referenceElement.dataset.referenceId,
-      label: referenceElement.dataset.referenceLabel || referenceElement.textContent || "Linked item"
-    });
-    return true;
-  }
-
-  const editor = new Editor({
-    element,
-    extensions: [...notebookEditorExtensions],
-    content: options.document?.document || options.document || {
-      type: "doc",
-      content: [{ type: "paragraph" }]
-    },
-    autofocus: options.autofocus ? "end" : false,
-    editable: options.editable !== false,
-    editorProps: {
-      attributes: {
-        class: "notebook-tiptap-editor",
-        role: "textbox",
-        "aria-label": options.ariaLabel || "Notebook card text",
-        "aria-multiline": "true"
-      },
-      handleDOMEvents: {
-        click(_view, event) {
-          return activateReference(event.target);
-        },
-        keydown(_view, event) {
-          if (event.key !== "Enter" && event.key !== " ") return false;
-          if (!activateReference(event.target)) return false;
-          event.preventDefault();
-          return true;
-        }
-      }
-    },
-    onCreate: ({ editor: activeEditor }) => {
-      options.onReady?.(activeEditor);
-    },
-    onUpdate: ({ editor: activeEditor }) => {
-      options.onChange?.({
-        schema: "permitext-notebook-card",
-        schemaVersion: 1,
-        format: "tiptap-json",
-        document: activeEditor.getJSON()
-      });
-    },
-    onSelectionUpdate: ({ editor: activeEditor }) => {
-      options.onSelectionChange?.({
-        bold: activeEditor.isActive("bold"),
-        italic: activeEditor.isActive("italic")
-      });
-    }
-  });
+  const controllerRef = { current: null };
+  const root = createRoot(element);
+  root.render(React.createElement(PermitextNotebookEditor, { options, controllerRef }));
 
   return {
     getDocument() {
-      return {
-        schema: "permitext-notebook-card",
-        schemaVersion: 1,
-        format: "tiptap-json",
-        document: editor.getJSON()
-      };
+      return wrappedDocument(controllerRef.current?.document || options.document?.document || []);
     },
-    setDocument(document, emitUpdate = false) {
-      editor.commands.setContent(document?.document || document, { emitUpdate });
+    setDocument(document) {
+      const editor = controllerRef.current;
+      if (!editor) return;
+      editor.replaceBlocks(editor.document, document?.document || document);
     },
     insertReference(reference) {
-      editor.chain().focus().insertContent({
-        type: "permitextReference",
-        attrs: normalizedReference(reference)
-      }).insertContent(" ").run();
-    },
-    toggleBold() {
-      editor.chain().focus().toggleBold().run();
-    },
-    toggleItalic() {
-      editor.chain().focus().toggleItalic().run();
+      const editor = controllerRef.current;
+      if (!editor) return;
+      editor.focus();
+      editor.insertInlineContent([
+        { type: "permitextReference", props: normalizedReference(reference) },
+        " "
+      ]);
     },
     undo() {
-      editor.chain().focus().undo().run();
+      controllerRef.current?.undo();
     },
     redo() {
-      editor.chain().focus().redo().run();
-    },
-    isActive(mark) {
-      return editor.isActive(mark);
+      controllerRef.current?.redo();
     },
     focus() {
-      editor.commands.focus("end");
+      controllerRef.current?.focus();
     },
     destroy() {
-      editor.destroy();
+      root.unmount();
     }
   };
 }

@@ -3,6 +3,9 @@ import { defineConfig } from "vite";
 
 export default defineConfig({
   base: "/web/notebook-assets/",
+  define: {
+    "process.env.NODE_ENV": JSON.stringify("production")
+  },
   publicDir: false,
   build: {
     outDir: resolve("public/notebook-assets"),
@@ -16,7 +19,9 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        assetFileNames: "[name][extname]",
+        assetFileNames: (assetInfo) => assetInfo.name?.endsWith(".css")
+          ? "notebook.css"
+          : "[name][extname]",
         chunkFileNames: "[name]-[hash].js"
       }
     }

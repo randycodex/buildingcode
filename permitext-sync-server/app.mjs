@@ -170,6 +170,7 @@ const maxWorkboardElements = 5_000;
 const maxWorkboardAssets = 250;
 const maxWorkboardRecordBytes = 768 * 1024;
 const maxWorkboardAssetBytes = 8 * 1024 * 1024;
+const maxNotebookAssetBytes = 8 * 1024 * 1024;
 const maxWorkboardPreviewBytes = 6 * 1024 * 1024;
 const maxReportFileBytes = 25 * 1024 * 1024;
 const defaultRequestBodyLimit = 1024 * 1024;
@@ -3587,6 +3588,27 @@ function legacyWorkboardAssetPrefix(userID, projectID) {
 function workboardAssetPathBelongsToProject(pathname, userID, projectID) {
   return pathname.startsWith(workboardAssetPrefix(userID, projectID)) ||
     pathname.startsWith(legacyWorkboardAssetPrefix(userID, projectID));
+}
+
+function notebookAssetPrefix(projectID) {
+  return `project-assets/${safeWorkboardPathHash(projectID)}/notebook/`;
+}
+
+function notebookAssetExtension(contentType) {
+  return {
+    "image/gif": "gif",
+    "image/jpeg": "jpg",
+    "image/png": "png",
+    "image/webp": "webp"
+  }[contentType] || "";
+}
+
+function notebookAssetPathname(projectID, assetID, contentType) {
+  return `${notebookAssetPrefix(projectID)}${safeWorkboardPathHash(assetID)}.${notebookAssetExtension(contentType)}`;
+}
+
+function notebookAssetPathBelongsToProject(pathname, projectID) {
+  return pathname.startsWith(notebookAssetPrefix(projectID)) && /\.(?:gif|jpg|png|webp)$/.test(pathname);
 }
 
 function workboardAssetExtension(contentType) {
@@ -13714,6 +13736,106 @@ async function handleWorkboardPreviewClear(request, response) {
   sendJSON(response, 200, { projectID: access.projectID, clearedCount });
 }
 
+async function handleNotebookAssetUpload(request, response) {
+  const userID = String(request.headers["x-permitext-user-id"] || "").trim();
+  const url = requestURL(request);
+  const projectID = String(url.searchParams.get("projectID") || "").trim();
+  const assetID = String(url.searchParams.get("assetID") || "").trim();
+  if (!userID || !projectID || !assetID || projectID.length > 200 || assetID.length > 200) {
+    sendError(response, 400, "Missing or invalid Notebook image identity.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+  const access = await requireProjectPermission(
+    response,
+    userID,
+    projectID,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  if (!access.organization && !hasActiveProEntitlement(context.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Notebook image uploads require Pro.",
+      code: "PRO_REQUIRED_NOTEBOOK"
+    });
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Notebook image storage is not configured.");
+    return;
+  }
+  const contentType = String(request.headers["content-type"] || "").split(";")[0].trim().toLowerCase();
+  if (!notebookAssetExtension(contentType)) {
+    sendError(response, 415, "Notebook images must be PNG, JPEG, WebP, or GIF files.");
+    return;
+  }
+  const body = await readBody(request, maxNotebookAssetBytes);
+  if (!body.length) {
+    sendError(response, 400, "Notebook image is empty.");
+    return;
+  }
+  const pathname = notebookAssetPathname(access.projectID, assetID, contentType);
+  await storePrivateProjectAsset(pathname, body, contentType);
+  sendJSON(response, 200, {
+    asset: {
+      projectID: access.projectID,
+      assetID,
+      pathname,
+      url: `permitext-notebook-asset:${encodeURIComponent(pathname)}`,
+      contentType,
+      size: body.length,
+      uploadedAt: new Date().toISOString()
+    }
+  });
+}
+
+async function handleNotebookAssetRead(request, response) {
+  const body = await readJSON(request);
+  const userID = String(body.auth?.accountUserID || "").trim();
+  const projectID = String(body.projectID || "").trim();
+  const pathname = String(body.pathname || "").trim();
+  if (!userID || !projectID || !pathname) {
+    sendError(response, 400, "Missing Notebook image identity.");
+    return;
+  }
+  if (!await authenticatedUserContext(request, response, userID, body.auth)) return;
+  const access = await requireProjectPermission(
+    response,
+    userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+  if (!notebookAssetPathBelongsToProject(pathname, access.projectID)) {
+    sendError(response, 403, "This Notebook image does not belong to the authenticated Project.");
+    return;
+  }
+  if (!privateProjectAssetStorageConfigured()) {
+    sendError(response, 503, "Private Notebook image storage is not configured.");
+    return;
+  }
+  const image = await readPrivateProjectAsset(pathname);
+  if (!image) {
+    sendError(response, 404, "Notebook image was not found.");
+    return;
+  }
+  const extension = pathname.split(".").pop();
+  const contentType = {
+    gif: "image/gif",
+    jpg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp"
+  }[extension] || "application/octet-stream";
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, no-store",
+    "content-type": contentType,
+    "content-length": String(image.length)
+  });
+  response.end(image);
+}
+
 async function handleWorkboardAssetUpload(request, response) {
   const userID = String(request.headers["x-permitext-user-id"] || "").trim();
   const url = requestURL(request);
@@ -15110,6 +15232,8 @@ const handlers = {
   "notebook/cards/get": handleNotebookCardGet,
   "notebook/cards/save": handleNotebookCardSave,
   "notebook/cards/delete": handleNotebookCardDelete,
+  "notebook/assets/upload": handleNotebookAssetUpload,
+  "notebook/assets/read": handleNotebookAssetRead,
   "reports/sources/list": handleReportSourceList,
   "reports/options": handleReportOptions,
   "reports/drafts/list": handleReportDraftList,

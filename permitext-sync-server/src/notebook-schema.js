@@ -1,10 +1,6 @@
-import { Node } from "@tiptap/core";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Text from "@tiptap/extension-text";
-import Bold from "@tiptap/extension-bold";
-import Italic from "@tiptap/extension-italic";
-import { UndoRedo } from "@tiptap/extensions/undo-redo";
+export const notebookSchemaName = "permitext-notebook-card";
+export const notebookSchemaVersion = 2;
+export const notebookDocumentFormat = "blocknote-json";
 
 export const notebookReferenceKinds = Object.freeze([
   "canonicalSection",
@@ -16,68 +12,85 @@ export const notebookReferenceKinds = Object.freeze([
   "reportDraft"
 ]);
 
-export const NotebookDocument = Document.extend({
-  content: "paragraph+"
-});
+export const notebookBlockTypes = Object.freeze([
+  "paragraph",
+  "heading",
+  "bulletListItem",
+  "numberedListItem",
+  "checkListItem",
+  "toggleListItem",
+  "quote",
+  "codeBlock",
+  "divider",
+  "table",
+  "image"
+]);
 
-export const PermitextReference = Node.create({
-  name: "permitextReference",
-  group: "inline",
-  inline: true,
-  atom: true,
-  selectable: true,
+export function emptyBlockNoteContent() {
+  return [{ type: "paragraph", content: [] }];
+}
 
-  addAttributes() {
+export function emptyNotebookDocument() {
+  return {
+    schema: notebookSchemaName,
+    schemaVersion: notebookSchemaVersion,
+    format: notebookDocumentFormat,
+    document: emptyBlockNoteContent()
+  };
+}
+
+function tiptapMarksToBlockNoteStyles(marks) {
+  const styles = {};
+  (Array.isArray(marks) ? marks : []).forEach((mark) => {
+    if (mark?.type === "bold" || mark?.type === "italic") {
+      styles[mark.type] = true;
+    }
+  });
+  return styles;
+}
+
+function tiptapInlineToBlockNote(node) {
+  if (node?.type === "text" && typeof node.text === "string") {
     return {
-      referenceKind: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-reference-kind"),
-        renderHTML: () => ({})
-      },
-      referenceID: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("data-reference-id"),
-        renderHTML: () => ({})
-      },
-      label: {
-        default: "Linked Permitext item",
-        parseHTML: (element) => element.getAttribute("data-reference-label") || element.textContent,
-        renderHTML: () => ({})
+      type: "text",
+      text: node.text,
+      styles: tiptapMarksToBlockNoteStyles(node.marks)
+    };
+  }
+  if (node?.type === "permitextReference") {
+    return {
+      type: "permitextReference",
+      props: {
+        referenceKind: String(node.attrs?.referenceKind || ""),
+        referenceID: String(node.attrs?.referenceID || ""),
+        label: String(node.attrs?.label || "Linked Permitext item")
       }
     };
-  },
-
-  parseHTML() {
-    return [{ tag: "span[data-permitext-reference]" }];
-  },
-
-  renderHTML({ node }) {
-    return [
-      "button",
-      {
-        type: "button",
-        class: "notebook-reference-chip",
-        "data-permitext-reference": "true",
-        "data-reference-kind": node.attrs.referenceKind,
-        "data-reference-id": node.attrs.referenceID,
-        "data-reference-label": node.attrs.label,
-        "aria-label": `Open ${node.attrs.label}`
-      },
-      node.attrs.label
-    ];
   }
-});
+  return null;
+}
 
-export const notebookContentExtensions = Object.freeze([
-  NotebookDocument,
-  Paragraph,
-  Text,
-  Bold,
-  Italic,
-  PermitextReference
-]);
+export function tiptapDocumentToBlockNote(document) {
+  const content = Array.isArray(document?.content) ? document.content : [];
+  const blocks = content
+    .filter((node) => node?.type === "paragraph")
+    .map((paragraph) => ({
+      type: "paragraph",
+      content: (Array.isArray(paragraph.content) ? paragraph.content : [])
+        .map(tiptapInlineToBlockNote)
+        .filter(Boolean)
+    }));
+  return blocks.length ? blocks : emptyBlockNoteContent();
+}
 
-export const notebookEditorExtensions = Object.freeze([
-  ...notebookContentExtensions,
-  UndoRedo.configure({ depth: 50 })
-]);
+export function plainTextToBlockNote(value) {
+  const blocks = String(value || "")
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.replace(/\s*\n\s*/g, " ").trim())
+    .filter(Boolean)
+    .map((paragraph) => ({
+      type: "paragraph",
+      content: [{ type: "text", text: paragraph, styles: {} }]
+    }));
+  return blocks.length ? blocks : emptyBlockNoteContent();
+}

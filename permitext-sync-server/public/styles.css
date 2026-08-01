@@ -10279,22 +10279,11 @@ body.is-resizing-research-evidence * {
 }
 
 .notebook-toolbar {
-  display: grid;
-  grid-template-columns: repeat(4, max-content);
-  gap: var(--space-1);
+  display: block;
   margin-bottom: var(--space-2);
 }
 
-.notebook-toolbar button {
-  border-radius: var(--radius-pill);
-}
-
-.notebook-toolbar button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--project-color) 32%, var(--surface));
-}
-
 .notebook-toolbar select {
-  grid-column: 1 / -1;
   width: 100%;
 }
 
@@ -10310,17 +10299,43 @@ body.is-resizing-research-evidence * {
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 48%, transparent);
 }
 
-.notebook-tiptap-editor {
+.notebook-editor-surface .bn-container {
   min-height: 100%;
-  padding: var(--space-4);
-  outline: none;
+  background: transparent;
   color: var(--text-primary);
   font-size: 15px;
   line-height: 1.55;
 }
 
-.notebook-tiptap-editor p {
-  margin: 0 0 0.85em;
+.notebook-editor-surface .bn-editor {
+  min-height: 100%;
+  padding: var(--space-4);
+  background: transparent;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.notebook-editor-surface .bn-block-content,
+.notebook-editor-surface .bn-inline-content {
+  font-family: inherit;
+}
+
+.notebook-editor-surface .bn-side-menu,
+.notebook-editor-surface .bn-formatting-toolbar,
+.notebook-editor-surface .bn-suggestion-menu,
+.notebook-editor-surface .mantine-Menu-dropdown,
+.notebook-editor-surface .mantine-Popover-dropdown {
+  color: var(--text-primary);
+}
+
+.notebook-editor-surface [data-color-scheme="dark"] {
+  --mantine-color-body: var(--surface);
+  --mantine-color-text: var(--text-primary);
+}
+
+.notebook-editor-surface img {
+  max-width: 100%;
+  border-radius: var(--radius-control);
 }
 
 .notebook-reference-chip {

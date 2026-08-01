@@ -1192,7 +1192,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-left-edge-resize-v282'),
+        webRoot.text.includes('/web/app.js?v=20260731-blocknote-notebook-v284'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1236,9 +1236,11 @@ async function main() {
         workspaceScript.text.includes('savedHeading.append(savedTitle, projectSectionCount(previewItems.length, "Saved evidence items"))') &&
         workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
         workspaceStyles.text.includes(".project-section-count {") &&
-        workspaceStyles.text.includes(".notebook-toolbar {\n  display: grid;\n  grid-template-columns: repeat(4, max-content);") &&
-        workspaceStyles.text.includes(".notebook-toolbar button {\n  border-radius: var(--radius-pill);") &&
-        workspaceStyles.text.includes(".notebook-toolbar select {\n  grid-column: 1 / -1;\n  width: 100%;") &&
+        workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
+        workspaceStyles.text.includes(".notebook-toolbar select {\n  width: 100%;") &&
+        workspaceStyles.text.includes(".notebook-editor-surface .bn-container {") &&
+        workspaceStyles.text.includes(".notebook-editor-surface .bn-editor {") &&
+        !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
         workspaceScript.text.includes('rail.className = "notebook-card-rail code-filter-menu notebook-card-menu"') &&
@@ -1261,7 +1263,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-left-edge-resize-v282'),
+        webRoot.text.includes('/web/styles.css?v=20260731-blocknote-notebook-v284'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1472,7 +1474,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-left-edge-resize-v282'),
+        webRoot.text.includes('/web/styles.css?v=20260731-blocknote-notebook-v284'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
