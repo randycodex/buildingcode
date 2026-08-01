@@ -1117,6 +1117,13 @@ async function main() {
         workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
+        workspaceScript.text.includes("function mergeRecentlyViewedDetails(entries, options = {})") &&
+        workspaceScript.text.includes("function cacheRecentlyViewedReaderPreview(reader, section)") &&
+        workspaceScript.text.includes("function updateVisibleSearchHistoryEntry(panel, entry)") &&
+        workspaceScript.text.includes("options.onEntry?.(hydratedEntry)") &&
+        workspaceScript.text.includes("tile.dataset.recentViewIdentity = recentViewIdentity(entry)") &&
+        workspaceScript.text.includes('if (String(entry?.previewText || "").trim()) return entry;') &&
+        workspaceScript.text.includes("const syncPromise = loadSyncedContent();\n    await renderSearchResults(panel, searchInstance);") &&
         workspaceScript.text.includes("if (attempt < 120)") &&
         workspaceScript.text.includes("requestAnimationFrame(() => hydrateSearchPanelWhenConnected(panel, searchInstance))") &&
         workspaceScript.text.includes("function scheduleWorkspaceStateSaveAfterPaint()") &&
@@ -1178,7 +1185,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260731-project-derived-colors-v278'),
+        webRoot.text.includes('/web/app.js?v=20260731-search-preview-cache-v279'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1247,7 +1254,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-derived-colors-v278'),
+        webRoot.text.includes('/web/styles.css?v=20260731-search-preview-cache-v279'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1458,7 +1465,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260731-project-derived-colors-v278'),
+        webRoot.text.includes('/web/styles.css?v=20260731-search-preview-cache-v279'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

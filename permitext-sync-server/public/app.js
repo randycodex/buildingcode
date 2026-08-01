@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-derived-colors-v278";
+} from "./offline-storage.js?v=20260731-search-preview-cache-v279";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -4743,6 +4743,75 @@ function recentViewIdentity(entry) {
   return `${recentViewCodePrefix(entry)}:${sectionID}`;
 }
 
+function recentViewEntryForReader(reader, chapter = null) {
+  const sectionID = Number(reader?.sectionID || 0);
+  if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return null;
+  const resolvedChapter = chapter || chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
+  const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || resolvedChapter?.codePrefix));
+  const entry = {
+    sectionID,
+    sectionNumber: reader.sectionNumber || "",
+    title: reader.title || "Section",
+    chapterTitle: resolvedChapter?.fullTitle || resolvedChapter?.displayTitle || resolvedChapter?.title || "",
+    codeSectionID: resolvedChapter?.codeSectionID || null,
+    codeSectionName: codeOption?.label || reader.codePrefix || "",
+    codePrefix: reader.codePrefix || resolvedChapter?.codePrefix || "BC",
+    chapterID: reader.chapterID || resolvedChapter?.id || "",
+    chapterNumber: resolvedChapter?.chapterNumber || "",
+    previewText: "",
+    viewedAt: swiftReferenceDateSeconds()
+  };
+  const identity = recentViewIdentity(entry);
+  const previous = (state.recentlyViewedSections || []).find((item) => recentViewIdentity(item) === identity);
+  if (previous?.previewText) entry.previewText = previous.previewText;
+  return entry;
+}
+
+function mergeRecentlyViewedDetails(entries, options = {}) {
+  const detailsByIdentity = new Map(
+    (entries || [])
+      .filter((entry) => recentViewIdentity(entry) && String(entry.previewText || "").trim())
+      .map((entry) => [recentViewIdentity(entry), entry])
+  );
+  if (!detailsByIdentity.size) return false;
+  let changed = false;
+  state.recentlyViewedSections = (state.recentlyViewedSections || []).map((entry) => {
+    const details = detailsByIdentity.get(recentViewIdentity(entry));
+    if (!details || String(entry.previewText || "").trim() === String(details.previewText || "").trim()) return entry;
+    changed = true;
+    return {
+      ...entry,
+      ...details,
+      viewedAt: entry.viewedAt || details.viewedAt
+    };
+  });
+  if (changed && options.persist !== false) saveWorkspaceState();
+  return changed;
+}
+
+function cacheRecentlyViewedReaderPreview(reader, section) {
+  if (!reader?.sectionID || !section) return;
+  const entry = recentViewEntryForReader(reader);
+  if (!entry) return;
+  const sectionNumber = section.sectionNumber || entry.sectionNumber || "";
+  const sectionTitle = section.title || entry.title || "Section";
+  const rawPreview = sectionPlainText(section);
+  const titleWithoutNumber = stripLeadingSectionNumber(sectionTitle, sectionNumber);
+  const previewSource = rawPreview || titleWithoutNumber;
+  const previewText = snippetWithoutDuplicateTitle({
+    sectionNumber,
+    title: sectionTitle,
+    snippet: previewSource
+  }).replace(/\s+/g, " ").trim().slice(0, 360);
+  if (!previewText) return;
+  mergeRecentlyViewedDetails([{
+    ...entry,
+    sectionNumber,
+    title: sectionTitle,
+    previewText
+  }]);
+}
+
 function continuityRecentSearches(values = {}) {
   try {
     const parsed = JSON.parse(values.recentSearchesJSON || "[]");
@@ -4785,23 +4854,9 @@ function outgoingRecentSearchHistory(existingValues, recentSearches) {
 }
 
 function recordRecentlyViewedReader(reader) {
-  const sectionID = Number(reader?.sectionID || 0);
-  if (!Number.isSafeInteger(sectionID) || sectionID <= 0) return;
   const chapter = chapters.find((item) => String(item.id) === String(reader.chapterID || ""));
-  const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || chapter?.codePrefix));
-  const entry = {
-    sectionID,
-    sectionNumber: reader.sectionNumber || "",
-    title: reader.title || "Section",
-    chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
-    codeSectionID: chapter?.codeSectionID || null,
-    codeSectionName: codeOption?.label || reader.codePrefix || "",
-    codePrefix: reader.codePrefix || chapter?.codePrefix || "BC",
-    chapterID: reader.chapterID || chapter?.id || "",
-    chapterNumber: chapter?.chapterNumber || "",
-    previewText: "",
-    viewedAt: swiftReferenceDateSeconds()
-  };
+  const entry = recentViewEntryForReader(reader, chapter);
+  if (!entry) return;
   const identity = recentViewIdentity(entry);
   state.recentlyViewedSections = [
     entry,
@@ -4826,20 +4881,7 @@ function continuityValuesForReader(reader) {
     if (!recentEntries.some((candidate) => recentViewIdentity(candidate) === recentViewIdentity(entry))) recentEntries.push(entry);
   });
   if (Number.isSafeInteger(sectionID) && sectionID > 0) {
-    const codeOption = codeOptions.find((item) => item.prefix === (reader.codePrefix || chapter?.codePrefix));
-    const entry = {
-      sectionID,
-      sectionNumber: reader.sectionNumber || "",
-      title: reader.title || "Section",
-      chapterTitle: chapter?.fullTitle || chapter?.displayTitle || chapter?.title || "",
-      codeSectionID: chapter?.codeSectionID || null,
-      codeSectionName: codeOption?.label || reader.codePrefix || "",
-      codePrefix: reader.codePrefix || chapter?.codePrefix || "BC",
-      chapterID: reader.chapterID || chapter?.id || "",
-      chapterNumber: chapter?.chapterNumber || "",
-      previewText: "",
-      viewedAt: swiftReferenceDateSeconds()
-    };
+    const entry = recentViewEntryForReader(reader, chapter);
     const identity = recentViewIdentity(entry);
     recentEntries.splice(
       0,
@@ -4922,7 +4964,17 @@ async function applyRemoteContinuityIfNewer() {
   const recentActivityTimestamp = Date.parse(state.recentActivityUpdatedAt || 0);
   if (!Number.isFinite(recentActivityTimestamp) || remoteTimestamp >= recentActivityTimestamp) {
     const remoteRecentEntries = continuityRecentEntries(record.values);
-    state.recentlyViewedSections = remoteRecentEntries.slice(0, recentViewLimit);
+    const localDetails = new Map(
+      (state.recentlyViewedSections || [])
+        .filter((entry) => String(entry.previewText || "").trim())
+        .map((entry) => [recentViewIdentity(entry), entry])
+    );
+    state.recentlyViewedSections = remoteRecentEntries.slice(0, recentViewLimit).map((entry) => {
+      const local = localDetails.get(recentViewIdentity(entry));
+      return !entry.previewText && local?.previewText
+        ? { ...entry, previewText: local.previewText }
+        : entry;
+    });
     if (record.values?.recentSearchesJSON !== undefined) {
       state.recentSearches = continuityRecentSearches(record.values);
       state.recentSearchHistory = continuityRecentSearchHistory(record.values, remoteTimestamp);
@@ -6983,16 +7035,20 @@ async function renderSectionContent(panel, reader) {
   if (panel.dataset.readerRenderToken !== renderToken) return;
   const groupLabelsByFirstSection = groupLabelsForChapter(chapter);
   clear(content);
-  sections.slice(initialStart, initialEnd).forEach((section) => {
+  const initialSections = sections.slice(initialStart, initialEnd).map((section) =>
+    readerSectionWithWindowBody(section, initialChapter)
+  );
+  initialSections.forEach((section) => {
     content.append(
       renderReaderChapterSection(
         panel,
         reader,
-        readerSectionWithWindowBody(section, initialChapter),
+        section,
         groupLabelsByFirstSection
       )
     );
   });
+  cacheRecentlyViewedReaderPreview(reader, initialSections[targetIndex - initialStart]);
   collapseRepeatedReaderCatalogAliases(content);
   // Notes now open from each block in the reader notes sheet. Do not build the
   // retired, permanently hidden sidebar editor for every block in the chapter.
@@ -8724,8 +8780,9 @@ function updateSearchDock(panel, instance, resultCount = null) {
   summaryCopy.textContent = countLabel;
 }
 
-async function hydrateSearchRecentlyViewedEntries(entries) {
-  return Promise.all(entries.map(async (entry) => {
+async function hydrateSearchRecentlyViewedEntries(entries, options = {}) {
+  const hydratedEntries = await Promise.all(entries.map(async (entry) => {
+    if (String(entry?.previewText || "").trim()) return entry;
     try {
       const detail = { ...entry };
       const { chapter, section } = await resolveSectionDetail(detail);
@@ -8739,7 +8796,7 @@ async function hydrateSearchRecentlyViewedEntries(entries) {
           ? titleWithoutNumber
           : entry.previewText || ""
       );
-      return {
+      const hydratedEntry = {
         ...entry,
         codePrefix: detail.codePrefix || chapter?.codePrefix || entry.codePrefix || "BC",
         chapterID: detail.chapterID || chapter?.id || entry.chapterID || "",
@@ -8753,10 +8810,26 @@ async function hydrateSearchRecentlyViewedEntries(entries) {
           snippet: previewSource
         }).replace(/\s+/g, " ").trim().slice(0, 360)
       };
+      options.onEntry?.(hydratedEntry);
+      return hydratedEntry;
     } catch {
       return entry;
     }
   }));
+  mergeRecentlyViewedDetails(hydratedEntries);
+  return hydratedEntries;
+}
+
+function updateVisibleSearchHistoryEntry(panel, entry) {
+  const identity = recentViewIdentity(entry);
+  if (!identity) return;
+  const tile = panel.querySelector(
+    `.search-jump-tile[data-recent-view-identity="${CSS.escape(identity)}"]`
+  );
+  const preview = tile?.querySelector(".search-jump-preview");
+  if (!preview || !entry.previewText) return;
+  preview.textContent = entry.previewText;
+  markResearchSelectable(preview, entry);
 }
 
 async function renderSearchHistory(panel, instance, options = {}) {
@@ -8764,7 +8837,9 @@ async function renderSearchHistory(panel, instance, options = {}) {
   const recentEntries = searchRecentlyViewedEntries();
   const recentSections = options.hydrate === false
     ? recentEntries
-    : await hydrateSearchRecentlyViewedEntries(recentEntries);
+    : await hydrateSearchRecentlyViewedEntries(recentEntries, {
+      onEntry: (entry) => updateVisibleSearchHistoryEntry(panel, entry)
+    });
   if (String(instance?.query || "").trim()) return;
   const pinned = normalizeSearchHistory(state.pinnedSearches);
   const recentQueries = normalizeSearchHistory(state.recentSearches, recentSearchLimit)
@@ -8785,6 +8860,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
     recentSections.forEach((entry) => {
       const tile = document.createElement("article");
       tile.className = `search-jump-tile code-theme-${codeTheme(entry.codePrefix || "BC")}`;
+      tile.dataset.recentViewIdentity = recentViewIdentity(entry);
       const openButton = document.createElement("button");
       openButton.type = "button";
       openButton.className = "search-jump-open";
@@ -8906,8 +8982,12 @@ function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0) {
     return;
   }
   void (async () => {
-    await loadSyncedContent();
+    const hasQuery = Boolean(String(searchInstance?.query || "").trim());
+    const syncPromise = loadSyncedContent();
+    await renderSearchResults(panel, searchInstance);
     if (!panel.isConnected) return;
+    await syncPromise;
+    if (!panel.isConnected || hasQuery) return;
     await renderSearchResults(panel, searchInstance);
   })();
 }
