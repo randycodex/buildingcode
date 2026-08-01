@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-glyph-size-v363";
+} from "./offline-storage.js?v=20260801-project-motion-resize-v365";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3026,11 +3026,18 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     updateControls(expanded);
     if (expanded) {
       body.hidden = false;
-      applyExpandedHeight();
       if (options.instant) {
         section.classList.add("is-restoring", "is-open");
-        void body.offsetHeight;
-        requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
+        const restoreWhenMounted = (remainingFrames = 12) => {
+          if ((!body.isConnected || body.offsetWidth === 0) && remainingFrames > 0) {
+            requestAnimationFrame(() => restoreWhenMounted(remainingFrames - 1));
+            return;
+          }
+          applyExpandedHeight();
+          void body.offsetHeight;
+          requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
+        };
+        requestAnimationFrame(() => restoreWhenMounted());
       } else if (!section.classList.contains("is-open")) {
         requestAnimationFrame(() => {
           if (!expanded) return;
@@ -3059,6 +3066,14 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
   };
 
   toggles.forEach((control) => control.addEventListener("click", () => setExpanded(!expanded)));
+  const bodyResizeObserver = new ResizeObserver(() => {
+    if (!section.isConnected) {
+      bodyResizeObserver.disconnect();
+      return;
+    }
+    if (expanded && section.classList.contains("is-open")) applyExpandedHeight();
+  });
+  bodyResizeObserver.observe(body);
   setExpanded(initialExpanded, { instant: true });
   return setExpanded;
 }
