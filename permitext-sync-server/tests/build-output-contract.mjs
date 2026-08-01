@@ -22,6 +22,9 @@ assert(
 );
 assert(
   notebookEditor.includes('type: "fontSize"') &&
+    notebookEditor.includes('{ label: "14", value: "" }') &&
+    notebookEditor.includes('className: "notebook-font-size-icon"') &&
+    !notebookEditor.includes('label: "Default"') &&
     notebookEditor.includes('className: "notebook-font-size-select"') &&
     notebookEditor.includes("FormattingToolbarController") &&
     notebookEditor.includes("editor.addStyles({ fontSize: value })") &&
@@ -45,7 +48,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260801-notebook-font-size-v6"'),
+    webClient.includes('notebookClientVersion = "20260801-notebook-font-size-v8"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

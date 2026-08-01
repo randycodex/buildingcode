@@ -49469,16 +49469,12 @@ function nX(e) {
 //#region src/notebook-editor.js
 var rX = new Set(XY), iX = Object.freeze([
 	{
-		label: "Default",
+		label: "14",
 		value: ""
 	},
 	{
 		label: "12",
 		value: "12px"
-	},
-	{
-		label: "14",
-		value: "14px"
 	},
 	{
 		label: "16",
@@ -49559,7 +49555,10 @@ function lX() {
 		className: "notebook-font-size-select",
 		items: iX.map(({ label: t, value: r }) => ({
 			text: t,
-			icon: _.createElement("span", { "aria-hidden": "true" }, r ? `${t}px` : "Aa"),
+			icon: _.createElement("span", {
+				"aria-hidden": "true",
+				className: "notebook-font-size-icon"
+			}),
 			isSelected: n === r,
 			onClick: () => {
 				r ? e.addStyles({ fontSize: r }) : n && e.removeStyles({ fontSize: n });

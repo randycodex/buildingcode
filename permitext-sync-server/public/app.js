@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-font-size-v312";
+} from "./offline-storage.js?v=20260801-notebook-font-size-v314";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -96,7 +96,7 @@ const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260731-project-tone-v22";
-const notebookClientVersion = "20260801-notebook-font-size-v6";
+const notebookClientVersion = "20260801-notebook-font-size-v8";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;

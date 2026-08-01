@@ -32,9 +32,8 @@ import {
 const allowedBlockTypeSet = new Set(notebookBlockTypes);
 
 const notebookFontSizes = Object.freeze([
-  { label: "Default", value: "" },
+  { label: "14", value: "" },
   { label: "12", value: "12px" },
-  { label: "14", value: "14px" },
   { label: "16", value: "16px" },
   { label: "18", value: "18px" },
   { label: "24", value: "24px" },
@@ -130,7 +129,10 @@ function FontSizeSelect() {
     className: "notebook-font-size-select",
     items: notebookFontSizes.map(({ label, value }) => ({
       text: label,
-      icon: React.createElement("span", { "aria-hidden": "true" }, value ? `${label}px` : "Aa"),
+      icon: React.createElement("span", {
+        "aria-hidden": "true",
+        className: "notebook-font-size-icon"
+      }),
       isSelected: activeFontSize === value,
       onClick: () => {
         if (value) {
