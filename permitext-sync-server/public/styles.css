@@ -7960,6 +7960,67 @@ body.is-resizing-research-evidence * {
   padding: var(--space-2) var(--space-3) var(--space-4);
 }
 
+@container (min-width: 580px) {
+  .saved-project-list,
+  .saved-code-filter,
+  .saved-tag-filter {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .saved-code-filter,
+  .saved-tag-filter {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent calc(33.333% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(33.333% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(33.333% + 0.5px),
+        transparent calc(33.333% + 0.5px)
+      ),
+      linear-gradient(
+        to right,
+        transparent calc(66.666% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(66.666% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(66.666% + 0.5px),
+        transparent calc(66.666% + 0.5px)
+      );
+  }
+}
+
+@container (min-width: 820px) {
+  .saved-project-list,
+  .saved-code-filter,
+  .saved-tag-filter {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .saved-code-filter,
+  .saved-tag-filter {
+    background-image:
+      linear-gradient(
+        to right,
+        transparent calc(25% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(25% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(25% + 0.5px),
+        transparent calc(25% + 0.5px)
+      ),
+      linear-gradient(
+        to right,
+        transparent calc(50% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% + 0.5px),
+        transparent calc(50% + 0.5px)
+      ),
+      linear-gradient(
+        to right,
+        transparent calc(75% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(75% - 0.5px),
+        color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(75% + 0.5px),
+        transparent calc(75% + 0.5px)
+      );
+  }
+}
+
 .saved-tag-filter-chip {
   width: 100%;
   min-height: 0;
