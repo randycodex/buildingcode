@@ -6609,8 +6609,8 @@ body.is-resizing-research-evidence * {
 
 .project-detail-header-actions {
   position: absolute;
-  top: var(--panel-padding);
-  right: var(--panel-padding);
+  top: 0;
+  right: 0;
   align-items: start;
   justify-content: end;
 }

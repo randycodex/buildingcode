@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-text-size-v351'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-close-align-v352'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1303,7 +1303,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&
         workspaceStyles.text.includes(".project-note-block-editor {\n  height: 260px;") &&
         workspaceStyles.text.includes("padding-top: calc(var(--project-pane-band-height) - var(--panel-padding) + var(--space-3));") &&
-        workspaceStyles.text.includes(".project-detail-header-actions {\n  position: absolute;\n  top: var(--panel-padding);\n  right: var(--panel-padding);") &&
+        workspaceStyles.text.includes(".project-detail-header-actions {\n  position: absolute;\n  top: 0;\n  right: 0;") &&
         workspaceStyles.text.includes("  background: transparent;\n}\n\n.project-note-editor-surface {") &&
         workspaceStyles.text.includes(".project-note-editor-surface {") &&
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
@@ -1337,7 +1337,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-size-v351'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-close-align-v352'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1548,7 +1548,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-size-v351'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-close-align-v352'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

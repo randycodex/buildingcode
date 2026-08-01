@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-text-size-v351";
+} from "./offline-storage.js?v=20260801-project-close-align-v352";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
