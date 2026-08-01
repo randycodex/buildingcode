@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-saved-responsive-grids-v373";
+} from "./offline-storage.js?v=20260801-saved-auto-fit-v374";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

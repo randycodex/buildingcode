@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-saved-responsive-grids-v373'),
+        webRoot.text.includes('/web/app.js?v=20260801-saved-auto-fit-v374'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1346,7 +1346,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-responsive-grids-v373'),
+        webRoot.text.includes('/web/styles.css?v=20260801-saved-auto-fit-v374'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1558,7 +1558,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-responsive-grids-v373'),
+        webRoot.text.includes('/web/styles.css?v=20260801-saved-auto-fit-v374'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2136,7 +2136,7 @@ async function main() {
       "Search code filters should expand from a single summary pill into two equal-width columns."
     );
     assert(
-      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: linear-gradient\(/) &&
+      workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?overflow: visible;[\s\S]*?background-image: none;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?justify-self: stretch;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip\[aria-pressed="true"\] \{[\s\S]*?font-weight: 600;/) &&
         workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter,[\s\S]*?\.code-filter-menu \.research-conversation-project-options \{[\s\S]*?max-height: 0;/) &&
@@ -2145,11 +2145,11 @@ async function main() {
         workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?margin-top: var\(--space-2\);[\s\S]*?border-radius: var\(--saved-projects-card-radius\);[\s\S]*?background: var\(--menu-subtle-surface\);/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?background-image: linear-gradient\(/) &&
+        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?background-image: none;/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-tag-filter \{[\s\S]*?max-height: min\(var\(--code-filter-menu-height, 240px\), 152px\);[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior-y: contain;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?width: 100%;[\s\S]*?min-height: 0;[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;[\s\S]*?font-size: 12px !important;[\s\S]*?text-align: left;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{[\s\S]*?content: none;/) &&
-        workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip:nth-child\(even\),[\s\S]*?\.saved-tag-filter-chip:nth-child\(even\) \{[\s\S]*?padding-left: var\(--space-2\);/) &&
+        !workspaceStyles.text.includes('.saved-tag-filter-chip:nth-child(even)') &&
         !workspaceStyles.text.includes(".saved-filter-resize-handle") &&
         !workspaceScript.text.includes("wireSavedFilterResizeHandle") &&
         workspaceScript.text.includes('stateKey: "projectsMenuOpen"') &&
@@ -2160,7 +2160,7 @@ async function main() {
         !workspaceScript.text.includes("savedFilterScrollPositions") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(tagRail)") &&
         !workspaceScript.text.includes("bindHorizontalWheelScroll(codeRail)"),
-      "Saved Sections and Tags should use fixed two-column text lists within the shared collapsible menu behavior."
+      "Saved menu grids should auto-fit only as many aligned columns as their items and available width support."
     );
     assert(
       workspaceStyles.text.match(/\.search-result-summary \{[\s\S]*?justify-content: center;[\s\S]*?color: #ffffff;[\s\S]*?text-align: center;/),
@@ -2176,9 +2176,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&
-        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
-        workspaceStyles.text.match(/@container \(min-width: 580px\) \{[\s\S]*?\.saved-project-list,[\s\S]*?\.saved-code-filter,[\s\S]*?\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);/) &&
-        workspaceStyles.text.match(/@container \(min-width: 820px\) \{[\s\S]*?\.saved-project-list,[\s\S]*?\.saved-code-filter,[\s\S]*?\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(150px, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?background-image: none;/) &&
         workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?grid-template-rows: auto 1fr;/) &&
         workspaceStyles.text.match(/\.saved-project-count \{[\s\S]*?grid-column: 2;[\s\S]*?grid-row: 1;/) &&
         workspaceStyles.text.match(/\.saved-project-tile-actions \{[\s\S]*?bottom: 4px;[\s\S]*?pointer-events: none;/) &&
@@ -2379,7 +2378,7 @@ async function main() {
       workspaceStyles.text.includes(".saved-panel .saved-code-group .saved-row") &&
         workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
         workspaceStyles.text.match(/\.saved-code-filter \.saved-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
-        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent !important;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter-chip::before \{\s*content: none;/) &&
         workspaceStyles.text.includes(".saved-chapter-header") &&
