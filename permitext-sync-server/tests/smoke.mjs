@@ -772,9 +772,14 @@ async function main() {
         workspaceScript.text.includes('deleteButton.className = "notebook-card-delete"') &&
         workspaceScript.text.includes('deleteButton.innerHTML = trashIconSVG()') &&
         !workspaceScript.text.includes('deleteButton.className = "notebook-danger-action"') &&
-        workspaceScript.text.includes('referenceSelect.setAttribute("aria-label", "Insert reference")') &&
-        workspaceScript.text.includes('placeholder.textContent = "Insert reference…"') &&
-        workspaceScript.text.includes('referenceSelect.addEventListener("change", () => {') &&
+        workspaceScript.text.includes('referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle"') &&
+        workspaceScript.text.includes('referenceList.className = "notebook-reference-list"') &&
+        workspaceScript.text.includes('option.className = "notebook-reference-option"') &&
+        workspaceScript.text.includes('label: "Insert reference"') &&
+        workspaceScript.text.includes("async function notebookReferenceCandidates") &&
+        workspaceScript.text.includes('chapterNumber ? `Chapter ${chapterNumber}` : ""') &&
+        workspaceScript.text.includes('`Section ${groupNumber}${groupTitle ? `: ${groupTitle}` : ""}`') &&
+        !workspaceScript.text.includes('referenceSelect.setAttribute("aria-label", "Insert reference")') &&
         !workspaceScript.text.includes('addReferenceButton.textContent = "Add link"') &&
         !workspaceScript.text.includes('saveButton.textContent = "Save card"') &&
         !workspaceScript.text.includes('typeSelect.setAttribute("aria-label", "Notebook card type")') &&
@@ -1197,7 +1202,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-blocknote-notebook-v294'),
+        webRoot.text.includes('/web/app.js?v=20260801-blocknote-notebook-v296'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1242,7 +1247,11 @@ async function main() {
         workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
         workspaceStyles.text.includes(".project-section-count {") &&
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
-        workspaceStyles.text.includes(".notebook-toolbar select {\n  width: 100%;") &&
+        workspaceStyles.text.includes(".notebook-reference-menu {\n  display: grid;") &&
+        workspaceStyles.text.includes(".notebook-reference-list {\n  display: grid;") &&
+        workspaceStyles.text.includes("@container (min-width: 320px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(2, minmax(0, 1fr));") &&
+        workspaceStyles.text.includes("@container (min-width: 580px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
+        workspaceStyles.text.includes("@container (min-width: 820px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(4, minmax(0, 1fr));") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-editor {") &&
         workspaceStyles.text.includes(".project-note-editor-surface {") &&
@@ -1272,7 +1281,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v294'),
+        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v296'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1483,7 +1492,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v294'),
+        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v296'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

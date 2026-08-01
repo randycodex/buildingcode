@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260801-blocknote-notebook-v294";
+} from "./offline-storage.js?v=20260801-blocknote-notebook-v296";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -12438,23 +12438,64 @@ function notebookDocumentFromPlainText(value) {
   };
 }
 
-function notebookReferenceCandidates(projectID, foundation, cards) {
+function notebookReferenceCodeLabel(codePrefix = "BC") {
+  return codeDisplayLabel(codePrefix)
+    .replace(/\s*\([^)]*\)\s*$/g, "")
+    .replace(/\s+[—–-].*$/, "")
+    .replace(/\s+Code$/i, "")
+    .trim();
+}
+
+function notebookCanonicalReferenceLabel(savedItem, chapter) {
+  const codePrefix = savedItem?.codePrefix || chapter?.codePrefix || "BC";
+  const chapterNumber = String(savedItem?.chapterNumber || chapter?.chapterNumber || "").trim();
+  const sectionNumber = String(savedItem?.sectionNumber || "").trim();
+  const section = (chapter?.sections || []).find((candidate) =>
+    String(candidate.id) === String(savedItem?.sectionID) ||
+    (sectionNumber && String(candidate.sectionNumber || "") === sectionNumber)
+  );
+  const headerLine = String(section?.headerLine || "").trim();
+  const groupNumber = headerLine.match(/(?:SECTION\s+)?(?:[A-Z]+\s+)?([A-Z]?\d+[A-Z]?)\s*$/i)?.[1] ||
+    sectionNumber.match(/^([A-Z]?\d{3}[A-Z]?)/i)?.[1] || "";
+  const groupTitle = researchHierarchyLabel(section?.headingLine || "");
+  const provisionTitle = sectionTitleWithoutNumber({
+    sectionNumber,
+    title: section?.title || savedItem?.title || ""
+  }).replace(/[.\s]+$/, "");
+  const sectionGroup = groupNumber
+    ? `Section ${groupNumber}${groupTitle ? `: ${groupTitle}` : ""}`
+    : "";
+  const provision = [sectionNumber, provisionTitle].filter(Boolean).join(" ");
+  return [
+    notebookReferenceCodeLabel(codePrefix),
+    chapterNumber ? `Chapter ${chapterNumber}` : "",
+    [sectionGroup, provision].filter(Boolean).join(", ")
+  ].filter(Boolean).join(" / ");
+}
+
+async function notebookReferenceCandidates(projectID, foundation, cards) {
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
   );
   const savedItems = currentContentSummary().savedItems || [];
   const references = [];
-  activeLinks.filter((link) => link.targetKind === "canonicalSection").forEach((link) => {
-    const savedItem = savedItems.find((item) => String(item.sectionID) === String(link.targetID));
-    const citation = savedItem?.sectionNumber
-      ? `${savedItem.codePrefix || "BC"} § ${savedItem.sectionNumber}`
-      : `Code section ${link.targetID}`;
-    references.push({
-      referenceKind: "canonicalSection",
-      referenceID: String(link.targetID),
-      label: citation
-    });
-  });
+  const canonicalReferences = await Promise.all(
+    activeLinks.filter((link) => link.targetKind === "canonicalSection").map(async (link) => {
+      const savedItem = savedItems.find((item) => String(item.sectionID) === String(link.targetID));
+      const chapter = savedItem?.chapterID
+        ? await fetchChapter(savedItem.chapterID).catch(() => null)
+        : null;
+      const citation = savedItem
+        ? notebookCanonicalReferenceLabel(savedItem, chapter)
+        : `Code section ${link.targetID}`;
+      return {
+        referenceKind: "canonicalSection",
+        referenceID: String(link.targetID),
+        label: citation
+      };
+    })
+  );
+  references.push(...canonicalReferences);
   (foundation.researchAnswers || []).forEach((answer) => {
     references.push({
       referenceKind: "researchAnswer",
@@ -12906,28 +12947,54 @@ async function renderProjectNotebook(project) {
       fields.append(titleInput);
 
       const toolbar = document.createElement("div");
-      toolbar.className = "notebook-toolbar";
+      toolbar.className = "notebook-toolbar code-filter-menu notebook-reference-menu";
       toolbar.setAttribute("aria-label", "Notebook references");
-      const referenceSelect = document.createElement("select");
-      referenceSelect.setAttribute("aria-label", "Insert reference");
-      const placeholder = document.createElement("option");
-      placeholder.value = "";
-      placeholder.textContent = "Insert reference…";
-      referenceSelect.append(placeholder);
-      const candidates = notebookReferenceCandidates(projectID, foundation, cards)
+      const referenceToggle = document.createElement("button");
+      referenceToggle.className = "code-filter-menu-toggle notebook-reference-menu-toggle";
+      referenceToggle.type = "button";
+      const referenceLabel = document.createElement("span");
+      referenceLabel.className = "code-filter-menu-label";
+      referenceLabel.textContent = "Insert reference";
+      const referenceIcon = document.createElement("span");
+      referenceIcon.className = "code-filter-menu-icon";
+      referenceIcon.setAttribute("aria-hidden", "true");
+      referenceIcon.innerHTML = `
+        <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
+        <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
+      `;
+      referenceToggle.append(referenceLabel, referenceIcon);
+      const referenceList = document.createElement("div");
+      referenceList.className = "notebook-reference-list";
+      const candidates = (await notebookReferenceCandidates(projectID, foundation, cards))
         .filter((reference) =>
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
         );
       candidates.forEach((reference, index) => {
-        const option = document.createElement("option");
-        option.value = String(index);
+        const option = document.createElement("button");
+        option.className = "notebook-reference-option";
+        option.type = "button";
+        option.dataset.referenceIndex = String(index);
         option.textContent = reference.label;
-        referenceSelect.append(option);
+        referenceList.append(option);
       });
-      toolbar.append(referenceSelect);
+      if (!candidates.length) {
+        const empty = document.createElement("p");
+        empty.className = "notebook-reference-empty";
+        empty.textContent = "No Project references are available yet.";
+        referenceList.append(empty);
+      }
+      toolbar.append(referenceToggle, referenceList);
+      const referenceMenuState = { referenceMenuOpen: false };
+      const referenceMenuOptions = {
+        stateKey: "referenceMenuOpen",
+        menuName: "Notebook references",
+        label: "Insert reference"
+      };
+      wireCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
+      referenceToggle.disabled = notebookReadOnly || !candidates.length;
       if (notebookReadOnly) {
-        toolbar.querySelectorAll("button, select").forEach((control) => {
+        toolbar.querySelectorAll("button").forEach((control) => {
           control.disabled = true;
         });
       }
@@ -12993,11 +13060,14 @@ async function renderProjectNotebook(project) {
         },
         onOpenReference: null
       });
-      referenceSelect.addEventListener("change", () => {
-        const reference = candidates[Number(referenceSelect.value)];
-        if (!reference) return;
-        editorMount?.insertReference(reference);
-        referenceSelect.value = "";
+      referenceList.querySelectorAll(".notebook-reference-option").forEach((option) => {
+        option.addEventListener("click", () => {
+          const reference = candidates[Number(option.dataset.referenceIndex)];
+          if (!reference) return;
+          editorMount?.insertReference(reference);
+          referenceMenuState.referenceMenuOpen = false;
+          updateCodeFilterMenu(referenceList, referenceMenuState, referenceMenuOptions);
+        });
       });
 
       researchButton.addEventListener("click", async () => {
