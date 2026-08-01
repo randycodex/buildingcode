@@ -6593,6 +6593,7 @@ body.is-resizing-research-evidence * {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: var(--space-3);
+  padding-top: calc(var(--project-pane-band-height) - var(--panel-padding) + var(--space-3));
 }
 
 .project-detail-actions {
@@ -6607,8 +6608,9 @@ body.is-resizing-research-evidence * {
 }
 
 .project-detail-header-actions {
-  grid-column: 2;
-  grid-row: 1;
+  position: absolute;
+  top: var(--panel-padding);
+  right: var(--panel-padding);
   align-items: start;
   justify-content: end;
 }
@@ -6643,7 +6645,9 @@ body.is-resizing-research-evidence * {
   align-items: start;
   min-height: var(--panel-title-row-height);
   margin-bottom: var(--space-3);
-  padding: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  padding-left: 0;
 }
 
 .project-detail-back {
@@ -10643,6 +10647,7 @@ body.is-resizing-research-evidence * {
 .notebook-editor-surface {
   min-height: 0;
   overflow-y: auto;
+  border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -10729,19 +10734,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   .notebook-editor-surface,
   .notebook-editor-surface .bn-container,
   .notebook-editor-surface .bn-editor {
-    background: #fff;
-    color: #111;
+    background: var(--surface-raised);
+    color: var(--text-primary);
   }
 
   .notebook-editor-surface .bn-block-content,
   .notebook-editor-surface .bn-inline-content,
   .notebook-editor-surface table :is(th, td),
   .notebook-editor-surface table :is(th, td) * {
-    color: #111 !important;
+    color: var(--text-primary) !important;
   }
 
   .notebook-editor-surface table :is(th, td) {
-    border-color: #000 !important;
+    border-color: #fff !important;
   }
 }
 
