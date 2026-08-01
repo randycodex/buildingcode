@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-card-inset-v344";
+} from "./offline-storage.js?v=20260801-workboard-canvas-restore-v345";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -95,7 +95,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260801-canvas-theme-v26";
+const workboardClientVersion = "20260801-canvas-restore-v27";
 const notebookClientVersion = "20260801-notebook-font-size-v8";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
