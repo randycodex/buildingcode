@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-project-x-overflow-v281";
+} from "./offline-storage.js?v=20260731-left-edge-resize-v282";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18574,29 +18574,48 @@ function wireReaderFontFamilyControl(panel) {
 }
 
 function createDivider(previousPaneID, nextPaneID) {
+  const isLeftEdge = !previousPaneID && Boolean(nextPaneID);
+  const isRightEdge = Boolean(previousPaneID) && !nextPaneID;
+  const edgePaneID = isLeftEdge ? nextPaneID : previousPaneID;
   const divider = document.createElement("div");
   divider.className = "pane-divider";
-  if (!nextPaneID) divider.classList.add("pane-edge-resizer");
-  divider.dataset.previousPaneId = previousPaneID;
+  if (isLeftEdge || isRightEdge) {
+    divider.classList.add(
+      "pane-edge-resizer",
+      isLeftEdge ? "pane-left-edge-resizer" : "pane-right-edge-resizer"
+    );
+  }
+  divider.dataset.previousPaneId = previousPaneID || "";
   divider.dataset.nextPaneId = nextPaneID || "";
   divider.role = "separator";
   divider.tabIndex = 0;
   divider.setAttribute("aria-orientation", "vertical");
-  divider.setAttribute("aria-label", nextPaneID ? "Resize adjacent columns" : "Resize right edge of last column");
-  if (!nextPaneID) {
-    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(previousPaneID))));
+  divider.setAttribute(
+    "aria-label",
+    isLeftEdge
+      ? "Resize left edge of first column"
+      : isRightEdge
+        ? "Resize right edge of last column"
+        : "Resize adjacent columns"
+  );
+  if (isLeftEdge || isRightEdge) {
+    divider.setAttribute("aria-valuemin", String(Math.round(defaultPaneWidthForID(edgePaneID))));
     divider.addEventListener("keydown", (event) => {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
       event.preventDefault();
       const step = event.shiftKey ? 80 : 24;
-      resizePaneEdgeBy(previousPaneID, event.key === "ArrowRight" ? step : -step, divider);
+      const growsPane = isLeftEdge ? event.key === "ArrowLeft" : event.key === "ArrowRight";
+      resizePaneEdgeBy(edgePaneID, growsPane ? step : -step, divider);
     });
   }
   divider.addEventListener("pointerdown", (event) => {
-    if (nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
-    else startPaneEdgeResize(event, previousPaneID);
+    if (previousPaneID && nextPaneID) startPaneResize(event, previousPaneID, nextPaneID);
+    else startPaneEdgeResize(event, edgePaneID, isLeftEdge ? "left" : "right");
   });
-  divider.addEventListener("dblclick", () => resetDividerPanes(previousPaneID, nextPaneID));
+  divider.addEventListener("dblclick", () => {
+    if (isLeftEdge || isRightEdge) resetDividerPanes(edgePaneID, null);
+    else resetDividerPanes(previousPaneID, nextPaneID);
+  });
   return divider;
 }
 
@@ -18871,7 +18890,7 @@ function resizePaneEdgeBy(paneID, delta, resizeHandle = null) {
   saveWorkspaceState();
 }
 
-function startPaneEdgeResize(event, paneID) {
+function startPaneEdgeResize(event, paneID, edgeSide = "right") {
   const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
   if (!pane) return;
 
@@ -18892,21 +18911,31 @@ function startPaneEdgeResize(event, paneID) {
   let isDragging = true;
 
   const applyResizeAt = (clientX) => {
-    const nextWidth = Math.max(minWidth, startWidth + clientX - startX);
+    const direction = edgeSide === "left" ? -1 : 1;
+    const nextWidth = Math.max(minWidth, startWidth + direction * (clientX - startX));
     if (Math.abs(nextWidth - lastAppliedWidth) < 0.25) return;
     state.paneWeights[paneID] = nextWidth;
     applyPaneWeight(pane, paneID);
     resizeHandle?.setAttribute("aria-valuenow", String(Math.round(nextWidth)));
     lastAppliedWidth = nextWidth;
-    const handleRect = resizeHandle.getBoundingClientRect();
-    const trackRect = track.getBoundingClientRect();
-    const overflow = handleRect.right - trackRect.right;
-    if (overflow > 0) track.scrollLeft = Math.min(track.scrollLeft + overflow, track.scrollWidth - track.clientWidth);
+    if (edgeSide === "right") {
+      const handleRect = resizeHandle.getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+      const overflow = handleRect.right - trackRect.right;
+      if (overflow > 0) track.scrollLeft = Math.min(track.scrollLeft + overflow, track.scrollWidth - track.clientWidth);
+    }
     scheduleVisibleReaderScrollIndicatorUpdates();
   };
 
   const edgeResizeVelocity = () => {
     const trackRect = track.getBoundingClientRect();
+    if (edgeSide === "left") {
+      const visibleLeft = Math.max(trackRect.left, 0) + 1;
+      const edgeEnd = visibleLeft + edgeAutoResizeThreshold;
+      if (pointerClientX >= edgeEnd) return 0;
+      const proximity = Math.min(1, Math.max(0, (edgeEnd - pointerClientX) / edgeAutoResizeThreshold));
+      return -edgeAutoResizeMaxSpeed * proximity;
+    }
     const visibleRight = Math.min(trackRect.right, window.innerWidth) - 1;
     const edgeStart = visibleRight - edgeAutoResizeThreshold;
     if (pointerClientX <= edgeStart) return 0;
@@ -18922,11 +18951,11 @@ function startPaneEdgeResize(event, paneID) {
       : Math.min(32, Math.max(0, frameTime - previousFrameTime));
     previousFrameTime = frameTime;
     const velocity = edgeResizeVelocity();
-    if (velocity > 0 && elapsed > 0) {
+    if (velocity !== 0 && elapsed > 0) {
       virtualClientX += velocity * elapsed / 1000;
     }
     applyResizeAt(virtualClientX);
-    if (velocity > 0) resizeFrame = window.requestAnimationFrame(applyPendingResize);
+    if (velocity !== 0) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onMove = (moveEvent) => {
@@ -18980,6 +19009,10 @@ function appendPaneSequence(panes) {
   cleanupInactiveNotebookMounts(orderedPanes);
   cleanupInactiveReportDraftMounts(orderedPanes);
   bindPaneDragging(orderedPanes);
+  if (orderedPanes.length) {
+    const firstPaneID = orderedPanes[0].dataset.paneId;
+    nodes.push(existingDividers.get(dividerKey("", firstPaneID)) || createDivider("", firstPaneID));
+  }
   orderedPanes.forEach((pane, index) => {
     if (index > 0) {
       const previousPaneID = orderedPanes[index - 1].dataset.paneId;
@@ -19012,10 +19045,15 @@ function appendPaneSequence(panes) {
     const currentNode = track.children[index] || null;
     if (currentNode !== node) track.insertBefore(node, currentNode);
   });
-  const edgeResizer = track.querySelector(":scope > .pane-edge-resizer");
+  const leftEdgeResizer = track.querySelector(":scope > .pane-left-edge-resizer");
+  const rightEdgeResizer = track.querySelector(":scope > .pane-right-edge-resizer");
+  const firstPane = orderedPanes[0];
   const lastPane = orderedPanes.at(-1);
-  if (edgeResizer && lastPane) {
-    edgeResizer.setAttribute("aria-valuenow", String(Math.round(lastPane.getBoundingClientRect().width)));
+  if (leftEdgeResizer && firstPane) {
+    leftEdgeResizer.setAttribute("aria-valuenow", String(Math.round(firstPane.getBoundingClientRect().width)));
+  }
+  if (rightEdgeResizer && lastPane) {
+    rightEdgeResizer.setAttribute("aria-valuenow", String(Math.round(lastPane.getBoundingClientRect().width)));
   }
   const activeSelectMenus = new Set(
     Array.from(track.querySelectorAll("select.native-select-hidden"))
