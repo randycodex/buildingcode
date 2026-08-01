@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-blocknote-notebook-v288";
+} from "./offline-storage.js?v=20260801-blocknote-notebook-v289";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

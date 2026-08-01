@@ -10088,9 +10088,11 @@ body.is-resizing-research-evidence * {
 .notebook-shell {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
+  width: calc(100% + (2 * var(--panel-padding)));
   min-height: 0;
+  margin-inline: calc(-1 * var(--panel-padding));
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + 4px);
+  border-radius: 0;
   background: color-mix(in srgb, var(--surface) 76%, transparent);
 }
 
