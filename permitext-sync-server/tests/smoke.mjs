@@ -1208,7 +1208,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-info-surface-v316'),
+        webRoot.text.includes('/web/app.js?v=20260801-reader-header-opaque-v317'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1302,7 +1302,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-info-surface-v316'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-header-opaque-v317'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1472,7 +1472,7 @@ async function main() {
     const readerHeaderStyleSource =
       workspaceStyles.text.match(/\.reader-panel::before \{[\s\S]*?\n\}/)?.[0] || "";
     assert(
-      readerHeaderStyleSource.includes("background: var(--surface-raised);") &&
+      readerHeaderStyleSource.includes("background: var(--surface);") &&
         readerHeaderStyleSource.includes("-webkit-backdrop-filter: none;") &&
         readerHeaderStyleSource.includes("backdrop-filter: none;") &&
         !readerHeaderStyleSource.includes("color-mix("),
@@ -1513,7 +1513,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-info-surface-v316'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-header-opaque-v317'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

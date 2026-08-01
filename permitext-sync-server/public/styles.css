@@ -203,7 +203,7 @@ body.is-resizing-notes * {
   overflow: hidden;
   border: 1px solid rgba(20, 20, 24, 0.08);
   border-radius: 12px;
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--text-primary);
   box-shadow: 0 18px 44px rgba(20, 20, 24, 0.22);
 }
@@ -371,7 +371,7 @@ body.is-resizing-notes * {
   overflow: hidden;
   border: 1px solid var(--border);
   border-radius: calc(var(--radius-card) + 4px);
-  background: var(--surface-raised);
+  background: var(--surface);
   box-shadow: var(--shadow-panel);
 }
 
@@ -1192,7 +1192,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   height: calc(var(--reader-header-overlay-height) + var(--panel-padding));
   content: "";
   pointer-events: none;
-  background: var(--surface-raised);
+  background: var(--surface);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
