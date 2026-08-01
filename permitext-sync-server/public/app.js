@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-prompt-contrast-v318";
+} from "./offline-storage.js?v=20260801-reader-code-menu-v319";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3637,6 +3637,8 @@ function enhanceSelect(select) {
   trigger.type = "button";
   const menu = document.createElement("div");
   menu.className = "custom-select-menu";
+  const readerCodeMenu = select.classList.contains("code-select");
+  menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
@@ -3705,10 +3707,12 @@ function enhanceSelect(select) {
     const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
     const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
     const naturalWidth = Math.max(rect.width, ...optionWidths);
-    const menuWidth = Math.min(naturalWidth, boundaryWidth);
-    const left = Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
+    const menuWidth = readerCodeMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
+    const left = readerCodeMenu
+      ? boundaryLeft
+      : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
     const availableBelow = Math.max(160, window.innerHeight - rect.bottom - viewportPadding);
-    menu.style.setProperty("--select-menu-top", `${rect.bottom + 2}px`);
+    menu.style.setProperty("--select-menu-top", `${rect.bottom + (readerCodeMenu ? 12 : 2)}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
     menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
     menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
