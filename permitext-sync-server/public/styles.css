@@ -10551,6 +10551,13 @@ body.is-resizing-research-evidence * {
   font-family: inherit;
 }
 
+/* Reserve a gutter for BlockNote's add and drag controls. BlockNote positions
+ * its side menu just to the left of the active block, so the normal editor
+ * padding lets those controls escape a narrow Notebook column. */
+.notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {
+  padding-inline-start: calc(var(--space-4) + 32px);
+}
+
 .notebook-editor-surface .bn-block-content,
 .notebook-editor-surface .bn-inline-content {
   font-family: inherit;
