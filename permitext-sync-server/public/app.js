@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-menus-compact-v322";
+} from "./offline-storage.js?v=20260801-reader-hydration-retry-v323";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -7177,6 +7177,7 @@ async function progressivelyRenderReaderChapter(
   let beforeCursor = initialStart;
   let afterCursor = initialEnd;
   let loadAfter = true;
+  let retryCount = 0;
   const status = document.createElement("p");
   status.className = "reader-progressive-status";
   status.dataset.researchSelectionExclude = "true";
@@ -7199,12 +7200,26 @@ async function progressivelyRenderReaderChapter(
     const end = shouldLoadAfter
       ? Math.min(sections.length, start + readerProgressiveSectionBatchSize)
       : beforeCursor;
+    let windowChapter;
     try {
-      const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
+      retryCount = 0;
+    } catch (error) {
       if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
         status.remove();
         return;
       }
+      retryCount += 1;
+      status.textContent = "Loading the rest of this chapter…";
+      console.warn("Reader chapter hydration will retry.", error);
+      await new Promise((resolve) => window.setTimeout(resolve, Math.min(4000, 250 * (2 ** retryCount))));
+      continue;
+    }
+    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
+      status.remove();
+      return;
+    }
+    try {
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
         fragment.append(
@@ -7230,9 +7245,9 @@ async function progressivelyRenderReaderChapter(
       status.textContent = `${afterCursor - beforeCursor} of ${sections.length} sections loaded`;
       loadAfter = !shouldLoadAfter;
       requestAnimationFrame(() => updateReaderScrollIndicator(panel));
-    } catch {
-      status.classList.add("is-error");
-      status.textContent = "The current section is available, but the rest of this chapter could not be loaded.";
+    } catch (error) {
+      console.error("Reader chapter hydration could not render a section batch.", error);
+      status.remove();
       return;
     }
   }

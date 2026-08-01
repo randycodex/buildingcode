@@ -1085,6 +1085,9 @@ async function main() {
         workspaceScript.text.includes("function fetchChapterBodyWindow") &&
         workspaceScript.text.includes("function progressivelyRenderReaderChapter") &&
         workspaceScript.text.includes("new Promise((resolve) => window.setTimeout(resolve, 16))") &&
+        workspaceScript.text.includes('console.warn("Reader chapter hydration will retry.", error)') &&
+        workspaceScript.text.includes("Math.min(4000, 250 * (2 ** retryCount))") &&
+        !workspaceScript.text.includes("The current section is available, but the rest of this chapter could not be loaded.") &&
         workspaceScript.text.includes("status.remove();\n      return;") &&
         workspaceScript.text.includes('content.dataset.chapterFullyLoaded = "true"'),
       "Reader chapters no longer open with a selected-section window before progressive loading."
@@ -1210,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-reader-menus-compact-v322'),
+        webRoot.text.includes('/web/app.js?v=20260801-reader-hydration-retry-v323'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1312,7 +1315,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-menus-compact-v322'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-hydration-retry-v323'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1523,7 +1526,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-menus-compact-v322'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-hydration-retry-v323'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
