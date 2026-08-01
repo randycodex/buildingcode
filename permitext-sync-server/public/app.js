@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-toolbar-order-v360";
+} from "./offline-storage.js?v=20260801-notebook-text-leading-v361";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

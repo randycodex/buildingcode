@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-toolbar-order-v360'),
+        webRoot.text.includes('/web/app.js?v=20260801-notebook-text-leading-v361'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1295,8 +1295,9 @@ async function main() {
         workspaceStyles.text.includes(".bn-suggestion-menu {\n  background: var(--menu-surface) !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-block-content::after,\n.notebook-editor-surface .bn-side-menu svg {\n  color: var(--text-tertiary) !important;") &&
         workspaceStyles.text.includes('.notebook-editor-surface table :is(th, td) {\n  border-color: #000 !important;') &&
-        workspaceStyles.text.includes('.notebook-editor-surface [data-line-spacing="24px"] { line-height: 24px !important; }') &&
-        workspaceStyles.text.includes('.notebook-editor-surface [data-text-size="24px"] { font-size: 24px !important; }') &&
+        workspaceStyles.text.includes('[data-line-spacing="24px"] { --notebook-line-spacing: 24px; line-height: 24px !important; }') &&
+        workspaceStyles.text.includes('[data-text-size="24px"] { --notebook-text-size: 24px; font-size: 24px !important; }') &&
+        workspaceStyles.text.includes("line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;") &&
         workspaceStyles.text.includes("border: 0;\n  border-radius: 0;") &&
         workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--surface-raised);\n    color: var(--text-primary);") &&
         workspaceStyles.text.includes("border-color: #fff !important;") &&
@@ -1337,7 +1338,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-toolbar-order-v360'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-leading-v361'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1548,7 +1549,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-toolbar-order-v360'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-leading-v361'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
