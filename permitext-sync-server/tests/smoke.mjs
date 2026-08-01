@@ -1208,7 +1208,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-reader-header-opaque-v317'),
+        webRoot.text.includes('/web/app.js?v=20260801-notebook-prompt-contrast-v318'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1270,6 +1270,7 @@ async function main() {
         workspaceStyles.text.includes("@container (min-width: 820px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(4, minmax(0, 1fr));") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-editor {") &&
+        workspaceStyles.text.includes(".notebook-editor-surface .bn-block-content::after,\n.notebook-editor-surface .bn-side-menu svg {\n  color: var(--text-tertiary) !important;") &&
         workspaceStyles.text.includes('.notebook-editor-surface table :is(th, td) {\n  border-color: #000 !important;') &&
         workspaceStyles.text.includes('.notebook-editor-surface [data-font-size="24px"] { font-size: 24px !important; }') &&
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&
@@ -1302,7 +1303,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-header-opaque-v317'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-prompt-contrast-v318'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1513,7 +1514,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-header-opaque-v317'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-prompt-contrast-v318'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

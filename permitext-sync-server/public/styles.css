@@ -10601,6 +10601,11 @@ body.is-resizing-research-evidence * {
   font-family: inherit;
 }
 
+.notebook-editor-surface .bn-block-content::after,
+.notebook-editor-surface .bn-side-menu svg {
+  color: var(--text-tertiary) !important;
+}
+
 /* The workspace's compact typography uses an !important rule, so preserve
  * explicitly selected BlockNote sizes with an equally scoped editor override. */
 body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="12px"] { font-size: 12px !important; }

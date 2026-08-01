@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-header-opaque-v317";
+} from "./offline-storage.js?v=20260801-notebook-prompt-contrast-v318";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
