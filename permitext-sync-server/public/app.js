@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-search-preview-cache-v279";
+} from "./offline-storage.js?v=20260731-edge-resize-v280";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18882,9 +18882,14 @@ function startPaneEdgeResize(event, paneID) {
   const startX = event.clientX;
   const startWidth = pane.getBoundingClientRect().width;
   const minWidth = defaultPaneWidthForID(paneID);
-  let pendingClientX = startX;
+  const edgeAutoResizeThreshold = 32;
+  const edgeAutoResizeMaxSpeed = 640;
+  let pointerClientX = startX;
+  let virtualClientX = startX;
   let resizeFrame = null;
+  let previousFrameTime = null;
   let lastAppliedWidth = startWidth;
+  let isDragging = true;
 
   const applyResizeAt = (clientX) => {
     const nextWidth = Math.max(minWidth, startWidth + clientX - startX);
@@ -18900,23 +18905,48 @@ function startPaneEdgeResize(event, paneID) {
     scheduleVisibleReaderScrollIndicatorUpdates();
   };
 
-  const applyPendingResize = () => {
+  const edgeResizeVelocity = () => {
+    const trackRect = track.getBoundingClientRect();
+    const visibleRight = Math.min(trackRect.right, window.innerWidth) - 1;
+    const edgeStart = visibleRight - edgeAutoResizeThreshold;
+    if (pointerClientX <= edgeStart) return 0;
+    const proximity = Math.min(1, Math.max(0, (pointerClientX - edgeStart) / edgeAutoResizeThreshold));
+    return edgeAutoResizeMaxSpeed * proximity;
+  };
+
+  const applyPendingResize = (frameTime) => {
     resizeFrame = null;
-    applyResizeAt(pendingClientX);
+    if (!isDragging) return;
+    const elapsed = previousFrameTime === null
+      ? 0
+      : Math.min(32, Math.max(0, frameTime - previousFrameTime));
+    previousFrameTime = frameTime;
+    const velocity = edgeResizeVelocity();
+    if (velocity > 0 && elapsed > 0) {
+      virtualClientX += velocity * elapsed / 1000;
+    }
+    applyResizeAt(virtualClientX);
+    if (velocity > 0) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onMove = (moveEvent) => {
-    pendingClientX = moveEvent.clientX;
+    const nextPointerClientX = moveEvent.clientX;
+    virtualClientX += nextPointerClientX - pointerClientX;
+    pointerClientX = nextPointerClientX;
     if (resizeFrame === null) resizeFrame = window.requestAnimationFrame(applyPendingResize);
   };
 
   const onUp = (upEvent) => {
+    isDragging = false;
     window.removeEventListener("pointermove", onMove);
     window.removeEventListener("pointerup", onUp);
     window.removeEventListener("pointercancel", onUp);
     if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
-    pendingClientX = Number.isFinite(upEvent.clientX) ? upEvent.clientX : pendingClientX;
-    applyResizeAt(pendingClientX);
+    if (Number.isFinite(upEvent.clientX)) {
+      virtualClientX += upEvent.clientX - pointerClientX;
+      pointerClientX = upEvent.clientX;
+    }
+    applyResizeAt(virtualClientX);
     if (resizeHandle?.hasPointerCapture?.(upEvent.pointerId)) {
       resizeHandle.releasePointerCapture(upEvent.pointerId);
     }
