@@ -10359,7 +10359,7 @@ body.is-resizing-research-evidence * {
   min-height: 0;
   overflow: hidden;
   padding: var(--space-4);
-  background: color-mix(in srgb, var(--surface) 92%, var(--project-color));
+  background: var(--notebook-project-background);
 }
 
 .notebook-welcome {

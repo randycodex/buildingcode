@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-light-notebook-v302";
+} from "./offline-storage.js?v=20260801-light-notebook-v303";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
