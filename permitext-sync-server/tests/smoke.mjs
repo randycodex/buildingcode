@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-projects-header-v340'),
+        webRoot.text.includes('/web/app.js?v=20260801-workboard-canvas-state-v343'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1327,7 +1327,7 @@ async function main() {
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-projects-header-v340'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-canvas-state-v343'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1538,7 +1538,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-projects-header-v340'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-canvas-state-v343'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2476,7 +2476,7 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260801-canvas-theme-v23";') &&
+      workspaceScript.text.includes('const workboardClientVersion = "20260801-canvas-theme-v26";') &&
         workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66"') &&
         webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
@@ -2492,7 +2492,13 @@ async function main() {
     assert(
       workboardSource.includes("function usePreferredTheme()") &&
         workboardSource.includes('return theme === "dark" ? "#000000" : "#ffffff";') &&
+        workboardSource.includes("...api.getAppState(),") &&
+        workboardSource.includes("applyCanvasBackground(excalidrawAPI.current, theme);") &&
         workboardSource.includes("viewBackgroundColor: canvasBackgroundForTheme(theme)") &&
+        workboardSource.includes("if (!boardView) return undefined;") &&
+        workboardSource.includes("}, [boardView, theme]);") &&
+        workboardSource.includes("if (appState.viewBackgroundColor !== viewBackgroundColor) {") &&
+        workboardSource.includes("appState = { ...appState, viewBackgroundColor };") &&
         workboardSource.includes("changeViewBackgroundColor: false") &&
         workboardSource.includes('mediaQuery.addEventListener("change", updateTheme)') &&
         workboardSource.includes("theme={theme}"),

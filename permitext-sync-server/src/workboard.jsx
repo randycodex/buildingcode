@@ -121,6 +121,16 @@ function canvasBackgroundForTheme(theme) {
   return theme === "dark" ? "#000000" : "#ffffff";
 }
 
+function applyCanvasBackground(api, theme) {
+  if (!api) return;
+  api.updateScene({
+    appState: {
+      ...api.getAppState(),
+      viewBackgroundColor: canvasBackgroundForTheme(theme)
+    }
+  });
+}
+
 function usePreferredTheme() {
   const [theme, setTheme] = useState(preferredTheme);
 
@@ -217,15 +227,17 @@ function Workboard({
   const captureExcalidrawAPI = useCallback((api) => {
     excalidrawAPI.current = api;
     api.toggleSidebar({ name: null, force: false });
-    api.updateScene({ appState: { viewBackgroundColor: canvasBackgroundForTheme(theme) } });
+    applyCanvasBackground(api, theme);
     refreshCanvasOrigin();
   }, [refreshCanvasOrigin, theme]);
 
   useEffect(() => {
-    excalidrawAPI.current?.updateScene({
-      appState: { viewBackgroundColor: canvasBackgroundForTheme(theme) }
+    if (!boardView) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      applyCanvasBackground(excalidrawAPI.current, theme);
     });
-  }, [theme]);
+    return () => window.cancelAnimationFrame(frame);
+  }, [boardView, theme]);
 
   const flushSave = useCallback(async () => {
     window.clearTimeout(saveTimer.current);
@@ -417,6 +429,11 @@ function Workboard({
 
   const handleChange = useCallback((elements, appState, files) => {
     if (!boardView || boardView.projectID !== projectID) return;
+    const viewBackgroundColor = canvasBackgroundForTheme(theme);
+    if (appState.viewBackgroundColor !== viewBackgroundColor) {
+      applyCanvasBackground(excalidrawAPI.current, theme);
+      appState = { ...appState, viewBackgroundColor };
+    }
     if (ignoreInitialChange.current) {
       ignoreInitialChange.current = false;
       lastChangeSignature.current = boardChangeSignature(elements, appState, files);
@@ -426,7 +443,7 @@ function Workboard({
     pendingScene.current = { elements, appState, files };
     window.clearTimeout(changeTimer.current);
     changeTimer.current = window.setTimeout(() => capturePendingScene(), changeCaptureDelayMS);
-  }, [boardView, capturePendingScene, projectID]);
+  }, [boardView, capturePendingScene, projectID, theme]);
 
   return (
     <section className="permitext-workboard" data-element-count={elementCount}>
