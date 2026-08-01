@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-editor-resize-v366'),
+        webRoot.text.includes('/web/app.js?v=20260801-evidence-preview-v367'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1343,7 +1343,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-editor-resize-v366'),
+        webRoot.text.includes('/web/styles.css?v=20260801-evidence-preview-v367'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1554,7 +1554,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-editor-resize-v366'),
+        webRoot.text.includes('/web/styles.css?v=20260801-evidence-preview-v367'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2448,7 +2448,7 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".saved-note-preview") &&
         workspaceStyles.text.includes(".project-saved-code-group") &&
-        workspaceStyles.text.includes(".project-detail-section-preview") &&
+        workspaceStyles.text.match(/\.project-detail-section-preview \{[\s\S]*?text-overflow: ellipsis;[\s\S]*?-webkit-line-clamp: 3;/) &&
         workspaceStyles.text.includes(".project-detail-section-heading") &&
         workspaceStyles.text.match(/\.project-detail-saved-row \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;/),
       "Saved and project cards omitted note previews, code grouping, or section previews."

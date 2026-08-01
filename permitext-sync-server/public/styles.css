@@ -7407,11 +7407,12 @@ body.is-resizing-research-evidence * {
   display: -webkit-box;
   margin: 1px 0 0;
   overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
   line-height: 1.25;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 3;
 }
 
 .saved-panel {

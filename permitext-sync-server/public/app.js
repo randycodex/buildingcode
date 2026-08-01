@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-editor-resize-v366";
+} from "./offline-storage.js?v=20260801-evidence-preview-v367";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
