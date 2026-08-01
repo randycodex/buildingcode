@@ -7436,8 +7436,9 @@ body.is-resizing-research-evidence * {
   flex: 1 1 auto;
 }
 
+.saved-projects-menu-toggle[aria-expanded="true"],
 .saved-projects-menu-toggle[aria-expanded="true"]:hover {
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: transparent;
 }
 
 .saved-projects-actions {
