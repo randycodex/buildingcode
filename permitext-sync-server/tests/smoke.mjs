@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-motion-resize-v365'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-editor-resize-v366'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1277,6 +1277,7 @@ async function main() {
         workspaceScript.text.includes("const restoreWhenMounted = (remainingFrames = 12)") &&
         workspaceScript.text.includes("const bodyResizeObserver = new ResizeObserver") &&
         workspaceScript.text.includes('bodyResizeObserver.observe(body)') &&
+        workspaceScript.text.includes('Array.from(body.children).forEach((child) => bodyResizeObserver.observe(child))') &&
         workspaceScript.text.includes('wireProjectSectionMotion(savedSection, savedBody, [savedTitle, savedToggle], "Saved evidence", true)') &&
         workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
         workspaceStyles.text.includes(".project-section-count {") &&
@@ -1342,7 +1343,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-motion-resize-v365'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-editor-resize-v366'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1553,7 +1554,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-motion-resize-v365'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-editor-resize-v366'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

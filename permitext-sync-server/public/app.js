@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-motion-resize-v365";
+} from "./offline-storage.js?v=20260801-project-editor-resize-v366";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3074,6 +3074,7 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     if (expanded && section.classList.contains("is-open")) applyExpandedHeight();
   });
   bodyResizeObserver.observe(body);
+  Array.from(body.children).forEach((child) => bodyResizeObserver.observe(child));
   setExpanded(initialExpanded, { instant: true });
   return setExpanded;
 }
