@@ -779,7 +779,11 @@ async function main() {
         workspaceScript.text.includes("async function notebookReferenceCandidates") &&
         workspaceScript.text.includes("function compareNotebookReferences(left, right)") &&
         workspaceScript.text.includes(".sort(compareNotebookReferences)") &&
+        workspaceScript.text.includes('filterRail.classList.contains("notebook-reference-list")') &&
+        workspaceScript.text.includes("filterGap + notebookReferenceBottomGap") &&
         workspaceScript.text.includes('chapterNumber ? `Chapter ${chapterNumber}` : ""') &&
+        workspaceScript.text.includes("function notebookReferenceCodeTitle") &&
+        workspaceScript.text.includes('groupTitle.className = `notebook-reference-group-title code-theme-${codeTheme(reference.codePrefix)}`') &&
         workspaceScript.text.includes('`Section ${groupNumber}${groupTitle ? `: ${groupTitle}` : ""}`') &&
         !workspaceScript.text.includes('referenceSelect.setAttribute("aria-label", "Insert reference")') &&
         !workspaceScript.text.includes('addReferenceButton.textContent = "Add link"') &&
@@ -1204,7 +1208,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-menu-opacity-v306'),
+        webRoot.text.includes('/web/app.js?v=20260801-notebook-reference-groups-v309'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1255,8 +1259,12 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
         workspaceStyles.text.includes(".notebook-reference-menu {\n  display: grid;") &&
         workspaceStyles.text.includes(".notebook-reference-list {\n  display: grid;") &&
-        workspaceStyles.text.includes("grid-auto-rows: minmax(48px, auto);") &&
+        workspaceStyles.text.includes("grid-auto-rows: auto;") &&
         workspaceStyles.text.includes("overflow-wrap: anywhere;") &&
+        workspaceStyles.text.includes(".notebook-reference-group-title {") &&
+        workspaceStyles.text.includes("margin: var(--space-3) 0 calc(-1 * var(--space-2));") &&
+        workspaceStyles.text.includes(".notebook-reference-group-title:first-child {") &&
+        workspaceStyles.text.includes(".code-filter-menu.is-open .notebook-reference-list {\n  padding-bottom: var(--space-3);") &&
         workspaceStyles.text.includes("@container (min-width: 320px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(2, minmax(0, 1fr));") &&
         workspaceStyles.text.includes("@container (min-width: 580px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
         workspaceStyles.text.includes("@container (min-width: 820px) {\n  .notebook-reference-list {\n    grid-template-columns: repeat(4, minmax(0, 1fr));") &&
@@ -1290,7 +1298,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-menu-opacity-v306'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-reference-groups-v309'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1501,7 +1509,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-menu-opacity-v306'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-reference-groups-v309'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-menu-opacity-v306";
+} from "./offline-storage.js?v=20260801-notebook-reference-groups-v309";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2916,11 +2916,14 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
       const filterStyles = getComputedStyle(filterRail);
       const filterGap = Number.parseFloat(filterStyles.getPropertyValue("--space-2")) || 0;
       const savedCodeBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-4")) || filterGap;
+      const notebookReferenceBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-3")) || filterGap;
       const openingPadding = menu.closest(".saved-inline-filters")
         ? filterGap + (filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap)
         : filterRail.classList.contains("research-conversation-project-options")
           ? filterGap + savedCodeBottomGap
-          : filterGap;
+          : filterRail.classList.contains("notebook-reference-list")
+            ? filterGap + notebookReferenceBottomGap
+            : filterGap;
       const expandedHeight = filterRail.scrollHeight +
         (menu.classList.contains("is-open") ? 0 : openingPadding);
       const nextHeight = `${expandedHeight}px`;
@@ -12594,11 +12597,10 @@ function notebookDocumentFromPlainText(value) {
   };
 }
 
-function notebookReferenceCodeLabel(codePrefix = "BC") {
+function notebookReferenceCodeTitle(codePrefix = "BC") {
   return codeDisplayLabel(codePrefix)
     .replace(/\s*\([^)]*\)\s*$/g, "")
     .replace(/\s+[—–-].*$/, "")
-    .replace(/\s+Code$/i, "")
     .trim();
 }
 
@@ -12623,7 +12625,6 @@ function notebookCanonicalReferenceLabel(savedItem, chapter) {
     : "";
   const provision = [sectionNumber, provisionTitle].filter(Boolean).join(" ");
   return [
-    notebookReferenceCodeLabel(codePrefix),
     chapterNumber ? `Chapter ${chapterNumber}` : "",
     [sectionGroup, provision].filter(Boolean).join(", ")
   ].filter(Boolean).join(" / ");
@@ -13252,7 +13253,15 @@ async function renderProjectNotebook(project) {
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
         );
+      let activeCodeGroup = "";
       candidates.forEach((reference, index) => {
+        if (reference.referenceKind === "canonicalSection" && reference.codePrefix !== activeCodeGroup) {
+          activeCodeGroup = reference.codePrefix;
+          const groupTitle = document.createElement("h4");
+          groupTitle.className = `notebook-reference-group-title code-theme-${codeTheme(reference.codePrefix)}`;
+          groupTitle.textContent = notebookReferenceCodeTitle(reference.codePrefix);
+          referenceList.append(groupTitle);
+        }
         const option = document.createElement("button");
         option.className = "notebook-reference-option";
         option.type = "button";

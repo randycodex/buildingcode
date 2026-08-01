@@ -10433,14 +10433,37 @@ body.is-resizing-research-evidence * {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   grid-auto-flow: row;
-  grid-auto-rows: minmax(48px, auto);
+  grid-auto-rows: auto;
   align-items: stretch;
   align-content: start;
   gap: var(--space-3) calc(2 * var(--space-3));
   min-height: 0;
   padding-inline: var(--space-3);
+  padding-bottom: 0;
   overflow-y: auto;
+  overscroll-behavior-y: contain;
   background-image: none;
+}
+
+.code-filter-menu.is-open .notebook-reference-list {
+  padding-bottom: var(--space-3);
+}
+
+.notebook-reference-group-title {
+  grid-column: 1 / -1;
+  align-self: end;
+  margin: var(--space-3) 0 calc(-1 * var(--space-2));
+  padding: 0;
+  color: var(--code-accent);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.notebook-reference-group-title:first-child {
+  margin-top: 0;
 }
 
 .notebook-toolbar .notebook-reference-option {
