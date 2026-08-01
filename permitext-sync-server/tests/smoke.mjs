@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-saved-pane-migration-v370'),
+        webRoot.text.includes('/web/app.js?v=20260801-saved-instance-width-v371'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1346,7 +1346,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-pane-migration-v370'),
+        webRoot.text.includes('/web/styles.css?v=20260801-saved-instance-width-v371'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1557,7 +1557,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-pane-migration-v370'),
+        webRoot.text.includes('/web/styles.css?v=20260801-saved-instance-width-v371'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1743,9 +1743,9 @@ async function main() {
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSavedPaneWidth = 600") &&
-        workspaceScript.text.includes('if (paneID === "utility:projects") return defaultSavedPaneWidth') &&
+        workspaceScript.text.includes('if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth') &&
         workspaceScript.text.includes("function migrateLegacyPaneWidth(paneID, value)") &&
-        workspaceScript.text.includes('paneID === "utility:projects" && value === defaultUtilityPaneWidth') &&
+        workspaceScript.text.includes('(paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth') &&
         workspaceScript.text.includes("const value = migrateLegacyPaneWidth(paneID, storedValue)") &&
         workspaceScript.text.includes("if (value !== storedValue) state.paneWeights[paneID] = value") &&
         workspaceScript.text.includes("const defaultDetailPaneWidth = 600") &&

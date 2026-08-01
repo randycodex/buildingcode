@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-saved-pane-migration-v370";
+} from "./offline-storage.js?v=20260801-saved-instance-width-v371";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2229,7 +2229,7 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
-  if (paneID === "utility:projects") return defaultSavedPaneWidth;
+  if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
   if (paneID.startsWith("reader:")) {
@@ -2241,7 +2241,7 @@ function defaultPaneWidthForID(paneID) {
 }
 
 function migrateLegacyPaneWidth(paneID, value) {
-  if (paneID === "utility:projects" && value === defaultUtilityPaneWidth) {
+  if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
     return defaultSavedPaneWidth;
   }
   return value;
