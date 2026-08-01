@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-card-gap-v348";
+} from "./offline-storage.js?v=20260801-dark-editor-white-v349";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
