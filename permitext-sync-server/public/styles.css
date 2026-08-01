@@ -2105,6 +2105,13 @@ label {
   box-shadow: none;
 }
 
+@media (prefers-color-scheme: dark) {
+  .reader-code-select-menu,
+  .reader-chapter-select-menu {
+    background: #353839;
+  }
+}
+
 .reader-code-select-menu .custom-select-group-label {
   margin-top: var(--space-3);
   padding: 0 0 var(--space-1);
