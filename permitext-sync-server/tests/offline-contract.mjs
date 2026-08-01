@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-reader-top-menus-dim-v321"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-reader-menus-compact-v322"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;

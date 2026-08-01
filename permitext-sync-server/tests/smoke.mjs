@@ -1084,6 +1084,8 @@ async function main() {
       workspaceScript.text.includes("const readerInitialSectionWindowSize = 5;") &&
         workspaceScript.text.includes("function fetchChapterBodyWindow") &&
         workspaceScript.text.includes("function progressivelyRenderReaderChapter") &&
+        workspaceScript.text.includes("new Promise((resolve) => window.setTimeout(resolve, 16))") &&
+        workspaceScript.text.includes("status.remove();\n      return;") &&
         workspaceScript.text.includes('content.dataset.chapterFullyLoaded = "true"'),
       "Reader chapters no longer open with a selected-section window before progressive loading."
     );
@@ -1208,7 +1210,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-reader-top-menus-dim-v321'),
+        webRoot.text.includes('/web/app.js?v=20260801-reader-menus-compact-v322'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1241,7 +1243,8 @@ async function main() {
         workspaceScript.text.includes('menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu)') &&
         workspaceScript.text.includes("const menuWidth = readerTopMenu ? boundaryWidth") &&
         workspaceStyles.text.includes(".reader-panel.has-open-reader-menu::after {") &&
-        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {\n  padding: clamp(18px, 4vw, 28px);\n  border-radius: clamp(24px, 6vw, 36px);") &&
+        workspaceScript.text.includes("window.innerHeight - menuTop - viewportPadding") &&
+        workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
         workspaceStyles.text.includes(".reader-code-select-menu .custom-select-group-label {") &&
         workspaceStyles.text.includes(".reader-trust {\n  position: static;") &&
         workspaceStyles.text.includes(".reader-trust-details {\n  position: absolute;") &&
@@ -1309,7 +1312,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-top-menus-dim-v321'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-menus-compact-v322'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1520,7 +1523,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-top-menus-dim-v321'),
+        webRoot.text.includes('/web/styles.css?v=20260801-reader-menus-compact-v322'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

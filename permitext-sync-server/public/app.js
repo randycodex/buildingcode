@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-top-menus-dim-v321";
+} from "./offline-storage.js?v=20260801-reader-menus-compact-v322";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3717,8 +3717,10 @@ function enhanceSelect(select) {
     const left = readerTopMenu
       ? boundaryLeft
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
-    const availableBelow = Math.max(160, window.innerHeight - rect.bottom - viewportPadding);
-    menu.style.setProperty("--select-menu-top", `${rect.bottom + (readerTopMenu ? 12 : 2)}px`);
+    const menuOffset = readerTopMenu ? 12 : 2;
+    const menuTop = rect.bottom + menuOffset;
+    const availableBelow = Math.max(0, window.innerHeight - menuTop - viewportPadding);
+    menu.style.setProperty("--select-menu-top", `${menuTop}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
     menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
     menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
@@ -7159,13 +7161,7 @@ function collapseRepeatedReaderCatalogAliases(content) {
 }
 
 function nextReaderProgressiveFrame() {
-  return new Promise((resolve) => {
-    if ("requestIdleCallback" in window) {
-      window.requestIdleCallback(resolve, { timeout: 180 });
-      return;
-    }
-    window.setTimeout(resolve, 16);
-  });
+  return new Promise((resolve) => window.setTimeout(resolve, 16));
 }
 
 async function progressivelyRenderReaderChapter(
@@ -7190,7 +7186,10 @@ async function progressivelyRenderReaderChapter(
 
   while (beforeCursor > 0 || afterCursor < sections.length) {
     await nextReaderProgressiveFrame();
-    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
+    if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
+      status.remove();
+      return;
+    }
     const canLoadAfter = afterCursor < sections.length;
     const canLoadBefore = beforeCursor > 0;
     const shouldLoadAfter = (loadAfter && canLoadAfter) || !canLoadBefore;
@@ -7202,7 +7201,10 @@ async function progressivelyRenderReaderChapter(
       : beforeCursor;
     try {
       const windowChapter = await fetchChapterBodyWindow(reader.chapterID, start, end - start);
-      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) return;
+      if (!panel.isConnected || panel.dataset.readerRenderToken !== renderToken) {
+        status.remove();
+        return;
+      }
       const fragment = document.createDocumentFragment();
       sections.slice(start, end).forEach((section) => {
         fragment.append(
