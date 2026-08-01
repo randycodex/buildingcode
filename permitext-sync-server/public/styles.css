@@ -6920,7 +6920,7 @@ body.is-resizing-research-evidence * {
   overflow: auto;
   resize: vertical;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--surface) 92%, var(--project-color));
+  background: transparent;
 }
 
 .project-note-editor-surface {

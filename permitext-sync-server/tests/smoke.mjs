@@ -1208,7 +1208,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-table-lines-v315'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-info-surface-v316'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1273,6 +1273,8 @@ async function main() {
         workspaceStyles.text.includes('.notebook-editor-surface table :is(th, td) {\n  border-color: #000 !important;') &&
         workspaceStyles.text.includes('.notebook-editor-surface [data-font-size="24px"] { font-size: 24px !important; }') &&
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&
+        workspaceStyles.text.includes(".project-note-block-editor {\n  height: 260px;") &&
+        workspaceStyles.text.includes("  background: transparent;\n}\n\n.project-note-editor-surface {") &&
         workspaceStyles.text.includes(".project-note-editor-surface {") &&
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
@@ -1300,7 +1302,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-table-lines-v315'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-info-surface-v316'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1511,7 +1513,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-table-lines-v315'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-info-surface-v316'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

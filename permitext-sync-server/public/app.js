@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-table-lines-v315";
+} from "./offline-storage.js?v=20260801-project-info-surface-v316";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
