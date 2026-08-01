@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: flex-end;
   padding: 10px 16px 10px 20px;
-  border-bottom: 1px solid var(--border, #d9d9dc);
+  border-bottom: 0;
   background: var(
     --project-pane-band-background,
     color-mix(in srgb, var(--project-color, #c96410) 22%, var(--surface-raised, #fff))

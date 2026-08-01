@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-dark-table-contrast-v337";
+} from "./offline-storage.js?v=20260801-workboard-header-v338";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -1282,7 +1282,7 @@ function loadWorkboardStyles() {
     }
     const link = existing || document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64";
+    link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-header-v65";
     link.dataset.permitextWorkboardStyles = "true";
     link.addEventListener("load", resolve, { once: true });
     link.addEventListener("error", () => {

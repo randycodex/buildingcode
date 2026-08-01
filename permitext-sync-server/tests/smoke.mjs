@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-dark-table-contrast-v337'),
+        webRoot.text.includes('/web/app.js?v=20260801-workboard-header-v338'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1326,7 +1326,7 @@ async function main() {
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-dark-table-contrast-v337'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-header-v338'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1537,7 +1537,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-dark-table-contrast-v337'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-header-v338'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2476,8 +2476,8 @@ async function main() {
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260731-project-tone-v22";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64'),
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-header-v65"') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-header-v65'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(
@@ -2495,9 +2495,10 @@ async function main() {
       "Workboard no longer follows live system appearance changes."
     );
     assert(
-      !workboardSource.includes("<p>Project Workboard</p>") &&
+        !workboardSource.includes("<p>Project Workboard</p>") &&
         !workboardSource.includes("<h2>{projectName}</h2>") &&
         workboardStyleSource.includes("justify-content: flex-end;") &&
+        workboardStyleSource.includes("border-bottom: 0;") &&
         workspaceScript.text.includes("function projectWorkspacePaneIDs(detail)") &&
         workspaceScript.text.includes("...openProjectDetails().flatMap(projectWorkspacePaneIDs)"),
       "Workboard should use the Project name only and move with the Project workspace panes."
