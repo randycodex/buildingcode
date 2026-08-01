@@ -36523,14 +36523,30 @@ function tI(e, t, n = {}) {
 		}
 	}), a.docChanged && t.view.dispatch(a);
 }
-var nI = (e, t) => {
+var nI = class {
+	constructor(e, t, n) {
+		this.component = e, this.editor = t.editor, this.options = { ...n }, this.mark = t.mark, this.HTMLAttributes = t.HTMLAttributes;
+	}
+	get dom() {
+		return this.editor.view.dom;
+	}
+	get contentDOM() {
+		return null;
+	}
+	updateAttributes(e, t) {
+		tI(t || this.mark, this.editor, e);
+	}
+	ignoreMutation(e) {
+		return !this.dom || !this.contentDOM ? !0 : typeof this.options.ignoreMutation == "function" ? this.options.ignoreMutation({ mutation: e }) : e.type === "selection" || this.dom.contains(e.target) && e.type === "childList" && (GN() || WN()) && this.editor.isFocused && [...Array.from(e.addedNodes), ...Array.from(e.removedNodes)].every((e) => e.isContentEditable) ? !1 : this.contentDOM === e.target && e.type === "attributes" || !this.contentDOM.contains(e.target);
+	}
+}, rI = (e, t) => {
 	if (NN(t)) return t.exec(e);
 	let n = t(e);
 	if (!n) return null;
 	let r = [n.text];
 	return r.index = n.index, r.input = e, r.data = n.data, n.replaceWith && (n.text.includes(n.replaceWith) || console.warn("[tiptap warn]: \"inputRuleMatch.replaceWith\" must be part of \"inputRuleMatch.text\"."), r.push(n.replaceWith)), r;
 };
-function rI(e) {
+function iI(e) {
 	let { editor: t, from: n, to: r, text: i, rules: a, plugin: o } = e, { view: s } = t;
 	if (s.composing) return !1;
 	let c = s.state.doc.resolve(n);
@@ -36538,7 +36554,7 @@ function rI(e) {
 	let l = !1, u = cF(c) + i;
 	return a.forEach((e) => {
 		if (l) return;
-		let a = nI(u, e.find);
+		let a = rI(u, e.find);
 		if (!a) return;
 		let d = a[0].length - i.length;
 		if (d > 0) {
@@ -36570,7 +36586,7 @@ function rI(e) {
 		}), s.dispatch(f), l = !0);
 	}), l;
 }
-function iI(e) {
+function aI(e) {
 	let { editor: t, rules: n } = e, r = new z({
 		state: {
 			init() {
@@ -36584,7 +36600,7 @@ function iI(e) {
 					let { text: e } = s;
 					e = typeof e == "string" ? e : LP(T.from(e), a.schema);
 					let { from: i } = s, o = i + e.length;
-					rI({
+					iI({
 						editor: t,
 						from: i,
 						to: o,
@@ -36597,7 +36613,7 @@ function iI(e) {
 		},
 		props: {
 			handleTextInput(e, i, a, o) {
-				return rI({
+				return iI({
 					editor: t,
 					from: i,
 					to: a,
@@ -36608,7 +36624,7 @@ function iI(e) {
 			},
 			handleDOMEvents: { compositionend: (e) => (setTimeout(() => {
 				let { $cursor: i } = e.state.selection;
-				i && rI({
+				i && iI({
 					editor: t,
 					from: i.pos,
 					to: i.pos,
@@ -36620,7 +36636,7 @@ function iI(e) {
 			handleKeyDown(e, i) {
 				if (i.key !== "Enter") return !1;
 				let { $cursor: a } = e.state.selection;
-				return a ? rI({
+				return a ? iI({
 					editor: t,
 					from: a.pos,
 					to: a.pos,
@@ -36634,7 +36650,7 @@ function iI(e) {
 	});
 	return r;
 }
-var aI = class {
+var oI = class {
 	constructor(e = {}) {
 		this.type = "extendable", this.parent = null, this.child = null, this.name = "", this.config = { name: this.name }, this.config = {
 			...this.config,
@@ -36664,7 +36680,7 @@ var aI = class {
 		});
 		return t.parent = this, this.child = t, t.name = "name" in e ? e.name : t.parent.name, t;
 	}
-}, oI = class e extends aI {
+}, sI = class e extends oI {
 	constructor() {
 		super(...arguments), this.type = "mark";
 	}
@@ -36689,7 +36705,7 @@ var aI = class {
 		let t = typeof e == "function" ? e() : e;
 		return super.extend(t);
 	}
-}, sI = (e, t, n) => {
+}, cI = (e, t, n) => {
 	if (NN(t)) return [...e.matchAll(t)];
 	let r = t(e, n);
 	return r ? r.map((t) => {
@@ -36697,7 +36713,7 @@ var aI = class {
 		return n.index = t.index, n.input = e, n.data = t.data, t.replaceWith && (t.text.includes(t.replaceWith) || console.warn("[tiptap warn]: \"pasteRuleMatch.replaceWith\" must be part of \"pasteRuleMatch.text\"."), n.push(t.replaceWith)), n;
 	}) : [];
 };
-function cI(e) {
+function lI(e) {
 	let { editor: t, state: n, from: r, to: i, rule: a, pasteEvent: o, dropEvent: s } = e, { commands: c, chain: l, can: u } = new hN({
 		editor: t,
 		state: n
@@ -36705,7 +36721,7 @@ function cI(e) {
 	return n.doc.nodesBetween(r, i, (e, t) => {
 		if (e.type?.spec?.code || !(e.isText || e.isTextblock || e.isInline)) return;
 		let f = e.content?.size ?? e.nodeSize ?? 0, p = Math.max(r, t), m = Math.min(i, t + f);
-		p >= m || sI(e.isText ? e.text || "" : e.textBetween(p - t, m - t, void 0, "￼"), a.find, o).forEach((e) => {
+		p >= m || cI(e.isText ? e.text || "" : e.textBetween(p - t, m - t, void 0, "￼"), a.find, o).forEach((e) => {
 			if (e.index === void 0) return;
 			let t = p + e.index + 1, r = t + e[0].length, i = {
 				from: n.tr.mapping.map(t),
@@ -36724,12 +36740,12 @@ function cI(e) {
 		});
 	}), d.every((e) => e !== null);
 }
-var lI = null, uI = (e) => {
+var uI = null, dI = (e) => {
 	var t;
 	let n = new ClipboardEvent("paste", { clipboardData: new DataTransfer() });
 	return (t = n.clipboardData) == null || t.setData("text/html", e), n;
 };
-function dI(e) {
+function fI(e) {
 	let { editor: t, rules: n } = e, r = null, i = !1, a = !1, o = typeof ClipboardEvent < "u" ? new ClipboardEvent("paste") : null, s;
 	try {
 		s = typeof DragEvent < "u" ? new DragEvent("drop") : null;
@@ -36741,7 +36757,7 @@ function dI(e) {
 			state: e,
 			transaction: c
 		});
-		if (!(!cI({
+		if (!(!lI({
 			editor: t,
 			state: l,
 			from: Math.max(n - 1, 0),
@@ -36761,9 +36777,9 @@ function dI(e) {
 	return n.map((e) => new z({
 		view(e) {
 			let n = (n) => {
-				r = e.dom.parentElement?.contains(n.target) ? e.dom.parentElement : null, r && (lI = t);
+				r = e.dom.parentElement?.contains(n.target) ? e.dom.parentElement : null, r && (uI = t);
 			}, i = () => {
-				lI &&= null;
+				uI &&= null;
 			};
 			return window.addEventListener("dragstart", n), window.addEventListener("dragend", i), { destroy() {
 				window.removeEventListener("dragstart", n), window.removeEventListener("dragend", i);
@@ -36772,7 +36788,7 @@ function dI(e) {
 		props: { handleDOMEvents: {
 			drop: (e, t) => {
 				if (a = r === e.dom.parentElement, s = t, !a) {
-					let e = lI;
+					let e = uI;
 					e?.isEditable && setTimeout(() => {
 						let t = e.state.selection;
 						t && e.commands.deleteRange({
@@ -36794,7 +36810,7 @@ function dI(e) {
 			if (f) {
 				let { text: t } = d;
 				t = typeof t == "string" ? t : LP(T.from(t), r.schema);
-				let { from: n } = d, i = n + t.length, a = uI(t);
+				let { from: n } = d, i = n + t.length, a = dI(t);
 				return c({
 					rule: e,
 					state: r,
@@ -36814,7 +36830,7 @@ function dI(e) {
 		}
 	}));
 }
-var fI = class {
+var pI = class {
 	constructor(e, t) {
 		this.splittableMarks = [], this.nonClearableMarks = [], this.editor = t, this.baseExtensions = e, this.extensions = eF(e), this.schema = ZP(this.extensions, t), this.setupExtensions();
 	}
@@ -36843,7 +36859,7 @@ var fI = class {
 				editor: e,
 				type: oF(t.name, this.schema)
 			}, r = [], i = K(t, "addKeyboardShortcuts", n), a = {};
-			if (t.type === "mark" && K(t, "exitable", n) && (a.ArrowRight = () => oI.handleExit({
+			if (t.type === "mark" && K(t, "exitable", n) && (a.ArrowRight = () => sI.handleExit({
 				editor: e,
 				mark: t
 			})), i) {
@@ -36859,7 +36875,7 @@ var fI = class {
 			if (uF(t, e.options.enableInputRules) && s) {
 				let t = s();
 				if (t && t.length) {
-					let n = iI({
+					let n = aI({
 						editor: e,
 						rules: t
 					}), i = Array.isArray(n) ? n : [n];
@@ -36870,7 +36886,7 @@ var fI = class {
 			if (uF(t, e.options.enablePasteRules) && c) {
 				let t = c();
 				if (t && t.length) {
-					let n = dI({
+					let n = fI({
 						editor: e,
 						rules: t
 					});
@@ -37000,20 +37016,20 @@ var fI = class {
 		});
 	}
 };
-fI.resolve = eF, fI.sort = $P, fI.flatten = IP, pN({}, {
-	ClipboardTextSerializer: () => mI,
-	Commands: () => hI,
-	Delete: () => gI,
-	Drop: () => _I,
-	Editable: () => vI,
-	FocusEvents: () => bI,
-	Keymap: () => xI,
-	Paste: () => SI,
-	Tabindex: () => CI,
-	TextDirection: () => wI,
-	focusEventsPluginKey: () => yI
+pI.resolve = eF, pI.sort = $P, pI.flatten = IP, pN({}, {
+	ClipboardTextSerializer: () => hI,
+	Commands: () => gI,
+	Delete: () => _I,
+	Drop: () => vI,
+	Editable: () => yI,
+	FocusEvents: () => xI,
+	Keymap: () => SI,
+	Paste: () => CI,
+	Tabindex: () => wI,
+	TextDirection: () => TI,
+	focusEventsPluginKey: () => bI
 });
-var pI = class e extends aI {
+var mI = class e extends oI {
 	constructor() {
 		super(...arguments), this.type = "extension";
 	}
@@ -37028,7 +37044,7 @@ var pI = class e extends aI {
 		let t = typeof e == "function" ? e() : e;
 		return super.extend(t);
 	}
-}, mI = pI.create({
+}, hI = mI.create({
 	name: "clipboardTextSerializer",
 	addOptions() {
 		return { blockSeparator: void 0 };
@@ -37048,12 +37064,12 @@ var pI = class e extends aI {
 			} }
 		})];
 	}
-}), hI = pI.create({
+}), gI = mI.create({
 	name: "commands",
 	addCommands() {
 		return { ...gN };
 	}
-}), gI = pI.create({
+}), _I = mI.create({
 	name: "delete",
 	onUpdate({ transaction: e, appendedTransactions: t }) {
 		let n = () => {
@@ -37106,7 +37122,7 @@ var pI = class e extends aI {
 		};
 		this.editor.options.coreExtensionOptions?.delete?.async ?? !0 ? setTimeout(n, 0) : n();
 	}
-}), _I = pI.create({
+}), vI = mI.create({
 	name: "drop",
 	addProseMirrorPlugins() {
 		return [new z({
@@ -37121,7 +37137,7 @@ var pI = class e extends aI {
 			} }
 		})];
 	}
-}), vI = pI.create({
+}), yI = mI.create({
 	name: "editable",
 	addProseMirrorPlugins() {
 		return [new z({
@@ -37129,12 +37145,12 @@ var pI = class e extends aI {
 			props: { editable: () => this.editor.options.editable }
 		})];
 	}
-}), yI = new B("focusEvents"), bI = pI.create({
+}), bI = new B("focusEvents"), xI = mI.create({
 	name: "focusEvents",
 	addProseMirrorPlugins() {
 		let { editor: e } = this;
 		return [new z({
-			key: yI,
+			key: bI,
 			props: { handleDOMEvents: {
 				focus: (t, n) => {
 					e.isFocused = !0;
@@ -37149,7 +37165,7 @@ var pI = class e extends aI {
 			} }
 		})];
 	}
-}), xI = pI.create({
+}), SI = mI.create({
 	name: "keymap",
 	addKeyboardShortcuts() {
 		let e = () => this.editor.commands.first(({ commands: e }) => [
@@ -37213,7 +37229,7 @@ var pI = class e extends aI {
 			}
 		})];
 	}
-}), SI = pI.create({
+}), CI = mI.create({
 	name: "paste",
 	addProseMirrorPlugins() {
 		return [new z({
@@ -37227,7 +37243,7 @@ var pI = class e extends aI {
 			} }
 		})];
 	}
-}), CI = pI.create({
+}), wI = mI.create({
 	name: "tabindex",
 	addOptions() {
 		return { value: void 0 };
@@ -37238,7 +37254,7 @@ var pI = class e extends aI {
 			props: { attributes: () => !this.editor.isEditable && this.options.value === void 0 ? {} : { tabindex: this.options.value ?? "0" } }
 		})];
 	}
-}), wI = pI.create({
+}), TI = mI.create({
 	name: "textDirection",
 	addOptions() {
 		return { direction: void 0 };
@@ -37267,7 +37283,7 @@ var pI = class e extends aI {
 			} }
 		})];
 	}
-}), TI = class e extends aI {
+}), EI = class e extends oI {
 	constructor() {
 		super(...arguments), this.type = "node";
 	}
@@ -37282,7 +37298,7 @@ var pI = class e extends aI {
 		let t = typeof e == "function" ? e() : e;
 		return super.extend(t);
 	}
-}, EI = class {
+}, DI = class {
 	constructor(e, t, n) {
 		this.isDragging = !1, this.component = e, this.editor = t.editor, this.options = {
 			stopEvent: null,
@@ -37379,30 +37395,30 @@ var pI = class e extends aI {
 			to: t
 		});
 	}
-}, DI = (0, _.createContext)(void 0);
-function OI(e) {
-	return (0, _.useContext)(DI);
+}, OI = (0, _.createContext)(void 0);
+function kI(e) {
+	return (0, _.useContext)(OI);
 }
 function q(e) {
-	let t = OI(e);
+	let t = kI(e);
 	if (!t?.editor) throw Error("useBlockNoteEditor was called outside of a BlockNoteContext provider or BlockNoteView component");
 	return t.editor;
 }
-function kI(e, t) {
+function AI(e, t) {
 	let n = (t?.editor ?? q()).getExtension(e);
 	if (!n) throw Error("Extension not found", { cause: { plugin: e } });
 	return n;
 }
-function AI(e, t) {
-	let { store: n } = kI(e, t);
+function jI(e, t) {
+	let { store: n } = AI(e, t);
 	if (!n) throw Error("Store not found on plugin", { cause: { plugin: e } });
 	return cN(n, t?.selector);
 }
-function jI(e) {
+function MI(e) {
 	let t = new DOMRect(), n = "getBoundingClientRect" in e ? () => e.getBoundingClientRect() : () => e.element.getBoundingClientRect();
 	return () => e.element && (e.cacheMountedBoundingClientRect ?? !0) ? (e.element.isConnected && (t = n()), t) : n();
 }
-function MI(e, t) {
+function NI(e, t) {
 	return e ? t ? (n, r, i) => {
 		let a = e(n, r, i), o = t(n, r, i);
 		return () => {
@@ -37410,11 +37426,11 @@ function MI(e, t) {
 		};
 	} : e : t;
 }
-var NI = (e) => {
+var PI = (e) => {
 	let t = q(), n = e.portalElement === null ? typeof document < "u" ? document.body : void 0 : e.portalElement ?? t?.portalElement;
 	if (!n) throw Error("Portal element not found");
 	let { whileElementsMounted: r, ...i } = e.useFloatingOptions ?? {}, { refs: a, floatingStyles: o, context: s } = HM({
-		whileElementsMounted: MI($A, e.useFloatingOptions?.whileElementsMounted),
+		whileElementsMounted: NI($A, e.useFloatingOptions?.whileElementsMounted),
 		...i
 	}), { isMounted: c, styles: l } = $M(s, e.useTransitionStylesProps), { status: u } = QM(s, e.useTransitionStatusProps), { getFloatingProps: d } = KM([BM(s, e.useDismissProps), Qj(s, {
 		enabled: !1,
@@ -37426,7 +37442,7 @@ var NI = (e) => {
 			n !== void 0 && (e.focusManagerProps?.disabled || !t.isWithinEditor(n)) && a.setReference(n);
 			let r = "getClientRects" in e.reference ? e.reference.getClientRects : void 0;
 			a.setPositionReference({
-				getBoundingClientRect: jI(e.reference),
+				getBoundingClientRect: MI(e.reference),
 				...r ? { getClientRects: r } : {},
 				contextElement: n
 			});
@@ -37480,14 +37496,14 @@ var NI = (e) => {
 			})
 		})
 	});
-}, PI = (0, _.createContext)(void 0);
+}, FI = (0, _.createContext)(void 0);
 function J() {
-	return (0, _.useContext)(PI);
+	return (0, _.useContext)(FI);
 }
 function Y() {
-	return OI().editor.dictionary;
+	return kI().editor.dictionary;
 }
-var FI = typeof window < "u" ? _.useLayoutEffect : _.useEffect, II = class {
+var II = typeof window < "u" ? _.useLayoutEffect : _.useEffect, LI = class {
 	transactionNumber = 0;
 	lastTransactionNumber = 0;
 	lastSnapshot;
@@ -37542,26 +37558,26 @@ var FI = typeof window < "u" ? _.useLayoutEffect : _.useEffect, II = class {
 		}
 	}
 };
-function LI(e) {
-	let t = OI(), n = e.editor || t?.editor || null, r = e.on || "all", [i] = (0, _.useState)(() => new II(n)), a = (0, sN.useSyncExternalStoreWithSelector)(i.subscribe, i.getSnapshot, i.getServerSnapshot, e.selector, e.equalityFn ?? dN.default);
-	return FI(() => i.watch(n, r), [
+function RI(e) {
+	let t = kI(), n = e.editor || t?.editor || null, r = e.on || "all", [i] = (0, _.useState)(() => new LI(n)), a = (0, sN.useSyncExternalStoreWithSelector)(i.subscribe, i.getSnapshot, i.getServerSnapshot, e.selector, e.equalityFn ?? dN.default);
+	return II(() => i.watch(n, r), [
 		n,
 		i,
 		r
 	]), (0, _.useDebugValue)(a), a;
 }
-function RI(e) {
-	let t = OI();
-	return e ||= t?.editor, LI({
+function zI(e) {
+	let t = kI();
+	return e ||= t?.editor, RI({
 		editor: e,
 		selector: (e) => e.editor?.domElement,
 		equalityFn: (e, t) => e === t,
 		on: "mount"
 	});
 }
-var zI = (e) => {
-	let { position: t, children: n, portalElement: r, ...i } = e, { from: a, to: o } = t || {}, s = q(), c = RI();
-	return /* @__PURE__ */ (0, G.jsx)(NI, {
+var BI = (e) => {
+	let { position: t, children: n, portalElement: r, ...i } = e, { from: a, to: o } = t || {}, s = q(), c = zI();
+	return /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: (0, _.useMemo)(() => {
 			if (!(a === void 0 || o === void 0)) return {
 				element: c?.firstElementChild || void 0,
@@ -37577,11 +37593,11 @@ var zI = (e) => {
 		...i,
 		children: t !== void 0 && n
 	});
-}, BI = (e = {}, t = []) => (0, _.useMemo)(() => {
+}, VI = (e = {}, t = []) => (0, _.useMemo)(() => {
 	let t = UD.create(e);
 	return window && (window.ProseMirror = t._tiptapEditor), t;
-}, t), VI = (e) => {
-	let [t, n] = (0, _.useState)(!1), r = LI({
+}, t), HI = (e) => {
+	let [t, n] = (0, _.useState)(!1), r = RI({
 		editor: e.editor,
 		selector: ({ editor: e }) => e.isEmpty
 	}), i = J(), a = (0, _.useCallback)(() => {
@@ -37609,16 +37625,16 @@ var zI = (e) => {
 			isEmpty: r
 		})
 	})] });
-}, { textColor: HI, backgroundColor: UI, ...WI } = wx, GI = Dx.create({
+}, { textColor: UI, backgroundColor: WI, ...GI } = wx, KI = Dx.create({
 	blockSpecs: { paragraph: Gb() },
-	styleSpecs: WI
+	styleSpecs: GI
 });
-function KI(e) {
+function qI(e) {
 	return !e.hasUnsavedContent || !e.confirmBeforeDiscard || (e.confirm ?? ((e) => window.confirm(e)))(e.message);
 }
 //#endregion
 //#region node_modules/@blocknote/core/dist/comments.js
-var qI = Dd.create({
+var JI = Dd.create({
 	name: "comment",
 	excludes: "",
 	inclusive: !1,
@@ -37647,8 +37663,8 @@ var qI = Dd.create({
 	extendMarkSchema(e) {
 		return e.name === "comment" ? { blocknoteIgnore: !0 } : {};
 	}
-}), JI = new B("blocknote-comments");
-function YI(e, t) {
+}), YI = new B("blocknote-comments");
+function XI(e, t) {
 	let n = /* @__PURE__ */ new Map();
 	return e.descendants((e, r) => {
 		e.marks.forEach((i) => {
@@ -37667,15 +37683,15 @@ function YI(e, t) {
 		});
 	}), n;
 }
-var XI = vf(({ editor: e, options: { schema: t, threadStore: n, resolveUsers: r, confirmBeforeDiscard: i = !0 } }) => {
+var ZI = vf(({ editor: e, options: { schema: t, threadStore: n, resolveUsers: r, confirmBeforeDiscard: i = !0 } }) => {
 	if (!r) throw Error("resolveUsers is required to be defined when using comments");
 	if (!n) throw Error("threadStore is required to be defined when using comments");
-	let a = jx(r), o = qI.name, s = yf({
+	let a = jx(r), o = JI.name, s = yf({
 		pendingComment: !1,
 		selectedThreadId: void 0,
 		threadPositions: /* @__PURE__ */ new Map()
 	}, { onUpdate() {
-		s.state.selectedThreadId !== s.prevState.selectedThreadId && e.transact((e) => e.setMeta(JI, !0));
+		s.state.selectedThreadId !== s.prevState.selectedThreadId && e.transact((e) => e.setMeta(YI, !0));
 	} }), c = (t) => {
 		e.transact((e) => {
 			e.doc.descendants((n, r) => {
@@ -37702,17 +37718,17 @@ var XI = vf(({ editor: e, options: { schema: t, threadStore: n, resolveUsers: r,
 		store: s,
 		userStore: a,
 		runsBefore: ["link"],
-		tiptapExtensions: [qI],
+		tiptapExtensions: [JI],
 		prosemirrorPlugins: [new z({
-			key: JI,
+			key: YI,
 			state: {
 				init() {
 					return { decorations: ys.empty };
 				},
 				apply(e, t) {
-					let n = e.getMeta(JI);
+					let n = e.getMeta(YI);
 					if (!e.docChanged && !n) return t;
-					let r = e.docChanged ? YI(e.doc, o) : s.state.threadPositions;
+					let r = e.docChanged ? XI(e.doc, o) : s.state.threadPositions;
 					(r.size > 0 || s.state.threadPositions.size > 0) && s.setState((e) => ({
 						...e,
 						threadPositions: r
@@ -37727,7 +37743,7 @@ var XI = vf(({ editor: e, options: { schema: t, threadStore: n, resolveUsers: r,
 			},
 			props: {
 				decorations(e) {
-					return JI.getState(e)?.decorations ?? ys.empty;
+					return YI.getState(e)?.decorations ?? ys.empty;
 				},
 				handleClick: (e, t, n) => {
 					if (n.button !== 0) return !1;
@@ -37805,15 +37821,15 @@ var XI = vf(({ editor: e, options: { schema: t, threadStore: n, resolveUsers: r,
 		commentEditorSchema: t,
 		confirmBeforeDiscard: i
 	};
-}), ZI = aN(), QI = (...e) => (t) => {
+}), QI = aN(), $I = (...e) => (t) => {
 	e.forEach((e) => {
 		typeof e == "function" ? e(t) : e && (e.current = t);
 	});
-}, $I = ({ contentComponent: e }) => {
-	let t = (0, ZI.useSyncExternalStore)(e.subscribe, e.getSnapshot, e.getServerSnapshot);
+}, eL = ({ contentComponent: e }) => {
+	let t = (0, QI.useSyncExternalStore)(e.subscribe, e.getSnapshot, e.getServerSnapshot);
 	return /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: Object.values(t) });
 };
-function eL() {
+function tL() {
 	let e = /* @__PURE__ */ new Set(), t = {}, n = !1, r = () => {
 		n || !e.size || (n = !0, queueMicrotask(() => {
 			n = !1, e.forEach((e) => e());
@@ -37843,7 +37859,7 @@ function eL() {
 		}
 	};
 }
-var tL = class extends _.Component {
+var nL = class extends _.Component {
 	constructor(e) {
 		super(e), this.editorContentRef = _.createRef();
 	}
@@ -37858,7 +37874,7 @@ var tL = class extends _.Component {
 		if (e && !e.isDestroyed && e.view.dom?.parentNode) {
 			if (e.contentComponent) return;
 			let t = this.editorContentRef.current;
-			t.append(...e.view.dom.parentNode.childNodes), e.setOptions({ element: t }), e.contentComponent = eL(), e.createNodeViews(), e.isEditorContentInitialized = !0, this.forceUpdate();
+			t.append(...e.view.dom.parentNode.childNodes), e.setOptions({ element: t }), e.contentComponent = tL(), e.createNodeViews(), e.isEditorContentInitialized = !0, this.forceUpdate();
 		}
 	}
 	componentWillUnmount() {
@@ -37875,27 +37891,27 @@ var tL = class extends _.Component {
 	render() {
 		let { editor: e, innerRef: t, ...n } = this.props;
 		return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)("div", {
-			ref: QI(t, this.editorContentRef),
+			ref: $I(t, this.editorContentRef),
 			...n
-		}), e?.contentComponent && /* @__PURE__ */ (0, G.jsx)($I, { contentComponent: e.contentComponent })] });
+		}), e?.contentComponent && /* @__PURE__ */ (0, G.jsx)(eL, { contentComponent: e.contentComponent })] });
 	}
-}, nL = (0, _.forwardRef)((e, t) => {
+}, rL = (0, _.forwardRef)((e, t) => {
 	let n = _.useMemo(() => Math.floor(Math.random() * 4294967295).toString(), [e.editor]);
-	return _.createElement(tL, {
+	return _.createElement(nL, {
 		key: n,
 		innerRef: t,
 		...e
 	});
-}), rL = _.memo(nL);
+}), iL = _.memo(rL);
 typeof window > "u" || typeof window < "u" && window.next;
-var iL = (0, _.createContext)({ editor: null });
-iL.Consumer;
-var aL = (0, _.createContext)({
+var aL = (0, _.createContext)({ editor: null });
+aL.Consumer;
+var oL = (0, _.createContext)({
 	onDragStart: () => {},
 	nodeViewContentChildren: void 0,
 	nodeViewContentRef: () => {}
-}), oL = () => (0, _.useContext)(aL), sL = _.forwardRef((e, t) => {
-	let { onDragStart: n } = oL();
+}), sL = () => (0, _.useContext)(oL), cL = _.forwardRef((e, t) => {
+	let { onDragStart: n } = sL();
 	return /* @__PURE__ */ (0, G.jsx)(e.as || "div", {
 		...e,
 		ref: t,
@@ -37907,30 +37923,30 @@ var aL = (0, _.createContext)({
 		}
 	});
 });
-function cL(e) {
+function lL(e) {
 	return !!(typeof e == "function" && e.prototype && e.prototype.isReactComponent);
 }
-function lL(e) {
+function uL(e) {
 	return !!(typeof e == "object" && e.$$typeof && (e.$$typeof.toString() === "Symbol(react.forward_ref)" || e.$$typeof.description === "react.forward_ref"));
 }
-function uL(e) {
+function dL(e) {
 	return !!(typeof e == "object" && e.$$typeof && (e.$$typeof.toString() === "Symbol(react.memo)" || e.$$typeof.description === "react.memo"));
 }
-function dL(e) {
-	if (cL(e) || lL(e)) return !0;
-	if (uL(e)) {
+function fL(e) {
+	if (lL(e) || uL(e)) return !0;
+	if (dL(e)) {
 		let t = e.type;
-		if (t) return cL(t) || lL(t);
+		if (t) return lL(t) || uL(t);
 	}
 	return !1;
 }
-function fL() {
+function pL() {
 	try {
 		if (_.version) return parseInt(_.version.split(".")[0], 10) >= 19;
 	} catch {}
 	return !1;
 }
-var pL = class {
+var mL = class {
 	constructor(e, { editor: t, props: n = {}, as: r = "div", className: i = "" }) {
 		this.ref = null, this.destroyed = !1, this.id = Math.floor(Math.random() * 4294967295).toString(), this.component = e, this.editor = t, this.props = n, this.element = document.createElement(r), this.element.classList.add("react-renderer"), i && this.element.classList.add(...i.split(" ")), this.editor.isEditorContentInitialized ? (0, v.flushSync)(() => {
 			this.render();
@@ -37941,7 +37957,7 @@ var pL = class {
 	render() {
 		var e;
 		if (this.destroyed) return;
-		let t = this.component, n = this.props, r = this.editor, i = fL(), a = dL(t), o = { ...n };
+		let t = this.component, n = this.props, r = this.editor, i = pL(), a = fL(t), o = { ...n };
 		o.ref && !(i || a) && delete o.ref, !o.ref && (i || a) && (o.ref = (e) => {
 			this.ref = e;
 		}), this.reactElement = /* @__PURE__ */ (0, G.jsx)(t, { ...o }), (e = r?.contentComponent) == null || e.setRenderer(this.id, this);
@@ -37973,9 +37989,38 @@ var pL = class {
 			this.element.setAttribute(t, e[t]);
 		});
 	}
+}, hL = _.createContext({ markViewContentRef: () => {} }), gL = class extends nI {
+	constructor(e, t, n) {
+		super(e, t, n);
+		let { as: r = "span", attrs: i, className: a = "" } = n || {}, o = {
+			...t,
+			updateAttributes: this.updateAttributes.bind(this)
+		};
+		this.contentDOMElement = document.createElement("span");
+		let s = { markViewContentRef: (e) => {
+			e && !e.contains(this.contentDOMElement) && e.appendChild(this.contentDOMElement);
+		} }, c = _.memo((t) => /* @__PURE__ */ (0, G.jsx)(hL.Provider, {
+			value: s,
+			children: _.createElement(e, t)
+		}));
+		c.displayName = "ReactMarkView", this.renderer = new mL(c, {
+			editor: t.editor,
+			props: o,
+			as: r,
+			className: `mark-${t.mark.type.name} ${a}`.trim()
+		}), i && this.renderer.updateAttributes(i);
+	}
+	get dom() {
+		return this.renderer.element;
+	}
+	get contentDOM() {
+		return this.contentDOMElement;
+	}
 };
-_.createContext({ markViewContentRef: () => {} });
-function mL(e) {
+function _L(e, t = {}) {
+	return (n) => new gL(e, n, t);
+}
+function vL(e) {
 	let t = e.getRootNode(), n = typeof t.getSelection == "function" ? t.getSelection() : (e.ownerDocument?.defaultView)?.getSelection();
 	if (!n || n.rangeCount === 0) return null;
 	let { anchorNode: r, anchorOffset: i, focusNode: a, focusOffset: o } = n;
@@ -37985,7 +38030,7 @@ function mL(e) {
 		} catch {}
 	};
 }
-var hL = class extends EI {
+var yL = class extends DI {
 	constructor(e, t, n) {
 		if (super(e, t, n), this.selectionRafId = null, this.handlePositionUpdate = () => {
 			let e = this.getPos();
@@ -38030,11 +38075,11 @@ var hL = class extends EI {
 			nodeViewContentRef: (e) => {
 				if (e && this.contentDOMElement && e.firstChild !== this.contentDOMElement) {
 					e.hasAttribute("data-node-view-wrapper") && e.removeAttribute("data-node-view-wrapper");
-					let t = mL(this.contentDOMElement);
+					let t = vL(this.contentDOMElement);
 					e.appendChild(this.contentDOMElement), t?.();
 				}
 			}
-		}, n = this.component, r = (0, _.memo)((e) => /* @__PURE__ */ (0, G.jsx)(aL.Provider, {
+		}, n = this.component, r = (0, _.memo)((e) => /* @__PURE__ */ (0, G.jsx)(oL.Provider, {
 			value: t,
 			children: (0, _.createElement)(n, e)
 		}));
@@ -38042,7 +38087,7 @@ var hL = class extends EI {
 		let i = this.node.isInline ? "span" : "div";
 		this.options.as && (i = this.options.as);
 		let { className: a = "" } = this.options;
-		this.handleSelectionUpdate = this.handleSelectionUpdate.bind(this), this.renderer = new pL(r, {
+		this.handleSelectionUpdate = this.handleSelectionUpdate.bind(this), this.renderer = new mL(r, {
 			editor: this.editor,
 			props: e,
 			as: i,
@@ -38130,47 +38175,47 @@ var hL = class extends EI {
 		}
 	}
 };
-function gL(e, t) {
-	return (n) => n.editor.contentComponent ? new hL(e, n, t) : {};
+function bL(e, t) {
+	return (n) => n.editor.contentComponent ? new yL(e, n, t) : {};
 }
-var _L = (0, _.createContext)({ get editor() {
+var xL = (0, _.createContext)({ get editor() {
 	throw Error("useTiptap must be used within a <Tiptap> provider");
 } });
-_L.displayName = "TiptapContext";
-var vL = () => (0, _.useContext)(_L);
-function yL({ children: e, ...t }) {
+xL.displayName = "TiptapContext";
+var SL = () => (0, _.useContext)(xL);
+function CL({ children: e, ...t }) {
 	let n = "editor" in t ? t.editor : t.instance;
 	if (!n) throw Error("Tiptap: An editor instance is required. Pass a non-null `editor` prop.");
 	let r = (0, _.useMemo)(() => ({ editor: n }), [n]), i = (0, _.useMemo)(() => ({ editor: n }), [n]);
-	return /* @__PURE__ */ (0, G.jsx)(iL.Provider, {
+	return /* @__PURE__ */ (0, G.jsx)(aL.Provider, {
 		value: i,
-		children: /* @__PURE__ */ (0, G.jsx)(_L.Provider, {
+		children: /* @__PURE__ */ (0, G.jsx)(xL.Provider, {
 			value: r,
 			children: e
 		})
 	});
 }
-yL.displayName = "Tiptap";
-function bL({ ...e }) {
-	let { editor: t } = vL();
-	return /* @__PURE__ */ (0, G.jsx)(rL, {
+CL.displayName = "Tiptap";
+function wL({ ...e }) {
+	let { editor: t } = SL();
+	return /* @__PURE__ */ (0, G.jsx)(iL, {
 		editor: t,
 		...e
 	});
 }
-bL.displayName = "Tiptap.Content", Object.assign(yL, { Content: bL });
+wL.displayName = "Tiptap.Content", Object.assign(CL, { Content: wL });
 //#endregion
 //#region node_modules/@blocknote/react/dist/blocknote-react.js
-var xL = Object.defineProperty, SL = (e, t) => {
+var TL = Object.defineProperty, EL = (e, t) => {
 	let n = {};
-	for (var r in e) xL(n, r, {
+	for (var r in e) TL(n, r, {
 		get: e[r],
 		enumerable: !0
 	});
-	return t || xL(n, Symbol.toStringTag, { value: "Module" }), n;
-}, CL = (e) => {
+	return t || TL(n, Symbol.toStringTag, { value: "Module" }), n;
+}, DL = (e) => {
 	let { blockId: t, children: n, portalElement: r, ...i } = e, a = q();
-	return /* @__PURE__ */ (0, G.jsx)(NI, {
+	return /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: (0, _.useMemo)(() => a.transact((e) => {
 			if (!t) return;
 			let n = Iy(t, e.doc);
@@ -38182,7 +38227,7 @@ var xL = Object.defineProperty, SL = (e, t) => {
 		...i,
 		children: t !== void 0 && n
 	});
-}, wL = (e) => {
+}, OL = (e) => {
 	let t = J(), n = Y(), r = q(), i = r.getBlock(e.blockId), [a, o] = (0, _.useState)(""), s = (0, _.useCallback)((e) => {
 		o(e.currentTarget.value);
 	}, []), c = (0, _.useCallback)((e) => {
@@ -38220,7 +38265,7 @@ var xL = Object.defineProperty, SL = (e, t) => {
 			children: n.file_panel.embed.embed_button[i.type] || n.file_panel.embed.embed_button.file
 		})]
 	});
-}, TL = (e) => {
+}, kL = (e) => {
 	let t = J(), n = Y(), { setLoading: r } = e, i = q(), a = i.getBlock(e.blockId), [o, s] = (0, _.useState)(!1);
 	(0, _.useEffect)(() => {
 		o && setTimeout(() => {
@@ -38262,16 +38307,16 @@ var xL = Object.defineProperty, SL = (e, t) => {
 			children: n.file_panel.upload.upload_error
 		})]
 	});
-}, EL = (e) => {
+}, AL = (e) => {
 	let t = J(), n = Y(), r = q(), [i, a] = (0, _.useState)(!1), o = e.tabs ?? [...r.uploadFile === void 0 ? [] : [{
 		name: n.file_panel.upload.title,
-		tabPanel: /* @__PURE__ */ (0, G.jsx)(TL, {
+		tabPanel: /* @__PURE__ */ (0, G.jsx)(kL, {
 			blockId: e.blockId,
 			setLoading: a
 		})
 	}], {
 		name: n.file_panel.embed.title,
-		tabPanel: /* @__PURE__ */ (0, G.jsx)(wL, { blockId: e.blockId })
+		tabPanel: /* @__PURE__ */ (0, G.jsx)(OL, { blockId: e.blockId })
 	}], [s, c] = (0, _.useState)(e.defaultOpenTab || o[0].name);
 	return /* @__PURE__ */ (0, G.jsx)(t.FilePanel.Root, {
 		className: "bn-panel",
@@ -38281,8 +38326,8 @@ var xL = Object.defineProperty, SL = (e, t) => {
 		tabs: o,
 		loading: i
 	});
-}, DL = (e) => {
-	let t = q(), n = kI(tb), r = AI(tb), i = (0, _.useMemo)(() => ({
+}, jL = (e) => {
+	let t = q(), n = AI(tb), r = jI(tb), i = (0, _.useMemo)(() => ({
 		...e.floatingUIOptions,
 		useFloatingOptions: {
 			open: !!r,
@@ -38305,34 +38350,34 @@ var xL = Object.defineProperty, SL = (e, t) => {
 		t,
 		n,
 		e.floatingUIOptions
-	]), a = e.filePanel || EL;
-	return /* @__PURE__ */ (0, G.jsx)(CL, {
+	]), a = e.filePanel || AL;
+	return /* @__PURE__ */ (0, G.jsx)(DL, {
 		blockId: r,
 		portalElement: e.portalElement,
 		...i,
 		children: r && /* @__PURE__ */ (0, G.jsx)(a, { blockId: r })
 	});
-}, OL = {
+}, ML = {
 	color: void 0,
 	size: void 0,
 	className: void 0,
 	style: void 0,
 	attr: void 0
-}, kL = _.createContext && /*#__PURE__*/ _.createContext(OL), AL = [
+}, NL = _.createContext && /*#__PURE__*/ _.createContext(ML), PL = [
 	"attr",
 	"size",
 	"title"
 ];
-function jL(e, t) {
+function FL(e, t) {
 	if (e == null) return {};
-	var n, r, i = ML(e, t);
+	var n, r, i = IL(e, t);
 	if (Object.getOwnPropertySymbols) {
 		var a = Object.getOwnPropertySymbols(e);
 		for (r = 0; r < a.length; r++) n = a[r], t.indexOf(n) === -1 && {}.propertyIsEnumerable.call(e, n) && (i[n] = e[n]);
 	}
 	return i;
 }
-function ML(e, t) {
+function IL(e, t) {
 	if (e == null) return {};
 	var n = {};
 	for (var r in e) if ({}.hasOwnProperty.call(e, r)) {
@@ -38341,16 +38386,16 @@ function ML(e, t) {
 	}
 	return n;
 }
-function NL() {
-	return NL = Object.assign ? Object.assign.bind() : function(e) {
+function LL() {
+	return LL = Object.assign ? Object.assign.bind() : function(e) {
 		for (var t = 1; t < arguments.length; t++) {
 			var n = arguments[t];
 			for (var r in n) ({}).hasOwnProperty.call(n, r) && (e[r] = n[r]);
 		}
 		return e;
-	}, NL.apply(null, arguments);
+	}, LL.apply(null, arguments);
 }
-function PL(e, t) {
+function RL(e, t) {
 	var n = Object.keys(e);
 	if (Object.getOwnPropertySymbols) {
 		var r = Object.getOwnPropertySymbols(e);
@@ -38360,30 +38405,30 @@ function PL(e, t) {
 	}
 	return n;
 }
-function FL(e) {
+function zL(e) {
 	for (var t = 1; t < arguments.length; t++) {
 		var n = arguments[t] == null ? {} : arguments[t];
-		t % 2 ? PL(Object(n), !0).forEach(function(t) {
-			IL(e, t, n[t]);
-		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : PL(Object(n)).forEach(function(t) {
+		t % 2 ? RL(Object(n), !0).forEach(function(t) {
+			BL(e, t, n[t]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : RL(Object(n)).forEach(function(t) {
 			Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
 		});
 	}
 	return e;
 }
-function IL(e, t, n) {
-	return (t = LL(t)) in e ? Object.defineProperty(e, t, {
+function BL(e, t, n) {
+	return (t = VL(t)) in e ? Object.defineProperty(e, t, {
 		value: n,
 		enumerable: !0,
 		configurable: !0,
 		writable: !0
 	}) : e[t] = n, e;
 }
-function LL(e) {
-	var t = RL(e, "string");
+function VL(e) {
+	var t = HL(e, "string");
 	return typeof t == "symbol" ? t : t + "";
 }
-function RL(e, t) {
+function HL(e, t) {
 	if (typeof e != "object" || !e) return e;
 	var n = e[Symbol.toPrimitive];
 	if (n !== void 0) {
@@ -38393,30 +38438,30 @@ function RL(e, t) {
 	}
 	return (t === "string" ? String : Number)(e);
 }
-function zL(e) {
-	return e && e.map((e, t) => /*#__PURE__*/ _.createElement(e.tag, FL({ key: t }, e.attr), zL(e.child)));
+function UL(e) {
+	return e && e.map((e, t) => /*#__PURE__*/ _.createElement(e.tag, zL({ key: t }, e.attr), UL(e.child)));
 }
 function X(e) {
-	return (t) => /*#__PURE__*/ _.createElement(BL, NL({ attr: FL({}, e.attr) }, t), zL(e.child));
+	return (t) => /*#__PURE__*/ _.createElement(WL, LL({ attr: zL({}, e.attr) }, t), UL(e.child));
 }
-function BL(e) {
+function WL(e) {
 	var t = (t) => {
-		var { attr: n, size: r, title: i } = e, a = jL(e, AL), o = r || t.size || "1em", s;
-		return t.className && (s = t.className), e.className && (s = (s ? s + " " : "") + e.className), /*#__PURE__*/ _.createElement("svg", NL({
+		var { attr: n, size: r, title: i } = e, a = FL(e, PL), o = r || t.size || "1em", s;
+		return t.className && (s = t.className), e.className && (s = (s ? s + " " : "") + e.className), /*#__PURE__*/ _.createElement("svg", LL({
 			stroke: "currentColor",
 			fill: "currentColor",
 			strokeWidth: "0"
 		}, t.attr, n, a, {
 			className: s,
-			style: FL(FL({ color: e.color || t.color }, t.style), e.style),
+			style: zL(zL({ color: e.color || t.color }, t.style), e.style),
 			height: o,
 			width: o,
 			xmlns: "http://www.w3.org/2000/svg"
 		}), i && /*#__PURE__*/ _.createElement("title", null, i), e.children);
 	};
-	return kL === void 0 ? t(OL) : /*#__PURE__*/ _.createElement(kL.Consumer, null, (e) => t(e));
+	return NL === void 0 ? t(ML) : /*#__PURE__*/ _.createElement(NL.Consumer, null, (e) => t(e));
 }
-function VL(e) {
+function GL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38430,7 +38475,7 @@ function VL(e) {
 		}]
 	})(e);
 }
-function HL(e) {
+function KL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38444,7 +38489,7 @@ function HL(e) {
 		}]
 	})(e);
 }
-function UL(e) {
+function qL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38458,7 +38503,7 @@ function UL(e) {
 		}]
 	})(e);
 }
-function WL(e) {
+function JL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38472,7 +38517,7 @@ function WL(e) {
 		}]
 	})(e);
 }
-function GL(e) {
+function YL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38486,7 +38531,7 @@ function GL(e) {
 		}]
 	})(e);
 }
-function KL(e) {
+function XL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38500,7 +38545,7 @@ function KL(e) {
 		}]
 	})(e);
 }
-function qL(e) {
+function ZL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38514,7 +38559,7 @@ function qL(e) {
 		}]
 	})(e);
 }
-function JL(e) {
+function QL(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38528,7 +38573,7 @@ function JL(e) {
 		}]
 	})(e);
 }
-function YL(e) {
+function $L(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38542,7 +38587,7 @@ function YL(e) {
 		}]
 	})(e);
 }
-function XL(e) {
+function eR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38556,7 +38601,7 @@ function XL(e) {
 		}]
 	})(e);
 }
-function ZL(e) {
+function tR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38570,7 +38615,7 @@ function ZL(e) {
 		}]
 	})(e);
 }
-function QL(e) {
+function nR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38584,7 +38629,7 @@ function QL(e) {
 		}]
 	})(e);
 }
-function $L(e) {
+function rR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38598,7 +38643,7 @@ function $L(e) {
 		}]
 	})(e);
 }
-function eR(e) {
+function iR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38612,7 +38657,7 @@ function eR(e) {
 		}]
 	})(e);
 }
-function tR(e) {
+function aR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38626,7 +38671,7 @@ function tR(e) {
 		}]
 	})(e);
 }
-function nR(e) {
+function oR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38640,7 +38685,7 @@ function nR(e) {
 		}]
 	})(e);
 }
-function rR(e) {
+function sR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38654,7 +38699,7 @@ function rR(e) {
 		}]
 	})(e);
 }
-function iR(e) {
+function cR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38668,7 +38713,7 @@ function iR(e) {
 		}]
 	})(e);
 }
-function aR(e) {
+function lR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38682,7 +38727,7 @@ function aR(e) {
 		}]
 	})(e);
 }
-function oR(e) {
+function uR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38696,7 +38741,7 @@ function oR(e) {
 		}]
 	})(e);
 }
-function sR(e) {
+function dR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38710,7 +38755,7 @@ function sR(e) {
 		}]
 	})(e);
 }
-function cR(e) {
+function fR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38724,7 +38769,7 @@ function cR(e) {
 		}]
 	})(e);
 }
-function lR(e) {
+function pR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38738,7 +38783,7 @@ function lR(e) {
 		}]
 	})(e);
 }
-function uR(e) {
+function mR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38752,7 +38797,7 @@ function uR(e) {
 		}]
 	})(e);
 }
-function dR(e) {
+function hR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38766,7 +38811,7 @@ function dR(e) {
 		}]
 	})(e);
 }
-function fR(e) {
+function gR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38780,7 +38825,7 @@ function fR(e) {
 		}]
 	})(e);
 }
-function pR(e) {
+function _R(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38794,7 +38839,7 @@ function pR(e) {
 		}]
 	})(e);
 }
-function mR(e) {
+function vR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38808,7 +38853,7 @@ function mR(e) {
 		}]
 	})(e);
 }
-function hR(e) {
+function yR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38822,7 +38867,7 @@ function hR(e) {
 		}]
 	})(e);
 }
-function gR(e) {
+function bR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38836,7 +38881,7 @@ function gR(e) {
 		}]
 	})(e);
 }
-function _R(e) {
+function xR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38850,7 +38895,7 @@ function _R(e) {
 		}]
 	})(e);
 }
-function vR(e) {
+function SR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38864,7 +38909,7 @@ function vR(e) {
 		}]
 	})(e);
 }
-function yR(e) {
+function CR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38878,7 +38923,7 @@ function yR(e) {
 		}]
 	})(e);
 }
-function bR(e) {
+function wR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38892,7 +38937,7 @@ function bR(e) {
 		}]
 	})(e);
 }
-function xR(e) {
+function TR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38906,7 +38951,7 @@ function xR(e) {
 		}]
 	})(e);
 }
-function SR(e) {
+function ER(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38920,7 +38965,7 @@ function SR(e) {
 		}]
 	})(e);
 }
-function CR(e) {
+function DR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38934,7 +38979,7 @@ function CR(e) {
 		}]
 	})(e);
 }
-function wR(e) {
+function OR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38948,7 +38993,7 @@ function wR(e) {
 		}]
 	})(e);
 }
-function TR(e) {
+function kR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38962,7 +39007,7 @@ function TR(e) {
 		}]
 	})(e);
 }
-function ER(e) {
+function AR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38976,7 +39021,7 @@ function ER(e) {
 		}]
 	})(e);
 }
-function DR(e) {
+function jR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -38990,7 +39035,7 @@ function DR(e) {
 		}]
 	})(e);
 }
-function OR(e) {
+function MR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39004,7 +39049,7 @@ function OR(e) {
 		}]
 	})(e);
 }
-function kR(e) {
+function NR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39018,7 +39063,7 @@ function kR(e) {
 		}]
 	})(e);
 }
-function AR(e) {
+function PR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39032,7 +39077,7 @@ function AR(e) {
 		}]
 	})(e);
 }
-function jR(e) {
+function FR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39046,7 +39091,7 @@ function jR(e) {
 		}]
 	})(e);
 }
-function MR(e) {
+function IR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39060,7 +39105,7 @@ function MR(e) {
 		}]
 	})(e);
 }
-function NR(e) {
+function LR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39074,7 +39119,7 @@ function NR(e) {
 		}]
 	})(e);
 }
-function PR(e) {
+function RR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39088,7 +39133,7 @@ function PR(e) {
 		}]
 	})(e);
 }
-function FR(e) {
+function zR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39102,7 +39147,7 @@ function FR(e) {
 		}]
 	})(e);
 }
-function IR(e) {
+function BR(e) {
 	return X({
 		tag: "svg",
 		attr: {
@@ -39116,27 +39161,27 @@ function IR(e) {
 		}]
 	})(e);
 }
-var LR = {
-	bold: DR,
-	italic: hR,
-	underline: rR,
-	strike: oR,
-	code: MR
+var VR = {
+	bold: jR,
+	italic: yR,
+	underline: sR,
+	strike: uR,
+	code: IR
 };
-function RR(e, t) {
+function HR(e, t) {
 	return e in t.schema.styleSchema && t.schema.styleSchema[e].type === e && t.schema.styleSchema[e].propSchema === "boolean";
 }
-var zR = (e) => {
-	let t = Y(), n = J(), r = q(), i = LI({
+var UR = (e) => {
+	let t = Y(), n = J(), r = q(), i = RI({
 		editor: r,
 		selector: ({ editor: t }) => {
-			if (!(!t.isEditable || !RR(e.basicTextStyle, t) || !(t.getSelection()?.blocks || [t.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return e.basicTextStyle in t.getActiveStyles() ? { active: !0 } : { active: !1 };
+			if (!(!t.isEditable || !HR(e.basicTextStyle, t) || !(t.getSelection()?.blocks || [t.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return e.basicTextStyle in t.getActiveStyles() ? { active: !0 } : { active: !1 };
 		}
 	}), a = (0, _.useCallback)((e) => {
 		r.focus(), r.toggleStyles({ [e]: !0 });
 	}, [r]);
 	if (i === void 0) return null;
-	let o = LR[e.basicTextStyle];
+	let o = VR[e.basicTextStyle];
 	return /* @__PURE__ */ (0, G.jsx)(n.FormattingToolbar.Button, {
 		className: "bn-button",
 		"data-test": e.basicTextStyle,
@@ -39147,7 +39192,7 @@ var zR = (e) => {
 		secondaryTooltip: hv(t.formatting_toolbar[e.basicTextStyle].secondary_tooltip, t.generic.ctrl_shortcut),
 		icon: /* @__PURE__ */ (0, G.jsx)(o, {})
 	});
-}, BR = (e) => {
+}, WR = (e) => {
 	let t = e.textColor || "default", n = e.backgroundColor || "default", r = e.size || 16;
 	return /* @__PURE__ */ (0, G.jsx)("div", {
 		className: "bn-color-icon",
@@ -39163,7 +39208,7 @@ var zR = (e) => {
 		}), [r]),
 		children: "A"
 	});
-}, VR = [
+}, GR = [
 	"default",
 	"gray",
 	"brown",
@@ -39174,25 +39219,25 @@ var zR = (e) => {
 	"blue",
 	"purple",
 	"pink"
-], HR = (e) => {
+], KR = (e) => {
 	let t = J(), n = Y();
-	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(() => e.text ? /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Label, { children: n.color_picker.text_title }), VR.map((r) => /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
+	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(() => e.text ? /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Label, { children: n.color_picker.text_title }), GR.map((r) => /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
 		onClick: () => {
 			e.onClick?.(), e.text.setColor(r);
 		},
 		"data-test": "text-color-" + r,
-		icon: /* @__PURE__ */ (0, G.jsx)(BR, {
+		icon: /* @__PURE__ */ (0, G.jsx)(WR, {
 			textColor: r,
 			size: e.iconSize
 		}),
 		checked: e.text.color === r,
 		children: n.color_picker.colors[r]
-	}, "text-color-" + r))] }) : null, {}), /* @__PURE__ */ (0, G.jsx)(() => e.background ? /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Label, { children: n.color_picker.background_title }), VR.map((r) => /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
+	}, "text-color-" + r))] }) : null, {}), /* @__PURE__ */ (0, G.jsx)(() => e.background ? /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Label, { children: n.color_picker.background_title }), GR.map((r) => /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
 		onClick: () => {
 			e.onClick?.(), e.background.setColor(r);
 		},
 		"data-test": "background-color-" + r,
-		icon: /* @__PURE__ */ (0, G.jsx)(BR, {
+		icon: /* @__PURE__ */ (0, G.jsx)(WR, {
 			backgroundColor: r,
 			size: e.iconSize
 		}),
@@ -39200,15 +39245,15 @@ var zR = (e) => {
 		children: n.color_picker.colors[r]
 	}, "background-color-" + r))] }) : null, {})] });
 };
-function UR(e, t) {
+function qR(e, t) {
 	return `${e}Color` in t.schema.styleSchema && t.schema.styleSchema[`${e}Color`].type === `${e}Color` && t.schema.styleSchema[`${e}Color`].propSchema === "string";
 }
-var WR = () => {
-	let e = J(), t = Y(), n = q(), r = UR("text", n), i = UR("background", n), a = LI({
+var JR = () => {
+	let e = J(), t = Y(), n = q(), r = qR("text", n), i = qR("background", n), a = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable || !(e.getSelection()?.blocks || [e.getTextCursorPosition().block]).find((e) => e.content !== void 0)) return;
-			let t = UR("text", e), n = UR("background", e);
+			let t = qR("text", e), n = qR("background", e);
 			if (!(!t && !n)) return {
 				textColor: t ? e.getActiveStyles().textColor || "default" : void 0,
 				backgroundColor: n ? e.getActiveStyles().backgroundColor || "default" : void 0
@@ -39230,14 +39275,14 @@ var WR = () => {
 		"data-test": "colors",
 		label: t.formatting_toolbar.colors.tooltip,
 		mainTooltip: t.formatting_toolbar.colors.tooltip,
-		icon: /* @__PURE__ */ (0, G.jsx)(BR, {
+		icon: /* @__PURE__ */ (0, G.jsx)(WR, {
 			textColor: a.textColor,
 			backgroundColor: a.backgroundColor,
 			size: 20
 		})
 	}) }), /* @__PURE__ */ (0, G.jsx)(e.Generic.Menu.Dropdown, {
 		className: "bn-menu-dropdown bn-color-picker-dropdown",
-		children: /* @__PURE__ */ (0, G.jsx)(HR, {
+		children: /* @__PURE__ */ (0, G.jsx)(KR, {
 			text: a.textColor ? {
 				color: a.textColor,
 				setColor: o
@@ -39248,23 +39293,23 @@ var WR = () => {
 			} : void 0
 		})
 	})] });
-}, GR = (e) => {
+}, YR = (e) => {
 	for (let t of TS) if (e.startsWith(t)) return e;
 	return `${ES}://${e}`;
-}, KR = (e) => {
-	let t = J(), n = Y(), { editLink: r } = kI(wS), { url: i, text: a, showTextField: o } = e, [s, c] = (0, _.useState)(i), [l, u] = (0, _.useState)(a);
+}, XR = (e) => {
+	let t = J(), n = Y(), { editLink: r } = AI(wS), { url: i, text: a, showTextField: o } = e, [s, c] = (0, _.useState)(i), [l, u] = (0, _.useState)(a);
 	(0, _.useEffect)(() => {
 		c(i), u(a);
 	}, [a, i]);
 	let d = (0, _.useCallback)((t) => {
-		t.key === "Enter" && !t.nativeEvent.isComposing && (t.preventDefault(), r(GR(s), l, e.range.from), e.setToolbarOpen?.(!1), e.setToolbarPositionFrozen?.(!1));
+		t.key === "Enter" && !t.nativeEvent.isComposing && (t.preventDefault(), r(YR(s), l, e.range.from), e.setToolbarOpen?.(!1), e.setToolbarPositionFrozen?.(!1));
 	}, [
 		r,
 		s,
 		l,
 		e
 	]), f = (0, _.useCallback)((e) => c(e.currentTarget.value), []), p = (0, _.useCallback)((e) => u(e.currentTarget.value), []), m = (0, _.useCallback)(() => {
-		r(GR(s), l, e.range.from), e.setToolbarOpen?.(!1), e.setToolbarPositionFrozen?.(!1);
+		r(YR(s), l, e.range.from), e.setToolbarOpen?.(!1), e.setToolbarPositionFrozen?.(!1);
 	}, [
 		r,
 		s,
@@ -39274,7 +39319,7 @@ var WR = () => {
 	return /* @__PURE__ */ (0, G.jsxs)(t.Generic.Form.Root, { children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Form.TextInput, {
 		className: "bn-text-input",
 		name: "url",
-		icon: /* @__PURE__ */ (0, G.jsx)(pR, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(_R, {}),
 		autoFocus: !0,
 		placeholder: n.link_toolbar.form.url_placeholder,
 		value: s,
@@ -39284,7 +39329,7 @@ var WR = () => {
 	}), o !== !1 && /* @__PURE__ */ (0, G.jsx)(t.Generic.Form.TextInput, {
 		className: "bn-text-input",
 		name: "title",
-		icon: /* @__PURE__ */ (0, G.jsx)(iR, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(cR, {}),
 		placeholder: n.link_toolbar.form.title_placeholder,
 		value: l,
 		onKeyDown: d,
@@ -39292,16 +39337,16 @@ var WR = () => {
 		onSubmit: m
 	})] });
 };
-function qR(e) {
+function ZR(e) {
 	return "link" in e.schema.inlineContentSchema && e.schema.inlineContentSchema.link === "link";
 }
-var JR = () => {
-	let e = q(), t = RI(), n = J(), r = Y(), i = kI(dx), { showSelection: a } = kI(kx), [o, s] = (0, _.useState)(!1);
+var QR = () => {
+	let e = q(), t = zI(), n = J(), r = Y(), i = AI(dx), { showSelection: a } = AI(kx), [o, s] = (0, _.useState)(!1);
 	(0, _.useEffect)(() => (a(o, "createLinkButton"), () => a(!1, "createLinkButton")), [o, a]);
-	let c = LI({
+	let c = RI({
 		editor: e,
 		selector: ({ editor: e }) => {
-			if (!(!e.isEditable || !qR(e) || ux(e.prosemirrorState.selection) || !(e.getSelection()?.blocks || [e.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return {
+			if (!(!e.isEditable || !ZR(e) || ux(e.prosemirrorState.selection) || !(e.getSelection()?.blocks || [e.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return {
 				url: e.getSelectedLinkUrl(),
 				text: e.getSelectedText(),
 				range: {
@@ -39329,12 +39374,12 @@ var JR = () => {
 			label: r.formatting_toolbar.link.tooltip,
 			mainTooltip: r.formatting_toolbar.link.tooltip,
 			secondaryTooltip: hv(r.formatting_toolbar.link.secondary_tooltip, r.generic.ctrl_shortcut),
-			icon: /* @__PURE__ */ (0, G.jsx)(pR, {}),
+			icon: /* @__PURE__ */ (0, G.jsx)(_R, {}),
 			onClick: () => s((e) => !e)
 		}) }), /* @__PURE__ */ (0, G.jsx)(n.Generic.Popover.Content, {
 			className: "bn-popover-content bn-form-popover",
 			variant: "form-popover",
-			children: /* @__PURE__ */ (0, G.jsx)(KR, {
+			children: /* @__PURE__ */ (0, G.jsx)(XR, {
 				url: c.url || "",
 				text: c.text,
 				range: c.range,
@@ -39343,8 +39388,8 @@ var JR = () => {
 			})
 		})]
 	});
-}, YR = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, $R = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39368,14 +39413,14 @@ var JR = () => {
 			className: "bn-button",
 			label: e.formatting_toolbar.file_caption.tooltip,
 			mainTooltip: e.formatting_toolbar.file_caption.tooltip,
-			icon: /* @__PURE__ */ (0, G.jsx)(gR, {}),
+			icon: /* @__PURE__ */ (0, G.jsx)(bR, {}),
 			onClick: () => a((e) => !e)
 		}) }), /* @__PURE__ */ (0, G.jsx)(t.Generic.Popover.Content, {
 			className: "bn-popover-content bn-form-popover",
 			variant: "form-popover",
 			children: /* @__PURE__ */ (0, G.jsx)(t.Generic.Form.Root, { children: /* @__PURE__ */ (0, G.jsx)(t.Generic.Form.TextInput, {
 				name: "file-caption",
-				icon: /* @__PURE__ */ (0, G.jsx)(gR, {}),
+				icon: /* @__PURE__ */ (0, G.jsx)(bR, {}),
 				value: r.props.caption,
 				autoFocus: !0,
 				placeholder: e.formatting_toolbar.file_caption.input_placeholder,
@@ -39384,8 +39429,8 @@ var JR = () => {
 			}) })
 		})]
 	});
-}, XR = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, ez = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39401,11 +39446,11 @@ var JR = () => {
 		className: "bn-button",
 		label: e.formatting_toolbar.file_delete.tooltip[r.type] || e.formatting_toolbar.file_delete.tooltip.file,
 		mainTooltip: e.formatting_toolbar.file_delete.tooltip[r.type] || e.formatting_toolbar.file_delete.tooltip.file,
-		icon: /* @__PURE__ */ (0, G.jsx)(JL, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(QL, {}),
 		onClick: i
 	});
-}, ZR = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, tz = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39429,14 +39474,14 @@ var JR = () => {
 			className: "bn-button",
 			label: e.formatting_toolbar.file_rename.tooltip[r.type] || e.formatting_toolbar.file_rename.tooltip.file,
 			mainTooltip: e.formatting_toolbar.file_rename.tooltip[r.type] || e.formatting_toolbar.file_rename.tooltip.file,
-			icon: /* @__PURE__ */ (0, G.jsx)(TR, {}),
+			icon: /* @__PURE__ */ (0, G.jsx)(kR, {}),
 			onClick: () => a((e) => !e)
 		}) }), /* @__PURE__ */ (0, G.jsx)(t.Generic.Popover.Content, {
 			className: "bn-popover-content bn-form-popover",
 			variant: "form-popover",
 			children: /* @__PURE__ */ (0, G.jsx)(t.Generic.Form.Root, { children: /* @__PURE__ */ (0, G.jsx)(t.Generic.Form.TextInput, {
 				name: "file-name",
-				icon: /* @__PURE__ */ (0, G.jsx)(TR, {}),
+				icon: /* @__PURE__ */ (0, G.jsx)(kR, {}),
 				value: r.props.name,
 				autoFocus: !0,
 				placeholder: e.formatting_toolbar.file_rename.input_placeholder[r.type] || e.formatting_toolbar.file_rename.input_placeholder.file,
@@ -39445,8 +39490,8 @@ var JR = () => {
 			}) })
 		})]
 	});
-}, QR = () => {
-	let e = Y(), t = J(), n = LI({
+}, nz = () => {
+	let e = Y(), t = J(), n = RI({
 		editor: q(),
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39462,15 +39507,15 @@ var JR = () => {
 			className: "bn-button",
 			mainTooltip: e.formatting_toolbar.file_replace.tooltip[n.type] || e.formatting_toolbar.file_replace.tooltip.file,
 			label: e.formatting_toolbar.file_replace.tooltip[n.type] || e.formatting_toolbar.file_replace.tooltip.file,
-			icon: /* @__PURE__ */ (0, G.jsx)($L, {})
+			icon: /* @__PURE__ */ (0, G.jsx)(rR, {})
 		}) }), /* @__PURE__ */ (0, G.jsx)(t.Generic.Popover.Content, {
 			className: "bn-popover-content bn-panel-popover",
 			variant: "panel-popover",
-			children: /* @__PURE__ */ (0, G.jsx)(EL, { blockId: n.id })
+			children: /* @__PURE__ */ (0, G.jsx)(AL, { blockId: n.id })
 		})]
 	});
-}, $R = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, rz = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!(!e.isEditable || !(e.getSelection()?.blocks || [e.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return { canNestBlock: e.canNestBlock() };
@@ -39486,10 +39531,10 @@ var JR = () => {
 		label: e.formatting_toolbar.nest.tooltip,
 		mainTooltip: e.formatting_toolbar.nest.tooltip,
 		secondaryTooltip: hv(e.formatting_toolbar.nest.secondary_tooltip, e.generic.ctrl_shortcut),
-		icon: /* @__PURE__ */ (0, G.jsx)(_R, {})
+		icon: /* @__PURE__ */ (0, G.jsx)(xR, {})
 	});
-}, ez = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, iz = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!(!e.isEditable || !(e.getSelection()?.blocks || [e.getTextCursorPosition().block]).find((e) => e.content !== void 0))) return { canUnnestBlock: e.canUnnestBlock() };
@@ -39505,13 +39550,13 @@ var JR = () => {
 		label: e.formatting_toolbar.unnest.tooltip,
 		mainTooltip: e.formatting_toolbar.unnest.tooltip,
 		secondaryTooltip: hv(e.formatting_toolbar.unnest.secondary_tooltip, e.generic.ctrl_shortcut),
-		icon: /* @__PURE__ */ (0, G.jsx)(vR, {})
+		icon: /* @__PURE__ */ (0, G.jsx)(SR, {})
 	});
-}, tz = (e) => [
+}, az = (e) => [
 	{
 		name: e.slash_menu.paragraph.title,
 		type: "paragraph",
-		icon: iR
+		icon: cR
 	},
 	{
 		name: e.slash_menu.heading.title,
@@ -39520,7 +39565,7 @@ var JR = () => {
 			level: 1,
 			isToggleable: !1
 		},
-		icon: wR
+		icon: OR
 	},
 	{
 		name: e.slash_menu.heading_2.title,
@@ -39529,7 +39574,7 @@ var JR = () => {
 			level: 2,
 			isToggleable: !1
 		},
-		icon: CR
+		icon: DR
 	},
 	{
 		name: e.slash_menu.heading_3.title,
@@ -39538,7 +39583,7 @@ var JR = () => {
 			level: 3,
 			isToggleable: !1
 		},
-		icon: SR
+		icon: ER
 	},
 	{
 		name: e.slash_menu.heading_4.title,
@@ -39547,7 +39592,7 @@ var JR = () => {
 			level: 4,
 			isToggleable: !1
 		},
-		icon: xR
+		icon: TR
 	},
 	{
 		name: e.slash_menu.heading_5.title,
@@ -39556,7 +39601,7 @@ var JR = () => {
 			level: 5,
 			isToggleable: !1
 		},
-		icon: bR
+		icon: wR
 	},
 	{
 		name: e.slash_menu.heading_6.title,
@@ -39565,7 +39610,7 @@ var JR = () => {
 			level: 6,
 			isToggleable: !1
 		},
-		icon: yR
+		icon: CR
 	},
 	{
 		name: e.slash_menu.toggle_heading.title,
@@ -39574,7 +39619,7 @@ var JR = () => {
 			level: 1,
 			isToggleable: !0
 		},
-		icon: wR
+		icon: OR
 	},
 	{
 		name: e.slash_menu.toggle_heading_2.title,
@@ -39583,7 +39628,7 @@ var JR = () => {
 			level: 2,
 			isToggleable: !0
 		},
-		icon: CR
+		icon: DR
 	},
 	{
 		name: e.slash_menu.toggle_heading_3.title,
@@ -39592,38 +39637,38 @@ var JR = () => {
 			level: 3,
 			isToggleable: !0
 		},
-		icon: SR
+		icon: ER
 	},
 	{
 		name: e.slash_menu.quote.title,
 		type: "quote",
-		icon: sR
+		icon: dR
 	},
 	{
 		name: e.slash_menu.toggle_list.title,
 		type: "toggleListItem",
-		icon: QL
+		icon: nR
 	},
 	{
 		name: e.slash_menu.bullet_list.title,
 		type: "bulletListItem",
-		icon: uR
+		icon: mR
 	},
 	{
 		name: e.slash_menu.numbered_list.title,
 		type: "numberedListItem",
-		icon: dR
+		icon: hR
 	},
 	{
 		name: e.slash_menu.check_list.title,
 		type: "checkListItem",
-		icon: fR
+		icon: gR
 	}
-], nz = (e) => {
-	let t = J(), n = q(), r = LI({
+], oz = (e) => {
+	let t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => e.getSelection()?.blocks || [e.getTextCursorPosition().block]
-	}), i = r[0], a = (0, _.useMemo)(() => (e.items || tz(n.dictionary)).filter((e) => cx(n, e.type, Object.fromEntries(Object.entries(e.props || {}).map(([e, t]) => [e, typeof t])))), [n, e.items]), o = (0, _.useMemo)(() => a.map((e) => {
+	}), i = r[0], a = (0, _.useMemo)(() => (e.items || az(n.dictionary)).filter((e) => cx(n, e.type, Object.fromEntries(Object.entries(e.props || {}).map(([e, t]) => [e, typeof t])))), [n, e.items]), o = (0, _.useMemo)(() => a.map((e) => {
 		let t = e.icon, a = e.type === i.type, o = Object.entries(e.props || {}).filter(([e, t]) => t !== i.props[e]).length === 0;
 		return {
 			text: e.name,
@@ -39649,18 +39694,18 @@ var JR = () => {
 		className: "bn-select",
 		items: o
 	});
-}, rz = () => {
-	let e = Y(), t = J(), n = kI("comments"), { store: r } = kI(dx), i = (0, _.useCallback)(() => {
+}, sz = () => {
+	let e = Y(), t = J(), n = AI("comments"), { store: r } = AI(dx), i = (0, _.useCallback)(() => {
 		n.startPendingComment(), r.setState(!1);
 	}, [n, r]);
 	return /* @__PURE__ */ (0, G.jsx)(t.FormattingToolbar.Button, {
 		className: "bn-button",
 		label: e.formatting_toolbar.comment.tooltip,
 		mainTooltip: e.formatting_toolbar.comment.tooltip,
-		icon: /* @__PURE__ */ (0, G.jsx)(PR, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(RR, {}),
 		onClick: i
 	});
-}, iz = () => q().getExtension("comments") ? /* @__PURE__ */ (0, G.jsx)(rz, {}) : null, az = () => {
+}, cz = () => q().getExtension("comments") ? /* @__PURE__ */ (0, G.jsx)(sz, {}) : null, lz = () => {
 	let e = Y(), t = J(), n = q(), r = (0, _.useCallback)(() => {
 		n._tiptapEditor.chain().focus().addPendingComment().run();
 	}, [n]);
@@ -39668,19 +39713,19 @@ var JR = () => {
 		className: "bn-button",
 		label: e.formatting_toolbar.comment.tooltip,
 		mainTooltip: e.formatting_toolbar.comment.tooltip,
-		icon: /* @__PURE__ */ (0, G.jsx)(PR, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(RR, {}),
 		onClick: r
 	});
 };
-function oz(e, t) {
+function uz(e, t) {
 	try {
 		let n = new URL(e, t);
 		if (n.protocol !== "javascript:") return n.href;
 	} catch {}
 	return "#";
 }
-var sz = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+var dz = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			let t = e.getSelection()?.blocks || [e.getTextCursorPosition().block];
@@ -39689,17 +39734,17 @@ var sz = () => {
 			if (lx(n, e, n.type, { url: "string" })) return n;
 		}
 	}), i = (0, _.useCallback)(() => {
-		r !== void 0 && (n.focus(), n.resolveFileUrl ? n.resolveFileUrl(r.props.url).then((e) => window.open(oz(e, window.location.href))) : window.open(oz(r.props.url, window.location.href)));
+		r !== void 0 && (n.focus(), n.resolveFileUrl ? n.resolveFileUrl(r.props.url).then((e) => window.open(uz(e, window.location.href))) : window.open(uz(r.props.url, window.location.href)));
 	}, [r, n]);
 	return r === void 0 ? null : /* @__PURE__ */ (0, G.jsx)(t.FormattingToolbar.Button, {
 		className: "bn-button",
 		label: e.formatting_toolbar.file_download.tooltip[r.type] || e.formatting_toolbar.file_download.tooltip.file,
 		mainTooltip: e.formatting_toolbar.file_download.tooltip[r.type] || e.formatting_toolbar.file_download.tooltip.file,
-		icon: /* @__PURE__ */ (0, G.jsx)(KL, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(XL, {}),
 		onClick: i
 	});
-}, cz = () => {
-	let e = Y(), t = J(), n = q(), r = LI({
+}, fz = () => {
+	let e = Y(), t = J(), n = q(), r = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39718,12 +39763,12 @@ var sz = () => {
 		className: "bn-button",
 		label: "Toggle preview",
 		mainTooltip: e.formatting_toolbar.file_preview_toggle.tooltip,
-		icon: /* @__PURE__ */ (0, G.jsx)(eR, {}),
+		icon: /* @__PURE__ */ (0, G.jsx)(iR, {}),
 		isSelected: r.props.showPreview,
 		onClick: i
 	});
-}, lz = () => {
-	let e = Y(), t = J(), n = q(), r = kI(BC), i = LI({
+}, pz = () => {
+	let e = Y(), t = J(), n = q(), r = AI(BC), i = RI({
 		editor: n,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable || !e.settings.tables.splitCells) return;
@@ -39739,16 +39784,16 @@ var sz = () => {
 		className: "bn-button",
 		label: e.formatting_toolbar.table_cell_merge.tooltip,
 		mainTooltip: e.formatting_toolbar.table_cell_merge.tooltip,
-		icon: i.mergeDirection === "horizontal" ? /* @__PURE__ */ (0, G.jsx)(lR, {}) : /* @__PURE__ */ (0, G.jsx)(cR, {}),
+		icon: i.mergeDirection === "horizontal" ? /* @__PURE__ */ (0, G.jsx)(pR, {}) : /* @__PURE__ */ (0, G.jsx)(fR, {}),
 		onClick: a
 	});
-}, uz = () => q().getExtension(BC) ? /* @__PURE__ */ (0, G.jsx)(lz, {}) : null, dz = {
-	left: kR,
-	center: jR,
-	right: OR,
-	justify: AR
-}, fz = (e) => {
-	let t = J(), n = Y(), r = q(), i = LI({
+}, mz = () => q().getExtension(BC) ? /* @__PURE__ */ (0, G.jsx)(pz, {}) : null, hz = {
+	left: NR,
+	center: FR,
+	right: MR,
+	justify: PR
+}, gz = (e) => {
+	let t = J(), n = Y(), r = q(), i = RI({
 		editor: r,
 		selector: ({ editor: e }) => {
 			if (!e.isEditable) return;
@@ -39787,7 +39832,7 @@ var sz = () => {
 		}
 	}, [r, i]);
 	if (i === void 0) return null;
-	let o = dz[e.textAlignment];
+	let o = hz[e.textAlignment];
 	return /* @__PURE__ */ (0, G.jsx)(t.FormattingToolbar.Button, {
 		className: "bn-button",
 		"data-test": `alignText${e.textAlignment.slice(0, 1).toUpperCase() + e.textAlignment.slice(1)}`,
@@ -39797,50 +39842,50 @@ var sz = () => {
 		mainTooltip: n.formatting_toolbar[`align_${e.textAlignment}`].tooltip,
 		icon: /* @__PURE__ */ (0, G.jsx)(o, {})
 	});
-}, pz = (e) => [
-	/* @__PURE__ */ (0, G.jsx)(nz, { items: e }, "blockTypeSelect"),
-	/* @__PURE__ */ (0, G.jsx)(uz, {}, "tableCellMergeButton"),
-	/* @__PURE__ */ (0, G.jsx)(YR, {}, "fileCaptionButton"),
-	/* @__PURE__ */ (0, G.jsx)(QR, {}, "replaceFileButton"),
-	/* @__PURE__ */ (0, G.jsx)(ZR, {}, "fileRenameButton"),
-	/* @__PURE__ */ (0, G.jsx)(XR, {}, "fileDeleteButton"),
-	/* @__PURE__ */ (0, G.jsx)(sz, {}, "fileDownloadButton"),
-	/* @__PURE__ */ (0, G.jsx)(cz, {}, "filePreviewButton"),
-	/* @__PURE__ */ (0, G.jsx)(zR, { basicTextStyle: "bold" }, "boldStyleButton"),
-	/* @__PURE__ */ (0, G.jsx)(zR, { basicTextStyle: "italic" }, "italicStyleButton"),
-	/* @__PURE__ */ (0, G.jsx)(zR, { basicTextStyle: "underline" }, "underlineStyleButton"),
-	/* @__PURE__ */ (0, G.jsx)(zR, { basicTextStyle: "strike" }, "strikeStyleButton"),
-	/* @__PURE__ */ (0, G.jsx)(fz, { textAlignment: "left" }, "textAlignLeftButton"),
-	/* @__PURE__ */ (0, G.jsx)(fz, { textAlignment: "center" }, "textAlignCenterButton"),
-	/* @__PURE__ */ (0, G.jsx)(fz, { textAlignment: "right" }, "textAlignRightButton"),
-	/* @__PURE__ */ (0, G.jsx)(WR, {}, "colorStyleButton"),
-	/* @__PURE__ */ (0, G.jsx)($R, {}, "nestBlockButton"),
-	/* @__PURE__ */ (0, G.jsx)(ez, {}, "unnestBlockButton"),
-	/* @__PURE__ */ (0, G.jsx)(JR, {}, "createLinkButton"),
-	/* @__PURE__ */ (0, G.jsx)(iz, {}, "addCommentButton"),
-	/* @__PURE__ */ (0, G.jsx)(az, {}, "addTiptapCommentButton")
-], mz = (e) => /* @__PURE__ */ (0, G.jsx)(J().FormattingToolbar.Root, {
+}, _z = (e) => [
+	/* @__PURE__ */ (0, G.jsx)(oz, { items: e }, "blockTypeSelect"),
+	/* @__PURE__ */ (0, G.jsx)(mz, {}, "tableCellMergeButton"),
+	/* @__PURE__ */ (0, G.jsx)($R, {}, "fileCaptionButton"),
+	/* @__PURE__ */ (0, G.jsx)(nz, {}, "replaceFileButton"),
+	/* @__PURE__ */ (0, G.jsx)(tz, {}, "fileRenameButton"),
+	/* @__PURE__ */ (0, G.jsx)(ez, {}, "fileDeleteButton"),
+	/* @__PURE__ */ (0, G.jsx)(dz, {}, "fileDownloadButton"),
+	/* @__PURE__ */ (0, G.jsx)(fz, {}, "filePreviewButton"),
+	/* @__PURE__ */ (0, G.jsx)(UR, { basicTextStyle: "bold" }, "boldStyleButton"),
+	/* @__PURE__ */ (0, G.jsx)(UR, { basicTextStyle: "italic" }, "italicStyleButton"),
+	/* @__PURE__ */ (0, G.jsx)(UR, { basicTextStyle: "underline" }, "underlineStyleButton"),
+	/* @__PURE__ */ (0, G.jsx)(UR, { basicTextStyle: "strike" }, "strikeStyleButton"),
+	/* @__PURE__ */ (0, G.jsx)(gz, { textAlignment: "left" }, "textAlignLeftButton"),
+	/* @__PURE__ */ (0, G.jsx)(gz, { textAlignment: "center" }, "textAlignCenterButton"),
+	/* @__PURE__ */ (0, G.jsx)(gz, { textAlignment: "right" }, "textAlignRightButton"),
+	/* @__PURE__ */ (0, G.jsx)(JR, {}, "colorStyleButton"),
+	/* @__PURE__ */ (0, G.jsx)(rz, {}, "nestBlockButton"),
+	/* @__PURE__ */ (0, G.jsx)(iz, {}, "unnestBlockButton"),
+	/* @__PURE__ */ (0, G.jsx)(QR, {}, "createLinkButton"),
+	/* @__PURE__ */ (0, G.jsx)(cz, {}, "addCommentButton"),
+	/* @__PURE__ */ (0, G.jsx)(lz, {}, "addTiptapCommentButton")
+], vz = (e) => /* @__PURE__ */ (0, G.jsx)(J().FormattingToolbar.Root, {
 	className: "bn-toolbar bn-formatting-toolbar",
-	children: e.children || pz(e.blockTypeSelectItems)
-}), hz = (e) => {
+	children: e.children || _z(e.blockTypeSelectItems)
+}), yz = (e) => {
 	switch (e) {
 		case "left": return "top-start";
 		case "center": return "top";
 		case "right": return "top-end";
 		default: return "top-start";
 	}
-}, gz = (e) => {
-	let t = q(), n = kI(dx, { editor: t }), r = AI(dx, { editor: t }), i = LI({
+}, bz = (e) => {
+	let t = q(), n = AI(dx, { editor: t }), r = jI(dx, { editor: t }), i = RI({
 		editor: t,
 		selector: ({ editor: e }) => n.store.state ? {
 			from: e.prosemirrorState.selection.from,
 			to: e.prosemirrorState.selection.to
 		} : void 0
-	}), a = LI({
+	}), a = RI({
 		editor: t,
 		selector: ({ editor: e }) => {
 			let t = e.getTextCursorPosition().block;
-			return lx(t, e, t.type, { textAlignment: Yy.textAlignment }) ? hz(t.props.textAlignment) : "top-start";
+			return lx(t, e, t.type, { textAlignment: Yy.textAlignment }) ? yz(t.props.textAlignment) : "top-start";
 		}
 	}), o = (0, _.useMemo)(() => ({
 		...e.floatingUIOptions,
@@ -39871,15 +39916,15 @@ var sz = () => {
 		e.floatingUIOptions,
 		n.store,
 		t
-	]), s = e.formattingToolbar || mz;
-	return /* @__PURE__ */ (0, G.jsx)(zI, {
+	]), s = e.formattingToolbar || vz;
+	return /* @__PURE__ */ (0, G.jsx)(BI, {
 		position: i,
 		portalElement: e.portalElement,
 		...o,
 		children: r && /* @__PURE__ */ (0, G.jsx)(s, {})
 	});
-}, _z = (e) => {
-	let t = J(), n = Y(), { deleteLink: r } = kI(wS);
+}, xz = (e) => {
+	let t = J(), n = Y(), { deleteLink: r } = AI(wS);
 	return /* @__PURE__ */ (0, G.jsx)(t.LinkToolbar.Button, {
 		className: "bn-button",
 		label: n.link_toolbar.delete.tooltip,
@@ -39888,9 +39933,9 @@ var sz = () => {
 		onClick: () => {
 			r(e.range.from), e.setToolbarOpen?.(!1);
 		},
-		icon: /* @__PURE__ */ (0, G.jsx)(mR, {})
+		icon: /* @__PURE__ */ (0, G.jsx)(vR, {})
 	});
-}, vz = (e) => {
+}, Sz = (e) => {
 	let t = J(), n = Y();
 	return /* @__PURE__ */ (0, G.jsxs)(t.Generic.Popover.Root, {
 		onOpenChange: e.setToolbarPositionFrozen,
@@ -39902,7 +39947,7 @@ var sz = () => {
 		}) }), /* @__PURE__ */ (0, G.jsx)(t.Generic.Popover.Content, {
 			className: "bn-popover-content bn-form-popover",
 			variant: "form-popover",
-			children: /* @__PURE__ */ (0, G.jsx)(KR, {
+			children: /* @__PURE__ */ (0, G.jsx)(XR, {
 				url: e.url,
 				text: e.text,
 				range: e.range,
@@ -39911,7 +39956,7 @@ var sz = () => {
 			})
 		})]
 	});
-}, yz = (e) => {
+}, Cz = (e) => {
 	let t = J(), n = Y();
 	return /* @__PURE__ */ (0, G.jsx)(t.LinkToolbar.Button, {
 		className: "bn-button",
@@ -39919,28 +39964,28 @@ var sz = () => {
 		label: n.link_toolbar.open.tooltip,
 		isSelected: !1,
 		onClick: () => {
-			window.open(oz(e.url, window.location.href), "_blank");
+			window.open(uz(e.url, window.location.href), "_blank");
 		},
-		icon: /* @__PURE__ */ (0, G.jsx)(GL, {})
+		icon: /* @__PURE__ */ (0, G.jsx)(YL, {})
 	});
-}, bz = (e) => /* @__PURE__ */ (0, G.jsx)(J().LinkToolbar.Root, {
+}, wz = (e) => /* @__PURE__ */ (0, G.jsx)(J().LinkToolbar.Root, {
 	className: "bn-toolbar bn-link-toolbar",
 	children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-		/* @__PURE__ */ (0, G.jsx)(vz, {
+		/* @__PURE__ */ (0, G.jsx)(Sz, {
 			url: e.url,
 			text: e.text,
 			range: e.range,
 			setToolbarOpen: e.setToolbarOpen,
 			setToolbarPositionFrozen: e.setToolbarPositionFrozen
 		}),
-		/* @__PURE__ */ (0, G.jsx)(yz, { url: e.url }),
-		/* @__PURE__ */ (0, G.jsx)(_z, {
+		/* @__PURE__ */ (0, G.jsx)(Cz, { url: e.url }),
+		/* @__PURE__ */ (0, G.jsx)(xz, {
 			range: e.range,
 			setToolbarOpen: e.setToolbarOpen
 		})
 	] })
-}), xz = (e) => {
-	let t = q(), [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(!1), o = RI(), s = kI(wS), [c, l] = (0, _.useState)(void 0);
+}), Tz = (e) => {
+	let t = q(), [n, r] = (0, _.useState)(!1), [i, a] = (0, _.useState)(!1), o = zI(), s = AI(wS), [c, l] = (0, _.useState)(void 0);
 	(0, _.useEffect)(() => {
 		let e = () => {
 			let e = s.getLinkAtSelection();
@@ -40012,8 +40057,8 @@ var sz = () => {
 		i
 	]), d = (0, _.useMemo)(() => c?.element ? { element: c.element } : void 0, [c?.element]);
 	if (!t.isEditable) return null;
-	let f = e.linkToolbar || bz;
-	return /* @__PURE__ */ (0, G.jsx)(NI, {
+	let f = e.linkToolbar || wz;
+	return /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: d,
 		portalElement: e.portalElement,
 		...u,
@@ -40026,7 +40071,7 @@ var sz = () => {
 		})
 	});
 };
-function Sz(e) {
+function Ez(e) {
 	return X({
 		tag: "svg",
 		attr: { viewBox: "0 0 1024 1024" },
@@ -40041,8 +40086,8 @@ function Sz(e) {
 		}]
 	})(e);
 }
-var Cz = () => {
-	let e = J(), t = Y(), n = q(), r = kI(gx), i = AI(OC, {
+var Dz = () => {
+	let e = J(), t = Y(), n = q(), r = AI(gx), i = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	}), a = (0, _.useCallback)(() => {
@@ -40061,14 +40106,14 @@ var Cz = () => {
 	return i === void 0 ? null : /* @__PURE__ */ (0, G.jsx)(e.SideMenu.Button, {
 		className: "bn-button",
 		label: t.side_menu.add_block_label,
-		icon: /* @__PURE__ */ (0, G.jsx)(Sz, {
+		icon: /* @__PURE__ */ (0, G.jsx)(Ez, {
 			size: 24,
 			onClick: a,
 			"data-test": "dragHandleAdd"
 		})
 	});
 };
-function wz(e) {
+function Oz(e) {
 	return X({
 		tag: "svg",
 		attr: { viewBox: "0 0 24 24" },
@@ -40086,7 +40131,7 @@ function wz(e) {
 		}]
 	})(e);
 }
-function Tz(e) {
+function kz(e) {
 	return X({
 		tag: "svg",
 		attr: { viewBox: "0 0 24 24" },
@@ -40104,8 +40149,8 @@ function Tz(e) {
 		}]
 	})(e);
 }
-var Ez = (e) => {
-	let t = J(), n = q(), r = AI(OC, {
+var Az = (e) => {
+	let t = J(), n = q(), r = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	});
@@ -40122,7 +40167,7 @@ var Ez = (e) => {
 		}), /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Dropdown, {
 			sub: !0,
 			className: "bn-menu-dropdown bn-color-picker-dropdown",
-			children: /* @__PURE__ */ (0, G.jsx)(HR, {
+			children: /* @__PURE__ */ (0, G.jsx)(KR, {
 				iconSize: 18,
 				text: lx(r, n, r.type, { textColor: "string" }) && cx(n, r.type, { textColor: "string" }) ? {
 					color: r.props.textColor,
@@ -40138,8 +40183,8 @@ var Ez = (e) => {
 			})
 		})]
 	});
-}, Dz = (e) => {
-	let t = J(), n = q(), r = AI(OC, {
+}, jz = (e) => {
+	let t = J(), n = q(), r = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	});
@@ -40151,8 +40196,8 @@ var Ez = (e) => {
 		},
 		children: e.children
 	});
-}, Oz = (e) => {
-	let t = J(), n = q(), r = AI(OC, {
+}, Mz = (e) => {
+	let t = J(), n = q(), r = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	});
@@ -40169,8 +40214,8 @@ var Ez = (e) => {
 		},
 		children: e.children
 	});
-}, kz = (e) => {
-	let t = J(), n = q(), r = AI(OC, {
+}, Nz = (e) => {
+	let t = J(), n = q(), r = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	});
@@ -40187,21 +40232,21 @@ var Ez = (e) => {
 		},
 		children: e.children
 	});
-}, Az = (e) => {
+}, Pz = (e) => {
 	let t = J(), n = Y();
 	return /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Dropdown, {
 		className: "bn-menu-dropdown bn-drag-handle-menu",
 		children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-			/* @__PURE__ */ (0, G.jsx)(Dz, { children: n.drag_handle.delete_menuitem }),
-			/* @__PURE__ */ (0, G.jsx)(Ez, { children: n.drag_handle.colors_menuitem }),
-			/* @__PURE__ */ (0, G.jsx)(Oz, { children: n.drag_handle.header_row_menuitem }),
-			/* @__PURE__ */ (0, G.jsx)(kz, { children: n.drag_handle.header_column_menuitem })
+			/* @__PURE__ */ (0, G.jsx)(jz, { children: n.drag_handle.delete_menuitem }),
+			/* @__PURE__ */ (0, G.jsx)(Az, { children: n.drag_handle.colors_menuitem }),
+			/* @__PURE__ */ (0, G.jsx)(Mz, { children: n.drag_handle.header_row_menuitem }),
+			/* @__PURE__ */ (0, G.jsx)(Nz, { children: n.drag_handle.header_column_menuitem })
 		] })
 	});
-}, jz = (e) => {
-	let t = J(), n = Y(), r = kI(OC), i = AI(OC, { selector: (e) => e?.block });
+}, Fz = (e) => {
+	let t = J(), n = Y(), r = AI(OC), i = jI(OC, { selector: (e) => e?.block });
 	if (i === void 0) return null;
-	let a = e.dragHandleMenu || Az;
+	let a = e.dragHandleMenu || Pz;
 	return /* @__PURE__ */ (0, G.jsxs)(t.Generic.Menu.Root, {
 		onOpenChange: (e) => {
 			e ? r.freezeMenu() : r.unfreezeMenu();
@@ -40213,14 +40258,14 @@ var Ez = (e) => {
 			onDragStart: (e) => r.blockDragStart(e, i),
 			onDragEnd: r.blockDragEnd,
 			className: "bn-button",
-			icon: /* @__PURE__ */ (0, G.jsx)(Tz, {
+			icon: /* @__PURE__ */ (0, G.jsx)(kz, {
 				size: 24,
 				"data-test": "dragHandle"
 			})
 		}) }), /* @__PURE__ */ (0, G.jsx)(a, { children: e.children })]
 	});
-}, Mz = (e) => {
-	let t = J(), n = q(), r = AI(OC, {
+}, Iz = (e) => {
+	let t = J(), n = q(), r = jI(OC, {
 		editor: n,
 		selector: (e) => e?.block
 	}), i = (0, _.useMemo)(() => {
@@ -40231,10 +40276,10 @@ var Ez = (e) => {
 	return /* @__PURE__ */ (0, G.jsx)(t.SideMenu.Root, {
 		className: "bn-side-menu",
 		...i,
-		children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(Cz, {}), /* @__PURE__ */ (0, G.jsx)(jz, { dragHandleMenu: e.dragHandleMenu })] })
+		children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(Dz, {}), /* @__PURE__ */ (0, G.jsx)(Fz, { dragHandleMenu: e.dragHandleMenu })] })
 	});
-}, Nz = (e) => {
-	let t = q(), { show: n, block: r } = AI(OC, { selector: (e) => e === void 0 ? void 0 : {
+}, Lz = (e) => {
+	let t = q(), { show: n, block: r } = jI(OC, { selector: (e) => e === void 0 ? void 0 : {
 		show: e.show,
 		block: e.block
 	} }) || {}, i = (0, _.useCallback)((e, n, r) => {
@@ -40275,14 +40320,14 @@ var Ez = (e) => {
 		e.floatingUIOptions,
 		n,
 		i
-	]), o = e.sideMenu || Mz;
-	return /* @__PURE__ */ (0, G.jsx)(CL, {
+	]), o = e.sideMenu || Iz;
+	return /* @__PURE__ */ (0, G.jsx)(DL, {
 		blockId: n ? r?.id : void 0,
 		portalElement: e.portalElement,
 		...a,
 		children: r?.id && /* @__PURE__ */ (0, G.jsx)(o, {})
 	});
-}, Pz = ({ format: e, dictionary: t }) => {
+}, Rz = ({ format: e, dictionary: t }) => {
 	let n = t.suggestion_changes.formatting_change;
 	if (e.length === 0) return n;
 	let r = t.formatting_toolbar, i = [];
@@ -40292,9 +40337,9 @@ var Ez = (e) => {
 		i.push(a);
 	}
 	return i.join(", ");
-}, Fz = (e) => {
+}, zz = (e) => {
 	let t = J(), n = Y(), r = (0, _.useMemo)(() => {
-		let t = n.suggestion_changes, r = e.formatChangeLabel ?? Pz, i = e.users.join(", ");
+		let t = n.suggestion_changes, r = e.formatChangeLabel ?? Rz, i = e.users.join(", ");
 		if (e.modificationType === "insert") return t.inserted_by(i);
 		if (e.modificationType === "delete") return t.deleted_by(i);
 		let a = e.format ? r({
@@ -40315,8 +40360,8 @@ var Ez = (e) => {
 		backgroundColor: e.className ? void 0 : e.color,
 		children: r
 	});
-}, Iz = (e) => {
-	let t = AI("attribution", { selector: (e) => e }), n = (0, _.useMemo)(() => t ? {
+}, Bz = (e) => {
+	let t = jI("attribution", { selector: (e) => e }), n = (0, _.useMemo)(() => t ? {
 		element: t.anchor,
 		getBoundingClientRect: () => {
 			let e = t.anchor.firstElementChild ?? t.anchor, n = e.getBoundingClientRect();
@@ -40350,7 +40395,7 @@ var Ez = (e) => {
 			},
 			...e.floatingUIOptions?.elementProps
 		}
-	}), [e.floatingUIOptions, t]), i = e.attributionTooltip || Fz, a = (0, _.useMemo)(() => t ? {
+	}), [e.floatingUIOptions, t]), i = e.attributionTooltip || zz, a = (0, _.useMemo)(() => t ? {
 		color: t.color,
 		className: t.className,
 		modificationType: t.modificationType,
@@ -40359,21 +40404,21 @@ var Ez = (e) => {
 		format: t.format,
 		formatChangeLabel: e.formatChangeLabel
 	} : void 0, [t, e.formatChangeLabel]);
-	return /* @__PURE__ */ (0, G.jsx)(NI, {
+	return /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: n,
 		portalElement: e.portalElement,
 		...r,
 		children: a && /* @__PURE__ */ (0, G.jsx)(i, { ...a })
 	});
 };
-async function Lz(e, t) {
+async function Vz(e, t) {
 	return (await jC(e, t)).map(({ id: e, onItemClick: t }) => ({
 		id: e,
 		onItemClick: t,
 		icon: e
 	}));
 }
-function Rz(e) {
+function Hz(e) {
 	let t = J(), n = Y(), { items: r, loadingState: i, selectedIndex: a, onItemClick: o, columns: s } = e, c = i === "loading-initial" || i === "loading" ? /* @__PURE__ */ (0, G.jsx)(t.GridSuggestionMenu.Loader, {
 		className: "bn-grid-suggestion-menu-loader",
 		columns: s
@@ -40411,7 +40456,7 @@ function Rz(e) {
 		]
 	});
 }
-function zz(e, t, n, r = 3) {
+function Uz(e, t, n, r = 3) {
 	let i = (0, _.useRef)(0);
 	(0, _.useEffect)(() => {
 		t !== void 0 && (e.length > 0 ? i.current = t.length : t.length - i.current > r && n());
@@ -40422,7 +40467,7 @@ function zz(e, t, n, r = 3) {
 		t
 	]);
 }
-function Bz(e, t) {
+function Wz(e, t) {
 	let [n, r] = (0, _.useState)([]), [i, a] = (0, _.useState)(!1), o = (0, _.useRef)(void 0), s = (0, _.useRef)(void 0);
 	return (0, _.useEffect)(() => {
 		let n = e;
@@ -40435,8 +40480,8 @@ function Bz(e, t) {
 		loadingState: s.current === void 0 ? "loading-initial" : i ? "loading" : "loaded"
 	};
 }
-function Vz(e, t, n, r, i) {
-	let a = RI(e), [o, s] = (0, _.useState)(0);
+function Gz(e, t, n, r, i) {
+	let a = zI(e), [o, s] = (0, _.useState)(0);
 	return (0, _.useEffect)(() => {
 		let e = (e) => (e.key === "ArrowLeft" && (e.preventDefault(), n.length && s((o - 1 + n.length) % n.length)), e.key === "ArrowRight" && (e.preventDefault(), n.length && s((o + 1 + n.length) % n.length)), e.key === "ArrowUp" ? (e.preventDefault(), n.length && s((o - r + n.length) % n.length), !0) : e.key === "ArrowDown" ? (e.preventDefault(), n.length && s((o + r) % n.length), !0) : e.key === "Enter" && !e.isComposing ? (e.stopPropagation(), e.preventDefault(), n.length && i?.(n[o]), !0) : !1);
 		return a?.addEventListener("keydown", e, !0), () => {
@@ -40453,16 +40498,16 @@ function Vz(e, t, n, r, i) {
 		s(0);
 	}, [t]), { selectedIndex: n.length === 0 ? void 0 : o };
 }
-function Hz(e) {
-	let t = OI().setContentEditableProps, n = q(), { getItems: r, gridSuggestionMenuComponent: i, query: a, clearQuery: o, closeMenu: s, onItemClick: c, columns: l } = e, u = (0, _.useCallback)((e) => {
+function Kz(e) {
+	let t = kI().setContentEditableProps, n = q(), { getItems: r, gridSuggestionMenuComponent: i, query: a, clearQuery: o, closeMenu: s, onItemClick: c, columns: l } = e, u = (0, _.useCallback)((e) => {
 		s(), o(), c?.(e);
 	}, [
 		c,
 		s,
 		o
-	]), { items: d, usedQuery: f, loadingState: p } = Bz(a, r);
-	zz(d, f, s);
-	let { selectedIndex: m } = Vz(n, a, d, l, u);
+	]), { items: d, usedQuery: f, loadingState: p } = Wz(a, r);
+	Uz(d, f, s);
+	let { selectedIndex: m } = Gz(n, a, d, l, u);
 	return (0, _.useEffect)(() => (t((e) => ({
 		...e,
 		"aria-expanded": !0,
@@ -40489,10 +40534,10 @@ function Hz(e) {
 		columns: l
 	});
 }
-function Uz(e) {
-	let t = q(), n = RI(), { triggerCharacter: r, gridSuggestionMenuComponent: i, columns: a, shouldOpen: o, minQueryLength: s, onItemClick: c, getItems: l } = e, u = (0, _.useMemo)(() => c || ((e) => {
+function qz(e) {
+	let t = q(), n = zI(), { triggerCharacter: r, gridSuggestionMenuComponent: i, columns: a, shouldOpen: o, minQueryLength: s, onItemClick: c, getItems: l } = e, u = (0, _.useMemo)(() => c || ((e) => {
 		e.onItemClick(t);
-	}), [t, c]), d = (0, _.useMemo)(() => l || (async (e) => await Lz(t, e)), [t, l]), f = kI(gx);
+	}), [t, c]), d = (0, _.useMemo)(() => l || (async (e) => await Vz(t, e)), [t, l]), f = AI(gx);
 	(0, _.useEffect)(() => {
 		f.addSuggestionMenu({
 			triggerCharacter: r,
@@ -40503,7 +40548,7 @@ function Uz(e) {
 		r,
 		o
 	]);
-	let p = AI(gx), m = AI(gx, { selector: (e) => ({
+	let p = jI(gx), m = jI(gx, { selector: (e) => ({
 		element: n?.firstChild || void 0,
 		getBoundingClientRect: () => e?.referencePos || new DOMRect()
 	}) }), h = (0, _.useMemo)(() => ({
@@ -40546,22 +40591,22 @@ function Uz(e) {
 		f,
 		r
 	]);
-	return !p || !p.ignoreQueryLength && s && (p.query.startsWith(" ") || p.query.length < s) ? null : /* @__PURE__ */ (0, G.jsx)(NI, {
+	return !p || !p.ignoreQueryLength && s && (p.query.startsWith(" ") || p.query.length < s) ? null : /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: m,
 		portalElement: e.portalElement,
 		...h,
-		children: r && /* @__PURE__ */ (0, G.jsx)(Hz, {
+		children: r && /* @__PURE__ */ (0, G.jsx)(Kz, {
 			query: p.query,
 			closeMenu: f.closeMenu,
 			clearQuery: f.clearQuery,
 			getItems: d,
 			columns: a,
-			gridSuggestionMenuComponent: i || Rz,
+			gridSuggestionMenuComponent: i || Hz,
 			onItemClick: u
 		})
 	});
 }
-function Wz(e) {
+function Jz(e) {
 	let t = J(), n = Y(), { items: r, loadingState: i, selectedIndex: a, onItemClick: o } = e, s = i === "loading-initial" || i === "loading" ? /* @__PURE__ */ (0, G.jsx)(t.SuggestionMenu.Loader, { className: "bn-suggestion-menu-loader" }) : null, c = (0, _.useMemo)(() => {
 		let e, n = [];
 		for (let i = 0; i < r.length; i++) {
@@ -40597,7 +40642,7 @@ function Wz(e) {
 		]
 	});
 }
-function Gz(e, t) {
+function Yz(e, t) {
 	let [n, r] = (0, _.useState)(0);
 	return {
 		selectedIndex: n,
@@ -40607,16 +40652,16 @@ function Gz(e, t) {
 			if (i.key === "ArrowDown") return i.preventDefault(), e.length && r((n + 1) % e.length), !0;
 			if (i.key === "PageUp") return i.preventDefault(), e.length && r(0), !0;
 			if (i.key === "PageDown") return i.preventDefault(), e.length && r(e.length - 1), !0;
-			let a = Kz(i) ? i.nativeEvent.isComposing : i.isComposing;
+			let a = Xz(i) ? i.nativeEvent.isComposing : i.isComposing;
 			return i.key === "Enter" && !a ? (i.preventDefault(), i.stopPropagation(), e.length && t?.(e[n]), !0) : !1;
 		}
 	};
 }
-function Kz(e) {
+function Xz(e) {
 	return e.nativeEvent !== void 0;
 }
-function qz(e, t, n, r, i) {
-	let a = RI(), { selectedIndex: o, setSelectedIndex: s, handler: c } = Gz(n, r);
+function Zz(e, t, n, r, i) {
+	let a = zI(), { selectedIndex: o, setSelectedIndex: s, handler: c } = Yz(n, r);
 	return (0, _.useEffect)(() => {
 		let e = i || a;
 		return e?.addEventListener("keydown", c, !0), () => {
@@ -40633,16 +40678,16 @@ function qz(e, t, n, r, i) {
 		s(0);
 	}, [t, s]), { selectedIndex: n.length === 0 ? void 0 : o };
 }
-function Jz(e) {
-	let t = OI().setContentEditableProps, n = q(), { getItems: r, suggestionMenuComponent: i, query: a, clearQuery: o, closeMenu: s, onItemClick: c } = e, l = (0, _.useCallback)((e) => {
+function Qz(e) {
+	let t = kI().setContentEditableProps, n = q(), { getItems: r, suggestionMenuComponent: i, query: a, clearQuery: o, closeMenu: s, onItemClick: c } = e, l = (0, _.useCallback)((e) => {
 		s(), o(), c?.(e);
 	}, [
 		c,
 		s,
 		o
-	]), { items: u, usedQuery: d, loadingState: f } = Bz(a, r);
-	zz(u, d, s);
-	let { selectedIndex: p } = qz(n, a, u, l);
+	]), { items: u, usedQuery: d, loadingState: f } = Wz(a, r);
+	Uz(u, d, s);
+	let { selectedIndex: p } = Zz(n, a, u, l);
 	return (0, _.useEffect)(() => (t((e) => ({
 		...e,
 		"aria-expanded": !0,
@@ -40668,44 +40713,44 @@ function Jz(e) {
 		selectedIndex: p
 	});
 }
-var Yz = {
-	heading: wR,
-	heading_2: CR,
-	heading_3: SR,
-	heading_4: xR,
-	heading_5: bR,
-	heading_6: yR,
-	toggle_heading: wR,
-	toggle_heading_2: CR,
-	toggle_heading_3: SR,
-	quote: sR,
-	toggle_list: QL,
-	numbered_list: dR,
-	bullet_list: uR,
-	check_list: fR,
-	paragraph: iR,
-	table: aR,
-	image: tR,
-	video: nR,
-	audio: ZL,
-	file: NR,
-	emoji: HL,
-	code_block: ER,
-	divider: UL
+var $z = {
+	heading: OR,
+	heading_2: DR,
+	heading_3: ER,
+	heading_4: TR,
+	heading_5: wR,
+	heading_6: CR,
+	toggle_heading: OR,
+	toggle_heading_2: DR,
+	toggle_heading_3: ER,
+	quote: dR,
+	toggle_list: nR,
+	numbered_list: hR,
+	bullet_list: mR,
+	check_list: gR,
+	paragraph: cR,
+	table: lR,
+	image: aR,
+	video: oR,
+	audio: tR,
+	file: LR,
+	emoji: KL,
+	code_block: AR,
+	divider: qL
 };
-function Xz(e) {
+function eB(e) {
 	return yx(e).map((e) => {
-		let t = Yz[e.key];
+		let t = $z[e.key];
 		return {
 			...e,
 			icon: /* @__PURE__ */ (0, G.jsx)(t, { size: 18 })
 		};
 	});
 }
-function Zz(e) {
-	let t = q(), n = RI(), { triggerCharacter: r, suggestionMenuComponent: i, shouldOpen: a, minQueryLength: o, onItemClick: s, getItems: c } = e, l = (0, _.useMemo)(() => s || ((e) => {
+function tB(e) {
+	let t = q(), n = zI(), { triggerCharacter: r, suggestionMenuComponent: i, shouldOpen: a, minQueryLength: o, onItemClick: s, getItems: c } = e, l = (0, _.useMemo)(() => s || ((e) => {
 		e.onItemClick(t);
-	}), [t, s]), u = (0, _.useMemo)(() => c || (async (e) => bx(Xz(t), e)), [t, c]), d = kI(gx);
+	}), [t, s]), u = (0, _.useMemo)(() => c || (async (e) => bx(eB(t), e)), [t, c]), d = AI(gx);
 	(0, _.useEffect)(() => {
 		d.addSuggestionMenu({
 			triggerCharacter: r,
@@ -40716,7 +40761,7 @@ function Zz(e) {
 		r,
 		a
 	]);
-	let f = AI(gx), p = AI(gx, { selector: (e) => ({
+	let f = jI(gx), p = jI(gx, { selector: (e) => ({
 		element: n?.firstChild || void 0,
 		getBoundingClientRect: () => e?.referencePos || new DOMRect()
 	}) }), m = (0, _.useMemo)(() => ({
@@ -40759,25 +40804,25 @@ function Zz(e) {
 		d,
 		r
 	]);
-	return !f || !f.ignoreQueryLength && o && (f.query.startsWith(" ") || f.query.length < o) ? null : /* @__PURE__ */ (0, G.jsx)(NI, {
+	return !f || !f.ignoreQueryLength && o && (f.query.startsWith(" ") || f.query.length < o) ? null : /* @__PURE__ */ (0, G.jsx)(PI, {
 		reference: p,
 		portalElement: e.portalElement,
 		...m,
-		children: r && /* @__PURE__ */ (0, G.jsx)(Jz, {
+		children: r && /* @__PURE__ */ (0, G.jsx)(Qz, {
 			query: f.query,
 			closeMenu: d.closeMenu,
 			clearQuery: d.clearQuery,
 			getItems: u,
-			suggestionMenuComponent: i || Wz,
+			suggestionMenuComponent: i || Jz,
 			onItemClick: l
 		})
 	});
 }
-var Qz = (e, t = .3) => {
+var nB = (e, t = .3) => {
 	let n = Math.floor(e) + t, r = Math.ceil(e) - t;
 	return e >= n && e <= r ? Math.round(e) : e < n ? Math.floor(e) : Math.ceil(e);
-}, $z = (e) => {
-	let t = J(), n = q(), r = kI(BC), i = AI(BC, { selector: (e) => e?.block }), a = (0, _.useRef)(!1), [o, s] = (0, _.useState)(), c = (0, _.useCallback)((t) => {
+}, rB = (e) => {
+	let t = J(), n = q(), r = AI(BC), i = jI(BC, { selector: (e) => e?.block }), a = (0, _.useRef)(!1), [o, s] = (0, _.useState)(), c = (0, _.useCallback)((t) => {
 		r.freezeHandles(), e.hideOtherElements(!0), i && (s({
 			originalContent: i.content,
 			originalCroppedContent: { rows: r.cropEmptyRowsOrColumns(i, e.orientation === "addOrRemoveColumns" ? "columns" : "rows") },
@@ -40806,7 +40851,7 @@ var Qz = (e, t = .3) => {
 			if (!i) return;
 			if (!o) throw Error("editingState is undefined");
 			a.current = !0;
-			let s = (e.orientation === "addOrRemoveColumns" ? t.clientX : t.clientY) - o.startPos, c = e.orientation === "addOrRemoveColumns" ? o.originalCroppedContent.rows[0]?.cells.length ?? 0 : o.originalCroppedContent.rows.length, l = e.orientation === "addOrRemoveColumns" ? o.originalContent.rows[0]?.cells.length ?? 0 : o.originalContent.rows.length, u = e.orientation === "addOrRemoveColumns" ? i.content.rows[0].cells.length : i.content.rows.length, d = l + Qz(s / (e.orientation === "addOrRemoveColumns" ? 120 : 31), .3);
+			let s = (e.orientation === "addOrRemoveColumns" ? t.clientX : t.clientY) - o.startPos, c = e.orientation === "addOrRemoveColumns" ? o.originalCroppedContent.rows[0]?.cells.length ?? 0 : o.originalCroppedContent.rows.length, l = e.orientation === "addOrRemoveColumns" ? o.originalContent.rows[0]?.cells.length ?? 0 : o.originalContent.rows.length, u = e.orientation === "addOrRemoveColumns" ? i.content.rows[0].cells.length : i.content.rows.length, d = l + nB(s / (e.orientation === "addOrRemoveColumns" ? 120 : 31), .3);
 			d >= c && d > 0 && d !== u && (n.updateBlock(i, {
 				type: "table",
 				content: {
@@ -40845,13 +40890,13 @@ var Qz = (e, t = .3) => {
 		className: gv("bn-extend-button", e.orientation === "addOrRemoveColumns" ? "bn-extend-button-add-remove-columns" : "bn-extend-button-add-remove-rows", o === null ? "" : "bn-extend-button-editing"),
 		onClick: l,
 		onMouseDown: c,
-		children: e.children || /* @__PURE__ */ (0, G.jsx)(XL, {
+		children: e.children || /* @__PURE__ */ (0, G.jsx)(eR, {
 			size: 18,
 			"data-test": "extendButton"
 		})
 	}) : null;
-}, eB = (e) => {
-	let t = J(), n = Y(), r = q(), { block: i, colIndex: a, rowIndex: o } = AI(BC, { selector: (e) => ({
+}, iB = (e) => {
+	let t = J(), n = Y(), r = q(), { block: i, colIndex: a, rowIndex: o } = jI(BC, { selector: (e) => ({
 		block: e?.block,
 		colIndex: e?.colIndex,
 		rowIndex: e?.rowIndex
@@ -40884,7 +40929,7 @@ var Qz = (e, t = .3) => {
 		}), /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Dropdown, {
 			sub: !0,
 			className: "bn-menu-dropdown bn-color-picker-dropdown",
-			children: /* @__PURE__ */ (0, G.jsx)(HR, {
+			children: /* @__PURE__ */ (0, G.jsx)(KR, {
 				iconSize: 18,
 				text: r.settings.tables.cellTextColor ? {
 					color: uv(c) ? c.props.textColor : "default",
@@ -40897,8 +40942,8 @@ var Qz = (e, t = .3) => {
 			})
 		})]
 	});
-}, tB = () => {
-	let e = J(), t = Y(), n = q(), r = kI(BC), { block: i, colIndex: a, rowIndex: o } = AI(BC, { selector: (e) => ({
+}, aB = () => {
+	let e = J(), t = Y(), n = q(), r = AI(BC), { block: i, colIndex: a, rowIndex: o } = jI(BC, { selector: (e) => ({
 		block: e?.block,
 		colIndex: e?.colIndex,
 		rowIndex: e?.rowIndex
@@ -40914,11 +40959,11 @@ var Qz = (e, t = .3) => {
 		},
 		children: t.table_handle.split_cell_menuitem
 	});
-}, nB = (e) => /* @__PURE__ */ (0, G.jsx)(J().Generic.Menu.Dropdown, {
+}, oB = (e) => /* @__PURE__ */ (0, G.jsx)(J().Generic.Menu.Dropdown, {
 	className: "bn-menu-dropdown bn-table-handle-menu",
-	children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(tB, {}), /* @__PURE__ */ (0, G.jsx)(eB, {})] })
-}), rB = (e) => {
-	let t = J(), n = q(), r = kI(BC), i = e.tableCellMenu || nB;
+	children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(aB, {}), /* @__PURE__ */ (0, G.jsx)(iB, {})] })
+}), sB = (e) => {
+	let t = J(), n = q(), r = AI(BC), i = e.tableCellMenu || oB;
 	return !n.settings.tables.splitCells && !n.settings.tables.cellBackgroundColor && !n.settings.tables.cellTextColor ? null : /* @__PURE__ */ (0, G.jsxs)(t.Generic.Menu.Root, {
 		onOpenChange: (t) => {
 			t ? (r.freezeHandles(), e.hideOtherElements(!0)) : (r.unfreezeHandles(), e.hideOtherElements(!1), n.focus());
@@ -40926,14 +40971,14 @@ var Qz = (e, t = .3) => {
 		position: "right",
 		children: [/* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Trigger, { children: /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Button, {
 			className: "bn-table-cell-handle",
-			children: e.children || /* @__PURE__ */ (0, G.jsx)(wz, {
+			children: e.children || /* @__PURE__ */ (0, G.jsx)(Oz, {
 				size: 12,
 				"data-test": "tableCellHandle"
 			})
 		}) }), /* @__PURE__ */ (0, G.jsx)(i, {})]
 	});
-}, iB = (e) => {
-	let t = J(), n = Y(), r = kI(BC), i = AI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
+}, cB = (e) => {
+	let t = J(), n = Y(), r = AI(BC), i = jI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
 	return r === void 0 || i === void 0 ? null : /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
 		onClick: () => {
 			r.addRowOrColumn(i, e.orientation === "row" ? {
@@ -40946,14 +40991,14 @@ var Qz = (e, t = .3) => {
 		},
 		children: n.table_handle[`add_${e.side}_menuitem`]
 	});
-}, aB = (e) => {
-	let t = J(), n = Y(), r = kI(BC), i = AI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
+}, lB = (e) => {
+	let t = J(), n = Y(), r = AI(BC), i = jI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
 	return r === void 0 || i === void 0 ? null : /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
 		onClick: () => r.removeRowOrColumn(i, e.orientation),
 		children: e.orientation === "row" ? n.table_handle.delete_row_menuitem : n.table_handle.delete_column_menuitem
 	});
-}, oB = (e) => {
-	let t = J(), n = Y(), r = q(), i = kI(BC), { block: a, index: o } = AI(BC, { selector: (t) => ({
+}, uB = (e) => {
+	let t = J(), n = Y(), r = q(), i = AI(BC), { block: a, index: o } = jI(BC, { selector: (t) => ({
 		block: t?.block,
 		index: e.orientation === "column" ? t?.colIndex : t?.rowIndex
 	}) }), s = (0, _.useMemo)(() => i === void 0 || a === void 0 || o === void 0 ? [] : e.orientation === "row" ? i.getCellsAtRowHandle(a, o) : i.getCellsAtColumnHandle(a, o), [
@@ -40992,7 +41037,7 @@ var Qz = (e, t = .3) => {
 		}), /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Dropdown, {
 			sub: !0,
 			className: "bn-menu-dropdown bn-color-picker-dropdown",
-			children: /* @__PURE__ */ (0, G.jsx)(HR, {
+			children: /* @__PURE__ */ (0, G.jsx)(KR, {
 				iconSize: 18,
 				text: r.settings.tables.cellTextColor ? {
 					color: s.every(({ cell: e }) => uv(e) && e.props.textColor === l.props.textColor) ? l.props.textColor : "default",
@@ -41007,8 +41052,8 @@ var Qz = (e, t = .3) => {
 			})
 		})]
 	});
-}, sB = (e) => {
-	let t = J(), n = Y(), r = q(), i = kI(BC), { block: a, index: o } = AI(BC, { selector: (t) => ({
+}, dB = (e) => {
+	let t = J(), n = Y(), r = q(), i = AI(BC), { block: a, index: o } = jI(BC, { selector: (t) => ({
 		block: t?.block,
 		index: e.orientation === "column" ? t?.colIndex : t?.rowIndex
 	}) });
@@ -41028,8 +41073,8 @@ var Qz = (e, t = .3) => {
 		},
 		children: n.drag_handle.header_row_menuitem
 	});
-}, cB = (e) => {
-	let t = J(), n = Y(), r = q(), i = kI(BC), a = AI(BC, { selector: (e) => e?.block }), o = AI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
+}, fB = (e) => {
+	let t = J(), n = Y(), r = q(), i = AI(BC), a = jI(BC, { selector: (e) => e?.block }), o = jI(BC, { selector: (t) => e.orientation === "column" ? t?.colIndex : t?.rowIndex });
 	if (!i || o !== 0 || !a || e.orientation !== "column" || !r.settings.tables.headers) return null;
 	let s = !!a.content.headerCols;
 	return /* @__PURE__ */ (0, G.jsx)(t.Generic.Menu.Item, {
@@ -41046,24 +41091,24 @@ var Qz = (e, t = .3) => {
 		},
 		children: n.drag_handle.header_column_menuitem
 	});
-}, lB = (e) => /* @__PURE__ */ (0, G.jsx)(J().Generic.Menu.Dropdown, {
+}, pB = (e) => /* @__PURE__ */ (0, G.jsx)(J().Generic.Menu.Dropdown, {
 	className: "bn-table-handle-menu",
 	children: e.children || /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-		/* @__PURE__ */ (0, G.jsx)(aB, { orientation: e.orientation }),
-		/* @__PURE__ */ (0, G.jsx)(iB, {
+		/* @__PURE__ */ (0, G.jsx)(lB, { orientation: e.orientation }),
+		/* @__PURE__ */ (0, G.jsx)(cB, {
 			orientation: e.orientation,
 			side: e.orientation === "row" ? "above" : "left"
 		}),
-		/* @__PURE__ */ (0, G.jsx)(iB, {
+		/* @__PURE__ */ (0, G.jsx)(cB, {
 			orientation: e.orientation,
 			side: e.orientation === "row" ? "below" : "right"
 		}),
-		/* @__PURE__ */ (0, G.jsx)(sB, { orientation: e.orientation }),
-		/* @__PURE__ */ (0, G.jsx)(cB, { orientation: e.orientation }),
-		/* @__PURE__ */ (0, G.jsx)(oB, { orientation: e.orientation })
+		/* @__PURE__ */ (0, G.jsx)(dB, { orientation: e.orientation }),
+		/* @__PURE__ */ (0, G.jsx)(fB, { orientation: e.orientation }),
+		/* @__PURE__ */ (0, G.jsx)(uB, { orientation: e.orientation })
 	] })
-}), uB = (e) => {
-	let t = q(), n = J(), [r, i] = (0, _.useState)(!1), a = e.tableHandleMenu || lB, o = kI(BC), s = AI(BC), c = (0, _.useMemo)(() => !o || !s || !s.block || s.block.type !== "table" ? !1 : e.orientation === "column" ? o.getCellsAtColumnHandle(s.block, s.colIndex).every(({ cell: e }) => dv(e) === 1) : o.getCellsAtRowHandle(s.block, s.rowIndex).every(({ cell: e }) => fv(e) === 1), [
+}), mB = (e) => {
+	let t = q(), n = J(), [r, i] = (0, _.useState)(!1), a = e.tableHandleMenu || pB, o = AI(BC), s = jI(BC), c = (0, _.useMemo)(() => !o || !s || !s.block || s.block.type !== "table" ? !1 : e.orientation === "column" ? o.getCellsAtColumnHandle(s.block, s.colIndex).every(({ cell: e }) => dv(e) === 1) : o.getCellsAtRowHandle(s.block, s.rowIndex).every(({ cell: e }) => fv(e) === 1), [
 		e.orientation,
 		s,
 		o
@@ -41083,14 +41128,14 @@ var Qz = (e, t = .3) => {
 				o.dragEnd(), e.hideOtherElements(!1), i(!1);
 			},
 			style: e.orientation === "column" ? { transform: "rotate(0.25turn)" } : void 0,
-			children: e.children || /* @__PURE__ */ (0, G.jsx)(Tz, {
+			children: e.children || /* @__PURE__ */ (0, G.jsx)(kz, {
 				size: 24,
 				"data-test": "tableHandle"
 			})
 		}) }), /* @__PURE__ */ (0, G.jsx)(a, { orientation: e.orientation })]
 	}) : null;
-}, dB = (e) => {
-	let t = q(), [n, r] = (0, _.useState)(), i = AI(BC), a = (0, _.useMemo)(() => {
+}, hB = (e) => {
+	let t = q(), [n, r] = (0, _.useState)(), i = jI(BC), a = (0, _.useMemo)(() => {
 		let e = {};
 		if (i === void 0) return {};
 		let n = Iy(i.block.id, t.prosemirrorState.doc);
@@ -41190,9 +41235,9 @@ var Qz = (e, t = .3) => {
 		o
 	]);
 	if (!i) return null;
-	let c = e.tableHandle || uB, l = e.extendButton || $z, u = e.tableCellHandle || rB;
+	let c = e.tableHandle || mB, l = e.extendButton || rB, u = e.tableCellHandle || sB;
 	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-		/* @__PURE__ */ (0, G.jsx)(NI, {
+		/* @__PURE__ */ (0, G.jsx)(PI, {
 			reference: a?.rowReference,
 			portalElement: e.portalElement,
 			...s?.rowTableHandle,
@@ -41201,7 +41246,7 @@ var Qz = (e, t = .3) => {
 				hideOtherElements: (e) => r(e ? "rowTableHandle" : void 0)
 			})
 		}),
-		/* @__PURE__ */ (0, G.jsx)(NI, {
+		/* @__PURE__ */ (0, G.jsx)(PI, {
 			reference: a?.columnReference,
 			portalElement: e.portalElement,
 			...s?.columnTableHandle,
@@ -41210,13 +41255,13 @@ var Qz = (e, t = .3) => {
 				hideOtherElements: (e) => r(e ? "columnTableHandle" : void 0)
 			})
 		}),
-		/* @__PURE__ */ (0, G.jsx)(NI, {
+		/* @__PURE__ */ (0, G.jsx)(PI, {
 			reference: a?.cellReference,
 			portalElement: e.portalElement,
 			...s?.tableCellHandle,
 			children: i.show && i.rowIndex !== void 0 && i.colIndex !== void 0 && (!n || n === "tableCellHandle") && /* @__PURE__ */ (0, G.jsx)(u, { hideOtherElements: (e) => r(e ? "tableCellHandle" : void 0) })
 		}),
-		/* @__PURE__ */ (0, G.jsx)(NI, {
+		/* @__PURE__ */ (0, G.jsx)(PI, {
 			reference: a?.tableReference,
 			portalElement: e.portalElement,
 			...s?.extendRowsButton,
@@ -41225,7 +41270,7 @@ var Qz = (e, t = .3) => {
 				hideOtherElements: (e) => r(e ? "extendRowsButton" : void 0)
 			})
 		}),
-		/* @__PURE__ */ (0, G.jsx)(NI, {
+		/* @__PURE__ */ (0, G.jsx)(PI, {
 			reference: a?.tableReference,
 			portalElement: e.portalElement,
 			...s?.extendColumnsButton,
@@ -41236,7 +41281,7 @@ var Qz = (e, t = .3) => {
 		})
 	] });
 };
-function fB(e) {
+function gB(e) {
 	if (e !== void 0) {
 		if (e === null) return typeof document < "u" ? document.body : void 0;
 		if (typeof e == "string") {
@@ -41251,41 +41296,41 @@ function fB(e) {
 		return e;
 	}
 }
-var pB = (0, _.lazy)(() => Promise.resolve().then(() => UB)), mB = (0, _.lazy)(() => Promise.resolve().then(() => JB));
-function hB(e) {
+var _B = (0, _.lazy)(() => Promise.resolve().then(() => qB)), vB = (0, _.lazy)(() => Promise.resolve().then(() => QB));
+function yB(e) {
 	let t = q();
 	if (!t) throw Error("BlockNoteDefaultUI must be used within a BlockNoteContext.Provider");
-	let n = e.portalElements, r = fB(n?.formattingToolbar), i = fB(n?.linkToolbar), a = fB(n?.slashMenu), o = fB(n?.emojiPicker), s = fB(n?.sideMenu), c = fB(n?.filePanel), l = fB(n?.tableHandles), u = fB(n?.comments), d = fB(n?.attributionTooltip);
+	let n = e.portalElements, r = gB(n?.formattingToolbar), i = gB(n?.linkToolbar), a = gB(n?.slashMenu), o = gB(n?.emojiPicker), s = gB(n?.sideMenu), c = gB(n?.filePanel), l = gB(n?.tableHandles), u = gB(n?.comments), d = gB(n?.attributionTooltip);
 	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-		t.getExtension(dx) && e.formattingToolbar !== !1 && /* @__PURE__ */ (0, G.jsx)(gz, { portalElement: r }),
-		t.getExtension(wS) && e.linkToolbar !== !1 && /* @__PURE__ */ (0, G.jsx)(xz, { portalElement: i }),
-		t.getExtension(gx) && e.slashMenu !== !1 && /* @__PURE__ */ (0, G.jsx)(Zz, {
+		t.getExtension(dx) && e.formattingToolbar !== !1 && /* @__PURE__ */ (0, G.jsx)(bz, { portalElement: r }),
+		t.getExtension(wS) && e.linkToolbar !== !1 && /* @__PURE__ */ (0, G.jsx)(Tz, { portalElement: i }),
+		t.getExtension(gx) && e.slashMenu !== !1 && /* @__PURE__ */ (0, G.jsx)(tB, {
 			triggerCharacter: "/",
 			shouldOpen: (e) => !e.selection.$from.parent.type.isInGroup("tableContent"),
 			portalElement: a
 		}),
-		t.getExtension(gx) && e.emojiPicker !== !1 && /* @__PURE__ */ (0, G.jsx)(Uz, {
+		t.getExtension(gx) && e.emojiPicker !== !1 && /* @__PURE__ */ (0, G.jsx)(qz, {
 			triggerCharacter: ":",
 			columns: 10,
 			minQueryLength: 2,
 			portalElement: o
 		}),
-		t.getExtension(OC) && e.sideMenu !== !1 && /* @__PURE__ */ (0, G.jsx)(Nz, { portalElement: s }),
-		t.getExtension(tb) && e.filePanel !== !1 && /* @__PURE__ */ (0, G.jsx)(DL, { portalElement: c }),
-		t.getExtension(BC) && e.tableHandles !== !1 && /* @__PURE__ */ (0, G.jsx)(dB, { portalElement: l }),
-		t.getExtension(XI) && e.comments !== !1 && /* @__PURE__ */ (0, G.jsxs)(_.Suspense, { children: [/* @__PURE__ */ (0, G.jsx)(pB, { portalElement: u }), /* @__PURE__ */ (0, G.jsx)(mB, { portalElement: u })] }),
-		t.getExtension("attribution") && e.attributionTooltip !== !1 && /* @__PURE__ */ (0, G.jsx)(Iz, { portalElement: d })
+		t.getExtension(OC) && e.sideMenu !== !1 && /* @__PURE__ */ (0, G.jsx)(Lz, { portalElement: s }),
+		t.getExtension(tb) && e.filePanel !== !1 && /* @__PURE__ */ (0, G.jsx)(jL, { portalElement: c }),
+		t.getExtension(BC) && e.tableHandles !== !1 && /* @__PURE__ */ (0, G.jsx)(hB, { portalElement: l }),
+		t.getExtension(ZI) && e.comments !== !1 && /* @__PURE__ */ (0, G.jsxs)(_.Suspense, { children: [/* @__PURE__ */ (0, G.jsx)(_B, { portalElement: u }), /* @__PURE__ */ (0, G.jsx)(vB, { portalElement: u })] }),
+		t.getExtension("attribution") && e.attributionTooltip !== !1 && /* @__PURE__ */ (0, G.jsx)(Bz, { portalElement: d })
 	] });
 }
-function gB(e, t) {
-	let n = OI();
+function bB(e, t) {
+	let n = kI();
 	t ||= n?.editor, (0, _.useEffect)(() => {
 		if (!t) throw Error("'editor' is required, either from BlockNoteContext or as a function argument");
 		return t.onChange(e);
 	}, [e, t]);
 }
-function _B(e, t, n) {
-	let r = OI();
+function xB(e, t, n) {
+	let r = kI();
 	t ||= r?.editor, (0, _.useEffect)(() => {
 		if (!t) throw Error("'editor' is required, either from BlockNoteContext or as a function argument");
 		return t.onSelectionChange(e, n);
@@ -41295,7 +41340,7 @@ function _B(e, t, n) {
 		n
 	]);
 }
-var vB = () => {
+var SB = () => {
 	let e = (0, _.useMemo)(() => window.matchMedia?.("(prefers-color-scheme: dark)"), []), t = (0, _.useMemo)(() => window.matchMedia?.("(prefers-color-scheme: light)"), []), n = e?.matches, r = t?.matches, [i, a] = (0, _.useState)(n ? "dark" : r ? "light" : "no-preference");
 	return (0, _.useEffect)(() => {
 		a(n ? "dark" : r ? "light" : "no-preference");
@@ -41312,11 +41357,11 @@ var vB = () => {
 			};
 		}
 	}, [e, t]), window.matchMedia, i;
-}, yB = (0, _.createContext)(void 0);
-function bB() {
-	return (0, _.useContext)(yB);
+}, CB = (0, _.createContext)(void 0);
+function wB() {
+	return (0, _.useContext)(CB);
 }
-function xB() {
+function TB() {
 	let e = /* @__PURE__ */ new Set(), t = {};
 	return {
 		subscribe(t) {
@@ -41342,10 +41387,10 @@ function xB() {
 		}
 	};
 }
-var SB = ({ contentComponent: e }) => {
+var EB = ({ contentComponent: e }) => {
 	let t = (0, _.useSyncExternalStore)(e.subscribe, e.getSnapshot, e.getServerSnapshot);
 	return /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: Object.values(t) });
-}, CB = (0, _.forwardRef)((e, t) => {
+}, DB = (0, _.forwardRef)((e, t) => {
 	let [n, r] = (0, _.useState)();
 	return (0, _.useImperativeHandle)(t, () => (e, t) => {
 		(0, v.flushSync)(() => {
@@ -41355,9 +41400,9 @@ var SB = ({ contentComponent: e }) => {
 			});
 		}), r(void 0);
 	}, []), /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: n && (0, v.createPortal)(n.node, n.container) });
-}), wB = () => {};
-function TB(e, t) {
-	let { editor: n, className: r, theme: i, children: a, editable: o, onSelectionChange: s, onChange: c, formattingToolbar: l, linkToolbar: u, slashMenu: d, emojiPicker: f, sideMenu: p, filePanel: m, tableHandles: h, comments: g, portalElements: v, autoFocus: y, renderEditor: b = !0, ...x } = e, S = (0, _.useMemo)(() => fB(v?.default) ?? null, [v?.default]), [C, w] = (0, _.useState)(), T = OI(), E = vB(), D = T?.colorSchemePreference || E, O = i || (D === "dark" ? "dark" : "light"), k = J(), A = (0, _.useMemo)(() => ({
+}), OB = () => {};
+function kB(e, t) {
+	let { editor: n, className: r, theme: i, children: a, editable: o, onSelectionChange: s, onChange: c, formattingToolbar: l, linkToolbar: u, slashMenu: d, emojiPicker: f, sideMenu: p, filePanel: m, tableHandles: h, comments: g, portalElements: v, autoFocus: y, renderEditor: b = !0, ...x } = e, S = (0, _.useMemo)(() => gB(v?.default) ?? null, [v?.default]), [C, w] = (0, _.useState)(), T = kI(), E = SB(), D = T?.colorSchemePreference || E, O = i || (D === "dark" ? "dark" : "light"), k = J(), A = (0, _.useMemo)(() => ({
 		formattingToolbar: k ? l : !1,
 		linkToolbar: k ? u : !1,
 		sideMenu: k ? p : !1,
@@ -41379,7 +41424,7 @@ function TB(e, t) {
 		h,
 		v
 	]);
-	gB(c || wB, n), _B(s || wB, n);
+	bB(c || OB, n), xB(s || OB, n);
 	let j = (0, _.useCallback)((e) => {
 		n.elementRenderer = e;
 	}, [n]);
@@ -41415,11 +41460,11 @@ function TB(e, t) {
 		A,
 		S
 	]);
-	return /* @__PURE__ */ (0, G.jsx)(DI.Provider, {
+	return /* @__PURE__ */ (0, G.jsx)(OI.Provider, {
 		value: M,
-		children: /* @__PURE__ */ (0, G.jsxs)(yB.Provider, {
+		children: /* @__PURE__ */ (0, G.jsxs)(CB.Provider, {
 			value: ee,
-			children: [/* @__PURE__ */ (0, G.jsx)(CB, { ref: j }), /* @__PURE__ */ (0, G.jsx)(EB, {
+			children: [/* @__PURE__ */ (0, G.jsx)(DB, { ref: j }), /* @__PURE__ */ (0, G.jsx)(AB, {
 				className: r,
 				renderEditor: b,
 				editorColorScheme: O,
@@ -41430,14 +41475,14 @@ function TB(e, t) {
 		})
 	});
 }
-var EB = _.forwardRef(({ className: e, renderEditor: t, editorColorScheme: n, children: r, ...i }, a) => /* @__PURE__ */ (0, G.jsx)("div", {
+var AB = _.forwardRef(({ className: e, renderEditor: t, editorColorScheme: n, children: r, ...i }, a) => /* @__PURE__ */ (0, G.jsx)("div", {
 	className: gv("bn-root", "bn-container", n, e),
 	"data-color-scheme": n,
 	...i,
 	ref: a,
-	children: t ? /* @__PURE__ */ (0, G.jsx)(OB, { children: r }) : r
-})), DB = _.forwardRef(TB), OB = (e) => {
-	let t = bB(), n = q(), r = (0, _.useMemo)(() => xB(), []), i = t.editorProps.portalTarget, a = (0, _.useCallback)((e) => {
+	children: t ? /* @__PURE__ */ (0, G.jsx)(MB, { children: r }) : r
+})), jB = _.forwardRef(kB), MB = (e) => {
+	let t = wB(), n = q(), r = (0, _.useMemo)(() => TB(), []), i = t.editorProps.portalTarget, a = (0, _.useCallback)((e) => {
 		n.isEditable = t.editorProps.editable !== !1, n._tiptapEditor.contentComponent = r, e ? n.mount(e, { portalTarget: i }) : n.unmount();
 	}, [
 		t.editorProps.editable,
@@ -41446,16 +41491,16 @@ var EB = _.forwardRef(({ className: e, renderEditor: t, editorColorScheme: n, ch
 		i
 	]);
 	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [
-		/* @__PURE__ */ (0, G.jsx)(SB, { contentComponent: r }),
-		/* @__PURE__ */ (0, G.jsx)(kB, {
+		/* @__PURE__ */ (0, G.jsx)(EB, { contentComponent: r }),
+		/* @__PURE__ */ (0, G.jsx)(NB, {
 			...t.editorProps,
 			...e,
 			mount: a
 		}),
-		/* @__PURE__ */ (0, G.jsx)(hB, { ...t.defaultUIProps }),
+		/* @__PURE__ */ (0, G.jsx)(yB, { ...t.defaultUIProps }),
 		e.children
 	] });
-}, kB = (e) => {
+}, NB = (e) => {
 	let { autoFocus: t, mount: n, contentEditableProps: r } = e;
 	return /* @__PURE__ */ (0, G.jsx)("div", {
 		"aria-autocomplete": "list",
@@ -41465,7 +41510,7 @@ var EB = _.forwardRef(({ className: e, renderEditor: t, editorColorScheme: n, ch
 		...r
 	});
 };
-function AB(e, t) {
+function PB(e, t) {
 	let n, r = document.createElement("div"), i;
 	if (t?.elementRenderer) t.elementRenderer(e((e) => n = e || void 0), r);
 	else {
@@ -41482,20 +41527,20 @@ function AB(e, t) {
 		contentDOM: s || void 0
 	};
 }
-var jB;
-async function MB() {
-	return jB || (jB = (async () => {
+var FB;
+async function IB() {
+	return FB || (FB = (async () => {
 		let [e, t] = await Promise.all([import("./module-CTSMhL_P.js"), import("./native-B_0ZyPxP.js")]), n = "default" in e ? e.default : e, r = "default" in t ? t.default : t;
 		return await n.init({ data: r }), {
 			emojiMart: n,
 			emojiData: r
 		};
-	})(), jB);
+	})(), FB);
 }
-function NB(e) {
+function LB(e) {
 	let t = (0, _.useRef)(null), n = (0, _.useRef)(null);
 	return n.current && n.current.update(e), (0, _.useEffect)(() => ((async () => {
-		let { emojiMart: r } = await MB();
+		let { emojiMart: r } = await IB();
 		n.current = new r.Picker({
 			...e,
 			ref: t
@@ -41504,8 +41549,8 @@ function NB(e) {
 		n.current = null;
 	}), []), _.createElement("div", { ref: t });
 }
-var PB = (e) => {
-	let [t, n] = (0, _.useState)(!1), r = J(), i = OI(), a = i.editor?.portalElement;
+var RB = (e) => {
+	let [t, n] = (0, _.useState)(!1), r = J(), i = kI(), a = i.editor?.portalElement;
 	if (!a) throw Error("Portal root not found");
 	return /* @__PURE__ */ (0, G.jsxs)(r.Generic.Popover.Root, {
 		open: t,
@@ -41523,7 +41568,7 @@ var PB = (e) => {
 		}) }), /* @__PURE__ */ (0, G.jsx)(r.Generic.Popover.Content, {
 			className: "bn-emoji-picker-popover",
 			variant: "panel-popover",
-			children: /* @__PURE__ */ (0, G.jsx)(NB, {
+			children: /* @__PURE__ */ (0, G.jsx)(LB, {
 				perLine: 7,
 				onClickOutside: () => {
 					n(!1), e.onOpenChange?.(!1);
@@ -41536,8 +41581,8 @@ var PB = (e) => {
 		})]
 	});
 };
-function FB(e) {
-	let { userStore: t } = kI(XI);
+function zB(e) {
+	let { userStore: t } = AI(ZI);
 	return (0, _.useEffect)(() => {
 		t.loadUsers(e);
 	}, [t, e.join(",")]), cN(t.store, (t) => {
@@ -41549,13 +41594,13 @@ function FB(e) {
 		return n;
 	});
 }
-function IB(e) {
-	return FB([e]).get(e);
+function BB(e) {
+	return zB([e]).get(e);
 }
-var LB = (e) => {
-	let t = J(), n = Y(), r = kI(XI), i = e.comment.reactions.find((t) => t.emoji === e.emoji);
+var VB = (e) => {
+	let t = J(), n = Y(), r = AI(ZI), i = e.comment.reactions.find((t) => t.emoji === e.emoji);
 	if (!i) throw Error("Trying to render reaction badge for non-existing reaction");
-	let [a, o] = (0, _.useState)([]), s = FB(a);
+	let [a, o] = (0, _.useState)([]), s = zB(a);
 	return /* @__PURE__ */ (0, G.jsx)(t.Generic.Badge.Root, {
 		className: gv("bn-badge", "bn-comment-reaction"),
 		text: i.userIds.length.toString(),
@@ -41566,21 +41611,21 @@ var LB = (e) => {
 		mainTooltip: n.comments.reactions.reacted_by,
 		secondaryTooltip: `${Array.from(s.values()).map((e) => e.username).join("\n")}`
 	}, i.emoji);
-}, RB = (0, _.memo)(({ isEmpty: e, comment: t, isEditing: n, threadStore: r, onReactionSelect: i, onEditSubmit: a, onEditCancel: o, onEmojiPickerOpenChange: s, Components: c, dict: l }) => {
+}, HB = (0, _.memo)(({ isEmpty: e, comment: t, isEditing: n, threadStore: r, onReactionSelect: i, onEditSubmit: a, onEditCancel: o, onEmojiPickerOpenChange: s, Components: c, dict: l }) => {
 	let u = r.auth.canAddReaction(t);
 	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [t.reactions.length > 0 && !n && /* @__PURE__ */ (0, G.jsxs)(c.Generic.Badge.Group, {
 		className: gv("bn-badge-group", "bn-comment-reactions"),
-		children: [t.reactions.map((e) => /* @__PURE__ */ (0, G.jsx)(LB, {
+		children: [t.reactions.map((e) => /* @__PURE__ */ (0, G.jsx)(VB, {
 			comment: t,
 			emoji: e.emoji,
 			onReactionSelect: i
-		}, e.emoji)), u && /* @__PURE__ */ (0, G.jsx)(PB, {
+		}, e.emoji)), u && /* @__PURE__ */ (0, G.jsx)(RB, {
 			onEmojiSelect: (e) => i(e.native),
 			onOpenChange: s,
 			children: /* @__PURE__ */ (0, G.jsx)(c.Generic.Badge.Root, {
 				className: gv("bn-badge", "bn-comment-add-reaction"),
 				text: "+",
-				icon: /* @__PURE__ */ (0, G.jsx)(VL, { size: 16 }),
+				icon: /* @__PURE__ */ (0, G.jsx)(GL, { size: 16 }),
 				mainTooltip: l.comments.actions.add_reaction
 			})
 		})]
@@ -41601,15 +41646,15 @@ var LB = (e) => {
 			children: l.comments.cancel_button_text
 		})]
 	})] });
-}), zB = ({ comment: e, thread: t, showResolveButton: n }) => {
-	let r = kI(XI), i = Y(), a = BI({
+}), UB = ({ comment: e, thread: t, showResolveButton: n }) => {
+	let r = AI(ZI), i = Y(), a = VI({
 		initialContent: e.body,
 		trailingBlock: !1,
 		dictionary: {
 			...i,
 			placeholders: { emptyDocument: i.placeholders.edit_comment }
 		},
-		schema: r.commentEditorSchema || GI
+		schema: r.commentEditorSchema || KI
 	}), o = J(), [s, c] = (0, _.useState)(!1), [l, u] = (0, _.useState)(!1), d = r.threadStore, f = (0, _.useCallback)(() => {
 		c(!0);
 	}, []), p = (0, _.useCallback)(() => {
@@ -41652,47 +41697,47 @@ var LB = (e) => {
 		await d.resolveThread({ threadId: t.id });
 	}, [t.id, d]), y = (0, _.useCallback)(async () => {
 		await d.unresolveThread({ threadId: t.id });
-	}, [t.id, d]), b = IB(e.userId);
+	}, [t.id, d]), b = BB(e.userId);
 	if (!e.body) return null;
 	let x, S = d.auth.canAddReaction(e), C = d.auth.canDeleteComment(e), w = d.auth.canUpdateComment(e), T = n && (t.resolved ? d.auth.canUnresolveThread(t) : d.auth.canResolveThread(t));
 	s || (x = /* @__PURE__ */ (0, G.jsxs)(o.Generic.Toolbar.Root, {
 		className: gv("bn-action-toolbar", "bn-comment-actions"),
 		variant: "action-toolbar",
 		children: [
-			S && /* @__PURE__ */ (0, G.jsx)(PB, {
+			S && /* @__PURE__ */ (0, G.jsx)(RB, {
 				onEmojiSelect: (e) => g(e.native),
 				onOpenChange: u,
 				children: /* @__PURE__ */ (0, G.jsx)(o.Generic.Toolbar.Button, {
 					mainTooltip: i.comments.actions.add_reaction,
 					variant: "compact",
-					children: /* @__PURE__ */ (0, G.jsx)(VL, { size: 16 })
+					children: /* @__PURE__ */ (0, G.jsx)(GL, { size: 16 })
 				}, "add-reaction")
 			}),
 			T && (t.resolved ? /* @__PURE__ */ (0, G.jsx)(o.Generic.Toolbar.Button, {
 				mainTooltip: i.comments.actions.reopen,
 				variant: "compact",
 				onClick: y,
-				children: /* @__PURE__ */ (0, G.jsx)(IR, { size: 16 })
+				children: /* @__PURE__ */ (0, G.jsx)(BR, { size: 16 })
 			}, "reopen") : /* @__PURE__ */ (0, G.jsx)(o.Generic.Toolbar.Button, {
 				mainTooltip: i.comments.actions.resolve,
 				variant: "compact",
 				onClick: v,
-				children: /* @__PURE__ */ (0, G.jsx)(YL, { size: 16 })
+				children: /* @__PURE__ */ (0, G.jsx)($L, { size: 16 })
 			}, "resolve")),
 			(C || w) && /* @__PURE__ */ (0, G.jsxs)(o.Generic.Menu.Root, {
 				position: "bottom-start",
 				children: [/* @__PURE__ */ (0, G.jsx)(o.Generic.Menu.Trigger, { children: /* @__PURE__ */ (0, G.jsx)(o.Generic.Toolbar.Button, {
 					mainTooltip: i.comments.actions.more_actions,
 					variant: "compact",
-					children: /* @__PURE__ */ (0, G.jsx)(WL, { size: 16 })
+					children: /* @__PURE__ */ (0, G.jsx)(JL, { size: 16 })
 				}, "more-actions") }), /* @__PURE__ */ (0, G.jsxs)(o.Generic.Menu.Dropdown, {
 					className: "bn-menu-dropdown",
 					children: [w && /* @__PURE__ */ (0, G.jsx)(o.Generic.Menu.Item, {
-						icon: /* @__PURE__ */ (0, G.jsx)(FR, {}),
+						icon: /* @__PURE__ */ (0, G.jsx)(zR, {}),
 						onClick: f,
 						children: i.comments.actions.edit_comment
 					}, "edit-comment"), C && /* @__PURE__ */ (0, G.jsx)(o.Generic.Menu.Item, {
-						icon: /* @__PURE__ */ (0, G.jsx)(qL, {}),
+						icon: /* @__PURE__ */ (0, G.jsx)(ZL, {}),
 						onClick: h,
 						children: i.comments.actions.delete_comment
 					}, "delete-comment")]
@@ -41713,11 +41758,11 @@ var LB = (e) => {
 		actions: x,
 		className: "bn-thread-comment",
 		emojiPickerOpen: l,
-		children: /* @__PURE__ */ (0, G.jsx)(VI, {
+		children: /* @__PURE__ */ (0, G.jsx)(HI, {
 			autoFocus: s,
 			editor: a,
 			editable: s,
-			actions: e.reactions.length > 0 || s ? ({ isFocused: t, isEmpty: n }) => /* @__PURE__ */ (0, G.jsx)(RB, {
+			actions: e.reactions.length > 0 || s ? ({ isFocused: t, isEmpty: n }) => /* @__PURE__ */ (0, G.jsx)(HB, {
 				isFocused: t,
 				isEmpty: n,
 				comment: e,
@@ -41732,8 +41777,8 @@ var LB = (e) => {
 			}) : void 0
 		})
 	});
-}, BB = ({ thread: e, maxCommentsBeforeCollapse: t }) => {
-	let n = J(), r = Y(), i = FB(e.resolvedBy ? [e.resolvedBy] : []), a = e.comments.map((t, n) => /* @__PURE__ */ (0, G.jsx)(zB, {
+}, WB = ({ thread: e, maxCommentsBeforeCollapse: t }) => {
+	let n = J(), r = Y(), i = zB(e.resolvedBy ? [e.resolvedBy] : []), a = e.comments.map((t, n) => /* @__PURE__ */ (0, G.jsx)(UB, {
 		thread: e,
 		comment: t,
 		showResolveButton: n === 0
@@ -41760,7 +41805,7 @@ var LB = (e) => {
 		className: "bn-thread-expand-prompt",
 		children: r.comments.sidebar.more_replies(e.comments.length - 2)
 	}, "expand-prompt")), a;
-}, VB = (0, _.memo)(({ isEmpty: e, onSave: t, Components: n, dict: r }) => /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Root, {
+}, GB = (0, _.memo)(({ isEmpty: e, onSave: t, Components: n, dict: r }) => /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Root, {
 	className: gv("bn-action-toolbar", "bn-comment-actions"),
 	variant: "action-toolbar",
 	children: /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Button, {
@@ -41772,8 +41817,8 @@ var LB = (e) => {
 		children: r.comments.save_button_text
 	})
 }));
-function HB(e) {
-	let t = q(), n = e.newCommentEditor, r = kI(XI), i = J(), a = Y(), o = (0, _.useCallback)(async () => {
+function KB(e) {
+	let t = q(), n = e.newCommentEditor, r = AI(ZI), i = J(), a = Y(), o = (0, _.useCallback)(async () => {
 		await r.createThread({ initialComment: { body: n.document } }), r.stopPendingComment(), t.transact((e) => {
 			e.setSelection(L.create(e.doc, e.selection.to));
 		}), t.focus();
@@ -41784,11 +41829,11 @@ function HB(e) {
 	]);
 	return /* @__PURE__ */ (0, G.jsx)(i.Comments.Card, {
 		className: "bn-thread",
-		children: /* @__PURE__ */ (0, G.jsx)(VI, {
+		children: /* @__PURE__ */ (0, G.jsx)(HI, {
 			autoFocus: !0,
 			editable: !0,
 			editor: n,
-			actions: ({ isFocused: e, isEmpty: t }) => /* @__PURE__ */ (0, G.jsx)(VB, {
+			actions: ({ isFocused: e, isEmpty: t }) => /* @__PURE__ */ (0, G.jsx)(GB, {
 				isFocused: e,
 				isEmpty: t,
 				onSave: o,
@@ -41798,19 +41843,19 @@ function HB(e) {
 		})
 	});
 }
-var UB = /* @__PURE__ */ SL({ default: () => WB });
-function WB(e) {
-	let t = q(), n = Y(), r = kI(XI), i = AI(XI, {
+var qB = /* @__PURE__ */ EL({ default: () => JB });
+function JB(e) {
+	let t = q(), n = Y(), r = AI(ZI), i = jI(ZI, {
 		editor: t,
 		selector: (e) => e.pendingComment
-	}), a = BI({
+	}), a = VI({
 		trailingBlock: !1,
 		dictionary: {
 			...n,
 			placeholders: { emptyDocument: n.placeholders.new_comment }
 		},
-		schema: r.commentEditorSchema || GI
-	}, [i]), o = LI({
+		schema: r.commentEditorSchema || KI
+	}, [i]), o = RI({
 		editor: t,
 		selector: ({ editor: e }) => i ? {
 			from: e.prosemirrorState.selection.from,
@@ -41822,7 +41867,7 @@ function WB(e) {
 			open: !!i,
 			onOpenChange: (e) => {
 				if (!e) {
-					if (!KI({
+					if (!qI({
 						hasUnsavedContent: !a.isEmpty,
 						confirmBeforeDiscard: r.confirmBeforeDiscard,
 						message: n.comments.discard_pending_comment
@@ -41850,15 +41895,15 @@ function WB(e) {
 		a,
 		i,
 		e.floatingUIOptions
-	]), c = e.floatingComposer || HB;
-	return /* @__PURE__ */ (0, G.jsx)(zI, {
+	]), c = e.floatingComposer || KB;
+	return /* @__PURE__ */ (0, G.jsx)(BI, {
 		position: o,
 		portalElement: e.portalElement,
 		...s,
 		children: /* @__PURE__ */ (0, G.jsx)(c, { newCommentEditor: a })
 	});
 }
-var GB = (0, _.memo)(({ isEmpty: e, onNewCommentSave: t, Components: n, dict: r }) => e ? null : /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Root, {
+var YB = (0, _.memo)(({ isEmpty: e, onNewCommentSave: t, Components: n, dict: r }) => e ? null : /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Root, {
 	variant: "action-toolbar",
 	className: gv("bn-action-toolbar", "bn-comment-actions"),
 	children: /* @__PURE__ */ (0, G.jsx)(n.Generic.Toolbar.Button, {
@@ -41868,14 +41913,14 @@ var GB = (0, _.memo)(({ isEmpty: e, onNewCommentSave: t, Components: n, dict: r 
 		onClick: t,
 		children: r.comments.save_button_text
 	})
-})), KB = ({ thread: e, selected: t, orphaned: n, referenceText: r, maxCommentsBeforeCollapse: i, onFocus: a, onBlur: o, tabIndex: s, newCommentEditor: c }) => {
-	let l = J(), u = Y(), d = kI(XI), f = BI({
+})), XB = ({ thread: e, selected: t, orphaned: n, referenceText: r, maxCommentsBeforeCollapse: i, onFocus: a, onBlur: o, tabIndex: s, newCommentEditor: c }) => {
+	let l = J(), u = Y(), d = AI(ZI), f = VI({
 		trailingBlock: !1,
 		dictionary: {
 			...u,
 			placeholders: { emptyDocument: u.placeholders.comment_reply }
 		},
-		schema: d.commentEditorSchema || GI
+		schema: d.commentEditorSchema || KI
 	}), p = c ?? f, m = (0, _.useCallback)(async () => {
 		await d.threadStore.addComment({
 			comment: { body: p.document },
@@ -41895,17 +41940,17 @@ var GB = (0, _.memo)(({ isEmpty: e, onNewCommentSave: t, Components: n, dict: r 
 		tabIndex: s,
 		children: [/* @__PURE__ */ (0, G.jsx)(l.Comments.CardSection, {
 			className: "bn-thread-comments",
-			children: /* @__PURE__ */ (0, G.jsx)(BB, {
+			children: /* @__PURE__ */ (0, G.jsx)(WB, {
 				thread: e,
 				maxCommentsBeforeCollapse: t ? void 0 : i || 5
 			})
 		}), t && /* @__PURE__ */ (0, G.jsx)(l.Comments.CardSection, {
 			className: "bn-thread-composer",
-			children: /* @__PURE__ */ (0, G.jsx)(VI, {
+			children: /* @__PURE__ */ (0, G.jsx)(HI, {
 				autoFocus: !1,
 				editable: !0,
 				editor: p,
-				actions: ({ isFocused: e, isEmpty: t }) => /* @__PURE__ */ (0, G.jsx)(GB, {
+				actions: ({ isFocused: e, isEmpty: t }) => /* @__PURE__ */ (0, G.jsx)(YB, {
 					isFocused: e,
 					isEmpty: t,
 					onNewCommentSave: m,
@@ -41916,34 +41961,34 @@ var GB = (0, _.memo)(({ isEmpty: e, onNewCommentSave: t, Components: n, dict: r 
 		})]
 	});
 };
-function qB() {
-	let e = kI(XI).threadStore, t = (0, _.useRef)(void 0);
+function ZB() {
+	let e = AI(ZI).threadStore, t = (0, _.useRef)(void 0);
 	return t.current ||= e.getThreads(), (0, _.useSyncExternalStore)((0, _.useCallback)((n) => e.subscribe((e) => {
 		t.current = e, n();
 	}), [e]), () => t.current);
 }
-var JB = /* @__PURE__ */ SL({ default: () => YB });
-function YB(e) {
-	let t = q(), n = Y(), r = kI(XI), i = AI(XI, {
+var QB = /* @__PURE__ */ EL({ default: () => $B });
+function $B(e) {
+	let t = q(), n = Y(), r = AI(ZI), i = jI(ZI, {
 		editor: t,
 		selector: (e) => e.selectedThreadId ? {
 			id: e.selectedThreadId,
 			position: e.threadPositions.get(e.selectedThreadId)
 		} : void 0
-	}), a = BI({
+	}), a = VI({
 		trailingBlock: !1,
 		dictionary: {
 			...n,
 			placeholders: { emptyDocument: n.placeholders.comment_reply }
 		},
-		schema: r.commentEditorSchema || GI
-	}, [i?.id]), o = qB(), s = (0, _.useMemo)(() => i ? o.get(i.id) : void 0, [i, o]), c = (0, _.useMemo)(() => ({
+		schema: r.commentEditorSchema || KI
+	}, [i?.id]), o = ZB(), s = (0, _.useMemo)(() => i ? o.get(i.id) : void 0, [i, o]), c = (0, _.useMemo)(() => ({
 		...e.floatingUIOptions,
 		useFloatingOptions: {
 			open: !!i,
 			onOpenChange: (e, i, o) => {
 				if (!e) {
-					if (!KI({
+					if (!qI({
 						hasUnsavedContent: !a.isEmpty,
 						confirmBeforeDiscard: r.confirmBeforeDiscard,
 						message: n.comments.discard_pending_comment
@@ -41974,8 +42019,8 @@ function YB(e) {
 		a,
 		e.floatingUIOptions,
 		i
-	]), l = e.floatingThread || KB;
-	return /* @__PURE__ */ (0, G.jsx)(zI, {
+	]), l = e.floatingThread || XB;
+	return /* @__PURE__ */ (0, G.jsx)(BI, {
 		position: i?.position,
 		portalElement: e.portalElement,
 		...c,
@@ -41987,14 +42032,14 @@ function YB(e) {
 	});
 }
 _.memo(({ thread: e, selectedThreadId: t, maxCommentsBeforeCollapse: n, referenceText: r, orphaned: i }) => {
-	let a = kI(XI), o = (0, _.useCallback)((t) => {
+	let a = AI(ZI), o = (0, _.useCallback)((t) => {
 		t.target.closest(".bn-action-toolbar") || a.selectThread(e.id);
 	}, [a, e.id]), s = (0, _.useCallback)((e) => {
 		if (!e.relatedTarget || e.relatedTarget.closest(".bn-action-toolbar")) return;
 		let t = e.target instanceof Node ? e.target : null, n = e.relatedTarget instanceof Node ? e.relatedTarget.closest(".bn-thread") : null;
 		(!t || !n || !n.contains(t)) && a.selectThread(void 0);
 	}, [a]);
-	return /* @__PURE__ */ (0, G.jsx)(KB, {
+	return /* @__PURE__ */ (0, G.jsx)(XB, {
 		thread: e,
 		selected: e.id === t,
 		orphaned: i,
@@ -42005,8 +42050,8 @@ _.memo(({ thread: e, selectedThreadId: t, maxCommentsBeforeCollapse: n, referenc
 		tabIndex: 0
 	});
 }), (0, _.createContext)(void 0);
-function XB(e) {
-	return /* @__PURE__ */ (0, G.jsx)(sL, {
+function eV(e) {
+	return /* @__PURE__ */ (0, G.jsx)(cL, {
 		as: "span",
 		className: "bn-inline-content-section",
 		"data-inline-content-type": e.inlineContentType,
@@ -42014,8 +42059,8 @@ function XB(e) {
 		children: e.children
 	});
 }
-function ZB(e, t) {
-	let n = TI.create({
+function tV(e, t) {
+	let n = EI.create({
 		name: e.type,
 		inline: !0,
 		group: "inline",
@@ -42034,7 +42079,7 @@ function ZB(e, t) {
 		},
 		renderHTML({ node: n }) {
 			let r = this.options.editor, i = jv(n, r.schema.inlineContentSchema, r.schema.styleSchema), a = t.toExternalHTML || t.render;
-			return qv(AB((e) => /* @__PURE__ */ (0, G.jsx)(a, {
+			return qv(PB((e) => /* @__PURE__ */ (0, G.jsx)(a, {
 				contentRef: (t) => {
 					e(t), t && (t.dataset.editable = "");
 				},
@@ -42045,11 +42090,11 @@ function ZB(e, t) {
 		},
 		addNodeView() {
 			let n = this.options.editor;
-			return (r) => gL((r) => {
-				let i = oL().nodeViewContentRef;
+			return (r) => bL((r) => {
+				let i = sL().nodeViewContentRef;
 				if (!i) throw Error("nodeViewContentRef is not set");
 				let a = t.render;
-				return /* @__PURE__ */ (0, G.jsx)(XB, {
+				return /* @__PURE__ */ (0, G.jsx)(eV, {
 					inlineContentProps: r.node.attrs,
 					inlineContentType: e.type,
 					propSchema: e.propSchema,
@@ -42076,7 +42121,7 @@ function ZB(e, t) {
 		node: n,
 		render(n, r, i) {
 			let a = t.render;
-			return AB((t) => /* @__PURE__ */ (0, G.jsx)(XB, {
+			return PB((t) => /* @__PURE__ */ (0, G.jsx)(eV, {
 				inlineContentProps: n.props,
 				inlineContentType: e.type,
 				propSchema: e.propSchema,
@@ -42092,7 +42137,7 @@ function ZB(e, t) {
 		},
 		toExternalHTML(n, r) {
 			let i = t.toExternalHTML || t.render;
-			return AB((t) => /* @__PURE__ */ (0, G.jsx)(XB, {
+			return PB((t) => /* @__PURE__ */ (0, G.jsx)(eV, {
 				inlineContentProps: n.props,
 				inlineContentType: e.type,
 				propSchema: e.propSchema,
@@ -42108,11 +42153,74 @@ function ZB(e, t) {
 		}
 	});
 }
-function QB(e, t) {
+function nV(e, t) {
+	let n = sI.create({
+		name: e.type,
+		addAttributes() {
+			return Zv(e.propSchema);
+		},
+		parseHTML() {
+			return ny(e);
+		},
+		renderHTML({ mark: n }) {
+			let r = t.render;
+			return Qv(PB((t) => /* @__PURE__ */ (0, G.jsx)(r, {
+				editor: this.options.editor,
+				value: e.propSchema === "boolean" ? void 0 : n.attrs.stringValue,
+				contentRef: (e) => {
+					t(e), e && (e.dataset.editable = "");
+				}
+			}), this.options.editor), e.type, n.attrs.stringValue, e.propSchema);
+		},
+		addMarkView() {
+			let n = this.options.editor;
+			return (r) => {
+				let i = _L((r) => {
+					let i = (0, _.useContext)(hL).markViewContentRef;
+					if (!i) throw Error("markViewContentRef is not set");
+					let a = t.render;
+					return /* @__PURE__ */ (0, G.jsx)(a, {
+						editor: n,
+						contentRef: (e) => {
+							i(e), e && (e.dataset.markViewContent = "");
+						},
+						value: e.propSchema === "boolean" ? void 0 : r.mark.attrs.stringValue
+					});
+				})(r);
+				return i.didMountContentDomElement = !0, i;
+			};
+		}
+	});
+	return $v(e, {
+		...t,
+		mark: n,
+		render(n, r) {
+			let i = t.render;
+			return Qv(PB((e) => /* @__PURE__ */ (0, G.jsx)(i, {
+				editor: r,
+				value: n,
+				contentRef: (t) => {
+					e(t), t && (t.dataset.editable = "");
+				}
+			}), r), e.type, n, e.propSchema);
+		},
+		toExternalHTML(n, r) {
+			let i = t.render;
+			return Qv(PB((e) => /* @__PURE__ */ (0, G.jsx)(i, {
+				editor: r,
+				value: n,
+				contentRef: (t) => {
+					e(t), t && (t.dataset.editable = "");
+				}
+			}), r), e.type, n, e.propSchema);
+		}
+	});
+}
+function rV(e, t) {
 	let n = e.getBoundingClientRect(), r = t.getBoundingClientRect(), i = n.top < r.top, a = n.bottom > r.bottom;
 	return i && a ? "both" : i ? "top" : a ? "bottom" : "none";
 }
-function $B(e) {
+function iV(e) {
 	return (t) => {
 		e.forEach((e) => {
 			typeof e == "function" ? e(t) : e != null && (e.current = t);
@@ -42121,45 +42229,45 @@ function $B(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/keys/keys.mjs
-function eV(e) {
+function aV(e) {
 	return Object.keys(e);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/deep-merge/deep-merge.mjs
-function tV(e) {
+function oV(e) {
 	return e && typeof e == "object" && !Array.isArray(e);
 }
-function nV(e, t) {
+function sV(e, t) {
 	let n = { ...e }, r = t;
-	return tV(e) && tV(t) && Object.keys(t).forEach((t) => {
-		tV(r[t]) && t in e ? n[t] = nV(n[t], r[t]) : n[t] = r[t];
+	return oV(e) && oV(t) && Object.keys(t).forEach((t) => {
+		oV(r[t]) && t in e ? n[t] = sV(n[t], r[t]) : n[t] = r[t];
 	}), n;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/camel-to-kebab-case/camel-to-kebab-case.mjs
-function rV(e) {
+function cV(e) {
 	return e.replace(/[A-Z]/g, (e) => `-${e.toLowerCase()}`);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/units-converters/px.mjs
-function iV(e) {
+function lV(e) {
 	return typeof e != "string" || !e.includes("var(--mantine-scale)") ? e : e.match(/^calc\((.*?)\)$/)?.[1].split("*")[0].trim();
 }
-function aV(e) {
-	let t = iV(e);
+function uV(e) {
+	let t = lV(e);
 	return typeof t == "number" ? t : typeof t == "string" ? t.includes("calc") || t.includes("var") ? t : t.includes("px") ? Number(t.replace("px", "")) : t.includes("rem") ? Number(t.replace("rem", "")) * 16 : t.includes("em") ? Number(t.replace("em", "")) * 16 : Number(t) : NaN;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/units-converters/rem.mjs
-function oV(e) {
+function dV(e) {
 	return e === "0rem" ? "0rem" : `calc(${e} * var(--mantine-scale))`;
 }
-function sV(e, { shouldScale: t = !1 } = {}) {
+function fV(e, { shouldScale: t = !1 } = {}) {
 	function n(r) {
 		if (r === 0 || r === "0") return `0${e}`;
 		if (typeof r == "number") {
 			let n = `${r / 16}${e}`;
-			return t ? oV(n) : n;
+			return t ? dV(n) : n;
 		}
 		if (typeof r == "string") {
 			if (r === "" || r.startsWith("calc(") || r.startsWith("clamp(") || r.includes("rgba(")) return r;
@@ -42168,22 +42276,22 @@ function sV(e, { shouldScale: t = !1 } = {}) {
 			let i = r.replace("px", "");
 			if (!Number.isNaN(Number(i))) {
 				let n = `${Number(i) / 16}${e}`;
-				return t ? oV(n) : n;
+				return t ? dV(n) : n;
 			}
 		}
 		return r;
 	}
 	return n;
 }
-var Z = sV("rem", { shouldScale: !0 }), cV = sV("em");
+var Z = fV("rem", { shouldScale: !0 }), pV = fV("em");
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/filter-props/filter-props.mjs
-function lV(e) {
+function mV(e) {
 	return Object.keys(e).reduce((t, n) => (e[n] !== void 0 && (t[n] = e[n]), t), {});
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/is-number-like/is-number-like.mjs
-function uV(e) {
+function hV(e) {
 	if (typeof e == "number") return !0;
 	if (typeof e == "string") {
 		if (e.startsWith("calc(") || e.startsWith("var(") || e.includes(" ") && e.trim() !== "") return !0;
@@ -42194,12 +42302,12 @@ function uV(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/is-element/is-element.mjs
-function dV(e) {
+function gV(e) {
 	return Array.isArray(e) || e === null ? !1 : typeof e == "object" && e.type !== _.Fragment;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/create-safe-context/create-safe-context.mjs
-function fV(e) {
+function _V(e) {
 	let t = (0, _.createContext)(null);
 	return [({ children: e, value: n }) => /* @__PURE__ */ (0, G.jsx)(t.Provider, {
 		value: n,
@@ -42212,7 +42320,7 @@ function fV(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/create-optional-context/create-optional-context.mjs
-function pV(e = null) {
+function vV(e = null) {
 	let t = (0, _.createContext)(e);
 	return [({ children: e, value: n }) => /* @__PURE__ */ (0, G.jsx)(t.Provider, {
 		value: n,
@@ -42221,7 +42329,7 @@ function pV(e = null) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-safe-id/get-safe-id.mjs
-function mV(e, t) {
+function yV(e, t) {
 	return (n) => {
 		if (typeof n != "string" || n.trim().length === 0) throw Error(t);
 		return `${e}-${n}`;
@@ -42229,34 +42337,34 @@ function mV(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/find-element-ancestor/find-element-ancestor.mjs
-function hV(e, t) {
+function bV(e, t) {
 	let n = e;
 	for (; (n = n.parentElement) && !n.matches(t););
 	return n;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/create-scoped-keydown-handler/create-scoped-keydown-handler.mjs
-function gV(e, t, n) {
+function xV(e, t, n) {
 	for (let n = e - 1; n >= 0; --n) if (!t[n].disabled) return n;
 	if (n) {
 		for (let e = t.length - 1; e > -1; --e) if (!t[e].disabled) return e;
 	}
 	return e;
 }
-function _V(e, t, n) {
+function SV(e, t, n) {
 	for (let n = e + 1; n < t.length; n += 1) if (!t[n].disabled) return n;
 	if (n) {
 		for (let e = 0; e < t.length; e += 1) if (!t[e].disabled) return e;
 	}
 	return e;
 }
-function vV(e, t, n) {
-	return hV(e, n) === hV(t, n);
+function CV(e, t, n) {
+	return bV(e, n) === bV(t, n);
 }
-function yV({ parentSelector: e, siblingSelector: t, onKeyDown: n, loop: r = !0, activateOnFocus: i = !1, dir: a = "rtl", orientation: o }) {
+function wV({ parentSelector: e, siblingSelector: t, onKeyDown: n, loop: r = !0, activateOnFocus: i = !1, dir: a = "rtl", orientation: o }) {
 	return (s) => {
 		n?.(s);
-		let c = Array.from(hV(s.currentTarget, e)?.querySelectorAll(t) || []).filter((t) => vV(s.currentTarget, t, e)), l = c.findIndex((e) => s.currentTarget === e), u = _V(l, c, r), d = gV(l, c, r), f = a === "rtl" ? d : u, p = a === "rtl" ? u : d;
+		let c = Array.from(bV(s.currentTarget, e)?.querySelectorAll(t) || []).filter((t) => CV(s.currentTarget, t, e)), l = c.findIndex((e) => s.currentTarget === e), u = SV(l, c, r), d = xV(l, c, r), f = a === "rtl" ? d : u, p = a === "rtl" ? u : d;
 		switch (s.key) {
 			case "ArrowRight":
 				o === "horizontal" && (s.stopPropagation(), s.preventDefault(), c[f].focus(), i && c[f].click());
@@ -42284,66 +42392,66 @@ function yV({ parentSelector: e, siblingSelector: t, onKeyDown: n, loop: r = !0,
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-default-z-index/get-default-z-index.mjs
-var bV = {
+var TV = {
 	app: 100,
 	modal: 200,
 	popover: 300,
 	overlay: 400,
 	max: 9999
 };
-function xV(e) {
-	return bV[e];
+function EV(e) {
+	return TV[e];
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/noop/noop.mjs
-var SV = () => {};
+var DV = () => {};
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/close-on-escape/close-on-escape.mjs
-function CV(e, t = { active: !0 }) {
-	return typeof e != "function" || !t.active ? t.onKeyDown || SV : (n) => {
+function OV(e, t = { active: !0 }) {
+	return typeof e != "function" || !t.active ? t.onKeyDown || DV : (n) => {
 		n.key === "Escape" && (e(n), t.onTrigger?.());
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-size/get-size.mjs
-function wV(e, t = "size", n = !0) {
-	if (e !== void 0) return uV(e) ? n ? Z(e) : e : `var(--${t}-${e})`;
+function kV(e, t = "size", n = !0) {
+	if (e !== void 0) return hV(e) ? n ? Z(e) : e : `var(--${t}-${e})`;
 }
-function TV(e) {
-	return wV(e, "mantine-spacing");
+function AV(e) {
+	return kV(e, "mantine-spacing");
 }
-function EV(e) {
-	return e === void 0 ? "var(--mantine-radius-default)" : wV(e, "mantine-radius");
+function jV(e) {
+	return e === void 0 ? "var(--mantine-radius-default)" : kV(e, "mantine-radius");
 }
-function DV(e) {
-	return wV(e, "mantine-font-size");
+function MV(e) {
+	return kV(e, "mantine-font-size");
 }
-function OV(e) {
-	return wV(e, "mantine-line-height", !1);
+function NV(e) {
+	return kV(e, "mantine-line-height", !1);
 }
-function kV(e) {
-	if (e) return wV(e, "mantine-shadow", !1);
+function PV(e) {
+	if (e) return kV(e, "mantine-shadow", !1);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/create-event-handler/create-event-handler.mjs
-function AV(e, t) {
+function FV(e, t) {
 	return (n) => {
 		e?.(n), t?.(n);
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-context-item-index/get-context-item-index.mjs
-function jV(e, t, n) {
-	return n ? Array.from(hV(n, t)?.querySelectorAll(e) || []).findIndex((e) => e === n) : null;
+function IV(e, t, n) {
+	return n ? Array.from(bV(n, t)?.querySelectorAll(e) || []).findIndex((e) => e === n) : null;
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/utils/random-id/random-id.mjs
-function MV(e = "mantine-") {
+function LV(e = "mantine-") {
 	return `${e}${Math.random().toString(36).slice(2, 11)}`;
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/utils/use-callback-ref/use-callback-ref.mjs
-function NV(e) {
+function RV(e) {
 	let t = (0, _.useRef)(e);
 	return (0, _.useEffect)(() => {
 		t.current = e;
@@ -42351,9 +42459,9 @@ function NV(e) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-click-outside/use-click-outside.mjs
-var PV = ["mousedown", "touchstart"];
-function FV(e, t, n) {
-	let r = (0, _.useRef)(null), i = t || PV;
+var zV = ["mousedown", "touchstart"];
+function BV(e, t, n) {
+	let r = (0, _.useRef)(null), i = t || zV;
 	return (0, _.useEffect)(() => {
 		let t = (t) => {
 			let { target: i } = t ?? {};
@@ -42373,22 +42481,22 @@ function FV(e, t, n) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-media-query/use-media-query.mjs
-function IV(e, t) {
+function VV(e, t) {
 	try {
 		return e.addEventListener("change", t), () => e.removeEventListener("change", t);
 	} catch {
 		return e.addListener(t), () => e.removeListener(t);
 	}
 }
-function LV(e, t) {
+function HV(e, t) {
 	return typeof window < "u" && "matchMedia" in window && window.matchMedia(e).matches;
 }
-function RV(e, t, { getInitialValueInEffect: n } = { getInitialValueInEffect: !0 }) {
-	let [r, i] = (0, _.useState)(n ? t : LV(e));
+function UV(e, t, { getInitialValueInEffect: n } = { getInitialValueInEffect: !0 }) {
+	let [r, i] = (0, _.useState)(n ? t : HV(e));
 	return (0, _.useEffect)(() => {
 		try {
 			let t = window.matchMedia(e);
-			return i(t.matches), IV(t, (e) => i(e.matches));
+			return i(t.matches), VV(t, (e) => i(e.matches));
 		} catch {
 			return;
 		}
@@ -42396,10 +42504,10 @@ function RV(e, t, { getInitialValueInEffect: n } = { getInitialValueInEffect: !0
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-isomorphic-effect/use-isomorphic-effect.mjs
-var zV = typeof document < "u" ? _.useLayoutEffect : _.useEffect;
+var WV = typeof document < "u" ? _.useLayoutEffect : _.useEffect;
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-did-update/use-did-update.mjs
-function BV(e, t) {
+function GV(e, t) {
 	let n = (0, _.useRef)(!1);
 	(0, _.useEffect)(() => () => {
 		n.current = !1;
@@ -42410,11 +42518,11 @@ function BV(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-focus-return/use-focus-return.mjs
-function VV({ opened: e, shouldReturnFocus: t = !0 }) {
+function KV({ opened: e, shouldReturnFocus: t = !0 }) {
 	let n = (0, _.useRef)(null), r = () => {
 		n.current && "focus" in n.current && typeof n.current.focus == "function" && n.current?.focus({ preventScroll: !0 });
 	};
-	return BV(() => {
+	return GV(() => {
 		let i = -1, a = (e) => {
 			e.key === "Tab" && window.clearTimeout(i);
 		};
@@ -42425,38 +42533,38 @@ function VV({ opened: e, shouldReturnFocus: t = !0 }) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-focus-trap/tabbable.mjs
-var HV = /input|select|textarea|button|object/, UV = "a, input, select, textarea, button, object, [tabindex]";
-function WV(e) {
+var qV = /input|select|textarea|button|object/, JV = "a, input, select, textarea, button, object, [tabindex]";
+function YV(e) {
 	return e.style.display === "none";
 }
-function GV(e) {
+function XV(e) {
 	if (e.getAttribute("aria-hidden") || e.getAttribute("hidden") || e.getAttribute("type") === "hidden") return !1;
 	let t = e;
 	for (; t && !(t === document.body || t.nodeType === 11);) {
-		if (WV(t)) return !1;
+		if (YV(t)) return !1;
 		t = t.parentNode;
 	}
 	return !0;
 }
-function KV(e) {
+function ZV(e) {
 	let t = e.getAttribute("tabindex");
 	return t === null && (t = void 0), parseInt(t, 10);
 }
-function qV(e) {
-	let t = e.nodeName.toLowerCase(), n = !Number.isNaN(KV(e));
-	return (HV.test(t) && !e.disabled || e instanceof HTMLAnchorElement && e.href || n) && GV(e);
+function QV(e) {
+	let t = e.nodeName.toLowerCase(), n = !Number.isNaN(ZV(e));
+	return (qV.test(t) && !e.disabled || e instanceof HTMLAnchorElement && e.href || n) && XV(e);
 }
-function JV(e) {
-	let t = KV(e);
-	return (Number.isNaN(t) || t >= 0) && qV(e);
+function $V(e) {
+	let t = ZV(e);
+	return (Number.isNaN(t) || t >= 0) && QV(e);
 }
-function YV(e) {
-	return Array.from(e.querySelectorAll(UV)).filter(JV);
+function eH(e) {
+	return Array.from(e.querySelectorAll(JV)).filter($V);
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-focus-trap/scope-tab.mjs
-function XV(e, t) {
-	let n = YV(e);
+function tH(e, t) {
+	let n = eH(e);
 	if (!n.length) {
 		t.preventDefault();
 		return;
@@ -42469,12 +42577,12 @@ function XV(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-focus-trap/use-focus-trap.mjs
-function ZV(e = !0) {
+function nH(e = !0) {
 	let t = (0, _.useRef)(null), n = (e) => {
 		let t = e.querySelector("[data-autofocus]");
 		if (!t) {
-			let n = Array.from(e.querySelectorAll(UV));
-			t = n.find(JV) || n.find(qV) || null, !t && qV(e) && (t = e);
+			let n = Array.from(e.querySelectorAll(JV));
+			t = n.find($V) || n.find(QV) || null, !t && QV(e) && (t = e);
 		}
 		t && t.focus({ preventScroll: !0 });
 	}, r = (0, _.useCallback)((r) => {
@@ -42486,52 +42594,52 @@ function ZV(e = !0) {
 		if (!e) return;
 		t.current && setTimeout(() => n(t.current));
 		let r = (e) => {
-			e.key === "Tab" && t.current && XV(t.current, e);
+			e.key === "Tab" && t.current && tH(t.current, e);
 		};
 		return document.addEventListener("keydown", r), () => document.removeEventListener("keydown", r);
 	}, [e]), r;
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-id/use-react-id.mjs
-var QV = _.default.useId || (() => void 0);
-function $V() {
-	let e = QV();
+var rH = _.default.useId || (() => void 0);
+function iH() {
+	let e = rH();
 	return e ? `mantine-${e.replace(/:/g, "")}` : "";
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-id/use-id.mjs
-function eH(e) {
-	let t = $V(), [n, r] = (0, _.useState)(t);
-	return zV(() => {
-		r(MV());
+function aH(e) {
+	let t = iH(), [n, r] = (0, _.useState)(t);
+	return WV(() => {
+		r(LV());
 	}, []), typeof e == "string" ? e : typeof window > "u" ? t : n;
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-merged-ref/use-merged-ref.mjs
-function tH(e, t) {
+function oH(e, t) {
 	if (typeof e == "function") return e(t);
 	typeof e == "object" && e && "current" in e && (e.current = t);
 }
-function nH(...e) {
+function sH(...e) {
 	let t = /* @__PURE__ */ new Map();
 	return (n) => {
 		if (e.forEach((e) => {
-			let r = tH(e, n);
+			let r = oH(e, n);
 			r && t.set(e, r);
 		}), t.size > 0) return () => {
 			e.forEach((e) => {
 				let n = t.get(e);
-				n && typeof n == "function" ? n() : tH(e, null);
+				n && typeof n == "function" ? n() : oH(e, null);
 			}), t.clear();
 		};
 	};
 }
-function rH(...e) {
-	return (0, _.useCallback)(nH(...e), e);
+function cH(...e) {
+	return (0, _.useCallback)(sH(...e), e);
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-uncontrolled/use-uncontrolled.mjs
-function iH({ value: e, defaultValue: t, finalValue: n, onChange: r = () => {} }) {
+function lH({ value: e, defaultValue: t, finalValue: n, onChange: r = () => {} }) {
 	let [i, a] = (0, _.useState)(t === void 0 ? n : t);
 	return e === void 0 ? [
 		i,
@@ -42547,12 +42655,12 @@ function iH({ value: e, defaultValue: t, finalValue: n, onChange: r = () => {} }
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-reduced-motion/use-reduced-motion.mjs
-function aH(e, t) {
-	return RV("(prefers-reduced-motion: reduce)", e, t);
+function uH(e, t) {
+	return UV("(prefers-reduced-motion: reduce)", e, t);
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-hover/use-hover.mjs
-function oH() {
+function dH() {
 	let [e, t] = (0, _.useState)(!1), n = (0, _.useRef)(null), r = (0, _.useCallback)(() => {
 		t(!0);
 	}, []), i = (0, _.useCallback)(() => {
@@ -42567,7 +42675,7 @@ function oH() {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-disclosure/use-disclosure.mjs
-function sH(e = !1, t = {}) {
+function fH(e = !1, t = {}) {
 	let [n, r] = (0, _.useState)(e), i = (0, _.useCallback)(() => {
 		r((e) => e || (t.onOpen?.(), !0));
 	}, [t.onOpen]), a = (0, _.useCallback)(() => {
@@ -42587,16 +42695,16 @@ function sH(e = !1, t = {}) {
 }
 //#endregion
 //#region node_modules/@mantine/hooks/esm/use-focus-within/use-focus-within.mjs
-function cH(e) {
+function pH(e) {
 	return e.currentTarget instanceof HTMLElement && e.relatedTarget instanceof HTMLElement && e.currentTarget.contains(e.relatedTarget);
 }
-function lH({ onBlur: e, onFocus: t } = {}) {
-	let [n, r] = (0, _.useState)(!1), i = (0, _.useRef)(!1), a = (0, _.useRef)(null), o = NV(t), s = NV(e), c = (0, _.useCallback)((e) => {
+function mH({ onBlur: e, onFocus: t } = {}) {
+	let [n, r] = (0, _.useState)(!1), i = (0, _.useRef)(!1), a = (0, _.useRef)(null), o = RV(t), s = RV(e), c = (0, _.useCallback)((e) => {
 		r(e), i.current = e;
 	}, []), l = (0, _.useCallback)((e) => {
 		i.current || (c(!0), o(e));
 	}, []), u = (0, _.useCallback)((e) => {
-		i.current && !cH(e) && (c(!1), s(e));
+		i.current && !pH(e) && (c(!1), s(e));
 	}, []), d = (0, _.useCallback)((e) => {
 		e && (a.current && (a.current.removeEventListener("focusin", l), a.current.removeEventListener("focusout", u)), e.addEventListener("focusin", l), e.addEventListener("focusout", u), a.current = e);
 	}, [l, u]);
@@ -42609,52 +42717,52 @@ function lH({ onBlur: e, onFocus: t } = {}) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-ref-prop/get-ref-prop.mjs
-function uH(e) {
+function hH(e) {
 	return e?.props?.ref;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/utils/get-single-element-child/get-single-element-child.mjs
-function dH(e) {
+function gH(e) {
 	let t = _.Children.toArray(e);
-	return t.length !== 1 || !dV(t[0]) ? null : t[0];
+	return t.length !== 1 || !gV(t[0]) ? null : t[0];
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/create-vars-resolver/create-vars-resolver.mjs
-function fH(e) {
+function _H(e) {
 	return e;
 }
 //#endregion
 //#region node_modules/@mantine/core/node_modules/clsx/dist/clsx.mjs
-function pH(e) {
+function vH(e) {
 	var t, n, r = "";
 	if (typeof e == "string" || typeof e == "number") r += e;
 	else if (typeof e == "object") if (Array.isArray(e)) {
 		var i = e.length;
-		for (t = 0; t < i; t++) e[t] && (n = pH(e[t])) && (r && (r += " "), r += n);
+		for (t = 0; t < i; t++) e[t] && (n = vH(e[t])) && (r && (r += " "), r += n);
 	} else for (n in e) e[n] && (r && (r += " "), r += n);
 	return r;
 }
-function mH() {
-	for (var e, t, n = 0, r = "", i = arguments.length; n < i; n++) (e = arguments[n]) && (t = pH(e)) && (r && (r += " "), r += t);
+function yH() {
+	for (var e, t, n = 0, r = "", i = arguments.length; n < i; n++) (e = arguments[n]) && (t = vH(e)) && (r && (r += " "), r += t);
 	return r;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/resolve-class-names/resolve-class-names.mjs
-var hH = {};
-function gH(e) {
+var bH = {};
+function xH(e) {
 	let t = {};
 	return e.forEach((e) => {
 		Object.entries(e).forEach(([e, n]) => {
-			t[e] ? t[e] = mH(t[e], n) : t[e] = n;
+			t[e] ? t[e] = yH(t[e], n) : t[e] = n;
 		});
 	}), t;
 }
-function _H({ theme: e, classNames: t, props: n, stylesCtx: r }) {
-	return gH((Array.isArray(t) ? t : [t]).map((t) => typeof t == "function" ? t(e, n, r) : t || hH));
+function SH({ theme: e, classNames: t, props: n, stylesCtx: r }) {
+	return xH((Array.isArray(t) ? t : [t]).map((t) => typeof t == "function" ? t(e, n, r) : t || bH));
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-styles/resolve-styles.mjs
-function vH({ theme: e, styles: t, props: n, stylesCtx: r }) {
+function CH({ theme: e, styles: t, props: n, stylesCtx: r }) {
 	return (Array.isArray(t) ? t : [t]).reduce((t, i) => typeof i == "function" ? {
 		...t,
 		...i(e, n, r)
@@ -42665,42 +42773,42 @@ function vH({ theme: e, styles: t, props: n, stylesCtx: r }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/Mantine.context.mjs
-var yH = (0, _.createContext)(null);
-function bH() {
-	let e = (0, _.useContext)(yH);
+var wH = (0, _.createContext)(null);
+function TH() {
+	let e = (0, _.useContext)(wH);
 	if (!e) throw Error("[@mantine/core] MantineProvider was not found in tree");
 	return e;
 }
-function xH() {
-	return bH().cssVariablesResolver;
-}
-function SH() {
-	return bH().classNamesPrefix;
-}
-function CH() {
-	return bH().getStyleNonce;
-}
-function wH() {
-	return bH().withStaticClasses;
-}
-function TH() {
-	return bH().headless;
-}
 function EH() {
-	return bH().stylesTransform?.sx;
+	return TH().cssVariablesResolver;
 }
 function DH() {
-	return bH().stylesTransform?.styles;
+	return TH().classNamesPrefix;
 }
 function OH() {
-	return bH().env || "default";
+	return TH().getStyleNonce;
+}
+function kH() {
+	return TH().withStaticClasses;
+}
+function AH() {
+	return TH().headless;
+}
+function jH() {
+	return TH().stylesTransform?.sx;
+}
+function MH() {
+	return TH().stylesTransform?.styles;
+}
+function NH() {
+	return TH().env || "default";
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/to-rgba/to-rgba.mjs
-function kH(e) {
+function PH(e) {
 	return /^#?([0-9A-F]{3}){1,2}([0-9A-F]{2})?$/i.test(e);
 }
-function AH(e) {
+function FH(e) {
 	let t = e.replace("#", "");
 	if (t.length === 3) {
 		let e = t.split("");
@@ -42730,7 +42838,7 @@ function AH(e) {
 		a: 1
 	};
 }
-function jH(e) {
+function IH(e) {
 	let [t, n, r, i] = e.replace(/[^0-9,./]/g, "").split(/[/,]/).map(Number);
 	return {
 		r: t,
@@ -42739,7 +42847,7 @@ function jH(e) {
 		a: i === void 0 ? 1 : i
 	};
 }
-function MH(e) {
+function LH(e) {
 	let t = e.match(/^hsla?\(\s*(\d+)\s*,\s*(\d+%)\s*,\s*(\d+%)\s*(,\s*(0?\.\d+|\d+(\.\d+)?))?\s*\)$/i);
 	if (!t) return {
 		r: 0,
@@ -42755,8 +42863,8 @@ function MH(e) {
 		a: a || 1
 	};
 }
-function NH(e) {
-	return kH(e) ? AH(e) : e.startsWith("rgb") ? jH(e) : e.startsWith("hsl") ? MH(e) : {
+function RH(e) {
+	return PH(e) ? FH(e) : e.startsWith("rgb") ? IH(e) : e.startsWith("hsl") ? LH(e) : {
 		r: 0,
 		g: 0,
 		b: 0,
@@ -42765,43 +42873,43 @@ function NH(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/darken/darken.mjs
-function PH(e, t) {
+function zH(e, t) {
 	if (e.startsWith("var(")) return `color-mix(in srgb, ${e}, black ${t * 100}%)`;
-	let { r: n, g: r, b: i, a } = NH(e), o = 1 - t, s = (e) => Math.round(e * o);
+	let { r: n, g: r, b: i, a } = RH(e), o = 1 - t, s = (e) => Math.round(e * o);
 	return `rgba(${s(n)}, ${s(r)}, ${s(i)}, ${a})`;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-primary-shade/get-primary-shade.mjs
-function FH(e, t) {
+function BH(e, t) {
 	return typeof e.primaryShade == "number" ? e.primaryShade : t === "dark" ? e.primaryShade.dark : e.primaryShade.light;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/luminance/luminance.mjs
-function IH(e) {
+function VH(e) {
 	return e <= .03928 ? e / 12.92 : ((e + .055) / 1.055) ** 2.4;
 }
-function LH(e) {
+function HH(e) {
 	let t = e.match(/oklch\((.*?)%\s/);
 	return t ? parseFloat(t[1]) : null;
 }
-function RH(e) {
-	if (e.startsWith("oklch(")) return (LH(e) || 0) / 100;
-	let { r: t, g: n, b: r } = NH(e), i = t / 255, a = n / 255, o = r / 255, s = IH(i), c = IH(a), l = IH(o);
+function UH(e) {
+	if (e.startsWith("oklch(")) return (HH(e) || 0) / 100;
+	let { r: t, g: n, b: r } = RH(e), i = t / 255, a = n / 255, o = r / 255, s = VH(i), c = VH(a), l = VH(o);
 	return .2126 * s + .7152 * c + .0722 * l;
 }
-function zH(e, t = .179) {
-	return !e.startsWith("var(") && RH(e) > t;
+function WH(e, t = .179) {
+	return !e.startsWith("var(") && UH(e) > t;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/parse-theme-color/parse-theme-color.mjs
-function BH({ color: e, theme: t, colorScheme: n }) {
+function GH({ color: e, theme: t, colorScheme: n }) {
 	if (typeof e != "string") throw Error(`[@mantine/core] Failed to parse color. Expected color to be a string, instead got ${typeof e}`);
 	if (e === "bright") return {
 		color: e,
 		value: n === "dark" ? t.white : t.black,
 		shade: void 0,
 		isThemeColor: !1,
-		isLight: zH(n === "dark" ? t.white : t.black, t.luminanceThreshold),
+		isLight: WH(n === "dark" ? t.white : t.black, t.luminanceThreshold),
 		variable: "--mantine-color-bright"
 	};
 	if (e === "dimmed") return {
@@ -42809,7 +42917,7 @@ function BH({ color: e, theme: t, colorScheme: n }) {
 		value: n === "dark" ? t.colors.dark[2] : t.colors.gray[7],
 		shade: void 0,
 		isThemeColor: !1,
-		isLight: zH(n === "dark" ? t.colors.dark[2] : t.colors.gray[6], t.luminanceThreshold),
+		isLight: WH(n === "dark" ? t.colors.dark[2] : t.colors.gray[6], t.luminanceThreshold),
 		variable: "--mantine-color-dimmed"
 	};
 	if (e === "white" || e === "black") return {
@@ -42817,18 +42925,18 @@ function BH({ color: e, theme: t, colorScheme: n }) {
 		value: e === "white" ? t.white : t.black,
 		shade: void 0,
 		isThemeColor: !1,
-		isLight: zH(e === "white" ? t.white : t.black, t.luminanceThreshold),
+		isLight: WH(e === "white" ? t.white : t.black, t.luminanceThreshold),
 		variable: `--mantine-color-${e}`
 	};
 	let [r, i] = e.split("."), a = i ? Number(i) : void 0, o = r in t.colors;
 	if (o) {
-		let e = a === void 0 ? t.colors[r][FH(t, n || "light")] : t.colors[r][a];
+		let e = a === void 0 ? t.colors[r][BH(t, n || "light")] : t.colors[r][a];
 		return {
 			color: r,
 			value: e,
 			shade: a,
 			isThemeColor: o,
-			isLight: zH(e, t.luminanceThreshold),
+			isLight: WH(e, t.luminanceThreshold),
 			variable: i ? `--mantine-color-${r}-${a}` : `--mantine-color-${r}-filled`
 		};
 	}
@@ -42836,15 +42944,15 @@ function BH({ color: e, theme: t, colorScheme: n }) {
 		color: e,
 		value: e,
 		isThemeColor: o,
-		isLight: zH(e, t.luminanceThreshold),
+		isLight: WH(e, t.luminanceThreshold),
 		shade: a,
 		variable: void 0
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-theme-color/get-theme-color.mjs
-function VH(e, t) {
-	let n = BH({
+function KH(e, t) {
+	let n = GH({
 		color: e || t.primaryColor,
 		theme: t
 	});
@@ -42852,25 +42960,25 @@ function VH(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-gradient/get-gradient.mjs
-function HH(e, t) {
+function qH(e, t) {
 	let n = {
 		from: e?.from || t.defaultGradient.from,
 		to: e?.to || t.defaultGradient.to,
 		deg: e?.deg ?? t.defaultGradient.deg ?? 0
-	}, r = VH(n.from, t), i = VH(n.to, t);
+	}, r = KH(n.from, t), i = KH(n.to, t);
 	return `linear-gradient(${n.deg}deg, ${r} 0%, ${i} 100%)`;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/rgba/rgba.mjs
-function UH(e, t) {
+function JH(e, t) {
 	if (typeof e != "string" || t > 1 || t < 0) return "rgba(0, 0, 0, 1)";
 	if (e.startsWith("var(")) return `color-mix(in srgb, ${e}, transparent ${(1 - t) * 100}%)`;
 	if (e.startsWith("oklch")) return e.includes("/") ? e.replace(/\/\s*[\d.]+\s*\)/, `/ ${t})`) : e.replace(")", ` / ${t})`);
-	let { r: n, g: r, b: i } = NH(e);
+	let { r: n, g: r, b: i } = RH(e);
 	return `rgba(${n}, ${r}, ${i}, ${t})`;
 }
-var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: i }) => {
-	let a = BH({
+var YH = JH, XH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: i }) => {
+	let a = GH({
 		color: e,
 		theme: t
 	}), o = typeof i == "boolean" ? i : t.autoContrast;
@@ -42894,7 +43002,7 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 			border: `${Z(1)} solid transparent`
 		} : {
 			background: e,
-			hover: PH(e, .1),
+			hover: zH(e, .1),
 			color: t,
 			border: `${Z(1)} solid transparent`
 		};
@@ -42909,15 +43017,15 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 			};
 			let n = t.colors[a.color][a.shade];
 			return {
-				background: UH(n, .1),
-				hover: UH(n, .12),
+				background: JH(n, .1),
+				hover: JH(n, .12),
 				color: `var(--mantine-color-${a.color}-${Math.min(a.shade, 6)})`,
 				border: `${Z(1)} solid transparent`
 			};
 		}
 		return {
-			background: UH(e, .1),
-			hover: UH(e, .12),
+			background: JH(e, .1),
+			hover: JH(e, .12),
 			color: e,
 			border: `${Z(1)} solid transparent`
 		};
@@ -42929,12 +43037,12 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 		border: `${Z(1)} solid var(--mantine-color-${e}-outline)`
 	} : {
 		background: "transparent",
-		hover: UH(t.colors[a.color][a.shade], .05),
+		hover: JH(t.colors[a.color][a.shade], .05),
 		color: `var(--mantine-color-${a.color}-${a.shade})`,
 		border: `${Z(1)} solid var(--mantine-color-${a.color}-${a.shade})`
 	} : {
 		background: "transparent",
-		hover: UH(e, .05),
+		hover: JH(e, .05),
 		color: e,
 		border: `${Z(1)} solid ${e}`
 	};
@@ -42949,14 +43057,14 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 			let n = t.colors[a.color][a.shade];
 			return {
 				background: "transparent",
-				hover: UH(n, .12),
+				hover: JH(n, .12),
 				color: `var(--mantine-color-${a.color}-${Math.min(a.shade, 6)})`,
 				border: `${Z(1)} solid transparent`
 			};
 		}
 		return {
 			background: "transparent",
-			hover: UH(e, .12),
+			hover: JH(e, .12),
 			color: e,
 			border: `${Z(1)} solid transparent`
 		};
@@ -42978,22 +43086,22 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 		border: `${Z(1)} solid transparent`
 	} : n === "white" ? a.isThemeColor ? a.shade === void 0 ? {
 		background: "var(--mantine-color-white)",
-		hover: PH(t.white, .01),
+		hover: zH(t.white, .01),
 		color: `var(--mantine-color-${e}-filled)`,
 		border: `${Z(1)} solid transparent`
 	} : {
 		background: "var(--mantine-color-white)",
-		hover: PH(t.white, .01),
+		hover: zH(t.white, .01),
 		color: `var(--mantine-color-${a.color}-${a.shade})`,
 		border: `${Z(1)} solid transparent`
 	} : {
 		background: "var(--mantine-color-white)",
-		hover: PH(t.white, .01),
+		hover: zH(t.white, .01),
 		color: e,
 		border: `${Z(1)} solid transparent`
 	} : n === "gradient" ? {
-		background: HH(r, t),
-		hover: HH(r, t),
+		background: qH(r, t),
+		hover: qH(r, t),
 		color: "var(--mantine-color-white)",
 		border: "none"
 	} : n === "default" ? {
@@ -43002,7 +43110,7 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 		color: "var(--mantine-color-default-color)",
 		border: `${Z(1)} solid var(--mantine-color-default-border)`
 	} : {};
-}, KH = {
+}, ZH = {
 	dark: [
 		"#C9C9C9",
 		"#b8b8b8",
@@ -43171,22 +43279,22 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 		"#e8590c",
 		"#d9480f"
 	]
-}, qH = "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji", JH = {
+}, QH = "-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji", $H = {
 	scale: 1,
 	fontSmoothing: !0,
 	focusRing: "auto",
 	white: "#fff",
 	black: "#000",
-	colors: KH,
+	colors: ZH,
 	primaryShade: {
 		light: 6,
 		dark: 8
 	},
 	primaryColor: "blue",
-	variantColorResolver: GH,
+	variantColorResolver: XH,
 	autoContrast: !1,
 	luminanceThreshold: .3,
-	fontFamily: qH,
+	fontFamily: QH,
 	fontFamilyMonospace: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, Liberation Mono, Courier New, monospace",
 	respectReducedMotion: !1,
 	cursorType: "default",
@@ -43199,7 +43307,7 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 	activeClassName: "mantine-active",
 	focusClassName: "",
 	headings: {
-		fontFamily: qH,
+		fontFamily: QH,
 		fontWeight: "700",
 		textWrap: "wrap",
 		sizes: {
@@ -43276,19 +43384,19 @@ var WH = UH, GH = ({ color: e, theme: t, variant: n, gradient: r, autoContrast: 
 };
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/is-mantine-color-scheme.mjs
-function YH(e) {
+function eU(e) {
 	return e === "auto" || e === "dark" || e === "light";
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-scheme-managers/local-storage-manager.mjs
-function XH({ key: e = "mantine-color-scheme-value" } = {}) {
+function tU({ key: e = "mantine-color-scheme-value" } = {}) {
 	let t;
 	return {
 		get: (t) => {
 			if (typeof window > "u") return t;
 			try {
 				let n = window.localStorage.getItem(e);
-				return YH(n) ? n : t;
+				return eU(n) ? n : t;
 			} catch {
 				return t;
 			}
@@ -43302,7 +43410,7 @@ function XH({ key: e = "mantine-color-scheme-value" } = {}) {
 		},
 		subscribe: (n) => {
 			t = (t) => {
-				t.storageArea === window.localStorage && t.key === e && YH(t.newValue) && n(t.newValue);
+				t.storageArea === window.localStorage && t.key === e && eU(t.newValue) && n(t.newValue);
 			}, window.addEventListener("storage", t);
 		},
 		unsubscribe: () => {
@@ -43315,45 +43423,45 @@ function XH({ key: e = "mantine-color-scheme-value" } = {}) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/merge-mantine-theme/merge-mantine-theme.mjs
-var ZH = "[@mantine/core] MantineProvider: Invalid theme.primaryColor, it accepts only key of theme.colors, learn more – https://mantine.dev/theming/colors/#primary-color", QH = "[@mantine/core] MantineProvider: Invalid theme.primaryShade, it accepts only 0-9 integers or an object { light: 0-9, dark: 0-9 }";
-function $H(e) {
+var nU = "[@mantine/core] MantineProvider: Invalid theme.primaryColor, it accepts only key of theme.colors, learn more – https://mantine.dev/theming/colors/#primary-color", rU = "[@mantine/core] MantineProvider: Invalid theme.primaryShade, it accepts only 0-9 integers or an object { light: 0-9, dark: 0-9 }";
+function iU(e) {
 	return e < 0 || e > 9 ? !1 : parseInt(e.toString(), 10) === e;
 }
-function eU(e) {
-	if (!(e.primaryColor in e.colors)) throw Error(ZH);
-	if (typeof e.primaryShade == "object" && (!$H(e.primaryShade.dark) || !$H(e.primaryShade.light)) || typeof e.primaryShade == "number" && !$H(e.primaryShade)) throw Error(QH);
+function aU(e) {
+	if (!(e.primaryColor in e.colors)) throw Error(nU);
+	if (typeof e.primaryShade == "object" && (!iU(e.primaryShade.dark) || !iU(e.primaryShade.light)) || typeof e.primaryShade == "number" && !iU(e.primaryShade)) throw Error(rU);
 }
-function tU(e, t) {
-	if (!t) return eU(e), e;
-	let n = nV(e, t);
-	return t.fontFamily && !t.headings?.fontFamily && (n.headings.fontFamily = t.fontFamily), eU(n), n;
+function oU(e, t) {
+	if (!t) return aU(e), e;
+	let n = sV(e, t);
+	return t.fontFamily && !t.headings?.fontFamily && (n.headings.fontFamily = t.fontFamily), aU(n), n;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineThemeProvider/MantineThemeProvider.mjs
-var nU = (0, _.createContext)(null), rU = () => (0, _.useContext)(nU) || JH;
-function iU() {
-	let e = (0, _.useContext)(nU);
+var sU = (0, _.createContext)(null), cU = () => (0, _.useContext)(sU) || $H;
+function lU() {
+	let e = (0, _.useContext)(sU);
 	if (!e) throw Error("@mantine/core: MantineProvider was not found in component tree, make sure you have it in your app");
 	return e;
 }
-function aU({ theme: e, children: t, inherit: n = !0 }) {
-	let r = rU(), i = (0, _.useMemo)(() => tU(n ? r : JH, e), [
+function uU({ theme: e, children: t, inherit: n = !0 }) {
+	let r = cU(), i = (0, _.useMemo)(() => oU(n ? r : $H, e), [
 		e,
 		r,
 		n
 	]);
-	return /* @__PURE__ */ (0, G.jsx)(nU.Provider, {
+	return /* @__PURE__ */ (0, G.jsx)(sU.Provider, {
 		value: i,
 		children: t
 	});
 }
-aU.displayName = "@mantine/core/MantineThemeProvider";
+uU.displayName = "@mantine/core/MantineThemeProvider";
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineClasses/MantineClasses.mjs
-function oU() {
-	let e = iU(), t = CH(), n = eV(e.breakpoints).reduce((t, n) => {
-		let r = e.breakpoints[n].includes("px"), i = aV(e.breakpoints[n]);
-		return `${t}@media (max-width: ${r ? `${i - .1}px` : cV(i - .1)}) {.mantine-visible-from-${n} {display: none !important;}}@media (min-width: ${r ? `${i}px` : cV(i)}) {.mantine-hidden-from-${n} {display: none !important;}}`;
+function dU() {
+	let e = lU(), t = OH(), n = aV(e.breakpoints).reduce((t, n) => {
+		let r = e.breakpoints[n].includes("px"), i = uV(e.breakpoints[n]);
+		return `${t}@media (max-width: ${r ? `${i - .1}px` : pV(i - .1)}) {.mantine-visible-from-${n} {display: none !important;}}@media (min-width: ${r ? `${i}px` : pV(i)}) {.mantine-hidden-from-${n} {display: none !important;}}`;
 	}, "");
 	return /* @__PURE__ */ (0, G.jsx)("style", {
 		"data-mantine-styles": "classes",
@@ -43363,13 +43471,13 @@ function oU() {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/css-variables-object-to-string.mjs
-function sU(e) {
+function fU(e) {
 	return Object.entries(e).map(([e, t]) => `${e}: ${t};`).join("");
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/convert-css-variables/convert-css-variables.mjs
-function cU(e, t) {
-	let n = t ? [t] : [":root", ":host"], r = sU(e.variables), i = r ? `${n.join(", ")}{${r}}` : "", a = sU(e.dark), o = sU(e.light), s = (e) => n.map((t) => t === ":host" ? `${t}([data-mantine-color-scheme="${e}"])` : `${t}[data-mantine-color-scheme="${e}"]`).join(", ");
+function pU(e, t) {
+	let n = t ? [t] : [":root", ":host"], r = fU(e.variables), i = r ? `${n.join(", ")}{${r}}` : "", a = fU(e.dark), o = fU(e.light), s = (e) => n.map((t) => t === ":host" ? `${t}([data-mantine-color-scheme="${e}"])` : `${t}[data-mantine-color-scheme="${e}"]`).join(", ");
 	return `${i}
 
 ${a ? `${s("dark")}{${a}}` : ""}
@@ -43378,33 +43486,33 @@ ${o ? `${s("light")}{${o}}` : ""}`;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-contrast-color/get-contrast-color.mjs
-function lU({ color: e, theme: t, autoContrast: n }) {
-	return (typeof n == "boolean" ? n : t.autoContrast) && BH({
+function mU({ color: e, theme: t, autoContrast: n }) {
+	return (typeof n == "boolean" ? n : t.autoContrast) && GH({
 		color: e || t.primaryColor,
 		theme: t
 	}).isLight ? "var(--mantine-color-black)" : "var(--mantine-color-white)";
 }
-function uU(e, t) {
-	return lU({
-		color: e.colors[e.primaryColor][FH(e, t)],
+function hU(e, t) {
+	return mU({
+		color: e.colors[e.primaryColor][BH(e, t)],
 		theme: e,
 		autoContrast: null
 	});
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-css-color-variables.mjs
-function dU({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: i = !0 }) {
+function gU({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: i = !0 }) {
 	if (!e.colors[t]) return {};
 	if (n === "light") {
-		let n = FH(e, "light"), a = {
+		let n = BH(e, "light"), a = {
 			[`--mantine-color-${r}-text`]: `var(--mantine-color-${r}-filled)`,
 			[`--mantine-color-${r}-filled`]: `var(--mantine-color-${r}-${n})`,
 			[`--mantine-color-${r}-filled-hover`]: `var(--mantine-color-${r}-${n === 9 ? 8 : n + 1})`,
-			[`--mantine-color-${r}-light`]: WH(e.colors[t][n], .1),
-			[`--mantine-color-${r}-light-hover`]: WH(e.colors[t][n], .12),
+			[`--mantine-color-${r}-light`]: YH(e.colors[t][n], .1),
+			[`--mantine-color-${r}-light-hover`]: YH(e.colors[t][n], .12),
 			[`--mantine-color-${r}-light-color`]: `var(--mantine-color-${r}-${n})`,
 			[`--mantine-color-${r}-outline`]: `var(--mantine-color-${r}-${n})`,
-			[`--mantine-color-${r}-outline-hover`]: WH(e.colors[t][n], .05)
+			[`--mantine-color-${r}-outline-hover`]: YH(e.colors[t][n], .05)
 		};
 		return i ? {
 			[`--mantine-color-${r}-0`]: e.colors[t][0],
@@ -43420,15 +43528,15 @@ function dU({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: 
 			...a
 		} : a;
 	}
-	let a = FH(e, "dark"), o = {
+	let a = BH(e, "dark"), o = {
 		[`--mantine-color-${r}-text`]: `var(--mantine-color-${r}-4)`,
 		[`--mantine-color-${r}-filled`]: `var(--mantine-color-${r}-${a})`,
 		[`--mantine-color-${r}-filled-hover`]: `var(--mantine-color-${r}-${a === 9 ? 8 : a + 1})`,
-		[`--mantine-color-${r}-light`]: WH(e.colors[t][Math.max(0, a - 2)], .15),
-		[`--mantine-color-${r}-light-hover`]: WH(e.colors[t][Math.max(0, a - 2)], .2),
+		[`--mantine-color-${r}-light`]: YH(e.colors[t][Math.max(0, a - 2)], .15),
+		[`--mantine-color-${r}-light-hover`]: YH(e.colors[t][Math.max(0, a - 2)], .2),
 		[`--mantine-color-${r}-light-color`]: `var(--mantine-color-${r}-${Math.max(a - 5, 0)})`,
 		[`--mantine-color-${r}-outline`]: `var(--mantine-color-${r}-${Math.max(a - 4, 0)})`,
-		[`--mantine-color-${r}-outline-hover`]: WH(e.colors[t][Math.max(a - 4, 0)], .05)
+		[`--mantine-color-${r}-outline-hover`]: YH(e.colors[t][Math.max(a - 4, 0)], .05)
 	};
 	return i ? {
 		[`--mantine-color-${r}-0`]: e.colors[t][0],
@@ -43446,16 +43554,16 @@ function dU({ theme: e, color: t, colorScheme: n, name: r = t, withColorValues: 
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/virtual-color/virtual-color.mjs
-function fU(e) {
+function _U(e) {
 	return !!e && typeof e == "object" && "mantine-virtual-color" in e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/default-css-variables-resolver.mjs
-function pU(e, t, n) {
-	eV(t).forEach((r) => Object.assign(e, { [`--mantine-${n}-${r}`]: t[r] }));
+function vU(e, t, n) {
+	aV(t).forEach((r) => Object.assign(e, { [`--mantine-${n}-${r}`]: t[r] }));
 }
-var mU = (e) => {
-	let t = FH(e, "light"), n = e.defaultRadius in e.radius ? e.radius[e.defaultRadius] : Z(e.defaultRadius), r = {
+var yU = (e) => {
+	let t = BH(e, "light"), n = e.defaultRadius in e.radius ? e.radius[e.defaultRadius] : Z(e.defaultRadius), r = {
 		variables: {
 			"--mantine-z-index-app": "100",
 			"--mantine-z-index-modal": "200",
@@ -43483,7 +43591,7 @@ var mU = (e) => {
 		},
 		light: {
 			"--mantine-color-scheme": "light",
-			"--mantine-primary-color-contrast": uU(e, "light"),
+			"--mantine-primary-color-contrast": hU(e, "light"),
 			"--mantine-color-bright": "var(--mantine-color-black)",
 			"--mantine-color-text": e.black,
 			"--mantine-color-body": e.white,
@@ -43501,7 +43609,7 @@ var mU = (e) => {
 		},
 		dark: {
 			"--mantine-color-scheme": "dark",
-			"--mantine-primary-color-contrast": uU(e, "dark"),
+			"--mantine-primary-color-contrast": hU(e, "dark"),
 			"--mantine-color-bright": "var(--mantine-color-white)",
 			"--mantine-color-text": "var(--mantine-color-dark-0)",
 			"--mantine-color-body": "var(--mantine-color-dark-7)",
@@ -43518,18 +43626,18 @@ var mU = (e) => {
 			"--mantine-color-disabled-border": "var(--mantine-color-dark-4)"
 		}
 	};
-	pU(r.variables, e.breakpoints, "breakpoint"), pU(r.variables, e.spacing, "spacing"), pU(r.variables, e.fontSizes, "font-size"), pU(r.variables, e.lineHeights, "line-height"), pU(r.variables, e.shadows, "shadow"), pU(r.variables, e.radius, "radius"), e.colors[e.primaryColor].forEach((t, n) => {
+	vU(r.variables, e.breakpoints, "breakpoint"), vU(r.variables, e.spacing, "spacing"), vU(r.variables, e.fontSizes, "font-size"), vU(r.variables, e.lineHeights, "line-height"), vU(r.variables, e.shadows, "shadow"), vU(r.variables, e.radius, "radius"), e.colors[e.primaryColor].forEach((t, n) => {
 		r.variables[`--mantine-primary-color-${n}`] = `var(--mantine-color-${e.primaryColor}-${n})`;
-	}), eV(e.colors).forEach((t) => {
+	}), aV(e.colors).forEach((t) => {
 		let n = e.colors[t];
-		if (fU(n)) {
-			Object.assign(r.light, dU({
+		if (_U(n)) {
+			Object.assign(r.light, gU({
 				theme: e,
 				name: n.name,
 				color: n.light,
 				colorScheme: "light",
 				withColorValues: !0
-			})), Object.assign(r.dark, dU({
+			})), Object.assign(r.dark, gU({
 				theme: e,
 				name: n.name,
 				color: n.dark,
@@ -43540,12 +43648,12 @@ var mU = (e) => {
 		}
 		n.forEach((e, n) => {
 			r.variables[`--mantine-color-${t}-${n}`] = e;
-		}), Object.assign(r.light, dU({
+		}), Object.assign(r.light, gU({
 			theme: e,
 			color: t,
 			colorScheme: "light",
 			withColorValues: !1
-		})), Object.assign(r.dark, dU({
+		})), Object.assign(r.dark, gU({
 			theme: e,
 			color: t,
 			colorScheme: "dark",
@@ -43553,77 +43661,77 @@ var mU = (e) => {
 		}));
 	});
 	let i = e.headings.sizes;
-	return eV(i).forEach((t) => {
+	return aV(i).forEach((t) => {
 		r.variables[`--mantine-${t}-font-size`] = i[t].fontSize, r.variables[`--mantine-${t}-line-height`] = i[t].lineHeight, r.variables[`--mantine-${t}-font-weight`] = i[t].fontWeight || e.headings.fontWeight;
 	}), r;
 };
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/get-merged-variables.mjs
-function hU({ theme: e, generator: t }) {
-	let n = mU(e), r = t?.(e);
-	return r ? nV(n, r) : n;
+function bU({ theme: e, generator: t }) {
+	let n = yU(e), r = t?.(e);
+	return r ? sV(n, r) : n;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/remove-default-variables.mjs
-var gU = mU(JH);
-function _U(e) {
+var xU = yU($H);
+function SU(e) {
 	let t = {
 		variables: {},
 		light: {},
 		dark: {}
 	};
-	return eV(e.variables).forEach((n) => {
-		gU.variables[n] !== e.variables[n] && (t.variables[n] = e.variables[n]);
-	}), eV(e.light).forEach((n) => {
-		gU.light[n] !== e.light[n] && (t.light[n] = e.light[n]);
-	}), eV(e.dark).forEach((n) => {
-		gU.dark[n] !== e.dark[n] && (t.dark[n] = e.dark[n]);
+	return aV(e.variables).forEach((n) => {
+		xU.variables[n] !== e.variables[n] && (t.variables[n] = e.variables[n]);
+	}), aV(e.light).forEach((n) => {
+		xU.light[n] !== e.light[n] && (t.light[n] = e.light[n]);
+	}), aV(e.dark).forEach((n) => {
+		xU.dark[n] !== e.dark[n] && (t.dark[n] = e.dark[n]);
 	}), t;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineCssVariables/MantineCssVariables.mjs
-function vU(e) {
-	return cU({
+function CU(e) {
+	return pU({
 		variables: {},
 		dark: { "--mantine-color-scheme": "dark" },
 		light: { "--mantine-color-scheme": "light" }
 	}, e);
 }
-function yU({ cssVariablesSelector: e, deduplicateCssVariables: t }) {
-	let n = iU(), r = CH(), i = hU({
+function wU({ cssVariablesSelector: e, deduplicateCssVariables: t }) {
+	let n = lU(), r = OH(), i = bU({
 		theme: n,
-		generator: xH()
-	}), a = (e === void 0 || e === ":root" || e === ":host") && t, o = cU(a ? _U(i) : i, e);
+		generator: EH()
+	}), a = (e === void 0 || e === ":root" || e === ":host") && t, o = pU(a ? SU(i) : i, e);
 	return o ? /* @__PURE__ */ (0, G.jsx)("style", {
 		"data-mantine-styles": !0,
 		nonce: r?.(),
-		dangerouslySetInnerHTML: { __html: `${o}${a ? "" : vU(e)}` }
+		dangerouslySetInnerHTML: { __html: `${o}${a ? "" : CU(e)}` }
 	}) : null;
 }
-yU.displayName = "@mantine/CssVariables";
+wU.displayName = "@mantine/CssVariables";
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/use-mantine-color-scheme/use-provider-color-scheme.mjs
-function bU(e, t) {
+function TU(e, t) {
 	let n = typeof window < "u" && "matchMedia" in window && window.matchMedia("(prefers-color-scheme: dark)")?.matches, r = e === "auto" ? n ? "dark" : "light" : e;
 	t()?.setAttribute("data-mantine-color-scheme", r);
 }
-function xU({ manager: e, defaultColorScheme: t, getRootElement: n, forceColorScheme: r }) {
+function EU({ manager: e, defaultColorScheme: t, getRootElement: n, forceColorScheme: r }) {
 	let i = (0, _.useRef)(null), [a, o] = (0, _.useState)(() => e.get(t)), s = r || a, c = (0, _.useCallback)((t) => {
-		r || (bU(t, n), o(t), e.set(t));
+		r || (TU(t, n), o(t), e.set(t));
 	}, [
 		e.set,
 		s,
 		r
 	]), l = (0, _.useCallback)(() => {
-		o(t), bU(t, n), e.clear();
+		o(t), TU(t, n), e.clear();
 	}, [e.clear, t]);
-	return (0, _.useEffect)(() => (e.subscribe(c), e.unsubscribe), [e.subscribe, e.unsubscribe]), zV(() => {
-		bU(e.get(t), n);
+	return (0, _.useEffect)(() => (e.subscribe(c), e.unsubscribe), [e.subscribe, e.unsubscribe]), WV(() => {
+		TU(e.get(t), n);
 	}, []), (0, _.useEffect)(() => {
-		if (r) return bU(r, n), () => {};
-		r === void 0 && bU(a, n), typeof window < "u" && "matchMedia" in window && (i.current = window.matchMedia("(prefers-color-scheme: dark)"));
+		if (r) return TU(r, n), () => {};
+		r === void 0 && TU(a, n), typeof window < "u" && "matchMedia" in window && (i.current = window.matchMedia("(prefers-color-scheme: dark)"));
 		let e = (e) => {
-			a === "auto" && bU(e.matches ? "dark" : "light", n);
+			a === "auto" && TU(e.matches ? "dark" : "light", n);
 		};
 		return i.current?.addEventListener("change", e), () => i.current?.removeEventListener("change", e);
 	}, [a, r]), {
@@ -43634,24 +43742,24 @@ function xU({ manager: e, defaultColorScheme: t, getRootElement: n, forceColorSc
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/use-respect-reduce-motion/use-respect-reduce-motion.mjs
-function SU({ respectReducedMotion: e, getRootElement: t }) {
-	zV(() => {
+function DU({ respectReducedMotion: e, getRootElement: t }) {
+	WV(() => {
 		e && t()?.setAttribute("data-respect-reduced-motion", "true");
 	}, [e]);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/MantineProvider.mjs
-function CU({ theme: e, children: t, getStyleNonce: n, withStaticClasses: r = !0, withGlobalClasses: i = !0, deduplicateCssVariables: a = !0, withCssVariables: o = !0, cssVariablesSelector: s, classNamesPrefix: c = "mantine", colorSchemeManager: l = XH(), defaultColorScheme: u = "light", getRootElement: d = () => document.documentElement, cssVariablesResolver: f, forceColorScheme: p, stylesTransform: m, env: h }) {
-	let { colorScheme: g, setColorScheme: _, clearColorScheme: v } = xU({
+function OU({ theme: e, children: t, getStyleNonce: n, withStaticClasses: r = !0, withGlobalClasses: i = !0, deduplicateCssVariables: a = !0, withCssVariables: o = !0, cssVariablesSelector: s, classNamesPrefix: c = "mantine", colorSchemeManager: l = tU(), defaultColorScheme: u = "light", getRootElement: d = () => document.documentElement, cssVariablesResolver: f, forceColorScheme: p, stylesTransform: m, env: h }) {
+	let { colorScheme: g, setColorScheme: _, clearColorScheme: v } = EU({
 		defaultColorScheme: u,
 		forceColorScheme: p,
 		manager: l,
 		getRootElement: d
 	});
-	return SU({
+	return DU({
 		respectReducedMotion: e?.respectReducedMotion || !1,
 		getRootElement: d
-	}), /* @__PURE__ */ (0, G.jsx)(yH.Provider, {
+	}), /* @__PURE__ */ (0, G.jsx)(wH.Provider, {
 		value: {
 			colorScheme: g,
 			setColorScheme: _,
@@ -43665,22 +43773,22 @@ function CU({ theme: e, children: t, getStyleNonce: n, withStaticClasses: r = !0
 			stylesTransform: m,
 			env: h
 		},
-		children: /* @__PURE__ */ (0, G.jsxs)(aU, {
+		children: /* @__PURE__ */ (0, G.jsxs)(uU, {
 			theme: e,
 			children: [
-				o && /* @__PURE__ */ (0, G.jsx)(yU, {
+				o && /* @__PURE__ */ (0, G.jsx)(wU, {
 					cssVariablesSelector: s,
 					deduplicateCssVariables: a
 				}),
-				i && /* @__PURE__ */ (0, G.jsx)(oU, {}),
+				i && /* @__PURE__ */ (0, G.jsx)(dU, {}),
 				t
 			]
 		})
 	});
 }
-CU.displayName = "@mantine/core/MantineProvider";
-function wU({ children: e, theme: t, env: n }) {
-	return /* @__PURE__ */ (0, G.jsx)(yH.Provider, {
+OU.displayName = "@mantine/core/MantineProvider";
+function kU({ children: e, theme: t, env: n }) {
+	return /* @__PURE__ */ (0, G.jsx)(wH.Provider, {
 		value: {
 			colorScheme: "auto",
 			setColorScheme: () => {},
@@ -43692,25 +43800,25 @@ function wU({ children: e, theme: t, env: n }) {
 			headless: !0,
 			env: n
 		},
-		children: /* @__PURE__ */ (0, G.jsx)(aU, {
+		children: /* @__PURE__ */ (0, G.jsx)(uU, {
 			theme: t,
 			children: e
 		})
 	});
 }
-wU.displayName = "@mantine/core/HeadlessMantineProvider";
+kU.displayName = "@mantine/core/HeadlessMantineProvider";
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-resolved-styles-api/use-resolved-styles-api.mjs
-function TU({ classNames: e, styles: t, props: n, stylesCtx: r }) {
-	let i = iU();
+function AU({ classNames: e, styles: t, props: n, stylesCtx: r }) {
+	let i = lU();
 	return {
-		resolvedClassNames: _H({
+		resolvedClassNames: SH({
 			theme: i,
 			classNames: e,
 			props: n,
 			stylesCtx: r || void 0
 		}),
-		resolvedStyles: vH({
+		resolvedStyles: CH({
 			theme: i,
 			styles: t,
 			props: n,
@@ -43720,18 +43828,18 @@ function TU({ classNames: e, styles: t, props: n, stylesCtx: r }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-global-class-names/get-global-class-names.mjs
-var EU = {
+var jU = {
 	always: "mantine-focus-always",
 	auto: "mantine-focus-auto",
 	never: "mantine-focus-never"
 };
-function DU({ theme: e, options: t, unstyled: n }) {
-	return mH(t?.focusable && !n && (e.focusClassName || EU[e.focusRing]), t?.active && !n && e.activeClassName);
+function MU({ theme: e, options: t, unstyled: n }) {
+	return yH(t?.focusable && !n && (e.focusClassName || jU[e.focusRing]), t?.active && !n && e.activeClassName);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-options-class-names/get-options-class-names.mjs
-function OU({ selector: e, stylesCtx: t, options: n, props: r, theme: i }) {
-	return _H({
+function NU({ selector: e, stylesCtx: t, options: n, props: r, theme: i }) {
+	return SH({
 		theme: i,
 		classNames: n?.classNames,
 		props: n?.props || r,
@@ -43740,8 +43848,8 @@ function OU({ selector: e, stylesCtx: t, options: n, props: r, theme: i }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-resolved-class-names/get-resolved-class-names.mjs
-function kU({ selector: e, stylesCtx: t, theme: n, classNames: r, props: i }) {
-	return _H({
+function PU({ selector: e, stylesCtx: t, theme: n, classNames: r, props: i }) {
+	return SH({
 		theme: n,
 		classNames: r,
 		props: i,
@@ -43750,23 +43858,23 @@ function kU({ selector: e, stylesCtx: t, theme: n, classNames: r, props: i }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-root-class-name/get-root-class-name.mjs
-function AU({ rootSelector: e, selector: t, className: n }) {
+function FU({ rootSelector: e, selector: t, className: n }) {
 	return e === t ? n : void 0;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-selector-class-name/get-selector-class-name.mjs
-function jU({ selector: e, classes: t, unstyled: n }) {
+function IU({ selector: e, classes: t, unstyled: n }) {
 	return n ? void 0 : t[e];
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-static-class-names/get-static-class-names.mjs
-function MU({ themeName: e, classNamesPrefix: t, selector: n, withStaticClass: r }) {
+function LU({ themeName: e, classNamesPrefix: t, selector: n, withStaticClass: r }) {
 	return r === !1 ? [] : e.map((e) => `${t}-${e}-${n}`);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-theme-class-names/get-theme-class-names.mjs
-function NU({ themeName: e, theme: t, selector: n, props: r, stylesCtx: i }) {
-	return e.map((e) => _H({
+function RU({ themeName: e, theme: t, selector: n, props: r, stylesCtx: i }) {
+	return e.map((e) => SH({
 		theme: t,
 		classNames: t.components[e]?.classNames,
 		props: r,
@@ -43775,54 +43883,54 @@ function NU({ themeName: e, theme: t, selector: n, props: r, stylesCtx: i }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-variant-class-name/get-variant-class-name.mjs
-function PU({ options: e, classes: t, selector: n, unstyled: r }) {
+function zU({ options: e, classes: t, selector: n, unstyled: r }) {
 	return e?.variant && !r ? t[`${n}--${e.variant}`] : void 0;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-class-name/get-class-name.mjs
-function FU({ theme: e, options: t, themeName: n, selector: r, classNamesPrefix: i, classNames: a, classes: o, unstyled: s, className: c, rootSelector: l, props: u, stylesCtx: d, withStaticClasses: f, headless: p, transformedStyles: m }) {
-	return mH(DU({
+function BU({ theme: e, options: t, themeName: n, selector: r, classNamesPrefix: i, classNames: a, classes: o, unstyled: s, className: c, rootSelector: l, props: u, stylesCtx: d, withStaticClasses: f, headless: p, transformedStyles: m }) {
+	return yH(MU({
 		theme: e,
 		options: t,
 		unstyled: s || p
-	}), NU({
+	}), RU({
 		theme: e,
 		themeName: n,
 		selector: r,
 		props: u,
 		stylesCtx: d
-	}), PU({
+	}), zU({
 		options: t,
 		classes: o,
 		selector: r,
 		unstyled: s
-	}), kU({
+	}), PU({
 		selector: r,
 		stylesCtx: d,
 		theme: e,
 		classNames: a,
 		props: u
-	}), kU({
+	}), PU({
 		selector: r,
 		stylesCtx: d,
 		theme: e,
 		classNames: m,
 		props: u
-	}), OU({
+	}), NU({
 		selector: r,
 		stylesCtx: d,
 		options: t,
 		props: u,
 		theme: e
-	}), AU({
+	}), FU({
 		rootSelector: l,
 		selector: r,
 		className: c
-	}), jU({
+	}), IU({
 		selector: r,
 		classes: o,
 		unstyled: s || p
-	}), f && !p && MU({
+	}), f && !p && LU({
 		themeName: n,
 		classNamesPrefix: i,
 		selector: r,
@@ -43831,8 +43939,8 @@ function FU({ theme: e, options: t, themeName: n, selector: r, classNamesPrefix:
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/get-theme-styles/get-theme-styles.mjs
-function IU({ theme: e, themeName: t, props: n, stylesCtx: r, selector: i }) {
-	return t.map((t) => vH({
+function VU({ theme: e, themeName: t, props: n, stylesCtx: r, selector: i }) {
+	return t.map((t) => CH({
 		theme: e,
 		styles: e.components[t]?.styles,
 		props: n,
@@ -43844,10 +43952,10 @@ function IU({ theme: e, themeName: t, props: n, stylesCtx: r, selector: i }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-style/resolve-style.mjs
-function LU({ style: e, theme: t }) {
+function HU({ style: e, theme: t }) {
 	return Array.isArray(e) ? [...e].reduce((e, n) => ({
 		...e,
-		...LU({
+		...HU({
 			style: n,
 			theme: t
 		})
@@ -43855,18 +43963,18 @@ function LU({ style: e, theme: t }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-vars/merge-vars.mjs
-function RU(e) {
+function UU(e) {
 	return e.reduce((e, t) => (t && Object.keys(t).forEach((n) => {
 		e[n] = {
 			...e[n],
-			...lV(t[n])
+			...mV(t[n])
 		};
 	}), e), {});
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/resolve-vars/resolve-vars.mjs
-function zU({ vars: e, varsResolver: t, theme: n, props: r, stylesCtx: i, selector: a, themeName: o, headless: s }) {
-	return RU([
+function WU({ vars: e, varsResolver: t, theme: n, props: r, stylesCtx: i, selector: a, themeName: o, headless: s }) {
+	return UU([
 		s ? {} : t?.(n, r, i),
 		...o.map((e) => n.components?.[e]?.vars?.(n, r, i)),
 		e?.(n, r, i)
@@ -43874,28 +43982,28 @@ function zU({ vars: e, varsResolver: t, theme: n, props: r, stylesCtx: i, select
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/get-style/get-style.mjs
-function BU({ theme: e, themeName: t, selector: n, options: r, props: i, stylesCtx: a, rootSelector: o, styles: s, style: c, vars: l, varsResolver: u, headless: d, withStylesTransform: f }) {
+function GU({ theme: e, themeName: t, selector: n, options: r, props: i, stylesCtx: a, rootSelector: o, styles: s, style: c, vars: l, varsResolver: u, headless: d, withStylesTransform: f }) {
 	return {
-		...!f && IU({
+		...!f && VU({
 			theme: e,
 			themeName: t,
 			props: i,
 			stylesCtx: a,
 			selector: n
 		}),
-		...!f && vH({
+		...!f && CH({
 			theme: e,
 			styles: s,
 			props: i,
 			stylesCtx: a
 		})[n],
-		...!f && vH({
+		...!f && CH({
 			theme: e,
 			styles: r?.styles,
 			props: r?.props || i,
 			stylesCtx: a
 		})[n],
-		...zU({
+		...WU({
 			theme: e,
 			props: i,
 			stylesCtx: a,
@@ -43905,11 +44013,11 @@ function BU({ theme: e, themeName: t, selector: n, options: r, props: i, stylesC
 			themeName: t,
 			headless: d
 		}),
-		...o === n ? LU({
+		...o === n ? HU({
 			style: c,
 			theme: e
 		}) : null,
-		...LU({
+		...HU({
 			style: r?.style,
 			theme: e
 		})
@@ -43917,8 +44025,8 @@ function BU({ theme: e, themeName: t, selector: n, options: r, props: i, stylesC
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/use-transformed-styles.mjs
-function VU({ props: e, stylesCtx: t, themeName: n }) {
-	let r = iU(), i = DH()?.();
+function KU({ props: e, stylesCtx: t, themeName: n }) {
+	let r = lU(), i = MH()?.();
 	return {
 		getTransformedStyles: (a) => i ? [...a.map((n) => i(n, {
 			props: e,
@@ -43934,14 +44042,14 @@ function VU({ props: e, stylesCtx: t, themeName: n }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/styles-api/use-styles/use-styles.mjs
-function HU({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: a, rootSelector: o = "root", unstyled: s, classNames: c, styles: l, vars: u, varsResolver: d, attributes: f }) {
-	let p = iU(), m = SH(), h = wH(), g = TH(), _ = (Array.isArray(e) ? e : [e]).filter((e) => e), { withStylesTransform: v, getTransformedStyles: y } = VU({
+function qU({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: a, rootSelector: o = "root", unstyled: s, classNames: c, styles: l, vars: u, varsResolver: d, attributes: f }) {
+	let p = lU(), m = DH(), h = kH(), g = AH(), _ = (Array.isArray(e) ? e : [e]).filter((e) => e), { withStylesTransform: v, getTransformedStyles: y } = KU({
 		props: n,
 		stylesCtx: r,
 		themeName: _
 	});
 	return (e, b) => ({
-		className: FU({
+		className: BU({
 			theme: p,
 			options: b,
 			themeName: _,
@@ -43958,7 +44066,7 @@ function HU({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: 
 			headless: g,
 			transformedStyles: y([b?.styles, l])
 		}),
-		style: BU({
+		style: GU({
 			theme: p,
 			themeName: _,
 			selector: e,
@@ -43978,45 +44086,45 @@ function HU({ name: e, classes: t, props: n, stylesCtx: r, className: i, style: 
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/color-functions/get-auto-contrast-value/get-auto-contrast-value.mjs
-function UU(e, t) {
+function JU(e, t) {
 	return typeof e == "boolean" ? e : t.autoContrast;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/MantineProvider/use-props/use-props.mjs
 function Q(e, t, n) {
-	let r = iU(), i = r.components[e]?.defaultProps, a = typeof i == "function" ? i(r) : i;
+	let r = lU(), i = r.components[e]?.defaultProps, a = typeof i == "function" ? i(r) : i;
 	return {
 		...t,
 		...a,
-		...lV(n)
+		...mV(n)
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/InlineStyles/css-object-to-string/css-object-to-string.mjs
-function WU(e) {
-	return eV(e).reduce((t, n) => e[n] === void 0 ? t : `${t}${rV(n)}:${e[n]};`, "").trim();
+function YU(e) {
+	return aV(e).reduce((t, n) => e[n] === void 0 ? t : `${t}${cV(n)}:${e[n]};`, "").trim();
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/InlineStyles/styles-to-string/styles-to-string.mjs
-function GU({ selector: e, styles: t, media: n, container: r }) {
-	let i = t ? WU(t) : "", a = Array.isArray(n) ? n.map((t) => `@media${t.query}{${e}{${WU(t.styles)}}}`) : [], o = Array.isArray(r) ? r.map((t) => `@container ${t.query}{${e}{${WU(t.styles)}}}`) : [];
+function XU({ selector: e, styles: t, media: n, container: r }) {
+	let i = t ? YU(t) : "", a = Array.isArray(n) ? n.map((t) => `@media${t.query}{${e}{${YU(t.styles)}}}`) : [], o = Array.isArray(r) ? r.map((t) => `@container ${t.query}{${e}{${YU(t.styles)}}}`) : [];
 	return `${i ? `${e}{${i}}` : ""}${a.join("")}${o.join("")}`.trim();
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/InlineStyles/InlineStyles.mjs
-function KU(e) {
+function ZU(e) {
 	return /* @__PURE__ */ (0, G.jsx)("style", {
 		"data-mantine-styles": "inline",
-		nonce: CH()?.(),
-		dangerouslySetInnerHTML: { __html: GU(e) }
+		nonce: OH()?.(),
+		dangerouslySetInnerHTML: { __html: XU(e) }
 	});
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/extract-style-props/extract-style-props.mjs
-function qU(e) {
+function QU(e) {
 	let { m: t, mx: n, my: r, mt: i, mb: a, ml: o, mr: s, me: c, ms: l, p: u, px: d, py: f, pt: p, pb: m, pl: h, pr: g, pe: _, ps: v, bd: y, bdrs: b, bg: x, c: S, opacity: C, ff: w, fz: T, fw: E, lts: D, ta: O, lh: k, fs: A, tt: j, td: M, w: ee, miw: te, maw: ne, h: N, mih: P, mah: re, bgsz: ie, bgp: F, bgr: ae, bga: oe, pos: se, top: ce, left: le, bottom: ue, right: de, inset: fe, display: pe, flex: me, hiddenFrom: he, visibleFrom: ge, lightHidden: _e, darkHidden: ve, sx: ye, ...be } = e;
 	return {
-		styleProps: lV({
+		styleProps: mV({
 			m: t,
 			mx: n,
 			my: r,
@@ -44078,7 +44186,7 @@ function qU(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/style-props-data.mjs
-var JU = {
+var $U = {
 	m: {
 		type: "spacing",
 		property: "margin"
@@ -44282,45 +44390,45 @@ var JU = {
 };
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/color-resolver/color-resolver.mjs
-function YU(e, t) {
-	let n = BH({
+function eW(e, t) {
+	let n = GH({
 		color: e,
 		theme: t
 	});
 	return n.color === "dimmed" ? "var(--mantine-color-dimmed)" : n.color === "bright" ? "var(--mantine-color-bright)" : n.variable ? `var(${n.variable})` : n.color;
 }
-function XU(e, t) {
-	let n = BH({
+function tW(e, t) {
+	let n = GH({
 		color: e,
 		theme: t
 	});
-	return n.isThemeColor && n.shade === void 0 ? `var(--mantine-color-${n.color}-text)` : YU(e, t);
+	return n.isThemeColor && n.shade === void 0 ? `var(--mantine-color-${n.color}-text)` : eW(e, t);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/border-resolver/border-resolver.mjs
-function ZU(e, t) {
+function nW(e, t) {
 	if (typeof e == "number") return Z(e);
 	if (typeof e == "string") {
 		let [n, r, ...i] = e.split(" ").filter((e) => e.trim() !== ""), a = `${Z(n)}`;
-		return r && (a += ` ${r}`), i.length > 0 && (a += ` ${YU(i.join(" "), t)}`), a.trim();
+		return r && (a += ` ${r}`), i.length > 0 && (a += ` ${eW(i.join(" "), t)}`), a.trim();
 	}
 	return e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-family-resolver/font-family-resolver.mjs
-var QU = {
+var rW = {
 	text: "var(--mantine-font-family)",
 	mono: "var(--mantine-font-family-monospace)",
 	monospace: "var(--mantine-font-family-monospace)",
 	heading: "var(--mantine-font-family-headings)",
 	headings: "var(--mantine-font-family-headings)"
 };
-function $U(e) {
-	return typeof e == "string" && e in QU ? QU[e] : e;
+function iW(e) {
+	return typeof e == "string" && e in rW ? rW[e] : e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/font-size-resolver/font-size-resolver.mjs
-var eW = [
+var aW = [
 	"h1",
 	"h2",
 	"h3",
@@ -44328,17 +44436,17 @@ var eW = [
 	"h5",
 	"h6"
 ];
-function tW(e, t) {
-	return typeof e == "string" && e in t.fontSizes ? `var(--mantine-font-size-${e})` : typeof e == "string" && eW.includes(e) ? `var(--mantine-${e}-font-size)` : typeof e == "number" || typeof e == "string" ? Z(e) : e;
+function oW(e, t) {
+	return typeof e == "string" && e in t.fontSizes ? `var(--mantine-font-size-${e})` : typeof e == "string" && aW.includes(e) ? `var(--mantine-${e}-font-size)` : typeof e == "number" || typeof e == "string" ? Z(e) : e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/identity-resolver/identity-resolver.mjs
-function nW(e) {
+function sW(e) {
 	return e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/line-height-resolver/line-height-resolver.mjs
-var rW = [
+var cW = [
 	"h1",
 	"h2",
 	"h3",
@@ -44346,22 +44454,22 @@ var rW = [
 	"h5",
 	"h6"
 ];
-function iW(e, t) {
-	return typeof e == "string" && e in t.lineHeights ? `var(--mantine-line-height-${e})` : typeof e == "string" && rW.includes(e) ? `var(--mantine-${e}-line-height)` : e;
+function lW(e, t) {
+	return typeof e == "string" && e in t.lineHeights ? `var(--mantine-line-height-${e})` : typeof e == "string" && cW.includes(e) ? `var(--mantine-${e}-line-height)` : e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/radius-resolver/radius-resolver.mjs
-function aW(e, t) {
+function uW(e, t) {
 	return typeof e == "string" && e in t.radius ? `var(--mantine-radius-${e})` : typeof e == "number" || typeof e == "string" ? Z(e) : e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/size-resolver/size-resolver.mjs
-function oW(e) {
+function dW(e) {
 	return typeof e == "number" ? Z(e) : e;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/spacing-resolver/spacing-resolver.mjs
-function sW(e, t) {
+function fW(e, t) {
 	if (typeof e == "number") return Z(e);
 	if (typeof e == "string") {
 		let n = e.replace("-", "");
@@ -44373,25 +44481,25 @@ function sW(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/resolvers/index.mjs
-var cW = {
-	color: YU,
-	textColor: XU,
-	fontSize: tW,
-	spacing: sW,
-	radius: aW,
-	identity: nW,
-	size: oW,
-	lineHeight: iW,
-	fontFamily: $U,
-	border: ZU
+var pW = {
+	color: eW,
+	textColor: tW,
+	fontSize: oW,
+	spacing: fW,
+	radius: uW,
+	identity: sW,
+	size: dW,
+	lineHeight: lW,
+	fontFamily: iW,
+	border: nW
 };
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/sort-media-queries.mjs
-function lW(e) {
+function mW(e) {
 	return e.replace("(min-width: ", "").replace("em)", "");
 }
-function uW({ media: e, ...t }) {
-	let n = Object.keys(e).sort((e, t) => Number(lW(e)) - Number(lW(t))).map((t) => ({
+function hW({ media: e, ...t }) {
+	let n = Object.keys(e).sort((e, t) => Number(mW(e)) - Number(mW(t))).map((t) => ({
 		query: t,
 		styles: e[t]
 	}));
@@ -44402,35 +44510,35 @@ function uW({ media: e, ...t }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/style-props/parse-style-props/parse-style-props.mjs
-function dW(e) {
+function gW(e) {
 	if (typeof e != "object" || !e) return !1;
 	let t = Object.keys(e);
 	return !(t.length === 1 && t[0] === "base");
 }
-function fW(e) {
+function _W(e) {
 	return typeof e == "object" && e ? "base" in e ? e.base : void 0 : e;
 }
-function pW(e) {
-	return typeof e == "object" && e ? eV(e).filter((e) => e !== "base") : [];
+function vW(e) {
+	return typeof e == "object" && e ? aV(e).filter((e) => e !== "base") : [];
 }
-function mW(e, t) {
+function yW(e, t) {
 	return typeof e == "object" && e && t in e ? e[t] : e;
 }
-function hW({ styleProps: e, data: t, theme: n }) {
-	return uW(eV(e).reduce((r, i) => {
+function bW({ styleProps: e, data: t, theme: n }) {
+	return hW(aV(e).reduce((r, i) => {
 		if (i === "hiddenFrom" || i === "visibleFrom" || i === "sx") return r;
-		let a = t[i], o = Array.isArray(a.property) ? a.property : [a.property], s = fW(e[i]);
-		if (!dW(e[i])) return o.forEach((e) => {
-			r.inlineStyles[e] = cW[a.type](s, n);
+		let a = t[i], o = Array.isArray(a.property) ? a.property : [a.property], s = _W(e[i]);
+		if (!gW(e[i])) return o.forEach((e) => {
+			r.inlineStyles[e] = pW[a.type](s, n);
 		}), r;
 		r.hasResponsiveStyles = !0;
-		let c = pW(e[i]);
+		let c = vW(e[i]);
 		return o.forEach((t) => {
-			s != null && (r.styles[t] = cW[a.type](s, n)), c.forEach((o) => {
+			s != null && (r.styles[t] = pW[a.type](s, n)), c.forEach((o) => {
 				let s = `(min-width: ${n.breakpoints[o]})`;
 				r.media[s] = {
 					...r.media[s],
-					[t]: cW[a.type](mW(e[i], o), n)
+					[t]: pW[a.type](yW(e[i], o), n)
 				};
 			});
 		}), r;
@@ -44443,49 +44551,49 @@ function hW({ styleProps: e, data: t, theme: n }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/use-random-classname/use-random-classname.mjs
-function gW() {
+function xW() {
 	return `__m__-${(0, _.useId)().replace(/[:«»]/g, "")}`;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/get-style-object/get-style-object.mjs
-function _W(e, t) {
-	return Array.isArray(e) ? [...e].reduce((e, n) => ({
-		...e,
-		..._W(n, t)
-	}), {}) : typeof e == "function" ? e(t) : e ?? {};
-}
-//#endregion
-//#region node_modules/@mantine/core/esm/core/factory/create-polymorphic-component.mjs
-function vW(e) {
-	return e;
-}
-//#endregion
-//#region node_modules/@mantine/core/esm/core/Box/get-box-mod/get-box-mod.mjs
-function yW(e) {
-	return e.startsWith("data-") ? e : `data-${e}`;
-}
-function bW(e) {
-	return Object.keys(e).reduce((t, n) => {
-		let r = e[n];
-		return r === void 0 || r === "" || r === !1 || r === null || (t[yW(n)] = e[n]), t;
-	}, {});
-}
-function xW(e) {
-	return e ? typeof e == "string" ? { [yW(e)]: !0 } : Array.isArray(e) ? [...e].reduce((e, t) => ({
-		...e,
-		...xW(t)
-	}), {}) : bW(e) : null;
-}
-//#endregion
-//#region node_modules/@mantine/core/esm/core/Box/get-box-style/get-box-style.mjs
 function SW(e, t) {
 	return Array.isArray(e) ? [...e].reduce((e, n) => ({
 		...e,
 		...SW(n, t)
 	}), {}) : typeof e == "function" ? e(t) : e ?? {};
 }
-function CW({ theme: e, style: t, vars: n, styleProps: r }) {
-	let i = SW(t, e), a = SW(n, e);
+//#endregion
+//#region node_modules/@mantine/core/esm/core/factory/create-polymorphic-component.mjs
+function CW(e) {
+	return e;
+}
+//#endregion
+//#region node_modules/@mantine/core/esm/core/Box/get-box-mod/get-box-mod.mjs
+function wW(e) {
+	return e.startsWith("data-") ? e : `data-${e}`;
+}
+function TW(e) {
+	return Object.keys(e).reduce((t, n) => {
+		let r = e[n];
+		return r === void 0 || r === "" || r === !1 || r === null || (t[wW(n)] = e[n]), t;
+	}, {});
+}
+function EW(e) {
+	return e ? typeof e == "string" ? { [wW(e)]: !0 } : Array.isArray(e) ? [...e].reduce((e, t) => ({
+		...e,
+		...EW(t)
+	}), {}) : TW(e) : null;
+}
+//#endregion
+//#region node_modules/@mantine/core/esm/core/Box/get-box-style/get-box-style.mjs
+function DW(e, t) {
+	return Array.isArray(e) ? [...e].reduce((e, n) => ({
+		...e,
+		...DW(n, t)
+	}), {}) : typeof e == "function" ? e(t) : e ?? {};
+}
+function OW({ theme: e, style: t, vars: n, styleProps: r }) {
+	let i = DW(t, e), a = DW(n, e);
 	return {
 		...i,
 		...a,
@@ -44494,20 +44602,20 @@ function CW({ theme: e, style: t, vars: n, styleProps: r }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/Box/Box.mjs
-var wW = (0, _.forwardRef)(({ component: e, style: t, __vars: n, className: r, variant: i, mod: a, size: o, hiddenFrom: s, visibleFrom: c, lightHidden: l, darkHidden: u, renderRoot: d, __size: f, ...p }, m) => {
-	let h = iU(), g = e || "div", { styleProps: _, rest: v } = qU(p), y = EH()?.()?.(_.sx), b = gW(), x = hW({
+var kW = (0, _.forwardRef)(({ component: e, style: t, __vars: n, className: r, variant: i, mod: a, size: o, hiddenFrom: s, visibleFrom: c, lightHidden: l, darkHidden: u, renderRoot: d, __size: f, ...p }, m) => {
+	let h = lU(), g = e || "div", { styleProps: _, rest: v } = QU(p), y = jH()?.()?.(_.sx), b = xW(), x = bW({
 		styleProps: _,
 		theme: h,
-		data: JU
+		data: $U
 	}), S = {
 		ref: m,
-		style: CW({
+		style: OW({
 			theme: h,
 			style: t,
 			vars: n,
 			styleProps: x.inlineStyles
 		}),
-		className: mH(r, y, {
+		className: yH(r, y, {
 			[b]: x.hasResponsiveStyles,
 			"mantine-light-hidden": l,
 			"mantine-dark-hidden": u,
@@ -44515,25 +44623,25 @@ var wW = (0, _.forwardRef)(({ component: e, style: t, __vars: n, className: r, v
 			[`mantine-visible-from-${c}`]: c
 		}),
 		"data-variant": i,
-		"data-size": uV(o) ? void 0 : o || void 0,
+		"data-size": hV(o) ? void 0 : o || void 0,
 		size: f,
-		...xW(a),
+		...EW(a),
 		...v
 	};
-	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [x.hasResponsiveStyles && /* @__PURE__ */ (0, G.jsx)(KU, {
+	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [x.hasResponsiveStyles && /* @__PURE__ */ (0, G.jsx)(ZU, {
 		selector: `.${b}`,
 		styles: x.styles,
 		media: x.media
 	}), typeof d == "function" ? d(S) : /* @__PURE__ */ (0, G.jsx)(g, { ...S })] });
 });
-wW.displayName = "@mantine/core/Box";
-var $ = vW(wW);
+kW.displayName = "@mantine/core/Box";
+var $ = CW(kW);
 //#endregion
 //#region node_modules/@mantine/core/esm/core/factory/factory.mjs
-function TW(e) {
+function AW(e) {
 	return e;
 }
-function EW(e) {
+function jW(e) {
 	let t = e;
 	return (e) => {
 		let n = (0, _.forwardRef)((n, r) => /* @__PURE__ */ (0, G.jsx)(t, {
@@ -44544,9 +44652,9 @@ function EW(e) {
 		return n.extend = t.extend, n.displayName = `WithProps(${t.displayName})`, n;
 	};
 }
-function DW(e) {
+function MW(e) {
 	let t = (0, _.forwardRef)(e);
-	return t.extend = TW, t.withProps = (e) => {
+	return t.extend = AW, t.withProps = (e) => {
 		let n = (0, _.forwardRef)((n, r) => /* @__PURE__ */ (0, G.jsx)(t, {
 			...e,
 			...n,
@@ -44557,7 +44665,7 @@ function DW(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/factory/polymorphic-factory.mjs
-function OW(e) {
+function NW(e) {
 	let t = (0, _.forwardRef)(e);
 	return t.withProps = (e) => {
 		let n = (0, _.forwardRef)((n, r) => /* @__PURE__ */ (0, G.jsx)(t, {
@@ -44566,27 +44674,27 @@ function OW(e) {
 			ref: r
 		}));
 		return n.extend = t.extend, n.displayName = `WithProps(${t.displayName})`, n;
-	}, t.extend = TW, t;
+	}, t.extend = AW, t;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/core/DirectionProvider/DirectionProvider.mjs
-var kW = (0, _.createContext)({
+var PW = (0, _.createContext)({
 	dir: "ltr",
 	toggleDirection: () => {},
 	setDirection: () => {}
 });
-function AW() {
-	return (0, _.useContext)(kW);
+function FW() {
+	return (0, _.useContext)(PW);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/UnstyledButton/UnstyledButton.module.css.mjs
-var jW = { root: "m_87cf2631" }, MW = { __staticSelector: "UnstyledButton" }, NW = OW((e, t) => {
-	let n = Q("UnstyledButton", MW, e), { className: r, component: i = "button", __staticSelector: a, unstyled: o, classNames: s, styles: c, style: l, attributes: u, ...d } = n;
+var IW = { root: "m_87cf2631" }, LW = { __staticSelector: "UnstyledButton" }, RW = NW((e, t) => {
+	let n = Q("UnstyledButton", LW, e), { className: r, component: i = "button", __staticSelector: a, unstyled: o, classNames: s, styles: c, style: l, attributes: u, ...d } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: a,
 			props: n,
-			classes: jW,
+			classes: IW,
 			className: r,
 			style: l,
 			classNames: s,
@@ -44600,17 +44708,17 @@ var jW = { root: "m_87cf2631" }, MW = { __staticSelector: "UnstyledButton" }, NW
 		...d
 	});
 });
-NW.classes = jW, NW.displayName = "@mantine/core/UnstyledButton";
+RW.classes = IW, RW.displayName = "@mantine/core/UnstyledButton";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/VisuallyHidden/VisuallyHidden.module.css.mjs
-var PW = { root: "m_515a97f8" }, FW = DW((e, t) => {
+var zW = { root: "m_515a97f8" }, BW = MW((e, t) => {
 	let n = Q("VisuallyHidden", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, attributes: l, ...u } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		component: "span",
 		ref: t,
-		...HU({
+		...qU({
 			name: "VisuallyHidden",
-			classes: PW,
+			classes: zW,
 			props: n,
 			className: i,
 			style: a,
@@ -44622,17 +44730,17 @@ var PW = { root: "m_515a97f8" }, FW = DW((e, t) => {
 		...u
 	});
 });
-FW.classes = PW, FW.displayName = "@mantine/core/VisuallyHidden";
+BW.classes = zW, BW.displayName = "@mantine/core/VisuallyHidden";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Paper/Paper.module.css.mjs
-var IW = { root: "m_1b7284a3" }, LW = fH((e, { radius: t, shadow: n }) => ({ root: {
-	"--paper-radius": t === void 0 ? void 0 : EV(t),
-	"--paper-shadow": kV(n)
-} })), RW = OW((e, t) => {
-	let n = Q("Paper", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, withBorder: c, vars: l, radius: u, shadow: d, variant: f, mod: p, attributes: m, ...h } = n, g = HU({
+var VW = { root: "m_1b7284a3" }, HW = _H((e, { radius: t, shadow: n }) => ({ root: {
+	"--paper-radius": t === void 0 ? void 0 : jV(t),
+	"--paper-shadow": PV(n)
+} })), UW = NW((e, t) => {
+	let n = Q("Paper", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, withBorder: c, vars: l, radius: u, shadow: d, variant: f, mod: p, attributes: m, ...h } = n, g = qU({
 		name: "Paper",
 		props: n,
-		classes: IW,
+		classes: VW,
 		className: i,
 		style: a,
 		classNames: r,
@@ -44640,7 +44748,7 @@ var IW = { root: "m_1b7284a3" }, LW = fH((e, { radius: t, shadow: n }) => ({ roo
 		unstyled: s,
 		attributes: m,
 		vars: l,
-		varsResolver: LW
+		varsResolver: HW
 	});
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
@@ -44650,53 +44758,53 @@ var IW = { root: "m_1b7284a3" }, LW = fH((e, { radius: t, shadow: n }) => ({ roo
 		...h
 	});
 });
-RW.classes = IW, RW.displayName = "@mantine/core/Paper";
+UW.classes = VW, UW.displayName = "@mantine/core/Paper";
 //#endregion
 //#region node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/get-arrow-position-styles.mjs
-function zW(e, t, n, r) {
+function WW(e, t, n, r) {
 	return e === "center" || r === "center" ? { top: t } : e === "end" ? { bottom: n } : e === "start" ? { top: n } : {};
 }
-function BW(e, t, n, r, i) {
+function GW(e, t, n, r, i) {
 	return e === "center" || r === "center" ? { left: t } : e === "end" ? { [i === "ltr" ? "right" : "left"]: n } : e === "start" ? { [i === "ltr" ? "left" : "right"]: n } : {};
 }
-var VW = {
+var KW = {
 	bottom: "borderTopLeftRadius",
 	left: "borderTopRightRadius",
 	right: "borderBottomLeftRadius",
 	top: "borderBottomRightRadius"
 };
-function HW({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPosition: i, arrowX: a, arrowY: o, dir: s }) {
+function qW({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPosition: i, arrowX: a, arrowY: o, dir: s }) {
 	let [c, l = "center"] = e.split("-"), u = {
 		width: t,
 		height: t,
 		transform: "rotate(45deg)",
 		position: "absolute",
-		[VW[c]]: r
+		[KW[c]]: r
 	}, d = -t / 2;
 	return c === "left" ? {
 		...u,
-		...zW(l, o, n, i),
+		...WW(l, o, n, i),
 		right: d,
 		borderLeftColor: "transparent",
 		borderBottomColor: "transparent",
 		clipPath: "polygon(100% 0, 0 0, 100% 100%)"
 	} : c === "right" ? {
 		...u,
-		...zW(l, o, n, i),
+		...WW(l, o, n, i),
 		left: d,
 		borderRightColor: "transparent",
 		borderTopColor: "transparent",
 		clipPath: "polygon(0 100%, 0 0, 100% 100%)"
 	} : c === "top" ? {
 		...u,
-		...BW(l, a, n, i, s),
+		...GW(l, a, n, i, s),
 		bottom: d,
 		borderTopColor: "transparent",
 		borderLeftColor: "transparent",
 		clipPath: "polygon(0 100%, 100% 100%, 100% 0)"
 	} : c === "bottom" ? {
 		...u,
-		...BW(l, a, n, i, s),
+		...GW(l, a, n, i, s),
 		top: d,
 		borderBottomColor: "transparent",
 		borderRightColor: "transparent",
@@ -44705,14 +44813,14 @@ function HW({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPo
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/utils/Floating/FloatingArrow/FloatingArrow.mjs
-var UW = (0, _.forwardRef)(({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPosition: i, visible: a, arrowX: o, arrowY: s, style: c, ...l }, u) => {
-	let { dir: d } = AW();
+var JW = (0, _.forwardRef)(({ position: e, arrowSize: t, arrowOffset: n, arrowRadius: r, arrowPosition: i, visible: a, arrowX: o, arrowY: s, style: c, ...l }, u) => {
+	let { dir: d } = FW();
 	return a ? /* @__PURE__ */ (0, G.jsx)("div", {
 		...l,
 		ref: u,
 		style: {
 			...c,
-			...HW({
+			...qW({
 				position: e,
 				arrowSize: t,
 				arrowOffset: n,
@@ -44725,10 +44833,10 @@ var UW = (0, _.forwardRef)(({ position: e, arrowSize: t, arrowOffset: n, arrowRa
 		}
 	}) : null;
 });
-UW.displayName = "@mantine/core/FloatingArrow";
+JW.displayName = "@mantine/core/FloatingArrow";
 //#endregion
 //#region node_modules/@mantine/core/esm/utils/Floating/get-floating-position/get-floating-position.mjs
-function WW(e, t) {
+function YW(e, t) {
 	if (e === "rtl" && (t.includes("right") || t.includes("left"))) {
 		let [e, n] = t.split("-"), r = e === "right" ? "left" : "right";
 		return n === void 0 ? r : `${r}-${n}`;
@@ -44737,19 +44845,19 @@ function WW(e, t) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Overlay/Overlay.module.css.mjs
-var GW = { root: "m_9814e45f" }, KW = { zIndex: xV("modal") }, qW = fH((e, { gradient: t, color: n, backgroundOpacity: r, blur: i, radius: a, zIndex: o }) => ({ root: {
-	"--overlay-bg": t || (n !== void 0 || r !== void 0) && UH(n || "#000", r ?? .6) || void 0,
+var XW = { root: "m_9814e45f" }, ZW = { zIndex: EV("modal") }, QW = _H((e, { gradient: t, color: n, backgroundOpacity: r, blur: i, radius: a, zIndex: o }) => ({ root: {
+	"--overlay-bg": t || (n !== void 0 || r !== void 0) && JH(n || "#000", r ?? .6) || void 0,
 	"--overlay-filter": i ? `blur(${Z(i)})` : void 0,
-	"--overlay-radius": a === void 0 ? void 0 : EV(a),
+	"--overlay-radius": a === void 0 ? void 0 : jV(a),
 	"--overlay-z-index": o?.toString()
-} })), JW = OW((e, t) => {
-	let n = Q("Overlay", KW, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, fixed: l, center: u, children: d, radius: f, zIndex: p, gradient: m, blur: h, color: g, backgroundOpacity: _, mod: v, attributes: y, ...b } = n;
+} })), $W = NW((e, t) => {
+	let n = Q("Overlay", ZW, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, fixed: l, center: u, children: d, radius: f, zIndex: p, gradient: m, blur: h, color: g, backgroundOpacity: _, mod: v, attributes: y, ...b } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
-		...HU({
+		...qU({
 			name: "Overlay",
 			props: n,
-			classes: GW,
+			classes: XW,
 			className: i,
 			style: a,
 			classNames: r,
@@ -44757,7 +44865,7 @@ var GW = { root: "m_9814e45f" }, KW = { zIndex: xV("modal") }, qW = fH((e, { gra
 			unstyled: s,
 			attributes: y,
 			vars: c,
-			varsResolver: qW
+			varsResolver: QW
 		})("root"),
 		mod: [{
 			center: u,
@@ -44767,45 +44875,45 @@ var GW = { root: "m_9814e45f" }, KW = { zIndex: xV("modal") }, qW = fH((e, { gra
 		children: d
 	});
 });
-JW.classes = GW, JW.displayName = "@mantine/core/Overlay";
+$W.classes = XW, $W.displayName = "@mantine/core/Overlay";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Portal/Portal.mjs
-function YW(e) {
+function eG(e) {
 	let t = document.createElement("div");
 	return t.setAttribute("data-portal", "true"), typeof e.className == "string" && t.classList.add(...e.className.split(" ").filter(Boolean)), typeof e.style == "object" && Object.assign(t.style, e.style), typeof e.id == "string" && t.setAttribute("id", e.id), t;
 }
-function XW({ target: e, reuseTargetNode: t, ...n }) {
-	if (e) return typeof e == "string" ? document.querySelector(e) || YW(n) : e;
+function tG({ target: e, reuseTargetNode: t, ...n }) {
+	if (e) return typeof e == "string" ? document.querySelector(e) || eG(n) : e;
 	if (t) {
 		let e = document.querySelector("[data-mantine-shared-portal-node]");
 		if (e) return e;
-		let t = YW(n);
+		let t = eG(n);
 		return t.setAttribute("data-mantine-shared-portal-node", "true"), document.body.appendChild(t), t;
 	}
-	return YW(n);
+	return eG(n);
 }
-var ZW = { reuseTargetNode: !0 }, QW = DW((e, t) => {
-	let { children: n, target: r, reuseTargetNode: i, ...a } = Q("Portal", ZW, e), [o, s] = (0, _.useState)(!1), c = (0, _.useRef)(null);
-	return zV(() => (s(!0), c.current = XW({
+var nG = { reuseTargetNode: !0 }, rG = MW((e, t) => {
+	let { children: n, target: r, reuseTargetNode: i, ...a } = Q("Portal", nG, e), [o, s] = (0, _.useState)(!1), c = (0, _.useRef)(null);
+	return WV(() => (s(!0), c.current = tG({
 		target: r,
 		reuseTargetNode: i,
 		...a
-	}), tH(t, c.current), !r && !i && c.current && document.body.appendChild(c.current), () => {
+	}), oH(t, c.current), !r && !i && c.current && document.body.appendChild(c.current), () => {
 		!r && !i && c.current && document.body.removeChild(c.current);
 	}), [r]), !o || !c.current ? null : (0, v.createPortal)(/* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: n }), c.current);
 });
-QW.displayName = "@mantine/core/Portal";
+rG.displayName = "@mantine/core/Portal";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Portal/OptionalPortal.mjs
-var $W = DW(({ withinPortal: e = !0, children: t, ...n }, r) => OH() === "test" || !e ? /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: t }) : /* @__PURE__ */ (0, G.jsx)(QW, {
+var iG = MW(({ withinPortal: e = !0, children: t, ...n }, r) => NH() === "test" || !e ? /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: t }) : /* @__PURE__ */ (0, G.jsx)(rG, {
 	ref: r,
 	...n,
 	children: t
 }));
-$W.displayName = "@mantine/core/OptionalPortal";
+iG.displayName = "@mantine/core/OptionalPortal";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Transition/transitions.mjs
-var eG = (e) => ({
+var aG = (e) => ({
 	in: {
 		opacity: 1,
 		transform: "scale(1)"
@@ -44815,7 +44923,7 @@ var eG = (e) => ({
 		transform: `scale(.9) translateY(${e === "bottom" ? 10 : -10}px)`
 	},
 	transitionProperty: "transform, opacity"
-}), tG = {
+}), oG = {
 	fade: {
 		in: { opacity: 1 },
 		out: { opacity: 0 },
@@ -44998,26 +45106,26 @@ var eG = (e) => ({
 		transitionProperty: "transform, opacity"
 	},
 	pop: {
-		...eG("bottom"),
+		...aG("bottom"),
 		common: { transformOrigin: "center center" }
 	},
 	"pop-bottom-left": {
-		...eG("bottom"),
+		...aG("bottom"),
 		common: { transformOrigin: "bottom left" }
 	},
 	"pop-bottom-right": {
-		...eG("bottom"),
+		...aG("bottom"),
 		common: { transformOrigin: "bottom right" }
 	},
 	"pop-top-left": {
-		...eG("top"),
+		...aG("top"),
 		common: { transformOrigin: "top left" }
 	},
 	"pop-top-right": {
-		...eG("top"),
+		...aG("top"),
 		common: { transformOrigin: "top right" }
 	}
-}, nG = {
+}, sG = {
 	entering: "in",
 	entered: "in",
 	exiting: "out",
@@ -45025,28 +45133,28 @@ var eG = (e) => ({
 	"pre-exiting": "out",
 	"pre-entering": "out"
 };
-function rG({ transition: e, state: t, duration: n, timingFunction: r }) {
+function cG({ transition: e, state: t, duration: n, timingFunction: r }) {
 	let i = {
 		WebkitBackfaceVisibility: "hidden",
 		transitionDuration: `${n}ms`,
 		transitionTimingFunction: r
 	};
-	return typeof e == "string" ? e in tG ? {
-		transitionProperty: tG[e].transitionProperty,
+	return typeof e == "string" ? e in oG ? {
+		transitionProperty: oG[e].transitionProperty,
 		...i,
-		...tG[e].common,
-		...tG[e][nG[t]]
+		...oG[e].common,
+		...oG[e][sG[t]]
 	} : {} : {
 		transitionProperty: e.transitionProperty,
 		...i,
 		...e.common,
-		...e[nG[t]]
+		...e[sG[t]]
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Transition/use-transition.mjs
-function iG({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnter: i, onExit: a, onEntered: o, onExited: s, enterDelay: c, exitDelay: l }) {
-	let u = iU(), d = aH(), f = u.respectReducedMotion ? d : !1, [p, m] = (0, _.useState)(f ? 0 : e), [h, g] = (0, _.useState)(r ? "entered" : "exited"), y = (0, _.useRef)(-1), b = (0, _.useRef)(-1), x = (0, _.useRef)(-1);
+function lG({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnter: i, onExit: a, onEntered: o, onExited: s, enterDelay: c, exitDelay: l }) {
+	let u = lU(), d = uH(), f = u.respectReducedMotion ? d : !1, [p, m] = (0, _.useState)(f ? 0 : e), [h, g] = (0, _.useState)(r ? "entered" : "exited"), y = (0, _.useRef)(-1), b = (0, _.useRef)(-1), x = (0, _.useRef)(-1);
 	function S() {
 		window.clearTimeout(y.current), window.clearTimeout(b.current), cancelAnimationFrame(x.current);
 	}
@@ -45071,7 +45179,7 @@ function iG({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnt
 			C(e);
 		}, e ? c : l);
 	};
-	return BV(() => {
+	return GV(() => {
 		w(r);
 	}, [r]), (0, _.useEffect)(() => () => {
 		S();
@@ -45083,8 +45191,8 @@ function iG({ duration: e, exitDuration: t, timingFunction: n, mounted: r, onEnt
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Transition/Transition.mjs
-function aG({ keepMounted: e, transition: t = "fade", duration: n = 250, exitDuration: r = n, mounted: i, children: a, timingFunction: o = "ease", onExit: s, onEntered: c, onEnter: l, onExited: u, enterDelay: d, exitDelay: f }) {
-	let p = OH(), { transitionDuration: m, transitionStatus: h, transitionTimingFunction: g } = iG({
+function uG({ keepMounted: e, transition: t = "fade", duration: n = 250, exitDuration: r = n, mounted: i, children: a, timingFunction: o = "ease", onExit: s, onEntered: c, onEnter: l, onExited: u, enterDelay: d, exitDelay: f }) {
+	let p = NH(), { transitionDuration: m, transitionStatus: h, transitionTimingFunction: g } = lG({
 		mounted: i,
 		exitDuration: r,
 		duration: n,
@@ -45096,39 +45204,39 @@ function aG({ keepMounted: e, transition: t = "fade", duration: n = 250, exitDur
 		enterDelay: d,
 		exitDelay: f
 	});
-	return m === 0 || p === "test" ? i ? /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: a({}) }) : e ? a({ display: "none" }) : null : h === "exited" ? e ? a({ display: "none" }) : null : /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: a(rG({
+	return m === 0 || p === "test" ? i ? /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: a({}) }) : e ? a({ display: "none" }) : null : h === "exited" ? e ? a({ display: "none" }) : null : /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: a(cG({
 		transition: t,
 		duration: m,
 		state: h,
 		timingFunction: g
 	})) });
 }
-aG.displayName = "@mantine/core/Transition";
+uG.displayName = "@mantine/core/Transition";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Popover/Popover.context.mjs
-var [oG, sG] = fV("Popover component was not found in the tree");
+var [dG, fG] = _V("Popover component was not found in the tree");
 //#endregion
 //#region node_modules/@mantine/core/esm/components/FocusTrap/FocusTrap.mjs
-function cG({ children: e, active: t = !0, refProp: n = "ref", innerRef: r }) {
-	let i = rH(ZV(t), r), a = dH(e);
+function pG({ children: e, active: t = !0, refProp: n = "ref", innerRef: r }) {
+	let i = cH(nH(t), r), a = gH(e);
 	return a ? (0, _.cloneElement)(a, { [n]: i }) : e;
 }
-function lG(e) {
-	return /* @__PURE__ */ (0, G.jsx)(FW, {
+function mG(e) {
+	return /* @__PURE__ */ (0, G.jsx)(BW, {
 		tabIndex: -1,
 		"data-autofocus": !0,
 		...e
 	});
 }
-cG.displayName = "@mantine/core/FocusTrap", lG.displayName = "@mantine/core/FocusTrapInitialFocus", cG.InitialFocus = lG;
+pG.displayName = "@mantine/core/FocusTrap", mG.displayName = "@mantine/core/FocusTrapInitialFocus", pG.InitialFocus = mG;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Popover/Popover.module.css.mjs
-var uG = {
+var hG = {
 	dropdown: "m_38a85659",
 	arrow: "m_a31dc6c1",
 	overlay: "m_3d7bc908"
-}, dG = DW((e, t) => {
-	let n = Q("PopoverDropdown", null, e), { className: r, style: i, vars: a, children: o, onKeyDownCapture: s, variant: c, classNames: l, styles: u, ...d } = n, f = sG(), p = VV({
+}, gG = MW((e, t) => {
+	let n = Q("PopoverDropdown", null, e), { className: r, style: i, vars: a, children: o, onKeyDownCapture: s, variant: c, classNames: l, styles: u, ...d } = n, f = fG(), p = KV({
 		opened: f.opened,
 		shouldReturnFocus: f.returnFocus
 	}), m = f.withRoles ? {
@@ -45136,25 +45244,25 @@ var uG = {
 		id: f.getDropdownId(),
 		role: "dialog",
 		tabIndex: -1
-	} : {}, h = rH(t, f.floating);
-	return f.disabled ? null : /* @__PURE__ */ (0, G.jsx)($W, {
+	} : {}, h = cH(t, f.floating);
+	return f.disabled ? null : /* @__PURE__ */ (0, G.jsx)(iG, {
 		...f.portalProps,
 		withinPortal: f.withinPortal,
-		children: /* @__PURE__ */ (0, G.jsx)(aG, {
+		children: /* @__PURE__ */ (0, G.jsx)(uG, {
 			mounted: f.opened,
 			...f.transitionProps,
 			transition: f.transitionProps?.transition || "fade",
 			duration: f.transitionProps?.duration ?? 150,
 			keepMounted: f.keepMounted,
 			exitDuration: typeof f.transitionProps?.exitDuration == "number" ? f.transitionProps.exitDuration : f.transitionProps?.duration,
-			children: (e) => /* @__PURE__ */ (0, G.jsx)(cG, {
+			children: (e) => /* @__PURE__ */ (0, G.jsx)(pG, {
 				active: f.trapFocus && f.opened,
 				innerRef: h,
 				children: /* @__PURE__ */ (0, G.jsxs)($, {
 					...m,
 					...d,
 					variant: c,
-					onKeyDownCapture: CV(() => {
+					onKeyDownCapture: OV(() => {
 						f.onClose?.(), f.onDismiss?.();
 					}, {
 						active: f.closeOnEscape,
@@ -45182,7 +45290,7 @@ var uG = {
 							i
 						]
 					}),
-					children: [o, /* @__PURE__ */ (0, G.jsx)(UW, {
+					children: [o, /* @__PURE__ */ (0, G.jsx)(JW, {
 						ref: f.arrowRef,
 						arrowX: f.arrowX,
 						arrowY: f.arrowY,
@@ -45203,16 +45311,16 @@ var uG = {
 		})
 	});
 });
-dG.classes = uG, dG.displayName = "@mantine/core/PopoverDropdown";
+gG.classes = hG, gG.displayName = "@mantine/core/PopoverDropdown";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Popover/PopoverTarget/PopoverTarget.mjs
-var fG = {
+var _G = {
 	refProp: "ref",
 	popupType: "dialog"
-}, pG = DW((e, t) => {
-	let { children: n, refProp: r, popupType: i, ...a } = Q("PopoverTarget", fG, e), o = dH(n);
+}, vG = MW((e, t) => {
+	let { children: n, refProp: r, popupType: i, ...a } = Q("PopoverTarget", _G, e), o = gH(n);
 	if (!o) throw Error("Popover.Target component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
-	let s = a, c = sG(), l = rH(c.reference, uH(o), t), u = c.withRoles ? {
+	let s = a, c = fG(), l = cH(c.reference, hH(o), t), u = c.withRoles ? {
 		"aria-haspopup": i,
 		"aria-expanded": c.opened,
 		"aria-controls": c.getDropdownId(),
@@ -45222,17 +45330,17 @@ var fG = {
 		...s,
 		...u,
 		...c.targetProps,
-		className: mH(c.targetProps.className, s.className, d.className),
+		className: yH(c.targetProps.className, s.className, d.className),
 		[r]: l,
 		...c.controlled ? null : { onClick: () => {
 			c.onToggle(), d.onClick?.();
 		} }
 	});
 });
-pG.displayName = "@mantine/core/PopoverTarget";
+vG.displayName = "@mantine/core/PopoverTarget";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Popover/use-popover.mjs
-function mG(e) {
+function yG(e) {
 	if (e === void 0) return {
 		shift: !0,
 		flip: !0
@@ -45240,8 +45348,8 @@ function mG(e) {
 	let t = { ...e };
 	return e.shift === void 0 && (t.shift = !0), e.flip === void 0 && (t.flip = !0), t;
 }
-function hG(e, t, n) {
-	let r = mG(e.middlewares), i = [_j(e.offset), Cj()];
+function bG(e, t, n) {
+	let r = yG(e.middlewares), i = [_j(e.offset), Cj()];
 	return e.dropdownVisible && n !== "test" && e.preventPositionChangeWhenVisible && (r.flip = !1), r.shift && i.push(vj(typeof r.shift == "boolean" ? {
 		limiter: yj(),
 		padding: 5
@@ -45268,8 +45376,8 @@ function hG(e, t, n) {
 		}
 	})), i;
 }
-function gG(e) {
-	let t = OH(), [n, r] = iH({
+function xG(e) {
+	let t = NH(), [n, r] = lH({
 		value: e.opened,
 		defaultValue: e.defaultOpened,
 		finalValue: !1,
@@ -45281,20 +45389,20 @@ function gG(e) {
 	}, s = HM({
 		strategy: e.strategy,
 		placement: e.preventPositionChangeWhenVisible ? e.positionRef.current : e.position,
-		middleware: hG(e, () => s, t),
+		middleware: bG(e, () => s, t),
 		whileElementsMounted: e.keepMounted ? void 0 : $A
 	});
 	return (0, _.useEffect)(() => {
 		if (!(!s.refs.reference.current || !s.refs.floating.current) && n) return $A(s.refs.reference.current, s.refs.floating.current, s.update);
-	}, [n, s.update]), BV(() => {
+	}, [n, s.update]), GV(() => {
 		e.onPositionChange?.(s.placement), e.positionRef.current = s.placement;
-	}, [s.placement, e.preventPositionChangeWhenVisible]), BV(() => {
+	}, [s.placement, e.preventPositionChangeWhenVisible]), GV(() => {
 		n !== i.current && (n ? e.onOpen?.() : e.onClose?.()), i.current = n;
 	}, [
 		n,
 		e.onClose,
 		e.onOpen
-	]), zV(() => {
+	]), WV(() => {
 		let t = -1;
 		return n && (t = window.setTimeout(() => e.setDropdownVisible(!0), 4)), () => {
 			window.clearTimeout(t);
@@ -45309,7 +45417,7 @@ function gG(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Popover/Popover.mjs
-var _G = {
+var SG = {
 	position: "bottom",
 	offset: 8,
 	positionDependencies: [],
@@ -45335,33 +45443,33 @@ var _G = {
 	withOverlay: !1,
 	hideDetached: !0,
 	clickOutsideEvents: ["mousedown", "touchstart"],
-	zIndex: xV("popover"),
+	zIndex: EV("popover"),
 	__staticSelector: "Popover",
 	width: "max-content"
-}, vG = fH((e, { radius: t, shadow: n }) => ({ dropdown: {
-	"--popover-radius": t === void 0 ? void 0 : EV(t),
-	"--popover-shadow": kV(n)
+}, CG = _H((e, { radius: t, shadow: n }) => ({ dropdown: {
+	"--popover-radius": t === void 0 ? void 0 : jV(t),
+	"--popover-shadow": PV(n)
 } }));
-function yG(e) {
-	let t = Q("Popover", _G, e), { children: n, position: r, offset: i, onPositionChange: a, positionDependencies: o, opened: s, transitionProps: c, onExitTransitionEnd: l, onEnterTransitionEnd: u, width: d, middlewares: f, withArrow: p, arrowSize: m, arrowOffset: h, arrowRadius: g, arrowPosition: v, unstyled: y, classNames: b, styles: x, closeOnClickOutside: S, withinPortal: C, portalProps: w, closeOnEscape: T, clickOutsideEvents: E, trapFocus: D, onClose: O, onDismiss: k, onOpen: A, onChange: j, zIndex: M, radius: ee, shadow: te, id: ne, defaultOpened: N, __staticSelector: P, withRoles: re, disabled: ie, returnFocus: F, variant: ae, keepMounted: oe, vars: se, floatingStrategy: ce, withOverlay: le, overlayProps: ue, hideDetached: de, attributes: fe, preventPositionChangeWhenVisible: pe, ...me } = t, he = HU({
+function wG(e) {
+	let t = Q("Popover", SG, e), { children: n, position: r, offset: i, onPositionChange: a, positionDependencies: o, opened: s, transitionProps: c, onExitTransitionEnd: l, onEnterTransitionEnd: u, width: d, middlewares: f, withArrow: p, arrowSize: m, arrowOffset: h, arrowRadius: g, arrowPosition: v, unstyled: y, classNames: b, styles: x, closeOnClickOutside: S, withinPortal: C, portalProps: w, closeOnEscape: T, clickOutsideEvents: E, trapFocus: D, onClose: O, onDismiss: k, onOpen: A, onChange: j, zIndex: M, radius: ee, shadow: te, id: ne, defaultOpened: N, __staticSelector: P, withRoles: re, disabled: ie, returnFocus: F, variant: ae, keepMounted: oe, vars: se, floatingStrategy: ce, withOverlay: le, overlayProps: ue, hideDetached: de, attributes: fe, preventPositionChangeWhenVisible: pe, ...me } = t, he = qU({
 		name: P,
 		props: t,
-		classes: uG,
+		classes: hG,
 		classNames: b,
 		styles: x,
 		unstyled: y,
 		attributes: fe,
 		rootSelector: "dropdown",
 		vars: se,
-		varsResolver: vG
-	}), { resolvedStyles: ge } = TU({
+		varsResolver: CG
+	}), { resolvedStyles: ge } = AU({
 		classNames: b,
 		styles: x,
 		props: t
-	}), [_e, ve] = (0, _.useState)(s ?? N ?? !1), ye = (0, _.useRef)(r), be = (0, _.useRef)(null), [xe, Se] = (0, _.useState)(null), [Ce, we] = (0, _.useState)(null), { dir: Te } = AW(), Ee = OH(), De = eH(ne), Oe = gG({
+	}), [_e, ve] = (0, _.useState)(s ?? N ?? !1), ye = (0, _.useRef)(r), be = (0, _.useRef)(null), [xe, Se] = (0, _.useState)(null), [Ce, we] = (0, _.useState)(null), { dir: Te } = FW(), Ee = NH(), De = aH(ne), Oe = xG({
 		middlewares: f,
 		width: d,
-		position: WW(Te, r),
+		position: YW(Te, r),
 		offset: typeof i == "number" ? i + (p ? m / 2 : 0) : i,
 		arrowRef: be,
 		arrowOffset: h,
@@ -45381,7 +45489,7 @@ function yG(e) {
 		preventPositionChangeWhenVisible: pe,
 		keepMounted: oe
 	});
-	FV(() => {
+	BV(() => {
 		S && (Oe.onClose(), k?.());
 	}, E, [xe, Ce]);
 	let ke = (0, _.useCallback)((e) => {
@@ -45398,7 +45506,7 @@ function yG(e) {
 	]), Me = (0, _.useCallback)(() => {
 		c?.onEntered?.(), u?.();
 	}, [c?.onEntered, u]);
-	return /* @__PURE__ */ (0, G.jsxs)(oG, {
+	return /* @__PURE__ */ (0, G.jsxs)(dG, {
 		value: {
 			returnFocus: F,
 			disabled: ie,
@@ -45448,14 +45556,14 @@ function yG(e) {
 			floatingStrategy: ce,
 			referenceHidden: de && Ee !== "test" ? Oe.floating.middlewareData.hide?.referenceHidden : !1
 		},
-		children: [n, le && /* @__PURE__ */ (0, G.jsx)(aG, {
+		children: [n, le && /* @__PURE__ */ (0, G.jsx)(uG, {
 			transition: "fade",
 			mounted: Oe.opened,
 			duration: c?.duration || 250,
 			exitDuration: c?.exitDuration || 250,
-			children: (e) => /* @__PURE__ */ (0, G.jsx)($W, {
+			children: (e) => /* @__PURE__ */ (0, G.jsx)(iG, {
 				withinPortal: C,
-				children: /* @__PURE__ */ (0, G.jsx)(JW, {
+				children: /* @__PURE__ */ (0, G.jsx)($W, {
 					...ue,
 					...he("overlay", {
 						className: ue?.className,
@@ -45466,10 +45574,10 @@ function yG(e) {
 		})]
 	});
 }
-yG.Target = pG, yG.Dropdown = dG, yG.displayName = "@mantine/core/Popover", yG.extend = (e) => e;
+wG.Target = vG, wG.Dropdown = gG, wG.displayName = "@mantine/core/Popover", wG.extend = (e) => e;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Loader/Loader.module.css.mjs
-var bG = {
+var TG = {
 	root: "m_5ae2e3c",
 	barsLoader: "m_7a2bd4cd",
 	bar: "m_870bb79",
@@ -45479,58 +45587,58 @@ var bG = {
 	"loader-dots-animation": "m_aac34a1",
 	ovalLoader: "m_b34414df",
 	"oval-loader-animation": "m_f8e89c4b"
-}, xG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsxs)($, {
+}, EG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsxs)($, {
 	component: "span",
-	className: mH(bG.barsLoader, e),
+	className: yH(TG.barsLoader, e),
 	...t,
 	ref: n,
 	children: [
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.bar }),
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.bar }),
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.bar })
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.bar }),
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.bar }),
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.bar })
 	]
 }));
-xG.displayName = "@mantine/core/Bars";
+EG.displayName = "@mantine/core/Bars";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Loader/loaders/Dots.mjs
-var SG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsxs)($, {
+var DG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsxs)($, {
 	component: "span",
-	className: mH(bG.dotsLoader, e),
+	className: yH(TG.dotsLoader, e),
 	...t,
 	ref: n,
 	children: [
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.dot }),
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.dot }),
-		/* @__PURE__ */ (0, G.jsx)("span", { className: bG.dot })
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.dot }),
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.dot }),
+		/* @__PURE__ */ (0, G.jsx)("span", { className: TG.dot })
 	]
 }));
-SG.displayName = "@mantine/core/Dots";
+DG.displayName = "@mantine/core/Dots";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Loader/loaders/Oval.mjs
-var CG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsx)($, {
+var OG = (0, _.forwardRef)(({ className: e, ...t }, n) => /* @__PURE__ */ (0, G.jsx)($, {
 	component: "span",
-	className: mH(bG.ovalLoader, e),
+	className: yH(TG.ovalLoader, e),
 	...t,
 	ref: n
 }));
-CG.displayName = "@mantine/core/Oval";
+OG.displayName = "@mantine/core/Oval";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Loader/Loader.mjs
-var wG = {
-	bars: xG,
-	oval: CG,
-	dots: SG
-}, TG = {
-	loaders: wG,
+var kG = {
+	bars: EG,
+	oval: OG,
+	dots: DG
+}, AG = {
+	loaders: kG,
 	type: "oval"
-}, EG = fH((e, { size: t, color: n }) => ({ root: {
-	"--loader-size": wV(t, "loader-size"),
-	"--loader-color": n ? VH(n, e) : void 0
-} })), DG = DW((e, t) => {
-	let n = Q("Loader", TG, e), { size: r, color: i, type: a, vars: o, className: s, style: c, classNames: l, styles: u, unstyled: d, loaders: f, variant: p, children: m, attributes: h, ...g } = n, _ = HU({
+}, jG = _H((e, { size: t, color: n }) => ({ root: {
+	"--loader-size": kV(t, "loader-size"),
+	"--loader-color": n ? KH(n, e) : void 0
+} })), MG = MW((e, t) => {
+	let n = Q("Loader", AG, e), { size: r, color: i, type: a, vars: o, className: s, style: c, classNames: l, styles: u, unstyled: d, loaders: f, variant: p, children: m, attributes: h, ...g } = n, _ = qU({
 		name: "Loader",
 		props: n,
-		classes: bG,
+		classes: TG,
 		className: s,
 		style: c,
 		classNames: l,
@@ -45538,7 +45646,7 @@ var wG = {
 		unstyled: d,
 		attributes: h,
 		vars: o,
-		varsResolver: EG
+		varsResolver: jG
 	});
 	return m ? /* @__PURE__ */ (0, G.jsx)($, {
 		..._("root"),
@@ -45554,22 +45662,22 @@ var wG = {
 		...g
 	});
 });
-DG.defaultLoaders = wG, DG.classes = bG, DG.displayName = "@mantine/core/Loader";
+MG.defaultLoaders = kG, MG.classes = TG, MG.displayName = "@mantine/core/Loader";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.module.css.mjs
-var OG = {
+var NG = {
 	root: "m_8d3f4000",
 	icon: "m_8d3afb97",
 	loader: "m_302b9fb1",
 	group: "m_1a0f1b21",
 	groupSection: "m_437b6484"
-}, kG = { orientation: "horizontal" }, AG = fH((e, { borderWidth: t }) => ({ group: { "--ai-border-width": Z(t) } })), jG = DW((e, t) => {
-	let n = Q("ActionIconGroup", kG, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, orientation: c, vars: l, borderWidth: u, variant: d, mod: f, attributes: p, ...m } = Q("ActionIconGroup", kG, e);
+}, PG = { orientation: "horizontal" }, FG = _H((e, { borderWidth: t }) => ({ group: { "--ai-border-width": Z(t) } })), IG = MW((e, t) => {
+	let n = Q("ActionIconGroup", PG, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, orientation: c, vars: l, borderWidth: u, variant: d, mod: f, attributes: p, ...m } = Q("ActionIconGroup", PG, e);
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: "ActionIconGroup",
 			props: n,
-			classes: OG,
+			classes: NG,
 			className: r,
 			style: i,
 			classNames: a,
@@ -45577,7 +45685,7 @@ var OG = {
 			unstyled: s,
 			attributes: p,
 			vars: l,
-			varsResolver: AG,
+			varsResolver: FG,
 			rootSelector: "group"
 		})("group"),
 		ref: t,
@@ -45587,10 +45695,10 @@ var OG = {
 		...m
 	});
 });
-jG.classes = OG, jG.displayName = "@mantine/core/ActionIconGroup";
+IG.classes = NG, IG.displayName = "@mantine/core/ActionIconGroup";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIconGroupSection/ActionIconGroupSection.mjs
-var MG = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
+var LG = _H((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
 	let s = e.variantColorResolver({
 		color: n || e.primaryColor,
 		theme: e,
@@ -45599,21 +45707,21 @@ var MG = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 		autoContrast: a
 	});
 	return { groupSection: {
-		"--section-height": wV(o, "section-height"),
-		"--section-padding-x": wV(o, "section-padding-x"),
-		"--section-fz": DV(o),
-		"--section-radius": t === void 0 ? void 0 : EV(t),
+		"--section-height": kV(o, "section-height"),
+		"--section-padding-x": kV(o, "section-padding-x"),
+		"--section-fz": MV(o),
+		"--section-radius": t === void 0 ? void 0 : jV(t),
 		"--section-bg": n || i ? s.background : void 0,
 		"--section-color": s.color,
 		"--section-bd": n || i ? s.border : void 0
 	} };
-}), NG = DW((e, t) => {
+}), RG = MW((e, t) => {
 	let n = Q("ActionIconGroupSection", null, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, vars: c, variant: l, gradient: u, radius: d, autoContrast: f, attributes: p, ...m } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: "ActionIconGroupSection",
 			props: n,
-			classes: OG,
+			classes: NG,
 			className: r,
 			style: i,
 			classNames: a,
@@ -45621,7 +45729,7 @@ var MG = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 			unstyled: s,
 			attributes: p,
 			vars: c,
-			varsResolver: MG,
+			varsResolver: LG,
 			rootSelector: "groupSection"
 		})("groupSection"),
 		ref: t,
@@ -45629,10 +45737,10 @@ var MG = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 		...m
 	});
 });
-NG.classes = OG, NG.displayName = "@mantine/core/ActionIconGroupSection";
+RG.classes = NG, RG.displayName = "@mantine/core/ActionIconGroupSection";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/ActionIcon/ActionIcon.mjs
-var PG = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o }) => {
+var zG = _H((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o }) => {
 	let s = e.variantColorResolver({
 		color: a || e.primaryColor,
 		theme: e,
@@ -45641,29 +45749,29 @@ var PG = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		autoContrast: o
 	});
 	return { root: {
-		"--ai-size": wV(t, "ai-size"),
-		"--ai-radius": n === void 0 ? void 0 : EV(n),
+		"--ai-size": kV(t, "ai-size"),
+		"--ai-radius": n === void 0 ? void 0 : jV(n),
 		"--ai-bg": a || r ? s.background : void 0,
 		"--ai-hover": a || r ? s.hover : void 0,
 		"--ai-hover-color": a || r ? s.hoverColor : void 0,
 		"--ai-color": s.color,
 		"--ai-bd": a || r ? s.border : void 0
 	} };
-}), FG = OW((e, t) => {
-	let n = Q("ActionIcon", null, e), { className: r, unstyled: i, variant: a, classNames: o, styles: s, style: c, loading: l, loaderProps: u, size: d, color: f, radius: p, __staticSelector: m, gradient: h, vars: g, children: _, disabled: v, "data-disabled": y, autoContrast: b, mod: x, attributes: S, ...C } = n, w = HU({
+}), BG = NW((e, t) => {
+	let n = Q("ActionIcon", null, e), { className: r, unstyled: i, variant: a, classNames: o, styles: s, style: c, loading: l, loaderProps: u, size: d, color: f, radius: p, __staticSelector: m, gradient: h, vars: g, children: _, disabled: v, "data-disabled": y, autoContrast: b, mod: x, attributes: S, ...C } = n, w = qU({
 		name: ["ActionIcon", m],
 		props: n,
 		className: r,
 		style: c,
-		classes: OG,
+		classes: NG,
 		classNames: o,
 		styles: s,
 		unstyled: i,
 		attributes: S,
 		vars: g,
-		varsResolver: PG
+		varsResolver: zG
 	});
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		...w("root", { active: !v && !l && !y }),
 		...C,
 		unstyled: i,
@@ -45675,7 +45783,7 @@ var PG = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 			loading: l,
 			disabled: v || y
 		}, x],
-		children: [typeof l == "boolean" && /* @__PURE__ */ (0, G.jsx)(aG, {
+		children: [typeof l == "boolean" && /* @__PURE__ */ (0, G.jsx)(uG, {
 			mounted: l,
 			transition: "slide-down",
 			duration: 150,
@@ -45683,7 +45791,7 @@ var PG = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 				component: "span",
 				...w("loader", { style: e }),
 				"aria-hidden": !0,
-				children: /* @__PURE__ */ (0, G.jsx)(DG, {
+				children: /* @__PURE__ */ (0, G.jsx)(MG, {
 					color: "var(--ai-color)",
 					size: "calc(var(--ai-size) * 0.55)",
 					...u
@@ -45697,10 +45805,10 @@ var PG = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		})]
 	});
 });
-FG.classes = OG, FG.displayName = "@mantine/core/ActionIcon", FG.Group = jG, FG.GroupSection = NG;
+BG.classes = NG, BG.displayName = "@mantine/core/ActionIcon", BG.Group = IG, BG.GroupSection = RG;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/CloseButton/CloseIcon.mjs
-var IG = (0, _.forwardRef)(({ size: e = "var(--cb-icon-size, 70%)", style: t, ...n }, r) => /* @__PURE__ */ (0, G.jsx)("svg", {
+var VG = (0, _.forwardRef)(({ size: e = "var(--cb-icon-size, 70%)", style: t, ...n }, r) => /* @__PURE__ */ (0, G.jsx)("svg", {
 	viewBox: "0 0 15 15",
 	fill: "none",
 	xmlns: "http://www.w3.org/2000/svg",
@@ -45718,31 +45826,31 @@ var IG = (0, _.forwardRef)(({ size: e = "var(--cb-icon-size, 70%)", style: t, ..
 		clipRule: "evenodd"
 	})
 }));
-IG.displayName = "@mantine/core/CloseIcon";
+VG.displayName = "@mantine/core/CloseIcon";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/CloseButton/CloseButton.module.css.mjs
-var LG = {
+var HG = {
 	root: "m_86a44da5",
 	"root--subtle": "m_220c80f2"
-}, RG = { variant: "subtle" }, zG = fH((e, { size: t, radius: n, iconSize: r }) => ({ root: {
-	"--cb-size": wV(t, "cb-size"),
-	"--cb-radius": n === void 0 ? void 0 : EV(n),
+}, UG = { variant: "subtle" }, WG = _H((e, { size: t, radius: n, iconSize: r }) => ({ root: {
+	"--cb-size": kV(t, "cb-size"),
+	"--cb-radius": n === void 0 ? void 0 : jV(n),
 	"--cb-icon-size": Z(r)
-} })), BG = OW((e, t) => {
-	let n = Q("CloseButton", RG, e), { iconSize: r, children: i, vars: a, radius: o, className: s, classNames: c, style: l, styles: u, unstyled: d, "data-disabled": f, disabled: p, variant: m, icon: h, mod: g, attributes: _, __staticSelector: v, ...y } = n, b = HU({
+} })), GG = NW((e, t) => {
+	let n = Q("CloseButton", UG, e), { iconSize: r, children: i, vars: a, radius: o, className: s, classNames: c, style: l, styles: u, unstyled: d, "data-disabled": f, disabled: p, variant: m, icon: h, mod: g, attributes: _, __staticSelector: v, ...y } = n, b = qU({
 		name: v || "CloseButton",
 		props: n,
 		className: s,
 		style: l,
-		classes: LG,
+		classes: HG,
 		classNames: c,
 		styles: u,
 		unstyled: d,
 		attributes: _,
 		vars: a,
-		varsResolver: zG
+		varsResolver: WG
 	});
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		ref: t,
 		...y,
 		unstyled: d,
@@ -45753,45 +45861,45 @@ var LG = {
 			variant: m,
 			active: !p && !f
 		}),
-		children: [h || /* @__PURE__ */ (0, G.jsx)(IG, {}), i]
+		children: [h || /* @__PURE__ */ (0, G.jsx)(VG, {}), i]
 	});
 });
-BG.classes = LG, BG.displayName = "@mantine/core/CloseButton";
+GG.classes = HG, GG.displayName = "@mantine/core/CloseButton";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Group/filter-falsy-children/filter-falsy-children.mjs
-function VG(e) {
+function KG(e) {
 	return _.Children.toArray(e).filter(Boolean);
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Group/Group.module.css.mjs
-var HG = { root: "m_4081bf90" }, UG = {
+var qG = { root: "m_4081bf90" }, JG = {
 	preventGrowOverflow: !0,
 	gap: "md",
 	align: "center",
 	justify: "flex-start",
 	wrap: "wrap"
-}, WG = fH((e, { grow: t, preventGrowOverflow: n, gap: r, align: i, justify: a, wrap: o }, { childWidth: s }) => ({ root: {
+}, YG = _H((e, { grow: t, preventGrowOverflow: n, gap: r, align: i, justify: a, wrap: o }, { childWidth: s }) => ({ root: {
 	"--group-child-width": t && n ? s : void 0,
-	"--group-gap": TV(r),
+	"--group-gap": AV(r),
 	"--group-align": i,
 	"--group-justify": a,
 	"--group-wrap": o
-} })), GG = DW((e, t) => {
-	let n = Q("Group", UG, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, children: c, gap: l, align: u, justify: d, wrap: f, grow: p, preventGrowOverflow: m, vars: h, variant: g, __size: _, mod: v, attributes: y, ...b } = n, x = VG(c), S = x.length, C = TV(l ?? "md");
+} })), XG = MW((e, t) => {
+	let n = Q("Group", JG, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, children: c, gap: l, align: u, justify: d, wrap: f, grow: p, preventGrowOverflow: m, vars: h, variant: g, __size: _, mod: v, attributes: y, ...b } = n, x = KG(c), S = x.length, C = AV(l ?? "md");
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: "Group",
 			props: n,
 			stylesCtx: { childWidth: `calc(${100 / S}% - (${C} - ${C} / ${S}))` },
 			className: i,
 			style: a,
-			classes: HG,
+			classes: qG,
 			classNames: r,
 			styles: o,
 			unstyled: s,
 			attributes: y,
 			vars: h,
-			varsResolver: WG
+			varsResolver: YG
 		})("root"),
 		ref: t,
 		variant: g,
@@ -45801,16 +45909,16 @@ var HG = { root: "m_4081bf90" }, UG = {
 		children: x
 	});
 });
-GG.classes = HG, GG.displayName = "@mantine/core/Group";
+XG.classes = qG, XG.displayName = "@mantine/core/Group";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/Input.context.mjs
-var [KG, qG] = pV({ size: "sm" }), JG = DW((e, t) => {
-	let n = Q("InputClearButton", null, e), { size: r, variant: i, vars: a, classNames: o, styles: s, ...c } = n, l = qG(), { resolvedClassNames: u, resolvedStyles: d } = TU({
+var [ZG, QG] = vV({ size: "sm" }), $G = MW((e, t) => {
+	let n = Q("InputClearButton", null, e), { size: r, variant: i, vars: a, classNames: o, styles: s, ...c } = n, l = QG(), { resolvedClassNames: u, resolvedStyles: d } = AU({
 		classNames: o,
 		styles: s,
 		props: n
 	});
-	return /* @__PURE__ */ (0, G.jsx)(BG, {
+	return /* @__PURE__ */ (0, G.jsx)(GG, {
 		variant: i || "transparent",
 		ref: t,
 		size: r || l?.size || "sm",
@@ -45825,17 +45933,17 @@ var [KG, qG] = pV({ size: "sm" }), JG = DW((e, t) => {
 		...c
 	});
 });
-JG.displayName = "@mantine/core/InputClearButton";
+$G.displayName = "@mantine/core/InputClearButton";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputClearSection/InputClearSection.mjs
-var YG = {
+var eK = {
 	xs: 7,
 	sm: 8,
 	md: 10,
 	lg: 12,
 	xl: 15
 };
-function XG({ __clearable: e, __clearSection: t, rightSection: n, __defaultRightSection: r, size: i = "sm" }) {
+function tK({ __clearable: e, __clearSection: t, rightSection: n, __defaultRightSection: r, size: i = "sm" }) {
 	let a = e && t;
 	return a && (n || r) ? /* @__PURE__ */ (0, G.jsxs)("div", {
 		"data-combined-clear-section": !0,
@@ -45843,21 +45951,21 @@ function XG({ __clearable: e, __clearSection: t, rightSection: n, __defaultRight
 			display: "flex",
 			gap: 2,
 			alignItems: "center",
-			paddingInlineEnd: YG[i]
+			paddingInlineEnd: eK[i]
 		},
 		children: [a, n || r]
 	}) : n === null ? null : n || a || r;
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputWrapper.context.mjs
-var [ZG, QG] = pV({
+var [nK, rK] = vV({
 	offsetBottom: !1,
 	offsetTop: !1,
 	describedBy: void 0,
 	getStyles: null,
 	inputId: void 0,
 	labelId: void 0
-}), $G = {
+}), iK = {
 	wrapper: "m_6c018570",
 	input: "m_8fb7ebe7",
 	section: "m_82577fc2",
@@ -45867,11 +45975,11 @@ var [ZG, QG] = pV({
 	required: "m_78a94662",
 	error: "m_8f816625",
 	description: "m_fe47ce59"
-}, eK = fH((e, { size: t }) => ({ description: { "--input-description-size": t === void 0 ? void 0 : `calc(${DV(t)} - ${Z(2)})` } })), tK = DW((e, t) => {
-	let n = Q("InputDescription", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, __staticSelector: u, __inheritStyles: d = !0, attributes: f, variant: p, ...m } = Q("InputDescription", null, n), h = QG(), g = HU({
+}, aK = _H((e, { size: t }) => ({ description: { "--input-description-size": t === void 0 ? void 0 : `calc(${MV(t)} - ${Z(2)})` } })), oK = MW((e, t) => {
+	let n = Q("InputDescription", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, __staticSelector: u, __inheritStyles: d = !0, attributes: f, variant: p, ...m } = Q("InputDescription", null, n), h = rK(), g = qU({
 		name: ["InputWrapper", u],
 		props: n,
-		classes: $G,
+		classes: iK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -45880,7 +45988,7 @@ var [ZG, QG] = pV({
 		attributes: f,
 		rootSelector: "description",
 		vars: c,
-		varsResolver: eK
+		varsResolver: aK
 	});
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		component: "p",
@@ -45894,14 +46002,14 @@ var [ZG, QG] = pV({
 		...m
 	});
 });
-tK.classes = $G, tK.displayName = "@mantine/core/InputDescription";
+oK.classes = iK, oK.displayName = "@mantine/core/InputDescription";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputError/InputError.mjs
-var nK = fH((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ? void 0 : `calc(${DV(t)} - ${Z(2)})` } })), rK = DW((e, t) => {
-	let n = Q("InputError", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, attributes: u, __staticSelector: d, __inheritStyles: f = !0, variant: p, ...m } = n, h = HU({
+var sK = _H((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ? void 0 : `calc(${MV(t)} - ${Z(2)})` } })), cK = MW((e, t) => {
+	let n = Q("InputError", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, attributes: u, __staticSelector: d, __inheritStyles: f = !0, variant: p, ...m } = n, h = qU({
 		name: ["InputWrapper", d],
 		props: n,
-		classes: $G,
+		classes: iK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -45910,8 +46018,8 @@ var nK = fH((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ?
 		attributes: u,
 		rootSelector: "error",
 		vars: c,
-		varsResolver: nK
-	}), g = QG();
+		varsResolver: sK
+	}), g = rK();
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		component: "p",
 		ref: t,
@@ -45924,17 +46032,17 @@ var nK = fH((e, { size: t }) => ({ error: { "--input-error-size": t === void 0 ?
 		...m
 	});
 });
-rK.classes = $G, rK.displayName = "@mantine/core/InputError";
+cK.classes = iK, cK.displayName = "@mantine/core/InputError";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputLabel/InputLabel.mjs
-var iK = { labelElement: "label" }, aK = fH((e, { size: t }) => ({ label: {
-	"--input-label-size": DV(t),
+var lK = { labelElement: "label" }, uK = _H((e, { size: t }) => ({ label: {
+	"--input-label-size": MV(t),
 	"--input-asterisk-color": void 0
-} })), oK = DW((e, t) => {
-	let n = Q("InputLabel", iK, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, labelElement: l, size: u, required: d, htmlFor: f, onMouseDown: p, children: m, __staticSelector: h, variant: g, mod: _, attributes: v, ...y } = Q("InputLabel", iK, n), b = HU({
+} })), dK = MW((e, t) => {
+	let n = Q("InputLabel", lK, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, labelElement: l, size: u, required: d, htmlFor: f, onMouseDown: p, children: m, __staticSelector: h, variant: g, mod: _, attributes: v, ...y } = Q("InputLabel", lK, n), b = qU({
 		name: ["InputWrapper", h],
 		props: n,
-		classes: $G,
+		classes: iK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -45943,8 +46051,8 @@ var iK = { labelElement: "label" }, aK = fH((e, { size: t }) => ({ label: {
 		attributes: v,
 		rootSelector: "label",
 		vars: c,
-		varsResolver: aK
-	}), x = QG(), S = x?.getStyles || b;
+		varsResolver: uK
+	}), x = rK(), S = x?.getStyles || b;
 	return /* @__PURE__ */ (0, G.jsxs)($, {
 		...S("label", x?.getStyles ? {
 			className: i,
@@ -45967,16 +46075,16 @@ var iK = { labelElement: "label" }, aK = fH((e, { size: t }) => ({ label: {
 		})]
 	});
 });
-oK.classes = $G, oK.displayName = "@mantine/core/InputLabel";
+dK.classes = iK, dK.displayName = "@mantine/core/InputLabel";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputPlaceholder/InputPlaceholder.mjs
-var sK = DW((e, t) => {
+var fK = MW((e, t) => {
 	let n = Q("InputPlaceholder", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, __staticSelector: l, variant: u, error: d, mod: f, attributes: p, ...m } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: ["InputPlaceholder", l],
 			props: n,
-			classes: $G,
+			classes: iK,
 			className: i,
 			style: a,
 			classNames: r,
@@ -45992,10 +46100,10 @@ var sK = DW((e, t) => {
 		...m
 	});
 });
-sK.classes = $G, sK.displayName = "@mantine/core/InputPlaceholder";
+fK.classes = iK, fK.displayName = "@mantine/core/InputPlaceholder";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputWrapper/get-input-offsets/get-input-offsets.mjs
-function cK(e, { hasDescription: t, hasError: n }) {
+function pK(e, { hasDescription: t, hasError: n }) {
 	let r = e.findIndex((e) => e === "input"), i = e.slice(0, r), a = e.slice(r + 1), o = t && i.includes("description") || n && i.includes("error");
 	return {
 		offsetBottom: t && a.includes("description") || n && a.includes("error"),
@@ -46004,7 +46112,7 @@ function cK(e, { hasDescription: t, hasError: n }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/InputWrapper/InputWrapper.mjs
-var lK = {
+var mK = {
 	labelElement: "label",
 	inputContainer: (e) => e,
 	inputWrapperOrder: [
@@ -46013,18 +46121,18 @@ var lK = {
 		"input",
 		"error"
 	]
-}, uK = fH((e, { size: t }) => ({
+}, hK = _H((e, { size: t }) => ({
 	label: {
-		"--input-label-size": DV(t),
+		"--input-label-size": MV(t),
 		"--input-asterisk-color": void 0
 	},
-	error: { "--input-error-size": t === void 0 ? void 0 : `calc(${DV(t)} - ${Z(2)})` },
-	description: { "--input-description-size": t === void 0 ? void 0 : `calc(${DV(t)} - ${Z(2)})` }
-})), dK = DW((e, t) => {
-	let n = Q("InputWrapper", lK, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, variant: u, __staticSelector: d, inputContainer: f, inputWrapperOrder: p, label: m, error: h, description: g, labelProps: v, descriptionProps: y, errorProps: b, labelElement: x, children: S, withAsterisk: C, id: w, required: T, __stylesApiProps: E, mod: D, attributes: O, ...k } = n, A = HU({
+	error: { "--input-error-size": t === void 0 ? void 0 : `calc(${MV(t)} - ${Z(2)})` },
+	description: { "--input-description-size": t === void 0 ? void 0 : `calc(${MV(t)} - ${Z(2)})` }
+})), gK = MW((e, t) => {
+	let n = Q("InputWrapper", mK, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, size: l, variant: u, __staticSelector: d, inputContainer: f, inputWrapperOrder: p, label: m, error: h, description: g, labelProps: v, descriptionProps: y, errorProps: b, labelElement: x, children: S, withAsterisk: C, id: w, required: T, __stylesApiProps: E, mod: D, attributes: O, ...k } = n, A = qU({
 		name: ["InputWrapper", d],
 		props: E || n,
-		classes: $G,
+		classes: iK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -46032,12 +46140,12 @@ var lK = {
 		unstyled: s,
 		attributes: O,
 		vars: c,
-		varsResolver: uK
+		varsResolver: hK
 	}), j = {
 		size: l,
 		variant: u,
 		__staticSelector: d
-	}, M = eH(w), ee = typeof C == "boolean" ? C : T, te = b?.id || `${M}-error`, ne = y?.id || `${M}-description`, N = M, P = !!h && typeof h != "boolean", re = !!g, ie = `${P ? te : ""} ${re ? ne : ""}`, F = ie.trim().length > 0 ? ie.trim() : void 0, ae = v?.id || `${M}-label`, oe = m && /* @__PURE__ */ (0, G.jsx)(oK, {
+	}, M = aH(w), ee = typeof C == "boolean" ? C : T, te = b?.id || `${M}-error`, ne = y?.id || `${M}-description`, N = M, P = !!h && typeof h != "boolean", re = !!g, ie = `${P ? te : ""} ${re ? ne : ""}`, F = ie.trim().length > 0 ? ie.trim() : void 0, ae = v?.id || `${M}-label`, oe = m && /* @__PURE__ */ (0, G.jsx)(dK, {
 		labelElement: x,
 		id: ae,
 		htmlFor: N,
@@ -46045,13 +46153,13 @@ var lK = {
 		...j,
 		...v,
 		children: m
-	}, "label"), se = re && /* @__PURE__ */ (0, G.jsx)(tK, {
+	}, "label"), se = re && /* @__PURE__ */ (0, G.jsx)(oK, {
 		...y,
 		...j,
 		size: y?.size || j.size,
 		id: y?.id || ne,
 		children: g
-	}, "description"), ce = /* @__PURE__ */ (0, G.jsx)(_.Fragment, { children: f(S) }, "input"), le = P && /* @__PURE__ */ (0, _.createElement)(rK, {
+	}, "description"), ce = /* @__PURE__ */ (0, G.jsx)(_.Fragment, { children: f(S) }, "input"), le = P && /* @__PURE__ */ (0, _.createElement)(cK, {
 		...b,
 		...j,
 		size: b?.size || j.size,
@@ -46066,13 +46174,13 @@ var lK = {
 			default: return null;
 		}
 	});
-	return /* @__PURE__ */ (0, G.jsx)(ZG, {
+	return /* @__PURE__ */ (0, G.jsx)(nK, {
 		value: {
 			getStyles: A,
 			describedBy: F,
 			inputId: N,
 			labelId: ae,
-			...cK(p, {
+			...pK(p, {
 				hasDescription: re,
 				hasError: P
 			})
@@ -46088,35 +46196,35 @@ var lK = {
 		})
 	});
 });
-dK.classes = $G, dK.displayName = "@mantine/core/InputWrapper";
+gK.classes = iK, gK.displayName = "@mantine/core/InputWrapper";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/Input.mjs
-var fK = {
+var _K = {
 	variant: "default",
 	leftSectionPointerEvents: "none",
 	rightSectionPointerEvents: "none",
 	withAria: !0,
 	withErrorStyles: !0,
 	size: "sm"
-}, pK = fH((e, t, n) => ({ wrapper: {
+}, vK = _H((e, t, n) => ({ wrapper: {
 	"--input-margin-top": n.offsetTop ? "calc(var(--mantine-spacing-xs) / 2)" : void 0,
 	"--input-margin-bottom": n.offsetBottom ? "calc(var(--mantine-spacing-xs) / 2)" : void 0,
-	"--input-height": wV(t.size, "input-height"),
-	"--input-fz": DV(t.size),
-	"--input-radius": t.radius === void 0 ? void 0 : EV(t.radius),
+	"--input-height": kV(t.size, "input-height"),
+	"--input-fz": MV(t.size),
+	"--input-radius": t.radius === void 0 ? void 0 : jV(t.radius),
 	"--input-left-section-width": t.leftSectionWidth === void 0 ? void 0 : Z(t.leftSectionWidth),
 	"--input-right-section-width": t.rightSectionWidth === void 0 ? void 0 : Z(t.rightSectionWidth),
-	"--input-padding-y": t.multiline ? wV(t.size, "input-padding-y") : void 0,
+	"--input-padding-y": t.multiline ? kV(t.size, "input-padding-y") : void 0,
 	"--input-left-section-pointer-events": t.leftSectionPointerEvents,
 	"--input-right-section-pointer-events": t.rightSectionPointerEvents
-} })), mK = OW((e, t) => {
-	let n = Q("Input", fK, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, required: c, __staticSelector: l, __stylesApiProps: u, size: d, wrapperProps: f, error: p, disabled: m, leftSection: h, leftSectionProps: g, leftSectionWidth: _, rightSection: v, rightSectionProps: y, rightSectionWidth: b, rightSectionPointerEvents: x, leftSectionPointerEvents: S, variant: C, vars: w, pointer: T, multiline: E, radius: D, id: O, withAria: k, withErrorStyles: A, mod: j, inputSize: M, attributes: ee, __clearSection: te, __clearable: ne, __defaultRightSection: N, ...P } = n, { styleProps: re, rest: ie } = qU(P), F = QG(), ae = {
+} })), yK = NW((e, t) => {
+	let n = Q("Input", _K, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, required: c, __staticSelector: l, __stylesApiProps: u, size: d, wrapperProps: f, error: p, disabled: m, leftSection: h, leftSectionProps: g, leftSectionWidth: _, rightSection: v, rightSectionProps: y, rightSectionWidth: b, rightSectionPointerEvents: x, leftSectionPointerEvents: S, variant: C, vars: w, pointer: T, multiline: E, radius: D, id: O, withAria: k, withErrorStyles: A, mod: j, inputSize: M, attributes: ee, __clearSection: te, __clearable: ne, __defaultRightSection: N, ...P } = n, { styleProps: re, rest: ie } = QU(P), F = rK(), ae = {
 		offsetBottom: F?.offsetBottom,
 		offsetTop: F?.offsetTop
-	}, oe = HU({
+	}, oe = qU({
 		name: ["Input", l],
 		props: u || n,
-		classes: $G,
+		classes: iK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -46126,21 +46234,21 @@ var fK = {
 		stylesCtx: ae,
 		rootSelector: "wrapper",
 		vars: w,
-		varsResolver: pK
+		varsResolver: vK
 	}), se = k ? {
 		required: c,
 		disabled: m,
 		"aria-invalid": !!p,
 		"aria-describedby": F?.describedBy,
 		id: F?.inputId || O
-	} : {}, ce = XG({
+	} : {}, ce = tK({
 		__clearable: ne,
 		__clearSection: te,
 		rightSection: v,
 		__defaultRightSection: N,
 		size: d
 	});
-	return /* @__PURE__ */ (0, G.jsx)(KG, {
+	return /* @__PURE__ */ (0, G.jsx)(ZG, {
 		value: { size: d || "sm" },
 		children: /* @__PURE__ */ (0, G.jsxs)($, {
 			...oe("wrapper"),
@@ -46193,11 +46301,11 @@ var fK = {
 		})
 	});
 });
-mK.classes = $G, mK.Wrapper = dK, mK.Label = oK, mK.Error = rK, mK.Description = tK, mK.Placeholder = sK, mK.ClearButton = JG, mK.displayName = "@mantine/core/Input";
+yK.classes = iK, yK.Wrapper = gK, yK.Label = dK, yK.Error = cK, yK.Description = oK, yK.Placeholder = fK, yK.ClearButton = $G, yK.displayName = "@mantine/core/Input";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Input/use-input-props.mjs
-function hK(e, t, n) {
-	let r = Q(e, t, n), { label: i, description: a, error: o, required: s, classNames: c, styles: l, className: u, unstyled: d, __staticSelector: f, __stylesApiProps: p, errorProps: m, labelProps: h, descriptionProps: g, wrapperProps: _, id: v, size: y, style: b, inputContainer: x, inputWrapperOrder: S, withAsterisk: C, variant: w, vars: T, mod: E, attributes: D, ...O } = r, { styleProps: k, rest: A } = qU(O), j = {
+function bK(e, t, n) {
+	let r = Q(e, t, n), { label: i, description: a, error: o, required: s, classNames: c, styles: l, className: u, unstyled: d, __staticSelector: f, __stylesApiProps: p, errorProps: m, labelProps: h, descriptionProps: g, wrapperProps: _, id: v, size: y, style: b, inputContainer: x, inputWrapperOrder: S, withAsterisk: C, variant: w, vars: T, mod: E, attributes: D, ...O } = r, { styleProps: k, rest: A } = QU(O), j = {
 		label: i,
 		description: a,
 		error: o,
@@ -46248,28 +46356,28 @@ function hK(e, t, n) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/InputBase/InputBase.mjs
-var gK = {
+var xK = {
 	__staticSelector: "InputBase",
 	withAria: !0,
 	size: "sm"
-}, _K = OW((e, t) => {
-	let { inputProps: n, wrapperProps: r, ...i } = hK("InputBase", gK, e);
-	return /* @__PURE__ */ (0, G.jsx)(mK.Wrapper, {
+}, SK = NW((e, t) => {
+	let { inputProps: n, wrapperProps: r, ...i } = bK("InputBase", xK, e);
+	return /* @__PURE__ */ (0, G.jsx)(yK.Wrapper, {
 		...r,
-		children: /* @__PURE__ */ (0, G.jsx)(mK, {
+		children: /* @__PURE__ */ (0, G.jsx)(yK, {
 			...n,
 			...i,
 			ref: t
 		})
 	});
 });
-_K.classes = {
-	...mK.classes,
-	...mK.Wrapper.classes
-}, _K.displayName = "@mantine/core/InputBase";
+SK.classes = {
+	...yK.classes,
+	...yK.Wrapper.classes
+}, SK.displayName = "@mantine/core/InputBase";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Flex/flex-props.mjs
-var vK = {
+var CK = {
 	gap: {
 		type: "spacing",
 		property: "gap"
@@ -46298,10 +46406,10 @@ var vK = {
 		type: "identity",
 		property: "flexDirection"
 	}
-}, yK = { root: "m_8bffd616" }, bK = OW((e, t) => {
-	let n = Q("Flex", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, gap: l, rowGap: u, columnGap: d, align: f, justify: p, wrap: m, direction: h, attributes: g, ..._ } = n, v = HU({
+}, wK = { root: "m_8bffd616" }, TK = NW((e, t) => {
+	let n = Q("Flex", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, gap: l, rowGap: u, columnGap: d, align: f, justify: p, wrap: m, direction: h, attributes: g, ..._ } = n, v = qU({
 		name: "Flex",
-		classes: yK,
+		classes: wK,
 		props: n,
 		className: i,
 		style: a,
@@ -46310,7 +46418,7 @@ var vK = {
 		unstyled: s,
 		attributes: g,
 		vars: c
-	}), y = iU(), b = gW(), x = hW({
+	}), y = lU(), b = xW(), x = bW({
 		styleProps: {
 			gap: l,
 			rowGap: u,
@@ -46321,9 +46429,9 @@ var vK = {
 			direction: h
 		},
 		theme: y,
-		data: vK
+		data: CK
 	});
-	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [x.hasResponsiveStyles && /* @__PURE__ */ (0, G.jsx)(KU, {
+	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [x.hasResponsiveStyles && /* @__PURE__ */ (0, G.jsx)(ZU, {
 		selector: `.${b}`,
 		styles: x.styles,
 		media: x.media
@@ -46331,15 +46439,15 @@ var vK = {
 		ref: t,
 		...v("root", {
 			className: b,
-			style: lV(x.inlineStyles)
+			style: mV(x.inlineStyles)
 		}),
 		..._
 	})] });
 });
-bK.classes = yK, bK.displayName = "@mantine/core/Flex";
+TK.classes = wK, TK.displayName = "@mantine/core/Flex";
 //#endregion
 //#region node_modules/@mantine/core/esm/utils/Floating/use-delayed-hover.mjs
-function xK({ open: e, close: t, openDelay: n, closeDelay: r }) {
+function EK({ open: e, close: t, openDelay: n, closeDelay: r }) {
 	let i = (0, _.useRef)(-1), a = (0, _.useRef)(-1), o = () => {
 		window.clearTimeout(i.current), window.clearTimeout(a.current);
 	};
@@ -46354,7 +46462,7 @@ function xK({ open: e, close: t, openDelay: n, closeDelay: r }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Accordion/AccordionChevron.mjs
-function SK({ style: e, size: t = 16, ...n }) {
+function DK({ style: e, size: t = 16, ...n }) {
 	return /* @__PURE__ */ (0, G.jsx)("svg", {
 		viewBox: "0 0 15 15",
 		fill: "none",
@@ -46374,29 +46482,29 @@ function SK({ style: e, size: t = 16, ...n }) {
 		})
 	});
 }
-SK.displayName = "@mantine/core/AccordionChevron";
+DK.displayName = "@mantine/core/AccordionChevron";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Text/Text.module.css.mjs
-var CK = { root: "m_b6d8b162" };
+var OK = { root: "m_b6d8b162" };
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Text/Text.mjs
-function wK(e) {
+function kK(e) {
 	if (e === "start") return "start";
 	if (e === "end" || e) return "end";
 }
-var TK = { inherit: !1 }, EK = fH((e, { variant: t, lineClamp: n, gradient: r, size: i, color: a }) => ({ root: {
-	"--text-fz": DV(i),
-	"--text-lh": OV(i),
-	"--text-gradient": t === "gradient" ? HH(r, e) : void 0,
+var AK = { inherit: !1 }, jK = _H((e, { variant: t, lineClamp: n, gradient: r, size: i, color: a }) => ({ root: {
+	"--text-fz": MV(i),
+	"--text-lh": NV(i),
+	"--text-gradient": t === "gradient" ? qH(r, e) : void 0,
 	"--text-line-clamp": typeof n == "number" ? n.toString() : void 0,
-	"--text-color": a ? VH(a, e) : void 0
-} })), DK = OW((e, t) => {
-	let n = Q("Text", TK, e), { lineClamp: r, truncate: i, inline: a, inherit: o, gradient: s, span: c, __staticSelector: l, vars: u, className: d, style: f, classNames: p, styles: m, unstyled: h, variant: g, mod: _, size: v, attributes: y, ...b } = n;
+	"--text-color": a ? KH(a, e) : void 0
+} })), MK = NW((e, t) => {
+	let n = Q("Text", AK, e), { lineClamp: r, truncate: i, inline: a, inherit: o, gradient: s, span: c, __staticSelector: l, vars: u, className: d, style: f, classNames: p, styles: m, unstyled: h, variant: g, mod: _, size: v, attributes: y, ...b } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: ["Text", l],
 			props: n,
-			classes: CK,
+			classes: OK,
 			className: d,
 			style: f,
 			classNames: p,
@@ -46404,13 +46512,13 @@ var TK = { inherit: !1 }, EK = fH((e, { variant: t, lineClamp: n, gradient: r, s
 			unstyled: h,
 			attributes: y,
 			vars: u,
-			varsResolver: EK
+			varsResolver: jK
 		})("root", { focusable: !0 }),
 		ref: t,
 		component: c ? "span" : "p",
 		variant: g,
 		mod: [{
-			"data-truncate": wK(i),
+			"data-truncate": kK(i),
 			"data-line-clamp": typeof r == "number",
 			"data-inline": a,
 			"data-inherit": o
@@ -46419,10 +46527,10 @@ var TK = { inherit: !1 }, EK = fH((e, { variant: t, lineClamp: n, gradient: r, s
 		...b
 	});
 });
-DK.classes = CK, DK.displayName = "@mantine/core/Text";
+MK.classes = OK, MK.displayName = "@mantine/core/Text";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Checkbox/CheckIcon.mjs
-function OK({ size: e, style: t, ...n }) {
+function NK({ size: e, style: t, ...n }) {
 	return /* @__PURE__ */ (0, G.jsx)("svg", {
 		viewBox: "0 0 10 7",
 		fill: "none",
@@ -46444,26 +46552,26 @@ function OK({ size: e, style: t, ...n }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/AvatarGroup/AvatarGroup.context.mjs
-var kK = (0, _.createContext)(null), AK = kK.Provider;
-function jK() {
-	return { withinGroup: !!(0, _.useContext)(kK) };
+var PK = (0, _.createContext)(null), FK = PK.Provider;
+function IK() {
+	return { withinGroup: !!(0, _.useContext)(PK) };
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/Avatar.module.css.mjs
-var MK = {
+var LK = {
 	group: "m_11def92b",
 	root: "m_f85678b6",
 	image: "m_11f8ac07",
 	placeholder: "m_104cd71f"
-}, NK = fH((e, { spacing: t }) => ({ group: { "--ag-spacing": TV(t) } })), PK = DW((e, t) => {
+}, RK = _H((e, { spacing: t }) => ({ group: { "--ag-spacing": AV(t) } })), zK = MW((e, t) => {
 	let n = Q("AvatarGroup", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, spacing: l, attributes: u, ...d } = n;
-	return /* @__PURE__ */ (0, G.jsx)(AK, {
+	return /* @__PURE__ */ (0, G.jsx)(FK, {
 		value: !0,
 		children: /* @__PURE__ */ (0, G.jsx)($, {
 			ref: t,
-			...HU({
+			...qU({
 				name: "AvatarGroup",
-				classes: MK,
+				classes: LK,
 				props: n,
 				className: i,
 				style: a,
@@ -46472,17 +46580,17 @@ var MK = {
 				unstyled: s,
 				attributes: u,
 				vars: c,
-				varsResolver: NK,
+				varsResolver: RK,
 				rootSelector: "group"
 			})("group"),
 			...d
 		})
 	});
 });
-PK.classes = MK, PK.displayName = "@mantine/core/AvatarGroup";
+zK.classes = LK, zK.displayName = "@mantine/core/AvatarGroup";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/AvatarPlaceholderIcon.mjs
-function FK(e) {
+function BK(e) {
 	return /* @__PURE__ */ (0, G.jsx)("svg", {
 		...e,
 		"data-avatar-placeholder-icon": !0,
@@ -46499,7 +46607,7 @@ function FK(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/get-initials-color/get-initials-color.mjs
-function IK(e) {
+function VK(e) {
 	let t = 0;
 	for (let n = 0; n < e.length; n += 1) {
 		let r = e.charCodeAt(n);
@@ -46507,7 +46615,7 @@ function IK(e) {
 	}
 	return t;
 }
-var LK = [
+var HK = [
 	"blue",
 	"cyan",
 	"grape",
@@ -46520,20 +46628,20 @@ var LK = [
 	"teal",
 	"violet"
 ];
-function RK(e, t = LK) {
-	let n = IK(e);
+function UK(e, t = HK) {
+	let n = VK(e);
 	return t[Math.abs(n) % t.length];
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/get-initials/get-initials.mjs
-function zK(e, t = 2) {
+function WK(e, t = 2) {
 	let n = e.split(" ");
 	return n.length === 1 ? e.slice(0, t).toUpperCase() : n.map((e) => e[0]).slice(0, t).join("").toUpperCase();
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Avatar/Avatar.mjs
-var BK = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o, name: s, allowedInitialsColors: c }) => {
-	let l = a === "initials" && typeof s == "string" ? RK(s, c) : a, u = e.variantColorResolver({
+var GK = _H((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoContrast: o, name: s, allowedInitialsColors: c }) => {
+	let l = a === "initials" && typeof s == "string" ? UK(s, c) : a, u = e.variantColorResolver({
 		color: l || "gray",
 		theme: e,
 		gradient: i,
@@ -46541,17 +46649,17 @@ var BK = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		autoContrast: o
 	});
 	return { root: {
-		"--avatar-size": wV(t, "avatar-size"),
-		"--avatar-radius": n === void 0 ? void 0 : EV(n),
+		"--avatar-size": kV(t, "avatar-size"),
+		"--avatar-radius": n === void 0 ? void 0 : jV(n),
 		"--avatar-bg": l || r ? u.background : void 0,
 		"--avatar-color": l || r ? u.color : void 0,
 		"--avatar-bd": l || r ? u.border : void 0
 	} };
-}), VK = OW((e, t) => {
-	let n = Q("Avatar", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, src: l, alt: u, radius: d, color: f, gradient: p, imageProps: m, children: h, autoContrast: g, mod: v, name: y, allowedInitialsColors: b, attributes: x, ...S } = n, C = jK(), [w, T] = (0, _.useState)(!l), E = HU({
+}), KK = NW((e, t) => {
+	let n = Q("Avatar", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, src: l, alt: u, radius: d, color: f, gradient: p, imageProps: m, children: h, autoContrast: g, mod: v, name: y, allowedInitialsColors: b, attributes: x, ...S } = n, C = IK(), [w, T] = (0, _.useState)(!l), E = qU({
 		name: "Avatar",
 		props: n,
-		classes: MK,
+		classes: LK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -46559,7 +46667,7 @@ var BK = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		unstyled: s,
 		attributes: x,
 		vars: c,
-		varsResolver: BK
+		varsResolver: GK
 	});
 	return (0, _.useEffect)(() => T(!l), [l]), /* @__PURE__ */ (0, G.jsx)($, {
 		...E("root"),
@@ -46569,7 +46677,7 @@ var BK = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		children: w || !l ? /* @__PURE__ */ (0, G.jsx)("span", {
 			...E("placeholder"),
 			title: u,
-			children: h || typeof y == "string" && zK(y) || /* @__PURE__ */ (0, G.jsx)(FK, {})
+			children: h || typeof y == "string" && WK(y) || /* @__PURE__ */ (0, G.jsx)(BK, {})
 		}) : /* @__PURE__ */ (0, G.jsx)("img", {
 			...m,
 			...E("image"),
@@ -46581,15 +46689,15 @@ var BK = fH((e, { size: t, radius: n, variant: r, gradient: i, color: a, autoCon
 		})
 	});
 });
-VK.classes = MK, VK.displayName = "@mantine/core/Avatar", VK.Group = PK;
+KK.classes = LK, KK.displayName = "@mantine/core/Avatar", KK.Group = zK;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Badge/Badge.module.css.mjs
-var HK = {
+var qK = {
 	root: "m_347db0ec",
 	"root--dot": "m_fbd81e3d",
 	label: "m_5add502a",
 	section: "m_91fdda9b"
-}, UK = fH((e, { radius: t, color: n, gradient: r, variant: i, size: a, autoContrast: o, circle: s }) => {
+}, JK = _H((e, { radius: t, color: n, gradient: r, variant: i, size: a, autoContrast: o, circle: s }) => {
 	let c = e.variantColorResolver({
 		color: n || e.primaryColor,
 		theme: e,
@@ -46598,20 +46706,20 @@ var HK = {
 		autoContrast: o
 	});
 	return { root: {
-		"--badge-height": wV(a, "badge-height"),
-		"--badge-padding-x": wV(a, "badge-padding-x"),
-		"--badge-fz": wV(a, "badge-fz"),
-		"--badge-radius": s || t === void 0 ? void 0 : EV(t),
+		"--badge-height": kV(a, "badge-height"),
+		"--badge-padding-x": kV(a, "badge-padding-x"),
+		"--badge-fz": kV(a, "badge-fz"),
+		"--badge-radius": s || t === void 0 ? void 0 : jV(t),
 		"--badge-bg": n || i ? c.background : void 0,
 		"--badge-color": n || i ? c.color : void 0,
 		"--badge-bd": n || i ? c.border : void 0,
-		"--badge-dot-color": i === "dot" ? VH(n, e) : void 0
+		"--badge-dot-color": i === "dot" ? KH(n, e) : void 0
 	} };
-}), WK = OW((e, t) => {
-	let n = Q("Badge", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, radius: l, color: u, gradient: d, leftSection: f, rightSection: p, children: m, variant: h, fullWidth: g, autoContrast: _, circle: v, mod: y, attributes: b, ...x } = n, S = HU({
+}), YK = NW((e, t) => {
+	let n = Q("Badge", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, radius: l, color: u, gradient: d, leftSection: f, rightSection: p, children: m, variant: h, fullWidth: g, autoContrast: _, circle: v, mod: y, attributes: b, ...x } = n, S = qU({
 		name: "Badge",
 		props: n,
-		classes: HK,
+		classes: qK,
 		className: i,
 		style: a,
 		classNames: r,
@@ -46619,7 +46727,7 @@ var HK = {
 		unstyled: s,
 		attributes: b,
 		vars: c,
-		varsResolver: UK
+		varsResolver: JK
 	});
 	return /* @__PURE__ */ (0, G.jsxs)($, {
 		variant: h,
@@ -46650,10 +46758,10 @@ var HK = {
 		]
 	});
 });
-WK.classes = HK, WK.displayName = "@mantine/core/Badge";
+YK.classes = qK, YK.displayName = "@mantine/core/Badge";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Button/Button.module.css.mjs
-var GK = {
+var XK = {
 	root: "m_77c9d27d",
 	inner: "m_80f1301b",
 	label: "m_811560b9",
@@ -46661,13 +46769,13 @@ var GK = {
 	loader: "m_a25b86ee",
 	group: "m_80d6d844",
 	groupSection: "m_70be2a01"
-}, KK = { orientation: "horizontal" }, qK = fH((e, { borderWidth: t }) => ({ group: { "--button-border-width": Z(t) } })), JK = DW((e, t) => {
-	let n = Q("ButtonGroup", KK, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, orientation: c, vars: l, borderWidth: u, variant: d, mod: f, attributes: p, ...m } = Q("ButtonGroup", KK, e);
+}, ZK = { orientation: "horizontal" }, QK = _H((e, { borderWidth: t }) => ({ group: { "--button-border-width": Z(t) } })), $K = MW((e, t) => {
+	let n = Q("ButtonGroup", ZK, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, orientation: c, vars: l, borderWidth: u, variant: d, mod: f, attributes: p, ...m } = Q("ButtonGroup", ZK, e);
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: "ButtonGroup",
 			props: n,
-			classes: GK,
+			classes: XK,
 			className: r,
 			style: i,
 			classNames: a,
@@ -46675,7 +46783,7 @@ var GK = {
 			unstyled: s,
 			attributes: p,
 			vars: l,
-			varsResolver: qK,
+			varsResolver: QK,
 			rootSelector: "group"
 		})("group"),
 		ref: t,
@@ -46685,10 +46793,10 @@ var GK = {
 		...m
 	});
 });
-JK.classes = GK, JK.displayName = "@mantine/core/ButtonGroup";
+$K.classes = XK, $K.displayName = "@mantine/core/ButtonGroup";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Button/ButtonGroupSection/ButtonGroupSection.mjs
-var YK = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
+var eq = _H((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a, size: o }) => {
 	let s = e.variantColorResolver({
 		color: n || e.primaryColor,
 		theme: e,
@@ -46697,21 +46805,21 @@ var YK = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 		autoContrast: a
 	});
 	return { groupSection: {
-		"--section-height": wV(o, "section-height"),
-		"--section-padding-x": wV(o, "section-padding-x"),
-		"--section-fz": o?.includes("compact") ? DV(o.replace("compact-", "")) : DV(o),
-		"--section-radius": t === void 0 ? void 0 : EV(t),
+		"--section-height": kV(o, "section-height"),
+		"--section-padding-x": kV(o, "section-padding-x"),
+		"--section-fz": o?.includes("compact") ? MV(o.replace("compact-", "")) : MV(o),
+		"--section-radius": t === void 0 ? void 0 : jV(t),
 		"--section-bg": n || i ? s.background : void 0,
 		"--section-color": s.color,
 		"--section-bd": n || i ? s.border : void 0
 	} };
-}), XK = DW((e, t) => {
+}), tq = MW((e, t) => {
 	let n = Q("ButtonGroupSection", null, e), { className: r, style: i, classNames: a, styles: o, unstyled: s, vars: c, variant: l, gradient: u, radius: d, autoContrast: f, attributes: p, ...m } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
-		...HU({
+		...qU({
 			name: "ButtonGroupSection",
 			props: n,
-			classes: GK,
+			classes: XK,
 			className: r,
 			style: i,
 			classNames: a,
@@ -46719,7 +46827,7 @@ var YK = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 			unstyled: s,
 			attributes: p,
 			vars: c,
-			varsResolver: YK,
+			varsResolver: eq,
 			rootSelector: "groupSection"
 		})("groupSection"),
 		ref: t,
@@ -46727,10 +46835,10 @@ var YK = fH((e, { radius: t, color: n, gradient: r, variant: i, autoContrast: a,
 		...m
 	});
 });
-XK.classes = GK, XK.displayName = "@mantine/core/ButtonGroupSection";
+tq.classes = XK, tq.displayName = "@mantine/core/ButtonGroupSection";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Button/Button.mjs
-var ZK = {
+var nq = {
 	in: {
 		opacity: 1,
 		transform: `translate(-50%, calc(-50% + ${Z(1)}))`
@@ -46741,7 +46849,7 @@ var ZK = {
 	},
 	common: { transformOrigin: "center" },
 	transitionProperty: "transform, opacity"
-}, QK = fH((e, { radius: t, color: n, gradient: r, variant: i, size: a, justify: o, autoContrast: s }) => {
+}, rq = _H((e, { radius: t, color: n, gradient: r, variant: i, size: a, justify: o, autoContrast: s }) => {
 	let c = e.variantColorResolver({
 		color: n || e.primaryColor,
 		theme: e,
@@ -46751,21 +46859,21 @@ var ZK = {
 	});
 	return { root: {
 		"--button-justify": o,
-		"--button-height": wV(a, "button-height"),
-		"--button-padding-x": wV(a, "button-padding-x"),
-		"--button-fz": a?.includes("compact") ? DV(a.replace("compact-", "")) : DV(a),
-		"--button-radius": t === void 0 ? void 0 : EV(t),
+		"--button-height": kV(a, "button-height"),
+		"--button-padding-x": kV(a, "button-padding-x"),
+		"--button-fz": a?.includes("compact") ? MV(a.replace("compact-", "")) : MV(a),
+		"--button-radius": t === void 0 ? void 0 : jV(t),
 		"--button-bg": n || i ? c.background : void 0,
 		"--button-hover": n || i ? c.hover : void 0,
 		"--button-color": c.color,
 		"--button-bd": n || i ? c.border : void 0,
 		"--button-hover-color": n || i ? c.hoverColor : void 0
 	} };
-}), $K = OW((e, t) => {
-	let n = Q("Button", null, e), { style: r, vars: i, className: a, color: o, disabled: s, children: c, leftSection: l, rightSection: u, fullWidth: d, variant: f, radius: p, loading: m, loaderProps: h, gradient: g, classNames: _, styles: v, unstyled: y, "data-disabled": b, autoContrast: x, mod: S, attributes: C, ...w } = n, T = HU({
+}), iq = NW((e, t) => {
+	let n = Q("Button", null, e), { style: r, vars: i, className: a, color: o, disabled: s, children: c, leftSection: l, rightSection: u, fullWidth: d, variant: f, radius: p, loading: m, loaderProps: h, gradient: g, classNames: _, styles: v, unstyled: y, "data-disabled": b, autoContrast: x, mod: S, attributes: C, ...w } = n, T = qU({
 		name: "Button",
 		props: n,
-		classes: GK,
+		classes: XK,
 		className: a,
 		style: r,
 		classNames: _,
@@ -46773,9 +46881,9 @@ var ZK = {
 		unstyled: y,
 		attributes: C,
 		vars: i,
-		varsResolver: QK
+		varsResolver: rq
 	}), E = !!l, D = !!u;
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		ref: t,
 		...T("root", { active: !s && !m && !b }),
 		unstyled: y,
@@ -46789,15 +46897,15 @@ var ZK = {
 			"with-right-section": D
 		}, S],
 		...w,
-		children: [typeof m == "boolean" && /* @__PURE__ */ (0, G.jsx)(aG, {
+		children: [typeof m == "boolean" && /* @__PURE__ */ (0, G.jsx)(uG, {
 			mounted: m,
-			transition: ZK,
+			transition: nq,
 			duration: 150,
 			children: (e) => /* @__PURE__ */ (0, G.jsx)($, {
 				component: "span",
 				...T("loader", { style: e }),
 				"aria-hidden": !0,
-				children: /* @__PURE__ */ (0, G.jsx)(DG, {
+				children: /* @__PURE__ */ (0, G.jsx)(MG, {
 					color: "var(--button-color)",
 					size: "calc(var(--button-height) / 1.8)",
 					...h
@@ -46828,14 +46936,14 @@ var ZK = {
 		})]
 	});
 });
-$K.classes = GK, $K.displayName = "@mantine/core/Button", $K.Group = JK, $K.GroupSection = XK;
+iq.classes = XK, iq.displayName = "@mantine/core/Button", iq.Group = $K, iq.GroupSection = tq;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Card/Card.context.mjs
-var [eq, tq] = fV("Card component was not found in tree"), nq = {
+var [aq, oq] = _V("Card component was not found in tree"), sq = {
 	root: "m_e615b15f",
 	section: "m_599a2148"
-}, rq = OW((e, t) => {
-	let { classNames: n, className: r, style: i, styles: a, vars: o, withBorder: s, inheritPadding: c, mod: l, ...u } = Q("CardSection", null, e), d = tq();
+}, cq = NW((e, t) => {
+	let { classNames: n, className: r, style: i, styles: a, vars: o, withBorder: s, inheritPadding: c, mod: l, ...u } = Q("CardSection", null, e), d = oq();
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
 		mod: [{
@@ -46851,14 +46959,14 @@ var [eq, tq] = fV("Card component was not found in tree"), nq = {
 		...u
 	});
 });
-rq.classes = nq, rq.displayName = "@mantine/core/CardSection";
+cq.classes = sq, cq.displayName = "@mantine/core/CardSection";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Card/Card.mjs
-var iq = fH((e, { padding: t }) => ({ root: { "--card-padding": TV(t) } })), aq = OW((e, t) => {
-	let n = Q("Card", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, children: l, padding: u, attributes: d, ...f } = n, p = HU({
+var lq = _H((e, { padding: t }) => ({ root: { "--card-padding": AV(t) } })), uq = NW((e, t) => {
+	let n = Q("Card", null, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, children: l, padding: u, attributes: d, ...f } = n, p = qU({
 		name: "Card",
 		props: n,
-		classes: nq,
+		classes: sq,
 		className: i,
 		style: a,
 		classNames: r,
@@ -46866,14 +46974,14 @@ var iq = fH((e, { padding: t }) => ({ root: { "--card-padding": TV(t) } })), aq 
 		unstyled: s,
 		attributes: d,
 		vars: c,
-		varsResolver: iq
-	}), m = _.Children.toArray(l), h = m.map((e, t) => typeof e == "object" && e && "type" in e && e.type === rq ? (0, _.cloneElement)(e, {
+		varsResolver: lq
+	}), m = _.Children.toArray(l), h = m.map((e, t) => typeof e == "object" && e && "type" in e && e.type === cq ? (0, _.cloneElement)(e, {
 		"data-first-section": t === 0 || void 0,
 		"data-last-section": t === m.length - 1 || void 0
 	}) : e);
-	return /* @__PURE__ */ (0, G.jsx)(eq, {
+	return /* @__PURE__ */ (0, G.jsx)(aq, {
 		value: { getStyles: p },
-		children: /* @__PURE__ */ (0, G.jsx)(RW, {
+		children: /* @__PURE__ */ (0, G.jsx)(UW, {
 			ref: t,
 			unstyled: s,
 			...p("root"),
@@ -46882,20 +46990,20 @@ var iq = fH((e, { padding: t }) => ({ root: { "--card-padding": TV(t) } })), aq 
 		})
 	});
 });
-aq.classes = nq, aq.displayName = "@mantine/core/Card", aq.Section = rq;
+uq.classes = sq, uq.displayName = "@mantine/core/Card", uq.Section = cq;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Chip/ChipGroup.context.mjs
-var [oq, sq] = pV();
+var [dq, fq] = vV();
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Chip/ChipGroup/ChipGroup.mjs
-function cq(e) {
-	let { value: t, defaultValue: n, onChange: r, multiple: i, children: a } = Q("ChipGroup", null, e), [o, s] = iH({
+function pq(e) {
+	let { value: t, defaultValue: n, onChange: r, multiple: i, children: a } = Q("ChipGroup", null, e), [o, s] = lH({
 		value: t,
 		defaultValue: n,
 		finalValue: i ? [] : null,
 		onChange: r
 	});
-	return /* @__PURE__ */ (0, G.jsx)(oq, {
+	return /* @__PURE__ */ (0, G.jsx)(dq, {
 		value: {
 			isChipSelected: (e) => Array.isArray(o) ? o.includes(e) : e === o,
 			onChange: (e) => {
@@ -46907,10 +47015,10 @@ function cq(e) {
 		children: a
 	});
 }
-cq.displayName = "@mantine/core/ChipGroup";
+pq.displayName = "@mantine/core/ChipGroup";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Chip/Chip.module.css.mjs
-var lq = {
+var mq = {
 	root: "m_f59ffda3",
 	label: "m_be049a53",
 	"label--outline": "m_3904c1af",
@@ -46919,7 +47027,7 @@ var lq = {
 	iconWrapper: "m_9ac86df9",
 	checkIcon: "m_d6d72580",
 	input: "m_bde07329"
-}, uq = { type: "checkbox" }, dq = fH((e, { size: t, radius: n, variant: r, color: i, autoContrast: a }) => {
+}, hq = { type: "checkbox" }, gq = _H((e, { size: t, radius: n, variant: r, color: i, autoContrast: a }) => {
 	let o = e.variantColorResolver({
 		color: i || e.primaryColor,
 		theme: e,
@@ -46927,22 +47035,22 @@ var lq = {
 		autoContrast: a
 	});
 	return { root: {
-		"--chip-fz": DV(t),
-		"--chip-size": wV(t, "chip-size"),
-		"--chip-radius": n === void 0 ? void 0 : EV(n),
-		"--chip-checked-padding": wV(t, "chip-checked-padding"),
-		"--chip-padding": wV(t, "chip-padding"),
-		"--chip-icon-size": wV(t, "chip-icon-size"),
+		"--chip-fz": MV(t),
+		"--chip-size": kV(t, "chip-size"),
+		"--chip-radius": n === void 0 ? void 0 : jV(n),
+		"--chip-checked-padding": kV(t, "chip-checked-padding"),
+		"--chip-padding": kV(t, "chip-padding"),
+		"--chip-icon-size": kV(t, "chip-icon-size"),
 		"--chip-bg": i || r ? o.background : void 0,
 		"--chip-hover": i || r ? o.hover : void 0,
 		"--chip-color": i || r ? o.color : void 0,
 		"--chip-bd": i || r ? o.border : void 0,
-		"--chip-spacing": wV(t, "chip-spacing")
+		"--chip-spacing": kV(t, "chip-spacing")
 	} };
-}), fq = DW((e, t) => {
-	let n = Q("Chip", uq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, id: l, checked: u, defaultChecked: d, onChange: f, value: p, wrapperProps: m, type: h, disabled: g, children: _, size: v, variant: y, icon: b, rootRef: x, autoContrast: S, mod: C, attributes: w, ...T } = n, E = HU({
+}), _q = MW((e, t) => {
+	let n = Q("Chip", hq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, id: l, checked: u, defaultChecked: d, onChange: f, value: p, wrapperProps: m, type: h, disabled: g, children: _, size: v, variant: y, icon: b, rootRef: x, autoContrast: S, mod: C, attributes: w, ...T } = n, E = qU({
 		name: "Chip",
-		classes: lq,
+		classes: mq,
 		props: n,
 		className: i,
 		style: a,
@@ -46951,8 +47059,8 @@ var lq = {
 		unstyled: s,
 		attributes: w,
 		vars: c,
-		varsResolver: dq
-	}), D = sq(), O = eH(l), { styleProps: k, rest: A } = qU(T), [j, M] = iH({
+		varsResolver: gq
+	}), D = fq(), O = aH(l), { styleProps: k, rest: A } = QU(T), [j, M] = lH({
 		value: u,
 		defaultValue: d,
 		finalValue: !1,
@@ -46990,25 +47098,25 @@ var lq = {
 			...E("label", { variant: y || "filled" }),
 			children: [te && b !== null && b !== !1 && /* @__PURE__ */ (0, G.jsx)("span", {
 				...E("iconWrapper"),
-				children: b === void 0 ? /* @__PURE__ */ (0, G.jsx)(OK, { ...E("checkIcon") }) : b
+				children: b === void 0 ? /* @__PURE__ */ (0, G.jsx)(NK, { ...E("checkIcon") }) : b
 			}), /* @__PURE__ */ (0, G.jsx)("span", { children: _ })]
 		})]
 	});
 });
-fq.classes = lq, fq.displayName = "@mantine/core/Chip", fq.Group = cq;
+_q.classes = mq, _q.displayName = "@mantine/core/Chip", _q.Group = pq;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Divider/Divider.module.css.mjs
-var pq = {
+var vq = {
 	root: "m_3eebeb36",
 	label: "m_9e365f20"
-}, mq = { orientation: "horizontal" }, hq = fH((e, { color: t, variant: n, size: r }) => ({ root: {
-	"--divider-color": t ? VH(t, e) : void 0,
+}, yq = { orientation: "horizontal" }, bq = _H((e, { color: t, variant: n, size: r }) => ({ root: {
+	"--divider-color": t ? KH(t, e) : void 0,
 	"--divider-border-style": n,
-	"--divider-size": wV(r, "divider-size")
-} })), gq = DW((e, t) => {
-	let n = Q("Divider", mq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, color: l, orientation: u, label: d, labelPosition: f, mod: p, attributes: m, ...h } = n, g = HU({
+	"--divider-size": kV(r, "divider-size")
+} })), xq = MW((e, t) => {
+	let n = Q("Divider", yq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, color: l, orientation: u, label: d, labelPosition: f, mod: p, attributes: m, ...h } = n, g = qU({
 		name: "Divider",
-		classes: pq,
+		classes: vq,
 		props: n,
 		className: i,
 		style: a,
@@ -47017,7 +47125,7 @@ var pq = {
 		unstyled: s,
 		attributes: m,
 		vars: c,
-		varsResolver: hq
+		varsResolver: bq
 	});
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
@@ -47036,14 +47144,14 @@ var pq = {
 		})
 	});
 });
-gq.classes = pq, gq.displayName = "@mantine/core/Divider";
+xq.classes = vq, xq.displayName = "@mantine/core/Divider";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/FileButton/FileButton.mjs
-var _q = { multiple: !1 }, vq = (0, _.forwardRef)((e, t) => {
-	let { onChange: n, children: r, multiple: i, accept: a, name: o, form: s, resetRef: c, disabled: l, capture: u, inputProps: d, ...f } = Q("FileButton", _q, e), p = (0, _.useRef)(null), m = () => {
+var Sq = { multiple: !1 }, Cq = (0, _.forwardRef)((e, t) => {
+	let { onChange: n, children: r, multiple: i, accept: a, name: o, form: s, resetRef: c, disabled: l, capture: u, inputProps: d, ...f } = Q("FileButton", Sq, e), p = (0, _.useRef)(null), m = () => {
 		!l && p.current?.click();
 	};
-	return tH(c, () => {
+	return oH(c, () => {
 		p.current && (p.current.value = "");
 	}), /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)("input", {
 		style: { display: "none" },
@@ -47054,7 +47162,7 @@ var _q = { multiple: !1 }, vq = (0, _.forwardRef)((e, t) => {
 			if (e.currentTarget.files === null) return n(i ? [] : null);
 			n(i ? Array.from(e.currentTarget.files) : e.currentTarget.files[0] || null);
 		},
-		ref: rH(t, p),
+		ref: cH(t, p),
 		name: o,
 		form: s,
 		capture: u,
@@ -47064,8 +47172,8 @@ var _q = { multiple: !1 }, vq = (0, _.forwardRef)((e, t) => {
 		...f
 	})] });
 });
-vq.displayName = "@mantine/core/FileButton";
-var yq = {
+Cq.displayName = "@mantine/core/FileButton";
+var wq = {
 	valueComponent: ({ value: e }) => /* @__PURE__ */ (0, G.jsx)("div", {
 		style: {
 			overflow: "hidden",
@@ -47075,17 +47183,17 @@ var yq = {
 		children: Array.isArray(e) ? e.map((e) => e.name).join(", ") : e?.name
 	}),
 	size: "sm"
-}, bq = DW((e, t) => {
-	let n = Q("FileInput", yq, e), { unstyled: r, vars: i, onChange: a, value: o, defaultValue: s, multiple: c, accept: l, name: u, form: d, valueComponent: f, clearable: p, clearButtonProps: m, readOnly: h, capture: g, fileInputProps: v, rightSection: y, size: b, placeholder: x, component: S, resetRef: C, classNames: w, styles: T, attributes: E, ...D } = n, O = (0, _.useRef)(null), { resolvedClassNames: k, resolvedStyles: A } = TU({
+}, Tq = MW((e, t) => {
+	let n = Q("FileInput", wq, e), { unstyled: r, vars: i, onChange: a, value: o, defaultValue: s, multiple: c, accept: l, name: u, form: d, valueComponent: f, clearable: p, clearButtonProps: m, readOnly: h, capture: g, fileInputProps: v, rightSection: y, size: b, placeholder: x, component: S, resetRef: C, classNames: w, styles: T, attributes: E, ...D } = n, O = (0, _.useRef)(null), { resolvedClassNames: k, resolvedStyles: A } = AU({
 		classNames: w,
 		styles: T,
 		props: n
-	}), [j, M] = iH({
+	}), [j, M] = lH({
 		value: o,
 		defaultValue: s,
 		onChange: a,
 		finalValue: c ? [] : null
-	}), ee = Array.isArray(j) ? j.length !== 0 : j !== null, te = y || (p && ee && !h ? /* @__PURE__ */ (0, G.jsx)(BG, {
+	}), ee = Array.isArray(j) ? j.length !== 0 : j !== null, te = y || (p && ee && !h ? /* @__PURE__ */ (0, G.jsx)(GG, {
 		...m,
 		variant: "subtle",
 		onClick: () => M(c ? [] : null),
@@ -47094,17 +47202,17 @@ var yq = {
 	}) : null);
 	return (0, _.useEffect)(() => {
 		(Array.isArray(j) && j.length === 0 || j === null) && O.current?.();
-	}, [j]), /* @__PURE__ */ (0, G.jsx)(vq, {
+	}, [j]), /* @__PURE__ */ (0, G.jsx)(Cq, {
 		onChange: M,
 		multiple: c,
 		accept: l,
 		name: u,
 		form: d,
-		resetRef: rH(O, C),
+		resetRef: cH(O, C),
 		disabled: h,
 		capture: g,
 		inputProps: v,
-		children: (e) => /* @__PURE__ */ (0, G.jsx)(_K, {
+		children: (e) => /* @__PURE__ */ (0, G.jsx)(SK, {
 			component: S || "button",
 			ref: t,
 			rightSection: te,
@@ -47120,7 +47228,7 @@ var yq = {
 			classNames: w,
 			styles: T,
 			attributes: E,
-			children: ee ? /* @__PURE__ */ (0, G.jsx)(f, { value: j }) : /* @__PURE__ */ (0, G.jsx)(mK.Placeholder, {
+			children: ee ? /* @__PURE__ */ (0, G.jsx)(f, { value: j }) : /* @__PURE__ */ (0, G.jsx)(yK.Placeholder, {
 				__staticSelector: "FileInput",
 				classNames: k,
 				styles: A,
@@ -47130,22 +47238,22 @@ var yq = {
 		})
 	});
 });
-bq.classes = _K.classes, bq.displayName = "@mantine/core/FileInput";
-var xq = bq, Sq = {
+Tq.classes = SK.classes, Tq.displayName = "@mantine/core/FileInput";
+var Eq = Tq, Dq = {
 	root: "m_6e45937b",
 	loader: "m_e8eb006c",
 	overlay: "m_df587f17"
-}, Cq = {
+}, Oq = {
 	transitionProps: {
 		transition: "fade",
 		duration: 0
 	},
 	overlayProps: { backgroundOpacity: .75 },
-	zIndex: xV("overlay")
-}, wq = fH((e, { zIndex: t }) => ({ root: { "--lo-z-index": t?.toString() } })), Tq = DW((e, t) => {
-	let n = Q("LoadingOverlay", Cq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, transitionProps: l, loaderProps: u, overlayProps: d, visible: f, zIndex: p, attributes: m, ...h } = n, g = iU(), _ = HU({
+	zIndex: EV("overlay")
+}, kq = _H((e, { zIndex: t }) => ({ root: { "--lo-z-index": t?.toString() } })), Aq = MW((e, t) => {
+	let n = Q("LoadingOverlay", Oq, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, transitionProps: l, loaderProps: u, overlayProps: d, visible: f, zIndex: p, attributes: m, ...h } = n, g = lU(), _ = qU({
 		name: "LoadingOverlay",
-		classes: Sq,
+		classes: Dq,
 		props: n,
 		className: i,
 		style: a,
@@ -47154,12 +47262,12 @@ var xq = bq, Sq = {
 		unstyled: s,
 		attributes: m,
 		vars: c,
-		varsResolver: wq
+		varsResolver: kq
 	}), v = {
-		...Cq.overlayProps,
+		...Oq.overlayProps,
 		...d
 	};
-	return /* @__PURE__ */ (0, G.jsx)(aG, {
+	return /* @__PURE__ */ (0, G.jsx)(uG, {
 		transition: "fade",
 		...l,
 		mounted: !!f,
@@ -47168,19 +47276,19 @@ var xq = bq, Sq = {
 			ref: t,
 			...h,
 			children: [
-				/* @__PURE__ */ (0, G.jsx)(DG, {
+				/* @__PURE__ */ (0, G.jsx)(MG, {
 					..._("loader"),
 					unstyled: s,
 					...u
 				}),
-				/* @__PURE__ */ (0, G.jsx)(JW, {
+				/* @__PURE__ */ (0, G.jsx)($W, {
 					...v,
 					..._("overlay"),
 					darkHidden: !0,
 					unstyled: s,
 					color: d?.color || g.white
 				}),
-				/* @__PURE__ */ (0, G.jsx)(JW, {
+				/* @__PURE__ */ (0, G.jsx)($W, {
 					...v,
 					..._("overlay"),
 					lightHidden: !0,
@@ -47191,10 +47299,10 @@ var xq = bq, Sq = {
 		})
 	});
 });
-Tq.classes = Sq, Tq.displayName = "@mantine/core/LoadingOverlay";
+Aq.classes = Dq, Aq.displayName = "@mantine/core/LoadingOverlay";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/Menu.context.mjs
-var [Eq, Dq] = fV("Menu component was not found in the tree"), Oq = {
+var [jq, Mq] = _V("Menu component was not found in the tree"), Nq = {
 	dropdown: "m_dc9b7c9f",
 	label: "m_9bfac126",
 	divider: "m_efdf90cb",
@@ -47202,11 +47310,11 @@ var [Eq, Dq] = fV("Menu component was not found in the tree"), Oq = {
 	itemLabel: "m_5476e0d3",
 	itemSection: "m_8b75e504",
 	chevron: "m_b85b0bed"
-}, kq = DW((e, t) => {
+}, Pq = MW((e, t) => {
 	let { classNames: n, className: r, style: i, styles: a, vars: o, ...s } = Q("MenuDivider", null, e);
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
-		...Dq().getStyles("divider", {
+		...Mq().getStyles("divider", {
 			className: r,
 			style: i,
 			styles: a,
@@ -47215,20 +47323,20 @@ var [Eq, Dq] = fV("Menu component was not found in the tree"), Oq = {
 		...s
 	});
 });
-kq.classes = Oq, kq.displayName = "@mantine/core/MenuDivider";
+Pq.classes = Nq, Pq.displayName = "@mantine/core/MenuDivider";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuDropdown/MenuDropdown.mjs
-var Aq = DW((e, t) => {
-	let { classNames: n, className: r, style: i, styles: a, vars: o, onMouseEnter: s, onMouseLeave: c, onKeyDown: l, children: u, ...d } = Q("MenuDropdown", null, e), f = (0, _.useRef)(null), p = Dq(), m = AV(l, (e) => {
+var Fq = MW((e, t) => {
+	let { classNames: n, className: r, style: i, styles: a, vars: o, onMouseEnter: s, onMouseLeave: c, onKeyDown: l, children: u, ...d } = Q("MenuDropdown", null, e), f = (0, _.useRef)(null), p = Mq(), m = FV(l, (e) => {
 		(e.key === "ArrowUp" || e.key === "ArrowDown") && (e.preventDefault(), f.current?.querySelectorAll("[data-menu-item]:not(:disabled)")[0]?.focus());
-	}), h = AV(s, () => (p.trigger === "hover" || p.trigger === "click-hover") && p.openDropdown()), g = AV(c, () => (p.trigger === "hover" || p.trigger === "click-hover") && p.closeDropdown());
-	return /* @__PURE__ */ (0, G.jsxs)(yG.Dropdown, {
+	}), h = FV(s, () => (p.trigger === "hover" || p.trigger === "click-hover") && p.openDropdown()), g = FV(c, () => (p.trigger === "hover" || p.trigger === "click-hover") && p.closeDropdown());
+	return /* @__PURE__ */ (0, G.jsxs)(wG.Dropdown, {
 		...d,
 		onMouseEnter: h,
 		onMouseLeave: g,
 		role: "menu",
 		"aria-orientation": "vertical",
-		ref: rH(t, f),
+		ref: cH(t, f),
 		...p.getStyles("dropdown", {
 			className: r,
 			style: i,
@@ -47247,23 +47355,23 @@ var Aq = DW((e, t) => {
 		}), u]
 	});
 });
-Aq.classes = Oq, Aq.displayName = "@mantine/core/MenuDropdown";
+Fq.classes = Nq, Fq.displayName = "@mantine/core/MenuDropdown";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.context.mjs
-var [jq, Mq] = pV(), Nq = OW((e, t) => {
-	let { classNames: n, className: r, style: i, styles: a, vars: o, color: s, closeMenuOnClick: c, leftSection: l, rightSection: u, children: d, disabled: f, "data-disabled": p, ...m } = Q("MenuItem", null, e), h = Dq(), g = Mq(), v = iU(), { dir: y } = AW(), b = (0, _.useRef)(null), x = m, S = AV(x.onClick, () => {
+var [Iq, Lq] = vV(), Rq = NW((e, t) => {
+	let { classNames: n, className: r, style: i, styles: a, vars: o, color: s, closeMenuOnClick: c, leftSection: l, rightSection: u, children: d, disabled: f, "data-disabled": p, ...m } = Q("MenuItem", null, e), h = Mq(), g = Lq(), v = lU(), { dir: y } = FW(), b = (0, _.useRef)(null), x = m, S = FV(x.onClick, () => {
 		p || (typeof c == "boolean" ? c && h.closeDropdownImmediately() : h.closeOnItemClick && h.closeDropdownImmediately());
 	}), C = s ? v.variantColorResolver({
 		color: s,
 		theme: v,
 		variant: "light"
-	}) : void 0, w = s ? BH({
+	}) : void 0, w = s ? GH({
 		color: s,
 		theme: v
-	}) : null, T = AV(x.onKeyDown, (e) => {
+	}) : null, T = FV(x.onKeyDown, (e) => {
 		e.key === "ArrowLeft" && g && (g.close(), g.focusParentItem());
 	});
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		onMouseDown: (e) => e.preventDefault(),
 		...m,
 		unstyled: h.unstyled,
@@ -47274,14 +47382,14 @@ var [jq, Mq] = pV(), Nq = OW((e, t) => {
 			styles: a,
 			classNames: n
 		}),
-		ref: rH(b, t),
+		ref: cH(b, t),
 		role: "menuitem",
 		disabled: f,
 		"data-menu-item": !0,
 		"data-disabled": f || p || void 0,
 		"data-mantine-stop-propagation": !0,
 		onClick: S,
-		onKeyDown: yV({
+		onKeyDown: wV({
 			siblingSelector: "[data-menu-item]:not([data-disabled])",
 			parentSelector: "[data-menu-dropdown]",
 			activateOnFocus: !1,
@@ -47321,14 +47429,14 @@ var [jq, Mq] = pV(), Nq = OW((e, t) => {
 		]
 	});
 });
-Nq.classes = Oq, Nq.displayName = "@mantine/core/MenuItem";
+Rq.classes = Nq, Rq.displayName = "@mantine/core/MenuItem";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuLabel/MenuLabel.mjs
-var Pq = DW((e, t) => {
+var zq = MW((e, t) => {
 	let { classNames: n, className: r, style: i, styles: a, vars: o, ...s } = Q("MenuLabel", null, e);
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
-		...Dq().getStyles("label", {
+		...Mq().getStyles("label", {
 			className: r,
 			style: i,
 			styles: a,
@@ -47337,18 +47445,18 @@ var Pq = DW((e, t) => {
 		...s
 	});
 });
-Pq.classes = Oq, Pq.displayName = "@mantine/core/MenuLabel";
+zq.classes = Nq, zq.displayName = "@mantine/core/MenuLabel";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuSubDropdown/MenuSubDropdown.mjs
-var Fq = DW((e, t) => {
-	let { classNames: n, className: r, style: i, styles: a, vars: o, onMouseEnter: s, onMouseLeave: c, onKeyDown: l, children: u, ...d } = Q("MenuSubDropdown", null, e), f = (0, _.useRef)(null), p = Dq(), m = Mq(), h = AV(s, m?.open), g = AV(c, m?.close);
-	return /* @__PURE__ */ (0, G.jsx)(yG.Dropdown, {
+var Bq = MW((e, t) => {
+	let { classNames: n, className: r, style: i, styles: a, vars: o, onMouseEnter: s, onMouseLeave: c, onKeyDown: l, children: u, ...d } = Q("MenuSubDropdown", null, e), f = (0, _.useRef)(null), p = Mq(), m = Lq(), h = FV(s, m?.open), g = FV(c, m?.close);
+	return /* @__PURE__ */ (0, G.jsx)(wG.Dropdown, {
 		...d,
 		onMouseEnter: h,
 		onMouseLeave: g,
 		role: "menu",
 		"aria-orientation": "vertical",
-		ref: rH(t, f),
+		ref: cH(t, f),
 		...p.getStyles("dropdown", {
 			className: r,
 			style: i,
@@ -47361,23 +47469,23 @@ var Fq = DW((e, t) => {
 		children: u
 	});
 });
-Fq.classes = Oq, Fq.displayName = "@mantine/core/MenuSubDropdown";
+Bq.classes = Nq, Bq.displayName = "@mantine/core/MenuSubDropdown";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuSubItem/MenuSubItem.mjs
-var Iq = OW((e, t) => {
-	let { classNames: n, className: r, style: i, styles: a, vars: o, color: s, leftSection: c, rightSection: l, children: u, disabled: d, "data-disabled": f, closeMenuOnClick: p, ...m } = Q("MenuSubItem", null, e), h = Dq(), g = Mq(), v = iU(), { dir: y } = AW(), b = (0, _.useRef)(null), x = m, S = s ? v.variantColorResolver({
+var Vq = NW((e, t) => {
+	let { classNames: n, className: r, style: i, styles: a, vars: o, color: s, leftSection: c, rightSection: l, children: u, disabled: d, "data-disabled": f, closeMenuOnClick: p, ...m } = Q("MenuSubItem", null, e), h = Mq(), g = Lq(), v = lU(), { dir: y } = FW(), b = (0, _.useRef)(null), x = m, S = s ? v.variantColorResolver({
 		color: s,
 		theme: v,
 		variant: "light"
-	}) : void 0, C = s ? BH({
+	}) : void 0, C = s ? GH({
 		color: s,
 		theme: v
-	}) : null, w = AV(x.onKeyDown, (e) => {
+	}) : null, w = FV(x.onKeyDown, (e) => {
 		e.key === "ArrowRight" && (g?.open(), g?.focusFirstItem()), e.key === "ArrowLeft" && g?.parentContext && (g.parentContext.close(), g.parentContext.focusParentItem());
-	}), T = AV(x.onClick, () => {
+	}), T = FV(x.onClick, () => {
 		!f && p && h.closeDropdownImmediately();
-	}), E = AV(x.onMouseEnter, g?.open), D = AV(x.onMouseLeave, g?.close);
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	}), E = FV(x.onMouseEnter, g?.open), D = FV(x.onMouseLeave, g?.close);
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		onMouseDown: (e) => e.preventDefault(),
 		...m,
 		unstyled: h.unstyled,
@@ -47388,7 +47496,7 @@ var Iq = OW((e, t) => {
 			styles: a,
 			classNames: n
 		}),
-		ref: rH(b, t),
+		ref: cH(b, t),
 		role: "menuitem",
 		disabled: d,
 		"data-menu-item": !0,
@@ -47398,7 +47506,7 @@ var Iq = OW((e, t) => {
 		onMouseEnter: E,
 		onMouseLeave: D,
 		onClick: T,
-		onKeyDown: yV({
+		onKeyDown: wV({
 			siblingSelector: "[data-menu-item]:not([data-disabled])",
 			parentSelector: "[data-menu-dropdown]",
 			activateOnFocus: !1,
@@ -47433,7 +47541,7 @@ var Iq = OW((e, t) => {
 					classNames: n
 				}),
 				"data-position": "right",
-				children: l || /* @__PURE__ */ (0, G.jsx)(SK, {
+				children: l || /* @__PURE__ */ (0, G.jsx)(DK, {
 					...h.getStyles("chevron"),
 					size: 14
 				})
@@ -47441,35 +47549,35 @@ var Iq = OW((e, t) => {
 		]
 	});
 });
-Iq.classes = Oq, Iq.displayName = "@mantine/core/MenuSubItem";
+Vq.classes = Nq, Vq.displayName = "@mantine/core/MenuSubItem";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuSubTarget/MenuSubTarget.mjs
-function Lq({ children: e, refProp: t }) {
-	if (!dV(e)) throw Error("Menu.Sub.Target component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
-	return Dq(), /* @__PURE__ */ (0, G.jsx)(yG.Target, {
+function Hq({ children: e, refProp: t }) {
+	if (!gV(e)) throw Error("Menu.Sub.Target component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
+	return Mq(), /* @__PURE__ */ (0, G.jsx)(wG.Target, {
 		refProp: t,
 		popupType: "menu",
 		children: e
 	});
 }
-Lq.displayName = "@mantine/core/MenuSubTarget";
+Hq.displayName = "@mantine/core/MenuSubTarget";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuSub/MenuSub.mjs
-var Rq = {
+var Uq = {
 	offset: 0,
 	position: "right-start",
 	transitionProps: { duration: 0 },
 	openDelay: 0,
 	middlewares: { shift: { crossAxis: !0 } }
 };
-function zq(e) {
-	let { children: t, closeDelay: n, openDelay: r, ...i } = Q("MenuSub", Rq, e), a = eH(), [o, { open: s, close: c }] = sH(!1), l = Mq(), { openDropdown: u, closeDropdown: d } = xK({
+function Wq(e) {
+	let { children: t, closeDelay: n, openDelay: r, ...i } = Q("MenuSub", Uq, e), a = aH(), [o, { open: s, close: c }] = fH(!1), l = Lq(), { openDropdown: u, closeDropdown: d } = EK({
 		open: s,
 		close: c,
 		closeDelay: n,
 		openDelay: r
 	});
-	return /* @__PURE__ */ (0, G.jsx)(jq, {
+	return /* @__PURE__ */ (0, G.jsx)(Iq, {
 		value: {
 			opened: o,
 			close: d,
@@ -47482,7 +47590,7 @@ function zq(e) {
 			}, 16),
 			parentContext: l
 		},
-		children: /* @__PURE__ */ (0, G.jsx)(yG, {
+		children: /* @__PURE__ */ (0, G.jsx)(wG, {
 			opened: o,
 			withinPortal: !1,
 			withArrow: !1,
@@ -47492,18 +47600,18 @@ function zq(e) {
 		})
 	});
 }
-zq.extend = (e) => e, zq.displayName = "@mantine/core/MenuSub", zq.Target = Lq, zq.Dropdown = Fq, zq.Item = Iq;
+Wq.extend = (e) => e, Wq.displayName = "@mantine/core/MenuSub", Wq.Target = Hq, Wq.Dropdown = Bq, Wq.Item = Vq;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/MenuTarget/MenuTarget.mjs
-var Bq = { refProp: "ref" }, Vq = (0, _.forwardRef)((e, t) => {
-	let { children: n, refProp: r, ...i } = Q("MenuTarget", Bq, e), a = dH(n);
+var Gq = { refProp: "ref" }, Kq = (0, _.forwardRef)((e, t) => {
+	let { children: n, refProp: r, ...i } = Q("MenuTarget", Gq, e), a = gH(n);
 	if (!a) throw Error("Menu.Target component children should be an element or a component that accepts ref. Fragments, strings, numbers and other primitive values are not supported");
-	let o = Dq(), s = a.props, c = AV(s.onClick, () => {
+	let o = Mq(), s = a.props, c = FV(s.onClick, () => {
 		o.trigger === "click" ? o.toggleDropdown() : o.trigger === "click-hover" && (o.setOpenedViaClick(!0), o.opened || o.openDropdown());
-	}), l = AV(s.onMouseEnter, () => (o.trigger === "hover" || o.trigger === "click-hover") && o.openDropdown()), u = AV(s.onMouseLeave, () => {
+	}), l = FV(s.onMouseEnter, () => (o.trigger === "hover" || o.trigger === "click-hover") && o.openDropdown()), u = FV(s.onMouseLeave, () => {
 		(o.trigger === "hover" || o.trigger === "click-hover" && !o.openedViaClick) && o.closeDropdown();
 	});
-	return /* @__PURE__ */ (0, G.jsx)(yG.Target, {
+	return /* @__PURE__ */ (0, G.jsx)(wG.Target, {
 		refProp: r,
 		popupType: "menu",
 		ref: t,
@@ -47516,10 +47624,10 @@ var Bq = { refProp: "ref" }, Vq = (0, _.forwardRef)((e, t) => {
 		})
 	});
 });
-Vq.displayName = "@mantine/core/MenuTarget";
+Kq.displayName = "@mantine/core/MenuTarget";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Menu/Menu.mjs
-var Hq = {
+var qq = {
 	trapFocus: !0,
 	closeOnItemClick: !0,
 	withInitialFocusPlaceholder: !0,
@@ -47534,16 +47642,16 @@ var Hq = {
 	closeDelay: 100,
 	menuItemTabIndex: -1
 };
-function Uq(e) {
-	let t = Q("Menu", Hq, e), { children: n, onOpen: r, onClose: i, opened: a, defaultOpened: o, trapFocus: s, onChange: c, closeOnItemClick: l, loop: u, closeOnEscape: d, trigger: f, openDelay: p, closeDelay: m, classNames: h, styles: g, unstyled: v, variant: y, vars: b, menuItemTabIndex: x, keepMounted: S, withInitialFocusPlaceholder: C, attributes: w, ...T } = t, E = HU({
+function Jq(e) {
+	let t = Q("Menu", qq, e), { children: n, onOpen: r, onClose: i, opened: a, defaultOpened: o, trapFocus: s, onChange: c, closeOnItemClick: l, loop: u, closeOnEscape: d, trigger: f, openDelay: p, closeDelay: m, classNames: h, styles: g, unstyled: v, variant: y, vars: b, menuItemTabIndex: x, keepMounted: S, withInitialFocusPlaceholder: C, attributes: w, ...T } = t, E = qU({
 		name: "Menu",
-		classes: Oq,
+		classes: Nq,
 		props: t,
 		classNames: h,
 		styles: g,
 		unstyled: v,
 		attributes: w
-	}), [D, O] = iH({
+	}), [D, O] = lH({
 		value: a,
 		defaultValue: o,
 		finalValue: !1,
@@ -47554,17 +47662,17 @@ function Uq(e) {
 		O(!0), !D && r?.();
 	}, ee = () => {
 		D ? j() : M();
-	}, { openDropdown: te, closeDropdown: ne } = xK({
+	}, { openDropdown: te, closeDropdown: ne } = EK({
 		open: M,
 		close: j,
 		closeDelay: m,
 		openDelay: p
-	}), N = (e) => jV("[data-menu-item]", "[data-menu-dropdown]", e), { resolvedClassNames: P, resolvedStyles: re } = TU({
+	}), N = (e) => IV("[data-menu-item]", "[data-menu-dropdown]", e), { resolvedClassNames: P, resolvedStyles: re } = AU({
 		classNames: h,
 		styles: g,
 		props: t
 	});
-	return /* @__PURE__ */ (0, G.jsx)(Eq, {
+	return /* @__PURE__ */ (0, G.jsx)(jq, {
 		value: {
 			getStyles: E,
 			opened: D,
@@ -47582,7 +47690,7 @@ function Uq(e) {
 			menuItemTabIndex: x,
 			withInitialFocusPlaceholder: C
 		},
-		children: /* @__PURE__ */ (0, G.jsx)(yG, {
+		children: /* @__PURE__ */ (0, G.jsx)(wG, {
 			returnFocus: !0,
 			...T,
 			opened: D,
@@ -47600,23 +47708,23 @@ function Uq(e) {
 		})
 	});
 }
-Uq.extend = (e) => e, Uq.withProps = EW(Uq), Uq.classes = Oq, Uq.displayName = "@mantine/core/Menu", Uq.Item = Nq, Uq.Label = Pq, Uq.Dropdown = Aq, Uq.Target = Vq, Uq.Divider = kq, Uq.Sub = zq;
+Jq.extend = (e) => e, Jq.withProps = jW(Jq), Jq.classes = Nq, Jq.displayName = "@mantine/core/Menu", Jq.Item = Rq, Jq.Label = zq, Jq.Dropdown = Fq, Jq.Target = Kq, Jq.Divider = Pq, Jq.Sub = Wq;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Transition/get-transition-props/get-transition-props.mjs
-var Wq = {
+var Yq = {
 	duration: 100,
 	transition: "fade"
 };
-function Gq(e, t) {
+function Xq(e, t) {
 	return {
-		...Wq,
+		...Yq,
 		...t,
 		...e
 	};
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tooltip/TooltipFloating/use-floating-tooltip.mjs
-function Kq({ offset: e, position: t, defaultOpened: n }) {
+function Zq({ offset: e, position: t, defaultOpened: n }) {
 	let [r, i] = (0, _.useState)(n), a = (0, _.useRef)(null), { x: o, y: s, elements: c, refs: l, update: u, placement: d } = HM({
 		placement: t,
 		middleware: [vj({
@@ -47669,24 +47777,24 @@ function Kq({ offset: e, position: t, defaultOpened: n }) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tooltip/Tooltip.module.css.mjs
-var qq = {
+var Qq = {
 	tooltip: "m_1b3c8819",
 	arrow: "m_f898399f"
-}, Jq = {
+}, $q = {
 	refProp: "ref",
 	withinPortal: !0,
 	offset: 10,
 	position: "right",
-	zIndex: xV("popover")
-}, Yq = fH((e, { radius: t, color: n }) => ({ tooltip: {
-	"--tooltip-radius": t === void 0 ? void 0 : EV(t),
-	"--tooltip-bg": n ? VH(n, e) : void 0,
+	zIndex: EV("popover")
+}, eJ = _H((e, { radius: t, color: n }) => ({ tooltip: {
+	"--tooltip-radius": t === void 0 ? void 0 : jV(t),
+	"--tooltip-bg": n ? KH(n, e) : void 0,
 	"--tooltip-color": n ? "var(--mantine-color-white)" : void 0
-} })), Xq = DW((e, t) => {
-	let n = Q("TooltipFloating", Jq, e), { children: r, refProp: i, withinPortal: a, style: o, className: s, classNames: c, styles: l, unstyled: u, radius: d, color: f, label: p, offset: m, position: h, multiline: g, zIndex: v, disabled: y, defaultOpened: b, variant: x, vars: S, portalProps: C, attributes: w, ...T } = n, E = iU(), D = HU({
+} })), tJ = MW((e, t) => {
+	let n = Q("TooltipFloating", $q, e), { children: r, refProp: i, withinPortal: a, style: o, className: s, classNames: c, styles: l, unstyled: u, radius: d, color: f, label: p, offset: m, position: h, multiline: g, zIndex: v, disabled: y, defaultOpened: b, variant: x, vars: S, portalProps: C, attributes: w, ...T } = n, E = lU(), D = qU({
 		name: "TooltipFloating",
 		props: n,
-		classes: qq,
+		classes: Qq,
 		className: s,
 		style: o,
 		classNames: c,
@@ -47695,25 +47803,25 @@ var qq = {
 		attributes: w,
 		rootSelector: "tooltip",
 		vars: S,
-		varsResolver: Yq
-	}), { handleMouseMove: O, x: k, y: A, opened: j, boundaryRef: M, floating: ee, setOpened: te } = Kq({
+		varsResolver: eJ
+	}), { handleMouseMove: O, x: k, y: A, opened: j, boundaryRef: M, floating: ee, setOpened: te } = Zq({
 		offset: m,
 		position: h,
 		defaultOpened: b
-	}), ne = dH(r);
+	}), ne = gH(r);
 	if (!ne) throw Error("[@mantine/core] Tooltip.Floating component children should be an element or a component that accepts ref, fragments, strings, numbers and other primitive values are not supported");
-	let N = rH(M, uH(ne), t), P = ne.props, re = (e) => {
+	let N = cH(M, hH(ne), t), P = ne.props, re = (e) => {
 		P.onMouseEnter?.(e), O(e), te(!0);
 	}, ie = (e) => {
 		P.onMouseLeave?.(e), te(!1);
 	};
-	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)($W, {
+	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(iG, {
 		...C,
 		withinPortal: a,
 		children: /* @__PURE__ */ (0, G.jsx)($, {
 			...T,
 			...D("tooltip", { style: {
-				..._W(o, E),
+				...SW(o, E),
 				zIndex: v,
 				display: !y && j ? "block" : "none",
 				top: (A && Math.round(A)) ?? "",
@@ -47731,16 +47839,16 @@ var qq = {
 		onMouseLeave: ie
 	})] });
 });
-Xq.classes = qq, Xq.displayName = "@mantine/core/TooltipFloating";
+tJ.classes = Qq, tJ.displayName = "@mantine/core/TooltipFloating";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tooltip/TooltipGroup/TooltipGroup.context.mjs
-var Zq = (0, _.createContext)(!1), Qq = Zq.Provider, $q = () => (0, _.useContext)(Zq), eJ = {
+var nJ = (0, _.createContext)(!1), rJ = nJ.Provider, iJ = () => (0, _.useContext)(nJ), aJ = {
 	openDelay: 0,
 	closeDelay: 0
 };
-function tJ(e) {
-	let { openDelay: t, closeDelay: n, children: r } = Q("TooltipGroup", eJ, e);
-	return /* @__PURE__ */ (0, G.jsx)(Qq, {
+function oJ(e) {
+	let { openDelay: t, closeDelay: n, children: r } = Q("TooltipGroup", aJ, e);
+	return /* @__PURE__ */ (0, G.jsx)(rJ, {
 		value: !0,
 		children: /* @__PURE__ */ (0, G.jsx)(nM, {
 			delay: {
@@ -47751,10 +47859,10 @@ function tJ(e) {
 		})
 	});
 }
-tJ.displayName = "@mantine/core/TooltipGroup", tJ.extend = (e) => e;
+oJ.displayName = "@mantine/core/TooltipGroup", oJ.extend = (e) => e;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tooltip/use-tooltip.mjs
-function nJ(e) {
+function sJ(e) {
 	if (e === void 0) return {
 		shift: !0,
 		flip: !0
@@ -47762,8 +47870,8 @@ function nJ(e) {
 	let t = { ...e };
 	return e.shift === void 0 && (t.shift = !0), e.flip === void 0 && (t.flip = !0), t;
 }
-function rJ(e) {
-	let t = nJ(e.middlewares), n = [_j(e.offset)];
+function cJ(e) {
+	let t = sJ(e.middlewares), n = [_j(e.offset)];
 	return t.shift && n.push(vj(typeof t.shift == "boolean" ? { padding: 8 } : {
 		padding: 8,
 		...t.shift
@@ -47772,15 +47880,15 @@ function rJ(e) {
 		padding: e.arrowOffset
 	})), t.inline ? n.push(typeof t.inline == "boolean" ? wj() : wj(t.inline)) : e.inline && n.push(wj()), n;
 }
-function iJ(e) {
-	let [t, n] = (0, _.useState)(e.defaultOpened), r = typeof e.opened == "boolean" ? e.opened : t, i = $q(), a = eH(), o = (0, _.useCallback)((e) => {
+function lJ(e) {
+	let [t, n] = (0, _.useState)(e.defaultOpened), r = typeof e.opened == "boolean" ? e.opened : t, i = iJ(), a = aH(), o = (0, _.useCallback)((e) => {
 		n(e), e && g(a);
 	}, [a]), { x: s, y: c, context: l, refs: u, placement: d, middlewareData: { arrow: { x: f, y: p } = {} } } = HM({
 		strategy: e.strategy,
 		placement: e.position,
 		open: r,
 		onOpenChange: o,
-		middleware: rJ(e),
+		middleware: cJ(e),
 		whileElementsMounted: $A
 	}), { delay: m, currentId: h, setCurrentId: g } = rM(l, { id: a }), { getReferenceProps: v, getFloatingProps: y } = KM([
 		Qj(l, {
@@ -47798,7 +47906,7 @@ function iJ(e) {
 		JM(l, { role: "tooltip" }),
 		BM(l, { enabled: e.opened === void 0 })
 	]);
-	BV(() => {
+	GV(() => {
 		e.onPositionChange?.(d);
 	}, [d]);
 	let b = r && h && h !== a;
@@ -47818,7 +47926,7 @@ function iJ(e) {
 }
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tooltip/Tooltip.mjs
-var aJ = {
+var uJ = {
 	position: "top",
 	refProp: "ref",
 	withinPortal: !0,
@@ -47836,14 +47944,14 @@ var aJ = {
 		focus: !1,
 		touch: !1
 	},
-	zIndex: xV("popover"),
+	zIndex: EV("popover"),
 	positionDependencies: [],
 	middlewares: {
 		flip: !0,
 		shift: !0,
 		inline: !1
 	}
-}, oJ = fH((e, { radius: t, color: n, variant: r, autoContrast: i }) => {
+}, dJ = _H((e, { radius: t, color: n, variant: r, autoContrast: i }) => {
 	let a = e.variantColorResolver({
 		theme: e,
 		color: n || e.primaryColor,
@@ -47851,13 +47959,13 @@ var aJ = {
 		variant: r || "filled"
 	});
 	return { tooltip: {
-		"--tooltip-radius": t === void 0 ? void 0 : EV(t),
+		"--tooltip-radius": t === void 0 ? void 0 : jV(t),
 		"--tooltip-bg": n ? a.background : void 0,
 		"--tooltip-color": n ? a.color : void 0
 	} };
-}), sJ = DW((e, t) => {
-	let n = Q("Tooltip", aJ, e), { children: r, position: i, refProp: a, label: o, openDelay: s, closeDelay: c, onPositionChange: l, opened: u, defaultOpened: d, withinPortal: f, radius: p, color: m, classNames: h, styles: g, unstyled: v, style: y, className: b, withArrow: x, arrowSize: S, arrowOffset: C, arrowRadius: w, arrowPosition: T, offset: E, transitionProps: D, multiline: O, events: k, zIndex: A, disabled: j, positionDependencies: M, onClick: ee, onMouseEnter: te, onMouseLeave: ne, inline: N, variant: P, keepMounted: re, vars: ie, portalProps: F, mod: ae, floatingStrategy: oe, middlewares: se, autoContrast: ce, attributes: le, target: ue, ...de } = Q("Tooltip", aJ, n), { dir: fe } = AW(), pe = (0, _.useRef)(null), me = iJ({
-		position: WW(fe, i),
+}), fJ = MW((e, t) => {
+	let n = Q("Tooltip", uJ, e), { children: r, position: i, refProp: a, label: o, openDelay: s, closeDelay: c, onPositionChange: l, opened: u, defaultOpened: d, withinPortal: f, radius: p, color: m, classNames: h, styles: g, unstyled: v, style: y, className: b, withArrow: x, arrowSize: S, arrowOffset: C, arrowRadius: w, arrowPosition: T, offset: E, transitionProps: D, multiline: O, events: k, zIndex: A, disabled: j, positionDependencies: M, onClick: ee, onMouseEnter: te, onMouseLeave: ne, inline: N, variant: P, keepMounted: re, vars: ie, portalProps: F, mod: ae, floatingStrategy: oe, middlewares: se, autoContrast: ce, attributes: le, target: ue, ...de } = Q("Tooltip", uJ, n), { dir: fe } = FW(), pe = (0, _.useRef)(null), me = lJ({
+		position: YW(fe, i),
 		closeDelay: c,
 		openDelay: s,
 		onPositionChange: l,
@@ -47876,10 +47984,10 @@ var aJ = {
 		let e = ue instanceof HTMLElement ? ue : typeof ue == "string" ? document.querySelector(ue) : ue?.current || null;
 		e && me.reference(e);
 	}, [ue, me]);
-	let he = HU({
+	let he = qU({
 		name: "Tooltip",
 		props: n,
-		classes: qq,
+		classes: Qq,
 		className: b,
 		style: y,
 		classNames: h,
@@ -47888,18 +47996,18 @@ var aJ = {
 		attributes: le,
 		rootSelector: "tooltip",
 		vars: ie,
-		varsResolver: oJ
-	}), ge = dH(r);
+		varsResolver: dJ
+	}), ge = gH(r);
 	if (!ue && !ge) return null;
 	if (ue) {
-		let e = Gq(D, {
+		let e = Xq(D, {
 			duration: 100,
 			transition: "fade"
 		});
-		return /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: /* @__PURE__ */ (0, G.jsx)($W, {
+		return /* @__PURE__ */ (0, G.jsx)(G.Fragment, { children: /* @__PURE__ */ (0, G.jsx)(iG, {
 			...F,
 			withinPortal: f,
-			children: /* @__PURE__ */ (0, G.jsx)(aG, {
+			children: /* @__PURE__ */ (0, G.jsx)(uG, {
 				...e,
 				keepMounted: re,
 				mounted: !j && !!me.opened,
@@ -47920,7 +48028,7 @@ var aJ = {
 							left: me.x ?? 0
 						}
 					}),
-					children: [o, /* @__PURE__ */ (0, G.jsx)(UW, {
+					children: [o, /* @__PURE__ */ (0, G.jsx)(JW, {
 						ref: pe,
 						arrowX: me.arrowX,
 						arrowY: me.arrowY,
@@ -47936,14 +48044,14 @@ var aJ = {
 			})
 		}) });
 	}
-	let _e = ge.props, ve = rH(me.reference, uH(ge), t), ye = Gq(D, {
+	let _e = ge.props, ve = cH(me.reference, hH(ge), t), ye = Xq(D, {
 		duration: 100,
 		transition: "fade"
 	});
-	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)($W, {
+	return /* @__PURE__ */ (0, G.jsxs)(G.Fragment, { children: [/* @__PURE__ */ (0, G.jsx)(iG, {
 		...F,
 		withinPortal: f,
-		children: /* @__PURE__ */ (0, G.jsx)(aG, {
+		children: /* @__PURE__ */ (0, G.jsx)(uG, {
 			...ye,
 			keepMounted: re,
 			mounted: !j && !!me.opened,
@@ -47964,7 +48072,7 @@ var aJ = {
 						left: me.x ?? 0
 					}
 				}),
-				children: [o, /* @__PURE__ */ (0, G.jsx)(UW, {
+				children: [o, /* @__PURE__ */ (0, G.jsx)(JW, {
 					ref: pe,
 					arrowX: me.arrowX,
 					arrowY: me.arrowY,
@@ -47986,30 +48094,30 @@ var aJ = {
 		onPointerDown: n.onPointerDown,
 		onPointerEnter: n.onPointerEnter,
 		..._e,
-		className: mH(b, _e.className),
+		className: yH(b, _e.className),
 		[a]: ve
 	}))] });
 });
-sJ.classes = qq, sJ.displayName = "@mantine/core/Tooltip", sJ.Floating = Xq, sJ.Group = tJ;
+fJ.classes = Qq, fJ.displayName = "@mantine/core/Tooltip", fJ.Floating = tJ, fJ.Group = oJ;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Skeleton/Skeleton.module.css.mjs
-var cJ = {
+var pJ = {
 	root: "m_18320242",
 	"skeleton-fade": "m_299c329c"
-}, lJ = {
+}, mJ = {
 	visible: !0,
 	animate: !0
-}, uJ = fH((e, { width: t, height: n, radius: r, circle: i }) => ({ root: {
+}, hJ = _H((e, { width: t, height: n, radius: r, circle: i }) => ({ root: {
 	"--skeleton-height": Z(n),
 	"--skeleton-width": Z(i ? n : t),
-	"--skeleton-radius": i ? "1000px" : r === void 0 ? void 0 : EV(r)
-} })), dJ = DW((e, t) => {
-	let n = Q("Skeleton", lJ, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, width: l, height: u, circle: d, visible: f, radius: p, animate: m, mod: h, attributes: g, ..._ } = n;
+	"--skeleton-radius": i ? "1000px" : r === void 0 ? void 0 : jV(r)
+} })), gJ = MW((e, t) => {
+	let n = Q("Skeleton", mJ, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, width: l, height: u, circle: d, visible: f, radius: p, animate: m, mod: h, attributes: g, ..._ } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
-		...HU({
+		...qU({
 			name: "Skeleton",
-			classes: cJ,
+			classes: pJ,
 			props: n,
 			className: i,
 			style: a,
@@ -48018,7 +48126,7 @@ var cJ = {
 			unstyled: s,
 			attributes: g,
 			vars: c,
-			varsResolver: uJ
+			varsResolver: hJ
 		})("root"),
 		mod: [{
 			visible: f,
@@ -48027,25 +48135,25 @@ var cJ = {
 		..._
 	});
 });
-dJ.classes = cJ, dJ.displayName = "@mantine/core/Skeleton";
+gJ.classes = pJ, gJ.displayName = "@mantine/core/Skeleton";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Stack/Stack.module.css.mjs
-var fJ = { root: "m_6d731127" }, pJ = {
+var _J = { root: "m_6d731127" }, vJ = {
 	gap: "md",
 	align: "stretch",
 	justify: "flex-start"
-}, mJ = fH((e, { gap: t, align: n, justify: r }) => ({ root: {
-	"--stack-gap": TV(t),
+}, yJ = _H((e, { gap: t, align: n, justify: r }) => ({ root: {
+	"--stack-gap": AV(t),
 	"--stack-align": n,
 	"--stack-justify": r
-} })), hJ = DW((e, t) => {
-	let n = Q("Stack", pJ, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, align: l, justify: u, gap: d, variant: f, attributes: p, ...m } = n;
+} })), bJ = MW((e, t) => {
+	let n = Q("Stack", vJ, e), { classNames: r, className: i, style: a, styles: o, unstyled: s, vars: c, align: l, justify: u, gap: d, variant: f, attributes: p, ...m } = n;
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		ref: t,
-		...HU({
+		...qU({
 			name: "Stack",
 			props: n,
-			classes: fJ,
+			classes: _J,
 			className: i,
 			style: a,
 			classNames: r,
@@ -48053,16 +48161,16 @@ var fJ = { root: "m_6d731127" }, pJ = {
 			unstyled: s,
 			attributes: p,
 			vars: c,
-			varsResolver: mJ
+			varsResolver: yJ
 		})("root"),
 		variant: f,
 		...m
 	});
 });
-hJ.classes = fJ, hJ.displayName = "@mantine/core/Stack";
+bJ.classes = _J, bJ.displayName = "@mantine/core/Stack";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tabs/Tabs.context.mjs
-var [gJ, _J] = fV("Tabs component was not found in the tree"), vJ = {
+var [xJ, SJ] = _V("Tabs component was not found in the tree"), CJ = {
 	root: "m_89d60db1",
 	"list--default": "m_576c9d4",
 	list: "m_89d33d6d",
@@ -48074,8 +48182,8 @@ var [gJ, _J] = fV("Tabs component was not found in the tree"), vJ = {
 	"list--outline": "m_6772fbd5",
 	"tab--outline": "m_b59ab47c",
 	"tab--pills": "m_c3381914"
-}, yJ = DW((e, t) => {
-	let n = Q("TabsList", null, e), { children: r, className: i, grow: a, justify: o, classNames: s, styles: c, style: l, mod: u, ...d } = n, f = _J();
+}, wJ = MW((e, t) => {
+	let n = Q("TabsList", null, e), { children: r, className: i, grow: a, justify: o, classNames: s, styles: c, style: l, mod: u, ...d } = n, f = SJ();
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		...d,
 		...f.getStyles("list", {
@@ -48100,11 +48208,11 @@ var [gJ, _J] = fV("Tabs component was not found in the tree"), vJ = {
 		children: r
 	});
 });
-yJ.classes = vJ, yJ.displayName = "@mantine/core/TabsList";
+wJ.classes = CJ, wJ.displayName = "@mantine/core/TabsList";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tabs/TabsPanel/TabsPanel.mjs
-var bJ = DW((e, t) => {
-	let n = Q("TabsPanel", null, e), { children: r, className: i, value: a, classNames: o, styles: s, style: c, mod: l, keepMounted: u, ...d } = n, f = _J(), p = f.value === a, m = f.keepMounted || u || p ? r : null;
+var TJ = MW((e, t) => {
+	let n = Q("TabsPanel", null, e), { children: r, className: i, value: a, classNames: o, styles: s, style: c, mod: l, keepMounted: u, ...d } = n, f = SJ(), p = f.value === a, m = f.keepMounted || u || p ? r : null;
 	return /* @__PURE__ */ (0, G.jsx)($, {
 		...f.getStyles("panel", {
 			className: i,
@@ -48122,18 +48230,18 @@ var bJ = DW((e, t) => {
 		children: m
 	});
 });
-bJ.classes = vJ, bJ.displayName = "@mantine/core/TabsPanel";
+TJ.classes = CJ, TJ.displayName = "@mantine/core/TabsPanel";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tabs/TabsTab/TabsTab.mjs
-var xJ = DW((e, t) => {
-	let n = Q("TabsTab", null, e), { className: r, children: i, rightSection: a, leftSection: o, value: s, onClick: c, onKeyDown: l, disabled: u, color: d, style: f, classNames: p, styles: m, vars: h, mod: g, tabIndex: _, ...v } = n, y = iU(), { dir: b } = AW(), x = _J(), S = s === x.value, C = (e) => {
+var EJ = MW((e, t) => {
+	let n = Q("TabsTab", null, e), { className: r, children: i, rightSection: a, leftSection: o, value: s, onClick: c, onKeyDown: l, disabled: u, color: d, style: f, classNames: p, styles: m, vars: h, mod: g, tabIndex: _, ...v } = n, y = lU(), { dir: b } = FW(), x = SJ(), S = s === x.value, C = (e) => {
 		x.onChange(x.allowTabDeactivation && s === x.value ? null : s), c?.(e);
 	}, w = {
 		classNames: p,
 		styles: m,
 		props: n
 	};
-	return /* @__PURE__ */ (0, G.jsxs)(NW, {
+	return /* @__PURE__ */ (0, G.jsxs)(RW, {
 		...x.getStyles("tab", {
 			className: r,
 			style: f,
@@ -48157,8 +48265,8 @@ var xJ = DW((e, t) => {
 		tabIndex: _ === void 0 ? S || x.value === null ? 0 : -1 : _,
 		"aria-controls": x.getPanelId(s),
 		onClick: C,
-		__vars: { "--tabs-color": d ? VH(d, y) : void 0 },
-		onKeyDown: yV({
+		__vars: { "--tabs-color": d ? KH(d, y) : void 0 },
+		onKeyDown: wV({
 			siblingSelector: "[role=\"tab\"]",
 			parentSelector: "[role=\"tablist\"]",
 			activateOnFocus: x.activateTabWithKeyboard,
@@ -48186,34 +48294,34 @@ var xJ = DW((e, t) => {
 		]
 	});
 });
-xJ.classes = vJ, xJ.displayName = "@mantine/core/TabsTab";
+EJ.classes = CJ, EJ.displayName = "@mantine/core/TabsTab";
 //#endregion
 //#region node_modules/@mantine/core/esm/components/Tabs/Tabs.mjs
-var SJ = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or without value", CJ = {
+var DJ = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or without value", OJ = {
 	keepMounted: !0,
 	orientation: "horizontal",
 	loop: !0,
 	activateTabWithKeyboard: !0,
 	variant: "default",
 	placement: "left"
-}, wJ = fH((e, { radius: t, color: n, autoContrast: r }) => ({ root: {
-	"--tabs-radius": EV(t),
-	"--tabs-color": VH(n, e),
-	"--tabs-text-color": UU(r, e) ? lU({
+}, kJ = _H((e, { radius: t, color: n, autoContrast: r }) => ({ root: {
+	"--tabs-radius": jV(t),
+	"--tabs-color": KH(n, e),
+	"--tabs-text-color": JU(r, e) ? mU({
 		color: n,
 		theme: e,
 		autoContrast: r
 	}) : void 0
-} })), TJ = DW((e, t) => {
-	let n = Q("Tabs", CJ, e), { defaultValue: r, value: i, onChange: a, orientation: o, children: s, loop: c, id: l, activateTabWithKeyboard: u, allowTabDeactivation: d, variant: f, color: p, radius: m, inverted: h, placement: g, keepMounted: _, classNames: v, styles: y, unstyled: b, className: x, style: S, vars: C, autoContrast: w, mod: T, attributes: E, ...D } = n, O = eH(l), [k, A] = iH({
+} })), AJ = MW((e, t) => {
+	let n = Q("Tabs", OJ, e), { defaultValue: r, value: i, onChange: a, orientation: o, children: s, loop: c, id: l, activateTabWithKeyboard: u, allowTabDeactivation: d, variant: f, color: p, radius: m, inverted: h, placement: g, keepMounted: _, classNames: v, styles: y, unstyled: b, className: x, style: S, vars: C, autoContrast: w, mod: T, attributes: E, ...D } = n, O = aH(l), [k, A] = lH({
 		value: i,
 		defaultValue: r,
 		finalValue: null,
 		onChange: a
-	}), j = HU({
+	}), j = qU({
 		name: "Tabs",
 		props: n,
-		classes: vJ,
+		classes: CJ,
 		className: x,
 		style: S,
 		classNames: v,
@@ -48221,9 +48329,9 @@ var SJ = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or wi
 		unstyled: b,
 		attributes: E,
 		vars: C,
-		varsResolver: wJ
+		varsResolver: kJ
 	});
-	return /* @__PURE__ */ (0, G.jsx)(gJ, {
+	return /* @__PURE__ */ (0, G.jsx)(xJ, {
 		value: {
 			placement: g,
 			value: k,
@@ -48231,8 +48339,8 @@ var SJ = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or wi
 			id: O,
 			loop: c,
 			activateTabWithKeyboard: u,
-			getTabId: mV(`${O}-tab`, SJ),
-			getPanelId: mV(`${O}-panel`, SJ),
+			getTabId: yV(`${O}-tab`, DJ),
+			getPanelId: yV(`${O}-panel`, DJ),
 			onChange: A,
 			allowTabDeactivation: d,
 			variant: f,
@@ -48258,19 +48366,19 @@ var SJ = "Tabs.Tab or Tabs.Panel component was rendered with invalid value or wi
 		})
 	});
 });
-TJ.classes = vJ, TJ.displayName = "@mantine/core/Tabs", TJ.Tab = xJ, TJ.Panel = bJ, TJ.List = yJ;
+AJ.classes = CJ, AJ.displayName = "@mantine/core/Tabs", AJ.Tab = EJ, AJ.Panel = TJ, AJ.List = wJ;
 //#endregion
 //#region node_modules/@mantine/core/esm/components/TextInput/TextInput.mjs
-var EJ = DW((e, t) => /* @__PURE__ */ (0, G.jsx)(_K, {
+var jJ = MW((e, t) => /* @__PURE__ */ (0, G.jsx)(SK, {
 	component: "input",
 	ref: t,
 	...Q("TextInput", null, e),
 	__staticSelector: "TextInput"
 }));
-EJ.classes = _K.classes, EJ.displayName = "@mantine/core/TextInput";
+jJ.classes = SK.classes, jJ.displayName = "@mantine/core/TextInput";
 //#endregion
 //#region node_modules/@blocknote/mantine/dist/blocknote-mantine.js
-var DJ = (e, t, n = !1) => {
+var MJ = (e, t, n = !1) => {
 	let r = [];
 	function i(e, r = "--bn") {
 		for (let a in e) {
@@ -48279,7 +48387,7 @@ var DJ = (e, t, n = !1) => {
 		}
 	}
 	return i(e), r;
-}, OJ = (e, t) => DJ(e, t), kJ = {
+}, NJ = (e, t) => MJ(e, t), PJ = {
 	colors: {
 		editor: {
 			text: void 0,
@@ -48349,22 +48457,22 @@ var DJ = (e, t, n = !1) => {
 	},
 	borderRadius: void 0,
 	fontFamily: void 0
-}, AJ = (e) => DJ(kJ, e, !0), jJ = (e) => /* @__PURE__ */ (0, G.jsxs)(hJ, {
+}, FJ = (e) => MJ(PJ, e, !0), IJ = (e) => /* @__PURE__ */ (0, G.jsxs)(bJ, {
 	gap: 0,
 	className: "bn-tooltip",
-	children: [/* @__PURE__ */ (0, G.jsx)(DK, {
+	children: [/* @__PURE__ */ (0, G.jsx)(MK, {
 		size: "sm",
 		lineClamp: 5,
 		children: e.mainTooltip
-	}), e.secondaryTooltip && /* @__PURE__ */ (0, G.jsx)(DK, {
+	}), e.secondaryTooltip && /* @__PURE__ */ (0, G.jsx)(MK, {
 		size: "xs",
 		lineClamp: 5,
 		children: e.secondaryTooltip
 	})]
-}), MJ = (0, _.forwardRef)((e, t) => {
+}), LJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, mainTooltip: i, secondaryTooltip: a, icon: o, isSelected: s, isDisabled: c, onClick: l, label: u, variant: d, ...f } = e;
 	W(f, !1);
-	let [p, m] = (0, _.useState)(!1), h = r ? /* @__PURE__ */ (0, G.jsx)($K, {
+	let [p, m] = (0, _.useState)(!1), h = r ? /* @__PURE__ */ (0, G.jsx)(iq, {
 		"aria-label": u,
 		className: n,
 		onMouseDown: (e) => {
@@ -48382,7 +48490,7 @@ var DJ = (e, t, n = !1) => {
 		ref: t,
 		...f,
 		children: r
-	}) : /* @__PURE__ */ (0, G.jsx)(FG, {
+	}) : /* @__PURE__ */ (0, G.jsx)(BG, {
 		className: n,
 		"aria-label": u,
 		onMouseDown: (e) => {
@@ -48401,19 +48509,19 @@ var DJ = (e, t, n = !1) => {
 		...f,
 		children: o
 	});
-	return i ? /* @__PURE__ */ (0, G.jsx)(sJ, {
+	return i ? /* @__PURE__ */ (0, G.jsx)(fJ, {
 		disabled: p,
 		withinPortal: !1,
-		label: /* @__PURE__ */ (0, G.jsx)(jJ, {
+		label: /* @__PURE__ */ (0, G.jsx)(IJ, {
 			mainTooltip: i,
 			secondaryTooltip: a
 		}),
 		children: h
 	}) : h;
-}), NJ = (0, _.forwardRef)((e, t) => {
+}), RJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, text: r, icon: i, isSelected: a, mainTooltip: o, secondaryTooltip: s, onClick: c, onMouseEnter: l, ...u } = e;
 	W(u, !1);
-	let [d, f] = (0, _.useState)(!1), p = /* @__PURE__ */ (0, G.jsxs)(fq, {
+	let [d, f] = (0, _.useState)(!1), p = /* @__PURE__ */ (0, G.jsxs)(_q, {
 		className: n,
 		checked: a === !0,
 		wrapperProps: {
@@ -48428,67 +48536,67 @@ var DJ = (e, t, n = !1) => {
 		ref: t,
 		children: [/* @__PURE__ */ (0, G.jsx)("span", { children: i }), /* @__PURE__ */ (0, G.jsx)("span", { children: r })]
 	});
-	return !o || d ? p : /* @__PURE__ */ (0, G.jsx)(sJ, {
+	return !o || d ? p : /* @__PURE__ */ (0, G.jsx)(fJ, {
 		refProp: "rootRef",
 		withinPortal: !1,
-		label: /* @__PURE__ */ (0, G.jsx)(jJ, {
+		label: /* @__PURE__ */ (0, G.jsx)(IJ, {
 			mainTooltip: o,
 			secondaryTooltip: s
 		}),
 		children: p
 	});
-}), PJ = (0, _.forwardRef)((e, t) => {
+}), zJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
-	return W(i), /* @__PURE__ */ (0, G.jsx)(GG, {
+	return W(i), /* @__PURE__ */ (0, G.jsx)(XG, {
 		className: n,
 		ref: t,
 		children: r
 	});
-}), FJ = (0, _.forwardRef)((e, t) => {
+}), BJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, headerText: i, selected: a, onFocus: o, onBlur: s, tabIndex: c, ...l } = e;
-	return W(l, !1), /* @__PURE__ */ (0, G.jsxs)(aq, {
+	return W(l, !1), /* @__PURE__ */ (0, G.jsxs)(uq, {
 		className: gv(n, a ? "selected" : ""),
 		onFocus: o,
 		onBlur: s,
 		tabIndex: c,
 		ref: t,
-		children: [i && /* @__PURE__ */ (0, G.jsx)(DK, {
+		children: [i && /* @__PURE__ */ (0, G.jsx)(MK, {
 			className: "bn-header-text",
 			children: i
 		}), r]
 	});
-}), IJ = (0, _.forwardRef)((e, t) => {
+}), VJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
-	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(aq.Section, {
+	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(uq.Section, {
 		className: n,
 		ref: t,
 		children: r
 	});
-}), LJ = (0, _.forwardRef)((e, t) => {
+}), HJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
-	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(gq, {
+	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(xq, {
 		className: n,
-		label: /* @__PURE__ */ (0, G.jsx)(DK, { children: r }),
+		label: /* @__PURE__ */ (0, G.jsx)(MK, { children: r }),
 		ref: t
 	});
-}), RJ = (0, _.forwardRef)((e, t) => {
+}), UJ = (0, _.forwardRef)((e, t) => {
 	let { authorInfo: n, timeString: r, edited: i, ...a } = e, o = Y();
-	return W(a, !1), n === "loading" ? /* @__PURE__ */ (0, G.jsxs)(GG, { children: [/* @__PURE__ */ (0, G.jsx)(dJ, {
+	return W(a, !1), n === "loading" ? /* @__PURE__ */ (0, G.jsxs)(XG, { children: [/* @__PURE__ */ (0, G.jsx)(gJ, {
 		height: 24,
 		width: 24
-	}), /* @__PURE__ */ (0, G.jsx)("div", { children: /* @__PURE__ */ (0, G.jsx)(dJ, {
+	}), /* @__PURE__ */ (0, G.jsx)("div", { children: /* @__PURE__ */ (0, G.jsx)(gJ, {
 		height: 12,
 		width: 100
-	}) })] }) : /* @__PURE__ */ (0, G.jsxs)(GG, { children: [/* @__PURE__ */ (0, G.jsx)(VK, {
+	}) })] }) : /* @__PURE__ */ (0, G.jsxs)(XG, { children: [/* @__PURE__ */ (0, G.jsx)(KK, {
 		src: n.avatarUrl,
 		alt: n.username,
 		radius: "xl",
 		size: "sm",
 		color: "initials"
-	}), /* @__PURE__ */ (0, G.jsxs)(DK, {
+	}), /* @__PURE__ */ (0, G.jsxs)(MK, {
 		fz: "sm",
 		fw: "bold",
-		children: [n.username, /* @__PURE__ */ (0, G.jsxs)(DK, {
+		children: [n.username, /* @__PURE__ */ (0, G.jsxs)(MK, {
 			fz: "xs",
 			c: "dimmed",
 			span: !0,
@@ -48500,14 +48608,14 @@ var DJ = (e, t, n = !1) => {
 			]
 		})]
 	})] });
-}), zJ = (0, _.forwardRef)((e, t) => {
-	let { className: n, showActions: r, authorInfo: i, timeString: a, edited: o, actions: s, emojiPickerOpen: c, children: l, ...u } = e, { hovered: d, ref: f } = oH(), p = $B([t, f]);
-	return W(u, !1), /* @__PURE__ */ (0, G.jsxs)(GG, {
+}), WJ = (0, _.forwardRef)((e, t) => {
+	let { className: n, showActions: r, authorInfo: i, timeString: a, edited: o, actions: s, emojiPickerOpen: c, children: l, ...u } = e, { hovered: d, ref: f } = dH(), p = iV([t, f]);
+	return W(u, !1), /* @__PURE__ */ (0, G.jsxs)(XG, {
 		pos: "relative",
 		ref: p,
 		className: n,
 		children: [
-			s && (r === !0 || r === void 0 || r === "hover" && d || c) ? /* @__PURE__ */ (0, G.jsx)(GG, {
+			s && (r === !0 || r === void 0 || r === "hover" && d || c) ? /* @__PURE__ */ (0, G.jsx)(XG, {
 				style: {
 					position: "absolute",
 					right: 0,
@@ -48516,15 +48624,15 @@ var DJ = (e, t, n = !1) => {
 				},
 				children: s
 			}) : null,
-			/* @__PURE__ */ (0, G.jsx)(RJ, { ...e }),
+			/* @__PURE__ */ (0, G.jsx)(UJ, { ...e }),
 			l
 		]
 	});
-}), BJ = (0, _.forwardRef)((e, t) => {
+}), GJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, autoFocus: r, onFocus: i, onBlur: a, editor: o, editable: s, ...c } = e;
 	W(c, !1);
-	let l = OI();
-	return /* @__PURE__ */ (0, G.jsx)(zY, {
+	let l = kI();
+	return /* @__PURE__ */ (0, G.jsx)(WY, {
 		autoFocus: r,
 		className: n,
 		editor: e.editor,
@@ -48538,14 +48646,14 @@ var DJ = (e, t, n = !1) => {
 		ref: t,
 		onFocus: i,
 		onBlur: a,
-		children: /* @__PURE__ */ (0, G.jsx)(gz, { formattingToolbar: VJ })
+		children: /* @__PURE__ */ (0, G.jsx)(bz, { formattingToolbar: KJ })
 	});
-}), VJ = () => /* @__PURE__ */ (0, G.jsx)(mz, {
+}), KJ = () => /* @__PURE__ */ (0, G.jsx)(vz, {
 	blockTypeSelectItems: [],
-	children: pz([]).filter((e) => e.key !== "nestBlockButton" && e.key !== "unnestBlockButton")
-}), HJ = (0, _.forwardRef)((e, t) => {
+	children: _z([]).filter((e) => e.key !== "nestBlockButton" && e.key !== "unnestBlockButton")
+}), qJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, name: r, label: i, variant: a, icon: o, value: s, autoFocus: c, placeholder: l, disabled: u, onKeyDown: d, onChange: f, onSubmit: p, autoComplete: m, "aria-activedescendant": h, rightSection: g, ..._ } = e;
-	return W(_), /* @__PURE__ */ (0, G.jsx)(EJ, {
+	return W(_), /* @__PURE__ */ (0, G.jsx)(jJ, {
 		size: "xs",
 		className: gv(n || "", a === "large" ? "bn-mt-input-large" : ""),
 		ref: t,
@@ -48564,9 +48672,9 @@ var DJ = (e, t, n = !1) => {
 		autoComplete: m,
 		"aria-activedescendant": h
 	});
-}), UJ = (0, _.createContext)(void 0), WJ = (e) => {
+}), JJ = (0, _.createContext)(void 0), YJ = (e) => {
 	let { children: t, onOpenChange: n, position: r, sub: i, ...a } = e;
-	return W(a), i ? /* @__PURE__ */ (0, G.jsx)(Uq.Sub, {
+	return W(a), i ? /* @__PURE__ */ (0, G.jsx)(Jq.Sub, {
 		transitionProps: {
 			duration: 250,
 			exitDelay: 250
@@ -48581,7 +48689,7 @@ var DJ = (e, t, n = !1) => {
 		onChange: n,
 		position: r,
 		children: t
-	}) : /* @__PURE__ */ (0, G.jsx)(Uq, {
+	}) : /* @__PURE__ */ (0, G.jsx)(Jq, {
 		withinPortal: !1,
 		middlewares: {
 			flip: !0,
@@ -48594,47 +48702,47 @@ var DJ = (e, t, n = !1) => {
 		returnFocus: !1,
 		children: t
 	});
-}, GJ = (0, _.forwardRef)((e, t) => {
+}, XJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, icon: i, checked: a, subTrigger: o, onClick: s, ...c } = e;
-	return W(c, !1), (0, G.jsx)(o ? Uq.Sub.Item : Uq.Item, {
+	return W(c, !1), (0, G.jsx)(o ? Jq.Sub.Item : Jq.Item, {
 		className: n,
 		ref: t,
 		leftSection: i,
-		rightSection: a ? /* @__PURE__ */ (0, G.jsx)(OK, { size: 10 }) : a === !1 ? /* @__PURE__ */ (0, G.jsx)("div", { className: "bn-tick-space" }) : null,
+		rightSection: a ? /* @__PURE__ */ (0, G.jsx)(NK, { size: 10 }) : a === !1 ? /* @__PURE__ */ (0, G.jsx)("div", { className: "bn-tick-space" }) : null,
 		onClick: s,
 		...c,
 		children: r
 	});
-}), KJ = (e) => {
+}), ZJ = (e) => {
 	let { children: t, sub: n, ...r } = e;
-	return W(r), (0, G.jsx)(n ? Uq.Sub.Target : Uq.Target, { children: t });
-}, qJ = (0, _.forwardRef)((e, t) => {
+	return W(r), (0, G.jsx)(n ? Jq.Sub.Target : Jq.Target, { children: t });
+}, QJ = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, sub: i, ...a } = e;
 	W(a);
-	let o = (0, _.useContext)(UJ);
-	return (0, G.jsx)(i ? Uq.Sub.Dropdown : Uq.Dropdown, {
+	let o = (0, _.useContext)(JJ);
+	return (0, G.jsx)(i ? Jq.Sub.Dropdown : Jq.Dropdown, {
 		className: n,
 		ref: t,
 		onMouseOver: o?.onMenuMouseOver,
 		onMouseLeave: o?.onMenuMouseLeave,
 		children: r
 	});
-}), JJ = (0, _.forwardRef)((e, t) => {
+}), $J = (0, _.forwardRef)((e, t) => {
 	let { className: n, ...r } = e;
-	return W(r), /* @__PURE__ */ (0, G.jsx)(Uq.Divider, {
+	return W(r), /* @__PURE__ */ (0, G.jsx)(Jq.Divider, {
 		className: n,
 		ref: t
 	});
-}), YJ = (0, _.forwardRef)((e, t) => {
+}), eY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
-	return W(i), /* @__PURE__ */ (0, G.jsx)(Uq.Label, {
+	return W(i), /* @__PURE__ */ (0, G.jsx)(Jq.Label, {
 		className: n,
 		ref: t,
 		children: r
 	});
-}), XJ = (0, _.forwardRef)((e, t) => {
+}), tY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, icon: i, onClick: a, onDragEnd: o, onDragStart: s, draggable: c, label: l, ...u } = e;
-	return W(u, !1), i ? /* @__PURE__ */ (0, G.jsx)(FG, {
+	return W(u, !1), i ? /* @__PURE__ */ (0, G.jsx)(BG, {
 		size: 24,
 		className: n,
 		ref: t,
@@ -48645,7 +48753,7 @@ var DJ = (e, t, n = !1) => {
 		"aria-label": l,
 		...u,
 		children: i
-	}) : /* @__PURE__ */ (0, G.jsx)($K, {
+	}) : /* @__PURE__ */ (0, G.jsx)(iq, {
 		className: n,
 		ref: t,
 		onClick: a,
@@ -48656,32 +48764,32 @@ var DJ = (e, t, n = !1) => {
 		...u,
 		children: r
 	});
-}), ZJ = (0, _.forwardRef)((e, t) => {
+}), nY = (0, _.forwardRef)((e, t) => {
 	let { className: n, tabs: r, defaultOpenTab: i, openTab: a, setOpenTab: o, loading: s, ...c } = e;
-	return W(c), /* @__PURE__ */ (0, G.jsx)(GG, {
+	return W(c), /* @__PURE__ */ (0, G.jsx)(XG, {
 		className: n,
 		ref: t,
-		children: /* @__PURE__ */ (0, G.jsxs)(TJ, {
+		children: /* @__PURE__ */ (0, G.jsxs)(AJ, {
 			value: a,
 			defaultValue: i,
 			onChange: o,
 			children: [
-				s && /* @__PURE__ */ (0, G.jsx)(Tq, { visible: s }),
-				/* @__PURE__ */ (0, G.jsx)(TJ.List, { children: r.map((e) => /* @__PURE__ */ (0, G.jsx)(TJ.Tab, {
+				s && /* @__PURE__ */ (0, G.jsx)(Aq, { visible: s }),
+				/* @__PURE__ */ (0, G.jsx)(AJ.List, { children: r.map((e) => /* @__PURE__ */ (0, G.jsx)(AJ.Tab, {
 					"data-test": `${e.name.toLowerCase()}-tab`,
 					value: e.name,
 					children: e.name
 				}, e.name)) }),
-				r.map((e) => /* @__PURE__ */ (0, G.jsx)(TJ.Panel, {
+				r.map((e) => /* @__PURE__ */ (0, G.jsx)(AJ.Panel, {
 					value: e.name,
 					children: e.tabPanel
 				}, e.name))
 			]
 		})
 	});
-}), QJ = (0, _.forwardRef)((e, t) => {
+}), rY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, onClick: i, label: a, ...o } = e;
-	return W(o), /* @__PURE__ */ (0, G.jsx)($K, {
+	return W(o), /* @__PURE__ */ (0, G.jsx)(iq, {
 		size: "xs",
 		"aria-label": a,
 		className: n,
@@ -48690,9 +48798,9 @@ var DJ = (e, t, n = !1) => {
 		...o,
 		children: r
 	});
-}), $J = (0, _.forwardRef)((e, t) => {
+}), iY = (0, _.forwardRef)((e, t) => {
 	let { className: n, accept: r, value: i, placeholder: a, onChange: o, ...s } = e;
-	return W(s), /* @__PURE__ */ (0, G.jsx)(xq, {
+	return W(s), /* @__PURE__ */ (0, G.jsx)(Eq, {
 		size: "xs",
 		className: n,
 		ref: t,
@@ -48702,16 +48810,16 @@ var DJ = (e, t, n = !1) => {
 		onChange: o,
 		...s
 	});
-}), eY = (0, _.forwardRef)((e, t) => {
+}), aY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
 	return W(i), /* @__PURE__ */ (0, G.jsx)("div", {
 		className: n,
 		ref: t,
 		children: r
 	});
-}), tY = (0, _.forwardRef)((e, t) => {
+}), oY = (0, _.forwardRef)((e, t) => {
 	let { className: n, value: r, placeholder: i, onKeyDown: a, onChange: o, ...s } = e;
-	return W(s), /* @__PURE__ */ (0, G.jsx)(EJ, {
+	return W(s), /* @__PURE__ */ (0, G.jsx)(jJ, {
 		size: "xs",
 		"data-test": "embed-input",
 		className: n,
@@ -48721,9 +48829,9 @@ var DJ = (e, t, n = !1) => {
 		onKeyDown: a,
 		onChange: o
 	});
-}), nY = (e) => {
+}), sY = (e) => {
 	let { open: t, onOpenChange: n, position: r, portalRoot: i, children: a, ...o } = e;
-	return W(o), /* @__PURE__ */ (0, G.jsx)(yG, {
+	return W(o), /* @__PURE__ */ (0, G.jsx)(wG, {
 		middlewares: { size: { padding: 20 } },
 		withinPortal: !!i,
 		portalProps: i ? { target: i } : void 0,
@@ -48732,19 +48840,19 @@ var DJ = (e, t, n = !1) => {
 		position: r,
 		children: a
 	});
-}, rY = (e) => {
+}, cY = (e) => {
 	let { children: t, ...n } = e;
-	return W(n), /* @__PURE__ */ (0, G.jsx)(pG, { children: t });
-}, iY = (0, _.forwardRef)((e, t) => {
+	return W(n), /* @__PURE__ */ (0, G.jsx)(vG, { children: t });
+}, lY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, variant: i, ...a } = e;
-	return W(a), /* @__PURE__ */ (0, G.jsx)(dG, {
+	return W(a), /* @__PURE__ */ (0, G.jsx)(gG, {
 		className: n,
 		ref: t,
 		children: r
 	});
-}), aY = (0, _.forwardRef)((e, t) => {
+}), uY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
-	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(GG, {
+	return W(i, !1), /* @__PURE__ */ (0, G.jsx)(XG, {
 		align: "center",
 		gap: 0,
 		className: n,
@@ -48752,9 +48860,9 @@ var DJ = (e, t, n = !1) => {
 		...i,
 		children: r
 	});
-}), oY = (0, _.forwardRef)((e, t) => {
+}), dY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, icon: i, onClick: a, onDragEnd: o, onDragStart: s, draggable: c, label: l, ...u } = e;
-	return W(u, !1), i ? /* @__PURE__ */ (0, G.jsx)(FG, {
+	return W(u, !1), i ? /* @__PURE__ */ (0, G.jsx)(BG, {
 		size: 24,
 		className: n,
 		ref: t,
@@ -48765,7 +48873,7 @@ var DJ = (e, t, n = !1) => {
 		"aria-label": l,
 		...u,
 		children: i
-	}) : /* @__PURE__ */ (0, G.jsx)($K, {
+	}) : /* @__PURE__ */ (0, G.jsx)(iq, {
 		className: n,
 		ref: t,
 		onClick: a,
@@ -48776,7 +48884,7 @@ var DJ = (e, t, n = !1) => {
 		...u,
 		children: r
 	});
-}), sY = (0, _.forwardRef)((e, t) => {
+}), fY = (0, _.forwardRef)((e, t) => {
 	let { className: n, markClassName: r, backgroundColor: i, children: a, ...o } = e;
 	return W(o), /* @__PURE__ */ (0, G.jsx)("span", {
 		className: gv(n || "", r || ""),
@@ -48784,9 +48892,9 @@ var DJ = (e, t, n = !1) => {
 		ref: t,
 		children: a
 	});
-}), cY = (0, _.forwardRef)((e, t) => {
+}), pY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, id: i, ...a } = e;
-	return W(a), /* @__PURE__ */ (0, G.jsx)(hJ, {
+	return W(a), /* @__PURE__ */ (0, G.jsx)(bJ, {
 		gap: 0,
 		className: n,
 		ref: t,
@@ -48794,92 +48902,12 @@ var DJ = (e, t, n = !1) => {
 		role: "listbox",
 		children: r
 	});
-}), lY = (0, _.forwardRef)((e, t) => {
-	let { className: n, children: r, ...i } = e;
-	return W(i), /* @__PURE__ */ (0, G.jsx)(GG, {
-		className: n,
-		ref: t,
-		children: /* @__PURE__ */ (0, G.jsx)(GG, {
-			className: "bn-mt-suggestion-menu-item-title",
-			children: r
-		})
-	});
-}), uY = (0, _.forwardRef)((e, t) => {
-	let { className: n, isSelected: r, onClick: i, item: a, id: o, ...s } = e;
-	W(s);
-	let c = (0, _.useRef)(null);
-	return (0, _.useEffect)(() => {
-		!c.current || !r || QB(c.current, c.current.closest(".bn-suggestion-menu, #ai-suggestion-menu")) !== "none" && c.current.scrollIntoView({ block: "nearest" });
-	}, [r]), /* @__PURE__ */ (0, G.jsxs)(GG, {
-		gap: 0,
-		className: n,
-		ref: nH(t, c),
-		id: o,
-		role: "option",
-		onMouseDown: (e) => e.preventDefault(),
-		onClick: i,
-		"aria-selected": r || void 0,
-		children: [
-			a.icon && /* @__PURE__ */ (0, G.jsx)(GG, {
-				className: "bn-mt-suggestion-menu-item-section",
-				"data-position": "left",
-				children: a.icon
-			}),
-			/* @__PURE__ */ (0, G.jsxs)(hJ, {
-				gap: 0,
-				className: "bn-mt-suggestion-menu-item-body",
-				children: [/* @__PURE__ */ (0, G.jsx)(DK, {
-					className: "bn-mt-suggestion-menu-item-title",
-					children: a.title
-				}), /* @__PURE__ */ (0, G.jsx)(DK, {
-					className: "bn-mt-suggestion-menu-item-subtitle",
-					children: a.subtext
-				})]
-			}),
-			a.badge && /* @__PURE__ */ (0, G.jsx)(GG, {
-				"data-position": "right",
-				className: "bn-mt-suggestion-menu-item-section",
-				children: /* @__PURE__ */ (0, G.jsx)(WK, {
-					size: "xs",
-					children: a.badge
-				})
-			})
-		]
-	});
-}), dY = (0, _.forwardRef)((e, t) => {
-	let { className: n, children: r, ...i } = e;
-	return W(i), /* @__PURE__ */ (0, G.jsx)(GG, {
-		className: n,
-		ref: t,
-		children: r
-	});
-}), fY = (0, _.forwardRef)((e, t) => {
-	let { className: n, ...r } = e;
-	return W(r), /* @__PURE__ */ (0, G.jsx)("div", {
-		ref: t,
-		children: /* @__PURE__ */ (0, G.jsx)(DG, {
-			className: n,
-			type: "dots",
-			size: 16
-		})
-	});
-}), pY = (0, _.forwardRef)((e, t) => {
-	let { className: n, children: r, id: i, columns: a, ...o } = e;
-	return W(o), /* @__PURE__ */ (0, G.jsx)("div", {
-		className: n,
-		style: { gridTemplateColumns: `repeat(${a}, 1fr)` },
-		ref: t,
-		id: i,
-		role: "grid",
-		children: r
-	});
 }), mY = (0, _.forwardRef)((e, t) => {
-	let { className: n, children: r, columns: i, ...a } = e;
-	return W(a), /* @__PURE__ */ (0, G.jsx)(GG, {
+	let { className: n, children: r, ...i } = e;
+	return W(i), /* @__PURE__ */ (0, G.jsx)(XG, {
 		className: n,
-		style: { gridColumn: `1 / ${i + 1}` },
 		ref: t,
-		children: /* @__PURE__ */ (0, G.jsx)(GG, {
+		children: /* @__PURE__ */ (0, G.jsx)(XG, {
 			className: "bn-mt-suggestion-menu-item-title",
 			children: r
 		})
@@ -48889,29 +48917,109 @@ var DJ = (e, t, n = !1) => {
 	W(s);
 	let c = (0, _.useRef)(null);
 	return (0, _.useEffect)(() => {
-		!c.current || !r || QB(c.current, c.current.closest(".bn-grid-suggestion-menu")) !== "none" && c.current.scrollIntoView({ block: "nearest" });
+		!c.current || !r || rV(c.current, c.current.closest(".bn-suggestion-menu, #ai-suggestion-menu")) !== "none" && c.current.scrollIntoView({ block: "nearest" });
+	}, [r]), /* @__PURE__ */ (0, G.jsxs)(XG, {
+		gap: 0,
+		className: n,
+		ref: sH(t, c),
+		id: o,
+		role: "option",
+		onMouseDown: (e) => e.preventDefault(),
+		onClick: i,
+		"aria-selected": r || void 0,
+		children: [
+			a.icon && /* @__PURE__ */ (0, G.jsx)(XG, {
+				className: "bn-mt-suggestion-menu-item-section",
+				"data-position": "left",
+				children: a.icon
+			}),
+			/* @__PURE__ */ (0, G.jsxs)(bJ, {
+				gap: 0,
+				className: "bn-mt-suggestion-menu-item-body",
+				children: [/* @__PURE__ */ (0, G.jsx)(MK, {
+					className: "bn-mt-suggestion-menu-item-title",
+					children: a.title
+				}), /* @__PURE__ */ (0, G.jsx)(MK, {
+					className: "bn-mt-suggestion-menu-item-subtitle",
+					children: a.subtext
+				})]
+			}),
+			a.badge && /* @__PURE__ */ (0, G.jsx)(XG, {
+				"data-position": "right",
+				className: "bn-mt-suggestion-menu-item-section",
+				children: /* @__PURE__ */ (0, G.jsx)(YK, {
+					size: "xs",
+					children: a.badge
+				})
+			})
+		]
+	});
+}), gY = (0, _.forwardRef)((e, t) => {
+	let { className: n, children: r, ...i } = e;
+	return W(i), /* @__PURE__ */ (0, G.jsx)(XG, {
+		className: n,
+		ref: t,
+		children: r
+	});
+}), _Y = (0, _.forwardRef)((e, t) => {
+	let { className: n, ...r } = e;
+	return W(r), /* @__PURE__ */ (0, G.jsx)("div", {
+		ref: t,
+		children: /* @__PURE__ */ (0, G.jsx)(MG, {
+			className: n,
+			type: "dots",
+			size: 16
+		})
+	});
+}), vY = (0, _.forwardRef)((e, t) => {
+	let { className: n, children: r, id: i, columns: a, ...o } = e;
+	return W(o), /* @__PURE__ */ (0, G.jsx)("div", {
+		className: n,
+		style: { gridTemplateColumns: `repeat(${a}, 1fr)` },
+		ref: t,
+		id: i,
+		role: "grid",
+		children: r
+	});
+}), yY = (0, _.forwardRef)((e, t) => {
+	let { className: n, children: r, columns: i, ...a } = e;
+	return W(a), /* @__PURE__ */ (0, G.jsx)(XG, {
+		className: n,
+		style: { gridColumn: `1 / ${i + 1}` },
+		ref: t,
+		children: /* @__PURE__ */ (0, G.jsx)(XG, {
+			className: "bn-mt-suggestion-menu-item-title",
+			children: r
+		})
+	});
+}), bY = (0, _.forwardRef)((e, t) => {
+	let { className: n, isSelected: r, onClick: i, item: a, id: o, ...s } = e;
+	W(s);
+	let c = (0, _.useRef)(null);
+	return (0, _.useEffect)(() => {
+		!c.current || !r || rV(c.current, c.current.closest(".bn-grid-suggestion-menu")) !== "none" && c.current.scrollIntoView({ block: "nearest" });
 	}, [r]), /* @__PURE__ */ (0, G.jsx)("div", {
 		className: n,
-		ref: nH(t, c),
+		ref: sH(t, c),
 		id: o,
 		role: "option",
 		onClick: i,
 		"aria-selected": r || void 0,
 		children: a.icon
 	});
-}), gY = (0, _.forwardRef)((e, t) => {
+}), xY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, columns: i, ...a } = e;
 	return W(a), /* @__PURE__ */ (0, G.jsx)("div", {
 		style: { gridColumn: `1 / ${i + 1}` },
 		ref: t,
-		children: /* @__PURE__ */ (0, G.jsx)(DG, {
+		children: /* @__PURE__ */ (0, G.jsx)(MG, {
 			className: n,
 			type: "dots"
 		})
 	});
-}), _Y = (0, _.forwardRef)((e, t) => {
+}), SY = (0, _.forwardRef)((e, t) => {
 	let { children: n, className: r, onMouseDown: i, onClick: a, ...o } = e;
-	return W(o, !1), /* @__PURE__ */ (0, G.jsx)($K, {
+	return W(o, !1), /* @__PURE__ */ (0, G.jsx)(iq, {
 		className: r,
 		ref: t,
 		onMouseDown: i,
@@ -48919,9 +49027,9 @@ var DJ = (e, t, n = !1) => {
 		...o,
 		children: n
 	});
-}), vY = (0, _.forwardRef)((e, t) => {
+}), CY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, draggable: i, onDragStart: a, onDragEnd: o, style: s, label: c, ...l } = e;
-	return W(l, !1), /* @__PURE__ */ (0, G.jsx)($K, {
+	return W(l, !1), /* @__PURE__ */ (0, G.jsx)(iq, {
 		className: n,
 		ref: t,
 		"aria-label": c,
@@ -48932,40 +49040,40 @@ var DJ = (e, t, n = !1) => {
 		...l,
 		children: r
 	});
-}), yY = (0, _.forwardRef)((e, t) => {
+}), wY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, onMouseEnter: i, onMouseLeave: a, variant: o, ...s } = e;
 	W(s);
-	let { ref: c, focused: l } = lH();
-	return /* @__PURE__ */ (0, G.jsx)(bK, {
+	let { ref: c, focused: l } = mH();
+	return /* @__PURE__ */ (0, G.jsx)(TK, {
 		className: n,
-		ref: nH(t, c, ZV(l)),
+		ref: sH(t, c, nH(l)),
 		role: "toolbar",
 		onMouseEnter: i,
 		onMouseLeave: a,
 		gap: o === "action-toolbar" ? 2 : void 0,
 		children: r
 	});
-}), bY = {
+}), TY = {
 	color: void 0,
 	size: void 0,
 	className: void 0,
 	style: void 0,
 	attr: void 0
-}, xY = _.createContext && /*#__PURE__*/ _.createContext(bY), SY = [
+}, EY = _.createContext && /*#__PURE__*/ _.createContext(TY), DY = [
 	"attr",
 	"size",
 	"title"
 ];
-function CY(e, t) {
+function OY(e, t) {
 	if (e == null) return {};
-	var n, r, i = wY(e, t);
+	var n, r, i = kY(e, t);
 	if (Object.getOwnPropertySymbols) {
 		var a = Object.getOwnPropertySymbols(e);
 		for (r = 0; r < a.length; r++) n = a[r], t.indexOf(n) === -1 && {}.propertyIsEnumerable.call(e, n) && (i[n] = e[n]);
 	}
 	return i;
 }
-function wY(e, t) {
+function kY(e, t) {
 	if (e == null) return {};
 	var n = {};
 	for (var r in e) if ({}.hasOwnProperty.call(e, r)) {
@@ -48974,16 +49082,16 @@ function wY(e, t) {
 	}
 	return n;
 }
-function TY() {
-	return TY = Object.assign ? Object.assign.bind() : function(e) {
+function AY() {
+	return AY = Object.assign ? Object.assign.bind() : function(e) {
 		for (var t = 1; t < arguments.length; t++) {
 			var n = arguments[t];
 			for (var r in n) ({}).hasOwnProperty.call(n, r) && (e[r] = n[r]);
 		}
 		return e;
-	}, TY.apply(null, arguments);
+	}, AY.apply(null, arguments);
 }
-function EY(e, t) {
+function jY(e, t) {
 	var n = Object.keys(e);
 	if (Object.getOwnPropertySymbols) {
 		var r = Object.getOwnPropertySymbols(e);
@@ -48993,30 +49101,30 @@ function EY(e, t) {
 	}
 	return n;
 }
-function DY(e) {
+function MY(e) {
 	for (var t = 1; t < arguments.length; t++) {
 		var n = arguments[t] == null ? {} : arguments[t];
-		t % 2 ? EY(Object(n), !0).forEach(function(t) {
-			OY(e, t, n[t]);
-		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : EY(Object(n)).forEach(function(t) {
+		t % 2 ? jY(Object(n), !0).forEach(function(t) {
+			NY(e, t, n[t]);
+		}) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(n)) : jY(Object(n)).forEach(function(t) {
 			Object.defineProperty(e, t, Object.getOwnPropertyDescriptor(n, t));
 		});
 	}
 	return e;
 }
-function OY(e, t, n) {
-	return (t = kY(t)) in e ? Object.defineProperty(e, t, {
+function NY(e, t, n) {
+	return (t = PY(t)) in e ? Object.defineProperty(e, t, {
 		value: n,
 		enumerable: !0,
 		configurable: !0,
 		writable: !0
 	}) : e[t] = n, e;
 }
-function kY(e) {
-	var t = AY(e, "string");
+function PY(e) {
+	var t = FY(e, "string");
 	return typeof t == "symbol" ? t : t + "";
 }
-function AY(e, t) {
+function FY(e, t) {
 	if (typeof e != "object" || !e) return e;
 	var n = e[Symbol.toPrimitive];
 	if (n !== void 0) {
@@ -49026,31 +49134,31 @@ function AY(e, t) {
 	}
 	return (t === "string" ? String : Number)(e);
 }
-function jY(e) {
-	return e && e.map((e, t) => /*#__PURE__*/ _.createElement(e.tag, DY({ key: t }, e.attr), jY(e.child)));
+function IY(e) {
+	return e && e.map((e, t) => /*#__PURE__*/ _.createElement(e.tag, MY({ key: t }, e.attr), IY(e.child)));
 }
-function MY(e) {
-	return (t) => /*#__PURE__*/ _.createElement(NY, TY({ attr: DY({}, e.attr) }, t), jY(e.child));
+function LY(e) {
+	return (t) => /*#__PURE__*/ _.createElement(RY, AY({ attr: MY({}, e.attr) }, t), IY(e.child));
 }
-function NY(e) {
+function RY(e) {
 	var t = (t) => {
-		var { attr: n, size: r, title: i } = e, a = CY(e, SY), o = r || t.size || "1em", s;
-		return t.className && (s = t.className), e.className && (s = (s ? s + " " : "") + e.className), /*#__PURE__*/ _.createElement("svg", TY({
+		var { attr: n, size: r, title: i } = e, a = OY(e, DY), o = r || t.size || "1em", s;
+		return t.className && (s = t.className), e.className && (s = (s ? s + " " : "") + e.className), /*#__PURE__*/ _.createElement("svg", AY({
 			stroke: "currentColor",
 			fill: "currentColor",
 			strokeWidth: "0"
 		}, t.attr, n, a, {
 			className: s,
-			style: DY(DY({ color: e.color || t.color }, t.style), e.style),
+			style: MY(MY({ color: e.color || t.color }, t.style), e.style),
 			height: o,
 			width: o,
 			xmlns: "http://www.w3.org/2000/svg"
 		}), i && /*#__PURE__*/ _.createElement("title", null, i), e.children);
 	};
-	return xY === void 0 ? t(bY) : /*#__PURE__*/ _.createElement(xY.Consumer, null, (e) => t(e));
+	return EY === void 0 ? t(TY) : /*#__PURE__*/ _.createElement(EY.Consumer, null, (e) => t(e));
 }
-function PY(e) {
-	return MY({
+function zY(e) {
+	return LY({
 		tag: "svg",
 		attr: {
 			viewBox: "0 0 20 20",
@@ -49068,11 +49176,11 @@ function PY(e) {
 		}]
 	})(e);
 }
-var FY = (0, _.forwardRef)((e, t) => {
+var BY = (0, _.forwardRef)((e, t) => {
 	let { className: n, items: r, isDisabled: i, ...a } = e;
 	W(a);
 	let o = r.filter((e) => e.isSelected)[0];
-	return o ? /* @__PURE__ */ (0, G.jsxs)(Uq, {
+	return o ? /* @__PURE__ */ (0, G.jsxs)(Jq, {
 		withinPortal: !1,
 		transitionProps: { exitDuration: 0 },
 		disabled: i,
@@ -49082,23 +49190,23 @@ var FY = (0, _.forwardRef)((e, t) => {
 			inline: !1,
 			size: !0
 		},
-		children: [/* @__PURE__ */ (0, G.jsx)(Uq.Target, { children: /* @__PURE__ */ (0, G.jsx)($K, {
+		children: [/* @__PURE__ */ (0, G.jsx)(Jq.Target, { children: /* @__PURE__ */ (0, G.jsx)(iq, {
 			onMouseDown: (e) => {
 				_v() && e.currentTarget.focus();
 			},
 			leftSection: o.icon,
-			rightSection: /* @__PURE__ */ (0, G.jsx)(PY, {}),
+			rightSection: /* @__PURE__ */ (0, G.jsx)(zY, {}),
 			size: "xs",
 			variant: "subtle",
 			disabled: i,
 			children: o.text
-		}) }), /* @__PURE__ */ (0, G.jsx)(Uq.Dropdown, {
+		}) }), /* @__PURE__ */ (0, G.jsx)(Jq.Dropdown, {
 			className: n,
 			ref: t,
-			children: r.map((e) => /* @__PURE__ */ (0, G.jsx)(Uq.Item, {
+			children: r.map((e) => /* @__PURE__ */ (0, G.jsx)(Jq.Item, {
 				onClick: e.onClick,
 				leftSection: e.icon,
-				rightSection: e.isSelected ? /* @__PURE__ */ (0, G.jsx)(OK, {
+				rightSection: e.isSelected ? /* @__PURE__ */ (0, G.jsx)(NK, {
 					size: 10,
 					className: "bn-tick-icon"
 				}) : /* @__PURE__ */ (0, G.jsx)("div", { className: "bn-tick-space" }),
@@ -49107,14 +49215,14 @@ var FY = (0, _.forwardRef)((e, t) => {
 			}, e.text))
 		})]
 	}) : null;
-}), IY = (0, _.forwardRef)((e, t) => {
+}), VY = (0, _.forwardRef)((e, t) => {
 	let { className: n, children: r, ...i } = e;
 	return W(i, !1), /* @__PURE__ */ (0, G.jsx)("div", {
 		className: gv(n),
 		ref: t,
 		children: r
 	});
-}), LY = (0, _.forwardRef)((e, t) => {
+}), HY = (0, _.forwardRef)((e, t) => {
 	let { className: n, selected: r, comparing: i, onClick: a, actions: o, children: s, ...c } = e;
 	return W(c, !1), /* @__PURE__ */ (0, G.jsxs)("div", {
 		className: gv(n, r ? "selected" : "", i ? "comparing" : ""),
@@ -49126,94 +49234,94 @@ var FY = (0, _.forwardRef)((e, t) => {
 			children: o
 		})]
 	});
-}), RY = {
+}), UY = {
 	FormattingToolbar: {
-		Root: yY,
-		Button: MJ,
-		Select: FY
+		Root: wY,
+		Button: LJ,
+		Select: BY
 	},
 	FilePanel: {
-		Root: ZJ,
-		Button: QJ,
-		FileInput: $J,
-		TabPanel: eY,
-		TextInput: tY
+		Root: nY,
+		Button: rY,
+		FileInput: iY,
+		TabPanel: aY,
+		TextInput: oY
 	},
 	GridSuggestionMenu: {
+		Root: vY,
+		Item: bY,
+		EmptyItem: yY,
+		Loader: xY
+	},
+	LinkToolbar: {
+		Root: wY,
+		Button: LJ,
+		Select: BY
+	},
+	SideMenu: {
+		Root: uY,
+		Button: dY
+	},
+	SuggestionMenu: {
 		Root: pY,
 		Item: hY,
 		EmptyItem: mY,
-		Loader: gY
+		Label: gY,
+		Loader: _Y
 	},
-	LinkToolbar: {
-		Root: yY,
-		Button: MJ,
-		Select: FY
-	},
-	SideMenu: {
-		Root: aY,
-		Button: oY
-	},
-	SuggestionMenu: {
-		Root: cY,
-		Item: uY,
-		EmptyItem: lY,
-		Label: dY,
-		Loader: fY
-	},
-	AttributionTooltip: { Root: sY },
+	AttributionTooltip: { Root: fY },
 	TableHandle: {
-		Root: vY,
-		ExtendButton: _Y
+		Root: CY,
+		ExtendButton: SY
 	},
 	Generic: {
 		Badge: {
-			Root: NJ,
-			Group: PJ
+			Root: RJ,
+			Group: zJ
 		},
 		Form: {
 			Root: (e) => /* @__PURE__ */ (0, G.jsx)("div", { children: e.children }),
-			TextInput: HJ
+			TextInput: qJ
 		},
 		Menu: {
-			Root: WJ,
-			Trigger: KJ,
-			Dropdown: qJ,
-			Divider: JJ,
-			Label: YJ,
-			Item: GJ,
-			Button: XJ
+			Root: YJ,
+			Trigger: ZJ,
+			Dropdown: QJ,
+			Divider: $J,
+			Label: eY,
+			Item: XJ,
+			Button: tY
 		},
 		Popover: {
-			Root: nY,
-			Trigger: rY,
-			Content: iY
+			Root: sY,
+			Trigger: cY,
+			Content: lY
 		},
 		Toolbar: {
-			Root: yY,
-			Button: MJ,
-			Select: FY
+			Root: wY,
+			Button: LJ,
+			Select: BY
 		}
 	},
 	Comments: {
-		Comment: zJ,
-		Editor: BJ,
-		Card: FJ,
-		CardSection: IJ,
-		ExpandSectionsPrompt: LJ
+		Comment: WJ,
+		Editor: GJ,
+		Card: BJ,
+		CardSection: VJ,
+		ExpandSectionsPrompt: HJ
 	},
 	Versioning: {
-		Sidebar: IY,
-		Snapshot: LY
+		Sidebar: VY,
+		Snapshot: HY
 	}
-}, zY = (e) => {
-	let { className: t, theme: n, editor: r, ...i } = e, a = OI(), o = vB(), s = a?.colorSchemePreference || o, c = typeof n == "string" ? n : s === "no-preference" ? "light" : s, l = (0, _.useCallback)((e) => {
-		if (e && (AJ(e), typeof n == "object")) {
+}, WY = (e) => {
+	let { className: t, theme: n, editor: r, ...i } = e, a = kI(), o = SB(), s = a?.colorSchemePreference || o, c = typeof n == "string" ? n : s === "no-preference" ? "light" : s, l = (0, _.useCallback)((e) => {
+		if (e && (FJ(e), typeof n == "object")) {
 			if ("light" in n && "dark" in n) {
-				OJ(n[s === "dark" ? "dark" : "light"], e);
+				NJ(n[s === "dark" ? "dark" : "light"], e);
 				return;
 			}
-			OJ(n, e);
+			NJ(n, e);
 			return;
 		}
 	}, [s, n]);
@@ -49225,9 +49333,9 @@ var FY = (0, _.forwardRef)((e, t) => {
 		l,
 		c
 	]);
-	let u = (0, _.useContext)(yH), d = /* @__PURE__ */ (0, G.jsx)(PI.Provider, {
-		value: RY,
-		children: /* @__PURE__ */ (0, G.jsx)(DB, {
+	let u = (0, _.useContext)(wH), d = /* @__PURE__ */ (0, G.jsx)(FI.Provider, {
+		value: UY,
+		children: /* @__PURE__ */ (0, G.jsx)(jB, {
 			"data-mantine-color-scheme": c,
 			className: gv("bn-mantine", t || ""),
 			theme: typeof n == "object" ? void 0 : n,
@@ -49236,12 +49344,12 @@ var FY = (0, _.forwardRef)((e, t) => {
 			ref: l
 		})
 	});
-	return u ? d : /* @__PURE__ */ (0, G.jsx)(CU, {
+	return u ? d : /* @__PURE__ */ (0, G.jsx)(OU, {
 		withCssVariables: !1,
 		getRootElement: () => void 0,
 		children: d
 	});
-}, BY = [
+}, GY = [
 	"#FFFFFF",
 	"#EFEFEF",
 	"#CFCFCF",
@@ -49252,44 +49360,44 @@ var FY = (0, _.forwardRef)((e, t) => {
 	"#161616",
 	"#0F0F0F",
 	"#000000"
-], VY = {
+], KY = {
 	colors: {
 		editor: {
-			text: BY[5],
-			background: BY[0]
+			text: GY[5],
+			background: GY[0]
 		},
 		menu: {
-			text: BY[5],
-			background: BY[0]
+			text: GY[5],
+			background: GY[0]
 		},
 		tooltip: {
-			text: BY[5],
-			background: BY[1]
+			text: GY[5],
+			background: GY[1]
 		},
 		hovered: {
-			text: BY[5],
-			background: BY[1]
+			text: GY[5],
+			background: GY[1]
 		},
 		selected: {
-			text: BY[0],
-			background: BY[5]
+			text: GY[0],
+			background: GY[5]
 		},
 		disabled: {
-			text: BY[3],
-			background: BY[1]
+			text: GY[3],
+			background: GY[1]
 		},
-		shadow: BY[2],
-		border: BY[1],
-		sideMenu: BY[2],
+		shadow: GY[2],
+		border: GY[1],
+		sideMenu: GY[2],
 		highlights: Jy
 	},
 	borderRadius: 6,
 	fontFamily: "\"Inter\", \"SF Pro Display\", -apple-system, BlinkMacSystemFont, \"Open Sans\", \"Segoe UI\", \"Roboto\", \"Oxygen\", \"Ubuntu\", \"Cantarell\", \"Fira Sans\", \"Droid Sans\", \"Helvetica Neue\", sans-serif"
 };
-BY[2], BY[6], BY[2], BY[6], BY[2], BY[7], BY[2], BY[7], BY[2], BY[8], BY[5], BY[7], BY[8], BY[7], BY[4], VY.borderRadius, VY.fontFamily;
+GY[2], GY[6], GY[2], GY[6], GY[2], GY[7], GY[2], GY[7], GY[2], GY[8], GY[5], GY[7], GY[8], GY[7], GY[4], KY.borderRadius, KY.fontFamily;
 //#endregion
 //#region src/notebook-schema.js
-var HY = "permitext-notebook-card", UY = "blocknote-json", WY = Object.freeze([
+var qY = "permitext-notebook-card", JY = "blocknote-json", YY = Object.freeze([
 	"canonicalSection",
 	"selectedPassage",
 	"researchAnswer",
@@ -49297,7 +49405,7 @@ var HY = "permitext-notebook-card", UY = "blocknote-json", WY = Object.freeze([
 	"attachment",
 	"workboard",
 	"reportDraft"
-]), GY = Object.freeze([
+]), XY = Object.freeze([
 	"paragraph",
 	"heading",
 	"bulletListItem",
@@ -49310,23 +49418,23 @@ var HY = "permitext-notebook-card", UY = "blocknote-json", WY = Object.freeze([
 	"table",
 	"image"
 ]);
-function KY() {
+function ZY() {
 	return [{
 		type: "paragraph",
 		content: []
 	}];
 }
-function qY(e) {
+function QY(e) {
 	let t = {};
 	return (Array.isArray(e) ? e : []).forEach((e) => {
 		(e?.type === "bold" || e?.type === "italic") && (t[e.type] = !0);
 	}), t;
 }
-function JY(e) {
+function $Y(e) {
 	return e?.type === "text" && typeof e.text == "string" ? {
 		type: "text",
 		text: e.text,
-		styles: qY(e.marks)
+		styles: QY(e.marks)
 	} : e?.type === "permitextReference" ? {
 		type: "permitextReference",
 		props: {
@@ -49336,17 +49444,17 @@ function JY(e) {
 		}
 	} : null;
 }
-function YY(e) {
+function eX(e) {
 	let t = (Array.isArray(e?.content) ? e.content : []).filter((e) => e?.type === "paragraph").map((e) => ({
 		type: "paragraph",
-		content: (Array.isArray(e.content) ? e.content : []).map(JY).filter(Boolean)
+		content: (Array.isArray(e.content) ? e.content : []).map($Y).filter(Boolean)
 	}));
-	return t.length ? t : KY();
+	return t.length ? t : ZY();
 }
-function XY(e) {
-	return Array.isArray(e) ? e.length ? e : KY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : KY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? YY(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? ZY(e.plainText) : KY();
+function tX(e) {
+	return Array.isArray(e) ? e.length ? e : ZY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : ZY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? eX(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? nX(e.plainText) : ZY();
 }
-function ZY(e) {
+function nX(e) {
 	let t = String(e || "").split(/\n{2,}/).map((e) => e.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean).map((e) => ({
 		type: "paragraph",
 		content: [{
@@ -49355,16 +49463,60 @@ function ZY(e) {
 			styles: {}
 		}]
 	}));
-	return t.length ? t : KY();
+	return t.length ? t : ZY();
 }
 //#endregion
 //#region src/notebook-editor.js
-var QY = new Set(GY), $Y = ZB({
+var rX = new Set(XY), iX = Object.freeze([
+	{
+		label: "Default",
+		value: ""
+	},
+	{
+		label: "12",
+		value: "12px"
+	},
+	{
+		label: "14",
+		value: "14px"
+	},
+	{
+		label: "16",
+		value: "16px"
+	},
+	{
+		label: "18",
+		value: "18px"
+	},
+	{
+		label: "24",
+		value: "24px"
+	},
+	{
+		label: "32",
+		value: "32px"
+	}
+]), aX = nV({
+	type: "fontSize",
+	propSchema: "string"
+}, {
+	render: ({ value: e, contentRef: t }) => _.createElement("span", {
+		ref: t,
+		style: { fontSize: e },
+		"data-font-size": e
+	}),
+	toExternalHTML: ({ value: e, contentRef: t }) => _.createElement("span", {
+		ref: t,
+		style: { fontSize: e },
+		"data-font-size": e
+	}),
+	parse: (e) => e.dataset.fontSize || e.style.fontSize || void 0
+}), oX = tV({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
 			default: "canonicalSection",
-			values: [...WY]
+			values: [...YY]
 		},
 		referenceID: { default: "" },
 		label: { default: "Linked Permitext item" }
@@ -49387,44 +49539,68 @@ var QY = new Set(GY), $Y = ZB({
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
 	}, e.props.label)
-}), eX = Object.fromEntries(Object.entries(xx).filter(([e]) => QY.has(e))), tX = Dx.create({
-	blockSpecs: eX,
+}), sX = Object.fromEntries(Object.entries(xx).filter(([e]) => rX.has(e))), cX = Dx.create({
+	blockSpecs: sX,
 	inlineContentSpecs: {
 		...Tx,
-		permitextReference: $Y
+		permitextReference: oX
 	},
-	styleSpecs: wx
+	styleSpecs: {
+		...wx,
+		fontSize: aX
+	}
 });
-function nX(e) {
+function lX() {
+	let e = q(cX), t = J(), n = RI({
+		editor: e,
+		selector: ({ editor: e }) => e.getActiveStyles().fontSize || ""
+	});
+	return t ? _.createElement(t.FormattingToolbar.Select, {
+		className: "notebook-font-size-select",
+		items: iX.map(({ label: t, value: r }) => ({
+			text: t,
+			icon: _.createElement("span", { "aria-hidden": "true" }, r ? `${t}px` : "Aa"),
+			isSelected: n === r,
+			onClick: () => {
+				r ? e.addStyles({ fontSize: r }) : n && e.removeStyles({ fontSize: n });
+			}
+		}))
+	}) : null;
+}
+function uX() {
+	let e = _z();
+	return _.createElement(vz, null, e[0], _.createElement(lX, { key: "font-size-select" }), ...e.slice(1));
+}
+function dX(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
-	if (!WY.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
+	if (!YY.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
 		referenceKind: t,
 		referenceID: n,
 		label: r
 	};
 }
-function rX(e) {
+function fX(e) {
 	return {
-		schema: HY,
+		schema: qY,
 		schemaVersion: 2,
-		format: UY,
+		format: JY,
 		document: e
 	};
 }
-function iX() {
+function pX() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function aX({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(iX), i = BI({
-		schema: tX,
-		initialContent: (0, _.useMemo)(() => XY(e.document), []),
+function mX({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(pX), i = VI({
+		schema: cX,
+		initialContent: (0, _.useMemo)(() => tX(e.document), []),
 		uploadFile: e.uploadFile,
 		resolveFileUrl: e.resolveFileUrl
 	}), a = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(iX()), t = new MutationObserver(e);
+		let e = () => r(pX()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -49437,34 +49613,35 @@ function aX({ options: e, controllerRef: t }) {
 		t.current === i && (t.current = null);
 	}), [i]), (0, _.useEffect)(() => {
 		let t = e.document;
-		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, XY(t)));
-	}, [i, e.document]), _.createElement(zY, {
+		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, tX(t)));
+	}, [i, e.document]), _.createElement(WY, {
 		editor: i,
 		editable: e.editable !== !1,
 		theme: n,
-		onChange: () => e.onChange?.(rX(i.document)),
+		formattingToolbar: !1,
+		onChange: () => e.onChange?.(fX(i.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	});
+	}, _.createElement(bz, { formattingToolbar: uX }));
 }
-function oX(e, t = {}) {
+function hX(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = { current: null }, r = (0, y.createRoot)(e);
-	return r.render(_.createElement(aX, {
+	return r.render(_.createElement(mX, {
 		options: t,
 		controllerRef: n
 	})), {
 		getDocument() {
-			return rX(n.current?.document || t.document?.document || []);
+			return fX(n.current?.document || t.document?.document || []);
 		},
 		setDocument(e) {
 			let t = n.current;
-			t && t.replaceBlocks(t.document, XY(e));
+			t && t.replaceBlocks(t.document, tX(e));
 		},
 		insertReference(e) {
 			let t = n.current;
 			t && (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: nX(e)
+				props: dX(e)
 			}, " "]));
 		},
 		replaceAssetURL(e, t) {
@@ -49499,4 +49676,4 @@ function oX(e, t = {}) {
 	};
 }
 //#endregion
-export { oX as mountPermitextNotebookEditor, tX as permitextNotebookSchema };
+export { hX as mountPermitextNotebookEditor, cX as permitextNotebookSchema };

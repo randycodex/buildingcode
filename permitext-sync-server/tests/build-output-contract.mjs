@@ -20,6 +20,14 @@ assert(
     notebookEditor.includes('from "@blocknote/react"'),
   "The Notebook editor is not built from the open-source BlockNote packages."
 );
+assert(
+  notebookEditor.includes('type: "fontSize"') &&
+    notebookEditor.includes('className: "notebook-font-size-select"') &&
+    notebookEditor.includes("FormattingToolbarController") &&
+    notebookEditor.includes("editor.addStyles({ fontSize: value })") &&
+    notebookEditor.includes("editor.removeStyles({ fontSize: activeFontSize })"),
+  "Every shared BlockNote editor must offer inline text-size formatting."
+);
 assert.equal(notebookSchema.includes("tiptapDocumentToBlockNote"), true);
 assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
 assert.equal(packageManifest.dependencies["@tiptap/core"], undefined);
@@ -37,7 +45,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260801-notebook-images-v5"'),
+    webClient.includes('notebookClientVersion = "20260801-notebook-font-size-v6"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

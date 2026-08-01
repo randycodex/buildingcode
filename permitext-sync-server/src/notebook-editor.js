@@ -10,7 +10,14 @@ import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
 import {
   createReactInlineContentSpec,
-  useCreateBlockNote
+  createReactStyleSpec,
+  FormattingToolbar,
+  FormattingToolbarController,
+  getFormattingToolbarItems,
+  useBlockNoteEditor,
+  useComponentsContext,
+  useCreateBlockNote,
+  useEditorState
 } from "@blocknote/react";
 import {
   blockNoteBlocksFromNotebookDocument,
@@ -23,6 +30,36 @@ import {
 } from "./notebook-schema.js";
 
 const allowedBlockTypeSet = new Set(notebookBlockTypes);
+
+const notebookFontSizes = Object.freeze([
+  { label: "Default", value: "" },
+  { label: "12", value: "12px" },
+  { label: "14", value: "14px" },
+  { label: "16", value: "16px" },
+  { label: "18", value: "18px" },
+  { label: "24", value: "24px" },
+  { label: "32", value: "32px" }
+]);
+
+const PermitextFontSize = createReactStyleSpec(
+  {
+    type: "fontSize",
+    propSchema: "string"
+  },
+  {
+    render: ({ value, contentRef }) => React.createElement("span", {
+      ref: contentRef,
+      style: { fontSize: value },
+      "data-font-size": value
+    }),
+    toExternalHTML: ({ value, contentRef }) => React.createElement("span", {
+      ref: contentRef,
+      style: { fontSize: value },
+      "data-font-size": value
+    }),
+    parse: (element) => element.dataset.fontSize || element.style.fontSize || undefined
+  }
+);
 
 const PermitextReference = createReactInlineContentSpec(
   {
@@ -75,8 +112,47 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
     ...defaultInlineContentSpecs,
     permitextReference: PermitextReference
   },
-  styleSpecs: defaultStyleSpecs
+  styleSpecs: {
+    ...defaultStyleSpecs,
+    fontSize: PermitextFontSize
+  }
 });
+
+function FontSizeSelect() {
+  const editor = useBlockNoteEditor(permitextNotebookSchema);
+  const components = useComponentsContext();
+  const activeFontSize = useEditorState({
+    editor,
+    selector: ({ editor: currentEditor }) => currentEditor.getActiveStyles().fontSize || ""
+  });
+  if (!components) return null;
+  return React.createElement(components.FormattingToolbar.Select, {
+    className: "notebook-font-size-select",
+    items: notebookFontSizes.map(({ label, value }) => ({
+      text: label,
+      icon: React.createElement("span", { "aria-hidden": "true" }, value ? `${label}px` : "Aa"),
+      isSelected: activeFontSize === value,
+      onClick: () => {
+        if (value) {
+          editor.addStyles({ fontSize: value });
+        } else if (activeFontSize) {
+          editor.removeStyles({ fontSize: activeFontSize });
+        }
+      }
+    }))
+  });
+}
+
+function PermitextFormattingToolbar() {
+  const defaultItems = getFormattingToolbarItems();
+  return React.createElement(
+    FormattingToolbar,
+    null,
+    defaultItems[0],
+    React.createElement(FontSizeSelect, { key: "font-size-select" }),
+    ...defaultItems.slice(1)
+  );
+}
 
 function normalizedReference(reference) {
   const referenceKind = String(reference?.referenceKind || "").trim();
@@ -148,13 +224,20 @@ function PermitextNotebookEditor({ options, controllerRef }) {
     editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(incoming));
   }, [editor, options.document]);
 
-  return React.createElement(BlockNoteView, {
-    editor,
-    editable: options.editable !== false,
-    theme,
-    onChange: () => options.onChange?.(wrappedDocument(editor.document)),
-    "aria-label": options.ariaLabel || "Notebook card"
-  });
+  return React.createElement(
+    BlockNoteView,
+    {
+      editor,
+      editable: options.editable !== false,
+      theme,
+      formattingToolbar: false,
+      onChange: () => options.onChange?.(wrappedDocument(editor.document)),
+      "aria-label": options.ariaLabel || "Notebook card"
+    },
+    React.createElement(FormattingToolbarController, {
+      formattingToolbar: PermitextFormattingToolbar
+    })
+  );
 }
 
 export function mountPermitextNotebookEditor(element, options = {}) {

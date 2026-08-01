@@ -10601,6 +10601,15 @@ body.is-resizing-research-evidence * {
   font-family: inherit;
 }
 
+/* The workspace's compact typography uses an !important rule, so preserve
+ * explicitly selected BlockNote sizes with an equally scoped editor override. */
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="12px"] { font-size: 12px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="14px"] { font-size: 14px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="16px"] { font-size: 16px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="18px"] { font-size: 18px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="24px"] { font-size: 24px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="32px"] { font-size: 32px !important; }
+
 .notebook-editor-surface .bn-side-menu,
 .notebook-editor-surface .bn-formatting-toolbar,
 .notebook-editor-surface .bn-suggestion-menu,
