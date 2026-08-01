@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-saved-auto-fit-v374";
+} from "./offline-storage.js?v=20260801-project-evidence-select-v375";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -6331,7 +6331,7 @@ async function removeSectionFromProject(project, item, options = {}) {
     deletion.projectSection
   ];
   saveWorkspaceState();
-  await refreshProjectMembershipPanes(project);
+  if (options.refreshPanes !== false) await refreshProjectMembershipPanes(project);
 
   if (activeAccount()) {
     try {
@@ -15002,7 +15002,40 @@ function projectNoteEditor(identity, note, options = {}) {
   container.className = "project-note-block-editor";
   const editorElement = document.createElement("div");
   editorElement.className = "notebook-editor-surface project-note-editor-surface";
-  container.append(editorElement);
+  const resizeHandle = document.createElement("div");
+  resizeHandle.className = "project-note-resize-handle";
+  resizeHandle.setAttribute("role", "separator");
+  resizeHandle.setAttribute("aria-label", "Resize Project information");
+  resizeHandle.setAttribute("aria-orientation", "horizontal");
+  resizeHandle.tabIndex = 0;
+  const resizeTo = (height) => {
+    const maximumHeight = Math.min(window.innerHeight * 0.7, 760);
+    container.style.height = `${Math.max(220, Math.min(maximumHeight, height))}px`;
+  };
+  resizeHandle.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    const startY = event.clientY;
+    const startHeight = container.getBoundingClientRect().height;
+    resizeHandle.setPointerCapture(event.pointerId);
+    container.classList.add("is-resizing");
+    const resize = (moveEvent) => resizeTo(startHeight + moveEvent.clientY - startY);
+    const finish = () => {
+      container.classList.remove("is-resizing");
+      resizeHandle.removeEventListener("pointermove", resize);
+      resizeHandle.removeEventListener("pointerup", finish);
+      resizeHandle.removeEventListener("pointercancel", finish);
+    };
+    resizeHandle.addEventListener("pointermove", resize);
+    resizeHandle.addEventListener("pointerup", finish);
+    resizeHandle.addEventListener("pointercancel", finish);
+  });
+  resizeHandle.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowUp" && event.key !== "ArrowDown") return;
+    event.preventDefault();
+    const direction = event.key === "ArrowDown" ? 1 : -1;
+    resizeTo(container.getBoundingClientRect().height + direction * (event.shiftKey ? 40 : 16));
+  });
+  container.append(editorElement, resizeHandle);
 
   let currentNote = note || null;
   let draftDocument = currentNote?.document || notebookDocumentFromPlainText(options.plainText || currentNote?.body || "");
@@ -15827,7 +15860,15 @@ async function renderProjectDetail(detail) {
   savedTitle.setAttribute("aria-expanded", "true");
   const savedHeadingActions = document.createElement("div");
   savedHeadingActions.className = "project-section-heading-actions";
-  savedHeadingActions.append(projectSectionCount(previewItems.length, "Saved evidence items"));
+  const savedSelectButton = document.createElement("button");
+  savedSelectButton.className = "project-section-toggle-chevron project-evidence-select-button";
+  savedSelectButton.type = "button";
+  savedSelectButton.title = "Select saved evidence";
+  savedSelectButton.setAttribute("aria-label", savedSelectButton.title);
+  savedSelectButton.setAttribute("aria-pressed", "false");
+  savedSelectButton.innerHTML = selectionModeIconSVG();
+  savedSelectButton.hidden = identity.sharedOnly || previewItems.length === 0;
+  savedHeadingActions.append(savedSelectButton);
   const savedToggle = document.createElement("button");
   savedToggle.className = "project-section-toggle-chevron";
   savedToggle.type = "button";
@@ -15838,6 +15879,64 @@ async function renderProjectDetail(detail) {
   savedHeading.append(savedTitle, savedHeadingActions);
   const savedBody = document.createElement("div");
   savedBody.className = "project-studio-collapsible-body project-saved-evidence-body";
+  const savedBulkBar = document.createElement("section");
+  savedBulkBar.className = "project-bulk-bar project-evidence-bulk-bar";
+  savedBulkBar.hidden = true;
+  const savedBulkCount = document.createElement("span");
+  savedBulkCount.className = "project-bulk-count";
+  const savedSelectAll = document.createElement("button");
+  savedSelectAll.className = "project-bulk-link";
+  savedSelectAll.type = "button";
+  const savedRemoveSelected = document.createElement("button");
+  savedRemoveSelected.className = "project-bulk-action is-delete";
+  savedRemoveSelected.type = "button";
+  const savedCancelSelection = document.createElement("button");
+  savedCancelSelection.className = "project-bulk-link";
+  savedCancelSelection.type = "button";
+  savedCancelSelection.textContent = "Cancel";
+  savedBulkBar.append(savedBulkCount, savedSelectAll, savedRemoveSelected, savedCancelSelection);
+  savedBody.append(savedBulkBar);
+  const savedEvidenceItemsByID = new Map();
+  const savedEvidenceRows = new Map();
+  const selectedSavedEvidenceIDs = new Set();
+  let selectingSavedEvidence = false;
+  let removingSavedEvidence = false;
+  const savedEvidenceItemID = (item) => String(
+    item.projectSectionID || item.id || `${item.sectionID || item.savedSectionID || item.itemID}:${item.blockID || ""}`
+  );
+  previewItems.forEach((item) => savedEvidenceItemsByID.set(savedEvidenceItemID(item), item));
+  const updateSavedEvidenceSelection = () => {
+    savedBody.classList.toggle("is-selecting", selectingSavedEvidence);
+    savedSelectButton.setAttribute("aria-pressed", String(selectingSavedEvidence));
+    savedBulkBar.hidden = !selectingSavedEvidence;
+    const selectedCount = selectedSavedEvidenceIDs.size;
+    savedBulkCount.textContent = `${selectedCount} selected`;
+    savedSelectAll.textContent = selectedCount === savedEvidenceItemsByID.size ? "Clear all" : "Select all";
+    savedRemoveSelected.textContent = selectedCount ? `Remove ${selectedCount}` : "Remove";
+    savedRemoveSelected.disabled = selectedCount === 0 || removingSavedEvidence;
+    savedSelectAll.disabled = removingSavedEvidence;
+    savedCancelSelection.disabled = removingSavedEvidence;
+    savedSelectButton.disabled = removingSavedEvidence;
+    savedEvidenceRows.forEach((row, id) => {
+      const selected = selectedSavedEvidenceIDs.has(id);
+      row.classList.toggle("is-selected", selected);
+      const rowButton = row.querySelector(".project-detail-section-open");
+      if (selectingSavedEvidence) rowButton?.setAttribute("aria-pressed", String(selected));
+      else rowButton?.removeAttribute("aria-pressed");
+    });
+  };
+  const setSavedEvidenceSelection = (active) => {
+    selectingSavedEvidence = Boolean(active);
+    selectedSavedEvidenceIDs.clear();
+    updateSavedEvidenceSelection();
+  };
+  const toggleSavedEvidenceItem = (item) => {
+    if (!selectingSavedEvidence || removingSavedEvidence) return;
+    const id = savedEvidenceItemID(item);
+    if (selectedSavedEvidenceIDs.has(id)) selectedSavedEvidenceIDs.delete(id);
+    else selectedSavedEvidenceIDs.add(id);
+    updateSavedEvidenceSelection();
+  };
   savedSection.append(savedHeading, savedBody);
   const codeGroups = new Map();
   previewItems.forEach((item) => {
@@ -15864,6 +15963,10 @@ async function renderProjectDetail(detail) {
       const row = document.createElement("article");
       row.className = "saved-row project-detail-saved-row";
       if (identity.sharedOnly) row.classList.add("is-read-only");
+      const selectionIndicator = document.createElement("span");
+      selectionIndicator.className = "project-evidence-selection-check";
+      selectionIndicator.setAttribute("aria-hidden", "true");
+      selectionIndicator.innerHTML = selectionIndicatorIconSVG();
       const openButton = document.createElement("button");
       openButton.className = "project-detail-section-open";
       openButton.type = "button";
@@ -15888,30 +15991,48 @@ async function renderProjectDetail(detail) {
         openButton.append(preview);
       }
       openButton.addEventListener("click", () => {
+        if (selectingSavedEvidence) {
+          toggleSavedEvidenceItem(item);
+          return;
+        }
         void openProjectSavedSection(identity, item);
       });
-      const removeButton = document.createElement("button");
-      removeButton.className = "project-detail-section-remove";
-      removeButton.type = "button";
-      removeButton.title = "Remove from project";
-      removeButton.setAttribute("aria-label", `Remove ${sectionDisplayTitle(sectionNumber, item.title || rowTitle.textContent)} from ${identity.name}`);
-      removeButton.innerHTML = trashIconSVG();
-      removeButton.addEventListener("click", async () => {
-        removeButton.disabled = true;
-        try {
-          await removeSectionFromProject(identity, item);
-          await renderWorkspace();
-        } catch (error) {
-          removeButton.disabled = false;
-          await showWebNotice("Could not remove section", error.message || "The section could not be removed.");
-        }
-      });
-      row.append(openButton);
-      if (!identity.sharedOnly) row.append(removeButton);
+      row.append(openButton, selectionIndicator);
+      savedEvidenceRows.set(savedEvidenceItemID(item), row);
       codeGroup.append(row);
     });
     savedBody.append(codeGroup);
   });
+  savedSelectButton.addEventListener("click", () => setSavedEvidenceSelection(!selectingSavedEvidence));
+  savedSelectAll.addEventListener("click", () => {
+    if (selectedSavedEvidenceIDs.size === savedEvidenceItemsByID.size) selectedSavedEvidenceIDs.clear();
+    else savedEvidenceItemsByID.forEach((_item, id) => selectedSavedEvidenceIDs.add(id));
+    updateSavedEvidenceSelection();
+  });
+  savedCancelSelection.addEventListener("click", () => setSavedEvidenceSelection(false));
+  savedRemoveSelected.addEventListener("click", async () => {
+    const selectedItems = Array.from(selectedSavedEvidenceIDs, (id) => savedEvidenceItemsByID.get(id)).filter(Boolean);
+    if (!selectedItems.length) return;
+    const confirmed = await confirmWebWarning(
+      "Remove saved evidence",
+      `Remove ${selectedItems.length} selected ${selectedItems.length === 1 ? "item" : "items"} from ${identity.name}?`,
+      { confirmLabel: "Remove" }
+    );
+    if (!confirmed) return;
+    removingSavedEvidence = true;
+    updateSavedEvidenceSelection();
+    try {
+      for (const item of selectedItems) {
+        await removeSectionFromProject(identity, item, { refreshPanes: false });
+      }
+      await refreshProjectMembershipPanes(identity);
+    } catch (error) {
+      removingSavedEvidence = false;
+      updateSavedEvidenceSelection();
+      await showWebNotice("Could not remove saved evidence", error.message || "The selected items could not be removed.");
+    }
+  });
+  updateSavedEvidenceSelection();
   backButton.addEventListener("click", async () => {
     if (detachedProjectWindow) {
       window.close();

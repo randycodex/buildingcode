@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-saved-auto-fit-v374'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-evidence-select-v375'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1310,10 +1310,14 @@ async function main() {
         workspaceStyles.text.includes(".notebook-editor-surface,\n  .notebook-editor-surface .bn-container,\n  .notebook-editor-surface .bn-editor {\n    background: var(--surface-raised);\n    color: var(--text-primary);") &&
         workspaceStyles.text.includes("border-color: #fff !important;") &&
         workspaceStyles.text.includes(".notebook-editor-surface:not(.project-note-editor-surface) .bn-editor {\n  padding-inline-start: calc(var(--space-4) + 32px);") &&
-        workspaceStyles.text.includes(".project-note-block-editor {\n  height: 260px;") &&
+        workspaceStyles.text.includes(".project-note-block-editor {\n  position: relative;\n  height: 260px;") &&
+        workspaceStyles.text.includes(".project-note-resize-handle {\n  position: absolute;") &&
+        workspaceStyles.text.includes("right: 0;\n  bottom: 0;\n  left: 0;") &&
+        workspaceScript.text.includes('resizeHandle.className = "project-note-resize-handle"') &&
+        workspaceScript.text.includes("resizeHandle.setPointerCapture(event.pointerId)") &&
         workspaceStyles.text.includes("padding-top: calc(var(--project-pane-band-height) - var(--panel-padding) + var(--space-3));") &&
         workspaceStyles.text.includes(".project-detail-header-actions {\n  position: absolute;\n  top: 0;\n  right: 0;") &&
-        workspaceStyles.text.includes("  background: transparent;\n}\n\n.project-note-editor-surface {") &&
+        workspaceStyles.text.includes("  resize: none;\n  border-radius: var(--radius-card);\n  background: transparent;") &&
         workspaceStyles.text.includes(".project-note-editor-surface {") &&
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
@@ -1346,7 +1350,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-auto-fit-v374'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-evidence-select-v375'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1558,7 +1562,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-saved-auto-fit-v374'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-evidence-select-v375'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2461,7 +2465,11 @@ async function main() {
         workspaceStyles.text.includes(".project-saved-code-group") &&
         workspaceStyles.text.match(/\.project-detail-section-preview \{[\s\S]*?text-overflow: ellipsis;[\s\S]*?-webkit-line-clamp: 3;/) &&
         workspaceStyles.text.includes(".project-detail-section-heading") &&
-        workspaceStyles.text.match(/\.project-detail-saved-row \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;/),
+        workspaceStyles.text.match(/\.project-detail-saved-row \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?border-radius: 0;/) &&
+        workspaceScript.text.includes('savedSelectButton.className = "project-section-toggle-chevron project-evidence-select-button"') &&
+        workspaceScript.text.includes('savedBulkBar.className = "project-bulk-bar project-evidence-bulk-bar"') &&
+        workspaceScript.text.includes("await removeSectionFromProject(identity, item, { refreshPanes: false })") &&
+        workspaceStyles.text.includes(".project-saved-evidence-body.is-selecting .project-detail-saved-row.is-selected"),
       "Saved and project cards omitted note previews, code grouping, or section previews."
     );
     assert(
