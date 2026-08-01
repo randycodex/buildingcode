@@ -10239,7 +10239,7 @@ body.is-resizing-research-evidence * {
   min-height: 0;
   overflow: hidden;
   padding: var(--space-4);
-  background: var(--surface);
+  background: #000;
 }
 
 .notebook-welcome {
@@ -10290,13 +10290,13 @@ body.is-resizing-research-evidence * {
 .notebook-editor-surface {
   min-height: 0;
   overflow-y: auto;
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--surface-muted) 66%, var(--surface));
-  box-shadow: inset 0 0 0 2px transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .notebook-editor-surface:focus-within {
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 48%, transparent);
+  box-shadow: none;
 }
 
 .notebook-editor-surface .bn-container {
