@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260801-blocknote-notebook-v297";
+} from "./offline-storage.js?v=20260801-blocknote-notebook-v298";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -15329,12 +15329,35 @@ async function renderProjectDetail(detail) {
   const savedSection = document.createElement("section");
   savedSection.className = "project-detail-section project-studio-section";
   const savedHeading = document.createElement("div");
-  savedHeading.className = "project-studio-section-heading";
-  const savedTitle = document.createElement("p");
-  savedTitle.className = "section-label";
+  savedHeading.className = "project-studio-section-heading project-collapsible-heading";
+  const savedTitle = document.createElement("button");
+  savedTitle.className = "project-section-toggle-label section-label";
+  savedTitle.type = "button";
   savedTitle.textContent = "Saved evidence";
-  savedHeading.append(savedTitle, projectSectionCount(previewItems.length, "Saved evidence items"));
-  savedSection.append(savedHeading);
+  savedTitle.setAttribute("aria-expanded", "true");
+  const savedHeadingActions = document.createElement("div");
+  savedHeadingActions.className = "project-section-heading-actions";
+  savedHeadingActions.append(projectSectionCount(previewItems.length, "Saved evidence items"));
+  const savedToggle = document.createElement("button");
+  savedToggle.className = "project-section-toggle-chevron";
+  savedToggle.type = "button";
+  savedToggle.setAttribute("aria-label", "Collapse Saved evidence");
+  savedToggle.setAttribute("aria-expanded", "true");
+  savedToggle.innerHTML = researchChevronIconsSVG();
+  savedHeadingActions.append(savedToggle);
+  savedHeading.append(savedTitle, savedHeadingActions);
+  const savedBody = document.createElement("div");
+  savedBody.className = "project-studio-collapsible-body project-saved-evidence-body";
+  const setSavedEvidenceExpanded = (expanded) => {
+    savedTitle.setAttribute("aria-expanded", String(expanded));
+    savedToggle.setAttribute("aria-expanded", String(expanded));
+    savedToggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Saved evidence`);
+    savedBody.hidden = !expanded;
+  };
+  const toggleSavedEvidence = () => setSavedEvidenceExpanded(savedTitle.getAttribute("aria-expanded") === "false");
+  savedTitle.addEventListener("click", toggleSavedEvidence);
+  savedToggle.addEventListener("click", toggleSavedEvidence);
+  savedSection.append(savedHeading, savedBody);
   const codeGroups = new Map();
   previewItems.forEach((item) => {
     const prefix = item.codePrefix || "BC";
@@ -15406,7 +15429,7 @@ async function renderProjectDetail(detail) {
       if (!identity.sharedOnly) row.append(removeButton);
       codeGroup.append(row);
     });
-    savedSection.append(codeGroup);
+    savedBody.append(codeGroup);
   });
   backButton.addEventListener("click", async () => {
     if (detachedProjectWindow) {
