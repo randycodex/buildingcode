@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-section-settle-v368";
+} from "./offline-storage.js?v=20260801-saved-pane-width-v369";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -167,6 +167,7 @@ const defaultReaderPaneWidth = 520;
 const defaultSourceLinkedReaderPaneWidth = 400;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
+const defaultSavedPaneWidth = 600;
 const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
 const defaultNotebookPaneWidth = 600;
@@ -2228,6 +2229,7 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
+  if (paneID === "utility:projects") return defaultSavedPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
   if (paneID.startsWith("reader:")) {
