@@ -21,6 +21,23 @@ assert.equal(note.updatedByUserID, "editor-1");
 assert.equal(note.schemaVersion, 1);
 assert.equal(note.createdByDisplayName, "Alex Editor");
 
+const structuredNote = normalizeProjectNotePayload({
+  projectID: "project-1",
+  document: {
+    schema: "permitext-notebook-card",
+    schemaVersion: 2,
+    format: "blocknote-json",
+    document: [{
+      type: "paragraph",
+      content: [{ type: "text", text: "One shared Project note.", styles: {} }]
+    }]
+  },
+  createdByUserID: "editor-1"
+});
+assert.equal(structuredNote.title, "Project information");
+assert.equal(structuredNote.body, "One shared Project note.");
+assert.equal(structuredNote.document.format, "blocknote-json");
+
 const request = normalizeReviewThreadPayload({
   projectID: "project-1",
   kind: "missing-project-fact",

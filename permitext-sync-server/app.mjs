@@ -7193,15 +7193,29 @@ async function handleProjectCollaborationNoteSave(request, response) {
   );
   if (!access) return;
   const requestedNoteID = String(context.body.noteID || "").trim();
-  const existing = requestedNoteID
-    ? await linkedProjectArtifact(
-        access.storageOwnerUserID,
-        projectID,
-        "projectNote",
-        "projectNote",
-        requestedNoteID
+  const linkedNoteIDs = new Set(
+    (await listStoredProjectLinks(access.storageOwnerUserID))
+      .filter((link) =>
+        !link.deletedAt &&
+        link.projectID === projectID &&
+        link.targetKind === "projectNote"
       )
-    : null;
+      .map((link) => link.targetID)
+  );
+  const projectNotes = (await listStoredFoundationArtifacts(access.storageOwnerUserID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "projectNote" &&
+      !artifact.envelope?.deletedAt &&
+      linkedNoteIDs.has(artifact.envelope.id)
+    )
+    .sort((left, right) =>
+      String(right.envelope.updatedAt || right.envelope.createdAt || "").localeCompare(
+        String(left.envelope.updatedAt || left.envelope.createdAt || "")
+      )
+    );
+  const existing = requestedNoteID
+    ? projectNotes.find((artifact) => artifact.envelope.id === requestedNoteID) || null
+    : projectNotes[0] || null;
   if (requestedNoteID && !existing) {
     sendError(response, 404, "Project note not found.");
     return;
@@ -7232,8 +7246,9 @@ async function handleProjectCollaborationNoteSave(request, response) {
       }),
       payload: normalizeProjectNotePayload({
         projectID,
-        title: context.body.title,
+        title: context.body.title || "Project information",
         body: context.body.body,
+        document: context.body.document,
         createdByUserID: existing?.payload.createdByUserID || context.userID,
         updatedByUserID: context.userID,
         createdByDisplayName: existing?.payload.createdByDisplayName ||

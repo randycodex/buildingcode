@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260801-blocknote-notebook-v289";
+} from "./offline-storage.js?v=20260801-blocknote-notebook-v292";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -12423,6 +12423,21 @@ function emptyNotebookDocument() {
   };
 }
 
+function notebookDocumentFromPlainText(value) {
+  const blocks = String(value || "")
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.replace(/\s*\n\s*/g, " ").trim())
+    .filter(Boolean)
+    .map((paragraph) => ({
+      type: "paragraph",
+      content: [{ type: "text", text: paragraph, styles: {} }]
+    }));
+  return {
+    ...emptyNotebookDocument(),
+    document: blocks.length ? blocks : emptyNotebookDocument().document
+  };
+}
+
 function notebookReferenceCandidates(projectID, foundation, cards) {
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
@@ -14459,55 +14474,76 @@ function projectCollaborationRefresh(identity) {
   });
 }
 
-function projectNoteEditor(identity, note, onCancel) {
-  const form = document.createElement("form");
-  form.className = "project-collaboration-editor";
-  const title = document.createElement("input");
-  title.type = "text";
-  title.maxLength = 160;
-  title.required = true;
-  title.placeholder = "Note title";
-  title.setAttribute("aria-label", "Project note title");
-  title.value = note?.title || "";
-  const body = document.createElement("textarea");
-  body.maxLength = 20000;
-  body.rows = 4;
-  body.placeholder = "Record a Project fact, coordination item, or professional note.";
-  body.setAttribute("aria-label", "Project note");
-  body.value = note?.body || "";
-  const actions = document.createElement("div");
-  actions.className = "project-collaboration-editor-actions";
-  const cancel = document.createElement("button");
-  cancel.type = "button";
-  cancel.textContent = "Cancel";
-  cancel.addEventListener("click", onCancel);
-  const save = document.createElement("button");
-  save.type = "submit";
-  save.textContent = note ? "Save revision" : "Save note";
-  actions.append(cancel, save);
-  form.append(title, body, actions);
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    form.querySelectorAll("button, input, textarea").forEach((control) => {
-      control.disabled = true;
-    });
-    try {
-      await postResearch("/projects/collaboration/notes/save", {
-        projectID: projectDetailKey(identity),
-        noteID: note?.id || undefined,
-        expectedVersion: note?.version || 0,
-        title: title.value,
-        body: body.value
-      });
-      await projectCollaborationRefresh(identity);
-    } catch (error) {
-      form.querySelectorAll("button, input, textarea").forEach((control) => {
-        control.disabled = false;
-      });
-      await showWebNotice("Project note not saved", error.message);
+function projectNoteEditor(identity, note, options = {}) {
+  const editable = options.editable !== false;
+  const container = document.createElement("div");
+  container.className = "project-note-block-editor";
+  const editorElement = document.createElement("div");
+  editorElement.className = "notebook-editor-surface project-note-editor-surface";
+  container.append(editorElement);
+
+  let currentNote = note || null;
+  let draftDocument = currentNote?.document || notebookDocumentFromPlainText(options.plainText || currentNote?.body || "");
+  let editorMount = null;
+  let editorReady = false;
+  let saveTimer = null;
+  let saveInFlight = false;
+  let saveQueued = false;
+
+  const saveDraft = async () => {
+    if (!editable || !editorMount) return;
+    if (saveInFlight) {
+      saveQueued = true;
+      return;
     }
-  });
-  return form;
+    saveInFlight = true;
+    const documentToSave = draftDocument;
+    try {
+      const payload = await postResearch("/projects/collaboration/notes/save", {
+        projectID: projectDetailKey(identity),
+        noteID: currentNote?.id || undefined,
+        expectedVersion: currentNote?.version || 0,
+        title: "Project information",
+        document: documentToSave
+      });
+      currentNote = payload.note;
+    } catch (error) {
+      await showWebNotice("Project note not saved", error.message);
+    } finally {
+      saveInFlight = false;
+      if (saveQueued || draftDocument !== documentToSave) {
+        saveQueued = false;
+        saveTimer = window.setTimeout(saveDraft, 100);
+      }
+    }
+  };
+
+  void loadNotebookModule()
+    .then((module) => {
+      editorMount = module.mountPermitextNotebookEditor(editorElement, {
+        document: draftDocument,
+        editable,
+        autofocus: false,
+        ariaLabel: "Project information",
+        uploadFile: (file) => uploadNotebookAsset(projectDetailKey(identity), file),
+        async resolveFileUrl(url) {
+          return resolveNotebookAsset(projectDetailKey(identity), url);
+        },
+        onReady() {
+          editorReady = true;
+        },
+        onChange(document) {
+          draftDocument = document;
+          if (!editable || !editorReady) return;
+          window.clearTimeout(saveTimer);
+          saveTimer = window.setTimeout(saveDraft, 800);
+        }
+      });
+    })
+    .catch((error) => {
+      editorElement.textContent = `Project information unavailable: ${error.message}`;
+    });
+  return container;
 }
 
 function appendProjectNotes(content, identity, foundation) {
@@ -14521,80 +14557,39 @@ function appendProjectNotes(content, identity, foundation) {
   const title = document.createElement("button");
   title.className = "project-notes-toggle-label section-label";
   title.type = "button";
-  title.textContent = "Project notes";
+  title.textContent = "Project information";
   title.setAttribute("aria-expanded", "true");
   heading.append(title);
   const headingActions = document.createElement("div");
   headingActions.className = "project-notes-heading-actions";
-  headingActions.append(projectSectionCount(notes.length, "Project notes"));
-  const editorSlot = document.createElement("div");
-  editorSlot.className = "project-collaboration-editor-slot";
-  if (canEdit) {
-    const add = document.createElement("button");
-    add.className = "project-note-add";
-    add.type = "button";
-    add.textContent = "Add note";
-    add.addEventListener("click", () => {
-      add.disabled = true;
-      editorSlot.replaceChildren(projectNoteEditor(identity, null, () => {
-        editorSlot.replaceChildren();
-        add.disabled = false;
-      }));
-      editorSlot.querySelector("input")?.focus();
-    });
-    headingActions.append(add);
-  }
   const toggle = document.createElement("button");
   toggle.className = "project-notes-toggle-chevron";
   toggle.type = "button";
-  toggle.setAttribute("aria-label", "Collapse Project notes");
+  toggle.setAttribute("aria-label", "Collapse Project information");
   toggle.setAttribute("aria-expanded", "true");
   toggle.innerHTML = researchChevronIconsSVG();
   headingActions.append(toggle);
   heading.append(headingActions);
   const body = document.createElement("div");
   body.className = "project-collaboration-notes-body";
-  body.append(editorSlot);
+  const primaryNote = notes[0] || null;
+  const legacyPlainText = primaryNote?.document
+    ? ""
+    : notes.map((item) => String(item.body || "").trim()).filter(Boolean).join("\n\n");
+  body.append(projectNoteEditor(identity, primaryNote, {
+    editable: canEdit,
+    plainText: legacyPlainText
+  }));
   const setExpanded = (expanded) => {
     title.setAttribute("aria-expanded", String(expanded));
     toggle.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project notes`);
+    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project information`);
     body.hidden = !expanded;
   };
   const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
   title.addEventListener("click", toggleExpanded);
   toggle.addEventListener("click", toggleExpanded);
   section.append(heading, body);
-  notes.slice(0, 12).forEach((note) => {
-    const card = document.createElement("article");
-    card.className = "project-collaboration-card project-note-card";
-    const cardHeading = document.createElement("div");
-    const noteTitle = document.createElement("strong");
-    noteTitle.textContent = note.title;
-    const meta = document.createElement("span");
-    meta.textContent = researchRelativeDate(note.updatedAt);
-    cardHeading.append(noteTitle, meta);
-    if (canEdit) {
-      const edit = document.createElement("button");
-      edit.type = "button";
-      edit.textContent = "Edit";
-      edit.addEventListener("click", () => {
-        const editor = projectNoteEditor(identity, note, () => {
-          editor.replaceWith(card);
-        });
-        card.replaceWith(editor);
-        editor.querySelector("input")?.focus();
-      });
-      cardHeading.append(edit);
-    }
-    card.append(cardHeading);
-    if (note.body) {
-      const body = document.createElement("p");
-      body.textContent = note.body;
-      card.append(body);
-    }
-    body.append(card);
-  });
   content.append(section);
 }
 
@@ -15362,8 +15357,8 @@ async function renderProjectDetail(detail) {
     warning.textContent = foundationError;
     content.append(warning);
   }
-  content.append(savedSection);
   appendProjectNotes(content, identity, foundation);
+  content.append(savedSection);
   appendProjectResearchHistory(content, identity, foundation);
   appendProjectEvidenceReviews(content, identity, foundation);
   appendProjectReviewThreads(content, identity, foundation);

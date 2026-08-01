@@ -6908,6 +6908,33 @@ body.is-resizing-research-evidence * {
   gap: var(--space-2);
 }
 
+.project-note-block-editor {
+  height: 260px;
+  min-width: 0;
+  min-height: 220px;
+  max-height: min(70vh, 760px);
+  overflow: auto;
+  resize: vertical;
+  border-radius: var(--radius-card);
+  background: #000;
+}
+
+.project-note-editor-surface {
+  height: 100%;
+  min-height: 100%;
+  max-height: none;
+  overflow: auto;
+}
+
+.project-note-editor-surface .bn-container,
+.project-note-editor-surface .bn-editor {
+  min-height: 100%;
+}
+
+.project-collaboration-notes {
+  margin-bottom: var(--space-4);
+}
+
 .project-collaboration-notes-body[hidden] {
   display: none;
 }

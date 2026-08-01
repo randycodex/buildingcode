@@ -1,3 +1,9 @@
+import {
+  notebookPlainText,
+  renderNotebookDocumentHTML,
+  validateNotebookDocument
+} from "./notebook-contract.mjs";
+
 export const collaborationSchemaVersion = 1;
 
 export const projectReviewKinds = Object.freeze([
@@ -53,18 +59,29 @@ function requiredISO(value, field) {
 
 export function normalizeProjectNotePayload({
   projectID,
-  title,
+  title = "Project information",
   body,
+  document,
   createdByUserID,
   updatedByUserID = createdByUserID,
   createdByDisplayName = "",
   updatedByDisplayName = createdByDisplayName
 }) {
+  let normalizedBody = optionalText(body, 20_000);
+  let structuredDocument = null;
+  let renderedHTML = "";
+  if (document !== undefined) {
+    const validated = validateNotebookDocument(document);
+    structuredDocument = validated.document;
+    normalizedBody = optionalText(notebookPlainText(structuredDocument), 20_000);
+    renderedHTML = renderNotebookDocumentHTML(structuredDocument);
+  }
   return {
     schemaVersion: collaborationSchemaVersion,
     projectID: requiredText(projectID, "Project ID", 256),
     title: requiredText(title, "Project note title", 160),
-    body: optionalText(body, 20_000),
+    body: normalizedBody,
+    ...(structuredDocument ? { document: structuredDocument, renderedHTML } : {}),
     createdByUserID: requiredText(createdByUserID, "Project note creator", 256),
     updatedByUserID: requiredText(updatedByUserID, "Project note updater", 256),
     createdByDisplayName: optionalText(createdByDisplayName, 160),

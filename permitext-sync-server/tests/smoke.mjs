@@ -734,8 +734,13 @@ async function main() {
         !workspaceScript.text.includes("No immutable Research answers are linked to this Project yet.") &&
         !workspaceScript.text.includes("No revision or missing-information requests are open.") &&
         workspaceScript.text.includes('headingActions.className = "project-notes-heading-actions"') &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project notes`)') &&
-        workspaceScript.text.includes("meta.textContent = researchRelativeDate(note.updatedAt)") &&
+        workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project information`)') &&
+        workspaceScript.text.includes('ariaLabel: "Project information"') &&
+        workspaceScript.text.includes('title: "Project information"') &&
+        workspaceScript.text.indexOf("appendProjectNotes(content, identity, foundation);") <
+          workspaceScript.text.indexOf("content.append(savedSection);") &&
+        !workspaceScript.text.includes('add.textContent = "Add note"') &&
+        !workspaceScript.text.includes('title.setAttribute("aria-label", "Project note title")') &&
         !workspaceScript.text.includes("projectCollaborationActor(note)") &&
         workspaceScript.text.includes('panel?.classList.contains("reader-panel")') &&
         workspaceScript.text.includes("getComputedStyle(panel).paddingLeft") &&
@@ -1192,7 +1197,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-blocknote-notebook-v289'),
+        webRoot.text.includes('/web/app.js?v=20260801-blocknote-notebook-v292'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1232,7 +1237,7 @@ async function main() {
         !workspaceScript.text.includes("function appendProjectStudioOverview") &&
         !workspaceStyles.text.includes(".project-studio-metrics {") &&
         workspaceScript.text.includes('count.className = "project-section-count"') &&
-        workspaceScript.text.includes('headingActions.append(projectSectionCount(notes.length, "Project notes"))') &&
+        workspaceScript.text.includes("body.append(projectNoteEditor(identity, primaryNote") &&
         workspaceScript.text.includes('savedHeading.append(savedTitle, projectSectionCount(previewItems.length, "Saved evidence items"))') &&
         workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
         workspaceStyles.text.includes(".project-section-count {") &&
@@ -1240,6 +1245,7 @@ async function main() {
         workspaceStyles.text.includes(".notebook-toolbar select {\n  width: 100%;") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-container {") &&
         workspaceStyles.text.includes(".notebook-editor-surface .bn-editor {") &&
+        workspaceStyles.text.includes(".project-note-editor-surface {") &&
         !workspaceStyles.text.includes(".notebook-tiptap-editor {") &&
         workspaceStyles.text.includes(".notebook-card-footer {\n  display: flex;\n  align-items: center;\n  justify-content: flex-end;") &&
         workspaceStyles.text.includes(".notebook-card-delete {\n  position: absolute;") &&
@@ -1263,7 +1269,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v289'),
+        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v292'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1474,7 +1480,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v289'),
+        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-notebook-v292'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
