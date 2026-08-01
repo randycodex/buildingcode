@@ -94,7 +94,6 @@ function persistedAppState(appState) {
     "gridSize",
     "scrollX",
     "scrollY",
-    "viewBackgroundColor",
     "zoom"
   ];
   return Object.fromEntries(keys.filter((key) => appState?.[key] !== undefined).map((key) => [key, appState[key]]));
@@ -116,6 +115,10 @@ function boardChangeSignature(elements, appState, files) {
 
 function preferredTheme() {
   return window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+}
+
+function canvasBackgroundForTheme(theme) {
+  return theme === "dark" ? "#000000" : "#ffffff";
 }
 
 function usePreferredTheme() {
@@ -214,8 +217,15 @@ function Workboard({
   const captureExcalidrawAPI = useCallback((api) => {
     excalidrawAPI.current = api;
     api.toggleSidebar({ name: null, force: false });
+    api.updateScene({ appState: { viewBackgroundColor: canvasBackgroundForTheme(theme) } });
     refreshCanvasOrigin();
-  }, [refreshCanvasOrigin]);
+  }, [refreshCanvasOrigin, theme]);
+
+  useEffect(() => {
+    excalidrawAPI.current?.updateScene({
+      appState: { viewBackgroundColor: canvasBackgroundForTheme(theme) }
+    });
+  }, [theme]);
 
   const flushSave = useCallback(async () => {
     window.clearTimeout(saveTimer.current);
@@ -319,6 +329,7 @@ function Workboard({
           appState: {
             ...(board?.appState || {}),
             theme: preferredTheme(),
+            viewBackgroundColor: canvasBackgroundForTheme(preferredTheme()),
             name: `${projectName} Workboard`
           },
           files: board?.files || {},
@@ -347,7 +358,11 @@ function Workboard({
         if (!active) return;
         const loadedData = {
           elements: [],
-          appState: { theme: preferredTheme(), name: `${projectName} Workboard` },
+          appState: {
+            theme: preferredTheme(),
+            viewBackgroundColor: canvasBackgroundForTheme(preferredTheme()),
+            name: `${projectName} Workboard`
+          },
           files: {}
         };
         lastChangeSignature.current = boardChangeSignature(
@@ -448,7 +463,7 @@ function Workboard({
             aiEnabled={false}
             UIOptions={{
               canvasActions: {
-                changeViewBackgroundColor: true,
+                changeViewBackgroundColor: false,
                 clearCanvas: true,
                 export: { saveFileToDisk: true },
                 loadScene: false,
