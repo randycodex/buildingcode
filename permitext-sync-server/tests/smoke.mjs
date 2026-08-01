@@ -719,14 +719,14 @@ async function main() {
         !workspaceScript.text.includes('eyebrow.textContent = "Project Studio"') &&
         workspaceScript.text.includes('toggle.className = "project-studio-activity-toggle section-label"') &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", "false")') &&
-        workspaceScript.text.includes("const list = document.createElement(\"ol\");\n  list.hidden = true;") &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-expanded", String(!expanded))') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, list, [toggle], "Recent activity", false)') &&
         workspaceScript.text.includes('title.textContent = "Research history";\n  title.setAttribute("aria-expanded", "false")') &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Research history`)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Research history", false)') &&
         workspaceScript.text.includes('title.textContent = "Review & coordination";\n  title.setAttribute("aria-expanded", "false")') &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Review & coordination`)') &&
-        workspaceScript.text.includes('button.addEventListener("click", () => {\n        setExpanded(true);') &&
+        workspaceScript.text.includes('setReviewExpanded = wireProjectSectionMotion(') &&
+        workspaceScript.text.includes('button.addEventListener("click", () => {\n        setReviewExpanded(true);') &&
         workspaceStyles.text.includes(".project-studio-collapsible-body[hidden]") &&
+        workspaceStyles.text.includes("max-height 420ms cubic-bezier(0.22, 1, 0.36, 1)") &&
         workspaceStyles.text.includes(".project-studio-activity li:first-child") &&
         workspaceStyles.text.includes(".project-studio-activity li {\n  display: grid;\n  grid-template-columns: minmax(0, 1fr) auto;") &&
         workspaceStyles.text.includes("font-size: 10px !important;\n  text-align: right;\n  white-space: nowrap;") &&
@@ -735,7 +735,7 @@ async function main() {
         !workspaceScript.text.includes("No immutable Research answers are linked to this Project yet.") &&
         !workspaceScript.text.includes("No revision or missing-information requests are open.") &&
         workspaceScript.text.includes('headingActions.className = "project-notes-heading-actions"') &&
-        workspaceScript.text.includes('toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project information`)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Project information", true)') &&
         workspaceScript.text.includes('ariaLabel: "Project information"') &&
         workspaceScript.text.includes('title: "Project information"') &&
         workspaceScript.text.indexOf("appendProjectNotes(content, identity, foundation);") <
@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-text-leading-v361'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-section-motion-v362'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1273,8 +1273,8 @@ async function main() {
         workspaceScript.text.includes('savedTitle.className = "project-section-toggle-label section-label"') &&
         workspaceScript.text.includes('savedToggle.setAttribute("aria-label", "Collapse Saved evidence")') &&
         workspaceScript.text.includes('savedBody.className = "project-studio-collapsible-body project-saved-evidence-body"') &&
-        workspaceScript.text.includes('savedBody.hidden = !expanded;') &&
-        workspaceScript.text.includes('savedTitle.addEventListener("click", toggleSavedEvidence)') &&
+        workspaceScript.text.includes('function wireProjectSectionMotion(section, body, controls, label, initialExpanded = false)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(savedSection, savedBody, [savedTitle, savedToggle], "Saved evidence", true)') &&
         workspaceScript.text.includes('headingMeta.append(scope, projectSectionCount(answers.length, "Evidence reviews"))') &&
         workspaceStyles.text.includes(".project-section-count {") &&
         workspaceStyles.text.includes(".notebook-toolbar {\n  display: block;") &&
@@ -1338,7 +1338,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-leading-v361'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-section-motion-v362'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1549,7 +1549,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-text-leading-v361'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-section-motion-v362'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

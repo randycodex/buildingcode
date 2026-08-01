@@ -6920,6 +6920,34 @@ body.is-resizing-research-evidence * {
   gap: var(--space-2);
 }
 
+.project-section-motion {
+  gap: 0;
+}
+
+.project-section-motion > .project-section-motion-body {
+  max-height: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding-top: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    max-height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 260ms ease,
+    padding 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.project-section-motion.is-open > .project-section-motion-body {
+  max-height: var(--project-section-body-height, 0px);
+  padding-top: var(--space-2);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.project-section-motion.is-restoring > .project-section-motion-body {
+  transition: none;
+}
+
 .project-studio-collapsible-body[hidden] {
   display: none;
 }

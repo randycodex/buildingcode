@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-text-leading-v361";
+} from "./offline-storage.js?v=20260801-project-section-motion-v362";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2999,6 +2999,68 @@ function wireCodeFilterMenu(filterRail, instance, options = {}) {
   });
   const initialOptions = instance[stateKey] ? { ...options, instant: true } : options;
   updateCodeFilterMenu(filterRail, instance, initialOptions);
+}
+
+function wireProjectSectionMotion(section, body, controls, label, initialExpanded = false) {
+  const toggles = controls.filter(Boolean);
+  section.classList.add("project-section-motion");
+  body.classList.add("project-section-motion-body");
+  let expanded = false;
+  let hideTimer = null;
+
+  const updateControls = (nextExpanded) => {
+    toggles.forEach((control) => {
+      control.setAttribute("aria-expanded", String(nextExpanded));
+      if (control.classList.contains("project-section-toggle-chevron") ||
+          control.classList.contains("project-notes-toggle-chevron")) {
+        control.setAttribute("aria-label", `${nextExpanded ? "Collapse" : "Expand"} ${label}`);
+      }
+    });
+  };
+  const applyExpandedHeight = () => {
+    section.style.setProperty("--project-section-body-height", `${body.scrollHeight}px`);
+  };
+  const setExpanded = (nextExpanded, options = {}) => {
+    expanded = Boolean(nextExpanded);
+    window.clearTimeout(hideTimer);
+    updateControls(expanded);
+    if (expanded) {
+      body.hidden = false;
+      applyExpandedHeight();
+      if (options.instant) {
+        section.classList.add("is-restoring", "is-open");
+        void body.offsetHeight;
+        requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
+      } else if (!section.classList.contains("is-open")) {
+        requestAnimationFrame(() => {
+          if (!expanded) return;
+          applyExpandedHeight();
+          section.classList.add("is-open");
+        });
+      } else {
+        applyExpandedHeight();
+      }
+      return;
+    }
+    if (!section.classList.contains("is-open")) {
+      body.hidden = true;
+      return;
+    }
+    applyExpandedHeight();
+    void body.offsetHeight;
+    section.classList.remove("is-open");
+    const hideBody = (event) => {
+      if (event && (event.target !== body || event.propertyName !== "max-height")) return;
+      if (!expanded) body.hidden = true;
+      body.removeEventListener("transitionend", hideBody);
+    };
+    body.addEventListener("transitionend", hideBody);
+    hideTimer = window.setTimeout(hideBody, 500);
+  };
+
+  toggles.forEach((control) => control.addEventListener("click", () => setExpanded(!expanded)));
+  setExpanded(initialExpanded, { instant: true });
+  return setExpanded;
 }
 
 async function api(path) {
@@ -14681,16 +14743,6 @@ function appendProjectResearchHistory(content, identity, foundation) {
   heading.append(title, headingActions);
   const body = document.createElement("div");
   body.className = "project-studio-collapsible-body project-research-history-body";
-  body.hidden = true;
-  const setExpanded = (expanded) => {
-    title.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Research history`);
-    body.hidden = !expanded;
-  };
-  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
-  title.addEventListener("click", toggleExpanded);
-  toggle.addEventListener("click", toggleExpanded);
   section.append(heading, body);
 
   const answers = [...(foundation?.researchAnswers || [])]
@@ -14719,6 +14771,7 @@ function appendProjectResearchHistory(content, identity, foundation) {
       body.append(card);
     });
   }
+  wireProjectSectionMotion(section, body, [title, toggle], "Research history", false);
   content.append(section);
 }
 
@@ -15061,16 +15114,8 @@ function appendProjectNotes(content, identity, foundation) {
     editable: canEdit,
     plainText: legacyPlainText
   }));
-  const setExpanded = (expanded) => {
-    title.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Project information`);
-    body.hidden = !expanded;
-  };
-  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
-  title.addEventListener("click", toggleExpanded);
-  toggle.addEventListener("click", toggleExpanded);
   section.append(heading, body);
+  wireProjectSectionMotion(section, body, [title, toggle], "Project information", true);
   content.append(section);
 }
 
@@ -15195,6 +15240,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
   const canRequest = projectCollaborationAccess(identity, "project.review.request");
   const canComment = projectCollaborationAccess(identity, "project.review.comment");
   const canResolve = projectCollaborationAccess(identity, "project.review.resolve");
+  let setReviewExpanded = () => {};
   if (!threads.length && !canRequest) return;
 
   const section = document.createElement("section");
@@ -15220,7 +15266,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
       button.type = "button";
       button.textContent = label;
       button.addEventListener("click", () => {
-        setExpanded(true);
+        setReviewExpanded(true);
         requestActions.querySelectorAll("button").forEach((control) => {
           control.disabled = true;
         });
@@ -15250,17 +15296,7 @@ function appendProjectReviewThreads(content, identity, foundation) {
   heading.append(title, requestActions);
   const body = document.createElement("div");
   body.className = "project-studio-collapsible-body project-review-threads-body";
-  body.hidden = true;
   body.append(editorSlot);
-  const setExpanded = (expanded) => {
-    title.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-expanded", String(expanded));
-    toggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Review & coordination`);
-    body.hidden = !expanded;
-  };
-  const toggleExpanded = () => setExpanded(title.getAttribute("aria-expanded") === "false");
-  title.addEventListener("click", toggleExpanded);
-  toggle.addEventListener("click", toggleExpanded);
   section.append(heading, body);
   threads.forEach((thread) => {
     const card = document.createElement("article");
@@ -15360,6 +15396,13 @@ function appendProjectReviewThreads(content, identity, foundation) {
     }
     body.append(card);
   });
+  setReviewExpanded = wireProjectSectionMotion(
+    section,
+    body,
+    [title, toggle],
+    "Review & coordination",
+    false
+  );
   content.append(section);
 }
 
@@ -15447,7 +15490,6 @@ function appendProjectActivity(content, foundation) {
   actions.append(chevron);
   toggle.append(title, actions);
   const list = document.createElement("ol");
-  list.hidden = true;
   events.slice(0, 10).forEach((event) => {
     const row = document.createElement("li");
     const label = document.createElement("strong");
@@ -15460,12 +15502,8 @@ function appendProjectActivity(content, foundation) {
     row.append(label, meta);
     list.append(row);
   });
-  toggle.addEventListener("click", () => {
-    const expanded = toggle.getAttribute("aria-expanded") !== "false";
-    toggle.setAttribute("aria-expanded", String(!expanded));
-    list.hidden = expanded;
-  });
   section.append(toggle, list);
+  wireProjectSectionMotion(section, list, [toggle], "Recent activity", false);
   content.append(section);
 }
 
@@ -15759,15 +15797,6 @@ async function renderProjectDetail(detail) {
   savedHeading.append(savedTitle, savedHeadingActions);
   const savedBody = document.createElement("div");
   savedBody.className = "project-studio-collapsible-body project-saved-evidence-body";
-  const setSavedEvidenceExpanded = (expanded) => {
-    savedTitle.setAttribute("aria-expanded", String(expanded));
-    savedToggle.setAttribute("aria-expanded", String(expanded));
-    savedToggle.setAttribute("aria-label", `${expanded ? "Collapse" : "Expand"} Saved evidence`);
-    savedBody.hidden = !expanded;
-  };
-  const toggleSavedEvidence = () => setSavedEvidenceExpanded(savedTitle.getAttribute("aria-expanded") === "false");
-  savedTitle.addEventListener("click", toggleSavedEvidence);
-  savedToggle.addEventListener("click", toggleSavedEvidence);
   savedSection.append(savedHeading, savedBody);
   const codeGroups = new Map();
   previewItems.forEach((item) => {
@@ -15862,6 +15891,7 @@ async function renderProjectDetail(detail) {
     content.append(warning);
   }
   appendProjectNotes(content, identity, foundation);
+  wireProjectSectionMotion(savedSection, savedBody, [savedTitle, savedToggle], "Saved evidence", true);
   content.append(savedSection);
   appendProjectResearchHistory(content, identity, foundation);
   appendProjectEvidenceReviews(content, identity, foundation);
