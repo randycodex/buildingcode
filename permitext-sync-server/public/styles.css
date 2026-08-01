@@ -10099,7 +10099,7 @@ body.is-resizing-research-evidence * {
   min-width: 0;
   overflow: visible;
   padding: var(--space-3);
-  background: color-mix(in srgb, var(--project-color) 10%, var(--surface-muted));
+  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
 }
 
 .notebook-card-rail-header {
