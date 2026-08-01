@@ -2139,7 +2139,7 @@ label {
 @media (prefers-color-scheme: dark) {
   .reader-code-select-menu,
   .reader-chapter-select-menu {
-    background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+    background: #121213;
   }
 }
 
