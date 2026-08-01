@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-menu-opaque-v328";
+} from "./offline-storage.js?v=20260801-opaque-menus-v329";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

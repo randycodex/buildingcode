@@ -4,6 +4,8 @@
   --surface: #ffffff;
   --surface-muted: #f7f7fa;
   --surface-raised: rgba(255, 255, 255, 0.92);
+  --menu-surface: #ffffff;
+  --menu-subtle-surface: #f3f3f5;
   --comment-surface: color-mix(in srgb, #fff2c2 24%, var(--surface));
   --reader-notes-surface: #eeeeee;
   --reader-notes-input-surface: #ffffff;
@@ -78,6 +80,8 @@
     --surface: #000000;
     --surface-muted: #000000;
     --surface-raised: #000000;
+    --menu-surface: #121213;
+    --menu-subtle-surface: #121213;
     --comment-surface: #22190a;
     --reader-notes-surface: #1c1c1d;
     --reader-notes-input-surface: #3c3e40;
@@ -722,7 +726,7 @@ textarea:focus-visible {
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--surface-raised);
+  background: var(--menu-surface);
   box-shadow: var(--shadow-panel);
 }
 
@@ -2087,7 +2091,7 @@ label {
   padding: 0;
   border: 0;
   border-radius: 0;
-  background: var(--surface);
+  background: var(--menu-surface);
   color: var(--text-primary);
   box-shadow: none;
 }
@@ -2101,7 +2105,7 @@ label {
   box-sizing: border-box;
   padding: clamp(14px, 2vw, 20px);
   border-radius: clamp(22px, 4vw, 30px);
-  background: var(--surface);
+  background: var(--menu-surface);
   box-shadow: none;
 }
 
@@ -2134,13 +2138,6 @@ label {
   background: color-mix(in srgb, var(--code-accent) 12%, transparent);
   color: var(--text-primary);
   font-weight: 650;
-}
-
-@media (prefers-color-scheme: dark) {
-  .reader-code-select-menu,
-  .reader-chapter-select-menu {
-    background: #121213;
-  }
 }
 
 .custom-select-option {
@@ -3795,6 +3792,7 @@ select option:checked {
 .code-filter-menu {
   display: grid;
   gap: 0;
+  background: var(--menu-subtle-surface);
 }
 
 .code-filter-menu .search-code-filter,
@@ -6325,7 +6323,7 @@ body.is-resizing-research-evidence * {
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--surface-raised);
+  background: var(--menu-surface);
   box-shadow: 0 12px 32px rgb(0 0 0 / 24%);
   color: var(--text-primary);
 }
@@ -7680,7 +7678,7 @@ body.is-resizing-research-evidence * {
   padding: var(--space-1);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
-  background: var(--surface-raised);
+  background: var(--menu-surface);
   box-shadow: var(--shadow-panel);
 }
 
@@ -7731,7 +7729,7 @@ body.is-resizing-research-evidence * {
   --saved-filter-card-radius: 22px;
   overflow: hidden;
   border-radius: var(--saved-filter-card-radius);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: var(--menu-subtle-surface);
 }
 
 .saved-inline-filters > .code-filter-menu > .code-filter-menu-toggle,
@@ -10205,7 +10203,7 @@ body.is-resizing-research-evidence * {
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface));
+  background: var(--menu-subtle-surface);
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -10464,7 +10462,7 @@ body.is-resizing-research-evidence * {
   overflow: hidden;
   padding: 0;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface));
+  background: var(--menu-subtle-surface);
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -10676,6 +10674,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 .notebook-editor-surface .bn-suggestion-menu,
 .notebook-editor-surface .mantine-Menu-dropdown,
 .notebook-editor-surface .mantine-Popover-dropdown {
+  background: var(--menu-surface) !important;
   color: var(--text-primary);
 }
 
