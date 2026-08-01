@@ -47,8 +47,11 @@ const permittedStyleNames = new Set([
   "strike",
   "code",
   "textColor",
-  "backgroundColor"
+  "backgroundColor",
+  "fontSize",
+  "textSize"
 ]);
+const permittedNotebookNumericStyles = new Set(["12px", "16px", "18px", "24px", "32px"]);
 
 function requiredText(value, label, maximum = 500) {
   const normalized = String(value || "").trim();
@@ -86,6 +89,11 @@ function canonicalStyles(styles) {
     }
     if (["textColor", "backgroundColor"].includes(name)) {
       canonical[name] = canonicalColor(value, `Notebook ${name}`);
+    } else if (["fontSize", "textSize"].includes(name)) {
+      if (!permittedNotebookNumericStyles.has(value)) {
+        throw new Error("Notebook text uses an unsupported numeric style value.");
+      }
+      canonical[name] = value;
     } else if (value === true) {
       canonical[name] = true;
     } else if (value !== false) {
@@ -429,6 +437,8 @@ function renderInlineHTML(content) {
     if (node.styles.italic) html = `<em>${html}</em>`;
     if (node.styles.underline) html = `<u>${html}</u>`;
     if (node.styles.strike) html = `<s>${html}</s>`;
+    if (node.styles.fontSize) html = `<span style="line-height:${escapeHTML(node.styles.fontSize)}">${html}</span>`;
+    if (node.styles.textSize) html = `<span style="font-size:${escapeHTML(node.styles.textSize)}">${html}</span>`;
     return html;
   }).join("");
 }

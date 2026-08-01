@@ -10692,12 +10692,18 @@ body.is-resizing-research-evidence * {
 
 /* The workspace's compact typography uses an !important rule, so preserve
  * explicitly selected BlockNote sizes with an equally scoped editor override. */
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="12px"] { font-size: 12px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="14px"] { font-size: 14px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="16px"] { font-size: 16px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="18px"] { font-size: 18px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="24px"] { font-size: 24px !important; }
-body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-font-size="32px"] { font-size: 32px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="12px"] { line-height: 12px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="14px"] { line-height: 14px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="16px"] { line-height: 16px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="18px"] { line-height: 18px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="24px"] { line-height: 24px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-line-spacing="32px"] { line-height: 32px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="12px"] { font-size: 12px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="14px"] { font-size: 14px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="16px"] { font-size: 16px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="18px"] { font-size: 18px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="24px"] { font-size: 24px !important; }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size="32px"] { font-size: 32px !important; }
 
 .notebook-editor-surface .bn-side-menu,
 .notebook-editor-surface .bn-formatting-toolbar,

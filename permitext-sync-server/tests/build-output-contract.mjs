@@ -22,14 +22,18 @@ assert(
 );
 assert(
   notebookEditor.includes('type: "fontSize"') &&
+    notebookEditor.includes('type: "textSize"') &&
     notebookEditor.includes('{ label: "14", value: "" }') &&
-    notebookEditor.includes('className: "notebook-font-size-icon"') &&
+    notebookEditor.includes('className: "notebook-line-spacing-icon"') &&
+    notebookEditor.includes('className: "notebook-text-size-icon"') &&
     !notebookEditor.includes('label: "Default"') &&
-    notebookEditor.includes('className: "notebook-font-size-select"') &&
+    notebookEditor.includes('className: "notebook-line-spacing-select"') &&
+    notebookEditor.includes('className: "notebook-text-size-select"') &&
     notebookEditor.includes("FormattingToolbarController") &&
     notebookEditor.includes("editor.addStyles({ fontSize: value })") &&
-    notebookEditor.includes("editor.removeStyles({ fontSize: activeFontSize })"),
-  "Every shared BlockNote editor must offer inline text-size formatting."
+    notebookEditor.includes("editor.addStyles({ textSize: value })") &&
+    notebookEditor.includes("editor.removeStyles({ textSize: activeTextSize })"),
+  "Every shared BlockNote editor must offer independent line-spacing and text-size formatting."
 );
 assert.equal(notebookSchema.includes("tiptapDocumentToBlockNote"), true);
 assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
@@ -48,7 +52,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260801-notebook-font-size-v8"'),
+    webClient.includes('notebookClientVersion = "20260801-notebook-text-size-v10"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

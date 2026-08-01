@@ -48,6 +48,33 @@ assert.match(html, /data-reference-kind="canonicalSection"/);
 assert.match(html, /AC § 28-103\.30\.2/);
 assert.match(html, /<strong>Verify <\/strong>/);
 
+const numericStyleDocument = {
+  ...emptyNotebookDocument(),
+  document: [{
+    type: "paragraph",
+    content: [{
+      type: "text",
+      text: "Readable field note",
+      styles: { fontSize: "24px", textSize: "18px" }
+    }]
+  }]
+};
+const numericStyleValidated = validateNotebookDocument(numericStyleDocument);
+assert.equal(numericStyleValidated.document.document[0].content[0].styles.fontSize, "24px");
+assert.equal(numericStyleValidated.document.document[0].content[0].styles.textSize, "18px");
+assert.match(renderNotebookDocumentHTML(numericStyleDocument), /line-height:24px/);
+assert.match(renderNotebookDocumentHTML(numericStyleDocument), /font-size:18px/);
+assert.throws(
+  () => validateNotebookDocument({
+    ...emptyNotebookDocument(),
+    document: [{
+      type: "paragraph",
+      content: [{ type: "text", text: "Bad size", styles: { textSize: "999px" } }]
+    }]
+  }),
+  /unsupported numeric style value/
+);
+
 const escapedHTML = renderNotebookDocumentHTML({
   ...emptyNotebookDocument(),
   document: [{

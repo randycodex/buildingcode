@@ -31,7 +31,7 @@ import {
 
 const allowedBlockTypeSet = new Set(notebookBlockTypes);
 
-const notebookFontSizes = Object.freeze([
+const notebookNumericSizes = Object.freeze([
   { label: "14", value: "" },
   { label: "12", value: "12px" },
   { label: "16", value: "16px" },
@@ -48,15 +48,35 @@ const PermitextFontSize = createReactStyleSpec(
   {
     render: ({ value, contentRef }) => React.createElement("span", {
       ref: contentRef,
+      style: { lineHeight: value },
+      "data-line-spacing": value
+    }),
+    toExternalHTML: ({ value, contentRef }) => React.createElement("span", {
+      ref: contentRef,
+      style: { lineHeight: value },
+      "data-line-spacing": value
+    }),
+    parse: (element) => element.dataset.lineSpacing || element.style.lineHeight || undefined
+  }
+);
+
+const PermitextTextSize = createReactStyleSpec(
+  {
+    type: "textSize",
+    propSchema: "string"
+  },
+  {
+    render: ({ value, contentRef }) => React.createElement("span", {
+      ref: contentRef,
       style: { fontSize: value },
-      "data-font-size": value
+      "data-text-size": value
     }),
     toExternalHTML: ({ value, contentRef }) => React.createElement("span", {
       ref: contentRef,
       style: { fontSize: value },
-      "data-font-size": value
+      "data-text-size": value
     }),
-    parse: (element) => element.dataset.fontSize || element.style.fontSize || undefined
+    parse: (element) => element.dataset.textSize || element.style.fontSize || undefined
   }
 );
 
@@ -113,7 +133,8 @@ export const permitextNotebookSchema = BlockNoteSchema.create({
   },
   styleSpecs: {
     ...defaultStyleSpecs,
-    fontSize: PermitextFontSize
+    fontSize: PermitextFontSize,
+    textSize: PermitextTextSize
   }
 });
 
@@ -126,13 +147,13 @@ function FontSizeSelect() {
   });
   if (!components) return null;
   return React.createElement(components.FormattingToolbar.Select, {
-    className: "notebook-font-size-select",
-    items: notebookFontSizes.map(({ label, value }) => ({
+    className: "notebook-line-spacing-select",
+    items: notebookNumericSizes.map(({ label, value }) => ({
       text: label,
       icon: React.createElement("span", {
         "aria-hidden": "true",
-        className: "notebook-font-size-icon"
-      }),
+        className: "notebook-line-spacing-icon"
+      }, "↕"),
       isSelected: activeFontSize === value,
       onClick: () => {
         if (value) {
@@ -145,13 +166,42 @@ function FontSizeSelect() {
   });
 }
 
+function TextSizeSelect() {
+  const editor = useBlockNoteEditor(permitextNotebookSchema);
+  const components = useComponentsContext();
+  const activeTextSize = useEditorState({
+    editor,
+    selector: ({ editor: currentEditor }) => currentEditor.getActiveStyles().textSize || ""
+  });
+  if (!components) return null;
+  return React.createElement(components.FormattingToolbar.Select, {
+    className: "notebook-text-size-select",
+    items: notebookNumericSizes.map(({ label, value }) => ({
+      text: label,
+      icon: React.createElement("span", {
+        "aria-hidden": "true",
+        className: "notebook-text-size-icon"
+      }, "A"),
+      isSelected: activeTextSize === value,
+      onClick: () => {
+        if (value) {
+          editor.addStyles({ textSize: value });
+        } else if (activeTextSize) {
+          editor.removeStyles({ textSize: activeTextSize });
+        }
+      }
+    }))
+  });
+}
+
 function PermitextFormattingToolbar() {
   const defaultItems = getFormattingToolbarItems();
   return React.createElement(
     FormattingToolbar,
     null,
     defaultItems[0],
-    React.createElement(FontSizeSelect, { key: "font-size-select" }),
+    React.createElement(FontSizeSelect, { key: "line-spacing-select" }),
+    React.createElement(TextSizeSelect, { key: "text-size-select" }),
     ...defaultItems.slice(1)
   );
 }

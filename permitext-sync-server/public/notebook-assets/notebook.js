@@ -49498,16 +49498,31 @@ var rX = new Set(XY), iX = Object.freeze([
 }, {
 	render: ({ value: e, contentRef: t }) => _.createElement("span", {
 		ref: t,
+		style: { lineHeight: e },
+		"data-line-spacing": e
+	}),
+	toExternalHTML: ({ value: e, contentRef: t }) => _.createElement("span", {
+		ref: t,
+		style: { lineHeight: e },
+		"data-line-spacing": e
+	}),
+	parse: (e) => e.dataset.lineSpacing || e.style.lineHeight || void 0
+}), oX = nV({
+	type: "textSize",
+	propSchema: "string"
+}, {
+	render: ({ value: e, contentRef: t }) => _.createElement("span", {
+		ref: t,
 		style: { fontSize: e },
-		"data-font-size": e
+		"data-text-size": e
 	}),
 	toExternalHTML: ({ value: e, contentRef: t }) => _.createElement("span", {
 		ref: t,
 		style: { fontSize: e },
-		"data-font-size": e
+		"data-text-size": e
 	}),
-	parse: (e) => e.dataset.fontSize || e.style.fontSize || void 0
-}), oX = tV({
+	parse: (e) => e.dataset.textSize || e.style.fontSize || void 0
+}), sX = tV({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
@@ -49535,30 +49550,31 @@ var rX = new Set(XY), iX = Object.freeze([
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
 	}, e.props.label)
-}), sX = Object.fromEntries(Object.entries(xx).filter(([e]) => rX.has(e))), cX = Dx.create({
-	blockSpecs: sX,
+}), cX = Object.fromEntries(Object.entries(xx).filter(([e]) => rX.has(e))), lX = Dx.create({
+	blockSpecs: cX,
 	inlineContentSpecs: {
 		...Tx,
-		permitextReference: oX
+		permitextReference: sX
 	},
 	styleSpecs: {
 		...wx,
-		fontSize: aX
+		fontSize: aX,
+		textSize: oX
 	}
 });
-function lX() {
-	let e = q(cX), t = J(), n = RI({
+function uX() {
+	let e = q(lX), t = J(), n = RI({
 		editor: e,
 		selector: ({ editor: e }) => e.getActiveStyles().fontSize || ""
 	});
 	return t ? _.createElement(t.FormattingToolbar.Select, {
-		className: "notebook-font-size-select",
+		className: "notebook-line-spacing-select",
 		items: iX.map(({ label: t, value: r }) => ({
 			text: t,
 			icon: _.createElement("span", {
 				"aria-hidden": "true",
-				className: "notebook-font-size-icon"
-			}),
+				className: "notebook-line-spacing-icon"
+			}, "↕"),
 			isSelected: n === r,
 			onClick: () => {
 				r ? e.addStyles({ fontSize: r }) : n && e.removeStyles({ fontSize: n });
@@ -49566,11 +49582,31 @@ function lX() {
 		}))
 	}) : null;
 }
-function uX() {
-	let e = _z();
-	return _.createElement(vz, null, e[0], _.createElement(lX, { key: "font-size-select" }), ...e.slice(1));
+function dX() {
+	let e = q(lX), t = J(), n = RI({
+		editor: e,
+		selector: ({ editor: e }) => e.getActiveStyles().textSize || ""
+	});
+	return t ? _.createElement(t.FormattingToolbar.Select, {
+		className: "notebook-text-size-select",
+		items: iX.map(({ label: t, value: r }) => ({
+			text: t,
+			icon: _.createElement("span", {
+				"aria-hidden": "true",
+				className: "notebook-text-size-icon"
+			}, "A"),
+			isSelected: n === r,
+			onClick: () => {
+				r ? e.addStyles({ textSize: r }) : n && e.removeStyles({ textSize: n });
+			}
+		}))
+	}) : null;
 }
-function dX(e) {
+function fX() {
+	let e = _z();
+	return _.createElement(vz, null, e[0], _.createElement(uX, { key: "line-spacing-select" }), _.createElement(dX, { key: "text-size-select" }), ...e.slice(1));
+}
+function pX(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
 	if (!YY.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
@@ -49579,7 +49615,7 @@ function dX(e) {
 		label: r
 	};
 }
-function fX(e) {
+function mX(e) {
 	return {
 		schema: qY,
 		schemaVersion: 2,
@@ -49587,19 +49623,19 @@ function fX(e) {
 		document: e
 	};
 }
-function pX() {
+function hX() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function mX({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(pX), i = VI({
-		schema: cX,
+function gX({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(hX), i = VI({
+		schema: lX,
 		initialContent: (0, _.useMemo)(() => tX(e.document), []),
 		uploadFile: e.uploadFile,
 		resolveFileUrl: e.resolveFileUrl
 	}), a = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(pX()), t = new MutationObserver(e);
+		let e = () => r(hX()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -49619,19 +49655,19 @@ function mX({ options: e, controllerRef: t }) {
 		theme: n,
 		formattingToolbar: !1,
 		portalElements: { slashMenu: null },
-		onChange: () => e.onChange?.(fX(i.document)),
+		onChange: () => e.onChange?.(mX(i.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
-	}, _.createElement(bz, { formattingToolbar: uX }));
+	}, _.createElement(bz, { formattingToolbar: fX }));
 }
-function hX(e, t = {}) {
+function _X(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = { current: null }, r = (0, y.createRoot)(e);
-	return r.render(_.createElement(mX, {
+	return r.render(_.createElement(gX, {
 		options: t,
 		controllerRef: n
 	})), {
 		getDocument() {
-			return fX(n.current?.document || t.document?.document || []);
+			return mX(n.current?.document || t.document?.document || []);
 		},
 		setDocument(e) {
 			let t = n.current;
@@ -49641,7 +49677,7 @@ function hX(e, t = {}) {
 			let t = n.current;
 			t && (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: dX(e)
+				props: pX(e)
 			}, " "]));
 		},
 		replaceAssetURL(e, t) {
@@ -49676,4 +49712,4 @@ function hX(e, t = {}) {
 	};
 }
 //#endregion
-export { hX as mountPermitextNotebookEditor, cX as permitextNotebookSchema };
+export { _X as mountPermitextNotebookEditor, lX as permitextNotebookSchema };
