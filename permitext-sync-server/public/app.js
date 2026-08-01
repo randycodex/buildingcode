@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-menu-alignment-v330";
+} from "./offline-storage.js?v=20260801-projects-menu-card-v331";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

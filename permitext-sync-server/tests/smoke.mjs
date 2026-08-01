@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-reader-menu-alignment-v330'),
+        webRoot.text.includes('/web/app.js?v=20260801-projects-menu-card-v331'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1253,6 +1253,7 @@ async function main() {
         workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {\n  box-sizing: border-box;\n  padding: clamp(14px, 2vw, 20px);\n  border-radius: clamp(22px, 4vw, 30px);") &&
         workspaceStyles.text.includes("--menu-surface: #121213;") &&
         workspaceStyles.text.includes("--menu-subtle-surface: #121213;") &&
+        workspaceStyles.text.includes("--saved-projects-card-radius: 22px;") &&
         workspaceStyles.text.includes(".reader-code-select-menu,\n.reader-chapter-select-menu {") &&
         workspaceStyles.text.includes("background: var(--menu-surface);") &&
         workspaceStyles.text.includes(".reader-code-select-menu .custom-select-group-label {") &&
@@ -1322,7 +1323,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-menu-alignment-v330'),
+        webRoot.text.includes('/web/styles.css?v=20260801-projects-menu-card-v331'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1533,7 +1534,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-reader-menu-alignment-v330'),
+        webRoot.text.includes('/web/styles.css?v=20260801-projects-menu-card-v331'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2097,7 +2098,7 @@ async function main() {
         workspaceStyles.text.match(/\.code-filter-menu \.saved-project-list,[\s\S]*?\.code-filter-menu \.saved-tag-filter,[\s\S]*?\.code-filter-menu \.research-conversation-project-options \{[\s\S]*?max-height: 0;/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-open \.saved-project-list,[\s\S]*?\.code-filter-menu\.is-open \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-open \.research-conversation-project-options \{[\s\S]*?max-height: var\(--code-filter-menu-height, 240px\);/) &&
         workspaceStyles.text.match(/\.code-filter-menu\.is-restoring \.search-code-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.saved-tag-filter,[\s\S]*?\.code-filter-menu\.is-restoring \.research-conversation-project-options \{[\s\S]*?transition: none;/) &&
-        workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?padding: var\(--space-2\) 0 0;/) &&
+        workspaceStyles.text.match(/\.saved-projects-section \{[\s\S]*?margin-top: var\(--space-2\);[\s\S]*?border-radius: var\(--saved-projects-card-radius\);[\s\S]*?background: var\(--menu-subtle-surface\);/) &&
         workspaceStyles.text.match(/\.saved-projects-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-menu\.is-open \.saved-projects-actions \{[\s\S]*?display: flex;/) &&
         workspaceStyles.text.match(/\.saved-tag-filter \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?grid-auto-flow: row;[\s\S]*?column-gap: calc\(var\(--space-3\) \* 2\);[\s\S]*?background-image: linear-gradient\(/) &&

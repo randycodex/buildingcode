@@ -7414,9 +7414,14 @@ body.is-resizing-research-evidence * {
 }
 
 .saved-projects-section {
+  --saved-projects-card-radius: 22px;
   display: grid;
   gap: 0;
-  padding: var(--space-2) 0 0;
+  margin-top: var(--space-2);
+  overflow: hidden;
+  padding: 0;
+  border-radius: var(--saved-projects-card-radius);
+  background: var(--menu-subtle-surface);
 }
 
 .saved-projects-heading {
