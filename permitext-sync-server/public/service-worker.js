@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v333";
+const shellCacheName = "permitext-pro-shell-v334";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,11 +6,11 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260801-saved-pane-width-v369",
+  "/web/styles.css?v=20260801-saved-pane-migration-v370",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260801-saved-pane-width-v369",
+  "/web/app.js?v=20260801-saved-pane-migration-v370",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260801-saved-pane-width-v369",
+  "/web/offline-storage.js?v=20260801-saved-pane-migration-v370",
   "/web/workspace-state.js?v=20260731-multi-workspace-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",

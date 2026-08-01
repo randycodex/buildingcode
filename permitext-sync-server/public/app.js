@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-saved-pane-width-v369";
+} from "./offline-storage.js?v=20260801-saved-pane-migration-v370";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2240,6 +2240,13 @@ function defaultPaneWidthForID(paneID) {
   return defaultNonReaderPaneWidth;
 }
 
+function migrateLegacyPaneWidth(paneID, value) {
+  if (paneID === "utility:projects" && value === defaultUtilityPaneWidth) {
+    return defaultSavedPaneWidth;
+  }
+  return value;
+}
+
 function isFixedWidthPaneID(paneID) {
   return paneID?.startsWith("utility:") ||
     isProjectDetailPaneID(paneID) ||
@@ -2716,7 +2723,7 @@ function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
   const hasManyColumns = ids.length >= 4;
   state.paneWeights = ids.reduce((weights, id) => {
-    const value = Number(current[id]);
+    const value = migrateLegacyPaneWidth(id, Number(current[id]));
     const defaultWidth = defaultPaneWidthForID(id);
     weights[id] = Number.isFinite(value) && value > 40
       ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
@@ -2728,7 +2735,9 @@ function normalizePaneWeights(ids) {
 function applyPaneWeight(panel, paneID) {
   panel.dataset.paneId = paneID;
   const defaultWidth = defaultPaneWidthForID(paneID);
-  const value = Number(state.paneWeights[paneID]);
+  const storedValue = Number(state.paneWeights[paneID]);
+  const value = migrateLegacyPaneWidth(paneID, storedValue);
+  if (value !== storedValue) state.paneWeights[paneID] = value;
   const hasManyColumns = activePaneIDs().length >= 4;
   const flexibleReader = isFlexibleReaderPaneID(paneID);
   const sourceLinkedReader = paneID?.startsWith("reader:") &&
