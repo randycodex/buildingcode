@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-opaque-menus-v329";
+} from "./offline-storage.js?v=20260801-reader-menu-alignment-v330";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3718,7 +3718,11 @@ function enhanceSelect(select) {
       ? boundaryLeft
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
     const menuOffset = readerTopMenu ? 12 : 2;
-    const menuTop = rect.bottom + menuOffset;
+    const chapterTrigger = readerCodeMenu
+      ? selectPanel?.querySelector(".chapter-select + .custom-select .custom-select-trigger")
+      : null;
+    const verticalAnchorRect = chapterTrigger?.getBoundingClientRect() || rect;
+    const menuTop = verticalAnchorRect.bottom + menuOffset;
     const menuBottomGap = readerChapterMenu ? menuTop : viewportPadding;
     const availableBelow = Math.max(0, window.innerHeight - menuTop - menuBottomGap);
     menu.style.setProperty("--select-menu-top", `${menuTop}px`);
