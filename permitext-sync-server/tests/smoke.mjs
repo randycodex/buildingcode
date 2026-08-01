@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-close-align-v352'),
+        webRoot.text.includes('/web/app.js?v=20260801-folder-band-match-v354'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1337,7 +1337,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-close-align-v352'),
+        webRoot.text.includes('/web/styles.css?v=20260801-folder-band-match-v354'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1548,7 +1548,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-close-align-v352'),
+        webRoot.text.includes('/web/styles.css?v=20260801-folder-band-match-v354'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1743,6 +1743,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes("--project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3))") &&
+        workspaceStyles.text.match(/--project-pane-band-background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);/g)?.length === 4 &&
         workspaceStyles.text.includes(".project-detail-actions {") &&
         workspaceStyles.text.includes("margin-top: var(--space-3);") &&
         workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
@@ -2486,9 +2487,9 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260801-status-v28";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66'),
+      workspaceScript.text.includes('const workboardClientVersion = "20260801-folder-band-match-v30";') &&
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-folder-band-match-v67"') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-folder-band-match-v67'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(
@@ -2557,6 +2558,7 @@ async function main() {
     );
     assert(
       workboardStyleSource.includes("--project-pane-band-background") &&
+        workboardStyleSource.includes("color-mix(in srgb, var(--project-color, #c96410) 42%, var(--surface, #fff))") &&
         workboardStyleSource.match(/background: var\(--surface-raised, #fff\);/g)?.length >= 2,
       "Workboard no longer limits the owning Project color to its aligned header band."
     );

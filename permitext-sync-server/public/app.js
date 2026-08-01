@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-close-align-v352";
+} from "./offline-storage.js?v=20260801-folder-band-match-v354";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -95,7 +95,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260801-status-v28";
+const workboardClientVersion = "20260801-folder-band-match-v30";
 const notebookClientVersion = "20260801-notebook-text-size-v10";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
@@ -1282,7 +1282,7 @@ function loadWorkboardStyles() {
     }
     const link = existing || document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66";
+    link.href = "/web/workboard-assets/workboard.css?v=20260801-folder-band-match-v67";
     link.dataset.permitextWorkboardStyles = "true";
     link.addEventListener("load", resolve, { once: true });
     link.addEventListener("error", () => {

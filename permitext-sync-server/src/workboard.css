@@ -21,7 +21,7 @@
   border-bottom: 0;
   background: var(
     --project-pane-band-background,
-    color-mix(in srgb, var(--project-color, #c96410) 22%, var(--surface-raised, #fff))
+    color-mix(in srgb, var(--project-color, #c96410) 42%, var(--surface, #fff))
   );
 }
 

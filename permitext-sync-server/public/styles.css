@@ -929,7 +929,7 @@ textarea:focus-visible {
 .workboard-panel {
   --pane-min-width: min(420px, 82vw);
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
-  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   grid-template-rows: minmax(0, 1fr);
   padding: 0;
   background: var(--surface-raised);
@@ -6571,7 +6571,7 @@ body.is-resizing-research-evidence * {
 
 .project-detail-panel {
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
-  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   display: grid;
   position: relative;
   grid-template-rows: auto minmax(0, 1fr);
@@ -10137,7 +10137,7 @@ body.is-resizing-research-evidence * {
 
 .notebook-panel {
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
-  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -10841,7 +10841,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .report-draft-panel {
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
-  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
   position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
