@@ -10,6 +10,7 @@
 }
 
 .permitext-workboard-header {
+  position: relative;
   display: flex;
   min-height: var(
     --project-pane-band-height,
@@ -26,6 +27,9 @@
 }
 
 .permitext-workboard-header-actions {
+  position: absolute;
+  top: var(--panel-padding, 24px);
+  right: 16px;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
