@@ -2105,13 +2105,6 @@ label {
   box-shadow: none;
 }
 
-@media (prefers-color-scheme: dark) {
-  .reader-code-select-menu,
-  .reader-chapter-select-menu {
-    background: #353839;
-  }
-}
-
 .reader-code-select-menu .custom-select-group-label {
   margin-top: var(--space-3);
   padding: 0 0 var(--space-1);
@@ -2141,6 +2134,13 @@ label {
   background: color-mix(in srgb, var(--code-accent) 12%, transparent);
   color: var(--text-primary);
   font-weight: 650;
+}
+
+@media (prefers-color-scheme: dark) {
+  .reader-code-select-menu,
+  .reader-chapter-select-menu {
+    background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  }
 }
 
 .custom-select-option {
