@@ -26,7 +26,7 @@ import {
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
   saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260731-edge-resize-v280";
+} from "./offline-storage.js?v=20260731-project-x-overflow-v281";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

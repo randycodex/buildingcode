@@ -6644,6 +6644,7 @@ body.is-resizing-research-evidence * {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: var(--space-4) 0 108px;
 }
