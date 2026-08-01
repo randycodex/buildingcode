@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-section-dividers-v358";
+} from "./offline-storage.js?v=20260801-evidence-lines-v359";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
