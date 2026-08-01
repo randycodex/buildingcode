@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-header-alignment-v334";
+} from "./offline-storage.js?v=20260801-project-controls-gap-v336";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

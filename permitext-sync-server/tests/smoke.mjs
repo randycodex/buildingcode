@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-header-alignment-v334'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-controls-gap-v336'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1323,7 +1323,8 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-header-alignment-v334'),
+        workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
+        webRoot.text.includes('/web/styles.css?v=20260801-project-controls-gap-v336'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1534,7 +1535,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-header-alignment-v334'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-controls-gap-v336'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1729,6 +1730,8 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes("--project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3))") &&
+        workspaceStyles.text.includes(".project-detail-actions {") &&
+        workspaceStyles.text.includes("margin-top: var(--space-3);") &&
         workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
         workspaceStyles.text.includes("height: var(--project-pane-band-height)") &&
         workspaceStyles.text.includes("background: var(--project-pane-band-background)") &&
