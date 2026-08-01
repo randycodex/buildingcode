@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-workboard-status-v347";
+} from "./offline-storage.js?v=20260801-project-card-gap-v348";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2921,6 +2921,8 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
         ? filterGap + (filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap)
         : filterRail.classList.contains("research-conversation-project-options")
           ? filterGap + savedCodeBottomGap
+          : filterRail.classList.contains("saved-project-list")
+            ? filterGap * 2
           : filterRail.classList.contains("notebook-reference-list")
             ? filterGap + notebookReferenceBottomGap
             : filterGap;
