@@ -200,8 +200,8 @@ function PermitextFormattingToolbar() {
     FormattingToolbar,
     null,
     defaultItems[0],
-    React.createElement(FontSizeSelect, { key: "line-spacing-select" }),
     React.createElement(TextSizeSelect, { key: "text-size-select" }),
+    React.createElement(FontSizeSelect, { key: "line-spacing-select" }),
     ...defaultItems.slice(1)
   );
 }

@@ -49604,7 +49604,7 @@ function dX() {
 }
 function fX() {
 	let e = _z();
-	return _.createElement(vz, null, e[0], _.createElement(uX, { key: "line-spacing-select" }), _.createElement(dX, { key: "text-size-select" }), ...e.slice(1));
+	return _.createElement(vz, null, e[0], _.createElement(dX, { key: "text-size-select" }), _.createElement(uX, { key: "line-spacing-select" }), ...e.slice(1));
 }
 function pX(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();

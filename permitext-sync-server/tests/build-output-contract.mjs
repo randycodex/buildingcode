@@ -35,6 +35,11 @@ assert(
     notebookEditor.includes("editor.removeStyles({ textSize: activeTextSize })"),
   "Every shared BlockNote editor must offer independent line-spacing and text-size formatting."
 );
+assert(
+  notebookEditor.indexOf('React.createElement(TextSizeSelect, { key: "text-size-select" })') <
+    notebookEditor.indexOf('React.createElement(FontSizeSelect, { key: "line-spacing-select" })'),
+  "Notebook text size must appear before line spacing in the formatting toolbar."
+);
 assert.equal(notebookSchema.includes("tiptapDocumentToBlockNote"), true);
 assert.equal(notebookSchema.includes('notebookSchemaVersion = 2'), true);
 assert.equal(packageManifest.dependencies["@tiptap/core"], undefined);
@@ -52,7 +57,7 @@ assert(
 assert(
   webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260801-notebook-text-size-v10"'),
+    webClient.includes('notebookClientVersion = "20260801-notebook-toolbar-order-v11"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 
