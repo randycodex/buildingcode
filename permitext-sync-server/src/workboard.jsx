@@ -413,11 +413,13 @@ function Workboard({
     changeTimer.current = window.setTimeout(() => capturePendingScene(), changeCaptureDelayMS);
   }, [boardView, capturePendingScene, projectID]);
 
+  const visibleStatus = status === "Synced" || status === "Saved locally" ? "" : status;
+
   return (
     <section className="permitext-workboard" data-element-count={elementCount}>
       <header className="permitext-workboard-header">
         <div className="permitext-workboard-header-actions">
-          {status ? <span className="permitext-workboard-save-state" role="status">{status}</span> : null}
+          {visibleStatus ? <span className="permitext-workboard-save-state" role="status">{visibleStatus}</span> : null}
           {onDetach ? (
             <button type="button" onClick={onDetach} aria-label={detachLabel} title={detachLabel}>
               <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

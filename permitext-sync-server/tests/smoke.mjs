@@ -1214,7 +1214,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-blocknote-menu-v346'),
+        webRoot.text.includes('/web/app.js?v=20260801-workboard-status-v347'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1331,7 +1331,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-menu-v346'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-status-v347'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1542,7 +1542,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-blocknote-menu-v346'),
+        webRoot.text.includes('/web/styles.css?v=20260801-workboard-status-v347'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2480,7 +2480,7 @@ async function main() {
     const workboardScript = await request("/web/workboard-assets/workboard.js");
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
-      workspaceScript.text.includes('const workboardClientVersion = "20260801-canvas-restore-v27";') &&
+      workspaceScript.text.includes('const workboardClientVersion = "20260801-status-v28";') &&
         workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66"') &&
         webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-canvas-v66'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
@@ -2518,10 +2518,11 @@ async function main() {
       "Workboard wheel panning guard no longer preserves trackpad and modified-wheel zoom gestures."
     );
     assert(
-      !workboardSource.includes("permitext-workboard-zoom-controls") &&
+        !workboardSource.includes("permitext-workboard-zoom-controls") &&
         !workboardSource.includes('aria-label="Reset zoom"') &&
         !workboardSource.includes("New local board") &&
-        workboardSource.includes('status ? <span className="permitext-workboard-save-state"') &&
+        workboardSource.includes('status === "Synced" || status === "Saved locally" ? "" : status') &&
+        workboardSource.includes('visibleStatus ? <span className="permitext-workboard-save-state"') &&
         workboardStyleSource.includes("width: var(--panel-title-control-size, 18px);") &&
         workboardStyleSource.includes("color: var(--text-secondary, #8f8f96);") &&
         workboardStyleSource.includes("width: var(--panel-title-icon-size, 16px);") &&

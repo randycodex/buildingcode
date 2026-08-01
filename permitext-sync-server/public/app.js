@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-blocknote-menu-v346";
+} from "./offline-storage.js?v=20260801-workboard-status-v347";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -95,7 +95,7 @@ const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
-const workboardClientVersion = "20260801-canvas-restore-v27";
+const workboardClientVersion = "20260801-status-v28";
 const notebookClientVersion = "20260801-notebook-menu-v9";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
