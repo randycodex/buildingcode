@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-header-band-v333";
+} from "./offline-storage.js?v=20260801-project-header-alignment-v334";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -1282,7 +1282,7 @@ function loadWorkboardStyles() {
     }
     const link = existing || document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63";
+    link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64";
     link.dataset.permitextWorkboardStyles = "true";
     link.addEventListener("load", resolve, { once: true });
     link.addEventListener("error", () => {

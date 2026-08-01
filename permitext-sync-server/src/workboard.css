@@ -11,7 +11,10 @@
 
 .permitext-workboard-header {
   display: flex;
-  min-height: 68px;
+  min-height: var(
+    --project-pane-band-height,
+    calc(var(--panel-padding, 24px) + var(--panel-title-row-height, 18px) + var(--space-3, 14px))
+  );
   align-items: center;
   justify-content: flex-end;
   padding: 10px 16px 10px 20px;

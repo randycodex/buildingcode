@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-header-band-v333'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-header-alignment-v334'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1323,7 +1323,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-header-band-v333'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-header-alignment-v334'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1534,7 +1534,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-header-band-v333'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-header-alignment-v334'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1728,7 +1728,7 @@ async function main() {
       "Non-Reader columns no longer preserve their intended default widths."
     );
     assert(
-      workspaceStyles.text.includes("--project-pane-band-height: 68px") &&
+      workspaceStyles.text.includes("--project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3))") &&
         workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
         workspaceStyles.text.includes("height: var(--project-pane-band-height)") &&
         workspaceStyles.text.includes("background: var(--project-pane-band-background)") &&
@@ -2471,8 +2471,8 @@ async function main() {
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260731-project-tone-v22";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63'),
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64"') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-project-header-alignment-v64'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(

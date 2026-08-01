@@ -928,7 +928,7 @@ textarea:focus-visible {
 
 .workboard-panel {
   --pane-min-width: min(420px, 82vw);
-  --project-pane-band-height: 68px;
+  --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   grid-template-rows: minmax(0, 1fr);
   padding: 0;
@@ -6570,7 +6570,7 @@ body.is-resizing-research-evidence * {
 }
 
 .project-detail-panel {
-  --project-pane-band-height: 68px;
+  --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   display: grid;
   position: relative;
@@ -10126,7 +10126,7 @@ body.is-resizing-research-evidence * {
 }
 
 .notebook-panel {
-  --project-pane-band-height: 68px;
+  --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   position: relative;
   display: grid;
@@ -10795,7 +10795,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-draft-panel {
-  --project-pane-band-height: 68px;
+  --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   position: relative;
   display: grid;
