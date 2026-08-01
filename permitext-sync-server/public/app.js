@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-section-motion-v362";
+} from "./offline-storage.js?v=20260801-notebook-glyph-size-v363";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

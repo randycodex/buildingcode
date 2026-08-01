@@ -10740,6 +10740,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size] {
   line-height: max(var(--notebook-line-spacing, 0px), calc(var(--notebook-text-size) * 1.2)) !important;
 }
+body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-surface [data-text-size] * {
+  font-size: inherit !important;
+}
 
 .notebook-editor-surface .bn-side-menu,
 .notebook-editor-surface .bn-formatting-toolbar,
