@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-code-menu-v319";
+} from "./offline-storage.js?v=20260801-reader-top-menus-dim-v321";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3618,6 +3618,7 @@ function closeActiveCustomSelect() {
   if (!activeCustomSelect) return;
   activeCustomSelect.menu.hidden = true;
   activeCustomSelect.trigger.setAttribute("aria-expanded", "false");
+  activeCustomSelect.panel?.classList.remove("has-open-reader-menu");
   activeCustomSelect = null;
 }
 
@@ -3638,7 +3639,11 @@ function enhanceSelect(select) {
   const menu = document.createElement("div");
   menu.className = "custom-select-menu";
   const readerCodeMenu = select.classList.contains("code-select");
+  const readerChapterMenu = select.classList.contains("chapter-select");
+  const readerTopMenu = readerCodeMenu || readerChapterMenu;
+  const selectPanel = select.closest(".workspace-panel");
   menu.classList.toggle("reader-code-select-menu", readerCodeMenu);
+  menu.classList.toggle("reader-chapter-select-menu", readerChapterMenu);
   menu.dataset.floatingSelect = "true";
   menu.hidden = true;
   select._customSelectMenu = menu;
@@ -3656,6 +3661,7 @@ function enhanceSelect(select) {
   const closeMenu = () => {
     menu.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
+    selectPanel?.classList.remove("has-open-reader-menu");
     if (activeCustomSelect?.menu === menu) activeCustomSelect = null;
   };
 
@@ -3707,12 +3713,12 @@ function enhanceSelect(select) {
     const boundaryWidth = Math.max(rect.width, boundaryRight - boundaryLeft);
     const optionWidths = Array.from(menu.children).map((item) => item.scrollWidth);
     const naturalWidth = Math.max(rect.width, ...optionWidths);
-    const menuWidth = readerCodeMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
-    const left = readerCodeMenu
+    const menuWidth = readerTopMenu ? boundaryWidth : Math.min(naturalWidth, boundaryWidth);
+    const left = readerTopMenu
       ? boundaryLeft
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
     const availableBelow = Math.max(160, window.innerHeight - rect.bottom - viewportPadding);
-    menu.style.setProperty("--select-menu-top", `${rect.bottom + (readerCodeMenu ? 12 : 2)}px`);
+    menu.style.setProperty("--select-menu-top", `${rect.bottom + (readerTopMenu ? 12 : 2)}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
     menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
     menu.style.setProperty("--select-menu-max-height", `${availableBelow}px`);
@@ -3727,7 +3733,8 @@ function enhanceSelect(select) {
     closeActiveCustomSelect();
     renderOptions();
     if (willOpen) {
-      activeCustomSelect = { custom, menu, trigger, positionMenu };
+      selectPanel?.classList.toggle("has-open-reader-menu", readerTopMenu);
+      activeCustomSelect = { custom, menu, trigger, positionMenu, panel: selectPanel };
     }
     menu.hidden = !willOpen;
     if (willOpen) positionMenu();

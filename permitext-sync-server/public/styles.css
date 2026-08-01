@@ -1197,6 +1197,15 @@ body.is-detached-workboard-window .detached-workboard-error p {
   backdrop-filter: none;
 }
 
+.reader-panel.has-open-reader-menu::after {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  content: "";
+  pointer-events: none;
+  background: rgb(0 0 0 / 16%);
+}
+
 .search-panel,
 .utility-panel,
 .settings-panel {
@@ -2087,11 +2096,12 @@ label {
   display: none;
 }
 
-.reader-code-select-menu {
+.reader-code-select-menu,
+.reader-chapter-select-menu {
   padding: clamp(18px, 4vw, 28px);
   border-radius: clamp(24px, 6vw, 36px);
   background: var(--surface);
-  box-shadow: 0 18px 46px color-mix(in srgb, #000 18%, transparent);
+  box-shadow: none;
 }
 
 .reader-code-select-menu .custom-select-group-label {
@@ -2109,7 +2119,8 @@ label {
 }
 
 .reader-code-select-menu .custom-select-option,
-.reader-code-select-menu .custom-select-option.is-indented {
+.reader-code-select-menu .custom-select-option.is-indented,
+.reader-chapter-select-menu .custom-select-option {
   min-height: 32px;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-control);
@@ -2117,7 +2128,8 @@ label {
   line-height: 1.3;
 }
 
-.reader-code-select-menu .custom-select-option[aria-selected="true"] {
+.reader-code-select-menu .custom-select-option[aria-selected="true"],
+.reader-chapter-select-menu .custom-select-option[aria-selected="true"] {
   background: color-mix(in srgb, var(--code-accent) 12%, transparent);
   color: var(--text-primary);
   font-weight: 650;
