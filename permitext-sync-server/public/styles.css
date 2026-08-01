@@ -6944,6 +6944,10 @@ body.is-resizing-research-evidence * {
   pointer-events: auto;
 }
 
+.project-section-motion.is-open.is-settled > .project-section-motion-body {
+  max-height: none;
+}
+
 .project-section-motion.is-restoring > .project-section-motion-body {
   transition: none;
 }

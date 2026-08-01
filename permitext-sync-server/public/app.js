@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-evidence-preview-v367";
+} from "./offline-storage.js?v=20260801-project-section-settle-v368";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3020,6 +3020,20 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
   const applyExpandedHeight = () => {
     section.style.setProperty("--project-section-body-height", `${body.scrollHeight}px`);
   };
+  const settleExpandedBody = () => {
+    if (expanded && section.classList.contains("is-open")) {
+      section.classList.add("is-settled");
+    }
+  };
+  const settleAfterTransition = () => {
+    const settle = (event) => {
+      if (event && (event.target !== body || event.propertyName !== "max-height")) return;
+      body.removeEventListener("transitionend", settle);
+      settleExpandedBody();
+    };
+    body.addEventListener("transitionend", settle);
+    hideTimer = window.setTimeout(() => settle(), 500);
+  };
   const setExpanded = (nextExpanded, options = {}) => {
     expanded = Boolean(nextExpanded);
     window.clearTimeout(hideTimer);
@@ -3027,25 +3041,18 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     if (expanded) {
       body.hidden = false;
       if (options.instant) {
-        section.classList.add("is-restoring", "is-open");
-        const restoreWhenMounted = (remainingFrames = 12) => {
-          if ((!body.isConnected || body.offsetWidth === 0) && remainingFrames > 0) {
-            requestAnimationFrame(() => restoreWhenMounted(remainingFrames - 1));
-            return;
-          }
-          applyExpandedHeight();
-          void body.offsetHeight;
-          requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
-        };
-        requestAnimationFrame(() => restoreWhenMounted());
+        section.classList.add("is-restoring", "is-open", "is-settled");
+        requestAnimationFrame(() => requestAnimationFrame(() => section.classList.remove("is-restoring")));
       } else if (!section.classList.contains("is-open")) {
+        section.classList.remove("is-settled");
+        applyExpandedHeight();
         requestAnimationFrame(() => {
           if (!expanded) return;
-          applyExpandedHeight();
           section.classList.add("is-open");
+          settleAfterTransition();
         });
       } else {
-        applyExpandedHeight();
+        settleExpandedBody();
       }
       return;
     }
@@ -3054,6 +3061,7 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
       return;
     }
     applyExpandedHeight();
+    section.classList.remove("is-settled");
     void body.offsetHeight;
     section.classList.remove("is-open");
     const hideBody = (event) => {
@@ -3071,7 +3079,9 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
       bodyResizeObserver.disconnect();
       return;
     }
-    if (expanded && section.classList.contains("is-open")) applyExpandedHeight();
+    if (expanded && section.classList.contains("is-open") && !section.classList.contains("is-settled")) {
+      applyExpandedHeight();
+    }
   });
   bodyResizeObserver.observe(body);
   Array.from(body.children).forEach((child) => bodyResizeObserver.observe(child));
