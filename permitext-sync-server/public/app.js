@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-saved-instance-width-v371";
+} from "./offline-storage.js?v=20260801-tag-menu-inset-v372";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2929,7 +2929,11 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
       const savedCodeBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-4")) || filterGap;
       const notebookReferenceBottomGap = Number.parseFloat(filterStyles.getPropertyValue("--space-3")) || filterGap;
       const openingPadding = menu.closest(".saved-inline-filters")
-        ? filterGap + (filterRail.classList.contains("saved-code-filter") ? savedCodeBottomGap : filterGap)
+        ? filterGap + (
+            filterRail.classList.contains("saved-code-filter") || filterRail.classList.contains("saved-tag-filter")
+              ? savedCodeBottomGap
+              : filterGap
+          )
         : filterRail.classList.contains("research-conversation-project-options")
           ? filterGap + savedCodeBottomGap
           : filterRail.classList.contains("saved-project-list")
