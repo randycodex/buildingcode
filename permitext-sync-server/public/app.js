@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-font-size-v314";
+} from "./offline-storage.js?v=20260801-notebook-table-lines-v315";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

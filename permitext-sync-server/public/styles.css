@@ -10628,6 +10628,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   border-radius: var(--radius-control);
 }
 
+.notebook-editor-surface table :is(th, td) {
+  border-color: #000 !important;
+}
+
 .notebook-reference-chip {
   display: inline;
   padding: 2px 7px;
