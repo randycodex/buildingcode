@@ -70,9 +70,11 @@ export function normalizeProjectNotePayload({
   let normalizedBody = optionalText(body, 20_000);
   let structuredDocument = null;
   let renderedHTML = "";
+  let imageAssets = [];
   if (document !== undefined) {
     const validated = validateNotebookDocument(document);
     structuredDocument = validated.document;
+    imageAssets = validated.imageAssets;
     normalizedBody = optionalText(notebookPlainText(structuredDocument), 20_000);
     renderedHTML = renderNotebookDocumentHTML(structuredDocument);
   }
@@ -81,7 +83,7 @@ export function normalizeProjectNotePayload({
     projectID: requiredText(projectID, "Project ID", 256),
     title: requiredText(title, "Project note title", 160),
     body: normalizedBody,
-    ...(structuredDocument ? { document: structuredDocument, renderedHTML } : {}),
+    ...(structuredDocument ? { document: structuredDocument, renderedHTML, imageAssets } : {}),
     createdByUserID: requiredText(createdByUserID, "Project note creator", 256),
     updatedByUserID: requiredText(updatedByUserID, "Project note updater", 256),
     createdByDisplayName: optionalText(createdByDisplayName, 160),

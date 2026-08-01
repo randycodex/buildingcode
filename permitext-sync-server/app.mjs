@@ -20,6 +20,7 @@ import { createPostgresOrganizationRepository } from "./postgres-organization-re
 import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
+import { createImageStorageProvider } from "./image-storage.mjs";
 import { matchesConfiguredAdminToken, timingSafeAdminTokenEqual } from "./admin-token-auth.mjs";
 import {
   accountRateLimitPrincipal,
@@ -3641,6 +3642,35 @@ function localPrivateAssetRoot() {
   return String(process.env.PERMITEXT_LOCAL_PRIVATE_ASSET_PATH || "").trim();
 }
 
+function notebookLocalAssetRoot() {
+  return localPrivateAssetRoot() || join(dirname(fileURLToPath(import.meta.url)), "data", "private-assets");
+}
+
+function notebookImageStorage(providerName = "") {
+  return createImageStorageProvider({
+    environment: process.env,
+    localRoot: notebookLocalAssetRoot(),
+    loadBlobModule: vercelBlob,
+    providerName
+  });
+}
+
+function notebookImageContentType(body) {
+  if (body.length >= 8 && body.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))) {
+    return "image/png";
+  }
+  if (body.length >= 3 && body[0] === 255 && body[1] === 216 && body[2] === 255) return "image/jpeg";
+  if (body.length >= 6 && ["GIF87a", "GIF89a"].includes(body.subarray(0, 6).toString("ascii"))) {
+    return "image/gif";
+  }
+  if (
+    body.length >= 12 &&
+    body.subarray(0, 4).toString("ascii") === "RIFF" &&
+    body.subarray(8, 12).toString("ascii") === "WEBP"
+  ) return "image/webp";
+  return "";
+}
+
 function privateProjectAssetStorageConfigured() {
   return blobStorageConfigured() || Boolean(localPrivateAssetRoot());
 }
@@ -7235,6 +7265,22 @@ async function handleProjectCollaborationNoteSave(request, response) {
   try {
     const now = new Date().toISOString();
     const noteID = existing?.envelope.id || randomUUID();
+    const payload = normalizeProjectNotePayload({
+      projectID,
+      title: context.body.title || "Project information",
+      body: context.body.body,
+      document: context.body.document,
+      createdByUserID: existing?.payload.createdByUserID || context.userID,
+      updatedByUserID: context.userID,
+      createdByDisplayName: existing?.payload.createdByDisplayName ||
+        collaborationActorDisplayName(context),
+      updatedByDisplayName: collaborationActorDisplayName(context)
+    });
+    await validateNotebookImageAssets(
+      access.storageOwnerUserID,
+      projectID,
+      payload.imageAssets || []
+    );
     const artifact = {
       envelope: artifactEnvelope({
         id: noteID,
@@ -7244,17 +7290,7 @@ async function handleProjectCollaborationNoteSave(request, response) {
         updatedAt: now,
         version: Number(existing?.envelope.version || 0) + 1
       }),
-      payload: normalizeProjectNotePayload({
-        projectID,
-        title: context.body.title || "Project information",
-        body: context.body.body,
-        document: context.body.document,
-        createdByUserID: existing?.payload.createdByUserID || context.userID,
-        updatedByUserID: context.userID,
-        createdByDisplayName: existing?.payload.createdByDisplayName ||
-          collaborationActorDisplayName(context),
-        updatedByDisplayName: collaborationActorDisplayName(context)
-      })
+      payload
     };
     await saveStoredFoundationArtifact(access.storageOwnerUserID, artifact);
     let link = null;
@@ -7290,6 +7326,13 @@ async function handleProjectCollaborationNoteSave(request, response) {
       createdAt: now
     });
     await saveStoredActivityEvent(access.storageOwnerUserID, event);
+    const removedImageAssets = (existing?.payload?.imageAssets || [])
+      .filter((assetID) => !(payload.imageAssets || []).includes(assetID));
+    await deleteOrphanedNotebookImageAssets(
+      access.storageOwnerUserID,
+      projectID,
+      removedImageAssets
+    );
     sendJSON(response, existing ? 200 : 201, {
       note: collaborationArtifactForClient(artifact),
       link,
@@ -7750,6 +7793,111 @@ async function ownedNotebookArtifact(userID, cardID, options = {}) {
   ) || null;
 }
 
+async function ownedNotebookImageAsset(userID, assetID, options = {}) {
+  const normalizedAssetID = String(assetID || "").trim();
+  return (await listStoredFoundationArtifacts(userID)).find((artifact) =>
+    artifact.envelope?.id === normalizedAssetID &&
+    artifact.envelope?.type === "notebookImageAsset" &&
+    (options.includeDeleted || !artifact.envelope?.deletedAt)
+  ) || null;
+}
+
+async function notebookArtifactWithIdentity(userID, artifactID) {
+  const normalizedID = String(artifactID || "").trim();
+  return (await listStoredFoundationArtifacts(userID)).find(
+    (artifact) => artifact.envelope?.id === normalizedID
+  ) || null;
+}
+
+async function notebookImageAccessibleFromProject(userID, projectID, assetID) {
+  const asset = await ownedNotebookImageAsset(userID, assetID);
+  if (!asset) return false;
+  if (asset.payload?.projectID === projectID) return true;
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  const referencingCardIDs = new Set(artifacts
+    .filter((artifact) =>
+      artifact.envelope?.type === "notebookCard" &&
+      !artifact.envelope?.deletedAt &&
+      (artifact.payload?.imageAssets || []).includes(assetID)
+    )
+    .map((artifact) => artifact.envelope.id));
+  if (!referencingCardIDs.size) return false;
+  return (await listStoredProjectLinks(userID)).some((link) =>
+    !link.deletedAt &&
+    link.projectID === projectID &&
+    link.targetKind === "notebookCard" &&
+    referencingCardIDs.has(link.targetID)
+  );
+}
+
+async function validateNotebookImageAssets(userID, projectID, imageAssets) {
+  for (const encodedIdentity of imageAssets || []) {
+    let identity = encodedIdentity;
+    try { identity = decodeURIComponent(encodedIdentity); } catch { /* legacy literal */ }
+    if (notebookAssetPathBelongsToProject(identity, projectID)) continue;
+    const accessible = await notebookImageAccessibleFromProject(userID, projectID, identity);
+    if (!accessible) {
+      throw new Error("A Notebook image is unavailable or belongs to another Project.");
+    }
+  }
+}
+
+async function deleteOrphanedNotebookImageAssets(userID, projectID, candidateIDs) {
+  const candidates = new Set(candidateIDs || []);
+  if (!candidates.size) return;
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  for (const artifact of artifacts) {
+    if (!['notebookCard', 'projectNote'].includes(artifact.envelope?.type) || artifact.envelope?.deletedAt) continue;
+    for (const identity of artifact.payload?.imageAssets || []) candidates.delete(identity);
+  }
+  const now = new Date().toISOString();
+  for (const assetID of candidates) {
+    const asset = await ownedNotebookImageAsset(userID, assetID);
+    if (!asset) continue;
+    const provider = notebookImageStorage(asset.payload?.storageProvider);
+    try {
+      if (!provider) throw new Error(`Storage provider ${asset.payload?.storageProvider || "unknown"} is not configured.`);
+      await provider.delete(asset.payload.storageKey);
+      await saveStoredFoundationArtifact(userID, {
+        ...asset,
+        envelope: artifactEnvelope({
+          ...asset.envelope,
+          updatedAt: now,
+          deletedAt: now,
+          version: asset.envelope.version + 1
+        })
+      });
+    } catch (error) {
+      await saveStoredFoundationArtifact(userID, {
+        ...asset,
+        envelope: artifactEnvelope({
+          ...asset.envelope,
+          updatedAt: now,
+          version: asset.envelope.version + 1
+        }),
+        payload: {
+          ...asset.payload,
+          deletionPendingAt: asset.payload?.deletionPendingAt || now,
+          deletionError: error instanceof Error ? error.message : "Image deletion failed."
+        }
+      });
+    }
+  }
+}
+
+async function retryPendingNotebookImageDeletions(userID) {
+  const pendingAssetIDs = (await listStoredFoundationArtifacts(userID))
+    .filter((artifact) =>
+      artifact.envelope?.type === "notebookImageAsset" &&
+      !artifact.envelope?.deletedAt &&
+      artifact.payload?.deletionPendingAt
+    )
+    .map((artifact) => artifact.envelope.id);
+  if (pendingAssetIDs.length) {
+    await deleteOrphanedNotebookImageAssets(userID, "", pendingAssetIDs);
+  }
+}
+
 async function validateNotebookReferences(userID, references) {
   if (references.length > 100) {
     throw new Error("Notebook cards are limited to 100 linked references.");
@@ -7904,6 +8052,7 @@ async function handleNotebookCardSave(request, response) {
       updatedBy: context.userID
     });
     await validateNotebookReferences(storageOwnerUserID, payload.references);
+    await validateNotebookImageAssets(storageOwnerUserID, projectID, payload.imageAssets);
     const artifact = {
       envelope: artifactEnvelope({
         id: cardID,
@@ -7954,6 +8103,9 @@ async function handleNotebookCardSave(request, response) {
       }
     });
     await saveStoredActivityEvent(storageOwnerUserID, event);
+    const removedImageAssets = (existing?.payload?.imageAssets || [])
+      .filter((assetID) => !payload.imageAssets.includes(assetID));
+    await deleteOrphanedNotebookImageAssets(storageOwnerUserID, projectID, removedImageAssets);
     sendJSON(response, existing ? 200 : 201, {
       card: notebookCardForClient(artifact, [projectID]),
       link,
@@ -8025,6 +8177,11 @@ async function handleNotebookCardDelete(request, response) {
     }
   }
   await saveStoredFoundationArtifact(access.storageOwnerUserID, deletedArtifact);
+  await deleteOrphanedNotebookImageAssets(
+    access.storageOwnerUserID,
+    access.projectID,
+    artifact.payload?.imageAssets || []
+  );
   for (const existingLink of activeLinks) {
     const link = projectLinkRecord({
       ...existingLink,
@@ -13438,7 +13595,7 @@ async function deletePrivateProjectAssetPathnames(pathnames) {
     }
     return;
   }
-  const root = localPrivateAssetRoot();
+  const root = localPrivateAssetRoot() || notebookLocalAssetRoot();
   if (!root) {
     throw new Error("Private project storage is unavailable for account deletion.");
   }
@@ -13756,7 +13913,12 @@ async function handleNotebookAssetUpload(request, response) {
   const url = requestURL(request);
   const projectID = String(url.searchParams.get("projectID") || "").trim();
   const assetID = String(url.searchParams.get("assetID") || "").trim();
-  if (!userID || !projectID || !assetID || projectID.length > 200 || assetID.length > 200) {
+  if (
+    !userID ||
+    !projectID ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(assetID) ||
+    projectID.length > 200
+  ) {
     sendError(response, 400, "Missing or invalid Notebook image identity.");
     return;
   }
@@ -13776,7 +13938,8 @@ async function handleNotebookAssetUpload(request, response) {
     });
     return;
   }
-  if (!privateProjectAssetStorageConfigured()) {
+  const imageStorage = notebookImageStorage();
+  if (!imageStorage) {
     sendError(response, 503, "Private Notebook image storage is not configured.");
     return;
   }
@@ -13790,17 +13953,117 @@ async function handleNotebookAssetUpload(request, response) {
     sendError(response, 400, "Notebook image is empty.");
     return;
   }
+  const detectedContentType = notebookImageContentType(body);
+  if (!detectedContentType || detectedContentType !== contentType) {
+    sendError(response, 415, "The Notebook image contents do not match its PNG, JPEG, WebP, or GIF type.");
+    return;
+  }
+  const contentHash = createHash("sha256").update(body).digest("hex");
+  const existingArtifact = await notebookArtifactWithIdentity(access.storageOwnerUserID, assetID);
+  if (existingArtifact) {
+    const idempotent =
+      existingArtifact.envelope?.type === "notebookImageAsset" &&
+      !existingArtifact.envelope?.deletedAt &&
+      existingArtifact.payload?.projectID === access.projectID &&
+      existingArtifact.payload?.uploadedBy === userID &&
+      existingArtifact.payload?.contentHash === contentHash &&
+      existingArtifact.payload?.contentType === contentType &&
+      existingArtifact.payload?.size === body.length;
+    if (!idempotent) {
+      sendJSON(response, 409, {
+        error: "This Notebook image identity is already in use.",
+        code: "NOTEBOOK_IMAGE_ID_CONFLICT"
+      });
+      return;
+    }
+    await retryPendingNotebookImageDeletions(access.storageOwnerUserID);
+    sendJSON(response, 200, {
+      asset: {
+        projectID: access.projectID,
+        assetID,
+        url: `permitext-notebook-asset:${assetID}`,
+        storageProvider: existingArtifact.payload.storageProvider,
+        contentType,
+        size: body.length,
+        width: existingArtifact.payload.width,
+        height: existingArtifact.payload.height,
+        uploadedAt: existingArtifact.payload.uploadedAt
+      }
+    });
+    return;
+  }
   const pathname = notebookAssetPathname(access.projectID, assetID, contentType);
-  await storePrivateProjectAsset(pathname, body, contentType);
+  let storedPathname = "";
+  try {
+    const existingBody = await imageStorage.get(pathname);
+    if (existingBody) {
+      if (!existingBody.equals(body)) {
+        sendJSON(response, 409, {
+          error: "This Notebook image storage key is already in use.",
+          code: "NOTEBOOK_IMAGE_ID_CONFLICT"
+        });
+        return;
+      }
+      storedPathname = pathname;
+    } else {
+      try {
+        storedPathname = await imageStorage.put(pathname, body, contentType);
+      } catch (writeError) {
+        const racedBody = await imageStorage.get(pathname);
+        if (!racedBody?.equals(body)) throw writeError;
+        storedPathname = pathname;
+      }
+    }
+  } catch (error) {
+    sendJSON(response, 503, {
+      error: error instanceof Error ? error.message : "Notebook image storage is unavailable.",
+      code: "NOTEBOOK_IMAGE_STORAGE_FAILED"
+    });
+    return;
+  }
+  const width = Number(request.headers["x-permitext-image-width"] || 0);
+  const height = Number(request.headers["x-permitext-image-height"] || 0);
+  const now = new Date().toISOString();
+  const asset = {
+    envelope: artifactEnvelope({
+      id: assetID,
+      type: "notebookImageAsset",
+      owner: access.owner,
+      createdAt: now,
+      updatedAt: now,
+      version: 1
+    }),
+    payload: {
+      projectID: access.projectID,
+      storageProvider: imageStorage.name,
+      storageKey: storedPathname,
+      contentHash,
+      contentType,
+      size: body.length,
+      width: Number.isSafeInteger(width) && width > 0 ? width : null,
+      height: Number.isSafeInteger(height) && height > 0 ? height : null,
+      uploadedAt: now,
+      uploadedBy: userID
+    }
+  };
+  try {
+    await saveStoredFoundationArtifact(access.storageOwnerUserID, asset);
+  } catch (error) {
+    await imageStorage.delete(storedPathname).catch(() => {});
+    throw error;
+  }
+  await retryPendingNotebookImageDeletions(access.storageOwnerUserID);
   sendJSON(response, 200, {
     asset: {
       projectID: access.projectID,
       assetID,
-      pathname,
-      url: `permitext-notebook-asset:${encodeURIComponent(pathname)}`,
+      url: `permitext-notebook-asset:${assetID}`,
+      storageProvider: imageStorage.name,
       contentType,
       size: body.length,
-      uploadedAt: new Date().toISOString()
+      width: asset.payload.width,
+      height: asset.payload.height,
+      uploadedAt: now
     }
   });
 }
@@ -13809,8 +14072,9 @@ async function handleNotebookAssetRead(request, response) {
   const body = await readJSON(request);
   const userID = String(body.auth?.accountUserID || "").trim();
   const projectID = String(body.projectID || "").trim();
-  const pathname = String(body.pathname || "").trim();
-  if (!userID || !projectID || !pathname) {
+  const assetID = String(body.assetID || "").trim();
+  const legacyPathname = String(body.pathname || "").trim();
+  if (!userID || !projectID || (!assetID && !legacyPathname)) {
     sendError(response, 400, "Missing Notebook image identity.");
     return;
   }
@@ -13822,21 +14086,44 @@ async function handleNotebookAssetRead(request, response) {
     organizationPermissions.projectView
   );
   if (!access) return;
-  if (!notebookAssetPathBelongsToProject(pathname, access.projectID)) {
+  const asset = assetID
+    ? await ownedNotebookImageAsset(access.storageOwnerUserID, assetID)
+    : null;
+  if (assetID && !asset) {
+    sendError(response, 404, "Notebook image was not found.");
+    return;
+  }
+  const pathname = asset?.payload?.storageKey || legacyPathname;
+  if (
+    (asset && !await notebookImageAccessibleFromProject(
+      access.storageOwnerUserID,
+      access.projectID,
+      assetID
+    )) ||
+    (!asset && !notebookAssetPathBelongsToProject(pathname, access.projectID))
+  ) {
     sendError(response, 403, "This Notebook image does not belong to the authenticated Project.");
     return;
   }
-  if (!privateProjectAssetStorageConfigured()) {
+  const imageStorage = notebookImageStorage(asset?.payload?.storageProvider || "");
+  if (!imageStorage) {
     sendError(response, 503, "Private Notebook image storage is not configured.");
     return;
   }
-  const image = await readPrivateProjectAsset(pathname);
+  const image = await imageStorage.get(pathname);
   if (!image) {
     sendError(response, 404, "Notebook image was not found.");
     return;
   }
+  if (
+    asset?.payload?.contentHash &&
+    createHash("sha256").update(image).digest("hex") !== asset.payload.contentHash
+  ) {
+    sendError(response, 409, "The stored Notebook image no longer matches its synchronized metadata.");
+    return;
+  }
   const extension = pathname.split(".").pop();
-  const contentType = {
+  const contentType = asset?.payload?.contentType || {
     gif: "image/gif",
     jpg: "image/jpeg",
     png: "image/png",
@@ -13849,6 +14136,43 @@ async function handleNotebookAssetRead(request, response) {
     "content-length": String(image.length)
   });
   response.end(image);
+}
+
+async function handleNotebookAssetDelete(request, response) {
+  const context = await authenticatedNotebookBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const assetID = String(context.body.assetID || "").trim();
+  const access = await notebookProjectAccess(
+    context,
+    response,
+    organizationPermissions.projectEdit
+  );
+  if (!access) return;
+  const asset = await ownedNotebookImageAsset(access.storageOwnerUserID, assetID);
+  if (!asset || asset.payload?.projectID !== projectID) {
+    sendError(response, 404, "Notebook image was not found.");
+    return;
+  }
+  const artifacts = await listStoredFoundationArtifacts(access.storageOwnerUserID);
+  const referenced = artifacts.some((artifact) =>
+    ["notebookCard", "projectNote"].includes(artifact.envelope?.type) &&
+    !artifact.envelope?.deletedAt &&
+    (artifact.payload?.imageAssets || []).includes(assetID)
+  );
+  if (referenced) {
+    sendJSON(response, 409, {
+      error: "This Notebook image is still referenced by synchronized content.",
+      code: "NOTEBOOK_IMAGE_IN_USE"
+    });
+    return;
+  }
+  await deleteOrphanedNotebookImageAssets(
+    access.storageOwnerUserID,
+    projectID,
+    [assetID]
+  );
+  sendJSON(response, 200, { assetID, deletionQueued: true });
 }
 
 async function handleWorkboardAssetUpload(request, response) {
@@ -15249,6 +15573,7 @@ const handlers = {
   "notebook/cards/delete": handleNotebookCardDelete,
   "notebook/assets/upload": handleNotebookAssetUpload,
   "notebook/assets/read": handleNotebookAssetRead,
+  "notebook/assets/delete": handleNotebookAssetDelete,
   "reports/sources/list": handleReportSourceList,
   "reports/options": handleReportOptions,
   "reports/drafts/list": handleReportDraftList,

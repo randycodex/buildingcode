@@ -35,6 +35,11 @@ assert.deepEqual(Object.keys(envelope).sort(), [
 ]);
 assert.equal(envelope.owner.id, "user-1");
 assert.equal(artifactEnvelope({
+  type: "notebookImageAsset",
+  owner,
+  createdAt
+}).type, "notebookImageAsset");
+assert.equal(artifactEnvelope({
   type: "notebookCard",
   owner: organizationOwner,
   createdAt
@@ -59,6 +64,7 @@ assert.equal(projectMembershipRules.researchConversation.maximumProjects, 1);
 assert.equal(projectMembershipRules.workboard.relationship, "owner");
 assert.equal(projectMembershipRules.workboardPreview.relationship, "owner");
 assert.equal(conflictPolicies.workboardPreview, "immutable");
+assert.equal(conflictPolicies.notebookImageAsset, "immutable-binary-metadata-revision");
 assert.equal(projectMembershipRules.projectNote.relationship, "owner");
 assert.equal(projectMembershipRules.reviewThread.relationship, "owner");
 assert.equal(projectMembershipRules.reviewComment.relationship, "reference");

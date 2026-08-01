@@ -49467,6 +49467,23 @@ function oX(e, t = {}) {
 				props: nX(e)
 			}, " "]));
 		},
+		replaceAssetURL(e, t) {
+			let r = n.current;
+			if (!r || !e || !t || e === t) return !1;
+			let i = !1, a = (n) => ({
+				...n,
+				...n.type === "image" && n.props?.url === e ? { props: {
+					...n.props,
+					url: t
+				} } : {},
+				children: (n.children || []).map(a)
+			}), o = r.document.map((t) => {
+				t.type === "image" && t.props?.url === e && (i = !0);
+				let n = a(t);
+				return JSON.stringify(n) !== JSON.stringify(t) && (i = !0), n;
+			});
+			return i && r.replaceBlocks(r.document, o), i;
+		},
 		undo() {
 			n.current?.undo();
 		},

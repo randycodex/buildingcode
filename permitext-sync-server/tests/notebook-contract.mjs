@@ -151,6 +151,11 @@ const richDocument = {
 const richValidated = validateNotebookDocument(richDocument);
 assert.equal(richValidated.document.document[0].type, "heading");
 assert.equal(richValidated.document.document[2].type, "image");
+assert.deepEqual(
+  richValidated.imageAssets,
+  ["project-assets%2Fproject%2Fnotebook%2Fimage.png"],
+  "Notebook image identities are not included in the synchronized card contract."
+);
 assert.match(notebookPlainText(richValidated.document), /Existing wall at corridor/);
 assert.match(renderNotebookDocumentHTML(richValidated.document), /data-notebook-image-asset/);
 assert.match(renderNotebookDocumentHTML(richValidated.document), /<table>/);
@@ -192,6 +197,16 @@ assert.equal(payload.schemaVersion, 2);
 assert.equal(payload.sourceClassification, "user-authored");
 assert.equal(payload.references[0].referenceKind, "canonicalSection");
 assert(payload.renderedHTML.includes("notebook-reference-chip"));
+assert.deepEqual(payload.imageAssets, []);
+
+assert.throws(
+  () => validateNotebookDocument({
+    ...emptyNotebookDocument(),
+    document: [{ type: "image", props: { url: "permitext-notebook-local:pending-image" } }]
+  }),
+  /Permitext asset or HTTPS URL/,
+  "Temporary device-local image references reached the synchronized Notebook contract."
+);
 
 const manifest = notebookManifestItem({
   cardID: "card-1",

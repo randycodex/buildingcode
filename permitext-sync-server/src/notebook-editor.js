@@ -183,6 +183,26 @@ export function mountPermitextNotebookEditor(element, options = {}) {
         " "
       ]);
     },
+    replaceAssetURL(fromURL, toURL) {
+      const editor = controllerRef.current;
+      if (!editor || !fromURL || !toURL || fromURL === toURL) return false;
+      let changed = false;
+      const replaceBlock = (block) => ({
+        ...block,
+        ...(block.type === "image" && block.props?.url === fromURL
+          ? { props: { ...block.props, url: toURL } }
+          : {}),
+        children: (block.children || []).map(replaceBlock)
+      });
+      const next = editor.document.map((block) => {
+        if (block.type === "image" && block.props?.url === fromURL) changed = true;
+        const mapped = replaceBlock(block);
+        if (JSON.stringify(mapped) !== JSON.stringify(block)) changed = true;
+        return mapped;
+      });
+      if (changed) editor.replaceBlocks(editor.document, next);
+      return changed;
+    },
     undo() {
       controllerRef.current?.undo();
     },

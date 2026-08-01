@@ -30,13 +30,17 @@ const structuredNote = normalizeProjectNotePayload({
     document: [{
       type: "paragraph",
       content: [{ type: "text", text: "One shared Project note.", styles: {} }]
+    }, {
+      type: "image",
+      props: { url: "permitext-notebook-asset:11111111-1111-4111-8111-111111111111" }
     }]
   },
   createdByUserID: "editor-1"
 });
 assert.equal(structuredNote.title, "Project information");
-assert.equal(structuredNote.body, "One shared Project note.");
+assert.equal(structuredNote.body, "One shared Project note.\n\nImage");
 assert.equal(structuredNote.document.format, "blocknote-json");
+assert.deepEqual(structuredNote.imageAssets, ["11111111-1111-4111-8111-111111111111"]);
 
 const request = normalizeReviewThreadPayload({
   projectID: "project-1",

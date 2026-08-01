@@ -26,14 +26,18 @@ assert.equal(packageManifest.dependencies["@tiptap/core"], undefined);
 assert(
   appServer.includes('"notebook/assets/upload": handleNotebookAssetUpload') &&
     appServer.includes('"notebook/assets/read": handleNotebookAssetRead') &&
-    appServer.includes("storePrivateProjectAsset(pathname, body, contentType)") &&
+    appServer.includes('"notebook/assets/delete": handleNotebookAssetDelete') &&
+    appServer.includes('type: "notebookImageAsset"') &&
+    appServer.includes("notebookImageStorage(asset?.payload?.storageProvider") &&
+    appServer.includes("notebookImageContentType(body)") &&
+    appServer.includes("NOTEBOOK_IMAGE_ID_CONFLICT") &&
     appServer.includes('"cache-control": "private, no-store"'),
   "Notebook images must use authenticated private Project storage."
 );
 assert(
-  webClient.includes("uploadNotebookAsset(projectID, file)") &&
+  webClient.includes('uploadNotebookAsset(projectID, file, cardID = "")') &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260731-blocknote-notebook-v3"'),
+    webClient.includes('notebookClientVersion = "20260801-notebook-images-v5"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

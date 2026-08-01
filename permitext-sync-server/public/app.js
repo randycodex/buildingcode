@@ -19,14 +19,29 @@ import {
 } from "./sync-state.js?v=20260721-causal-clear-v4";
 import {
   disableOfflineFeature,
+  deleteNotebookCardSnapshot,
+  deleteLocalNotebookImage,
+  deleteNotebookDraft,
   downloadOfflineLibrary,
+  finalizeNotebookImagesForDocument,
+  loadNotebookDraft,
+  loadNotebookProjectSnapshot,
   loadOfflineSyncSnapshot,
+  markNotebookImageUploaded,
+  markNotebookImageUploadError,
+  notebookImageRecord,
+  notebookImagesForProject,
   offlineAPI,
   offlineFeatureMetadata,
   offlineLibraryStatus,
   reconcileOfflineFeatureAccess,
-  saveOfflineSyncSnapshot
-} from "./offline-storage.js?v=20260801-blocknote-notebook-v298";
+  pendingNotebookImages,
+  saveNotebookDraft,
+  saveNotebookCardSnapshot,
+  saveNotebookProjectSnapshot,
+  saveOfflineSyncSnapshot,
+  stageNotebookImage
+} from "./offline-storage.js?v=20260801-notebook-images-v300";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -81,7 +96,7 @@ const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260731-project-tone-v22";
-const notebookClientVersion = "20260731-blocknote-notebook-v3";
+const notebookClientVersion = "20260801-notebook-images-v5";
 const detachedWorkboardRoute = window.location.pathname === detachedWorkboardPath;
 const legacyDetachedProjectParameter = new URLSearchParams(window.location.search).get("detachedWorkboard") || "";
 const detachedProjectSession = detachedWorkboardRoute ? detachedProjectSessionFromWindow() : null;
@@ -4679,36 +4694,176 @@ async function uploadWorkboardAsset(projectID, fileID, file) {
   return payload.asset;
 }
 
-async function uploadNotebookAsset(projectID, file) {
-  const account = activeAccount();
-  if (!account) throw new Error("Sign in to upload Notebook images.");
-  if (!(file instanceof File) || !file.type.startsWith("image/")) {
-    throw new Error("The Notebook accepts PNG, JPEG, WebP, and GIF images.");
+const notebookImageTypes = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
+const maximumNotebookImageBytes = 8 * 1024 * 1024;
+
+async function notebookImageDimensions(blob) {
+  try {
+    const image = await createImageBitmap(blob);
+    try {
+      return { width: image.width, height: image.height };
+    } finally {
+      image.close();
+    }
+  } catch {
+    return { width: null, height: null };
   }
-  const blob = await optimizedWorkboardImageBlob(file);
+}
+
+async function uploadPendingNotebookImage(record) {
+  const account = activeAccount();
+  if (!account || account.userID !== record.accountUserID) return null;
+  const dimensions = await notebookImageDimensions(record.blob);
   const url = new URL("/notebook/assets/upload", window.location.origin);
-  url.searchParams.set("projectID", projectID);
-  url.searchParams.set("assetID", crypto.randomUUID());
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      authorization: `Bearer ${account.sessionToken}`,
-      "content-type": blob.type || file.type,
-      "x-permitext-user-id": account.userID
-    },
-    body: blob
-  });
+  url.searchParams.set("projectID", record.projectID);
+  url.searchParams.set("assetID", record.assetID);
+  let response;
+  try {
+    response = await fetch(url, {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${account.sessionToken}`,
+        "content-type": record.contentType,
+        "x-permitext-user-id": account.userID,
+        ...(dimensions.width ? { "x-permitext-image-width": String(dimensions.width) } : {}),
+        ...(dimensions.height ? { "x-permitext-image-height": String(dimensions.height) } : {})
+      },
+      body: record.blob
+    });
+  } catch (error) {
+    throw new Error(navigator.onLine === false
+      ? "Upload is waiting for network connectivity."
+      : `Notebook image upload failed: ${error.message}`);
+  }
   const payload = await response.json().catch(() => ({}));
   if (!response.ok) throw new Error(responseErrorMessage(payload, "Could not upload this Notebook image."));
-  return payload.asset.url;
+  await markNotebookImageUploaded(record.localURL, payload.asset);
+  window.dispatchEvent(new CustomEvent("permitext:notebook-image-uploaded", {
+    detail: { projectID: record.projectID, localURL: record.localURL, permanentURL: payload.asset.url }
+  }));
+  return payload.asset;
+}
+
+async function flushPendingNotebookImages() {
+  const account = activeAccount();
+  if (!account || navigator.onLine === false) return [];
+  const pending = await pendingNotebookImages(account.userID).catch(() => []);
+  const uploaded = [];
+  let firstError = null;
+  for (const record of pending) {
+    try {
+      const asset = await uploadPendingNotebookImage(record);
+      if (asset) uploaded.push(asset);
+    } catch (error) {
+      await markNotebookImageUploadError(record.localURL, error.message).catch(() => {});
+      firstError ||= error;
+      if (navigator.onLine === false) break;
+    }
+  }
+  if (firstError && navigator.onLine !== false) {
+    void showWebNotice("Notebook image not synchronized", firstError.message);
+  }
+  return uploaded;
+}
+
+function notebookDocumentAssetURLs(document, prefix) {
+  const urls = [];
+  const visit = (block) => {
+    if (block?.type === "image" && String(block.props?.url || "").startsWith(prefix)) {
+      urls.push(block.props.url);
+    }
+    (block?.children || []).forEach(visit);
+  };
+  (document?.document || []).forEach(visit);
+  return Array.from(new Set(urls));
+}
+
+function replaceNotebookDocumentAssetURL(document, fromURL, toURL) {
+  const replace = (block) => ({
+    ...block,
+    ...(block?.type === "image" && block.props?.url === fromURL
+      ? { props: { ...block.props, url: toURL } }
+      : {}),
+    children: (block?.children || []).map(replace)
+  });
+  return { ...document, document: (document?.document || []).map(replace) };
+}
+
+async function pruneUnusedPendingNotebookImages(accountUserID, projectID, cardID, document) {
+  const used = new Set(notebookDocumentAssetURLs(document, "permitext-notebook-local:"));
+  const localImages = await notebookImagesForProject(accountUserID, projectID, cardID).catch(() => []);
+  await Promise.all(localImages.filter((record) => !used.has(record.localURL)).map(async (record) => {
+    if (record.uploadState === "uploaded" && record.remoteAsset?.assetID) {
+      try {
+        await postResearch("/notebook/assets/delete", {
+          projectID,
+          assetID: record.remoteAsset.assetID
+        });
+      } catch (error) {
+        if (error.payload?.code === "NOTEBOOK_IMAGE_IN_USE") return;
+        throw error;
+      }
+    }
+    await deleteLocalNotebookImage(record.localURL);
+  })).catch((error) => {
+    void showWebNotice("Notebook image cleanup delayed", error.message);
+  });
+}
+
+async function reconcileNotebookDocumentAssets(document) {
+  let reconciled = document;
+  for (const localURL of notebookDocumentAssetURLs(document, "permitext-notebook-local:")) {
+    const record = await notebookImageRecord(localURL).catch(() => null);
+    if (record?.permanentURL) {
+      reconciled = replaceNotebookDocumentAssetURL(reconciled, localURL, record.permanentURL);
+    }
+  }
+  return reconciled;
+}
+
+async function uploadNotebookAsset(projectID, file, cardID = "") {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to upload Notebook images.");
+  if (!(file instanceof File) || !notebookImageTypes.has(file.type)) {
+    throw new Error("The Notebook accepts PNG, JPEG, WebP, and GIF images.");
+  }
+  if (file.size > maximumNotebookImageBytes) {
+    throw new Error("Notebook images must be 8 MB or smaller.");
+  }
+  const blob = await optimizedWorkboardImageBlob(file);
+  const record = await stageNotebookImage({
+    accountUserID: account.userID,
+    projectID,
+    cardID,
+    assetID: crypto.randomUUID(),
+    blob,
+    name: file.name
+  });
+  if (navigator.onLine !== false) {
+    try {
+      return (await uploadPendingNotebookImage(record)).url;
+    } catch (error) {
+      await markNotebookImageUploadError(record.localURL, error.message).catch(() => {});
+      if (!/network|connectivity|failed to fetch/i.test(error.message)) throw error;
+    }
+  }
+  return record.localURL;
 }
 
 async function resolveNotebookAsset(projectID, assetURL) {
   const value = String(assetURL || "");
+  if (value.startsWith("permitext-notebook-local:")) {
+    const local = await notebookImageRecord(value);
+    if (!local?.blob) throw new Error("This offline Notebook image is no longer available on this device.");
+    return URL.createObjectURL(local.blob);
+  }
   if (!value.startsWith("permitext-notebook-asset:")) return value;
   const account = activeAccount();
   if (!account) throw new Error("Sign in to load this Notebook image.");
-  const pathname = decodeURIComponent(value.slice("permitext-notebook-asset:".length));
+  const identity = value.slice("permitext-notebook-asset:".length);
+  let decodedIdentity = identity;
+  try { decodedIdentity = decodeURIComponent(identity); } catch { /* use literal identity */ }
+  const legacyPathname = decodedIdentity.startsWith("project-assets/") ? decodedIdentity : "";
   const response = await fetch("/notebook/assets/read", {
     method: "POST",
     headers: {
@@ -4718,7 +4873,7 @@ async function resolveNotebookAsset(projectID, assetURL) {
     body: JSON.stringify({
       auth: { accountUserID: account.userID },
       projectID,
-      pathname
+      ...(legacyPathname ? { pathname: legacyPathname } : { assetID: identity })
     })
   });
   if (!response.ok) {
@@ -5402,6 +5557,7 @@ async function performForegroundSync() {
     const accountUserID = activeAccount()?.userID || "";
     const previousStatus = syncedContent?.status || "";
     const previousEventID = Number(syncedContent?.latestEventID || 0);
+    await flushPendingNotebookImages();
     const pushResult = await flushSyncOutbox({ refresh: false });
     if (activeAccount()?.userID !== accountUserID) {
       await renderWorkspace();
@@ -12606,6 +12762,11 @@ async function renderProjectNotebook(project) {
   const notebookObjectURLs = new Set();
   let notebookAutosaveTimer = null;
   let flushNotebookAutosave = async () => !dirty;
+  const notebookImageUploaded = (event) => {
+    if (event.detail?.projectID !== projectID) return;
+    editorMount?.replaceAssetURL?.(event.detail.localURL, event.detail.permanentURL);
+  };
+  window.addEventListener("permitext:notebook-image-uploaded", notebookImageUploaded);
 
   const mountState = {
     panel,
@@ -12626,6 +12787,7 @@ async function renderProjectNotebook(project) {
       editorMount = null;
       notebookObjectURLs.forEach((url) => URL.revokeObjectURL(url));
       notebookObjectURLs.clear();
+      window.removeEventListener("permitext:notebook-image-uploaded", notebookImageUploaded);
     }
   };
   notebookMounts.set(projectID, mountState);
@@ -12636,17 +12798,42 @@ async function renderProjectNotebook(project) {
   }
 
   try {
-    const [foundationPayload, cardPayload] = await Promise.all([
-      identity.sharedOrganizationID
-        ? postResearch("/organizations/projects/snapshot", { projectID })
-            .then((payload) => payload.project)
-        : postResearch("/projects/foundation/state", { projectID }),
-      postResearch("/notebook/cards/list", { projectID })
-    ]);
+    let foundationPayload;
+    let cardPayload;
+    try {
+      [foundationPayload, cardPayload] = await Promise.all([
+        identity.sharedOrganizationID
+          ? postResearch("/organizations/projects/snapshot", { projectID })
+              .then((payload) => payload.project)
+          : postResearch("/projects/foundation/state", { projectID }),
+        postResearch("/notebook/cards/list", { projectID })
+      ]);
+      await saveNotebookProjectSnapshot({
+        accountUserID: activeAccount().userID,
+        projectID,
+        foundation: foundationPayload,
+        cardPayload
+      }).catch(() => {});
+    } catch (networkError) {
+      const cached = await loadNotebookProjectSnapshot(
+        activeAccount().userID,
+        projectID
+      ).catch(() => null);
+      if (!cached?.foundation || !cached?.cardPayload) throw networkError;
+      foundationPayload = cached.foundation;
+      cardPayload = cached.cardPayload;
+      status.textContent = "Offline Notebook · changes will synchronize when connectivity returns.";
+    }
     if (disposed) return panel;
     foundation = foundationPayload;
     cards = cardPayload.cards || [];
     notebookReadOnly = cardPayload.access?.readOnly === true;
+    if (navigator.onLine !== false) {
+      void Promise.allSettled(cards.map(async (card) => {
+        const payload = await postResearch("/notebook/cards/get", { projectID, cardID: card.id });
+        await saveNotebookCardSnapshot(activeAccount().userID, projectID, payload.card);
+      }));
+    }
     shell.replaceChildren();
     if (identity.sharedOrganizationID) {
       const accessNote = document.createElement("p");
@@ -12746,6 +12933,17 @@ async function renderProjectNotebook(project) {
       const revisionAtStart = notebookRevision;
       const documentAtStart = editorMount?.getDocument?.() || draftDocument;
       const cardAtStart = activeCard;
+      if (notebookDocumentAssetURLs(documentAtStart, "permitext-notebook-local:").length) {
+        await saveNotebookDraft({
+          accountUserID: activeAccount().userID,
+          projectID,
+          cardID: cardAtStart.id,
+          title,
+          document: documentAtStart
+        });
+        dirty = false;
+        return true;
+      }
       const saveTask = (async () => {
         try {
           const payload = await postResearch("/notebook/cards/save", {
@@ -12771,6 +12969,27 @@ async function renderProjectNotebook(project) {
             ...(foundation.artifacts || []).filter((artifact) => artifact.envelope?.id !== payload.card.id),
             { envelope: { id: payload.card.id, type: "notebookCard" }, payload: payload.card }
           ];
+          await Promise.all([
+            deleteNotebookDraft(activeAccount().userID, projectID, cardAtStart.id).catch(() => {}),
+            cardAtStart.id ? Promise.resolve() : deleteNotebookDraft(activeAccount().userID, projectID, "").catch(() => {}),
+            finalizeNotebookImagesForDocument(
+              activeAccount().userID,
+              projectID,
+              cardAtStart.id,
+              notebookDocumentAssetURLs(documentAtStart, "permitext-notebook-asset:")
+            ).catch(() => {})
+          ]);
+          await saveNotebookProjectSnapshot({
+            accountUserID: activeAccount().userID,
+            projectID,
+            foundation,
+            cardPayload: { cards, access: { readOnly: notebookReadOnly } }
+          }).catch(() => {});
+          await saveNotebookCardSnapshot(
+            activeAccount().userID,
+            projectID,
+            payload.card
+          ).catch(() => {});
           renderCardList();
           if (changedDuringSave) {
             scheduleNotebookAutosave(180);
@@ -12819,10 +13038,29 @@ async function renderProjectNotebook(project) {
         );
         if (!confirmed) return;
       }
-      const payload = await postResearch("/notebook/cards/get", { projectID, cardID });
+      let payload;
+      try {
+        payload = await postResearch("/notebook/cards/get", { projectID, cardID });
+        await saveNotebookCardSnapshot(
+          activeAccount().userID,
+          projectID,
+          payload.card
+        ).catch(() => {});
+      } catch (networkError) {
+        const cached = await loadNotebookProjectSnapshot(
+          activeAccount().userID,
+          projectID
+        ).catch(() => null);
+        const cachedCard = cached?.cardDocuments?.[cardID];
+        if (!cachedCard) throw networkError;
+        payload = { card: cachedCard };
+      }
       activeCard = payload.card;
-      draftDocument = activeCard.document;
-      dirty = false;
+      const localDraft = await loadNotebookDraft(activeAccount().userID, projectID, cardID).catch(() => null);
+      const useLocalDraft = localDraft && String(localDraft.updatedAt) > String(activeCard.updatedAt || "");
+      draftDocument = await reconcileNotebookDocumentAssets(useLocalDraft ? localDraft.document : activeCard.document);
+      if (useLocalDraft && localDraft.title) activeCard.title = localDraft.title;
+      dirty = useLocalDraft;
       renderCardList();
       await renderFocusedCard();
     }
@@ -12850,6 +13088,13 @@ async function renderProjectNotebook(project) {
         foundation.artifacts = (foundation.artifacts || []).filter(
           (artifact) => artifact.envelope?.id !== target.id
         );
+        await Promise.all([
+          deleteNotebookDraft(activeAccount().userID, projectID, target.id).catch(() => {}),
+          deleteNotebookCardSnapshot(activeAccount().userID, projectID, target.id).catch(() => {}),
+          ...((target.imageAssets || []).map((assetID) =>
+            deleteLocalNotebookImage(`permitext-notebook-local:${assetID}`).catch(() => {})
+          ))
+        ]);
         if (activeCard?.id === target.id) {
           activeCard = null;
           draftDocument = emptyNotebookDocument();
@@ -13047,7 +13292,10 @@ async function renderProjectNotebook(project) {
         document: draftDocument,
         autofocus: !notebookReadOnly && !activeCard.id,
         editable: !notebookReadOnly,
-        uploadFile: (file) => uploadNotebookAsset(projectID, file),
+        uploadFile: (file) => uploadNotebookAsset(projectID, file, activeCard.id).catch((error) => {
+          void showWebNotice("Image not added", error.message);
+          throw error;
+        }),
         async resolveFileUrl(url) {
           const resolved = await resolveNotebookAsset(projectID, url);
           if (resolved.startsWith("blob:")) notebookObjectURLs.add(resolved);
@@ -13056,6 +13304,19 @@ async function renderProjectNotebook(project) {
         onChange(document) {
           if (notebookReadOnly) return;
           draftDocument = document;
+          void saveNotebookDraft({
+            accountUserID: activeAccount().userID,
+            projectID,
+            cardID: activeCard.id,
+            title: activeCard.title,
+            document
+          }).catch(() => {});
+          void pruneUnusedPendingNotebookImages(
+            activeAccount().userID,
+            projectID,
+            activeCard.id,
+            document
+          );
           markNotebookDirty();
         },
         onOpenReference: null
@@ -13106,7 +13367,23 @@ async function renderProjectNotebook(project) {
     });
 
     renderCardList();
-    if (cards[0]) {
+    const unsavedDraft = notebookReadOnly
+      ? null
+      : await loadNotebookDraft(activeAccount().userID, projectID, "").catch(() => null);
+    if (unsavedDraft?.document) {
+      activeCard = {
+        id: "",
+        version: 0,
+        cardType: "finding",
+        title: unsavedDraft.title || "",
+        plainText: "",
+        references: []
+      };
+      draftDocument = await reconcileNotebookDocumentAssets(unsavedDraft.document);
+      dirty = true;
+      renderCardList();
+      await renderFocusedCard();
+    } else if (cards[0]) {
       await loadCard(cards[0].id);
     } else {
       await renderFocusedCard();
@@ -14559,6 +14836,21 @@ function projectNoteEditor(identity, note, options = {}) {
   let saveTimer = null;
   let saveInFlight = false;
   let saveQueued = false;
+  const projectID = projectDetailKey(identity);
+  const localScopeID = "project-information";
+  const objectURLs = new Set();
+
+  const imageUploaded = (event) => {
+    if (!container.isConnected) {
+      window.removeEventListener("permitext:notebook-image-uploaded", imageUploaded);
+      objectURLs.forEach((url) => URL.revokeObjectURL(url));
+      objectURLs.clear();
+      return;
+    }
+    if (event.detail?.projectID !== projectID) return;
+    editorMount?.replaceAssetURL?.(event.detail.localURL, event.detail.permanentURL);
+  };
+  window.addEventListener("permitext:notebook-image-uploaded", imageUploaded);
 
   const saveDraft = async () => {
     if (!editable || !editorMount) return;
@@ -14568,15 +14860,28 @@ function projectNoteEditor(identity, note, options = {}) {
     }
     saveInFlight = true;
     const documentToSave = draftDocument;
+    if (notebookDocumentAssetURLs(documentToSave, "permitext-notebook-local:").length) {
+      saveInFlight = false;
+      return;
+    }
     try {
       const payload = await postResearch("/projects/collaboration/notes/save", {
-        projectID: projectDetailKey(identity),
+        projectID,
         noteID: currentNote?.id || undefined,
         expectedVersion: currentNote?.version || 0,
         title: "Project information",
         document: documentToSave
       });
       currentNote = payload.note;
+      await Promise.all([
+        deleteNotebookDraft(activeAccount().userID, projectID, localScopeID).catch(() => {}),
+        finalizeNotebookImagesForDocument(
+          activeAccount().userID,
+          projectID,
+          localScopeID,
+          notebookDocumentAssetURLs(documentToSave, "permitext-notebook-asset:")
+        ).catch(() => {})
+      ]);
     } catch (error) {
       await showWebNotice("Project note not saved", error.message);
     } finally {
@@ -14588,16 +14893,28 @@ function projectNoteEditor(identity, note, options = {}) {
     }
   };
 
-  void loadNotebookModule()
-    .then((module) => {
+  void Promise.all([
+    loadNotebookModule(),
+    loadNotebookDraft(activeAccount().userID, projectID, localScopeID).catch(() => null)
+  ])
+    .then(async ([module, localDraft]) => {
+      if (localDraft && String(localDraft.updatedAt) > String(currentNote?.updatedAt || "")) {
+        draftDocument = localDraft.document;
+      }
+      draftDocument = await reconcileNotebookDocumentAssets(draftDocument);
       editorMount = module.mountPermitextNotebookEditor(editorElement, {
         document: draftDocument,
         editable,
         autofocus: false,
         ariaLabel: "Project information",
-        uploadFile: (file) => uploadNotebookAsset(projectDetailKey(identity), file),
+        uploadFile: (file) => uploadNotebookAsset(projectID, file, localScopeID).catch((error) => {
+          void showWebNotice("Image not added", error.message);
+          throw error;
+        }),
         async resolveFileUrl(url) {
-          return resolveNotebookAsset(projectDetailKey(identity), url);
+          const resolved = await resolveNotebookAsset(projectID, url);
+          if (resolved.startsWith("blob:")) objectURLs.add(resolved);
+          return resolved;
         },
         onReady() {
           editorReady = true;
@@ -14605,6 +14922,19 @@ function projectNoteEditor(identity, note, options = {}) {
         onChange(document) {
           draftDocument = document;
           if (!editable || !editorReady) return;
+          void saveNotebookDraft({
+            accountUserID: activeAccount().userID,
+            projectID,
+            cardID: localScopeID,
+            title: "Project information",
+            document
+          }).catch(() => {});
+          void pruneUnusedPendingNotebookImages(
+            activeAccount().userID,
+            projectID,
+            localScopeID,
+            document
+          );
           window.clearTimeout(saveTimer);
           saveTimer = window.setTimeout(saveDraft, 800);
         }
@@ -19790,6 +20120,7 @@ async function start() {
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
+    void flushPendingNotebookImages();
   });
   window.addEventListener("offline", () => {
     serverReachable = false;

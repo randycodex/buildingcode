@@ -300,6 +300,9 @@ function canonicalBlock(node, state, depth = 0) {
     children: (Array.isArray(node.children) ? node.children : [])
       .map((child) => canonicalBlock(child, state, depth + 1))
   };
+  if (node.type === "image" && block.props.url?.startsWith("permitext-notebook-asset:")) {
+    state.imageAssets.push(block.props.url.slice("permitext-notebook-asset:".length));
+  }
   if (node.type === "table") block.content = canonicalTableContent(node.content, state);
   else if (inlineBlockTypes.has(node.type)) block.content = canonicalInlineContent(node.content, state);
   return block;
@@ -353,7 +356,7 @@ export function validateNotebookDocument(input) {
     throw new Error("Notebook card document is too large.");
   }
   if (!migrated.document.length) throw new Error("Notebook documents require a block.");
-  const state = { textLength: 0, blockCount: 0, references: [] };
+  const state = { textLength: 0, blockCount: 0, references: [], imageAssets: [] };
   const canonical = {
     schema: notebookSchemaName,
     schemaVersion: notebookSchemaVersion,
@@ -363,7 +366,11 @@ export function validateNotebookDocument(input) {
       ? { migratedFromSchemaVersion: migrated.migratedFromSchemaVersion }
       : {})
   };
-  return { document: canonical, references: state.references };
+  return {
+    document: canonical,
+    references: state.references,
+    imageAssets: Array.from(new Set(state.imageAssets))
+  };
 }
 
 function inlinePlainText(content) {
@@ -496,6 +503,7 @@ export function normalizeNotebookCardPayload({ cardType, title, document, create
     title: requiredText(title, "Notebook card title", 300),
     document: validated.document,
     references: validated.references,
+    imageAssets: validated.imageAssets,
     plainText,
     renderedHTML: renderNotebookDocumentHTML(validated.document),
     sourceClassification: "user-authored",

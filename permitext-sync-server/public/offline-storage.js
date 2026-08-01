@@ -1,13 +1,16 @@
 const databaseName = "permitext-offline";
-const databaseVersion = 2;
+const databaseVersion = 4;
 const offlineLibrarySchemaVersion = 2;
 const metadataStoreName = "metadata";
 const chaptersStoreName = "chapters";
 const sectionsStoreName = "sections";
 const syncSnapshotsStoreName = "sync-snapshots";
+const notebookImagesStoreName = "notebook-images";
+const notebookDraftsStoreName = "notebook-drafts";
+const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v263";
-const shellAssetVersion = "20260801-blocknote-notebook-v298";
+const shellCacheName = "permitext-pro-shell-v265";
+const shellAssetVersion = "20260801-notebook-images-v300";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -16,10 +19,10 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260801-blocknote-notebook-v298",
-  "/web/app.js?v=20260801-blocknote-notebook-v298",
+  "/web/styles.css?v=20260801-notebook-images-v300",
+  "/web/app.js?v=20260801-notebook-images-v300",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260801-blocknote-notebook-v298",
+  "/web/offline-storage.js?v=20260801-notebook-images-v300",
   "/web/workspace-state.js?v=20260731-multi-workspace-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
@@ -61,10 +64,218 @@ function openDatabase() {
       if (!database.objectStoreNames.contains(syncSnapshotsStoreName)) {
         database.createObjectStore(syncSnapshotsStoreName, { keyPath: "userID" });
       }
+      if (!database.objectStoreNames.contains(notebookImagesStoreName)) {
+        const images = database.createObjectStore(notebookImagesStoreName, { keyPath: "localURL" });
+        images.createIndex("accountUserID", "accountUserID");
+        images.createIndex("uploadState", "uploadState");
+      }
+      if (!database.objectStoreNames.contains(notebookDraftsStoreName)) {
+        database.createObjectStore(notebookDraftsStoreName, { keyPath: "key" });
+      }
+      if (!database.objectStoreNames.contains(notebookProjectsStoreName)) {
+        database.createObjectStore(notebookProjectsStoreName, { keyPath: "key" });
+      }
     };
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error || new Error("Could not open offline code storage."));
   });
+}
+
+async function withOfflineStore(storeName, mode, operation, fallbackMessage) {
+  if (typeof indexedDB === "undefined") throw new Error("Offline Notebook storage is unavailable.");
+  const database = await openDatabase();
+  try {
+    const transaction = database.transaction(storeName, mode);
+    const result = await operation(transaction.objectStore(storeName));
+    await transactionComplete(transaction, fallbackMessage);
+    return result;
+  } finally {
+    database.close();
+  }
+}
+
+export async function stageNotebookImage({ accountUserID, projectID, cardID, assetID, blob, name }) {
+  const localURL = `permitext-notebook-local:${assetID}`;
+  const record = {
+    localURL,
+    accountUserID,
+    projectID,
+    cardID: cardID || "",
+    assetID,
+    blob,
+    name: String(name || "Notebook image"),
+    contentType: blob.type,
+    size: blob.size,
+    uploadState: "pending",
+    permanentURL: null,
+    error: null,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  await withOfflineStore(notebookImagesStoreName, "readwrite", (store) => {
+    store.put(record);
+  }, "Could not store this Notebook image offline.");
+  return record;
+}
+
+export async function notebookImageRecord(localURL) {
+  return withOfflineStore(notebookImagesStoreName, "readonly", (store) =>
+    requestResult(store.get(localURL), "Could not read this offline Notebook image."),
+  "Could not read this offline Notebook image.");
+}
+
+export async function pendingNotebookImages(accountUserID) {
+  return withOfflineStore(notebookImagesStoreName, "readonly", (store) =>
+    requestResult(store.index("accountUserID").getAll(accountUserID), "Could not read pending Notebook images."),
+  "Could not read pending Notebook images.").then((records) =>
+    records.filter((record) => record.uploadState === "pending"));
+}
+
+export async function notebookImagesForProject(accountUserID, projectID, cardID) {
+  return withOfflineStore(notebookImagesStoreName, "readonly", (store) =>
+    requestResult(store.index("accountUserID").getAll(accountUserID), "Could not read local Notebook images."),
+  "Could not read local Notebook images.").then((records) => records.filter((record) =>
+    record.projectID === projectID && record.cardID === (cardID || "")));
+}
+
+export async function markNotebookImageUploaded(localURL, asset) {
+  const current = await notebookImageRecord(localURL);
+  if (!current) return null;
+  const next = {
+    ...current,
+    uploadState: "uploaded",
+    permanentURL: asset.url,
+    remoteAsset: asset,
+    error: null,
+    updatedAt: new Date().toISOString()
+  };
+  await withOfflineStore(notebookImagesStoreName, "readwrite", (store) => {
+    store.put(next);
+  }, "Could not finalize this Notebook image upload.");
+  return next;
+}
+
+export async function markNotebookImageUploadError(localURL, message) {
+  const current = await notebookImageRecord(localURL);
+  if (!current) return null;
+  const next = { ...current, error: String(message || "Upload failed."), updatedAt: new Date().toISOString() };
+  await withOfflineStore(notebookImagesStoreName, "readwrite", (store) => {
+    store.put(next);
+  }, "Could not retain this Notebook upload error.");
+  return next;
+}
+
+export async function deleteLocalNotebookImage(localURL) {
+  await withOfflineStore(notebookImagesStoreName, "readwrite", (store) => {
+    store.delete(localURL);
+  }, "Could not remove this local Notebook image.");
+}
+
+export async function finalizeNotebookImagesForDocument(accountUserID, projectID, cardID, permanentURLs) {
+  const expected = new Set(permanentURLs || []);
+  const records = await notebookImagesForProject(accountUserID, projectID, cardID);
+  await Promise.all(records
+    .filter((record) => record.uploadState === "uploaded" && expected.has(record.permanentURL))
+    .map((record) => deleteLocalNotebookImage(record.localURL)));
+}
+
+function notebookDraftKey(accountUserID, projectID, cardID) {
+  return [accountUserID, projectID, cardID || "new"].join(":");
+}
+
+export async function saveNotebookDraft({ accountUserID, projectID, cardID, title, document }) {
+  const record = {
+    key: notebookDraftKey(accountUserID, projectID, cardID),
+    accountUserID,
+    projectID,
+    cardID: cardID || "",
+    title: String(title || ""),
+    document,
+    updatedAt: new Date().toISOString()
+  };
+  await withOfflineStore(notebookDraftsStoreName, "readwrite", (store) => {
+    store.put(record);
+  }, "Could not save this Notebook draft offline.");
+  return record;
+}
+
+export async function loadNotebookDraft(accountUserID, projectID, cardID) {
+  return withOfflineStore(notebookDraftsStoreName, "readonly", (store) =>
+    requestResult(
+      store.get(notebookDraftKey(accountUserID, projectID, cardID)),
+      "Could not load this Notebook draft."
+    ), "Could not load this Notebook draft.");
+}
+
+export async function deleteNotebookDraft(accountUserID, projectID, cardID) {
+  await withOfflineStore(notebookDraftsStoreName, "readwrite", (store) => {
+    store.delete(notebookDraftKey(accountUserID, projectID, cardID));
+  }, "Could not clear this Notebook draft.");
+}
+
+function notebookProjectKey(accountUserID, projectID) {
+  return [accountUserID, projectID].join(":");
+}
+
+export async function saveNotebookProjectSnapshot({
+  accountUserID,
+  projectID,
+  foundation,
+  cardPayload
+}) {
+  const current = await loadNotebookProjectSnapshot(accountUserID, projectID).catch(() => null);
+  const record = {
+    ...(current || {}),
+    key: notebookProjectKey(accountUserID, projectID),
+    accountUserID,
+    projectID,
+    foundation,
+    cardPayload,
+    cardDocuments: current?.cardDocuments || {},
+    updatedAt: new Date().toISOString()
+  };
+  await withOfflineStore(notebookProjectsStoreName, "readwrite", (store) => {
+    store.put(record);
+  }, "Could not cache this Notebook for offline use.");
+  return record;
+}
+
+export async function saveNotebookCardSnapshot(accountUserID, projectID, card) {
+  const current = await loadNotebookProjectSnapshot(accountUserID, projectID).catch(() => null);
+  if (!current) return null;
+  const record = {
+    ...current,
+    cardDocuments: { ...(current.cardDocuments || {}), [card.id]: card },
+    updatedAt: new Date().toISOString()
+  };
+  await withOfflineStore(notebookProjectsStoreName, "readwrite", (store) => {
+    store.put(record);
+  }, "Could not cache this Notebook card for offline use.");
+  return record;
+}
+
+export async function deleteNotebookCardSnapshot(accountUserID, projectID, cardID) {
+  const current = await loadNotebookProjectSnapshot(accountUserID, projectID).catch(() => null);
+  if (!current) return;
+  const cardDocuments = { ...(current.cardDocuments || {}) };
+  delete cardDocuments[cardID];
+  const cards = (current.cardPayload?.cards || []).filter((card) => card.id !== cardID);
+  await withOfflineStore(notebookProjectsStoreName, "readwrite", (store) => {
+    store.put({
+      ...current,
+      cardPayload: { ...(current.cardPayload || {}), cards },
+      cardDocuments,
+      updatedAt: new Date().toISOString()
+    });
+  }, "Could not update this offline Notebook.");
+}
+
+export async function loadNotebookProjectSnapshot(accountUserID, projectID) {
+  return withOfflineStore(notebookProjectsStoreName, "readonly", (store) =>
+    requestResult(
+      store.get(notebookProjectKey(accountUserID, projectID)),
+      "Could not load this offline Notebook."
+    ), "Could not load this offline Notebook.");
 }
 
 async function metadataRecord() {

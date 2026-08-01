@@ -57,6 +57,17 @@ assert(
   "Cold offline startup does not preserve the last synced Pro account snapshot."
 );
 assert(
+  offlineStorage.includes('const notebookImagesStoreName = "notebook-images"') &&
+    offlineStorage.includes("stageNotebookImage") &&
+    offlineStorage.includes("markNotebookImageUploaded") &&
+    offlineStorage.includes("saveNotebookDraft") &&
+    offlineStorage.includes("saveNotebookProjectSnapshot") &&
+    offlineStorage.includes("saveNotebookCardSnapshot") &&
+    app.includes("flushPendingNotebookImages") &&
+    app.includes('permitext:notebook-image-uploaded'),
+  "Notebook images do not use the durable offline queue and draft reconciliation path."
+);
+assert(
   offlineFeatureMetadata.assetCacheName.includes(offlineFeatureMetadata.assetVersion) &&
     offlineStorage.includes("caches.open(offlineAssetCacheName)") &&
     serviceWorker.includes("offlineAssetCacheName"),
@@ -184,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-blocknote-notebook-v298"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-notebook-images-v300"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;
