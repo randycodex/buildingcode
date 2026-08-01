@@ -10069,10 +10069,17 @@ body.is-resizing-research-evidence * {
 }
 
 .notebook-panel {
+  --notebook-project-background: color-mix(in srgb, var(--project-color) 12%, var(--surface-raised));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
-  background: color-mix(in srgb, var(--project-color) 8%, var(--surface));
+  background: var(--notebook-project-background);
+}
+
+@media (prefers-color-scheme: dark) {
+  .notebook-panel {
+    --notebook-project-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  }
 }
 
 .notebook-header {
@@ -10124,7 +10131,7 @@ body.is-resizing-research-evidence * {
   margin-inline: calc(-1 * var(--panel-padding));
   overflow: hidden;
   border-radius: 0;
-  background: color-mix(in srgb, var(--surface) 76%, transparent);
+  background: var(--notebook-project-background);
 }
 
 .notebook-status {
@@ -10142,7 +10149,7 @@ body.is-resizing-research-evidence * {
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: var(--notebook-project-background);
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -10401,7 +10408,7 @@ body.is-resizing-research-evidence * {
   overflow: hidden;
   padding: 0;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: var(--notebook-project-background);
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
