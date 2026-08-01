@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-projects-menu-card-v331";
+} from "./offline-storage.js?v=20260801-project-pane-widths-v332";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -167,9 +167,9 @@ const defaultReaderPaneWidth = 520;
 const defaultSourceLinkedReaderPaneWidth = 400;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
-const defaultDetailPaneWidth = defaultNonReaderPaneWidth;
+const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
-const defaultNotebookPaneWidth = 400;
+const defaultNotebookPaneWidth = 600;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
