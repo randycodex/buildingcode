@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-light-notebook-v304";
+} from "./offline-storage.js?v=20260801-notebook-reference-grid-v305";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -12629,6 +12629,38 @@ function notebookCanonicalReferenceLabel(savedItem, chapter) {
   ].filter(Boolean).join(" / ");
 }
 
+function compareNotebookReferences(left, right) {
+  const kindOrder = {
+    canonicalSection: 0,
+    researchAnswer: 1,
+    notebookCard: 2,
+    workboard: 3
+  };
+  const kindDifference = (kindOrder[left.referenceKind] ?? 99) -
+    (kindOrder[right.referenceKind] ?? 99);
+  if (kindDifference) return kindDifference;
+  if (left.referenceKind === "canonicalSection") {
+    const codeDifference = codeOptions.findIndex((option) => option.prefix === left.codePrefix) -
+      codeOptions.findIndex((option) => option.prefix === right.codePrefix);
+    if (codeDifference) return codeDifference;
+    const hierarchyDifference = [left.chapterNumber, left.sectionNumber]
+      .map((part) => String(part || ""))
+      .join(".")
+      .localeCompare(
+        [right.chapterNumber, right.sectionNumber]
+          .map((part) => String(part || ""))
+          .join("."),
+        undefined,
+        { numeric: true, sensitivity: "base" }
+      );
+    if (hierarchyDifference) return hierarchyDifference;
+  }
+  return String(left.label || "").localeCompare(String(right.label || ""), undefined, {
+    numeric: true,
+    sensitivity: "base"
+  });
+}
+
 async function notebookReferenceCandidates(projectID, foundation, cards) {
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
@@ -12647,7 +12679,10 @@ async function notebookReferenceCandidates(projectID, foundation, cards) {
       return {
         referenceKind: "canonicalSection",
         referenceID: String(link.targetID),
-        label: citation
+        label: citation,
+        codePrefix: savedItem?.codePrefix || chapter?.codePrefix || "BC",
+        chapterNumber: savedItem?.chapterNumber || chapter?.chapterNumber || "",
+        sectionNumber: savedItem?.sectionNumber || ""
       };
     })
   );
@@ -12673,12 +12708,14 @@ async function notebookReferenceCandidates(projectID, foundation, cards) {
       label: "Project Workboard"
     });
   });
-  return references.filter((reference, index, all) =>
-    all.findIndex((candidate) =>
-      candidate.referenceKind === reference.referenceKind &&
-      candidate.referenceID === reference.referenceID
-    ) === index
-  );
+  return references
+    .filter((reference, index, all) =>
+      all.findIndex((candidate) =>
+        candidate.referenceKind === reference.referenceKind &&
+        candidate.referenceID === reference.referenceID
+      ) === index
+    )
+    .sort(compareNotebookReferences);
 }
 
 async function openNotebookReference(project, foundation, reference, selectCard) {
