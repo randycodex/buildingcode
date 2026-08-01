@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v249";
+const shellCacheName = "permitext-pro-shell-v250";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,9 +6,9 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260731-blocknote-notebook-v284",
+  "/web/styles.css?v=20260731-blocknote-notebook-v285",
   "/web/workboard-assets/workboard.css?v=20260731-project-tone-v62",
-  "/web/app.js?v=20260731-blocknote-notebook-v284",
+  "/web/app.js?v=20260731-blocknote-notebook-v285",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
   "/web/offline-storage.js?v=20260731-left-edge-resize-v282",
   "/web/workspace-state.js?v=20260731-multi-workspace-v1",

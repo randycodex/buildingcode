@@ -184,7 +184,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260731-blocknote-notebook-v284"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260731-blocknote-notebook-v285"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;

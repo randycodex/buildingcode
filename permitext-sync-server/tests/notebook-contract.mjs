@@ -8,6 +8,7 @@ import {
   renderNotebookDocumentHTML,
   validateNotebookDocument
 } from "../notebook-contract.mjs";
+import { blockNoteBlocksFromNotebookDocument } from "../src/notebook-schema.js";
 
 const linkedDocument = {
   schema: "permitext-notebook-card",
@@ -91,6 +92,24 @@ assert.equal(migratedTipTap.schemaVersion, 2);
 assert.equal(migratedTipTap.format, "blocknote-json");
 assert.equal(migratedTipTap.migratedFromSchemaVersion, 1);
 assert.equal(notebookPlainText(migratedTipTap), "Existing AC § 28-103.30.2");
+assert.deepEqual(
+  blockNoteBlocksFromNotebookDocument({
+    schema: "permitext-notebook-card",
+    schemaVersion: 1,
+    format: "tiptap-json",
+    document: {
+      type: "doc",
+      content: [{
+        type: "paragraph",
+        content: [{ type: "text", text: "Existing note" }]
+      }]
+    }
+  }),
+  [{
+    type: "paragraph",
+    content: [{ type: "text", text: "Existing note", styles: {} }]
+  }]
+);
 
 const richDocument = {
   ...emptyNotebookDocument(),

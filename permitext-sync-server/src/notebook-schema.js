@@ -83,6 +83,29 @@ export function tiptapDocumentToBlockNote(document) {
   return blocks.length ? blocks : emptyBlockNoteContent();
 }
 
+export function blockNoteBlocksFromNotebookDocument(input) {
+  if (Array.isArray(input)) return input.length ? input : emptyBlockNoteContent();
+  if (
+    input?.schema === notebookSchemaName &&
+    input?.schemaVersion === notebookSchemaVersion &&
+    input?.format === notebookDocumentFormat &&
+    Array.isArray(input.document)
+  ) {
+    return input.document.length ? input.document : emptyBlockNoteContent();
+  }
+  if (
+    input?.schema === notebookSchemaName &&
+    input?.schemaVersion === 1 &&
+    input?.format === "tiptap-json"
+  ) {
+    return tiptapDocumentToBlockNote(input.document);
+  }
+  if (input?.schemaVersion === 0 && typeof input.plainText === "string") {
+    return plainTextToBlockNote(input.plainText);
+  }
+  return emptyBlockNoteContent();
+}
+
 export function plainTextToBlockNote(value) {
   const blocks = String(value || "")
     .split(/\n{2,}/)

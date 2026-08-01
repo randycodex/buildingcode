@@ -13,6 +13,7 @@ import {
   useCreateBlockNote
 } from "@blocknote/react";
 import {
+  blockNoteBlocksFromNotebookDocument,
   emptyNotebookDocument,
   notebookBlockTypes,
   notebookDocumentFormat,
@@ -105,7 +106,7 @@ function preferredNotebookTheme() {
 function PermitextNotebookEditor({ options, controllerRef }) {
   const [theme, setTheme] = useState(preferredNotebookTheme);
   const initialContent = useMemo(
-    () => options.document?.document || emptyNotebookDocument().document,
+    () => blockNoteBlocksFromNotebookDocument(options.document),
     []
   );
   const editor = useCreateBlockNote({
@@ -144,7 +145,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
     const incoming = options.document;
     if (!incoming || incoming === lastDocumentRef.current) return;
     lastDocumentRef.current = incoming;
-    editor.replaceBlocks(editor.document, incoming.document || incoming);
+    editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(incoming));
   }, [editor, options.document]);
 
   return React.createElement(BlockNoteView, {
@@ -171,7 +172,7 @@ export function mountPermitextNotebookEditor(element, options = {}) {
     setDocument(document) {
       const editor = controllerRef.current;
       if (!editor) return;
-      editor.replaceBlocks(editor.document, document?.document || document);
+      editor.replaceBlocks(editor.document, blockNoteBlocksFromNotebookDocument(document));
     },
     insertReference(reference) {
       const editor = controllerRef.current;

@@ -33,7 +33,7 @@ assert(
 assert(
   webClient.includes("uploadNotebookAsset(projectID, file)") &&
     webClient.includes("resolveNotebookAsset(projectID, assetURL)") &&
-    webClient.includes('notebookClientVersion = "20260731-blocknote-notebook-v2"'),
+    webClient.includes('notebookClientVersion = "20260731-blocknote-notebook-v3"'),
   "The web Notebook must upload, resolve, and version its private BlockNote images."
 );
 

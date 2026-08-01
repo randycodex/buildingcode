@@ -49316,17 +49316,50 @@ function KY() {
 		content: []
 	}];
 }
-function qY() {
-	return {
-		schema: HY,
-		schemaVersion: 2,
-		format: UY,
-		document: KY()
-	};
+function qY(e) {
+	let t = {};
+	return (Array.isArray(e) ? e : []).forEach((e) => {
+		(e?.type === "bold" || e?.type === "italic") && (t[e.type] = !0);
+	}), t;
+}
+function JY(e) {
+	return e?.type === "text" && typeof e.text == "string" ? {
+		type: "text",
+		text: e.text,
+		styles: qY(e.marks)
+	} : e?.type === "permitextReference" ? {
+		type: "permitextReference",
+		props: {
+			referenceKind: String(e.attrs?.referenceKind || ""),
+			referenceID: String(e.attrs?.referenceID || ""),
+			label: String(e.attrs?.label || "Linked Permitext item")
+		}
+	} : null;
+}
+function YY(e) {
+	let t = (Array.isArray(e?.content) ? e.content : []).filter((e) => e?.type === "paragraph").map((e) => ({
+		type: "paragraph",
+		content: (Array.isArray(e.content) ? e.content : []).map(JY).filter(Boolean)
+	}));
+	return t.length ? t : KY();
+}
+function XY(e) {
+	return Array.isArray(e) ? e.length ? e : KY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 2 && e?.format === "blocknote-json" && Array.isArray(e.document) ? e.document.length ? e.document : KY() : e?.schema === "permitext-notebook-card" && e?.schemaVersion === 1 && e?.format === "tiptap-json" ? YY(e.document) : e?.schemaVersion === 0 && typeof e.plainText == "string" ? ZY(e.plainText) : KY();
+}
+function ZY(e) {
+	let t = String(e || "").split(/\n{2,}/).map((e) => e.replace(/\s*\n\s*/g, " ").trim()).filter(Boolean).map((e) => ({
+		type: "paragraph",
+		content: [{
+			type: "text",
+			text: e,
+			styles: {}
+		}]
+	}));
+	return t.length ? t : KY();
 }
 //#endregion
 //#region src/notebook-editor.js
-var JY = new Set(GY), YY = ZB({
+var QY = new Set(GY), $Y = ZB({
 	type: "permitextReference",
 	propSchema: {
 		referenceKind: {
@@ -49354,15 +49387,15 @@ var JY = new Set(GY), YY = ZB({
 		"data-reference-id": e.props.referenceID,
 		"data-reference-label": e.props.label
 	}, e.props.label)
-}), XY = Object.fromEntries(Object.entries(xx).filter(([e]) => JY.has(e))), ZY = Dx.create({
-	blockSpecs: XY,
+}), eX = Object.fromEntries(Object.entries(xx).filter(([e]) => QY.has(e))), tX = Dx.create({
+	blockSpecs: eX,
 	inlineContentSpecs: {
 		...Tx,
-		permitextReference: YY
+		permitextReference: $Y
 	},
 	styleSpecs: wx
 });
-function QY(e) {
+function nX(e) {
 	let t = String(e?.referenceKind || "").trim(), n = String(e?.referenceID || "").trim(), r = String(e?.label || "").trim();
 	if (!WY.includes(t) || !n || !r) throw Error("A Notebook reference requires a supported kind, ID, and label.");
 	return {
@@ -49371,7 +49404,7 @@ function QY(e) {
 		label: r
 	};
 }
-function $Y(e) {
+function rX(e) {
 	return {
 		schema: HY,
 		schemaVersion: 2,
@@ -49379,19 +49412,19 @@ function $Y(e) {
 		document: e
 	};
 }
-function eX() {
+function iX() {
 	let e = document.documentElement.dataset.theme;
 	return e === "dark" || e === "light" ? e : window.matchMedia?.("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
-function tX({ options: e, controllerRef: t }) {
-	let [n, r] = (0, _.useState)(eX), i = BI({
-		schema: ZY,
-		initialContent: (0, _.useMemo)(() => e.document?.document || qY().document, []),
+function aX({ options: e, controllerRef: t }) {
+	let [n, r] = (0, _.useState)(iX), i = BI({
+		schema: tX,
+		initialContent: (0, _.useMemo)(() => XY(e.document), []),
 		uploadFile: e.uploadFile,
 		resolveFileUrl: e.resolveFileUrl
 	}), a = (0, _.useRef)(e.document);
 	return (0, _.useEffect)(() => {
-		let e = () => r(eX()), t = new MutationObserver(e);
+		let e = () => r(iX()), t = new MutationObserver(e);
 		t.observe(document.documentElement, {
 			attributes: !0,
 			attributeFilter: ["class", "data-theme"]
@@ -49404,34 +49437,34 @@ function tX({ options: e, controllerRef: t }) {
 		t.current === i && (t.current = null);
 	}), [i]), (0, _.useEffect)(() => {
 		let t = e.document;
-		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, t.document || t));
+		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, XY(t)));
 	}, [i, e.document]), _.createElement(zY, {
 		editor: i,
 		editable: e.editable !== !1,
 		theme: n,
-		onChange: () => e.onChange?.($Y(i.document)),
+		onChange: () => e.onChange?.(rX(i.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
 	});
 }
-function nX(e, t = {}) {
+function oX(e, t = {}) {
 	if (!(e instanceof HTMLElement)) throw Error("A Notebook editor mount element is required.");
 	let n = { current: null }, r = (0, y.createRoot)(e);
-	return r.render(_.createElement(tX, {
+	return r.render(_.createElement(aX, {
 		options: t,
 		controllerRef: n
 	})), {
 		getDocument() {
-			return $Y(n.current?.document || t.document?.document || []);
+			return rX(n.current?.document || t.document?.document || []);
 		},
 		setDocument(e) {
 			let t = n.current;
-			t && t.replaceBlocks(t.document, e?.document || e);
+			t && t.replaceBlocks(t.document, XY(e));
 		},
 		insertReference(e) {
 			let t = n.current;
 			t && (t.focus(), t.insertInlineContent([{
 				type: "permitextReference",
-				props: QY(e)
+				props: nX(e)
 			}, " "]));
 		},
 		undo() {
@@ -49449,4 +49482,4 @@ function nX(e, t = {}) {
 	};
 }
 //#endregion
-export { nX as mountPermitextNotebookEditor, ZY as permitextNotebookSchema };
+export { oX as mountPermitextNotebookEditor, tX as permitextNotebookSchema };
