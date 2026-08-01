@@ -10703,6 +10703,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
   color: var(--text-primary);
 }
 
+/* Slash menus are portaled to the document so Floating UI can flip and size
+ * them against the viewport instead of clipping them to an editor column. */
+.bn-suggestion-menu {
+  background: var(--menu-surface) !important;
+  color: var(--text-primary);
+}
+
 .notebook-editor-surface [data-color-scheme="dark"] {
   --mantine-color-body: var(--surface);
   --mantine-color-text: var(--text-primary);

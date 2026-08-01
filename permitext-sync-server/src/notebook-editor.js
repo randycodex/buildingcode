@@ -233,6 +233,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
       editable: options.editable !== false,
       theme,
       formattingToolbar: false,
+      portalElements: { slashMenu: null },
       onChange: () => options.onChange?.(wrappedDocument(editor.document)),
       "aria-label": options.ariaLabel || "Notebook card"
     },

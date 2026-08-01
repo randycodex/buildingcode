@@ -49618,6 +49618,7 @@ function mX({ options: e, controllerRef: t }) {
 		editable: e.editable !== !1,
 		theme: n,
 		formattingToolbar: !1,
+		portalElements: { slashMenu: null },
 		onChange: () => e.onChange?.(fX(i.document)),
 		"aria-label": e.ariaLabel || "Notebook card"
 	}, _.createElement(bz, { formattingToolbar: uX }));
