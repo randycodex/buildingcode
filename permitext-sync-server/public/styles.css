@@ -10710,6 +10710,17 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 
 .notebook-editor-surface table :is(th, td) {
   border-color: #000 !important;
+  color: var(--text-primary) !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  .notebook-editor-surface table :is(th, td) {
+    border-color: #fff !important;
+  }
+
+  .notebook-editor-surface table :is(th, td) * {
+    color: var(--text-primary) !important;
+  }
 }
 
 .notebook-reference-chip {
