@@ -1213,7 +1213,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-project-pane-widths-v332'),
+        webRoot.text.includes('/web/app.js?v=20260801-project-header-band-v333'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1323,7 +1323,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-pane-widths-v332'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-header-band-v333'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1534,7 +1534,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-project-pane-widths-v332'),
+        webRoot.text.includes('/web/styles.css?v=20260801-project-header-band-v333'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1726,6 +1726,16 @@ async function main() {
         workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("return defaultNonReaderPaneWidth"),
       "Non-Reader columns no longer preserve their intended default widths."
+    );
+    assert(
+      workspaceStyles.text.includes("--project-pane-band-height: 68px") &&
+        workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
+        workspaceStyles.text.includes("height: var(--project-pane-band-height)") &&
+        workspaceStyles.text.includes("background: var(--project-pane-band-background)") &&
+        workspaceStyles.text.includes(".workboard-panel {") &&
+        workspaceStyles.text.includes("background: var(--surface-raised);") &&
+        !workspaceStyles.text.includes("--notebook-project-background"),
+      "Project-owned panes no longer limit the Project color to one aligned header band."
     );
     assert(
       workspaceScript.text.includes("connectionStatus.dataset.state = statusKind") &&
@@ -2461,8 +2471,8 @@ async function main() {
     assert(workboardScript.response.ok, "Nested Workboard script asset did not load.");
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260731-project-tone-v22";') &&
-        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260731-project-tone-v62"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260731-project-tone-v62'),
+        workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63"') &&
+        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63'),
       "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
     );
     assert(
@@ -2526,9 +2536,9 @@ async function main() {
       "Workboard active tools no longer inherit the project color."
     );
     assert(
-      workboardStyleSource.includes("background: color-mix(in srgb, var(--project-color, #c96410) 7%, var(--surface-raised, #fff));") &&
-        workboardStyleSource.includes("background: color-mix(in srgb, var(--project-color, #c96410) 5%, var(--surface-raised, #fff));"),
-      "Workboard surfaces no longer share the owning Project color tone."
+      workboardStyleSource.includes("--project-pane-band-background") &&
+        workboardStyleSource.match(/background: var\(--surface-raised, #fff\);/g)?.length >= 2,
+      "Workboard no longer limits the owning Project color to its aligned header band."
     );
     const workboardFont = await request(
       "/web/workboard-assets/fonts/Xiaolai/Xiaolai-Regular-353f33792a8f60dc69323ddf635a269e.woff2"

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-project-pane-widths-v332";
+} from "./offline-storage.js?v=20260801-project-header-band-v333";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -1282,7 +1282,7 @@ function loadWorkboardStyles() {
     }
     const link = existing || document.createElement("link");
     link.rel = "stylesheet";
-    link.href = "/web/workboard-assets/workboard.css?v=20260731-project-tone-v62";
+    link.href = "/web/workboard-assets/workboard.css?v=20260801-project-header-band-v63";
     link.dataset.permitextWorkboardStyles = "true";
     link.addEventListener("load", resolve, { once: true });
     link.addEventListener("error", () => {

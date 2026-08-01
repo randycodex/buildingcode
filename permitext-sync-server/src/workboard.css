@@ -5,7 +5,7 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
-  background: color-mix(in srgb, var(--project-color, #c96410) 7%, var(--surface-raised, #fff));
+  background: var(--surface-raised, #fff);
   color: var(--text-primary, #202124);
 }
 
@@ -16,7 +16,10 @@
   justify-content: flex-end;
   padding: 10px 16px 10px 20px;
   border-bottom: 1px solid var(--border, #d9d9dc);
-  background: color-mix(in srgb, var(--surface-raised, #fff) 94%, var(--project-color, #c96410));
+  background: var(
+    --project-pane-band-background,
+    color-mix(in srgb, var(--project-color, #c96410) 22%, var(--surface-raised, #fff))
+  );
 }
 
 .permitext-workboard-header-actions {
@@ -63,7 +66,7 @@
   min-width: 0;
   min-height: 0;
   overflow: hidden;
-  background: color-mix(in srgb, var(--project-color, #c96410) 5%, var(--surface-raised, #fff));
+  background: var(--surface-raised, #fff);
 }
 
 .permitext-workboard-canvas .excalidraw {

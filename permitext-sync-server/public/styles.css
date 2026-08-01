@@ -928,9 +928,11 @@ textarea:focus-visible {
 
 .workboard-panel {
   --pane-min-width: min(420px, 82vw);
+  --project-pane-band-height: 68px;
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   grid-template-rows: minmax(0, 1fr);
   padding: 0;
-  background: color-mix(in srgb, var(--project-color) 7%, var(--surface-raised));
+  background: var(--surface-raised);
 }
 
 .workboard-root {
@@ -6568,11 +6570,13 @@ body.is-resizing-research-evidence * {
 }
 
 .project-detail-panel {
-  --project-detail-background: color-mix(in srgb, var(--project-color) 12%, var(--surface-raised));
+  --project-pane-band-height: 68px;
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
   display: grid;
   position: relative;
   grid-template-rows: auto minmax(0, 1fr);
-  background: var(--project-detail-background);
+  isolation: isolate;
+  background: var(--surface-raised);
 }
 
 .project-detail-loading-status {
@@ -6583,12 +6587,6 @@ body.is-resizing-research-evidence * {
 
 .saved-project-tile.is-opening {
   background: color-mix(in srgb, var(--project-color) 22%, var(--surface));
-}
-
-@media (prefers-color-scheme: dark) {
-  .project-detail-panel {
-    --project-detail-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
-  }
 }
 
 .project-detail-chrome {
@@ -10128,17 +10126,33 @@ body.is-resizing-research-evidence * {
 }
 
 .notebook-panel {
-  --notebook-project-background: color-mix(in srgb, var(--project-color) 12%, var(--surface-raised));
+  --project-pane-band-height: 68px;
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
-  background: var(--notebook-project-background);
+  isolation: isolate;
+  background: var(--surface-raised);
 }
 
-@media (prefers-color-scheme: dark) {
-  .notebook-panel {
-    --notebook-project-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
-  }
+.project-detail-panel::before,
+.notebook-panel::before,
+.report-draft-panel::before {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 0;
+  height: var(--project-pane-band-height);
+  content: "";
+  pointer-events: none;
+  background: var(--project-pane-band-background);
+}
+
+.project-detail-panel > *,
+.notebook-panel > *,
+.report-draft-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .notebook-header {
@@ -10190,7 +10204,7 @@ body.is-resizing-research-evidence * {
   margin-inline: calc(-1 * var(--panel-padding));
   overflow: hidden;
   border-radius: 0;
-  background: var(--notebook-project-background);
+  background: var(--surface-raised);
 }
 
 .notebook-status {
@@ -10418,7 +10432,7 @@ body.is-resizing-research-evidence * {
   min-height: 0;
   overflow: hidden;
   padding: var(--space-4);
-  background: var(--notebook-project-background);
+  background: var(--surface-raised);
 }
 
 .notebook-welcome {
@@ -10781,10 +10795,14 @@ body .panel-track > article.workspace-panel:not(.reader-panel) .notebook-editor-
 }
 
 .report-draft-panel {
+  --project-pane-band-height: 68px;
+  --project-pane-band-background: color-mix(in srgb, var(--project-color) 22%, var(--surface-raised));
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   overflow: hidden;
-  background: color-mix(in srgb, var(--project-color) 7%, var(--surface));
+  isolation: isolate;
+  background: var(--surface-raised);
 }
 
 .report-draft-header {
