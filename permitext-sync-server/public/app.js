@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-workboard-canvas-state-v343";
+} from "./offline-storage.js?v=20260801-project-card-inset-v344";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
