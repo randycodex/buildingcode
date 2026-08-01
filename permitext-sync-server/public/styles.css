@@ -7030,26 +7030,6 @@ body.is-resizing-research-evidence * {
   touch-action: none;
 }
 
-.project-note-resize-handle::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 48px;
-  height: 2px;
-  border-radius: 999px;
-  background: var(--text-tertiary);
-  content: "";
-  opacity: 0.55;
-  transform: translate(-50%, -50%);
-}
-
-.project-note-resize-handle:hover::before,
-.project-note-resize-handle:focus-visible::before,
-.project-note-block-editor.is-resizing .project-note-resize-handle::before {
-  background: var(--text-secondary);
-  opacity: 1;
-}
-
 .project-note-editor-surface {
   height: 100%;
   min-height: 100%;

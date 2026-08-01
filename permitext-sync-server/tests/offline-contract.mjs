@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-project-evidence-select-v375"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260801-invisible-note-resize-v376"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260731-multi-workspace-v1"));
 
 let activationCompletion;
