@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-reader-hydration-retry-v323";
+} from "./offline-storage.js?v=20260801-chapter-menu-balanced-v324";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3719,7 +3719,8 @@ function enhanceSelect(select) {
       : Math.max(boundaryLeft, Math.min(rect.left, boundaryRight - menuWidth));
     const menuOffset = readerTopMenu ? 12 : 2;
     const menuTop = rect.bottom + menuOffset;
-    const availableBelow = Math.max(0, window.innerHeight - menuTop - viewportPadding);
+    const menuBottomGap = readerChapterMenu ? menuTop : viewportPadding;
+    const availableBelow = Math.max(0, window.innerHeight - menuTop - menuBottomGap);
     menu.style.setProperty("--select-menu-top", `${menuTop}px`);
     menu.style.setProperty("--select-menu-left", `${left}px`);
     menu.style.setProperty("--select-menu-width", `${menuWidth}px`);
