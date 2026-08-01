@@ -1204,7 +1204,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-notebook-reference-grid-v305'),
+        webRoot.text.includes('/web/app.js?v=20260801-notebook-menu-opacity-v306'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1290,7 +1290,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
         workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-reference-grid-v305'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-menu-opacity-v306'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1501,7 +1501,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-notebook-reference-grid-v305'),
+        webRoot.text.includes('/web/styles.css?v=20260801-notebook-menu-opacity-v306'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

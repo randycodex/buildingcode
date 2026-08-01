@@ -10149,7 +10149,7 @@ body.is-resizing-research-evidence * {
   padding: 0;
   overflow: hidden;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface));
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -10408,7 +10408,7 @@ body.is-resizing-research-evidence * {
   overflow: hidden;
   padding: 0;
   border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);
+  background: color-mix(in srgb, var(--text-tertiary) 16%, var(--surface));
   transition: padding-bottom 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 

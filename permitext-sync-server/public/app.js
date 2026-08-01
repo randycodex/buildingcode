@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-notebook-reference-grid-v305";
+} from "./offline-storage.js?v=20260801-notebook-menu-opacity-v306";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
