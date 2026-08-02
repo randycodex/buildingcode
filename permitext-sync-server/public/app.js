@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-sdc-reader-reuse-v437";
+} from "./offline-storage.js?v=20260802-membership-in-place-v438";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2844,9 +2844,19 @@ function syncSavedArchiveButtonStates() {
 }
 
 async function refreshProjectMembershipPanes(project) {
-  await transitionWorkspace("utility", {
-    refreshPaneIDs: projectOverviewRefreshPaneIDs()
+  const savedPaneIDs = new Set();
+  track.querySelectorAll(".saved-panel[data-pane-id]").forEach((panel) => {
+    const paneID = panel.dataset.paneId;
+    if (!paneID) return;
+    if (typeof panel.__refreshProjectMembership === "function") {
+      panel.__refreshProjectMembership();
+      savedPaneIDs.add(paneID);
+    }
   });
+  const refreshPaneIDs = projectOverviewRefreshPaneIDs().filter((paneID) => !savedPaneIDs.has(paneID));
+  if (refreshPaneIDs.length) {
+    await transitionWorkspace("utility", { refreshPaneIDs });
+  }
 }
 
 function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
@@ -18447,6 +18457,30 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
   panel.__applySavedView = applySavedView;
   renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
   applySavedView();
+  panel.__refreshProjectMembership = () => {
+    const scrollContainer = panel.querySelector(".saved-column-scroll");
+    const scrollTop = scrollContainer?.scrollTop || 0;
+    const currentSummary = currentContentSummary();
+    summary.projectSections = currentSummary.projectSections || [];
+    resolvedItems.forEach((item) => {
+      item.folderNames = activeFolderRecords(workspaceProjects)
+        .filter((folder) => summary.projectSections.some((link) =>
+          savedEvidenceKey(link) === savedEvidenceKey(item) && projectSectionBelongsToProject(link, folder)
+        ))
+        .map((folder) => folder.name || folder.title || "Folder");
+    });
+    panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
+      const folder = workspaceProjects.find((candidate) => projectRecordID(candidate) === tile.dataset.projectId);
+      const countLabel = tile.querySelector(".saved-project-count");
+      if (!folder || !countLabel) return;
+      const count = summary.projectSections.filter((item) => projectSectionBelongsToProject(item, folder)).length;
+      countLabel.textContent = String(count);
+      countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
+      countLabel.setAttribute("aria-label", countLabel.title);
+    });
+    applySavedView();
+    if (scrollContainer) scrollContainer.scrollTop = scrollTop;
+  };
 }
 
 function hydrateSavedPanelWhenConnected(panel, savedInstance, paneID, attempt = 0) {

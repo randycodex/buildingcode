@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-sdc-reader-reuse-v437'),
+        webRoot.text.includes('/web/app.js?v=20260802-membership-in-place-v438'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-sdc-reader-reuse-v437'),
+        webRoot.text.includes('/web/styles.css?v=20260802-membership-in-place-v438'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1570,7 +1570,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-sdc-reader-reuse-v437'),
+        webRoot.text.includes('/web/styles.css?v=20260802-membership-in-place-v438'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2023,6 +2023,11 @@ async function main() {
         workspaceScript.text.includes("projectSections: Array.from(projectSectionsByID.values()).filter((item) => !item.deletedAt)") &&
         workspaceScript.text.includes("async function refreshProjectMembershipPanes(project)") &&
         workspaceScript.text.includes("await refreshProjectMembershipPanes(project)") &&
+        workspaceScript.text.includes('typeof panel.__refreshProjectMembership === "function"') &&
+        workspaceScript.text.includes("panel.__refreshProjectMembership = () =>") &&
+        workspaceScript.text.includes("const scrollTop = scrollContainer?.scrollTop || 0") &&
+        workspaceScript.text.includes("summary.projectSections = currentSummary.projectSections || []") &&
+        workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
         workspaceScript.text.includes('button.setAttribute("aria-label", "Bookmarked")'),
