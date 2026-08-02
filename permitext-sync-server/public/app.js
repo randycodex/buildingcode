@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-recent-sdc-v433";
+} from "./offline-storage.js?v=20260802-saved-sdc-v434";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -19221,7 +19221,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             const openItem = item.annotationBlockID
               ? { ...item, blockID: item.annotationBlockID }
               : item;
-            void openSavedItemInReader(openItem, paneID);
+            void openSavedItemInSDC(openItem, paneID);
           }
         });
         row.append(openButton);
@@ -19308,61 +19308,27 @@ function closeSavedItemDetailsForPane(savedPaneID) {
   });
 }
 
-async function openSavedItemInReader(item, savedPaneID, options = {}) {
+async function openSavedItemInSDC(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
-  const recentlyViewedSearchID = String(options.recentlyViewedSearchID || "").trim();
-  const detail = {
-    codePrefix: item.codePrefix || "BC",
-    codeVersion: item.codeVersion || syncCodeVersionForPrefix(item.codePrefix || "BC"),
-    chapterID: item.chapterID || "",
-    chapterNumber: item.chapterNumber || "",
-    sectionID,
-    sectionNumber: item.sectionNumber || "",
-    title: item.title || "Section"
-  };
+  const anchoredSearchID = Object.entries(sectionDetailAnchorsBySearch())
+    .find(([, anchorPaneID]) => anchorPaneID === savedPaneID)?.[0] || "";
+  let searchInstance = (state.utilityInstances || []).find((instance) =>
+    instance.key === "search" && instance.id === anchoredSearchID
+  ) || (state.utilityInstances || []).find((instance) => instance.key === "search");
+  if (!searchInstance) {
+    searchInstance = newUtilityInstance("search");
+    state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
+  }
   closeSavedItemDetailsForPane(savedPaneID);
-  const readerFields = readerFieldsForSectionDetail(detail, {
-    shouldSmoothScrollToSection: false,
-    savedSourcePaneID: savedPaneID,
-    recentlyViewedSourceSearchID: recentlyViewedSearchID
-  });
-  const canAddReader = isProAccount() || state.readers.length < 2;
-  let reader = (state.readers || []).find((candidate) => candidate.savedSourcePaneID === savedPaneID);
-  if (reader) {
-    Object.assign(reader, readerFields);
-  } else if (canAddReader) {
-    reader = newReaderState(readerFields);
-    state.readers.push(reader);
-  } else {
-    reader = state.readers[1] || state.readers[0];
-    Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
-      if (readerID === reader.id) delete state.searchLinkedReaders[searchID];
-    });
-    delete reader.projectSavedSourceKey;
-    Object.assign(reader, readerFields);
-  }
-  const readerPaneID = paneIDForReader(reader);
-  if (!reader.sourceLinkedDefaultWidthApplied) {
-    state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;
-    reader.sourceLinkedDefaultWidthApplied = true;
-  }
-  if (recentlyViewedSearchID) {
-    Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
-      if (readerID === reader.id && searchID !== recentlyViewedSearchID) {
-        delete state.searchLinkedReaders[searchID];
-      }
-    });
-    state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;
-  }
-  placePaneAfter(savedPaneID, readerPaneID);
-  updateBrowserSectionURL(sectionID);
-  scheduleContinuitySync(reader);
-  saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [readerPaneID] });
-  scrollPaneIntoView(readerPaneID);
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => alignSavedReaderTargetAtTop(reader, item));
+  closeLinkedReaderForSavedPane(savedPaneID);
+  closeLinkedReaderForSearch(searchInstance.id);
+  await openSectionDetail(searchInstance.id, searchResultDetail({
+    ...item,
+    id: sectionID,
+    sectionID
+  }), {
+    anchorPaneID: savedPaneID
   });
 }
 

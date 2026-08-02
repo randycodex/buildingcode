@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-recent-sdc-v433'),
+        webRoot.text.includes('/web/app.js?v=20260802-saved-sdc-v434'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-recent-sdc-v433'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-sdc-v434'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1429,30 +1429,17 @@ async function main() {
       "Closing a Search section-detail column should also close only its linked Reader."
     );
     assert(
-      workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID, options = {})") &&
+      workspaceScript.text.includes("async function openSavedItemInSDC(item, savedPaneID)") &&
+        workspaceScript.text.includes("void openSavedItemInSDC(openItem, paneID)") &&
+        workspaceScript.text.includes("const anchoredSearchID = Object.entries(sectionDetailAnchorsBySearch())") &&
+        workspaceScript.text.includes("closeSavedItemDetailsForPane(savedPaneID)") &&
         workspaceScript.text.includes("function closeLinkedReaderForSavedPane(savedPaneID)") &&
-        workspaceScript.text.includes('if (instance.key === "saved") closeLinkedReaderForSavedPane(paneID);') &&
-        workspaceScript.text.includes("reader.savedSourcePaneID === savedPaneID") &&
-        workspaceScript.text.includes("linkedReaderIDs.has(reader.id)") &&
-        workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
-        workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
-        workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
-        workspaceScript.text.includes("const defaultSourceLinkedReaderPaneWidth = 600;") &&
-        workspaceScript.text.includes("state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;") &&
-        workspaceScript.text.includes("reader.sourceLinkedDefaultWidthApplied = true;") &&
-        workspaceScript.text.includes("if (sourceLinkedReader)") &&
-        workspaceScript.text.includes("placePaneAfter(savedPaneID, readerPaneID);") &&
-        workspaceScript.text.includes("function alignSavedReaderTargetAtTop(reader, item)") &&
-        workspaceScript.text.includes('const savedTitle = String(item.title || "").replace(/\\s+/g, " ")') &&
-        workspaceScript.text.includes("readerSectionTitleNode(sectionTarget)?.textContent") &&
-        workspaceScript.text.includes("sectionTitle.includes(savedTitle) || savedTitle.includes(sectionTitle)") &&
-        workspaceScript.text.includes('(sectionTarget || content).querySelectorAll(".annotated-code-block")') &&
-        workspaceScript.text.includes("candidateText.includes(savedTitle) || savedTitle.includes(candidateText)") &&
-        workspaceScript.text.includes('scrollReaderContentToNode(content, target, "auto")') &&
-        !workspaceScript.text.includes("flashSavedReaderTarget") &&
-        !workspaceScript.text.includes("saved-reader-target-flash") &&
-        !workspaceStyles.text.includes("@keyframes saved-reader-target-flash"),
-      "Saved items should open directly in a Reader with the exact target aligned at the top and no highlight."
+        workspaceScript.text.includes("closeLinkedReaderForSavedPane(savedPaneID)") &&
+        workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
+        workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail({") &&
+        workspaceScript.text.includes("anchorPaneID: savedPaneID") &&
+        !workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID"),
+      "Saved Evidence items should open an SDC beside Projects instead of a linked Reader."
     );
     assert(
       workspaceScript.text.includes("function researchSourceCitation(source)") &&
@@ -1577,7 +1564,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-recent-sdc-v433'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-sdc-v434'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
