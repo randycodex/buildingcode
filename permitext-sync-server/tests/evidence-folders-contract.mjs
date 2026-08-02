@@ -96,6 +96,9 @@ assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: #
 assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: #111113;[\s\S]*?color: #ffffff;/);
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
 assert.doesNotMatch(appSource, /typeLegend\.textContent = "Folder type"/);
+assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y="3"[\s\S]*?<rect x="14" y="14"/);
+assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);
+assert.match(appSource, /projectsMenuToggle\.addEventListener\("click"[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
 assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
 assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-folder-type-heading-v406";
+} from "./offline-storage.js?v=20260802-active-projects-icon-v407";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -10493,6 +10493,17 @@ function archiveIconSVG() {
   `;
 }
 
+function activeProjectsIconSVG() {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"></rect>
+    </svg>
+  `;
+}
+
 function archiveRestoreIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -18430,11 +18441,21 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       ? ""
       : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
   });
+  const projectsMenuToggle = panel.querySelector(".saved-projects-menu-toggle");
+  projectsMenuToggle.addEventListener("click", () => {
+    if (instance.projectsMenuOpen || !showingArchived) return;
+    showingArchived = false;
+    instance.projectsArchiveMode = false;
+    syncProjectModeControls();
+    renderProjectCards();
+    saveWorkspaceState();
+  });
 
   const syncProjectModeControls = () => {
     archiveButton.setAttribute("aria-pressed", String(showingArchived));
-    archiveButton.title = showingArchived ? "Show active folders" : "Show archived folders";
+    archiveButton.title = showingArchived ? "Show active projects" : "Show archived projects";
     archiveButton.setAttribute("aria-label", archiveButton.title);
+    archiveButton.innerHTML = showingArchived ? activeProjectsIconSVG() : archiveIconSVG();
     addButton.hidden = showingArchived;
     addButton.disabled = showingArchived;
   };
