@@ -1237,7 +1237,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-saved-row-status-v429'),
+        webRoot.text.includes('/web/app.js?v=20260802-reader-saved-marker-v430'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1377,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-row-status-v429'),
+        webRoot.text.includes('/web/styles.css?v=20260802-reader-saved-marker-v430'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1581,7 +1581,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-row-status-v429'),
+        webRoot.text.includes('/web/styles.css?v=20260802-reader-saved-marker-v430'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1978,11 +1978,12 @@ async function main() {
         workspaceScript.text.includes('toggleReaderNotesSheet(panel, section, reader, { target });') &&
         workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved folders")') &&
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
-        workspaceScript.text.includes('bookmarkButton.hidden = !saved') &&
-        workspaceScript.text.includes('const bookmarkWrapper = wrappers.find((wrapper) => wrapper.classList.contains("has-note")) || wrappers[0] || null') &&
-        workspaceScript.text.includes('const showBookmark = Boolean(saved && wrapper === bookmarkWrapper)') &&
+        workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
+        workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
+        workspaceScript.text.includes('marker.hidden = !saved') &&
+        workspaceStyles.text.includes(".reader-section-saved-marker") &&
         !workspaceScript.text.includes("restoreReaderNotesSheet"),
-      "Paragraph taps or saved bookmark controls no longer match the iOS note-sheet behavior."
+      "Paragraph taps or Reader saved markers no longer match the iOS note-sheet behavior."
     );
     assert(
       workspaceScript.text.includes("projectSavedSourceKey: projectKey") &&

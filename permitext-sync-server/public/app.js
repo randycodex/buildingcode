@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-row-status-v429";
+} from "./offline-storage.js?v=20260802-reader-saved-marker-v430";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -7727,7 +7727,14 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   const headingRow = document.createElement("div");
   headingRow.className = "reader-section-heading-row";
   headingRow.dataset.researchSelectionExclude = "true";
-  headingRow.append(sectionHeading);
+  const savedSection = isSectionSaved({ sectionID: section.id, codeVersion: reader.codeVersion });
+  const savedMarker = document.createElement("span");
+  savedMarker.className = "reader-section-saved-marker";
+  savedMarker.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
+  savedMarker.setAttribute("aria-label", "Bookmarked");
+  savedMarker.setAttribute("aria-hidden", savedSection ? "false" : "true");
+  savedMarker.hidden = !savedSection;
+  headingRow.append(sectionHeading, savedMarker);
   sectionWrapper.append(headingRow);
 
   const projectContext = document.createElement("div");
@@ -7738,17 +7745,9 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   sectionWrapper.append(projectContext);
 
   const blocks = annotatedBlocksForSection(section);
-  const bookmarkedBlockIndex = isSectionSaved({ sectionID: section.id, codeVersion: reader.codeVersion })
-    ? Math.max(0, blocks.findIndex((block, blockIndex) => {
-        const blockTarget = annotationTargetForBlock(section, block, reader, blockIndex);
-        return Boolean(noteValueForTarget(blockTarget.sectionID, blockTarget.blockID).trim());
-      }))
-    : -1;
   blocks.forEach((block, index) => {
     const target = annotationTargetForBlock(section, block, reader, index);
-    sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target, {
-      showBookmark: index === bookmarkedBlockIndex
-    }));
+    sectionWrapper.append(renderAnnotatedCodeBlock(block, section, reader, target));
   });
   linkInlineCodeReferences(sectionWrapper, panel, reader);
   return sectionWrapper;
@@ -8699,6 +8698,10 @@ function syncReaderNoteBookmarkButtons(sectionID, saved) {
     button.setAttribute("aria-hidden", showBookmark ? "false" : "true");
     button.setAttribute("aria-label", "Bookmarked");
     button.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
+  });
+  track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"] .reader-section-saved-marker`).forEach((marker) => {
+    marker.hidden = !saved;
+    marker.setAttribute("aria-hidden", saved ? "false" : "true");
   });
 }
 
