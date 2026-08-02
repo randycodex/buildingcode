@@ -78,7 +78,7 @@ assert(!appSource.includes("No archived folders."), "An empty archive should not
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
-assert.match(savedFolderContextSource, /"Project Address"[\s\S]*?"Project Description"/);
+assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
 assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?savedTitle\.textContent = "Saved Evidence"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
 assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);

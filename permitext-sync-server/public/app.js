@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-active-projects-icon-v407";
+} from "./offline-storage.js?v=20260802-project-summary-labels-v409";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18131,10 +18131,10 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     const identity = projectIdentity(folder);
     const summary = document.createElement("section");
     summary.className = "saved-project-summary";
-    appendSavedProjectSummaryField(summary, "Project Address", folder.address || identity.address, {
+    appendSavedProjectSummaryField(summary, "Address", folder.address || identity.address, {
       emptyText: "No address added"
     });
-    appendSavedProjectSummaryField(summary, "Project Description", folder.description || identity.description, {
+    appendSavedProjectSummaryField(summary, "Description", folder.description || identity.description, {
       optional: true
     });
     context.append(summary);
