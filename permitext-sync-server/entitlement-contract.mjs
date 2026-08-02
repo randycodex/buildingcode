@@ -268,7 +268,9 @@ export function freePlanMutationDecision({ mutation, existingMutation, entitleme
   const updatesActiveRecord = Boolean(existingMutation) && !isDeleted(existingRecord);
   const updatesFreeRecord =
     kind === "savedItem" ||
-    (kind === "annotation" && record.tags === undefined);
+    (kind === "annotation" && record.tags === undefined) ||
+    (kind === "project" && record.folderType === "reference") ||
+    (kind === "projectSection" && record.folderType === "reference");
   if (updatesActiveRecord && updatesFreeRecord) return { allowed: true };
 
   if (kind === "savedItem" && usage.savedItems >= freePlanLimits.savedItems) {
@@ -292,14 +294,14 @@ export function freePlanMutationDecision({ mutation, existingMutation, entitleme
       message: "Tags and advanced organization require Pro."
     };
   }
-  if (kind === "project") {
+  if (kind === "project" && record.folderType !== "reference") {
     return {
       allowed: false,
       code: "PRO_REQUIRED_PROJECTS",
       message: "Projects require Pro."
     };
   }
-  if (kind === "projectSection") {
+  if (kind === "projectSection" && record.folderType !== "reference") {
     return {
       allowed: false,
       code: "PRO_REQUIRED_PROJECTS",

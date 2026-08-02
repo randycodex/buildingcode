@@ -678,7 +678,7 @@ async function main() {
         savedTemplateSource.includes('class="code-filter-menu-toggle saved-projects-menu-toggle"') &&
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
-        savedTemplateSource.includes('aria-label="Add project"') &&
+        savedTemplateSource.includes('aria-label="Add Project or Reference folder"') &&
         savedTemplateSource.includes('class="saved-code-filter"') &&
         savedTemplateSource.includes('class="saved-code-filter-clear"') &&
         savedTemplateSource.includes('class="code-filter-menu saved-tag-filter-menu"') &&
@@ -710,10 +710,11 @@ async function main() {
         workspaceScript.text.includes("restoreProjectsStackOrder(options.sourcePaneID)") &&
         workspaceScript.text.includes("const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] :") &&
         workspaceScript.text.includes('sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID)') &&
-        workspaceScript.text.includes("tile.append(heading, countLabel, actions)") &&
+        workspaceScript.text.includes("tile.append(heading, typeBadge, countLabel, actions)") &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
-        workspaceScript.text.includes("openProjectDetail(project, { sourcePaneID: paneID })") &&
+        workspaceScript.text.includes("function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
+        workspaceScript.text.includes("instance.selectedFolderID = projectRecordID(project)") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
       "Combined Saved no longer owns the project grid and project-detail flow."
     );
@@ -1006,7 +1007,8 @@ async function main() {
     );
     assert(
       iosUserDataStoreSource.includes("private func folderSectionSyncTargets") &&
-        iosUserDataStoreSource.includes('values: ["folderClientID": target.folderClientID]') &&
+        iosUserDataStoreSource.includes('"folderClientID": target.folderClientID') &&
+        iosUserDataStoreSource.includes('"folderType": target.folderType.rawValue') &&
         iosUserDataStoreSource.includes("let sectionIDs = try sectionIDs(inFolder: id, codeVersion: codeVersion)") &&
         !iosUserDataStoreSource.includes('values: ["scope": "allFolders"]'),
       "iOS project membership removals are no longer durable project-specific tombstones."
@@ -1043,14 +1045,14 @@ async function main() {
         !workspaceScript.text.includes("function renderReaderSectionToolbar") &&
         workspaceScript.text.includes('leadingActions.className = "reader-notes-leading-actions"') &&
         workspaceScript.text.includes('projectButton.className = "reader-notes-card-action reader-notes-project-action"') &&
-        workspaceScript.text.includes('projectButton.textContent = "Project"') &&
+        workspaceScript.text.includes('projectButton.textContent = "Folders"') &&
         workspaceScript.text.includes('linkButton.textContent = "Copy link"') &&
         workspaceScript.text.includes('researchButton.textContent = "Research"') &&
         workspaceScript.text.includes("await openReaderNotesProjectPicker(sheet, sectionPayload)") &&
         workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
-        workspaceScript.text.includes('label.textContent = "Project record"'),
+        workspaceScript.text.includes('label.textContent = "Folder record"'),
       "Reader trust, note-card actions, or exact Project membership context is no longer wired."
     );
     assert(
@@ -1231,7 +1233,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-centered-settings-warning-v383'),
+        webRoot.text.includes('/web/app.js?v=20260802-evidence-folders-v389'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1243,7 +1245,7 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode)") &&
-        workspaceScript.text.includes('savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"') &&
+        workspaceScript.text.includes('savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"') &&
         workspaceScript.text.includes('list.classList.add("is-mode-switching")') &&
         workspaceScript.text.includes("showingArchived = !showingArchived") &&
         workspaceScript.text.includes("archivedProjectRecords(projects)") &&
@@ -1370,7 +1372,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-centered-settings-warning-v383'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-folders-v389'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1582,7 +1584,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-centered-settings-warning-v383'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-folders-v389'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1808,9 +1810,10 @@ async function main() {
       "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
     );
     assert(
-      workspaceScript.text.match(/function showProjectCreateSheet\(panel, project = null, options = \{\}\) \{\s+if \(!project && !hasCapability\("projects"\)\)/) &&
-        workspaceScript.text.includes('"Sign in and upgrade to Pro before creating a Project workspace."'),
-      "Free or signed-out users can still open the new-Project form before the plan gate."
+      workspaceScript.text.includes('if (value === "project" && !hasCapability("projects"))') &&
+        workspaceScript.text.includes('if (requestedType === "project" && !hasCapability("projects"))') &&
+        workspaceScript.text.includes('selectedFolderType = "reference"'),
+      "Free users must be offered Reference folders while Project creation remains plan-gated."
     );
     assert(
       workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
@@ -1927,8 +1930,9 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function createSavedBulkSelectionController") &&
-        workspaceScript.text.includes('newProjectButton.textContent = "New project…"') &&
-        workspaceScript.text.includes('button.className = "reader-notes-project-option"'),
+        workspaceScript.text.includes('[["project", "New Project…"], ["reference", "New Reference…"]]') &&
+        workspaceScript.text.includes('button.className = "reader-notes-project-option"') &&
+        workspaceScript.text.includes('confirmButton.className = "reader-notes-project-confirm"'),
       "Saved pane selection removal or new-project saving controls are missing."
     );
     assert(
@@ -1959,22 +1963,23 @@ async function main() {
         workspaceScript.text.includes('row.classList.add("is-list-paragraph")') &&
         workspaceStyles.text.includes(".saved-section-row.is-list-paragraph .saved-section-title") &&
         workspaceScript.text.includes('sortSavedItems(filteredItems, "codeOrder")') &&
-        workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true })'),
+        workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, {') &&
+        workspaceScript.text.includes('removableSavedItems: Boolean(selectedFolder && !savedInstance.showAllSaved)'),
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(
       workspaceScript.text.includes("async function openReaderNotesProjectPicker") &&
-        workspaceScript.text.includes("await persistSectionBookmark(sectionPayload, true)") &&
-        workspaceScript.text.includes('label.textContent = "Save to project"') &&
-        workspaceScript.text.includes("await removeSectionFromProject(project, existingLink, { removeBookmark: false })") &&
-        !workspaceScript.text.includes('doneButton.className = "reader-notes-project-done"') &&
-        !workspaceScript.text.includes('savedOnlyButton.textContent = "Saved items"'),
-      "Reader bookmark and project selection no longer follow the iOS save-then-manage flow."
+        workspaceScript.text.includes("function persistSectionFolderSelection") &&
+        workspaceScript.text.includes('label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save to folders"') &&
+        workspaceScript.text.includes('destinationList.setAttribute("aria-multiselectable", "true")') &&
+        workspaceScript.text.includes("await persistSectionFolderSelection(sectionPayload, selectedFolders, projects)") &&
+        workspaceScript.text.includes("confirmButton.disabled = selected.length === 0"),
+      "Reader save no longer requires confirmed Project or Reference destinations."
     );
     assert(
       workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
         workspaceScript.text.includes('toggleReaderNotesSheet(panel, section, reader, { target });') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved projects")') &&
+        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved folders")') &&
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
         workspaceScript.text.includes('bookmarkButton.hidden = !saved') &&
         workspaceScript.text.includes('const bookmarkWrapper = wrappers.find((wrapper) => wrapper.classList.contains("has-note")) || wrappers[0] || null') &&
@@ -2313,7 +2318,7 @@ async function main() {
         workspaceScript.text.includes("notes.append(notesHeader, textareaWrap, projectsHost, tagsHost)") &&
         workspaceScript.text.includes("function refreshOpenAnnotationProjectEditors()") &&
         workspaceScript.text.includes('commentsLabel.textContent = "Comments";') &&
-        workspaceScript.text.includes('label.textContent = "Projects";') &&
+        workspaceScript.text.includes('label.textContent = "Folders";') &&
         workspaceScript.text.includes("normalizeAnnotationBlockID(candidate.blockID) === blockID") &&
         workspaceStyles.text.match(/\.annotation-project-chip,[\s\S]*?border-radius: var\(--radius-pill\);/),
       "Reader paragraph cards no longer toggle by target or expose Comments, Projects, and Tags organization."
@@ -2493,7 +2498,7 @@ async function main() {
         workspaceStyles.text.match(/\.project-detail-saved-row \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\);[\s\S]*?border-radius: 0;/) &&
         workspaceScript.text.includes('savedSelectButton.className = "project-section-toggle-chevron project-evidence-select-button"') &&
         workspaceScript.text.includes('savedBulkBar.className = "project-bulk-bar project-evidence-bulk-bar"') &&
-        workspaceScript.text.includes("await removeSectionFromProject(identity, item, { refreshPanes: false })") &&
+        workspaceScript.text.includes("await unlinkEvidenceFromFolder(identity, item, panel)") &&
         workspaceStyles.text.includes(".project-saved-evidence-body.is-selecting .project-detail-saved-row.is-selected"),
       "Saved and project cards omitted note previews, code grouping, or section previews."
     );

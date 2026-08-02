@@ -2857,14 +2857,23 @@ select option:checked {
 }
 
 .reader-notes-project-picker {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
   gap: var(--space-2);
-  flex-wrap: wrap;
   min-width: 0;
   margin-top: calc(-1 * var(--space-2));
-  overflow-x: visible;
+  padding-right: var(--space-1);
+}
+
+.reader-notes-project-options {
+  display: grid;
+  gap: var(--space-2);
+  max-height: min(38vh, 280px);
+  padding-right: var(--space-1);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
 }
 
 .reader-notes-project-picker-header {
@@ -2894,10 +2903,62 @@ select option:checked {
 }
 
 .reader-notes-project-picker .reader-notes-project-option {
-  display: inline-flex;
+  --project-color: var(--text-secondary);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   align-items: center;
   gap: var(--space-1);
   background: color-mix(in srgb, var(--project-color) 16%, transparent);
+}
+
+.reader-notes-project-option > span:first-child,
+.reader-notes-project-option small {
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reader-notes-project-option small {
+  color: var(--text-secondary);
+  font-size: 0.72em !important;
+}
+
+.reader-notes-project-instruction,
+.reader-notes-project-status {
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+  white-space: normal !important;
+}
+
+.reader-notes-save-tags {
+  width: 100%;
+  min-width: 0;
+}
+
+.reader-notes-new-folder-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.reader-notes-project-picker-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.reader-notes-project-picker .reader-notes-project-confirm {
+  background: var(--text-primary);
+  color: var(--surface);
+  font-weight: 700;
+}
+
+.reader-notes-project-picker .reader-notes-project-confirm:disabled {
+  cursor: default;
+  opacity: 0.42;
 }
 
 .reader-notes-project-picker .reader-notes-project-option.is-selected {
@@ -7614,6 +7675,53 @@ body.is-resizing-research-evidence * {
 
 .saved-projects-menu.is-open .saved-project-list {
   padding: var(--space-2);
+  max-height: min(var(--code-filter-menu-height, 240px), 52vh, 360px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
+.reader-notes-save-tag-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.saved-tag-manage {
+  width: auto !important;
+  padding: 0 var(--space-2) !important;
+  font-size: calc(var(--chrome-font-size) * 0.68) !important;
+}
+
+.saved-tag-manager > p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.saved-tag-manager-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-2);
+}
+
+.saved-tag-manager-row input,
+.saved-tag-manager-row button {
+  min-height: 36px;
+  border: 0;
+  border-radius: var(--radius-pill);
+}
+
+.saved-tag-manager-row input {
+  min-width: 0;
+  padding: 0 var(--space-3);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+}
+
+.saved-tag-manager-row button {
+  padding: 0 var(--space-3);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  color: var(--text-primary);
 }
 
 .saved-project-list.is-mode-switching {
@@ -7712,6 +7820,120 @@ body.is-resizing-research-evidence * {
   font-size: calc(var(--chrome-font-size) * 0.76) !important;
 }
 
+.saved-folder-type {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.62) !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-project-tile.is-reference {
+  --project-color: var(--text-secondary);
+  background: var(--surface-muted);
+}
+
+.saved-folder-context,
+.saved-unassigned-notice {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-card);
+  background: var(--surface-muted);
+}
+
+.saved-folder-context.is-project {
+  background: color-mix(in srgb, var(--project-color) 16%, var(--surface));
+}
+
+.saved-folder-context > header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.saved-folder-context > header > div {
+  display: grid;
+  min-width: 0;
+}
+
+.saved-folder-context > header span {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.68) !important;
+}
+
+.saved-folder-context > header strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.saved-folder-back,
+.saved-folder-controls button,
+.saved-unassigned-notice button {
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--text-primary) 10%, transparent);
+  color: var(--text-primary);
+}
+
+.saved-folder-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.saved-folder-context.is-project .saved-folder-controls button:hover,
+.saved-folder-context.is-project .saved-folder-controls button:focus-visible {
+  background: color-mix(in srgb, var(--project-color) 34%, transparent);
+}
+
+.saved-folder-back:focus-visible,
+.saved-folder-controls button:focus-visible,
+.saved-unassigned-notice button:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--project-color, var(--text-primary)) 62%, transparent);
+  outline-offset: 2px;
+}
+
+.saved-reference-capabilities {
+  align-self: center;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+.saved-folder-search {
+  width: 100%;
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.saved-unassigned-notice p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.saved-unassigned-notice button {
+  justify-self: start;
+}
+
+.saved-row-folders {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--text-secondary);
+  font-size: calc(var(--saved-font-size) * 0.76) !important;
+}
+
 .saved-project-count {
   grid-column: 2;
   grid-row: 1;
@@ -7726,8 +7948,8 @@ body.is-resizing-research-evidence * {
   right: 2px;
   bottom: 4px;
   display: flex;
-  opacity: 0;
-  pointer-events: none;
+  opacity: 0.58;
+  pointer-events: auto;
   transition: opacity 120ms ease;
 }
 
@@ -8231,6 +8453,51 @@ body.is-resizing-research-evidence * {
 .project-sheet-field {
   display: grid;
   gap: 0;
+}
+
+.project-folder-type {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.project-folder-type legend {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.78) !important;
+}
+
+.project-folder-type > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.project-folder-type button {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface-muted);
+  color: var(--text-primary);
+  text-align: left;
+}
+
+.project-folder-type button[aria-pressed="true"] {
+  background: color-mix(in srgb, var(--accent) 24%, var(--surface));
+}
+
+.project-folder-type button:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.project-folder-type button span {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.68) !important;
 }
 
 .project-sheet-field span,

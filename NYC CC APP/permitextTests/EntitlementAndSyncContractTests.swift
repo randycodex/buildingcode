@@ -362,6 +362,269 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testLegacyFoldersMigrateAsProjects() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-folder-type-migration-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        do {
+            let connection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
+            try connection.execute(
+                """
+                CREATE TABLE folders (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    client_id TEXT NOT NULL DEFAULT '',
+                    owner_id TEXT NOT NULL DEFAULT 'local',
+                    visibility TEXT NOT NULL DEFAULT 'personal',
+                    sync_state TEXT NOT NULL DEFAULT 'localOnly',
+                    code_version TEXT NOT NULL,
+                    name TEXT NOT NULL,
+                    address TEXT NOT NULL DEFAULT '',
+                    description TEXT NOT NULL DEFAULT '',
+                    color_hex TEXT NOT NULL,
+                    sort_order INTEGER NOT NULL DEFAULT 0,
+                    archived_at TEXT,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT '',
+                    deleted_at TEXT
+                );
+                INSERT INTO folders (
+                    client_id, code_version, name, description, color_hex, sort_order, created_at
+                ) VALUES (
+                    'legacy-project-1', 'nyc-2022', 'Legacy project', '', '#6674c8', 0, '2026-01-01T00:00:00Z'
+                );
+                """
+            )
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let folder = try XCTUnwrap(store.folders(codeVersion: "nyc-2022").first)
+        XCTAssertEqual(folder.folderType, CodeFolderType.project.rawValue)
+        #if DEBUG
+        XCTAssertTrue(try store.debugSchemaValidationMessages().isEmpty)
+        #endif
+    }
+
+    func testServerProjectRecordDefaultsLegacyFolderTypeAndEncodesReferenceType() throws {
+        let legacyJSON = Data(
+            """
+            {
+              "id": "project-legacy",
+              "userID": "apple:folder-test",
+              "codeVersion": "nyc-construction-codes-2022",
+              "localFolderID": 1,
+              "updatedAt": 0
+            }
+            """.utf8
+        )
+        let legacyRecord = try JSONDecoder().decode(ServerProjectRecord.self, from: legacyJSON)
+        XCTAssertEqual(legacyRecord.folderType, .project)
+
+        let referenceRecord = ServerProjectRecord(
+            id: "reference-1",
+            userID: "apple:folder-test",
+            codeVersion: "nyc-construction-codes-2022",
+            clientID: "reference-client-1",
+            localFolderID: 1,
+            name: "Egress",
+            address: nil,
+            description: "Reusable research",
+            colorHex: nil,
+            sortOrder: 0,
+            folderType: .reference,
+            archivedAt: nil,
+            updatedAt: Date(timeIntervalSinceReferenceDate: 0),
+            deletedAt: nil
+        )
+        let decodedReference = try JSONDecoder().decode(
+            ServerProjectRecord.self,
+            from: JSONEncoder().encode(referenceRecord)
+        )
+        XCTAssertEqual(decodedReference.folderType, .reference)
+    }
+
+    func testReferenceFolderTypeRoundTripsThroughSQLiteAndSyncMutations() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-reference-folder-sync-\(UUID().uuidString).sqlite")
+        let remoteDatabaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-reference-folder-pull-\(UUID().uuidString).sqlite")
+        defer {
+            for url in [databaseURL, remoteDatabaseURL] {
+                for suffix in ["", "-shm", "-wal"] {
+                    try? FileManager.default.removeItem(atPath: url.path + suffix)
+                }
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let folderID = try store.createFolder(
+            name: "Egress",
+            address: "",
+            description: "Reusable research",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .reference,
+            codeVersion: codeVersion
+        )
+        XCTAssertEqual(
+            try XCTUnwrap(store.folders(codeVersion: codeVersion).first).folderType,
+            CodeFolderType.reference.rawValue
+        )
+
+        try store.addSection(77, toFolder: folderID, codeVersion: codeVersion)
+        let queued = try store.pendingSyncQueueItems(limit: 20)
+        let account = SignedInAccount(
+            appUserID: "apple:folder-test",
+            appleUserID: "folder-test",
+            displayName: "Folder Test",
+            signedInAt: Date()
+        )
+
+        let folderQueueItem = try XCTUnwrap(queued.first { $0.entityType == .folder })
+        let folderMutation = try ServerUserContentMutation(syncQueueItem: folderQueueItem, account: account)
+        guard case .project(let projectRecord) = folderMutation else {
+            return XCTFail("Expected a project mutation for the folder queue item.")
+        }
+        XCTAssertEqual(projectRecord.folderType, .reference)
+
+        let membershipQueueItem = try XCTUnwrap(queued.first { $0.entityType == .folderSection })
+        let membershipMutation = try ServerUserContentMutation(syncQueueItem: membershipQueueItem, account: account)
+        guard case .projectSection(let membershipRecord) = membershipMutation else {
+            return XCTFail("Expected a projectSection mutation for the membership queue item.")
+        }
+        XCTAssertEqual(membershipRecord.resolvedFolderType, .reference)
+
+        let remoteStore = try UserDataStore(databaseURL: remoteDatabaseURL)
+        try remoteStore.applyServerUserContentMutation(folderMutation)
+        XCTAssertEqual(
+            try XCTUnwrap(remoteStore.folders(codeVersion: codeVersion).first).folderType,
+            CodeFolderType.reference.rawValue
+        )
+
+        try store.deleteFolder(id: folderID, codeVersion: codeVersion)
+        let queuedDelete = try XCTUnwrap(
+            store.pendingSyncQueueItems(limit: 50).first {
+                $0.entityType == .folder && $0.operationType == .delete
+            }
+        )
+        guard case .project(let deletedRecord) = try ServerUserContentMutation(
+            syncQueueItem: queuedDelete,
+            account: account
+        ) else {
+            return XCTFail("Expected a project delete mutation for the folder queue item.")
+        }
+        XCTAssertEqual(deletedRecord.folderType, .reference)
+    }
+
+    func testSavingEvidenceRequiresDestinationAndAtomicallyCreatesOneBookmarkWithManyMemberships() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-folder-save-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let firstFolderID = try store.createFolder(
+            name: "Egress",
+            address: "",
+            description: "Reusable research",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .reference,
+            codeVersion: codeVersion
+        )
+        let secondFolderID = try store.createFolder(
+            name: "Accessibility",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .reference,
+            codeVersion: codeVersion
+        )
+
+        XCTAssertThrowsError(try store.saveSection(705, toFolderIDs: [], codeVersion: codeVersion))
+        XCTAssertFalse(try store.isBookmarked(sectionID: 705, codeVersion: codeVersion))
+
+        try store.saveSection(
+            705,
+            toFolderIDs: [firstFolderID, secondFolderID],
+            codeVersion: codeVersion
+        )
+
+        XCTAssertTrue(try store.isBookmarked(sectionID: 705, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: codeVersion), 1)
+        XCTAssertEqual(
+            Set(try store.folderMembership(codeVersion: codeVersion)[705] ?? []),
+            [firstFolderID, secondFolderID]
+        )
+
+        let queued = try store.pendingSyncQueueItems(limit: 50)
+        XCTAssertEqual(
+            queued.filter { $0.entityType == .bookmark && $0.operationType == .upsert }.count,
+            1
+        )
+        XCTAssertEqual(
+            queued.filter { $0.entityType == .folderSection && $0.operationType == .upsert }.count,
+            2
+        )
+    }
+
+    func testReplacingFolderMembershipPreservesBookmarkAndRejectsFinalUnlink() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-folder-replace-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+        let firstFolderID = try store.createFolder(
+            name: "Project Alpha",
+            address: "1 Centre Street",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: codeVersion
+        )
+        let secondFolderID = try store.createFolder(
+            name: "Reusable references",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .reference,
+            codeVersion: codeVersion
+        )
+
+        try store.saveSection(
+            1026,
+            toFolderIDs: [firstFolderID, secondFolderID],
+            codeVersion: codeVersion
+        )
+        try store.saveSection(1026, toFolderIDs: [secondFolderID], codeVersion: codeVersion)
+
+        XCTAssertTrue(try store.isBookmarked(sectionID: 1026, codeVersion: codeVersion))
+        XCTAssertEqual(try store.bookmarkCount(codeVersion: codeVersion), 1)
+        XCTAssertEqual(
+            Set(try store.folderMembership(codeVersion: codeVersion)[1026] ?? []),
+            [secondFolderID]
+        )
+
+        XCTAssertThrowsError(try store.saveSection(1026, toFolderIDs: [], codeVersion: codeVersion))
+        XCTAssertTrue(try store.isBookmarked(sectionID: 1026, codeVersion: codeVersion))
+        XCTAssertEqual(
+            Set(try store.folderMembership(codeVersion: codeVersion)[1026] ?? []),
+            [secondFolderID]
+        )
+    }
+
     func testUpgradeCallToActionUsesStoreKitLocalizedPrice() {
         XCTAssertEqual(
             permitextUpgradeCallToActionTitle(

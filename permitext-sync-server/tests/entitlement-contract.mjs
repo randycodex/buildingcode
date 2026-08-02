@@ -104,6 +104,42 @@ const proOnlyMutations = [
 decision = enforceFreePlanMutationBatch([], proOnlyMutations, null);
 assert.equal(decision.rejectedMutationIDs.length, proOnlyMutations.length);
 
+const freeReference = mutation("project", "reference-1", {
+  clientID: "reference-1",
+  name: "Reusable egress research",
+  folderType: "reference"
+});
+const freeReferenceSection = mutation("projectSection", "reference-section-1", {
+  folderClientID: "reference-1",
+  folderType: "reference",
+  sectionID: 101,
+  scope: "manual"
+});
+decision = enforceFreePlanMutationBatch([], [freeReference, freeReferenceSection], null);
+assert.equal(decision.acceptedMutations.length, 2, "Free accounts must be able to create and use Reference folders.");
+assert.notEqual(
+  postgresMutationRejectionReason({ userID, mutation: freeReference, context: {} }).code,
+  "PRO_REQUIRED_PROJECTS",
+  "PostgreSQL enforcement must not classify a Reference folder as Pro-only."
+);
+assert.notEqual(
+  postgresMutationRejectionReason({ userID, mutation: freeReferenceSection, context: {} }).code,
+  "PRO_REQUIRED_PROJECTS",
+  "PostgreSQL enforcement must not classify Reference-folder membership as Pro-only."
+);
+const convertReferenceToProject = mutation("project", "reference-1", {
+  clientID: "reference-1",
+  name: "Reusable egress research",
+  folderType: "project",
+  updatedAt: "2026-01-03T00:00:00.000Z"
+});
+decision = enforceFreePlanMutationBatch([freeReference], [convertReferenceToProject], null);
+assert.equal(
+  decision.rejectionReasons["reference-1"].code,
+  "PRO_REQUIRED_PROJECTS",
+  "Converting a Reference folder to a Project must still require Pro."
+);
+
 const activePro = { plan: "pro", expiresAt: "2099-01-01T00:00:00.000Z" };
 assert.equal(hasActiveProEntitlement(activePro), true);
 assert.equal(

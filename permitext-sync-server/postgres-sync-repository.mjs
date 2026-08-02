@@ -106,7 +106,10 @@ export function postgresMutationRejectionReason({ userID, mutation, context = {}
         message: "Tags and advanced organization require Pro."
       };
     }
-    if (kind === "project" || kind === "projectSection") {
+    if (
+      (kind === "project" || kind === "projectSection") &&
+      record.folderType !== "reference"
+    ) {
       return {
         code: "PRO_REQUIRED_PROJECTS",
         message: kind === "project" ? "Projects require Pro." : "Project organization requires Pro."
@@ -215,7 +218,10 @@ export function createPostgresSyncRepository(sql) {
     if (kind === "annotation" && Array.isArray(record.tags) && record.tags.length > 0) {
       return pro;
     }
-    if (kind === "project" || kind === "projectSection" || kind === "workboard") {
+    if (
+      ((kind === "project" || kind === "projectSection") && record.folderType !== "reference") ||
+      kind === "workboard"
+    ) {
       return pro;
     }
     return sql`TRUE`;
@@ -245,6 +251,10 @@ export function createPostgresSyncRepository(sql) {
         deleted_at = EXCLUDED.deleted_at,
         server_version = permitext_user_content_records.server_version + 1
       WHERE permitext_user_content_records.user_id = EXCLUDED.user_id
+        AND NOT (
+          permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'
+          AND NOT (EXCLUDED.mutation->'project' ? 'folderType')
+        )
         AND (
           permitext_user_content_records.updated_at < EXCLUDED.updated_at
           OR (
@@ -419,12 +429,12 @@ export function createPostgresSyncRepository(sql) {
     return sql`
       INSERT INTO permitext_projects (
         record_id, user_id, code_version, client_id, local_folder_id, name,
-        address, description, color_hex, sort_order, mutation,
+        address, description, folder_type, color_hex, sort_order, mutation,
         updated_at, deleted_at, server_version
       )
       SELECT ${recordID}, ${ownerUserID}, ${record.codeVersion}, ${record.clientID || null},
         ${record.localFolderID || null}, ${record.name ?? null}, ${record.address ?? null},
-        ${record.description ?? null}, ${record.colorHex ?? null}, ${record.sortOrder ?? null},
+        ${record.description ?? null}, ${record.folderType || "project"}, ${record.colorHex ?? null}, ${record.sortOrder ?? null},
         ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz,
         ${deletedAt(record)}::timestamptz, 1
       WHERE ${accepted}
@@ -436,6 +446,7 @@ export function createPostgresSyncRepository(sql) {
         name = EXCLUDED.name,
         address = EXCLUDED.address,
         description = EXCLUDED.description,
+        folder_type = EXCLUDED.folder_type,
         color_hex = EXCLUDED.color_hex,
         sort_order = EXCLUDED.sort_order,
         mutation = EXCLUDED.mutation,
@@ -456,10 +467,10 @@ export function createPostgresSyncRepository(sql) {
     return sql`
       INSERT INTO permitext_project_items (
         record_id, user_id, code_version, project_client_id, local_folder_id,
-        section_id, block_id, scope, mutation, updated_at, deleted_at, server_version
+        folder_type, section_id, block_id, scope, mutation, updated_at, deleted_at, server_version
       )
       SELECT ${recordID}, ${ownerUserID}, ${record.codeVersion}, ${record.folderClientID || null},
-        ${record.localFolderID || null}, ${record.sectionID}, ${blockID(record.blockID)},
+        ${record.localFolderID || null}, ${record.folderType || "project"}, ${record.sectionID}, ${blockID(record.blockID)},
         ${record.scope || null}, ${mutationJSON}::jsonb, ${updatedAt(record)}::timestamptz,
         ${deletedAt(record)}::timestamptz, 1
       WHERE ${accepted}
@@ -468,6 +479,7 @@ export function createPostgresSyncRepository(sql) {
         code_version = EXCLUDED.code_version,
         project_client_id = EXCLUDED.project_client_id,
         local_folder_id = EXCLUDED.local_folder_id,
+        folder_type = EXCLUDED.folder_type,
         section_id = EXCLUDED.section_id,
         block_id = EXCLUDED.block_id,
         scope = EXCLUDED.scope,

@@ -117,7 +117,7 @@ struct FolderFilterChipsRow: View {
 
 /// Compact horizontal row showing every folder the current section belongs
 /// to, with a tappable "✕" to remove this section from that folder. The
-/// trailing "+ Project" opens the picker sheet to add membership.
+/// trailing "+ Folder" opens the picker sheet to add membership.
 struct FolderMembershipRow: View {
     let memberFolders: [CodeFolder]
     let onRemove: (CodeFolder) -> Void
@@ -182,8 +182,9 @@ struct FolderMembershipRow: View {
 struct FolderEditorSheet: View {
     /// Existing folder when editing; nil when creating new.
     let existing: CodeFolder?
+    let defaultFolderType: CodeFolderType
     /// Called on Save tap. Validation (non-empty name) is handled inside.
-    let onSave: (_ name: String, _ address: String, _ description: String, _ colorHex: String) -> Void
+    let onSave: (_ name: String, _ address: String, _ description: String, _ colorHex: String, _ folderType: CodeFolderType) -> Void
     /// Called on Delete tap. Only invoked when `existing != nil`.
     let onDelete: () -> Void
 
@@ -195,6 +196,7 @@ struct FolderEditorSheet: View {
     @State private var showsDeleteConfirm = false
 
     private var isEditing: Bool { existing != nil }
+    private var folderType: CodeFolderType { existing?.folderType ?? defaultFolderType }
     private var trimmedName: String { name.trimmingCharacters(in: .whitespacesAndNewlines) }
     private var canSave: Bool { !trimmedName.isEmpty }
     private var detents: Set<PresentationDetent> {
@@ -204,16 +206,18 @@ struct FolderEditorSheet: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Project name") {
-                    TextField("e.g. Bronx R-2 Passive House", text: $name)
+                Section(folderType == .project ? "Project name" : "Reference name") {
+                    TextField(folderType == .project ? "e.g. Bronx R-2 Passive House" : "e.g. Egress research", text: $name)
                         .textInputAutocapitalization(.words)
                         .autocorrectionDisabled()
                 }
 
-                Section("Project address") {
-                    TextField("Address", text: $address, axis: .vertical)
-                        .textInputAutocapitalization(.words)
-                        .lineLimit(1...3)
+                if folderType == .project {
+                    Section("Project address") {
+                        TextField("Address", text: $address, axis: .vertical)
+                            .textInputAutocapitalization(.words)
+                            .lineLimit(1...3)
+                    }
                 }
 
                 Section("Description (optional)") {
@@ -221,16 +225,18 @@ struct FolderEditorSheet: View {
                         .lineLimit(2...4)
                 }
 
-                Section("Color") {
-                    LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5),
-                        spacing: 12
-                    ) {
-                        ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
-                            colorSwatch(hex)
+                if folderType == .project {
+                    Section("Color") {
+                        LazyVGrid(
+                            columns: Array(repeating: GridItem(.flexible(), spacing: 10), count: 5),
+                            spacing: 12
+                        ) {
+                            ForEach(CodeFolder.presetColorHexes, id: \.self) { hex in
+                                colorSwatch(hex)
+                            }
                         }
+                        .padding(.vertical, 4)
                     }
-                    .padding(.vertical, 4)
                 }
 
                 if isEditing {
@@ -238,14 +244,14 @@ struct FolderEditorSheet: View {
                         Button(role: .destructive) {
                             showsDeleteConfirm = true
                         } label: {
-                            Label("Delete project", systemImage: "trash")
+                            Label("Delete \(folderType == .project ? "project" : "reference")", systemImage: "trash")
                         }
                     } footer: {
-                        Text("Bookmarked sections in this project will keep their bookmarks.")
+                        Text("Saved sections in this folder keep their saved records.")
                     }
                 }
             }
-            .navigationTitle(isEditing ? "Edit project" : "New project")
+            .navigationTitle(isEditing ? "Edit \(folderType.rawValue)" : "New \(folderType.rawValue)")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -253,7 +259,7 @@ struct FolderEditorSheet: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        onSave(trimmedName, address, description, colorHex)
+                        onSave(trimmedName, address, description, colorHex, folderType)
                         dismiss()
                     }
                     .disabled(!canSave)
@@ -261,7 +267,7 @@ struct FolderEditorSheet: View {
                 }
             }
             .confirmationDialog(
-                "Delete this project?",
+                "Delete this folder?",
                 isPresented: $showsDeleteConfirm,
                 titleVisibility: .visible
             ) {
@@ -271,7 +277,7 @@ struct FolderEditorSheet: View {
                 }
                 Button("Cancel", role: .cancel) { }
             } message: {
-                Text("Sections in this project keep their bookmarks. Only the project grouping is removed.")
+                Text("Saved sections keep their saved records. Only this folder grouping is removed.")
             }
             .onAppear {
                 if let existing {
@@ -312,10 +318,11 @@ struct FolderEditorSheet: View {
 struct FolderPickerSheet: View {
     let folders: [CodeFolder]
     let memberFolderIDs: Set<Int64>
-    /// Tap on a folder row toggles its membership for the current section.
-    let onToggle: (CodeFolder) -> Void
-    /// Tap on "+ New project" — caller opens FolderEditorSheet.
-    let onCreateNew: () -> Void
+    @Binding var selectedFolderIDs: Set<Int64>
+    let canUseProjects: Bool
+    let onSave: (Set<Int64>) -> Void
+    let onCreateNew: (CodeFolderType) -> Void
+    let onRequireProjectAccess: () -> Void
 
     @Environment(\.dismiss) private var dismiss
 
@@ -323,22 +330,47 @@ struct FolderPickerSheet: View {
         NavigationStack {
             List {
                 Section {
-                    Button(action: onCreateNew) {
-                        Label("New project", systemImage: "folder.badge.plus")
+                    Button { onCreateNew(.reference) } label: {
+                        Label("New reference", systemImage: "folder.badge.plus")
                             .foregroundStyle(Color.appChrome)
+                    }
+                    Button {
+                        if canUseProjects {
+                            onCreateNew(.project)
+                        } else {
+                            onRequireProjectAccess()
+                        }
+                    } label: {
+                        HStack {
+                            Label("New project", systemImage: "building.2.crop.circle")
+                            Spacer()
+                            if !canUseProjects { Text("Pro").font(.caption.weight(.semibold)) }
+                        }
+                        .foregroundStyle(canUseProjects ? Color.appChrome : Color.secondary)
                     }
                 }
 
-                Section("Your projects") {
+                Section("Your folders") {
                     if folders.isEmpty {
-                        Text("No projects yet — tap “New project” above.")
+                        Text("Create a Reference or Project folder to save this section.")
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(folders) { folder in
+                            let projectIsLocked = folder.folderType == .project &&
+                                !canUseProjects &&
+                                !selectedFolderIDs.contains(folder.id)
                             Button {
+                                if projectIsLocked {
+                                    onRequireProjectAccess()
+                                    return
+                                }
                                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                onToggle(folder)
+                                if selectedFolderIDs.contains(folder.id) {
+                                    selectedFolderIDs.remove(folder.id)
+                                } else {
+                                    selectedFolderIDs.insert(folder.id)
+                                }
                             } label: {
                                 HStack(spacing: 12) {
                                     Circle()
@@ -347,6 +379,9 @@ struct FolderPickerSheet: View {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(folder.name)
                                             .foregroundStyle(.primary)
+                                        Text(folder.folderType == .project ? "Project" : "Reference")
+                                            .font(.caption2.weight(.semibold))
+                                            .foregroundStyle(.secondary)
                                         if !folder.description.isEmpty {
                                             Text(folder.description)
                                                 .font(.caption)
@@ -355,9 +390,14 @@ struct FolderPickerSheet: View {
                                         }
                                     }
                                     Spacer()
-                                    Image(systemName: memberFolderIDs.contains(folder.id) ? "checkmark.circle.fill" : "circle")
+                                    if projectIsLocked {
+                                        Text("Pro")
+                                            .font(.caption.weight(.semibold))
+                                            .foregroundStyle(.secondary)
+                                    }
+                                    Image(systemName: selectedFolderIDs.contains(folder.id) ? "checkmark.circle.fill" : "circle")
                                         .font(.title3)
-                                        .foregroundStyle(memberFolderIDs.contains(folder.id) ? folder.color : Color.secondary.opacity(0.5))
+                                        .foregroundStyle(selectedFolderIDs.contains(folder.id) ? folder.color : Color.secondary.opacity(0.5))
                                 }
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .contentShape(Rectangle())
@@ -367,12 +407,24 @@ struct FolderPickerSheet: View {
                     }
                 }
             }
-            .navigationTitle("Add to project")
+            .safeAreaInset(edge: .bottom) {
+                if selectedFolderIDs.isEmpty {
+                    Text("Choose at least one destination to save.")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .padding(.vertical, 8)
+                }
+            }
+            .navigationTitle(memberFolderIDs.isEmpty ? "Save to folder" : "Edit folders")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                        .fontWeight(.semibold)
+                    Button(memberFolderIDs.isEmpty ? "Save" : "Done") {
+                        onSave(selectedFolderIDs)
+                        dismiss()
+                    }
+                    .fontWeight(.semibold)
+                    .disabled(selectedFolderIDs.isEmpty)
                 }
             }
         }

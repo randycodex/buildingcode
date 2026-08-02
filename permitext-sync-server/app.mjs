@@ -1333,6 +1333,7 @@ async function createPostgresStoreAdapter() {
         name TEXT,
         address TEXT,
         description TEXT,
+        folder_type TEXT NOT NULL DEFAULT 'project',
         color_hex TEXT,
         sort_order INTEGER,
         mutation JSONB NOT NULL DEFAULT '{}'::jsonb,
@@ -1340,6 +1341,10 @@ async function createPostgresStoreAdapter() {
         deleted_at TIMESTAMPTZ,
         server_version BIGINT NOT NULL DEFAULT 1
       )
+    `;
+    await sql`
+      ALTER TABLE permitext_projects
+      ADD COLUMN IF NOT EXISTS folder_type TEXT NOT NULL DEFAULT 'project'
     `;
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_projects_user_version_idx
@@ -1356,6 +1361,7 @@ async function createPostgresStoreAdapter() {
         code_version TEXT NOT NULL,
         project_client_id TEXT,
         local_folder_id BIGINT,
+        folder_type TEXT NOT NULL DEFAULT 'project',
         section_id BIGINT NOT NULL,
         block_id TEXT NOT NULL DEFAULT '',
         scope TEXT,
@@ -1364,6 +1370,10 @@ async function createPostgresStoreAdapter() {
         deleted_at TIMESTAMPTZ,
         server_version BIGINT NOT NULL DEFAULT 1
       )
+    `;
+    await sql`
+      ALTER TABLE permitext_project_items
+      ADD COLUMN IF NOT EXISTS folder_type TEXT NOT NULL DEFAULT 'project'
     `;
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_project_items_project_idx
@@ -1725,6 +1735,7 @@ async function createPostgresStoreAdapter() {
           name,
           address,
           description,
+          folder_type,
           color_hex,
           sort_order,
           mutation,
@@ -1741,6 +1752,7 @@ async function createPostgresStoreAdapter() {
           ${record.name ?? null},
           ${record.address ?? null},
           ${record.description ?? null},
+          ${record.folderType || "project"},
           ${record.colorHex ?? null},
           ${record.sortOrder ?? null},
           ${mutationJSON}::jsonb,
@@ -1756,6 +1768,7 @@ async function createPostgresStoreAdapter() {
           name = EXCLUDED.name,
           address = EXCLUDED.address,
           description = EXCLUDED.description,
+          folder_type = EXCLUDED.folder_type,
           color_hex = EXCLUDED.color_hex,
           sort_order = EXCLUDED.sort_order,
           mutation = EXCLUDED.mutation,
@@ -1774,6 +1787,7 @@ async function createPostgresStoreAdapter() {
           code_version,
           project_client_id,
           local_folder_id,
+          folder_type,
           section_id,
           block_id,
           scope,
@@ -1788,6 +1802,7 @@ async function createPostgresStoreAdapter() {
           ${codeVersion},
           ${record.folderClientID || null},
           ${record.localFolderID || null},
+          ${record.folderType || "project"},
           ${record.sectionID},
           ${normalizedBlockID(record.blockID)},
           ${record.scope || null},
@@ -1801,6 +1816,7 @@ async function createPostgresStoreAdapter() {
           code_version = EXCLUDED.code_version,
           project_client_id = EXCLUDED.project_client_id,
           local_folder_id = EXCLUDED.local_folder_id,
+          folder_type = EXCLUDED.folder_type,
           section_id = EXCLUDED.section_id,
           block_id = EXCLUDED.block_id,
           scope = EXCLUDED.scope,
@@ -5442,7 +5458,12 @@ async function ownedProjectRecord(userID, projectID) {
   const mutations = await userContentMutations(userID);
   const projectMutation = mutations.find((mutation) => {
     const { kind, record } = mutationKindAndRecord(mutation);
-    if (kind !== "project" || !record || Number.isFinite(Date.parse(record.deletedAt || ""))) return false;
+    if (
+      kind !== "project" ||
+      !record ||
+      record.folderType === "reference" ||
+      Number.isFinite(Date.parse(record.deletedAt || ""))
+    ) return false;
     return [record.id, record.clientID, projectIdentityForRecord(record, userID)]
       .filter(Boolean)
       .some((candidate) => String(candidate) === normalizedProjectID);
@@ -5724,6 +5745,15 @@ async function migrateLegacyProjectFoundation(userID) {
   const existingCheckpoint = await storedMigrationCheckpoint(userID, checkpointName);
 
   const mutations = await userContentMutations(userID);
+  const referenceProjectIDs = new Set(mutations
+    .map((mutation) => mutationKindAndRecord(mutation))
+    .filter(({ kind, record }) =>
+      kind === "project" &&
+      record?.folderType === "reference" &&
+      !Number.isFinite(Date.parse(record.deletedAt || ""))
+    )
+    .map(({ record }) => projectIdentityForRecord(record, userID))
+    .filter(Boolean));
   const existingLinks = await listStoredProjectLinks(userID);
   const existingAnswers = await listStoredResearchAnswers(userID);
   const answerIDs = new Set(existingAnswers.map((answer) => answer.id));
@@ -5741,7 +5771,7 @@ async function migrateLegacyProjectFoundation(userID) {
         (record.localFolderID === null || record.localFolderID === undefined
           ? null
           : `legacy-project-${record.localFolderID}`);
-      if (!projectID || !record.sectionID) continue;
+      if (!projectID || !record.sectionID || referenceProjectIDs.has(projectID)) continue;
       const targetID = String(record.sectionID);
       const key = [projectID, "canonicalSection", targetID].join("\u001f");
       if (knownKeys.has(key)) continue;
@@ -5854,7 +5884,10 @@ async function projectFoundationStateForStorageOwner(
   const allProjects = (await userContentMutations(storageOwnerUserID))
     .map((mutation) => mutationKindAndRecord(mutation))
     .filter(({ kind, record }) =>
-      kind === "project" && record && !Number.isFinite(Date.parse(record.deletedAt || ""))
+      kind === "project" &&
+      record &&
+      record.folderType !== "reference" &&
+      !Number.isFinite(Date.parse(record.deletedAt || ""))
     )
     .map(({ record }) => ({
       id: projectIdentityForRecord(record, storageOwnerUserID),
@@ -13079,6 +13112,13 @@ function validateMutation(mutation, userID) {
   if (updatedAt > Date.now() + maxSyncFutureClockSkewMilliseconds) {
     return validationError("Mutation updatedAt is too far in the future.");
   }
+  if (
+    (kind === "project" || kind === "projectSection") &&
+    record.folderType !== undefined &&
+    !["project", "reference"].includes(record.folderType)
+  ) {
+    return validationError("Folder type must be project or reference.");
+  }
   if (kind === "workboard") {
     return validateWorkboardRecord(record);
   }
@@ -13124,11 +13164,19 @@ function mergeMutations(existing, incoming) {
       continue;
     }
 
+    let acceptedMutation = mutation;
+    if (kind === "project" && existingMutation) {
+      const existingProject = mutationKindAndRecord(existingMutation).record;
+      const incomingProject = mutationKindAndRecord(mutation).record;
+      if (existingProject?.folderType === "reference" && incomingProject?.folderType === undefined) {
+        acceptedMutation = { project: { ...incomingProject, folderType: "reference" } };
+      }
+    }
     byID.set(
       id,
       kind === "continuity" && existingMutation
         ? mergeContinuityMutations(existingMutation, mutation, { mergedAt: new Date().toISOString() })
-        : mutation
+        : acceptedMutation
     );
     acceptedMutationIDs.push(id);
   }

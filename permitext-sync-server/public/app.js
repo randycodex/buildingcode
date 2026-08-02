@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-centered-settings-warning-v383";
+} from "./offline-storage.js?v=20260802-evidence-folders-v389";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -528,6 +528,10 @@ function newUtilityInstance(key, overrides = {}) {
     instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode);
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
     instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
+    instance.selectedFolderID = String(overrides.selectedFolderID || "");
+    instance.organizeUnassigned = Boolean(overrides.organizeUnassigned);
+    instance.folderQuery = String(overrides.folderQuery || "");
+    instance.showAllSaved = Boolean(overrides.showAllSaved);
   }
   return instance;
 }
@@ -545,7 +549,11 @@ function normalizeUtilityInstances(saved = {}) {
       projectsMenuOpen: pane?.projectsMenuOpen,
       projectsArchiveMode: pane?.projectsArchiveMode,
       codeFilterMenuOpen: pane?.codeFilterMenuOpen,
-      tagsMenuOpen: pane?.tagsMenuOpen
+      tagsMenuOpen: pane?.tagsMenuOpen,
+      selectedFolderID: pane?.selectedFolderID,
+      organizeUnassigned: pane?.organizeUnassigned,
+      folderQuery: pane?.folderQuery,
+      showAllSaved: pane?.showAllSaved
     }))
     .filter((pane) => repeatableUtilityKeys.has(pane.key));
 
@@ -1852,7 +1860,11 @@ function normalizeSavedInstance(instance) {
       sortMode: "codeOrder",
       projectsMenuOpen: false,
       codeFilterMenuOpen: false,
-      tagsMenuOpen: false
+      tagsMenuOpen: false,
+      selectedFolderID: "",
+      organizeUnassigned: false,
+      folderQuery: "",
+      showAllSaved: false
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
@@ -1861,6 +1873,10 @@ function normalizeSavedInstance(instance) {
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
   instance.codeFilterMenuOpen = Boolean(instance.codeFilterMenuOpen);
   instance.tagsMenuOpen = Boolean(instance.tagsMenuOpen);
+  instance.selectedFolderID = String(instance.selectedFolderID || "");
+  instance.organizeUnassigned = Boolean(instance.organizeUnassigned);
+  instance.folderQuery = String(instance.folderQuery || "");
+  instance.showAllSaved = Boolean(instance.showAllSaved);
   return instance;
 }
 
@@ -3206,6 +3222,45 @@ function wireCodeFilterMenu(filterRail, instance, options = {}) {
     instance[stateKey] = !instance[stateKey];
     saveWorkspaceState();
     updateCodeFilterMenu(filterRail, instance, options);
+  });
+  const focusableSelector = 'button:not([disabled]), [role="button"], [role="option"]:not([aria-disabled="true"]), a[href], [tabindex]:not([tabindex="-1"])';
+  const focusableOptions = () => Array.from(filterRail.children)
+    .filter((element) => element.matches(focusableSelector))
+    .filter((element) => !element.hidden && element.getClientRects().length > 0);
+  toggle.addEventListener("keydown", (event) => {
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    if (!instance[stateKey]) {
+      instance[stateKey] = true;
+      saveWorkspaceState();
+      updateCodeFilterMenu(filterRail, instance, options);
+    }
+    requestAnimationFrame(() => {
+      const items = focusableOptions();
+      const target = event.key === "ArrowUp" || event.key === "End" ? items.at(-1) : items[0];
+      target?.focus({ preventScroll: true });
+    });
+  });
+  filterRail.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      instance[stateKey] = false;
+      saveWorkspaceState();
+      updateCodeFilterMenu(filterRail, instance, options);
+      toggle.focus({ preventScroll: true });
+      return;
+    }
+    if (!["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+    const items = focusableOptions();
+    if (!items.length) return;
+    const currentIndex = items.indexOf(document.activeElement);
+    let nextIndex = currentIndex;
+    if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = items.length - 1;
+    else if (event.key === "ArrowDown") nextIndex = Math.min(items.length - 1, currentIndex + 1);
+    else nextIndex = Math.max(0, currentIndex <= 0 ? 0 : currentIndex - 1);
+    event.preventDefault();
+    items[nextIndex]?.focus({ preventScroll: true });
   });
   const initialOptions = instance[stateKey] ? { ...options, instant: true } : options;
   updateCodeFilterMenu(filterRail, instance, initialOptions);
@@ -4744,7 +4799,7 @@ function currentContentSummary() {
     .filter((item) => item && item.sectionID && !item.deletedAt &&
       recordSurvivesBulkClear(item, clearRecords, ["bookmarks", "folders"]))
     .map((item) => ({
-      id: `web-saved-${item.sectionID}`,
+      id: `web-saved-${safeAnnotationIDPart(syncCodeVersion(item.codeVersion))}-${item.sectionID}`,
       userID: item.userID || "local-web",
       codeVersion: syncCodeVersion(item.codeVersion),
       codePrefix: item.codePrefix || "BC",
@@ -4758,10 +4813,10 @@ function currentContentSummary() {
   const localSavedItems = [...(state.localSavedItems || []), ...localProjectSavedItems]
     .filter((item) => recordSurvivesBulkClear(item, clearRecords, ["bookmarks"]));
   const savedItemsBySection = new Map(
-    summarySavedItems.map((item) => [String(item.sectionID || ""), item])
+    summarySavedItems.map((item) => [savedEvidenceKey(item), item])
   );
   localSavedItems.forEach((item) => {
-    if (item?.sectionID) mergeNewestRecord(savedItemsBySection, String(item.sectionID), item);
+    if (item?.sectionID) mergeNewestRecord(savedItemsBySection, savedEvidenceKey(item), item);
   });
   const annotationsByID = new Map(
     summaryAnnotations.map((item) => [String(item.id || ""), item])
@@ -4773,6 +4828,7 @@ function currentContentSummary() {
     }
   });
   const projectSectionIdentity = (item) => [
+    syncCodeVersion(item.codeVersion),
     item.folderClientID || item.projectID || item.localFolderID || "project",
     item.sectionID || item.savedSectionID || item.itemID || item.id || "section",
     normalizeAnnotationBlockID(item.blockID)
@@ -5576,7 +5632,7 @@ async function applyRemoteContinuityIfNewer() {
   saveWorkspaceState();
 }
 
-function enqueueSyncMutation(mutation, account) {
+function enqueueSyncMutation(mutation, account, options = {}) {
   const recordID = syncMutationRecordID(mutation);
   if (!recordID) throw new Error("Could not queue a sync record without an ID.");
   const entry = {
@@ -5584,6 +5640,7 @@ function enqueueSyncMutation(mutation, account) {
     accountUserID: account.userID,
     recordID,
     mutation,
+    operationGroupID: options.operationGroupID || null,
     queuedAt: new Date().toISOString(),
     attemptCount: 0,
     lastError: null
@@ -5595,6 +5652,24 @@ function enqueueSyncMutation(mutation, account) {
   state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
   saveWorkspaceState();
   return entry;
+}
+
+async function pushMutationBatch(mutations, options = {}) {
+  const account = activeAccount();
+  if (!account || !mutations.length) return null;
+  const operationGroupID = options.operationGroupID || crypto.randomUUID();
+  const entries = mutations.map((mutation) => enqueueSyncMutation(mutation, account, { operationGroupID }));
+  const result = await flushSyncOutbox({ refresh: true });
+  const rejected = entries.find((entry) => result.rejectedMutationIDs.includes(entry.recordID));
+  if (rejected) {
+    const reason = result.payload?.rejectionReasons?.[rejected.recordID];
+    throw new Error(reason?.message || "One or more folder changes could not be synced.");
+  }
+  entries
+    .filter((entry) => result.acceptedMutationIDs.includes(entry.recordID))
+    .forEach((entry) => discardLocalMutationOverlay(entry.mutation));
+  saveWorkspaceState();
+  return result.payload;
 }
 
 function recoverQueuedWorkboardProjectID(record = {}) {
@@ -5699,7 +5774,7 @@ function discardLocalMutationOverlay(mutation) {
   if (kind === "savedItem") {
     state.localSavedItems = (state.localSavedItems || []).filter((item) =>
       String(item.id || "") !== String(record.id || "") &&
-      String(item.sectionID || "") !== String(record.sectionID || "")
+      savedEvidenceKey(item) !== savedEvidenceKey(record)
     );
     state.localSavedSectionIDs = (state.localSavedSectionIDs || [])
       .filter((sectionID) => String(sectionID) !== String(record.sectionID || ""));
@@ -5715,13 +5790,17 @@ function discardLocalMutationOverlay(mutation) {
     state.localProjects = (state.localProjects || []).filter((item) => !projectDetailMatches(item, record));
   } else if (kind === "projectSection") {
     const identity = [
+      syncCodeVersion(record.codeVersion),
       record.folderClientID || record.localFolderID || "",
       record.sectionID || "",
+      normalizeAnnotationBlockID(record.blockID),
       record.scope || ""
     ].map(String).join(":");
     state.localProjectSections = (state.localProjectSections || []).filter((item) => [
+      syncCodeVersion(item.codeVersion),
       item.folderClientID || item.localFolderID || "",
       item.sectionID || "",
+      normalizeAnnotationBlockID(item.blockID),
       item.scope || ""
     ].map(String).join(":") !== identity);
   } else if (kind === "continuity") {
@@ -5791,9 +5870,15 @@ async function flushSyncOutbox(options = {}) {
     const rejectedMutationIDs = [];
     let latestPayload = null;
     while (true) {
-      const entries = (state.syncOutbox || [])
-        .filter((item) => item.accountUserID === account.userID)
-        .slice(0, 100);
+      const queuedEntries = (state.syncOutbox || [])
+        .filter((item) => item.accountUserID === account.userID);
+      let entries = queuedEntries.slice(0, 100);
+      const boundaryGroupID = entries.at(-1)?.operationGroupID;
+      if (boundaryGroupID) {
+        entries = queuedEntries.filter((item, index) =>
+          index < 100 || item.operationGroupID === boundaryGroupID
+        );
+      }
       if (!entries.length) break;
 
       try {
@@ -6027,11 +6112,20 @@ function savedRecordForSection(section, userID = "local-web", updatedAt = new Da
   };
 }
 
+function savedEvidenceKey(value, codeVersion = "") {
+  const record = value && typeof value === "object" ? value : { sectionID: value, codeVersion };
+  const sectionID = String(record.sectionID || record.savedSectionID || record.itemID || "");
+  const version = syncCodeVersion(record.codeVersion || codeVersion || defaultSyncCodeVersion);
+  return `${version}:${sectionID}`;
+}
+
 function projectSectionRecordForSection(project, sectionPayload) {
   const account = activeAccount();
   const now = new Date().toISOString();
   const sectionID = String(sectionPayload.sectionID || "");
-  const blockID = normalizeAnnotationBlockID(sectionPayload.blockID);
+  // Folder membership is section-level. Paragraph-specific context remains in
+  // annotations and Project Foundation links so web and native sync agree.
+  const blockID = "";
   const folderClientID = project.clientID || project.id || project.localFolderID || "";
   return {
     id: `web-project-section-${folderClientID}-${sectionID}${blockID ? `-${safeAnnotationIDPart(blockID)}` : ""}`,
@@ -6043,6 +6137,7 @@ function projectSectionRecordForSection(project, sectionPayload) {
     chapterID: sectionPayload.chapterID || "",
     chapterNumber: sectionPayload.chapterNumber || "",
     folderClientID,
+    folderType: folderType(project),
     localFolderID: numericLocalFolderID(project) || null,
     sectionID: Number(sectionID),
     blockID,
@@ -6062,6 +6157,7 @@ function projectSectionMutationForSection(project, sectionPayload) {
       userID: record.userID,
       codeVersion: record.codeVersion,
       folderClientID: record.folderClientID,
+      folderType: record.folderType,
       localFolderID: record.localFolderID,
       sectionID: record.sectionID,
       blockID: record.blockID || null,
@@ -6080,6 +6176,7 @@ function deletedProjectSectionMutationForItem(project, item) {
       userID: activeAccount()?.userID || item.userID || "local-web",
       codeVersion: syncCodeVersion(item.codeVersion),
       folderClientID: item.folderClientID || record.folderClientID,
+      folderType: item.folderType || record.folderType,
       localFolderID: item.localFolderID || record.localFolderID,
       sectionID: Number(item.sectionID || item.savedSectionID || item.itemID),
       blockID: normalizeAnnotationBlockID(item.blockID) || null,
@@ -6090,20 +6187,20 @@ function deletedProjectSectionMutationForItem(project, item) {
   };
 }
 
-function savedItemForSection(sectionID) {
-  const sectionKey = String(sectionID || "");
+function savedItemForSection(section) {
+  const sectionKey = savedEvidenceKey(section);
   return [...(state.localSavedItems || []), ...(syncedContent?.summary?.savedItems || [])]
-    .filter((item) => String(item?.sectionID || "") === sectionKey)
+    .filter((item) => savedEvidenceKey(item) === sectionKey)
     .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0))[0] || null;
 }
 
 function deletedSavedMutationForSection(section, existingRecord = null) {
   const account = activeAccount();
   const now = new Date().toISOString();
-  const existing = existingRecord || savedItemForSection(section.sectionID) || {};
+  const existing = existingRecord || savedItemForSection(section) || {};
   return {
     savedItem: {
-      id: existing.id || `web-saved-${section.sectionID}`,
+      id: existing.id || `web-saved-${safeAnnotationIDPart(syncCodeVersion(section.codeVersion))}-${section.sectionID}`,
       userID: account.userID,
       codeVersion: syncCodeVersion(existing.codeVersion || section.codeVersion),
       sectionID: Number(section.sectionID),
@@ -6137,6 +6234,20 @@ function projectColor(project) {
   // `colorHex` is the native iOS storage field and the canonical sync value.
   // Legacy web aliases remain as fallbacks for records created before sync.
   return project?.colorHex || project?.color || project?.tintColor || projectColorOptions[0];
+}
+
+function folderType(folder) {
+  return String(folder?.folderType || folder?.type || "project").toLowerCase() === "reference"
+    ? "reference"
+    : "project";
+}
+
+function folderTypeLabel(folder) {
+  return folderType(folder) === "reference" ? "Reference folder" : "Project";
+}
+
+function folderIsProject(folder) {
+  return folderType(folder) === "project";
 }
 
 function readableProjectName(project) {
@@ -6176,6 +6287,7 @@ function projectMutationForRecord(project, accountOverride = null) {
       title: project.title || project.name || "Project",
       address: project.address || "",
       description: project.description || "",
+      folderType: folderType(project),
       color,
       colorHex: color,
       sortOrder: Number.isFinite(Number(project.sortOrder)) ? Number(project.sortOrder) : 0,
@@ -6284,6 +6396,12 @@ function visibleProjectRecords(syncedProjects = []) {
 }
 
 function activeProjectRecords(syncedProjects = []) {
+  return visibleProjectRecords(syncedProjects).filter((project) =>
+    !projectIsArchived(project) && folderIsProject(project)
+  );
+}
+
+function activeFolderRecords(syncedProjects = []) {
   return visibleProjectRecords(syncedProjects).filter((project) => !projectIsArchived(project));
 }
 
@@ -6304,12 +6422,15 @@ function nextProjectName() {
 }
 
 function nextProjectSortOrder() {
-  const projects = activeProjectRecords(currentContentSummary().projects || []);
+  const projects = activeFolderRecords(currentContentSummary().projects || []);
   return projects.reduce((maximum, project) => Math.max(maximum, projectSortOrder(project)), -1) + 1;
 }
 
 async function createProjectFolder(details = {}) {
-  if (!hasCapability("projects")) {
+  const requestedType = String(details.folderType || "project").toLowerCase() === "reference"
+    ? "reference"
+    : "project";
+  if (requestedType === "project" && !hasCapability("projects")) {
     void presentPlanLimitNotice("Projects require Pro", "Upgrade to Pro to create Project workspaces and organize saved code by job.");
     return null;
   }
@@ -6320,6 +6441,7 @@ async function createProjectFolder(details = {}) {
   const name = String(details.name || "").trim() || fallbackName;
   const description = String(details.description || "").trim();
   const address = String(details.address || "").trim();
+  const type = requestedType;
   const project = {
     id,
     clientID: id,
@@ -6329,6 +6451,7 @@ async function createProjectFolder(details = {}) {
     title: name,
     address,
     description,
+    folderType: type,
     color: details.color || projectColorOptions[0],
     sortOrder: nextProjectSortOrder(),
     sortMode: "Code order",
@@ -6389,6 +6512,11 @@ async function persistProjectOrder(projects, paneID) {
 async function updateProjectFolder(project, details = {}) {
   const id = projectRecordID(project);
   if (!id) return;
+  const nextFolderType = details.folderType ? folderType(details) : folderType(project);
+  if (nextFolderType === "project" && folderType(project) === "reference" && !hasCapability("projects")) {
+    void presentPlanLimitNotice("Projects require Pro", "Upgrade to convert this Reference folder into a Project workspace.");
+    return false;
+  }
   const now = new Date().toISOString();
   const name = String(details.name || "").trim() || project.name || project.title || "Project";
   const color = details.color || projectColor(project);
@@ -6403,6 +6531,7 @@ async function updateProjectFolder(project, details = {}) {
     title: name,
     address,
     description: String(details.description || "").trim(),
+    folderType: nextFolderType,
     color,
     colorHex: color,
     tintColor: color,
@@ -6433,16 +6562,21 @@ async function updateProjectFolder(project, details = {}) {
       // Keep the local edit visible while the durable sync queue recovers.
     }
   }
+  return true;
 }
 
-function isSectionSaved(sectionID) {
-  const sectionKey = String(sectionID);
+function isSectionSaved(section, codeVersion = "") {
+  const sectionKey = savedEvidenceKey(section, codeVersion);
+  const rawSectionID = String(section && typeof section === "object" ? section.sectionID : section);
   const localRecord = [...(state.localSavedItems || [])].reverse()
-    .find((item) => String(item.sectionID || "") === sectionKey);
+    .find((item) => savedEvidenceKey(item) === sectionKey);
   if (localRecord) return !localRecord.deletedAt;
-  if ((state.localSavedSectionIDs || []).map(String).includes(sectionKey)) return true;
+  if (
+    syncCodeVersion(codeVersion || section?.codeVersion || defaultSyncCodeVersion) === defaultSyncCodeVersion &&
+    (state.localSavedSectionIDs || []).map(String).includes(rawSectionID)
+  ) return true;
   const savedItems = syncedContent?.summary?.savedItems || [];
-  return savedItems.some((item) => String(item.sectionID) === sectionKey);
+  return savedItems.some((item) => savedEvidenceKey(item) === sectionKey);
 }
 
 function setLocalSectionSaved(sectionID, saved) {
@@ -6456,10 +6590,10 @@ function setLocalSectionSaved(sectionID, saved) {
 }
 
 async function persistSectionBookmark(sectionPayload, saved, options = {}) {
-  const existingRecord = savedItemForSection(sectionPayload.sectionID);
+  const existingRecord = savedItemForSection(sectionPayload);
   if (
     saved &&
-    !isSectionSaved(sectionPayload.sectionID) &&
+    !isSectionSaved(sectionPayload) &&
     !isProAccount() &&
     webFreePlanUsage().savedItems >= webFreePlanLimits.savedItems
   ) {
@@ -6472,8 +6606,10 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
   if (!saved && options.removeProjectLinks !== false) {
     await removeSectionFromAllProjects(sectionPayload);
   }
-  setLocalSectionSaved(sectionPayload.sectionID, saved);
-  const sectionKey = String(sectionPayload.sectionID || "");
+  if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
+    setLocalSectionSaved(sectionPayload.sectionID, saved);
+  }
+  const sectionKey = savedEvidenceKey(sectionPayload);
   const record = saved
     ? savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web")
     : {
@@ -6483,7 +6619,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
       };
   const localRecord = saved ? record : { ...record, deletedAt: record.updatedAt };
   state.localSavedItems = [
-    ...(state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey),
+    ...(state.localSavedItems || []).filter((item) => savedEvidenceKey(item) !== sectionKey),
     localRecord
   ];
   saveWorkspaceState();
@@ -6493,7 +6629,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     await pushMutation(saved
       ? savedMutationForSection(sectionPayload)
       : deletedSavedMutationForSection(sectionPayload, existingRecord));
-    state.localSavedItems = (state.localSavedItems || []).filter((item) => String(item.sectionID) !== sectionKey);
+    state.localSavedItems = (state.localSavedItems || []).filter((item) => savedEvidenceKey(item) !== sectionKey);
     saveWorkspaceState();
   } catch (error) {
     if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
@@ -6503,7 +6639,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
 }
 
 async function persistSectionInProject(project, sectionPayload) {
-  if (!hasCapability("projects")) {
+  if (folderIsProject(project) && !hasCapability("projects")) {
     void presentPlanLimitNotice("Project organization requires Pro", "Upgrade to Pro to add saved code to Projects.");
     return false;
   }
@@ -6524,13 +6660,102 @@ async function persistSectionInProject(project, sectionPayload) {
   return true;
 }
 
+async function persistSectionFolderSelection(sectionPayload, selectedFolders, visibleFolders) {
+  const selectedByID = new Map(selectedFolders.map((folder) => [projectRecordID(folder), folder]));
+  if (!selectedByID.size) return { saved: false, changed: false, queued: false };
+  if (
+    !isSectionSaved(sectionPayload) &&
+    !isProAccount() &&
+    webFreePlanUsage().savedItems >= webFreePlanLimits.savedItems
+  ) {
+    void presentPlanLimitNotice(
+      "Free saved-section limit reached",
+      `Free includes up to ${webFreePlanLimits.savedItems} saved sections. Upgrade to Pro to save more.`
+    );
+    return { saved: false, changed: false, queued: false };
+  }
+  if (selectedFolders.some(folderIsProject) && !hasCapability("projects")) {
+    void presentPlanLimitNotice("Projects require Pro", "Use a Reference folder on Free, or upgrade to organize evidence by Project.");
+    return { saved: false, changed: false, queued: false };
+  }
+
+  const summary = currentContentSummary();
+  const sectionKey = savedEvidenceKey(sectionPayload);
+  const visibleFolderIDs = new Set(visibleFolders.map(projectRecordID));
+  const visibleLinks = (summary.projectSections || []).filter((link) =>
+    savedEvidenceKey(link) === sectionKey &&
+    visibleFolders.some((folder) => projectSectionBelongsToProject(link, folder))
+  );
+  const linkedFolderIDs = new Set(visibleLinks.map((link) => {
+    const folder = visibleFolders.find((candidate) => projectSectionBelongsToProject(link, candidate));
+    return folder ? projectRecordID(folder) : "";
+  }).filter(Boolean));
+  const additions = selectedFolders.filter((folder) => !linkedFolderIDs.has(projectRecordID(folder)));
+  const removals = visibleLinks.filter((link) => {
+    const folder = visibleFolders.find((candidate) => projectSectionBelongsToProject(link, candidate));
+    return folder && visibleFolderIDs.has(projectRecordID(folder)) && !selectedByID.has(projectRecordID(folder));
+  });
+  const wasSaved = isSectionSaved(sectionPayload);
+  const mutations = [];
+
+  if (!wasSaved) {
+    const savedRecord = savedRecordForSection(sectionPayload, activeAccount()?.userID || "local-web");
+    state.localSavedItems = [
+      ...(state.localSavedItems || []).filter((item) => savedEvidenceKey(item) !== sectionKey),
+      savedRecord
+    ];
+    if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
+      setLocalSectionSaved(sectionPayload.sectionID, true);
+    }
+    mutations.push(savedMutationForSection(sectionPayload));
+  }
+
+  additions.forEach((folder) => {
+    const record = projectSectionRecordForSection(folder, sectionPayload);
+    state.localProjectSections = [
+      ...(state.localProjectSections || []).filter((item) => item.id !== record.id),
+      record
+    ];
+    mutations.push(projectSectionMutationForSection(folder, sectionPayload));
+  });
+  removals.forEach((link) => {
+    const folder = visibleFolders.find((candidate) => projectSectionBelongsToProject(link, candidate));
+    if (!folder) return;
+    const deletion = deletedProjectSectionMutationForItem(folder, link);
+    const matches = (candidate) =>
+      savedEvidenceKey(candidate) === sectionKey && projectSectionBelongsToProject(candidate, folder);
+    state.localProjectSections = [
+      ...(state.localProjectSections || []).filter((candidate) => !matches(candidate)),
+      deletion.projectSection
+    ];
+    mutations.push(deletion);
+  });
+  saveWorkspaceState();
+
+  let queued = false;
+  if (activeAccount() && mutations.length) {
+    try {
+      await pushMutationBatch(mutations);
+    } catch (error) {
+      queued = true;
+      if (isSessionAuthenticationError(error)) clearExpiredAccountSession();
+    }
+  }
+  await refreshOpenSavedPanes();
+  return {
+    saved: true,
+    changed: !wasSaved || additions.length > 0 || removals.length > 0,
+    queued
+  };
+}
+
 async function removeSectionFromAllProjects(sectionPayload) {
   const sectionID = String(sectionPayload.sectionID || sectionPayload.savedSectionID || sectionPayload.itemID || "");
   if (!sectionID) return;
   const summary = currentContentSummary();
   const projects = summary.projects || [];
   const links = (summary.projectSections || []).filter((item) =>
-    String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID
+    savedEvidenceKey(item) === savedEvidenceKey(sectionPayload)
   );
 
   for (const link of links) {
@@ -6552,6 +6777,7 @@ async function removeSectionFromProject(project, item, options = {}) {
     String(candidate.id || "") === String(item.projectSectionID || item.id || "") ||
     (
       String(candidate.sectionID || candidate.savedSectionID || candidate.itemID || "") === sectionID &&
+      syncCodeVersion(candidate.codeVersion) === syncCodeVersion(item.codeVersion) &&
       normalizeAnnotationBlockID(candidate.blockID) === blockID &&
       projectSectionBelongsToProject(candidate, project)
     );
@@ -6575,10 +6801,30 @@ async function removeSectionFromProject(project, item, options = {}) {
     }
   }
 
-  if (options.removeBookmark !== false) {
+  if (options.removeBookmark === true) {
     await persistSectionBookmark(item, false, { refreshSavedPanes: false });
     syncReaderNoteBookmarkButtons(sectionID, false);
   }
+}
+
+async function unlinkEvidenceFromFolder(folder, item, container = null) {
+  const remainingLinks = (currentContentSummary().projectSections || []).filter((candidate) =>
+    savedEvidenceKey(candidate) === savedEvidenceKey(item) &&
+    !projectSectionBelongsToProject(candidate, folder)
+  );
+  if (!remainingLinks.length) {
+    const confirmed = await openWebWarning({
+      title: "Remove final folder?",
+      message: "This is the last folder containing this evidence. Removing it will also delete the saved record. Notes, tags, source metadata, and evidence history are not silently reassigned.",
+      confirmLabel: "Remove and delete",
+      container
+    });
+    if (!confirmed) return false;
+    await removeSectionFromProject(folder, item, { removeBookmark: true });
+    return true;
+  }
+  await removeSectionFromProject(folder, item, { removeBookmark: false });
+  return true;
 }
 
 function normalizeAnnotationBlockID(value) {
@@ -6602,7 +6848,7 @@ function annotationRecordID(target) {
 function normalizeAnnotationTags(tags = []) {
   const seen = new Set();
   return tags
-    .map((tag) => String(tag || "").trim())
+    .map((tag) => String(tag || "").normalize("NFKC").trim().replace(/\s+/g, " "))
     .filter(Boolean)
     .filter((tag) => {
       const key = tag.toLowerCase();
@@ -6612,13 +6858,19 @@ function normalizeAnnotationTags(tags = []) {
     });
 }
 
-function annotationRecordsForTarget(sectionID, blockID = "") {
-  const sectionKey = String(sectionID || "");
-  const blockKey = normalizeAnnotationBlockID(blockID);
+function annotationRecordsForTarget(target, blockID = "", codeVersion = "") {
+  const sectionKey = String(target && typeof target === "object" ? target.sectionID : target || "");
+  const blockKey = normalizeAnnotationBlockID(
+    target && typeof target === "object" ? target.blockID : blockID
+  );
+  const versionKey = syncCodeVersion(
+    (target && typeof target === "object" ? target.codeVersion : codeVersion) || defaultSyncCodeVersion
+  );
   const localIDs = new Set((state.localAnnotations || []).map((annotation) => String(annotation?.id || "")));
   return currentContentSummary().annotations
     .filter((annotation) =>
       String(annotation?.sectionID || "") === sectionKey &&
+      syncCodeVersion(annotation?.codeVersion) === versionKey &&
       normalizeAnnotationBlockID(annotation?.blockID || annotation?.anchorID || annotation?.contentBlockID) === blockKey
     )
     .sort((left, right) => {
@@ -6630,8 +6882,8 @@ function annotationRecordsForTarget(sectionID, blockID = "") {
     });
 }
 
-function annotationForTarget(sectionID, blockID = "") {
-  const records = annotationRecordsForTarget(sectionID, blockID);
+function annotationForTarget(target, blockID = "", codeVersion = "") {
+  const records = annotationRecordsForTarget(target, blockID, codeVersion);
   let noteBody = "";
   let tags = [];
   let noteResolved = false;
@@ -6672,12 +6924,14 @@ function annotationForTarget(sectionID, blockID = "") {
 }
 
 function noteValueForTarget(sectionID, blockID = "") {
-  const blockKey = normalizeAnnotationBlockID(blockID);
-  if (!blockKey) {
-    const legacyNote = state.sectionNotes?.[sectionNoteKey(sectionID)];
+  const target = sectionID && typeof sectionID === "object" ? sectionID : null;
+  const blockKey = normalizeAnnotationBlockID(target ? target.blockID : blockID);
+  const targetVersion = syncCodeVersion(target?.codeVersion || defaultSyncCodeVersion);
+  if (!blockKey && targetVersion === defaultSyncCodeVersion) {
+    const legacyNote = state.sectionNotes?.[sectionNoteKey(target ? target.sectionID : sectionID)];
     if (legacyNote !== undefined) return legacyNote;
   }
-  return annotationForTarget(sectionID, blockKey).noteBody;
+  return annotationForTarget(target || sectionID, blockKey).noteBody;
 }
 
 function tagsForTarget(sectionID, blockID = "") {
@@ -6685,7 +6939,7 @@ function tagsForTarget(sectionID, blockID = "") {
 }
 
 function annotationRecordForTarget(target, values = {}) {
-  const existing = annotationForTarget(target.sectionID, target.blockID);
+  const existing = annotationForTarget(target);
   const now = values.updatedAt || new Date().toISOString();
   const blockID = normalizeAnnotationBlockID(target.blockID);
   const noteBody = values.noteBody !== undefined ? values.noteBody : existing.noteBody;
@@ -6764,7 +7018,7 @@ function scheduleAnnotationPush(record) {
 
 function setAnnotationNoteValue(target, value) {
   if (!target?.sectionID) return false;
-  const currentNote = noteValueForTarget(target.sectionID, target.blockID);
+  const currentNote = noteValueForTarget(target);
   const nextNote = String(value || "");
   if (
     !isProAccount() &&
@@ -6778,7 +7032,7 @@ function setAnnotationNoteValue(target, value) {
     );
     return false;
   }
-  const existingTags = tagsForTarget(target.sectionID, target.blockID);
+  const existingTags = tagsForTarget(target);
   const record = annotationRecordForTarget(target, {
     noteBody: nextNote,
     tags: existingTags,
@@ -6792,7 +7046,7 @@ function setAnnotationNoteValue(target, value) {
 
 function setAnnotationTags(target, tags) {
   if (!target?.sectionID) return false;
-  const currentTags = tagsForTarget(target.sectionID, target.blockID);
+  const currentTags = tagsForTarget(target);
   const nextTags = normalizeAnnotationTags(tags);
   const addsTag = nextTags.some((tag) =>
     !currentTags.some((current) => current.toLowerCase() === tag.toLowerCase())
@@ -6801,7 +7055,7 @@ function setAnnotationTags(target, tags) {
     void presentPlanLimitNotice("Tags require Pro", "Upgrade to Pro to add tags and use advanced organization.");
     return false;
   }
-  const noteBody = noteValueForTarget(target.sectionID, target.blockID);
+  const noteBody = noteValueForTarget(target);
   const record = annotationRecordForTarget(target, {
     noteBody,
     tags: nextTags,
@@ -6816,7 +7070,7 @@ function setAnnotationTags(target, tags) {
 function renderAnnotationTagEditor(container, target, options = {}) {
   if (!container || !target?.sectionID) return;
   clear(container);
-  const tags = tagsForTarget(target.sectionID, target.blockID);
+  const tags = tagsForTarget(target);
   const label = document.createElement("p");
   label.className = "annotation-tags-label";
   label.textContent = "Tags";
@@ -6864,10 +7118,9 @@ function renderAnnotationTagEditor(container, target, options = {}) {
 
 function projectLinkForAnnotationTarget(project, target) {
   const sectionID = String(target.sectionID || "");
-  const blockID = normalizeAnnotationBlockID(target.blockID);
   return currentContentSummary().projectSections.find((item) =>
     String(item.sectionID || item.savedSectionID || item.itemID || "") === sectionID &&
-    normalizeAnnotationBlockID(item.blockID) === blockID &&
+    syncCodeVersion(item.codeVersion) === syncCodeVersion(target.codeVersion) &&
     projectSectionBelongsToProject(item, project)
   );
 }
@@ -6878,24 +7131,21 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
 
   const label = document.createElement("p");
   label.className = "annotation-tags-label";
-  label.textContent = "Projects";
+  label.textContent = "Folders";
   const header = document.createElement("div");
   header.className = "annotation-projects-header";
   header.append(label);
 
   const chips = document.createElement("div");
   chips.className = "annotation-project-chips";
-  const canUseProjects = hasCapability("projects");
-  const projects = canUseProjects
-    ? activeProjectRecords(currentContentSummary().projects || [])
-    : [];
+  const projects = activeFolderRecords(currentContentSummary().projects || []);
 
-  if (canUseProjects && container.classList.contains("section-detail-projects")) {
+  if (container.classList.contains("section-detail-projects")) {
     const addButton = document.createElement("button");
     addButton.type = "button";
     addButton.className = "annotation-project-add";
-    addButton.title = "Create project";
-    addButton.setAttribute("aria-label", "Create project");
+    addButton.title = "Create folder";
+    addButton.setAttribute("aria-label", "Create Project or Reference folder");
     addButton.innerHTML = `
       <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
         <path d="M12 5v14"></path>
@@ -6907,7 +7157,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
       if (!panel) return;
       showProjectCreateSheet(panel, null, {
         onCreated: async (project) => {
-          if (!isSectionSaved(sectionPayload.sectionID)) {
+          if (!isSectionSaved(sectionPayload)) {
             const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
             if (!saved) return;
             syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
@@ -6920,15 +7170,10 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
     header.append(addButton);
   }
 
-  if (!canUseProjects) {
-    const unavailable = document.createElement("span");
-    unavailable.className = "annotation-projects-empty";
-    unavailable.textContent = "Pro required";
-    chips.append(unavailable);
-  } else if (!projects.length) {
+  if (!projects.length) {
     const empty = document.createElement("span");
     empty.className = "annotation-projects-empty";
-    empty.textContent = "No projects";
+    empty.textContent = "No folders";
     chips.append(empty);
   } else {
     projects.forEach((project) => {
@@ -6944,14 +7189,24 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
         `${existingLink ? "Remove from" : "Add to"} ${project.name || project.title || "project"}`
       );
       button.textContent = project.name || project.title || "Project";
+      button.title = folderTypeLabel(project);
+      if (!existingLink && folderIsProject(project) && !hasCapability("projects")) {
+        button.disabled = true;
+        button.title = "Projects require Pro";
+      }
       button.addEventListener("click", async () => {
         button.disabled = true;
         try {
           const currentLink = projectLinkForAnnotationTarget(project, target);
           if (currentLink) {
-            await removeSectionFromProject(project, currentLink, { removeBookmark: false });
+            const removed = await unlinkEvidenceFromFolder(
+              project,
+              currentLink,
+              container.closest(".workspace-panel")
+            );
+            if (!removed) return;
           } else {
-            if (!isSectionSaved(sectionPayload.sectionID)) {
+            if (!isSectionSaved(sectionPayload)) {
               const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
               if (!saved) return;
               syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
@@ -7341,7 +7596,9 @@ function renderReaderSectionProjectContext(host, section, reader, panel) {
     return;
   }
   const projects = readerProjectsForSection(section);
-  const saved = [...readerSectionIdentityValues(section)].some(isSectionSaved);
+  const saved = [...readerSectionIdentityValues(section)].some((sectionID) =>
+    isSectionSaved({ sectionID, codeVersion: reader?.codeVersion })
+  );
   if (!saved && projects.length === 0) {
     host.hidden = true;
     return;
@@ -7349,13 +7606,13 @@ function renderReaderSectionProjectContext(host, section, reader, panel) {
   host.hidden = false;
   const label = document.createElement("span");
   label.className = "reader-section-project-context-label";
-  label.textContent = "Project record";
+  label.textContent = "Folder record";
   host.append(label);
   const hasNote = readerSectionHasNote(section);
   if (!projects.length) {
     const status = document.createElement("span");
     status.className = "reader-section-project-context-status";
-    status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence · Not linked to a Project";
+    status.textContent = hasNote ? "Saved evidence · Note" : "Saved evidence · Needs a folder";
     host.append(status);
     return;
   }
@@ -7365,10 +7622,10 @@ function renderReaderSectionProjectContext(host, section, reader, panel) {
     projectButton.className = "reader-section-project-chip";
     projectButton.style.setProperty("--project-color", projectColor(project));
     const archived = projectIsArchived(project);
-    projectButton.textContent = `${project.name || project.title || "Project"}${archived ? " · Archived" : ""}`;
-    projectButton.title = "Open Project record";
+    projectButton.textContent = `${project.name || project.title || "Folder"} · ${folderTypeLabel(project)}${archived ? " · Archived" : ""}`;
+    projectButton.title = folderIsProject(project) ? "Open Project record" : "Reference folder";
     projectButton.addEventListener("click", () => {
-      void openProjectDetail(project, { sourcePaneID: paneIDForReader(reader) });
+      if (folderIsProject(project)) void openProjectDetail(project, { sourcePaneID: paneIDForReader(reader) });
     });
     host.append(projectButton);
   });
@@ -7453,7 +7710,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   sectionWrapper.append(projectContext);
 
   const blocks = annotatedBlocksForSection(section);
-  const bookmarkedBlockIndex = isSectionSaved(section.id)
+  const bookmarkedBlockIndex = isSectionSaved({ sectionID: section.id, codeVersion: reader.codeVersion })
     ? Math.max(0, blocks.findIndex((block, blockIndex) => {
         const blockTarget = annotationTargetForBlock(section, block, reader, blockIndex);
         return Boolean(noteValueForTarget(blockTarget.sectionID, blockTarget.blockID).trim());
@@ -7880,7 +8137,10 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
       button.setAttribute("aria-hidden", hasNote ? "false" : "true");
     }
   });
-  syncReaderNoteBookmarkButtons(sectionID, isSectionSaved(sectionID));
+  syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
+    sectionID,
+    codeVersion: options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion
+  }));
   track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"][data-block-id="${CSS.escape(blockKey)}"]`).forEach((sheet) => {
     const input = sheet.querySelector(".reader-notes-input");
     if (input && input !== options.source) input.value = value;
@@ -7911,7 +8171,7 @@ function ensureReaderNotesSheet(panel, reader) {
   const projectButton = document.createElement("button");
   projectButton.className = "reader-notes-card-action reader-notes-project-action";
   projectButton.type = "button";
-  projectButton.textContent = "Project";
+  projectButton.textContent = "Folders";
 
   const linkButton = document.createElement("button");
   linkButton.className = "reader-notes-card-action reader-notes-link-action";
@@ -7949,10 +8209,10 @@ function ensureReaderNotesSheet(panel, reader) {
     const blockID = sheet.dataset.blockId || "";
     const target = sheet.__annotationTarget || { sectionID, blockID, codeVersion: defaultSyncCodeVersion };
     if (!setAnnotationNoteValue(target, input.value)) {
-      input.value = noteValueForTarget(sectionID, blockID);
+      input.value = noteValueForTarget(target);
       return;
     }
-    syncReaderNoteControls(sectionID, blockID, input.value, { source: input });
+    syncReaderNoteControls(sectionID, blockID, input.value, { source: input, target });
   });
 
   const commentsLabel = document.createElement("p");
@@ -7976,21 +8236,6 @@ function removeReaderNotesProjectPicker(sheet) {
 }
 
 async function openReaderNotesProjectPicker(sheet, sectionPayload) {
-  const wasAlreadySaved = isSectionSaved(sectionPayload.sectionID);
-  if (!wasAlreadySaved) {
-    const saved = await persistSectionBookmark(sectionPayload, true);
-    if (!saved) return false;
-    syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
-  }
-  if (!hasCapability("projects")) {
-    if (wasAlreadySaved) {
-      void presentPlanLimitNotice(
-        "Projects require Pro",
-        "Upgrade to Pro to organize saved code in Project workspaces."
-      );
-    }
-    return true;
-  }
   showReaderNotesProjectPicker(sheet, sectionPayload);
   return true;
 }
@@ -8000,97 +8245,167 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
   if (sheet.getBoundingClientRect().height < 440) {
     sheet.style.setProperty("--reader-notes-height", "440px");
   }
-  const projects = activeProjectRecords(currentContentSummary().projects || []);
+  const projects = activeFolderRecords(currentContentSummary().projects || []);
+  const existingLinks = (currentContentSummary().projectSections || []).filter((item) =>
+    savedEvidenceKey(item) === savedEvidenceKey(sectionPayload)
+  );
+  const selectedFolderIDs = new Set(projects
+    .filter((project) => existingLinks.some((link) => projectSectionBelongsToProject(link, project)))
+    .map(projectRecordID));
   const picker = document.createElement("section");
   picker.className = "reader-notes-project-picker";
-  picker.setAttribute("aria-label", "Choose project folder");
+  picker.setAttribute("aria-label", "Choose destination folder");
 
   const pickerHeader = document.createElement("header");
   pickerHeader.className = "reader-notes-project-picker-header";
   const label = document.createElement("strong");
-  label.textContent = "Save to project";
+  label.textContent = isSectionSaved(sectionPayload) ? "Organize saved evidence" : "Save to folders";
+  const instruction = document.createElement("p");
+  instruction.className = "reader-notes-project-instruction";
+  instruction.textContent = "Select one or more destinations, add optional tags, then confirm. Permitext keeps one saved record linked to every folder you choose.";
   pickerHeader.append(label);
-  picker.append(pickerHeader);
+  picker.append(pickerHeader, instruction);
 
-  const projectLink = (project) => projectLinkForAnnotationTarget(project, sectionPayload);
+  const optionalTags = document.createElement("input");
+  optionalTags.type = "text";
+  optionalTags.className = "reader-notes-save-tags";
+  optionalTags.placeholder = "Optional tags, separated by commas";
+  optionalTags.setAttribute("aria-label", "Optional tags");
+  optionalTags.disabled = !isProAccount();
+  picker.append(optionalTags);
+  const suggestedTags = recentAnnotationTags();
+  if (suggestedTags.length && isProAccount()) {
+    const suggestions = document.createElement("div");
+    suggestions.className = "reader-notes-save-tag-suggestions";
+    suggestedTags.forEach((tag) => {
+      const suggestion = document.createElement("button");
+      suggestion.type = "button";
+      suggestion.textContent = tag;
+      suggestion.addEventListener("click", () => {
+        const current = normalizeAnnotationTags(optionalTags.value.split(","));
+        optionalTags.value = normalizeAnnotationTags([...current, tag]).join(", ");
+      });
+      suggestions.append(suggestion);
+    });
+    picker.append(suggestions);
+  }
+
+  const status = document.createElement("p");
+  status.className = "reader-notes-project-status";
+  status.setAttribute("role", "status");
+
+  const destinationList = document.createElement("div");
+  destinationList.className = "reader-notes-project-options";
+  destinationList.setAttribute("role", "listbox");
+  destinationList.setAttribute("aria-label", "Destination folders");
+  destinationList.setAttribute("aria-multiselectable", "true");
 
   const setProjectButtonState = (button, selected) => {
     button.classList.toggle("is-selected", selected);
     button.setAttribute("aria-pressed", String(selected));
+    button.setAttribute("aria-selected", String(selected));
     const check = button.querySelector(".reader-notes-project-check");
     if (check) check.textContent = selected ? "✓" : "";
   };
 
-  if (!projects.length) {
-    const empty = document.createElement("p");
-    empty.className = "reader-notes-project-empty";
-    empty.textContent = "No projects yet.";
-    picker.append(empty);
-  }
+  const confirmButton = document.createElement("button");
+  confirmButton.type = "button";
+  confirmButton.className = "reader-notes-project-confirm";
+  const syncConfirmState = () => {
+    const selected = projects.filter((project) => selectedFolderIDs.has(projectRecordID(project)));
+    confirmButton.disabled = selected.length === 0;
+    confirmButton.textContent = isSectionSaved(sectionPayload)
+      ? `Update ${selected.length || ""} ${selected.length === 1 ? "folder" : "folders"}`.replace("Update  folders", "Choose a folder")
+      : `Save to ${selected.length || ""} ${selected.length === 1 ? "folder" : "folders"}`.replace("Save to  folders", "Choose a folder");
+  };
 
-  projects.forEach((project) => {
+  const appendFolderOption = (project) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "reader-notes-project-option";
-    button.style.setProperty("--project-color", projectColor(project));
+    button.setAttribute("role", "option");
+    button.dataset.folderId = projectRecordID(project);
+    if (folderIsProject(project)) button.style.setProperty("--project-color", projectColor(project));
     const name = document.createElement("span");
     name.textContent = project.name || project.title || "Project";
+    const type = document.createElement("small");
+    type.textContent = folderTypeLabel(project);
     const check = document.createElement("span");
     check.className = "reader-notes-project-check";
     check.setAttribute("aria-hidden", "true");
-    button.append(name, check);
-    setProjectButtonState(button, Boolean(projectLink(project)));
-    button.addEventListener("click", async () => {
-      button.disabled = true;
-      button.classList.remove("has-error");
-      const existingLink = projectLink(project);
-      try {
-        if (existingLink) {
-          await removeSectionFromProject(project, existingLink, { removeBookmark: false });
-          setProjectButtonState(button, false);
-        } else {
-          await persistSectionInProject(project, sectionPayload);
-          setProjectButtonState(button, true);
-        }
-        refreshReaderSectionProjectContexts(sectionPayload.sectionID);
-      } catch (error) {
-        const message = error.message || "Could not update this project.";
-        button.classList.add("has-error");
-        button.title = message;
-        presentWorkspaceIssue(message);
-      } finally {
-        button.disabled = false;
-      }
+    button.append(name, type, check);
+    setProjectButtonState(button, selectedFolderIDs.has(projectRecordID(project)));
+    button.addEventListener("click", () => {
+      const folderID = projectRecordID(project);
+      if (selectedFolderIDs.has(folderID)) selectedFolderIDs.delete(folderID);
+      else selectedFolderIDs.add(folderID);
+      setProjectButtonState(button, selectedFolderIDs.has(folderID));
+      syncConfirmState();
+      status.textContent = selectedFolderIDs.size
+        ? `${selectedFolderIDs.size} ${selectedFolderIDs.size === 1 ? "destination" : "destinations"} selected.`
+        : "Choose at least one destination.";
     });
-    picker.append(button);
+    destinationList.append(button);
+  };
+  destinationList.addEventListener("keydown", (event) => {
+    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+    const options = Array.from(destinationList.querySelectorAll('[role="option"]:not([disabled])'));
+    if (!options.length) return;
+    event.preventDefault();
+    const currentIndex = options.indexOf(document.activeElement);
+    const nextIndex = event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? options.length - 1
+        : event.key === 'ArrowDown'
+          ? Math.min(options.length - 1, Math.max(0, currentIndex + 1))
+          : Math.max(0, currentIndex <= 0 ? 0 : currentIndex - 1);
+    options[nextIndex]?.focus({ preventScroll: true });
+    options[nextIndex]?.scrollIntoView({ block: 'nearest' });
   });
 
-  const newProjectButton = document.createElement("button");
-  newProjectButton.type = "button";
-  newProjectButton.className = "reader-notes-new-project";
-  newProjectButton.textContent = "New project…";
-  newProjectButton.addEventListener("click", () => {
-    newProjectButton.hidden = true;
+  if (!projects.length) {
+    const empty = document.createElement("p");
+    empty.className = "reader-notes-project-empty";
+    empty.textContent = "No folders yet. Create a Project or Reference folder below.";
+    destinationList.append(empty);
+  }
+  projects.forEach(appendFolderOption);
+  picker.append(destinationList);
+
+  const newFolderActions = document.createElement("div");
+  newFolderActions.className = "reader-notes-new-folder-actions";
+  const showNewFolderForm = (folderTypeValue) => {
+    newFolderActions.querySelectorAll("button").forEach((button) => { button.hidden = true; });
     const form = document.createElement("form");
     form.className = "reader-notes-new-project-form";
     const input = document.createElement("input");
     input.type = "text";
-    input.placeholder = "Project name";
-    input.setAttribute("aria-label", "New project name");
+    input.placeholder = folderTypeValue === "reference" ? "Reference folder name" : "Project name";
+    input.setAttribute("aria-label", `New ${folderTypeValue} folder name`);
     const createButton = document.createElement("button");
     createButton.type = "submit";
-    createButton.textContent = "Create and save";
+    createButton.textContent = "Create and select";
     form.append(input, createButton);
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (!input.value.trim()) return;
       createButton.disabled = true;
       try {
-        const project = await createProjectFolder({ name: input.value.trim() });
-        await persistSectionInProject(project, sectionPayload);
-        showReaderNotesProjectPicker(sheet, sectionPayload);
+        const project = await createProjectFolder({ name: input.value.trim(), folderType: folderTypeValue });
+        if (!project) {
+          createButton.disabled = false;
+          return;
+        }
+        projects.push(project);
+        selectedFolderIDs.add(projectRecordID(project));
+        destinationList.querySelector(".reader-notes-project-empty")?.remove();
+        appendFolderOption(project);
+        form.remove();
+        newFolderActions.querySelectorAll("button").forEach((button) => { button.hidden = false; });
+        syncConfirmState();
+        status.textContent = `${project.name || project.title} created and selected. Confirm below to save.`;
         refreshOpenAnnotationProjectEditors();
-        refreshReaderSectionProjectContexts(sectionPayload.sectionID);
       } catch (error) {
         const message = error.message || "Could not create the project.";
         createButton.disabled = false;
@@ -8100,11 +8415,67 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
     });
     picker.append(form);
     input.focus();
+  };
+  [["project", "New Project…"], ["reference", "New Reference…"]].forEach(([type, text]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "reader-notes-new-project";
+    button.textContent = text;
+    if (type === "project" && !hasCapability("projects")) {
+      button.disabled = true;
+      button.title = "Projects require Pro";
+    }
+    button.addEventListener("click", () => showNewFolderForm(type));
+    newFolderActions.append(button);
   });
-  picker.append(newProjectButton);
+
+  const actions = document.createElement("div");
+  actions.className = "reader-notes-project-picker-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "reader-notes-project-cancel";
+  cancelButton.textContent = "Cancel";
+  cancelButton.addEventListener("click", () => removeReaderNotesProjectPicker(sheet));
+  confirmButton.addEventListener("click", async () => {
+    const selectedFolders = projects.filter((project) => selectedFolderIDs.has(projectRecordID(project)));
+    if (!selectedFolders.length) return;
+    confirmButton.disabled = true;
+    cancelButton.disabled = true;
+    destinationList.querySelectorAll("button").forEach((button) => { button.disabled = true; });
+    try {
+      const result = await persistSectionFolderSelection(sectionPayload, selectedFolders, projects);
+      if (!result.saved) {
+        confirmButton.disabled = false;
+        cancelButton.disabled = false;
+        destinationList.querySelectorAll("button").forEach((button) => { button.disabled = false; });
+        return;
+      }
+      const tags = normalizeAnnotationTags(optionalTags.value.split(","));
+      if (tags.length) setAnnotationTags(sectionPayload, [...tagsForTarget(sectionPayload), ...tags]);
+      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+      const names = selectedFolders.map((folder) => folder.name || folder.title || "Folder");
+      status.textContent = `${result.queued ? "Saved locally; sync pending" : "Saved"} to ${new Intl.ListFormat(undefined, { style: "long", type: "conjunction" }).format(names)}.`;
+      sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
+        detail: { saved: true, folders: selectedFolders }
+      }));
+      refreshReaderSectionProjectContexts(sectionPayload.sectionID);
+      refreshOpenAnnotationProjectEditors();
+      window.setTimeout(() => removeReaderNotesProjectPicker(sheet), 900);
+    } catch (error) {
+      status.textContent = error.message || "The evidence could not be saved.";
+      presentWorkspaceIssue(status.textContent);
+      confirmButton.disabled = false;
+      cancelButton.disabled = false;
+      destinationList.querySelectorAll("button").forEach((button) => { button.disabled = false; });
+    }
+  });
+  actions.append(cancelButton, confirmButton);
+  picker.append(newFolderActions, status, actions);
+  syncConfirmState();
 
   const header = sheet.querySelector(".reader-notes-header");
-  header?.insertAdjacentElement("afterend", picker);
+  if (header) header.insertAdjacentElement("afterend", picker);
+  else sheet.prepend(picker);
 }
 
 function bindReaderNotesResize(resizer, sheet, panel) {
@@ -8192,7 +8563,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   const blockID = normalizeAnnotationBlockID(target.blockID);
   setReaderNotesActiveTarget(panel, sectionID, blockID);
 
-  const saved = isSectionSaved(section.id);
+  const saved = isSectionSaved({ sectionID: section.id, codeVersion: target.codeVersion });
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
   const projectButton = sheet.querySelector(".reader-notes-project-action");
   const linkButton = sheet.querySelector(".reader-notes-link-action");
@@ -8210,21 +8581,23 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     blockLabel: target.blockLabel || ""
   };
   if (bookmarkButton) {
-    bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved projects" : "Save bookmark"}</span>`;
+    bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved folders" : "Save bookmark"}</span>`;
     bookmarkButton.classList.toggle("is-saved", saved);
     bookmarkButton.setAttribute("aria-pressed", String(saved));
-    bookmarkButton.setAttribute("aria-label", saved ? "Manage saved projects" : "Save bookmark");
+    bookmarkButton.setAttribute("aria-label", saved ? "Manage saved folders" : "Save bookmark");
     bookmarkButton.onclick = async () => {
       bookmarkButton.disabled = true;
       bookmarkButton.classList.remove("has-error");
       try {
         const opened = await openReaderNotesProjectPicker(sheet, sectionPayload);
         if (!opened) return;
-        bookmarkButton.classList.add("is-saved");
-        bookmarkButton.setAttribute("aria-pressed", "true");
-        bookmarkButton.setAttribute("aria-label", "Manage saved projects");
-        bookmarkButton.title = "Manage saved projects";
-        bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Manage saved projects</span>`;
+        if (isSectionSaved(sectionPayload)) {
+          bookmarkButton.classList.add("is-saved");
+          bookmarkButton.setAttribute("aria-pressed", "true");
+          bookmarkButton.setAttribute("aria-label", "Manage saved folders");
+          bookmarkButton.title = "Manage saved folders";
+          bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Manage saved folders</span>`;
+        }
       } catch (error) {
         const message = error.message || "Could not update this saved section.";
         bookmarkButton.title = message;
@@ -8237,21 +8610,14 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   }
   if (projectButton) {
     projectButton.disabled = false;
-    projectButton.title = "Add section to a Project";
+    projectButton.title = "Add section to Project or Reference folders";
     projectButton.onclick = async () => {
       projectButton.disabled = true;
       try {
-        if (!hasCapability("projects")) {
-          await presentPlanLimitNotice(
-            "Projects require Pro",
-            "Upgrade to Pro to organize saved code in Project workspaces."
-          );
-          return;
-        }
         await openReaderNotesProjectPicker(sheet, sectionPayload);
         refreshReaderSectionProjectContexts(section.id);
       } catch (error) {
-        presentWorkspaceIssue(error.message || "Could not open Projects.");
+        presentWorkspaceIssue(error.message || "Could not open folders.");
       } finally {
         projectButton.disabled = false;
       }
@@ -8618,7 +8984,7 @@ function renderSectionComments(commentsList, targets) {
         textarea.value = noteValueForTarget(target.sectionID, target.blockID);
         return;
       }
-      syncReaderNoteControls(target.sectionID, target.blockID, textarea.value, { source: textarea });
+      syncReaderNoteControls(target.sectionID, target.blockID, textarea.value, { source: textarea, target });
     });
 
     inputLabel.append(textarea);
@@ -10182,8 +10548,8 @@ async function renderSectionDetail(searchID, detail) {
     ...sectionPayload,
     blockID: ""
   };
-  const saved = isSectionSaved(detail.sectionID);
-  const noteBody = noteValueForTarget(sectionTarget.sectionID, "");
+  const saved = isSectionSaved(sectionPayload);
+  const noteBody = noteValueForTarget(sectionTarget);
   const bodyText = sectionPlainText(section);
 
   const chrome = document.createElement("header");
@@ -10284,6 +10650,14 @@ async function renderSectionDetail(searchID, detail) {
   notes.append(notesHeader, textareaWrap, projectsHost, tagsHost);
   panel.__annotationTarget = sectionTarget;
   panel.__sectionPayload = sectionPayload;
+  notes.addEventListener("permitext-folder-save", (event) => {
+    const nextSaved = event.detail?.saved === true;
+    saveButton.classList.toggle("is-saved", nextSaved);
+    saveButton.setAttribute("aria-pressed", String(nextSaved));
+    saveButton.title = nextSaved ? "Manage saved folders" : "Save to a folder";
+    saveButton.setAttribute("aria-label", saveButton.title);
+    saveButton.innerHTML = bookmarkIconSVG(nextSaved);
+  });
 
   backButton.addEventListener("click", () => {
     closeLinkedReaderForSearch(searchID);
@@ -10297,26 +10671,24 @@ async function renderSectionDetail(searchID, detail) {
     saveButton.disabled = true;
     saveButton.classList.remove("has-error");
     const shouldRemove = saveButton.classList.contains("is-saved");
-    saveButton.classList.toggle("is-saved", !shouldRemove);
-    saveButton.setAttribute("aria-pressed", String(!shouldRemove));
-    saveButton.title = shouldRemove ? "Save bookmark" : "Remove bookmark";
-    saveButton.setAttribute("aria-label", saveButton.title);
-    saveButton.innerHTML = bookmarkIconSVG(!shouldRemove);
     try {
-      const persisted = await persistSectionBookmark(sectionPayload, !shouldRemove);
+      if (!shouldRemove) {
+        showReaderNotesProjectPicker(notes, sectionPayload);
+        return;
+      }
+      const confirmed = await openWebWarning({
+        title: "Delete saved evidence?",
+        message: "This removes the section from every folder and deletes the canonical saved record. Notes and tags remain available if you save the section again later.",
+        confirmLabel: "Delete saved evidence",
+        container: panel
+      });
+      if (!confirmed) return;
+      const persisted = await persistSectionBookmark(sectionPayload, false);
       if (persisted === false) {
-        saveButton.classList.toggle("is-saved", shouldRemove);
-        saveButton.setAttribute("aria-pressed", String(shouldRemove));
-        saveButton.title = shouldRemove ? "Remove bookmark" : "Save bookmark";
-        saveButton.setAttribute("aria-label", saveButton.title);
-        saveButton.innerHTML = bookmarkIconSVG(shouldRemove);
         return;
       }
       await renderWorkspace();
     } catch (error) {
-      saveButton.classList.toggle("is-saved", shouldRemove);
-      saveButton.setAttribute("aria-pressed", String(shouldRemove));
-      saveButton.innerHTML = bookmarkIconSVG(shouldRemove);
       saveButton.classList.add("has-error");
       const message = error.message || "Could not update this saved section.";
       saveButton.title = message;
@@ -10342,11 +10714,11 @@ async function renderSectionDetail(searchID, detail) {
   let noteTimer = null;
   textarea.addEventListener("input", () => {
     if (!setAnnotationNoteValue(sectionTarget, textarea.value)) {
-      textarea.value = noteValueForTarget(sectionTarget.sectionID, "");
+      textarea.value = noteValueForTarget(sectionTarget);
       saveState.textContent = "";
       return;
     }
-    syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea });
+    syncReaderNoteControls(sectionTarget.sectionID, "", textarea.value, { source: textarea, target: sectionTarget });
     saveState.textContent = "Saving...";
     window.clearTimeout(noteTimer);
     noteTimer = window.setTimeout(() => {
@@ -12849,6 +13221,7 @@ function projectIdentity(project) {
     title: project.title || project.name || "Project",
     address: project.address || "",
     description: project.description || "",
+    folderType: folderType(project),
     color: projectColor(project),
     ...(project.sharedOrganizationID ? {
       sharedOrganizationID: project.sharedOrganizationID,
@@ -14818,9 +15191,9 @@ async function restoreArchivedProject(project) {
 async function deleteArchivedProject(project) {
   const id = projectRecordID(project);
   if (!id) return;
-  const name = project.name || project.title || "this project";
+  const name = project.name || project.title || "this folder";
   const confirmed = await confirmWebWarning(
-    "Delete project",
+    "Delete folder",
     `This will permanently delete ${name}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
@@ -14829,7 +15202,7 @@ async function deleteArchivedProject(project) {
   try {
     await deleteArchivedProjectData(project);
   } catch (error) {
-    await showWebNotice("Could not delete project", error.message || "The project could not be deleted.");
+    await showWebNotice("Could not delete folder", error.message || "The folder could not be deleted.");
     return;
   }
   saveWorkspaceState();
@@ -14842,8 +15215,8 @@ async function deleteArchivedProjects(projects) {
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
   const confirmed = await confirmWebWarning(
-    `Delete ${count === 1 ? "project" : "projects"}`,
-    `This will permanently delete ${count} ${count === 1 ? "project" : "projects"}. This cannot be undone.`,
+    `Delete ${count === 1 ? "folder" : "folders"}`,
+    `This will permanently delete ${count} ${count === 1 ? "folder" : "folders"}. This cannot be undone.`,
     { confirmLabel: "Delete" }
   );
   if (!confirmed) return false;
@@ -16925,7 +17298,7 @@ async function renderProjectDetail(detail) {
     updateSavedEvidenceSelection();
     try {
       for (const item of selectedItems) {
-        await removeSectionFromProject(identity, item, { refreshPanes: false });
+        await unlinkEvidenceFromFolder(identity, item, panel);
       }
       await refreshProjectMembershipPanes(identity);
     } catch (error) {
@@ -17041,22 +17414,15 @@ async function openProjectSavedSection(project, item) {
 }
 
 function showProjectCreateSheet(panel, project = null, options = {}) {
-  if (!project && !hasCapability("projects")) {
-    const account = activeAccount();
-    void presentPlanLimitNotice(
-      "Projects require Pro",
-      account
-        ? "Upgrade to Pro before creating a Project workspace."
-        : "Sign in and upgrade to Pro before creating a Project workspace."
-    );
-    return;
-  }
   panel.querySelector(".project-sheet-overlay")?.remove();
   const isEditing = Boolean(project);
   const identity = isEditing ? projectIdentity(project) : null;
+  let selectedFolderType = String(options.folderType || identity?.folderType || "project") === "reference"
+    ? "reference"
+    : "project";
   const overlay = document.createElement("section");
   overlay.className = "project-sheet-overlay";
-  overlay.setAttribute("aria-label", isEditing ? "Edit project" : "New project");
+  overlay.setAttribute("aria-label", isEditing ? `Edit ${folderTypeLabel(project)}` : "New folder");
 
   const sheet = document.createElement("form");
   sheet.className = "project-create-sheet";
@@ -17071,6 +17437,43 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   saveButton.textContent = "Save";
   saveButton.disabled = !isEditing;
   header.append(cancelButton, saveButton);
+
+  const typeGroup = document.createElement("fieldset");
+  typeGroup.className = "project-folder-type";
+  const typeLegend = document.createElement("legend");
+  typeLegend.textContent = "Folder type";
+  const typeChoices = document.createElement("div");
+  const syncFolderTypeControls = () => {
+    typeChoices.querySelectorAll("button").forEach((button) => {
+      button.setAttribute("aria-pressed", String(button.dataset.folderType === selectedFolderType));
+    });
+    addressLabel.hidden = selectedFolderType === "reference";
+    descriptionInput.placeholder = selectedFolderType === "reference"
+      ? "Reference notes: purpose, topic, or how this collection should be used"
+      : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
+    colorGroup.hidden = selectedFolderType === "reference";
+  };
+  [
+    ["project", "Project", "A job, property, address, or professional matter"],
+    ["reference", "Reference", "Reusable research that is not attached to a job yet"]
+  ].forEach(([value, label, description]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.dataset.folderType = value;
+    button.innerHTML = `<strong>${label}</strong><span>${description}</span>`;
+    if (value === "project" && !hasCapability("projects")) {
+      button.disabled = true;
+      button.title = "Projects require Pro";
+      if (selectedFolderType === "project" && !isEditing) selectedFolderType = "reference";
+    }
+    button.addEventListener("click", () => {
+      selectedFolderType = value;
+      syncFolderTypeControls();
+    });
+    typeChoices.append(button);
+  });
+  typeGroup.append(typeLegend, typeChoices);
+  if (isEditing && folderIsProject(project)) typeGroup.hidden = true;
 
   const nameLabel = document.createElement("label");
   nameLabel.className = "project-sheet-field";
@@ -17137,13 +17540,17 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
         name: nameInput.value,
         address: addressInput.value,
         color: selectedColor,
-        description: descriptionInput.value
+        description: descriptionInput.value,
+        folderType: selectedFolderType
       };
       if (isEditing) {
         await updateProjectFolder(project, details);
       } else {
         const createdProject = await createProjectFolder(details);
-        if (!createdProject) return;
+        if (!createdProject) {
+          saveButton.disabled = false;
+          return;
+        }
         await options.onCreated?.(createdProject);
       }
       overlay.remove();
@@ -17160,9 +17567,10 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     }
   });
 
-  sheet.append(header, nameLabel, addressLabel, descriptionLabel, colorGroup);
+  sheet.append(header, typeGroup, nameLabel, addressLabel, descriptionLabel, colorGroup);
   overlay.append(sheet);
   panel.append(overlay);
+  syncFolderTypeControls();
   nameInput.focus();
 }
 
@@ -17280,7 +17688,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
 }
 
 function savedItemTags(item) {
-  const annotation = annotationForTarget(item.sectionID, item.blockID || "");
+  const annotation = annotationForTarget(item);
   return normalizeAnnotationTags([...(Array.isArray(item.tags) ? item.tags : []), ...(annotation.tags || [])]);
 }
 
@@ -17407,7 +17815,7 @@ function printSavedItemsAsPDF(items, scopeLabel) {
         preview.textContent = item.previewText;
         row.append(preview);
       }
-      const noteText = String(item.noteBody || annotationForTarget(item.sectionID, item.blockID || "").noteBody || "").trim();
+      const noteText = String(item.noteBody || annotationForTarget(item).noteBody || "").trim();
       if (noteText) {
         const note = documentRoot.createElement("span");
         note.className = "note";
@@ -17430,6 +17838,91 @@ function printSavedItemsAsPDF(items, scopeLabel) {
   document.body.append(frame);
 }
 
+function recentAnnotationTags(limit = 8) {
+  const records = [...(currentContentSummary().annotations || [])]
+    .filter((record) => !record.deletedAt && Array.isArray(record.tags))
+    .sort((left, right) => Date.parse(right.updatedAt || 0) - Date.parse(left.updatedAt || 0));
+  return normalizeAnnotationTags(records.flatMap((record) => record.tags || [])).slice(0, limit);
+}
+
+function renameAnnotationTag(oldTag, newTag) {
+  const oldKey = normalizeAnnotationTags([oldTag])[0]?.toLocaleLowerCase();
+  const replacement = normalizeAnnotationTags([newTag])[0];
+  if (!oldKey || !replacement) return 0;
+  const latestByTarget = new Map();
+  (currentContentSummary().annotations || []).forEach((record) => {
+    if (!record || record.deletedAt || !Array.isArray(record.tags)) return;
+    const key = [
+      syncCodeVersion(record.codeVersion),
+      record.sectionID,
+      normalizeAnnotationBlockID(record.blockID)
+    ].join(":");
+    const existing = latestByTarget.get(key);
+    if (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0)) {
+      latestByTarget.set(key, record);
+    }
+  });
+  let changed = 0;
+  latestByTarget.forEach((record) => {
+    const tags = normalizeAnnotationTags(record.tags || []);
+    if (!tags.some((tag) => tag.toLocaleLowerCase() === oldKey)) return;
+    const nextTags = tags.map((tag) => tag.toLocaleLowerCase() === oldKey ? replacement : tag);
+    if (setAnnotationTags({
+      ...record,
+      sectionID: record.sectionID,
+      codeVersion: record.codeVersion,
+      blockID: record.blockID || ""
+    }, nextTags)) changed += 1;
+  });
+  return changed;
+}
+
+function showSavedTagManager(panel, tags, onChange) {
+  panel.querySelector(".project-sheet-overlay")?.remove();
+  const overlay = document.createElement("section");
+  overlay.className = "project-sheet-overlay";
+  overlay.setAttribute("aria-label", "Manage tags");
+  const sheet = document.createElement("section");
+  sheet.className = "project-create-sheet saved-tag-manager";
+  const header = document.createElement("header");
+  header.className = "project-sheet-header project-sheet-header-compact";
+  const title = document.createElement("strong");
+  title.textContent = "Rename or merge tags";
+  const done = document.createElement("button");
+  done.type = "button";
+  done.textContent = "Done";
+  done.addEventListener("click", () => overlay.remove());
+  header.append(title, done);
+  const copy = document.createElement("p");
+  copy.textContent = "Rename a tag across every folder. Renaming it to an existing tag merges them without duplicates.";
+  sheet.append(header, copy);
+  tags.forEach((tag) => {
+    const form = document.createElement("form");
+    form.className = "saved-tag-manager-row";
+    const input = document.createElement("input");
+    input.value = tag;
+    input.setAttribute("aria-label", `Rename ${tag}`);
+    const rename = document.createElement("button");
+    rename.type = "submit";
+    rename.textContent = "Rename";
+    rename.disabled = true;
+    input.addEventListener("input", () => {
+      rename.disabled = !normalizeAnnotationTags([input.value])[0] || input.value === tag;
+    });
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const count = renameAnnotationTag(tag, input.value);
+      if (!count) return;
+      overlay.remove();
+      onChange();
+    });
+    form.append(input, rename);
+    sheet.append(form);
+  });
+  overlay.append(sheet);
+  panel.append(overlay);
+}
+
 function renderSavedFilters(panel, instance, allItems, onChange) {
   const wrapper = panel.querySelector(".saved-inline-filters");
   const codeRail = panel.querySelector(".saved-code-filter");
@@ -17437,6 +17930,7 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   const tagRail = panel.querySelector(".saved-tag-filter");
   const tagMenu = panel.querySelector(".saved-tag-filter-menu");
   const tagClearButton = panel.querySelector(".saved-tag-filter-clear");
+  let tagManageButton = panel.querySelector(".saved-tag-manage");
   const tagCounts = new Map();
   allItems.forEach((item) => {
     new Set(savedItemTags(item)).forEach((tag) => tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1));
@@ -17451,6 +17945,18 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   instance.codeFilters = instance.codeFilters.filter((prefix) => availableCodePrefixes.has(prefix));
   clear(codeRail);
   clear(tagRail);
+  if (!tagManageButton) {
+    tagManageButton = document.createElement("button");
+    tagManageButton.type = "button";
+    tagManageButton.className = "saved-tag-manage";
+    tagManageButton.textContent = "Manage";
+    tagManageButton.setAttribute("aria-label", "Rename or merge tags");
+    tagClearButton.before(tagManageButton);
+  }
+  tagManageButton.hidden = availableTags.length === 0;
+  tagManageButton.onclick = () => showSavedTagManager(panel, availableTags, () => {
+    void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(instance)] });
+  });
   searchCodeFilterOptions()
     .filter((option) => option.prefix !== "ALL" && availableCodePrefixes.has(option.prefix))
     .forEach((option) => {
@@ -17547,6 +18053,164 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   wrapper.hidden = allItems.length === 0;
 }
 
+function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
+  panel.querySelector(".saved-folder-context")?.remove();
+  const folder = activeFolderRecords(folders).find((item) =>
+    projectRecordID(item) === String(savedInstance.selectedFolderID || "")
+  ) || null;
+  const projectsSection = panel.querySelector(".saved-projects-section");
+  if (!folder) {
+    if (savedInstance.selectedFolderID) savedInstance.selectedFolderID = "";
+    projectsSection.hidden = false;
+    return null;
+  }
+
+  projectsSection.hidden = true;
+  const context = document.createElement("section");
+  context.className = `saved-folder-context is-${folderType(folder)}`;
+  if (folderIsProject(folder)) {
+    context.style.setProperty("--project-color", projectColor(folder));
+    panel.style.setProperty("--project-color", projectColor(folder));
+    panel.classList.add("has-selected-project-folder");
+  } else {
+    panel.classList.remove("has-selected-project-folder");
+    panel.style.removeProperty("--project-color");
+  }
+
+  const header = document.createElement("header");
+  const back = document.createElement("button");
+  back.type = "button";
+  back.className = "saved-folder-back";
+  back.textContent = "All folders";
+  back.addEventListener("click", () => {
+    savedInstance.selectedFolderID = "";
+    savedInstance.showAllSaved = false;
+    savedInstance.folderQuery = "";
+    saveWorkspaceState();
+    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  });
+  const identity = document.createElement("div");
+  const type = document.createElement("span");
+  type.textContent = folderTypeLabel(folder);
+  const name = document.createElement("strong");
+  name.textContent = folder.name || folder.title || "Folder";
+  identity.append(type, name);
+  header.append(back, identity);
+
+  const controls = document.createElement("div");
+  controls.className = "saved-folder-controls";
+  const addEvidence = document.createElement("button");
+  addEvidence.type = "button";
+  addEvidence.textContent = "Add Evidence";
+  addEvidence.addEventListener("click", () => void toggleUtilityPane("search"));
+  const scope = document.createElement("button");
+  scope.type = "button";
+  scope.textContent = savedInstance.showAllSaved ? "Folder Evidence" : "All Saved";
+  scope.setAttribute("aria-pressed", String(savedInstance.showAllSaved));
+  scope.addEventListener("click", () => {
+    savedInstance.showAllSaved = !savedInstance.showAllSaved;
+    saveWorkspaceState();
+    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  });
+  controls.append(addEvidence, scope);
+
+  if (folderIsProject(folder)) {
+    [
+      ["Notebook", () => openProjectNotebook(folder)],
+      ["Report Draft", () => openProjectReportDraft(folder)],
+      ["Workboard", () => openProjectWorkboard(folder)],
+      ["Coordination", () => openProjectCoordination(folder)]
+    ].forEach(([label, action]) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = label;
+      button.addEventListener("click", () => void action());
+      controls.append(button);
+    });
+  } else {
+    const notes = document.createElement("span");
+    notes.textContent = folder.description || "Add notes explaining how this reference collection should be used.";
+    notes.className = "saved-reference-capabilities";
+    const edit = document.createElement("button");
+    edit.type = "button";
+    edit.textContent = "Edit notes";
+    edit.addEventListener("click", () => showProjectCreateSheet(panel, folder));
+    const convert = document.createElement("button");
+    convert.type = "button";
+    convert.textContent = "Convert to Project";
+    convert.disabled = !hasCapability("projects");
+    if (convert.disabled) convert.title = "Projects require Pro";
+    convert.addEventListener("click", async () => {
+      const confirmed = await openWebWarning({
+        title: "Convert to Project?",
+        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report Draft, Workboard, Coordination, and Project history.",
+        confirmLabel: "Convert",
+        container: panel
+      });
+      if (!confirmed) return;
+      const converted = await updateProjectFolder(folder, {
+        name: folder.name || folder.title,
+        address: folder.address || "",
+        description: folder.description || "",
+        color: projectColor(folder),
+        folderType: "project"
+      });
+      if (converted === false) return;
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+    });
+    controls.append(notes, edit, convert);
+  }
+
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "saved-folder-search";
+  search.placeholder = savedInstance.showAllSaved ? "Search all saved evidence" : "Search within this folder";
+  search.setAttribute("aria-label", search.placeholder);
+  search.value = savedInstance.folderQuery;
+  search.addEventListener("input", () => {
+    savedInstance.folderQuery = search.value;
+    saveWorkspaceState();
+    panel.__applySavedView?.();
+  });
+  context.append(header, controls, search);
+  projectsSection.before(context);
+  return folder;
+}
+
+function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems, projectSections, selectedFolder) {
+  panel.querySelector(".saved-unassigned-notice")?.remove();
+  if (selectedFolder) return new Set();
+  const linkedSectionIDs = new Set((projectSections || []).map((item) =>
+    savedEvidenceKey(item)
+  ));
+  const unassignedIDs = new Set((savedItems || [])
+    .map((item) => savedEvidenceKey(item))
+    .filter((sectionID) => !sectionID.endsWith(":") && !linkedSectionIDs.has(sectionID)));
+  if (!unassignedIDs.size && !savedInstance.organizeUnassigned) return unassignedIDs;
+
+  const notice = document.createElement("section");
+  notice.className = "saved-unassigned-notice";
+  const heading = document.createElement("strong");
+  heading.textContent = savedInstance.organizeUnassigned
+    ? "Organize existing evidence"
+    : `${unassignedIDs.size} saved ${unassignedIDs.size === 1 ? "section needs" : "sections need"} a folder`;
+  const copy = document.createElement("p");
+  copy.textContent = savedInstance.organizeUnassigned
+    ? "Open each section below and use Save to choose one or more destinations. Nothing is moved or deleted automatically."
+    : "Older saved evidence is kept safely until you choose a Project or Reference folder.";
+  const action = document.createElement("button");
+  action.type = "button";
+  action.textContent = savedInstance.organizeUnassigned ? "Return to All Saved" : "Organize existing evidence";
+  action.addEventListener("click", () => {
+    savedInstance.organizeUnassigned = !savedInstance.organizeUnassigned;
+    saveWorkspaceState();
+    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  });
+  notice.append(heading, copy, action);
+  panel.querySelector(".saved-inline-filters")?.before(notice);
+  return unassignedIDs;
+}
+
 async function hydrateSavedPanel(panel, savedInstance, paneID) {
   const content = panel.querySelector(".saved-content");
   const data = await loadSyncedContent();
@@ -17555,6 +18219,7 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
   if (!panel.isConnected) return;
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
+  const selectedFolder = renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
@@ -17568,27 +18233,69 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
   }
 
   const { savedItems, annotations } = summary;
+  const unassignedSectionIDs = renderUnassignedEvidenceNotice(
+    panel,
+    savedInstance,
+    paneID,
+    savedItems,
+    summary.projectSections || [],
+    selectedFolder
+  );
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
-  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
+  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems))
+    .map((item) => {
+      const names = activeFolderRecords(workspaceProjects)
+        .filter((folder) => (summary.projectSections || []).some((link) =>
+          savedEvidenceKey(link) === savedEvidenceKey(item) && projectSectionBelongsToProject(link, folder)
+        ))
+        .map((folder) => folder.name || folder.title || "Folder");
+      return { ...item, folderNames: names };
+    });
   if (!panel.isConnected) return;
   const applySavedView = () => {
     const filteredItems = resolvedItems.filter((item) => {
       const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
       const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
-      return prefixMatches && tagMatches;
+      const itemSectionID = savedEvidenceKey(item);
+      const folderMatches = !selectedFolder || savedInstance.showAllSaved || (summary.projectSections || []).some((link) =>
+        savedEvidenceKey(link) === itemSectionID &&
+        projectSectionBelongsToProject(link, selectedFolder)
+      );
+      const query = savedInstance.folderQuery.trim().toLocaleLowerCase();
+      const queryMatches = !query || [item.sectionNumber, item.title, item.noteBody, ...savedItemTags(item)]
+        .some((value) => String(value || "").toLocaleLowerCase().includes(query));
+      const organizationMatches = !savedInstance.organizeUnassigned || unassignedSectionIDs.has(itemSectionID);
+      return prefixMatches && tagMatches && folderMatches && queryMatches && organizationMatches;
     });
     const orderedItems = sortSavedItems(filteredItems, "codeOrder");
     clear(content);
     if (orderedItems.length > 0) {
-      renderSavedItemsByCode(content, orderedItems, paneID, { showChapterHeaders: true, preserveOrder: true });
+      renderSavedItemsByCode(content, orderedItems, paneID, {
+        showChapterHeaders: true,
+        preserveOrder: true,
+        removableSavedItems: Boolean(selectedFolder && !savedInstance.showAllSaved),
+        removeAction: selectedFolder
+          ? (item) => unlinkEvidenceFromFolder(
+              selectedFolder,
+              (summary.projectSections || []).find((link) =>
+                savedEvidenceKey(link) === savedEvidenceKey(item) &&
+                projectSectionBelongsToProject(link, selectedFolder)
+              ) || item,
+              panel
+            )
+          : null
+      });
     } else if (resolvedItems.length > 0) {
-      appendEmptySaved(content, "No saved items match", "Try another code book or tag filter.");
+      appendEmptySaved(content, "No saved items match", selectedFolder
+        ? "Try another search, code book, or tag filter, or add evidence to this folder."
+        : "Try another code book or tag filter.");
     } else {
       appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");
     }
   };
+  panel.__applySavedView = applySavedView;
   renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
   applySavedView();
 }
@@ -17627,13 +18334,13 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   wireCodeFilterMenu(list, instance, {
     stateKey: "projectsMenuOpen",
-    menuName: "projects",
-    label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+    menuName: "folders",
+    label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
   });
 
   const syncProjectModeControls = () => {
     archiveButton.setAttribute("aria-pressed", String(showingArchived));
-    archiveButton.title = showingArchived ? "Show active projects" : "Show archived projects";
+    archiveButton.title = showingArchived ? "Show active folders" : "Show archived folders";
     archiveButton.setAttribute("aria-label", archiveButton.title);
     addButton.hidden = showingArchived;
     addButton.disabled = showingArchived;
@@ -17642,20 +18349,20 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const renderProjectCards = () => {
     const visibleProjects = showingArchived
       ? archivedProjectRecords(projects)
-      : activeProjectRecords(projects);
+      : activeFolderRecords(projects);
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
     if (!visibleProjects.length) {
       const empty = document.createElement("p");
       empty.className = "saved-projects-empty";
       empty.textContent = showingArchived
-        ? "No archived projects."
-        : "No projects yet. Use + to create one.";
+        ? "No archived folders."
+        : "No folders yet. Use + to create a Project or Reference folder.";
       list.append(empty);
       updateCodeFilterMenu(list, instance, {
         stateKey: "projectsMenuOpen",
-        menuName: "projects",
-        label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+        menuName: "folders",
+        label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
       });
       return;
     }
@@ -17682,6 +18389,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     visibleProjects.forEach((project) => {
       const tile = document.createElement("article");
       tile.className = "saved-project-tile";
+      tile.classList.add(`is-${folderType(project)}`);
       if (showingArchived) tile.classList.add("is-archived");
       if (project.sharedOrganizationID) tile.classList.add("is-shared");
       const tileColor = projectColor(project);
@@ -17689,16 +18397,19 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.style.setProperty("--project-on-color", projectForegroundColor(tileColor));
       tile.tabIndex = 0;
       tile.setAttribute("role", "button");
-      tile.setAttribute("aria-label", `Open ${project.name || project.title || "project"}`);
+      tile.setAttribute("aria-label", `Open ${project.name || project.title || "folder"}`);
       tile.dataset.projectId = projectRecordID(project);
       if (!showingArchived && !project.sharedOnly) {
         tile.dataset.draggable = "true";
         tile.draggable = true;
-        tile.title = "Drag to reorder · Alt+Arrow keys also move this Project";
+        tile.title = "Drag to reorder · Alt+Arrow keys also move this folder";
         tile.setAttribute("aria-keyshortcuts", "Alt+ArrowUp Alt+ArrowDown");
       }
       const heading = document.createElement("strong");
       heading.textContent = project.name || project.title || "Project";
+      const typeBadge = document.createElement("small");
+      typeBadge.className = "saved-folder-type";
+      typeBadge.textContent = folderTypeLabel(project);
       const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
       const countLabel = document.createElement("span");
       countLabel.className = "saved-project-count";
@@ -17709,7 +18420,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       actions.className = "saved-project-tile-actions";
       const editButton = document.createElement("button");
       editButton.type = "button";
-      editButton.title = showingArchived ? "Restore project" : "Edit project";
+      editButton.title = showingArchived ? "Restore folder" : "Edit folder";
       editButton.setAttribute("aria-label", `${editButton.title}: ${heading.textContent}`);
       editButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : pencilIconSVG();
       editButton.addEventListener("click", (event) => {
@@ -17719,7 +18430,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       const archiveProjectButton = document.createElement("button");
       archiveProjectButton.type = "button";
-      archiveProjectButton.title = showingArchived ? "Delete project" : "Archive project";
+      archiveProjectButton.title = showingArchived ? "Delete folder" : "Archive folder";
       archiveProjectButton.setAttribute("aria-label", `${archiveProjectButton.title}: ${heading.textContent}`);
       archiveProjectButton.innerHTML = showingArchived ? trashIconSVG() : archiveIconSVG();
       archiveProjectButton.addEventListener("click", (event) => {
@@ -17728,13 +18439,18 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         else void archiveProject(project);
       });
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
-      tile.append(heading, countLabel, actions);
+      tile.append(heading, typeBadge, countLabel, actions);
       const open = () => {
         if (tile.dataset.opening === "true") return;
         tile.dataset.opening = "true";
         tile.classList.add("is-opening");
         tile.setAttribute("aria-busy", "true");
-        void openProjectDetail(project, { sourcePaneID: paneID }).finally(() => {
+        instance.selectedFolderID = projectRecordID(project);
+        instance.organizeUnassigned = false;
+        instance.showAllSaved = false;
+        instance.folderQuery = "";
+        saveWorkspaceState();
+        void transitionWorkspace("utility", { refreshPaneIDs: [paneID] }).finally(() => {
           tile.classList.remove("is-opening");
           tile.removeAttribute("aria-busy");
           delete tile.dataset.opening;
@@ -17832,8 +18548,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     });
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
-      menuName: "projects",
-      label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+      menuName: "folders",
+      label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
     });
   };
 
@@ -18262,7 +18978,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           : sectionNumber;
         const status = document.createElement("span");
         status.className = "saved-section-status";
-        const annotation = annotationForTarget(item.sectionID, item.blockID || "");
+        const annotation = annotationForTarget(item);
         const notePreview = String(item.noteBody || annotation.noteBody || "").trim();
         if (notePreview) {
           const noteIcon = document.createElement("span");
@@ -18312,6 +19028,12 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           });
           openButton.append(tags);
         }
+        if (Array.isArray(item.folderNames) && item.folderNames.length) {
+          const folders = document.createElement("span");
+          folders.className = "saved-row-folders";
+          folders.textContent = `Folders: ${item.folderNames.join(", ")}`;
+          openButton.append(folders);
+        }
         openButton.addEventListener("click", () => {
           if (window.getSelection && String(window.getSelection()).trim()) return;
           if (options.selectionController?.isActive()) {
@@ -18337,7 +19059,15 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             removeButton.classList.remove("has-error");
             row.classList.add("is-removing");
             try {
-              await persistSectionBookmark(item, false);
+              if (typeof options.removeAction === "function") {
+                const removed = await options.removeAction(item);
+                if (!removed) {
+                  row.classList.remove("is-removing");
+                  return;
+                }
+              } else {
+                await persistSectionBookmark(item, false);
+              }
               await renderWorkspace();
             } catch (error) {
               const message = error.message || "Could not remove saved section";

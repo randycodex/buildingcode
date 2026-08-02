@@ -614,6 +614,30 @@ struct ServerAnnotationRecord: Codable, Hashable, Sendable {
     }
 }
 
+enum CodeFolderType: String, Codable, CaseIterable, Hashable, Sendable {
+    case project
+    case reference
+
+    /// Older native databases and server records predate typed folders. Treat
+    /// an absent or unrecognized discriminator as a Project so upgrades retain
+    /// the behavior and entitlements those folders already had.
+    init(serverValue: String?) {
+        self = serverValue?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() == Self.reference.rawValue
+            ? .reference
+            : .project
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        self.init(serverValue: try? container.decode(String.self))
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+}
+
 struct ServerProjectRecord: Codable, Hashable, Sendable {
     let id: String
     let userID: String
@@ -625,10 +649,72 @@ struct ServerProjectRecord: Codable, Hashable, Sendable {
     let description: String?
     let colorHex: String?
     let sortOrder: Int?
+    let folderType: CodeFolderType
     let archivedAt: Date?
     let updatedAt: Date
     let deletedAt: Date?
     var serverEventID: Int64? = nil
+
+    init(
+        id: String,
+        userID: String,
+        codeVersion: String,
+        clientID: String?,
+        localFolderID: Int64,
+        name: String?,
+        address: String?,
+        description: String?,
+        colorHex: String?,
+        sortOrder: Int?,
+        folderType: CodeFolderType = .project,
+        archivedAt: Date?,
+        updatedAt: Date,
+        deletedAt: Date?,
+        serverEventID: Int64? = nil
+    ) {
+        self.id = id
+        self.userID = userID
+        self.codeVersion = codeVersion
+        self.clientID = clientID
+        self.localFolderID = localFolderID
+        self.name = name
+        self.address = address
+        self.description = description
+        self.colorHex = colorHex
+        self.sortOrder = sortOrder
+        self.folderType = folderType
+        self.archivedAt = archivedAt
+        self.updatedAt = updatedAt
+        self.deletedAt = deletedAt
+        self.serverEventID = serverEventID
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case id, userID, codeVersion, clientID, localFolderID, name, address
+        case description, colorHex, sortOrder, folderType, archivedAt, updatedAt
+        case deletedAt, serverEventID
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        userID = try container.decode(String.self, forKey: .userID)
+        codeVersion = try container.decode(String.self, forKey: .codeVersion)
+        clientID = try container.decodeIfPresent(String.self, forKey: .clientID)
+        localFolderID = try container.decode(Int64.self, forKey: .localFolderID)
+        name = try container.decodeIfPresent(String.self, forKey: .name)
+        address = try container.decodeIfPresent(String.self, forKey: .address)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        colorHex = try container.decodeIfPresent(String.self, forKey: .colorHex)
+        sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder)
+        folderType = CodeFolderType(
+            serverValue: try container.decodeIfPresent(String.self, forKey: .folderType)
+        )
+        archivedAt = try container.decodeIfPresent(Date.self, forKey: .archivedAt)
+        updatedAt = try container.decode(Date.self, forKey: .updatedAt)
+        deletedAt = try container.decodeIfPresent(Date.self, forKey: .deletedAt)
+        serverEventID = try container.decodeIfPresent(Int64.self, forKey: .serverEventID)
+    }
 }
 
 struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
@@ -636,12 +722,17 @@ struct ServerProjectSectionRecord: Codable, Hashable, Sendable {
     let userID: String
     let codeVersion: String
     let folderClientID: String?
+    let folderType: CodeFolderType?
     let localFolderID: Int64?
     let sectionID: Int64
     let scope: String?
     let updatedAt: Date
     let deletedAt: Date?
     var serverEventID: Int64? = nil
+
+    var resolvedFolderType: CodeFolderType {
+        folderType ?? .project
+    }
 }
 
 struct ServerWorkboardRecord: Codable, Hashable, Sendable {
@@ -833,6 +924,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     description: item.operationType == .delete ? nil : payload.values["description"],
                     colorHex: item.operationType == .delete ? nil : payload.values["colorHex"],
                     sortOrder: payload.values["sortOrder"].flatMap(Int.init),
+                    folderType: CodeFolderType(serverValue: payload.values["folderType"]),
                     archivedAt: payload.values["archivedAt"].flatMap(ISO8601DateFormatter().date(from:)),
                     updatedAt: item.mutationUpdatedAt,
                     deletedAt: deletedAt
@@ -860,6 +952,7 @@ enum ServerUserContentMutation: Codable, Hashable, Sendable {
                     userID: account.appUserID,
                     codeVersion: codeVersion,
                     folderClientID: folderClientID,
+                    folderType: CodeFolderType(serverValue: payload.values["folderType"]),
                     localFolderID: payload.folderID,
                     sectionID: sectionID,
                     scope: payload.values["scope"],
@@ -2666,6 +2759,7 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let address: String
     let description: String
     let colorHex: String
+    let folderType: CodeFolderType
     let sortOrder: Int
     let createdAt: Date
     let updatedAt: Date

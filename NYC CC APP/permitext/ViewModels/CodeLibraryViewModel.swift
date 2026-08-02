@@ -1727,6 +1727,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     address: record.address,
                     description: record.description,
                     colorHex: record.colorHex,
+                    folderType: CodeFolderType(serverValue: record.folderType),
                     sortOrder: record.sortOrder,
                     createdAt: ISO8601DateFormatter().date(from: record.createdAt) ?? Date(),
                     updatedAt: ISO8601DateFormatter().date(from: record.updatedAt) ?? Date()
@@ -1745,18 +1746,27 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     @discardableResult
-    func createFolder(name: String, address: String = "", description: String = "", colorHex: String = CodeFolder.defaultColorHex) -> CodeFolder? {
+    func createFolder(
+        name: String,
+        address: String = "",
+        description: String = "",
+        colorHex: String = CodeFolder.defaultColorHex,
+        folderType: CodeFolderType = .project
+    ) -> CodeFolder? {
         guard let selectedVersion, let userContentRepository else { return nil }
         do {
-            let folderCount = try folderCountForEntitlements(codeVersion: selectedVersion.codeVersion)
-            guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
-                return nil
+            if folderType == .project {
+                let folderCount = try folderCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
+                    return nil
+                }
             }
             let id = try userContentRepository.createFolder(
                 name: name,
                 address: address,
                 description: description,
                 colorHex: colorHex,
+                folderType: folderType,
                 codeVersion: selectedVersion.codeVersion
             )
             refreshFolders()
@@ -1777,6 +1787,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 address: address,
                 description: description,
                 colorHex: colorHex,
+                folderType: folder.folderType,
                 codeVersion: selectedVersion.codeVersion
             )
             refreshFolders()
@@ -1821,22 +1832,61 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func addSection(_ sectionID: Int64, toFolder folderID: Int64) {
-        guard let selectedVersion, let userContentRepository else { return }
-        // Adding a section to a folder implicitly bookmarks it — folders are
-        // a *grouping* of saved sections, so an unbookmarked section in a
-        // folder makes no sense. The DB cleanup goes the other way too
-        // (unbookmark wipes folder rows), so this keeps the invariant tight.
-        if !isBookmarked(sectionID: sectionID) {
-            _ = toggleBookmark(sectionID: sectionID)
-            guard isBookmarked(sectionID: sectionID) else { return }
+        var destinationIDs = Set(folderMembership[sectionID] ?? [])
+        destinationIDs.insert(folderID)
+        _ = saveSection(sectionID: sectionID, toFolderIDs: destinationIDs)
+    }
+
+    /// Saves one section to one or more destinations without ever exposing an
+    /// intermediate unassigned bookmark to the UI or sync queue.
+    @discardableResult
+    func saveSection(sectionID: Int64, toFolderIDs folderIDs: Set<Int64>) -> Bool {
+        guard !folderIDs.isEmpty, let selectedVersion, let userContentRepository else {
+            statusMessage = "Choose at least one folder before saving."
+            return false
+        }
+        let destinations = folders.filter { folderIDs.contains($0.id) }
+        guard destinations.count == folderIDs.count else {
+            statusMessage = "One or more selected folders are no longer available."
+            return false
+        }
+        let existingFolderIDs = Set(folderMembership[sectionID] ?? [])
+        let newlyAddedFolderIDs = folderIDs.subtracting(existingFolderIDs)
+        if destinations.contains(where: {
+            $0.folderType == .project && newlyAddedFolderIDs.contains($0.id)
+        }) && !hasProjectAccess {
+            requireProjectAccess()
+            return false
         }
         do {
-            try userContentRepository.addSection(sectionID, toFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            if !isBookmarked(sectionID: sectionID) {
+                let bookmarkCount = try bookmarkCountForEntitlements()
+                guard !denyIfNeeded(entitlementService.canCreateSavedSection(currentCount: bookmarkCount)) else {
+                    return false
+                }
+            }
+            try userContentRepository.saveSection(
+                sectionID,
+                toFolderIDs: folderIDs,
+                codeVersion: selectedVersion.codeVersion
+            )
+            refreshBookmarks()
             refreshFolders()
             scheduleUserContentAutoSync()
+            return isBookmarked(sectionID: sectionID)
         } catch {
             statusMessage = error.localizedDescription
+            return false
         }
+    }
+
+    /// Replaces memberships for an already-saved section. Empty membership is
+    /// intentionally rejected; the Reader routes that destructive final
+    /// unlink through its explicit delete confirmation instead.
+    @discardableResult
+    func replaceFolderMembership(sectionID: Int64, folderIDs: Set<Int64>) -> Bool {
+        guard isBookmarked(sectionID: sectionID) else { return false }
+        return saveSection(sectionID: sectionID, toFolderIDs: folderIDs)
     }
 
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64) {

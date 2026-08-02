@@ -19,6 +19,9 @@ struct ReaderView: View {
     @State private var pendingCustomTag: String = ""
     @State private var isTagComposerOpen: Bool = false
     @State private var isFolderPickerOpen: Bool = false
+    @State private var pendingFolderIDs: Set<Int64> = []
+    @State private var pendingFinalFolderRemoval: CodeFolder?
+    @State private var showsBookmarkRemovalConfirmation = false
     @State private var folderEditorTarget: ReaderFolderEditorTarget?
     @FocusState private var isNotesFieldFocused: Bool
     @FocusState private var isTagComposerFocused: Bool
@@ -26,12 +29,12 @@ struct ReaderView: View {
     /// Same shape as BookmarksView.FolderEditorTarget but scoped to this view
     /// so the two states don't share an `Identifiable` collision.
     enum ReaderFolderEditorTarget: Identifiable {
-        case new
+        case new(CodeFolderType)
         case edit(CodeFolder)
 
         var id: String {
             switch self {
-            case .new: return "new"
+            case .new(let folderType): return "new-\(folderType.rawValue)"
             case .edit(let folder): return "edit-\(folder.id)"
             }
         }
@@ -39,6 +42,13 @@ struct ReaderView: View {
         var folder: CodeFolder? {
             if case .edit(let f) = self { return f }
             return nil
+        }
+
+        var folderType: CodeFolderType {
+            switch self {
+            case .new(let folderType): return folderType
+            case .edit(let folder): return folder.folderType
+            }
         }
     }
 
@@ -116,7 +126,11 @@ struct ReaderView: View {
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 Button {
-                    toggleBookmark()
+                    if isBookmarked {
+                        showsBookmarkRemovalConfirmation = true
+                    } else {
+                        openFolderPicker()
+                    }
                 } label: {
                     Image(systemName: isBookmarked ? "bookmark.fill" : "bookmark")
                 }
@@ -147,38 +161,51 @@ struct ReaderView: View {
             FolderPickerSheet(
                 folders: library.folders,
                 memberFolderIDs: Set(library.folderMembership[sectionID] ?? []),
-                onToggle: { folder in
-                    let memberIDs = Set(library.folderMembership[sectionID] ?? [])
-                    if memberIDs.contains(folder.id) {
-                        library.removeSection(sectionID, fromFolder: folder.id)
+                selectedFolderIDs: $pendingFolderIDs,
+                canUseProjects: library.hasProjectAccess,
+                onSave: { folderIDs in
+                    if isBookmarked {
+                        _ = library.replaceFolderMembership(sectionID: sectionID, folderIDs: folderIDs)
                     } else {
-                        library.addSection(sectionID, toFolder: folder.id)
+                        isBookmarked = library.saveSection(sectionID: sectionID, toFolderIDs: folderIDs)
                     }
                 },
-                onCreateNew: {
+                onCreateNew: { folderType in
                     // Close the picker first, then open the editor for a
                     // new folder. Presenting one sheet on top of another
                     // is unreliable in SwiftUI; this two-step keeps the
                     // animation clean.
                     isFolderPickerOpen = false
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
-                        folderEditorTarget = .new
+                        folderEditorTarget = .new(folderType)
                     }
+                },
+                onRequireProjectAccess: {
+                    library.requireProjectAccess()
                 }
             )
         }
         .sheet(item: $folderEditorTarget) { target in
             FolderEditorSheet(
                 existing: target.folder,
-                onSave: { name, address, description, colorHex in
+                defaultFolderType: target.folderType,
+                onSave: { name, address, description, colorHex, folderType in
                     if let existing = target.folder {
                         library.updateFolder(existing, name: name, address: address, description: description, colorHex: colorHex)
                     } else {
-                        // After creating a new folder from inside the Reader,
-                        // assign the current section to it so the user
-                        // doesn't have to reopen the picker.
-                        if let newFolder = library.createFolder(name: name, address: address, description: description, colorHex: colorHex) {
-                            library.addSection(sectionID, toFolder: newFolder.id)
+                        // Creating a destination does not save the section.
+                        // Stage it, then return to the picker for confirmation.
+                        if let newFolder = library.createFolder(
+                            name: name,
+                            address: address,
+                            description: description,
+                            colorHex: colorHex,
+                            folderType: folderType
+                        ) {
+                            pendingFolderIDs.insert(newFolder.id)
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                                isFolderPickerOpen = true
+                            }
                         }
                     }
                 },
@@ -188,6 +215,40 @@ struct ReaderView: View {
                     }
                 }
             )
+        }
+        .confirmationDialog(
+            "Remove saved section?",
+            isPresented: $showsBookmarkRemovalConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Remove from Saved", role: .destructive) {
+                removeBookmarkAndFolderLinks()
+            }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This removes the section from every folder and deletes its saved record. Notes remain available in the Reader.")
+        }
+        .confirmationDialog(
+            "Remove the last folder?",
+            isPresented: Binding(
+                get: { pendingFinalFolderRemoval != nil },
+                set: { if !$0 { pendingFinalFolderRemoval = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Remove from Saved", role: .destructive) {
+                removeBookmarkAndFolderLinks()
+                pendingFinalFolderRemoval = nil
+            }
+            Button("Choose another folder") {
+                pendingFinalFolderRemoval = nil
+                openFolderPicker()
+            }
+            Button("Cancel", role: .cancel) {
+                pendingFinalFolderRemoval = nil
+            }
+        } message: {
+            Text("Every saved section needs a folder. Removing this final destination will delete the saved record. You can choose another folder instead.")
         }
     }
 
@@ -345,29 +406,22 @@ struct ReaderView: View {
 
     private var projectsEditor: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Projects")
+            Text("Folders")
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
 
-            if library.hasProjectAccess {
-                FolderMembershipRow(
-                    memberFolders: library.folders(containing: sectionID),
-                    onRemove: { folder in
+            FolderMembershipRow(
+                memberFolders: library.folders(containing: sectionID),
+                onRemove: { folder in
+                    let memberFolderIDs = Set(library.folderMembership[sectionID] ?? [])
+                    if memberFolderIDs.count <= 1 {
+                        pendingFinalFolderRemoval = folder
+                    } else {
                         library.removeSection(sectionID, fromFolder: folder.id)
-                    },
-                    onAdd: {
-                        isFolderPickerOpen = true
                     }
-                )
-            } else {
-                FolderMembershipRow(
-                    memberFolders: [],
-                    onRemove: { _ in },
-                    onAdd: {
-                        library.requireProjectAccess()
-                    }
-                )
-            }
+                },
+                onAdd: openFolderPicker
+            )
         }
     }
 
@@ -547,13 +601,18 @@ struct ReaderView: View {
         noteSaveState = .idle
     }
 
-    private func toggleBookmark() {
+    private func openFolderPicker() {
+        pendingFolderIDs = Set(library.folderMembership[sectionID] ?? [])
+        isFolderPickerOpen = true
+    }
+
+    private func removeBookmarkAndFolderLinks() {
+        guard isBookmarked else { return }
         isBookmarked = library.toggleBookmark(sectionID: sectionID)
-        // If the bookmark was removed, the tag rows were deleted from disk —
-        // reflect that in the editor so the UI doesn't lie until next load.
         if !isBookmarked {
             sectionTags = []
             isTagComposerOpen = false
+            pendingFolderIDs = []
         }
     }
 
