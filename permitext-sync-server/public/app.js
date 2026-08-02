@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-recent-last-divider-v424";
+} from "./offline-storage.js?v=20260802-projects-open-v425";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -525,7 +525,9 @@ function newUtilityInstance(key, overrides = {}) {
     instance.codeFilters = normalizeSearchCodeFilters(overrides.codeFilters);
     instance.tagFilter = typeof overrides.tagFilter === "string" ? overrides.tagFilter.trim() : "";
     instance.sortMode = normalizeSavedSortMode(overrides.sortMode);
-    instance.projectsMenuOpen = Boolean(overrides.projectsMenuOpen);
+    instance.projectsMenuOpen = overrides.projectsMenuOpen === undefined
+      ? true
+      : Boolean(overrides.projectsMenuOpen);
     instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode);
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
     instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);

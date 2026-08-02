@@ -114,6 +114,7 @@ assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: n
 assert.match(stylesSource, /\.project-create-sheet\.is-reference-folder \.project-description-input \{[\s\S]*?min-height: calc\(126px \+ var\(--space-3\)\);[\s\S]*?max-height: 230px;/);
 assert.doesNotMatch(appSource, /typeLegend\.textContent = "Folder type"/);
 assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y="3"[\s\S]*?<rect x="14" y="14"/);
+assert.match(appSource, /instance\.projectsMenuOpen = overrides\.projectsMenuOpen === undefined[\s\S]*?\? true[\s\S]*?: Boolean\(overrides\.projectsMenuOpen\);/);
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(appSource, /const legacyCoordinationPaneWidth = 430;[\s\S]*?const defaultCoordinationPaneWidth = 600;/);
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
