@@ -9481,6 +9481,7 @@ body.is-resizing-research-evidence * {
   justify-self: end;
   color: var(--text-secondary);
   font-size: 8.75pt !important;
+  text-transform: none;
   white-space: nowrap;
 }
 

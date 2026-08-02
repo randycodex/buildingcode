@@ -80,10 +80,16 @@ assert.match(
   /if \(projectIsArchived\(project\)\) \{[\s\S]*?archivedLabel\.className = "settings-project-archive-label";[\s\S]*?archivedLabel\.textContent = "Archived";/,
   "Settings must mark only archived folders when active and archived folders share a name."
 );
+assert.match(
+  appSource,
+  /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,
+  "Open Settings must refresh immediately after a folder is archived, restored, or deleted elsewhere."
+);
 assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);
 assert.match(stylesSource, /\.saved-projects-menu\.is-open \.saved-project-list \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;/);
+assert.match(stylesSource, /\.settings-project-archive-label \{[\s\S]*?text-transform: none;/);
 
 assert.match(serverSource, /folder_type TEXT NOT NULL DEFAULT 'project'/);
 assert.match(serverSource, /referenceProjectIDs\.has\(projectID\)/);

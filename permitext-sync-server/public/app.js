@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-archived-label-v392";
+} from "./offline-storage.js?v=20260802-settings-folder-refresh-v394";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2784,8 +2784,9 @@ function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   return Array.from(new Set([
     ...savedPaneIDs(),
     ...researchPaneIDs,
+    state.utilities.settings ? "utility:settings" : "",
     ...additionalPaneIDs.filter(Boolean)
-  ]));
+  ].filter(Boolean)));
 }
 
 function refreshOpenProjectPaneTheme(project) {
