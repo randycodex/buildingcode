@@ -11233,7 +11233,8 @@ body.is-resizing-research-evidence * {
 }
 
 .notebook-toolbar .notebook-reference-option {
-  display: flex;
+  display: grid;
+  gap: 3px;
   align-items: flex-start;
   min-width: 0;
   min-height: 48px;
@@ -11249,6 +11250,24 @@ body.is-resizing-research-evidence * {
   overflow-wrap: anywhere;
   text-align: left;
   white-space: normal;
+}
+
+.notebook-reference-option strong,
+.notebook-reference-option small {
+  display: block;
+  min-width: 0;
+}
+
+.notebook-reference-option strong {
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 600;
+}
+
+.notebook-reference-option small {
+  color: var(--text-tertiary);
+  font-size: 10px;
+  line-height: 1.25;
 }
 
 .notebook-toolbar .notebook-reference-option:hover,

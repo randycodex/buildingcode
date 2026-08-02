@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-project-tool-order-v451";
+} from "./offline-storage.js?v=20260802-notebook-reference-menu-v452";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -13449,30 +13449,24 @@ function notebookReferenceCodeTitle(codePrefix = "BC") {
     .trim();
 }
 
-function notebookCanonicalReferenceLabel(savedItem, chapter) {
+function notebookCanonicalReferenceLabel(savedItem, chapter, resolvedSection = null) {
   const codePrefix = savedItem?.codePrefix || chapter?.codePrefix || "BC";
   const chapterNumber = String(savedItem?.chapterNumber || chapter?.chapterNumber || "").trim();
   const sectionNumber = String(savedItem?.sectionNumber || "").trim();
-  const section = (chapter?.sections || []).find((candidate) =>
+  const section = resolvedSection || (chapter?.sections || []).find((candidate) =>
     String(candidate.id) === String(savedItem?.sectionID) ||
     (sectionNumber && String(candidate.sectionNumber || "") === sectionNumber)
   );
-  const headerLine = String(section?.headerLine || "").trim();
-  const groupNumber = headerLine.match(/(?:SECTION\s+)?(?:[A-Z]+\s+)?([A-Z]?\d+[A-Z]?)\s*$/i)?.[1] ||
-    sectionNumber.match(/^([A-Z]?\d{3}[A-Z]?)/i)?.[1] || "";
-  const groupTitle = researchHierarchyLabel(section?.headingLine || "");
   const provisionTitle = sectionTitleWithoutNumber({
     sectionNumber,
     title: section?.title || savedItem?.title || ""
   }).replace(/[.\s]+$/, "");
-  const sectionGroup = groupNumber
-    ? `Section ${groupNumber}${groupTitle ? `: ${groupTitle}` : ""}`
-    : "";
-  const provision = [sectionNumber, provisionTitle].filter(Boolean).join(" ");
-  return [
-    chapterNumber ? `Chapter ${chapterNumber}` : "",
-    [sectionGroup, provision].filter(Boolean).join(", ")
-  ].filter(Boolean).join(" / ");
+  const citation = sectionNumber ? `§ ${sectionNumber}` : "Code section";
+  return {
+    label: [notebookReferenceCodeTitle(codePrefix), citation, provisionTitle].filter(Boolean).join(" · "),
+    title: [citation, provisionTitle].filter(Boolean).join(" · "),
+    meta: chapterNumber ? `Chapter ${chapterNumber}` : ""
+  };
 }
 
 function compareNotebookReferences(left, right) {
@@ -13516,28 +13510,48 @@ function notebookResearchAnswers(foundation) {
   );
 }
 
-async function notebookReferenceCandidates(projectID, foundation, cards) {
+async function notebookReferenceCandidates(project, foundation, cards) {
+  const identity = projectIdentity(project);
+  const projectID = projectDetailKey(identity);
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
   );
-  const savedItems = currentContentSummary().savedItems || [];
+  const summary = currentContentSummary();
+  const savedItems = summary.savedItems || [];
+  const savedBySectionID = new Map(savedItems.map((item) => [String(item.sectionID || item.id || ""), item]));
+  const currentProjectSections = (summary.projectSections || [])
+    .filter((item) => projectSectionBelongsToProject(item, identity));
+  const canonicalTargets = currentProjectSections.length
+    ? currentProjectSections.map((item) => ({
+        targetID: String(item.sectionID || item.savedSectionID || item.itemID || ""),
+        projectSection: item
+      }))
+    : activeLinks
+        .filter((link) => link.targetKind === "canonicalSection")
+        .map((link) => ({ targetID: String(link.targetID || ""), projectSection: null }));
   const references = [];
   const canonicalReferences = await Promise.all(
-    activeLinks.filter((link) => link.targetKind === "canonicalSection").map(async (link) => {
-      const savedItem = savedItems.find((item) => String(item.sectionID) === String(link.targetID));
-      const chapter = savedItem?.chapterID
-        ? await fetchChapter(savedItem.chapterID).catch(() => null)
-        : null;
-      const citation = savedItem
-        ? notebookCanonicalReferenceLabel(savedItem, chapter)
-        : `Code section ${link.targetID}`;
+    canonicalTargets.filter((target) => target.targetID).map(async (target) => {
+      const savedItem = savedBySectionID.get(target.targetID) || {};
+      const detail = {
+        codePrefix: savedItem.codePrefix || target.projectSection?.codePrefix || "BC",
+        chapterID: savedItem.chapterID || target.projectSection?.chapterID || "",
+        chapterNumber: savedItem.chapterNumber || target.projectSection?.chapterNumber || "",
+        sectionID: target.targetID,
+        sectionNumber: savedItem.sectionNumber || target.projectSection?.sectionNumber || "",
+        title: savedItem.title || target.projectSection?.title || "Section"
+      };
+      const resolved = await resolveSectionDetail(detail).catch(() => ({ chapter: null, section: null }));
+      const citation = notebookCanonicalReferenceLabel(detail, resolved.chapter, resolved.section);
       return {
         referenceKind: "canonicalSection",
-        referenceID: String(link.targetID),
-        label: citation,
-        codePrefix: savedItem?.codePrefix || chapter?.codePrefix || "BC",
-        chapterNumber: savedItem?.chapterNumber || chapter?.chapterNumber || "",
-        sectionNumber: savedItem?.sectionNumber || ""
+        referenceID: target.targetID,
+        label: citation.label,
+        displayTitle: citation.title,
+        displayMeta: citation.meta,
+        codePrefix: detail.codePrefix || resolved.chapter?.codePrefix || "BC",
+        chapterNumber: detail.chapterNumber || resolved.chapter?.chapterNumber || "",
+        sectionNumber: detail.sectionNumber || resolved.section?.sectionNumber || ""
       };
     })
   );
@@ -14103,7 +14117,7 @@ async function renderProjectNotebook(project) {
       referenceToggle.append(referenceLabel, referenceIcon);
       const referenceList = document.createElement("div");
       referenceList.className = "notebook-reference-list";
-      const candidates = (await notebookReferenceCandidates(projectID, foundation, cards))
+      const candidates = (await notebookReferenceCandidates(identity, foundation, cards))
         .filter((reference) =>
           reference.referenceKind !== "notebookCard" ||
           reference.referenceID !== activeCard.id
@@ -14121,7 +14135,18 @@ async function renderProjectNotebook(project) {
         option.className = "notebook-reference-option";
         option.type = "button";
         option.dataset.referenceIndex = String(index);
-        option.textContent = reference.label;
+        if (reference.displayTitle) {
+          const optionTitle = document.createElement("strong");
+          optionTitle.textContent = reference.displayTitle;
+          option.append(optionTitle);
+          if (reference.displayMeta) {
+            const optionMeta = document.createElement("small");
+            optionMeta.textContent = reference.displayMeta;
+            option.append(optionMeta);
+          }
+        } else {
+          option.textContent = reference.label;
+        }
         referenceList.append(option);
       });
       if (!candidates.length) {
