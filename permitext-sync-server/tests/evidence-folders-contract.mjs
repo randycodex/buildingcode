@@ -73,6 +73,7 @@ assert.match(
   "Clear All Bookmarks must tombstone both canonical saved records and every Project membership in one queued operation group."
 );
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
+assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 assert.match(appSource, /function renderSavedFolderContext\([\s\S]*?folderIsProject\(folder\)[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
 assert.match(appSource, /convert\.disabled = !hasCapability\("projects"\)/);
 assert.match(

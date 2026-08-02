@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-settings-scroll-v396";
+} from "./offline-storage.js?v=20260802-empty-archive-v397";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18354,12 +18354,12 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     clear(list);
     list.classList.toggle("is-showing-archive", showingArchived);
     if (!visibleProjects.length) {
-      const empty = document.createElement("p");
-      empty.className = "saved-projects-empty";
-      empty.textContent = showingArchived
-        ? "No archived folders."
-        : "No folders yet. Use + to create a Project or Reference folder.";
-      list.append(empty);
+      if (!showingArchived) {
+        const empty = document.createElement("p");
+        empty.className = "saved-projects-empty";
+        empty.textContent = "No folders yet. Use + to create a Project or Reference folder.";
+        list.append(empty);
+      }
       updateCodeFilterMenu(list, instance, {
         stateKey: "projectsMenuOpen",
         menuName: "folders",
