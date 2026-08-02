@@ -8608,6 +8608,10 @@ body.is-resizing-research-evidence * {
   gap: 0;
 }
 
+.project-sheet-field[hidden] {
+  display: none;
+}
+
 .project-folder-type {
   display: grid;
   gap: var(--space-2);

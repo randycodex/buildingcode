@@ -106,6 +106,10 @@ assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] 
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle \{[\s\S]*?padding-block: var\(--space-1\);/);
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed \{[\s\S]*?margin-top: 0;/);
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
+assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
+assert.match(appSource, /address: selectedFolderType === "reference" \? "" : addressInput\.value/);
+assert.doesNotMatch(appSource, /colorGroup\.hidden = selectedFolderType === "reference"/);
+assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: none;/);
 assert.doesNotMatch(appSource, /typeLegend\.textContent = "Folder type"/);
 assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y="3"[\s\S]*?<rect x="14" y="14"/);
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);

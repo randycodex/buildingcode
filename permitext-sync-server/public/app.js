@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-folder-type-card-v421";
+} from "./offline-storage.js?v=20260802-reference-address-v422";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -17494,7 +17494,6 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     descriptionInput.placeholder = selectedFolderType === "reference"
       ? "Reference notes: purpose, topic, or how this collection should be used"
       : "Project description, occupancy, construction type, height, existing conditions, proposed work, and relevant dates";
-    colorGroup.hidden = selectedFolderType === "reference";
   };
   [
     ["project", "Project", "A job, property, address, or professional matter"],
@@ -17581,7 +17580,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     try {
       const details = {
         name: nameInput.value,
-        address: addressInput.value,
+        address: selectedFolderType === "reference" ? "" : addressInput.value,
         color: selectedColor,
         description: descriptionInput.value,
         folderType: selectedFolderType
