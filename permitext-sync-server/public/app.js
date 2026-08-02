@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-coordination-width-v419";
+} from "./offline-storage.js?v=20260802-recently-viewed-gap-v420";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
