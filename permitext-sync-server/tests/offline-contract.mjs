@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-project-summary-case-v401"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-blocknotes-label-v402"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
 
 let activationCompletion;

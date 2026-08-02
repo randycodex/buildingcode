@@ -7894,6 +7894,11 @@ body.is-resizing-research-evidence * {
   min-width: 0;
 }
 
+.saved-folder-context.is-project .saved-project-blocknote .section-label {
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .saved-folder-context.is-project .saved-project-evidence-section > .section-label {
   margin: 0 0 var(--space-3);
 }

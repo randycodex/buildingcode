@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-project-summary-case-v401";
+} from "./offline-storage.js?v=20260802-blocknotes-label-v402";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18155,7 +18155,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     if (!panel.isConnected) return folder;
     if (activeAccount()) {
       appendProjectNotes(context, identity, foundation, {
-        title: "Project Blocknote",
+        title: "Blocknotes",
         className: "saved-project-blocknote"
       });
     } else {
@@ -18163,9 +18163,9 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       unavailable.className = "project-studio-section saved-project-blocknote";
       const title = document.createElement("p");
       title.className = "section-label";
-      title.textContent = "Project Blocknote";
+      title.textContent = "Blocknotes";
       const copy = document.createElement("p");
-      copy.textContent = "Sign in to load and edit the Project Blocknote.";
+      copy.textContent = "Sign in to load and edit Blocknotes.";
       unavailable.append(title, copy);
       context.append(unavailable);
     }
