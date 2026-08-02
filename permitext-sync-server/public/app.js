@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-notebook-reference-menu-v382";
+} from "./offline-storage.js?v=20260802-centered-settings-warning-v383";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -274,6 +274,7 @@ let pendingResearchSelection = null;
 let researchSelectionMenuInteracting = false;
 let researchSelectionMenuPinned = false;
 let activeWebWarningClose = null;
+const webWarningPositionCleanups = new WeakMap();
 let activeWorkspaceIssueAction = null;
 
 applyReaderSettings();
@@ -3420,10 +3421,34 @@ function mountWebWarningBackdrop(backdrop, container, previousFocus) {
   backdrop.classList.toggle("is-column-scoped", Boolean(warningContainer));
   warningContainer?.classList.add("has-web-warning");
   (warningContainer || document.body).append(backdrop);
+  if (warningContainer) {
+    const syncPosition = () => {
+      const bounds = warningContainer.getBoundingClientRect();
+      backdrop.style.inset = "auto";
+      backdrop.style.top = `${bounds.top}px`;
+      backdrop.style.left = `${bounds.left}px`;
+      backdrop.style.width = `${bounds.width}px`;
+      backdrop.style.height = `${bounds.height}px`;
+    };
+    const panelTrack = warningContainer.closest(".panel-track");
+    const positionObserver = new ResizeObserver(syncPosition);
+    positionObserver.observe(warningContainer);
+    if (panelTrack) positionObserver.observe(panelTrack);
+    window.addEventListener("resize", syncPosition);
+    panelTrack?.addEventListener("scroll", syncPosition, { passive: true });
+    webWarningPositionCleanups.set(backdrop, () => {
+      positionObserver.disconnect();
+      window.removeEventListener("resize", syncPosition);
+      panelTrack?.removeEventListener("scroll", syncPosition);
+    });
+    syncPosition();
+  }
   return warningContainer;
 }
 
 function unmountWebWarningBackdrop(backdrop, warningContainer) {
+  webWarningPositionCleanups.get(backdrop)?.();
+  webWarningPositionCleanups.delete(backdrop);
   backdrop.remove();
   if (!warningContainer?.querySelector(".web-warning-backdrop.is-column-scoped")) {
     warningContainer?.classList.remove("has-web-warning");

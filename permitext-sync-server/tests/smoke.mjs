@@ -1231,7 +1231,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-notebook-reference-menu-v382'),
+        webRoot.text.includes('/web/app.js?v=20260802-centered-settings-warning-v383'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1370,7 +1370,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-menu-v382'),
+        webRoot.text.includes('/web/styles.css?v=20260802-centered-settings-warning-v383'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1582,7 +1582,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-menu-v382'),
+        webRoot.text.includes('/web/styles.css?v=20260802-centered-settings-warning-v383'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2351,6 +2351,7 @@ async function main() {
     assert(
       workspaceStyles.text.includes(".web-warning-backdrop") &&
         workspaceStyles.text.includes(".web-warning-backdrop.is-column-scoped") &&
+        workspaceStyles.text.includes(".web-warning-backdrop.is-column-scoped {\n  position: fixed;") &&
         workspaceStyles.text.includes(".has-web-warning") &&
         workspaceStyles.text.includes("@container (max-width: 340px)") &&
         workspaceStyles.text.includes(".web-warning-dialog") &&
@@ -2361,7 +2362,11 @@ async function main() {
         workspaceStyles.text.includes("border-bottom: 1px solid var(--border);") &&
         workspaceStyles.text.includes(".web-warning-cancel") &&
         workspaceStyles.text.includes(".web-warning-confirm") &&
-        workspaceStyles.text.includes("background: #df6464;"),
+        workspaceStyles.text.includes("background: #df6464;") &&
+        workspaceScript.text.includes("const bounds = warningContainer.getBoundingClientRect();") &&
+        workspaceScript.text.includes('backdrop.style.top = `${bounds.top}px`;') &&
+        workspaceScript.text.includes('backdrop.style.height = `${bounds.height}px`;') &&
+        workspaceScript.text.includes("webWarningPositionCleanups.get(backdrop)?.();"),
       "Web warning-dialog proportions or action styling regressed."
     );
     assert(
