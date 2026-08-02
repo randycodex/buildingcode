@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-recently-viewed-gap-v420";
+} from "./offline-storage.js?v=20260802-folder-type-card-v421";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

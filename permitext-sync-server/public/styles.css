@@ -8629,14 +8629,16 @@ body.is-resizing-research-evidence * {
   padding: var(--space-3);
   border: 0;
   border-radius: var(--radius-control);
-  background: #f1f1f3;
-  color: #141416;
+  background: var(--menu-subtle-surface);
+  color: var(--text-primary);
+  box-shadow: none;
   text-align: left;
 }
 
 .project-folder-type button[aria-pressed="true"] {
-  background: #111113;
-  color: #ffffff;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-panel);
 }
 
 .project-folder-type button:focus-visible {
@@ -8645,12 +8647,12 @@ body.is-resizing-research-evidence * {
 }
 
 .project-folder-type button span {
-  color: #55555c;
+  color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.68) !important;
 }
 
 .project-folder-type button[aria-pressed="true"] span {
-  color: #c9c9ce;
+  color: var(--text-secondary);
 }
 
 .project-sheet-field span,

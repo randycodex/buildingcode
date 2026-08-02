@@ -101,8 +101,8 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-b
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research \.project-section-toggle-label \{[\s\S]*?font-size: inherit !important;[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
-assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: #f1f1f3;[\s\S]*?color: #141416;/);
-assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: #111113;[\s\S]*?color: #ffffff;/);
+assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: var\(--menu-subtle-surface\);[\s\S]*?color: var\(--text-primary\);[\s\S]*?box-shadow: none;/);
+assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: var\(--surface-raised\);[\s\S]*?color: var\(--text-primary\);[\s\S]*?box-shadow: var\(--shadow-panel\);/);
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle \{[\s\S]*?padding-block: var\(--space-1\);/);
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed \{[\s\S]*?margin-top: 0;/);
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
