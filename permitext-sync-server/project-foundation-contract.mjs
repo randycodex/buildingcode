@@ -120,6 +120,7 @@ export const activityActions = Object.freeze([
   "review-thread.created",
   "review-thread.revision.saved",
   "review-thread.status.changed",
+  "review-thread.assignee.changed",
   "review-comment.created",
   "report.generated",
   "report.export.saved",

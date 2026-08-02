@@ -135,6 +135,8 @@ import {
 } from "./enacted-code-content.mjs";
 import { constructionHTMLBodyForSection } from "./construction-html-content.mjs";
 import {
+  collaborationSchemaVersion,
+  latestReviewThreadUpdatedAt,
   normalizeProjectNotePayload,
   normalizeReviewCommentPayload,
   normalizeReviewThreadPayload
@@ -5853,8 +5855,29 @@ async function projectFoundationStateForStorageOwner(
   const links = (await listStoredProjectLinks(storageOwnerUserID))
     .filter((link) => !projectID || link.projectID === projectID);
   const linkedTargetIDs = new Set(links.filter((link) => !link.deletedAt).map((link) => link.targetID));
-  const artifacts = (await listStoredFoundationArtifacts(storageOwnerUserID))
+  const storedArtifacts = (await listStoredFoundationArtifacts(storageOwnerUserID))
     .filter((artifact) => !projectID || linkedTargetIDs.has(artifact.envelope?.id));
+  const commentsByThreadID = new Map();
+  storedArtifacts
+    .filter((artifact) => artifact.envelope?.type === "reviewComment")
+    .forEach((artifact) => {
+      const threadID = artifact.payload?.threadID;
+      if (!threadID) return;
+      const comments = commentsByThreadID.get(threadID) || [];
+      comments.push(artifact.payload);
+      commentsByThreadID.set(threadID, comments);
+    });
+  const artifacts = storedArtifacts.map((artifact) => {
+    if (artifact.envelope?.type !== "reviewThread") return artifact;
+    const updatedAt = latestReviewThreadUpdatedAt(
+      artifact.envelope.updatedAt,
+      commentsByThreadID.get(artifact.envelope.id) || []
+    );
+    return updatedAt === artifact.envelope.updatedAt ? artifact : {
+      ...artifact,
+      envelope: { ...artifact.envelope, updatedAt }
+    };
+  });
   const answers = (await listStoredResearchAnswers(storageOwnerUserID))
     .filter((answer) => !projectID || answer.projectID === projectID)
     .map((answer) => ({
@@ -5880,6 +5903,9 @@ async function projectFoundationStateForStorageOwner(
   const workboardPreview = projectID
     ? workboardPreviewSummary((await projectWorkboardPreviews(storageOwnerUserID, projectID))[0])
     : null;
+  const coordinationAssignees = projectID
+    ? await coordinationAssigneesForProject(storageOwnerUserID, projectID)
+    : [];
   return {
     schemaVersion: projectFoundationSchemaVersion,
     projects,
@@ -5888,9 +5914,45 @@ async function projectFoundationStateForStorageOwner(
     researchConversations,
     researchAnswers: answers,
     activity,
+    coordinationAssignees,
     workboardPreview,
     migrationCheckpoint: checkpoint
   };
+}
+
+async function coordinationAssigneesForProject(storageOwnerUserID, projectID) {
+  const ownership = await storedProjectOwnership(projectID);
+  let candidateUserIDs = [storageOwnerUserID];
+  if (ownership?.owner?.kind === "organization") {
+    const organizationID = ownership.owner.organizationID || ownership.owner.id;
+    const [organizationMemberships, projectMemberships] = await Promise.all([
+      listStoredOrganizationMemberships(organizationID),
+      listStoredProjectMemberships(projectID)
+    ]);
+    candidateUserIDs = [...organizationMemberships, ...projectMemberships]
+      .filter((membership) => membership?.status === "active")
+      .map((membership) => membership.userID);
+  }
+  const uniqueUserIDs = Array.from(new Set(candidateUserIDs.filter(Boolean)));
+  const accessibleUserIDs = [];
+  for (const userID of uniqueUserIDs) {
+    const access = await projectAccessForUser(userID, projectID);
+    if (access?.permissions.includes(organizationPermissions.projectView)) {
+      accessibleUserIDs.push(userID);
+    }
+  }
+  const accountStore = (await readStore()).users || {};
+  return accessibleUserIDs
+    .map((userID) => {
+      const account = accountStore[userID] || null;
+      return {
+        userID,
+        displayName: String(
+          account?.displayName || account?.publicUsername || "Project member"
+        ).trim()
+      };
+    })
+    .sort((left, right) => left.displayName.localeCompare(right.displayName));
 }
 
 async function handleProjectFoundationState(request, response) {
@@ -7187,13 +7249,40 @@ async function collaborationProjectAccess(context, response, permission) {
   return access;
 }
 
-async function reviewTargetExistsInProject(storageOwnerUserID, projectID, targetKind, targetID) {
+function reviewTargetSnapshot({ label, description = "", updatedAt = null }) {
+  return {
+    label: String(label || "Linked Project item").trim().slice(0, 240),
+    description: String(description || "").trim().slice(0, 2_000),
+    updatedAt: Number.isFinite(Date.parse(updatedAt || "")) ? updatedAt : null
+  };
+}
+
+async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, targetID) {
   const normalizedTargetID = String(targetID || "").trim();
-  if (targetKind === "project") return normalizedTargetID === projectID;
+  if (targetKind === "project") {
+    if (normalizedTargetID !== projectID) return null;
+    const project = await ownedProjectRecord(storageOwnerUserID, projectID);
+    return project ? {
+      target: project,
+      snapshot: reviewTargetSnapshot({
+        label: project.name || "Project information",
+        description: [project.address, project.description].filter(Boolean).join(" — "),
+        updatedAt: project.updatedAt
+      })
+    } : null;
+  }
   if (targetKind === "researchAnswer") {
-    return (await listStoredResearchAnswers(storageOwnerUserID)).some((answer) =>
-      answer.id === normalizedTargetID && answer.projectID === projectID
+    const answer = (await listStoredResearchAnswers(storageOwnerUserID)).find((candidate) =>
+      candidate.id === normalizedTargetID && candidate.projectID === projectID
     );
+    return answer ? {
+      target: answer,
+      snapshot: reviewTargetSnapshot({
+        label: answer.question || "Research answer",
+        description: answer.answer?.conclusion || "",
+        updatedAt: answer.createdAt
+      })
+    } : null;
   }
   const artifactTypeByTargetKind = {
     evidenceReview: "evidenceReview",
@@ -7201,15 +7290,29 @@ async function reviewTargetExistsInProject(storageOwnerUserID, projectID, target
     notebookCard: "notebookCard"
   };
   const artifactType = artifactTypeByTargetKind[targetKind];
-  return artifactType
-    ? Boolean(await linkedProjectArtifact(
-        storageOwnerUserID,
-        projectID,
-        targetKind,
-        artifactType,
-        normalizedTargetID
-      ))
-    : false;
+  if (!artifactType) return null;
+  const artifact = await linkedProjectArtifact(
+    storageOwnerUserID,
+    projectID,
+    targetKind,
+    artifactType,
+    normalizedTargetID
+  );
+  if (!artifact) return null;
+  const fallbackLabelByTargetKind = {
+    evidenceReview: "Evidence review",
+    reportDraft: "Report Draft",
+    notebookCard: "Notebook card"
+  };
+  return {
+    target: artifact,
+    snapshot: reviewTargetSnapshot({
+      label: artifact.payload?.title || fallbackLabelByTargetKind[targetKind],
+      description: artifact.payload?.note || artifact.payload?.plainText ||
+        artifact.payload?.introduction || "",
+      updatedAt: artifact.envelope?.updatedAt
+    })
+  };
 }
 
 async function handleProjectCollaborationNoteSave(request, response) {
@@ -7380,10 +7483,47 @@ async function handleProjectCollaborationThreadSave(request, response) {
     });
     return;
   }
+  if (requestedStatus === "dismissed" && existing?.payload.status !== "dismissed") {
+    sendJSON(response, 400, {
+      error: "Dismissed is a legacy coordination status and cannot be newly assigned.",
+      code: "INVALID_REVIEW_THREAD_STATUS"
+    });
+    return;
+  }
   const statusChanged = Boolean(existing && requestedStatus !== existing.payload.status);
-  const requiredPermission = statusChanged
+  const requestedAssigneeUserID = context.body.assigneeUserID === undefined
+    ? existing?.payload.assigneeUserID || null
+    : String(context.body.assigneeUserID || "").trim() || null;
+  const assigneeChanged = Boolean(
+    existing && requestedAssigneeUserID !== (existing.payload.assigneeUserID || null)
+  );
+  const requestedKind = context.body.kind || existing?.payload.kind;
+  const requestedTitle = context.body.title || existing?.payload.title;
+  const requestedBody = context.body.body ?? existing?.payload.body;
+  const requestedResolution = requestedStatus === "resolved"
+    ? context.body.resolution ?? existing?.payload.resolution
+    : null;
+  const resolutionChanged = Boolean(
+    existing && requestedStatus === "resolved" && existing.payload.status === "resolved" &&
+    String(requestedResolution || "").trim() !== String(existing.payload.resolution || "").trim()
+  );
+  const preserveLegacyResolvedWithoutResolution = Boolean(
+    existing &&
+    Number(existing.payload.schemaVersion || 1) < collaborationSchemaVersion &&
+    existing.payload.status === "resolved" &&
+    requestedStatus === "resolved" &&
+    !requestedResolution
+  );
+  const contentChanged = Boolean(existing && (
+    String(requestedKind || "").trim() !== String(existing.payload.kind || "").trim() ||
+    String(requestedTitle || "").trim() !== String(existing.payload.title || "").trim() ||
+    String(requestedBody || "").trim() !== String(existing.payload.body || "").trim()
+  ));
+  const requiredPermission = statusChanged || resolutionChanged
     ? organizationPermissions.projectReviewResolve
-    : organizationPermissions.projectReviewRequest;
+    : assigneeChanged && !contentChanged
+      ? organizationPermissions.projectReviewComment
+      : organizationPermissions.projectReviewRequest;
   if (!viewAccess.permissions.includes(requiredPermission)) {
     sendJSON(response, 403, {
       error: "Your Project role does not allow this action.",
@@ -7420,47 +7560,71 @@ async function handleProjectCollaborationThreadSave(request, response) {
     });
     return;
   }
-  if (!await reviewTargetExistsInProject(
+  const creationTarget = existing ? null : await reviewTargetInProject(
     viewAccess.storageOwnerUserID,
     projectID,
     targetKind,
     targetID
-  )) {
+  );
+  if (!existing && !creationTarget) {
     sendError(response, 404, "Review target not found in this Project.");
     return;
+  }
+  const linkedItemSnapshot = existing?.payload.linkedItemSnapshot ||
+    creationTarget?.snapshot || null;
+  if (requestedAssigneeUserID && (!existing || assigneeChanged)) {
+    const assigneeAccess = await projectAccessForUser(requestedAssigneeUserID, projectID);
+    if (!assigneeAccess?.permissions.includes(organizationPermissions.projectView)) {
+      sendJSON(response, 400, {
+        error: "The coordination assignee must have active access to this Project.",
+        code: "INVALID_REVIEW_ASSIGNEE"
+      });
+      return;
+    }
   }
   try {
     const now = new Date().toISOString();
     const threadID = existing?.envelope.id || randomUUID();
     const payload = normalizeReviewThreadPayload({
       projectID,
-      kind: context.body.kind || existing?.payload.kind,
+      kind: requestedKind,
       status: requestedStatus,
       targetKind,
       targetID,
-      title: context.body.title || existing?.payload.title,
-      body: context.body.body ?? existing?.payload.body,
+      linkedItemSnapshot,
+      title: requestedTitle,
+      body: requestedBody,
       createdByUserID: existing?.payload.createdByUserID || context.userID,
       updatedByUserID: context.userID,
       createdByDisplayName: existing?.payload.createdByDisplayName ||
         collaborationActorDisplayName(context),
       updatedByDisplayName: collaborationActorDisplayName(context),
-      resolvedByUserID: requestedStatus === "open"
+      assigneeUserID: requestedAssigneeUserID,
+      resolvedByUserID: requestedStatus !== "resolved" && requestedStatus !== "dismissed"
         ? null
-        : statusChanged
+        : statusChanged || resolutionChanged
           ? context.userID
           : existing?.payload.resolvedByUserID,
-      resolvedByDisplayName: requestedStatus === "open"
+      resolvedByDisplayName: requestedStatus !== "resolved" && requestedStatus !== "dismissed"
         ? ""
-        : statusChanged
+        : statusChanged || resolutionChanged
           ? collaborationActorDisplayName(context)
           : existing?.payload.resolvedByDisplayName,
-      resolvedAt: requestedStatus === "open"
+      resolvedAt: requestedStatus !== "resolved" && requestedStatus !== "dismissed"
         ? null
-        : statusChanged
+        : statusChanged || resolutionChanged
           ? now
-          : existing?.payload.resolvedAt
+          : existing?.payload.resolvedAt,
+      resolution: requestedStatus === "resolved"
+        ? requestedResolution
+        : null,
+      allowLegacyResolvedWithoutResolution: Boolean(
+        preserveLegacyResolvedWithoutResolution
+      )
     });
+    if (preserveLegacyResolvedWithoutResolution) {
+      payload.schemaVersion = Number(existing.payload.schemaVersion || 1);
+    }
     const artifact = {
       envelope: artifactEnvelope({
         id: threadID,
@@ -7494,27 +7658,79 @@ async function handleProjectCollaborationThreadSave(request, response) {
       });
       await saveStoredProjectLink(viewAccess.storageOwnerUserID, link);
     }
-    const event = activityEvent({
+    const sharedActivity = {
       owner: viewAccess.owner,
       projectID,
       actorUserID: context.userID,
-      action: existing
-        ? statusChanged
-          ? "review-thread.status.changed"
-          : "review-thread.revision.saved"
-        : "review-thread.created",
       objectKind: "reviewThread",
       objectID: threadID,
-      previousStatus: existing?.payload.status || null,
-      newStatus: payload.status,
-      createdAt: now,
-      metadata: { kind: payload.kind, targetKind, targetID }
-    });
-    await saveStoredActivityEvent(viewAccess.storageOwnerUserID, event);
+      createdAt: now
+    };
+    const sharedMetadata = {
+      threadID,
+      kind: payload.kind,
+      targetKind,
+      targetID,
+      assigneeUserID: payload.assigneeUserID,
+      resolution: payload.resolution
+    };
+    const activities = [];
+    if (!existing) {
+      activities.push(activityEvent({
+        ...sharedActivity,
+        action: "review-thread.created",
+        previousStatus: null,
+        newStatus: payload.status,
+        metadata: sharedMetadata
+      }));
+    } else {
+      if (statusChanged || resolutionChanged) {
+        activities.push(activityEvent({
+          ...sharedActivity,
+          action: "review-thread.status.changed",
+          previousStatus: existing.payload.status,
+          newStatus: payload.status,
+          metadata: {
+            ...sharedMetadata,
+            previousResolution: existing.payload.resolution || null
+          }
+        }));
+      }
+      if (assigneeChanged) {
+        activities.push(activityEvent({
+          ...sharedActivity,
+          action: "review-thread.assignee.changed",
+          previousStatus: existing.payload.status,
+          newStatus: payload.status,
+          metadata: {
+            ...sharedMetadata,
+            previousAssigneeUserID: existing.payload.assigneeUserID || null,
+            newAssigneeUserID: payload.assigneeUserID
+          }
+        }));
+      }
+      if (contentChanged || (!statusChanged && !resolutionChanged && !assigneeChanged)) {
+        activities.push(activityEvent({
+          ...sharedActivity,
+          action: "review-thread.revision.saved",
+          previousStatus: existing.payload.status,
+          newStatus: payload.status,
+          metadata: {
+            ...sharedMetadata,
+            previousVersion: existing.envelope.version,
+            newVersion: artifact.envelope.version
+          }
+        }));
+      }
+    }
+    for (const activity of activities) {
+      await saveStoredActivityEvent(viewAccess.storageOwnerUserID, activity);
+    }
     sendJSON(response, existing ? 200 : 201, {
       thread: collaborationArtifactForClient(artifact),
       link,
-      activity: event
+      activity: activities[0],
+      activities
     });
   } catch (error) {
     sendJSON(response, 400, {
@@ -7546,7 +7762,7 @@ async function handleProjectCollaborationCommentSave(request, response) {
     sendError(response, 404, "Project review thread not found.");
     return;
   }
-  if (thread.payload.status !== "open") {
+  if (thread.payload.status === "resolved" || thread.payload.status === "dismissed") {
     sendJSON(response, 409, {
       error: "Resolved or dismissed review threads cannot receive new comments.",
       code: "REVIEW_THREAD_CLOSED",

@@ -193,8 +193,8 @@ struct OrganizationProjectHubView: View {
             metric(value: "\(notebookCards.count)", label: "Notebook cards")
             metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Research answers")
             metric(
-                value: "\(reviewThreads.filter { $0.payload.status == "open" }.count)",
-                label: "Open reviews"
+                value: "\(reviewThreads.filter { ["open", "waiting"].contains($0.payload.status ?? "") }.count)",
+                label: "Active coordination"
             )
             metric(value: "\(reportFiles.count)", label: "Report exports")
         }
@@ -368,7 +368,7 @@ struct OrganizationProjectHubView: View {
     @ViewBuilder
     private var reviewCoordinationSection: some View {
         if !reviewThreads.isEmpty {
-            projectSection(title: "Review & coordination", systemImage: "person.2.badge.gearshape") {
+            projectSection(title: "Coordination", systemImage: "person.2.badge.gearshape") {
                 ForEach(reviewThreads) { thread in
                     VStack(alignment: .leading, spacing: 7) {
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
@@ -378,7 +378,7 @@ struct OrganizationProjectHubView: View {
                             Text(reviewStatusLabel(thread.payload.status))
                                 .font(.caption2.weight(.bold))
                                 .foregroundStyle(
-                                    thread.payload.status == "open" ? projectAccent : .secondary
+                                    ["open", "waiting"].contains(thread.payload.status ?? "") ? projectAccent : .secondary
                                 )
                         }
                         Text(
@@ -415,7 +415,7 @@ struct OrganizationProjectHubView: View {
                     }
                     .projectHubRow(accent: projectAccent)
                 }
-                Text("Create requests and respond on Permitext Web.")
+                Text("Manage Coordination on Permitext Web.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -568,7 +568,7 @@ struct OrganizationProjectHubView: View {
     private func reviewKindLabel(_ kind: String?) -> String {
         switch kind {
         case "revision-request": return "Revision request"
-        case "missing-project-fact": return "Missing Project fact"
+        case "missing-project-fact": return "Information request"
         case "general-review": return "General review"
         default: return "Project review"
         }
@@ -576,6 +576,7 @@ struct OrganizationProjectHubView: View {
 
     private func reviewStatusLabel(_ status: String?) -> String {
         switch status {
+        case "waiting": return "Waiting"
         case "resolved": return "Resolved"
         case "dismissed": return "Dismissed"
         default: return "Open"

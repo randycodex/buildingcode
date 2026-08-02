@@ -42,7 +42,7 @@ assert.equal(roleAllows(viewer.role, organizationPermissions.projectView), true)
 assert.equal(roleAllows(viewer.role, organizationPermissions.projectEdit), false);
 assert.equal(roleAllows("editor", organizationPermissions.projectNoteEdit), true);
 assert.equal(roleAllows("editor", organizationPermissions.projectReviewComment), true);
-assert.equal(roleAllows("editor", organizationPermissions.projectReviewRequest), false);
+assert.equal(roleAllows("editor", organizationPermissions.projectReviewRequest), true);
 assert.equal(roleAllows("reviewer", organizationPermissions.projectReviewRequest), true);
 assert.equal(roleAllows("reviewer", organizationPermissions.projectReviewResolve), true);
 assert.equal(roleAllows("viewer", organizationPermissions.projectReviewComment), false);

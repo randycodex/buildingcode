@@ -56,6 +56,7 @@ export const organizationRolePermissions = Object.freeze({
     organizationPermissions.projectEdit,
     organizationPermissions.projectNoteEdit,
     organizationPermissions.projectReviewComment,
+    organizationPermissions.projectReviewRequest,
     organizationPermissions.evidencePropose,
     organizationPermissions.reportDownload
   ]),

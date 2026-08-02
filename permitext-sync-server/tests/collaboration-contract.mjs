@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {
+  latestReviewThreadUpdatedAt,
   normalizeProjectNotePayload,
   normalizeReviewCommentPayload,
   normalizeReviewThreadPayload,
@@ -9,6 +10,14 @@ import {
 } from "../collaboration-contract.mjs";
 
 const createdAt = "2026-07-25T12:00:00.000Z";
+const responseCreatedAt = "2026-07-25T13:00:00.000Z";
+
+assert.equal(
+  latestReviewThreadUpdatedAt(createdAt, [{ createdAt: responseCreatedAt }]),
+  responseCreatedAt,
+  "A response must advance the displayed Coordination thread update date."
+);
+assert.equal(latestReviewThreadUpdatedAt(responseCreatedAt, [{ createdAt }]), responseCreatedAt);
 
 const note = normalizeProjectNotePayload({
   projectID: "project-1",
@@ -18,7 +27,7 @@ const note = normalizeProjectNotePayload({
   createdByDisplayName: "Alex Editor"
 });
 assert.equal(note.updatedByUserID, "editor-1");
-assert.equal(note.schemaVersion, 1);
+assert.equal(note.schemaVersion, 2);
 assert.equal(note.createdByDisplayName, "Alex Editor");
 
 const structuredNote = normalizeProjectNotePayload({
@@ -53,15 +62,56 @@ const request = normalizeReviewThreadPayload({
 });
 assert.equal(request.status, "open");
 assert.equal(request.resolvedAt, null);
+assert.equal(request.assigneeUserID, null);
+assert.equal(request.linkedItemSnapshot, null);
 
 const resolved = normalizeReviewThreadPayload({
   ...request,
   status: "resolved",
   resolvedByUserID: "reviewer-1",
-  resolvedAt: createdAt
+  resolvedAt: createdAt,
+  resolution: "Occupancy group B was confirmed from the approved drawings."
 });
 assert.equal(resolved.resolvedAt, createdAt);
 assert.equal(resolved.resolvedByUserID, "reviewer-1");
+assert.match(resolved.resolution, /confirmed/);
+
+const waiting = normalizeReviewThreadPayload({
+  ...request,
+  status: "waiting",
+  assigneeUserID: "editor-1",
+  linkedItemSnapshot: {
+    label: "Research answer: Egress review",
+    description: "Research conclusion based on selected evidence.",
+    updatedAt: createdAt
+  }
+});
+assert.equal(waiting.status, "waiting");
+assert.equal(waiting.assigneeUserID, "editor-1");
+assert.equal(waiting.resolvedAt, null);
+assert.equal(waiting.resolvedByUserID, null);
+assert.equal(waiting.linkedItemSnapshot.label, "Research answer: Egress review");
+
+const legacyDismissed = normalizeReviewThreadPayload({
+  ...request,
+  status: "dismissed",
+  resolvedByUserID: "reviewer-1",
+  resolvedAt: createdAt
+});
+assert.equal(legacyDismissed.status, "dismissed");
+assert.equal(legacyDismissed.resolution, null);
+
+const legacyResolved = normalizeReviewThreadPayload({
+  ...request,
+  status: "resolved",
+  resolvedByUserID: "reviewer-1",
+  resolvedAt: createdAt,
+  assigneeUserID: "inactive-historical-member",
+  allowLegacyResolvedWithoutResolution: true
+});
+assert.equal(legacyResolved.status, "resolved");
+assert.equal(legacyResolved.resolution, null);
+assert.equal(legacyResolved.assigneeUserID, "inactive-historical-member");
 
 const comment = normalizeReviewCommentPayload({
   projectID: "project-1",
@@ -79,7 +129,7 @@ assert.deepEqual(projectReviewKinds, [
   "revision-request",
   "missing-project-fact"
 ]);
-assert.deepEqual(projectReviewStatuses, ["open", "resolved", "dismissed"]);
+assert.deepEqual(projectReviewStatuses, ["open", "waiting", "resolved", "dismissed"]);
 assert.equal(projectReviewTargetKinds.includes("notebookCard"), true);
 assert.throws(
   () => normalizeReviewThreadPayload({
@@ -91,9 +141,18 @@ assert.throws(
 assert.throws(
   () => normalizeReviewThreadPayload({
     ...request,
-    status: "resolved"
+    status: "resolved",
+    resolvedByUserID: "reviewer-1",
+    resolvedAt: createdAt
   }),
-  /resolver/
+  /resolution statement/
+);
+assert.throws(
+  () => normalizeReviewThreadPayload({
+    ...request,
+    linkedItemSnapshot: ["untrusted", "shape"]
+  }),
+  /linked item snapshot/
 );
 assert.throws(
   () => normalizeReviewCommentPayload({

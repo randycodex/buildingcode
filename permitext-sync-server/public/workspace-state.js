@@ -19,6 +19,9 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "workboards",
   "notebooks",
   "reportDrafts",
+  "coordinations",
+  "coordinationThreads",
+  "coordinationFilters",
   "trackScrollLeft"
 ]);
 
@@ -61,6 +64,9 @@ export function emptyWorkspaceLayout() {
     workboards: [],
     notebooks: [],
     reportDrafts: [],
+    coordinations: [],
+    coordinationThreads: [],
+    coordinationFilters: {},
     trackScrollLeft: 0
   };
 }
@@ -114,6 +120,20 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.workboards = Array.isArray(source.workboards) ? copy(source.workboards) : [];
   layout.notebooks = Array.isArray(source.notebooks) ? copy(source.notebooks) : [];
   layout.reportDrafts = Array.isArray(source.reportDrafts) ? copy(source.reportDrafts) : [];
+  layout.coordinations = Array.isArray(source.coordinations) ? copy(source.coordinations) : [];
+  layout.coordinationThreads = Array.isArray(source.coordinationThreads)
+    ? copy(source.coordinationThreads.filter((thread) =>
+        thread && typeof thread === "object" && typeof thread.threadID === "string" && thread.threadID
+      ))
+    : [];
+  layout.coordinationFilters = source.coordinationFilters && typeof source.coordinationFilters === "object"
+    ? Object.fromEntries(
+        Object.entries(source.coordinationFilters)
+          .filter(([projectID, status]) =>
+            typeof projectID === "string" && ["open", "waiting", "resolved"].includes(status)
+          )
+      )
+    : {};
   layout.trackScrollLeft = Number.isFinite(Number(source.trackScrollLeft))
     ? Math.max(0, Number(source.trackScrollLeft))
     : 0;
@@ -146,6 +166,8 @@ export function workspaceLayoutHasVisiblePanes(value = {}) {
     layout.workboards.length ||
     layout.notebooks.length ||
     layout.reportDrafts.length ||
+    layout.coordinations.length ||
+    layout.coordinationThreads.length ||
     Object.values(layout.utilities).some(Boolean)
   );
 }

@@ -328,6 +328,16 @@ assert.equal(activityEvent({
   newStatus: "resolved",
   createdAt
 }).newStatus, "resolved");
+assert.equal(activityEvent({
+  owner,
+  projectID: "project-1",
+  actorUserID: "user-1",
+  action: "review-thread.assignee.changed",
+  objectKind: "reviewThread",
+  objectID: "thread-1",
+  createdAt,
+  metadata: { previousAssigneeUserID: null, assigneeUserID: "editor-1" }
+}).metadata.assigneeUserID, "editor-1");
 assert.throws(
   () => activityEvent({
     owner,

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260801-invisible-note-resize-v376";
+} from "./offline-storage.js?v=20260802-coordination-workspace-v378";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260731-multi-workspace-v1";
+} from "./workspace-state.js?v=20260802-coordination-workspace-v2";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -172,6 +172,8 @@ const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
 const defaultNotebookPaneWidth = 600;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
+const defaultCoordinationPaneWidth = 430;
+const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
@@ -259,6 +261,10 @@ let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
+const coordinationComposerDraftByProject = new Map();
+const pendingNotebookCardByProject = new Map();
+const pendingReportDraftByProject = new Map();
+const reportDraftFocusResultByProject = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
 let researchUsage = null;
@@ -330,6 +336,10 @@ function loadWorkspaceState() {
     const savedWorkboards = normalizeProjectIdentities(saved.workboards, saved.workboard);
     const savedNotebooks = normalizeProjectIdentities(saved.notebooks);
     const savedReportDrafts = normalizeProjectIdentities(saved.reportDrafts);
+    const savedCoordinations = normalizeProjectIdentities(saved.coordinations);
+    const savedCoordinationThreads = Array.isArray(saved.coordinationThreads)
+      ? saved.coordinationThreads.filter((thread) => thread && typeof thread === "object" && thread.threadID)
+      : [];
     const savedReaders = Array.isArray(saved.readers)
       ? saved.readers.filter((reader) => reader && typeof reader === "object" && !reader.comparisonManaged)
       : [];
@@ -397,6 +407,18 @@ function loadWorkspaceState() {
       reportDrafts: activeProjectDetail && savedReportDrafts.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
         : [],
+      coordinations: activeProjectDetail && savedCoordinations.some((item) => projectDetailMatches(activeProjectDetail, item))
+        ? [projectIdentity(activeProjectDetail)]
+        : [],
+      coordinationThreads: activeProjectDetail
+        ? savedCoordinationThreads
+          .filter((item) => projectDetailMatches(activeProjectDetail, item))
+          .slice(0, 1)
+          .map((item) => ({ ...projectIdentity(activeProjectDetail), threadID: String(item.threadID) }))
+        : [],
+      coordinationFilters: saved.coordinationFilters && typeof saved.coordinationFilters === "object"
+        ? saved.coordinationFilters
+        : {},
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards),
       trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0
     };
@@ -453,6 +475,9 @@ function loadWorkspaceState() {
       workboards: [],
       notebooks: [],
       reportDrafts: [],
+      coordinations: [],
+      coordinationThreads: [],
+      coordinationFilters: {},
       detachedWorkboards: [],
       trackScrollLeft: 0
     };
@@ -666,6 +691,8 @@ function workspaceTransitionPaneLabel(paneID) {
   if (paneID.startsWith("project:notebook:")) return "Notebook";
   if (paneID.startsWith("project:report-draft:")) return "Report draft";
   if (paneID.startsWith("project:workboard:")) return "Workboard";
+  if (paneID.startsWith("project:coordination-thread:")) return "Coordination thread";
+  if (paneID.startsWith("project:coordination:")) return "Coordination";
   if (paneID.startsWith("project:detail:")) return "Project";
   return "Workspace";
 }
@@ -1206,6 +1233,8 @@ function initializeDetachedProjectState(project) {
   state.workboards = [identity];
   state.notebooks = [];
   state.reportDrafts = [];
+  state.coordinations = [];
+  state.coordinationThreads = [];
   state.detachedWorkboards = [];
   state.utilityInstances = [];
   state.utilities = { projects: false, archive: false, search: false, saved: false, analysis: false, settings: false };
@@ -1237,6 +1266,18 @@ function openReportDrafts() {
   return state.reportDrafts;
 }
 
+function openCoordinations() {
+  state.coordinations = normalizeProjectIdentities(state.coordinations);
+  return state.coordinations;
+}
+
+function openCoordinationThreads() {
+  state.coordinationThreads = Array.isArray(state.coordinationThreads)
+    ? state.coordinationThreads.filter((thread) => thread && typeof thread === "object" && thread.threadID)
+    : [];
+  return state.coordinationThreads;
+}
+
 function detachedWorkboards() {
   state.detachedWorkboards = normalizeProjectIdentities(state.detachedWorkboards);
   return state.detachedWorkboards;
@@ -1252,6 +1293,14 @@ function projectHasOpenNotebook(project) {
 
 function projectHasOpenReportDraft(project) {
   return openReportDrafts().some((item) => projectDetailMatches(project, item));
+}
+
+function projectHasOpenCoordination(project) {
+  return openCoordinations().some((item) => projectDetailMatches(project, item));
+}
+
+function openCoordinationThreadForProject(project) {
+  return openCoordinationThreads().find((item) => projectDetailMatches(project, item)) || null;
 }
 
 function projectHasDetachedWorkboard(project) {
@@ -1409,6 +1458,81 @@ async function openProjectReportDraft(project) {
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
   scrollPaneIntoView(reportDraftID);
+  return true;
+}
+
+async function closeProjectCoordination(project) {
+  const coordinationID = paneIDForProjectCoordination(project);
+  const thread = openCoordinationThreadForProject(project);
+  const threadPaneID = thread ? paneIDForProjectCoordinationThread(project, thread.threadID) : "";
+  state.coordinations = openCoordinations().filter((item) => !projectDetailMatches(project, item));
+  state.coordinationThreads = openCoordinationThreads().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[coordinationID];
+  if (threadPaneID) delete state.paneWeights[threadPaneID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== coordinationID && id !== threadPaneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  return true;
+}
+
+async function openProjectCoordination(project, options = {}) {
+  const identity = projectIdentity(project);
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    const activated = await activateProjectStudio(identity, { openCoordination: true });
+    if (!activated) return false;
+  }
+  state.coordinations = [identity];
+  const coordinationID = paneIDForProjectCoordination(identity);
+  state.paneWeights[coordinationID] ||= defaultCoordinationPaneWidth;
+  placeProjectDetailAfterProjects(identity);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: [paneIDForProjectDetail(identity), coordinationID]
+  });
+  if (options.threadID) {
+    await openProjectCoordinationThread(identity, options.threadID);
+    return true;
+  }
+  scrollPaneIntoView(coordinationID);
+  return true;
+}
+
+async function closeProjectCoordinationThread(project) {
+  const thread = openCoordinationThreadForProject(project);
+  if (!thread) return true;
+  const paneID = paneIDForProjectCoordinationThread(project, thread.threadID);
+  state.coordinationThreads = openCoordinationThreads().filter((item) => !projectDetailMatches(project, item));
+  delete state.paneWeights[paneID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: [paneIDForProjectCoordination(project)]
+  });
+  return true;
+}
+
+async function openProjectCoordinationThread(project, threadID) {
+  const identity = projectIdentity(project);
+  if (!projectHasOpenCoordination(identity)) {
+    const opened = await openProjectCoordination(identity);
+    if (!opened) return false;
+  }
+  const previous = openCoordinationThreadForProject(identity);
+  const previousPaneID = previous
+    ? paneIDForProjectCoordinationThread(identity, previous.threadID)
+    : "";
+  const paneID = paneIDForProjectCoordinationThread(identity, threadID);
+  if (previousPaneID && previousPaneID !== paneID) {
+    delete state.paneWeights[previousPaneID];
+    state.paneOrder = (state.paneOrder || []).filter((id) => id !== previousPaneID);
+  }
+  state.coordinationThreads = [{ ...identity, threadID: String(threadID) }];
+  state.paneWeights[paneID] ||= defaultCoordinationThreadPaneWidth;
+  saveWorkspaceState();
+  await transitionWorkspace("utility", {
+    refreshPaneIDs: [paneIDForProjectCoordination(identity), paneID]
+  });
+  scrollPaneIntoView(paneID);
   return true;
 }
 
@@ -2105,6 +2229,23 @@ function isProjectReportDraftPaneID(paneID) {
   return String(paneID || "").startsWith("project:report-draft:");
 }
 
+function paneIDForProjectCoordination(detail = null) {
+  return `project:coordination:${encodeURIComponent(projectDetailKey(detail))}`;
+}
+
+function isProjectCoordinationPaneID(paneID) {
+  return String(paneID || "").startsWith("project:coordination:") &&
+    !String(paneID || "").startsWith("project:coordination-thread:");
+}
+
+function paneIDForProjectCoordinationThread(detail = null, threadID = "") {
+  return `project:coordination-thread:${encodeURIComponent(projectDetailKey(detail))}:${encodeURIComponent(String(threadID))}`;
+}
+
+function isProjectCoordinationThreadPaneID(paneID) {
+  return String(paneID || "").startsWith("project:coordination-thread:");
+}
+
 function openProjectDetails() {
   if (Array.isArray(state.projectDetails)) return state.projectDetails;
   return state.projectDetail ? [state.projectDetail] : [];
@@ -2168,26 +2309,44 @@ async function activateProjectStudio(project, options = {}) {
   const keepReportDraftOpen = current
     ? projectHasOpenReportDraft(current)
     : Boolean(options.openReportDraft);
+  const keepCoordinationOpen = current
+    ? projectHasOpenCoordination(current)
+    : Boolean(options.openCoordination);
+  const currentCoordinationThread = current ? openCoordinationThreadForProject(current) : null;
   const currentDetailID = current ? paneIDForProjectDetail(current) : "";
   const currentNotebookID = current ? paneIDForProjectNotebook(current) : "";
   const currentWorkboardID = current ? paneIDForProjectWorkboard(current) : "";
   const currentReportDraftID = current ? paneIDForProjectReportDraft(current) : "";
+  const currentCoordinationID = current ? paneIDForProjectCoordination(current) : "";
+  const currentCoordinationThreadID = currentCoordinationThread
+    ? paneIDForProjectCoordinationThread(current, currentCoordinationThread.threadID)
+    : "";
   const detailWidth = currentDetailID ? state.paneWeights[currentDetailID] : null;
   const notebookWidth = currentNotebookID ? state.paneWeights[currentNotebookID] : null;
   const workboardWidth = currentWorkboardID ? state.paneWeights[currentWorkboardID] : null;
   const reportDraftWidth = currentReportDraftID ? state.paneWeights[currentReportDraftID] : null;
+  const coordinationWidth = currentCoordinationID ? state.paneWeights[currentCoordinationID] : null;
 
   if (current) {
     clearProjectSpecificReaders(current);
     clearProjectSpecificResearch(current);
-    [currentDetailID, currentNotebookID, currentWorkboardID, currentReportDraftID].forEach((paneID) => {
+    [
+      currentDetailID,
+      currentNotebookID,
+      currentWorkboardID,
+      currentReportDraftID,
+      currentCoordinationID,
+      currentCoordinationThreadID
+    ].forEach((paneID) => {
       delete state.paneWeights[paneID];
     });
     state.paneOrder = (state.paneOrder || []).filter((paneID) =>
       paneID !== currentDetailID &&
       paneID !== currentNotebookID &&
       paneID !== currentWorkboardID &&
-      paneID !== currentReportDraftID
+      paneID !== currentReportDraftID &&
+      paneID !== currentCoordinationID &&
+      paneID !== currentCoordinationThreadID
     );
   }
 
@@ -2195,10 +2354,13 @@ async function activateProjectStudio(project, options = {}) {
   state.notebooks = keepNotebookOpen ? [identity] : [];
   state.workboards = keepWorkboardOpen ? [identity] : [];
   state.reportDrafts = keepReportDraftOpen ? [identity] : [];
+  state.coordinations = keepCoordinationOpen ? [identity] : [];
+  state.coordinationThreads = [];
   const detailID = paneIDForProjectDetail(identity);
   const notebookID = paneIDForProjectNotebook(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
   const reportDraftID = paneIDForProjectReportDraft(identity);
+  const coordinationID = paneIDForProjectCoordination(identity);
   state.paneWeights[detailID] = Number(detailWidth) > 40 ? detailWidth : defaultDetailPaneWidth;
   if (keepNotebookOpen) {
     state.paneWeights[notebookID] = Number(notebookWidth) > 40 ? notebookWidth : defaultNotebookPaneWidth;
@@ -2210,6 +2372,11 @@ async function activateProjectStudio(project, options = {}) {
     state.paneWeights[reportDraftID] = Number(reportDraftWidth) > 40
       ? reportDraftWidth
       : defaultReportDraftPaneWidth;
+  }
+  if (keepCoordinationOpen) {
+    state.paneWeights[coordinationID] = Number(coordinationWidth) > 40
+      ? coordinationWidth
+      : defaultCoordinationPaneWidth;
   }
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
   restoreProjectsStackOrder(options.sourcePaneID);
@@ -2228,6 +2395,8 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
+  if (isProjectCoordinationThreadPaneID(paneID)) return defaultCoordinationThreadPaneWidth;
+  if (isProjectCoordinationPaneID(paneID)) return defaultCoordinationPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth;
   if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
@@ -2253,6 +2422,8 @@ function isFixedWidthPaneID(paneID) {
     isProjectWorkboardPaneID(paneID) ||
     isProjectNotebookPaneID(paneID) ||
     isProjectReportDraftPaneID(paneID) ||
+    isProjectCoordinationPaneID(paneID) ||
+    isProjectCoordinationThreadPaneID(paneID) ||
     paneID?.startsWith("section:detail:");
 }
 
@@ -2345,6 +2516,11 @@ function defaultActivePaneIDs() {
     ids.push(paneIDForProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
+    if (projectHasOpenCoordination(detail)) {
+      ids.push(paneIDForProjectCoordination(detail));
+      const thread = openCoordinationThreadForProject(detail);
+      if (thread) ids.push(paneIDForProjectCoordinationThread(detail, thread.threadID));
+    }
     if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
   });
   if (state.utilities.archive) ids.push("utility:archive");
@@ -2366,6 +2542,10 @@ function projectWorkspacePaneIDs(detail) {
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
+    ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
+    ...(openCoordinationThreadForProject(detail)
+      ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
+      : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ];
 }
@@ -2382,6 +2562,8 @@ function activePaneIDs() {
     !isProjectDetailPaneID(id) &&
     !isProjectNotebookPaneID(id) &&
     !isProjectReportDraftPaneID(id) &&
+    !isProjectCoordinationPaneID(id) &&
+    !isProjectCoordinationThreadPaneID(id) &&
     !isProjectWorkboardPaneID(id)
   );
   if (openProjectDetails().length) {
@@ -2596,6 +2778,10 @@ function refreshOpenProjectPaneTheme(project) {
     paneIDForProjectDetail(identity),
     paneIDForProjectNotebook(identity),
     paneIDForProjectReportDraft(identity),
+    paneIDForProjectCoordination(identity),
+    ...(openCoordinationThreadForProject(identity)
+      ? [paneIDForProjectCoordinationThread(identity, openCoordinationThreadForProject(identity).threadID)]
+      : []),
     paneIDForProjectWorkboard(identity)
   ].forEach((paneID) => {
     track
@@ -2647,6 +2833,10 @@ function placeArchiveAfterProjectsStack() {
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
+    ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
+    ...(openCoordinationThreadForProject(detail)
+      ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
+      : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
@@ -2662,6 +2852,10 @@ function restoreProjectsStackOrder(sourcePaneID = "") {
     paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
+    ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
+    ...(openCoordinationThreadForProject(detail)
+      ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
+      : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ]);
   const archiveID = "utility:archive";
@@ -13461,7 +13655,25 @@ async function renderProjectNotebook(project) {
       researchButton.textContent = "Start Research";
       researchButton.title = "Use this card as the starting point for a new evidence-selected Research question";
       researchButton.hidden = notebookReadOnly;
-      footerActions.append(researchButton);
+      const coordinateButton = document.createElement("button");
+      coordinateButton.className = "notebook-secondary-action";
+      coordinateButton.type = "button";
+      coordinateButton.textContent = "Coordinate";
+      coordinateButton.title = activeCard.id
+        ? "Open a coordination item linked to this Notebook card"
+        : "Save this card before opening a coordination item";
+      coordinateButton.disabled = !activeCard.id;
+      coordinateButton.hidden = !projectCollaborationAccess(identity, "project.review.request");
+      coordinateButton.addEventListener("click", () => {
+        void openCoordinationComposer({
+          projectID,
+          type: "revision-request",
+          targetKind: "notebookCard",
+          targetID: activeCard.id,
+          snapshot: { label: `Notebook: ${activeCard.title || "Untitled card"}` }
+        });
+      });
+      footerActions.append(researchButton, coordinateButton);
       footer.append(footerActions);
       focus.append(fields, toolbar, editorElement, footer);
 
@@ -13568,7 +13780,10 @@ async function renderProjectNotebook(project) {
       renderCardList();
       await renderFocusedCard();
     } else if (cards[0]) {
-      await loadCard(cards[0].id);
+      const pendingCardID = pendingNotebookCardByProject.get(projectID);
+      const initialCard = cards.find((card) => card.id === pendingCardID) || cards[0];
+      pendingNotebookCardByProject.delete(projectID);
+      await loadCard(initialCard.id);
     } else {
       await renderFocusedCard();
     }
@@ -14315,7 +14530,24 @@ async function renderProjectReportDraft(project) {
     generate.addEventListener("click", () => {
       void generateReport();
     });
-    primaryActions.append(save, generate);
+    const coordinate = document.createElement("button");
+    coordinate.type = "button";
+    coordinate.textContent = "Coordinate";
+    coordinate.disabled = !activeDraft.id;
+    coordinate.title = activeDraft.id
+      ? "Open a coordination item linked to this Report Draft"
+      : "Save this draft before opening a coordination item";
+    coordinate.hidden = !projectCollaborationAccess(identity, "project.review.request");
+    coordinate.addEventListener("click", () => {
+      void openCoordinationComposer({
+        projectID,
+        type: "revision-request",
+        targetKind: "reportDraft",
+        targetID: activeDraft.id,
+        snapshot: { label: `Report Draft: ${activeDraft.title || "Untitled Report"}` }
+      });
+    });
+    primaryActions.append(save, generate, coordinate);
 
     const preview = document.createElement("section");
     preview.className = "report-draft-preview";
@@ -14372,7 +14604,17 @@ async function renderProjectReportDraft(project) {
     selectedReportTemplateID = optionsPayload.defaultReportTemplateID ||
       optionsPayload.templates?.[0]?.id ||
       "permitext-standard";
-    activeDraft = drafts[0] ? structuredClone(drafts[0]) : emptyProjectReportDraft(identity);
+    const pendingDraftID = pendingReportDraftByProject.get(projectID);
+    const exactDraft = pendingDraftID ? drafts.find((draft) => draft.id === pendingDraftID) : null;
+    const requestedDraft = exactDraft || drafts[0];
+    if (pendingDraftID) {
+      reportDraftFocusResultByProject.set(projectID, {
+        threadTargetID: pendingDraftID,
+        focused: Boolean(exactDraft)
+      });
+    }
+    pendingReportDraftByProject.delete(projectID);
+    activeDraft = requestedDraft ? structuredClone(requestedDraft) : emptyProjectReportDraft(identity);
     status.textContent = activeDraft.id ? `Loaded revision ${activeDraft.version}` : "New Report Draft";
     renderWorkspaceContent();
   } catch (error) {
@@ -14392,21 +14634,32 @@ function closeProjectDetailForProject(project) {
     const workboardID = paneIDForProjectWorkboard(detail);
     const notebookID = paneIDForProjectNotebook(detail);
     const reportDraftID = paneIDForProjectReportDraft(detail);
+    const coordinationID = paneIDForProjectCoordination(detail);
+    const coordinationThread = openCoordinationThreadForProject(detail);
+    const coordinationThreadID = coordinationThread
+      ? paneIDForProjectCoordinationThread(detail, coordinationThread.threadID)
+      : "";
     delete state.paneWeights[detailID];
     delete state.paneWeights[workboardID];
     delete state.paneWeights[notebookID];
     delete state.paneWeights[reportDraftID];
+    delete state.paneWeights[coordinationID];
+    if (coordinationThreadID) delete state.paneWeights[coordinationThreadID];
     state.paneOrder = (state.paneOrder || [])
       .filter((id) =>
         id !== detailID &&
         id !== workboardID &&
         id !== notebookID &&
-        id !== reportDraftID
+        id !== reportDraftID &&
+        id !== coordinationID &&
+        id !== coordinationThreadID
       );
   });
   state.workboards = openWorkboards().filter((item) => !projectDetailMatches(project, item));
   state.notebooks = openNotebooks().filter((item) => !projectDetailMatches(project, item));
   state.reportDrafts = openReportDrafts().filter((item) => !projectDetailMatches(project, item));
+  state.coordinations = openCoordinations().filter((item) => !projectDetailMatches(project, item));
+  state.coordinationThreads = openCoordinationThreads().filter((item) => !projectDetailMatches(project, item));
 }
 
 function closeDeletedProjectDetails() {
@@ -14612,6 +14865,11 @@ function projectActivityLabel(event) {
     "research.answer.generated": "Research answer generated",
     "research.project-context.reviewed": "Project context reviewed",
     "review-status.changed": "Review status changed",
+    "review-thread.created": "Coordination item opened",
+    "review-thread.revision.saved": "Coordination item updated",
+    "review-thread.status.changed": "Coordination status changed",
+    "review-thread.assignee.changed": "Coordination assignee changed",
+    "review-comment.created": "Coordination response added",
     "report.generated": "Report generated",
     "report.export.saved": "Report export saved",
     "project.transferred": "Project transferred to firm",
@@ -14792,6 +15050,7 @@ function appendProjectResearchHistory(content, identity, foundation) {
     answers.slice(0, 8).forEach((answer) => {
       const card = document.createElement(identity.sharedOnly ? "article" : "button");
       card.className = "project-research-history-card";
+      card.dataset.researchAnswerId = answer.id;
       if (!identity.sharedOnly) card.type = "button";
       const question = document.createElement("strong");
       question.textContent = answer.question || "Research answer";
@@ -14870,6 +15129,8 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
     const review = reviewsByAnswerID.get(answer.id);
     const row = document.createElement("article");
     row.className = "project-evidence-review";
+    if (review?.id) row.dataset.evidenceReviewId = review.id;
+    row.dataset.researchAnswerId = answer.id;
     const copy = document.createElement("div");
     const question = document.createElement("strong");
     question.textContent = answer.question || "Research answer";
@@ -14924,6 +15185,21 @@ function appendProjectEvidenceReviews(content, identity, foundation) {
         );
       });
       actions.append(propose);
+    }
+    if (projectCollaborationAccess(identity, "project.review.request")) {
+      const coordinate = document.createElement("button");
+      coordinate.type = "button";
+      coordinate.textContent = "Coordinate";
+      coordinate.addEventListener("click", () => {
+        void openCoordinationComposer({
+          projectID: projectDetailKey(identity),
+          type: review?.status === "changes-requested" ? "revision-request" : "missing-project-fact",
+          targetKind: review ? "evidenceReview" : "researchAnswer",
+          targetID: review?.id || answer.id,
+          snapshot: { label: `Evidence review: ${answer.question || "Research answer"}` }
+        });
+      });
+      actions.append(coordinate);
     }
     if (canReview && review) {
       if (review.status !== "approved") {
@@ -14991,8 +15267,13 @@ function projectCollaborationAccess(identity, permission) {
 }
 
 function projectCollaborationRefresh(identity) {
+  const thread = openCoordinationThreadForProject(identity);
   return transitionWorkspace("utility", {
-    refreshPaneIDs: [paneIDForProjectDetail(identity)]
+    refreshPaneIDs: [
+      paneIDForProjectDetail(identity),
+      ...(projectHasOpenCoordination(identity) ? [paneIDForProjectCoordination(identity)] : []),
+      ...(thread ? [paneIDForProjectCoordinationThread(identity, thread.threadID)] : [])
+    ]
   });
 }
 
@@ -15193,17 +15474,10 @@ function appendProjectNotes(content, identity, foundation) {
   content.append(section);
 }
 
-function projectReviewKindLabel(kind) {
-  return {
-    "general-review": "General review",
-    "revision-request": "Revision request",
-    "missing-project-fact": "Missing Project fact"
-  }[kind] || "Project review";
-}
-
 function projectReviewStatusLabel(status) {
   return {
     open: "Open",
+    waiting: "Waiting",
     resolved: "Resolved",
     dismissed: "Dismissed"
   }[status] || "Open";
@@ -15238,42 +15512,163 @@ function projectReviewTargets(identity, foundation) {
   return targets;
 }
 
-function projectReviewThreadEditor(identity, foundation, kind, onCancel) {
+function coordinationThreadStatus(thread) {
+  return thread?.status === "waiting"
+    ? "waiting"
+    : ["resolved", "dismissed"].includes(thread?.status) ? "resolved" : "open";
+}
+
+function coordinationThreadTypeLabel(kind) {
+  return kind === "missing-project-fact"
+    ? "Information Request"
+    : kind === "revision-request" ? "Revision Request" : "Review Request";
+}
+
+function coordinationTargetLabel(thread, identity, foundation) {
+  if (thread?.linkedItemSnapshot?.label) return thread.linkedItemSnapshot.label;
+  return projectReviewTargets(identity, foundation)
+    .find((target) => target.kind === thread?.targetKind && String(target.id) === String(thread?.targetID))
+    ?.label || String(thread?.targetKind || "Project").replaceAll(/([a-z])([A-Z])/g, "$1 $2");
+}
+
+function coordinationAssigneeLabel(thread, foundation) {
+  if (!thread?.assigneeUserID) return "Unassigned";
+  return thread.assigneeDisplayName || (foundation?.coordinationAssignees || [])
+    .find((assignee) => assignee.userID === thread.assigneeUserID)?.displayName ||
+    (thread.assigneeUserID === activeAccount()?.userID ? "You" : thread.assigneeUserID);
+}
+
+function coordinationActivityActor(event, foundation) {
+  const actorUserID = String(event?.actorUserID || "");
+  return String(event?.actorDisplayName || "").trim() ||
+    (foundation?.coordinationAssignees || [])
+      .find((assignee) => assignee.userID === actorUserID)?.displayName ||
+    (actorUserID === activeAccount()?.userID ? "You" : actorUserID) ||
+    "Permitext professional";
+}
+
+function coordinationCommentsByThread(foundation) {
+  const grouped = new Map();
+  projectCollaborationArtifacts(foundation, "reviewComment")
+    .reverse()
+    .forEach((comment) => {
+      const items = grouped.get(comment.threadID) || [];
+      items.push(comment);
+      grouped.set(comment.threadID, items);
+    });
+  return grouped;
+}
+
+async function loadProjectCoordinationFoundation(identity) {
+  if (!activeAccount()) return { foundation: null, error: "Sign in to use Project Coordination." };
+  try {
+    if (identity.sharedOrganizationID) {
+      const payload = await postResearch("/organizations/projects/snapshot", {
+        projectID: projectDetailKey(identity)
+      });
+      identity.sharedRole = payload.access?.role || identity.sharedRole;
+      identity.sharedPermissions = payload.access?.permissions || identity.sharedPermissions;
+      return { foundation: payload.project, error: "" };
+    }
+    return {
+      foundation: await postResearch("/projects/foundation/state", {
+        projectID: projectDetailKey(identity)
+      }),
+      error: ""
+    };
+  } catch (error) {
+    return { foundation: null, error: error.message || "Coordination is temporarily unavailable." };
+  }
+}
+
+function coordinationComposer(identity, foundation, preset = {}) {
   const form = document.createElement("form");
-  form.className = "project-collaboration-editor project-review-editor";
-  const title = document.createElement("input");
-  title.type = "text";
-  title.maxLength = 200;
-  title.required = true;
-  title.placeholder = kind === "missing-project-fact"
-    ? "What Project fact is missing?"
-    : "What needs revision?";
-  title.setAttribute("aria-label", "Review request title");
-  const body = document.createElement("textarea");
-  body.maxLength = 20000;
-  body.rows = 4;
-  body.placeholder = "Explain what is needed and why.";
-  body.setAttribute("aria-label", "Review request details");
+  form.className = "coordination-composer project-collaboration-editor";
+  const heading = document.createElement("div");
+  heading.className = "coordination-composer-heading";
+  const headingTitle = document.createElement("strong");
+  headingTitle.textContent = "New coordination item";
+  const dismiss = document.createElement("button");
+  dismiss.type = "button";
+  dismiss.textContent = "Cancel";
+  heading.append(headingTitle, dismiss);
+
+  const kind = document.createElement("select");
+  kind.setAttribute("aria-label", "Coordination type");
+  [
+    ["revision-request", "Revision Request"],
+    ["missing-project-fact", "Information Request"]
+  ].forEach(([value, label]) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = label;
+    option.selected = value === (preset.kind || "revision-request");
+    kind.append(option);
+  });
+
   const target = document.createElement("select");
-  target.setAttribute("aria-label", "Project item to review");
-  projectReviewTargets(identity, foundation).forEach((item) => {
+  target.setAttribute("aria-label", "Linked Project item");
+  const targets = projectReviewTargets(identity, foundation);
+  if (preset.targetKind && preset.targetID && !targets.some((item) =>
+    item.kind === preset.targetKind && String(item.id) === String(preset.targetID)
+  )) {
+    targets.unshift({
+      kind: preset.targetKind,
+      id: preset.targetID,
+      label: preset.snapshot?.label || "Linked Project item"
+    });
+  }
+  targets.forEach((item) => {
     const option = document.createElement("option");
     option.value = item.id;
     option.dataset.targetKind = item.kind;
     option.textContent = item.label;
+    option.selected = item.kind === preset.targetKind && String(item.id) === String(preset.targetID);
     target.append(option);
   });
+
+  const assignee = document.createElement("select");
+  assignee.setAttribute("aria-label", "Assignee");
+  const unassigned = document.createElement("option");
+  unassigned.value = "";
+  unassigned.textContent = "Unassigned";
+  assignee.append(unassigned);
+  (foundation?.coordinationAssignees || []).forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.userID;
+    option.textContent = item.displayName || item.userID;
+    option.selected = item.userID === preset.assigneeUserID;
+    assignee.append(option);
+  });
+
+  const title = document.createElement("input");
+  title.type = "text";
+  title.required = true;
+  title.maxLength = 200;
+  title.placeholder = "What needs attention?";
+  title.setAttribute("aria-label", "Coordination title");
+  title.value = preset.title || "";
+  const body = document.createElement("textarea");
+  body.rows = 5;
+  body.maxLength = 20_000;
+  body.placeholder = "Describe the question, missing information, or required revision.";
+  body.setAttribute("aria-label", "Coordination request");
+  body.value = preset.body || "";
   const actions = document.createElement("div");
   actions.className = "project-collaboration-editor-actions";
-  const cancel = document.createElement("button");
-  cancel.type = "button";
-  cancel.textContent = "Cancel";
-  cancel.addEventListener("click", onCancel);
   const save = document.createElement("button");
   save.type = "submit";
-  save.textContent = "Open request";
-  actions.append(cancel, save);
-  form.append(target, title, body, actions);
+  save.textContent = "Open item";
+  actions.append(save);
+  form.append(heading, kind, target, assignee, title, body, actions);
+
+  const closeComposer = async () => {
+    coordinationComposerDraftByProject.delete(projectDetailKey(identity));
+    await transitionWorkspace("utility", {
+      refreshPaneIDs: [paneIDForProjectCoordination(identity)]
+    });
+  };
+  dismiss.addEventListener("click", () => void closeComposer());
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const selected = target.selectedOptions[0];
@@ -15281,57 +15676,263 @@ function projectReviewThreadEditor(identity, foundation, kind, onCancel) {
       control.disabled = true;
     });
     try {
-      await postResearch("/projects/collaboration/threads/save", {
+      const payload = await postResearch("/projects/collaboration/threads/save", {
         projectID: projectDetailKey(identity),
         expectedVersion: 0,
-        kind,
+        kind: kind.value,
         status: "open",
         targetKind: selected?.dataset.targetKind || "project",
         targetID: selected?.value || projectDetailKey(identity),
         title: title.value,
-        body: body.value
+        body: body.value,
+        assigneeUserID: assignee.value || null
       });
-      await projectCollaborationRefresh(identity);
+      coordinationComposerDraftByProject.delete(projectDetailKey(identity));
+      await openProjectCoordinationThread(identity, payload.thread.id);
     } catch (error) {
       form.querySelectorAll("button, input, textarea, select").forEach((control) => {
         control.disabled = false;
       });
-      await showWebNotice("Review request not saved", error.message);
+      await showWebNotice("Coordination item not saved", error.message);
     }
   });
+  requestAnimationFrame(() => title.focus());
   return form;
 }
 
-function appendProjectReviewThreads(content, identity, foundation) {
-  const threads = projectCollaborationArtifacts(foundation, "reviewThread");
-  const comments = projectCollaborationArtifacts(foundation, "reviewComment");
-  const commentsByThreadID = new Map();
-  comments.reverse().forEach((comment) => {
-    const items = commentsByThreadID.get(comment.threadID) || [];
-    items.push(comment);
-    commentsByThreadID.set(comment.threadID, items);
+async function openCoordinationComposer(options = {}) {
+  const projectID = String(options.projectID || "");
+  const project = openProjectDetails().find((item) => projectDetailKey(item) === projectID) ||
+    visibleProjectRecords(currentContentSummary().projects || [])
+      .find((item) => projectDetailKey(item) === projectID);
+  if (!project) throw new Error("Open the Project before creating a coordination item.");
+  const identity = projectIdentity(project);
+  coordinationComposerDraftByProject.set(projectDetailKey(identity), {
+    kind: options.type || options.kind || "revision-request",
+    targetKind: options.targetKind || "project",
+    targetID: options.targetID || projectDetailKey(identity),
+    snapshot: options.snapshot || options.linkedItemSnapshot || null,
+    title: options.title || "",
+    body: options.body || "",
+    assigneeUserID: options.assigneeUserID || ""
   });
-  const canRequest = projectCollaborationAccess(identity, "project.review.request");
-  const canComment = projectCollaborationAccess(identity, "project.review.comment");
-  const canResolve = projectCollaborationAccess(identity, "project.review.resolve");
-  let setReviewExpanded = () => {};
-  if (!threads.length && !canRequest) return;
+  await openProjectCoordination(identity);
+  return true;
+}
 
+window.PermitextCoordination = Object.freeze({
+  openComposer: openCoordinationComposer,
+  openThread: ({ projectID, threadID }) => {
+    const project = openProjectDetails().find((item) => projectDetailKey(item) === String(projectID || ""));
+    if (!project) throw new Error("Open the Project before opening its coordination thread.");
+    return openProjectCoordinationThread(project, threadID);
+  }
+});
+
+function appendProjectCoordinationSummary(content, identity, foundation) {
+  const threads = projectCollaborationArtifacts(foundation, "reviewThread");
+  const openCount = threads.filter((thread) => coordinationThreadStatus(thread) === "open").length;
+  const waitingCount = threads.filter((thread) => coordinationThreadStatus(thread) === "waiting").length;
+  const resolvedCount = threads.filter((thread) => coordinationThreadStatus(thread) === "resolved").length;
+  if (!threads.length) return;
   const section = document.createElement("section");
-  section.className = "project-studio-section project-review-threads";
+  section.className = "project-studio-section project-coordination-summary";
+  const copy = document.createElement("div");
+  const label = document.createElement("span");
+  label.className = "section-label";
+  label.textContent = "Coordination";
+  const counts = document.createElement("strong");
+  counts.textContent = [
+    `${openCount} open`,
+    waitingCount ? `${waitingCount} waiting` : "",
+    `${resolvedCount} resolved`
+  ].filter(Boolean).join(" · ");
+  copy.append(label, counts);
+  const open = document.createElement("button");
+  open.type = "button";
+  open.textContent = "Open";
+  open.addEventListener("click", () => void openProjectCoordination(identity));
+  section.append(copy, open);
+  content.append(section);
+}
+
+async function focusLinkedProjectRecord(identity, selector, options = {}) {
+  const paneID = paneIDForProjectDetail(identity);
+  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  scrollPaneIntoView(paneID);
+  await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+  const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+  const record = panel?.querySelector(selector);
+  if (!record) return false;
+  const collapsible = record.closest(".project-section-motion");
+  if (collapsible && !collapsible.classList.contains("is-open")) {
+    collapsible.querySelector(":scope > .project-studio-section-heading .project-section-toggle-label")?.click();
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  }
+  record.tabIndex = -1;
+  record.focus({ preventScroll: true });
+  record.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+  record.classList.add("is-coordination-target");
+  window.setTimeout(() => record.classList.remove("is-coordination-target"), 2200);
+  return true;
+}
+
+async function openCoordinationTarget(identity, foundation, thread) {
+  if (thread.targetKind === "project") {
+    scrollPaneIntoView(paneIDForProjectDetail(identity));
+    return;
+  }
+  if (["researchAnswer", "evidenceReview"].includes(thread.targetKind)) {
+    const answerID = thread.targetKind === "evidenceReview"
+      ? projectCollaborationArtifacts(foundation, "evidenceReview")
+        .find((review) => review.id === thread.targetID)?.answerID
+      : thread.targetID;
+    const answer = (foundation?.researchAnswers || []).find((item) => item.id === answerID);
+    if (thread.targetKind === "evidenceReview") {
+      const focused = await focusLinkedProjectRecord(
+        identity,
+        `[data-evidence-review-id="${CSS.escape(String(thread.targetID))}"]`
+      );
+      if (focused) return;
+    }
+    if (identity.sharedOnly || identity.sharedOrganizationID) {
+      const focused = answerID && await focusLinkedProjectRecord(
+        identity,
+        `[data-research-answer-id="${CSS.escape(String(answerID))}"]`
+      );
+      if (focused) return;
+      await showWebNotice(
+        "Linked Research record",
+        "This shared coordination thread preserves the Research item's identity, but the full owner-held conversation is not available from the current account."
+      );
+      return;
+    }
+    if (answer?.conversationID) {
+      try {
+        const payload = await postResearch("/research/conversations/get", {
+          conversationID: answer.conversationID
+        });
+        activeResearchConversation = payload.conversation;
+        await openResearchConversation(answer.conversationID);
+        return;
+      } catch {
+        await showWebNotice(
+          "Linked Research record",
+          "The coordination thread preserves this Research item's identity, but the historical conversation cannot be opened from the current account."
+        );
+        return;
+      }
+    }
+  }
+  if (thread.targetKind === "notebookCard") {
+    pendingNotebookCardByProject.set(projectDetailKey(identity), thread.targetID);
+    await openProjectNotebook(identity);
+    await transitionWorkspace("utility", {
+      refreshPaneIDs: [paneIDForProjectNotebook(identity)]
+    });
+    scrollPaneIntoView(paneIDForProjectNotebook(identity));
+    return;
+  }
+  if (thread.targetKind === "reportDraft") {
+    pendingReportDraftByProject.set(projectDetailKey(identity), thread.targetID);
+    await openProjectReportDraft(identity);
+    await transitionWorkspace("utility", {
+      refreshPaneIDs: [paneIDForProjectReportDraft(identity)]
+    });
+    scrollPaneIntoView(paneIDForProjectReportDraft(identity));
+    const focusResult = reportDraftFocusResultByProject.get(projectDetailKey(identity));
+    reportDraftFocusResultByProject.delete(projectDetailKey(identity));
+    if (!focusResult?.focused) {
+      await showWebNotice(
+        "Linked Report Draft",
+        "The coordination thread preserves this Report Draft's identity, but that exact draft is no longer available."
+      );
+    }
+    return;
+  }
+  await showWebNotice(
+    "Linked Project item",
+    "The coordination record preserves this item's identity, but its dedicated view is not available yet."
+  );
+}
+
+async function renderProjectCoordination(project) {
+  const identity = projectIdentity(project);
+  const paneID = paneIDForProjectCoordination(identity);
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel coordination-panel project-derived-panel";
+  panel.dataset.paneId = paneID;
+  panel.dataset.projectId = projectDetailKey(identity);
+  panel.style.setProperty("--project-color", identity.color);
+  applyPaneWeight(panel, paneID);
+  const header = document.createElement("header");
+  header.className = "coordination-header";
   const heading = document.createElement("div");
-  heading.className = "project-studio-section-heading project-review-thread-heading project-collapsible-heading";
-  const title = document.createElement("button");
-  title.className = "project-section-toggle-label section-label";
-  title.type = "button";
-  title.textContent = "Review & coordination";
-  title.setAttribute("aria-expanded", "false");
-  const requestActions = document.createElement("div");
-  requestActions.className = "project-review-request-actions project-section-heading-actions";
-  requestActions.append(projectSectionCount(threads.length, "Review and coordination items"));
-  const editorSlot = document.createElement("div");
-  editorSlot.className = "project-collaboration-editor-slot";
-  if (canRequest) {
+  const eyebrow = document.createElement("span");
+  eyebrow.textContent = identity.name;
+  const title = document.createElement("h2");
+  title.textContent = "Coordination";
+  heading.append(eyebrow, title);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  const close = appendDetailIconButton(actions, {
+    title: "Close Coordination",
+    label: "Close Coordination",
+    className: "coordination-close",
+    svg: circleXIconSVG()
+  });
+  close.addEventListener("click", () => void closeProjectCoordination(identity));
+  header.append(heading, actions);
+  const content = document.createElement("section");
+  content.className = "coordination-content";
+  panel.append(header, content);
+
+  const { foundation, error } = await loadProjectCoordinationFoundation(identity);
+  if (error) {
+    const warning = document.createElement("p");
+    warning.className = "project-studio-warning";
+    warning.textContent = error;
+    content.append(warning);
+    return panel;
+  }
+  const threads = projectCollaborationArtifacts(foundation, "reviewThread");
+  const comments = coordinationCommentsByThread(foundation);
+  const counts = Object.fromEntries(["open", "waiting", "resolved"].map((status) => [
+    status,
+    threads.filter((thread) => coordinationThreadStatus(thread) === status).length
+  ]));
+  const projectID = projectDetailKey(identity);
+  state.coordinationFilters = state.coordinationFilters && typeof state.coordinationFilters === "object"
+    ? state.coordinationFilters
+    : {};
+  const activeFilter = ["open", "waiting", "resolved"].includes(state.coordinationFilters[projectID])
+    ? state.coordinationFilters[projectID]
+    : "open";
+  const filterBar = document.createElement("div");
+  filterBar.className = "coordination-filters";
+  filterBar.setAttribute("role", "tablist");
+  ["open", "waiting", "resolved"].forEach((status) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.setAttribute("role", "tab");
+    button.setAttribute("aria-selected", String(status === activeFilter));
+    button.textContent = `${projectReviewStatusLabel(status)} ${counts[status]}`;
+    button.addEventListener("click", async () => {
+      state.coordinationFilters[projectID] = status;
+      saveWorkspaceState();
+      await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+    });
+    filterBar.append(button);
+  });
+  content.append(filterBar);
+
+  const canRequest = projectCollaborationAccess(identity, "project.review.request");
+  const composerPreset = coordinationComposerDraftByProject.get(projectID);
+  if (composerPreset && canRequest) {
+    content.append(coordinationComposer(identity, foundation, composerPreset));
+  } else if (canRequest) {
+    const createActions = document.createElement("div");
+    createActions.className = "coordination-create-actions";
     [
       ["revision-request", "Request revision"],
       ["missing-project-fact", "Ask for information"]
@@ -15340,144 +15941,366 @@ function appendProjectReviewThreads(content, identity, foundation) {
       button.type = "button";
       button.textContent = label;
       button.addEventListener("click", () => {
-        setReviewExpanded(true);
-        requestActions.querySelectorAll("button").forEach((control) => {
-          control.disabled = true;
-        });
-        editorSlot.replaceChildren(projectReviewThreadEditor(
-          identity,
-          foundation,
+        coordinationComposerDraftByProject.set(projectID, {
           kind,
-          () => {
-            editorSlot.replaceChildren();
-            requestActions.querySelectorAll("button").forEach((control) => {
-              control.disabled = false;
-            });
-          }
-        ));
-        editorSlot.querySelector("input")?.focus();
+          targetKind: "project",
+          targetID: projectID
+        });
+        void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
       });
-      requestActions.append(button);
+      createActions.append(button);
     });
+    content.append(createActions);
   }
-  const toggle = document.createElement("button");
-  toggle.className = "project-section-toggle-chevron";
-  toggle.type = "button";
-  toggle.setAttribute("aria-label", "Expand Review & coordination");
-  toggle.setAttribute("aria-expanded", "false");
-  toggle.innerHTML = researchChevronIconsSVG();
-  requestActions.append(toggle);
-  heading.append(title, requestActions);
-  const body = document.createElement("div");
-  body.className = "project-studio-collapsible-body project-review-threads-body";
-  body.append(editorSlot);
-  section.append(heading, body);
-  threads.forEach((thread) => {
-    const card = document.createElement("article");
-    card.className = `project-collaboration-card project-review-thread is-${thread.status}`;
-    const cardHeading = document.createElement("div");
-    const copy = document.createElement("div");
-    const threadTitle = document.createElement("strong");
-    threadTitle.textContent = thread.title;
+
+  const list = document.createElement("ol");
+  list.className = "coordination-list";
+  const selectedThreadID = openCoordinationThreadForProject(identity)?.threadID || "";
+  threads.filter((thread) => coordinationThreadStatus(thread) === activeFilter).forEach((thread) => {
+    const row = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "coordination-list-item";
+    button.setAttribute("aria-current", String(thread.id === selectedThreadID));
+    const top = document.createElement("span");
+    top.className = "coordination-list-item-top";
+    const type = document.createElement("span");
+    type.className = "coordination-type";
+    type.textContent = coordinationThreadTypeLabel(thread.kind);
+    const status = document.createElement("span");
+    status.className = `coordination-status is-${coordinationThreadStatus(thread)}`;
+    status.textContent = projectReviewStatusLabel(thread.status);
+    top.append(type, status);
+    const itemTitle = document.createElement("strong");
+    itemTitle.textContent = thread.title;
+    const linked = document.createElement("span");
+    linked.className = "coordination-linked-item";
+    linked.textContent = coordinationTargetLabel(thread, identity, foundation);
     const meta = document.createElement("span");
+    const responseCount = comments.get(thread.id)?.length || 0;
+    meta.className = "coordination-list-meta";
     meta.textContent = [
-      projectReviewKindLabel(thread.kind),
-      projectReviewStatusLabel(thread.status),
-      String(thread.targetKind || "project").replaceAll(/([a-z])([A-Z])/g, "$1 $2"),
+      coordinationAssigneeLabel(thread, foundation),
       `By ${projectCollaborationActor(thread)}`,
-      researchRelativeDate(thread.updatedAt)
+      researchRelativeDate(thread.updatedAt),
+      responseCount ? `${responseCount} ${responseCount === 1 ? "response" : "responses"}` : "No responses"
     ].filter(Boolean).join(" · ");
-    copy.append(threadTitle, meta);
-    cardHeading.append(copy);
-    if (canResolve) {
-      const statusButton = document.createElement("button");
-      statusButton.type = "button";
-      statusButton.textContent = thread.status === "open" ? "Resolve" : "Reopen";
-      statusButton.addEventListener("click", async () => {
-        statusButton.disabled = true;
-        try {
-          await postResearch("/projects/collaboration/threads/save", {
-            projectID: projectDetailKey(identity),
-            threadID: thread.id,
-            expectedVersion: thread.version,
-            status: thread.status === "open" ? "resolved" : "open"
-          });
-          await projectCollaborationRefresh(identity);
-        } catch (error) {
-          statusButton.disabled = false;
-          await showWebNotice("Review status not saved", error.message);
-        }
-      });
-      cardHeading.append(statusButton);
-    }
-    card.append(cardHeading);
-    if (thread.body) {
-      const body = document.createElement("p");
-      body.textContent = thread.body;
-      card.append(body);
-    }
-    const threadComments = commentsByThreadID.get(thread.id) || [];
-    if (threadComments.length) {
-      const list = document.createElement("ol");
-      list.className = "project-review-comments";
-      threadComments.forEach((comment) => {
-        const row = document.createElement("li");
-        const commentBody = document.createElement("p");
-        commentBody.textContent = comment.body;
-        const commentMeta = document.createElement("span");
-        commentMeta.textContent = [
-          projectCollaborationActor(comment),
-          researchRelativeDate(comment.createdAt)
-        ].join(" · ");
-        row.append(commentBody, commentMeta);
-        list.append(row);
-      });
-      card.append(list);
-    }
-    if (canComment && thread.status === "open") {
-      const form = document.createElement("form");
-      form.className = "project-review-comment-form";
-      const input = document.createElement("textarea");
-      input.rows = 2;
-      input.maxLength = 10000;
-      input.required = true;
-      input.placeholder = thread.kind === "missing-project-fact"
-        ? "Provide the requested Project fact…"
-        : "Add a response…";
-      input.setAttribute("aria-label", `Respond to ${thread.title}`);
-      const submit = document.createElement("button");
-      submit.type = "submit";
-      submit.textContent = "Post response";
-      form.append(input, submit);
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        input.disabled = true;
-        submit.disabled = true;
-        try {
-          await postResearch("/projects/collaboration/comments/save", {
-            projectID: projectDetailKey(identity),
-            threadID: thread.id,
-            body: input.value
-          });
-          await projectCollaborationRefresh(identity);
-        } catch (error) {
-          input.disabled = false;
-          submit.disabled = false;
-          await showWebNotice("Response not saved", error.message);
-        }
-      });
-      card.append(form);
-    }
-    body.append(card);
+    button.append(top, itemTitle, linked, meta);
+    button.addEventListener("click", () => void openProjectCoordinationThread(identity, thread.id));
+    row.append(button);
+    list.append(row);
   });
-  setReviewExpanded = wireProjectSectionMotion(
-    section,
-    body,
-    [title, toggle],
-    "Review & coordination",
-    false
-  );
-  content.append(section);
+  if (!list.childElementCount) {
+    const empty = document.createElement("li");
+    empty.className = "coordination-empty";
+    empty.textContent = activeFilter === "open"
+      ? "No open coordination items."
+      : `No ${activeFilter} coordination items.`;
+    list.append(empty);
+  }
+  content.append(list);
+  return panel;
+}
+
+async function renderProjectCoordinationThread(project, threadID) {
+  const identity = projectIdentity(project);
+  const paneID = paneIDForProjectCoordinationThread(identity, threadID);
+  const panel = document.createElement("article");
+  panel.className = "workspace-panel coordination-thread-panel project-derived-panel";
+  panel.dataset.paneId = paneID;
+  panel.dataset.projectId = projectDetailKey(identity);
+  panel.style.setProperty("--project-color", identity.color);
+  applyPaneWeight(panel, paneID);
+  const { foundation, error } = await loadProjectCoordinationFoundation(identity);
+  const thread = projectCollaborationArtifacts(foundation, "reviewThread")
+    .find((item) => item.id === threadID);
+  const header = document.createElement("header");
+  header.className = "coordination-thread-header";
+  const heading = document.createElement("div");
+  const eyebrow = document.createElement("span");
+  eyebrow.textContent = "Coordination";
+  const title = document.createElement("h2");
+  title.textContent = thread?.title || "Coordination thread";
+  heading.append(eyebrow, title);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions";
+  const close = appendDetailIconButton(actions, {
+    title: "Close thread",
+    label: "Close Coordination thread",
+    className: "coordination-close",
+    svg: circleXIconSVG()
+  });
+  close.addEventListener("click", () => void closeProjectCoordinationThread(identity));
+  header.append(heading, actions);
+  const content = document.createElement("section");
+  content.className = "coordination-thread-content";
+  panel.append(header, content);
+  if (error || !thread) {
+    const warning = document.createElement("p");
+    warning.className = "project-studio-warning";
+    warning.textContent = error || "This coordination thread is no longer available.";
+    content.append(warning);
+    return panel;
+  }
+
+  const status = coordinationThreadStatus(thread);
+  const metadata = document.createElement("dl");
+  metadata.className = "coordination-thread-metadata";
+  [
+    ["Type", coordinationThreadTypeLabel(thread.kind)],
+    ["Status", projectReviewStatusLabel(thread.status)],
+    ["Project", identity.name],
+    ["Creator", projectCollaborationActor(thread)],
+    ["Assignee", coordinationAssigneeLabel(thread, foundation)],
+    ["Created", researchRelativeDate(thread.createdAt)],
+    ["Updated", researchRelativeDate(thread.updatedAt)]
+  ].forEach(([term, value]) => {
+    const dt = document.createElement("dt");
+    dt.textContent = term;
+    const dd = document.createElement("dd");
+    dd.textContent = value;
+    metadata.append(dt, dd);
+  });
+  const linked = document.createElement("button");
+  linked.className = "coordination-linked-card";
+  linked.type = "button";
+  const linkedLabel = document.createElement("span");
+  linkedLabel.textContent = "Linked item";
+  const linkedTitle = document.createElement("strong");
+  linkedTitle.textContent = coordinationTargetLabel(thread, identity, foundation);
+  linked.append(linkedLabel, linkedTitle);
+  linked.addEventListener("click", () => void openCoordinationTarget(identity, foundation, thread));
+  content.append(metadata, linked);
+
+  const canResolve = projectCollaborationAccess(identity, "project.review.resolve");
+  const canComment = projectCollaborationAccess(identity, "project.review.comment");
+  const controls = document.createElement("div");
+  controls.className = "coordination-thread-controls";
+  if (canComment) {
+    const assignee = document.createElement("select");
+    assignee.setAttribute("aria-label", "Change assignee");
+    const nobody = document.createElement("option");
+    nobody.value = "";
+    nobody.textContent = "Unassigned";
+    assignee.append(nobody);
+    (foundation.coordinationAssignees || []).forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.userID;
+      option.textContent = item.displayName || item.userID;
+      option.selected = item.userID === thread.assigneeUserID;
+      assignee.append(option);
+    });
+    assignee.addEventListener("change", async () => {
+      assignee.disabled = true;
+      try {
+        await postResearch("/projects/collaboration/threads/save", {
+          projectID: projectDetailKey(identity),
+          threadID: thread.id,
+          expectedVersion: thread.version,
+          assigneeUserID: assignee.value || null
+        });
+        await projectCollaborationRefresh(identity);
+      } catch (error) {
+        assignee.disabled = false;
+        await showWebNotice("Assignee not saved", error.message);
+      }
+    });
+    controls.append(assignee);
+  }
+  if (canResolve) {
+    const saveStatus = async (nextStatus, resolution = undefined) => {
+      controls.querySelectorAll("button, select").forEach((control) => {
+        control.disabled = true;
+      });
+      try {
+        await postResearch("/projects/collaboration/threads/save", {
+          projectID: projectDetailKey(identity),
+          threadID: thread.id,
+          expectedVersion: thread.version,
+          status: nextStatus,
+          ...(resolution !== undefined ? { resolution } : {})
+        });
+        await projectCollaborationRefresh(identity);
+      } catch (error) {
+        controls.querySelectorAll("button, select").forEach((control) => {
+          control.disabled = false;
+        });
+        await showWebNotice("Coordination status not saved", error.message);
+      }
+    };
+    if (status === "resolved") {
+      const reopen = document.createElement("button");
+      reopen.type = "button";
+      reopen.textContent = "Reopen";
+      reopen.addEventListener("click", () => void saveStatus("open"));
+      controls.append(reopen);
+    } else {
+      if (status !== "waiting") {
+        const waiting = document.createElement("button");
+        waiting.type = "button";
+        waiting.textContent = "Mark waiting";
+        waiting.addEventListener("click", () => void saveStatus("waiting"));
+        controls.append(waiting);
+      } else {
+        const reopen = document.createElement("button");
+        reopen.type = "button";
+        reopen.textContent = "Mark open";
+        reopen.addEventListener("click", () => void saveStatus("open"));
+        controls.append(reopen);
+      }
+      const resolve = document.createElement("button");
+      resolve.type = "button";
+      resolve.textContent = "Resolve";
+      controls.append(resolve);
+      const resolutionForm = document.createElement("form");
+      resolutionForm.className = "coordination-resolution-form";
+      resolutionForm.hidden = true;
+      const resolution = document.createElement("textarea");
+      resolution.rows = 3;
+      resolution.maxLength = 2_000;
+      resolution.required = true;
+      resolution.placeholder = "Record the concise resolution…";
+      resolution.setAttribute("aria-label", "Resolution statement");
+      const record = document.createElement("button");
+      record.type = "submit";
+      record.textContent = "Record resolution";
+      resolutionForm.append(resolution, record);
+      resolve.addEventListener("click", () => {
+        resolutionForm.hidden = false;
+        resolution.focus();
+      });
+      resolutionForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        void saveStatus("resolved", resolution.value);
+      });
+      content.append(controls, resolutionForm);
+    }
+  }
+  if (controls.childElementCount && !controls.isConnected) content.append(controls);
+
+  const request = document.createElement("article");
+  request.className = "coordination-request";
+  const requestLabel = document.createElement("span");
+  requestLabel.textContent = "Original request";
+  const requestBody = document.createElement("p");
+  requestBody.textContent = thread.body || "No additional details were recorded.";
+  const requestMeta = document.createElement("small");
+  requestMeta.textContent = `${projectCollaborationActor(thread)} · ${researchRelativeDate(thread.createdAt)}`;
+  request.append(requestLabel, requestBody, requestMeta);
+  content.append(request);
+
+  const responses = coordinationCommentsByThread(foundation).get(thread.id) || [];
+  const discussion = document.createElement("section");
+  discussion.className = "coordination-discussion";
+  const discussionTitle = document.createElement("h3");
+  discussionTitle.textContent = `Discussion · ${responses.length}`;
+  discussion.append(discussionTitle);
+  responses.forEach((comment) => {
+    const response = document.createElement("article");
+    const body = document.createElement("p");
+    body.textContent = comment.body;
+    const meta = document.createElement("small");
+    meta.textContent = `${projectCollaborationActor(comment)} · ${researchRelativeDate(comment.createdAt)}`;
+    response.append(body, meta);
+    discussion.append(response);
+  });
+  if (canComment && status !== "resolved") {
+    const form = document.createElement("form");
+    form.className = "coordination-response-form";
+    const input = document.createElement("textarea");
+    input.rows = 3;
+    input.maxLength = 10_000;
+    input.required = true;
+    input.placeholder = status === "waiting" ? "Add information or a response…" : "Add a response…";
+    input.setAttribute("aria-label", `Respond to ${thread.title}`);
+    const submit = document.createElement("button");
+    submit.type = "submit";
+    submit.textContent = "Post response";
+    form.append(input, submit);
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      input.disabled = true;
+      submit.disabled = true;
+      try {
+        await postResearch("/projects/collaboration/comments/save", {
+          projectID: projectDetailKey(identity),
+          threadID: thread.id,
+          body: input.value
+        });
+        await projectCollaborationRefresh(identity);
+      } catch (error) {
+        input.disabled = false;
+        submit.disabled = false;
+        await showWebNotice("Response not saved", error.message);
+      }
+    });
+    discussion.append(form);
+  }
+  content.append(discussion);
+
+  if (thread.resolution || thread.status === "dismissed") {
+    const resolution = document.createElement("aside");
+    resolution.className = "coordination-resolution";
+    const label = document.createElement("strong");
+    label.textContent = thread.status === "dismissed" ? "Historical disposition" : "Resolution";
+    const copy = document.createElement("p");
+    copy.textContent = thread.resolution || "This legacy item was dismissed before resolution statements were recorded.";
+    const meta = document.createElement("small");
+    meta.textContent = [
+      projectCollaborationActor(thread, "resolvedBy"),
+      researchRelativeDate(thread.resolvedAt)
+    ].filter(Boolean).join(" · ");
+    resolution.append(label, copy, meta);
+    content.append(resolution);
+  }
+
+  const events = (foundation.activity || []).filter((event) =>
+    event.objectID === thread.id || event.metadata?.threadID === thread.id
+  ).sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
+  if (events.length) {
+    const history = document.createElement("section");
+    history.className = "coordination-thread-activity";
+    const heading = document.createElement("h3");
+    heading.textContent = "Thread activity";
+    const list = document.createElement("ol");
+    events.forEach((event) => {
+      const row = document.createElement("li");
+      const copy = document.createElement("div");
+      const label = document.createElement("span");
+      label.textContent = projectActivityLabel(event);
+      copy.append(label);
+      const activityDetails = [
+        event.action === "review-thread.status.changed" &&
+          event.previousStatus &&
+          event.newStatus &&
+          event.previousStatus !== event.newStatus
+          ? `${projectReviewStatusLabel(event.previousStatus)} → ${projectReviewStatusLabel(event.newStatus)}`
+          : "",
+        event.action === "review-thread.assignee.changed"
+          ? event.metadata?.assigneeUserID
+            ? `Assigned to ${(foundation.coordinationAssignees || [])
+              .find((item) => item.userID === event.metadata.assigneeUserID)?.displayName || event.metadata.assigneeUserID}`
+            : "Unassigned"
+          : "",
+        event.metadata?.resolution ? `Resolution: ${event.metadata.resolution}` : ""
+      ].filter(Boolean);
+      if (activityDetails.length) {
+        const details = document.createElement("p");
+        details.textContent = activityDetails.join(" · ");
+        copy.append(details);
+      }
+      const date = document.createElement("small");
+      date.textContent = [
+        coordinationActivityActor(event, foundation),
+        researchRelativeDate(event.createdAt)
+      ].filter(Boolean).join(" · ");
+      row.append(copy, date);
+      list.append(row);
+    });
+    history.append(heading, list);
+    content.append(history);
+  }
+  return panel;
 }
 
 function appendProjectReportExports(content, identity, foundation) {
@@ -15800,13 +16623,28 @@ async function renderProjectDetail(detail) {
       workboardButton.setAttribute("aria-pressed", "true");
     }
   });
+  const coordinationButton = document.createElement("button");
+  coordinationButton.className = "project-coordination-button";
+  coordinationButton.type = "button";
+  coordinationButton.textContent = "Coordination";
+  coordinationButton.setAttribute("aria-pressed", String(projectHasOpenCoordination(identity)));
+  coordinationButton.hidden = detachedProjectWindow;
+  coordinationButton.addEventListener("click", async () => {
+    if (projectHasOpenCoordination(identity)) {
+      const closed = await closeProjectCoordination(identity);
+      if (closed) coordinationButton.setAttribute("aria-pressed", "false");
+    } else {
+      const opened = await openProjectCoordination(identity);
+      if (opened) coordinationButton.setAttribute("aria-pressed", "true");
+    }
+  });
   const backButton = appendDetailIconButton(headerActions, {
     title: "Back",
     label: "Back to projects",
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
-  actions.prepend(notebookButton, reportDraftButton, workboardButton);
+  actions.prepend(notebookButton, reportDraftButton, workboardButton, coordinationButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -16057,7 +16895,7 @@ async function renderProjectDetail(detail) {
   content.append(savedSection);
   appendProjectResearchHistory(content, identity, foundation);
   appendProjectEvidenceReviews(content, identity, foundation);
-  appendProjectReviewThreads(content, identity, foundation);
+  appendProjectCoordinationSummary(content, identity, foundation);
   appendProjectReportExports(content, identity, foundation);
   appendProjectActivity(content, foundation);
   if (projectResearchConversation) appendProjectContextNotice(content);
@@ -19395,6 +20233,8 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
     isProjectDetailPaneID(paneID) ||
     isProjectNotebookPaneID(paneID) ||
     isProjectReportDraftPaneID(paneID) ||
+    isProjectCoordinationPaneID(paneID) ||
+    isProjectCoordinationThreadPaneID(paneID) ||
     isProjectWorkboardPaneID(paneID)
   ) {
     return [
@@ -19911,6 +20751,11 @@ async function renderWorkspace() {
     panes.push(await renderProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
+    if (projectHasOpenCoordination(detail)) {
+      panes.push(await renderProjectCoordination(detail));
+      const thread = openCoordinationThreadForProject(detail);
+      if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
+    }
     if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
   }
   if (state.utilities.archive) {
@@ -19974,6 +20819,18 @@ async function renderUtilityWorkspace(options = {}) {
     if (projectHasOpenReportDraft(detail)) {
       const reportDraftID = paneIDForProjectReportDraft(detail);
       panes.push(await reuseOrRenderPane(reportDraftID, () => renderProjectReportDraft(detail)));
+    }
+    if (projectHasOpenCoordination(detail)) {
+      const coordinationID = paneIDForProjectCoordination(detail);
+      panes.push(await reuseOrRenderPane(coordinationID, () => renderProjectCoordination(detail)));
+      const thread = openCoordinationThreadForProject(detail);
+      if (thread) {
+        const threadPaneID = paneIDForProjectCoordinationThread(detail, thread.threadID);
+        panes.push(await reuseOrRenderPane(
+          threadPaneID,
+          () => renderProjectCoordinationThread(detail, thread.threadID)
+        ));
+      }
     }
     if (projectHasOpenWorkboard(detail)) {
       const workboardID = paneIDForProjectWorkboard(detail);
@@ -20070,6 +20927,11 @@ async function toggleUtilityPane(key) {
       delete state.paneWeights[paneIDForProjectWorkboard(detail)];
       delete state.paneWeights[paneIDForProjectNotebook(detail)];
       delete state.paneWeights[paneIDForProjectReportDraft(detail)];
+      delete state.paneWeights[paneIDForProjectCoordination(detail)];
+      const coordinationThread = openCoordinationThreadForProject(detail);
+      if (coordinationThread) {
+        delete state.paneWeights[paneIDForProjectCoordinationThread(detail, coordinationThread.threadID)];
+      }
     });
     delete state.paneWeights["utility:archive"];
     state.paneOrder = (state.paneOrder || []).filter((id) =>
@@ -20077,6 +20939,8 @@ async function toggleUtilityPane(key) {
       !isProjectDetailPaneID(id) &&
       !isProjectNotebookPaneID(id) &&
       !isProjectReportDraftPaneID(id) &&
+      !isProjectCoordinationPaneID(id) &&
+      !isProjectCoordinationThreadPaneID(id) &&
       !isProjectWorkboardPaneID(id) &&
       id !== "utility:archive"
     );

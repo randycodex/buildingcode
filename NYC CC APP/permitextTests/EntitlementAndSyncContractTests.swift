@@ -878,4 +878,63 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(project.sourceRecordID, "folder-1")
         XCTAssertEqual(project.name, "Permitext QA")
     }
+
+    func testProjectFoundationDecodesWaitingCoordinationThread() throws {
+        let data = Data(
+            """
+            {
+              "schemaVersion": 1,
+              "projects": [],
+              "links": [],
+              "artifacts": [{
+                "envelope": {
+                  "id": "review-thread-1",
+                  "type": "reviewThread",
+                  "createdAt": "2026-08-01T14:00:00.000Z",
+                  "updatedAt": "2026-08-01T15:00:00.000Z",
+                  "deletedAt": null,
+                  "version": 2
+                },
+                "payload": {
+                  "schemaVersion": 2,
+                  "projectID": "project-1",
+                  "kind": "missing-project-fact",
+                  "status": "waiting",
+                  "targetKind": "notebook-card",
+                  "targetID": "card-1",
+                  "linkedItemSnapshot": {
+                    "label": "Filing assumptions",
+                    "description": "Confirm the proposed occupancy group.",
+                    "updatedAt": "2026-08-01T13:30:00.000Z"
+                  },
+                  "title": "Confirm occupancy group",
+                  "body": "Waiting for the architect's response.",
+                  "createdByUserID": "reviewer-1",
+                  "updatedByUserID": "reviewer-1",
+                  "createdByDisplayName": "Reviewer",
+                  "updatedByDisplayName": "Reviewer",
+                  "assigneeUserID": "architect-1",
+                  "resolvedByUserID": null,
+                  "resolvedByDisplayName": "",
+                  "resolvedAt": null,
+                  "resolution": null
+                }
+              }],
+              "researchConversations": [],
+              "researchAnswers": [],
+              "activity": [],
+              "workboardPreview": null
+            }
+            """.utf8
+        )
+
+        let response = try JSONDecoder().decode(
+            BackendProjectFoundationResponse.self,
+            from: data
+        )
+
+        let thread = try XCTUnwrap(response.artifacts?.first)
+        XCTAssertEqual(thread.envelope.type, "reviewThread")
+        XCTAssertEqual(thread.payload.status, "waiting")
+    }
 }

@@ -4,7 +4,7 @@ import {
   validateNotebookDocument
 } from "./notebook-contract.mjs";
 
-export const collaborationSchemaVersion = 1;
+export const collaborationSchemaVersion = 2;
 
 export const projectReviewKinds = Object.freeze([
   "general-review",
@@ -14,6 +14,7 @@ export const projectReviewKinds = Object.freeze([
 
 export const projectReviewStatuses = Object.freeze([
   "open",
+  "waiting",
   "resolved",
   "dismissed"
 ]);
@@ -57,6 +58,35 @@ function requiredISO(value, field) {
   return normalized;
 }
 
+function nullableIdentifier(value, field) {
+  if (value === null || value === undefined || value === "") return null;
+  return requiredText(value, field, 256);
+}
+
+function normalizedLinkedItemSnapshot(value) {
+  if (value === null || value === undefined) return null;
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Invalid linked item snapshot.");
+  }
+  const label = optionalText(value.label, 240);
+  const description = optionalText(value.description, 2_000);
+  const updatedAt = optionalISO(value.updatedAt, "linked item snapshot date");
+  if (!label && !description && !updatedAt) return null;
+  return {
+    label,
+    description,
+    updatedAt
+  };
+}
+
+export function latestReviewThreadUpdatedAt(threadUpdatedAt, comments = []) {
+  const baseline = requiredISO(threadUpdatedAt, "review thread update date");
+  return (Array.isArray(comments) ? comments : [])
+    .map((comment) => optionalISO(comment?.createdAt ?? comment, "review comment date"))
+    .filter(Boolean)
+    .reduce((latest, candidate) => candidate > latest ? candidate : latest, baseline);
+}
+
 export function normalizeProjectNotePayload({
   projectID,
   title = "Project information",
@@ -97,15 +127,19 @@ export function normalizeReviewThreadPayload({
   status = "open",
   targetKind = "project",
   targetID = projectID,
+  linkedItemSnapshot = null,
   title,
   body,
   createdByUserID,
   updatedByUserID = createdByUserID,
   createdByDisplayName = "",
   updatedByDisplayName = createdByDisplayName,
+  assigneeUserID = null,
   resolvedByUserID = null,
   resolvedByDisplayName = "",
-  resolvedAt = null
+  resolvedAt = null,
+  resolution = null,
+  allowLegacyResolvedWithoutResolution = false
 }) {
   const normalizedKind = requiredText(kind, "review kind", 64).toLowerCase();
   if (!reviewKindSet.has(normalizedKind)) throw new Error("Invalid review kind.");
@@ -115,7 +149,15 @@ export function normalizeReviewThreadPayload({
   if (!reviewTargetKindSet.has(normalizedTargetKind)) {
     throw new Error("Invalid review target kind.");
   }
-  const isClosed = normalizedStatus !== "open";
+  const isClosed = normalizedStatus === "resolved" || normalizedStatus === "dismissed";
+  const normalizedResolution = optionalText(resolution, 2_000);
+  if (
+    normalizedStatus === "resolved" &&
+    !normalizedResolution &&
+    allowLegacyResolvedWithoutResolution !== true
+  ) {
+    throw new Error("A resolution statement is required to resolve a coordination thread.");
+  }
   return {
     schemaVersion: collaborationSchemaVersion,
     projectID: requiredText(projectID, "Project ID", 256),
@@ -123,12 +165,14 @@ export function normalizeReviewThreadPayload({
     status: normalizedStatus,
     targetKind: normalizedTargetKind,
     targetID: requiredText(targetID, "review target ID", 256),
+    linkedItemSnapshot: normalizedLinkedItemSnapshot(linkedItemSnapshot),
     title: requiredText(title, "review title", 200),
     body: optionalText(body, 20_000),
     createdByUserID: requiredText(createdByUserID, "review creator", 256),
     updatedByUserID: requiredText(updatedByUserID, "review updater", 256),
     createdByDisplayName: optionalText(createdByDisplayName, 160),
     updatedByDisplayName: optionalText(updatedByDisplayName, 160),
+    assigneeUserID: nullableIdentifier(assigneeUserID, "review assignee"),
     resolvedByUserID: isClosed
       ? requiredText(resolvedByUserID, "review resolver", 256)
       : null,
@@ -137,7 +181,8 @@ export function normalizeReviewThreadPayload({
       : "",
     resolvedAt: isClosed
       ? requiredISO(resolvedAt, "review resolution date")
-      : null
+      : null,
+    resolution: normalizedStatus === "resolved" ? normalizedResolution || null : null
   };
 }
 

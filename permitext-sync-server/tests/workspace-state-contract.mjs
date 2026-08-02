@@ -41,12 +41,18 @@ const legacyLayout = normalizeWorkspaceLayout({
     invalid: 10
   },
   sectionDetails: { "search-1": { sectionID: "8779" } },
+  coordinations: [{ id: "project-1", name: "Project 1" }],
+  coordinationThreads: [{ id: "project-1", name: "Project 1", threadID: "thread-1" }],
+  coordinationFilters: { "project-1": "waiting", invalid: "blocked" },
   trackScrollLeft: 220
 });
 assert.equal(legacyLayout.readers.length, 1);
 assert.deepEqual(legacyLayout.paneOrder, ["reader:reader-1", "utility:search:search-1"]);
 assert.deepEqual(legacyLayout.paneWeights, { "reader:reader-1": 620 });
 assert.equal(legacyLayout.sectionDetails["search-1"].sectionID, "8779");
+assert.equal(legacyLayout.coordinations[0].id, "project-1");
+assert.equal(legacyLayout.coordinationThreads[0].threadID, "thread-1");
+assert.deepEqual(legacyLayout.coordinationFilters, { "project-1": "waiting" });
 assert.equal(workspaceLayoutHasVisiblePanes(legacyLayout), true);
 
 let registry = blankRegistry;

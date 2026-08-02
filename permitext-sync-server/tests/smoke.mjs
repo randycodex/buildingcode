@@ -602,7 +602,16 @@ async function main() {
         workspaceScript.text.includes('postResearch("/organizations/projects/snapshot"') &&
         workspaceScript.text.includes("function appendProjectEvidenceReviews") &&
         workspaceScript.text.includes("function appendProjectNotes") &&
-        workspaceScript.text.includes("function appendProjectReviewThreads") &&
+        workspaceScript.text.includes("function appendProjectCoordinationSummary") &&
+        workspaceScript.text.includes("async function renderProjectCoordination(project)") &&
+        workspaceScript.text.includes("async function renderProjectCoordinationThread(project, threadID)") &&
+        workspaceScript.text.includes("function coordinationActivityActor(event, foundation)") &&
+        workspaceScript.text.includes('event.action === "review-thread.status.changed" &&') &&
+        workspaceScript.text.includes("event.previousStatus !== event.newStatus") &&
+        workspaceScript.text.includes("pendingReportDraftByProject.set(projectDetailKey(identity), thread.targetID)") &&
+        workspaceScript.text.includes("reportDraftFocusResultByProject.get(projectDetailKey(identity))") &&
+        workspaceScript.text.includes('`[data-evidence-review-id="${CSS.escape(String(thread.targetID))}"]`') &&
+        workspaceScript.text.includes("This shared coordination thread preserves the Research item's identity") &&
         workspaceScript.text.includes('postResearch("/projects/collaboration/notes/save"') &&
         workspaceScript.text.includes('postResearch("/projects/collaboration/threads/save"') &&
         workspaceScript.text.includes('postResearch("/projects/collaboration/comments/save"') &&
@@ -722,9 +731,10 @@ async function main() {
         workspaceScript.text.includes('wireProjectSectionMotion(section, list, [toggle], "Recent activity", false)') &&
         workspaceScript.text.includes('title.textContent = "Research history";\n  title.setAttribute("aria-expanded", "false")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Research history", false)') &&
-        workspaceScript.text.includes('title.textContent = "Review & coordination";\n  title.setAttribute("aria-expanded", "false")') &&
-        workspaceScript.text.includes('setReviewExpanded = wireProjectSectionMotion(') &&
-        workspaceScript.text.includes('button.addEventListener("click", () => {\n        setReviewExpanded(true);') &&
+        workspaceScript.text.includes('coordinationButton.textContent = "Coordination"') &&
+        workspaceScript.text.includes('filterBar.setAttribute("role", "tablist")') &&
+        workspaceScript.text.includes('resolutionForm.className = "coordination-resolution-form"') &&
+        !workspaceScript.text.includes("function appendProjectReviewThreads") &&
         workspaceStyles.text.includes(".project-studio-collapsible-body[hidden]") &&
         workspaceStyles.text.includes("max-height 420ms cubic-bezier(0.22, 1, 0.36, 1)") &&
         workspaceStyles.text.includes(".project-studio-activity li:first-child") &&
@@ -1214,7 +1224,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260801-invisible-note-resize-v376'),
+        webRoot.text.includes('/web/app.js?v=20260802-coordination-workspace-v378'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1350,7 +1360,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-invisible-note-resize-v376'),
+        webRoot.text.includes('/web/styles.css?v=20260802-coordination-workspace-v378'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1562,7 +1572,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260801-invisible-note-resize-v376'),
+        webRoot.text.includes('/web/styles.css?v=20260802-coordination-workspace-v378'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1763,7 +1773,7 @@ async function main() {
     );
     assert(
       workspaceStyles.text.includes("--project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3))") &&
-        workspaceStyles.text.match(/--project-pane-band-background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);/g)?.length === 4 &&
+        workspaceStyles.text.match(/--project-pane-band-background: color-mix\(in srgb, var\(--project-color\) 42%, var\(--surface\)\);/g)?.length === 5 &&
         workspaceStyles.text.includes(".project-detail-actions {") &&
         workspaceStyles.text.includes("margin-top: var(--space-3);") &&
         workspaceStyles.text.includes(".project-detail-panel::before,\n.notebook-panel::before,\n.report-draft-panel::before {") &&
@@ -4702,6 +4712,9 @@ async function main() {
         status: "open",
         targetKind: "researchAnswer",
         targetID: answerID,
+        linkedItemSnapshot: {
+          label: "Client supplied labels must not become historical evidence."
+        },
         title: "Confirm the Project occupancy group",
         body: "The professional record needs this fact before the Research conclusion is relied upon."
       }
@@ -4711,10 +4724,28 @@ async function main() {
         reviewerMissingFactRequest.json.thread.createdByUserID === sharedReviewerID &&
         reviewerMissingFactRequest.json.thread.createdByDisplayName === "Smoke Reviewer" &&
         reviewerMissingFactRequest.json.thread.targetID === answerID &&
+        reviewerMissingFactRequest.json.thread.linkedItemSnapshot?.label !==
+          "Client supplied labels must not become historical evidence." &&
         reviewerMissingFactRequest.json.activity.action === "review-thread.created",
       `A Project reviewer could not open an attributed missing-information request: ${reviewerMissingFactRequest.response.status} ${JSON.stringify(reviewerMissingFactRequest.json)}`
     );
     const reviewThreadID = reviewerMissingFactRequest.json.thread.id;
+    const invalidReviewAssignee = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 1,
+        assigneeUserID: "not-a-project-member"
+      }
+    });
+    assert(
+      invalidReviewAssignee.response.status === 400 &&
+        invalidReviewAssignee.json.code === "INVALID_REVIEW_ASSIGNEE",
+      "A coordination thread accepted an assignee without active Project access."
+    );
     const reactivateEditor = await request("/organizations/members/update", {
       method: "POST",
       token: signIn.json.account.backendSessionToken,
@@ -4730,6 +4761,101 @@ async function main() {
       reactivateEditor.response.ok &&
         reactivateEditor.json.membership.status === "active",
       "The Project editor could not be restored to answer the reviewer request."
+    );
+    const reviewerWaitingAssignment = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 1,
+        status: "waiting",
+        assigneeUserID: sharedEditorID
+      }
+    });
+    assert(
+      reviewerWaitingAssignment.response.ok &&
+        reviewerWaitingAssignment.json.thread.version === 2 &&
+        reviewerWaitingAssignment.json.thread.status === "waiting" &&
+        reviewerWaitingAssignment.json.thread.assigneeUserID === sharedEditorID &&
+        reviewerWaitingAssignment.json.thread.resolvedAt === null &&
+        reviewerWaitingAssignment.json.activities.some((activity) =>
+          activity.action === "review-thread.status.changed" &&
+          activity.metadata.threadID === reviewThreadID
+        ) &&
+        reviewerWaitingAssignment.json.activities.some((activity) =>
+          activity.action === "review-thread.assignee.changed" &&
+          activity.metadata.newAssigneeUserID === sharedEditorID
+        ),
+      "A reviewer could not mark coordination as waiting and assign an active Project member."
+    );
+    const deactivateHistoricalAssignee = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        userID: sharedEditorID,
+        status: "deactivated"
+      }
+    });
+    assert(
+      deactivateHistoricalAssignee.response.ok &&
+        deactivateHistoricalAssignee.json.membership.status === "deactivated",
+      "The historical Coordination assignee could not be deactivated for compatibility testing."
+    );
+    const editWithInactiveHistoricalAssignee = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 2,
+        body: "The professional record still needs this fact before the Research conclusion is relied upon."
+      }
+    });
+    assert(
+      editWithInactiveHistoricalAssignee.response.ok &&
+        editWithInactiveHistoricalAssignee.json.thread.version === 3 &&
+        editWithInactiveHistoricalAssignee.json.thread.assigneeUserID === sharedEditorID,
+      "An unchanged historical assignee blocked a later Coordination edit after deactivation."
+    );
+    const reactivateHistoricalAssignee = await request("/organizations/members/update", {
+      method: "POST",
+      token: signIn.json.account.backendSessionToken,
+      body: {
+        auth: { accountUserID: userID },
+        organizationID,
+        projectID: researchProjectIDs[0],
+        userID: sharedEditorID,
+        status: "active"
+      }
+    });
+    assert(
+      reactivateHistoricalAssignee.response.ok &&
+        reactivateHistoricalAssignee.json.membership.status === "active",
+      "The historical Coordination assignee could not be restored for response testing."
+    );
+    const editorReassignment = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedEditorToken,
+      body: {
+        auth: { accountUserID: sharedEditorID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 3,
+        assigneeUserID: sharedReviewerID
+      }
+    });
+    assert(
+      editorReassignment.response.ok &&
+        editorReassignment.json.thread.version === 4 &&
+        editorReassignment.json.thread.assigneeUserID === sharedReviewerID &&
+        editorReassignment.json.activity.action === "review-thread.assignee.changed",
+      "An editor with response permission could not reassign a coordination thread."
     );
     const editorReviewResponse = await request("/projects/collaboration/comments/save", {
       method: "POST",
@@ -4749,6 +4875,40 @@ async function main() {
         editorReviewResponse.json.activity.action === "review-comment.created",
       "An authorized Project editor could not answer the reviewer request with immutable attribution."
     );
+    const responseUpdateSnapshot = await request("/organizations/projects/snapshot", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0]
+      }
+    });
+    const responseUpdatedThread = (responseUpdateSnapshot.json.project?.artifacts || [])
+      .find((artifact) =>
+        artifact.envelope?.type === "reviewThread" && artifact.envelope.id === reviewThreadID
+      );
+    assert(
+      responseUpdateSnapshot.response.ok &&
+        responseUpdatedThread?.envelope.updatedAt === editorReviewResponse.json.comment.createdAt,
+      "A Coordination response did not advance the thread's displayed latest update."
+    );
+    const reviewerResolutionWithoutStatement = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 4,
+        status: "resolved"
+      }
+    });
+    assert(
+      reviewerResolutionWithoutStatement.response.status === 400 &&
+        reviewerResolutionWithoutStatement.json.code === "INVALID_REVIEW_THREAD" &&
+        /resolution statement/i.test(reviewerResolutionWithoutStatement.json.error),
+      "A coordination thread was resolved without a concise resolution statement."
+    );
     const reviewerResolution = await request("/projects/collaboration/threads/save", {
       method: "POST",
       token: sharedReviewerToken,
@@ -4756,8 +4916,9 @@ async function main() {
         auth: { accountUserID: sharedReviewerID },
         projectID: researchProjectIDs[0],
         threadID: reviewThreadID,
-        expectedVersion: 1,
-        status: "resolved"
+        expectedVersion: 4,
+        status: "resolved",
+        resolution: "Occupancy group B was confirmed from the approved Project drawings."
       }
     });
     assert(
@@ -4765,6 +4926,7 @@ async function main() {
         reviewerResolution.json.thread.status === "resolved" &&
         reviewerResolution.json.thread.resolvedByUserID === sharedReviewerID &&
         reviewerResolution.json.thread.resolvedByDisplayName === "Smoke Reviewer" &&
+        reviewerResolution.json.thread.resolution === "Occupancy group B was confirmed from the approved Project drawings." &&
         reviewerResolution.json.activity.action === "review-thread.status.changed",
       "A Project reviewer could not resolve the answered missing-information request."
     );
@@ -4783,6 +4945,45 @@ async function main() {
         commentAfterResolution.json.code === "REVIEW_THREAD_CLOSED",
       "A resolved review thread accepted another comment."
     );
+    const reviewerReopen = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 5,
+        status: "open"
+      }
+    });
+    assert(
+      reviewerReopen.response.ok &&
+        reviewerReopen.json.thread.version === 6 &&
+        reviewerReopen.json.thread.status === "open" &&
+        reviewerReopen.json.thread.resolution === null &&
+        reviewerReopen.json.activity.metadata.previousResolution ===
+          "Occupancy group B was confirmed from the approved Project drawings.",
+      "A reviewer could not reopen resolved coordination while preserving resolution history."
+    );
+    const reviewerReresolution = await request("/projects/collaboration/threads/save", {
+      method: "POST",
+      token: sharedReviewerToken,
+      body: {
+        auth: { accountUserID: sharedReviewerID },
+        projectID: researchProjectIDs[0],
+        threadID: reviewThreadID,
+        expectedVersion: 6,
+        status: "resolved",
+        resolution: "The reopened request was reviewed and remains resolved."
+      }
+    });
+    assert(
+      reviewerReresolution.response.ok &&
+        reviewerReresolution.json.thread.version === 7 &&
+        reviewerReresolution.json.thread.resolution ===
+          "The reopened request was reviewed and remains resolved.",
+      "A reopened coordination thread could not be resolved again with a new statement."
+    );
     const collaborationSnapshot = await request("/organizations/projects/snapshot", {
       method: "POST",
       token: sharedReviewerToken,
@@ -4792,6 +4993,10 @@ async function main() {
       }
     });
     const collaborationArtifacts = collaborationSnapshot.json.project?.artifacts || [];
+    const coordinationAssigneeIDs = new Set(
+      (collaborationSnapshot.json.project?.coordinationAssignees || [])
+        .map((assignee) => assignee.userID)
+    );
     assert(
       collaborationSnapshot.response.ok &&
         collaborationArtifacts.some((artifact) =>
@@ -4802,13 +5007,16 @@ async function main() {
         collaborationArtifacts.some((artifact) =>
           artifact.envelope.type === "reviewThread" &&
           artifact.envelope.id === reviewThreadID &&
-          artifact.payload.status === "resolved"
+          artifact.payload.status === "resolved" &&
+          artifact.payload.resolution === "The reopened request was reviewed and remains resolved."
         ) &&
         collaborationArtifacts.some((artifact) =>
           artifact.envelope.type === "reviewComment" &&
           artifact.payload.threadID === reviewThreadID &&
           artifact.payload.createdByDisplayName === "Smoke Editor"
-        ),
+        ) &&
+        coordinationAssigneeIDs.has(sharedEditorID) &&
+        coordinationAssigneeIDs.has(sharedReviewerID),
       "The shared Project snapshot did not preserve the complete attributed collaboration record."
     );
 

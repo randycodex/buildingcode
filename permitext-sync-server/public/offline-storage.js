@@ -9,8 +9,8 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v340";
-const shellAssetVersion = "20260801-invisible-note-resize-v376";
+const shellCacheName = "permitext-pro-shell-v342";
+const shellAssetVersion = "20260802-coordination-workspace-v378";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -19,11 +19,11 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260801-invisible-note-resize-v376",
-  "/web/app.js?v=20260801-invisible-note-resize-v376",
+  "/web/styles.css?v=20260802-coordination-workspace-v378",
+  "/web/app.js?v=20260802-coordination-workspace-v378",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260801-invisible-note-resize-v376",
-  "/web/workspace-state.js?v=20260731-multi-workspace-v1",
+  "/web/offline-storage.js?v=20260802-coordination-workspace-v378",
+  "/web/workspace-state.js?v=20260802-coordination-workspace-v2",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
   "/web/sync-state.js?v=20260721-causal-clear-v4"
