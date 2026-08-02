@@ -8516,11 +8516,6 @@ body.is-resizing-research-evidence * {
   border: 0;
 }
 
-.project-folder-type legend {
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.78) !important;
-}
-
 .project-folder-type > div {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

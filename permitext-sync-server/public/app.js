@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-folder-type-contrast-v405";
+} from "./offline-storage.js?v=20260802-folder-type-heading-v406";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -17465,8 +17465,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
 
   const typeGroup = document.createElement("fieldset");
   typeGroup.className = "project-folder-type";
-  const typeLegend = document.createElement("legend");
-  typeLegend.textContent = "Folder type";
+  typeGroup.setAttribute("aria-label", "Folder type");
   const typeChoices = document.createElement("div");
   const syncFolderTypeControls = () => {
     typeChoices.querySelectorAll("button").forEach((button) => {
@@ -17497,7 +17496,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
     });
     typeChoices.append(button);
   });
-  typeGroup.append(typeLegend, typeChoices);
+  typeGroup.append(typeChoices);
   if (isEditing && folderIsProject(project)) typeGroup.hidden = true;
 
   const nameLabel = document.createElement("label");
