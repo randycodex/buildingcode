@@ -8269,6 +8269,10 @@ body.is-resizing-research-evidence * {
   padding: var(--space-2) 0 var(--space-3);
 }
 
+.saved-project-evidence-section > .saved-inline-filters:not(:has(> :not([hidden]))) {
+  display: none;
+}
+
 .saved-plan-usage {
   margin: 0 0 var(--space-3);
   padding: var(--space-2) var(--space-3);

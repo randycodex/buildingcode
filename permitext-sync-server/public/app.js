@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-sdc-v434";
+} from "./offline-storage.js?v=20260802-evidence-heading-gap-v435";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-saved-sdc-v434'),
+        webRoot.text.includes('/web/app.js?v=20260802-evidence-heading-gap-v435'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-sdc-v434'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-heading-gap-v435'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1546,6 +1546,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-evidence-search-input {") &&
         workspaceStyles.text.match(/\.saved-evidence-search-input \{[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.includes(".saved-evidence-search[hidden]") &&
+        workspaceStyles.text.includes('.saved-project-evidence-section > .saved-inline-filters:not(:has(> :not([hidden])))') &&
         workspaceStyles.text.includes(".saved-tag-filter-menu.is-open .saved-tag-filter-actions") &&
         webRoot.text.includes('class="saved-tag-filter-clear"') &&
         workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")') &&
@@ -1564,7 +1565,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-sdc-v434'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-heading-gap-v435'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
