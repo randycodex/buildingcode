@@ -7900,6 +7900,13 @@ body.is-resizing-research-evidence * {
   text-transform: uppercase;
 }
 
+.saved-folder-context.is-project .project-studio-research .project-section-toggle-label {
+  font-size: inherit !important;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .saved-evidence-heading {
   display: flex;
   align-items: center;

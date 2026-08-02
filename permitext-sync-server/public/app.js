@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-blocknotes-weight-v414";
+} from "./offline-storage.js?v=20260802-research-heading-v416";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
