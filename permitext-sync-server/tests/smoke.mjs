@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-uppercase-topbar-v444'),
+        webRoot.text.includes('/web/app.js?v=20260802-live-reader-evidence-v445'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-uppercase-topbar-v444'),
+        webRoot.text.includes('/web/styles.css?v=20260802-live-reader-evidence-v445'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1588,7 +1588,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-uppercase-topbar-v444'),
+        webRoot.text.includes('/web/styles.css?v=20260802-live-reader-evidence-v445'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1955,6 +1955,8 @@ async function main() {
         workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
+        workspaceScript.text.includes("const visibleSavedItems = selectedFolder ? savedItems : savedItems.slice(0, 48)") &&
+        workspaceScript.text.includes("const visibleAnnotatedItems = selectedFolder ? annotatedItems : annotatedItems.slice(0, 48)") &&
         workspaceScript.text.includes("const applySavedView = () =>") &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("codeDisplayLabel(prefix)") &&

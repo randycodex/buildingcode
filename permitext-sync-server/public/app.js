@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-uppercase-topbar-v444";
+} from "./offline-storage.js?v=20260802-live-reader-evidence-v445";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18382,8 +18382,9 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
     selectedFolder
   );
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
-  const visibleSavedItems = savedItems.slice(0, 48);
-  const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
+  const visibleSavedItems = selectedFolder ? savedItems : savedItems.slice(0, 48);
+  const visibleAnnotatedItems = selectedFolder ? annotatedItems : annotatedItems.slice(0, 48);
+  const combinedItems = mergeSavedColumnItems(visibleSavedItems, visibleAnnotatedItems);
   const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
   if (!panel.isConnected) return;
   const removableSavedItems = selectedFolder && !savedInstance.showAllSaved
