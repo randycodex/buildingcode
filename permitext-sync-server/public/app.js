@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-live-reader-evidence-v445";
+} from "./offline-storage.js?v=20260802-exact-bookmark-marker-v446";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -6613,20 +6613,26 @@ function isSectionSaved(section, codeVersion = "") {
   const localRecord = [...(state.localSavedItems || [])].reverse()
     .find((item) => savedEvidenceKey(item) === sectionKey);
   if (localRecord) return !localRecord.deletedAt;
+  const localSavedSectionKeys = (state.localSavedSectionIDs || []).map(String);
+  if (localSavedSectionKeys.includes(sectionKey)) return true;
   if (
     syncCodeVersion(codeVersion || section?.codeVersion || defaultSyncCodeVersion) === defaultSyncCodeVersion &&
-    (state.localSavedSectionIDs || []).map(String).includes(rawSectionID)
+    localSavedSectionKeys.includes(rawSectionID)
   ) return true;
   const savedItems = syncedContent?.summary?.savedItems || [];
   return savedItems.some((item) => savedEvidenceKey(item) === sectionKey);
 }
 
-function setLocalSectionSaved(sectionID, saved) {
+function setLocalSectionSaved(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
   const sectionKey = String(sectionID || "");
   if (!sectionKey) return;
   const current = new Set((state.localSavedSectionIDs || []).map(String));
-  if (saved) current.add(sectionKey);
-  else current.delete(sectionKey);
+  const exactKey = savedEvidenceKey({ sectionID: sectionKey, codeVersion });
+  if (saved) current.add(exactKey);
+  else {
+    current.delete(exactKey);
+    current.delete(sectionKey);
+  }
   state.localSavedSectionIDs = Array.from(current);
   saveWorkspaceState();
 }
@@ -6649,7 +6655,7 @@ async function persistSectionBookmark(sectionPayload, saved, options = {}) {
     await removeSectionFromAllProjects(sectionPayload);
   }
   if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
-    setLocalSectionSaved(sectionPayload.sectionID, saved);
+    setLocalSectionSaved(sectionPayload.sectionID, saved, sectionPayload.codeVersion);
   }
   const sectionKey = savedEvidenceKey(sectionPayload);
   const record = saved
@@ -6747,7 +6753,7 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
       savedRecord
     ];
     if (syncCodeVersion(sectionPayload.codeVersion) === defaultSyncCodeVersion) {
-      setLocalSectionSaved(sectionPayload.sectionID, true);
+      setLocalSectionSaved(sectionPayload.sectionID, true, sectionPayload.codeVersion);
     }
     mutations.push(savedMutationForSection(sectionPayload));
   }
@@ -6845,7 +6851,7 @@ async function removeSectionFromProject(project, item, options = {}) {
 
   if (options.removeBookmark === true) {
     await persistSectionBookmark(item, false, { refreshSavedPanes: false });
-    syncReaderNoteBookmarkButtons(sectionID, false);
+    syncReaderNoteBookmarkButtons(sectionID, false, item.codeVersion);
   }
 }
 
@@ -7202,7 +7208,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
           if (!isSectionSaved(sectionPayload)) {
             const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
             if (!saved) return;
-            syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+            syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
           }
           await persistSectionInProject(project, { ...sectionPayload, ...target });
           options.onChange?.();
@@ -7251,7 +7257,7 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
             if (!isSectionSaved(sectionPayload)) {
               const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
               if (!saved) return;
-              syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+              syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
             }
             await persistSectionInProject(project, { ...sectionPayload, ...target });
           }
@@ -7712,6 +7718,7 @@ function renderReaderChapterSection(panel, reader, section, groupLabelsByFirstSe
   const sectionWrapper = document.createElement("section");
   sectionWrapper.className = "chapter-section";
   sectionWrapper.dataset.sectionId = String(section.id);
+  sectionWrapper.dataset.codeVersion = syncCodeVersion(reader.codeVersion || syncCodeVersionForPrefix(reader.codePrefix));
   sectionWrapper.dataset.sectionNumber = String(section.sectionNumber || "");
   if (section.readerAliasSectionIDs.length > 0) {
     sectionWrapper.dataset.sectionAliases = section.readerAliasSectionIDs.join(" ");
@@ -8123,6 +8130,7 @@ function renderInlineCommentBox(section, _reader, target = annotationTargetForSe
   wrapper.classList.toggle("has-note", Boolean(noteBody.trim()));
   wrapper.classList.toggle("has-saved-section", saved);
   wrapper.dataset.commentSectionId = String(section.id);
+  wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion);
   wrapper.dataset.commentBlockId = target.blockID || "";
   wrapper.dataset.researchSelectionExclude = "true";
 
@@ -8178,10 +8186,11 @@ function syncReaderNoteControls(sectionID, blockID, value, options = {}) {
       button.setAttribute("aria-hidden", hasNote ? "false" : "true");
     }
   });
+  const bookmarkCodeVersion = options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion;
   syncReaderNoteBookmarkButtons(sectionID, isSectionSaved({
     sectionID,
-    codeVersion: options.codeVersion || options.target?.codeVersion || defaultSyncCodeVersion
-  }));
+    codeVersion: bookmarkCodeVersion
+  }), bookmarkCodeVersion);
   track.querySelectorAll(`.reader-notes-sheet[data-section-id="${CSS.escape(sectionKey)}"][data-block-id="${CSS.escape(blockKey)}"]`).forEach((sheet) => {
     const input = sheet.querySelector(".reader-notes-input");
     if (input && input !== options.source) input.value = value;
@@ -8483,7 +8492,7 @@ function showReaderNotesProjectPicker(sheet, sectionPayload) {
       }
       const tags = normalizeAnnotationTags(optionalTags.value.split(","));
       if (tags.length) setAnnotationTags(sectionPayload, [...tagsForTarget(sectionPayload), ...tags]);
-      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true);
+      syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
       const names = selectedFolders.map((folder) => folder.name || folder.title || "Folder");
       status.textContent = `${result.queued ? "Saved locally; sync pending" : "Saved"} to ${new Intl.ListFormat(undefined, { style: "long", type: "conjunction" }).format(names)}.`;
       sheet.dispatchEvent(new CustomEvent("permitext-folder-save", {
@@ -8697,23 +8706,26 @@ function closeReaderNotesSheet(panel, reader = null, options = {}) {
   }, 220);
 }
 
-function syncReaderNoteBookmarkButtons(sectionID, saved) {
+function syncReaderNoteBookmarkButtons(sectionID, saved, codeVersion = defaultSyncCodeVersion) {
   const sectionKey = sectionNoteKey(sectionID);
   if (!sectionKey) return;
-  const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`));
-  const bookmarkWrapper = wrappers.find((wrapper) => wrapper.classList.contains("has-note")) || wrappers[0] || null;
+  const exactCodeVersion = syncCodeVersion(codeVersion);
+  const wrappers = Array.from(track.querySelectorAll(`.inline-comment[data-comment-section-id="${CSS.escape(sectionKey)}"]`))
+    .filter((wrapper) => wrapper.dataset.commentCodeVersion === exactCodeVersion);
   wrappers.forEach((wrapper) => {
     const button = wrapper.querySelector(".inline-bookmark-toggle");
-    const showBookmark = Boolean(saved && wrapper === bookmarkWrapper);
-    wrapper.classList.toggle("has-saved-section", showBookmark);
+    wrapper.classList.remove("has-saved-section");
     if (!button) return;
-    button.classList.toggle("is-saved", showBookmark);
-    button.hidden = !showBookmark;
-    button.setAttribute("aria-hidden", showBookmark ? "false" : "true");
+    button.classList.remove("is-saved");
+    button.hidden = true;
+    button.setAttribute("aria-hidden", "true");
     button.setAttribute("aria-label", "Bookmarked");
     button.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Bookmarked</span>`;
   });
-  track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"] .reader-section-saved-marker`).forEach((marker) => {
+  track.querySelectorAll(`.reader-panel .chapter-section[data-section-id="${CSS.escape(sectionKey)}"]`).forEach((section) => {
+    if (section.dataset.codeVersion !== exactCodeVersion) return;
+    const marker = section.querySelector(".reader-section-saved-marker");
+    if (!marker) return;
     marker.hidden = !saved;
     marker.setAttribute("aria-hidden", saved ? "false" : "true");
   });

@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-live-reader-evidence-v445"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-exact-bookmark-marker-v446"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
 
 let activationCompletion;

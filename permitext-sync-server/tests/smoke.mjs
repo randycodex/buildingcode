@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-live-reader-evidence-v445'),
+        webRoot.text.includes('/web/app.js?v=20260802-exact-bookmark-marker-v446'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-live-reader-evidence-v445'),
+        webRoot.text.includes('/web/styles.css?v=20260802-exact-bookmark-marker-v446'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1588,7 +1588,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-live-reader-evidence-v445'),
+        webRoot.text.includes('/web/styles.css?v=20260802-exact-bookmark-marker-v446'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1999,6 +1999,11 @@ async function main() {
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
+        workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
+        workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
+        workspaceScript.text.includes('wrapper.classList.remove("has-saved-section")') &&
+        workspaceScript.text.includes('button.hidden = true') &&
+        !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
         workspaceScript.text.includes('marker.hidden = !saved') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
         workspaceStyles.text.includes(".reader-section-saved-marker[hidden]") &&
@@ -2031,7 +2036,7 @@ async function main() {
         workspaceScript.text.includes("await removeSectionFromAllProjects(sectionPayload)") &&
         workspaceScript.text.includes("await removeSectionFromProject(project, link, { removeBookmark: false })") &&
         workspaceScript.text.includes("await persistSectionBookmark(item, false, { refreshSavedPanes: false })") &&
-        workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false)"),
+        workspaceScript.text.includes("syncReaderNoteBookmarkButtons(sectionID, false, item.codeVersion)"),
       "Removing a saved item no longer clears its bookmark and every project membership like iOS."
     );
     assert(
