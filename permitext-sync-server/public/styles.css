@@ -8681,6 +8681,15 @@ body.is-resizing-research-evidence * {
   transform: rotate(0deg);
 }
 
+.saved-panel .saved-code-group.is-collapsed .saved-code-toggle {
+  margin: 0;
+  padding-block: var(--space-1);
+}
+
+.saved-panel .saved-code-group.is-collapsed + .saved-code-group.is-collapsed {
+  margin-top: 0;
+}
+
 .saved-code-group.project-section-motion.is-open > .saved-code-group-body {
   padding-top: 0;
 }

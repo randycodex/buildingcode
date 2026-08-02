@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-project-summary-labels-v409";
+} from "./offline-storage.js?v=20260802-compact-code-groups-v410";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

@@ -94,6 +94,8 @@ assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: #f1f1f3;[\s\S]*?color: #141416;/);
 assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: #111113;[\s\S]*?color: #ffffff;/);
+assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle \{[\s\S]*?padding-block: var\(--space-1\);/);
+assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed \{[\s\S]*?margin-top: 0;/);
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
 assert.doesNotMatch(appSource, /typeLegend\.textContent = "Folder type"/);
 assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y="3"[\s\S]*?<rect x="14" y="14"/);
