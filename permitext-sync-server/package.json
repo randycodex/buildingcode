@@ -28,6 +28,7 @@
     "test:file-storage": "node --check file-store-coordinator.mjs && node --check private-path-containment.mjs && node --check image-storage.mjs && node tests/file-storage-hardening.mjs && node tests/image-storage-contract.mjs",
     "test:offline": "node tests/offline-contract.mjs",
     "test:rate-limit": "node tests/rate-limit-contract.mjs && node tests/rate-limit-postgres.mjs",
+    "test:routing": "node tests/vercel-routing-contract.mjs",
     "eval:research": "node tests/research-evals.mjs",
     "eval:research:live": "node tests/research-evals.mjs --run-live",
     "eval:research:list": "node tests/research-evals.mjs --list",
@@ -39,6 +40,7 @@
     "verify:production": "node tests/production-health.mjs",
     "verify:production:aasa": "node tests/production-aasa.mjs",
     "verify:production:identity": "node tests/production-identity-restore.mjs",
+    "verify:preview:routing": "node tests/preview-routing.mjs",
     "inventory:nyc-legal": "node scripts/inventory-nyc-legal-expansion.mjs"
   },
   "dependencies": {

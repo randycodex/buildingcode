@@ -15734,7 +15734,36 @@ function requestMutatesFileStore(request) {
   return request.method === "GET" && path === "account/apple/callback";
 }
 
+function requestTelemetryRoute(path) {
+  if (!path) return "root";
+  if (path === ".well-known/apple-app-site-association") return "apple-app-site-association";
+  if (path === "health") return "health";
+  const segments = path.split("/").filter(Boolean);
+  if (segments[0] === "code" && segments[1]) return `code/${segments[1]}`;
+  if (segments[0] === "research" && segments[1]) return `research/${segments[1]}`;
+  return segments[0] || "unknown";
+}
+
+function observeVercelRequest(request, response) {
+  if (!process.env.VERCEL || typeof response?.once !== "function") return;
+  const startedAt = performance.now();
+  const route = requestTelemetryRoute(normalizePath(request.url));
+  response.once("finish", () => {
+    const durationMilliseconds = Math.round(performance.now() - startedAt);
+    const statusCode = Number(response.statusCode || 0);
+    if (durationMilliseconds < 250 && statusCode < 500) return;
+    console.info(JSON.stringify({
+      event: "dynamic_route_timing",
+      route,
+      method: String(request.method || "GET").toUpperCase(),
+      statusCode,
+      durationMilliseconds
+    }));
+  });
+}
+
 export async function handleRequest(request, response) {
+  observeVercelRequest(request, response);
   if (!requestMutatesFileStore(request)) {
     await handleRequestUnlocked(request, response);
     return;
