@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-tool-grid-v418";
+} from "./offline-storage.js?v=20260802-coordination-width-v419";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -172,7 +172,8 @@ const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
 const defaultNotebookPaneWidth = 600;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
-const defaultCoordinationPaneWidth = 430;
+const legacyCoordinationPaneWidth = 430;
+const defaultCoordinationPaneWidth = 600;
 const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
 const readerSearchFlashDurationMS = 2000;
@@ -2438,6 +2439,9 @@ function defaultPaneWidthForID(paneID) {
 function migrateLegacyPaneWidth(paneID, value) {
   if ((paneID === "utility:saved" || paneID.startsWith("utility:saved:")) && value === defaultUtilityPaneWidth) {
     return defaultSavedPaneWidth;
+  }
+  if (isProjectCoordinationPaneID(paneID) && value === legacyCoordinationPaneWidth) {
+    return defaultCoordinationPaneWidth;
   }
   return value;
 }
