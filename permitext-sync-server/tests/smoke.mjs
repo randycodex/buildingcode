@@ -1237,7 +1237,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-reader-saved-marker-v430'),
+        webRoot.text.includes('/web/app.js?v=20260802-saved-bulk-select-v431'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1377,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-reader-saved-marker-v430'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-bulk-select-v431'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1581,7 +1581,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-reader-saved-marker-v430'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-bulk-select-v431'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1927,10 +1927,17 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function createSavedBulkSelectionController") &&
+        workspaceScript.text.includes('select.className = "saved-evidence-select-toggle"') &&
+        workspaceScript.text.includes('remove.className = "saved-evidence-delete-selection"') &&
+        workspaceScript.text.includes('cancel.className = "saved-evidence-cancel-selection"') &&
+        workspaceScript.text.includes("selectionController?.beginRender()") &&
+        workspaceScript.text.includes("removeButton.hidden = selectedCount === 0") &&
+        !workspaceScript.text.includes('removeButton.className = "saved-row-remove"') &&
+        workspaceStyles.text.includes(".saved-evidence-heading-actions") &&
         workspaceScript.text.includes('[["project", "New Project…"], ["reference", "New Reference…"]]') &&
         workspaceScript.text.includes('button.className = "reader-notes-project-option"') &&
         workspaceScript.text.includes('confirmButton.className = "reader-notes-project-confirm"'),
-      "Saved pane selection removal or new-project saving controls are missing."
+      "Saved Evidence bulk deletion or new-project saving controls are missing."
     );
     assert(
       workspaceScript.text.includes("function consolidatedSavedAnnotations") &&
@@ -1961,7 +1968,8 @@ async function main() {
         workspaceStyles.text.includes(".saved-section-row.is-list-paragraph .saved-section-title") &&
         workspaceScript.text.includes('sortSavedItems(filteredItems, "codeOrder")') &&
         workspaceScript.text.includes('renderSavedItemsByCode(content, orderedItems, paneID, {') &&
-        workspaceScript.text.includes('removableSavedItems: Boolean(selectedFolder && !savedInstance.showAllSaved)'),
+        workspaceScript.text.includes("const removableSavedItems = selectedFolder && !savedInstance.showAllSaved") &&
+        workspaceScript.text.includes("removableSavedItems: Boolean(selectionController)"),
       "Saved rows no longer match the iOS code, chapter, and code-order structure."
     );
     assert(

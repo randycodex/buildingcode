@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-reader-saved-marker-v430";
+} from "./offline-storage.js?v=20260802-saved-bulk-select-v431";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18068,7 +18068,29 @@ function createSavedEvidenceHeading() {
   search.setAttribute("aria-expanded", "false");
   search.setAttribute("aria-pressed", "false");
   search.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>';
-  heading.append(title, search);
+  const actions = document.createElement("div");
+  actions.className = "saved-evidence-heading-actions";
+  const select = document.createElement("button");
+  select.type = "button";
+  select.className = "saved-evidence-select-toggle";
+  select.title = "Select saved evidence";
+  select.setAttribute("aria-label", select.title);
+  select.setAttribute("aria-pressed", "false");
+  select.innerHTML = selectionModeIconSVG();
+  const remove = document.createElement("button");
+  remove.type = "button";
+  remove.className = "saved-evidence-delete-selection";
+  remove.title = "Delete selected evidence";
+  remove.setAttribute("aria-label", remove.title);
+  remove.innerHTML = removeIconSVG();
+  remove.hidden = true;
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.className = "saved-evidence-cancel-selection";
+  cancel.textContent = "Cancel";
+  cancel.hidden = true;
+  actions.append(search, select, remove, cancel);
+  heading.append(title, actions);
   return heading;
 }
 
@@ -18348,6 +18370,25 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
       return { ...item, folderNames: names };
     });
   if (!panel.isConnected) return;
+  const removableSavedItems = selectedFolder && !savedInstance.showAllSaved
+    ? resolvedItems.filter((item) => (summary.projectSections || []).some((link) =>
+        savedEvidenceKey(link) === savedEvidenceKey(item) &&
+        projectSectionBelongsToProject(link, selectedFolder)
+      ))
+    : [];
+  const selectionController = removableSavedItems.length
+    ? createSavedBulkSelectionController(panel, removableSavedItems, {
+        removeAction: (item) => unlinkEvidenceFromFolder(
+          selectedFolder,
+          (summary.projectSections || []).find((link) =>
+            savedEvidenceKey(link) === savedEvidenceKey(item) &&
+            projectSectionBelongsToProject(link, selectedFolder)
+          ) || item,
+          panel
+        )
+      })
+    : null;
+  panel.querySelector(".saved-evidence-select-toggle").hidden = !selectionController;
   const applySavedView = () => {
     const query = savedInstance.folderQuery.trim();
     const searchActive = Boolean(query);
@@ -18365,6 +18406,7 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
     const orderedItems = sortSavedItems(filteredItems, "codeOrder");
     clear(content);
     if (orderedItems.length > 0) {
+      selectionController?.beginRender();
       renderSavedItemsByCode(content, orderedItems, paneID, {
         showChapterHeaders: true,
         preserveOrder: true,
@@ -18377,17 +18419,8 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
           savedInstance.collapsedCodePrefixes = Array.from(collapsedPrefixes);
           saveWorkspaceState();
         },
-        removableSavedItems: Boolean(selectedFolder && !savedInstance.showAllSaved),
-        removeAction: selectedFolder
-          ? (item) => unlinkEvidenceFromFolder(
-              selectedFolder,
-              (summary.projectSections || []).find((link) =>
-                savedEvidenceKey(link) === savedEvidenceKey(item) &&
-                projectSectionBelongsToProject(link, selectedFolder)
-              ) || item,
-              panel
-            )
-          : null
+        removableSavedItems: Boolean(selectionController),
+        selectionController
       });
     } else if (resolvedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
@@ -18897,7 +18930,7 @@ function savedItemSelectionID(item) {
   return String(item?.id || `${item?.sectionID || "section"}:${item?.blockID || ""}`);
 }
 
-function createSavedBulkSelectionController(panel, savedItems) {
+function createSavedBulkSelectionController(panel, savedItems, options = {}) {
   const records = savedItems.filter((item) => item?.sectionID);
   const recordByID = new Map(records.map((item) => [savedItemSelectionID(item), item]));
   const orderedIDs = [...recordByID.keys()];
@@ -18906,43 +18939,20 @@ function createSavedBulkSelectionController(panel, savedItems) {
   let active = false;
   let busy = false;
 
-  const selectButton = document.createElement("button");
-  selectButton.className = "icon-button saved-select-button";
-  selectButton.type = "button";
-  selectButton.title = "Select saved items";
-  selectButton.setAttribute("aria-label", selectButton.title);
-  selectButton.setAttribute("aria-pressed", "false");
-  selectButton.innerHTML = selectionModeIconSVG();
-  panel.querySelector(".panel-actions")?.prepend(selectButton);
-
-  const bulkBar = document.createElement("section");
-  bulkBar.className = "project-bulk-bar saved-bulk-bar";
-  bulkBar.hidden = true;
-  const countLabel = document.createElement("span");
-  countLabel.className = "project-bulk-count";
-  const selectAllButton = document.createElement("button");
-  selectAllButton.className = "project-bulk-link";
-  selectAllButton.type = "button";
-  const removeButton = document.createElement("button");
-  removeButton.className = "project-bulk-action is-delete";
-  removeButton.type = "button";
-  const cancelButton = document.createElement("button");
-  cancelButton.className = "project-bulk-link";
-  cancelButton.type = "button";
-  cancelButton.textContent = "Cancel";
-  bulkBar.append(countLabel, selectAllButton, removeButton, cancelButton);
-  panel.append(bulkBar);
+  const selectButton = panel.querySelector(".saved-evidence-select-toggle");
+  const removeButton = panel.querySelector(".saved-evidence-delete-selection");
+  const cancelButton = panel.querySelector(".saved-evidence-cancel-selection");
+  if (!selectButton || !removeButton || !cancelButton) return null;
 
   const update = () => {
     panel.classList.toggle("is-saved-selecting", active);
     selectButton.setAttribute("aria-pressed", String(active));
-    bulkBar.hidden = !active;
     const selectedCount = selectedIDs.size;
-    countLabel.textContent = `${selectedCount} selected`;
-    selectAllButton.textContent = selectedCount === orderedIDs.length ? "Clear all" : "Select all";
-    removeButton.textContent = `Remove ${selectedCount}`;
+    removeButton.hidden = selectedCount === 0;
+    removeButton.title = selectedCount === 1 ? "Delete selected evidence" : `Delete ${selectedCount} selected items`;
+    removeButton.setAttribute("aria-label", removeButton.title);
     removeButton.disabled = selectedCount === 0 || busy;
-    selectAllButton.disabled = busy;
+    cancelButton.hidden = !active;
     cancelButton.disabled = busy;
     selectButton.disabled = busy;
     rows.forEach((row, id) => {
@@ -18959,6 +18969,9 @@ function createSavedBulkSelectionController(panel, savedItems) {
   };
   const controller = {
     isActive: () => active,
+    beginRender() {
+      rows.clear();
+    },
     register(row, item) {
       const id = savedItemSelectionID(item);
       rows.set(id, row);
@@ -18979,20 +18992,15 @@ function createSavedBulkSelectionController(panel, savedItems) {
   };
 
   selectButton.addEventListener("click", () => setActive(!active));
-  selectAllButton.addEventListener("click", () => {
-    if (selectedIDs.size === orderedIDs.length) selectedIDs.clear();
-    else orderedIDs.forEach((id) => selectedIDs.add(id));
-    update();
-  });
   cancelButton.addEventListener("click", () => setActive(false));
   removeButton.addEventListener("click", async () => {
     const selectedItems = orderedIDs.filter((id) => selectedIDs.has(id)).map((id) => recordByID.get(id));
     const count = selectedItems.length;
     if (!count) return;
     const confirmed = await confirmWebWarning(
-      "Remove saved items",
-      `This will remove the save from ${count} ${count === 1 ? "item" : "items"}. Are you sure?`,
-      { confirmLabel: "Remove" }
+      "Delete saved evidence",
+      `Delete ${count} selected ${count === 1 ? "item" : "items"} from this project?`,
+      { confirmLabel: "Delete" }
     );
     if (!confirmed) return;
     busy = true;
@@ -19000,12 +19008,15 @@ function createSavedBulkSelectionController(panel, savedItems) {
     let removedCount = 0;
     try {
       for (const item of selectedItems) {
-        await persistSectionBookmark(item, false, { refreshSavedPanes: false });
+        const removed = typeof options.removeAction === "function"
+          ? await options.removeAction(item)
+          : await persistSectionBookmark(item, false, { refreshSavedPanes: false });
+        if (removed === false) continue;
         removedCount += 1;
       }
       await showWebNotice(
-        "Saved items removed",
-        `${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} removed.`
+        "Saved evidence deleted",
+        `${removedCount} saved ${removedCount === 1 ? "item was" : "items were"} deleted.`
       );
       await renderWorkspace();
     } catch (error) {
@@ -19131,9 +19142,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           ? options.removableSavedItems(item)
           : Boolean(options.removableSavedItems);
         const selectableSavedItem = removableSavedItem && Boolean(options.selectionController);
-        if (removableSavedItem) {
-          row.classList.add("has-remove-action");
-        }
         const openButton = document.createElement("button");
         openButton.className = "saved-row-button saved-section-open";
         openButton.type = "button";
@@ -19214,40 +19222,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         });
         row.append(openButton);
         if (selectableSavedItem) options.selectionController.register(row, item);
-        if (removableSavedItem) {
-          const removeButton = document.createElement("button");
-          removeButton.className = "saved-row-remove";
-          removeButton.type = "button";
-          removeButton.title = "Remove saved section";
-          removeButton.setAttribute("aria-label", `Remove ${sectionDisplayTitle(item.sectionNumber || item.sectionID || "", item.title || "saved section")}`);
-          removeButton.innerHTML = `${removeIconSVG()}<span class="sr-only">Remove saved section</span>`;
-          removeButton.addEventListener("click", async () => {
-            removeButton.disabled = true;
-            removeButton.classList.remove("has-error");
-            row.classList.add("is-removing");
-            try {
-              if (typeof options.removeAction === "function") {
-                const removed = await options.removeAction(item);
-                if (!removed) {
-                  row.classList.remove("is-removing");
-                  return;
-                }
-              } else {
-                await persistSectionBookmark(item, false);
-              }
-              await renderWorkspace();
-            } catch (error) {
-              const message = error.message || "Could not remove saved section";
-              removeButton.title = message;
-              removeButton.classList.add("has-error");
-              row.classList.remove("is-removing");
-              presentWorkspaceIssue(message);
-            } finally {
-              removeButton.disabled = false;
-            }
-          });
-          row.append(removeButton);
-        }
         codeBody.append(row);
     });
 
