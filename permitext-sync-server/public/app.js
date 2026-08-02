@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-evidence-selection-layout-v441";
+} from "./offline-storage.js?v=20260802-projects-column-title-v442";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
