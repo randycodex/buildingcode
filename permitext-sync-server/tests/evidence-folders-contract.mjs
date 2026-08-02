@@ -75,6 +75,11 @@ assert.match(
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
 assert.match(appSource, /function renderSavedFolderContext\([\s\S]*?folderIsProject\(folder\)[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
 assert.match(appSource, /convert\.disabled = !hasCapability\("projects"\)/);
+assert.match(
+  appSource,
+  /if \(projectIsArchived\(project\)\) \{[\s\S]*?archivedLabel\.className = "settings-project-archive-label";[\s\S]*?archivedLabel\.textContent = "Archived";/,
+  "Settings must mark only archived folders when active and archived folders share a name."
+);
 assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);

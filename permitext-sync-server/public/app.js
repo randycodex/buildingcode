@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-clear-folder-links-v390";
+} from "./offline-storage.js?v=20260802-archived-label-v392";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -20355,7 +20355,13 @@ function renderSettings() {
     status.classList.toggle("has-error", isError);
   };
 
-  const settingsProjects = visibleProjectRecords(currentContentSummary().projects || []);
+  const settingsProjects = visibleProjectRecords(currentContentSummary().projects || [])
+    .map((project, sourceIndex) => ({ project, sourceIndex }))
+    .sort((left, right) =>
+      Number(projectIsArchived(left.project)) - Number(projectIsArchived(right.project)) ||
+      left.sourceIndex - right.sourceIndex
+    )
+    .map(({ project }) => project);
   const selectedProjectIDs = new Set();
   const projectCheckboxes = new Map();
   const updateProjectSelection = () => {
@@ -20383,6 +20389,12 @@ function renderSettings() {
     name.textContent = readableProjectName(project);
     copy.append(name);
     row.append(checkbox, copy);
+    if (projectIsArchived(project)) {
+      const archivedLabel = document.createElement("span");
+      archivedLabel.className = "settings-project-archive-label";
+      archivedLabel.textContent = "Archived";
+      row.append(archivedLabel);
+    }
     checkbox.addEventListener("change", () => {
       if (checkbox.checked) selectedProjectIDs.add(id);
       else selectedProjectIDs.delete(id);

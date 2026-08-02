@@ -9469,12 +9469,19 @@ body.is-resizing-research-evidence * {
 
 .settings-project-row {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
+  grid-template-columns: 18px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
   border-bottom: 1px solid var(--border);
   cursor: pointer;
+}
+
+.settings-project-archive-label {
+  justify-self: end;
+  color: var(--text-secondary);
+  font-size: 8.75pt !important;
+  white-space: nowrap;
 }
 
 .settings-project-row:last-child {
