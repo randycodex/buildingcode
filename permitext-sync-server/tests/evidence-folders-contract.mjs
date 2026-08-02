@@ -86,6 +86,8 @@ assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S
 assert.match(appSource, /collapsedCodePrefixes: searchActive \? \[\] : savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
 assert.match(appSource, /function savedEvidenceMatchesQuery\([\s\S]*?codeDisplayLabel\(prefix\)[\s\S]*?item\.chapterTitle[\s\S]*?item\.noteBody/);
+assert.doesNotMatch(appSource, /bookmarkIcon\.setAttribute\("aria-label", "Bookmarked"\)/);
+assert.match(appSource, /if \(status\.childElementCount\) metaLine\.append\(status\)/);
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evidence-search-toggle[\s\S]*?Search saved evidence/);
 assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);

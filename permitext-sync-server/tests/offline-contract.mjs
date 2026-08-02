@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-reader-width-v428"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-saved-row-status-v429"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
 
 let activationCompletion;

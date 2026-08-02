@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-reader-width-v428";
+} from "./offline-storage.js?v=20260802-saved-row-status-v429";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -19155,18 +19155,13 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           noteIcon.innerHTML = `<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"></path><path d="M8 9h8M8 13h6"></path></svg>`;
           status.append(noteIcon);
         }
-        if (item.savedColumnKind === "bookmark") {
-          const bookmarkIcon = document.createElement("span");
-          bookmarkIcon.setAttribute("aria-label", "Bookmarked");
-          bookmarkIcon.innerHTML = bookmarkIconSVG(true);
-          status.append(bookmarkIcon);
-        }
         const title = document.createElement(item.isNestedListParagraph ? "span" : "strong");
         title.className = "saved-section-title";
         title.textContent = titleText;
         const metaLine = document.createElement("span");
         metaLine.className = "saved-section-meta-line";
-        metaLine.append(meta, status);
+        metaLine.append(meta);
+        if (status.childElementCount) metaLine.append(status);
         heading.append(metaLine, title);
         openButton.append(heading);
         if (item.previewText) {
