@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-exact-bookmark-marker-v446'),
+        webRoot.text.includes('/web/app.js?v=20260802-paragraph-bookmark-marker-v448'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-exact-bookmark-marker-v446'),
+        webRoot.text.includes('/web/styles.css?v=20260802-paragraph-bookmark-marker-v448'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1588,7 +1588,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-exact-bookmark-marker-v446'),
+        webRoot.text.includes('/web/styles.css?v=20260802-paragraph-bookmark-marker-v448'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1999,12 +1999,18 @@ async function main() {
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
+        workspaceScript.text.includes('function savedSectionRecord(section, codeVersion = "")') &&
+        workspaceScript.text.includes('blockID: normalizeAnnotationBlockID(section.blockID)') &&
+        workspaceScript.text.includes('const savedTargetChanged = wasSaved') &&
+        workspaceScript.text.includes('(savedRecord ? normalizeAnnotationBlockID(blocks[0]?.id') &&
+        workspaceScript.text.includes('(savedRecord ? normalizeAnnotationBlockID(wrappers[0]?.dataset.commentBlockId)') &&
+        workspaceScript.text.includes('showBookmark: Boolean(savedRecord && savedBlockID === target.blockID)') &&
         workspaceScript.text.includes('sectionWrapper.dataset.codeVersion = syncCodeVersion') &&
         workspaceScript.text.includes('wrapper.dataset.commentCodeVersion = syncCodeVersion(target.codeVersion)') &&
-        workspaceScript.text.includes('wrapper.classList.remove("has-saved-section")') &&
-        workspaceScript.text.includes('button.hidden = true') &&
+        workspaceScript.text.includes('wrapper.classList.toggle("has-saved-section", showBookmark)') &&
+        workspaceScript.text.includes('button.hidden = !showBookmark') &&
         !workspaceScript.text.includes('const bookmarkWrapper = wrappers.find') &&
-        workspaceScript.text.includes('marker.hidden = !saved') &&
+        workspaceScript.text.includes('marker.hidden = !showSectionMarker') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
         workspaceStyles.text.includes(".reader-section-saved-marker[hidden]") &&
         !workspaceScript.text.includes("restoreReaderNotesSheet"),
