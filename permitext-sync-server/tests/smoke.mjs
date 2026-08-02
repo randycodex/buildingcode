@@ -682,8 +682,10 @@ async function main() {
         !savedTemplateSource.includes('class="saved-project-pages"') &&
         !savedTemplateSource.includes('class="saved-project-page-dots"') &&
         savedTemplateSource.includes('aria-label="Add Project or Reference folder"') &&
-        savedTemplateSource.includes('class="saved-code-filter"') &&
-        savedTemplateSource.includes('class="saved-code-filter-clear"') &&
+        savedTemplateSource.includes('class="saved-evidence-search"') &&
+        savedTemplateSource.includes('class="saved-evidence-search-input"') &&
+        savedTemplateSource.includes('class="saved-evidence-search-close"') &&
+        !savedTemplateSource.includes('class="saved-code-filter"') &&
         savedTemplateSource.includes('class="code-filter-menu saved-tag-filter-menu"') &&
         savedTemplateSource.includes('class="saved-tag-filter"') &&
         savedTemplateSource.indexOf('class="saved-projects-section code-filter-menu saved-projects-menu"') < savedTemplateSource.indexOf('class="saved-inline-filters"') &&
@@ -1236,7 +1238,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-blocknotes-uppercase-v411'),
+        webRoot.text.includes('/web/app.js?v=20260802-evidence-search-v412'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1376,7 +1378,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-blocknotes-uppercase-v411'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-search-v412'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1553,29 +1555,21 @@ async function main() {
       "Regular Reader headers should be fully opaque without a backdrop blur."
     );
     assert(
-      workspaceScript.text.includes("function savedCodeFilterMenuLabel(instance)") &&
-        workspaceScript.text.includes(".map((word) => word[0].toUpperCase())") &&
-        workspaceScript.text.includes('}).join(", ");') &&
-        workspaceScript.text.includes("label: savedCodeFilterMenuLabel") &&
-        workspaceScript.text.includes('filterRail.classList.contains("saved-code-filter") || filterRail.classList.contains("saved-tag-filter")') &&
-        workspaceScript.text.includes('? savedCodeBottomGap') &&
-        workspaceStyles.text.includes(".saved-inline-filters > .code-filter-menu {") &&
-        workspaceStyles.text.includes("--saved-filter-card-radius: 22px;") &&
-        workspaceStyles.text.includes("border-radius: var(--saved-filter-card-radius);") &&
-        !workspaceStyles.text.includes("transition: border-radius 420ms") &&
-        !workspaceStyles.text.includes("saved-filter-bubble") &&
-        !workspaceStyles.text.includes("clip-path: ellipse(") &&
-        workspaceStyles.text.includes(".code-filter-menu.is-open .saved-code-filter {") &&
-        workspaceStyles.text.includes("padding: var(--space-2) var(--space-3) var(--space-4);") &&
-        workspaceStyles.text.match(/\.saved-code-filter-actions,\s*\.saved-tag-filter-actions \{[\s\S]*?position: absolute;[\s\S]*?display: none;/) &&
-        workspaceStyles.text.includes(".saved-code-filter-menu.is-open .saved-code-filter-actions") &&
+      workspaceScript.text.includes("function createSavedEvidenceHeading()") &&
+        workspaceScript.text.includes('search.className = "saved-evidence-search-toggle"') &&
+        workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
+        workspaceScript.text.includes("instance.evidenceSearchOpen = true") &&
+        workspaceScript.text.includes('searchInput.oninput = () => {') &&
+        workspaceScript.text.includes('searchCloseButton.onclick = closeEvidenceSearch') &&
+        workspaceStyles.text.includes(".saved-evidence-search-input {") &&
+        workspaceStyles.text.includes("border-radius: 999px;") &&
+        workspaceStyles.text.includes(".saved-evidence-search[hidden]") &&
         workspaceStyles.text.includes(".saved-tag-filter-menu.is-open .saved-tag-filter-actions") &&
         webRoot.text.includes('class="saved-tag-filter-clear"') &&
         workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")') &&
         workspaceScript.text.includes("availableTags.forEach((tag) => {") &&
-        !workspaceScript.text.includes('["", ...availableTags].forEach((tag) => {') &&
-        workspaceStyles.text.includes("background: color-mix(in srgb, var(--text-tertiary) 16%, transparent);"),
-      "Saved code and tag filters should expand inside one growing card and summarize multiple codes by initials."
+        !workspaceScript.text.includes('["", ...availableTags].forEach((tag) => {'),
+      "Saved Evidence should provide a revealable project search while retaining optional tag filtering."
     );
     assert(
       !webRoot.text.includes("account-plan-detail") &&
@@ -1588,7 +1582,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-blocknotes-uppercase-v411'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-search-v412'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1949,12 +1943,12 @@ async function main() {
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
         workspaceScript.text.includes("const applySavedView = () =>") &&
-        workspaceScript.text.includes("const availableCodePrefixes = new Set") &&
-        workspaceScript.text.includes('option.prefix !== "ALL" && availableCodePrefixes.has(option.prefix)') &&
-        workspaceScript.text.includes('const codeClearButton = panel.querySelector(".saved-code-filter-clear")') &&
+        workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
+        workspaceScript.text.includes("codeDisplayLabel(prefix)") &&
+        workspaceScript.text.includes('const searchInput = panel.querySelector(".saved-evidence-search-input")') &&
         workspaceScript.text.includes("instance.codeFilters = [];") &&
-        workspaceScript.text.includes("updateCodeFilterMenu(codeRail, instance, {") &&
-        workspaceScript.text.includes("label: savedCodeFilterMenuLabel") &&
+        workspaceScript.text.includes("collapsedCodePrefixes: searchActive ? [] : savedInstance.collapsedCodePrefixes") &&
+        workspaceScript.text.includes("if (searchActive) return;") &&
         workspaceScript.text.includes("function mountProjectOpeningPane") &&
         workspaceScript.text.includes('panel.className = "workspace-panel project-detail-panel project-detail-loading"') &&
         workspaceScript.text.includes("savedContentComparisonText") &&

@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 
-const [appSource, stylesSource, serverSource, entitlementSource, swiftModelSource, swiftStoreSource] = await Promise.all([
+const [appSource, stylesSource, indexSource, serverSource, entitlementSource, swiftModelSource, swiftStoreSource] = await Promise.all([
   readFile(new URL("../public/app.js", import.meta.url), "utf8"),
   readFile(new URL("../public/styles.css", import.meta.url), "utf8"),
+  readFile(new URL("../public/index.html", import.meta.url), "utf8"),
   readFile(new URL("../app.mjs", import.meta.url), "utf8"),
   readFile(new URL("../entitlement-contract.mjs", import.meta.url), "utf8"),
   readFile(new URL("../../NYC CC APP/permitext/Models/CodeModels.swift", import.meta.url), "utf8"),
@@ -80,10 +81,15 @@ assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
-assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?savedTitle\.textContent = "Saved Evidence"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
 assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
-assert.match(appSource, /collapsedCodePrefixes: savedInstance\.collapsedCodePrefixes/);
+assert.match(appSource, /collapsedCodePrefixes: searchActive \? \[\] : savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
+assert.match(appSource, /function savedEvidenceMatchesQuery\([\s\S]*?codeDisplayLabel\(prefix\)[\s\S]*?item\.chapterTitle[\s\S]*?item\.noteBody/);
+assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);
+assert.match(appSource, /function createSavedEvidenceHeading\([\s\S]*?saved-evidence-search-toggle[\s\S]*?Search saved evidence/);
+assert.match(indexSource, /class="saved-evidence-search"[\s\S]*?class="saved-evidence-search-input"[\s\S]*?class="saved-evidence-search-close"/);
+assert.doesNotMatch(indexSource, /class="code-filter-menu saved-code-filter-menu"/);
 assert.match(appSource, /control\.setAttribute\("aria-expanded", String\(nextExpanded\)\)/);
 assert.match(appSource, /if \(!expanded\) body\.hidden = true/);
 assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed\)/);

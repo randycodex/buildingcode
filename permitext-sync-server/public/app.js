@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-blocknotes-uppercase-v411";
+} from "./offline-storage.js?v=20260802-evidence-search-v412";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -531,6 +531,7 @@ function newUtilityInstance(key, overrides = {}) {
     instance.selectedFolderID = String(overrides.selectedFolderID || "");
     instance.organizeUnassigned = Boolean(overrides.organizeUnassigned);
     instance.folderQuery = String(overrides.folderQuery || "");
+    instance.evidenceSearchOpen = Boolean(overrides.evidenceSearchOpen || instance.folderQuery.trim());
     instance.showAllSaved = Boolean(overrides.showAllSaved);
     instance.collapsedCodePrefixes = Array.from(new Set(
       (Array.isArray(overrides.collapsedCodePrefixes) ? overrides.collapsedCodePrefixes : [])
@@ -558,6 +559,7 @@ function normalizeUtilityInstances(saved = {}) {
       selectedFolderID: pane?.selectedFolderID,
       organizeUnassigned: pane?.organizeUnassigned,
       folderQuery: pane?.folderQuery,
+      evidenceSearchOpen: pane?.evidenceSearchOpen,
       showAllSaved: pane?.showAllSaved,
       collapsedCodePrefixes: pane?.collapsedCodePrefixes
     }))
@@ -1869,6 +1871,7 @@ function normalizeSavedInstance(instance) {
       selectedFolderID: "",
       organizeUnassigned: false,
       folderQuery: "",
+      evidenceSearchOpen: false,
       showAllSaved: false,
       collapsedCodePrefixes: []
     };
@@ -1882,6 +1885,7 @@ function normalizeSavedInstance(instance) {
   instance.selectedFolderID = String(instance.selectedFolderID || "");
   instance.organizeUnassigned = Boolean(instance.organizeUnassigned);
   instance.folderQuery = String(instance.folderQuery || "");
+  instance.evidenceSearchOpen = Boolean(instance.evidenceSearchOpen || instance.folderQuery.trim());
   instance.showAllSaved = Boolean(instance.showAllSaved);
   instance.collapsedCodePrefixes = Array.from(new Set(
     (Array.isArray(instance.collapsedCodePrefixes) ? instance.collapsedCodePrefixes : [])
@@ -17960,8 +17964,10 @@ function showSavedTagManager(panel, tags, onChange) {
 
 function renderSavedFilters(panel, instance, allItems, onChange) {
   const wrapper = panel.querySelector(".saved-inline-filters");
-  const codeRail = panel.querySelector(".saved-code-filter");
-  const codeClearButton = panel.querySelector(".saved-code-filter-clear");
+  const searchForm = panel.querySelector(".saved-evidence-search");
+  const searchInput = panel.querySelector(".saved-evidence-search-input");
+  const searchCloseButton = panel.querySelector(".saved-evidence-search-close");
+  const searchToggle = panel.querySelector(".saved-evidence-search-toggle");
   const tagRail = panel.querySelector(".saved-tag-filter");
   const tagMenu = panel.querySelector(".saved-tag-filter-menu");
   const tagClearButton = panel.querySelector(".saved-tag-filter-clear");
@@ -17974,12 +17980,46 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     .sort(([leftTag, leftCount], [rightTag, rightCount]) =>
       rightCount - leftCount || leftTag.localeCompare(rightTag, undefined, { sensitivity: "base" }))
     .map(([tag]) => tag);
-  const availableCodePrefixes = new Set(
-    allItems.map((item) => item.codePrefix || item.code || "BC")
-  );
-  instance.codeFilters = instance.codeFilters.filter((prefix) => availableCodePrefixes.has(prefix));
-  clear(codeRail);
+  instance.codeFilters = [];
   clear(tagRail);
+  const syncEvidenceSearch = ({ focus = false } = {}) => {
+    const open = Boolean(instance.evidenceSearchOpen);
+    searchForm.hidden = !open;
+    searchToggle?.setAttribute("aria-expanded", String(open));
+    searchToggle?.setAttribute("aria-pressed", String(open));
+    searchToggle?.setAttribute("title", open ? "Close saved evidence search" : "Search saved evidence");
+    searchToggle?.setAttribute("aria-label", open ? "Close saved evidence search" : "Search saved evidence");
+    if (open) {
+      searchInput.value = instance.folderQuery;
+      if (focus) requestAnimationFrame(() => searchInput.focus());
+    }
+  };
+  const closeEvidenceSearch = () => {
+    instance.folderQuery = "";
+    instance.evidenceSearchOpen = false;
+    searchInput.value = "";
+    syncEvidenceSearch();
+    onChange();
+    saveWorkspaceState();
+  };
+  searchForm.onsubmit = (event) => event.preventDefault();
+  searchInput.oninput = () => {
+    instance.folderQuery = searchInput.value;
+    onChange();
+    saveWorkspaceState();
+  };
+  searchCloseButton.onclick = closeEvidenceSearch;
+  if (searchToggle) {
+    searchToggle.onclick = () => {
+      if (instance.evidenceSearchOpen) closeEvidenceSearch();
+      else {
+        instance.evidenceSearchOpen = true;
+        syncEvidenceSearch({ focus: true });
+        saveWorkspaceState();
+      }
+    };
+  }
+  syncEvidenceSearch();
   if (!tagManageButton) {
     tagManageButton = document.createElement("button");
     tagManageButton.type = "button";
@@ -17991,52 +18031,6 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   tagManageButton.hidden = availableTags.length === 0;
   tagManageButton.onclick = () => showSavedTagManager(panel, availableTags, () => {
     void transitionWorkspace("utility", { refreshPaneIDs: [paneIDForUtilityInstance(instance)] });
-  });
-  searchCodeFilterOptions()
-    .filter((option) => option.prefix !== "ALL" && availableCodePrefixes.has(option.prefix))
-    .forEach((option) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.className = "search-filter-chip saved-filter-chip";
-      button.textContent = option.label;
-      button.dataset.prefix = option.prefix;
-      if (option.prefix !== "ALL") button.classList.add(`code-theme-${codeTheme(option.prefix)}`);
-      const selected = instance.codeFilters.includes(option.prefix);
-      button.setAttribute("aria-pressed", String(selected));
-      button.addEventListener("click", () => {
-        const selectedPrefixes = new Set(instance.codeFilters);
-        if (selectedPrefixes.has(option.prefix)) selectedPrefixes.delete(option.prefix);
-        else selectedPrefixes.add(option.prefix);
-        instance.codeFilters = [...selectedPrefixes];
-        codeRail.querySelectorAll(".saved-filter-chip").forEach((chip) => {
-          const prefix = chip.dataset.prefix || "";
-          const isSelected = instance.codeFilters.includes(prefix);
-          chip.setAttribute("aria-pressed", String(isSelected));
-        });
-        codeClearButton.disabled = instance.codeFilters.length === 0;
-        updateCodeFilterMenu(codeRail, instance, {
-          label: savedCodeFilterMenuLabel
-        });
-        onChange();
-        saveWorkspaceState();
-      });
-      codeRail.append(button);
-    });
-  codeClearButton.disabled = instance.codeFilters.length === 0;
-  codeClearButton.addEventListener("click", () => {
-    instance.codeFilters = [];
-    codeRail.querySelectorAll(".saved-filter-chip").forEach((chip) => {
-      chip.setAttribute("aria-pressed", "false");
-    });
-    codeClearButton.disabled = true;
-    updateCodeFilterMenu(codeRail, instance, {
-      label: savedCodeFilterMenuLabel
-    });
-    onChange();
-    saveWorkspaceState();
-  });
-  wireCodeFilterMenu(codeRail, instance, {
-    label: savedCodeFilterMenuLabel
   });
   if (availableTags.length) {
     availableTags.forEach((tag) => {
@@ -18086,6 +18080,24 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
     });
   }
   wrapper.hidden = allItems.length === 0;
+}
+
+function createSavedEvidenceHeading() {
+  const heading = document.createElement("div");
+  heading.className = "saved-evidence-heading";
+  const title = document.createElement("p");
+  title.className = "section-label";
+  title.textContent = "Saved Evidence";
+  const search = document.createElement("button");
+  search.type = "button";
+  search.className = "saved-evidence-search-toggle";
+  search.title = "Search saved evidence";
+  search.setAttribute("aria-label", "Search saved evidence");
+  search.setAttribute("aria-expanded", "false");
+  search.setAttribute("aria-pressed", "false");
+  search.innerHTML = '<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>';
+  heading.append(title, search);
+  return heading;
 }
 
 function appendSavedProjectSummaryField(container, label, value, options = {}) {
@@ -18194,11 +18206,8 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
 
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
-    const savedTitle = document.createElement("p");
-    savedTitle.className = "section-label";
-    savedTitle.textContent = "Saved Evidence";
     savedSection.append(
-      savedTitle,
+      createSavedEvidenceHeading(),
       panel.querySelector(".saved-inline-filters"),
       panel.querySelector(".saved-plan-usage"),
       panel.querySelector(".saved-content")
@@ -18247,11 +18256,8 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
 
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
-    const savedTitle = document.createElement("p");
-    savedTitle.className = "section-label";
-    savedTitle.textContent = "Saved Evidence";
     savedSection.append(
-      savedTitle,
+      createSavedEvidenceHeading(),
       panel.querySelector(".saved-inline-filters"),
       panel.querySelector(".saved-plan-usage"),
       panel.querySelector(".saved-content")
@@ -18295,6 +18301,28 @@ function renderUnassignedEvidenceNotice(panel, savedInstance, paneID, savedItems
   notice.append(heading, copy, action);
   panel.querySelector(".saved-inline-filters")?.before(notice);
   return unassignedIDs;
+}
+
+function savedEvidenceMatchesQuery(item, query) {
+  const normalizedQuery = String(query || "").trim().toLocaleLowerCase();
+  if (!normalizedQuery) return true;
+  const prefix = item.codePrefix || item.code || "BC";
+  return [
+    prefix,
+    codeDisplayLabel(prefix),
+    item.chapterNumber,
+    item.chapterID,
+    item.chapterTitle,
+    item.sectionNumber,
+    item.sectionID,
+    item.title,
+    item.body,
+    item.bodyText,
+    item.text,
+    item.excerpt,
+    item.noteBody,
+    ...savedItemTags(item)
+  ].some((value) => String(value || "").toLocaleLowerCase().includes(normalizedQuery));
 }
 
 async function hydrateSavedPanel(panel, savedInstance, paneID) {
@@ -18349,19 +18377,18 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
     });
   if (!panel.isConnected) return;
   const applySavedView = () => {
+    const query = savedInstance.folderQuery.trim();
+    const searchActive = Boolean(query);
     const filteredItems = resolvedItems.filter((item) => {
-      const prefixMatches = savedInstance.codeFilters.length === 0 || savedInstance.codeFilters.includes(item.codePrefix || item.code || "BC");
       const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
       const itemSectionID = savedEvidenceKey(item);
       const folderMatches = !selectedFolder || savedInstance.showAllSaved || (summary.projectSections || []).some((link) =>
         savedEvidenceKey(link) === itemSectionID &&
         projectSectionBelongsToProject(link, selectedFolder)
       );
-      const query = savedInstance.folderQuery.trim().toLocaleLowerCase();
-      const queryMatches = !query || [item.sectionNumber, item.title, item.noteBody, ...savedItemTags(item)]
-        .some((value) => String(value || "").toLocaleLowerCase().includes(query));
+      const queryMatches = savedEvidenceMatchesQuery(item, query);
       const organizationMatches = !savedInstance.organizeUnassigned || unassignedSectionIDs.has(itemSectionID);
-      return prefixMatches && tagMatches && folderMatches && queryMatches && organizationMatches;
+      return tagMatches && folderMatches && queryMatches && organizationMatches;
     });
     const orderedItems = sortSavedItems(filteredItems, "codeOrder");
     clear(content);
@@ -18369,8 +18396,9 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
       renderSavedItemsByCode(content, orderedItems, paneID, {
         showChapterHeaders: true,
         preserveOrder: true,
-        collapsedCodePrefixes: savedInstance.collapsedCodePrefixes,
+        collapsedCodePrefixes: searchActive ? [] : savedInstance.collapsedCodePrefixes,
         onCodeGroupToggle: (prefix, collapsed) => {
+          if (searchActive) return;
           const collapsedPrefixes = new Set(savedInstance.collapsedCodePrefixes);
           if (collapsed) collapsedPrefixes.add(prefix);
           else collapsedPrefixes.delete(prefix);
@@ -18570,6 +18598,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         instance.organizeUnassigned = false;
         instance.showAllSaved = false;
         instance.folderQuery = "";
+        instance.evidenceSearchOpen = false;
         saveWorkspaceState();
         try {
           if (nextFolderID && folderIsProject(project)) {

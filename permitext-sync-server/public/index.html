@@ -7,7 +7,7 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260802-blocknotes-uppercase-v411">
+    <link rel="stylesheet" href="/web/styles.css?v=20260802-evidence-search-v412">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68">
   </head>
   <body>
@@ -347,27 +347,12 @@
             <div class="saved-project-list"></div>
           </section>
           <section class="saved-inline-filters" hidden>
-            <div class="code-filter-menu saved-code-filter-menu">
-              <div class="saved-code-filter-heading">
-                <button class="code-filter-menu-toggle saved-code-filter-menu-toggle" type="button" aria-label="Expand code section filters" aria-expanded="false">
-                  <span class="code-filter-menu-label">All Sections</span>
-                  <span class="code-filter-menu-icon" aria-hidden="true">
-                    <svg class="code-filter-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4 4 4-4"></path></svg>
-                    <svg class="code-filter-chevron-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m8 14 4-4 4 4"></path></svg>
-                  </span>
-                </button>
-                <div class="saved-code-filter-actions">
-                  <button class="saved-code-filter-clear" type="button" title="Clear section filters" aria-label="Clear section filters">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="m7 21-4.3-4.3c-.9-.9-.9-2.3 0-3.2L13.4 2.8c.9-.9 2.3-.9 3.2 0l4.6 4.6c.9.9.9 2.3 0 3.2L11.8 20"></path>
-                      <path d="m5 11 9 9"></path>
-                      <path d="M22 21H7"></path>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-              <div class="saved-code-filter" aria-label="Filter saved sections by code section" hidden></div>
-            </div>
+            <form class="saved-evidence-search" role="search" hidden>
+              <input class="saved-evidence-search-input" type="search" placeholder="Search saved evidence" aria-label="Search saved evidence" autocomplete="off">
+              <button class="saved-evidence-search-close" type="button" title="Clear and close search" aria-label="Clear and close saved evidence search">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+              </button>
+            </form>
             <div class="code-filter-menu saved-tag-filter-menu">
               <div class="saved-tag-filter-heading">
                 <button class="code-filter-menu-toggle saved-tag-filter-menu-toggle" type="button" aria-label="Expand tag filters" aria-expanded="false">
@@ -583,6 +568,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260802-blocknotes-uppercase-v411" type="module"></script>
+    <script src="/web/app.js?v=20260802-evidence-search-v412" type="module"></script>
   </body>
 </html>
