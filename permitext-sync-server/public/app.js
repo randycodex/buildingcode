@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-marker-visibility-v432";
+} from "./offline-storage.js?v=20260802-recent-sdc-v433";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -9787,6 +9787,12 @@ function updateVisibleSearchHistoryEntry(panel, entry) {
   markResearchSelectable(preview, entry);
 }
 
+async function openRecentlyViewedInSDC(searchInstance, entry) {
+  if (!searchInstance?.id || !entry) return;
+  closeLinkedReaderForSearch(searchInstance.id);
+  await openSectionDetail(searchInstance.id, searchResultDetail(entry));
+}
+
 async function renderSearchHistory(panel, instance, options = {}) {
   const results = panel.querySelector(".search-results");
   const recentEntries = searchRecentlyViewedEntries();
@@ -9833,9 +9839,7 @@ async function renderSearchHistory(panel, instance, options = {}) {
       openButton.append(code, title, preview);
       openButton.addEventListener("click", () => {
         if (window.getSelection && String(window.getSelection()).trim()) return;
-        void openSavedItemInReader(entry, paneIDForUtilityInstance(instance), {
-          recentlyViewedSearchID: instance.id
-        });
+        void openRecentlyViewedInSDC(instance, entry);
       });
       tile.append(openButton);
       list.append(tile);

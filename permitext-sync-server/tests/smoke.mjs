@@ -1165,8 +1165,10 @@ async function main() {
         workspaceScript.text.includes("state.recentSearchHistory = normalizeRecentSearchHistory([") &&
         workspaceScript.text.includes('label.textContent = "Recently Viewed"') &&
         workspaceScript.text.includes('list.className = "search-history-list search-history-scroll-list search-jump-list"') &&
-        workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance), {") &&
-        workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
+        workspaceScript.text.includes("async function openRecentlyViewedInSDC(searchInstance, entry)") &&
+        workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
+        workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail(entry))") &&
+        workspaceScript.text.includes("void openRecentlyViewedInSDC(instance, entry)") &&
         workspaceScript.text.includes("await renderSearchHistory(panel, searchInstance, { hydrate: false });") &&
         workspaceScript.text.includes("function hydrateSearchPanelWhenConnected(panel, searchInstance, attempt = 0)") &&
         workspaceScript.text.includes("function mergeRecentlyViewedDetails(entries, options = {})") &&
@@ -1182,7 +1184,7 @@ async function main() {
         workspaceScript.text.includes('if (key === "search")') &&
         workspaceScript.text.includes('await transitionWorkspace("utility", { deferStateSave: true });') &&
         workspaceScript.text.includes('behavior: key === "search" ? "auto" : "smooth"') &&
-        !workspaceScript.text.includes("openSectionDetail(instance.id, entry);") &&
+        !workspaceScript.text.includes("void openSavedItemInReader(entry, paneIDForUtilityInstance(instance)") &&
         !workspaceScript.text.includes('bookmarkButton.className = "search-jump-bookmark"') &&
         !workspaceScript.text.includes('pages.className = "search-jump-pages"') &&
         !workspaceScript.text.includes('dots.className = "search-jump-dots"') &&
@@ -1237,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-saved-marker-visibility-v432'),
+        webRoot.text.includes('/web/app.js?v=20260802-recent-sdc-v433'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-marker-visibility-v432'),
+        webRoot.text.includes('/web/styles.css?v=20260802-recent-sdc-v433'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1532,17 +1534,11 @@ async function main() {
       "Unassigned Research conversations should not show redundant Project-assignment helper copy."
     );
     assert(
-      workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
-        workspaceScript.text.includes("recentlyViewedSourceSearchID: recentlyViewedSearchID") &&
-        workspaceScript.text.includes("state.searchLinkedReaders[recentlyViewedSearchID] = reader.id;") &&
-        workspaceScript.text.includes('panel.classList.toggle("is-recently-viewed-linked-reader", isRecentlyViewedLinkedReader)') &&
-        workspaceScript.text.includes('typographyToggle.closest(".reader-typography-menu").hidden = isRecentlyViewedLinkedReader;') &&
-        workspaceScript.text.includes("internalSearchButton.hidden = isRecentlyViewedLinkedReader;") &&
-        workspaceScript.text.includes("dragHandle.hidden = isRecentlyViewedLinkedReader;") &&
-        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader {") &&
-        workspaceStyles.text.includes("background: var(--recently-viewed-reader-background);") &&
-        workspaceStyles.text.includes(".reader-panel.is-recently-viewed-linked-reader::before {\n  right: 0;\n  background: var(--recently-viewed-reader-background);"),
-      "A Recently Viewed Reader should move with Search, retain only Close in its header, and carry its background through the full header."
+      !workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
+        workspaceScript.text.includes("async function openRecentlyViewedInSDC(searchInstance, entry)") &&
+        workspaceScript.text.includes("closeLinkedReaderForSearch(searchInstance.id)") &&
+        workspaceScript.text.includes("await openSectionDetail(searchInstance.id, searchResultDetail(entry))"),
+      "Recently Viewed should open the Section Detail column instead of a linked Reader."
     );
     const readerHeaderStyleSource =
       workspaceStyles.text.match(/\.reader-panel::before \{[\s\S]*?\n\}/)?.[0] || "";
@@ -1581,7 +1577,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-marker-visibility-v432'),
+        webRoot.text.includes('/web/styles.css?v=20260802-recent-sdc-v433'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
