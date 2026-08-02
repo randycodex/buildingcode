@@ -9,8 +9,8 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v400";
-const shellAssetVersion = "20260802-independent-sdc-v436";
+const shellCacheName = "permitext-pro-shell-v401";
+const shellAssetVersion = "20260802-sdc-reader-reuse-v437";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -19,10 +19,10 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260802-independent-sdc-v436",
-  "/web/app.js?v=20260802-independent-sdc-v436",
+  "/web/styles.css?v=20260802-sdc-reader-reuse-v437",
+  "/web/app.js?v=20260802-sdc-reader-reuse-v437",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260802-independent-sdc-v436",
+  "/web/offline-storage.js?v=20260802-sdc-reader-reuse-v437",
   "/web/workspace-state.js?v=20260802-coordination-workspace-v2",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",

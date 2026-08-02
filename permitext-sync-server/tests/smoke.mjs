@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-independent-sdc-v436'),
+        webRoot.text.includes('/web/app.js?v=20260802-sdc-reader-reuse-v437'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-independent-sdc-v436'),
+        webRoot.text.includes('/web/styles.css?v=20260802-sdc-reader-reuse-v437'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1434,6 +1434,8 @@ async function main() {
         workspaceScript.text.includes("const anchoredOwnerID = Object.entries(sectionDetailAnchorsBySearch())") &&
         workspaceScript.text.includes('instance.key === "sdc" && instance.id === anchoredOwnerID') &&
         workspaceScript.text.includes('sdcOwner = newUtilityInstance("sdc")') &&
+        workspaceScript.text.includes('.filter((instance) => instance.key === "search" || instance.key === "sdc")') &&
+        workspaceScript.text.includes("const existing = updateLinkedReaderForSearch(searchID, detail, overrides)") &&
         workspaceScript.text.includes("closeSavedItemDetailsForPane(savedPaneID)") &&
         workspaceScript.text.includes("function closeLinkedReaderForSavedPane(savedPaneID)") &&
         workspaceScript.text.includes("closeLinkedReaderForSavedPane(savedPaneID)") &&
@@ -1568,7 +1570,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-independent-sdc-v436'),
+        webRoot.text.includes('/web/styles.css?v=20260802-sdc-reader-reuse-v437'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

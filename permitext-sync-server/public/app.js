@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-independent-sdc-v436";
+} from "./offline-storage.js?v=20260802-sdc-reader-reuse-v437";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2525,7 +2525,9 @@ function sectionDetailAnchorsBySearch() {
 
 function searchLinkedReadersBySearch() {
   state.searchLinkedReaders = state.searchLinkedReaders && typeof state.searchLinkedReaders === "object" ? state.searchLinkedReaders : {};
-  const activeSearchIDs = new Set((state.utilityInstances || []).filter((instance) => instance.key === "search").map((instance) => instance.id));
+  const activeSearchIDs = new Set((state.utilityInstances || [])
+    .filter((instance) => instance.key === "search" || instance.key === "sdc")
+    .map((instance) => instance.id));
   const activeReaderIDs = new Set((state.readers || []).map((reader) => reader.id));
   Object.keys(state.searchLinkedReaders).forEach((searchID) => {
     if (!activeSearchIDs.has(searchID) || !activeReaderIDs.has(state.searchLinkedReaders[searchID])) {
