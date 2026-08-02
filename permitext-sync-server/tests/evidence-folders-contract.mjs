@@ -88,6 +88,7 @@ assert.match(appSource, /codeLabel\.setAttribute\("aria-expanded", String\(!coll
 assert.match(appSource, /codeBody\.hidden = collapsed/);
 assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed\)/);
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
+assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
 assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
 assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);

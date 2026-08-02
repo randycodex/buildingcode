@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-code-collapse-v400";
+} from "./offline-storage.js?v=20260802-project-summary-case-v401";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
