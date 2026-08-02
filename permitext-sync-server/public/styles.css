@@ -3524,6 +3524,10 @@ select option:checked {
   color: var(--text-secondary);
 }
 
+.reader-section-saved-marker[hidden] {
+  display: none;
+}
+
 .reader-section-saved-marker svg {
   width: 18px;
   height: 18px;
@@ -7991,6 +7995,12 @@ body.is-resizing-research-evidence * {
 
 .saved-evidence-delete-selection {
   color: var(--destructive, #ff6767);
+}
+
+.saved-evidence-select-toggle[hidden],
+.saved-evidence-delete-selection[hidden],
+.saved-evidence-cancel-selection[hidden] {
+  display: none;
 }
 
 .saved-evidence-cancel-selection {

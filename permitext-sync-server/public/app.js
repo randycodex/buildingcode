@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-bulk-select-v431";
+} from "./offline-storage.js?v=20260802-saved-marker-visibility-v432";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

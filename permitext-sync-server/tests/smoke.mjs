@@ -1237,7 +1237,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-saved-bulk-select-v431'),
+        webRoot.text.includes('/web/app.js?v=20260802-saved-marker-visibility-v432'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1377,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-bulk-select-v431'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-marker-visibility-v432'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1581,7 +1581,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-saved-bulk-select-v431'),
+        webRoot.text.includes('/web/styles.css?v=20260802-saved-marker-visibility-v432'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1990,6 +1990,7 @@ async function main() {
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
         workspaceScript.text.includes('marker.hidden = !saved') &&
         workspaceStyles.text.includes(".reader-section-saved-marker") &&
+        workspaceStyles.text.includes(".reader-section-saved-marker[hidden]") &&
         !workspaceScript.text.includes("restoreReaderNotesSheet"),
       "Paragraph taps or Reader saved markers no longer match the iOS note-sheet behavior."
     );
