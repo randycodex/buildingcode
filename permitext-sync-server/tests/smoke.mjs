@@ -1049,10 +1049,9 @@ async function main() {
         workspaceScript.text.includes("codeTrustProfiles = libraryPayload.codeTrustProfiles || []") &&
         !workspaceScript.text.includes("function renderReaderSectionToolbar") &&
         workspaceScript.text.includes('leadingActions.className = "reader-notes-leading-actions"') &&
-        workspaceScript.text.includes('projectButton.className = "reader-notes-card-action reader-notes-project-action"') &&
-        workspaceScript.text.includes('projectButton.textContent = "Folders"') &&
-        workspaceScript.text.includes('linkButton.textContent = "Copy link"') &&
-        workspaceScript.text.includes('researchButton.textContent = "Research"') &&
+        !workspaceScript.text.includes('reader-notes-project-action') &&
+        !workspaceScript.text.includes('reader-notes-link-action') &&
+        workspaceScript.text.includes('researchButton.textContent = "Add to Research"') &&
         workspaceScript.text.includes("await openReaderNotesProjectPicker(sheet, sectionPayload)") &&
         workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
@@ -1238,7 +1237,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-projects-open-v425'),
+        webRoot.text.includes('/web/app.js?v=20260802-note-actions-v426'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1378,7 +1377,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-projects-open-v425'),
+        webRoot.text.includes('/web/styles.css?v=20260802-note-actions-v426'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1582,7 +1581,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-projects-open-v425'),
+        webRoot.text.includes('/web/styles.css?v=20260802-note-actions-v426'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

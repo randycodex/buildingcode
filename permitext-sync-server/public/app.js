@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-projects-open-v425";
+} from "./offline-storage.js?v=20260802-note-actions-v426";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -8187,26 +8187,16 @@ function ensureReaderNotesSheet(panel, reader) {
   bookmarkButton.className = "reader-notes-bookmark";
   bookmarkButton.type = "button";
 
-  const projectButton = document.createElement("button");
-  projectButton.className = "reader-notes-card-action reader-notes-project-action";
-  projectButton.type = "button";
-  projectButton.textContent = "Folders";
-
-  const linkButton = document.createElement("button");
-  linkButton.className = "reader-notes-card-action reader-notes-link-action";
-  linkButton.type = "button";
-  linkButton.textContent = "Copy link";
-
   const researchButton = document.createElement("button");
   researchButton.className = "reader-notes-card-action reader-notes-research-action";
   researchButton.type = "button";
-  researchButton.textContent = "Research";
+  researchButton.textContent = "Add to Research";
 
   const leadingActions = document.createElement("div");
   leadingActions.className = "reader-notes-leading-actions";
   leadingActions.setAttribute("role", "toolbar");
   leadingActions.setAttribute("aria-label", "Section actions");
-  leadingActions.append(bookmarkButton, projectButton, linkButton, researchButton);
+  leadingActions.append(bookmarkButton, researchButton);
 
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
@@ -8584,8 +8574,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
 
   const saved = isSectionSaved({ sectionID: section.id, codeVersion: target.codeVersion });
   const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
-  const projectButton = sheet.querySelector(".reader-notes-project-action");
-  const linkButton = sheet.querySelector(".reader-notes-link-action");
   const researchButton = sheet.querySelector(".reader-notes-research-action");
   const sectionWrapper = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`);
   const sectionPayload = {
@@ -8627,46 +8615,12 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
       }
     };
   }
-  if (projectButton) {
-    projectButton.disabled = false;
-    projectButton.title = "Add section to Project or Reference folders";
-    projectButton.onclick = async () => {
-      projectButton.disabled = true;
-      try {
-        await openReaderNotesProjectPicker(sheet, sectionPayload);
-        refreshReaderSectionProjectContexts(section.id);
-      } catch (error) {
-        presentWorkspaceIssue(error.message || "Could not open folders.");
-      } finally {
-        projectButton.disabled = false;
-      }
-    };
-  }
-  if (linkButton) {
-    const sectionURL = sharedSectionURL(section.id);
-    linkButton.textContent = "Copy link";
-    linkButton.disabled = !sectionURL;
-    linkButton.title = sectionURL ? "Copy shareable section link" : "No shareable link is available for this section";
-    linkButton.onclick = async () => {
-      if (!sectionURL) return;
-      linkButton.disabled = true;
-      const copied = await copyTextToClipboard(sectionURL).catch(() => false);
-      linkButton.textContent = copied ? "Copied" : "Copy failed";
-      linkButton.title = copied ? "Section link copied" : "Could not copy section link";
-      window.setTimeout(() => {
-        if (!linkButton.isConnected || sheet.dataset.sectionId !== sectionID) return;
-        linkButton.textContent = "Copy link";
-        linkButton.title = "Copy shareable section link";
-        linkButton.disabled = false;
-      }, 1600);
-    };
-  }
   if (researchButton) {
     researchButton.disabled = !sectionWrapper ||
       String(reader?.codePrefix || "").toUpperCase() === zoningCodePrefix;
     researchButton.title = researchButton.disabled
       ? "Research requires enacted code text with stable section identifiers"
-      : "Start Research with this section as selected evidence";
+      : "Add this section to Research as selected evidence";
     researchButton.onclick = () => selectReaderSectionForResearch(sectionWrapper);
   }
 
