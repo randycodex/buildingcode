@@ -4,11 +4,29 @@ import {
   normalizeReportDraftPayload,
   reportDraftForClient,
   reportManifestSummary,
-  stableReportJSON
+  stableReportJSON,
+  unavailableReportEvidenceWarning
 } from "../report-contract.mjs";
 import { renderReportPDF } from "../report-pdf.mjs";
 
 const createdAt = "2026-07-24T12:00:00.000Z";
+assert.deepEqual(
+  unavailableReportEvidenceWarning(
+    { code: "ENOENT" },
+    { canonicalID: "1026", sectionNumber: "4.2.", title: "Roof framing" }
+  ),
+  {
+    kind: "evidence",
+    sourceID: "1026",
+    code: "ENOENT",
+    message: "4.2. Roof framing"
+  }
+);
+assert.equal(
+  unavailableReportEvidenceWarning({ code: "DATABASE_FAILURE" }, { canonicalID: "1026" }),
+  null,
+  "Report source recovery must not hide unexpected server failures."
+);
 const draft = normalizeReportDraftPayload({
   title: "Egress Code Review",
   reportDate: createdAt,

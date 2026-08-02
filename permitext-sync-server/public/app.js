@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-coordination-workspace-v378";
+} from "./offline-storage.js?v=20260802-project-tool-recovery-v381";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -5089,24 +5089,36 @@ async function flushPendingNotebookImages() {
 function notebookDocumentAssetURLs(document, prefix) {
   const urls = [];
   const visit = (block) => {
-    if (block?.type === "image" && String(block.props?.url || "").startsWith(prefix)) {
-      urls.push(block.props.url);
+    const url = block?.props?.url || block?.attrs?.src || block?.attrs?.url || "";
+    if (block?.type === "image" && String(url).startsWith(prefix)) {
+      urls.push(url);
     }
-    (block?.children || []).forEach(visit);
+    const children = Array.isArray(block?.children)
+      ? block.children
+      : Array.isArray(block?.content) ? block.content : [];
+    children.forEach(visit);
   };
-  (document?.document || []).forEach(visit);
+  const roots = Array.isArray(document?.document)
+    ? document.document
+    : Array.isArray(document?.document?.content) ? document.document.content : [];
+  roots.forEach(visit);
   return Array.from(new Set(urls));
 }
 
 function replaceNotebookDocumentAssetURL(document, fromURL, toURL) {
-  const replace = (block) => ({
-    ...block,
-    ...(block?.type === "image" && block.props?.url === fromURL
-      ? { props: { ...block.props, url: toURL } }
-      : {}),
-    children: (block?.children || []).map(replace)
-  });
-  return { ...document, document: (document?.document || []).map(replace) };
+  const replace = (value) => {
+    if (Array.isArray(value)) return value.map(replace);
+    if (!value || typeof value !== "object") return value;
+    const next = Object.fromEntries(
+      Object.entries(value).map(([key, nested]) => [key, replace(nested)])
+    );
+    if (value.type !== "image") return next;
+    if (value.props?.url === fromURL) next.props = { ...next.props, url: toURL };
+    if (value.attrs?.src === fromURL) next.attrs = { ...next.attrs, src: toURL };
+    if (value.attrs?.url === fromURL) next.attrs = { ...next.attrs, url: toURL };
+    return next;
+  };
+  return replace(document);
 }
 
 async function pruneUnusedPendingNotebookImages(accountUserID, projectID, cardID, document) {
@@ -12994,6 +13006,15 @@ function compareNotebookReferences(left, right) {
   });
 }
 
+function notebookResearchAnswers(foundation) {
+  const value = foundation?.researchAnswers;
+  if (Array.isArray(value)) return value;
+  if (!value || typeof value !== "object") return [];
+  return Object.values(value).filter((answer) =>
+    answer && typeof answer === "object" && String(answer.id || "").trim()
+  );
+}
+
 async function notebookReferenceCandidates(projectID, foundation, cards) {
   const activeLinks = (foundation.links || []).filter((link) =>
     !link.deletedAt && link.projectID === projectID
@@ -13020,7 +13041,7 @@ async function notebookReferenceCandidates(projectID, foundation, cards) {
     })
   );
   references.push(...canonicalReferences);
-  (foundation.researchAnswers || []).forEach((answer) => {
+  notebookResearchAnswers(foundation).forEach((answer) => {
     references.push({
       referenceKind: "researchAnswer",
       referenceID: answer.id,
@@ -13066,7 +13087,7 @@ async function openNotebookReference(project, foundation, reference, selectCard)
     return;
   }
   if (reference.referenceKind === "researchAnswer") {
-    const answer = (foundation.researchAnswers || [])
+    const answer = notebookResearchAnswers(foundation)
       .find((candidate) => candidate.id === reference.referenceID);
     if (answer?.conversationID) await openResearchConversation(answer.conversationID);
     return;
@@ -14082,6 +14103,7 @@ async function renderProjectReportDraft(project) {
 
   let drafts = [];
   let sources = [];
+  let sourceWarnings = [];
   let history = [];
   let reportOptions = {
     templates: [],
@@ -14294,6 +14316,22 @@ async function renderProjectReportDraft(project) {
     title.className = "section-label";
     title.textContent = "Project sources";
     container.append(title);
+    if (sourceWarnings.length) {
+      const warning = document.createElement("div");
+      warning.className = "project-studio-warning";
+      const warningTitle = document.createElement("strong");
+      warningTitle.textContent = `${sourceWarnings.length} linked code ${sourceWarnings.length === 1 ? "source is" : "sources are"} unavailable`;
+      const warningCopy = document.createElement("p");
+      warningCopy.textContent = "The unavailable source was omitted so you can continue editing this Report Draft. Re-open or remove its Saved evidence link before finalizing the report.";
+      const warningList = document.createElement("ul");
+      sourceWarnings.slice(0, 5).forEach((item) => {
+        const row = document.createElement("li");
+        row.textContent = item.message || item.sourceID || "Unavailable linked code source";
+        warningList.append(row);
+      });
+      warning.append(warningTitle, warningCopy, warningList);
+      container.append(warning);
+    }
     if (!sources.length) {
       const empty = document.createElement("p");
       empty.className = "report-draft-empty";
@@ -14599,6 +14637,7 @@ async function renderProjectReportDraft(project) {
     if (disposed) return panel;
     drafts = draftPayload.drafts || [];
     sources = sourcePayload.sources || [];
+    sourceWarnings = sourcePayload.warnings || [];
     history = historyPayload.reports || [];
     reportOptions = optionsPayload;
     selectedReportTemplateID = optionsPayload.defaultReportTemplateID ||

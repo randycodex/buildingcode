@@ -4,6 +4,23 @@ export const reportDraftSchemaVersion = 1;
 export const reportManifestSchemaVersion = 2;
 export const reportGeneratorVersion = "permitext-report-v2";
 
+const unavailableReportEvidenceCodes = new Set([
+  "ENOENT",
+  "INCOMPLETE_RESEARCH_SECTION",
+  "INVALID_RESEARCH_SECTION"
+]);
+
+export function unavailableReportEvidenceWarning(error, section = {}) {
+  if (!unavailableReportEvidenceCodes.has(error?.code)) return null;
+  return {
+    kind: "evidence",
+    sourceID: String(section.canonicalID || section.requestedID || ""),
+    code: error.code,
+    message: [section.sectionNumber, section.title].filter(Boolean).join(" ") ||
+      `Linked section ${section.requestedID || section.canonicalID || "is unavailable"}`
+  };
+}
+
 export const reportDraftBlockKinds = Object.freeze([
   "heading",
   "paragraph",

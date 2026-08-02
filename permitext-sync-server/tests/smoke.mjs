@@ -763,6 +763,13 @@ async function main() {
         workspaceScript.text.includes('postResearch("/organizations/controls/save"') &&
         workspaceScript.text.includes('postResearch("/reports/options"') &&
         workspaceScript.text.includes("reportTemplateID: selectedReportTemplateID") &&
+        workspaceScript.text.includes("sourceWarnings = sourcePayload.warnings || []") &&
+        workspaceScript.text.includes("linked code ${sourceWarnings.length === 1 ? \"source is\" : \"sources are\"} unavailable") &&
+        workspaceScript.text.includes("The unavailable source was omitted so you can continue editing this Report Draft.") &&
+        workspaceScript.text.includes("function notebookResearchAnswers(foundation)") &&
+        workspaceScript.text.includes("notebookResearchAnswers(foundation).forEach((answer) =>") &&
+        workspaceScript.text.includes("Array.isArray(document?.document?.content) ? document.document.content : []") &&
+        workspaceScript.text.includes('block?.attrs?.src || block?.attrs?.url || ""') &&
         workspaceScript.text.includes("async function downloadProjectReportFile") &&
         workspaceScript.text.includes('fetch("/reports/files/read"') &&
         workspaceScript.text.includes("function refreshOpenProjectPaneTheme(project)") &&
@@ -1224,7 +1231,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-coordination-workspace-v378'),
+        webRoot.text.includes('/web/app.js?v=20260802-project-tool-recovery-v381'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1360,7 +1367,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-coordination-workspace-v378'),
+        webRoot.text.includes('/web/styles.css?v=20260802-project-tool-recovery-v381'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1572,7 +1579,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-coordination-workspace-v378'),
+        webRoot.text.includes('/web/styles.css?v=20260802-project-tool-recovery-v381'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -5071,8 +5078,9 @@ async function main() {
           source.kind === "workboardPreview" &&
           source.id === workboardPreviewID &&
           source.sourceClassification === "project-material"
-        ),
-      "The Report Draft could not discover the Project's immutable Research answer and Workboard preview."
+        ) &&
+        Array.isArray(reportSources.json.warnings),
+      "The Report Draft could not discover Project sources with a stable warning contract."
     );
     const reportDate = "2026-07-24T12:00:00.000Z";
     const createReportDraft = await request("/reports/drafts/save", {

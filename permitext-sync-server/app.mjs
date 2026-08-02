@@ -74,7 +74,8 @@ import {
   immutableReportManifest,
   normalizeReportDraftPayload,
   reportDraftForClient,
-  reportManifestSummary
+  reportManifestSummary,
+  unavailableReportEvidenceWarning
 } from "./report-contract.mjs";
 import { renderReportPDF } from "./report-pdf.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
@@ -4329,34 +4330,54 @@ function matchingCanonicalResearchSelection(value, canonicalText) {
   return "";
 }
 
-async function researchEvidenceForSectionIDs(sectionIDs) {
+async function researchEvidenceForSectionIDs(sectionIDs, options = {}) {
   const evidence = [];
   const charactersPerSection = Math.min(12_000, Math.floor(60_000 / sectionIDs.length));
   const chapterSummaries = await chapterIndex();
   for (const requestedID of sectionIDs) {
-    const summary = await sectionSummaryByID(requestedID);
-    if (!summary) {
-      const error = new Error(`Unknown code section: ${requestedID}.`);
-      error.code = "INVALID_RESEARCH_SECTION";
-      throw error;
-    }
-    const canonicalID = String(summary.id || summary.sectionID || requestedID);
-    const body = await sectionBody(summary.webSectionID || requestedID, {
-      allowMissing: false,
-      canonicalSectionID: canonicalID
-    });
-    const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
-    const enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
-    const canonicalText = [summary.sectionNumber, summary.title, enactedBodyText]
-      .filter(Boolean)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim();
-    const text = enactedBodyText.slice(0, charactersPerSection);
-    if (!enactedBodyText) {
-      const error = new Error(`Section ${summary.sectionNumber || canonicalID} has no enacted text available for research.`);
-      error.code = "INCOMPLETE_RESEARCH_SECTION";
-      throw error;
+    let summary;
+    let canonicalID;
+    let body;
+    let enactedBodyText;
+    let canonicalText;
+    let text;
+    try {
+      summary = await sectionSummaryByID(requestedID);
+      if (!summary) {
+        const error = new Error(`Unknown code section: ${requestedID}.`);
+        error.code = "INVALID_RESEARCH_SECTION";
+        throw error;
+      }
+      canonicalID = String(summary.id || summary.sectionID || requestedID);
+      body = await sectionBody(summary.webSectionID || requestedID, {
+        allowMissing: false,
+        canonicalSectionID: canonicalID
+      });
+      const rawText = (body.blocks || []).map((block) => block.plainText || "").join("\n\n");
+      enactedBodyText = String(rawText || "").replace(/\s+/g, " ").trim();
+      canonicalText = [summary.sectionNumber, summary.title, enactedBodyText]
+        .filter(Boolean)
+        .join(" ")
+        .replace(/\s+/g, " ")
+        .trim();
+      text = enactedBodyText.slice(0, charactersPerSection);
+      if (!enactedBodyText) {
+        const error = new Error(`Section ${summary.sectionNumber || canonicalID} has no enacted text available for research.`);
+        error.code = "INCOMPLETE_RESEARCH_SECTION";
+        throw error;
+      }
+    } catch (error) {
+      const warning = unavailableReportEvidenceWarning(error, {
+        requestedID: String(requestedID),
+        canonicalID: String(canonicalID || requestedID),
+        sectionNumber: String(summary?.sectionNumber || ""),
+        title: String(summary?.title || "")
+      });
+      if (!options.skipUnavailable || !warning) {
+        throw error;
+      }
+      options.onUnavailable?.(warning);
+      continue;
     }
     const visualReferences = visualSourceReferences(body);
     const visualSources = (await Promise.all(
@@ -8510,12 +8531,18 @@ async function reportSourcesForProject(userID, projectID) {
     .filter((link) => !link.deletedAt && link.projectID === projectID);
   const artifacts = await listStoredFoundationArtifacts(userID);
   const sources = [];
+  const warnings = [];
 
   const sectionIDs = Array.from(new Set(
     links.filter((link) => link.targetKind === "canonicalSection").map((link) => link.targetID)
   ));
   if (sectionIDs.length) {
-    const evidenceItems = await researchEvidenceForSectionIDs(sectionIDs);
+    const evidenceItems = await researchEvidenceForSectionIDs(sectionIDs, {
+      skipUnavailable: true,
+      onUnavailable(warning) {
+        warnings.push(warning);
+      }
+    });
     evidenceItems.forEach((evidence) => {
       sources.push({
         id: evidence.sectionID,
@@ -8632,7 +8659,7 @@ async function reportSourcesForProject(userID, projectID) {
         });
       });
   }
-  return sources;
+  return { sources, warnings };
 }
 
 async function handleReportSourceList(request, response) {
@@ -8646,11 +8673,15 @@ async function handleReportSourceList(request, response) {
     organizationPermissions.reportDownload
   );
   if (!access) return;
-  const sources = await reportSourcesForProject(access.storageOwnerUserID, access.projectID);
+  const { sources, warnings } = await reportSourcesForProject(
+    access.storageOwnerUserID,
+    access.projectID
+  );
   sendJSON(response, 200, {
     schemaVersion: 1,
     projectID: access.projectID,
-    sources: sources.map(reportSourceClientSummary)
+    sources: sources.map(reportSourceClientSummary),
+    warnings
   });
 }
 
@@ -8768,7 +8799,7 @@ async function handleReportDraftGet(request, response) {
 }
 
 async function validateReportDraftSources(userID, projectID, draft) {
-  const sources = await reportSourcesForProject(userID, projectID);
+  const { sources } = await reportSourcesForProject(userID, projectID);
   const sourceKeys = new Set(sources.map((source) => `${source.kind}:${source.id}`));
   for (const block of draft.blocks) {
     if (["heading", "paragraph", "list"].includes(block.kind)) continue;
@@ -9054,7 +9085,7 @@ async function handleReportGenerate(request, response) {
       reportConfiguration.controls,
       context.body.reportTemplateID
     );
-    const sources = await reportSourcesForProject(storageOwnerUserID, access.projectID);
+    const { sources } = await reportSourcesForProject(storageOwnerUserID, access.projectID);
     const sourcesByKey = new Map(sources.map((source) => [`${source.kind}:${source.id}`, source]));
     const priorManifests = await projectReportManifests(storageOwnerUserID, access.projectID);
     const reportVersion = Math.max(
