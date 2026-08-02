@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-evidence-search-v412";
+} from "./offline-storage.js?v=20260802-evidence-search-size-v413";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
