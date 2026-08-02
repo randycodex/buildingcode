@@ -7878,9 +7878,17 @@ body.is-resizing-research-evidence * {
   text-transform: none;
 }
 
-.saved-project-tool-controls {
+.saved-folder-context.is-project .saved-project-tool-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: 100%;
   padding-top: var(--space-3);
   border-top: 1px solid color-mix(in srgb, var(--project-color) 36%, var(--border));
+}
+
+.saved-folder-context.is-project .saved-project-tool-controls button {
+  width: 100%;
+  min-width: 0;
 }
 
 .saved-folder-context.is-project > .project-studio-section,

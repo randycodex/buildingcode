@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-research-heading-v416";
+} from "./offline-storage.js?v=20260802-tool-grid-v418";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
