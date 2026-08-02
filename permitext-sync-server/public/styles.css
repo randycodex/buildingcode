@@ -5678,22 +5678,10 @@ mark {
 }
 
 .research-conversation-project-options {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-auto-flow: row;
-  column-gap: calc(var(--space-3) * 2);
-  gap: var(--space-2);
+  display: block;
   margin: 0;
   padding: 0 var(--space-3);
-  background-image: linear-gradient(
-    to right,
-    transparent calc(50% - 0.5px),
-    color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% - 0.5px),
-    color-mix(in srgb, var(--text-tertiary) 34%, transparent) calc(50% + 0.5px),
-    transparent calc(50% + 0.5px)
-  );
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-image: none;
 }
 
 .code-filter-menu.is-open .research-conversation-project-options {
@@ -5701,10 +5689,12 @@ mark {
 }
 
 .research-conversation-project-option {
+  display: block;
   width: 100%;
   min-height: 0;
-  padding: var(--space-1) 0;
+  padding: 6px 0;
   border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--text-tertiary) 24%, transparent);
   border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
@@ -5714,8 +5704,8 @@ mark {
   white-space: normal;
 }
 
-.research-conversation-project-option:nth-child(even) {
-  padding-left: var(--space-2);
+.research-conversation-project-option:last-child {
+  border-bottom: 0;
 }
 
 .research-conversation-project-option[aria-pressed="true"] {

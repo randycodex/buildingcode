@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-notebook-reference-density-v455";
+} from "./offline-storage.js?v=20260802-research-project-list-v456";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
