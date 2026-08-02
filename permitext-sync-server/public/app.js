@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-hide-row-folders-v439";
+} from "./offline-storage.js?v=20260802-collapsed-project-name-v440";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18499,13 +18499,19 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
   let showingArchived = Boolean(instance.projectsArchiveMode);
   let switchCleanupTimer = null;
+  const projectsMenuLabel = (savedInstance) => {
+    if (savedInstance.projectsMenuOpen) return "";
+    if (savedInstance.projectsArchiveMode) return "Archived Projects";
+    const selectedFolder = projects.find((project) =>
+      projectRecordID(project) === String(savedInstance.selectedFolderID || "")
+    );
+    return selectedFolder?.name || selectedFolder?.title || "Projects";
+  };
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   wireCodeFilterMenu(list, instance, {
     stateKey: "projectsMenuOpen",
     menuName: "projects",
-    label: (savedInstance) => savedInstance.projectsMenuOpen
-      ? ""
-      : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+    label: projectsMenuLabel
   });
   const projectsMenuToggle = panel.querySelector(".saved-projects-menu-toggle");
   projectsMenuToggle.addEventListener("click", () => {
@@ -18542,9 +18548,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       updateCodeFilterMenu(list, instance, {
         stateKey: "projectsMenuOpen",
         menuName: "projects",
-        label: (savedInstance) => savedInstance.projectsMenuOpen
-          ? ""
-          : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+        label: projectsMenuLabel
       });
       return;
     }
@@ -18751,9 +18755,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
       menuName: "projects",
-      label: (savedInstance) => savedInstance.projectsMenuOpen
-        ? ""
-        : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
+      label: projectsMenuLabel
     });
   };
 
