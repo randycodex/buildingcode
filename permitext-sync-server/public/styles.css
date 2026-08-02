@@ -2471,7 +2471,7 @@ select option:checked {
   min-width: 0;
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
-  font-weight: 700;
+  font-weight: 400;
   line-height: 1.25;
   overflow-wrap: anywhere;
 }
@@ -2480,6 +2480,7 @@ select option:checked {
   float: left;
   margin-right: 12px;
   color: var(--code-accent);
+  font-weight: 700;
 }
 
 .section-detail-jump {

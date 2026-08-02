@@ -1244,7 +1244,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-notebook-reference-spacing-v453'),
+        webRoot.text.includes('/web/app.js?v=20260802-section-detail-format-v454'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1388,7 +1388,7 @@ async function main() {
         workspaceStyles.text.includes("align-self: start;") &&
         workspaceStyles.text.includes("height: auto;") &&
         !workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-option {\n  display: grid;\n  gap: 3px;\n  align-items: flex-start;\n  min-width: 0;\n  min-height: 48px;\n  height: 100%;") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-spacing-v453'),
+        webRoot.text.includes('/web/styles.css?v=20260802-section-detail-format-v454'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1597,7 +1597,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-spacing-v453'),
+        webRoot.text.includes('/web/styles.css?v=20260802-section-detail-format-v454'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2349,6 +2349,11 @@ async function main() {
         workspaceStyles.text.match(/\.chapter-section \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) 46px;[\s\S]*?column-gap: var\(--space-1\);/) &&
         workspaceStyles.text.match(/\.inline-comment-toggle \{[\s\S]*?right: 22px;/),
       "Reader comment and bookmark rail no longer preserves the compact 46-pixel layout."
+    );
+    assert(
+      workspaceStyles.text.match(/\.section-detail-heading span \{[^}]*font-weight: 400;/) &&
+        workspaceStyles.text.match(/\.section-detail-heading \.section-detail-number \{[^}]*font-weight: 700;/),
+      "Section Detail should preserve normal Reader text weight while emphasizing only the section number."
     );
     assert(
         workspaceScript.text.includes("toggleReaderNotesSheet(panel, section, reader, { target });") &&

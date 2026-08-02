@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-notebook-reference-spacing-v453";
+} from "./offline-storage.js?v=20260802-section-detail-format-v454";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
