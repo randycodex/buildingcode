@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-evidence-heading-gap-v435";
+} from "./offline-storage.js?v=20260802-independent-sdc-v436";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -2505,7 +2505,9 @@ function sectionDetailsBySearch() {
     }
     state.sectionDetail = null;
   }
-  const activeSearchIDs = new Set((state.utilityInstances || []).filter((instance) => instance.key === "search").map((instance) => instance.id));
+  const activeSearchIDs = new Set((state.utilityInstances || [])
+    .filter((instance) => instance.key === "search" || instance.key === "sdc")
+    .map((instance) => instance.id));
   Object.keys(state.sectionDetails).forEach((searchID) => {
     if (!activeSearchIDs.has(searchID)) delete state.sectionDetails[searchID];
   });
@@ -2565,8 +2567,8 @@ function defaultActivePaneIDs() {
   });
   if (state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
-    ids.push(paneIDForUtilityInstance(instance));
-    if (instance.key === "search" && sectionDetailsBySearch()[instance.id]) {
+    if (instance.key !== "sdc") ids.push(paneIDForUtilityInstance(instance));
+    if ((instance.key === "search" || instance.key === "sdc") && sectionDetailsBySearch()[instance.id]) {
       ids.push(paneIDForSectionDetail(instance.id));
     }
   });
@@ -2620,10 +2622,10 @@ function activePaneIDs() {
     }
   }
   (state.utilityInstances || []).forEach((instance) => {
-    if (instance.key !== "search" || !sectionDetailsBySearch()[instance.id]) return;
+    if ((instance.key !== "search" && instance.key !== "sdc") || !sectionDetailsBySearch()[instance.id]) return;
     const searchID = paneIDForUtilityInstance(instance);
     const detailID = paneIDForSectionDetail(instance.id);
-    const anchorPaneID = sectionDetailAnchorsBySearch()[instance.id] || searchID;
+    const anchorPaneID = sectionDetailAnchorsBySearch()[instance.id] || (instance.key === "sdc" ? primarySavedPaneID() : searchID);
     const anchorIndex = paired.indexOf(anchorPaneID);
     if (anchorIndex === -1) {
       paired.push(detailID);
@@ -10663,6 +10665,9 @@ async function renderSectionDetail(searchID, detail) {
     closeLinkedReaderForSearch(searchID);
     delete sectionDetailsBySearch()[searchID];
     delete sectionDetailAnchorsBySearch()[searchID];
+    state.utilityInstances = (state.utilityInstances || []).filter((instance) =>
+      instance.id !== searchID || instance.key !== "sdc"
+    );
     saveWorkspaceState();
     void transitionWorkspace("utility");
   });
@@ -10745,7 +10750,10 @@ function closeUtilityInstance(instance) {
   const paneID = paneIDForUtilityInstance(instance);
   const detailID = instance.key === "search" ? paneIDForSectionDetail(instance.id) : "";
   if (instance.key === "search") closeLinkedReaderForSearch(instance.id);
-  if (instance.key === "saved") closeLinkedReaderForSavedPane(paneID);
+  if (instance.key === "saved") {
+    closeLinkedReaderForSavedPane(paneID);
+    closeSavedItemDetailsForPane(paneID);
+  }
   state.utilityInstances = (state.utilityInstances || []).filter((pane) => pane.id !== instance.id);
   if (instance.key === "search") {
     delete sectionDetailsBySearch()[instance.id];
@@ -19305,25 +19313,27 @@ function closeSavedItemDetailsForPane(savedPaneID) {
     delete anchors[searchID];
     delete state.paneWeights[detailPaneID];
     state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== detailPaneID);
+    state.utilityInstances = (state.utilityInstances || []).filter((instance) =>
+      instance.id !== searchID || instance.key !== "sdc"
+    );
   });
 }
 
 async function openSavedItemInSDC(item, savedPaneID) {
   const sectionID = String(item?.sectionID || item?.id || "").trim();
   if (!sectionID) return;
-  const anchoredSearchID = Object.entries(sectionDetailAnchorsBySearch())
+  const anchoredOwnerID = Object.entries(sectionDetailAnchorsBySearch())
     .find(([, anchorPaneID]) => anchorPaneID === savedPaneID)?.[0] || "";
-  let searchInstance = (state.utilityInstances || []).find((instance) =>
-    instance.key === "search" && instance.id === anchoredSearchID
-  ) || (state.utilityInstances || []).find((instance) => instance.key === "search");
-  if (!searchInstance) {
-    searchInstance = newUtilityInstance("search");
-    state.utilityInstances = [...(state.utilityInstances || []), searchInstance];
+  let sdcOwner = (state.utilityInstances || []).find((instance) =>
+    instance.key === "sdc" && instance.id === anchoredOwnerID
+  );
+  if (!sdcOwner) {
+    closeSavedItemDetailsForPane(savedPaneID);
+    sdcOwner = newUtilityInstance("sdc");
+    state.utilityInstances = [...(state.utilityInstances || []), sdcOwner];
   }
-  closeSavedItemDetailsForPane(savedPaneID);
   closeLinkedReaderForSavedPane(savedPaneID);
-  closeLinkedReaderForSearch(searchInstance.id);
-  await openSectionDetail(searchInstance.id, searchResultDetail({
+  await openSectionDetail(sdcOwner.id, searchResultDetail({
     ...item,
     id: sectionID,
     sectionID
@@ -21712,7 +21722,7 @@ async function renderWorkspace() {
   for (const instance of state.utilityInstances || []) {
     const pane = await renderUtilityInstance(instance);
     if (pane) panes.push(pane);
-    if (instance.key === "search") {
+    if (instance.key === "search" || instance.key === "sdc") {
       const detail = sectionDetailsBySearch()[instance.id];
       if (detail) panes.push(await renderSectionDetail(instance.id, detail));
     }
@@ -21791,10 +21801,12 @@ async function renderUtilityWorkspace(options = {}) {
   }
   for (const instance of state.utilityInstances || []) {
     const paneID = paneIDForUtilityInstance(instance);
-    const pane = await reuseOrRenderPane(paneID, () => renderUtilityInstance(instance));
-    wireUtilityInstanceActions(pane, instance);
-    if (pane) panes.push(pane);
-    if (instance.key === "search") {
+    if (instance.key !== "sdc") {
+      const pane = await reuseOrRenderPane(paneID, () => renderUtilityInstance(instance));
+      wireUtilityInstanceActions(pane, instance);
+      if (pane) panes.push(pane);
+    }
+    if (instance.key === "search" || instance.key === "sdc") {
       const detailID = paneIDForSectionDetail(instance.id);
       const detailState = sectionDetailsBySearch()[instance.id];
       if (detailState) {

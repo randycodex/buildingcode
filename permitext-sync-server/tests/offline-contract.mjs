@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-evidence-heading-gap-v435"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-independent-sdc-v436"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
 
 let activationCompletion;
