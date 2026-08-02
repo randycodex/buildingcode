@@ -107,9 +107,11 @@ assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.sav
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \+ \.saved-code-group\.is-collapsed \{[\s\S]*?margin-top: 0;/);
 assert.match(appSource, /typeGroup\.setAttribute\("aria-label", "Folder type"\)/);
 assert.match(appSource, /addressLabel\.hidden = selectedFolderType === "reference"/);
+assert.match(appSource, /sheet\.classList\.toggle\("is-reference-folder", selectedFolderType === "reference"\)/);
 assert.match(appSource, /address: selectedFolderType === "reference" \? "" : addressInput\.value/);
 assert.doesNotMatch(appSource, /colorGroup\.hidden = selectedFolderType === "reference"/);
 assert.match(stylesSource, /\.project-sheet-field\[hidden\] \{[\s\S]*?display: none;/);
+assert.match(stylesSource, /\.project-create-sheet\.is-reference-folder \.project-description-input \{[\s\S]*?min-height: calc\(126px \+ var\(--space-3\)\);[\s\S]*?max-height: 230px;/);
 assert.doesNotMatch(appSource, /typeLegend\.textContent = "Folder type"/);
 assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y="3"[\s\S]*?<rect x="14" y="14"/);
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);

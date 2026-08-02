@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-reference-address-v422";
+} from "./offline-storage.js?v=20260802-reference-notes-size-v423";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -17487,6 +17487,7 @@ function showProjectCreateSheet(panel, project = null, options = {}) {
   typeGroup.setAttribute("aria-label", "Folder type");
   const typeChoices = document.createElement("div");
   const syncFolderTypeControls = () => {
+    sheet.classList.toggle("is-reference-folder", selectedFolderType === "reference");
     typeChoices.querySelectorAll("button").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.folderType === selectedFolderType));
     });

@@ -8692,6 +8692,11 @@ body.is-resizing-research-evidence * {
   overflow-wrap: anywhere;
 }
 
+.project-create-sheet.is-reference-folder .project-description-input {
+  min-height: calc(126px + var(--space-3));
+  max-height: 230px;
+}
+
 .project-sheet-field .project-description-input {
   text-align: left;
 }
