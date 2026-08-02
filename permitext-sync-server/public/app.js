@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-compact-code-groups-v410";
+} from "./offline-storage.js?v=20260802-blocknotes-uppercase-v411";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
