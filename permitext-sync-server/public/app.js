@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-evidence-folders-v389";
+} from "./offline-storage.js?v=20260802-clear-folder-links-v390";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -6201,7 +6201,7 @@ function deletedSavedMutationForSection(section, existingRecord = null) {
   return {
     savedItem: {
       id: existing.id || `web-saved-${safeAnnotationIDPart(syncCodeVersion(section.codeVersion))}-${section.sectionID}`,
-      userID: account.userID,
+      userID: account?.userID || existing.userID || "local-web",
       codeVersion: syncCodeVersion(existing.codeVersion || section.codeVersion),
       sectionID: Number(section.sectionID),
       sectionNumber: section.sectionNumber || existing.sectionNumber || "",
@@ -19240,7 +19240,7 @@ function bookmarkRecordsForSettings() {
     .filter((item) => item?.sectionID && !item.deletedAt);
 }
 
-function enqueueSettingsBulkClear(scope) {
+function enqueueSettingsBulkClear(scope, options = {}) {
   const account = activeAccount();
   if (!account) return null;
   const mutation = {
@@ -19257,17 +19257,49 @@ function enqueueSettingsBulkClear(scope) {
     ...(state.localBulkClears || []).filter((item) => bulkClearKey(item) !== key),
     record
   ];
-  enqueueSyncMutation(mutation, account);
+  enqueueSyncMutation(mutation, account, options);
   return mutation;
 }
 
 async function clearSettingsBookmarks() {
+  const summary = currentContentSummary();
   const records = bookmarkRecordsForSettings();
+  const projectSections = (summary.projectSections || [])
+    .filter((item) => item?.sectionID && !item.deletedAt);
+  const folders = visibleProjectRecords(summary.projects || []);
+  const savedTombstones = records.map((record) =>
+    deletedSavedMutationForSection(record, record).savedItem
+  );
+  const membershipTombstones = projectSections.map((item) => {
+    const folder = folders.find((candidate) => projectSectionBelongsToProject(item, candidate)) || {
+      id: item.localFolderID || item.folderClientID,
+      clientID: item.folderClientID || item.localFolderID,
+      folderType: item.folderType || "project"
+    };
+    return deletedProjectSectionMutationForItem(folder, item).projectSection;
+  });
   const account = activeAccount();
-  state.localSavedItems = [];
+  // Keep explicit tombstones locally and in the durable outbox. The bulk-clear
+  // marker prevents older offline records from returning, while the tombstones
+  // remove every known folder membership even if its timestamp is newer than
+  // the marker because it was echoed or edited by another device.
+  state.localSavedItems = savedTombstones;
   state.localSavedSectionIDs = [];
-  state.localProjectSections = [];
-  enqueueSettingsBulkClear("bookmarks");
+  state.localProjectSections = membershipTombstones;
+  const operationGroupID = crypto.randomUUID();
+  if (account) {
+    savedTombstones.forEach((record) => enqueueSyncMutation(
+      { savedItem: record },
+      account,
+      { operationGroupID }
+    ));
+    membershipTombstones.forEach((record) => enqueueSyncMutation(
+      { projectSection: record },
+      account,
+      { operationGroupID }
+    ));
+  }
+  enqueueSettingsBulkClear("bookmarks", { operationGroupID });
   saveWorkspaceState();
   if (account) await flushSyncOutbox({ refresh: true }).catch(() => {});
   return records.length;

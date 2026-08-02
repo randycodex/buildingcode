@@ -67,6 +67,11 @@ assert.match(appSource, /confirmButton\.disabled = selected\.length === 0/);
 assert.match(appSource, /await persistSectionFolderSelection\(sectionPayload, selectedFolders, projects\)/);
 assert.match(appSource, /function unlinkEvidenceFromFolder\([\s\S]*?title: "Remove final folder\?"[\s\S]*?removeBookmark: true/);
 assert.match(appSource, /if \(options\.removeBookmark === true\)/);
+assert.match(
+  appSource,
+  /async function clearSettingsBookmarks\(\)[\s\S]*?deletedSavedMutationForSection[\s\S]*?deletedProjectSectionMutationForItem[\s\S]*?operationGroupID[\s\S]*?enqueueSettingsBulkClear\("bookmarks", \{ operationGroupID \}\)/,
+  "Clear All Bookmarks must tombstone both canonical saved records and every Project membership in one queued operation group."
+);
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
 assert.match(appSource, /function renderSavedFolderContext\([\s\S]*?folderIsProject\(folder\)[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
 assert.match(appSource, /convert\.disabled = !hasCapability\("projects"\)/);
