@@ -4394,6 +4394,10 @@ body.is-resizing-search-history * {
   background: transparent;
 }
 
+.search-jump-tile:last-child {
+  border-bottom: 0;
+}
+
 .search-jump-open {
   display: grid;
   align-content: start;

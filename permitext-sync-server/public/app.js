@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-reference-notes-size-v423";
+} from "./offline-storage.js?v=20260802-recent-last-divider-v424";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

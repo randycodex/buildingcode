@@ -1238,7 +1238,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-reference-notes-size-v423'),
+        webRoot.text.includes('/web/app.js?v=20260802-recent-last-divider-v424'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1378,7 +1378,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-reference-notes-size-v423'),
+        webRoot.text.includes('/web/styles.css?v=20260802-recent-last-divider-v424'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1582,7 +1582,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-reference-notes-size-v423'),
+        webRoot.text.includes('/web/styles.css?v=20260802-recent-last-divider-v424'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2419,6 +2419,7 @@ async function main() {
         workspaceStyles.text.match(/\.saved-chapter-header strong,\s*\.saved-chapter-header span \{\s*color: var\(--code-accent\);/) &&
         workspaceStyles.text.includes(".saved-inline-filters") &&
         workspaceStyles.text.match(/\.search-jump-section \{[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.match(/\.search-jump-tile:last-child \{[\s\S]*?border-bottom: 0;/) &&
         workspaceStyles.text.includes(".saved-paragraph-preview") &&
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes(".saved-section-meta"),
