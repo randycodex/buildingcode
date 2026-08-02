@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-paragraph-bookmark-marker-v449";
+} from "./offline-storage.js?v=20260802-inline-folder-controls-v450";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -8229,10 +8229,6 @@ function ensureReaderNotesSheet(panel, reader) {
   const header = document.createElement("header");
   header.className = "reader-notes-header";
 
-  const bookmarkButton = document.createElement("button");
-  bookmarkButton.className = "reader-notes-bookmark";
-  bookmarkButton.type = "button";
-
   const researchButton = document.createElement("button");
   researchButton.className = "reader-notes-card-action reader-notes-research-action";
   researchButton.type = "button";
@@ -8242,7 +8238,7 @@ function ensureReaderNotesSheet(panel, reader) {
   leadingActions.className = "reader-notes-leading-actions";
   leadingActions.setAttribute("role", "toolbar");
   leadingActions.setAttribute("aria-label", "Section actions");
-  leadingActions.append(bookmarkButton, researchButton);
+  leadingActions.append(researchButton);
 
   const doneButton = document.createElement("button");
   doneButton.className = "reader-notes-done";
@@ -8619,7 +8615,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   setReaderNotesActiveTarget(panel, sectionID, blockID);
 
   const saved = isSectionSaved({ sectionID: section.id, codeVersion: target.codeVersion });
-  const bookmarkButton = sheet.querySelector(".reader-notes-bookmark");
   const researchButton = sheet.querySelector(".reader-notes-research-action");
   const sectionWrapper = panel.querySelector(`.chapter-section[data-section-id="${CSS.escape(sectionID)}"]`);
   const sectionPayload = {
@@ -8637,34 +8632,6 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID) {
     void persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
     syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
-  }
-  if (bookmarkButton) {
-    bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved folders" : "Save bookmark"}</span>`;
-    bookmarkButton.classList.toggle("is-saved", saved);
-    bookmarkButton.setAttribute("aria-pressed", String(saved));
-    bookmarkButton.setAttribute("aria-label", saved ? "Manage saved folders" : "Save bookmark");
-    bookmarkButton.onclick = async () => {
-      bookmarkButton.disabled = true;
-      bookmarkButton.classList.remove("has-error");
-      try {
-        const opened = await openReaderNotesProjectPicker(sheet, sectionPayload);
-        if (!opened) return;
-        if (isSectionSaved(sectionPayload)) {
-          bookmarkButton.classList.add("is-saved");
-          bookmarkButton.setAttribute("aria-pressed", "true");
-          bookmarkButton.setAttribute("aria-label", "Manage saved folders");
-          bookmarkButton.title = "Manage saved folders";
-          bookmarkButton.innerHTML = `${bookmarkIconSVG(true)}<span class="sr-only">Manage saved folders</span>`;
-        }
-      } catch (error) {
-        const message = error.message || "Could not update this saved section.";
-        bookmarkButton.title = message;
-        bookmarkButton.classList.add("has-error");
-        presentWorkspaceIssue(message);
-      } finally {
-        bookmarkButton.disabled = false;
-      }
-    };
   }
   if (researchButton) {
     researchButton.disabled = !sectionWrapper ||

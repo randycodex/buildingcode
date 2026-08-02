@@ -1051,8 +1051,9 @@ async function main() {
         workspaceScript.text.includes('leadingActions.className = "reader-notes-leading-actions"') &&
         !workspaceScript.text.includes('reader-notes-project-action') &&
         !workspaceScript.text.includes('reader-notes-link-action') &&
+        !workspaceScript.text.includes('bookmarkButton.className = "reader-notes-bookmark"') &&
         workspaceScript.text.includes('researchButton.textContent = "Add to Research"') &&
-        workspaceScript.text.includes("await openReaderNotesProjectPicker(sheet, sectionPayload)") &&
+        workspaceScript.text.includes("leadingActions.append(researchButton)") &&
         workspaceScript.text.includes("selectReaderSectionForResearch(sectionWrapper)") &&
         workspaceScript.text.includes("function readerProjectsForSection") &&
         workspaceScript.text.includes("links.some((link) => projectSectionBelongsToProject(link, project))") &&
@@ -1239,7 +1240,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-paragraph-bookmark-marker-v449'),
+        webRoot.text.includes('/web/app.js?v=20260802-inline-folder-controls-v450'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1380,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-paragraph-bookmark-marker-v449'),
+        webRoot.text.includes('/web/styles.css?v=20260802-inline-folder-controls-v450'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1588,7 +1589,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-paragraph-bookmark-marker-v449'),
+        webRoot.text.includes('/web/styles.css?v=20260802-inline-folder-controls-v450'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1993,9 +1994,9 @@ async function main() {
       "Reader save no longer requires confirmed Project or Reference destinations."
     );
     assert(
-      workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
+        workspaceScript.text.includes('if (window.getSelection && String(window.getSelection()).trim()) return;') &&
         workspaceScript.text.includes('toggleReaderNotesSheet(panel, section, reader, { target });') &&
-        workspaceScript.text.includes('bookmarkButton.setAttribute("aria-label", "Manage saved folders")') &&
+        workspaceScript.text.includes('renderAnnotationProjectEditor(projectsHost, target, sectionPayload)') &&
         workspaceScript.text.includes('button.hidden = !noteBody.trim()') &&
         workspaceScript.text.includes('savedMarker.className = "reader-section-saved-marker"') &&
         workspaceScript.text.includes('savedMarker.hidden = !savedSection') &&
