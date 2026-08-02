@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-paragraph-bookmark-marker-v448";
+} from "./offline-storage.js?v=20260802-paragraph-bookmark-marker-v449";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -7219,11 +7219,9 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
       if (!panel) return;
       showProjectCreateSheet(panel, null, {
         onCreated: async (project) => {
-          if (!isSectionSaved(sectionPayload)) {
-            const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
-            if (!saved) return;
-            syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
-          }
+          const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
+          if (!saved) return;
+          syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
           await persistSectionInProject(project, { ...sectionPayload, ...target });
           options.onChange?.();
         }
@@ -7268,11 +7266,9 @@ function renderAnnotationProjectEditor(container, target, sectionPayload, option
             );
             if (!removed) return;
           } else {
-            if (!isSectionSaved(sectionPayload)) {
-              const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
-              if (!saved) return;
-              syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
-            }
+            const saved = await persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
+            if (!saved) return;
+            syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
             await persistSectionInProject(project, { ...sectionPayload, ...target });
           }
           renderAnnotationProjectEditor(container, target, sectionPayload, options);
@@ -8637,6 +8633,11 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
     blockID,
     blockLabel: target.blockLabel || ""
   };
+  const savedRecord = savedSectionRecord(sectionPayload);
+  if (saved && blockID && normalizeAnnotationBlockID(savedRecord?.blockID) !== blockID) {
+    void persistSectionBookmark(sectionPayload, true, { refreshSavedPanes: false });
+    syncReaderNoteBookmarkButtons(sectionPayload.sectionID, true, sectionPayload.codeVersion);
+  }
   if (bookmarkButton) {
     bookmarkButton.innerHTML = `${bookmarkIconSVG(saved)}<span class="sr-only">${saved ? "Manage saved folders" : "Save bookmark"}</span>`;
     bookmarkButton.classList.toggle("is-saved", saved);
@@ -8687,11 +8688,7 @@ function openReaderNotesSheet(panel, section, reader, options = {}) {
   removeReaderNotesProjectPicker(sheet);
   input.value = noteValueForTarget(section.id, blockID);
   input.setAttribute("aria-label", `Note for ${sectionDisplayTitle(section.sectionNumber, section.title)}`);
-  renderAnnotationProjectEditor(projectsHost, target, sectionPayload, {
-    onChange: () => {
-      if (state.utilities.saved) renderWorkspace();
-    }
-  });
+  renderAnnotationProjectEditor(projectsHost, target, sectionPayload);
   renderAnnotationTagEditor(tagsHost, target, {
     onChange: () => {
       if (state.utilities.saved) renderWorkspace();
