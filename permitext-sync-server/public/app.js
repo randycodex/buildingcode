@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-section-detail-format-v454";
+} from "./offline-storage.js?v=20260802-notebook-reference-density-v455";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -14134,6 +14134,7 @@ async function renderProjectNotebook(project) {
         const option = document.createElement("button");
         option.className = "notebook-reference-option";
         option.type = "button";
+        option.title = reference.label;
         option.dataset.referenceIndex = String(index);
         if (reference.displayTitle) {
           const optionTitle = document.createElement("strong");
