@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-collapsed-project-name-v440'),
+        webRoot.text.includes('/web/app.js?v=20260802-evidence-selection-layout-v441'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-collapsed-project-name-v440'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-selection-layout-v441'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1445,6 +1445,11 @@ async function main() {
         workspaceScript.text.includes('instance.key === "search" || instance.key === "sdc"') &&
         !workspaceScript.text.includes("function openSavedItemInReader(item, savedPaneID"),
       "Saved Evidence items should open an independently owned SDC beside Projects."
+    );
+    assert(
+      workspaceStyles.text.includes(".is-saved-selecting .saved-section-row .saved-row-button {\n  padding-right: 40px;") &&
+        !workspaceStyles.text.includes(".is-saved-selecting .saved-section-row.is-selected {\n  background:"),
+      "Saved Evidence selection should reserve room for its checkmark without highlighting the selected row."
     );
     assert(
       workspaceScript.text.includes("function researchSourceCitation(source)") &&
@@ -1570,7 +1575,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-collapsed-project-name-v440'),
+        webRoot.text.includes('/web/styles.css?v=20260802-evidence-selection-layout-v441'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

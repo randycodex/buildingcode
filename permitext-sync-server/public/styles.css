@@ -8935,16 +8935,15 @@ body.is-resizing-research-evidence * {
 }
 
 .is-saved-selecting .saved-section-row {
-  padding-right: 40px;
   cursor: pointer;
+}
+
+.is-saved-selecting .saved-section-row .saved-row-button {
+  padding-right: 40px;
 }
 
 .is-saved-selecting .saved-section-row .saved-selection-check {
   display: grid;
-}
-
-.is-saved-selecting .saved-section-row.is-selected {
-  background: color-mix(in srgb, var(--code-accent, var(--project-color)) 12%, transparent);
 }
 
 .is-saved-selecting .saved-section-row.is-selected .project-selection-checkmark {
