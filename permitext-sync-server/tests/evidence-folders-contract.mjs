@@ -97,7 +97,7 @@ assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?cod
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
 assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?text-transform: uppercase;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
 assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: #f1f1f3;[\s\S]*?color: #141416;/);
 assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: #111113;[\s\S]*?color: #ffffff;/);
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle \{[\s\S]*?padding-block: var\(--space-1\);/);

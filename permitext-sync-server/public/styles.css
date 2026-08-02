@@ -7895,7 +7895,8 @@ body.is-resizing-research-evidence * {
 }
 
 .saved-folder-context.is-project .saved-project-blocknote .section-label {
-  letter-spacing: normal;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
