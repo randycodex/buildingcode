@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-membership-in-place-v438";
+} from "./offline-storage.js?v=20260802-hide-row-folders-v439";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18384,15 +18384,7 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
   const visibleSavedItems = savedItems.slice(0, 48);
   const combinedItems = mergeSavedColumnItems(visibleSavedItems, annotatedItems.slice(0, 48));
-  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems))
-    .map((item) => {
-      const names = activeFolderRecords(workspaceProjects)
-        .filter((folder) => (summary.projectSections || []).some((link) =>
-          savedEvidenceKey(link) === savedEvidenceKey(item) && projectSectionBelongsToProject(link, folder)
-        ))
-        .map((folder) => folder.name || folder.title || "Folder");
-      return { ...item, folderNames: names };
-    });
+  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
   if (!panel.isConnected) return;
   const removableSavedItems = selectedFolder && !savedInstance.showAllSaved
     ? resolvedItems.filter((item) => (summary.projectSections || []).some((link) =>
@@ -18462,13 +18454,6 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
     const scrollTop = scrollContainer?.scrollTop || 0;
     const currentSummary = currentContentSummary();
     summary.projectSections = currentSummary.projectSections || [];
-    resolvedItems.forEach((item) => {
-      item.folderNames = activeFolderRecords(workspaceProjects)
-        .filter((folder) => summary.projectSections.some((link) =>
-          savedEvidenceKey(link) === savedEvidenceKey(item) && projectSectionBelongsToProject(link, folder)
-        ))
-        .map((folder) => folder.name || folder.title || "Folder");
-    });
     panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
       const folder = workspaceProjects.find((candidate) => projectRecordID(candidate) === tile.dataset.projectId);
       const countLabel = tile.querySelector(".saved-project-count");
@@ -19250,12 +19235,6 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
             tags.append(chip);
           });
           openButton.append(tags);
-        }
-        if (Array.isArray(item.folderNames) && item.folderNames.length) {
-          const folders = document.createElement("span");
-          folders.className = "saved-row-folders";
-          folders.textContent = `Folders: ${item.folderNames.join(", ")}`;
-          openButton.append(folders);
         }
         openButton.addEventListener("click", () => {
           if (window.getSelection && String(window.getSelection()).trim()) return;

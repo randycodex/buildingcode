@@ -8146,13 +8146,6 @@ body.is-resizing-research-evidence * {
   justify-self: start;
 }
 
-.saved-row-folders {
-  display: block;
-  margin-top: var(--space-1);
-  color: var(--text-secondary);
-  font-size: calc(var(--saved-font-size) * 0.76) !important;
-}
-
 .saved-project-count {
   grid-column: 2;
   grid-row: 1;
