@@ -82,6 +82,12 @@ assert.match(savedFolderContextSource, /"Project Address"[\s\S]*?"Project Descri
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
 assert.match(savedFolderContextSource, /title: "Project Blocknote"[\s\S]*?savedTitle\.textContent = "Saved Evidence"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
 assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
+assert.match(appSource, /collapsedCodePrefixes: savedInstance\.collapsedCodePrefixes/);
+assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
+assert.match(appSource, /codeLabel\.setAttribute\("aria-expanded", String\(!collapsed\)\)/);
+assert.match(appSource, /codeBody\.hidden = collapsed/);
+assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed\)/);
+assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
 assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
 assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-inline-project-overview-v398";
+} from "./offline-storage.js?v=20260802-saved-code-collapse-v400";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -532,6 +532,11 @@ function newUtilityInstance(key, overrides = {}) {
     instance.organizeUnassigned = Boolean(overrides.organizeUnassigned);
     instance.folderQuery = String(overrides.folderQuery || "");
     instance.showAllSaved = Boolean(overrides.showAllSaved);
+    instance.collapsedCodePrefixes = Array.from(new Set(
+      (Array.isArray(overrides.collapsedCodePrefixes) ? overrides.collapsedCodePrefixes : [])
+        .map((prefix) => String(prefix || "").trim().toUpperCase())
+        .filter(Boolean)
+    ));
   }
   return instance;
 }
@@ -553,7 +558,8 @@ function normalizeUtilityInstances(saved = {}) {
       selectedFolderID: pane?.selectedFolderID,
       organizeUnassigned: pane?.organizeUnassigned,
       folderQuery: pane?.folderQuery,
-      showAllSaved: pane?.showAllSaved
+      showAllSaved: pane?.showAllSaved,
+      collapsedCodePrefixes: pane?.collapsedCodePrefixes
     }))
     .filter((pane) => repeatableUtilityKeys.has(pane.key));
 
@@ -1863,7 +1869,8 @@ function normalizeSavedInstance(instance) {
       selectedFolderID: "",
       organizeUnassigned: false,
       folderQuery: "",
-      showAllSaved: false
+      showAllSaved: false,
+      collapsedCodePrefixes: []
     };
   }
   instance.codeFilters = normalizeSearchCodeFilters(instance.codeFilters);
@@ -1876,6 +1883,11 @@ function normalizeSavedInstance(instance) {
   instance.organizeUnassigned = Boolean(instance.organizeUnassigned);
   instance.folderQuery = String(instance.folderQuery || "");
   instance.showAllSaved = Boolean(instance.showAllSaved);
+  instance.collapsedCodePrefixes = Array.from(new Set(
+    (Array.isArray(instance.collapsedCodePrefixes) ? instance.collapsedCodePrefixes : [])
+      .map((prefix) => String(prefix || "").trim().toUpperCase())
+      .filter(Boolean)
+  ));
   return instance;
 }
 
@@ -18341,6 +18353,14 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
       renderSavedItemsByCode(content, orderedItems, paneID, {
         showChapterHeaders: true,
         preserveOrder: true,
+        collapsedCodePrefixes: savedInstance.collapsedCodePrefixes,
+        onCodeGroupToggle: (prefix, collapsed) => {
+          const collapsedPrefixes = new Set(savedInstance.collapsedCodePrefixes);
+          if (collapsed) collapsedPrefixes.add(prefix);
+          else collapsedPrefixes.delete(prefix);
+          savedInstance.collapsedCodePrefixes = Array.from(collapsedPrefixes);
+          saveWorkspaceState();
+        },
         removableSavedItems: Boolean(selectedFolder && !savedInstance.showAllSaved),
         removeAction: selectedFolder
           ? (item) => unlinkEvidenceFromFolder(
@@ -18980,10 +19000,40 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
     const codeGroup = document.createElement("section");
     codeGroup.className = "saved-code-group";
     codeGroup.classList.add(`code-theme-${codeTheme(prefix)}`);
-    const codeLabel = document.createElement("p");
-    codeLabel.className = "section-label saved-code-label";
-    codeLabel.textContent = codeDisplayLabel(prefix);
-    codeGroup.append(codeLabel);
+    const normalizedPrefix = String(prefix || "BC").toUpperCase();
+    const collapsedPrefixes = new Set(
+      (Array.isArray(options.collapsedCodePrefixes) ? options.collapsedCodePrefixes : [])
+        .map((value) => String(value || "").toUpperCase())
+    );
+    const codeBody = document.createElement("div");
+    codeBody.className = "saved-code-group-body";
+    codeBody.id = `saved-code-group-${crypto.randomUUID()}`;
+    const codeLabel = document.createElement("button");
+    codeLabel.type = "button";
+    codeLabel.className = "section-label saved-code-label saved-code-toggle";
+    codeLabel.setAttribute("aria-controls", codeBody.id);
+    const codeLabelText = document.createElement("span");
+    codeLabelText.textContent = codeDisplayLabel(prefix);
+    const chevron = document.createElement("span");
+    chevron.className = "saved-code-toggle-chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>';
+    codeLabel.append(codeLabelText, chevron);
+    const setCodeGroupCollapsed = (collapsed) => {
+      codeBody.hidden = collapsed;
+      codeGroup.classList.toggle("is-collapsed", collapsed);
+      codeLabel.setAttribute("aria-expanded", String(!collapsed));
+      codeLabel.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${codeDisplayLabel(prefix)}`);
+    };
+    setCodeGroupCollapsed(collapsedPrefixes.has(normalizedPrefix));
+    codeLabel.addEventListener("click", () => {
+      const collapsed = !codeBody.hidden;
+      setCodeGroupCollapsed(collapsed);
+      if (typeof options.onCodeGroupToggle === "function") {
+        options.onCodeGroupToggle(normalizedPrefix, collapsed);
+      }
+    });
+    codeGroup.append(codeLabel, codeBody);
 
     const orderedItems = options.preserveOrder ? [...items] : [...items].sort((left, right) => {
       const chapterOrder = String(left.chapterNumber || left.chapterID || "").localeCompare(
@@ -19031,7 +19081,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
         chapterTitle.textContent = normalizedChapterTitle;
         chapterHeader.append(chapterNumber);
         if (normalizedChapterTitle) chapterHeader.append(chapterTitle);
-        codeGroup.append(chapterHeader);
+        codeBody.append(chapterHeader);
         return;
       }
       const item = entry.item;
@@ -19166,7 +19216,7 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
           });
           row.append(removeButton);
         }
-        codeGroup.append(row);
+        codeBody.append(row);
     });
 
     content.append(codeGroup);
