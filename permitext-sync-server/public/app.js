@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-empty-archive-v397";
+} from "./offline-storage.js?v=20260802-inline-project-overview-v398";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -1396,7 +1396,7 @@ async function closeProjectWorkboard(project) {
   delete state.paneWeights[workboardID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
 }
 
 async function openProjectWorkboard(project) {
@@ -1411,7 +1411,7 @@ async function openProjectWorkboard(project) {
   state.paneWeights[workboardID] ||= defaultWorkboardPaneWidth;
   placeProjectDetailAfterProjects(identity);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(workboardID);
   return true;
 }
@@ -1423,7 +1423,7 @@ async function closeProjectNotebook(project) {
   delete state.paneWeights[notebookID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== notebookID);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   return true;
 }
 
@@ -1438,7 +1438,7 @@ async function openProjectNotebook(project) {
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
   placeProjectDetailAfterProjects(identity);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(notebookID);
   return true;
 }
@@ -1450,7 +1450,7 @@ async function closeProjectReportDraft(project) {
   delete state.paneWeights[reportDraftID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== reportDraftID);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   return true;
 }
 
@@ -1465,7 +1465,7 @@ async function openProjectReportDraft(project) {
   state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
   placeProjectDetailAfterProjects(identity);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(identity)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(reportDraftID);
   return true;
 }
@@ -1480,7 +1480,7 @@ async function closeProjectCoordination(project) {
   if (threadPaneID) delete state.paneWeights[threadPaneID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== coordinationID && id !== threadPaneID);
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneIDForProjectDetail(project)] });
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   return true;
 }
 
@@ -1496,7 +1496,7 @@ async function openProjectCoordination(project, options = {}) {
   placeProjectDetailAfterProjects(identity);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: [paneIDForProjectDetail(identity), coordinationID]
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(coordinationID)
   });
   if (options.threadID) {
     await openProjectCoordinationThread(identity, options.threadID);
@@ -1737,7 +1737,7 @@ async function detachProjectWorkboard(project) {
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== workboardID);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
+    refreshPaneIDs: projectOverviewRefreshPaneIDs()
   });
 }
 
@@ -1779,12 +1779,11 @@ async function reattachProjectWorkboard(project, detachedWindow = null) {
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
   state.workboards = [identity];
   placeProjectDetailAfterProjects(identity);
-  state.paneWeights[paneIDForProjectDetail(identity)] ||= defaultDetailPaneWidth;
   state.paneWeights[paneIDForProjectWorkboard(identity)] ||= defaultWorkboardPaneWidth;
   localStorage.removeItem("permitext:pendingWorkboardReattach");
   saveWorkspaceState();
   await transitionWorkspace("utility", {
-    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
+    refreshPaneIDs: projectOverviewRefreshPaneIDs()
   });
   scrollPaneIntoView(paneIDForProjectWorkboard(identity));
   return true;
@@ -2315,7 +2314,8 @@ async function activateProjectStudio(project, options = {}) {
   const identity = projectIdentity(project);
   const current = openProjectDetails()[0] || null;
   if (current && projectDetailMatches(current, identity)) {
-    scrollPaneIntoView(paneIDForProjectDetail(current));
+    await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
+    if (options.focusSaved !== false) scrollPaneIntoView(primarySavedPaneID());
     return true;
   }
   if (current && !(await confirmNotebookDiscard(current))) return false;
@@ -2338,7 +2338,6 @@ async function activateProjectStudio(project, options = {}) {
   const currentCoordinationThreadID = currentCoordinationThread
     ? paneIDForProjectCoordinationThread(current, currentCoordinationThread.threadID)
     : "";
-  const detailWidth = currentDetailID ? state.paneWeights[currentDetailID] : null;
   const notebookWidth = currentNotebookID ? state.paneWeights[currentNotebookID] : null;
   const workboardWidth = currentWorkboardID ? state.paneWeights[currentWorkboardID] : null;
   const reportDraftWidth = currentReportDraftID ? state.paneWeights[currentReportDraftID] : null;
@@ -2373,12 +2372,10 @@ async function activateProjectStudio(project, options = {}) {
   state.reportDrafts = keepReportDraftOpen ? [identity] : [];
   state.coordinations = keepCoordinationOpen ? [identity] : [];
   state.coordinationThreads = [];
-  const detailID = paneIDForProjectDetail(identity);
   const notebookID = paneIDForProjectNotebook(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
   const reportDraftID = paneIDForProjectReportDraft(identity);
   const coordinationID = paneIDForProjectCoordination(identity);
-  state.paneWeights[detailID] = Number(detailWidth) > 40 ? detailWidth : defaultDetailPaneWidth;
   if (keepNotebookOpen) {
     state.paneWeights[notebookID] = Number(notebookWidth) > 40 ? notebookWidth : defaultNotebookPaneWidth;
   }
@@ -2398,12 +2395,8 @@ async function activateProjectStudio(project, options = {}) {
   placeProjectDetailAfterProjects(identity, options.sourcePaneID);
   restoreProjectsStackOrder(options.sourcePaneID);
   saveWorkspaceState();
-  mountProjectOpeningPane(identity, {
-    sourcePaneID: options.sourcePaneID,
-    replacingPaneID: currentDetailID
-  });
-  await transitionWorkspace("utility", { refreshPaneIDs: [detailID] });
-  scrollPaneIntoView(detailID);
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
+  if (options.focusSaved !== false) scrollPaneIntoView(primarySavedPaneID());
   return true;
 }
 
@@ -2530,7 +2523,6 @@ function defaultActivePaneIDs() {
   }
   const ids = [];
   openProjectDetails().forEach((detail) => {
-    ids.push(paneIDForProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
     if (projectHasOpenCoordination(detail)) {
@@ -2556,7 +2548,6 @@ function defaultActivePaneIDs() {
 
 function projectWorkspacePaneIDs(detail) {
   return [
-    paneIDForProjectDetail(detail),
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
@@ -2818,9 +2809,8 @@ function syncSavedArchiveButtonStates() {
 }
 
 async function refreshProjectMembershipPanes(project) {
-  const identity = projectIdentity(project);
   await transitionWorkspace("utility", {
-    refreshPaneIDs: projectOverviewRefreshPaneIDs(paneIDForProjectDetail(identity))
+    refreshPaneIDs: projectOverviewRefreshPaneIDs()
   });
 }
 
@@ -13287,25 +13277,41 @@ function mountProjectOpeningPane(project, options = {}) {
   requestAnimationFrame(() => scrollPaneIntoView(paneID));
 }
 
+function selectProjectInSaved(project, preferredPaneID = "") {
+  let savedInstance = (state.utilityInstances || []).find((instance) =>
+    instance.key === "saved" && paneIDForUtilityInstance(instance) === preferredPaneID
+  ) || (state.utilityInstances || []).find((instance) => instance.key === "saved");
+  if (!savedInstance) {
+    savedInstance = newUtilityInstance("saved");
+    state.utilityInstances = [...(state.utilityInstances || []), savedInstance];
+    state.utilities.saved = false;
+    state.paneWeights[paneIDForUtilityInstance(savedInstance)] = defaultSavedPaneWidth;
+    movePaneToFront(paneIDForUtilityInstance(savedInstance));
+  }
+  savedInstance.selectedFolderID = projectRecordID(project);
+  savedInstance.projectsArchiveMode = false;
+  savedInstance.organizeUnassigned = false;
+  savedInstance.showAllSaved = false;
+  savedInstance.folderQuery = "";
+  return paneIDForUtilityInstance(savedInstance);
+}
+
 async function openProjectDetail(project, options = {}) {
   if (!detachedProjectWindow && projectHasDetachedWorkboard(project)) {
     openDetachedWindow(project);
     return;
   }
   const identity = projectIdentity(project);
-  const detailID = paneIDForProjectDetail(identity);
-  if (openProjectDetails().some((detail) => projectDetailMatches(project, detail))) {
-    scrollPaneIntoView(detailID);
-    return;
-  }
-  const activated = await activateProjectStudio(identity, options);
+  const savedPaneID = selectProjectInSaved(identity, options.sourcePaneID);
+  saveWorkspaceState();
+  const activated = await activateProjectStudio(identity, {
+    ...options,
+    sourcePaneID: savedPaneID,
+    focusSaved: false
+  });
   if (!activated) return;
-  if (options.sourcePaneID === "utility:archive") {
-    placePaneBefore("utility:archive", detailID);
-    placeArchiveAfterProjectsStack();
-    saveWorkspaceState();
-    await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
-  }
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs(savedPaneID) });
+  scrollPaneIntoView(savedPaneID);
 }
 
 function projectDetailMatches(project, detail) {
@@ -15707,11 +15713,10 @@ function projectCollaborationAccess(identity, permission) {
 function projectCollaborationRefresh(identity) {
   const thread = openCoordinationThreadForProject(identity);
   return transitionWorkspace("utility", {
-    refreshPaneIDs: [
-      paneIDForProjectDetail(identity),
+    refreshPaneIDs: projectOverviewRefreshPaneIDs(
       ...(projectHasOpenCoordination(identity) ? [paneIDForProjectCoordination(identity)] : []),
       ...(thread ? [paneIDForProjectCoordinationThread(identity, thread.threadID)] : [])
-    ]
+    )
   });
 }
 
@@ -15873,7 +15878,7 @@ function projectNoteEditor(identity, note, options = {}) {
   return container;
 }
 
-function appendProjectNotes(content, identity, foundation) {
+function appendProjectNotes(content, identity, foundation, options = {}) {
   const notes = projectCollaborationArtifacts(foundation, "projectNote");
   const canEdit = projectCollaborationAccess(identity, "project.note.edit");
   if (!notes.length && !canEdit) return;
@@ -15884,7 +15889,7 @@ function appendProjectNotes(content, identity, foundation) {
   const title = document.createElement("button");
   title.className = "project-notes-toggle-label section-label";
   title.type = "button";
-  title.textContent = "Project information";
+  title.textContent = options.title || "Project information";
   title.setAttribute("aria-expanded", "true");
   heading.append(title);
   const headingActions = document.createElement("div");
@@ -15907,8 +15912,9 @@ function appendProjectNotes(content, identity, foundation) {
     editable: canEdit,
     plainText: legacyPlainText
   }));
+  if (options.className) section.classList.add(options.className);
   section.append(heading, body);
-  wireProjectSectionMotion(section, body, [title, toggle], "Project information", true);
+  wireProjectSectionMotion(section, body, [title, toggle], options.title || "Project information", true);
   content.append(section);
 }
 
@@ -16195,8 +16201,8 @@ function appendProjectCoordinationSummary(content, identity, foundation) {
 }
 
 async function focusLinkedProjectRecord(identity, selector, options = {}) {
-  const paneID = paneIDForProjectDetail(identity);
-  await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+  const paneID = primarySavedPaneID();
+  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(paneID);
   await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
   const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
@@ -16217,7 +16223,7 @@ async function focusLinkedProjectRecord(identity, selector, options = {}) {
 
 async function openCoordinationTarget(identity, foundation, thread) {
   if (thread.targetKind === "project") {
-    scrollPaneIntoView(paneIDForProjectDetail(identity));
+    scrollPaneIntoView(primarySavedPaneID());
     return;
   }
   if (["researchAnswer", "evidenceReview"].includes(thread.targetKind)) {
@@ -16803,10 +16809,10 @@ function appendProjectReportExports(content, identity, foundation) {
   content.append(section);
 }
 
-function appendProjectActivity(content, foundation) {
+function appendProjectActivity(content, foundation, options = {}) {
   const events = [...(foundation?.activity || [])]
     .sort((left, right) => String(right.createdAt).localeCompare(String(left.createdAt)));
-  if (!events.length) return;
+  if (!events.length && !options.showEmpty) return;
   const section = document.createElement("section");
   section.className = "project-studio-section project-studio-activity";
   const toggle = document.createElement("button");
@@ -16814,7 +16820,7 @@ function appendProjectActivity(content, foundation) {
   toggle.type = "button";
   toggle.setAttribute("aria-expanded", "false");
   const title = document.createElement("span");
-  title.textContent = "Recent activity";
+  title.textContent = options.title || "Recent activity";
   const actions = document.createElement("span");
   actions.className = "project-activity-heading-actions";
   actions.append(projectSectionCount(events.length, "Recent activity items"));
@@ -16838,7 +16844,7 @@ function appendProjectActivity(content, foundation) {
     list.append(row);
   });
   section.append(toggle, list);
-  wireProjectSectionMotion(section, list, [toggle], "Recent activity", false);
+  wireProjectSectionMotion(section, list, [toggle], options.title || "Recent activity", false);
   content.append(section);
 }
 
@@ -17405,7 +17411,7 @@ async function openProjectSavedSection(project, item) {
     reader = newReaderState(readerFields);
     state.readers.push(reader);
   }
-  placePaneAfter(paneIDForProjectDetail(project), paneIDForReader(reader));
+  placePaneAfter(primarySavedPaneID(), paneIDForReader(reader));
   updateBrowserSectionURL(reader.sectionID);
   scheduleContinuitySync(reader);
   saveWorkspaceState();
@@ -18054,19 +18060,34 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
   wrapper.hidden = allItems.length === 0;
 }
 
-function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
+function appendSavedProjectSummaryField(container, label, value, options = {}) {
+  const normalizedValue = String(value || "").trim();
+  if (!normalizedValue && options.optional) return;
+  const field = document.createElement("section");
+  field.className = "saved-project-summary-field";
+  const heading = document.createElement("span");
+  heading.className = "section-label";
+  heading.textContent = label;
+  const copy = document.createElement("p");
+  copy.textContent = normalizedValue || options.emptyText || "Not provided";
+  field.append(heading, copy);
+  container.append(field);
+}
+
+async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
   panel.querySelector(".saved-folder-context")?.remove();
   const folder = activeFolderRecords(folders).find((item) =>
     projectRecordID(item) === String(savedInstance.selectedFolderID || "")
   ) || null;
   const projectsSection = panel.querySelector(".saved-projects-section");
+  projectsSection.hidden = false;
   if (!folder) {
     if (savedInstance.selectedFolderID) savedInstance.selectedFolderID = "";
-    projectsSection.hidden = false;
+    panel.classList.remove("has-selected-project-folder");
+    panel.style.removeProperty("--project-color");
     return null;
   }
 
-  projectsSection.hidden = true;
   const context = document.createElement("section");
   context.className = `saved-folder-context is-${folderType(folder)}`;
   if (folderIsProject(folder)) {
@@ -18078,57 +18099,91 @@ function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     panel.style.removeProperty("--project-color");
   }
 
-  const header = document.createElement("header");
-  const back = document.createElement("button");
-  back.type = "button";
-  back.className = "saved-folder-back";
-  back.textContent = "All folders";
-  back.addEventListener("click", () => {
-    savedInstance.selectedFolderID = "";
-    savedInstance.showAllSaved = false;
-    savedInstance.folderQuery = "";
-    saveWorkspaceState();
-    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  });
-  const identity = document.createElement("div");
-  const type = document.createElement("span");
-  type.textContent = folderTypeLabel(folder);
-  const name = document.createElement("strong");
-  name.textContent = folder.name || folder.title || "Folder";
-  identity.append(type, name);
-  header.append(back, identity);
-
-  const controls = document.createElement("div");
-  controls.className = "saved-folder-controls";
-  const addEvidence = document.createElement("button");
-  addEvidence.type = "button";
-  addEvidence.textContent = "Add Evidence";
-  addEvidence.addEventListener("click", () => void toggleUtilityPane("search"));
-  const scope = document.createElement("button");
-  scope.type = "button";
-  scope.textContent = savedInstance.showAllSaved ? "Folder Evidence" : "All Saved";
-  scope.setAttribute("aria-pressed", String(savedInstance.showAllSaved));
-  scope.addEventListener("click", () => {
-    savedInstance.showAllSaved = !savedInstance.showAllSaved;
-    saveWorkspaceState();
-    void transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
-  });
-  controls.append(addEvidence, scope);
-
   if (folderIsProject(folder)) {
+    const identity = projectIdentity(folder);
+    const summary = document.createElement("section");
+    summary.className = "saved-project-summary";
+    appendSavedProjectSummaryField(summary, "Project Address", folder.address || identity.address, {
+      emptyText: "No address added"
+    });
+    appendSavedProjectSummaryField(summary, "Project Description", folder.description || identity.description, {
+      optional: true
+    });
+    context.append(summary);
+
+    const controls = document.createElement("nav");
+    controls.className = "saved-folder-controls saved-project-tool-controls";
+    controls.setAttribute("aria-label", `${identity.name} tools`);
     [
-      ["Notebook", () => openProjectNotebook(folder)],
-      ["Report Draft", () => openProjectReportDraft(folder)],
-      ["Workboard", () => openProjectWorkboard(folder)],
-      ["Coordination", () => openProjectCoordination(folder)]
-    ].forEach(([label, action]) => {
+      ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
+      ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
+      ["Workboard", "project-workboard-button", projectHasOpenWorkboard, openProjectWorkboard, closeProjectWorkboard],
+      ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]
+    ].forEach(([label, className, isOpen, openTool, closeTool]) => {
       const button = document.createElement("button");
       button.type = "button";
+      button.className = className;
       button.textContent = label;
-      button.addEventListener("click", () => void action());
+      button.setAttribute("aria-pressed", String(isOpen(identity)));
+      if (identity.sharedOnly && (label === "Report Draft" || label === "Workboard")) {
+        button.disabled = true;
+        button.title = `${label} editing is unavailable for shared-only Projects.`;
+      }
+      button.addEventListener("click", async () => {
+        const changed = isOpen(identity)
+          ? await closeTool(identity)
+          : await openTool(identity);
+        if (changed !== false) button.setAttribute("aria-pressed", String(isOpen(identity)));
+      });
       controls.append(button);
     });
+    context.append(controls);
+
+    const { foundation, error } = await loadProjectCoordinationFoundation(identity);
+    if (!panel.isConnected) return folder;
+    if (activeAccount()) {
+      appendProjectNotes(context, identity, foundation, {
+        title: "Project Blocknote",
+        className: "saved-project-blocknote"
+      });
+    } else {
+      const unavailable = document.createElement("section");
+      unavailable.className = "project-studio-section saved-project-blocknote";
+      const title = document.createElement("p");
+      title.className = "section-label";
+      title.textContent = "Project Blocknote";
+      const copy = document.createElement("p");
+      copy.textContent = "Sign in to load and edit the Project Blocknote.";
+      unavailable.append(title, copy);
+      context.append(unavailable);
+    }
+    if (error && activeAccount()) {
+      const warning = document.createElement("p");
+      warning.className = "project-studio-warning saved-project-overview-warning";
+      warning.textContent = error;
+      context.append(warning);
+    }
+
+    const savedSection = document.createElement("section");
+    savedSection.className = "project-studio-section saved-project-evidence-section";
+    const savedTitle = document.createElement("p");
+    savedTitle.className = "section-label";
+    savedTitle.textContent = "Saved Evidence";
+    savedSection.append(
+      savedTitle,
+      panel.querySelector(".saved-inline-filters"),
+      panel.querySelector(".saved-plan-usage"),
+      panel.querySelector(".saved-content")
+    );
+    context.append(savedSection);
+    appendProjectResearchHistory(context, identity, foundation);
+    appendProjectActivity(context, foundation, {
+      title: "Recent Activities",
+      showEmpty: true
+    });
   } else {
+    const controls = document.createElement("div");
+    controls.className = "saved-folder-controls";
     const notes = document.createElement("span");
     notes.textContent = folder.description || "Add notes explaining how this reference collection should be used.";
     notes.className = "saved-reference-capabilities";
@@ -18160,21 +18215,23 @@ function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
     });
     controls.append(notes, edit, convert);
+    context.append(controls);
+
+    const savedSection = document.createElement("section");
+    savedSection.className = "project-studio-section saved-project-evidence-section";
+    const savedTitle = document.createElement("p");
+    savedTitle.className = "section-label";
+    savedTitle.textContent = "Saved Evidence";
+    savedSection.append(
+      savedTitle,
+      panel.querySelector(".saved-inline-filters"),
+      panel.querySelector(".saved-plan-usage"),
+      panel.querySelector(".saved-content")
+    );
+    context.append(savedSection);
   }
 
-  const search = document.createElement("input");
-  search.type = "search";
-  search.className = "saved-folder-search";
-  search.placeholder = savedInstance.showAllSaved ? "Search all saved evidence" : "Search within this folder";
-  search.setAttribute("aria-label", search.placeholder);
-  search.value = savedInstance.folderQuery;
-  search.addEventListener("input", () => {
-    savedInstance.folderQuery = search.value;
-    saveWorkspaceState();
-    panel.__applySavedView?.();
-  });
-  context.append(header, controls, search);
-  projectsSection.before(context);
+  projectsSection.after(context);
   return folder;
 }
 
@@ -18220,7 +18277,15 @@ async function hydrateSavedPanel(panel, savedInstance, paneID) {
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
   if (!panel.isConnected) return;
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
-  const selectedFolder = renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
+  const selectedFolder = await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
+  if (!panel.isConnected) return;
+  if (!selectedFolder) {
+    panel.querySelector(".saved-inline-filters").hidden = true;
+    panel.querySelector(".saved-plan-usage").hidden = true;
+    clear(content);
+    panel.__applySavedView = null;
+    return;
+  }
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
@@ -18400,6 +18465,9 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.setAttribute("role", "button");
       tile.setAttribute("aria-label", `Open ${project.name || project.title || "folder"}`);
       tile.dataset.projectId = projectRecordID(project);
+      const selected = !showingArchived && projectRecordID(project) === String(instance.selectedFolderID || "");
+      tile.classList.toggle("is-selected", selected);
+      if (selected) tile.setAttribute("aria-current", "true");
       if (!showingArchived && !project.sharedOnly) {
         tile.dataset.draggable = "true";
         tile.draggable = true;
@@ -18441,21 +18509,37 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
       tile.append(heading, typeBadge, countLabel, actions);
-      const open = () => {
+      const open = async () => {
         if (tile.dataset.opening === "true") return;
         tile.dataset.opening = "true";
         tile.classList.add("is-opening");
         tile.setAttribute("aria-busy", "true");
-        instance.selectedFolderID = projectRecordID(project);
+        const previousFolderID = String(instance.selectedFolderID || "");
+        const nextFolderID = selected ? "" : projectRecordID(project);
+        instance.selectedFolderID = nextFolderID;
         instance.organizeUnassigned = false;
         instance.showAllSaved = false;
         instance.folderQuery = "";
         saveWorkspaceState();
-        void transitionWorkspace("utility", { refreshPaneIDs: [paneID] }).finally(() => {
+        try {
+          if (nextFolderID && folderIsProject(project)) {
+            const activated = await activateProjectStudio(project, {
+              sourcePaneID: paneID,
+              focusSaved: false
+            });
+            if (!activated) {
+              instance.selectedFolderID = previousFolderID;
+              saveWorkspaceState();
+              return;
+            }
+          } else {
+            await transitionWorkspace("utility", { refreshPaneIDs: [paneID] });
+          }
+        } finally {
           tile.classList.remove("is-opening");
           tile.removeAttribute("aria-busy");
           delete tile.dataset.opening;
-        });
+        }
       };
       tile.addEventListener("pointerdown", (event) => {
         if (event.pointerType !== "mouse" && event.pointerType !== "pen") return;
@@ -18470,7 +18554,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
           tile.blur();
           delete tile.dataset.pointerFocus;
         }
-        open();
+        void open();
       });
       tile.addEventListener("keydown", (event) => {
         if (
@@ -21587,7 +21671,6 @@ async function renderWorkspace() {
     return;
   }
   for (const detail of openProjectDetails()) {
-    panes.push(await renderProjectDetail(detail));
     if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
     if (projectHasOpenCoordination(detail)) {
@@ -21652,8 +21735,6 @@ async function renderUtilityWorkspace(options = {}) {
 
   const panes = [];
   for (const detail of openProjectDetails()) {
-    const detailID = paneIDForProjectDetail(detail);
-    panes.push(await reuseOrRenderPane(detailID, () => renderProjectDetail(detail)));
     if (projectHasOpenNotebook(detail)) {
       const notebookID = paneIDForProjectNotebook(detail);
       panes.push(await reuseOrRenderPane(notebookID, () => renderProjectNotebook(detail)));

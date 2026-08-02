@@ -11,7 +11,8 @@ const [appSource, stylesSource, serverSource, entitlementSource, swiftModelSourc
 ]);
 
 function functionSource(source, name) {
-  const start = source.indexOf(`function ${name}(`);
+  const asyncStart = source.indexOf(`async function ${name}(`);
+  const start = asyncStart >= 0 ? asyncStart : source.indexOf(`function ${name}(`);
   assert.notEqual(start, -1, `${name} must exist.`);
   const bodyStart = source.indexOf("{", start);
   let depth = 0;
@@ -74,7 +75,17 @@ assert.match(
 );
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
-assert.match(appSource, /function renderSavedFolderContext\([\s\S]*?folderIsProject\(folder\)[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
+const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
+assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
+assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
+assert.match(savedFolderContextSource, /"Project Address"[\s\S]*?"Project Description"/);
+assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
+assert.match(savedFolderContextSource, /title: "Project Blocknote"[\s\S]*?savedTitle\.textContent = "Saved Evidence"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
+assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
+assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
+assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);
+assert.doesNotMatch(functionSource(appSource, "renderUtilityWorkspace"), /renderProjectDetail/);
 assert.match(appSource, /convert\.disabled = !hasCapability\("projects"\)/);
 assert.match(
   appSource,

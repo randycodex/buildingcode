@@ -349,8 +349,7 @@ async function main() {
       '>Account</h3>',
       '>Firm &amp; Collaboration</h3>',
       '>Offline Access</h3>',
-      '>Data &amp; Storage</h3>',
-      '>Projects</h4>'
+      '>Data &amp; Storage</h3>'
     ].map((marker) => settingsTemplateSource.indexOf(marker));
     assert(
       settingsSectionOrder.every((index, position) => index >= 0 && (position === 0 || index > settingsSectionOrder[position - 1])),
@@ -713,8 +712,8 @@ async function main() {
         workspaceScript.text.includes("tile.append(heading, typeBadge, countLabel, actions)") &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
-        workspaceScript.text.includes("function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
-        workspaceScript.text.includes("instance.selectedFolderID = projectRecordID(project)") &&
+        workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
+        workspaceScript.text.includes("instance.selectedFolderID = nextFolderID") &&
         !workspaceScript.text.includes("panes.push(await renderProjects())"),
       "Combined Saved no longer owns the project grid and project-detail flow."
     );
@@ -729,7 +728,7 @@ async function main() {
         !workspaceScript.text.includes('eyebrow.textContent = "Project Studio"') &&
         workspaceScript.text.includes('toggle.className = "project-studio-activity-toggle section-label"') &&
         workspaceScript.text.includes('toggle.setAttribute("aria-expanded", "false")') &&
-        workspaceScript.text.includes('wireProjectSectionMotion(section, list, [toggle], "Recent activity", false)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, list, [toggle], options.title || "Recent activity", false)') &&
         workspaceScript.text.includes('title.textContent = "Research history";\n  title.setAttribute("aria-expanded", "false")') &&
         workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Research history", false)') &&
         workspaceScript.text.includes('coordinationButton.textContent = "Coordination"') &&
@@ -746,7 +745,7 @@ async function main() {
         !workspaceScript.text.includes("No immutable Research answers are linked to this Project yet.") &&
         !workspaceScript.text.includes("No revision or missing-information requests are open.") &&
         workspaceScript.text.includes('headingActions.className = "project-notes-heading-actions"') &&
-        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], "Project information", true)') &&
+        workspaceScript.text.includes('wireProjectSectionMotion(section, body, [title, toggle], options.title || "Project information", true)') &&
         workspaceScript.text.includes('ariaLabel: "Project information"') &&
         workspaceScript.text.includes('title: "Project information"') &&
         workspaceScript.text.indexOf("appendProjectNotes(content, identity, foundation);") <
@@ -1233,7 +1232,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-empty-archive-v397'),
+        webRoot.text.includes('/web/app.js?v=20260802-inline-project-overview-v398'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1372,7 +1371,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-empty-archive-v397'),
+        webRoot.text.includes('/web/styles.css?v=20260802-inline-project-overview-v398'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1584,7 +1583,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-empty-archive-v397'),
+        webRoot.text.includes('/web/styles.css?v=20260802-inline-project-overview-v398'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2045,10 +2044,10 @@ async function main() {
       "Remote project deletion can leave a stale project detail or Workboard column open."
     );
     assert(
-      workspaceScript.text.includes('options.sourcePaneID === "utility:archive"') &&
-        workspaceScript.text.includes('placePaneBefore("utility:archive", detailID)') &&
-        workspaceScript.text.includes("placeArchiveAfterProjectsStack();"),
-      "Archived project details no longer open immediately to the archive column's left."
+      workspaceScript.text.includes("function selectProjectInSaved(project, preferredPaneID = \"\")") &&
+        workspaceScript.text.includes("const savedPaneID = selectProjectInSaved(identity, options.sourcePaneID)") &&
+        workspaceScript.text.includes("scrollPaneIntoView(savedPaneID)"),
+      "Project entry points no longer select and reveal the Project in Saved."
     );
     assert(
       workspaceScript.text.includes("function setReaderNotesActiveTarget") &&
