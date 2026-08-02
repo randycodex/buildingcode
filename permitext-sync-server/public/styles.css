@@ -462,6 +462,14 @@ textarea:focus-visible {
   gap: var(--space-3);
   padding: 0 clamp(22px, 3vw, 46px);
   border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+}
+
+.topbar button,
+.topbar input,
+.topbar .connection-status,
+.topbar .topbar-brand-plan {
+  text-transform: uppercase;
 }
 
 .workspace-issue {
@@ -577,6 +585,7 @@ textarea:focus-visible {
   font-size: calc(var(--chrome-font-size) * 1.08);
   font-weight: 300;
   letter-spacing: -0.03em;
+  text-transform: none;
 }
 
 .topbar-brand-plan {

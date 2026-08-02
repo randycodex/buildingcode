@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-projects-column-title-v442";
+} from "./offline-storage.js?v=20260802-uppercase-topbar-v444";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

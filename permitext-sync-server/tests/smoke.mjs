@@ -1239,7 +1239,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-projects-column-title-v442'),
+        webRoot.text.includes('/web/app.js?v=20260802-uppercase-topbar-v444'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1379,7 +1379,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-projects-column-title-v442'),
+        webRoot.text.includes('/web/styles.css?v=20260802-uppercase-topbar-v444'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1451,6 +1451,13 @@ async function main() {
         savedTemplateSource.includes('<h2 class="panel-title">Projects</h2>') &&
         !savedTemplateSource.includes('<p class="eyebrow panel-kind">Saved</p>'),
       "The Projects column should identify itself as Projects rather than Saved."
+    );
+    assert(
+      workspaceStyles.text.includes(".topbar {\n  display: flex;") &&
+        workspaceStyles.text.includes("border-bottom: 1px solid var(--border);\n  text-transform: uppercase;") &&
+        workspaceStyles.text.includes(".topbar button,\n.topbar input,\n.topbar .connection-status,\n.topbar .topbar-brand-plan {\n  text-transform: uppercase;") &&
+        workspaceStyles.text.includes("letter-spacing: -0.03em;\n  text-transform: none;"),
+      "The top bar should be uppercase while preserving the permitext wordmark casing."
     );
     assert(
       workspaceStyles.text.includes(".is-saved-selecting .saved-section-row .saved-row-button {\n  padding-right: 40px;") &&
@@ -1581,7 +1588,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-projects-column-title-v442'),
+        webRoot.text.includes('/web/styles.css?v=20260802-uppercase-topbar-v444'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
