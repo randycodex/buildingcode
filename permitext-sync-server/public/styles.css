@@ -10746,6 +10746,21 @@ body.is-resizing-research-evidence * {
   }
 }
 
+/* Keep references as a readable dropdown list. The shared menu animation
+ * measures the full content height, so this later, more-specific rule caps
+ * the open rail and restores scrolling inside it. */
+.notebook-reference-menu .notebook-reference-list {
+  grid-template-columns: minmax(0, 1fr);
+  background-image: none;
+}
+
+.notebook-reference-menu.is-open .notebook-reference-list {
+  max-height: min(var(--code-filter-menu-height, 240px), 52vh, 360px);
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-gutter: stable;
+}
+
 .notebook-editor-surface {
   min-height: 0;
   overflow-y: auto;

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-project-tool-recovery-v381";
+} from "./offline-storage.js?v=20260802-notebook-reference-menu-v382";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
