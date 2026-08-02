@@ -92,6 +92,8 @@ assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle
 assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
 assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?text-transform: none;/);
+assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: #f1f1f3;[\s\S]*?color: #141416;/);
+assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: #111113;[\s\S]*?color: #ffffff;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
 assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
 assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);

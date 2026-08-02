@@ -8534,13 +8534,14 @@ body.is-resizing-research-evidence * {
   padding: var(--space-3);
   border: 0;
   border-radius: var(--radius-control);
-  background: var(--surface-muted);
-  color: var(--text-primary);
+  background: #f1f1f3;
+  color: #141416;
   text-align: left;
 }
 
 .project-folder-type button[aria-pressed="true"] {
-  background: color-mix(in srgb, var(--accent) 24%, var(--surface));
+  background: #111113;
+  color: #ffffff;
 }
 
 .project-folder-type button:focus-visible {
@@ -8549,8 +8550,12 @@ body.is-resizing-research-evidence * {
 }
 
 .project-folder-type button span {
-  color: var(--text-secondary);
+  color: #55555c;
   font-size: calc(var(--chrome-font-size) * 0.68) !important;
+}
+
+.project-folder-type button[aria-pressed="true"] span {
+  color: #c9c9ce;
 }
 
 .project-sheet-field span,

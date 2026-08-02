@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-saved-collapse-motion-v404";
+} from "./offline-storage.js?v=20260802-folder-type-contrast-v405";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
