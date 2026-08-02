@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-inline-folder-controls-v450";
+} from "./offline-storage.js?v=20260802-project-tool-order-v451";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -1414,6 +1414,7 @@ async function closeProjectWorkboard(project) {
 
 async function openProjectWorkboard(project) {
   const identity = projectIdentity(project);
+  const wasOpen = projectHasOpenWorkboard(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
     const activated = await activateProjectStudio(identity);
     if (!activated) return false;
@@ -1422,7 +1423,7 @@ async function openProjectWorkboard(project) {
   state.detachedWorkboards = detachedWorkboards().filter((item) => !projectDetailMatches(identity, item));
   const workboardID = paneIDForProjectWorkboard(identity);
   state.paneWeights[workboardID] ||= defaultWorkboardPaneWidth;
-  placeProjectDetailAfterProjects(identity);
+  if (!wasOpen) placeProjectToolPaneLast(identity, workboardID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(workboardID);
@@ -1442,6 +1443,7 @@ async function closeProjectNotebook(project) {
 
 async function openProjectNotebook(project) {
   const identity = projectIdentity(project);
+  const wasOpen = projectHasOpenNotebook(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
     const activated = await activateProjectStudio(identity);
     if (!activated) return false;
@@ -1449,7 +1451,7 @@ async function openProjectNotebook(project) {
   state.notebooks = [identity];
   const notebookID = paneIDForProjectNotebook(identity);
   state.paneWeights[notebookID] ||= defaultNotebookPaneWidth;
-  placeProjectDetailAfterProjects(identity);
+  if (!wasOpen) placeProjectToolPaneLast(identity, notebookID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(notebookID);
@@ -1469,6 +1471,7 @@ async function closeProjectReportDraft(project) {
 
 async function openProjectReportDraft(project) {
   const identity = projectIdentity(project);
+  const wasOpen = projectHasOpenReportDraft(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
     const activated = await activateProjectStudio(identity);
     if (!activated) return false;
@@ -1476,7 +1479,7 @@ async function openProjectReportDraft(project) {
   state.reportDrafts = [identity];
   const reportDraftID = paneIDForProjectReportDraft(identity);
   state.paneWeights[reportDraftID] ||= defaultReportDraftPaneWidth;
-  placeProjectDetailAfterProjects(identity);
+  if (!wasOpen) placeProjectToolPaneLast(identity, reportDraftID);
   saveWorkspaceState();
   await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs() });
   scrollPaneIntoView(reportDraftID);
@@ -1499,6 +1502,7 @@ async function closeProjectCoordination(project) {
 
 async function openProjectCoordination(project, options = {}) {
   const identity = projectIdentity(project);
+  const wasOpen = projectHasOpenCoordination(identity);
   if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
     const activated = await activateProjectStudio(identity, { openCoordination: true });
     if (!activated) return false;
@@ -1506,7 +1510,7 @@ async function openProjectCoordination(project, options = {}) {
   state.coordinations = [identity];
   const coordinationID = paneIDForProjectCoordination(identity);
   state.paneWeights[coordinationID] ||= defaultCoordinationPaneWidth;
-  placeProjectDetailAfterProjects(identity);
+  if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID);
   saveWorkspaceState();
   await transitionWorkspace("utility", {
     refreshPaneIDs: projectOverviewRefreshPaneIDs(coordinationID)
@@ -1612,7 +1616,7 @@ function renderProjectWorkboard(project) {
     root.className = "workboard-root";
     root.dataset.projectId = projectID;
     root.textContent = "Loading workboard…";
-    panel.append(root);
+    panel.append(root, createProjectToolDragHandle(identity));
     mounted = {
       panel,
       root,
@@ -2582,7 +2586,7 @@ function defaultActivePaneIDs() {
 }
 
 function projectWorkspacePaneIDs(detail) {
-  return [
+  const activeIDs = [
     ...(projectHasOpenNotebook(detail) ? [paneIDForProjectNotebook(detail)] : []),
     ...(projectHasOpenReportDraft(detail) ? [paneIDForProjectReportDraft(detail)] : []),
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
@@ -2591,6 +2595,32 @@ function projectWorkspacePaneIDs(detail) {
       : []),
     ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
   ];
+  const active = new Set(activeIDs);
+  const ordered = (state.paneOrder || []).filter((id) => active.has(id));
+  activeIDs.forEach((id) => {
+    if (!ordered.includes(id)) ordered.push(id);
+  });
+  return ordered;
+}
+
+function projectToolPaneIDs(detail) {
+  return [
+    paneIDForProjectNotebook(detail),
+    paneIDForProjectReportDraft(detail),
+    paneIDForProjectCoordination(detail),
+    ...(openCoordinationThreadForProject(detail)
+      ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
+      : []),
+    paneIDForProjectWorkboard(detail)
+  ];
+}
+
+function projectForToolPaneID(paneID) {
+  return openProjectDetails().find((detail) => projectToolPaneIDs(detail).includes(paneID)) || null;
+}
+
+function isProjectToolPaneID(paneID) {
+  return Boolean(projectForToolPaneID(paneID));
 }
 
 function activePaneIDs() {
@@ -2662,6 +2692,25 @@ function appendPaneIfMissing(paneID) {
     if (!ordered.includes(id) && id !== paneID) ordered.push(id);
   });
   if (!ordered.includes(paneID)) ordered.push(paneID);
+  state.paneOrder = ordered;
+}
+
+function placeProjectToolPaneLast(detail, paneID) {
+  const activeIDs = defaultActivePaneIDs();
+  const active = new Set(activeIDs);
+  const ordered = (state.paneOrder || []).filter((id) => active.has(id) && id !== paneID);
+  activeIDs.forEach((id) => {
+    if (id !== paneID && !ordered.includes(id)) ordered.push(id);
+  });
+  const siblingIDs = new Set(projectToolPaneIDs(detail).filter((id) => id !== paneID));
+  const siblingIndexes = ordered
+    .map((id, index) => siblingIDs.has(id) ? index : -1)
+    .filter((index) => index !== -1);
+  const projectAnchorIndex = ordered.indexOf(primarySavedPaneID());
+  const insertIndex = siblingIndexes.length
+    ? Math.max(...siblingIndexes) + 1
+    : projectAnchorIndex === -1 ? ordered.length : projectAnchorIndex + 1;
+  ordered.splice(insertIndex, 0, paneID);
   state.paneOrder = ordered;
 }
 
@@ -10443,6 +10492,24 @@ function circleXIconSVG() {
   `;
 }
 
+function paneDragHandleSVG() {
+  return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
+    <circle cx="9" cy="6" r="1.2"></circle><circle cx="15" cy="6" r="1.2"></circle>
+    <circle cx="9" cy="12" r="1.2"></circle><circle cx="15" cy="12" r="1.2"></circle>
+    <circle cx="9" cy="18" r="1.2"></circle><circle cx="15" cy="18" r="1.2"></circle>
+  </svg>`;
+}
+
+function createProjectToolDragHandle(project) {
+  const handle = document.createElement("button");
+  handle.className = "icon-button pane-drag-handle project-tool-pane-drag-handle";
+  handle.type = "button";
+  handle.title = `Reorder ${projectIdentity(project).name} tools`;
+  handle.setAttribute("aria-label", `Reorder ${projectIdentity(project).name} tools`);
+  handle.innerHTML = paneDragHandleSVG();
+  return handle;
+}
+
 function selectionModeIconSVG() {
   return `
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
@@ -13555,6 +13622,7 @@ async function renderProjectNotebook(project) {
 
   const header = document.createElement("header");
   header.className = "notebook-header";
+  const dragHandle = createProjectToolDragHandle(identity);
   const closeButton = document.createElement("button");
   closeButton.className = "icon-button utility-close notebook-close";
   closeButton.type = "button";
@@ -13564,7 +13632,7 @@ async function renderProjectNotebook(project) {
   closeButton.addEventListener("click", () => {
     void closeProjectNotebook(identity);
   });
-  header.append(closeButton);
+  header.append(dragHandle, closeButton);
 
   const shell = document.createElement("div");
   shell.className = "notebook-shell";
@@ -14524,7 +14592,10 @@ async function renderProjectReportDraft(project) {
   closeButton.addEventListener("click", () => {
     void closeProjectReportDraft(identity);
   });
-  header.append(heading, closeButton);
+  const actions = document.createElement("div");
+  actions.className = "panel-actions report-draft-header-actions";
+  actions.append(createProjectToolDragHandle(identity), closeButton);
+  header.append(heading, actions);
 
   const shell = document.createElement("div");
   shell.className = "report-draft-shell";
@@ -16348,6 +16419,7 @@ async function renderProjectCoordination(project) {
   heading.append(eyebrow, title);
   const actions = document.createElement("div");
   actions.className = "panel-actions";
+  actions.append(createProjectToolDragHandle(identity));
   const close = appendDetailIconButton(actions, {
     title: "Close Coordination",
     label: "Close Coordination",
@@ -21207,18 +21279,23 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   }
   if (
     paneID === primarySavedPaneID() ||
-    isProjectDetailPaneID(paneID) ||
-    isProjectNotebookPaneID(paneID) ||
-    isProjectReportDraftPaneID(paneID) ||
-    isProjectCoordinationPaneID(paneID) ||
-    isProjectCoordinationThreadPaneID(paneID) ||
-    isProjectWorkboardPaneID(paneID)
+    isProjectDetailPaneID(paneID)
   ) {
     return [
       primarySavedPaneID(),
       ...openProjectDetails().flatMap(projectWorkspacePaneIDs),
       "utility:archive"
     ].filter((id) => active.has(id));
+  }
+  if (isProjectToolPaneID(paneID)) {
+    const detail = projectForToolPaneID(paneID);
+    const coordinationID = paneIDForProjectCoordination(detail);
+    const thread = openCoordinationThreadForProject(detail);
+    const threadID = thread ? paneIDForProjectCoordinationThread(detail, thread.threadID) : "";
+    if (paneID === coordinationID || paneID === threadID) {
+      return [coordinationID, threadID].filter((id) => active.has(id));
+    }
+    return active.has(paneID) ? [paneID] : [];
   }
   if (paneID.startsWith("utility:search:")) {
     const searchID = paneID.replace("utility:search:", "");
@@ -21238,6 +21315,11 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
 function orderWithPaneMoved(draggedPaneID, targetPaneID, position) {
   if (!draggedPaneID || !targetPaneID || draggedPaneID === targetPaneID) return null;
   const currentOrder = activePaneIDs();
+  const draggedProject = projectForToolPaneID(draggedPaneID);
+  const targetProject = projectForToolPaneID(targetPaneID);
+  if (draggedProject || targetProject) {
+    if (!draggedProject || !targetProject || !projectDetailMatches(draggedProject, targetProject)) return null;
+  }
   const draggedGroup = paneGroupForMove(draggedPaneID, currentOrder);
   const targetGroup = paneGroupForMove(targetPaneID, currentOrder);
   if (!draggedGroup.length || !targetGroup.length) return null;
@@ -21326,10 +21408,14 @@ function bindPaneDragging(panes) {
     pane.addEventListener("dragover", (event) => {
       const activeDraggedPaneID = draggedPaneID || event.dataTransfer.getData("text/plain");
       if (!activeDraggedPaneID || activeDraggedPaneID === pane.dataset.paneId) return;
-      event.preventDefault();
       const rect = pane.getBoundingClientRect();
       const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
       const previewOrder = orderWithPaneMoved(activeDraggedPaneID, pane.dataset.paneId, position);
+      if (!previewOrder) {
+        pane.classList.remove("is-drop-before", "is-drop-after");
+        return;
+      }
+      event.preventDefault();
       if (previewOrder && previewOrder.join("|") !== dragPreviewOrder.join("|")) {
         applyDragPreviewOrder(previewOrder);
       }
@@ -21347,9 +21433,8 @@ function bindPaneDragging(panes) {
       event.preventDefault();
       const rect = pane.getBoundingClientRect();
       const position = event.clientX > rect.left + rect.width / 2 ? "after" : "before";
-      const nextOrder = dragPreviewOrder.length
-        ? dragPreviewOrder.slice()
-        : orderWithPaneMoved(activeDraggedPaneID, pane.dataset.paneId, position);
+      const validOrder = orderWithPaneMoved(activeDraggedPaneID, pane.dataset.paneId, position);
+      const nextOrder = validOrder && dragPreviewOrder.length ? dragPreviewOrder.slice() : validOrder;
       draggedPaneID = "";
       if (nextOrder?.length) {
         state.paneOrder = nextOrder;

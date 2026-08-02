@@ -1240,7 +1240,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-inline-folder-controls-v450'),
+        webRoot.text.includes('/web/app.js?v=20260802-project-tool-order-v451'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1380,7 +1380,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-inline-folder-controls-v450'),
+        webRoot.text.includes('/web/styles.css?v=20260802-project-tool-order-v451'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1589,7 +1589,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-inline-folder-controls-v450'),
+        webRoot.text.includes('/web/styles.css?v=20260802-project-tool-order-v451'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2613,6 +2613,15 @@ async function main() {
         workspaceScript.text.includes("function projectWorkspacePaneIDs(detail)") &&
         workspaceScript.text.includes("...openProjectDetails().flatMap(projectWorkspacePaneIDs)"),
       "Workboard should use the Project name only and move with the Project workspace panes."
+    );
+    assert(
+      workspaceScript.text.includes("function placeProjectToolPaneLast(detail, paneID)") &&
+        workspaceScript.text.includes("if (!wasOpen) placeProjectToolPaneLast(identity, coordinationID)") &&
+        workspaceScript.text.includes("function projectForToolPaneID(paneID)") &&
+        workspaceScript.text.includes("projectDetailMatches(draggedProject, targetProject)") &&
+        workspaceScript.text.includes("createProjectToolDragHandle(identity)") &&
+        workspaceStyles.text.includes(".workboard-panel > .project-tool-pane-drag-handle"),
+      "Project tools should append in opening order and only drag within their own Project group."
     );
     assert(
       workboardSource.includes("const preventWheelPanning = (event) =>") &&

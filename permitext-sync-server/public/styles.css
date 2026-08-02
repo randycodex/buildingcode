@@ -939,9 +939,17 @@ textarea:focus-visible {
   --pane-min-width: min(420px, 82vw);
   --project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3));
   --project-pane-band-background: color-mix(in srgb, var(--project-color) 42%, var(--surface));
+  position: relative;
   grid-template-rows: minmax(0, 1fr);
   padding: 0;
   background: var(--surface-raised);
+}
+
+.workboard-panel > .project-tool-pane-drag-handle {
+  position: absolute;
+  z-index: 20;
+  top: calc(var(--panel-padding) + 1px);
+  right: calc(var(--panel-padding) + (var(--panel-title-control-size) * 2) + var(--space-2));
 }
 
 .workboard-root {
@@ -970,6 +978,10 @@ body.is-detached-workboard-window .workboard-panel {
   width: 100%;
   height: 100%;
   border: 0;
+}
+
+body.is-detached-workboard-window .project-tool-pane-drag-handle {
+  display: none;
 }
 
 body.is-detached-workboard-window .detached-workboard-error {
@@ -10837,6 +10849,11 @@ body.is-resizing-research-evidence * {
   align-items: flex-start;
   justify-content: flex-end;
   margin-bottom: var(--space-3);
+}
+
+.notebook-header,
+.report-draft-header-actions {
+  align-items: center;
 }
 
 .notebook-card-rail h3,
