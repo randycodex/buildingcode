@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-settings-folder-refresh-v394";
+} from "./offline-storage.js?v=20260802-settings-divider-v395";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

@@ -10238,7 +10238,6 @@ body.is-resizing-research-evidence * {
 
 .settings-panel .settings-danger-zone {
   padding-top: var(--space-3);
-  border-top: 1px solid var(--border);
 }
 
 .settings-panel .settings-project-delete {
