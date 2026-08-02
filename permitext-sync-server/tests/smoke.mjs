@@ -339,6 +339,10 @@ async function main() {
       topbarGroupOrder.every((index, position) => index >= 0 && (position === 0 || index > topbarGroupOrder[position - 1])),
       "Web topbar tools are no longer draggable on the left with workspaces and the brand on the right."
     );
+    assert(
+      topbarSource.includes('id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>'),
+      "The Projects toolbar label is no longer concise."
+    );
     const settingsTemplateSource = webRoot.text.slice(
       webRoot.text.indexOf('<template id="settings-template"'),
       webRoot.text.indexOf('<script src="/web/app.js')
@@ -1232,7 +1236,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-blocknotes-label-v402'),
+        webRoot.text.includes('/web/app.js?v=20260802-projects-label-v403'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1244,7 +1248,8 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode)") &&
-        workspaceScript.text.includes('savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"') &&
+        workspaceScript.text.includes('savedInstance.projectsMenuOpen\n      ? ""') &&
+        workspaceScript.text.includes('savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"') &&
         workspaceScript.text.includes('list.classList.add("is-mode-switching")') &&
         workspaceScript.text.includes("showingArchived = !showingArchived") &&
         workspaceScript.text.includes("archivedProjectRecords(projects)") &&
@@ -1371,7 +1376,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-blocknotes-label-v402'),
+        webRoot.text.includes('/web/styles.css?v=20260802-projects-label-v403'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1583,7 +1588,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-blocknotes-label-v402'),
+        webRoot.text.includes('/web/styles.css?v=20260802-projects-label-v403'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

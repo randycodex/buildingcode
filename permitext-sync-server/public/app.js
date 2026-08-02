@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-blocknotes-label-v402";
+} from "./offline-storage.js?v=20260802-projects-label-v403";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -18420,8 +18420,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   addButton.addEventListener("click", () => showProjectCreateSheet(panel));
   wireCodeFilterMenu(list, instance, {
     stateKey: "projectsMenuOpen",
-    menuName: "folders",
-    label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
+    menuName: "projects",
+    label: (savedInstance) => savedInstance.projectsMenuOpen
+      ? ""
+      : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
   });
 
   const syncProjectModeControls = () => {
@@ -18447,8 +18449,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       }
       updateCodeFilterMenu(list, instance, {
         stateKey: "projectsMenuOpen",
-        menuName: "folders",
-        label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
+        menuName: "projects",
+        label: (savedInstance) => savedInstance.projectsMenuOpen
+          ? ""
+          : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
       });
       return;
     }
@@ -18653,8 +18657,10 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     });
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
-      menuName: "folders",
-      label: (savedInstance) => savedInstance.projectsArchiveMode ? "Archived Folders" : "Folders"
+      menuName: "projects",
+      label: (savedInstance) => savedInstance.projectsMenuOpen
+        ? ""
+        : savedInstance.projectsArchiveMode ? "Archived Projects" : "Projects"
     });
   };
 
