@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-projects-label-v403";
+} from "./offline-storage.js?v=20260802-saved-collapse-motion-v404";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -3269,7 +3269,7 @@ function wireCodeFilterMenu(filterRail, instance, options = {}) {
   updateCodeFilterMenu(filterRail, instance, initialOptions);
 }
 
-function wireProjectSectionMotion(section, body, controls, label, initialExpanded = false) {
+function wireProjectSectionMotion(section, body, controls, label, initialExpanded = false, motionOptions = {}) {
   const toggles = controls.filter(Boolean);
   section.classList.add("project-section-motion");
   body.classList.add("project-section-motion-body");
@@ -3281,6 +3281,8 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
       control.setAttribute("aria-expanded", String(nextExpanded));
       if (control.classList.contains("project-section-toggle-chevron") ||
           control.classList.contains("project-notes-toggle-chevron")) {
+        control.setAttribute("aria-label", `${nextExpanded ? "Collapse" : "Expand"} ${label}`);
+      } else if (control.classList.contains("saved-code-toggle")) {
         control.setAttribute("aria-label", `${nextExpanded ? "Collapse" : "Expand"} ${label}`);
       }
     });
@@ -3341,7 +3343,11 @@ function wireProjectSectionMotion(section, body, controls, label, initialExpande
     hideTimer = window.setTimeout(hideBody, 500);
   };
 
-  toggles.forEach((control) => control.addEventListener("click", () => setExpanded(!expanded)));
+  toggles.forEach((control) => control.addEventListener("click", () => {
+    const nextExpanded = !expanded;
+    setExpanded(nextExpanded);
+    if (typeof motionOptions.onChange === "function") motionOptions.onChange(nextExpanded);
+  }));
   const bodyResizeObserver = new ResizeObserver(() => {
     if (!section.isConnected) {
       bodyResizeObserver.disconnect();
@@ -19025,20 +19031,24 @@ function renderSavedItemsByCode(content, savedItems, paneID = "utility:saved", o
     chevron.setAttribute("aria-hidden", "true");
     chevron.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>';
     codeLabel.append(codeLabelText, chevron);
-    const setCodeGroupCollapsed = (collapsed) => {
-      codeBody.hidden = collapsed;
-      codeGroup.classList.toggle("is-collapsed", collapsed);
-      codeLabel.setAttribute("aria-expanded", String(!collapsed));
-      codeLabel.setAttribute("aria-label", `${collapsed ? "Expand" : "Collapse"} ${codeDisplayLabel(prefix)}`);
-    };
-    setCodeGroupCollapsed(collapsedPrefixes.has(normalizedPrefix));
-    codeLabel.addEventListener("click", () => {
-      const collapsed = !codeBody.hidden;
-      setCodeGroupCollapsed(collapsed);
-      if (typeof options.onCodeGroupToggle === "function") {
-        options.onCodeGroupToggle(normalizedPrefix, collapsed);
+    const initiallyCollapsed = collapsedPrefixes.has(normalizedPrefix);
+    codeGroup.classList.toggle("is-collapsed", initiallyCollapsed);
+    wireProjectSectionMotion(
+      codeGroup,
+      codeBody,
+      [codeLabel],
+      codeDisplayLabel(prefix),
+      !initiallyCollapsed,
+      {
+        onChange: (expanded) => {
+          const collapsed = !expanded;
+          codeGroup.classList.toggle("is-collapsed", collapsed);
+          if (typeof options.onCodeGroupToggle === "function") {
+            options.onCodeGroupToggle(normalizedPrefix, collapsed);
+          }
+        }
       }
-    });
+    );
     codeGroup.append(codeLabel, codeBody);
 
     const orderedItems = options.preserveOrder ? [...items] : [...items].sort((left, right) => {

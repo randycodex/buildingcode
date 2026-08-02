@@ -8681,8 +8681,19 @@ body.is-resizing-research-evidence * {
   transform: rotate(0deg);
 }
 
+.saved-code-group.project-section-motion.is-open > .saved-code-group-body {
+  padding-top: 0;
+}
+
 .saved-code-group-body[hidden] {
   display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-section-motion > .project-section-motion-body,
+  .saved-code-toggle-chevron {
+    transition: none;
+  }
 }
 
 .saved-panel .saved-code-group + .saved-code-group {

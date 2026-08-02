@@ -84,10 +84,12 @@ assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?savedTitle\.t
 assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
 assert.match(appSource, /collapsedCodePrefixes: savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
-assert.match(appSource, /codeLabel\.setAttribute\("aria-expanded", String\(!collapsed\)\)/);
-assert.match(appSource, /codeBody\.hidden = collapsed/);
+assert.match(appSource, /control\.setAttribute\("aria-expanded", String\(nextExpanded\)\)/);
+assert.match(appSource, /if \(!expanded\) body\.hidden = true/);
 assert.match(appSource, /options\.onCodeGroupToggle\(normalizedPrefix, collapsed\)/);
+assert.match(appSource, /wireProjectSectionMotion\([\s\S]*?codeGroup,[\s\S]*?codeBody,[\s\S]*?onChange: \(expanded\)/);
 assert.match(stylesSource, /\.saved-code-group\.is-collapsed \.saved-code-toggle-chevron/);
+assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-body[\s\S]*?max-height 420ms cubic-bezier/);
 assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
