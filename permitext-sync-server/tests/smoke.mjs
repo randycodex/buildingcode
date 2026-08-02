@@ -1244,7 +1244,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-notebook-reference-menu-v452'),
+        webRoot.text.includes('/web/app.js?v=20260802-notebook-reference-spacing-v453'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1384,7 +1384,11 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-menu-v452'),
+        workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-option {") &&
+        workspaceStyles.text.includes("align-self: start;") &&
+        workspaceStyles.text.includes("height: auto;") &&
+        !workspaceStyles.text.includes(".notebook-toolbar .notebook-reference-option {\n  display: grid;\n  gap: 3px;\n  align-items: flex-start;\n  min-width: 0;\n  min-height: 48px;\n  height: 100%;") &&
+        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-spacing-v453'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1593,7 +1597,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-menu-v452'),
+        webRoot.text.includes('/web/styles.css?v=20260802-notebook-reference-spacing-v453'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
