@@ -85,6 +85,11 @@ assert.match(
   /function projectOverviewRefreshPaneIDs\([\s\S]*?state\.utilities\.settings \? "utility:settings" : ""/,
   "Open Settings must refresh immediately after a folder is archived, restored, or deleted elsewhere."
 );
+assert.match(
+  appSource,
+  /const settingsScrollTop = refreshPaneIDs\.has\("utility:settings"\)[\s\S]*?settingsPane\.scrollTop = Math\.min\(/,
+  "Refreshing Settings must preserve its vertical scroll position."
+);
 assert.match(appSource, /function renameAnnotationTag\([\s\S]*?normalizeAnnotationTags/);
 assert.match(appSource, /function wireCodeFilterMenu\([\s\S]*?"ArrowDown"[\s\S]*?"Home"[\s\S]*?"End"[\s\S]*?"Escape"/);
 assert.match(stylesSource, /\.reader-notes-project-options \{[\s\S]*?max-height:[\s\S]*?overflow-y: auto;[\s\S]*?scrollbar-gutter: stable;/);

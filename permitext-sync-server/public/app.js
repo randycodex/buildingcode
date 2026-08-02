@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-settings-divider-v395";
+} from "./offline-storage.js?v=20260802-settings-scroll-v396";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -21637,6 +21637,9 @@ async function renderUtilityWorkspace(options = {}) {
       .map((pane) => [pane.dataset.paneId, pane])
   );
   const refreshPaneIDs = new Set(options.refreshPaneIDs || []);
+  const settingsScrollTop = refreshPaneIDs.has("utility:settings")
+    ? existingPanesByID.get("utility:settings")?.scrollTop ?? null
+    : null;
   const reuseOrRenderPane = async (paneID, renderPane) => {
     const existingPane = refreshPaneIDs.has(paneID) ? null : existingPanesByID.get(paneID);
     const pane = existingPane || await renderPane();
@@ -21713,6 +21716,15 @@ async function renderUtilityWorkspace(options = {}) {
   }
 
   appendPaneSequence(panes);
+  if (settingsScrollTop !== null) {
+    const settingsPane = track.querySelector('.workspace-panel[data-pane-id="utility:settings"]');
+    if (settingsPane) {
+      settingsPane.scrollTop = Math.min(
+        settingsScrollTop,
+        Math.max(0, settingsPane.scrollHeight - settingsPane.clientHeight)
+      );
+    }
+  }
   syncAllCommentBoxHeights();
   bindAllReaderCommentScroll();
   enhanceReaderSelects();

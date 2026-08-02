@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-settings-divider-v395"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-settings-scroll-v396"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
 
 let activationCompletion;
