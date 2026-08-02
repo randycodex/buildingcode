@@ -19,7 +19,7 @@ Packages/
 # Local Permitext web sync smoke-test data.
 permitext-sync-server/data/
 permitext-sync-server/node_modules/
-permitext-sync-server/public/notebook-assets/notebook 2.js
+permitext-sync-server/public/notebook-assets/notebook *.js
 permitext-sync-server/public/workboard-assets/
 
 NYC CC APP/IMG_*.PNG
