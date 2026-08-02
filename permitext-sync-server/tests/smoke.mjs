@@ -1244,7 +1244,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-research-project-list-v456'),
+        webRoot.text.includes('/web/app.js?v=20260802-research-folder-groups-v457'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1386,7 +1386,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-research-project-list-v456'),
+        webRoot.text.includes('/web/styles.css?v=20260802-research-folder-groups-v457'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1595,7 +1595,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-research-project-list-v456'),
+        webRoot.text.includes('/web/styles.css?v=20260802-research-folder-groups-v457'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1617,6 +1617,10 @@ async function main() {
         workspaceScript.text.includes('projectSelectWrap.className = "code-filter-menu research-conversation-project-picker";') &&
         workspaceScript.text.includes('projectToggle.className = "code-filter-menu-toggle research-conversation-project-toggle";') &&
         workspaceScript.text.includes('projectOptions.className = "research-conversation-project-options";') &&
+        workspaceScript.text.includes('categoryLabel.className = "research-conversation-project-category";') &&
+        workspaceScript.text.includes('categoryLabel.textContent = choice.category === "reference" ? "Reference folders" : "Projects";') &&
+        workspaceScript.text.includes("folders.filter(folderIsProject).forEach") &&
+        workspaceScript.text.includes('category: "reference"') &&
         workspaceScript.text.includes('optionButton.className = "research-conversation-project-option";') &&
         workspaceScript.text.includes("wireCodeFilterMenu(projectOptions, projectMenuState, {") &&
         workspaceScript.text.includes("assignResearchConversationProject(conversation, targetProjectID, {") &&
@@ -1625,6 +1629,7 @@ async function main() {
         workspaceScript.text.includes('postResearch("/research/conversations/assign-project"') &&
         workspaceStyles.text.includes(".research-conversation-project-picker {") &&
         workspaceStyles.text.includes(".research-conversation-project-options {\n  display: block;") &&
+        workspaceStyles.text.includes(".research-conversation-project-category {") &&
         workspaceStyles.text.includes(".research-conversation-project-option {\n  display: block;") &&
         workspaceStyles.text.includes(".research-conversation-project-option:last-child {\n  border-bottom: 0;") &&
         !workspaceStyles.text.includes(".research-conversation-project-option:nth-child(even)") &&

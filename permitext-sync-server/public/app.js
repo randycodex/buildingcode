@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-research-project-list-v456";
+} from "./offline-storage.js?v=20260802-research-folder-groups-v457";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -11296,12 +11296,21 @@ function researchProjectChoices({
 } = {}) {
   const choices = [];
   if (includeUnassigned) {
-    choices.push({ value: "", label: unassignedLabel });
+    choices.push({ value: "", label: unassignedLabel, category: "unassigned" });
   }
-  researchProjects().forEach((project) => {
+  const folders = activeFolderRecords(currentContentSummary().projects || []);
+  folders.filter(folderIsProject).forEach((project) => {
     choices.push({
       value: researchProjectID(project),
-      label: readableProjectName(project)
+      label: readableProjectName(project),
+      category: "project"
+    });
+  });
+  folders.filter((folder) => !folderIsProject(folder)).forEach((folder) => {
+    choices.push({
+      value: researchProjectID(folder),
+      label: readableProjectName(folder),
+      category: "reference"
     });
   });
   if (value && !choices.some((choice) => choice.value === value)) {
@@ -11310,7 +11319,8 @@ function researchProjectChoices({
     if (historicalProject) {
       choices.push({
         value,
-        label: `${readableProjectName(historicalProject)} (Archived)`
+        label: `${readableProjectName(historicalProject)} (Archived)`,
+        category: folderIsProject(historicalProject) ? "project" : "reference"
       });
     }
   }
@@ -12021,7 +12031,15 @@ async function renderResearch(paneID = "utility:analysis") {
           button.disabled = !enabled;
         });
       };
+      let previousProjectChoiceCategory = "";
       projectChoices.forEach((choice) => {
+        if (choice.category !== "unassigned" && choice.category !== previousProjectChoiceCategory) {
+          const categoryLabel = document.createElement("p");
+          categoryLabel.className = "research-conversation-project-category";
+          categoryLabel.textContent = choice.category === "reference" ? "Reference folders" : "Projects";
+          projectOptions.append(categoryLabel);
+        }
+        previousProjectChoiceCategory = choice.category;
         const optionButton = document.createElement("button");
         optionButton.type = "button";
         optionButton.className = "research-conversation-project-option";
