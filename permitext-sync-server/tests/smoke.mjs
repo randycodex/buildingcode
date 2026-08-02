@@ -1237,7 +1237,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260802-note-actions-v426'),
+        webRoot.text.includes('/web/app.js?v=20260802-reader-width-v428'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1377,7 +1377,7 @@ async function main() {
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
         workspaceStyles.text.includes("margin: var(--space-3) var(--space-3) var(--space-3);") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-note-actions-v426'),
+        webRoot.text.includes('/web/styles.css?v=20260802-reader-width-v428'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1435,7 +1435,7 @@ async function main() {
         workspaceScript.text.includes("void openSavedItemInReader(openItem, paneID);") &&
         workspaceScript.text.includes("candidate.savedSourcePaneID === savedPaneID") &&
         workspaceScript.text.includes("savedSourcePaneID: savedPaneID") &&
-        workspaceScript.text.includes("const defaultSourceLinkedReaderPaneWidth = 400;") &&
+        workspaceScript.text.includes("const defaultSourceLinkedReaderPaneWidth = 600;") &&
         workspaceScript.text.includes("state.paneWeights[readerPaneID] = defaultSourceLinkedReaderPaneWidth;") &&
         workspaceScript.text.includes("reader.sourceLinkedDefaultWidthApplied = true;") &&
         workspaceScript.text.includes("if (sourceLinkedReader)") &&
@@ -1581,7 +1581,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260802-note-actions-v426'),
+        webRoot.text.includes('/web/styles.css?v=20260802-reader-width-v428'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1763,7 +1763,7 @@ async function main() {
       "Free web accounts can expose or persist more than two Readers."
     );
     assert(
-      workspaceScript.text.includes("const defaultReaderPaneWidth = 520") &&
+      workspaceScript.text.includes("const defaultReaderPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultNonReaderPaneWidth = 400") &&
         workspaceScript.text.includes("const defaultUtilityPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSavedPaneWidth = 600") &&

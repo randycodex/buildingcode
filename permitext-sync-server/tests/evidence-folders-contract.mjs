@@ -117,6 +117,9 @@ assert.match(appSource, /function activeProjectsIconSVG\(\)[\s\S]*?<rect x="3" y
 assert.match(appSource, /instance\.projectsMenuOpen = overrides\.projectsMenuOpen === undefined[\s\S]*?\? true[\s\S]*?: Boolean\(overrides\.projectsMenuOpen\);/);
 assert.match(appSource, /archiveButton\.innerHTML = showingArchived \? activeProjectsIconSVG\(\) : archiveIconSVG\(\)/);
 assert.match(appSource, /const legacyCoordinationPaneWidth = 430;[\s\S]*?const defaultCoordinationPaneWidth = 600;/);
+assert.match(appSource, /const legacyReaderPaneWidth = 520;[\s\S]*?const defaultReaderPaneWidth = 600;/);
+assert.match(appSource, /const legacySourceLinkedReaderPaneWidth = 400;[\s\S]*?const defaultSourceLinkedReaderPaneWidth = 600;/);
+assert.match(appSource, /paneID\?\.startsWith\("reader:"\)[\s\S]*?value === legacyReaderPaneWidth \|\| value === legacySourceLinkedReaderPaneWidth[\s\S]*?defaultPaneWidthForID\(paneID\) === defaultReaderPaneWidth[\s\S]*?return defaultReaderPaneWidth;/);
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
 assert.match(appSource, /projectsMenuToggle\.addEventListener\("click"[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);

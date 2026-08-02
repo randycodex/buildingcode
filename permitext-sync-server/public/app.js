@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-note-actions-v426";
+} from "./offline-storage.js?v=20260802-reader-width-v428";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -163,8 +163,10 @@ const existingBuildingCodePrefix = "EBC";
 const zoningSyncCodeVersion = "CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1";
 
 const codeThemeClasses = codeOptions.map((option) => `code-theme-${option.theme}`);
-const defaultReaderPaneWidth = 520;
-const defaultSourceLinkedReaderPaneWidth = 400;
+const legacyReaderPaneWidth = 520;
+const defaultReaderPaneWidth = 600;
+const legacySourceLinkedReaderPaneWidth = 400;
+const defaultSourceLinkedReaderPaneWidth = 600;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultSavedPaneWidth = 600;
@@ -2444,6 +2446,13 @@ function migrateLegacyPaneWidth(paneID, value) {
   }
   if (isProjectCoordinationPaneID(paneID) && value === legacyCoordinationPaneWidth) {
     return defaultCoordinationPaneWidth;
+  }
+  if (
+    paneID?.startsWith("reader:") &&
+    (value === legacyReaderPaneWidth || value === legacySourceLinkedReaderPaneWidth) &&
+    defaultPaneWidthForID(paneID) === defaultReaderPaneWidth
+  ) {
+    return defaultReaderPaneWidth;
   }
   return value;
 }
