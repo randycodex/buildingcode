@@ -1573,7 +1573,7 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 | 1 — Contracts, storage, permissions, migration | Complete (branch) | `4523703ff` | `npm run check` / `smoke` / `test:code-question` (includes phase1); CAS/counters/issuance saga/migration/adapters/permissions covered | Domain + handlers gated by disabled flag; no primary UI change; iOS decode preserves new optional fields |
 | 2 — Project and Question workspace shell | Complete (branch) | `a56e51079` | `npm run check` / `smoke`; `code-question-workspace-contract`; workspace-state normalization | Flag-gated shell: question index, stage control, Add column/More, deep links, project/question switch isolation |
 | 3 — Define | Complete (branch) | `fcac63182` | `npm run check` / `smoke`; `code-question-define-contract` | Definition column: fields, facts/assumptions/unknowns, revisions, fact requests, readiness, offline queue conflicts, viewer read-only |
-| 4 — Evidence | Complete (branch) | (set after commit) | `npm run check` / `smoke`; `code-question-evidence-contract` | Candidates→Reader→Tray; propose/approve; versioned sets; verification≠applicability; reconstructable snapshots |
+| 4 — Evidence | Complete (branch) |  | `npm run check` / `smoke`; `code-question-evidence-contract` | Candidates→Reader→Tray; propose/approve; versioned sets; verification≠applicability; reconstructable snapshots |
 | 5 — Analyze and Professional Conclusion | Not started | — | — | — |
 | 6 — Review | Not started | — | — | — |
 | 7 — Issue | Not started | — | — | — |
