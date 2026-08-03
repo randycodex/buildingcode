@@ -90,6 +90,8 @@ export function emptyCodeQuestionWorkspaceState() {
     questionsByProjectID: {},
     /** Phase 3: definition working records keyed by question ID. */
     definitionsByQuestionID: {},
+    /** Phase 4: evidence workspace keyed by question ID. */
+    evidenceByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -249,6 +251,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
   if (source.definitionsByQuestionID && typeof source.definitionsByQuestionID === "object") {
     state.definitionsByQuestionID = Object.fromEntries(
       Object.entries(source.definitionsByQuestionID)
+        .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
+        .map(([questionID, record]) => [questionID, copy(record)])
+    );
+  }
+  if (source.evidenceByQuestionID && typeof source.evidenceByQuestionID === "object") {
+    state.evidenceByQuestionID = Object.fromEntries(
+      Object.entries(source.evidenceByQuestionID)
         .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
         .map(([questionID, record]) => [questionID, copy(record)])
     );

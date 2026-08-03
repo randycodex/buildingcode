@@ -81,6 +81,7 @@ function emptyCodeQuestionWorkspaceLayout() {
     moreMenuOpen: false,
     questionsByProjectID: {},
     definitionsByQuestionID: {},
+    evidenceByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -148,6 +149,9 @@ function normalizeCodeQuestionWorkspaceLayout(value = {}, activeProject = null) 
   }
   if (source.definitionsByQuestionID && typeof source.definitionsByQuestionID === "object") {
     layout.definitionsByQuestionID = copy(source.definitionsByQuestionID);
+  }
+  if (source.evidenceByQuestionID && typeof source.evidenceByQuestionID === "object") {
+    layout.evidenceByQuestionID = copy(source.evidenceByQuestionID);
   }
   if (source.deepLink && typeof source.deepLink === "object") {
     layout.deepLink = {

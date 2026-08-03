@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260803-code-question-define-v1";
+} from "./offline-storage.js?v=20260803-code-question-evidence-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260803-code-question-define-v1";
+} from "./workspace-state.js?v=20260803-code-question-evidence-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -80,7 +80,7 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260803-code-question-define-v1";
+} from "./code-question-workspace.js?v=20260803-code-question-evidence-v1";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -97,7 +97,28 @@ import {
   resolveFactRequest,
   reviseQuestionInput,
   updateDefinitionFields
-} from "./code-question-define.js?v=20260803-code-question-define-v1";
+} from "./code-question-define.js?v=20260803-code-question-evidence-v1";
+import {
+  addCandidates,
+  analysisEligibleEvidence,
+  approveEvidenceProposal,
+  assertNoCandidatesInAnalysisInput,
+  canApproveEvidence,
+  canProposeEvidence,
+  currentEvidenceSet,
+  emptyEvidenceWorkspace,
+  evidenceWarnings,
+  normalizeEvidenceWorkspace,
+  proposeEvidence,
+  readerProvenanceModel,
+  reconstructEvidenceSet,
+  rejectEvidenceProposal,
+  removeEvidenceEntry,
+  selectCandidate,
+  setSelectedPassage,
+  sourceVerificationLabel,
+  trayModel
+} from "./code-question-evidence.js?v=20260803-code-question-evidence-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4924,6 +4945,74 @@ function codeQuestionActor() {
     userID: state.account?.userID || state.account?.appUserID || "local-user",
     displayName: state.account?.displayName || "Local user"
   };
+}
+
+function getEvidenceForQuestion(questionID) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const cq = codeQuestionWorkspaceState();
+  const existing = cq.evidenceByQuestionID?.[id];
+  if (existing) return normalizeEvidenceWorkspace(existing, id);
+  // Seed with clearly synthetic demo candidates only when empty (flag-on shell).
+  return normalizeEvidenceWorkspace(emptyEvidenceWorkspace(id, {
+    unassignedSaved: [
+      {
+        id: "saved-unassigned-1",
+        label: "Unassigned saved passage (not question evidence)",
+        note: "Preserved outside the question tray until explicitly proposed."
+      }
+    ]
+  }), id);
+}
+
+function saveEvidenceForQuestion(questionID, evidence) {
+  const id = String(questionID || "").trim();
+  if (!id) return;
+  const normalized = normalizeEvidenceWorkspace(evidence, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    evidenceByQuestionID: {
+      ...(cq.evidenceByQuestionID || {}),
+      [id]: normalized
+    }
+  });
+  return normalized;
+}
+
+function ensureEvidenceSeedCandidates(questionID) {
+  let evidence = getEvidenceForQuestion(questionID);
+  if (evidence.candidates.length) return evidence;
+  evidence = addCandidates(evidence, [
+    {
+      id: "cand-syn-10-1",
+      label: "SYNTHETIC-CODE §TEST-10.1 Minimum corridor width",
+      sourceIdentity: "synthetic-source:TEST-CODE:edition-fixture-1",
+      passageLocator: "SYNTHETIC-CODE §TEST-10.1",
+      previewText: "[SYNTHETIC TEST PASSAGE — NOT LAW] The minimum clear width of exit access corridors shall be not less than 44 inches (1118 mm).",
+      sourceFamily: "Synthetic test code",
+      edition: "fixture-edition-1",
+      effectiveDate: "2026-01-01T00:00:00.000Z",
+      sourceStatus: "synthetic-fixture",
+      completeness: "complete-for-fixture",
+      researchEligible: true,
+      note: "Search candidate only — not approved evidence."
+    },
+    {
+      id: "cand-syn-10-2",
+      label: "SYNTHETIC-CODE §TEST-10.2 Handrails (not selected)",
+      sourceIdentity: "synthetic-source:TEST-CODE:edition-fixture-1",
+      passageLocator: "SYNTHETIC-CODE §TEST-10.2",
+      previewText: "[SYNTHETIC TEST PASSAGE — NOT LAW] Handrail requirements for the synthetic fixture stair.",
+      sourceFamily: "Synthetic test code",
+      edition: "fixture-edition-1",
+      sourceStatus: "verification-required",
+      completeness: "partial",
+      researchEligible: false,
+      note: "Candidate excluded from default approval path."
+    }
+  ]);
+  return saveEvidenceForQuestion(questionID, evidence);
 }
 
 function ensureCodeQuestionShellForProject(project) {
@@ -22729,6 +22818,12 @@ function renderCodeQuestionPane(paneDescriptor) {
     body.appendChild(renderCodeQuestionIndexBody(project));
   } else if (parsed.paneRole === "definition") {
     body.appendChild(renderCodeQuestionDefinitionBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "candidates") {
+    body.appendChild(renderCodeQuestionCandidatesBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "reader") {
+    body.appendChild(renderCodeQuestionEvidenceReaderBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "evidence-tray" || parsed.paneRole === "approved-evidence") {
+    body.appendChild(renderCodeQuestionEvidenceTrayBody(project, parsed.questionID));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
@@ -23361,6 +23456,450 @@ function refreshCodeQuestionDefinitionPane(questionID) {
   }
   const project = openProjectDetails()[0] || null;
   pane.replaceChildren(renderCodeQuestionDefinitionBody(project, questionID));
+}
+
+function refreshCodeQuestionEvidencePanes(questionID) {
+  const project = openProjectDetails()[0] || null;
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const roles = ["candidates", "reader", "evidence-tray", "approved-evidence"];
+  let refreshed = false;
+  for (const role of roles) {
+    const pane = track?.querySelector?.(
+      `.code-question-panel[data-cq-role="${role}"][data-question-id="${safeID}"] .code-question-panel-body`
+    );
+    if (!pane) continue;
+    refreshed = true;
+    if (role === "candidates") pane.replaceChildren(renderCodeQuestionCandidatesBody(project, questionID));
+    else if (role === "reader") pane.replaceChildren(renderCodeQuestionEvidenceReaderBody(project, questionID));
+    else pane.replaceChildren(renderCodeQuestionEvidenceTrayBody(project, questionID));
+  }
+  if (!refreshed) void renderWorkspace();
+}
+
+function renderCodeQuestionCandidatesBody(project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-evidence-candidates";
+  const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!qid || qid === "_") {
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to search candidates for its Evidence stage.</p>`;
+    return wrap;
+  }
+  let evidence = ensureEvidenceSeedCandidates(qid);
+  const role = codeQuestionDefineRole();
+  const notice = document.createElement("p");
+  notice.className = "code-question-evidence-banner";
+  notice.innerHTML = `<strong>Candidates only.</strong> Search results and bookmarks are not evidence until a professional explicitly proposes and approves them.`;
+  wrap.appendChild(notice);
+  const toolbar = document.createElement("div");
+  toolbar.className = "code-question-evidence-toolbar";
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "code-question-index-search";
+  search.placeholder = "Filter candidates for this question";
+  search.setAttribute("aria-label", "Filter evidence candidates");
+  const addDemo = document.createElement("button");
+  addDemo.type = "button";
+  addDemo.className = "code-question-define-secondary";
+  addDemo.textContent = "Add scoped candidate";
+  addDemo.disabled = !canProposeEvidence(role) && role === "viewer";
+  addDemo.addEventListener("click", async () => {
+    const label = await openWebTextPrompt({
+      title: "Scoped candidate",
+      message: "Adds a question-scoped search candidate. It is not approved evidence.",
+      label: "Candidate label",
+      required: true,
+      confirmLabel: "Add candidate"
+    });
+    if (!label) return;
+    evidence = addCandidates(getEvidenceForQuestion(qid), [{
+      id: `cand-local-${Date.now().toString(16)}`,
+      label,
+      sourceIdentity: "user-scoped-search",
+      passageLocator: "User-scoped locator",
+      previewText: `[CANDIDATE — NOT EVIDENCE] ${label}`,
+      sourceStatus: "verification-required",
+      researchEligible: false
+    }]);
+    saveEvidenceForQuestion(qid, evidence);
+    refreshCodeQuestionEvidencePanes(qid);
+  });
+  toolbar.append(search, addDemo);
+  wrap.appendChild(toolbar);
+  const list = document.createElement("ul");
+  list.className = "code-question-candidate-list";
+  list.setAttribute("role", "listbox");
+  list.setAttribute("aria-label", "Evidence candidates");
+  const renderList = () => {
+    list.replaceChildren();
+    const query = String(search.value || "").trim().toLowerCase();
+    const items = evidence.candidates.filter((item) =>
+      !query || `${item.label} ${item.passageLocator} ${item.previewText}`.toLowerCase().includes(query)
+    );
+    if (!items.length) {
+      const empty = document.createElement("li");
+      empty.className = "code-question-define-empty-item";
+      empty.textContent = "No candidates. Use Search outside this tray or add a scoped candidate.";
+      list.appendChild(empty);
+      return;
+    }
+    items.forEach((candidate) => {
+      const li = document.createElement("li");
+      li.className = "code-question-candidate-item";
+      if (evidence.selectedCandidateID === candidate.id) li.classList.add("is-selected");
+      li.setAttribute("role", "option");
+      li.setAttribute("aria-selected", evidence.selectedCandidateID === candidate.id ? "true" : "false");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "code-question-candidate-open";
+      button.innerHTML = `
+        <span class="code-question-candidate-label">${escapeHTML(candidate.label)}</span>
+        <span class="code-question-candidate-meta">${escapeHTML(candidate.passageLocator)} · ${escapeHTML(sourceVerificationLabel(candidate.sourceStatus))}</span>
+        <span class="code-question-candidate-badge">Candidate</span>
+      `;
+      button.addEventListener("click", () => {
+        evidence = selectCandidate(getEvidenceForQuestion(qid), candidate.id);
+        evidence = setSelectedPassage(evidence, {
+          candidateID: candidate.id,
+          passageLocator: candidate.passageLocator,
+          quotedText: candidate.previewText,
+          surroundingContext: "Surrounding synthetic context for fixture review."
+        });
+        saveEvidenceForQuestion(qid, evidence);
+        refreshCodeQuestionEvidencePanes(qid);
+      });
+      li.appendChild(button);
+      list.appendChild(li);
+    });
+  };
+  search.addEventListener("input", renderList);
+  renderList();
+  wrap.appendChild(list);
+  return wrap;
+}
+
+function renderCodeQuestionEvidenceReaderBody(project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-evidence-reader";
+  const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!qid || qid === "_") {
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to inspect candidate passages.</p>`;
+    return wrap;
+  }
+  const evidence = ensureEvidenceSeedCandidates(qid);
+  const candidate = evidence.candidates.find((item) => item.id === evidence.selectedCandidateID);
+  const passage = evidence.selectedPassage;
+  const role = codeQuestionDefineRole();
+  if (!candidate) {
+    wrap.innerHTML = `<p class="code-question-define-empty">Select a candidate to inspect exact text, provenance, and eligibility.</p>`;
+    return wrap;
+  }
+  const provenance = readerProvenanceModel(candidate);
+  const prov = document.createElement("section");
+  prov.className = "code-question-evidence-provenance";
+  prov.setAttribute("aria-label", "Source provenance");
+  prov.innerHTML = `
+    <h3>Source verification</h3>
+    <dl class="code-question-evidence-provenance-grid">
+      <div><dt>Authority</dt><dd>${escapeHTML(provenance.authority)}</dd></div>
+      <div><dt>Edition</dt><dd>${escapeHTML(provenance.edition)}</dd></div>
+      <div><dt>Effective</dt><dd>${escapeHTML(provenance.effectiveDate || "Not stated")}</dd></div>
+      <div><dt>Status</dt><dd>${escapeHTML(provenance.sourceStatusLabel)}</dd></div>
+      <div><dt>Completeness</dt><dd>${escapeHTML(provenance.completeness)}</dd></div>
+      <div><dt>Research eligibility</dt><dd>${provenance.researchEligible ? "Eligible" : "Not eligible"}</dd></div>
+    </dl>
+    <p class="code-question-define-muted">Source verification is separate from Project applicability. A verified source may still not govern this Project.</p>
+  `;
+  wrap.appendChild(prov);
+  const passageEl = document.createElement("section");
+  passageEl.className = "code-question-evidence-passage";
+  passageEl.setAttribute("aria-label", "Exact passage");
+  passageEl.innerHTML = `
+    <h3>${escapeHTML(candidate.passageLocator || "Passage")}</h3>
+    <blockquote class="code-question-evidence-quote">${escapeHTML(passage?.quotedText || candidate.previewText)}</blockquote>
+    <h4>Surrounding context</h4>
+    <p class="code-question-evidence-context">${escapeHTML(passage?.surroundingContext || "No surrounding context selected.")}</p>
+  `;
+  if (passage?.structuredMaterial) {
+    const table = document.createElement("pre");
+    table.className = "code-question-evidence-structured";
+    table.textContent = JSON.stringify(passage.structuredMaterial, null, 2);
+    passageEl.appendChild(table);
+  }
+  wrap.appendChild(passageEl);
+  const actions = document.createElement("div");
+  actions.className = "code-question-evidence-actions";
+  const propose = document.createElement("button");
+  propose.type = "button";
+  propose.className = "code-question-create-button";
+  propose.textContent = role === "owner"
+    ? "Propose as Evidence"
+    : "Add as Evidence (proposal)";
+  propose.disabled = !canProposeEvidence(role);
+  propose.addEventListener("click", async () => {
+    const evidenceRole = await openWebTextPrompt({
+      title: "Evidence role",
+      message: "governing, supporting, or conflicting",
+      label: "Role",
+      defaultValue: "governing",
+      required: true,
+      confirmLabel: "Continue"
+    });
+    if (!evidenceRole) return;
+    const applicability = await openWebTextPrompt({
+      title: "Project applicability",
+      message: "Separate from source verification: does this provision govern this Project?",
+      label: "Applicability note",
+      required: false,
+      multiline: true,
+      confirmLabel: "Propose"
+    });
+    if (applicability === null) return;
+    try {
+      let next = proposeEvidence(getEvidenceForQuestion(qid), {
+        actorRole: role,
+        actorUserID: codeQuestionActor().userID,
+        role: evidenceRole,
+        analysisEligible: true,
+        projectApplicabilityNote: applicability || "",
+        professionalNote: "Proposed from Candidates reader.",
+        incompleteContext: !String(passage?.surroundingContext || "").trim()
+      });
+      // Solo owner explicit combined propose+approve
+      if (role === "owner") {
+        const combined = await confirmWebWarning(
+          "Approve immediately?",
+          "As Owner you may propose and approve in one explicit flow. Choose Approve to create Evidence Set vN, or Cancel to leave a proposal only.",
+          { confirmLabel: "Approve into Evidence Set", cancelLabel: "Leave as proposal" }
+        );
+        if (combined) {
+          const proposal = next.proposals[next.proposals.length - 1];
+          next = approveEvidenceProposal(next, proposal.id, {
+            actorRole: "owner",
+            actorUserID: codeQuestionActor().userID,
+            combined: true
+          });
+        }
+      }
+      saveEvidenceForQuestion(qid, next);
+      assertNoCandidatesInAnalysisInput(next);
+      refreshCodeQuestionEvidencePanes(qid);
+    } catch (error) {
+      void showWebNotice("Could not propose evidence", error.message || "Proposal failed.");
+    }
+  });
+  actions.appendChild(propose);
+  if (!canProposeEvidence(role)) {
+    const ro = document.createElement("p");
+    ro.className = "code-question-define-muted";
+    ro.textContent = "Viewers cannot propose evidence.";
+    actions.appendChild(ro);
+  }
+  wrap.appendChild(actions);
+  return wrap;
+}
+
+function renderCodeQuestionEvidenceTrayBody(project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-evidence-tray";
+  const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!qid || qid === "_") {
+    wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to manage its Evidence Tray.</p>`;
+    return wrap;
+  }
+  const evidence = ensureEvidenceSeedCandidates(qid);
+  const model = trayModel(evidence);
+  const role = codeQuestionDefineRole();
+  const head = document.createElement("div");
+  head.className = "code-question-evidence-tray-head";
+  head.innerHTML = `
+    <h3>Evidence Tray</h3>
+    <p class="code-question-define-muted">Approved set v${model.currentVersion || 0}${model.setContentHash ? ` · hash ${escapeHTML(model.setContentHash.slice(0, 12))}…` : ""}. Candidates are never analysis input.</p>
+  `;
+  wrap.appendChild(head);
+
+  // Proposals awaiting approval
+  const propSection = document.createElement("section");
+  propSection.className = "code-question-evidence-proposals";
+  propSection.innerHTML = `<h4>Proposals</h4>`;
+  const propList = document.createElement("ul");
+  propList.className = "code-question-evidence-list";
+  if (!model.proposals.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = "No open proposals.";
+    propList.appendChild(empty);
+  } else {
+    model.proposals.forEach((proposal) => {
+      const snap = evidence.snapshots[proposal.snapshotID];
+      const li = document.createElement("li");
+      li.className = `code-question-evidence-item is-${proposal.state}`;
+      const warnings = evidenceWarnings(proposal);
+      li.innerHTML = `
+        <div class="code-question-evidence-item-head">
+          <span class="code-question-define-kind-badge">${escapeHTML(proposal.role)}</span>
+          <span>${escapeHTML(proposal.state)}</span>
+          <span class="code-question-define-muted">${escapeHTML(sourceVerificationLabel(proposal.sourceVerificationState))}</span>
+        </div>
+        <p>${escapeHTML(snap?.quotedText || "(snapshot)")}</p>
+        <p class="code-question-define-muted">
+          Verification: ${escapeHTML(proposal.sourceVerificationState)} ·
+          Applicability: ${escapeHTML(proposal.projectApplicabilityNote || "Not noted")}
+        </p>
+      `;
+      if (warnings.length) {
+        const warn = document.createElement("ul");
+        warn.className = "code-question-evidence-warnings";
+        warnings.forEach((item) => {
+          const w = document.createElement("li");
+          w.textContent = item.message;
+          warn.appendChild(w);
+        });
+        li.appendChild(warn);
+      }
+      if (canApproveEvidence(role)) {
+        const actions = document.createElement("div");
+        actions.className = "code-question-evidence-item-actions";
+        const approve = document.createElement("button");
+        approve.type = "button";
+        approve.textContent = "Approve";
+        approve.addEventListener("click", async () => {
+          try {
+            const next = approveEvidenceProposal(getEvidenceForQuestion(qid), proposal.id, {
+              actorRole: role,
+              actorUserID: codeQuestionActor().userID,
+              overrideVerification: proposal.state === "verification-blocked"
+            });
+            saveEvidenceForQuestion(qid, next);
+            assertNoCandidatesInAnalysisInput(next);
+            refreshCodeQuestionEvidencePanes(qid);
+          } catch (error) {
+            void showWebNotice("Could not approve evidence", error.message || "Approval failed.");
+          }
+        });
+        const reject = document.createElement("button");
+        reject.type = "button";
+        reject.textContent = "Reject";
+        reject.addEventListener("click", async () => {
+          try {
+            const next = rejectEvidenceProposal(getEvidenceForQuestion(qid), proposal.id, {
+              actorRole: role,
+              actorUserID: codeQuestionActor().userID
+            });
+            saveEvidenceForQuestion(qid, next);
+            refreshCodeQuestionEvidencePanes(qid);
+          } catch (error) {
+            void showWebNotice("Could not reject evidence", error.message || "Reject failed.");
+          }
+        });
+        actions.append(approve, reject);
+        li.appendChild(actions);
+      }
+      propList.appendChild(li);
+    });
+  }
+  propSection.appendChild(propList);
+  wrap.appendChild(propSection);
+
+  // Approved set
+  const approvedSection = document.createElement("section");
+  approvedSection.className = "code-question-evidence-approved";
+  approvedSection.innerHTML = `<h4>Approved Evidence Set</h4>`;
+  const approvedList = document.createElement("ul");
+  approvedList.className = "code-question-evidence-list";
+  if (!model.approved.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = "No approved evidence yet. Approved entries are the only analysis-eligible material.";
+    approvedList.appendChild(empty);
+  } else {
+    model.approved.forEach(({ entry, snapshot }) => {
+      const li = document.createElement("li");
+      li.className = "code-question-evidence-item is-approved";
+      li.innerHTML = `
+        <div class="code-question-evidence-item-head">
+          <span class="code-question-define-kind-badge">${escapeHTML(entry.role)}</span>
+          <span>${entry.analysisEligible ? "Analysis-eligible" : "Not analysis-eligible"}</span>
+        </div>
+        <p>${escapeHTML(snapshot?.quotedText || "")}</p>
+        <p class="code-question-define-muted">
+          Verification: ${escapeHTML(sourceVerificationLabel(entry.sourceVerificationState))} ·
+          Applicability: ${escapeHTML(entry.projectApplicabilityNote || "Not noted")} ·
+          hash ${escapeHTML((snapshot?.textHash || "").slice(0, 12))}…
+        </p>
+      `;
+      if (canApproveEvidence(role)) {
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.textContent = "Remove (new set version)";
+        remove.addEventListener("click", async () => {
+          const ok = await confirmWebWarning(
+            "Remove approved evidence?",
+            "Removal creates Evidence Set vN+1. Prior versions remain immutable and reconstructable.",
+            { confirmLabel: "Remove from set" }
+          );
+          if (!ok) return;
+          try {
+            const next = removeEvidenceEntry(getEvidenceForQuestion(qid), entry.snapshotID, {
+              actorRole: role,
+              actorUserID: codeQuestionActor().userID
+            });
+            saveEvidenceForQuestion(qid, next);
+            refreshCodeQuestionEvidencePanes(qid);
+          } catch (error) {
+            void showWebNotice("Could not remove evidence", error.message || "Removal failed.");
+          }
+        });
+        li.appendChild(remove);
+      }
+      approvedList.appendChild(li);
+    });
+  }
+  approvedSection.appendChild(approvedList);
+  wrap.appendChild(approvedSection);
+
+  // Unassigned saved (outside tray)
+  const unassigned = document.createElement("section");
+  unassigned.className = "code-question-evidence-unassigned";
+  unassigned.innerHTML = `
+    <h4>Unassigned Saved (outside tray)</h4>
+    <p class="code-question-define-muted">Preserved Project/unassigned Saved material is not question evidence until explicitly proposed.</p>
+  `;
+  const uList = document.createElement("ul");
+  uList.className = "code-question-evidence-list";
+  if (!model.unassignedSaved.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = "No unassigned saved items linked here.";
+    uList.appendChild(empty);
+  } else {
+    model.unassignedSaved.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = "code-question-evidence-item is-unassigned";
+      li.innerHTML = `<strong>${escapeHTML(item.label)}</strong><p class="code-question-define-muted">${escapeHTML(item.note || "")}</p>`;
+      uList.appendChild(li);
+    });
+  }
+  unassigned.appendChild(uList);
+  wrap.appendChild(unassigned);
+
+  // Reconstructability / analysis eligibility summary
+  const summary = document.createElement("section");
+  summary.className = "code-question-evidence-summary";
+  try {
+    const reconstructed = reconstructEvidenceSet(evidence);
+    const eligible = analysisEligibleEvidence(evidence);
+    assertNoCandidatesInAnalysisInput(evidence);
+    summary.innerHTML = `
+      <h4>Integrity</h4>
+      <p>Reconstructable: <strong>${reconstructed ? "yes" : "n/a"}</strong>
+      · Analysis-eligible entries: <strong>${eligible.length}</strong>
+      · Candidates never included.</p>
+    `;
+  } catch (error) {
+    summary.innerHTML = `<h4>Integrity</h4><p class="code-question-define-blockers">${escapeHTML(error.message)}</p>`;
+  }
+  wrap.appendChild(summary);
+  return wrap;
 }
 
 function toggleLocalCodeQuestionArchive(questionID) {
