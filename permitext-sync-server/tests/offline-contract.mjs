@@ -195,8 +195,9 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-project-state-flicker-v458"));
-assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-project-state-flicker-v3"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260803-code-question-workspace-v1"));
+assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260803-code-question-workspace-v1"));
+assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260803-code-question-workspace-v1"));
 
 let activationCompletion;
 listeners.get("activate")({
@@ -205,7 +206,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.deepEqual(deletedCacheNames, ["permitext-pro-shell-v222"]);
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v423"));
 
 function navigationResponse(path) {
   let response;

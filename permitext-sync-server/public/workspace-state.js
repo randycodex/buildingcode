@@ -23,7 +23,8 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "coordinations",
   "coordinationThreads",
   "coordinationFilters",
-  "trackScrollLeft"
+  "trackScrollLeft",
+  "codeQuestionWorkspace"
 ]);
 
 function copy(value) {
@@ -71,6 +72,91 @@ function utilityState(value = {}) {
   };
 }
 
+function emptyCodeQuestionWorkspaceLayout() {
+  return {
+    activeQuestionID: "",
+    activeStage: "define",
+    openPanes: [],
+    questionIndexOpen: true,
+    moreMenuOpen: false,
+    questionsByProjectID: {},
+    questionFilters: {
+      query: "",
+      recordState: "active",
+      includeArchived: false
+    },
+    deepLink: null
+  };
+}
+
+function normalizeCodeQuestionOpenPane(value) {
+  if (!value || typeof value !== "object") return null;
+  const projectID = String(value.projectID || "").trim();
+  const questionID = String(value.questionID || "_").trim() || "_";
+  const paneRole = String(value.paneRole || "").trim();
+  if (!projectID || !paneRole) return null;
+  const paneID = typeof value.paneID === "string" && value.paneID.startsWith("cq:")
+    ? value.paneID
+    : `cq:${projectID}:${questionID}:${paneRole}`;
+  return { projectID, questionID, paneRole, paneID };
+}
+
+function normalizeCodeQuestionWorkspaceLayout(value = {}, activeProject = null) {
+  const source = value && typeof value === "object" ? value : {};
+  const layout = emptyCodeQuestionWorkspaceLayout();
+  const activeProjectID = String(
+    activeProject?.id || activeProject?.clientID || activeProject?.localFolderID || ""
+  ).trim();
+  const stages = new Set(["define", "evidence", "analyze", "review", "issue"]);
+  const stage = String(source.activeStage || "define").trim().toLowerCase();
+  layout.activeStage = stages.has(stage) ? stage : "define";
+  layout.activeQuestionID = typeof source.activeQuestionID === "string"
+    ? source.activeQuestionID.trim()
+    : "";
+  layout.questionIndexOpen = source.questionIndexOpen !== false;
+  layout.moreMenuOpen = source.moreMenuOpen === true;
+  layout.questionFilters = {
+    query: typeof source.questionFilters?.query === "string" ? source.questionFilters.query : "",
+    recordState: ["active", "archived", "all"].includes(source.questionFilters?.recordState)
+      ? source.questionFilters.recordState
+      : "active",
+    includeArchived: source.questionFilters?.includeArchived === true
+  };
+  let openPanes = (Array.isArray(source.openPanes) ? source.openPanes : [])
+    .map(normalizeCodeQuestionOpenPane)
+    .filter(Boolean);
+  if (activeProjectID) {
+    openPanes = openPanes.filter((pane) => pane.projectID === activeProjectID);
+  }
+  if (layout.activeQuestionID) {
+    openPanes = openPanes.filter((pane) =>
+      pane.questionID === "_" || pane.questionID === layout.activeQuestionID
+    );
+  } else {
+    openPanes = openPanes.filter((pane) => pane.questionID === "_");
+  }
+  const seen = new Set();
+  layout.openPanes = openPanes.filter((pane) => {
+    if (seen.has(pane.paneID)) return false;
+    seen.add(pane.paneID);
+    return true;
+  });
+  // Drop orphan cq: pane weights/order is handled by paneOrder filter in normalizeWorkspaceLayout.
+  if (source.questionsByProjectID && typeof source.questionsByProjectID === "object") {
+    layout.questionsByProjectID = copy(source.questionsByProjectID);
+  }
+  if (source.deepLink && typeof source.deepLink === "object") {
+    layout.deepLink = {
+      projectID: String(source.deepLink.projectID || "").trim() || null,
+      questionID: String(source.deepLink.questionID || "").trim() || null,
+      stage: stages.has(String(source.deepLink.stage || "").trim().toLowerCase())
+        ? String(source.deepLink.stage).trim().toLowerCase()
+        : null
+    };
+  }
+  return layout;
+}
+
 export function emptyWorkspaceLayout() {
   return {
     readers: [],
@@ -93,7 +179,8 @@ export function emptyWorkspaceLayout() {
     coordinations: [],
     coordinationThreads: [],
     coordinationFilters: {},
-    trackScrollLeft: 0
+    trackScrollLeft: 0,
+    codeQuestionWorkspace: emptyCodeQuestionWorkspaceLayout()
   };
 }
 
@@ -177,6 +264,23 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.trackScrollLeft = Number.isFinite(Number(source.trackScrollLeft))
     ? Math.max(0, Number(source.trackScrollLeft))
     : 0;
+  layout.codeQuestionWorkspace = normalizeCodeQuestionWorkspaceLayout(
+    source.codeQuestionWorkspace,
+    activeProject
+  );
+  // Drop stale Code Question pane IDs from order/weights when they no longer belong
+  // to the active Project/question (Project or question switch must not leak context).
+  const cqPaneIDs = new Set(
+    (layout.codeQuestionWorkspace.openPanes || []).map((pane) => pane.paneID)
+  );
+  layout.paneOrder = layout.paneOrder.filter((paneID) =>
+    !String(paneID).startsWith("cq:") || cqPaneIDs.has(paneID)
+  );
+  layout.paneWeights = Object.fromEntries(
+    Object.entries(layout.paneWeights).filter(([paneID]) =>
+      !String(paneID).startsWith("cq:") || cqPaneIDs.has(paneID)
+    )
+  );
   return layout;
 }
 
@@ -208,6 +312,7 @@ export function workspaceLayoutHasVisiblePanes(value = {}) {
     layout.reportDrafts.length ||
     layout.coordinations.length ||
     layout.coordinationThreads.length ||
+    (layout.codeQuestionWorkspace?.openPanes || []).length ||
     Object.values(layout.utilities).some(Boolean)
   );
 }

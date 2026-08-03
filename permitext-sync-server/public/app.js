@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260802-project-state-flicker-v458";
+} from "./offline-storage.js?v=20260803-code-question-workspace-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,28 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260802-project-state-flicker-v3";
+} from "./workspace-state.js?v=20260803-code-question-workspace-v1";
+import {
+  applyStageArrangement,
+  buildCodeQuestionDeepLink,
+  closeCodeQuestionPane,
+  codeQuestionMoreTools,
+  codeQuestionPaneIDsFromState,
+  deriveQuestionListLabel,
+  emptyCodeQuestionWorkspaceState,
+  ensureSingleWorkboardPane,
+  filterQuestions,
+  isCodeQuestionPaneID,
+  minimumWidthForPaneRole,
+  normalizeCodeQuestionWorkspaceState,
+  openSupportingTool,
+  parseCodeQuestionDeepLink,
+  parseQuestionPaneKey,
+  questionPaneKey,
+  stageControlModel,
+  switchActiveProject as switchCodeQuestionProject,
+  switchActiveQuestion as switchCodeQuestionQuestion
+} from "./code-question-workspace.js?v=20260803-code-question-workspace-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -72,7 +93,8 @@ const permitextClientCapabilities = Object.freeze([
   "research",
   "evidence-discovery",
   "collaboration",
-  "organization-administration"
+  "organization-administration",
+  "code-question-workspace"
 ]);
 const baseWorkspaceKey = "permitext:webWorkspace:v1";
 const accountSessionKey = "permitext:webAccount:v1";
@@ -428,7 +450,12 @@ function loadWorkspaceState() {
         ? saved.coordinationFilters
         : {},
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards),
-      trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0
+      trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0,
+      codeQuestionWorkspace: normalizeCodeQuestionWorkspaceState(saved.codeQuestionWorkspace, {
+        activeProjectID: activeProjectDetail
+          ? String(activeProjectDetail.id || activeProjectDetail.clientID || activeProjectDetail.localFolderID || "")
+          : ""
+      })
     };
   } catch {
     if (!detachedProjectWindow) {
@@ -488,7 +515,8 @@ function loadWorkspaceState() {
       coordinationThreads: [],
       coordinationFilters: {},
       detachedWorkboards: [],
-      trackScrollLeft: 0
+      trackScrollLeft: 0,
+      codeQuestionWorkspace: emptyCodeQuestionWorkspaceState()
     };
   }
 }
@@ -2514,6 +2542,12 @@ async function activateProjectStudio(project, options = {}) {
   state.reportDrafts = keepReportDraftOpen ? [identity] : [];
   state.coordinations = keepCoordinationOpen ? [identity] : [];
   state.coordinationThreads = [];
+  // Project switch replaces Project-owned Code Question context (no cross-project leak).
+  if (codeQuestionWorkspaceEnabled()) {
+    ensureCodeQuestionShellForProject(identity);
+  } else if (state.codeQuestionWorkspace) {
+    state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
+  }
   const notebookID = paneIDForProjectNotebook(identity);
   const workboardID = paneIDForProjectWorkboard(identity);
   const reportDraftID = paneIDForProjectReportDraft(identity);
@@ -2547,6 +2581,10 @@ async function activateProjectStudio(project, options = {}) {
 
 function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
+  if (isCodeQuestionPaneID(paneID)) {
+    const parsed = parseQuestionPaneKey(paneID);
+    return minimumWidthForPaneRole(parsed?.paneRole) || defaultDetailPaneWidth;
+  }
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
   if (isProjectReportDraftPaneID(paneID)) return defaultReportDraftPaneWidth;
@@ -2702,6 +2740,7 @@ function defaultActivePaneIDs() {
   if (state.utilities.analysis && state.researchConversationID) ids.push(paneIDForResearchConversation());
   if (state.utilities.settings) ids.push("utility:settings");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
+  openCodeQuestionPaneIDs().forEach((id) => ids.push(id));
   return ids;
 }
 
@@ -2757,7 +2796,8 @@ function activePaneIDs() {
     !isProjectReportDraftPaneID(id) &&
     !isProjectCoordinationPaneID(id) &&
     !isProjectCoordinationThreadPaneID(id) &&
-    !isProjectWorkboardPaneID(id)
+    !isProjectWorkboardPaneID(id) &&
+    !isCodeQuestionPaneID(id)
   );
   if (openProjectDetails().length) {
     const detailIDs = openProjectDetails().flatMap(projectWorkspacePaneIDs);
@@ -2772,6 +2812,16 @@ function activePaneIDs() {
     } else {
       paired.splice(projectAnchorIndex + 1, 0, ...detailIDs);
     }
+  }
+  // Code Question shell panes (flag-gated) follow the Projects/Saved anchor.
+  const cqIDs = openCodeQuestionPaneIDs();
+  if (cqIDs.length) {
+    const anchor = primarySavedPaneID();
+    const anchorIndex = paired.indexOf(anchor);
+    const insertAt = anchorIndex === -1 ? paired.length : anchorIndex + 1;
+    cqIDs.forEach((id, offset) => {
+      if (!paired.includes(id)) paired.splice(insertAt + offset, 0, id);
+    });
   }
   (state.utilityInstances || []).forEach((instance) => {
     if ((instance.key !== "search" && instance.key !== "sdc") || !sectionDetailsBySearch()[instance.id]) return;
@@ -4578,6 +4628,10 @@ function hasCapability(capabilityID) {
   if (typeof contractValue === "boolean") return contractValue;
   if (["saved-work", "notes"].includes(capabilityID)) return true;
   if (capabilityID === "research") return entitlementResearchEnabled();
+  if (capabilityID === "code-question-workspace") {
+    // Default disabled; only explicit capability contract or debug override enables UI.
+    return false;
+  }
   if ([
     "projects",
     "notebook",
@@ -4587,6 +4641,136 @@ function hasCapability(capabilityID) {
     return isProAccount();
   }
   return false;
+}
+
+function codeQuestionWorkspaceEnabled() {
+  return hasCapability("code-question-workspace");
+}
+
+function codeQuestionWorkspaceState() {
+  if (!state.codeQuestionWorkspace || typeof state.codeQuestionWorkspace !== "object") {
+    state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
+  }
+  return state.codeQuestionWorkspace;
+}
+
+function activeProjectIDForCodeQuestions() {
+  const detail = openProjectDetails()[0] || null;
+  return String(detail?.id || detail?.clientID || detail?.localFolderID || "").trim();
+}
+
+function setCodeQuestionWorkspaceState(next, options = {}) {
+  const projectID = options.activeProjectID ?? activeProjectIDForCodeQuestions();
+  state.codeQuestionWorkspace = normalizeCodeQuestionWorkspaceState(next, {
+    activeProjectID: projectID
+  });
+  // One Workboard role pane per Project in CQ shell.
+  if (projectID) {
+    state.codeQuestionWorkspace.openPanes = ensureSingleWorkboardPane(
+      state.codeQuestionWorkspace.openPanes,
+      projectID
+    );
+  }
+  if (options.syncDeepLink) {
+    syncCodeQuestionDeepLink();
+  }
+  return state.codeQuestionWorkspace;
+}
+
+function syncCodeQuestionDeepLink() {
+  if (!codeQuestionWorkspaceEnabled() || typeof history === "undefined" || !history.replaceState) return;
+  const projectID = activeProjectIDForCodeQuestions();
+  const cq = codeQuestionWorkspaceState();
+  if (!projectID) {
+    if (String(location.hash || "").startsWith("#cq/")) {
+      history.replaceState(null, "", `${location.pathname}${location.search}`);
+    }
+    return;
+  }
+  const hash = buildCodeQuestionDeepLink({
+    projectID,
+    questionID: cq.activeQuestionID || null,
+    stage: cq.activeQuestionID ? cq.activeStage : null
+  });
+  if (hash && location.hash !== hash) {
+    history.replaceState(null, "", `${location.pathname}${location.search}${hash}`);
+  }
+}
+
+function applyCodeQuestionDeepLinkFromLocation() {
+  if (!codeQuestionWorkspaceEnabled()) return false;
+  const parsed = parseCodeQuestionDeepLink(location.hash);
+  if (!parsed?.projectID) return false;
+  const open = openProjectDetails()[0] || null;
+  const openID = String(open?.id || open?.clientID || open?.localFolderID || "").trim();
+  if (openID && openID !== parsed.projectID) {
+    // Deep link targets a different Project; leave selection to Projects list navigation.
+    return false;
+  }
+  if (parsed.questionID) {
+    setCodeQuestionWorkspaceState(
+      switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+        projectID: parsed.projectID,
+        questionID: parsed.questionID,
+        stage: parsed.stage || "define"
+      }),
+      { activeProjectID: parsed.projectID }
+    );
+  } else {
+    setCodeQuestionWorkspaceState(
+      switchCodeQuestionProject(codeQuestionWorkspaceState(), parsed.projectID),
+      { activeProjectID: parsed.projectID }
+    );
+  }
+  return true;
+}
+
+function openCodeQuestionPaneIDs() {
+  if (!codeQuestionWorkspaceEnabled()) return [];
+  const projectID = activeProjectIDForCodeQuestions();
+  if (!projectID) return [];
+  const cq = normalizeCodeQuestionWorkspaceState(codeQuestionWorkspaceState(), {
+    activeProjectID: projectID
+  });
+  state.codeQuestionWorkspace = cq;
+  return codeQuestionPaneIDsFromState(cq);
+}
+
+function questionsForActiveProject() {
+  const projectID = activeProjectIDForCodeQuestions();
+  if (!projectID) return [];
+  const byProject = codeQuestionWorkspaceState().questionsByProjectID || {};
+  return Array.isArray(byProject[projectID]) ? byProject[projectID] : [];
+}
+
+function setQuestionsForActiveProject(questions) {
+  const projectID = activeProjectIDForCodeQuestions();
+  if (!projectID) return;
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    questionsByProjectID: {
+      ...(cq.questionsByProjectID || {}),
+      [projectID]: (Array.isArray(questions) ? questions : []).map((item) => ({
+        ...item,
+        listLabel: item.listLabel || deriveQuestionListLabel(item)
+      }))
+    }
+  }, { activeProjectID: projectID });
+}
+
+function ensureCodeQuestionShellForProject(project) {
+  if (!codeQuestionWorkspaceEnabled() || !project) return;
+  const projectID = String(project.id || project.clientID || project.localFolderID || "").trim();
+  if (!projectID) return;
+  const cq = codeQuestionWorkspaceState();
+  const currentProjectPanes = (cq.openPanes || []).filter((pane) => pane.projectID === projectID);
+  if (!currentProjectPanes.length || (cq.openPanes || []).some((pane) => pane.projectID !== projectID)) {
+    setCodeQuestionWorkspaceState(
+      switchCodeQuestionProject(cq, projectID),
+      { activeProjectID: projectID, syncDeepLink: true }
+    );
+  }
 }
 
 const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 });
@@ -22202,6 +22386,386 @@ function restoreReaderScrollPositions(positions) {
   requestAnimationFrame(restore);
 }
 
+function codeQuestionPaneTitle(paneRole) {
+  const labels = {
+    "question-index": "Code Questions",
+    definition: "Definition",
+    candidates: "Candidates",
+    reader: "Evidence Reader",
+    "evidence-tray": "Evidence Tray",
+    "approved-evidence": "Approved Evidence",
+    "bounded-analysis": "Bounded Analysis",
+    "professional-conclusion": "Professional Conclusion",
+    "review-requests": "Review Requests",
+    history: "History",
+    "code-memo-draft": "Code Memo Draft",
+    readiness: "Readiness",
+    versions: "Versions",
+    "working-notes": "Working Notes",
+    workboard: "Workboard",
+    "report-draft": "Report Draft",
+    legacy: "Legacy / Unassigned"
+  };
+  return labels[paneRole] || paneRole;
+}
+
+function projectColorStyle(project) {
+  const color = String(project?.color || project?.colorHex || "").trim();
+  return color ? `--project-color: ${color};` : "";
+}
+
+function renderCodeQuestionStageControl(project) {
+  if (!codeQuestionWorkspaceEnabled() || !project) return null;
+  const cq = codeQuestionWorkspaceState();
+  if (!cq.activeQuestionID) return null;
+  const bar = document.createElement("div");
+  bar.className = "code-question-stage-control";
+  bar.setAttribute("role", "navigation");
+  bar.setAttribute("aria-label", "Code Question workflow stages");
+  bar.style.cssText = projectColorStyle(project);
+  const steps = document.createElement("ol");
+  steps.className = "code-question-stage-list";
+  stageControlModel(cq.activeStage).forEach((step) => {
+    const item = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-question-stage-button";
+    button.textContent = step.label;
+    button.dataset.stage = step.stage;
+    if (step.current) {
+      button.setAttribute("aria-current", "step");
+      button.classList.add("is-current");
+    }
+    button.addEventListener("click", async () => {
+      // Stage control never mutates facts/approval/issue — only open panes + stage context.
+      const projectID = activeProjectIDForCodeQuestions();
+      setCodeQuestionWorkspaceState(
+        applyStageArrangement(codeQuestionWorkspaceState(), {
+          projectID,
+          questionID: codeQuestionWorkspaceState().activeQuestionID,
+          stage: step.stage,
+          keepIndex: true
+        }),
+        { activeProjectID: projectID, syncDeepLink: true }
+      );
+      await renderWorkspace();
+    });
+    item.appendChild(button);
+    steps.appendChild(item);
+  });
+  bar.appendChild(steps);
+  const addColumn = document.createElement("div");
+  addColumn.className = "code-question-add-column";
+  const addButton = document.createElement("button");
+  addButton.type = "button";
+  addButton.className = "code-question-add-column-button";
+  addButton.setAttribute("aria-haspopup", "menu");
+  addButton.setAttribute("aria-expanded", cq.moreMenuOpen ? "true" : "false");
+  addButton.textContent = "Add column";
+  addButton.addEventListener("click", async () => {
+    setCodeQuestionWorkspaceState({
+      ...codeQuestionWorkspaceState(),
+      moreMenuOpen: !codeQuestionWorkspaceState().moreMenuOpen
+    });
+    await renderWorkspace();
+  });
+  addColumn.appendChild(addButton);
+  if (cq.moreMenuOpen) {
+    const menu = document.createElement("ul");
+    menu.className = "code-question-more-menu";
+    menu.setAttribute("role", "menu");
+    codeQuestionMoreTools.forEach((tool) => {
+      const item = document.createElement("li");
+      const option = document.createElement("button");
+      option.type = "button";
+      option.setAttribute("role", "menuitem");
+      option.textContent = tool.label;
+      option.addEventListener("click", async () => {
+        const projectID = activeProjectIDForCodeQuestions();
+        setCodeQuestionWorkspaceState(
+          openSupportingTool(codeQuestionWorkspaceState(), {
+            projectID,
+            questionID: codeQuestionWorkspaceState().activeQuestionID || "_",
+            paneRole: tool.role
+          }),
+          { activeProjectID: projectID }
+        );
+        // Bridge More tools to existing Project tool surfaces when present.
+        const detail = openProjectDetails()[0];
+        if (detail && tool.legacyTool === "notebook" && !projectHasOpenNotebook(detail)) {
+          await openProjectNotebook(detail);
+        } else if (detail && tool.legacyTool === "workboard" && !projectHasOpenWorkboard(detail)) {
+          await openProjectWorkboard(detail);
+        } else if (detail && tool.legacyTool === "reportDraft" && !projectHasOpenReportDraft(detail)) {
+          await openProjectReportDraft(detail);
+        }
+        await renderWorkspace();
+      });
+      item.appendChild(option);
+      menu.appendChild(item);
+    });
+    addColumn.appendChild(menu);
+  }
+  bar.appendChild(addColumn);
+  return bar;
+}
+
+function renderCodeQuestionPane(paneDescriptor) {
+  const parsed = typeof paneDescriptor === "string"
+    ? parseQuestionPaneKey(paneDescriptor)
+    : paneDescriptor;
+  if (!parsed) return null;
+  const project = openProjectDetails().find((detail) =>
+    String(detail.id || detail.clientID || detail.localFolderID || "") === parsed.projectID
+  ) || openProjectDetails()[0] || null;
+  const article = document.createElement("article");
+  article.className = "workspace-panel code-question-panel";
+  article.dataset.paneId = parsed.paneID;
+  article.dataset.cqRole = parsed.paneRole;
+  article.dataset.projectId = parsed.projectID;
+  if (parsed.questionID && parsed.questionID !== "_") {
+    article.dataset.questionId = parsed.questionID;
+  }
+  article.style.cssText = projectColorStyle(project);
+  const header = document.createElement("header");
+  header.className = "panel-header";
+  const titleBlock = document.createElement("div");
+  const eyebrow = document.createElement("p");
+  eyebrow.className = "eyebrow panel-kind";
+  eyebrow.textContent = project?.name || "Project";
+  const title = document.createElement("h2");
+  title.className = "panel-title";
+  title.textContent = codeQuestionPaneTitle(parsed.paneRole);
+  titleBlock.append(eyebrow, title);
+  header.appendChild(titleBlock);
+  const close = document.createElement("button");
+  close.type = "button";
+  close.className = "panel-close code-question-pane-close";
+  close.setAttribute("aria-label", `Close ${codeQuestionPaneTitle(parsed.paneRole)}`);
+  close.textContent = "×";
+  close.addEventListener("click", async () => {
+    setCodeQuestionWorkspaceState(
+      closeCodeQuestionPane(
+        codeQuestionWorkspaceState(),
+        parsed.paneID,
+        activeProjectIDForCodeQuestions()
+      ),
+      { syncDeepLink: true }
+    );
+    await renderWorkspace();
+  });
+  header.appendChild(close);
+  article.appendChild(header);
+  const body = document.createElement("div");
+  body.className = "panel-body code-question-panel-body";
+  if (parsed.paneRole === "question-index") {
+    body.appendChild(renderCodeQuestionIndexBody(project));
+  } else {
+    const placeholder = document.createElement("div");
+    placeholder.className = "code-question-pane-placeholder";
+    placeholder.innerHTML = `
+      <p class="code-question-pane-status">Stage shell ready</p>
+      <p>This ${codeQuestionPaneTitle(parsed.paneRole)} column is part of the Code Question workspace.
+      Full Define / Evidence / Analyze / Review / Issue content arrives in later phases.
+      Stage selection does not change review or issuance state.</p>
+    `;
+    body.appendChild(placeholder);
+  }
+  article.appendChild(body);
+  applyPaneWeight(article, parsed.paneID);
+  return article;
+}
+
+function renderCodeQuestionIndexBody(project) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-index";
+  const cq = codeQuestionWorkspaceState();
+  const filters = cq.questionFilters || {};
+  const toolbar = document.createElement("div");
+  toolbar.className = "code-question-index-toolbar";
+  const search = document.createElement("input");
+  search.type = "search";
+  search.className = "code-question-index-search";
+  search.placeholder = "Search questions";
+  search.setAttribute("aria-label", "Search Code Questions");
+  search.value = filters.query || "";
+  search.addEventListener("input", () => {
+    setCodeQuestionWorkspaceState({
+      ...codeQuestionWorkspaceState(),
+      questionFilters: {
+        ...codeQuestionWorkspaceState().questionFilters,
+        query: search.value
+      }
+    });
+    const list = wrap.querySelector(".code-question-index-list");
+    if (list) list.replaceWith(renderCodeQuestionIndexList(project));
+  });
+  const createButton = document.createElement("button");
+  createButton.type = "button";
+  createButton.className = "code-question-create-button";
+  createButton.textContent = "New question";
+  createButton.addEventListener("click", async () => {
+    await createLocalCodeQuestionDraft(project);
+  });
+  toolbar.append(search, createButton);
+  wrap.appendChild(toolbar);
+  const meta = document.createElement("p");
+  meta.className = "code-question-index-meta";
+  meta.textContent = project
+    ? `${project.name || "Project"}${project.address ? ` · ${project.address}` : ""}`
+    : "Select a Project";
+  wrap.appendChild(meta);
+  wrap.appendChild(renderCodeQuestionIndexList(project));
+  const legacy = document.createElement("div");
+  legacy.className = "code-question-legacy-path";
+  legacy.innerHTML = `
+    <h3>Legacy / Unassigned</h3>
+    <p>Notebook, Workboard, Coordination, Saved evidence, and advanced Report Drafts remain available under <strong>Add column</strong> and the existing Projects tools. Nothing is deleted during migration.</p>
+  `;
+  wrap.appendChild(legacy);
+  return wrap;
+}
+
+function renderCodeQuestionIndexList(project) {
+  const list = document.createElement("ul");
+  list.className = "code-question-index-list";
+  list.setAttribute("role", "list");
+  const cq = codeQuestionWorkspaceState();
+  const questions = filterQuestions(questionsForActiveProject(), cq.questionFilters);
+  if (!questions.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-index-empty";
+    empty.textContent = "No Code Questions yet. Create one to start Define → Evidence → Analyze → Review → Issue.";
+    list.appendChild(empty);
+    return list;
+  }
+  questions.forEach((question) => {
+    const item = document.createElement("li");
+    item.className = "code-question-index-item";
+    if (cq.activeQuestionID === question.id) item.classList.add("is-active");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-question-index-open";
+    button.innerHTML = `
+      <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
+      <span class="code-question-index-title">${escapeHTML(question.title || "Untitled question")}</span>
+      <span class="code-question-index-state">${escapeHTML(question.listLabel || deriveQuestionListLabel(question))}</span>
+      <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
+    `;
+    button.addEventListener("click", async () => {
+      const projectID = activeProjectIDForCodeQuestions();
+      setCodeQuestionWorkspaceState(
+        switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+          projectID,
+          questionID: question.id,
+          stage: codeQuestionWorkspaceState().activeStage || "define"
+        }),
+        { activeProjectID: projectID, syncDeepLink: true }
+      );
+      await renderWorkspace();
+    });
+    item.appendChild(button);
+    const actions = document.createElement("div");
+    actions.className = "code-question-index-actions";
+    const archiveButton = document.createElement("button");
+    archiveButton.type = "button";
+    archiveButton.textContent = question.recordState === "archived" ? "Restore" : "Archive";
+    archiveButton.addEventListener("click", async (event) => {
+      event.stopPropagation();
+      toggleLocalCodeQuestionArchive(question.id);
+      await renderWorkspace();
+    });
+    actions.appendChild(archiveButton);
+    item.appendChild(actions);
+    list.appendChild(item);
+  });
+  return list;
+}
+
+function escapeHTML(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+async function createLocalCodeQuestionDraft(project) {
+  if (!codeQuestionWorkspaceEnabled()) return;
+  const projectID = String(project?.id || project?.clientID || project?.localFolderID || "").trim();
+  if (!projectID) return;
+  const existing = questionsForActiveProject();
+  const nextNumber = existing.reduce((max, item) => {
+    const n = Number(String(item.displayID || "").replace(/\D/g, "")) || 0;
+    return Math.max(max, n);
+  }, 0) + 1;
+  const displayID = `Q-${String(nextNumber).padStart(3, "0")}`;
+  const id = `local-cq-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  const question = {
+    id,
+    displayID,
+    title: "New Code Question",
+    recordState: "active",
+    responsibleDisplayName: state.account?.displayName || "",
+    reviewState: "",
+    lastActivityAt: new Date().toISOString(),
+    latestIssuedVersion: null,
+    revisionInProgress: false,
+    listLabel: "Active"
+  };
+  setQuestionsForActiveProject([...existing, question]);
+  setCodeQuestionWorkspaceState(
+    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID: id,
+      stage: "define"
+    }),
+    { activeProjectID: projectID, syncDeepLink: true }
+  );
+  await renderWorkspace();
+}
+
+function toggleLocalCodeQuestionArchive(questionID) {
+  const next = questionsForActiveProject().map((item) => {
+    if (item.id !== questionID) return item;
+    const archived = item.recordState !== "archived";
+    return {
+      ...item,
+      recordState: archived ? "archived" : "active",
+      listLabel: deriveQuestionListLabel({
+        ...item,
+        recordState: archived ? "archived" : "active"
+      })
+    };
+  });
+  setQuestionsForActiveProject(next);
+}
+
+function renderCodeQuestionShellChrome() {
+  if (!codeQuestionWorkspaceEnabled()) {
+    document.querySelector(".code-question-stage-control")?.remove();
+    document.body.classList.remove("code-question-workspace-enabled");
+    return;
+  }
+  document.body.classList.add("code-question-workspace-enabled");
+  const project = openProjectDetails()[0] || null;
+  if (project) ensureCodeQuestionShellForProject(project);
+  const existing = document.querySelector(".code-question-stage-control");
+  const next = renderCodeQuestionStageControl(project);
+  if (existing && next) existing.replaceWith(next);
+  else if (existing && !next) existing.remove();
+  else if (!existing && next) {
+    const shell = document.querySelector(".workspace-shell");
+    const trackEl = document.querySelector("#panel-track");
+    if (shell && trackEl) shell.insertBefore(next, trackEl);
+  }
+  // Promote Projects button labeling when CQ shell is on (Projects remain primary).
+  if (toggleSavedButton) {
+    toggleSavedButton.setAttribute("aria-label", "Projects");
+    toggleSavedButton.title = "Projects";
+  }
+}
+
 async function renderWorkspace() {
   const renderGeneration = ++workspaceRenderGeneration;
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
@@ -22210,6 +22774,7 @@ async function renderWorkspace() {
   updateReaderPlanControls();
   renderWorkspaceTabs();
   closeDeletedProjectDetails();
+  renderCodeQuestionShellChrome();
   const paneIDs = activePaneIDs();
   normalizePaneWeights(paneIDs);
   setUtilityButtonStates();
@@ -22233,6 +22798,11 @@ async function renderWorkspace() {
       if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
     }
     if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
+  }
+  // Code Question shell panes (flag-gated; empty when capability is off).
+  for (const paneID of openCodeQuestionPaneIDs()) {
+    const pane = renderCodeQuestionPane(paneID);
+    if (pane) panes.push(pane);
   }
   if (state.utilities.archive) {
     panes.push(await renderArchive());
@@ -22316,6 +22886,9 @@ async function renderUtilityWorkspace(options = {}) {
       const workboardID = paneIDForProjectWorkboard(detail);
       panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(detail)));
     }
+  }
+  for (const paneID of openCodeQuestionPaneIDs()) {
+    panes.push(await reuseOrRenderPane(paneID, () => renderCodeQuestionPane(paneID)));
   }
   if (state.utilities.archive) {
     panes.push(await reuseOrRenderPane("utility:archive", renderArchive));
@@ -22798,6 +23371,15 @@ async function start() {
       void transitionWorkspace("utility");
     }
   });
+  window.addEventListener("hashchange", () => {
+    if (!codeQuestionWorkspaceEnabled()) return;
+    if (applyCodeQuestionDeepLinkFromLocation()) {
+      void renderWorkspace();
+    }
+  });
+  if (codeQuestionWorkspaceEnabled()) {
+    applyCodeQuestionDeepLinkFromLocation();
+  }
   try {
     const pendingReattach = JSON.parse(localStorage.getItem("permitext:pendingWorkboardReattach") || "null");
     if (pendingReattach) await reattachProjectWorkboard(pendingReattach);
