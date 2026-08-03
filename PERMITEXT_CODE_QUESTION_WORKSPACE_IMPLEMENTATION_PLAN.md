@@ -1569,7 +1569,7 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 | Phase | Status | Commit(s) | Verification | Notes / blockers |
 | --- | --- | --- | --- | --- |
 | Plan creation | Complete | `468f7e306` docs: plan Code Question workspace reorganization | Repository/roadmap/architecture/Stitch audits; Markdown checks | Plan only |
-| 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; `f5a4db822` feat: Phase 0 Code Question workspace scaffolding | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
+| 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; `f5a4db822` feat scaffolding; `67476772f` ledger commit ID | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
 | 1 — Contracts, storage, permissions, migration | Not started | — | — | Next: storage, handlers, adapters behind disabled flag |
 | 2 — Project and Question workspace shell | Not started | — | — | — |
 | 3 — Define | Not started | — | — | — |
