@@ -20,7 +20,9 @@ export const capabilityIDs = Object.freeze({
   research: "research",
   evidenceDiscovery: "evidence-discovery",
   collaboration: "collaboration",
-  organizationAdministration: "organization-administration"
+  organizationAdministration: "organization-administration",
+  /** Phase 0: Code Question workspace. Default disabled; no UI path when off. */
+  codeQuestionWorkspace: "code-question-workspace"
 });
 
 export const artifactTypes = Object.freeze([
@@ -353,6 +355,7 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
   const evidenceDiscovery = research && options.evidenceDiscoveryEnabled === true;
   const collaboration = options.collaborationEnabled === true;
   const organizationAdministration = options.organizationAdministrationEnabled === true;
+  const codeQuestionWorkspace = options.codeQuestionWorkspaceEnabled === true;
   const researchMonthlyLimit = Number.isSafeInteger(Number(options.researchMonthlyLimit))
     ? Number(options.researchMonthlyLimit)
     : defaultResearchMonthlyLimit;
@@ -385,7 +388,12 @@ export function capabilityContract(entitlement, now = Date.now(), options = {}) 
         release: evidenceDiscovery ? "private-beta" : "unavailable"
       },
       [capabilityIDs.collaboration]: { enabled: collaboration },
-      [capabilityIDs.organizationAdministration]: { enabled: organizationAdministration }
+      [capabilityIDs.organizationAdministration]: { enabled: organizationAdministration },
+      [capabilityIDs.codeQuestionWorkspace]: {
+        enabled: codeQuestionWorkspace,
+        release: codeQuestionWorkspace ? "private-beta" : "unavailable",
+        featureFlag: "permitext:codeQuestionWorkspace"
+      }
     }
   };
 }
@@ -399,7 +407,8 @@ export function syncContract({
   researchMonthlyLimit = defaultResearchMonthlyLimit,
   evidenceDiscoveryEnabled = false,
   collaborationEnabled = false,
-  organizationAdministrationEnabled = false
+  organizationAdministrationEnabled = false,
+  codeQuestionWorkspaceEnabled = false
 }) {
   const normalizedClientSchemaVersion = Number(clientSchemaVersion);
   return {
@@ -417,7 +426,8 @@ export function syncContract({
       researchMonthlyLimit,
       evidenceDiscoveryEnabled,
       collaborationEnabled,
-      organizationAdministrationEnabled
+      organizationAdministrationEnabled,
+      codeQuestionWorkspaceEnabled
     }),
     contentMapVersion: Number(contentMapVersion || 0),
     migrationCheckpoint,

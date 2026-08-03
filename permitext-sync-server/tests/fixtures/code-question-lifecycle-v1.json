@@ -1,0 +1,303 @@
+{
+  "fixtureSchemaVersion": 1,
+  "fixtureKind": "synthetic-code-question-lifecycle",
+  "legalContentPolicy": "All quoted passages are synthetic test strings only. They are not enacted law, not verified official source text, and must never be presented as production legal authority.",
+  "shared": {
+    "projectID": "proj-cq-fixture-001",
+    "questionID": "cq-fixture-001",
+    "displayID": "Q-001",
+    "questionNumber": 1,
+    "title": "Synthetic egress width for test fixture corridor",
+    "definitionRevision": 2,
+    "actors": {
+      "editor": "user-editor-fixture",
+      "reviewer": "user-reviewer-fixture",
+      "owner": "user-owner-fixture"
+    },
+    "timestamps": {
+      "t0": "2026-08-01T12:00:00.000Z",
+      "t1": "2026-08-01T13:00:00.000Z",
+      "t2": "2026-08-01T14:00:00.000Z",
+      "t3": "2026-08-01T15:00:00.000Z",
+      "t4": "2026-08-01T16:00:00.000Z",
+      "t5": "2026-08-01T17:00:00.000Z"
+    }
+  },
+  "stages": {
+    "define": {
+      "stage": "define",
+      "questionID": "cq-fixture-001",
+      "codeQuestion": {
+        "projectID": "proj-cq-fixture-001",
+        "displayID": "Q-001",
+        "questionNumber": 1,
+        "title": "Synthetic egress width for test fixture corridor",
+        "questionText": "For the synthetic test fixture project, what minimum clear width applies to the primary exit corridor under the approved evidence set?",
+        "scope": "Interior alteration of a synthetic multi-story office fixture building; primary exit corridor only.",
+        "desiredOutput": "Professional conclusion suitable for an internal Code Memo.",
+        "jurisdiction": "SYNTHETIC-TEST-JURISDICTION",
+        "asOfDate": "2026-01-01T00:00:00.000Z",
+        "recordState": "active",
+        "definitionRevision": 2,
+        "createdBy": "user-editor-fixture",
+        "updatedBy": "user-editor-fixture",
+        "createdAt": "2026-08-01T12:00:00.000Z",
+        "updatedAt": "2026-08-01T13:00:00.000Z",
+        "expectedVersion": 2
+      },
+      "inputs": [
+        {
+          "id": "qi-fact-001",
+          "questionID": "cq-fixture-001",
+          "kind": "confirmedFact",
+          "statement": "Occupancy group for the synthetic fixture is Business (B).",
+          "state": "confirmed",
+          "basis": "Project intake form (synthetic).",
+          "revision": 1,
+          "createdBy": "user-editor-fixture",
+          "updatedBy": "user-editor-fixture",
+          "createdAt": "2026-08-01T12:05:00.000Z",
+          "updatedAt": "2026-08-01T12:05:00.000Z"
+        },
+        {
+          "id": "qi-assumption-001",
+          "questionID": "cq-fixture-001",
+          "kind": "assumption",
+          "statement": "Assume the corridor is not part of an accessible means of egress for this synthetic scenario.",
+          "state": "proposed",
+          "basis": "Scope boundary for fixture.",
+          "revision": 1,
+          "createdBy": "user-editor-fixture",
+          "updatedBy": "user-editor-fixture",
+          "createdAt": "2026-08-01T12:06:00.000Z",
+          "updatedAt": "2026-08-01T12:06:00.000Z"
+        },
+        {
+          "id": "qi-unknown-001",
+          "questionID": "cq-fixture-001",
+          "kind": "unknown",
+          "statement": "Actual measured clear width of the existing corridor is not yet field-verified.",
+          "state": "resolved",
+          "basis": "Resolved for fixture issuance path with disclosed condition.",
+          "revision": 2,
+          "priorInputID": "qi-unknown-001-r1",
+          "createdBy": "user-editor-fixture",
+          "updatedBy": "user-editor-fixture",
+          "createdAt": "2026-08-01T12:07:00.000Z",
+          "updatedAt": "2026-08-01T13:00:00.000Z"
+        }
+      ]
+    },
+    "evidence": {
+      "stage": "evidence",
+      "questionID": "cq-fixture-001",
+      "candidates": [
+        {
+          "id": "candidate-syn-001",
+          "label": "SYNTHETIC-CODE §TEST-10.1 Minimum corridor width",
+          "note": "Search candidate only — not approved evidence until explicit approval."
+        },
+        {
+          "id": "candidate-syn-002",
+          "label": "SYNTHETIC-CODE §TEST-10.2 Handrails (not selected)",
+          "note": "Candidate excluded from approval in this fixture."
+        }
+      ],
+      "snapshots": [
+        {
+          "id": "esnap-v2-001",
+          "sourceIdentity": "synthetic-source:TEST-CODE:edition-fixture-1",
+          "passageLocator": "SYNTHETIC-CODE §TEST-10.1",
+          "quotedText": "[SYNTHETIC TEST PASSAGE — NOT LAW] The minimum clear width of exit access corridors shall be not less than 44 inches (1118 mm) for the synthetic fixture occupancy.",
+          "sourceVersion": "fixture-edition-1",
+          "createdAt": "2026-08-01T13:10:00.000Z"
+        },
+        {
+          "id": "esnap-v2-002",
+          "sourceIdentity": "synthetic-source:TEST-CODE:edition-fixture-1",
+          "passageLocator": "SYNTHETIC-CODE §TEST-10.1 Exception A",
+          "quotedText": "[SYNTHETIC TEST PASSAGE — NOT LAW] Exception A: For occupant loads of 50 or fewer in the synthetic fixture, the minimum clear width shall be not less than 36 inches (914 mm).",
+          "sourceVersion": "fixture-edition-1",
+          "createdAt": "2026-08-01T13:12:00.000Z"
+        }
+      ],
+      "evidenceSet": {
+        "id": "eset-cq-fixture-001-v2",
+        "questionID": "cq-fixture-001",
+        "version": 2,
+        "createdBy": "user-reviewer-fixture",
+        "createdAt": "2026-08-01T13:30:00.000Z",
+        "entries": [
+          {
+            "snapshotID": "esnap-v2-001",
+            "role": "governing",
+            "analysisEligible": true,
+            "qualification": "",
+            "professionalNote": "Primary governing synthetic rule for corridor width.",
+            "approvalActor": "user-reviewer-fixture",
+            "approvalAt": "2026-08-01T13:20:00.000Z",
+            "sourceVerificationState": "synthetic-fixture",
+            "projectApplicabilityNote": "Assumed applicable to primary exit corridor of synthetic project."
+          },
+          {
+            "snapshotID": "esnap-v2-002",
+            "role": "supporting",
+            "analysisEligible": true,
+            "qualification": "Applies only if occupant load ≤ 50.",
+            "professionalNote": "Supporting exception; occupancy load treated as assumption for fixture.",
+            "approvalActor": "user-reviewer-fixture",
+            "approvalAt": "2026-08-01T13:25:00.000Z",
+            "sourceVerificationState": "synthetic-fixture",
+            "projectApplicabilityNote": "Conditional on occupant load."
+          }
+        ]
+      }
+    },
+    "analyze": {
+      "stage": "analyze",
+      "questionID": "cq-fixture-001",
+      "analysis": {
+        "id": "qanalysis-fixture-001",
+        "questionID": "cq-fixture-001",
+        "definitionRevision": 2,
+        "definitionHash": "PLACEHOLDER_DEFINITION_HASH",
+        "inputSnapshotIDs": ["qi-fact-001", "qi-assumption-001", "qi-unknown-001"],
+        "inputSetHash": "PLACEHOLDER_INPUT_SET_HASH",
+        "evidenceSetID": "eset-cq-fixture-001-v2",
+        "evidenceSetVersion": 2,
+        "evidenceSetHash": "PLACEHOLDER_EVIDENCE_SET_HASH",
+        "dependencyHash": "PLACEHOLDER_DEPENDENCY_HASH",
+        "researchAnswerID": "research-answer-fixture-001",
+        "modelID": "synthetic-model-fixture",
+        "analysisPolicyID": "selected-evidence-only-v1",
+        "promptTemplateVersion": "fixture-1",
+        "requestedBy": "user-editor-fixture",
+        "createdAt": "2026-08-01T14:00:00.000Z",
+        "requestID": "idem-analysis-fixture-001",
+        "citationValidation": "valid"
+      },
+      "researchAnswerSummary": {
+        "id": "research-answer-fixture-001",
+        "note": "Immutable Research answer body lives in existing Research store; descriptor only links here.",
+        "citations": ["esnap-v2-001", "esnap-v2-002"],
+        "limitations": ["Synthetic fixture; not legal advice."]
+      },
+      "conclusion": {
+        "id": "pconcl-fixture-001-r1",
+        "questionID": "cq-fixture-001",
+        "revision": 1,
+        "definitionRevision": 2,
+        "definitionHash": "PLACEHOLDER_DEFINITION_HASH",
+        "inputSetHash": "PLACEHOLDER_INPUT_SET_HASH",
+        "evidenceSetID": "eset-cq-fixture-001-v2",
+        "evidenceSetVersion": 2,
+        "evidenceSetHash": "PLACEHOLDER_EVIDENCE_SET_HASH",
+        "analysisRunID": "qanalysis-fixture-001",
+        "analysisDependencyHash": "PLACEHOLDER_DEPENDENCY_HASH",
+        "conclusionText": "Based on the approved synthetic evidence set, the professional conclusion for this fixture is that the primary exit corridor should provide not less than 44 inches clear width, unless the occupant-load exception (≤ 50) is confirmed, in which case 36 inches may apply.",
+        "reasoning": "Governing synthetic passage sets 44 inches; supporting exception is conditional.",
+        "citations": ["esnap-v2-001", "esnap-v2-002"],
+        "assumptions": ["Assume the corridor is not part of an accessible means of egress for this synthetic scenario."],
+        "unknowns": [],
+        "aiAssistanceDisclosure": "Bounded Analysis was used as a starting point; conclusion is professionally authored.",
+        "authorUserID": "user-editor-fixture",
+        "createdAt": "2026-08-01T14:30:00.000Z"
+      }
+    },
+    "review": {
+      "stage": "review",
+      "questionID": "cq-fixture-001",
+      "reviewRequests": [
+        {
+          "id": "review-fixture-001",
+          "requestType": "interpretation-review",
+          "legacyKind": "general-review",
+          "status": "resolved",
+          "targetKind": "professionalConclusion",
+          "targetID": "pconcl-fixture-001-r1",
+          "questionID": "cq-fixture-001",
+          "assigneeUserID": "user-reviewer-fixture",
+          "openedBy": "user-editor-fixture",
+          "openedAt": "2026-08-01T15:00:00.000Z",
+          "resolvedAt": "2026-08-01T15:30:00.000Z",
+          "comments": [
+            {
+              "id": "rcomment-fixture-001",
+              "body": "Please confirm whether occupant load is known before relying on the 36-inch exception.",
+              "authorUserID": "user-reviewer-fixture",
+              "createdAt": "2026-08-01T15:05:00.000Z"
+            },
+            {
+              "id": "rcomment-fixture-002",
+              "body": "Occupant load remains conditional; conclusion keeps 44 inches as primary with exception disclosed.",
+              "authorUserID": "user-editor-fixture",
+              "createdAt": "2026-08-01T15:20:00.000Z"
+            }
+          ]
+        }
+      ],
+      "conclusionApproval": {
+        "conclusionID": "pconcl-fixture-001-r1",
+        "approvedBy": "user-reviewer-fixture",
+        "approvedAt": "2026-08-01T15:35:00.000Z"
+      }
+    },
+    "issue": {
+      "stage": "issue",
+      "questionID": "cq-fixture-001",
+      "codeMemoDraft": {
+        "recordType": "codeDecisionMemo",
+        "schemaVersion": 2,
+        "questionID": "cq-fixture-001",
+        "projectID": "proj-cq-fixture-001",
+        "title": "Code Memo — Synthetic egress width (fixture)",
+        "draftRevision": 1,
+        "state": "issued",
+        "preparedAt": "2026-08-01T16:00:00.000Z"
+      },
+      "issuedRecord": {
+        "id": "issued-fixture-001-v1",
+        "questionID": "cq-fixture-001",
+        "issueVersion": 1,
+        "status": "issued",
+        "reportManifestID": "manifest-v3-fixture-001",
+        "componentVersions": {
+          "definitionRevision": 2,
+          "evidenceSetVersion": 2,
+          "conclusionRevision": 1,
+          "memoDraftRevision": 1
+        },
+        "componentHashes": {
+          "definitionHash": "PLACEHOLDER_DEFINITION_HASH",
+          "evidenceSetHash": "PLACEHOLDER_EVIDENCE_SET_HASH",
+          "conclusionHash": "PLACEHOLDER_CONCLUSION_HASH"
+        },
+        "issuingActor": "user-owner-fixture",
+        "approvalBasis": "Reviewer-approved conclusion revision 1; no open blockers.",
+        "predecessorID": null,
+        "successorID": null,
+        "issuedAt": "2026-08-01T17:00:00.000Z"
+      },
+      "lineage": {
+        "questionID": "cq-fixture-001",
+        "versions": [
+          {
+            "issueVersion": 1,
+            "issuedRecordID": "issued-fixture-001-v1",
+            "status": "issued"
+          }
+        ]
+      }
+    }
+  },
+  "coherenceChecks": {
+    "singleQuestionID": "cq-fixture-001",
+    "stagesMustShareQuestionID": ["define", "evidence", "analyze", "review", "issue"],
+    "versionChain": {
+      "definitionRevision": 2,
+      "evidenceSetVersion": 2,
+      "conclusionRevision": 1,
+      "issueVersion": 1
+    }
+  }
+}

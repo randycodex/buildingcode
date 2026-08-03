@@ -3,10 +3,10 @@
 - **Plan version:** 1.0
 - **Prepared:** August 3, 2026
 - **Repository:** `/Users/randy/Documents/X_CODING/Building Code`
-- **Implementation status:** **NOT STARTED**
+- **Implementation status:** **PHASE 0 IN PROGRESS / COMPLETED ON BRANCH** (see progress ledger)
 - **Purpose:** Product, architecture, migration, verification, and continuation plan
 
-> This document authorizes no application implementation by itself. It was written because the product owner requested a durable handoff plan before implementation. Do not begin product changes until the product owner explicitly says to proceed.
+> Phase 0 scaffolding may proceed on an authorized implementation branch. Product UI reorganization and Phases 1–10 remain gated by their exit criteria. Do not enable the Code Question workspace capability in production until rollout stages allow.
 
 ---
 
@@ -1568,9 +1568,9 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 
 | Phase | Status | Commit(s) | Verification | Notes / blockers |
 | --- | --- | --- | --- | --- |
-| Plan creation | Complete | This document's commit; see Git history | Repository/roadmap/architecture/Stitch audits; Markdown checks | No application implementation authorized or started |
-| 0 — Baseline and safety rails | Not started | — | — | Requires explicit implementation approval |
-| 1 — Contracts, storage, permissions, migration | Not started | — | — | — |
+| Plan creation | Complete | `468f7e306` docs: plan Code Question workspace reorganization | Repository/roadmap/architecture/Stitch audits; Markdown checks | Plan only |
+| 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; commit recorded after Phase 0 landing | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
+| 1 — Contracts, storage, permissions, migration | Not started | — | — | Next: storage, handlers, adapters behind disabled flag |
 | 2 — Project and Question workspace shell | Not started | — | — | — |
 | 3 — Define | Not started | — | — | — |
 | 4 — Evidence | Not started | — | — | — |
@@ -1583,7 +1583,8 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 
 ### Current handoff state
 
-- The requested plan has been written.
-- No Permitext application code, database schema, UI, server behavior, test behavior, iOS behavior, deployment, or production configuration has been changed by this planning task.
-- The latest Stitch ZIP and previews remain optional visual references, not dependencies.
-- The next agent must wait for explicit implementation approval and begin with Phase 0.
+- Branch: `codex/code-question-workspace` (from `468f7e306` on `codex/project-state-flicker-fixes`).
+- Phase 0 delivered: disabled `permitext:codeQuestionWorkspace` / `code-question-workspace` capability; `code-question-contract.mjs` pure domain scaffolding; synthetic lifecycle fixtures; Stitch Keep/Adapt/Reject matrix; eight ADRs under `docs/code-question/adrs/`; focused contract tests wired into check/smoke.
+- No visible product navigation reorganization; no tool deletion; no production deploy.
+- Unrelated untracked `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` must remain unstaged.
+- Next authorized work: **Phase 1** (storage, permissions, migrations, server handlers) with capability still default-disabled.

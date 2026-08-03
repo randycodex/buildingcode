@@ -104,6 +104,15 @@ assert.equal(freeCapabilities.capabilities["projects"].enabled, false);
 assert.equal(freeCapabilities.capabilities["offline-access"].enabled, false);
 assert.equal(freeCapabilities.capabilities.research.enabled, false);
 assert.equal(freeCapabilities.capabilities.research.monthlyLimit, 0);
+assert.equal(
+  freeCapabilities.capabilities["code-question-workspace"].enabled,
+  false,
+  "Code Question workspace capability must default disabled."
+);
+assert.equal(
+  freeCapabilities.capabilities["code-question-workspace"].featureFlag,
+  "permitext:codeQuestionWorkspace"
+);
 const packagedProCapabilities = capabilityContract({
   plan: "pro",
   expiresAt: "2099-01-01T00:00:00.000Z",
