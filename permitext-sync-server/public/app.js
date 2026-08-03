@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260803-code-question-workspace-v1";
+} from "./offline-storage.js?v=20260803-code-question-define-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260803-code-question-workspace-v1";
+} from "./workspace-state.js?v=20260803-code-question-define-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -80,7 +80,24 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260803-code-question-workspace-v1";
+} from "./code-question-workspace.js?v=20260803-code-question-define-v1";
+import {
+  assertInputPresentationSeparation,
+  createQuestionInput,
+  deriveDefineReadiness,
+  emptyDefinitionRecord,
+  enqueueDefinitionOfflineMutation,
+  groupInputsByKind,
+  inputKindCssClass,
+  inputKindLabel,
+  inputRevisionHistory,
+  normalizeDefinitionRecord,
+  openFactRequest,
+  replayDefinitionOfflineQueue,
+  resolveFactRequest,
+  reviseQuestionInput,
+  updateDefinitionFields
+} from "./code-question-define.js?v=20260803-code-question-define-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -3914,6 +3931,97 @@ function showWebNotice(title, message, options = {}) {
   return openWebWarning({ title, message, ...options, confirmLabel: options.confirmLabel || "OK", cancellable: false });
 }
 
+/**
+ * Accessible single-field text prompt (no window.prompt).
+ * Resolves to string on confirm, null on cancel.
+ */
+function openWebTextPrompt({
+  title,
+  message = "",
+  label = "Value",
+  defaultValue = "",
+  confirmLabel = "Save",
+  cancelLabel = "Cancel",
+  required = false,
+  multiline = false
+} = {}) {
+  activeWebWarningClose?.(false);
+  const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const titleID = `web-prompt-title-${crypto.randomUUID()}`;
+  const messageID = `web-prompt-message-${crypto.randomUUID()}`;
+  const inputID = `web-prompt-input-${crypto.randomUUID()}`;
+  const backdrop = document.createElement("div");
+  backdrop.className = "web-warning-backdrop";
+  const dialog = document.createElement("form");
+  dialog.className = "web-warning-dialog web-warning-form";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-labelledby", titleID);
+  dialog.setAttribute("aria-describedby", messageID);
+  const heading = document.createElement("h2");
+  heading.className = "web-warning-title";
+  heading.id = titleID;
+  heading.textContent = title;
+  const body = document.createElement("p");
+  body.className = "web-warning-message";
+  body.id = messageID;
+  body.textContent = message;
+  const fieldLabel = document.createElement("label");
+  fieldLabel.className = "web-warning-field";
+  fieldLabel.htmlFor = inputID;
+  fieldLabel.textContent = label;
+  const input = multiline ? document.createElement("textarea") : document.createElement("input");
+  if (!multiline) input.type = "text";
+  else input.rows = 3;
+  input.id = inputID;
+  input.value = String(defaultValue || "");
+  if (required) input.required = true;
+  const actions = document.createElement("div");
+  actions.className = "web-warning-actions";
+  const cancelButton = document.createElement("button");
+  cancelButton.type = "button";
+  cancelButton.className = "web-warning-button web-warning-cancel";
+  cancelButton.textContent = cancelLabel;
+  const confirmButton = document.createElement("button");
+  confirmButton.type = "submit";
+  confirmButton.className = "web-warning-button web-warning-confirm";
+  confirmButton.textContent = confirmLabel;
+  actions.append(cancelButton, confirmButton);
+  fieldLabel.append(input);
+  dialog.append(heading, body, fieldLabel, actions);
+  backdrop.append(dialog);
+  const warningContainer = mountWebWarningBackdrop(backdrop, null, previousFocus);
+  return new Promise((resolve) => {
+    let settled = false;
+    const close = (value) => {
+      if (settled) return;
+      settled = true;
+      unmountWebWarningBackdrop(backdrop, warningContainer);
+      if (activeWebWarningClose === close) activeWebWarningClose = null;
+      previousFocus?.focus?.({ preventScroll: true });
+      resolve(value);
+    };
+    activeWebWarningClose = close;
+    cancelButton.addEventListener("click", () => close(null));
+    dialog.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const value = String(input.value || "").trim();
+      if (required && !value) {
+        input.focus();
+        return;
+      }
+      close(value);
+    });
+    backdrop.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        close(null);
+      }
+    });
+    queueMicrotask(() => input.focus());
+  });
+}
+
 function stripeRestoreIDError(value) {
   const restoreID = String(value || "").trim();
   if (!restoreID) return "Enter the Stripe ID from your Permitext receipt.";
@@ -4757,6 +4865,65 @@ function setQuestionsForActiveProject(questions) {
       }))
     }
   }, { activeProjectID: projectID });
+}
+
+function codeQuestionDefineRole() {
+  // Personal Projects act as owner; organization role may appear on project access later.
+  if (!isProAccount()) return "viewer";
+  return "owner";
+}
+
+function getDefinitionForQuestion(questionID) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const cq = codeQuestionWorkspaceState();
+  const existing = cq.definitionsByQuestionID?.[id];
+  if (existing) return normalizeDefinitionRecord(existing, id);
+  const listItem = questionsForActiveProject().find((item) => item.id === id);
+  return normalizeDefinitionRecord(emptyDefinitionRecord(id, {
+    title: listItem?.title || "New Code Question",
+    createdBy: state.account?.userID || "local-user"
+  }), id);
+}
+
+function saveDefinitionForQuestion(questionID, definition) {
+  const id = String(questionID || "").trim();
+  if (!id) return;
+  const normalized = normalizeDefinitionRecord(definition, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    definitionsByQuestionID: {
+      ...(cq.definitionsByQuestionID || {}),
+      [id]: normalized
+    },
+    questionsByProjectID: {
+      ...(cq.questionsByProjectID || {}),
+      [activeProjectIDForCodeQuestions()]: questionsForActiveProject().map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              title: normalized.title || item.title,
+              listLabel: deriveQuestionListLabel({
+                ...item,
+                revisionInProgress: Boolean(
+                  normalized.dependentsStale?.analysis ||
+                  normalized.dependentsStale?.conclusion
+                )
+              })
+            }
+          : item
+      )
+    }
+  });
+  return normalized;
+}
+
+function codeQuestionActor() {
+  return {
+    userID: state.account?.userID || state.account?.appUserID || "local-user",
+    displayName: state.account?.displayName || "Local user"
+  };
 }
 
 function ensureCodeQuestionShellForProject(project) {
@@ -22560,13 +22727,15 @@ function renderCodeQuestionPane(paneDescriptor) {
   body.className = "panel-body code-question-panel-body";
   if (parsed.paneRole === "question-index") {
     body.appendChild(renderCodeQuestionIndexBody(project));
+  } else if (parsed.paneRole === "definition") {
+    body.appendChild(renderCodeQuestionDefinitionBody(project, parsed.questionID));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
     placeholder.innerHTML = `
       <p class="code-question-pane-status">Stage shell ready</p>
       <p>This ${codeQuestionPaneTitle(parsed.paneRole)} column is part of the Code Question workspace.
-      Full Define / Evidence / Analyze / Review / Issue content arrives in later phases.
+      Content for this stage arrives in a later phase.
       Stage selection does not change review or issuance state.</p>
     `;
     body.appendChild(placeholder);
@@ -22701,12 +22870,13 @@ async function createLocalCodeQuestionDraft(project) {
   }, 0) + 1;
   const displayID = `Q-${String(nextNumber).padStart(3, "0")}`;
   const id = `local-cq-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  const actor = codeQuestionActor();
   const question = {
     id,
     displayID,
     title: "New Code Question",
     recordState: "active",
-    responsibleDisplayName: state.account?.displayName || "",
+    responsibleDisplayName: actor.displayName || "",
     reviewState: "",
     lastActivityAt: new Date().toISOString(),
     latestIssuedVersion: null,
@@ -22714,6 +22884,10 @@ async function createLocalCodeQuestionDraft(project) {
     listLabel: "Active"
   };
   setQuestionsForActiveProject([...existing, question]);
+  saveDefinitionForQuestion(id, emptyDefinitionRecord(id, {
+    title: "New Code Question",
+    createdBy: actor.userID
+  }));
   setCodeQuestionWorkspaceState(
     switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
       projectID,
@@ -22723,6 +22897,470 @@ async function createLocalCodeQuestionDraft(project) {
     { activeProjectID: projectID, syncDeepLink: true }
   );
   await renderWorkspace();
+}
+
+function renderCodeQuestionDefinitionBody(project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-define";
+  const qid = String(questionID || codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!qid || qid === "_") {
+    wrap.innerHTML = `<p class="code-question-define-empty">Open or create a Code Question to edit its definition.</p>`;
+    return wrap;
+  }
+  const definition = getDefinitionForQuestion(qid);
+  const readiness = deriveDefineReadiness(definition, { role: codeQuestionDefineRole() });
+  const readOnly = readiness.readOnly || !codeQuestionWorkspaceEnabled();
+  wrap.dataset.questionId = qid;
+  wrap.dataset.readonly = readOnly ? "true" : "false";
+
+  const readinessEl = document.createElement("section");
+  readinessEl.className = "code-question-define-readiness";
+  readinessEl.setAttribute("aria-label", "Definition readiness");
+  readinessEl.innerHTML = `
+    <div class="code-question-define-readiness-head">
+      <strong>Readiness</strong>
+      <span class="code-question-define-revision">Definition r${escapeHTML(String(definition.definitionRevision))} · v${escapeHTML(String(definition.expectedVersion))}</span>
+    </div>
+    <p class="code-question-define-readiness-summary">
+      ${readiness.canApprove ? "No Define blockers for approval/issuance policy." : "Approval/issuance blocked until Define requirements are met."}
+      Stage control does not change review or issue state.
+    </p>
+  `;
+  if (readiness.blockers.length) {
+    const list = document.createElement("ul");
+    list.className = "code-question-define-blockers";
+    readiness.blockers.forEach((item) => {
+      const li = document.createElement("li");
+      li.dataset.classification = "blocker";
+      li.textContent = item.message;
+      list.appendChild(li);
+    });
+    readinessEl.appendChild(list);
+  }
+  if (readiness.disclosedLimitations.length || readiness.acceptedConditions.length) {
+    const notes = document.createElement("ul");
+    notes.className = "code-question-define-notes";
+    [...readiness.disclosedLimitations, ...readiness.acceptedConditions].forEach((item) => {
+      const li = document.createElement("li");
+      li.dataset.classification = item.classification;
+      li.textContent = `${item.classification === "accepted-condition" ? "Condition" : "Note"}: ${item.message}`;
+      notes.appendChild(li);
+    });
+    readinessEl.appendChild(notes);
+  }
+  if (definition.dependentsStale?.analysis || definition.dependentsStale?.conclusion) {
+    const stale = document.createElement("p");
+    stale.className = "code-question-define-stale";
+    stale.textContent = "Dependent analysis, conclusion, approval, and draft may be stale after this definition change.";
+    readinessEl.appendChild(stale);
+  }
+  wrap.appendChild(readinessEl);
+
+  const form = document.createElement("form");
+  form.className = "code-question-define-form";
+  form.setAttribute("aria-label", "Code Question definition");
+  if (readOnly) form.setAttribute("aria-readonly", "true");
+
+  const fields = [
+    { key: "title", label: "Concise title", type: "text", max: 240 },
+    { key: "questionText", label: "Precise question", type: "textarea", max: 8000, required: true },
+    { key: "scope", label: "Scope", type: "textarea", max: 4000 },
+    { key: "jurisdiction", label: "Jurisdiction", type: "text", max: 240 },
+    { key: "asOfDate", label: "As-of date", type: "date" },
+    { key: "desiredOutput", label: "Desired decision / output", type: "textarea", max: 2000 }
+  ];
+  fields.forEach((field) => {
+    const group = document.createElement("div");
+    group.className = "code-question-define-field";
+    const label = document.createElement("label");
+    const inputID = `cq-define-${qid}-${field.key}`;
+    label.setAttribute("for", inputID);
+    label.textContent = field.label;
+    let input;
+    if (field.type === "textarea") {
+      input = document.createElement("textarea");
+      input.rows = field.key === "questionText" ? 4 : 2;
+    } else {
+      input = document.createElement("input");
+      input.type = field.type;
+    }
+    input.id = inputID;
+    input.name = field.key;
+    input.value = field.key === "asOfDate"
+      ? String(definition.asOfDate || "").slice(0, 10)
+      : String(definition[field.key] || "");
+    if (field.max) input.maxLength = field.max;
+    if (field.required) input.required = true;
+    input.disabled = readOnly;
+    input.addEventListener("change", () => {
+      if (readOnly) return;
+      const actor = codeQuestionActor();
+      try {
+        const patch = { [field.key]: input.value };
+        if (field.key === "asOfDate") {
+          patch.asOfDate = input.value ? new Date(`${input.value}T00:00:00.000Z`).toISOString() : null;
+        }
+        const next = updateDefinitionFields(definition, patch, {
+          expectedVersion: definition.expectedVersion,
+          actorUserID: actor.userID
+        });
+        saveDefinitionForQuestion(qid, next);
+        refreshCodeQuestionDefinitionPane(qid);
+      } catch (error) {
+        if (error.code === "CODE_QUESTION_VERSION_CONFLICT") {
+          void showWebNotice("Definition conflict", "This definition changed elsewhere. Reload the pane and try again.");
+        } else {
+          void showWebNotice("Could not update definition", error.message || "Could not update definition.");
+        }
+      }
+    });
+    group.append(label, input);
+    form.appendChild(group);
+  });
+  wrap.appendChild(form);
+
+  // Structured inputs
+  const groups = groupInputsByKind(definition.inputs);
+  assertInputPresentationSeparation(definition.inputs);
+  wrap.appendChild(renderDefineInputSection({
+    questionID: qid,
+    title: "Confirmed facts",
+    kind: "confirmedFact",
+    items: groups.confirmedFacts,
+    readOnly,
+    emptyText: "No confirmed facts yet."
+  }));
+  wrap.appendChild(renderDefineInputSection({
+    questionID: qid,
+    title: "Assumptions",
+    kind: "assumption",
+    items: groups.assumptions,
+    readOnly,
+    emptyText: "No assumptions recorded."
+  }));
+  wrap.appendChild(renderDefineInputSection({
+    questionID: qid,
+    title: "Unknowns",
+    kind: "unknown",
+    items: groups.unknowns,
+    readOnly,
+    emptyText: "No unknowns recorded. Unresolved unknowns block approval/issuance."
+  }));
+
+  // Fact requests
+  const factSection = document.createElement("section");
+  factSection.className = "code-question-define-fact-requests";
+  factSection.innerHTML = `<h3>Fact Requests</h3>`;
+  const frList = document.createElement("ul");
+  frList.className = "code-question-define-fact-request-list";
+  const openRequests = definition.factRequests.filter((item) => item.status === "open" || item.status === "waiting");
+  if (!openRequests.length && !definition.factRequests.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = "No Fact Requests. Anchor a request to an unknown or fact when collaboration is needed.";
+    frList.appendChild(empty);
+  } else {
+    definition.factRequests.forEach((request) => {
+      const li = document.createElement("li");
+      li.className = `code-question-fact-request is-${request.status}`;
+      li.innerHTML = `
+        <strong>${escapeHTML(request.title)}</strong>
+        <span class="code-question-fact-request-meta">${escapeHTML(request.status)}${request.inputID ? ` · anchored to ${escapeHTML(request.inputID)}` : ""}</span>
+        <p>${escapeHTML(request.body || "")}</p>
+      `;
+      if (!readOnly && (request.status === "open" || request.status === "waiting")) {
+        const resolveBtn = document.createElement("button");
+        resolveBtn.type = "button";
+        resolveBtn.textContent = "Resolve";
+        resolveBtn.addEventListener("click", () => {
+          const next = resolveFactRequest(getDefinitionForQuestion(qid), request.id, {
+            actorUserID: codeQuestionActor().userID
+          });
+          saveDefinitionForQuestion(qid, next);
+          refreshCodeQuestionDefinitionPane(qid);
+        });
+        li.appendChild(resolveBtn);
+      }
+      frList.appendChild(li);
+    });
+  }
+  factSection.appendChild(frList);
+  if (!readOnly) {
+    const addFr = document.createElement("button");
+    addFr.type = "button";
+    addFr.className = "code-question-define-secondary";
+    addFr.textContent = "Open Fact Request";
+    addFr.addEventListener("click", async () => {
+      const title = await openWebTextPrompt({
+        title: "Fact Request",
+        message: "Open a Fact Request anchored to this Code Question.",
+        label: "Title",
+        required: true,
+        confirmLabel: "Continue"
+      });
+      if (!title) return;
+      const body = await openWebTextPrompt({
+        title: "Fact Request details",
+        message: "Optional details for the assignee.",
+        label: "Details",
+        required: false,
+        multiline: true,
+        confirmLabel: "Continue"
+      });
+      if (body === null) return;
+      const anchor = await openWebTextPrompt({
+        title: "Anchor input",
+        message: "Optional input ID to anchor this request.",
+        label: "Input ID",
+        required: false,
+        confirmLabel: "Create request"
+      });
+      if (anchor === null) return;
+      try {
+        const next = openFactRequest(getDefinitionForQuestion(qid), {
+          title,
+          body: body || "",
+          inputID: anchor || null,
+          actorUserID: codeQuestionActor().userID,
+          actorDisplayName: codeQuestionActor().displayName
+        });
+        saveDefinitionForQuestion(qid, next);
+        refreshCodeQuestionDefinitionPane(qid);
+      } catch (error) {
+        void showWebNotice("Could not open Fact Request", error.message || "Could not open Fact Request.");
+      }
+    });
+    factSection.appendChild(addFr);
+  }
+  wrap.appendChild(factSection);
+
+  // Offline queue controls (proves conflict-aware queue behavior)
+  const offline = document.createElement("section");
+  offline.className = "code-question-define-offline";
+  offline.innerHTML = `<h3>Offline queue</h3>
+    <p class="code-question-define-muted">Queued definition mutations wait for reconnect. Conflicts are reported; edits are not silently dropped.</p>
+    <p>Queued: <strong>${definition.offlineQueue?.length || 0}</strong></p>`;
+  if (!readOnly) {
+    const queueBtn = document.createElement("button");
+    queueBtn.type = "button";
+    queueBtn.className = "code-question-define-secondary";
+    queueBtn.textContent = "Queue sample offline save";
+    queueBtn.addEventListener("click", () => {
+      const current = getDefinitionForQuestion(qid);
+      const next = enqueueDefinitionOfflineMutation(current, {
+        commandKind: "codeQuestion.definition.update",
+        payload: {
+          title: current.title,
+          actorUserID: codeQuestionActor().userID
+        }
+      });
+      saveDefinitionForQuestion(qid, next);
+      refreshCodeQuestionDefinitionPane(qid);
+    });
+    const replayBtn = document.createElement("button");
+    replayBtn.type = "button";
+    replayBtn.className = "code-question-define-secondary";
+    replayBtn.textContent = "Replay queue";
+    replayBtn.addEventListener("click", () => {
+      const current = getDefinitionForQuestion(qid);
+      const { definition: next, results } = replayDefinitionOfflineQueue(current, {
+        serverVersion: current.expectedVersion,
+        strictConflict: false
+      });
+      saveDefinitionForQuestion(qid, next);
+      const conflicts = results.filter((item) => item.status === "conflict").length;
+      void showWebNotice("Offline queue replay", `Replay complete: ${results.length - conflicts} applied, ${conflicts} conflict(s).`);
+      refreshCodeQuestionDefinitionPane(qid);
+    });
+    offline.append(queueBtn, replayBtn);
+  }
+  wrap.appendChild(offline);
+
+  if (readOnly) {
+    const banner = document.createElement("p");
+    banner.className = "code-question-define-readonly-banner";
+    banner.textContent = "Read-only for Viewer/Reviewer roles. Editors and Owners can edit definitions.";
+    wrap.prepend(banner);
+  }
+  return wrap;
+}
+
+function renderDefineInputSection({ questionID, title, kind, items, readOnly, emptyText }) {
+  const section = document.createElement("section");
+  section.className = `code-question-define-inputs ${inputKindCssClass(kind)}`;
+  section.dataset.inputKind = kind;
+  const heading = document.createElement("h3");
+  heading.textContent = title;
+  section.appendChild(heading);
+  const list = document.createElement("ul");
+  list.className = "code-question-define-input-list";
+  list.setAttribute("aria-label", title);
+  if (!items.length) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = emptyText;
+    list.appendChild(empty);
+  } else {
+    items.forEach((item) => {
+      const li = document.createElement("li");
+      li.className = `code-question-define-input ${inputKindCssClass(item.inputKind)}`;
+      if (item.changeIndicator) li.classList.add("has-change");
+      li.dataset.inputId = item.id;
+      li.dataset.inputKind = item.inputKind;
+      li.innerHTML = `
+        <div class="code-question-define-input-head">
+          <span class="code-question-define-kind-badge">${escapeHTML(inputKindLabel(item.inputKind))}</span>
+          <span class="code-question-define-input-state">${escapeHTML(item.state)}</span>
+          ${item.changeIndicator ? '<span class="code-question-define-change">Changed</span>' : ""}
+        </div>
+        <p class="code-question-define-statement">${escapeHTML(item.statement)}</p>
+        <p class="code-question-define-input-meta">
+          ${escapeHTML(item.id)} · r${escapeHTML(String(item.revision))}
+          ${item.basis ? ` · Basis: ${escapeHTML(item.basis)}` : ""}
+          ${item.responsibleDisplayName ? ` · ${escapeHTML(item.responsibleDisplayName)}` : ""}
+          · ${escapeHTML(item.updatedBy || item.createdBy || "")}
+        </p>
+      `;
+      const history = inputRevisionHistory(getDefinitionForQuestion(questionID), item.id);
+      if (history.length > 1) {
+        const details = document.createElement("details");
+        details.className = "code-question-define-history";
+        details.innerHTML = `<summary>Revision history (${history.length})</summary>`;
+        const histList = document.createElement("ol");
+        history.forEach((rev) => {
+          const revItem = document.createElement("li");
+          revItem.textContent = `r${rev.revision}: ${rev.statement} (${rev.state}) — ${rev.updatedBy || rev.createdBy || "unknown"} @ ${rev.updatedAt || rev.createdAt || ""}`;
+          histList.appendChild(revItem);
+        });
+        details.appendChild(histList);
+        li.appendChild(details);
+      }
+      if (!readOnly) {
+        const actions = document.createElement("div");
+        actions.className = "code-question-define-input-actions";
+        const edit = document.createElement("button");
+        edit.type = "button";
+        edit.textContent = "Revise";
+        edit.addEventListener("click", async () => {
+          const statement = await openWebTextPrompt({
+            title: "Revise input",
+            message: "Update the statement for this structured input.",
+            label: "Statement",
+            defaultValue: item.statement,
+            required: true,
+            multiline: true,
+            confirmLabel: "Continue"
+          });
+          if (statement == null) return;
+          const stateValue = await openWebTextPrompt({
+            title: "Input state",
+            message: `Allowed: ${questionInputStatesForKind(item.inputKind).join(", ")}`,
+            label: "State",
+            defaultValue: item.state,
+            required: true,
+            confirmLabel: "Save revision"
+          });
+          if (stateValue == null) return;
+          try {
+            const next = reviseQuestionInput(
+              getDefinitionForQuestion(questionID),
+              item.id,
+              { statement, state: stateValue },
+              { actorUserID: codeQuestionActor().userID }
+            );
+            saveDefinitionForQuestion(questionID, next);
+            refreshCodeQuestionDefinitionPane(questionID);
+          } catch (error) {
+            void showWebNotice("Could not revise input", error.message || "Could not revise input.");
+          }
+        });
+        actions.appendChild(edit);
+        if (item.inputKind === "unknown" && item.state !== "resolved") {
+          const resolve = document.createElement("button");
+          resolve.type = "button";
+          resolve.textContent = "Mark resolved";
+          resolve.addEventListener("click", () => {
+            try {
+              const next = reviseQuestionInput(
+                getDefinitionForQuestion(questionID),
+                item.id,
+                { state: "resolved" },
+                { actorUserID: codeQuestionActor().userID }
+              );
+              saveDefinitionForQuestion(questionID, next);
+              refreshCodeQuestionDefinitionPane(questionID);
+            } catch (error) {
+              void showWebNotice("Could not resolve unknown", error.message || "Could not resolve unknown.");
+            }
+          });
+          actions.appendChild(resolve);
+        }
+        li.appendChild(actions);
+      }
+      list.appendChild(li);
+    });
+  }
+  section.appendChild(list);
+  if (!readOnly) {
+    const add = document.createElement("button");
+    add.type = "button";
+    add.className = "code-question-define-add-input";
+    add.textContent = `Add ${inputKindLabel(kind).toLowerCase()}`;
+    add.addEventListener("click", async () => {
+      const statement = await openWebTextPrompt({
+        title: `Add ${inputKindLabel(kind)}`,
+        message: "Enter the statement. Assumptions are never labeled as confirmed facts.",
+        label: "Statement",
+        required: true,
+        multiline: true,
+        confirmLabel: "Continue"
+      });
+      if (!statement) return;
+      const basis = await openWebTextPrompt({
+        title: "Basis / source",
+        message: "Optional basis or source for this input.",
+        label: "Basis",
+        required: false,
+        confirmLabel: "Add input"
+      });
+      if (basis === null) return;
+      try {
+        const actor = codeQuestionActor();
+        const next = createQuestionInput(getDefinitionForQuestion(questionID), {
+          inputKind: kind,
+          statement,
+          basis: basis || "",
+          actorUserID: actor.userID,
+          responsibleDisplayName: actor.displayName
+        });
+        saveDefinitionForQuestion(questionID, next);
+        refreshCodeQuestionDefinitionPane(questionID);
+      } catch (error) {
+        void showWebNotice("Could not add input", error.message || "Could not add input.");
+      }
+    });
+    section.appendChild(add);
+  }
+  return section;
+}
+
+function questionInputStatesForKind(kind) {
+  if (kind === "assumption") return ["proposed", "disputed", "retired"];
+  if (kind === "unknown") return ["proposed", "resolved", "retired"];
+  return ["proposed", "confirmed", "disputed", "retired"];
+}
+
+function refreshCodeQuestionDefinitionPane(questionID) {
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const pane = track?.querySelector?.(
+    `.code-question-panel[data-cq-role="definition"][data-question-id="${safeID}"] .code-question-panel-body`
+  );
+  if (!pane) {
+    void renderWorkspace();
+    return;
+  }
+  const project = openProjectDetails()[0] || null;
+  pane.replaceChildren(renderCodeQuestionDefinitionBody(project, questionID));
 }
 
 function toggleLocalCodeQuestionArchive(questionID) {

@@ -88,6 +88,8 @@ export function emptyCodeQuestionWorkspaceState() {
     questionIndexOpen: true,
     moreMenuOpen: false,
     questionsByProjectID: {},
+    /** Phase 3: definition working records keyed by question ID. */
+    definitionsByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -242,6 +244,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
               listLabel: String(item.listLabel || "")
             }))
         ])
+    );
+  }
+  if (source.definitionsByQuestionID && typeof source.definitionsByQuestionID === "object") {
+    state.definitionsByQuestionID = Object.fromEntries(
+      Object.entries(source.definitionsByQuestionID)
+        .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
+        .map(([questionID, record]) => [questionID, copy(record)])
     );
   }
 

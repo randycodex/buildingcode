@@ -80,6 +80,7 @@ function emptyCodeQuestionWorkspaceLayout() {
     questionIndexOpen: true,
     moreMenuOpen: false,
     questionsByProjectID: {},
+    definitionsByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -144,6 +145,9 @@ function normalizeCodeQuestionWorkspaceLayout(value = {}, activeProject = null) 
   // Drop orphan cq: pane weights/order is handled by paneOrder filter in normalizeWorkspaceLayout.
   if (source.questionsByProjectID && typeof source.questionsByProjectID === "object") {
     layout.questionsByProjectID = copy(source.questionsByProjectID);
+  }
+  if (source.definitionsByQuestionID && typeof source.definitionsByQuestionID === "object") {
+    layout.definitionsByQuestionID = copy(source.definitionsByQuestionID);
   }
   if (source.deepLink && typeof source.deepLink === "object") {
     layout.deepLink = {
