@@ -15,7 +15,18 @@ function functionSource(source, name) {
   const asyncStart = source.indexOf(`async function ${name}(`);
   const start = asyncStart >= 0 ? asyncStart : source.indexOf(`function ${name}(`);
   assert.notEqual(start, -1, `${name} must exist.`);
-  const bodyStart = source.indexOf("{", start);
+  const parametersStart = source.indexOf("(", start);
+  let parameterDepth = 0;
+  let parametersEnd = -1;
+  for (let index = parametersStart; index < source.length; index += 1) {
+    if (source[index] === "(") parameterDepth += 1;
+    if (source[index] === ")") parameterDepth -= 1;
+    if (parameterDepth === 0) {
+      parametersEnd = index;
+      break;
+    }
+  }
+  const bodyStart = source.indexOf("{", parametersEnd);
   let depth = 0;
   let quote = "";
   let escaped = false;
@@ -81,7 +92,68 @@ assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
+assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
 assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+[
+  "openProjectNotebook",
+  "closeProjectNotebook",
+  "openProjectReportDraft",
+  "closeProjectReportDraft",
+  "openProjectWorkboard",
+  "closeProjectWorkboard",
+  "openProjectCoordination",
+  "closeProjectCoordination"
+].forEach((name) => {
+  const source = functionSource(appSource, name);
+  assert.doesNotMatch(
+    source,
+    /projectOverviewRefreshPaneIDs/,
+    `${name} must keep Projects, Research, and Settings mounted.`
+  );
+  assert.match(source, /syncProjectToolButtonStates/);
+  assert.match(source, /transitionWorkspace\("utility"/);
+});
+const deactivateProjectStudioSource = functionSource(appSource, "deactivateProjectStudio");
+assert.ok(
+  deactivateProjectStudioSource.indexOf("confirmNotebookDiscard") <
+    deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
+  "Project deactivation must confirm Notebook edits before changing workspace state."
+);
+assert.ok(
+  deactivateProjectStudioSource.indexOf("confirmReportDraftDiscard") <
+    deactivateProjectStudioSource.indexOf("closeProjectDetailForProject"),
+  "Project deactivation must confirm Report Draft edits before changing workspace state."
+);
+assert.match(functionSource(appSource, "transitionProjectSelection"), /refreshSavedPanelInPlace/);
+assert.match(functionSource(appSource, "refreshSavedPanelInPlace"), /scrollTop[\s\S]*?hydrateSavedPanel[\s\S]*?scrollTop/);
+assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
+assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
+assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
+assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /projectHostSavedInstance/);
+assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders"), /outcome\.value === "cancelled"[\s\S]*?expectedHostPaneID[\s\S]*?expectedSelectedFolderID/);
+assert.match(savedFolderContextSource, /await loadProjectCoordinationFoundation[\s\S]*?previousContext\.replaceWith\(context\)/);
+assert.doesNotMatch(savedFolderContextSource, /previousContext\?\.remove\(\)[\s\S]*?const folder/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /addButton\.onclick[\s\S]*?projectsMenuToggle\.onclick[\s\S]*?archiveButton\.onclick/);
+assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);
+assert.match(functionSource(appSource, "closeUtilityInstance"), /successorFolder[\s\S]*?activateProjectStudio\(successorFolder/);
+assert.match(functionSource(appSource, "renderWorkspace"), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?renderGeneration !== workspaceRenderGeneration[\s\S]*?appendPaneSequence/);
+assert.match(functionSource(appSource, "renderUtilityWorkspace"), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?renderGeneration !== workspaceRenderGeneration[\s\S]*?appendPaneSequence/);
+assert.doesNotMatch(functionSource(appSource, "projectCollaborationRefresh"), /projectOverviewRefreshPaneIDs/);
+assert.doesNotMatch(functionSource(appSource, "focusLinkedProjectRecord"), /projectOverviewRefreshPaneIDs/);
+assert.doesNotMatch(functionSource(appSource, "refreshProjectMembershipPanes"), /transitionWorkspace/);
+assert.ok(
+  functionSource(appSource, "performSavedPanelHydration").indexOf("renderSavedFolderContext") <
+    functionSource(appSource, "performSavedPanelHydration").indexOf("renderSavedProjects"),
+  "Saved tiles and context must swap in the same render turn after the Project foundation is ready."
+);
+[
+  "detachProjectWorkboard",
+  "reattachProjectWorkboard"
+].forEach((name) => {
+  const source = functionSource(appSource, name);
+  assert.doesNotMatch(source, /projectOverviewRefreshPaneIDs/);
+  assert.match(source, /syncProjectToolButtonStates/);
+});
 assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
 assert.match(appSource, /collapsedCodePrefixes: searchActive \? \[\] : savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
@@ -123,7 +195,7 @@ assert.match(appSource, /const legacyReaderPaneWidth = 520;[\s\S]*?const default
 assert.match(appSource, /const legacySourceLinkedReaderPaneWidth = 400;[\s\S]*?const defaultSourceLinkedReaderPaneWidth = 600;/);
 assert.match(appSource, /paneID\?\.startsWith\("reader:"\)[\s\S]*?value === legacyReaderPaneWidth \|\| value === legacySourceLinkedReaderPaneWidth[\s\S]*?defaultPaneWidthForID\(paneID\) === defaultReaderPaneWidth[\s\S]*?return defaultReaderPaneWidth;/);
 assert.match(appSource, /if \(isProjectCoordinationPaneID\(paneID\) && value === legacyCoordinationPaneWidth\) \{[\s\S]*?return defaultCoordinationPaneWidth;/);
-assert.match(appSource, /projectsMenuToggle\.addEventListener\("click"[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
+assert.match(appSource, /projectsMenuToggle\.onclick = \(\) => \{[\s\S]*?if \(instance\.projectsMenuOpen \|\| !showingArchived\) return;[\s\S]*?instance\.projectsArchiveMode = false;/);
 assert.match(functionSource(appSource, "defaultActivePaneIDs"), /projectHasOpenNotebook/);
 assert.doesNotMatch(functionSource(appSource, "defaultActivePaneIDs"), /paneIDForProjectDetail/);
 assert.doesNotMatch(functionSource(appSource, "renderWorkspace"), /renderProjectDetail/);

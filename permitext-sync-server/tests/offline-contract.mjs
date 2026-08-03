@@ -195,8 +195,8 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-research-folder-groups-v457"));
-assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-coordination-workspace-v2"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260802-project-state-flicker-v458"));
+assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260802-project-state-flicker-v3"));
 
 let activationCompletion;
 listeners.get("activate")({

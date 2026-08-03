@@ -11,6 +11,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "sectionDetailAnchors",
   "projectDetail",
   "projectDetails",
+  "projectHostPaneID",
   "utilityInstances",
   "utilities",
   "paneWeights",
@@ -28,6 +29,30 @@ export const workspaceLayoutStateKeys = Object.freeze([
 function copy(value) {
   if (value === undefined) return undefined;
   return JSON.parse(JSON.stringify(value));
+}
+
+function projectIdentityValues(project) {
+  return [project?.id, project?.clientID, project?.localFolderID]
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .map(String);
+}
+
+function projectRecordsMatch(left, right) {
+  const leftIDs = projectIdentityValues(left);
+  const rightIDs = projectIdentityValues(right);
+  if (leftIDs.length && rightIDs.length) {
+    return leftIDs.some((id) => rightIDs.includes(id));
+  }
+  const leftName = String(left?.name || left?.title || "").trim();
+  const rightName = String(right?.name || right?.title || "").trim();
+  return Boolean(leftName && rightName && leftName === rightName);
+}
+
+function activeProjectToolState(records, activeProject) {
+  if (!activeProject || !Array.isArray(records)) return [];
+  return records.some((record) => projectRecordsMatch(record, activeProject))
+    ? [copy(activeProject)]
+    : [];
 }
 
 function cleanWorkspaceName(value, fallback = defaultWorkspaceName) {
@@ -56,6 +81,7 @@ export function emptyWorkspaceLayout() {
     sectionDetailAnchors: {},
     projectDetail: null,
     projectDetails: [],
+    projectHostPaneID: "",
     utilityInstances: [],
     utilities: utilityState(),
     paneWeights: {},
@@ -98,6 +124,12 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.utilityInstances = Array.isArray(source.utilityInstances)
     ? copy(source.utilityInstances.filter((instance) => instance && typeof instance === "object"))
     : [];
+  const savedPaneIDs = new Set(layout.utilityInstances
+    .filter((instance) => instance.key === "saved" && instance.id)
+    .map((instance) => `utility:saved:${instance.id}`));
+  layout.projectHostPaneID = typeof source.projectHostPaneID === "string" && savedPaneIDs.has(source.projectHostPaneID)
+    ? source.projectHostPaneID
+    : "";
   layout.utilities = utilityState(source.utilities);
   layout.paneWeights = source.paneWeights && typeof source.paneWeights === "object"
     ? Object.fromEntries(
@@ -117,14 +149,22 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.researchConversationID = typeof source.researchConversationID === "string"
     ? source.researchConversationID
     : "";
-  layout.workboards = Array.isArray(source.workboards) ? copy(source.workboards) : [];
-  layout.notebooks = Array.isArray(source.notebooks) ? copy(source.notebooks) : [];
-  layout.reportDrafts = Array.isArray(source.reportDrafts) ? copy(source.reportDrafts) : [];
-  layout.coordinations = Array.isArray(source.coordinations) ? copy(source.coordinations) : [];
-  layout.coordinationThreads = Array.isArray(source.coordinationThreads)
-    ? copy(source.coordinationThreads.filter((thread) =>
-        thread && typeof thread === "object" && typeof thread.threadID === "string" && thread.threadID
-      ))
+  const activeProject = layout.projectDetails[0] || null;
+  layout.workboards = activeProjectToolState(source.workboards, activeProject);
+  layout.notebooks = activeProjectToolState(source.notebooks, activeProject);
+  layout.reportDrafts = activeProjectToolState(source.reportDrafts, activeProject);
+  layout.coordinations = activeProjectToolState(source.coordinations, activeProject);
+  const coordinationThread = activeProject && layout.coordinations.length && Array.isArray(source.coordinationThreads)
+    ? source.coordinationThreads.find((thread) =>
+        thread &&
+        typeof thread === "object" &&
+        typeof thread.threadID === "string" &&
+        thread.threadID &&
+        projectRecordsMatch(thread, activeProject)
+      )
+    : null;
+  layout.coordinationThreads = coordinationThread
+    ? [{ ...copy(activeProject), threadID: coordinationThread.threadID }]
     : [];
   layout.coordinationFilters = source.coordinationFilters && typeof source.coordinationFilters === "object"
     ? Object.fromEntries(

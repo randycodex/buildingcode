@@ -28,10 +28,12 @@ assert.equal(blankRegistry.workspaces.length, 1);
 assert.equal(blankRegistry.workspaces[0].name, "Main");
 assert.equal(blankRegistry.activeWorkspaceID, blankRegistry.workspaces[0].id);
 assert.deepEqual(emptyWorkspaceLayout().readers, []);
+assert.equal(emptyWorkspaceLayout().projectHostPaneID, "");
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
 
 const legacyLayout = normalizeWorkspaceLayout({
   readers: [{ id: "reader-1", codePrefix: "BC" }, { id: "comparison", comparisonManaged: true }],
+  projectDetail: { id: "project-1", name: "Project 1", color: "#2f8f4e" },
   utilityInstances: [{ id: "search-1", key: "search" }],
   utilities: { analysis: true },
   paneOrder: ["reader:reader-1", "section:detail:search-1", "utility:search:search-1"],
@@ -54,6 +56,43 @@ assert.equal(legacyLayout.coordinations[0].id, "project-1");
 assert.equal(legacyLayout.coordinationThreads[0].threadID, "thread-1");
 assert.deepEqual(legacyLayout.coordinationFilters, { "project-1": "waiting" });
 assert.equal(workspaceLayoutHasVisiblePanes(legacyLayout), true);
+
+const hostedProjectLayout = normalizeWorkspaceLayout({
+  utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],
+  projectHostPaneID: "utility:saved:saved-2"
+});
+assert.equal(hostedProjectLayout.projectHostPaneID, "utility:saved:saved-2");
+assert.equal(normalizeWorkspaceLayout({
+  utilityInstances: [{ id: "saved-1", key: "saved" }],
+  projectHostPaneID: "utility:saved:missing"
+}).projectHostPaneID, "");
+
+const orphanProjectTools = normalizeWorkspaceLayout({
+  notebooks: [{ id: "project-1", name: "Project 1" }],
+  workboards: [{ id: "project-1", name: "Project 1" }],
+  reportDrafts: [{ id: "project-1", name: "Project 1" }],
+  coordinations: [{ id: "project-1", name: "Project 1" }],
+  coordinationThreads: [{ id: "project-1", name: "Project 1", threadID: "thread-1" }]
+});
+assert.deepEqual(orphanProjectTools.notebooks, []);
+assert.deepEqual(orphanProjectTools.workboards, []);
+assert.deepEqual(orphanProjectTools.reportDrafts, []);
+assert.deepEqual(orphanProjectTools.coordinations, []);
+assert.deepEqual(orphanProjectTools.coordinationThreads, []);
+assert.equal(workspaceLayoutHasVisiblePanes(orphanProjectTools), false);
+
+const conflictingProjectTools = normalizeWorkspaceLayout({
+  projectDetails: [{ id: "project-2", name: "Project 2", color: "#3f6f9f" }],
+  notebooks: [{ id: "project-1", name: "Project 1" }],
+  workboards: [{ id: "project-2", name: "Stale Project 2 label" }],
+  coordinations: [{ id: "project-2", name: "Project 2" }],
+  coordinationThreads: [{ id: "project-1", name: "Project 1", threadID: "thread-1" }]
+});
+assert.deepEqual(conflictingProjectTools.notebooks, []);
+assert.equal(conflictingProjectTools.workboards[0].id, "project-2");
+assert.equal(conflictingProjectTools.workboards[0].name, "Project 2");
+assert.equal(conflictingProjectTools.coordinations[0].id, "project-2");
+assert.deepEqual(conflictingProjectTools.coordinationThreads, []);
 
 let registry = blankRegistry;
 const created = createWorkspace(registry, options);
@@ -96,6 +135,19 @@ const destinationState = { localProjects: sourceState.localProjects };
 applyWorkspaceLayout(destinationState, captured);
 assert.deepEqual(destinationState.localProjects, sourceState.localProjects);
 assert.deepEqual(destinationState.readers, sourceState.readers);
+
+const hostedSourceState = {
+  ...emptyWorkspaceLayout(),
+  utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],
+  projectHostPaneID: "utility:saved:saved-2"
+};
+const capturedHostedLayout = captureWorkspaceLayout(hostedSourceState);
+assert.equal(capturedHostedLayout.projectHostPaneID, "utility:saved:saved-2");
+const hostedDestinationState = {};
+applyWorkspaceLayout(hostedDestinationState, capturedHostedLayout);
+assert.equal(hostedDestinationState.projectHostPaneID, "utility:saved:saved-2");
+const duplicatedHosted = duplicateWorkspace(registry, created.workspace.id, capturedHostedLayout, options);
+assert.equal(duplicatedHosted.layout.projectHostPaneID, "utility:saved:saved-2");
 
 const activeBeforeDelete = registry.activeWorkspaceID;
 const deletion = deleteWorkspace(registry, activeBeforeDelete, options);
