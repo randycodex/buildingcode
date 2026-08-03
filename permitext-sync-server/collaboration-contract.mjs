@@ -12,6 +12,14 @@ export const projectReviewKinds = Object.freeze([
   "missing-project-fact"
 ]);
 
+/** User-facing Code Question request types (v2); mapped onto legacy kinds. */
+export const projectReviewRequestTypes = Object.freeze([
+  "fact-request",
+  "evidence-review",
+  "interpretation-review",
+  "revision-request"
+]);
+
 export const projectReviewStatuses = Object.freeze([
   "open",
   "waiting",
@@ -24,12 +32,55 @@ export const projectReviewTargetKinds = Object.freeze([
   "researchAnswer",
   "evidenceReview",
   "reportDraft",
-  "notebookCard"
+  "notebookCard",
+  "codeQuestion",
+  "questionInput",
+  "questionEvidenceSet",
+  "questionAnalysis",
+  "professionalConclusion",
+  "codeMemoDraft"
 ]);
 
 const reviewKindSet = new Set(projectReviewKinds);
+const reviewRequestTypeSet = new Set(projectReviewRequestTypes);
 const reviewStatusSet = new Set(projectReviewStatuses);
 const reviewTargetKindSet = new Set(projectReviewTargetKinds);
+
+/**
+ * Map a Code Question requestType onto a stored legacy kind for old clients.
+ * Unknown request types throw; missing requestType is allowed (legacy threads).
+ */
+export function reviewRequestTypeToKind(requestType) {
+  switch (String(requestType || "").trim()) {
+    case "fact-request":
+      return "missing-project-fact";
+    case "revision-request":
+      return "revision-request";
+    case "evidence-review":
+    case "interpretation-review":
+      return "general-review";
+    case "":
+      return null;
+    default:
+      throw new Error("Invalid review request type.");
+  }
+}
+
+/**
+ * Infer requestType from a legacy kind when requestType was not stored.
+ */
+export function legacyKindToRequestType(kind) {
+  switch (String(kind || "").trim().toLowerCase()) {
+    case "missing-project-fact":
+      return "fact-request";
+    case "revision-request":
+      return "revision-request";
+    case "general-review":
+      return "interpretation-review";
+    default:
+      return null;
+  }
+}
 
 function requiredText(value, field, maximum = 512) {
   const normalized = String(value || "").trim();
@@ -124,6 +175,7 @@ export function normalizeProjectNotePayload({
 export function normalizeReviewThreadPayload({
   projectID,
   kind = "general-review",
+  requestType = null,
   status = "open",
   targetKind = "project",
   targetID = projectID,
@@ -139,11 +191,42 @@ export function normalizeReviewThreadPayload({
   resolvedByDisplayName = "",
   resolvedAt = null,
   resolution = null,
-  allowLegacyResolvedWithoutResolution = false
+  allowLegacyResolvedWithoutResolution = false,
+  questionID = null,
+  reviewRound = 1
 }) {
-  const normalizedKind = requiredText(kind, "review kind", 64).toLowerCase();
+  const rawRequestType = requestType === null || requestType === undefined || requestType === ""
+    ? null
+    : requiredText(requestType, "review request type", 64).toLowerCase();
+  if (rawRequestType && !reviewRequestTypeSet.has(rawRequestType)) {
+    throw new Error("Invalid review request type.");
+  }
+  // Prefer an explicit kind for validation so invalid kinds still fail even if a
+  // prior payload carried requestType (e.g. spread of a normalized thread).
+  // When kind is omitted, derive it from requestType for new clients.
+  const kindProvided = kind !== null && kind !== undefined && String(kind).trim() !== "";
+  let normalizedKind;
+  if (kindProvided) {
+    normalizedKind = requiredText(kind, "review kind", 64).toLowerCase();
+  } else if (rawRequestType) {
+    normalizedKind = reviewRequestTypeToKind(rawRequestType);
+  } else {
+    normalizedKind = "general-review";
+  }
   if (!reviewKindSet.has(normalizedKind)) throw new Error("Invalid review kind.");
+  if (rawRequestType) {
+    const mappedKind = reviewRequestTypeToKind(rawRequestType);
+    if (mappedKind !== normalizedKind) {
+      throw new Error("Review requestType does not match kind.");
+    }
+  }
+  // Old clients may omit requestType; new clients may send it. Never coerce unknown kinds.
+  const resolvedRequestType = rawRequestType || legacyKindToRequestType(normalizedKind);
   const normalizedStatus = requiredText(status, "review status", 32).toLowerCase();
+  // Reopen is an action → open; never store status "reopened".
+  if (normalizedStatus === "reopened") {
+    throw new Error("Invalid review status; use open after a reopen action.");
+  }
   if (!reviewStatusSet.has(normalizedStatus)) throw new Error("Invalid review status.");
   const normalizedTargetKind = requiredText(targetKind, "review target kind", 64);
   if (!reviewTargetKindSet.has(normalizedTargetKind)) {
@@ -158,7 +241,7 @@ export function normalizeReviewThreadPayload({
   ) {
     throw new Error("A resolution statement is required to resolve a coordination thread.");
   }
-  return {
+  const payload = {
     schemaVersion: collaborationSchemaVersion,
     projectID: requiredText(projectID, "Project ID", 256),
     kind: normalizedKind,
@@ -183,6 +266,31 @@ export function normalizeReviewThreadPayload({
       ? requiredISO(resolvedAt, "review resolution date")
       : null,
     resolution: normalizedStatus === "resolved" ? normalizedResolution || null : null
+  };
+  // Additive v2 fields: older readers preserve-and-ignore unknown keys if they freeze known shapes.
+  if (resolvedRequestType) payload.requestType = resolvedRequestType;
+  if (questionID) payload.questionID = requiredText(questionID, "question ID", 256);
+  if (reviewRound != null && reviewRound !== undefined) {
+    const round = Number(reviewRound);
+    if (!Number.isSafeInteger(round) || round < 1) throw new Error("Invalid review round.");
+    payload.reviewRound = round;
+  }
+  return payload;
+}
+
+/**
+ * Adapter: read a stored thread for a new client without rewriting storage.
+ * Does not mutate the input object.
+ */
+export function reviewThreadForClient(payload) {
+  if (!payload || typeof payload !== "object") return payload;
+  const requestType = payload.requestType || legacyKindToRequestType(payload.kind);
+  return {
+    ...payload,
+    requestType: requestType || null,
+    reviewRound: Number.isSafeInteger(Number(payload.reviewRound))
+      ? Number(payload.reviewRound)
+      : 1
   };
 }
 

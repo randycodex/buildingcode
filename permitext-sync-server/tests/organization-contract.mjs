@@ -46,6 +46,11 @@ assert.equal(roleAllows("editor", organizationPermissions.projectReviewRequest),
 assert.equal(roleAllows("reviewer", organizationPermissions.projectReviewRequest), true);
 assert.equal(roleAllows("reviewer", organizationPermissions.projectReviewResolve), true);
 assert.equal(roleAllows("viewer", organizationPermissions.projectReviewComment), false);
+assert.equal(roleAllows("owner", organizationPermissions.codeQuestionIssue), true);
+assert.equal(roleAllows("editor", organizationPermissions.codeQuestionEdit), true);
+assert.equal(roleAllows("editor", organizationPermissions.codeQuestionIssue), false);
+assert.equal(roleAllows("reviewer", organizationPermissions.codeQuestionEvidenceApprove), true);
+assert.equal(roleAllows("viewer", organizationPermissions.codeQuestionEdit), false);
 
 const credentials = invitationToken();
 const invitation = organizationInvitationRecord({

@@ -37,7 +37,14 @@ export const artifactTypes = Object.freeze([
   "generatedReport",
   "evidenceReview",
   "reviewThread",
-  "reviewComment"
+  "reviewComment",
+  "codeQuestion",
+  "questionInput",
+  "evidenceSnapshotV2",
+  "questionEvidenceSet",
+  "questionAnalysis",
+  "professionalConclusion",
+  "issuedDecisionRecord"
 ]);
 
 export const projectTargetKinds = Object.freeze([
@@ -58,7 +65,14 @@ export const projectTargetKinds = Object.freeze([
   "generatedReport",
   "evidenceReview",
   "reviewThread",
-  "reviewComment"
+  "reviewComment",
+  "codeQuestion",
+  "questionInput",
+  "evidenceSnapshotV2",
+  "questionEvidenceSet",
+  "questionAnalysis",
+  "professionalConclusion",
+  "issuedDecisionRecord"
 ]);
 
 export const projectMembershipRules = Object.freeze({
@@ -79,7 +93,14 @@ export const projectMembershipRules = Object.freeze({
   generatedReport: { maximumProjects: 1, relationship: "owner" },
   evidenceReview: { maximumProjects: 1, relationship: "reference" },
   reviewThread: { maximumProjects: 1, relationship: "owner" },
-  reviewComment: { maximumProjects: 1, relationship: "reference" }
+  reviewComment: { maximumProjects: 1, relationship: "reference" },
+  codeQuestion: { maximumProjects: 1, relationship: "owner" },
+  questionInput: { maximumProjects: 1, relationship: "owner" },
+  evidenceSnapshotV2: { maximumProjects: null, requiresExplicitLink: true },
+  questionEvidenceSet: { maximumProjects: 1, relationship: "owner" },
+  questionAnalysis: { maximumProjects: 1, relationship: "owner" },
+  professionalConclusion: { maximumProjects: 1, relationship: "owner" },
+  issuedDecisionRecord: { maximumProjects: 1, relationship: "owner" }
 });
 
 export const conflictPolicies = Object.freeze({
@@ -101,7 +122,14 @@ export const conflictPolicies = Object.freeze({
   reviewThread: "explicit-revision",
   reviewComment: "immutable",
   activityEvent: "append-only",
-  projectLink: "latest-explicit-link-state"
+  projectLink: "latest-explicit-link-state",
+  codeQuestion: "explicit-revision",
+  questionInput: "explicit-revision",
+  evidenceSnapshotV2: "immutable",
+  questionEvidenceSet: "immutable",
+  questionAnalysis: "immutable",
+  professionalConclusion: "immutable",
+  issuedDecisionRecord: "immutable"
 });
 
 export const activityActions = Object.freeze([
@@ -130,7 +158,27 @@ export const activityActions = Object.freeze([
   "project.restored",
   "project.transferred",
   "member.invited",
-  "permission.changed"
+  "permission.changed",
+  "code-question.created",
+  "code-question.archived",
+  "code-question.restored",
+  "code-question.input.confirmed",
+  "code-question.input.disputed",
+  "code-question.input.revised",
+  "code-question.evidence.approved",
+  "code-question.evidence.removed",
+  "code-question.evidence.stale",
+  "code-question.analysis.generated",
+  "code-question.analysis.stale",
+  "code-question.conclusion.revised",
+  "code-question.conclusion.approved",
+  "code-question.review.opened",
+  "code-question.review.assigned",
+  "code-question.review.resolved",
+  "code-question.review.reopened",
+  "code-question.record.issued",
+  "code-question.record.superseded",
+  "code-question.migration.promoted"
 ]);
 
 const artifactTypeSet = new Set(artifactTypes);

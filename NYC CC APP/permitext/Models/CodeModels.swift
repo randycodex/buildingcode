@@ -1884,6 +1884,21 @@ struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
     let updatedByUserID: String?
     let reviewedByUserID: String?
     let reviewedAt: String?
+    // Code Question workspace (Phase 1): optional fields so new records decode
+    // without discarding the whole foundation payload. Unknown envelope types
+    // remain String-typed and unknown JSON keys are ignored by Codable.
+    let displayID: String?
+    let questionNumber: Int?
+    let questionText: String?
+    let questionID: String?
+    let recordState: String?
+    let definitionRevision: Int?
+    let requestType: String?
+    let reviewRound: Int?
+    let issueVersion: Int?
+    let reportManifestID: String?
+    let inputKind: String?
+    let statement: String?
 }
 
 struct ProjectFoundationArtifact: Codable, Hashable, Identifiable, Sendable {

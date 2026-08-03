@@ -1570,7 +1570,7 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 | --- | --- | --- | --- | --- |
 | Plan creation | Complete | `468f7e306` docs: plan Code Question workspace reorganization | Repository/roadmap/architecture/Stitch audits; Markdown checks | Plan only |
 | 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; `f5a4db822` feat scaffolding; `67476772f` ledger commit ID | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
-| 1 — Contracts, storage, permissions, migration | Not started | — | — | Next: storage, handlers, adapters behind disabled flag |
+| 1 — Contracts, storage, permissions, migration | Complete (branch) | See Git history on `codex/code-question-workspace` after Phase 1 commit | `npm run check` / `smoke` / `test:code-question` (includes phase1); CAS/counters/issuance saga/migration/adapters/permissions covered | Domain + handlers gated by disabled flag; no primary UI change; iOS decode preserves new optional fields |
 | 2 — Project and Question workspace shell | Not started | — | — | — |
 | 3 — Define | Not started | — | — | — |
 | 4 — Evidence | Not started | — | — | — |
@@ -1584,7 +1584,8 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 ### Current handoff state
 
 - Branch: `codex/code-question-workspace` (from `468f7e306` on `codex/project-state-flicker-fixes`).
-- Phase 0 delivered: disabled `permitext:codeQuestionWorkspace` / `code-question-workspace` capability; `code-question-contract.mjs` pure domain scaffolding; synthetic lifecycle fixtures; Stitch Keep/Adapt/Reject matrix; eight ADRs under `docs/code-question/adrs/`; focused contract tests wired into check/smoke.
+- Phase 0 delivered: disabled capability flag, pure contracts, fixtures, ADRs, baseline tests.
+- Phase 1 delivered: foundation artifact kinds/targets/activity; organization CQ permissions; collaboration `requestType` adapters; Report Draft v2 / Manifest v3 adapters; `code-question-commands.mjs` (CAS, counters, issuance saga, outbox, migration); gated server routes under `projects/code-questions/*`; file + Postgres storage ports; iOS optional payload fields + decode test; phase1 contract tests. Capability remains **default disabled** (`PERMITEXT_CODE_QUESTION_WORKSPACE=1` to enable).
 - No visible product navigation reorganization; no tool deletion; no production deploy.
 - Unrelated untracked `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` must remain unstaged.
-- Next authorized work: **Phase 1** (storage, permissions, migrations, server handlers) with capability still default-disabled.
+- Next authorized work: **Phase 2** (Project/Question workspace shell UI) with capability still default-disabled until opt-in.

@@ -1,8 +1,12 @@
 import { createHash, randomUUID } from "node:crypto";
 
 export const reportDraftSchemaVersion = 1;
+export const reportDraftSchemaVersionV2 = 2;
 export const reportManifestSchemaVersion = 2;
+export const reportManifestSchemaVersionV3 = 3;
 export const reportGeneratorVersion = "permitext-report-v2";
+export const reportGeneratorVersionV3 = "permitext-report-v3";
+export const codeDecisionMemoRecordType = "codeDecisionMemo";
 
 const unavailableReportEvidenceCodes = new Set([
   "ENOENT",
@@ -187,6 +191,108 @@ export function normalizeReportDraftPayload({
   };
 }
 
+/**
+ * Report Draft v2 for typed Code Decision Memos (and future typed drafts).
+ * Does not mutate stored v1 payloads — callers must store v2 as a distinct revision.
+ */
+export function normalizeReportDraftPayloadV2({
+  title,
+  reportDate,
+  introduction = "",
+  blocks,
+  createdBy,
+  updatedBy,
+  recordType = codeDecisionMemoRecordType,
+  questionID,
+  projectID = null,
+  draftRevision = 1,
+  codeMemo = null
+}) {
+  const base = normalizeReportDraftPayload({
+    title,
+    reportDate,
+    introduction,
+    blocks,
+    createdBy,
+    updatedBy
+  });
+  const normalizedRecordType = requiredText(recordType, "Report record type", 64);
+  if (normalizedRecordType === codeDecisionMemoRecordType && !questionID) {
+    throw new Error("Code Decision Memo drafts require a questionID.");
+  }
+  return {
+    ...base,
+    schemaVersion: reportDraftSchemaVersionV2,
+    recordType: normalizedRecordType,
+    questionID: questionID
+      ? requiredText(questionID, "Code Question ID", 256)
+      : null,
+    projectID: projectID
+      ? requiredText(projectID, "Project ID", 256)
+      : null,
+    draftRevision: positiveInteger(draftRevision, "draft revision"),
+    codeMemo: codeMemo && typeof codeMemo === "object" && !Array.isArray(codeMemo)
+      ? {
+          conclusionRevision: codeMemo.conclusionRevision == null
+            ? null
+            : positiveInteger(codeMemo.conclusionRevision, "conclusion revision"),
+          evidenceSetVersion: codeMemo.evidenceSetVersion == null
+            ? null
+            : positiveInteger(codeMemo.evidenceSetVersion, "evidence set version"),
+          definitionRevision: codeMemo.definitionRevision == null
+            ? null
+            : positiveInteger(codeMemo.definitionRevision, "definition revision"),
+          analysisRunID: codeMemo.analysisRunID
+            ? requiredText(codeMemo.analysisRunID, "analysis run ID", 256)
+            : null,
+          readinessState: optionalText(codeMemo.readinessState, 64) || null
+        }
+      : null
+  };
+}
+
+/**
+ * Adapter: lift a stored v1 draft view to a v2-shaped object without rewriting storage.
+ * Never mutates the input.
+ */
+export function adaptReportDraftV1ToV2View(v1Payload, extras = {}) {
+  if (!v1Payload || typeof v1Payload !== "object") {
+    throw new Error("Invalid Report Draft payload.");
+  }
+  if (Number(v1Payload.schemaVersion) === reportDraftSchemaVersionV2) {
+    return { ...v1Payload };
+  }
+  if (Number(v1Payload.schemaVersion) !== reportDraftSchemaVersion) {
+    throw new Error("Unsupported Report Draft schema version.");
+  }
+  return {
+    ...v1Payload,
+    schemaVersion: reportDraftSchemaVersionV2,
+    recordType: extras.recordType || "genericReport",
+    questionID: extras.questionID || null,
+    projectID: extras.projectID || null,
+    draftRevision: extras.draftRevision || 1,
+    codeMemo: extras.codeMemo || null,
+    adaptedFromSchemaVersion: reportDraftSchemaVersion
+  };
+}
+
+/**
+ * Strip unknown v2 fields when presenting to a v1-only client (does not rewrite storage).
+ */
+export function reportDraftV1CompatibleView(payload) {
+  if (!payload || typeof payload !== "object") return payload;
+  return {
+    schemaVersion: reportDraftSchemaVersion,
+    title: payload.title,
+    reportDate: payload.reportDate,
+    introduction: payload.introduction,
+    blocks: payload.blocks,
+    createdBy: payload.createdBy,
+    updatedBy: payload.updatedBy
+  };
+}
+
 export function reportDraftForClient(artifact, projectIDs = []) {
   return {
     id: artifact.envelope.id,
@@ -335,6 +441,144 @@ export function immutableReportManifest({
   return {
     ...normalized,
     contentHash: createHash("sha256").update(stableReportJSON(normalized)).digest("hex")
+  };
+}
+
+/**
+ * Report Manifest v3 for Code Question issued records.
+ * Retains all v2 fields and adds question snapshot + lineage metadata.
+ * Never mutates stored v1/v2 manifests — create a new immutable v3 record.
+ */
+export function immutableReportManifestV3({
+  id = randomUUID(),
+  project,
+  draftID,
+  title,
+  reportDate,
+  author,
+  codeEdition,
+  items,
+  disclaimers,
+  presentation = null,
+  reportVersion,
+  sourceVersions,
+  createdAt = new Date().toISOString(),
+  questionSnapshot,
+  evidenceSetIdentity = null,
+  conclusionRevision = null,
+  approval = null,
+  issueLineage = null,
+  evidenceRoles = null
+}) {
+  const base = immutableReportManifest({
+    id,
+    project,
+    draftID,
+    title,
+    reportDate,
+    author,
+    codeEdition,
+    items,
+    disclaimers,
+    presentation,
+    reportVersion,
+    sourceVersions,
+    createdAt
+  });
+  // Rebuild without v2 contentHash so v3 hash covers the extended body.
+  const {
+    contentHash: _ignored,
+    schemaVersion: _sv,
+    generatorVersion: _gv,
+    ...rest
+  } = base;
+  const normalized = {
+    ...rest,
+    immutable: true,
+    schemaVersion: reportManifestSchemaVersionV3,
+    generatorVersion: reportGeneratorVersionV3,
+    questionSnapshot: {
+      questionID: requiredText(questionSnapshot?.questionID, "question snapshot ID", 256),
+      displayID: requiredText(questionSnapshot?.displayID, "question display ID", 32),
+      title: requiredText(questionSnapshot?.title, "question title", 240),
+      questionText: requiredText(questionSnapshot?.questionText, "question text", 8_000),
+      definitionRevision: positiveInteger(
+        questionSnapshot?.definitionRevision,
+        "definition revision"
+      ),
+      definitionHash: requiredText(questionSnapshot?.definitionHash, "definition hash", 128)
+    },
+    evidenceSetIdentity: evidenceSetIdentity
+      ? {
+          evidenceSetID: requiredText(evidenceSetIdentity.evidenceSetID, "evidence set ID", 256),
+          version: positiveInteger(evidenceSetIdentity.version, "evidence set version"),
+          contentHash: requiredText(evidenceSetIdentity.contentHash, "evidence set hash", 128)
+        }
+      : null,
+    conclusionRevision: conclusionRevision == null
+      ? null
+      : positiveInteger(conclusionRevision, "conclusion revision"),
+    approval: approval
+      ? {
+          actorUserID: requiredText(approval.actorUserID, "approval actor", 256),
+          approvedAt: requiredISO(approval.approvedAt, "approval date"),
+          basis: optionalText(approval.basis, 4_000)
+        }
+      : null,
+    issueLineage: issueLineage
+      ? {
+          issueVersion: positiveInteger(issueLineage.issueVersion, "issue version"),
+          predecessorID: issueLineage.predecessorID
+            ? requiredText(issueLineage.predecessorID, "predecessor ID", 256)
+            : null,
+          successorID: issueLineage.successorID
+            ? requiredText(issueLineage.successorID, "successor ID", 256)
+            : null
+        }
+      : null,
+    evidenceRoles: Array.isArray(evidenceRoles)
+      ? evidenceRoles.map((entry) => ({
+          snapshotID: requiredText(entry.snapshotID, "evidence role snapshot ID", 256),
+          role: requiredText(entry.role, "evidence role", 32),
+          analysisEligible: entry.analysisEligible === true,
+          qualification: optionalText(entry.qualification, 2_000),
+          projectApplicabilityNote: optionalText(entry.projectApplicabilityNote, 2_000)
+        }))
+      : null
+  };
+  return {
+    ...normalized,
+    contentHash: createHash("sha256").update(stableReportJSON(normalized)).digest("hex")
+  };
+}
+
+/**
+ * Reader adapter for mixed v1/v2/v3 manifests without mutating storage.
+ */
+export function reportManifestForClient(manifest) {
+  if (!manifest || typeof manifest !== "object") return manifest;
+  const version = Number(manifest.schemaVersion) || reportManifestSchemaVersion;
+  return {
+    ...manifest,
+    schemaVersion: version,
+    isCodeQuestionManifest: version >= reportManifestSchemaVersionV3 &&
+      Boolean(manifest.questionSnapshot?.questionID)
+  };
+}
+
+/**
+ * v1/v2-compatible summary that drops v3-only fields for older clients (view only).
+ */
+export function reportManifestV2CompatibleView(manifest) {
+  if (!manifest || typeof manifest !== "object") return manifest;
+  const summary = reportManifestSummary({
+    ...manifest,
+    schemaVersion: reportManifestSchemaVersion,
+    generatorVersion: manifest.generatorVersion || reportGeneratorVersion
+  });
+  return {
+    ...summary,
+    schemaVersion: Math.min(Number(manifest.schemaVersion) || 2, reportManifestSchemaVersion)
   };
 }
 

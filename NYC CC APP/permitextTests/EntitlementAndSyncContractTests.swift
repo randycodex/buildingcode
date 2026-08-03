@@ -1200,4 +1200,82 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(thread.envelope.type, "reviewThread")
         XCTAssertEqual(thread.payload.status, "waiting")
     }
+
+    func testProjectFoundationPreservesCodeQuestionArtifactWithoutCrashing() throws {
+        let data = Data(
+            """
+            {
+              "schemaVersion": 1,
+              "projects": [],
+              "links": [],
+              "artifacts": [{
+                "envelope": {
+                  "id": "cq-1",
+                  "type": "codeQuestion",
+                  "createdAt": "2026-08-03T12:00:00.000Z",
+                  "updatedAt": "2026-08-03T12:00:00.000Z",
+                  "deletedAt": null,
+                  "version": 1
+                },
+                "payload": {
+                  "schemaVersion": 1,
+                  "projectID": "project-1",
+                  "displayID": "Q-001",
+                  "questionNumber": 1,
+                  "title": "Synthetic corridor width",
+                  "questionText": "What minimum clear width applies in this synthetic fixture?",
+                  "recordState": "active",
+                  "definitionRevision": 1,
+                  "futureUnknownField": "must-not-break-decode"
+                }
+              }, {
+                "envelope": {
+                  "id": "review-1",
+                  "type": "reviewThread",
+                  "createdAt": "2026-08-03T13:00:00.000Z",
+                  "updatedAt": "2026-08-03T13:00:00.000Z",
+                  "deletedAt": null,
+                  "version": 1
+                },
+                "payload": {
+                  "schemaVersion": 2,
+                  "projectID": "project-1",
+                  "kind": "general-review",
+                  "requestType": "interpretation-review",
+                  "status": "open",
+                  "targetKind": "professionalConclusion",
+                  "targetID": "conclusion-1",
+                  "questionID": "cq-1",
+                  "reviewRound": 1,
+                  "title": "Interpret exception",
+                  "body": "Please confirm applicability.",
+                  "createdByUserID": "reviewer-1",
+                  "updatedByUserID": "reviewer-1"
+                }
+              }],
+              "researchConversations": [],
+              "researchAnswers": [],
+              "activity": [],
+              "workboardPreview": null
+            }
+            """.utf8
+        )
+
+        let response = try JSONDecoder().decode(
+            BackendProjectFoundationResponse.self,
+            from: data
+        )
+
+        XCTAssertEqual(response.artifacts?.count, 2)
+        let question = try XCTUnwrap(response.artifacts?.first { $0.envelope.type == "codeQuestion" })
+        XCTAssertEqual(question.payload.displayID, "Q-001")
+        XCTAssertEqual(question.payload.questionNumber, 1)
+        XCTAssertEqual(question.payload.recordState, "active")
+        XCTAssertEqual(question.payload.questionText?.contains("synthetic fixture"), true)
+
+        let review = try XCTUnwrap(response.artifacts?.first { $0.envelope.type == "reviewThread" })
+        XCTAssertEqual(review.payload.requestType, "interpretation-review")
+        XCTAssertEqual(review.payload.questionID, "cq-1")
+        XCTAssertEqual(review.payload.reviewRound, 1)
+    }
 }

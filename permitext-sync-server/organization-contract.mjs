@@ -45,7 +45,17 @@ export const organizationPermissions = Object.freeze({
   projectTransfer: "project.transfer",
   evidencePropose: "evidence.propose",
   evidenceReview: "evidence.review",
-  reportDownload: "report.download"
+  reportDownload: "report.download",
+  /** Code Question workspace permissions (Phase 1). */
+  codeQuestionEdit: "code-question.edit",
+  codeQuestionEvidencePropose: "code-question.evidence.propose",
+  codeQuestionEvidenceApprove: "code-question.evidence.approve",
+  codeQuestionAnalyze: "code-question.analyze",
+  codeQuestionConclusionDraft: "code-question.conclusion.draft",
+  codeQuestionConclusionApprove: "code-question.conclusion.approve",
+  codeQuestionReview: "code-question.review",
+  codeQuestionIssue: "code-question.issue",
+  codeQuestionSupersede: "code-question.supersede"
 });
 
 export const organizationRolePermissions = Object.freeze({
@@ -58,7 +68,12 @@ export const organizationRolePermissions = Object.freeze({
     organizationPermissions.projectReviewComment,
     organizationPermissions.projectReviewRequest,
     organizationPermissions.evidencePropose,
-    organizationPermissions.reportDownload
+    organizationPermissions.reportDownload,
+    organizationPermissions.codeQuestionEdit,
+    organizationPermissions.codeQuestionEvidencePropose,
+    organizationPermissions.codeQuestionAnalyze,
+    organizationPermissions.codeQuestionConclusionDraft,
+    organizationPermissions.codeQuestionReview
   ]),
   reviewer: Object.freeze([
     organizationPermissions.organizationView,
@@ -68,7 +83,10 @@ export const organizationRolePermissions = Object.freeze({
     organizationPermissions.projectReviewRequest,
     organizationPermissions.projectReviewResolve,
     organizationPermissions.evidenceReview,
-    organizationPermissions.reportDownload
+    organizationPermissions.reportDownload,
+    organizationPermissions.codeQuestionEvidenceApprove,
+    organizationPermissions.codeQuestionConclusionApprove,
+    organizationPermissions.codeQuestionReview
   ]),
   viewer: Object.freeze([
     organizationPermissions.organizationView,

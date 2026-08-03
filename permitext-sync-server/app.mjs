@@ -66,6 +66,35 @@ import {
   syncContract
 } from "./project-foundation-contract.mjs";
 import {
+  allocateQuestionNumber,
+  allocateScopedVersion,
+  archiveCodeQuestionArtifact,
+  assertCodeQuestionPermission,
+  assertCodeQuestionWorkspaceEnabled,
+  CodeQuestionCommandError,
+  codeQuestionMigrationCheckpointName,
+  codeQuestionWorkspaceFeatureEnabled,
+  compareAndSwapFoundationArtifact,
+  createCodeQuestionArtifact,
+  createConclusionArtifact,
+  createEvidenceSetArtifact,
+  createEvidenceSnapshotArtifact,
+  createIssuedRecordArtifact,
+  createPendingIssuanceRecord,
+  createQuestionInputArtifact,
+  createQuestionOutboxEntry,
+  linkForArtifact,
+  activityFor,
+  permissionForCommand,
+  restoreCodeQuestionArtifact,
+  runCodeQuestionBootstrapMigration,
+  advanceIssuanceSaga
+} from "./code-question-commands.mjs";
+import {
+  formatQuestionDisplayID,
+  isCodeQuestionWorkspaceEnabled
+} from "./code-question-contract.mjs";
+import {
   notebookCardTypes,
   normalizeNotebookCardPayload
 } from "./notebook-contract.mjs";
@@ -256,7 +285,10 @@ const emptyStore = () => ({
   organizationMembershipsByOrganizationID: {},
   organizationInvitationsByID: {},
   projectOwnerships: {},
-  projectMembershipsByProjectID: {}
+  projectMembershipsByProjectID: {},
+  codeQuestionCountersByUserID: {},
+  codeQuestionPendingIssuanceByUserID: {},
+  codeQuestionOutboxByUserID: {}
 });
 
 const allowedMutationKinds = new Set([
@@ -621,6 +653,71 @@ function createFileStoreAdapter() {
       store.foundationArtifactsByUserID[userID] = entries;
       await this.write(store);
       return artifact;
+    },
+    async saveFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
+      const store = await this.read();
+      store.foundationArtifactsByUserID ||= {};
+      const entries = store.foundationArtifactsByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
+      const existing = index === -1 ? null : entries[index];
+      const next = compareAndSwapFoundationArtifact(existing, artifact, expectedVersion);
+      if (existing && next === existing) {
+        return existing;
+      }
+      if (index === -1) entries.push(next);
+      else entries[index] = next;
+      store.foundationArtifactsByUserID[userID] = entries;
+      await this.write(store);
+      return next;
+    },
+    async allocateCodeQuestionCounter(userID, scope, scopeKey) {
+      const store = await this.read();
+      store.codeQuestionCountersByUserID ||= {};
+      const userCounters = store.codeQuestionCountersByUserID[userID] || {};
+      const scopeMap = userCounters[scope] || {};
+      let result;
+      if (scope === "questionNumber") {
+        result = allocateQuestionNumber(scopeMap, scopeKey);
+        userCounters[scope] = result.counters;
+        store.codeQuestionCountersByUserID[userID] = userCounters;
+        await this.write(store);
+        return { value: result.questionNumber };
+      }
+      result = allocateScopedVersion(scopeMap, scopeKey);
+      userCounters[scope] = result.scopes;
+      store.codeQuestionCountersByUserID[userID] = userCounters;
+      await this.write(store);
+      return { value: result.version };
+    },
+    async listCodeQuestionPendingIssuance(userID) {
+      const store = await this.read();
+      return (store.codeQuestionPendingIssuanceByUserID?.[userID] || []).slice();
+    },
+    async saveCodeQuestionPendingIssuance(userID, record) {
+      const store = await this.read();
+      store.codeQuestionPendingIssuanceByUserID ||= {};
+      const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.id === record.id);
+      if (index === -1) entries.push(record);
+      else entries[index] = record;
+      store.codeQuestionPendingIssuanceByUserID[userID] = entries;
+      await this.write(store);
+      return record;
+    },
+    async listCodeQuestionOutbox(userID) {
+      const store = await this.read();
+      return (store.codeQuestionOutboxByUserID?.[userID] || []).slice();
+    },
+    async saveCodeQuestionOutboxEntry(userID, entry) {
+      const store = await this.read();
+      store.codeQuestionOutboxByUserID ||= {};
+      const entries = store.codeQuestionOutboxByUserID[userID] || [];
+      const index = entries.findIndex((item) => item.id === entry.id);
+      if (index === -1) entries.push(entry);
+      else entries[index] = entry;
+      store.codeQuestionOutboxByUserID[userID] = entries;
+      await this.write(store);
+      return entry;
     },
     async listProjectLinks(userID) {
       const store = await this.read();
@@ -2509,6 +2606,153 @@ async function createPostgresStoreAdapter() {
       `;
       return artifact;
     },
+    async saveFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
+      await ensureSchema();
+      const existingRows = await sql`
+        SELECT envelope, payload
+        FROM permitext_foundation_artifacts
+        WHERE user_id = ${userID} AND id = ${artifact.envelope.id}
+        LIMIT 1
+      `;
+      const existing = existingRows[0]
+        ? {
+            envelope: safeJSON(existingRows[0].envelope, {}),
+            payload: safeJSON(existingRows[0].payload, {})
+          }
+        : null;
+      const next = compareAndSwapFoundationArtifact(existing, artifact, expectedVersion);
+      if (existing && next === existing) return existing;
+      const envelope = next.envelope;
+      if (!existing) {
+        await sql`
+          INSERT INTO permitext_foundation_artifacts (
+            id, user_id, artifact_type, envelope, payload,
+            created_at, updated_at, archived_at, deleted_at
+          )
+          VALUES (
+            ${envelope.id}, ${userID}, ${envelope.type},
+            ${JSON.stringify(envelope)}::jsonb, ${JSON.stringify(next.payload || {})}::jsonb,
+            ${envelope.createdAt}::timestamptz, ${envelope.updatedAt}::timestamptz,
+            ${envelope.archivedAt}::timestamptz, ${envelope.deletedAt}::timestamptz
+          )
+        `;
+        return next;
+      }
+      const rows = await sql`
+        UPDATE permitext_foundation_artifacts
+        SET
+          artifact_type = ${envelope.type},
+          envelope = ${JSON.stringify(envelope)}::jsonb,
+          payload = ${JSON.stringify(next.payload || {})}::jsonb,
+          updated_at = ${envelope.updatedAt}::timestamptz,
+          archived_at = ${envelope.archivedAt}::timestamptz,
+          deleted_at = ${envelope.deletedAt}::timestamptz
+        WHERE user_id = ${userID}
+          AND id = ${envelope.id}
+          AND (envelope->>'version')::int = ${Number(expectedVersion)}
+        RETURNING id
+      `;
+      if (!rows.length) {
+        throw new CodeQuestionCommandError(
+          "This Code Question record changed after you opened it.",
+          { code: "CODE_QUESTION_VERSION_CONFLICT", status: 409 }
+        );
+      }
+      return next;
+    },
+    async allocateCodeQuestionCounter(userID, scope, scopeKey) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_counters (
+          user_id TEXT NOT NULL,
+          scope TEXT NOT NULL,
+          scope_key TEXT NOT NULL,
+          value INTEGER NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          PRIMARY KEY (user_id, scope, scope_key)
+        )
+      `;
+      const rows = await sql`
+        INSERT INTO permitext_code_question_counters (user_id, scope, scope_key, value, updated_at)
+        VALUES (${userID}, ${scope}, ${scopeKey}, 1, now())
+        ON CONFLICT (user_id, scope, scope_key) DO UPDATE SET
+          value = permitext_code_question_counters.value + 1,
+          updated_at = now()
+        RETURNING value
+      `;
+      return { value: Number(rows[0].value) };
+    },
+    async listCodeQuestionPendingIssuance(userID) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_pending_issuance (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          record JSONB NOT NULL DEFAULT '{}'::jsonb,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `;
+      const rows = await sql`
+        SELECT record FROM permitext_code_question_pending_issuance
+        WHERE user_id = ${userID}
+      `;
+      return rows.map((row) => safeJSON(row.record, {}));
+    },
+    async saveCodeQuestionPendingIssuance(userID, record) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_pending_issuance (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          record JSONB NOT NULL DEFAULT '{}'::jsonb,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `;
+      await sql`
+        INSERT INTO permitext_code_question_pending_issuance (id, user_id, record, updated_at)
+        VALUES (${record.id}, ${userID}, ${JSON.stringify(record)}::jsonb, now())
+        ON CONFLICT (id) DO UPDATE SET
+          record = EXCLUDED.record,
+          updated_at = now()
+        WHERE permitext_code_question_pending_issuance.user_id = ${userID}
+      `;
+      return record;
+    },
+    async listCodeQuestionOutbox(userID) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_outbox (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          entry JSONB NOT NULL DEFAULT '{}'::jsonb,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `;
+      const rows = await sql`
+        SELECT entry FROM permitext_code_question_outbox WHERE user_id = ${userID}
+      `;
+      return rows.map((row) => safeJSON(row.entry, {}));
+    },
+    async saveCodeQuestionOutboxEntry(userID, entry) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_outbox (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          entry JSONB NOT NULL DEFAULT '{}'::jsonb,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `;
+      await sql`
+        INSERT INTO permitext_code_question_outbox (id, user_id, entry, updated_at)
+        VALUES (${entry.id}, ${userID}, ${JSON.stringify(entry)}::jsonb, now())
+        ON CONFLICT (id) DO UPDATE SET
+          entry = EXCLUDED.entry,
+          updated_at = now()
+        WHERE permitext_code_question_outbox.user_id = ${userID}
+      `;
+      return entry;
+    },
     async listProjectLinks(userID) {
       await ensureSchema();
       const rows = await sql`
@@ -2998,6 +3242,58 @@ async function listStoredFoundationArtifacts(userID) {
 async function saveStoredFoundationArtifact(userID, artifact) {
   const adapter = await storeAdapter();
   return adapter.saveFoundationArtifact(userID, artifact);
+}
+
+async function saveStoredFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveFoundationArtifactCompareAndSwap === "function") {
+    return adapter.saveFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion);
+  }
+  const existing = (await listStoredFoundationArtifacts(userID))
+    .find((item) => item.envelope?.id === artifact.envelope?.id) || null;
+  const next = compareAndSwapFoundationArtifact(existing, artifact, expectedVersion);
+  if (existing && next === existing) return existing;
+  return saveStoredFoundationArtifact(userID, next);
+}
+
+async function allocateStoredCodeQuestionCounter(userID, scope, scopeKey) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.allocateCodeQuestionCounter === "function") {
+    return adapter.allocateCodeQuestionCounter(userID, scope, scopeKey);
+  }
+  throw new CodeQuestionCommandError("Code Question counters are unavailable.", {
+    code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+    status: 503
+  });
+}
+
+async function listStoredCodeQuestionPendingIssuance(userID) {
+  const adapter = await storeAdapter();
+  return typeof adapter.listCodeQuestionPendingIssuance === "function"
+    ? adapter.listCodeQuestionPendingIssuance(userID)
+    : [];
+}
+
+async function saveStoredCodeQuestionPendingIssuance(userID, record) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveCodeQuestionPendingIssuance === "function") {
+    return adapter.saveCodeQuestionPendingIssuance(userID, record);
+  }
+  throw new CodeQuestionCommandError("Pending issuance storage is unavailable.", {
+    code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+    status: 503
+  });
+}
+
+async function saveStoredCodeQuestionOutboxEntry(userID, entry) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.saveCodeQuestionOutboxEntry === "function") {
+    return adapter.saveCodeQuestionOutboxEntry(userID, entry);
+  }
+  throw new CodeQuestionCommandError("Code Question outbox storage is unavailable.", {
+    code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+    status: 503
+  });
 }
 
 async function listStoredProjectLinks(userID) {
@@ -14615,6 +14911,7 @@ async function syncResponseContract(userID, entitlement, body, contentMapVersion
     contentMapVersion,
     researchMonthlyLimit: monthlyResearchRequestLimit(),
     evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled(),
+    codeQuestionWorkspaceEnabled: codeQuestionWorkspaceFeatureEnabled(),
     ...organizationCapabilities,
     migrationCheckpoint: await storedMigrationCheckpoint(
       userID,
@@ -15810,6 +16107,538 @@ async function handleAppleWebCallback(request, response) {
   }
 }
 
+function sendCodeQuestionError(response, error) {
+  if (error instanceof CodeQuestionCommandError) {
+    sendJSON(response, error.status || 400, {
+      error: error.message,
+      code: error.code,
+      details: error.details || null
+    });
+    return true;
+  }
+  return false;
+}
+
+function codeQuestionEnabledForRequest(body = {}) {
+  return isCodeQuestionWorkspaceEnabled({
+    codeQuestionWorkspaceEnabled: codeQuestionWorkspaceFeatureEnabled() ||
+      body.codeQuestionWorkspaceEnabled === true
+  });
+}
+
+async function requireCodeQuestionContext(request, response, { permission = null, role = "owner" } = {}) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return null;
+  try {
+    assertCodeQuestionWorkspaceEnabled({
+      codeQuestionWorkspaceEnabled: codeQuestionEnabledForRequest(context.body)
+    });
+    if (permission) {
+      // Personal Projects act as owner; organization role may be supplied by body for tests.
+      const effectiveRole = String(context.body.organizationRole || role || "owner").trim().toLowerCase();
+      assertCodeQuestionPermission(effectiveRole, permission);
+    }
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return null;
+    throw error;
+  }
+  if (!hasActiveProEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 403, {
+      error: "Code Questions require Pro.",
+      code: "PRO_REQUIRED_PROJECTS"
+    });
+    return null;
+  }
+  return context;
+}
+
+async function handleCodeQuestionList(request, response) {
+  const context = await requireCodeQuestionContext(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  const links = (await listStoredProjectLinks(context.userID))
+    .filter((link) => !link.deletedAt && link.projectID === projectID && link.targetKind === "codeQuestion");
+  const artifacts = await listStoredFoundationArtifacts(context.userID);
+  const questions = links.map((link) => {
+    const artifact = artifacts.find((item) => item.envelope?.id === link.targetID);
+    return artifact
+      ? {
+          id: artifact.envelope.id,
+          version: artifact.envelope.version,
+          ...artifact.payload
+        }
+      : null;
+  }).filter(Boolean);
+  sendJSON(response, 200, { projectID, questions });
+}
+
+async function handleCodeQuestionCreate(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.create")
+  });
+  if (!context) return;
+  try {
+    const projectID = String(context.body.projectID || "").trim();
+    if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+      sendError(response, 404, "Project not found.");
+      return;
+    }
+    const allocated = await allocateStoredCodeQuestionCounter(
+      context.userID,
+      "questionNumber",
+      projectID
+    );
+    const now = new Date().toISOString();
+    const artifact = createCodeQuestionArtifact({
+      userID: context.userID,
+      projectID,
+      title: context.body.title,
+      questionText: context.body.questionText,
+      scope: context.body.scope,
+      desiredOutput: context.body.desiredOutput,
+      jurisdiction: context.body.jurisdiction,
+      asOfDate: context.body.asOfDate,
+      questionNumber: allocated.value,
+      createdAt: now,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    const link = linkForArtifact({
+      userID: context.userID,
+      projectID,
+      targetKind: "codeQuestion",
+      targetID: artifact.envelope.id,
+      createdAt: now
+    });
+    await saveStoredProjectLink(context.userID, link);
+    const event = activityFor({
+      userID: context.userID,
+      projectID,
+      action: "code-question.created",
+      objectKind: "codeQuestion",
+      objectID: artifact.envelope.id,
+      newStatus: "active",
+      createdAt: now
+    });
+    await saveStoredActivityEvent(context.userID, event);
+    sendJSON(response, 201, {
+      question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
+      link,
+      activity: event,
+      displayID: formatQuestionDisplayID(allocated.value)
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionArchive(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.archive")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const existing = (await listStoredFoundationArtifacts(context.userID))
+      .find((item) => item.envelope?.id === questionID && item.envelope?.type === "codeQuestion");
+    if (!existing) {
+      sendError(response, 404, "Code Question not found.");
+      return;
+    }
+    const artifact = archiveCodeQuestionArtifact(existing, {
+      userID: context.userID,
+      expectedVersion: Number(context.body.expectedVersion)
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(
+      context.userID,
+      artifact,
+      Number(context.body.expectedVersion)
+    );
+    const event = activityFor({
+      userID: context.userID,
+      projectID: artifact.payload.projectID,
+      action: "code-question.archived",
+      objectKind: "codeQuestion",
+      objectID: artifact.envelope.id,
+      previousStatus: "active",
+      newStatus: "archived"
+    });
+    await saveStoredActivityEvent(context.userID, event);
+    sendJSON(response, 200, {
+      question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
+      activity: event
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionRestore(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.restore")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const existing = (await listStoredFoundationArtifacts(context.userID))
+      .find((item) => item.envelope?.id === questionID && item.envelope?.type === "codeQuestion");
+    if (!existing) {
+      sendError(response, 404, "Code Question not found.");
+      return;
+    }
+    const artifact = restoreCodeQuestionArtifact(existing, {
+      userID: context.userID,
+      expectedVersion: Number(context.body.expectedVersion)
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(
+      context.userID,
+      artifact,
+      Number(context.body.expectedVersion)
+    );
+    const event = activityFor({
+      userID: context.userID,
+      projectID: artifact.payload.projectID,
+      action: "code-question.restored",
+      objectKind: "codeQuestion",
+      objectID: artifact.envelope.id,
+      previousStatus: "archived",
+      newStatus: "active"
+    });
+    await saveStoredActivityEvent(context.userID, event);
+    sendJSON(response, 200, {
+      question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
+      activity: event
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionInputSave(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.input.save")
+  });
+  if (!context) return;
+  try {
+    const artifact = createQuestionInputArtifact({
+      userID: context.userID,
+      questionID: context.body.questionID,
+      kind: context.body.kind || context.body.inputKind,
+      statement: context.body.statement,
+      state: context.body.state,
+      basis: context.body.basis,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    const question = (await listStoredFoundationArtifacts(context.userID))
+      .find((item) => item.envelope?.id === artifact.payload.questionID);
+    const projectID = question?.payload?.projectID || context.body.projectID;
+    if (projectID) {
+      await saveStoredProjectLink(context.userID, linkForArtifact({
+        userID: context.userID,
+        projectID,
+        targetKind: "questionInput",
+        targetID: artifact.envelope.id
+      }));
+      await saveStoredActivityEvent(context.userID, activityFor({
+        userID: context.userID,
+        projectID,
+        action: artifact.payload.inputKind === "confirmedFact"
+          ? "code-question.input.confirmed"
+          : "code-question.input.revised",
+        objectKind: "questionInput",
+        objectID: artifact.envelope.id,
+        newStatus: artifact.payload.state
+      }));
+    }
+    sendJSON(response, 201, {
+      input: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionEvidenceSnapshot(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.evidence.propose")
+  });
+  if (!context) return;
+  try {
+    const artifact = createEvidenceSnapshotArtifact({
+      userID: context.userID,
+      sourceIdentity: context.body.sourceIdentity,
+      passageLocator: context.body.passageLocator,
+      quotedText: context.body.quotedText,
+      sourceVersion: context.body.sourceVersion,
+      structuredMaterial: context.body.structuredMaterial,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    sendJSON(response, 201, {
+      snapshot: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionEvidenceSetCreate(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.evidence.approve")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const allocated = await allocateStoredCodeQuestionCounter(
+      context.userID,
+      "evidenceSetVersion",
+      questionID
+    );
+    const artifact = createEvidenceSetArtifact({
+      userID: context.userID,
+      questionID,
+      version: allocated.value,
+      entries: context.body.entries,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    const question = (await listStoredFoundationArtifacts(context.userID))
+      .find((item) => item.envelope?.id === questionID);
+    const projectID = question?.payload?.projectID || context.body.projectID;
+    if (projectID) {
+      await saveStoredProjectLink(context.userID, linkForArtifact({
+        userID: context.userID,
+        projectID,
+        targetKind: "questionEvidenceSet",
+        targetID: artifact.envelope.id
+      }));
+      await saveStoredActivityEvent(context.userID, activityFor({
+        userID: context.userID,
+        projectID,
+        action: "code-question.evidence.approved",
+        objectKind: "questionEvidenceSet",
+        objectID: artifact.envelope.id,
+        newStatus: `v${allocated.value}`
+      }));
+    }
+    sendJSON(response, 201, {
+      evidenceSet: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionConclusionPublish(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.conclusion.publish")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const allocated = await allocateStoredCodeQuestionCounter(
+      context.userID,
+      "conclusionRevision",
+      questionID
+    );
+    const artifact = createConclusionArtifact({
+      userID: context.userID,
+      questionID,
+      revision: allocated.value,
+      definitionRevision: context.body.definitionRevision,
+      definitionHash: context.body.definitionHash,
+      inputSetHash: context.body.inputSetHash,
+      evidenceSetID: context.body.evidenceSetID,
+      evidenceSetVersion: context.body.evidenceSetVersion,
+      evidenceSetHash: context.body.evidenceSetHash,
+      conclusionText: context.body.conclusionText,
+      reasoning: context.body.reasoning,
+      citations: context.body.citations,
+      assumptions: context.body.assumptions,
+      unknowns: context.body.unknowns,
+      analysisRunID: context.body.analysisRunID,
+      analysisDependencyHash: context.body.analysisDependencyHash,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    sendJSON(response, 201, {
+      conclusion: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionIssueStart(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.issue.start")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const idempotencyKey = String(context.body.idempotencyKey || "").trim();
+    if (!idempotencyKey) {
+      sendError(response, 400, "Issuance requires an idempotency key.");
+      return;
+    }
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const existing = pendingList.find((item) =>
+      item.idempotencyKey === idempotencyKey && item.questionID === questionID
+    );
+    if (existing) {
+      sendJSON(response, 200, { pending: existing, replayed: true });
+      return;
+    }
+    const allocated = await allocateStoredCodeQuestionCounter(
+      context.userID,
+      "issueVersion",
+      questionID
+    );
+    const pending = createPendingIssuanceRecord({
+      questionID,
+      issueVersion: allocated.value,
+      idempotencyKey,
+      actorUserID: context.userID,
+      stagedObjectKey: context.body.stagedObjectKey ||
+        `staged/code-question/${questionID}/issue-v${allocated.value}/${idempotencyKey}`,
+      status: "reserved"
+    });
+    await saveStoredCodeQuestionPendingIssuance(context.userID, pending);
+    sendJSON(response, 201, { pending, replayed: false });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionIssueComplete(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.issue.complete")
+  });
+  if (!context) return;
+  try {
+    const pendingID = String(context.body.pendingID || "").trim();
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const pending = pendingList.find((item) => item.id === pendingID);
+    if (!pending) {
+      sendError(response, 404, "Pending issuance not found.");
+      return;
+    }
+    let advanced = advanceIssuanceSaga(pending, "staged", {
+      stagedObjectKey: pending.stagedObjectKey || context.body.stagedObjectKey
+    });
+    advanced = advanceIssuanceSaga(advanced, "committing");
+    const reportManifestID = String(context.body.reportManifestID || randomUUID());
+    const issued = createIssuedRecordArtifact({
+      userID: context.userID,
+      questionID: pending.questionID,
+      issueVersion: pending.issueVersion,
+      reportManifestID,
+      componentVersions: context.body.componentVersions || {},
+      componentHashes: context.body.componentHashes || {},
+      approvalBasis: context.body.approvalBasis || "",
+      predecessorID: context.body.predecessorID || null,
+      id: context.body.issuedRecordID || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, issued, 0);
+    advanced = advanceIssuanceSaga(advanced, "issued");
+    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
+    const question = (await listStoredFoundationArtifacts(context.userID))
+      .find((item) => item.envelope?.id === pending.questionID);
+    if (question?.payload?.projectID) {
+      await saveStoredActivityEvent(context.userID, activityFor({
+        userID: context.userID,
+        projectID: question.payload.projectID,
+        action: "code-question.record.issued",
+        objectKind: "issuedDecisionRecord",
+        objectID: issued.envelope.id,
+        newStatus: "issued"
+      }));
+    }
+    sendJSON(response, 201, {
+      pending: advanced,
+      issuedRecord: { id: issued.envelope.id, version: issued.envelope.version, ...issued.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionIssueFail(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.issue.fail")
+  });
+  if (!context) return;
+  try {
+    const pendingID = String(context.body.pendingID || "").trim();
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const pending = pendingList.find((item) => item.id === pendingID);
+    if (!pending) {
+      sendError(response, 404, "Pending issuance not found.");
+      return;
+    }
+    const failed = advanceIssuanceSaga(pending, "failed", {
+      error: String(context.body.error || "Issuance failed.")
+    });
+    await saveStoredCodeQuestionPendingIssuance(context.userID, failed);
+    sendJSON(response, 200, { pending: failed });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionOutboxEnqueue(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.create")
+  });
+  if (!context) return;
+  try {
+    const entry = createQuestionOutboxEntry({
+      commandKind: context.body.commandKind,
+      payload: context.body.payload,
+      idempotencyKey: context.body.idempotencyKey
+    });
+    await saveStoredCodeQuestionOutboxEntry(context.userID, entry);
+    sendJSON(response, 201, { entry });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionMigrationRun(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.migration.run")
+  });
+  if (!context) return;
+  try {
+    const previous = await storedMigrationCheckpoint(
+      context.userID,
+      codeQuestionMigrationCheckpointName
+    );
+    const result = runCodeQuestionBootstrapMigration({ previousCheckpoint: previous });
+    await saveStoredMigrationCheckpoint(context.userID, codeQuestionMigrationCheckpointName, result);
+    sendJSON(response, 200, { migration: result });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
 const handlers = {
   "account/sign-in": handleSignIn,
   "account/sign-out": handleSignOut,
@@ -15844,6 +16673,20 @@ const handlers = {
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
+  // Code Question routes (Phase 1): gated by permitext:codeQuestionWorkspace (default off).
+  "projects/code-questions/list": handleCodeQuestionList,
+  "projects/code-questions/create": handleCodeQuestionCreate,
+  "projects/code-questions/archive": handleCodeQuestionArchive,
+  "projects/code-questions/restore": handleCodeQuestionRestore,
+  "projects/code-questions/inputs/save": handleCodeQuestionInputSave,
+  "projects/code-questions/evidence/snapshot": handleCodeQuestionEvidenceSnapshot,
+  "projects/code-questions/evidence/approve-set": handleCodeQuestionEvidenceSetCreate,
+  "projects/code-questions/conclusions/publish": handleCodeQuestionConclusionPublish,
+  "projects/code-questions/issue/start": handleCodeQuestionIssueStart,
+  "projects/code-questions/issue/complete": handleCodeQuestionIssueComplete,
+  "projects/code-questions/issue/fail": handleCodeQuestionIssueFail,
+  "projects/code-questions/outbox/enqueue": handleCodeQuestionOutboxEnqueue,
+  "projects/code-questions/migration/run": handleCodeQuestionMigrationRun,
   "projects/collaboration/notes/save": handleProjectCollaborationNoteSave,
   "projects/collaboration/threads/save": handleProjectCollaborationThreadSave,
   "projects/collaboration/comments/save": handleProjectCollaborationCommentSave,
