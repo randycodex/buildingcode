@@ -1574,7 +1574,7 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 | 2 — Project and Question workspace shell | Complete (branch) | `a56e51079` | `npm run check` / `smoke`; `code-question-workspace-contract`; workspace-state normalization | Flag-gated shell: question index, stage control, Add column/More, deep links, project/question switch isolation |
 | 3 — Define | Complete (branch) | `fcac63182` | `npm run check` / `smoke`; `code-question-define-contract` | Definition column: fields, facts/assumptions/unknowns, revisions, fact requests, readiness, offline queue conflicts, viewer read-only |
 | 4 — Evidence | Complete (branch) | `8608305a8` | `npm run check` / `smoke`; `code-question-evidence-contract` | Candidates→Reader→Tray; propose/approve; versioned sets; verification≠applicability; reconstructable snapshots |
-| 5 — Analyze and Professional Conclusion | Complete (branch) | (set after commit) | `test:code-question`; offline contract; production client builds; full `smoke`; rendered local Analyze workflow | Approved-evidence-only server binding; immutable analysis; stale dependency detection; idempotent generation; separately authored conclusion; capability remains default-disabled |
+| 5 — Analyze and Professional Conclusion | Complete (branch) | `11e129cb8` | `check`; `test:code-question`; offline contract; production client builds; full `smoke`; rendered local Analyze workflow | Approved-evidence-only server binding; immutable analysis; stale dependency detection; idempotent generation; separately authored conclusion; capability remains default-disabled |
 | 6 — Review | Not started | — | — | — |
 | 7 — Issue | Not started | — | — | — |
 | 8 — Legacy promotion and supporting tools | Not started | — | — | — |
