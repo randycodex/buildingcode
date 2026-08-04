@@ -74,6 +74,10 @@ export const codeQuestionPaneMinimumWidths = Object.freeze({
 const stageSet = new Set(codeQuestionWorkflowStages);
 const roleSet = new Set(codeQuestionPaneRoles);
 
+function copy(value) {
+  return value == null ? value : JSON.parse(JSON.stringify(value));
+}
+
 function requiredText(value, label = "value") {
   const normalized = String(value || "").trim();
   if (!normalized) throw new Error(`Invalid ${label}.`);
@@ -92,6 +96,8 @@ export function emptyCodeQuestionWorkspaceState() {
     definitionsByQuestionID: {},
     /** Phase 4: evidence workspace keyed by question ID. */
     evidenceByQuestionID: {},
+    /** Phase 5: immutable analysis runs + separate conclusion drafts/revisions. */
+    analysisByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -258,6 +264,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
   if (source.evidenceByQuestionID && typeof source.evidenceByQuestionID === "object") {
     state.evidenceByQuestionID = Object.fromEntries(
       Object.entries(source.evidenceByQuestionID)
+        .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
+        .map(([questionID, record]) => [questionID, copy(record)])
+    );
+  }
+  if (source.analysisByQuestionID && typeof source.analysisByQuestionID === "object") {
+    state.analysisByQuestionID = Object.fromEntries(
+      Object.entries(source.analysisByQuestionID)
         .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
         .map(([questionID, record]) => [questionID, copy(record)])
     );

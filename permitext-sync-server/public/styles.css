@@ -12902,3 +12902,137 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   margin: 0 0 6px;
   font-size: 1em;
 }
+
+/* Phase 5 — bounded analysis and separately authored conclusion */
+.code-question-analysis-approved,
+.code-question-bounded-analysis,
+.code-question-professional-conclusion {
+  display: grid;
+  gap: 16px;
+  padding: 14px;
+}
+
+.code-question-analysis-binding,
+.code-question-analysis-intro,
+.code-question-analysis-result,
+.code-question-conclusion-boundary,
+.code-question-conclusion-history {
+  padding: 14px;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 6%, var(--surface, #fff));
+}
+
+.code-question-analysis-result.is-stale {
+  box-shadow: inset 4px 0 0 #9a5b00;
+  background: color-mix(in srgb, #d98b16 8%, var(--surface, #fff));
+}
+
+.code-question-analysis-hashes {
+  display: grid;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.code-question-analysis-hashes div {
+  display: grid;
+  grid-template-columns: minmax(80px, 0.35fr) 1fr;
+  gap: 10px;
+}
+
+.code-question-analysis-hashes dt {
+  font-weight: 700;
+}
+
+.code-question-analysis-hashes dd {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.78rem;
+}
+
+.code-question-analysis-evidence-list,
+.code-question-analysis-result ul,
+.code-question-analysis-result ol,
+.code-question-conclusion-history ol {
+  margin: 8px 0 0;
+  padding-left: 1.3rem;
+}
+
+.code-question-analysis-evidence-list > li,
+.code-question-conclusion-history li {
+  margin-bottom: 12px;
+}
+
+.code-question-analysis-run,
+.code-question-analysis-actions button,
+.code-question-conclusion-publish {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--project-color, #5268c8);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.code-question-analysis-run:disabled,
+.code-question-analysis-actions button:disabled,
+.code-question-conclusion-publish:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.code-question-analysis-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.code-question-analysis-structured,
+.code-question-analysis-citations {
+  margin-top: 14px;
+}
+
+.code-question-analysis-structured h4,
+.code-question-analysis-citations h4,
+.code-question-analysis-result h3,
+.code-question-analysis-result h4,
+.code-question-conclusion-history h3 {
+  margin: 0 0 6px;
+}
+
+.code-question-conclusion-form {
+  display: grid;
+  gap: 8px;
+}
+
+.code-question-conclusion-form > label,
+.code-question-conclusion-form legend {
+  font-weight: 700;
+}
+
+.code-question-conclusion-form textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 10px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--surface-raised, #f4f5f7);
+  color: inherit;
+  font: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.code-question-conclusion-form fieldset {
+  display: grid;
+  gap: 8px;
+  margin: 6px 0;
+  padding: 12px;
+  border: 0;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 5%, transparent);
+}
+
+.code-question-conclusion-citation-choice {
+  min-height: 32px;
+}

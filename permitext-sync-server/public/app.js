@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260803-code-question-evidence-v1";
+} from "./offline-storage.js?v=20260803-code-question-analyze-v3";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260803-code-question-evidence-v1";
+} from "./workspace-state.js?v=20260803-code-question-analyze-v3";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -80,7 +80,7 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260803-code-question-evidence-v1";
+} from "./code-question-workspace.js?v=20260803-code-question-analyze-v4";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -97,7 +97,7 @@ import {
   resolveFactRequest,
   reviseQuestionInput,
   updateDefinitionFields
-} from "./code-question-define.js?v=20260803-code-question-evidence-v1";
+} from "./code-question-define.js?v=20260803-code-question-analyze-v3";
 import {
   addCandidates,
   analysisEligibleEvidence,
@@ -118,7 +118,21 @@ import {
   setSelectedPassage,
   sourceVerificationLabel,
   trayModel
-} from "./code-question-evidence.js?v=20260803-code-question-evidence-v1";
+} from "./code-question-evidence.js?v=20260803-code-question-analyze-v3";
+import {
+  analysisRunIsStale,
+  beginAnalysisRequest,
+  buildAnalysisBinding,
+  completeAnalysisRequest,
+  emptyAnalysisWorkspace,
+  latestAnalysisRun,
+  normalizeAnalysisWorkspace,
+  publishProfessionalConclusion,
+  syntheticBoundedInterpretation,
+  transferAnalysisCitations,
+  updateConclusionDraft,
+  useAnalysisAsStartingPoint
+} from "./code-question-analysis.js?v=20260803-code-question-analyze-v3";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -4753,6 +4767,14 @@ function entitlementResearchEnabled(entitlement = currentEntitlement()) {
 }
 
 function hasCapability(capabilityID) {
+  if (
+    capabilityID === "code-question-workspace" &&
+    typeof location !== "undefined" &&
+    ["localhost", "127.0.0.1", "::1"].includes(location.hostname) &&
+    new URLSearchParams(location.search).get("enableCodeQuestionWorkspace") === "1"
+  ) {
+    return true;
+  }
   const contractValue = currentCapabilityContract()?.capabilities?.[capabilityID]?.enabled;
   if (typeof contractValue === "boolean") return contractValue;
   if (["saved-work", "notes"].includes(capabilityID)) return true;
@@ -4785,7 +4807,7 @@ function codeQuestionWorkspaceState() {
 
 function activeProjectIDForCodeQuestions() {
   const detail = openProjectDetails()[0] || null;
-  return String(detail?.id || detail?.clientID || detail?.localFolderID || "").trim();
+  return detail ? String(projectDetailKey(detail) || "").trim() : "";
 }
 
 function setCodeQuestionWorkspaceState(next, options = {}) {
@@ -4831,7 +4853,7 @@ function applyCodeQuestionDeepLinkFromLocation() {
   const parsed = parseCodeQuestionDeepLink(location.hash);
   if (!parsed?.projectID) return false;
   const open = openProjectDetails()[0] || null;
-  const openID = String(open?.id || open?.clientID || open?.localFolderID || "").trim();
+  const openID = open ? String(projectDetailKey(open) || "").trim() : "";
   if (openID && openID !== parsed.projectID) {
     // Deep link targets a different Project; leave selection to Projects list navigation.
     return false;
@@ -4980,6 +5002,28 @@ function saveEvidenceForQuestion(questionID, evidence) {
   return normalized;
 }
 
+function getAnalysisForQuestion(questionID) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const existing = codeQuestionWorkspaceState().analysisByQuestionID?.[id];
+  return normalizeAnalysisWorkspace(existing || emptyAnalysisWorkspace(id), id);
+}
+
+function saveAnalysisForQuestion(questionID, analysis) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const normalized = normalizeAnalysisWorkspace(analysis, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    analysisByQuestionID: {
+      ...(cq.analysisByQuestionID || {}),
+      [id]: normalized
+    }
+  });
+  return normalized;
+}
+
 function ensureEvidenceSeedCandidates(questionID) {
   let evidence = getEvidenceForQuestion(questionID);
   if (evidence.candidates.length) return evidence;
@@ -5017,7 +5061,7 @@ function ensureEvidenceSeedCandidates(questionID) {
 
 function ensureCodeQuestionShellForProject(project) {
   if (!codeQuestionWorkspaceEnabled() || !project) return;
-  const projectID = String(project.id || project.clientID || project.localFolderID || "").trim();
+  const projectID = String(projectDetailKey(project) || "").trim();
   if (!projectID) return;
   const cq = codeQuestionWorkspaceState();
   const currentProjectPanes = (cq.openPanes || []).filter((pane) => pane.projectID === projectID);
@@ -22822,8 +22866,14 @@ function renderCodeQuestionPane(paneDescriptor) {
     body.appendChild(renderCodeQuestionCandidatesBody(project, parsed.questionID));
   } else if (parsed.paneRole === "reader") {
     body.appendChild(renderCodeQuestionEvidenceReaderBody(project, parsed.questionID));
-  } else if (parsed.paneRole === "evidence-tray" || parsed.paneRole === "approved-evidence") {
+  } else if (parsed.paneRole === "evidence-tray") {
     body.appendChild(renderCodeQuestionEvidenceTrayBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "approved-evidence") {
+    body.appendChild(renderCodeQuestionApprovedEvidenceBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "bounded-analysis") {
+    body.appendChild(renderCodeQuestionBoundedAnalysisBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "professional-conclusion") {
+    body.appendChild(renderCodeQuestionProfessionalConclusionBody(project, parsed.questionID));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
@@ -22956,7 +23006,7 @@ function escapeHTML(value) {
 
 async function createLocalCodeQuestionDraft(project) {
   if (!codeQuestionWorkspaceEnabled()) return;
-  const projectID = String(project?.id || project?.clientID || project?.localFolderID || "").trim();
+  const projectID = project ? String(projectDetailKey(project) || "").trim() : "";
   if (!projectID) return;
   const existing = questionsForActiveProject();
   const nextNumber = existing.reduce((max, item) => {
@@ -23112,6 +23162,33 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
     group.append(label, input);
     form.appendChild(group);
   });
+  if (!readOnly) {
+    const saveDefinition = document.createElement("button");
+    saveDefinition.type = "button";
+    saveDefinition.className = "code-question-define-add-input";
+    saveDefinition.textContent = "Save definition";
+    saveDefinition.addEventListener("click", () => {
+      try {
+        const values = Object.fromEntries(fields.map((field) => {
+          const input = form.elements.namedItem(field.key);
+          return [field.key, input?.value || ""];
+        }));
+        values.asOfDate = values.asOfDate
+          ? new Date(`${values.asOfDate}T00:00:00.000Z`).toISOString()
+          : null;
+        const current = getDefinitionForQuestion(qid);
+        const next = updateDefinitionFields(current, values, {
+          expectedVersion: current.expectedVersion,
+          actorUserID: codeQuestionActor().userID
+        });
+        saveDefinitionForQuestion(qid, next);
+        refreshCodeQuestionDefinitionPane(qid);
+      } catch (error) {
+        void showWebNotice("Could not save definition", error.message || "Definition save failed.");
+      }
+    });
+    form.appendChild(saveDefinition);
+  }
   wrap.appendChild(form);
 
   // Structured inputs
@@ -23900,6 +23977,311 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
   }
   wrap.appendChild(summary);
   return wrap;
+}
+
+function codeQuestionAnalysisBinding(questionID) {
+  return buildAnalysisBinding(
+    getDefinitionForQuestion(questionID),
+    getEvidenceForQuestion(questionID)
+  );
+}
+
+function renderCodeQuestionApprovedEvidenceBody(_project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-analysis-approved";
+  const qid = String(questionID || "").trim();
+  if (!qid) {
+    wrap.innerHTML = '<p class="code-question-define-empty">Open a Code Question to inspect approved evidence.</p>';
+    return wrap;
+  }
+  try {
+    const binding = codeQuestionAnalysisBinding(qid);
+    wrap.innerHTML = `
+      <section class="code-question-analysis-binding">
+        <p class="code-question-pane-status">Bound server authority</p>
+        <h3>Evidence Set v${escapeHTML(String(binding.evidenceSetVersion))}</h3>
+        <p class="code-question-define-muted">Only these approved, analysis-eligible snapshots may enter Research. Candidates and mutable conversation selections are excluded.</p>
+        <dl class="code-question-analysis-hashes">
+          <div><dt>Definition</dt><dd title="${escapeHTML(binding.definitionHash)}">r${escapeHTML(String(binding.definitionRevision))} · ${escapeHTML(binding.definitionHash.slice(0, 16))}…</dd></div>
+          <div><dt>Inputs</dt><dd title="${escapeHTML(binding.inputSetHash)}">${escapeHTML(String(binding.inputSnapshotIDs.length))} selected · ${escapeHTML(binding.inputSetHash.slice(0, 16))}…</dd></div>
+          <div><dt>Evidence</dt><dd title="${escapeHTML(binding.evidenceSetHash)}">${escapeHTML(binding.evidenceSetHash.slice(0, 16))}…</dd></div>
+        </dl>
+      </section>`;
+    const list = document.createElement("ol");
+    list.className = "code-question-analysis-evidence-list";
+    binding.approvedEvidence.forEach(({ entry, snapshot }) => {
+      const item = document.createElement("li");
+      item.innerHTML = `
+        <div class="code-question-evidence-item-head">
+          <span class="code-question-define-kind-badge">${escapeHTML(entry.role)}</span>
+          <span>${escapeHTML(snapshot.passageLocator || snapshot.sourceIdentity)}</span>
+        </div>
+        <blockquote class="code-question-evidence-quote">${escapeHTML(snapshot.quotedText)}</blockquote>
+        <p class="code-question-define-muted">Snapshot ${escapeHTML(snapshot.id)} · ${escapeHTML((snapshot.textHash || "").slice(0, 16))}…</p>`;
+      list.appendChild(item);
+    });
+    wrap.appendChild(list);
+  } catch (error) {
+    wrap.innerHTML = `
+      <p class="code-question-pane-status">Not ready for analysis</p>
+      <p class="code-question-define-blockers">${escapeHTML(error.message)}</p>
+      <p class="code-question-define-muted">Complete Define and approve at least one analysis-eligible passage in Evidence.</p>`;
+  }
+  return wrap;
+}
+
+function renderCodeQuestionBoundedAnalysisBody(_project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-bounded-analysis";
+  const qid = String(questionID || "").trim();
+  if (!qid) {
+    wrap.innerHTML = '<p class="code-question-define-empty">Open a Code Question to run bounded analysis.</p>';
+    return wrap;
+  }
+  let binding;
+  try {
+    binding = codeQuestionAnalysisBinding(qid);
+  } catch (error) {
+    wrap.innerHTML = `<p class="code-question-pane-status">Analysis unavailable</p><p class="code-question-define-blockers">${escapeHTML(error.message)}</p>`;
+    return wrap;
+  }
+  const workspace = getAnalysisForQuestion(qid);
+  const run = latestAnalysisRun(workspace);
+  const stale = analysisRunIsStale(run, binding);
+  const intro = document.createElement("section");
+  intro.className = "code-question-analysis-intro";
+  intro.innerHTML = `
+    <p class="code-question-pane-status">Selected-evidence-only Research</p>
+    <p>Each run is bound to Definition r${escapeHTML(String(binding.definitionRevision))}, ${escapeHTML(String(binding.inputSnapshotIDs.length))} selected inputs, and Evidence Set v${escapeHTML(String(binding.evidenceSetVersion))}.</p>
+    <p class="code-question-define-muted">AI-generated research assistance, not an official code determination. The professional conclusion is authored separately.</p>`;
+  const runButton = document.createElement("button");
+  runButton.type = "button";
+  runButton.className = "code-question-analysis-run";
+  runButton.textContent = run ? (stale ? "Rerun against current versions" : "Run again with new request") : "Run bounded analysis";
+  runButton.addEventListener("click", async () => {
+    runButton.disabled = true;
+    const requestID = globalThis.crypto?.randomUUID?.() || `request-${Date.now()}`;
+    try {
+      const started = beginAnalysisRequest(getAnalysisForQuestion(qid), binding, {
+        requestID,
+        requestedBy: codeQuestionActor().userID
+      });
+      saveAnalysisForQuestion(qid, started.workspace);
+      // The production command uses the existing server Research generator. The
+      // local flag-gated shell uses a deterministic bounded fixture until the
+      // locally-created Question/Evidence records are hydrated from the server.
+      const completed = completeAnalysisRequest(
+        getAnalysisForQuestion(qid),
+        binding,
+        syntheticBoundedInterpretation(binding),
+        {
+          requestID,
+          researchAnswerID: `local-research-${requestID}`,
+          requestedBy: codeQuestionActor().userID,
+          modelID: "permitext-bounded-fixture"
+        }
+      );
+      saveAnalysisForQuestion(qid, completed.workspace);
+      refreshCodeQuestionAnalysisPanes(qid);
+    } catch (error) {
+      void showWebNotice("Could not run bounded analysis", error.message || "Analysis failed.");
+      runButton.disabled = false;
+    }
+  });
+  intro.appendChild(runButton);
+  wrap.appendChild(intro);
+  if (!run) {
+    const empty = document.createElement("p");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = "No analysis run yet. AI is optional; the professional conclusion can be authored without it.";
+    wrap.appendChild(empty);
+    return wrap;
+  }
+  const result = document.createElement("article");
+  result.className = `code-question-analysis-result${stale ? " is-stale" : ""}`;
+  result.innerHTML = `
+    <header>
+      <p class="code-question-pane-status">${stale ? "Stale analysis — retained for history" : "Current bounded analysis"}</p>
+      <p class="code-question-define-muted">${escapeHTML(run.modelID)} · ${escapeHTML(run.createdAt)} · dependency ${escapeHTML(run.dependencyHash)}</p>
+    </header>
+    <h3>Analysis conclusion</h3>
+    <p>${escapeHTML(run.answer.conclusion)}</p>
+    <h4>Explanation</h4>
+    <p>${escapeHTML(run.answer.explanation)}</p>`;
+  const structured = [
+    ["Assumptions", run.answer.assumptions],
+    ["Missing facts", run.answer.missingFacts],
+    ["Limitations", run.answer.limitations],
+    ["Conflicts", run.answer.conflicts],
+    ["Additional evidence requested", run.answer.additionalEvidenceNeeded]
+  ];
+  structured.forEach(([label, values]) => {
+    const section = document.createElement("section");
+    section.className = "code-question-analysis-structured";
+    section.innerHTML = `<h4>${escapeHTML(label)}</h4>`;
+    const list = document.createElement("ul");
+    if (!values.length) {
+      const item = document.createElement("li");
+      item.textContent = "None stated.";
+      list.appendChild(item);
+    } else {
+      values.forEach((value) => {
+        const item = document.createElement("li");
+        item.textContent = value;
+        list.appendChild(item);
+      });
+    }
+    section.appendChild(list);
+    result.appendChild(section);
+  });
+  const citations = document.createElement("section");
+  citations.className = "code-question-analysis-citations";
+  citations.innerHTML = "<h4>Validated citations</h4>";
+  const citationList = document.createElement("ol");
+  run.answer.citations.forEach((citation) => {
+    const item = document.createElement("li");
+    item.textContent = `${citation.snapshotIDs.join(", ")} — ${citation.relevance}`;
+    citationList.appendChild(item);
+  });
+  citations.appendChild(citationList);
+  result.appendChild(citations);
+  const actions = document.createElement("div");
+  actions.className = "code-question-analysis-actions";
+  const start = document.createElement("button");
+  start.type = "button";
+  start.textContent = "Use as starting point";
+  start.disabled = stale;
+  start.addEventListener("click", () => {
+    saveAnalysisForQuestion(qid, useAnalysisAsStartingPoint(getAnalysisForQuestion(qid), run));
+    refreshCodeQuestionAnalysisPanes(qid);
+  });
+  const transfer = document.createElement("button");
+  transfer.type = "button";
+  transfer.textContent = "Transfer citations only";
+  transfer.disabled = stale;
+  transfer.addEventListener("click", () => {
+    saveAnalysisForQuestion(qid, transferAnalysisCitations(getAnalysisForQuestion(qid), run));
+    refreshCodeQuestionAnalysisPanes(qid);
+  });
+  actions.append(start, transfer);
+  result.appendChild(actions);
+  wrap.appendChild(result);
+  return wrap;
+}
+
+function renderCodeQuestionProfessionalConclusionBody(_project, questionID) {
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-professional-conclusion";
+  const qid = String(questionID || "").trim();
+  if (!qid) return wrap;
+  let binding;
+  try {
+    binding = codeQuestionAnalysisBinding(qid);
+  } catch (error) {
+    wrap.innerHTML = `<p class="code-question-pane-status">Conclusion unavailable</p><p class="code-question-define-blockers">${escapeHTML(error.message)}</p>`;
+    return wrap;
+  }
+  const workspace = getAnalysisForQuestion(qid);
+  const draft = workspace.conclusionDraft;
+  wrap.innerHTML = `
+    <section class="code-question-conclusion-boundary">
+      <p class="code-question-pane-status">Human-authored professional work product</p>
+      <p>This conclusion is a separate revisioned artifact. Research text never becomes the conclusion without an explicit professional action.</p>
+    </section>`;
+  const form = document.createElement("form");
+  form.className = "code-question-conclusion-form";
+  const conclusion = document.createElement("textarea");
+  conclusion.rows = 7;
+  conclusion.maxLength = 20_000;
+  conclusion.value = draft.conclusionText || "";
+  conclusion.setAttribute("aria-label", "Professional conclusion");
+  const reasoning = document.createElement("textarea");
+  reasoning.rows = 5;
+  reasoning.maxLength = 20_000;
+  reasoning.value = draft.reasoning || "";
+  reasoning.setAttribute("aria-label", "Professional reasoning");
+  form.innerHTML = "<label>Professional conclusion</label>";
+  form.appendChild(conclusion);
+  const reasoningLabel = document.createElement("label");
+  reasoningLabel.textContent = "Professional reasoning";
+  form.append(reasoningLabel, reasoning);
+  const citationField = document.createElement("fieldset");
+  citationField.innerHTML = "<legend>Approved evidence cited</legend>";
+  binding.approvedEvidence.forEach(({ snapshot }) => {
+    const label = document.createElement("label");
+    label.className = "code-question-conclusion-citation-choice";
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = snapshot.id;
+    checkbox.checked = (draft.citations || []).includes(snapshot.id);
+    label.append(checkbox, document.createTextNode(` ${snapshot.passageLocator || snapshot.id}`));
+    citationField.appendChild(label);
+  });
+  form.appendChild(citationField);
+  const disclosure = document.createElement("p");
+  disclosure.className = "code-question-define-muted";
+  disclosure.textContent = draft.aiAssistanceDisclosure || "No AI starting point is currently disclosed. AI may be skipped entirely.";
+  form.appendChild(disclosure);
+  const saveDraft = () => {
+    const citations = Array.from(citationField.querySelectorAll('input[type="checkbox"]:checked')).map((input) => input.value);
+    saveAnalysisForQuestion(qid, updateConclusionDraft(getAnalysisForQuestion(qid), {
+      conclusionText: conclusion.value,
+      reasoning: reasoning.value,
+      citations
+    }));
+  };
+  conclusion.addEventListener("input", saveDraft);
+  reasoning.addEventListener("input", saveDraft);
+  citationField.addEventListener("change", saveDraft);
+  const publish = document.createElement("button");
+  publish.type = "button";
+  publish.className = "code-question-conclusion-publish";
+  publish.textContent = "Publish conclusion revision";
+  publish.addEventListener("click", () => {
+    try {
+      saveDraft();
+      const result = publishProfessionalConclusion(getAnalysisForQuestion(qid), binding, {
+        authorUserID: codeQuestionActor().userID
+      });
+      saveAnalysisForQuestion(qid, result.workspace);
+      refreshCodeQuestionAnalysisPanes(qid);
+    } catch (error) {
+      void showWebNotice("Could not publish conclusion", error.message || "Conclusion failed.");
+    }
+  });
+  form.appendChild(publish);
+  wrap.appendChild(form);
+  const history = document.createElement("section");
+  history.className = "code-question-conclusion-history";
+  history.innerHTML = `<h3>Revision history</h3>`;
+  const list = document.createElement("ol");
+  if (!workspace.conclusionRevisions.length) {
+    const item = document.createElement("li");
+    item.textContent = "No published conclusion revisions.";
+    list.appendChild(item);
+  } else {
+    workspace.conclusionRevisions.slice().reverse().forEach((revision) => {
+      const item = document.createElement("li");
+      item.innerHTML = `<strong>r${escapeHTML(String(revision.revision))}</strong> · ${escapeHTML(revision.authorUserID)} · ${escapeHTML(revision.createdAt)}<p>${escapeHTML(revision.conclusionText)}</p>`;
+      list.appendChild(item);
+    });
+  }
+  history.appendChild(list);
+  wrap.appendChild(history);
+  return wrap;
+}
+
+function refreshCodeQuestionAnalysisPanes(questionID) {
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  track?.querySelectorAll?.(`.code-question-panel[data-question-id="${safeID}"]`).forEach((pane) => {
+    const role = pane.dataset.cqRole;
+    const body = pane.querySelector(".code-question-panel-body");
+    if (!body) return;
+    if (role === "approved-evidence") body.replaceChildren(renderCodeQuestionApprovedEvidenceBody(null, questionID));
+    if (role === "bounded-analysis") body.replaceChildren(renderCodeQuestionBoundedAnalysisBody(null, questionID));
+    if (role === "professional-conclusion") body.replaceChildren(renderCodeQuestionProfessionalConclusionBody(null, questionID));
+  });
+  saveWorkspaceState();
 }
 
 function toggleLocalCodeQuestionArchive(questionID) {

@@ -75,6 +75,7 @@ import {
   codeQuestionMigrationCheckpointName,
   codeQuestionWorkspaceFeatureEnabled,
   compareAndSwapFoundationArtifact,
+  createAnalysisArtifact,
   createCodeQuestionArtifact,
   createConclusionArtifact,
   createEvidenceSetArtifact,
@@ -91,6 +92,8 @@ import {
   advanceIssuanceSaga
 } from "./code-question-commands.mjs";
 import {
+  computeDependencyHash,
+  contentHash as codeQuestionContentHash,
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled
 } from "./code-question-contract.mjs";
@@ -1072,6 +1075,7 @@ function createFileStoreAdapter() {
         const retentionCutoff = new Date(Date.now() - 400 * 24 * 60 * 60 * 1000).toISOString();
         const retainedEntries = (store.researchUsageByUserID?.[userID] || [])
           .filter((entry) => entry.createdAt >= retentionCutoff);
+        if (retainedEntries.some((entry) => entry.id === reservation.id)) return false;
         const entries = retainedEntries
           .filter((entry) =>
             entry.createdAt >= reservation.since && activeResearchUsageEntry(entry)
@@ -16440,6 +16444,320 @@ async function handleCodeQuestionEvidenceSetCreate(request, response) {
   }
 }
 
+const codeQuestionAnalysisInFlight = new Map();
+
+function codeQuestionResearchEvidence(snapshotArtifact, entry) {
+  const snapshot = snapshotArtifact.payload;
+  const sectionID = String(snapshot.sourceIdentity || snapshot.passageLocator || snapshot.id);
+  const sourceID = String(snapshot.id || snapshotArtifact.envelope.id);
+  const sourceVersion = String(snapshot.sourceVersion || snapshot.textHash || "bound-snapshot-v2");
+  return {
+    sectionID,
+    sourceID,
+    passageID: sourceID,
+    sectionNumber: String(snapshot.passageLocator || sectionID),
+    title: String(snapshot.passageLocator || "Approved Code Question evidence"),
+    text: snapshot.quotedText,
+    selectedText: snapshot.quotedText,
+    jurisdiction: "New York City",
+    codeEdition: sourceVersion,
+    codeVersion: sourceVersion,
+    codeBook: String(snapshot.sourceIdentity || "Approved evidence snapshot"),
+    codePrefix: "CQ",
+    chapterNumber: "bound",
+    evidenceRole: entry.role,
+    qualification: entry.qualification || "",
+    structuredSource: snapshot.structuredMaterial || null
+  };
+}
+
+function assertCodeQuestionBindingField(actual, supplied, label) {
+  if (String(actual) !== String(supplied)) {
+    throw new CodeQuestionCommandError(`${label} changed before analysis began.`, {
+      code: "CODE_QUESTION_VERSION_CONFLICT",
+      status: 409,
+      details: { label, supplied, current: actual }
+    });
+  }
+}
+
+async function resolveCodeQuestionAnalysisBinding(userID, body) {
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  const questionID = String(body.questionID || "").trim();
+  const question = artifacts.find((item) =>
+    item.envelope?.id === questionID && item.envelope?.type === "codeQuestion"
+  );
+  if (!question) throw new CodeQuestionCommandError("Code Question not found.", { status: 404 });
+  const evidenceSetID = String(body.evidenceSetID || "").trim();
+  const evidenceSet = artifacts.find((item) =>
+    item.envelope?.id === evidenceSetID && item.envelope?.type === "questionEvidenceSet"
+  );
+  if (!evidenceSet || evidenceSet.payload.questionID !== questionID) {
+    throw new CodeQuestionCommandError("Approved Evidence Set not found for this question.", { status: 404 });
+  }
+  const requestedInputIDs = (Array.isArray(body.inputSnapshotIDs) ? body.inputSnapshotIDs : [])
+    .map(String).filter(Boolean);
+  const inputs = requestedInputIDs.map((id) => artifacts.find((item) =>
+    item.envelope?.id === id &&
+    item.envelope?.type === "questionInput" &&
+    item.payload?.questionID === questionID
+  ));
+  if (inputs.some((item) => !item)) {
+    throw new CodeQuestionCommandError("A selected Question Input could not be resolved.", {
+      code: "CODE_QUESTION_VERSION_CONFLICT",
+      status: 409
+    });
+  }
+  const entries = (evidenceSet.payload.entries || []).filter((entry) => entry.analysisEligible === true);
+  if (!entries.length) {
+    throw new CodeQuestionCommandError("The approved Evidence Set has no analysis-eligible passages.");
+  }
+  const approvedEvidence = entries.map((entry) => {
+    const snapshot = artifacts.find((item) =>
+      item.envelope?.id === entry.snapshotID && item.envelope?.type === "evidenceSnapshotV2"
+    );
+    if (!snapshot) {
+      throw new CodeQuestionCommandError("An approved evidence snapshot could not be resolved.", {
+        code: "CODE_QUESTION_VERSION_CONFLICT",
+        status: 409
+      });
+    }
+    return { entry, snapshot };
+  });
+  const definitionHash = codeQuestionContentHash({
+    questionText: question.payload.questionText,
+    scope: question.payload.scope || "",
+    jurisdiction: question.payload.jurisdiction || "",
+    asOfDate: question.payload.asOfDate || null,
+    definitionRevision: question.payload.definitionRevision
+  });
+  const normalizedInputs = inputs.map((item) => item.payload);
+  const inputSetHash = codeQuestionContentHash(normalizedInputs.map((input) => ({
+    id: input.id,
+    inputKind: input.inputKind,
+    state: input.state,
+    statement: input.statement,
+    revision: input.revision
+  })));
+  const evidenceSetHash = evidenceSet.payload.contentHash;
+  const dependencyHash = computeDependencyHash({
+    questionText: question.payload.questionText,
+    scope: question.payload.scope || "",
+    jurisdiction: question.payload.jurisdiction || "",
+    asOfDate: question.payload.asOfDate || null,
+    inputs: normalizedInputs,
+    evidenceSet: evidenceSet.payload
+  });
+  assertCodeQuestionBindingField(question.payload.definitionRevision, body.definitionRevision, "Definition revision");
+  assertCodeQuestionBindingField(definitionHash, body.definitionHash, "Definition hash");
+  assertCodeQuestionBindingField(inputSetHash, body.inputSetHash, "Question Input hash");
+  assertCodeQuestionBindingField(evidenceSet.payload.version, body.evidenceSetVersion, "Evidence Set version");
+  assertCodeQuestionBindingField(evidenceSetHash, body.evidenceSetHash, "Evidence Set hash");
+  assertCodeQuestionBindingField(dependencyHash, body.dependencyHash, "Dependency hash");
+  return {
+    question,
+    inputs: normalizedInputs,
+    evidenceSet,
+    approvedEvidence,
+    definitionHash,
+    inputSetHash,
+    evidenceSetHash,
+    dependencyHash
+  };
+}
+
+async function generateCodeQuestionAnalysis(context, binding, requestID) {
+  const { question, evidenceSet, approvedEvidence } = binding;
+  const questionID = question.envelope.id;
+  const existingArtifacts = await listStoredFoundationArtifacts(context.userID);
+  const replay = existingArtifacts.find((item) =>
+    item.envelope?.type === "questionAnalysis" &&
+    item.payload?.questionID === questionID &&
+    item.payload?.requestID === requestID
+  );
+  if (replay) {
+    const answer = (await listStoredResearchAnswers(context.userID))
+      .find((item) => item.id === replay.payload.researchAnswerID) || null;
+    return { analysis: { id: replay.envelope.id, ...replay.payload }, answer, replayed: true };
+  }
+  const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+  const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
+  const requestLimit = monthlyResearchRequestLimit();
+  if (!mockMode && usageEntries.length >= requestLimit) {
+    throw new CodeQuestionCommandError("This account reached its monthly AI research limit.", {
+      code: "RESEARCH_MONTHLY_LIMIT",
+      status: 429
+    });
+  }
+  const reservationID = `cq-analysis-${createHash("sha256")
+    .update(`${context.userID}:${questionID}:${requestID}`)
+    .digest("hex")}`;
+  let reserved = false;
+  let completedReservation = false;
+  try {
+    if (!mockMode) {
+      reserved = await reserveResearchUsage(context.userID, {
+        id: reservationID,
+        since: currentMonthStart(),
+        limit: requestLimit,
+        createdAt: new Date().toISOString()
+      });
+      if (!reserved) {
+        throw new CodeQuestionCommandError("This analysis request is already running or completed.", {
+          code: "CODE_QUESTION_ANALYSIS_IN_PROGRESS",
+          status: 409
+        });
+      }
+    }
+    const evidence = approvedEvidence.map(({ snapshot, entry }) =>
+      codeQuestionResearchEvidence(snapshot, entry)
+    );
+    const projectFacts = binding.inputs.map((input) =>
+      `${input.inputKind}: ${input.statement} [${input.state}]`
+    );
+    const result = mockMode
+      ? {
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question.payload.questionText, evidence), evidence),
+          model: "permitext-mock",
+          configuration: researchModelConfiguration(),
+          usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
+        }
+      : await openAIResearchInterpretation(question.payload.questionText, evidence, context.userID, {
+          projectContextFacts: projectFacts,
+          messages: []
+        });
+    const estimatedCost = estimatedResearchCost(result.usage);
+    const createdAt = new Date().toISOString();
+    const answerID = `cq-answer-${createHash("sha256").update(`${questionID}:${requestID}`).digest("hex")}`;
+    const answerPayload = {
+      mode: mockMode ? "mock" : "openai",
+      model: result.model,
+      requestedModel: result.requestedModel || result.model,
+      promptVersion: result.configuration.promptVersion,
+      evidenceVersion: result.configuration.evidenceVersion,
+      ...result.interpretation,
+      evidenceSectionIDs: evidence.map((item) => item.sectionID),
+      evidenceSourceIDs: evidence.map((item) => item.sourceID),
+      usage: result.usage,
+      estimatedCostUSD: estimatedCost.estimatedUSD,
+      pricingVersion: estimatedCost.pricingVersion,
+      disclaimer: "AI-generated research assistance, not an official code determination."
+    };
+    const immutableEvidence = evidence.map((source) => immutableEvidenceSnapshot({
+      id: source.sourceID,
+      source,
+      approvedAt: createdAt,
+      evidenceSetVersion: evidenceSet.payload.version,
+      sourceLibraryVersion: source.codeVersion
+    }));
+    const answer = immutableResearchAnswer({
+      id: answerID,
+      owner: ownerScope(context.userID),
+      conversationID: `code-question:${questionID}`,
+      projectID: question.payload.projectID,
+      question: question.payload.questionText,
+      answer: answerPayload,
+      evidence: immutableEvidence,
+      citations: answerPayload.citations,
+      model: result.model,
+      researchSystemVersion: [answerPayload.promptVersion, answerPayload.evidenceVersion].filter(Boolean).join(":"),
+      createdAt
+    });
+    await saveStoredResearchAnswer(context.userID, answer);
+    const analysisID = `qa-${createHash("sha256").update(`${questionID}:${requestID}`).digest("hex")}`;
+    const artifact = createAnalysisArtifact({
+      userID: context.userID,
+      questionID,
+      definitionRevision: question.payload.definitionRevision,
+      definitionHash: binding.definitionHash,
+      inputSnapshotIDs: binding.inputs.map((input) => input.id),
+      inputSetHash: binding.inputSetHash,
+      evidenceSetID: evidenceSet.envelope.id,
+      evidenceSetVersion: evidenceSet.payload.version,
+      evidenceSetHash: binding.evidenceSetHash,
+      dependencyHash: binding.dependencyHash,
+      researchAnswerID: answer.id,
+      requestID,
+      id: analysisID,
+      createdAt,
+      modelID: result.model,
+      analysisPolicyID: "selected-evidence-only-v1",
+      promptTemplateVersion: result.configuration.promptVersion,
+      citationValidation: "approved-evidence-only"
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    if (!mockMode) {
+      await completeResearchUsageReservation(context.userID, reservationID, {
+        model: result.model,
+        requestedModel: result.requestedModel || result.model,
+        mode: "openai-code-question",
+        ...result.usage,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
+        createdAt
+      });
+      completedReservation = true;
+    }
+    await saveStoredProjectLink(context.userID, linkForArtifact({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      targetKind: "questionAnalysis",
+      targetID: artifact.envelope.id
+    }));
+    await saveStoredActivityEvent(context.userID, activityFor({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      action: "code-question.analysis.generated",
+      objectKind: "questionAnalysis",
+      objectID: artifact.envelope.id,
+      newStatus: "generated",
+      metadata: { researchAnswerID: answer.id, dependencyHash: binding.dependencyHash }
+    }));
+    return { analysis: { id: artifact.envelope.id, ...artifact.payload }, answer, replayed: false };
+  } catch (error) {
+    if (reserved && !completedReservation) await releaseResearchUsageReservation(context.userID, reservationID);
+    throw error;
+  }
+}
+
+async function handleCodeQuestionAnalysisCreate(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.analysis.create")
+  });
+  if (!context) return;
+  if (!hasActiveResearchEntitlement(context.authContext.entitlement) && process.env.PERMITEXT_RESEARCH_MOCK !== "1") {
+    sendJSON(response, 403, { error: "Research Add-On required for bounded analysis.", code: "RESEARCH_REQUIRED" });
+    return;
+  }
+  try {
+    const requestID = String(context.body.requestID || context.body.idempotencyKey || "").trim();
+    if (!requestID) throw new CodeQuestionCommandError("Analysis requires an idempotent request ID.");
+    const binding = await resolveCodeQuestionAnalysisBinding(context.userID, context.body);
+    const key = `${context.userID}:${binding.question.envelope.id}:${requestID}`;
+    let task = codeQuestionAnalysisInFlight.get(key);
+    if (!task) {
+      task = generateCodeQuestionAnalysis(context, binding, requestID)
+        .finally(() => codeQuestionAnalysisInFlight.delete(key));
+      codeQuestionAnalysisInFlight.set(key, task);
+    }
+    const result = await task;
+    sendJSON(response, result.replayed ? 200 : 201, result);
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    if (["INVALID_RESEARCH_RESPONSE", "INVALID_RESEARCH_CITATION"].includes(error.code)) {
+      sendError(response, 502, "The research model could not return a verified, approved-evidence-only answer.");
+      return;
+    }
+    if (error.code === "RESEARCH_NOT_CONFIGURED") {
+      sendError(response, 503, error.message);
+      return;
+    }
+    throw error;
+  }
+}
+
 async function handleCodeQuestionConclusionPublish(request, response) {
   const context = await requireCodeQuestionContext(request, response, {
     permission: permissionForCommand("codeQuestion.conclusion.publish")
@@ -16447,6 +16765,44 @@ async function handleCodeQuestionConclusionPublish(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
+    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const question = artifacts.find((item) =>
+      item.envelope?.id === questionID && item.envelope?.type === "codeQuestion"
+    );
+    const evidenceSet = artifacts.find((item) =>
+      item.envelope?.id === String(context.body.evidenceSetID || "") &&
+      item.envelope?.type === "questionEvidenceSet" &&
+      item.payload?.questionID === questionID
+    );
+    if (!question || !evidenceSet) {
+      throw new CodeQuestionCommandError("The bound Code Question or Evidence Set was not found.", {
+        code: "CODE_QUESTION_VERSION_CONFLICT",
+        status: 409
+      });
+    }
+    assertCodeQuestionBindingField(evidenceSet.payload.version, context.body.evidenceSetVersion, "Evidence Set version");
+    assertCodeQuestionBindingField(evidenceSet.payload.contentHash, context.body.evidenceSetHash, "Evidence Set hash");
+    const approvedSnapshotIDs = new Set((evidenceSet.payload.entries || []).map((entry) => entry.snapshotID));
+    const citations = (Array.isArray(context.body.citations) ? context.body.citations : []).map(String);
+    if (citations.some((id) => !approvedSnapshotIDs.has(id))) {
+      throw new CodeQuestionCommandError("Professional conclusion cites evidence outside the approved Evidence Set.", {
+        code: "INVALID_RESEARCH_CITATION",
+        status: 409
+      });
+    }
+    if (context.body.analysisRunID) {
+      const analysis = artifacts.find((item) =>
+        item.envelope?.id === String(context.body.analysisRunID) &&
+        item.envelope?.type === "questionAnalysis" &&
+        item.payload?.questionID === questionID
+      );
+      if (!analysis || analysis.payload.dependencyHash !== context.body.analysisDependencyHash) {
+        throw new CodeQuestionCommandError("The selected analysis is stale or could not be resolved.", {
+          code: "CODE_QUESTION_VERSION_CONFLICT",
+          status: 409
+        });
+      }
+    }
     const allocated = await allocateStoredCodeQuestionCounter(
       context.userID,
       "conclusionRevision",
@@ -16469,9 +16825,25 @@ async function handleCodeQuestionConclusionPublish(request, response) {
       unknowns: context.body.unknowns,
       analysisRunID: context.body.analysisRunID,
       analysisDependencyHash: context.body.analysisDependencyHash,
+      aiAssistanceDisclosure: context.body.aiAssistanceDisclosure,
+      predecessorRevisionID: context.body.predecessorRevisionID,
       id: context.body.id || randomUUID()
     });
     await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    await saveStoredProjectLink(context.userID, linkForArtifact({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      targetKind: "professionalConclusion",
+      targetID: artifact.envelope.id
+    }));
+    await saveStoredActivityEvent(context.userID, activityFor({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      action: "code-question.conclusion.revised",
+      objectKind: "professionalConclusion",
+      objectID: artifact.envelope.id,
+      newStatus: `r${allocated.value}`
+    }));
     sendJSON(response, 201, {
       conclusion: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
     });
@@ -16681,6 +17053,7 @@ const handlers = {
   "projects/code-questions/inputs/save": handleCodeQuestionInputSave,
   "projects/code-questions/evidence/snapshot": handleCodeQuestionEvidenceSnapshot,
   "projects/code-questions/evidence/approve-set": handleCodeQuestionEvidenceSetCreate,
+  "projects/code-questions/analysis/create": handleCodeQuestionAnalysisCreate,
   "projects/code-questions/conclusions/publish": handleCodeQuestionConclusionPublish,
   "projects/code-questions/issue/start": handleCodeQuestionIssueStart,
   "projects/code-questions/issue/complete": handleCodeQuestionIssueComplete,

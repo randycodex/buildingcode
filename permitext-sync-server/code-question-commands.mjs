@@ -471,7 +471,8 @@ export function createAnalysisArtifact({
   createdAt = new Date().toISOString(),
   modelID = "",
   analysisPolicyID = "selected-evidence-only-v1",
-  promptTemplateVersion = "1"
+  promptTemplateVersion = "1",
+  citationValidation = "pending"
 }) {
   assertValidTransition("analysisRun", "nonexistent", "immutable");
   const payload = normalizeQuestionAnalysisPayload({
@@ -492,7 +493,7 @@ export function createAnalysisArtifact({
     requestedBy: userID,
     createdAt,
     requestID,
-    citationValidation: "pending"
+    citationValidation
   });
   return {
     envelope: artifactEnvelope({
@@ -524,6 +525,8 @@ export function createConclusionArtifact({
   unknowns = [],
   analysisRunID = null,
   analysisDependencyHash = null,
+  aiAssistanceDisclosure = "",
+  predecessorRevisionID = null,
   id = randomUUID(),
   createdAt = new Date().toISOString()
 }) {
@@ -545,6 +548,8 @@ export function createConclusionArtifact({
     citations,
     assumptions,
     unknowns,
+    aiAssistanceDisclosure,
+    predecessorRevisionID,
     authorUserID: userID,
     createdAt
   });
