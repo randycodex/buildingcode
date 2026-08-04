@@ -13036,3 +13036,54 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .code-question-conclusion-citation-choice {
   min-height: 32px;
 }
+
+/* Phase 6 — auditable Review Requests and passive History. */
+.code-question-review-workspace,
+.code-question-review-history { display: grid; gap: 1rem; }
+.code-question-review-boundary,
+.code-question-review-history-boundary,
+.code-question-review-approval,
+.code-question-review-composer,
+.code-question-review-request,
+.code-question-review-server-links {
+  padding: 1rem;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--project-color, #315c52) 8%, var(--surface-raised));
+  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--project-color, #315c52) 72%, transparent);
+}
+.code-question-review-approval,
+.code-question-review-composer,
+.code-question-review-request-actions,
+.code-question-review-comment-form,
+.code-question-review-resolution,
+.code-question-review-server-links { display: grid; gap: 0.7rem; }
+.code-question-review-approval textarea,
+.code-question-review-composer input,
+.code-question-review-composer textarea,
+.code-question-review-composer select,
+.code-question-review-comment-form input,
+.code-question-review-resolution input { width: 100%; box-sizing: border-box; }
+.code-question-review-blocking-choice { display: flex; align-items: center; gap: 0.45rem; font-weight: 650; }
+.code-question-review-filters,
+.code-question-review-request-head,
+.code-question-review-request-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem; }
+.code-question-review-filters button[aria-pressed="true"] { background: var(--project-color, #315c52); color: white; }
+.code-question-review-list,
+.code-question-review-comments,
+.code-question-review-history-list { display: grid; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+.code-question-review-request-head { justify-content: space-between; }
+.code-question-review-request.is-waiting { background: color-mix(in srgb, #b97a19 10%, var(--surface-raised)); }
+.code-question-review-request.is-resolved,
+.code-question-review-request.is-dismissed {
+  opacity: 0.82;
+  box-shadow: inset 4px 0 0 color-mix(in srgb, #64748b 65%, transparent);
+}
+.code-question-review-resolution,
+.code-question-review-comment-form { grid-template-columns: minmax(12rem, 1fr) auto; flex: 1 1 100%; }
+.code-question-review-comments li,
+.code-question-review-history-list li {
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface-raised) 88%, var(--project-color, #315c52));
+}
+.code-question-review-history-list li p { margin: 0.3rem 0 0; color: var(--text-muted); }

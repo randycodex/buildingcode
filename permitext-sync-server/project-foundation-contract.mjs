@@ -44,6 +44,7 @@ export const artifactTypes = Object.freeze([
   "questionEvidenceSet",
   "questionAnalysis",
   "professionalConclusion",
+  "conclusionApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -72,6 +73,7 @@ export const projectTargetKinds = Object.freeze([
   "questionEvidenceSet",
   "questionAnalysis",
   "professionalConclusion",
+  "conclusionApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -100,6 +102,7 @@ export const projectMembershipRules = Object.freeze({
   questionEvidenceSet: { maximumProjects: 1, relationship: "owner" },
   questionAnalysis: { maximumProjects: 1, relationship: "owner" },
   professionalConclusion: { maximumProjects: 1, relationship: "owner" },
+  conclusionApproval: { maximumProjects: 1, relationship: "owner" },
   issuedDecisionRecord: { maximumProjects: 1, relationship: "owner" }
 });
 
@@ -129,6 +132,7 @@ export const conflictPolicies = Object.freeze({
   questionEvidenceSet: "immutable",
   questionAnalysis: "immutable",
   professionalConclusion: "immutable",
+  conclusionApproval: "immutable",
   issuedDecisionRecord: "immutable"
 });
 

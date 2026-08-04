@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260803-code-question-analyze-v3";
+} from "./offline-storage.js?v=20260803-code-question-review-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -80,7 +80,7 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260803-code-question-analyze-v4";
+} from "./code-question-workspace.js?v=20260803-code-question-review-v1";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -133,6 +133,17 @@ import {
   updateConclusionDraft,
   useAnalysisAsStartingPoint
 } from "./code-question-analysis.js?v=20260803-code-question-analyze-v3";
+import {
+  adaptLegacyReviewThread,
+  appendReviewComment,
+  approveProfessionalConclusion,
+  codeQuestionReviewRequestTypes,
+  createReviewRequest,
+  emptyReviewWorkspace,
+  normalizeReviewWorkspace,
+  transitionReviewRequest,
+  unresolvedBlockingRequests
+} from "./code-question-review.js?v=20260803-code-question-review-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5018,6 +5029,28 @@ function saveAnalysisForQuestion(questionID, analysis) {
     ...cq,
     analysisByQuestionID: {
       ...(cq.analysisByQuestionID || {}),
+      [id]: normalized
+    }
+  });
+  return normalized;
+}
+
+function getReviewForQuestion(questionID) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const existing = codeQuestionWorkspaceState().reviewByQuestionID?.[id];
+  return normalizeReviewWorkspace(existing || emptyReviewWorkspace(id), id);
+}
+
+function saveReviewForQuestion(questionID, review) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const normalized = normalizeReviewWorkspace(review, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    reviewByQuestionID: {
+      ...(cq.reviewByQuestionID || {}),
       [id]: normalized
     }
   });
@@ -22874,6 +22907,10 @@ function renderCodeQuestionPane(paneDescriptor) {
     body.appendChild(renderCodeQuestionBoundedAnalysisBody(project, parsed.questionID));
   } else if (parsed.paneRole === "professional-conclusion") {
     body.appendChild(renderCodeQuestionProfessionalConclusionBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "review-requests") {
+    body.appendChild(renderCodeQuestionReviewRequestsBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "history") {
+    body.appendChild(renderCodeQuestionReviewHistoryBody(project, parsed.questionID));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
@@ -24268,6 +24305,339 @@ function renderCodeQuestionProfessionalConclusionBody(_project, questionID) {
   }
   history.appendChild(list);
   wrap.appendChild(history);
+  return wrap;
+}
+
+function codeQuestionReviewTargets(questionID) {
+  const qid = String(questionID || "").trim();
+  const question = questionsForActiveProject().find((item) => item.id === qid);
+  const definition = getDefinitionForQuestion(qid);
+  const evidence = getEvidenceForQuestion(qid);
+  const analysis = getAnalysisForQuestion(qid);
+  const targets = [{
+    kind: "codeQuestion", id: qid,
+    label: `${question?.displayID || "Question"} · ${question?.title || definition?.title || "Code Question"}`,
+    anchor: { anchorKind: "question", anchorID: qid, label: "Question definition", snapshotHash: definition?.definitionHash || "" }
+  }];
+  (definition?.inputs || []).filter((item) => item.state !== "retired").forEach((item) => targets.push({
+    kind: "questionInput", id: item.id,
+    label: `${inputKindLabel(item.inputKind)} · ${item.statement}`,
+    anchor: { anchorKind: "input", anchorID: item.id, label: item.statement, snapshotHash: item.contentHash || "" }
+  }));
+  const set = currentEvidenceSet(evidence);
+  if (set) targets.push({
+    kind: "questionEvidenceSet", id: set.id,
+    label: `Approved Evidence Set v${set.version}`,
+    anchor: { anchorKind: "evidence-set", anchorID: set.id, label: `Evidence Set v${set.version}`, snapshotHash: set.setHash }
+  });
+  const run = latestAnalysisRun(analysis);
+  if (run) targets.push({
+    kind: "questionAnalysis", id: run.id,
+    label: `Bounded Analysis · ${run.createdAt}`,
+    anchor: { anchorKind: "analysis-run", anchorID: run.id, label: "Bounded Analysis", snapshotHash: run.dependencyHash }
+  });
+  const conclusion = analysis?.conclusionRevisions?.[analysis.conclusionRevisions.length - 1];
+  if (conclusion) targets.push({
+    kind: "professionalConclusion", id: conclusion.id,
+    label: `Professional Conclusion r${conclusion.revision}`,
+    anchor: { anchorKind: "conclusion-revision", anchorID: conclusion.id, label: `Conclusion r${conclusion.revision}`, snapshotHash: conclusion.analysisDependencyHash || conclusion.evidenceSetHash }
+  });
+  return targets;
+}
+
+function codeQuestionReviewTypeLabel(type) {
+  return {
+    "fact-request": "Fact Request",
+    "evidence-review": "Evidence Review",
+    "interpretation-review": "Interpretation Review",
+    "revision-request": "Revision Request"
+  }[type] || "Review Request";
+}
+
+function refreshCodeQuestionReviewPanes(questionID) {
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const project = openProjectDetails()[0] || null;
+  track?.querySelectorAll?.(`.code-question-panel[data-question-id="${safeID}"]`).forEach((pane) => {
+    const body = pane.querySelector(".code-question-panel-body");
+    if (!body) return;
+    if (pane.dataset.cqRole === "review-requests") body.replaceChildren(renderCodeQuestionReviewRequestsBody(project, questionID));
+    if (pane.dataset.cqRole === "history") body.replaceChildren(renderCodeQuestionReviewHistoryBody(project, questionID));
+  });
+  saveWorkspaceState();
+}
+
+function renderCodeQuestionReviewRequestsBody(project, questionID) {
+  const qid = String(questionID || "").trim();
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-review-workspace";
+  if (!qid) return wrap;
+  const review = getReviewForQuestion(qid);
+  const actor = codeQuestionActor();
+  const targets = codeQuestionReviewTargets(qid);
+  const latestConclusion = getAnalysisForQuestion(qid)?.conclusionRevisions?.at(-1) || null;
+  const blockers = unresolvedBlockingRequests(review);
+  const boundary = document.createElement("section");
+  boundary.className = "code-question-review-boundary";
+  boundary.innerHTML = `
+    <p class="code-question-pane-status">Auditable professional review</p>
+    <p>Review Requests reuse Project Coordination records. Responses are immutable; status transitions and approval remain separate recorded actions.</p>
+    <p class="code-question-define-muted">${escapeHTML(String(blockers.length))} open blocking request${blockers.length === 1 ? "" : "s"} · approval ${review.approvals.length ? `recorded r${review.approvals.length}` : "not recorded"}</p>`;
+  wrap.appendChild(boundary);
+
+  const approval = document.createElement("section");
+  approval.className = "code-question-review-approval";
+  const approvalTitle = document.createElement("h3");
+  approvalTitle.textContent = "Professional approval";
+  const approvalCopy = document.createElement("p");
+  approvalCopy.textContent = "Approval targets one immutable conclusion revision. Resolving a request never approves the conclusion.";
+  const basis = document.createElement("textarea");
+  basis.rows = 3;
+  basis.maxLength = 4_000;
+  basis.placeholder = "Record the review basis…";
+  basis.setAttribute("aria-label", "Conclusion approval basis");
+  const approve = document.createElement("button");
+  approve.type = "button";
+  approve.textContent = latestConclusion ? `Approve conclusion r${latestConclusion.revision}` : "Publish a conclusion before approval";
+  approve.disabled = !latestConclusion || blockers.length > 0;
+  approve.addEventListener("click", () => {
+    try {
+      const result = approveProfessionalConclusion(getReviewForQuestion(qid), latestConclusion, {
+        basis: basis.value,
+        actor
+      });
+      saveReviewForQuestion(qid, result.workspace);
+      refreshCodeQuestionReviewPanes(qid);
+    } catch (error) {
+      void showWebNotice("Conclusion not approved", error.message);
+    }
+  });
+  approval.append(approvalTitle, approvalCopy, basis, approve);
+  if (blockers.length) {
+    const warning = document.createElement("p");
+    warning.className = "code-question-define-blockers";
+    warning.textContent = "Approval is blocked until all blocking Review Requests are resolved or dismissed.";
+    approval.appendChild(warning);
+  }
+  wrap.appendChild(approval);
+
+  const composer = document.createElement("form");
+  composer.className = "code-question-review-composer";
+  composer.innerHTML = "<h3>Open Review Request</h3>";
+  const type = document.createElement("select");
+  type.setAttribute("aria-label", "Review Request type");
+  codeQuestionReviewRequestTypes.forEach((value) => type.append(new Option(codeQuestionReviewTypeLabel(value), value)));
+  const target = document.createElement("select");
+  target.setAttribute("aria-label", "Review Request target");
+  targets.forEach((item, index) => {
+    const option = new Option(item.label, String(index));
+    target.append(option);
+  });
+  const blocking = document.createElement("label");
+  blocking.className = "code-question-review-blocking-choice";
+  const blockingInput = document.createElement("input");
+  blockingInput.type = "checkbox";
+  blockingInput.checked = true;
+  blocking.append(blockingInput, document.createTextNode(" Blocking for approval and issuance"));
+  const title = document.createElement("input");
+  title.required = true;
+  title.maxLength = 200;
+  title.placeholder = "What needs professional attention?";
+  title.setAttribute("aria-label", "Review Request title");
+  const body = document.createElement("textarea");
+  body.rows = 4;
+  body.maxLength = 20_000;
+  body.placeholder = "Describe the fact, evidence, interpretation, or revision needed.";
+  body.setAttribute("aria-label", "Review Request details");
+  const open = document.createElement("button");
+  open.type = "submit";
+  open.textContent = "Open Review Request";
+  composer.append(type, target, blocking, title, body, open);
+  composer.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const selected = targets[Number(target.value)] || targets[0];
+      const result = createReviewRequest(getReviewForQuestion(qid), {
+        questionID: qid,
+        requestType: type.value,
+        targetKind: selected.kind,
+        targetID: selected.id,
+        targetLabel: selected.label,
+        targetAnchor: selected.anchor,
+        blocking: blockingInput.checked,
+        title: title.value,
+        body: body.value,
+        actor
+      });
+      saveReviewForQuestion(qid, result.workspace);
+      refreshCodeQuestionReviewPanes(qid);
+    } catch (error) {
+      void showWebNotice("Review Request not opened", error.message);
+    }
+  });
+  wrap.appendChild(composer);
+
+  const filters = document.createElement("div");
+  filters.className = "code-question-review-filters";
+  ["open", "waiting", "resolved", "dismissed"].forEach((status) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = `${projectReviewStatusLabel(status)} ${review.requests.filter((item) => item.status === status).length}`;
+    button.setAttribute("aria-pressed", String(review.activeFilter === status));
+    button.addEventListener("click", () => {
+      saveReviewForQuestion(qid, { ...getReviewForQuestion(qid), activeFilter: status });
+      refreshCodeQuestionReviewPanes(qid);
+    });
+    filters.appendChild(button);
+  });
+  wrap.appendChild(filters);
+  const list = document.createElement("ol");
+  list.className = "code-question-review-list";
+  review.requests.filter((item) => item.status === review.activeFilter).slice().reverse().forEach((request) => {
+    const item = document.createElement("li");
+    item.className = `code-question-review-request is-${request.status}`;
+    item.innerHTML = `
+      <div class="code-question-review-request-head"><span>${escapeHTML(codeQuestionReviewTypeLabel(request.requestType))}</span><strong>${escapeHTML(projectReviewStatusLabel(request.status))}</strong></div>
+      <h4>${escapeHTML(request.title)}</h4>
+      <p>${escapeHTML(request.body || "No additional details recorded.")}</p>
+      <p class="code-question-define-muted">${request.blocking ? "Blocking" : "Advisory"} · Round ${escapeHTML(String(request.reviewRound))} · ${escapeHTML(request.targetLabel)} · ${escapeHTML(request.updatedAt)}</p>`;
+    const actions = document.createElement("div");
+    actions.className = "code-question-review-request-actions";
+    const transition = (status, resolution = "") => {
+      try {
+        const result = transitionReviewRequest(getReviewForQuestion(qid), request.id, status, { resolution, actor });
+        saveReviewForQuestion(qid, result.workspace);
+        refreshCodeQuestionReviewPanes(qid);
+      } catch (error) {
+        void showWebNotice("Review status not changed", error.message);
+      }
+    };
+    if (["resolved", "dismissed"].includes(request.status)) {
+      const reopen = document.createElement("button");
+      reopen.type = "button";
+      reopen.textContent = "Reopen";
+      reopen.addEventListener("click", () => transition("open"));
+      actions.append(reopen);
+    } else {
+      const waiting = document.createElement("button");
+      waiting.type = "button";
+      waiting.textContent = request.status === "waiting" ? "Mark open" : "Mark waiting";
+      waiting.addEventListener("click", () => transition(request.status === "waiting" ? "open" : "waiting"));
+      const dismiss = document.createElement("button");
+      dismiss.type = "button";
+      dismiss.textContent = "Dismiss";
+      dismiss.addEventListener("click", () => transition("dismissed"));
+      actions.append(waiting, dismiss);
+      const resolution = document.createElement("form");
+      resolution.className = "code-question-review-resolution";
+      const resolutionText = document.createElement("input");
+      resolutionText.required = true;
+      resolutionText.maxLength = 2_000;
+      resolutionText.placeholder = "Resolution statement";
+      resolutionText.setAttribute("aria-label", `Resolution for ${request.title}`);
+      const resolve = document.createElement("button");
+      resolve.type = "submit";
+      resolve.textContent = "Resolve";
+      resolution.append(resolutionText, resolve);
+      resolution.addEventListener("submit", (event) => {
+        event.preventDefault();
+        transition("resolved", resolutionText.value);
+      });
+      actions.append(resolution);
+      const commentForm = document.createElement("form");
+      commentForm.className = "code-question-review-comment-form";
+      const comment = document.createElement("input");
+      comment.required = true;
+      comment.maxLength = 10_000;
+      comment.placeholder = "Add immutable response";
+      comment.setAttribute("aria-label", `Respond to ${request.title}`);
+      const post = document.createElement("button");
+      post.type = "submit";
+      post.textContent = "Post";
+      commentForm.append(comment, post);
+      commentForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        try {
+          const result = appendReviewComment(getReviewForQuestion(qid), request.id, { body: comment.value, actor });
+          saveReviewForQuestion(qid, result.workspace);
+          refreshCodeQuestionReviewPanes(qid);
+        } catch (error) {
+          void showWebNotice("Response not posted", error.message);
+        }
+      });
+      actions.append(commentForm);
+    }
+    item.appendChild(actions);
+    const comments = review.comments.filter((comment) => comment.requestID === request.id);
+    if (comments.length) {
+      const responses = document.createElement("ol");
+      responses.className = "code-question-review-comments";
+      comments.forEach((comment) => {
+        const response = document.createElement("li");
+        response.textContent = `${comment.body} — ${comment.createdBy.displayName}, ${comment.createdAt}`;
+        responses.appendChild(response);
+      });
+      item.appendChild(responses);
+    }
+    list.appendChild(item);
+  });
+  if (!list.childElementCount) {
+    const empty = document.createElement("li");
+    empty.className = "code-question-define-empty-item";
+    empty.textContent = `No ${review.activeFilter} Review Requests.`;
+    list.appendChild(empty);
+  }
+  wrap.appendChild(list);
+  if (project) void appendServerReviewRequestLinks(wrap, project, qid, targets);
+  return wrap;
+}
+
+async function appendServerReviewRequestLinks(wrap, project, questionID, targets) {
+  const identity = projectIdentity(project);
+  const { foundation } = await loadProjectCoordinationFoundation(identity);
+  if (!foundation || !wrap.isConnected) return;
+  const targetIDs = new Set(targets.map((item) => item.id));
+  const legacy = projectCollaborationArtifacts(foundation, "reviewThread")
+    .filter((thread) => thread.questionID === questionID || targetIDs.has(thread.targetID))
+    .map((thread) => adaptLegacyReviewThread(thread, questionID))
+    .filter(Boolean);
+  if (!legacy.length) return;
+  const section = document.createElement("section");
+  section.className = "code-question-review-server-links";
+  section.innerHTML = "<h3>Shared Project Review Requests</h3><p class=\"code-question-define-muted\">Existing Coordination records retain their version and editing rules.</p>";
+  legacy.forEach((thread) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = `${codeQuestionReviewTypeLabel(thread.requestType)} · ${thread.title} · ${projectReviewStatusLabel(thread.status)}`;
+    button.addEventListener("click", () => void openProjectCoordinationThread(identity, thread.id));
+    section.appendChild(button);
+  });
+  wrap.appendChild(section);
+}
+
+function renderCodeQuestionReviewHistoryBody(_project, questionID) {
+  const qid = String(questionID || "").trim();
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-review-history";
+  const review = getReviewForQuestion(qid);
+  wrap.innerHTML = `
+    <section class="code-question-review-history-boundary">
+      <p class="code-question-pane-status">Passive audit history</p>
+      <p>History records what happened. Active requests and controls remain in the Review Requests pane.</p>
+    </section>`;
+  const list = document.createElement("ol");
+  list.className = "code-question-review-history-list";
+  review.history.slice().reverse().forEach((event) => {
+    const item = document.createElement("li");
+    const transition = event.from || event.to ? ` · ${event.from || "—"} → ${event.to || "—"}` : "";
+    item.innerHTML = `<strong>${escapeHTML(event.action.replaceAll(".", " "))}</strong>${escapeHTML(transition)}<p>${escapeHTML(event.actor.displayName)} · ${escapeHTML(event.at)}</p>`;
+    list.appendChild(item);
+  });
+  if (!list.childElementCount) {
+    const empty = document.createElement("li");
+    empty.textContent = "No review activity recorded yet.";
+    list.appendChild(empty);
+  }
+  wrap.appendChild(list);
   return wrap;
 }
 

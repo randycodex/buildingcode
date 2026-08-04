@@ -43,6 +43,7 @@ export const codeQuestionArtifactKinds = Object.freeze([
   "questionEvidenceSet",
   "questionAnalysis",
   "professionalConclusion",
+  "conclusionApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -691,6 +692,32 @@ export function normalizeProfessionalConclusionPayload({
       : null,
     authorUserID: requiredText(authorUserID, "author user ID", 256),
     createdAt: requiredISO(createdAt, "created date")
+  };
+}
+
+export function normalizeConclusionApprovalPayload({
+  id,
+  questionID,
+  conclusionID,
+  conclusionRevision,
+  dependencyHash,
+  reviewRound,
+  approvalBasis,
+  approvedByUserID,
+  approvedAt
+}) {
+  return {
+    schemaVersion: codeQuestionContractSchemaVersion,
+    kind: "conclusionApproval",
+    id: requiredText(id, "approval ID", 256),
+    questionID: requiredText(questionID, "question ID", 256),
+    conclusionID: requiredText(conclusionID, "conclusion ID", 256),
+    conclusionRevision: positiveInteger(conclusionRevision, "conclusion revision"),
+    dependencyHash: requiredText(dependencyHash, "approval dependency hash", 128),
+    reviewRound: positiveInteger(reviewRound, "review round"),
+    approvalBasis: requiredText(approvalBasis, "approval basis", 4_000),
+    approvedByUserID: requiredText(approvedByUserID, "approval actor", 256),
+    approvedAt: requiredISO(approvedAt, "approval time")
   };
 }
 

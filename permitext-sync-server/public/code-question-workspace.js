@@ -98,6 +98,8 @@ export function emptyCodeQuestionWorkspaceState() {
     evidenceByQuestionID: {},
     /** Phase 5: immutable analysis runs + separate conclusion drafts/revisions. */
     analysisByQuestionID: {},
+    /** Phase 6: Review Requests, immutable comments/history, and approvals. */
+    reviewByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -271,6 +273,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
   if (source.analysisByQuestionID && typeof source.analysisByQuestionID === "object") {
     state.analysisByQuestionID = Object.fromEntries(
       Object.entries(source.analysisByQuestionID)
+        .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
+        .map(([questionID, record]) => [questionID, copy(record)])
+    );
+  }
+  if (source.reviewByQuestionID && typeof source.reviewByQuestionID === "object") {
+    state.reviewByQuestionID = Object.fromEntries(
+      Object.entries(source.reviewByQuestionID)
         .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
         .map(([questionID, record]) => [questionID, copy(record)])
     );

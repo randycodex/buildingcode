@@ -130,6 +130,18 @@ function normalizedLinkedItemSnapshot(value) {
   };
 }
 
+function normalizedReviewTargetAnchor(value) {
+  if (value === null || value === undefined) return null;
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    throw new Error("Invalid review target anchor.");
+  }
+  const anchorKind = requiredText(value.anchorKind || "record", "review anchor kind", 64);
+  const anchorID = requiredText(value.anchorID, "review anchor ID", 256);
+  const label = optionalText(value.label, 240);
+  const snapshotHash = optionalText(value.snapshotHash, 128);
+  return { anchorKind, anchorID, label, snapshotHash };
+}
+
 export function latestReviewThreadUpdatedAt(threadUpdatedAt, comments = []) {
   const baseline = requiredISO(threadUpdatedAt, "review thread update date");
   return (Array.isArray(comments) ? comments : [])
@@ -193,7 +205,9 @@ export function normalizeReviewThreadPayload({
   resolution = null,
   allowLegacyResolvedWithoutResolution = false,
   questionID = null,
-  reviewRound = 1
+  reviewRound = 1,
+  blocking = false,
+  targetAnchor = null
 }) {
   const rawRequestType = requestType === null || requestType === undefined || requestType === ""
     ? null
@@ -275,6 +289,8 @@ export function normalizeReviewThreadPayload({
     if (!Number.isSafeInteger(round) || round < 1) throw new Error("Invalid review round.");
     payload.reviewRound = round;
   }
+  payload.blocking = blocking === true;
+  payload.targetAnchor = normalizedReviewTargetAnchor(targetAnchor);
   return payload;
 }
 
@@ -290,7 +306,9 @@ export function reviewThreadForClient(payload) {
     requestType: requestType || null,
     reviewRound: Number.isSafeInteger(Number(payload.reviewRound))
       ? Number(payload.reviewRound)
-      : 1
+      : 1,
+    blocking: payload.blocking === true,
+    targetAnchor: payload.targetAnchor || null
   };
 }
 

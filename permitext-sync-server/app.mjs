@@ -71,12 +71,14 @@ import {
   archiveCodeQuestionArtifact,
   assertCodeQuestionPermission,
   assertCodeQuestionWorkspaceEnabled,
+  blockingReviewRequestIDs,
   CodeQuestionCommandError,
   codeQuestionMigrationCheckpointName,
   codeQuestionWorkspaceFeatureEnabled,
   compareAndSwapFoundationArtifact,
   createAnalysisArtifact,
   createCodeQuestionArtifact,
+  createConclusionApprovalArtifact,
   createConclusionArtifact,
   createEvidenceSetArtifact,
   createEvidenceSnapshotArtifact,
@@ -172,7 +174,8 @@ import {
   latestReviewThreadUpdatedAt,
   normalizeProjectNotePayload,
   normalizeReviewCommentPayload,
-  normalizeReviewThreadPayload
+  normalizeReviewThreadPayload,
+  reviewRequestTypeToKind
 } from "./collaboration-contract.mjs";
 import {
   activeReportTemplate,
@@ -7611,7 +7614,7 @@ function reviewTargetSnapshot({ label, description = "", updatedAt = null }) {
   };
 }
 
-async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, targetID) {
+async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, targetID, questionID = null) {
   const normalizedTargetID = String(targetID || "").trim();
   if (targetKind === "project") {
     if (normalizedTargetID !== projectID) return null;
@@ -7641,7 +7644,12 @@ async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, 
   const artifactTypeByTargetKind = {
     evidenceReview: "evidenceReview",
     reportDraft: "reportDraft",
-    notebookCard: "notebookCard"
+    notebookCard: "notebookCard",
+    codeQuestion: "codeQuestion",
+    questionInput: "questionInput",
+    questionEvidenceSet: "questionEvidenceSet",
+    questionAnalysis: "questionAnalysis",
+    professionalConclusion: "professionalConclusion"
   };
   const artifactType = artifactTypeByTargetKind[targetKind];
   if (!artifactType) return null;
@@ -7653,10 +7661,24 @@ async function reviewTargetInProject(storageOwnerUserID, projectID, targetKind, 
     normalizedTargetID
   );
   if (!artifact) return null;
+  const codeQuestionTarget = [
+    "codeQuestion", "questionInput", "questionEvidenceSet", "questionAnalysis", "professionalConclusion"
+  ].includes(targetKind);
+  if (codeQuestionTarget) {
+    const artifactQuestionID = targetKind === "codeQuestion"
+      ? artifact.envelope?.id
+      : artifact.payload?.questionID;
+    if (!questionID || artifactQuestionID !== questionID) return null;
+  }
   const fallbackLabelByTargetKind = {
     evidenceReview: "Evidence review",
     reportDraft: "Report Draft",
-    notebookCard: "Notebook card"
+    notebookCard: "Notebook card",
+    codeQuestion: "Code Question",
+    questionInput: "Question Input",
+    questionEvidenceSet: "Approved Evidence Set",
+    questionAnalysis: "Bounded Analysis",
+    professionalConclusion: "Professional Conclusion"
   };
   return {
     target: artifact,
@@ -7837,13 +7859,6 @@ async function handleProjectCollaborationThreadSave(request, response) {
     });
     return;
   }
-  if (requestedStatus === "dismissed" && existing?.payload.status !== "dismissed") {
-    sendJSON(response, 400, {
-      error: "Dismissed is a legacy coordination status and cannot be newly assigned.",
-      code: "INVALID_REVIEW_THREAD_STATUS"
-    });
-    return;
-  }
   const statusChanged = Boolean(existing && requestedStatus !== existing.payload.status);
   const requestedAssigneeUserID = context.body.assigneeUserID === undefined
     ? existing?.payload.assigneeUserID || null
@@ -7851,7 +7866,18 @@ async function handleProjectCollaborationThreadSave(request, response) {
   const assigneeChanged = Boolean(
     existing && requestedAssigneeUserID !== (existing.payload.assigneeUserID || null)
   );
-  const requestedKind = context.body.kind || existing?.payload.kind;
+  const requestedRequestType = context.body.requestType || existing?.payload.requestType || null;
+  const requestedKind = context.body.kind || existing?.payload.kind ||
+    (requestedRequestType ? reviewRequestTypeToKind(requestedRequestType) : "general-review");
+  const requestedQuestionID = String(
+    context.body.questionID || existing?.payload.questionID || ""
+  ).trim() || null;
+  const requestedBlocking = context.body.blocking === undefined
+    ? existing?.payload.blocking === true
+    : context.body.blocking === true;
+  const requestedTargetAnchor = context.body.targetAnchor === undefined
+    ? existing?.payload.targetAnchor || null
+    : context.body.targetAnchor;
   const requestedTitle = context.body.title || existing?.payload.title;
   const requestedBody = context.body.body ?? existing?.payload.body;
   const requestedResolution = requestedStatus === "resolved"
@@ -7872,6 +7898,8 @@ async function handleProjectCollaborationThreadSave(request, response) {
     String(requestedKind || "").trim() !== String(existing.payload.kind || "").trim() ||
     String(requestedTitle || "").trim() !== String(existing.payload.title || "").trim() ||
     String(requestedBody || "").trim() !== String(existing.payload.body || "").trim()
+    || String(requestedRequestType || "") !== String(existing.payload.requestType || "")
+    || requestedBlocking !== (existing.payload.blocking === true)
   ));
   const requiredPermission = statusChanged || resolutionChanged
     ? organizationPermissions.projectReviewResolve
@@ -7883,6 +7911,24 @@ async function handleProjectCollaborationThreadSave(request, response) {
       error: "Your Project role does not allow this action.",
       code: "PROJECT_PERMISSION_REQUIRED",
       requiredPermission
+    });
+    return;
+  }
+  if (requestedQuestionID && (
+    !codeQuestionEnabledForRequest(context.body) ||
+    !viewAccess.permissions.includes(organizationPermissions.codeQuestionReview)
+  )) {
+    sendJSON(response, 403, {
+      error: "Your Project role does not allow Code Question review.",
+      code: "CODE_QUESTION_PERMISSION_DENIED",
+      requiredPermission: organizationPermissions.codeQuestionReview
+    });
+    return;
+  }
+  if (existing?.payload.questionID && requestedQuestionID !== existing.payload.questionID) {
+    sendJSON(response, 409, {
+      error: "A Review Request cannot be moved to a different Code Question.",
+      code: "REVIEW_QUESTION_IMMUTABLE"
     });
     return;
   }
@@ -7918,7 +7964,8 @@ async function handleProjectCollaborationThreadSave(request, response) {
     viewAccess.storageOwnerUserID,
     projectID,
     targetKind,
-    targetID
+    targetID,
+    requestedQuestionID
   );
   if (!existing && !creationTarget) {
     sendError(response, 404, "Review target not found in this Project.");
@@ -7942,6 +7989,7 @@ async function handleProjectCollaborationThreadSave(request, response) {
     const payload = normalizeReviewThreadPayload({
       projectID,
       kind: requestedKind,
+      requestType: requestedRequestType,
       status: requestedStatus,
       targetKind,
       targetID,
@@ -7974,7 +8022,13 @@ async function handleProjectCollaborationThreadSave(request, response) {
         : null,
       allowLegacyResolvedWithoutResolution: Boolean(
         preserveLegacyResolvedWithoutResolution
-      )
+      ),
+      questionID: requestedQuestionID,
+      reviewRound: existing && ["resolved", "dismissed"].includes(existing.payload.status) && requestedStatus === "open"
+        ? Number(existing.payload.reviewRound || 1) + 1
+        : Number(existing?.payload.reviewRound || 1),
+      blocking: requestedBlocking,
+      targetAnchor: requestedTargetAnchor
     });
     if (preserveLegacyResolvedWithoutResolution) {
       payload.schemaVersion = Number(existing.payload.schemaVersion || 1);
@@ -8023,6 +8077,11 @@ async function handleProjectCollaborationThreadSave(request, response) {
     const sharedMetadata = {
       threadID,
       kind: payload.kind,
+      requestType: payload.requestType || null,
+      questionID: payload.questionID || null,
+      reviewRound: payload.reviewRound || 1,
+      blocking: payload.blocking === true,
+      targetAnchor: payload.targetAnchor || null,
       targetKind,
       targetID,
       assigneeUserID: payload.assigneeUserID,
@@ -8032,7 +8091,7 @@ async function handleProjectCollaborationThreadSave(request, response) {
     if (!existing) {
       activities.push(activityEvent({
         ...sharedActivity,
-        action: "review-thread.created",
+        action: payload.questionID ? "code-question.review.opened" : "review-thread.created",
         previousStatus: null,
         newStatus: payload.status,
         metadata: sharedMetadata
@@ -8041,7 +8100,11 @@ async function handleProjectCollaborationThreadSave(request, response) {
       if (statusChanged || resolutionChanged) {
         activities.push(activityEvent({
           ...sharedActivity,
-          action: "review-thread.status.changed",
+          action: payload.questionID && ["resolved", "dismissed"].includes(payload.status)
+            ? "code-question.review.resolved"
+            : payload.questionID && ["resolved", "dismissed"].includes(existing.payload.status) && payload.status === "open"
+              ? "code-question.review.reopened"
+              : "review-thread.status.changed",
           previousStatus: existing.payload.status,
           newStatus: payload.status,
           metadata: {
@@ -8053,7 +8116,7 @@ async function handleProjectCollaborationThreadSave(request, response) {
       if (assigneeChanged) {
         activities.push(activityEvent({
           ...sharedActivity,
-          action: "review-thread.assignee.changed",
+          action: payload.questionID ? "code-question.review.assigned" : "review-thread.assignee.changed",
           previousStatus: existing.payload.status,
           newStatus: payload.status,
           metadata: {
@@ -16853,6 +16916,90 @@ async function handleCodeQuestionConclusionPublish(request, response) {
   }
 }
 
+async function handleCodeQuestionConclusionApprove(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.conclusion.approve")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const conclusionID = String(context.body.conclusionID || "").trim();
+    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const question = artifacts.find((item) =>
+      item.envelope?.type === "codeQuestion" && item.envelope.id === questionID
+    );
+    const conclusion = artifacts.find((item) =>
+      item.envelope?.type === "professionalConclusion" &&
+      item.envelope.id === conclusionID &&
+      item.payload?.questionID === questionID
+    );
+    if (!question || !conclusion) {
+      sendError(response, 404, "Code Question or professional conclusion not found.");
+      return;
+    }
+    const openBlockingIDs = blockingReviewRequestIDs(artifacts, questionID);
+    if (openBlockingIDs.length) {
+      sendJSON(response, 409, {
+        error: "Resolve all blocking Review Requests before approval.",
+        code: "BLOCKING_REVIEW_REQUESTS_OPEN",
+        requestIDs: openBlockingIDs
+      });
+      return;
+    }
+    const allocated = await allocateStoredCodeQuestionCounter(
+      context.userID,
+      "conclusionApprovalRound",
+      questionID
+    );
+    const dependencyHash = conclusion.payload.analysisDependencyHash || codeQuestionContentHash({
+      definitionRevision: conclusion.payload.definitionRevision,
+      definitionHash: conclusion.payload.definitionHash,
+      inputSetHash: conclusion.payload.inputSetHash,
+      evidenceSetID: conclusion.payload.evidenceSetID,
+      evidenceSetVersion: conclusion.payload.evidenceSetVersion,
+      evidenceSetHash: conclusion.payload.evidenceSetHash
+    });
+    const approval = createConclusionApprovalArtifact({
+      userID: context.userID,
+      questionID,
+      conclusionID,
+      conclusionRevision: conclusion.payload.revision,
+      dependencyHash,
+      reviewRound: allocated.value,
+      approvalBasis: context.body.approvalBasis,
+      id: context.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(context.userID, approval, 0);
+    await saveStoredProjectLink(context.userID, linkForArtifact({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      targetKind: "conclusionApproval",
+      targetID: approval.envelope.id,
+      metadata: { questionID, conclusionID }
+    }));
+    const activity = activityFor({
+      userID: context.userID,
+      projectID: question.payload.projectID,
+      action: "code-question.conclusion.approved",
+      objectKind: "conclusionApproval",
+      objectID: approval.envelope.id,
+      newStatus: "approved",
+      metadata: { questionID, conclusionID, reviewRound: allocated.value }
+    });
+    await saveStoredActivityEvent(context.userID, activity);
+    sendJSON(response, 201, {
+      approval: { id: approval.envelope.id, version: approval.envelope.version, ...approval.payload },
+      activity
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "Invalid conclusion approval.",
+      code: "INVALID_CONCLUSION_APPROVAL"
+    });
+  }
+}
+
 async function handleCodeQuestionIssueStart(request, response) {
   const context = await requireCodeQuestionContext(request, response, {
     permission: permissionForCommand("codeQuestion.issue.start")
@@ -16863,6 +17010,16 @@ async function handleCodeQuestionIssueStart(request, response) {
     const idempotencyKey = String(context.body.idempotencyKey || "").trim();
     if (!idempotencyKey) {
       sendError(response, 400, "Issuance requires an idempotency key.");
+      return;
+    }
+    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const openBlockingIDs = blockingReviewRequestIDs(artifacts, questionID);
+    if (openBlockingIDs.length) {
+      sendJSON(response, 409, {
+        error: "Resolve all blocking Review Requests before issuance.",
+        code: "BLOCKING_REVIEW_REQUESTS_OPEN",
+        requestIDs: openBlockingIDs
+      });
       return;
     }
     const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
@@ -16906,6 +17063,16 @@ async function handleCodeQuestionIssueComplete(request, response) {
     const pending = pendingList.find((item) => item.id === pendingID);
     if (!pending) {
       sendError(response, 404, "Pending issuance not found.");
+      return;
+    }
+    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const openBlockingIDs = blockingReviewRequestIDs(artifacts, pending.questionID);
+    if (openBlockingIDs.length) {
+      sendJSON(response, 409, {
+        error: "Resolve all blocking Review Requests before issuance.",
+        code: "BLOCKING_REVIEW_REQUESTS_OPEN",
+        requestIDs: openBlockingIDs
+      });
       return;
     }
     let advanced = advanceIssuanceSaga(pending, "staged", {
@@ -17055,6 +17222,7 @@ const handlers = {
   "projects/code-questions/evidence/approve-set": handleCodeQuestionEvidenceSetCreate,
   "projects/code-questions/analysis/create": handleCodeQuestionAnalysisCreate,
   "projects/code-questions/conclusions/publish": handleCodeQuestionConclusionPublish,
+  "projects/code-questions/conclusions/approve": handleCodeQuestionConclusionApprove,
   "projects/code-questions/issue/start": handleCodeQuestionIssueStart,
   "projects/code-questions/issue/complete": handleCodeQuestionIssueComplete,
   "projects/code-questions/issue/fail": handleCodeQuestionIssueFail,

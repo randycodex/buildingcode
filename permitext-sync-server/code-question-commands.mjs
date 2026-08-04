@@ -19,6 +19,7 @@ import {
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled,
   normalizeCodeQuestionPayload,
+  normalizeConclusionApprovalPayload,
   normalizeEvidenceSnapshotV2,
   normalizeIssuedDecisionRecordPayload,
   normalizeProfessionalConclusionPayload,
@@ -43,6 +44,8 @@ export const codeQuestionCommandKinds = Object.freeze([
   "codeQuestion.evidenceSet.version",
   "codeQuestion.analysis.create",
   "codeQuestion.conclusion.publish",
+  "codeQuestion.conclusion.approve",
+  "codeQuestion.review.manage",
   "codeQuestion.issue.start",
   "codeQuestion.issue.complete",
   "codeQuestion.issue.fail",
@@ -85,6 +88,19 @@ export function assertCodeQuestionPermission(role, permission) {
       details: { permission, role }
     });
   }
+}
+
+export function blockingReviewRequestIDs(artifacts, questionID) {
+  const normalizedQuestionID = String(questionID || "").trim();
+  if (!normalizedQuestionID) return [];
+  return (Array.isArray(artifacts) ? artifacts : [])
+    .filter((item) =>
+      item?.envelope?.type === "reviewThread" &&
+      item?.payload?.questionID === normalizedQuestionID &&
+      item?.payload?.blocking === true &&
+      ["open", "waiting"].includes(item?.payload?.status)
+    )
+    .map((item) => item.envelope.id);
 }
 
 /**
@@ -566,6 +582,42 @@ export function createConclusionArtifact({
   };
 }
 
+export function createConclusionApprovalArtifact({
+  userID,
+  questionID,
+  conclusionID,
+  conclusionRevision,
+  dependencyHash,
+  reviewRound,
+  approvalBasis,
+  id = randomUUID(),
+  approvedAt = new Date().toISOString()
+}) {
+  assertValidTransition("conclusionApproval", "unapproved", "approved");
+  const payload = normalizeConclusionApprovalPayload({
+    id,
+    questionID,
+    conclusionID,
+    conclusionRevision,
+    dependencyHash,
+    reviewRound,
+    approvalBasis,
+    approvedByUserID: userID,
+    approvedAt
+  });
+  return {
+    envelope: artifactEnvelope({
+      id,
+      type: "conclusionApproval",
+      owner: ownerScope(userID),
+      createdAt: approvedAt,
+      updatedAt: approvedAt,
+      version: 1
+    }),
+    payload
+  };
+}
+
 export function createIssuedRecordArtifact({
   userID,
   questionID,
@@ -636,7 +688,8 @@ export function activityFor({
   objectID,
   previousStatus = null,
   newStatus = null,
-  createdAt = new Date().toISOString()
+  createdAt = new Date().toISOString(),
+  metadata = {}
 }) {
   return activityEvent({
     owner: ownerScope(userID),
@@ -647,7 +700,8 @@ export function activityFor({
     objectID,
     previousStatus,
     newStatus,
-    createdAt
+    createdAt,
+    metadata
   });
 }
 
@@ -715,6 +769,10 @@ export function permissionForCommand(commandKind) {
       return organizationPermissions.codeQuestionAnalyze;
     case "codeQuestion.conclusion.publish":
       return organizationPermissions.codeQuestionConclusionDraft;
+    case "codeQuestion.conclusion.approve":
+      return organizationPermissions.codeQuestionConclusionApprove;
+    case "codeQuestion.review.manage":
+      return organizationPermissions.codeQuestionReview;
     case "codeQuestion.issue.start":
     case "codeQuestion.issue.complete":
     case "codeQuestion.issue.fail":

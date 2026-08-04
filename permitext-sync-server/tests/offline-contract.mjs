@@ -195,12 +195,13 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260803-code-question-analyze-v8"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260803-code-question-review-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260803-code-question-analyze-v3"));
-assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260803-code-question-analyze-v4"));
+assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260803-code-question-review-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-define.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-evidence.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260803-code-question-analyze-v3"));
+assert(shellPrecacheURLs.includes("/web/code-question-review.js?v=20260803-code-question-review-v1"));
 
 let activationCompletion;
 listeners.get("activate")({
@@ -209,7 +210,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v433"));
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v434"));
 
 function navigationResponse(path) {
   let response;

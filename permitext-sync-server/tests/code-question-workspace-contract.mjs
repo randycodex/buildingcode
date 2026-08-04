@@ -72,6 +72,12 @@ const mixed = normalizeCodeQuestionWorkspaceState({
 assert.equal(mixed.openPanes.every((pane) => pane.projectID === "project-1"), true);
 assert.equal(mixed.openPanes.some((pane) => pane.questionID === "other"), false);
 assert.ok(mixed.openPanes.some((pane) => pane.paneRole === "question-index"));
+const reviewState = normalizeCodeQuestionWorkspaceState({
+  reviewByQuestionID: {
+    "cq-1": { questionID: "cq-1", requests: [{ id: "request-1", status: "open" }] }
+  }
+});
+assert.equal(reviewState.reviewByQuestionID["cq-1"].requests[0].id, "request-1");
 
 // Stage arrangement is workspace-only (does not invent approval state)
 const arranged = applyStageArrangement(emptyCodeQuestionWorkspaceState(), {
