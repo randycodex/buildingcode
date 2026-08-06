@@ -44,6 +44,8 @@ export const codeQuestionArtifactKinds = Object.freeze([
   "questionAnalysis",
   "professionalConclusion",
   "conclusionApproval",
+  "codeMemoReadiness",
+  "codeMemoApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -718,6 +720,69 @@ export function normalizeConclusionApprovalPayload({
     approvalBasis: requiredText(approvalBasis, "approval basis", 4_000),
     approvedByUserID: requiredText(approvedByUserID, "approval actor", 256),
     approvedAt: requiredISO(approvedAt, "approval time")
+  };
+}
+
+export function normalizeCodeMemoApprovalPayload({
+  id,
+  questionID,
+  draftID,
+  draftRevision,
+  draftHash,
+  conclusionID,
+  conclusionRevision,
+  conclusionHash,
+  approvalBasis,
+  approvedByUserID,
+  approvedAt
+}) {
+  return {
+    schemaVersion: codeQuestionContractSchemaVersion,
+    kind: "codeMemoApproval",
+    id: requiredText(id, "Code Memo approval ID", 256),
+    questionID: requiredText(questionID, "question ID", 256),
+    draftID: requiredText(draftID, "Code Memo Draft ID", 256),
+    draftRevision: positiveInteger(draftRevision, "Code Memo Draft revision"),
+    draftHash: requiredText(draftHash, "Code Memo Draft hash", 256),
+    conclusionID: requiredText(conclusionID, "conclusion ID", 256),
+    conclusionRevision: positiveInteger(conclusionRevision, "conclusion revision"),
+    conclusionHash: requiredText(conclusionHash, "conclusion hash", 256),
+    approvalBasis: requiredText(approvalBasis, "Code Memo approval basis", 4_000),
+    approvedByUserID: requiredText(approvedByUserID, "Code Memo approval actor", 256),
+    approvedAt: requiredISO(approvedAt, "Code Memo approval time")
+  };
+}
+
+export function normalizeCodeMemoReadinessPayload({
+  id,
+  questionID,
+  draftID,
+  draftRevision,
+  draftHash,
+  checks,
+  markedByUserID,
+  markedAt
+}) {
+  const normalizedChecks = (Array.isArray(checks) ? checks : []).map((check) => ({
+    id: requiredText(check.id, "readiness check ID", 128),
+    label: requiredText(check.label, "readiness check label", 240),
+    ready: check.ready === true,
+    message: requiredText(check.message, "readiness check message", 2_000)
+  }));
+  if (!normalizedChecks.length || normalizedChecks.some((check) => !check.ready)) {
+    throw new Error("Code Memo readiness requires every check to pass.");
+  }
+  return {
+    schemaVersion: codeQuestionContractSchemaVersion,
+    kind: "codeMemoReadiness",
+    id: requiredText(id, "Code Memo readiness ID", 256),
+    questionID: requiredText(questionID, "question ID", 256),
+    draftID: requiredText(draftID, "Code Memo Draft ID", 256),
+    draftRevision: positiveInteger(draftRevision, "Code Memo Draft revision"),
+    draftHash: requiredText(draftHash, "Code Memo Draft hash", 256),
+    checks: normalizedChecks,
+    markedByUserID: requiredText(markedByUserID, "readiness actor", 256),
+    markedAt: requiredISO(markedAt, "readiness time")
   };
 }
 

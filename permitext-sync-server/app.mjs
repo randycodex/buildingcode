@@ -78,6 +78,8 @@ import {
   compareAndSwapFoundationArtifact,
   createAnalysisArtifact,
   createCodeQuestionArtifact,
+  createCodeMemoApprovalArtifact,
+  createCodeMemoReadinessArtifact,
   createConclusionApprovalArtifact,
   createConclusionArtifact,
   createEvidenceSetArtifact,
@@ -106,11 +108,14 @@ import {
 import { codeTrustProfilesForLibraries } from "./code-trust-contract.mjs";
 import {
   immutableReportManifest,
+  immutableReportManifestV3,
   normalizeReportDraftPayload,
+  normalizeReportDraftPayloadV2,
   reportDraftForClient,
   reportManifestSummary,
   unavailableReportEvidenceWarning
 } from "./report-contract.mjs";
+import { codeMemoHTML, codeMemoStructuredJSON } from "./public/code-question-issue.js";
 import { renderReportPDF } from "./report-pdf.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
@@ -710,6 +715,38 @@ function createFileStoreAdapter() {
       await this.write(store);
       return record;
     },
+    async reserveCodeQuestionIssuance(userID, input) {
+      const store = await this.read();
+      store.codeQuestionPendingIssuanceByUserID ||= {};
+      const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
+      const existing = entries.find((item) =>
+        item.questionID === input.questionID && item.idempotencyKey === input.idempotencyKey
+      );
+      if (existing) return { pending: existing, replayed: true };
+      const active = entries.find((item) =>
+        item.questionID === input.questionID && ["reserved", "staged", "committing"].includes(item.status)
+      );
+      if (active) {
+        throw new CodeQuestionCommandError("Another issuance attempt is already active for this Code Question.", {
+          code: "CODE_QUESTION_ISSUANCE_IN_PROGRESS", status: 409, details: { pendingID: active.id }
+        });
+      }
+      store.codeQuestionCountersByUserID ||= {};
+      const userCounters = store.codeQuestionCountersByUserID[userID] || {};
+      const scopeMap = userCounters.issueVersion || {};
+      const allocated = allocateScopedVersion(scopeMap, input.questionID);
+      userCounters.issueVersion = allocated.scopes;
+      store.codeQuestionCountersByUserID[userID] = userCounters;
+      const pending = createPendingIssuanceRecord({
+        ...input,
+        issueVersion: allocated.version,
+        stagedObjectKey: `${input.stagedPrefix}issue-v${allocated.version}/${input.deterministicHash}`
+      });
+      entries.push(pending);
+      store.codeQuestionPendingIssuanceByUserID[userID] = entries;
+      await this.write(store);
+      return { pending, replayed: false };
+    },
     async listCodeQuestionOutbox(userID) {
       const store = await this.read();
       return (store.codeQuestionOutboxByUserID?.[userID] || []).slice();
@@ -773,6 +810,48 @@ function createFileStoreAdapter() {
       store.activityEventsByUserID[userID] = entries;
       await this.write(store);
       return existing || event;
+    },
+    async commitCodeQuestionIssuance(userID, { artifacts, links, events, pending }) {
+      const store = await this.read();
+      store.foundationArtifactsByUserID ||= {};
+      store.projectLinksByUserID ||= {};
+      store.activityEventsByUserID ||= {};
+      store.codeQuestionPendingIssuanceByUserID ||= {};
+      const storedArtifacts = store.foundationArtifactsByUserID[userID] || [];
+      for (const artifact of artifacts) {
+        const index = storedArtifacts.findIndex((item) => item.envelope?.id === artifact.envelope.id);
+        const existing = index === -1 ? null : storedArtifacts[index];
+        if (existing && canonicalJSONString(existing) !== canonicalJSONString(artifact)) {
+          throw new Error("Immutable issuance artifacts cannot be changed.");
+        }
+        if (index === -1) storedArtifacts.push(artifact);
+      }
+      store.foundationArtifactsByUserID[userID] = storedArtifacts;
+      const storedLinks = store.projectLinksByUserID[userID] || [];
+      for (const link of links) {
+        const index = storedLinks.findIndex((item) => item.id === link.id);
+        if (index === -1) storedLinks.push(link);
+        else if (canonicalJSONString(storedLinks[index]) !== canonicalJSONString(link)) {
+          throw new Error("Immutable issuance links cannot be changed.");
+        }
+      }
+      store.projectLinksByUserID[userID] = storedLinks;
+      const storedEvents = store.activityEventsByUserID[userID] || [];
+      for (const event of events) {
+        const existing = storedEvents.find((item) => item.id === event.id);
+        if (existing && canonicalJSONString(existing) !== canonicalJSONString(event)) {
+          throw new Error("Activity events are append-only.");
+        }
+        if (!existing) storedEvents.push(event);
+      }
+      store.activityEventsByUserID[userID] = storedEvents;
+      const pendingEntries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
+      const pendingIndex = pendingEntries.findIndex((item) => item.id === pending.id);
+      if (pendingIndex === -1) throw new Error("Pending issuance disappeared before commit.");
+      pendingEntries[pendingIndex] = pending;
+      store.codeQuestionPendingIssuanceByUserID[userID] = pendingEntries;
+      await this.write(store);
+      return { artifacts, links, events, pending };
     },
     async organization(organizationID) {
       const store = await this.read();
@@ -2725,6 +2804,93 @@ async function createPostgresStoreAdapter() {
       `;
       return record;
     },
+    async reserveCodeQuestionIssuance(userID, input) {
+      await ensureSchema();
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_counters (
+          user_id TEXT NOT NULL,
+          scope TEXT NOT NULL,
+          scope_key TEXT NOT NULL,
+          value INTEGER NOT NULL DEFAULT 0,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+          PRIMARY KEY (user_id, scope, scope_key)
+        )
+      `;
+      await sql`
+        CREATE TABLE IF NOT EXISTS permitext_code_question_pending_issuance (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          record JSONB NOT NULL DEFAULT '{}'::jsonb,
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+        )
+      `;
+      const baseRecord = createPendingIssuanceRecord({
+        ...input,
+        issueVersion: 1,
+        stagedObjectKey: `${input.stagedPrefix}issue-v1/${input.deterministicHash}`
+      });
+      const lockKey = `${userID}:code-question-issue:${input.questionID}`;
+      const [_, insertedRows, existingRows, activeRows] = await sql.transaction([
+        sql`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`,
+        sql`
+          WITH existing AS (
+            SELECT record
+            FROM permitext_code_question_pending_issuance
+            WHERE user_id = ${userID}
+              AND record->>'questionID' = ${input.questionID}
+              AND record->>'idempotencyKey' = ${input.idempotencyKey}
+          ), active AS (
+            SELECT record
+            FROM permitext_code_question_pending_issuance
+            WHERE user_id = ${userID}
+              AND record->>'questionID' = ${input.questionID}
+              AND record->>'status' IN ('reserved', 'staged', 'committing')
+            LIMIT 1
+          ), next_counter AS (
+            INSERT INTO permitext_code_question_counters (user_id, scope, scope_key, value, updated_at)
+            SELECT ${userID}, 'issueVersion', ${input.questionID}, 1, now()
+            WHERE NOT EXISTS (SELECT 1 FROM existing) AND NOT EXISTS (SELECT 1 FROM active)
+            ON CONFLICT (user_id, scope, scope_key) DO UPDATE SET
+              value = permitext_code_question_counters.value + 1,
+              updated_at = now()
+            RETURNING value
+          )
+          INSERT INTO permitext_code_question_pending_issuance (id, user_id, record, updated_at)
+          SELECT
+            ${input.id},
+            ${userID},
+            ${JSON.stringify(baseRecord)}::jsonb || jsonb_build_object(
+              'issueVersion', next_counter.value,
+              'stagedObjectKey', ${input.stagedPrefix} || 'issue-v' || next_counter.value::text || '/' || ${input.deterministicHash}
+            ),
+            now()
+          FROM next_counter
+          ON CONFLICT (id) DO NOTHING
+          RETURNING record
+        `,
+        sql`
+          SELECT record
+          FROM permitext_code_question_pending_issuance
+          WHERE id = ${input.id} AND user_id = ${userID}
+          LIMIT 1
+        `,
+        sql`
+          SELECT record
+          FROM permitext_code_question_pending_issuance
+          WHERE user_id = ${userID}
+            AND record->>'questionID' = ${input.questionID}
+            AND record->>'status' IN ('reserved', 'staged', 'committing')
+          ORDER BY updated_at DESC
+          LIMIT 1
+        `
+      ], { isolationLevel: "Serializable" });
+      const pending = safeJSON(existingRows[0]?.record || insertedRows[0]?.record, null);
+      if (pending) return { pending, replayed: insertedRows.length === 0 };
+      const active = safeJSON(activeRows[0]?.record, null);
+      throw new CodeQuestionCommandError("Another issuance attempt is already active for this Code Question.", {
+        code: "CODE_QUESTION_ISSUANCE_IN_PROGRESS", status: 409, details: { pendingID: active?.id || null }
+      });
+    },
     async listCodeQuestionOutbox(userID) {
       await ensureSchema();
       await sql`
@@ -2844,6 +3010,65 @@ async function createPostgresStoreAdapter() {
         throw new Error("Immutable Research answer cannot be changed.");
       }
       return existing;
+    },
+    async commitCodeQuestionIssuance(userID, { artifacts, links, events, pending }) {
+      await ensureSchema();
+      const queries = [
+        ...artifacts.map((artifact) => {
+          const envelope = artifact.envelope;
+          return sql`
+            INSERT INTO permitext_foundation_artifacts (
+              id, user_id, artifact_type, envelope, payload,
+              created_at, updated_at, archived_at, deleted_at
+            )
+            VALUES (
+              ${envelope.id}, ${userID}, ${envelope.type},
+              ${JSON.stringify(envelope)}::jsonb, ${JSON.stringify(artifact.payload || {})}::jsonb,
+              ${envelope.createdAt}::timestamptz, ${envelope.updatedAt}::timestamptz,
+              ${envelope.archivedAt}::timestamptz, ${envelope.deletedAt}::timestamptz
+            )
+            ON CONFLICT (id) DO NOTHING
+          `;
+        }),
+        ...links.map((link) => sql`
+          INSERT INTO permitext_project_links (
+            id, user_id, project_id, target_kind, target_id, relationship,
+            link, created_at, updated_at, deleted_at
+          )
+          VALUES (
+            ${link.id}, ${userID}, ${link.projectID}, ${link.targetKind}, ${link.targetID},
+            ${link.relationship}, ${JSON.stringify(link)}::jsonb,
+            ${link.createdAt}::timestamptz, ${link.updatedAt}::timestamptz,
+            ${link.deletedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `),
+        ...events.map((event) => sql`
+          INSERT INTO permitext_project_activity (
+            id, user_id, project_id, action, object_kind, object_id, event, created_at
+          )
+          VALUES (
+            ${event.id}, ${userID}, ${event.projectID}, ${event.action},
+            ${event.objectKind}, ${event.objectID}, ${JSON.stringify(event)}::jsonb,
+            ${event.createdAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `),
+        sql`
+          UPDATE permitext_code_question_pending_issuance
+          SET record = ${JSON.stringify(pending)}::jsonb, updated_at = now()
+          WHERE id = ${pending.id} AND user_id = ${userID}
+            AND record->>'status' = 'committing'
+          RETURNING id
+        `
+      ];
+      const results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+      if (!results.at(-1)?.length) {
+        throw new CodeQuestionCommandError("Pending issuance changed before transactional commit.", {
+          code: "ISSUANCE_SAGA_INVALID_TRANSITION", status: 409
+        });
+      }
+      return { artifacts, links, events, pending };
     },
     async listActivityEvents(userID) {
       await ensureSchema();
@@ -3287,6 +3512,28 @@ async function saveStoredCodeQuestionPendingIssuance(userID, record) {
     return adapter.saveCodeQuestionPendingIssuance(userID, record);
   }
   throw new CodeQuestionCommandError("Pending issuance storage is unavailable.", {
+    code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+    status: 503
+  });
+}
+
+async function reserveStoredCodeQuestionIssuance(userID, input) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.reserveCodeQuestionIssuance === "function") {
+    return adapter.reserveCodeQuestionIssuance(userID, input);
+  }
+  throw new CodeQuestionCommandError("Transactional issuance reservation is unavailable.", {
+    code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+    status: 503
+  });
+}
+
+async function commitStoredCodeQuestionIssuance(userID, payload) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.commitCodeQuestionIssuance === "function") {
+    return adapter.commitCodeQuestionIssuance(userID, payload);
+  }
+  throw new CodeQuestionCommandError("Transactional issuance commit is unavailable.", {
     code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
     status: 503
   });
@@ -4061,6 +4308,24 @@ async function readPrivateProjectAsset(pathname) {
 
 async function storePrivateReportFile(pathname, body) {
   return storePrivateProjectAsset(pathname, body, "application/pdf");
+}
+
+async function storeOrVerifyPrivateProjectAsset(pathname, body, contentType) {
+  try {
+    return await storePrivateProjectAsset(pathname, body, contentType);
+  } catch (error) {
+    if (error?.code !== "EEXIST") throw error;
+    const existing = await readPrivateProjectAsset(pathname);
+    if (!existing || !Buffer.from(existing).equals(Buffer.from(body))) {
+      throw new Error("A deterministic staged output exists with different content.");
+    }
+    return pathname;
+  }
+}
+
+function codeMemoFilePathname(projectID, manifestID, format) {
+  const extension = format === "pdf" ? "pdf" : format === "html" ? "html" : "json";
+  return `${reportFilePrefix(projectID)}${safeWorkboardPathHash(manifestID)}/code-memo.${extension}`;
 }
 
 async function readPrivateReportFile(pathname) {
@@ -17000,6 +17265,366 @@ async function handleCodeQuestionConclusionApprove(request, response) {
   }
 }
 
+function latestCodeQuestionArtifact(artifacts, type, questionID, field = "revision") {
+  return artifacts
+    .filter((item) => item.envelope?.type === type && item.payload?.questionID === questionID)
+    .sort((left, right) => Number(right.payload?.[field] || 0) - Number(left.payload?.[field] || 0))[0] || null;
+}
+
+async function resolveServerCodeMemoContext(userID, questionID, draftID = null) {
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  const question = artifacts.find((item) =>
+    item.envelope?.type === "codeQuestion" && item.envelope.id === questionID
+  ) || null;
+  if (!question) throw new CodeQuestionCommandError("Code Question not found.", { status: 404 });
+  const inputs = artifacts
+    .filter((item) => item.envelope?.type === "questionInput" && item.payload?.questionID === questionID)
+    .map((item) => item.payload)
+    .filter((item) => item.state !== "retired")
+    .sort((left, right) => String(left.id).localeCompare(String(right.id)));
+  const evidenceSet = latestCodeQuestionArtifact(artifacts, "questionEvidenceSet", questionID, "version");
+  const snapshots = new Map(artifacts
+    .filter((item) => item.envelope?.type === "evidenceSnapshotV2")
+    .map((item) => [item.envelope.id, item]));
+  const draftCandidates = artifacts
+    .filter((item) =>
+      item.envelope?.type === "reportDraft" &&
+      item.payload?.recordType === "codeDecisionMemo" &&
+      item.payload?.questionID === questionID
+    )
+    .sort((left, right) => Number(right.payload?.draftRevision || 0) - Number(left.payload?.draftRevision || 0));
+  const draft = draftID
+    ? draftCandidates.find((item) => item.envelope.id === draftID) || null
+    : draftCandidates[0] || null;
+  const analysisID = draft?.payload?.codeMemo?.analysisRunID || question.payload.currentAnalysisID || null;
+  const analysis = analysisID
+    ? artifacts.find((item) => item.envelope?.type === "questionAnalysis" && item.envelope.id === analysisID) || null
+    : null;
+  const conclusion = latestCodeQuestionArtifact(artifacts, "professionalConclusion", questionID, "revision");
+  const conclusionHash = conclusion ? codeQuestionContentHash(conclusion.payload) : null;
+  const conclusionApproval = artifacts
+    .filter((item) =>
+      item.envelope?.type === "conclusionApproval" &&
+      item.payload?.questionID === questionID &&
+      item.payload?.conclusionID === conclusion?.envelope.id &&
+      Number(item.payload?.conclusionRevision) === Number(conclusion?.payload?.revision)
+    )
+    .sort((left, right) => String(right.payload?.approvedAt).localeCompare(String(left.payload?.approvedAt)))[0] || null;
+  const readiness = artifacts
+    .filter((item) => item.envelope?.type === "codeMemoReadiness" && item.payload?.draftID === draft?.envelope.id)
+    .sort((left, right) => String(right.payload?.markedAt).localeCompare(String(left.payload?.markedAt)))[0] || null;
+  const memoApproval = artifacts
+    .filter((item) => item.envelope?.type === "codeMemoApproval" && item.payload?.draftID === draft?.envelope.id)
+    .sort((left, right) => String(right.payload?.approvedAt).localeCompare(String(left.payload?.approvedAt)))[0] || null;
+  const definitionHash = codeQuestionContentHash({
+    questionText: question.payload.questionText,
+    scope: question.payload.scope || "",
+    jurisdiction: question.payload.jurisdiction || "",
+    asOfDate: question.payload.asOfDate || null,
+    definitionRevision: question.payload.definitionRevision
+  });
+  const inputSetHash = codeQuestionContentHash(inputs.map((input) => ({
+    id: input.id,
+    inputKind: input.inputKind,
+    state: input.state,
+    statement: input.statement,
+    revision: input.revision
+  })));
+  const dependencyHash = evidenceSet ? computeDependencyHash({
+    questionText: question.payload.questionText,
+    scope: question.payload.scope || "",
+    jurisdiction: question.payload.jurisdiction || "",
+    asOfDate: question.payload.asOfDate || null,
+    inputs,
+    evidenceSet: evidenceSet.payload
+  }) : null;
+  return {
+    artifacts, question, inputs, evidenceSet, snapshots, analysis, conclusion,
+    conclusionHash, conclusionApproval, draft, readiness, memoApproval,
+    definitionHash, inputSetHash, dependencyHash
+  };
+}
+
+function serverCodeMemoReadiness(context) {
+  const checks = [];
+  const add = (id, label, ready, message) => checks.push({ id, label, ready: ready === true, message });
+  const entries = context.evidenceSet?.payload?.entries || [];
+  add("evidence", "Approved evidence", entries.length > 0,
+    entries.length ? `Evidence Set v${context.evidenceSet.payload.version} selected.` : "Approve an Evidence Set.");
+  const unresolved = context.inputs.filter((item) => item.inputKind === "unknown" && !["resolved", "retired"].includes(item.state));
+  add("inputs", "Resolved required inputs", unresolved.length === 0,
+    unresolved.length ? `${unresolved.length} unresolved unknown input(s).` : "No unresolved required unknowns.");
+  const includeAnalysis = context.draft?.payload?.codeMemo?.includeAnalysis !== false;
+  const analysisCurrent = !includeAnalysis || (
+    context.analysis && context.analysis.payload.dependencyHash === context.dependencyHash
+  );
+  add("analysis", "Current selected analysis", analysisCurrent,
+    !includeAnalysis ? "The memo does not rely on AI analysis." : analysisCurrent ? "Selected analysis is current." : "Selected analysis is missing or stale.");
+  const conclusionCurrent = Boolean(context.conclusion && context.draft &&
+    context.draft.payload.codeMemo?.conclusionID === context.conclusion.envelope.id &&
+    Number(context.draft.payload.codeMemo?.conclusionRevision) === Number(context.conclusion.payload.revision) &&
+    context.draft.payload.codeMemo?.conclusionHash === context.conclusionHash
+  );
+  add("conclusion", "Current professional conclusion", conclusionCurrent,
+    conclusionCurrent ? `Professional Conclusion r${context.conclusion.payload.revision}.` : "Prepare a draft from the current conclusion revision.");
+  const allowedSnapshots = new Set(entries.map((entry) => entry.snapshotID));
+  const citations = context.conclusion?.payload?.citations || [];
+  const citationsValid = citations.length > 0 && citations.every((id) => allowedSnapshots.has(id));
+  add("citations", "Approved-evidence citations", citationsValid,
+    citationsValid ? `${citations.length} citation(s) resolved.` : "Every conclusion citation must resolve to approved evidence.");
+  const blockerIDs = blockingReviewRequestIDs(context.artifacts, context.question.envelope.id);
+  add("review", "Blocking Review Requests", blockerIDs.length === 0,
+    blockerIDs.length ? `${blockerIDs.length} blocking Review Request(s) remain.` : "No blocking Review Requests remain.");
+  const approvalCurrent = Boolean(context.conclusionApproval &&
+    context.conclusionApproval.payload.dependencyHash === (
+      context.conclusion?.payload?.analysisDependencyHash || context.conclusion?.payload?.evidenceSetHash
+    ));
+  add("conclusion-approval", "Conclusion approval", approvalCurrent,
+    approvalCurrent ? "The current conclusion approval resolves." : "Approve the current conclusion revision.");
+  const missingSnapshots = entries.filter((entry) => !context.snapshots.has(entry.snapshotID));
+  const sourceBlocked = entries.filter((entry) =>
+    ["verification-blocked", "verification-required", "unavailable"].includes(entry.sourceVerificationState)
+  );
+  add("source-status", "Source status", entries.length > 0 && !missingSnapshots.length && !sourceBlocked.length,
+    missingSnapshots.length ? "An immutable evidence snapshot is unavailable." : sourceBlocked.length ? "An approved source requires verification resolution." : "Approved source snapshots are available and qualified.");
+  const draftBound = Boolean(context.draft &&
+    Number(context.draft.payload.codeMemo?.definitionRevision) === Number(context.question.payload.definitionRevision) &&
+    context.draft.payload.codeMemo?.definitionHash === context.definitionHash &&
+    context.draft.payload.codeMemo?.inputSetHash === context.inputSetHash &&
+    context.draft.payload.codeMemo?.evidenceSetID === context.evidenceSet?.envelope.id &&
+    Number(context.draft.payload.codeMemo?.evidenceSetVersion) === Number(context.evidenceSet?.payload?.version) &&
+    context.draft.payload.codeMemo?.evidenceSetHash === context.evidenceSet?.payload?.contentHash
+  );
+  add("draft-binding", "Exact selected versions", draftBound,
+    draftBound ? "Draft hashes match current selected inputs and evidence." : "Prepare a new draft from the current selected versions.");
+  return { ready: checks.every((check) => check.ready), checks, blockers: checks.filter((check) => !check.ready) };
+}
+
+function codeMemoDraftBlocks(context, narrative, includeAnalysis, researchAnswer) {
+  const blocks = [
+    { id: `${context.question.envelope.id}:question-heading`, kind: "heading", text: "Question presented" },
+    { id: `${context.question.envelope.id}:question`, kind: "paragraph", text: context.question.payload.questionText },
+    { id: `${context.question.envelope.id}:inputs-heading`, kind: "heading", text: "Project inputs" }
+  ];
+  if (context.inputs.length) {
+    blocks.push({
+      id: `${context.question.envelope.id}:inputs`, kind: "list",
+      items: context.inputs.map((input) => `${input.inputKind} [${input.state}]: ${input.statement}`)
+    });
+  } else {
+    blocks.push({ id: `${context.question.envelope.id}:inputs-empty`, kind: "paragraph", text: "No selected Project inputs." });
+  }
+  blocks.push({ id: `${context.question.envelope.id}:evidence-heading`, kind: "heading", text: "Approved evidence" });
+  for (const entry of context.evidenceSet?.payload?.entries || []) {
+    const snapshot = context.snapshots.get(entry.snapshotID);
+    blocks.push({
+      id: `${context.question.envelope.id}:evidence:${entry.snapshotID}`,
+      kind: "evidence",
+      sourceID: entry.snapshotID,
+      label: `${snapshot?.payload?.passageLocator || entry.snapshotID} · ${entry.role}`
+    });
+  }
+  if (includeAnalysis && researchAnswer) {
+    blocks.push(
+      { id: `${context.question.envelope.id}:analysis-heading`, kind: "heading", text: "Bounded analysis summary" },
+      { id: `${context.question.envelope.id}:analysis`, kind: "paragraph", text: researchAnswer.answer?.conclusion || "No supported analysis conclusion was recorded." }
+    );
+  }
+  blocks.push(
+    { id: `${context.question.envelope.id}:conclusion-heading`, kind: "heading", text: "Professional conclusion" },
+    { id: `${context.question.envelope.id}:conclusion`, kind: "paragraph", text: context.conclusion.payload.conclusionText }
+  );
+  if (context.conclusion.payload.reasoning) {
+    blocks.push({ id: `${context.question.envelope.id}:reasoning`, kind: "paragraph", text: context.conclusion.payload.reasoning });
+  }
+  if (String(narrative || "").trim()) {
+    blocks.push(
+      { id: `${context.question.envelope.id}:narrative-heading`, kind: "heading", text: "Authored narrative" },
+      { id: `${context.question.envelope.id}:narrative`, kind: "paragraph", text: String(narrative).trim() }
+    );
+  }
+  return blocks;
+}
+
+async function handleCodeQuestionMemoPrepare(request, response) {
+  const requestContext = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.memo.prepare")
+  });
+  if (!requestContext) return;
+  try {
+    const questionID = String(requestContext.body.questionID || "").trim();
+    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID);
+    if (!context.evidenceSet || !context.conclusion) {
+      throw new CodeQuestionCommandError("Prepare approved evidence and a professional conclusion before the Code Memo.", { status: 409 });
+    }
+    const includeAnalysis = requestContext.body.includeAnalysis !== false;
+    const researchAnswer = includeAnalysis && context.analysis
+      ? (await listStoredResearchAnswers(requestContext.userID)).find((item) => item.id === context.analysis.payload.researchAnswerID) || null
+      : null;
+    if (includeAnalysis && context.analysis && !researchAnswer) {
+      throw new CodeQuestionCommandError("The selected immutable Research answer is unavailable.", { status: 409 });
+    }
+    const allocated = await allocateStoredCodeQuestionCounter(requestContext.userID, "codeMemoDraftRevision", questionID);
+    const now = new Date().toISOString();
+    const draftID = String(requestContext.body.draftID || randomUUID());
+    const payload = normalizeReportDraftPayloadV2({
+      title: requestContext.body.title || `${context.question.payload.displayID} · ${context.question.payload.title}`,
+      reportDate: now,
+      introduction: String(requestContext.body.narrative || "").trim(),
+      blocks: codeMemoDraftBlocks(context, requestContext.body.narrative, includeAnalysis, researchAnswer),
+      createdBy: requestContext.userID,
+      updatedBy: requestContext.userID,
+      questionID,
+      projectID: context.question.payload.projectID,
+      draftRevision: allocated.value,
+      codeMemo: {
+        conclusionRevision: context.conclusion.payload.revision,
+        evidenceSetVersion: context.evidenceSet.payload.version,
+        definitionRevision: context.question.payload.definitionRevision,
+        analysisRunID: includeAnalysis ? context.analysis?.envelope.id || null : null,
+        readinessState: "draft",
+        includeAnalysis,
+        definitionHash: context.definitionHash,
+        inputSetHash: context.inputSetHash,
+        evidenceSetID: context.evidenceSet.envelope.id,
+        evidenceSetHash: context.evidenceSet.payload.contentHash,
+        conclusionID: context.conclusion.envelope.id,
+        conclusionHash: context.conclusionHash,
+        conclusionApprovalID: context.conclusionApproval?.envelope.id || null,
+        correctionOfIssuedRecordID: requestContext.body.correctionOfIssuedRecordID || null
+      }
+    });
+    const artifact = {
+      envelope: artifactEnvelope({
+        id: draftID, type: "reportDraft", owner: ownerScope(requestContext.userID),
+        createdAt: now, updatedAt: now, version: 1
+      }),
+      payload
+    };
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
+    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      targetKind: "reportDraft",
+      targetID: draftID,
+      metadata: { questionID, recordType: "codeDecisionMemo", draftRevision: allocated.value }
+    }));
+    const activity = activityFor({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      action: "code-question.memo.prepared",
+      objectKind: "reportDraft",
+      objectID: draftID,
+      newStatus: "draft",
+      metadata: { questionID, draftRevision: allocated.value, draftHash: payload.contentHash }
+    });
+    await saveStoredActivityEvent(requestContext.userID, activity);
+    sendJSON(response, 201, { draft: reportDraftForClient(artifact, [context.question.payload.projectID]), activity });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    sendJSON(response, 400, { error: error.message || "Invalid Code Memo Draft.", code: "INVALID_CODE_MEMO_DRAFT" });
+  }
+}
+
+async function handleCodeQuestionMemoReady(request, response) {
+  const requestContext = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.memo.ready")
+  });
+  if (!requestContext) return;
+  try {
+    const questionID = String(requestContext.body.questionID || "").trim();
+    const draftID = String(requestContext.body.draftID || "").trim();
+    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID, draftID);
+    if (!context.draft) throw new CodeQuestionCommandError("Code Memo Draft not found.", { status: 404 });
+    const readiness = serverCodeMemoReadiness(context);
+    if (!readiness.ready) {
+      sendJSON(response, 409, { error: "Code Memo readiness has blockers.", code: "CODE_MEMO_NOT_READY", readiness });
+      return;
+    }
+    const artifact = createCodeMemoReadinessArtifact({
+      userID: requestContext.userID,
+      questionID,
+      draftID,
+      draftRevision: context.draft.payload.draftRevision,
+      draftHash: context.draft.payload.contentHash,
+      checks: readiness.checks,
+      id: requestContext.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
+    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      targetKind: "codeMemoReadiness",
+      targetID: artifact.envelope.id,
+      metadata: { questionID, draftID }
+    }));
+    await saveStoredActivityEvent(requestContext.userID, activityFor({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      action: "code-question.memo.ready",
+      objectKind: "codeMemoReadiness",
+      objectID: artifact.envelope.id,
+      newStatus: "ready-for-approval",
+      metadata: { questionID, draftID, draftHash: context.draft.payload.contentHash }
+    }));
+    sendJSON(response, 201, { readiness: { id: artifact.envelope.id, ...artifact.payload } });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionMemoApprove(request, response) {
+  const requestContext = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.memo.approve")
+  });
+  if (!requestContext) return;
+  try {
+    const questionID = String(requestContext.body.questionID || "").trim();
+    const draftID = String(requestContext.body.draftID || "").trim();
+    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID, draftID);
+    const readiness = serverCodeMemoReadiness(context);
+    if (!context.draft || !context.readiness ||
+      context.readiness.payload.draftHash !== context.draft.payload.contentHash || !readiness.ready) {
+      sendJSON(response, 409, { error: "Mark the current Code Memo Draft ready before approval.", code: "CODE_MEMO_NOT_READY", readiness });
+      return;
+    }
+    const artifact = createCodeMemoApprovalArtifact({
+      userID: requestContext.userID,
+      questionID,
+      draftID,
+      draftRevision: context.draft.payload.draftRevision,
+      draftHash: context.draft.payload.contentHash,
+      conclusionID: context.conclusion.envelope.id,
+      conclusionRevision: context.conclusion.payload.revision,
+      conclusionHash: context.conclusionHash,
+      approvalBasis: requestContext.body.approvalBasis,
+      id: requestContext.body.id || randomUUID()
+    });
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
+    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      targetKind: "codeMemoApproval",
+      targetID: artifact.envelope.id,
+      metadata: { questionID, draftID }
+    }));
+    await saveStoredActivityEvent(requestContext.userID, activityFor({
+      userID: requestContext.userID,
+      projectID: context.question.payload.projectID,
+      action: "code-question.memo.approved",
+      objectKind: "codeMemoApproval",
+      objectID: artifact.envelope.id,
+      newStatus: "approved",
+      metadata: { questionID, draftID, draftHash: context.draft.payload.contentHash }
+    }));
+    sendJSON(response, 201, { approval: { id: artifact.envelope.id, ...artifact.payload } });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    sendJSON(response, 400, { error: error.message || "Invalid Code Memo approval.", code: "INVALID_CODE_MEMO_APPROVAL" });
+  }
+}
+
 async function handleCodeQuestionIssueStart(request, response) {
   const context = await requireCodeQuestionContext(request, response, {
     permission: permissionForCommand("codeQuestion.issue.start")
@@ -17007,18 +17632,28 @@ async function handleCodeQuestionIssueStart(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
+    const draftID = String(context.body.draftID || "").trim();
     const idempotencyKey = String(context.body.idempotencyKey || "").trim();
-    if (!idempotencyKey) {
-      sendError(response, 400, "Issuance requires an idempotency key.");
+    if (!draftID || !idempotencyKey) {
+      sendError(response, 400, "Issuance requires a Code Memo Draft and idempotency key.");
       return;
     }
-    const artifacts = await listStoredFoundationArtifacts(context.userID);
-    const openBlockingIDs = blockingReviewRequestIDs(artifacts, questionID);
-    if (openBlockingIDs.length) {
+    const memoContext = await resolveServerCodeMemoContext(context.userID, questionID, draftID);
+    const readiness = serverCodeMemoReadiness(memoContext);
+    if (!readiness.ready) {
       sendJSON(response, 409, {
-        error: "Resolve all blocking Review Requests before issuance.",
-        code: "BLOCKING_REVIEW_REQUESTS_OPEN",
-        requestIDs: openBlockingIDs
+        error: "Code Memo readiness changed before issuance.",
+        code: "CODE_MEMO_NOT_READY",
+        readiness
+      });
+      return;
+    }
+    if (!memoContext.memoApproval ||
+      memoContext.memoApproval.payload.draftHash !== memoContext.draft.payload.contentHash ||
+      memoContext.memoApproval.payload.conclusionHash !== memoContext.conclusionHash) {
+      sendJSON(response, 409, {
+        error: "Approve the current Code Memo Draft before issuance.",
+        code: "CODE_MEMO_APPROVAL_REQUIRED"
       });
       return;
     }
@@ -17027,29 +17662,61 @@ async function handleCodeQuestionIssueStart(request, response) {
       item.idempotencyKey === idempotencyKey && item.questionID === questionID
     );
     if (existing) {
-      sendJSON(response, 200, { pending: existing, replayed: true });
+      const recovered = existing.status === "failed"
+        ? advanceIssuanceSaga(existing, "reserved", { error: null })
+        : existing;
+      if (recovered !== existing) await saveStoredCodeQuestionPendingIssuance(context.userID, recovered);
+      sendJSON(response, 200, { pending: recovered, replayed: true, recovered: recovered !== existing });
       return;
     }
-    const allocated = await allocateStoredCodeQuestionCounter(
-      context.userID,
-      "issueVersion",
-      questionID
-    );
-    const pending = createPendingIssuanceRecord({
+    const deterministicHash = createHash("sha256")
+      .update(`${context.userID}:${questionID}:${idempotencyKey}`)
+      .digest("hex");
+    const reservation = await reserveStoredCodeQuestionIssuance(context.userID, {
+      id: `cq-pending-${deterministicHash}`,
       questionID,
-      issueVersion: allocated.value,
       idempotencyKey,
       actorUserID: context.userID,
-      stagedObjectKey: context.body.stagedObjectKey ||
-        `staged/code-question/${questionID}/issue-v${allocated.value}/${idempotencyKey}`,
+      stagedPrefix: `staged/code-question/${safeWorkboardPathHash(questionID)}/`,
+      deterministicHash,
+      draftID,
+      draftHash: memoContext.draft.payload.contentHash,
+      memoApprovalID: memoContext.memoApproval.envelope.id,
+      predecessorID: memoContext.draft.payload.codeMemo?.correctionOfIssuedRecordID || null,
+      manifestID: `cq-manifest-${deterministicHash}`,
+      issuedRecordID: `cq-issued-${deterministicHash}`,
       status: "reserved"
     });
-    await saveStoredCodeQuestionPendingIssuance(context.userID, pending);
-    sendJSON(response, 201, { pending, replayed: false });
+    sendJSON(response, reservation.replayed ? 200 : 201, reservation);
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
     throw error;
   }
+}
+
+function codeMemoManifestItems(memoContext) {
+  return (memoContext.draft.payload.blocks || []).map((block) => {
+    if (["heading", "paragraph", "list"].includes(block.kind)) return block;
+    if (block.kind !== "evidence") {
+      throw new CodeQuestionCommandError("Code Memo Draft contains an unsupported source block.", { status: 409 });
+    }
+    const snapshot = memoContext.snapshots.get(block.sourceID)?.payload;
+    if (!snapshot) {
+      throw new CodeQuestionCommandError("An approved evidence snapshot is unavailable.", { status: 409 });
+    }
+    return {
+      id: block.id,
+      kind: "evidence",
+      sectionID: snapshot.id,
+      sectionNumber: snapshot.passageLocator,
+      codeBook: snapshot.sourceIdentity || "Approved source",
+      chapter: "Code Question evidence",
+      title: snapshot.passageLocator,
+      passageText: snapshot.quotedText,
+      passageTextHash: snapshot.textHash,
+      sourceLibraryVersion: snapshot.sourceVersion || "evidence-snapshot-v2"
+    };
+  });
 }
 
 async function handleCodeQuestionIssueComplete(request, response) {
@@ -17057,6 +17724,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
     permission: permissionForCommand("codeQuestion.issue.complete")
   });
   if (!context) return;
+  let pendingForFailure = null;
   try {
     const pendingID = String(context.body.pendingID || "").trim();
     const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
@@ -17065,55 +17733,356 @@ async function handleCodeQuestionIssueComplete(request, response) {
       sendError(response, 404, "Pending issuance not found.");
       return;
     }
-    const artifacts = await listStoredFoundationArtifacts(context.userID);
-    const openBlockingIDs = blockingReviewRequestIDs(artifacts, pending.questionID);
-    if (openBlockingIDs.length) {
-      sendJSON(response, 409, {
-        error: "Resolve all blocking Review Requests before issuance.",
-        code: "BLOCKING_REVIEW_REQUESTS_OPEN",
-        requestIDs: openBlockingIDs
+    pendingForFailure = pending;
+    if (pending.status === "issued") {
+      const replay = (await listStoredFoundationArtifacts(context.userID)).find((item) =>
+        item.envelope?.type === "issuedDecisionRecord" && item.envelope.id === pending.issuedRecordID
+      );
+      sendJSON(response, 200, {
+        pending,
+        issuedRecord: replay ? { id: replay.envelope.id, version: replay.envelope.version, ...replay.payload } : null,
+        replayed: true
       });
       return;
     }
+    if (pending.status !== "reserved") {
+      sendJSON(response, 409, {
+        error: "Issuance is not in a recoverable reserved state.",
+        code: "ISSUANCE_SAGA_INVALID_TRANSITION",
+        pending
+      });
+      return;
+    }
+    const memoContext = await resolveServerCodeMemoContext(
+      context.userID,
+      pending.questionID,
+      pending.draftID
+    );
+    const readiness = serverCodeMemoReadiness(memoContext);
+    if (!readiness.ready ||
+      !memoContext.memoApproval ||
+      memoContext.memoApproval.envelope.id !== pending.memoApprovalID ||
+      memoContext.memoApproval.payload.draftHash !== pending.draftHash) {
+      sendJSON(response, 409, {
+        error: "Issuance dependencies or approval changed before commit.",
+        code: "CODE_MEMO_NOT_READY",
+        readiness
+      });
+      return;
+    }
+    const predecessor = pending.predecessorID
+      ? memoContext.artifacts.find((item) =>
+          item.envelope?.type === "issuedDecisionRecord" &&
+          item.envelope.id === pending.predecessorID &&
+          item.payload?.questionID === pending.questionID
+        ) || null
+      : null;
+    if (pending.predecessorID && !predecessor) {
+      throw new CodeQuestionCommandError("The correction predecessor could not be resolved.", { status: 409 });
+    }
+    if (!privateProjectAssetStorageConfigured()) {
+      sendError(response, 503, "Private Code Memo output storage is not configured.");
+      return;
+    }
     let advanced = advanceIssuanceSaga(pending, "staged", {
-      stagedObjectKey: pending.stagedObjectKey || context.body.stagedObjectKey
+      stagedObjectKey: pending.stagedObjectKey
     });
+    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
+    const project = await ownedProjectRecord(context.userID, memoContext.question.payload.projectID);
+    if (!project) throw new CodeQuestionCommandError("Project not found.", { status: 404 });
+    const now = pending.createdAt;
+    const manifestID = pending.manifestID;
+    const manifest = immutableReportManifestV3({
+      id: manifestID,
+      project: {
+        id: memoContext.question.payload.projectID,
+        name: project.name || "Untitled Project",
+        address: project.address || "",
+        description: project.description || ""
+      },
+      draftID: memoContext.draft.envelope.id,
+      title: memoContext.draft.payload.title,
+      reportDate: now,
+      author: {
+        userID: context.userID,
+        displayName: context.authContext.account?.displayName ||
+          context.authContext.account?.publicUsername || "Permitext professional"
+      },
+      codeEdition: defaultResearchCodeEdition,
+      items: codeMemoManifestItems(memoContext),
+      disclaimers: [
+        ...permitextRequiredReportDisclaimers,
+        "Permitext Issued Record — professional work product; not agency approval or a compliance certificate."
+      ],
+      reportVersion: pending.issueVersion,
+      sourceVersions: {
+        codeEdition: defaultResearchCodeEdition,
+        codeContent: defaultSyncCodeVersion,
+        draftVersion: memoContext.draft.envelope.version,
+        draftRevision: memoContext.draft.payload.draftRevision
+      },
+      createdAt: now,
+      questionSnapshot: {
+        questionID: memoContext.question.envelope.id,
+        displayID: memoContext.question.payload.displayID,
+        title: memoContext.question.payload.title,
+        questionText: memoContext.question.payload.questionText,
+        definitionRevision: memoContext.question.payload.definitionRevision,
+        definitionHash: memoContext.definitionHash
+      },
+      evidenceSetIdentity: {
+        evidenceSetID: memoContext.evidenceSet.envelope.id,
+        version: memoContext.evidenceSet.payload.version,
+        contentHash: memoContext.evidenceSet.payload.contentHash
+      },
+      conclusionRevision: memoContext.conclusion.payload.revision,
+      approval: {
+        actorUserID: memoContext.conclusionApproval.payload.approvedByUserID,
+        approvedAt: memoContext.conclusionApproval.payload.approvedAt,
+        basis: memoContext.conclusionApproval.payload.approvalBasis
+      },
+      issueLineage: {
+        issueVersion: pending.issueVersion,
+        predecessorID: pending.predecessorID || null,
+        successorID: null
+      },
+      evidenceRoles: memoContext.evidenceSet.payload.entries.map((entry) => ({
+        snapshotID: entry.snapshotID,
+        role: entry.role,
+        analysisEligible: entry.analysisEligible,
+        qualification: entry.qualification,
+        projectApplicabilityNote: entry.projectApplicabilityNote
+      })),
+      inputSnapshots: memoContext.inputs.map((input) => ({
+        id: input.id,
+        inputKind: input.inputKind,
+        state: input.state,
+        statement: input.statement,
+        revision: input.revision
+      })),
+      analysisIdentity: memoContext.analysis ? {
+        analysisRunID: memoContext.analysis.envelope.id,
+        dependencyHash: memoContext.analysis.payload.dependencyHash,
+        researchAnswerID: memoContext.analysis.payload.researchAnswerID
+      } : null,
+      conclusionIdentity: {
+        conclusionID: memoContext.conclusion.envelope.id,
+        revision: memoContext.conclusion.payload.revision,
+        contentHash: memoContext.conclusionHash
+      },
+      memoApproval: {
+        approvalID: memoContext.memoApproval.envelope.id,
+        actorUserID: memoContext.memoApproval.payload.approvedByUserID,
+        approvedAt: memoContext.memoApproval.payload.approvedAt,
+        basis: memoContext.memoApproval.payload.approvalBasis,
+        draftHash: memoContext.memoApproval.payload.draftHash
+      }
+    });
+    const pdfBody = await renderReportPDF(manifest);
+    const htmlBody = Buffer.from(codeMemoHTML(manifest), "utf8");
+    const structuredBody = Buffer.from(codeMemoStructuredJSON(manifest), "utf8");
+    if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
+      throw new Error("The generated Code Memo PDF exceeds the supported file size.");
+    }
+    const outputBodies = [
+      { format: "pdf", contentType: "application/pdf", body: pdfBody },
+      { format: "html", contentType: "text/html; charset=utf-8", body: htmlBody },
+      { format: "structured", contentType: "application/json; charset=utf-8", body: structuredBody }
+    ];
+    const outputs = [];
+    for (const output of outputBodies) {
+      const pathname = codeMemoFilePathname(
+        memoContext.question.payload.projectID,
+        manifestID,
+        output.format
+      );
+      await storeOrVerifyPrivateProjectAsset(pathname, output.body, output.contentType);
+      outputs.push({
+        format: output.format,
+        pathname,
+        contentType: output.contentType,
+        size: output.body.length,
+        contentHash: createHash("sha256").update(output.body).digest("hex")
+      });
+    }
     advanced = advanceIssuanceSaga(advanced, "committing");
-    const reportManifestID = String(context.body.reportManifestID || randomUUID());
+    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
     const issued = createIssuedRecordArtifact({
       userID: context.userID,
       questionID: pending.questionID,
       issueVersion: pending.issueVersion,
-      reportManifestID,
-      componentVersions: context.body.componentVersions || {},
-      componentHashes: context.body.componentHashes || {},
-      approvalBasis: context.body.approvalBasis || "",
-      predecessorID: context.body.predecessorID || null,
-      id: context.body.issuedRecordID || randomUUID()
+      reportManifestID: manifestID,
+      componentVersions: {
+        definitionRevision: memoContext.question.payload.definitionRevision,
+        inputRevisions: Object.fromEntries(memoContext.inputs.map((input) => [input.id, input.revision])),
+        evidenceSetVersion: memoContext.evidenceSet.payload.version,
+        conclusionRevision: memoContext.conclusion.payload.revision,
+        draftRevision: memoContext.draft.payload.draftRevision
+      },
+      componentHashes: {
+        definition: memoContext.definitionHash,
+        inputs: memoContext.inputSetHash,
+        evidenceSet: memoContext.evidenceSet.payload.contentHash,
+        analysis: memoContext.analysis?.payload?.dependencyHash || null,
+        conclusion: memoContext.conclusionHash,
+        draft: memoContext.draft.payload.contentHash,
+        manifest: manifest.contentHash,
+        outputs: Object.fromEntries(outputs.map((output) => [output.format, output.contentHash]))
+      },
+      approvalBasis: memoContext.memoApproval.payload.approvalBasis,
+      predecessorID: pending.predecessorID || null,
+      id: pending.issuedRecordID,
+      issuedAt: now
     });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, issued, 0);
-    advanced = advanceIssuanceSaga(advanced, "issued");
-    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
-    const question = (await listStoredFoundationArtifacts(context.userID))
-      .find((item) => item.envelope?.id === pending.questionID);
-    if (question?.payload?.projectID) {
-      await saveStoredActivityEvent(context.userID, activityFor({
+    const manifestArtifact = {
+      envelope: artifactEnvelope({
+        id: manifestID,
+        type: "reportManifest",
+        owner: ownerScope(context.userID),
+        createdAt: now,
+        updatedAt: now,
+        version: 1
+      }),
+      payload: manifest
+    };
+    const generatedReportID = `cq-output-${createHash("sha256").update(manifestID).digest("hex")}`;
+    const generatedReportArtifact = {
+      envelope: artifactEnvelope({
+        id: generatedReportID,
+        type: "generatedReport",
+        owner: ownerScope(context.userID),
+        createdAt: now,
+        updatedAt: now,
+        version: 1
+      }),
+      payload: {
+        manifestID,
+        reportVersion: pending.issueVersion,
+        title: manifest.title,
+        outputFormats: outputs.map((output) => output.format),
+        contentHash: manifest.contentHash,
+        generatorVersion: manifest.generatorVersion,
+        files: outputs,
+        createdBy: context.userID,
+        createdAt: now
+      }
+    };
+    const links = [
+      ["reportManifest", manifestID, { questionID: pending.questionID, issueVersion: pending.issueVersion }],
+      ["generatedReport", generatedReportID, { questionID: pending.questionID, manifestID }],
+      ["issuedDecisionRecord", issued.envelope.id, { questionID: pending.questionID, manifestID }]
+    ].map(([targetKind, targetID, metadata]) => linkForArtifact({
         userID: context.userID,
-        projectID: question.payload.projectID,
-        action: "code-question.record.issued",
+        projectID: memoContext.question.payload.projectID,
+        targetKind,
+        targetID,
+        metadata
+      }));
+    const events = [activityFor({
+      userID: context.userID,
+      projectID: memoContext.question.payload.projectID,
+      action: "code-question.record.issued",
+      objectKind: "issuedDecisionRecord",
+      objectID: issued.envelope.id,
+      newStatus: "issued",
+      metadata: { manifestID, issueVersion: pending.issueVersion, outputHashes: issued.payload.componentHashes.outputs }
+    })];
+    if (pending.predecessorID) {
+      events.push(activityFor({
+        userID: context.userID,
+        projectID: memoContext.question.payload.projectID,
+        action: "code-question.record.superseded",
         objectKind: "issuedDecisionRecord",
-        objectID: issued.envelope.id,
-        newStatus: "issued"
+        objectID: predecessor.envelope.id,
+        previousStatus: "issued",
+        newStatus: "superseded",
+        metadata: {
+          successorID: issued.envelope.id,
+          reason: String(context.body.supersessionReason || "Corrected by a later issued version.")
+        }
       }));
     }
+    advanced = advanceIssuanceSaga(advanced, "issued");
+    await commitStoredCodeQuestionIssuance(context.userID, {
+      artifacts: [manifestArtifact, generatedReportArtifact, issued],
+      links,
+      events,
+      pending: advanced
+    });
     sendJSON(response, 201, {
       pending: advanced,
+      manifest,
+      outputs: outputs.map(({ pathname: _pathname, ...output }) => output),
       issuedRecord: { id: issued.envelope.id, version: issued.envelope.version, ...issued.payload }
     });
   } catch (error) {
+    if (pendingForFailure && ["reserved", "staged", "committing"].includes(pendingForFailure.status)) {
+      try {
+        const currentPending = (await listStoredCodeQuestionPendingIssuance(context.userID))
+          .find((item) => item.id === pendingForFailure.id) || pendingForFailure;
+        if (["reserved", "staged", "committing"].includes(currentPending.status)) {
+          await saveStoredCodeQuestionPendingIssuance(context.userID, advanceIssuanceSaga(currentPending, "failed", {
+            error: String(error?.message || "Issuance failed.")
+          }));
+        }
+      } catch (recoveryError) {
+        console.error("Code Question issuance recovery could not persist failure state.", recoveryError);
+      }
+    }
     if (sendCodeQuestionError(response, error)) return;
-    throw error;
+    sendJSON(response, 500, {
+      error: "Code Memo issuance failed. The approved draft remains unissued and can be retried.",
+      code: "CODE_MEMO_ISSUANCE_FAILED"
+    });
   }
+}
+
+async function handleCodeQuestionIssuedFileRead(request, response) {
+  const context = await requireCodeQuestionContext(request, response);
+  if (!context) return;
+  const issuedRecordID = String(context.body.issuedRecordID || "").trim();
+  const format = String(context.body.format || "pdf").trim();
+  if (!issuedRecordID || !["pdf", "html", "structured"].includes(format)) {
+    sendError(response, 400, "Missing or invalid Issued Record output identity.");
+    return;
+  }
+  const artifacts = await listStoredFoundationArtifacts(context.userID);
+  const issued = artifacts.find((item) =>
+    item.envelope?.type === "issuedDecisionRecord" && item.envelope.id === issuedRecordID
+  );
+  const question = artifacts.find((item) =>
+    item.envelope?.type === "codeQuestion" && item.envelope.id === issued?.payload?.questionID
+  );
+  const generated = artifacts.find((item) =>
+    item.envelope?.type === "generatedReport" &&
+    item.payload?.manifestID === issued?.payload?.reportManifestID
+  );
+  const file = generated?.payload?.files?.find((item) => item.format === format);
+  if (!issued || !question || !file?.pathname ||
+    !file.pathname.startsWith(reportFilePrefix(question.payload.projectID))) {
+    sendError(response, 404, "Issued Record output not found.");
+    return;
+  }
+  const body = await readPrivateProjectAsset(file.pathname);
+  if (!body) {
+    sendError(response, 404, "Issued Record output not found.");
+    return;
+  }
+  if (createHash("sha256").update(body).digest("hex") !== file.contentHash) {
+    sendError(response, 409, "The stored Issued Record output no longer matches its immutable hash.");
+    return;
+  }
+  const extension = format === "structured" ? "json" : format;
+  const safeTitle = String(generated.payload.title || "Permitext Code Memo")
+    .replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "Permitext-Code-Memo";
+  response.writeHead(200, {
+    ...securityHeaders(),
+    "cache-control": "private, no-store",
+    "content-type": file.contentType,
+    "content-length": String(body.length),
+    "content-disposition": `attachment; filename="${safeTitle}-v${issued.payload.issueVersion}.${extension}"`
+  });
+  response.end(body);
 }
 
 async function handleCodeQuestionIssueFail(request, response) {
@@ -17223,9 +18192,13 @@ const handlers = {
   "projects/code-questions/analysis/create": handleCodeQuestionAnalysisCreate,
   "projects/code-questions/conclusions/publish": handleCodeQuestionConclusionPublish,
   "projects/code-questions/conclusions/approve": handleCodeQuestionConclusionApprove,
+  "projects/code-questions/memos/prepare": handleCodeQuestionMemoPrepare,
+  "projects/code-questions/memos/ready": handleCodeQuestionMemoReady,
+  "projects/code-questions/memos/approve": handleCodeQuestionMemoApprove,
   "projects/code-questions/issue/start": handleCodeQuestionIssueStart,
   "projects/code-questions/issue/complete": handleCodeQuestionIssueComplete,
   "projects/code-questions/issue/fail": handleCodeQuestionIssueFail,
+  "projects/code-questions/records/file": handleCodeQuestionIssuedFileRead,
   "projects/code-questions/outbox/enqueue": handleCodeQuestionOutboxEnqueue,
   "projects/code-questions/migration/run": handleCodeQuestionMigrationRun,
   "projects/collaboration/notes/save": handleProjectCollaborationNoteSave,

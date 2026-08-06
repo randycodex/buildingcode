@@ -13087,3 +13087,49 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   background: color-mix(in srgb, var(--surface-raised) 88%, var(--project-color, #315c52));
 }
 .code-question-review-history-list li p { margin: 0.3rem 0 0; color: var(--text-muted); }
+
+/* Code Question Phase 7 — constrained Code Memo and immutable issued versions. */
+.code-memo-workspace,
+.code-memo-readiness,
+.code-memo-versions { display: grid; gap: 1rem; align-content: start; }
+.code-memo-boundary,
+.code-memo-preview,
+.code-memo-recovery {
+  padding: 0.9rem 1rem;
+  background: color-mix(in srgb, var(--project-color, #315c52) 7%, var(--surface-raised));
+  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--project-color, #315c52) 74%, transparent);
+}
+.code-memo-boundary p,
+.code-memo-preview p,
+.code-memo-recovery p { margin: 0.35rem 0 0; }
+.code-memo-prepare-form,
+.code-memo-approval-form { display: grid; gap: 0.7rem; }
+.code-memo-prepare-form input,
+.code-memo-prepare-form textarea,
+.code-memo-approval-form textarea { width: 100%; box-sizing: border-box; }
+.code-memo-analysis-choice { display: flex; align-items: flex-start; gap: 0.5rem; font-size: 0.9rem; }
+.code-memo-analysis-choice input { width: auto; margin-top: 0.2rem; }
+.code-memo-preview { background: var(--surface-raised); }
+.code-memo-preview header,
+.code-memo-preview section { padding: 0.65rem 0; }
+.code-memo-preview section + section { box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text) 10%, transparent); }
+.code-memo-preview h3,
+.code-memo-preview h4 { margin: 0; }
+.code-memo-readiness-list,
+.code-memo-version-list { display: grid; gap: 0.7rem; margin: 0; padding: 0; list-style: none; }
+.code-memo-readiness-list li,
+.code-memo-version-list li {
+  padding: 0.8rem 0.9rem;
+  background: var(--surface-raised);
+  box-shadow: inset 3px 0 0 color-mix(in srgb, var(--text) 24%, transparent);
+}
+.code-memo-readiness-list li.is-ready { box-shadow: inset 3px 0 0 color-mix(in srgb, #2d7d46 72%, transparent); }
+.code-memo-readiness-list li.is-blocked { box-shadow: inset 3px 0 0 color-mix(in srgb, #b24c38 76%, transparent); }
+.code-memo-readiness-list p,
+.code-memo-version-list p { margin: 0.3rem 0 0; color: var(--text-muted); }
+.code-memo-recovery {
+  background: color-mix(in srgb, #b24c38 8%, var(--surface-raised));
+  box-shadow: inset 4px 0 0 color-mix(in srgb, #b24c38 76%, transparent);
+}
+.code-memo-version-list li.is-superseded { opacity: 0.82; box-shadow: inset 3px 0 0 color-mix(in srgb, var(--text) 38%, transparent); }
+.code-memo-downloads { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }

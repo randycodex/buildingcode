@@ -144,6 +144,20 @@ import {
   transitionReviewRequest,
   unresolvedBlockingRequests
 } from "./code-question-review.js?v=20260803-code-question-review-v1";
+import {
+  approveCodeMemo,
+  beginCodeMemoIssuance,
+  codeMemoHTML,
+  codeMemoReadiness,
+  codeMemoStructuredJSON,
+  completeCodeMemoIssuance,
+  emptyIssueWorkspace,
+  failCodeMemoIssuance,
+  issuedRecordStatus,
+  markCodeMemoReady,
+  normalizeIssueWorkspace,
+  prepareCodeMemoDraft
+} from "./code-question-issue.js?v=20260803-code-question-issue-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -5051,6 +5065,28 @@ function saveReviewForQuestion(questionID, review) {
     ...cq,
     reviewByQuestionID: {
       ...(cq.reviewByQuestionID || {}),
+      [id]: normalized
+    }
+  });
+  return normalized;
+}
+
+function getIssueForQuestion(questionID) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const existing = codeQuestionWorkspaceState().issueByQuestionID?.[id];
+  return normalizeIssueWorkspace(existing || emptyIssueWorkspace(id), id);
+}
+
+function saveIssueForQuestion(questionID, issue) {
+  const id = String(questionID || "").trim();
+  if (!id) return null;
+  const normalized = normalizeIssueWorkspace(issue, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    issueByQuestionID: {
+      ...(cq.issueByQuestionID || {}),
       [id]: normalized
     }
   });
@@ -22911,6 +22947,12 @@ function renderCodeQuestionPane(paneDescriptor) {
     body.appendChild(renderCodeQuestionReviewRequestsBody(project, parsed.questionID));
   } else if (parsed.paneRole === "history") {
     body.appendChild(renderCodeQuestionReviewHistoryBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "code-memo-draft") {
+    body.appendChild(renderCodeMemoDraftBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "readiness") {
+    body.appendChild(renderCodeMemoReadinessBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "versions") {
+    body.appendChild(renderCodeMemoVersionsBody(project, parsed.questionID));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
@@ -24635,6 +24677,384 @@ function renderCodeQuestionReviewHistoryBody(_project, questionID) {
   if (!list.childElementCount) {
     const empty = document.createElement("li");
     empty.textContent = "No review activity recorded yet.";
+    list.appendChild(empty);
+  }
+  wrap.appendChild(list);
+  return wrap;
+}
+
+function codeMemoContext(project, questionID) {
+  const qid = String(questionID || "").trim();
+  const definition = getDefinitionForQuestion(qid);
+  const evidence = getEvidenceForQuestion(qid);
+  const analysis = getAnalysisForQuestion(qid);
+  const review = getReviewForQuestion(qid);
+  const issue = getIssueForQuestion(qid);
+  const question = questionsForActiveProject().find((item) => item.id === qid) || {};
+  let binding = null;
+  try {
+    binding = buildAnalysisBinding(definition, evidence);
+  } catch {
+    // Readiness reports the missing dependency in its own bounded checklist.
+  }
+  const draft = issue.draftRevisions.at(-1) || null;
+  const actor = { ...codeQuestionActor(), role: "owner" };
+  const readiness = codeMemoReadiness({
+    definition, evidence, analysis, review, draft, actor,
+    currentDependencyHash: binding?.dependencyHash || null
+  });
+  return { qid, project, question, definition, evidence, analysis, review, issue, binding, draft, actor, readiness };
+}
+
+function codeMemoDerivedState(context) {
+  const { issue, draft } = context;
+  if (!draft) return "draft";
+  const issued = issue.issuedRecords.find((item) => item.draftID === draft.id);
+  if (issued) return issuedRecordStatus(issue, issued.id).state;
+  const pending = issue.pendingIssuance.slice().reverse().find((item) => item.draftID === draft.id);
+  if (pending?.state === "issuing") return "issuing";
+  if (issue.memoApprovals.some((item) => item.draftID === draft.id && item.draftHash === draft.draftHash)) return "approved";
+  if (issue.readinessRecord?.draftID === draft.id && issue.readinessRecord?.draftHash === draft.draftHash) return "ready-for-approval";
+  return "draft";
+}
+
+function refreshCodeMemoPanes(questionID) {
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const project = openProjectDetails()[0] || null;
+  track?.querySelectorAll?.(`.code-question-panel[data-question-id="${safeID}"]`).forEach((pane) => {
+    const body = pane.querySelector(".code-question-panel-body");
+    if (!body) return;
+    if (pane.dataset.cqRole === "code-memo-draft") body.replaceChildren(renderCodeMemoDraftBody(project, questionID));
+    if (pane.dataset.cqRole === "readiness") body.replaceChildren(renderCodeMemoReadinessBody(project, questionID));
+    if (pane.dataset.cqRole === "versions") body.replaceChildren(renderCodeMemoVersionsBody(project, questionID));
+  });
+  saveWorkspaceState();
+}
+
+function renderCodeMemoDraftBody(project, questionID) {
+  const context = codeMemoContext(project, questionID);
+  const wrap = document.createElement("div");
+  wrap.className = "code-memo-workspace";
+  const stateLabel = codeMemoDerivedState(context).replaceAll("-", " ");
+  const boundary = document.createElement("section");
+  boundary.className = "code-memo-boundary";
+  boundary.innerHTML = `<p class="code-question-pane-status">Typed Code Memo · ${escapeHTML(stateLabel)}</p><p>A constrained professional memo assembled from selected versions. Editing creates a new immutable draft revision; generic Report Draft remains available under Add column.</p>`;
+  wrap.appendChild(boundary);
+
+  const form = document.createElement("form");
+  form.className = "code-memo-prepare-form";
+  const title = document.createElement("input");
+  title.required = true;
+  title.maxLength = 300;
+  title.setAttribute("aria-label", "Code Memo title");
+  title.value = `${context.question.displayID || "Q"} · ${context.question.title || context.definition?.title || "Code Memo"}`;
+  const narrative = document.createElement("textarea");
+  narrative.rows = 6;
+  narrative.maxLength = 20_000;
+  narrative.setAttribute("aria-label", "Bounded authored narrative");
+  narrative.placeholder = "Optional professional context, conditions, or implementation note. Source evidence and conclusion remain separate governed sections.";
+  narrative.value = context.draft?.sections?.authoredNarrative || "";
+  const include = document.createElement("label");
+  include.className = "code-memo-analysis-choice";
+  const includeInput = document.createElement("input");
+  includeInput.type = "checkbox";
+  includeInput.checked = context.draft?.includeAnalysis !== false;
+  include.append(includeInput, document.createTextNode(" Include the selected bounded analysis summary"));
+  const prepare = document.createElement("button");
+  prepare.type = "submit";
+  prepare.textContent = context.draft ? "Prepare new draft revision" : "Prepare Code Memo Draft";
+  form.append(title, narrative, include, prepare);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const result = prepareCodeMemoDraft(getIssueForQuestion(context.qid), {
+        project: {
+          id: activeProjectIDForCodeQuestions(),
+          name: project?.name || "Project",
+          address: project?.address || ""
+        },
+        definition: { ...context.definition, displayID: context.question.displayID || "Q" },
+        evidence: context.evidence,
+        analysis: context.analysis,
+        review: context.review,
+        title: title.value,
+        narrative: narrative.value,
+        includeAnalysis: includeInput.checked,
+        actor: context.actor,
+        definitionHash: context.binding?.definitionHash || "unavailable",
+        inputSetHash: context.binding?.inputSetHash || "unavailable",
+        currentDependencyHash: context.binding?.dependencyHash || "unavailable"
+      });
+      saveIssueForQuestion(context.qid, result.workspace);
+      refreshCodeMemoPanes(context.qid);
+    } catch (error) {
+      void showWebNotice("Code Memo Draft not prepared", error.message);
+    }
+  });
+  wrap.appendChild(form);
+
+  if (context.draft) {
+    const preview = document.createElement("article");
+    preview.className = "code-memo-preview";
+    preview.setAttribute("aria-label", `Code Memo Draft revision ${context.draft.draftRevision}`);
+    preview.innerHTML = `
+      <header><p>Draft r${escapeHTML(String(context.draft.draftRevision))} · ${escapeHTML(context.draft.draftHash)}</p><h3>${escapeHTML(context.draft.title)}</h3></header>
+      <section><h4>Question presented</h4><p>${escapeHTML(context.draft.sections.questionPresented)}</p></section>
+      <section><h4>Project inputs</h4><ul>${context.draft.sections.projectInputs.map((item) => `<li><strong>${escapeHTML(item.inputKind)}</strong>: ${escapeHTML(item.statement)}</li>`).join("")}</ul></section>
+      <section><h4>Approved evidence</h4><ol>${context.draft.sections.evidence.map((item) => `<li>${escapeHTML(item.snapshot?.passageLocator || item.snapshotID)} · ${escapeHTML(item.role)}</li>`).join("")}</ol></section>
+      ${context.draft.sections.analysisSummary ? `<section><h4>Bounded analysis summary</h4><p>${escapeHTML(context.draft.sections.analysisSummary.conclusion)}</p></section>` : ""}
+      <section><h4>Professional conclusion</h4><p>${escapeHTML(context.draft.sections.professionalConclusion?.conclusionText || "Not published")}</p></section>
+      <section><h4>Authored narrative</h4><p>${escapeHTML(context.draft.sections.authoredNarrative || "No additional narrative.")}</p></section>`;
+    wrap.appendChild(preview);
+  }
+  return wrap;
+}
+
+function renderCodeMemoReadinessBody(project, questionID) {
+  const context = codeMemoContext(project, questionID);
+  const wrap = document.createElement("div");
+  wrap.className = "code-memo-readiness";
+  const state = codeMemoDerivedState(context);
+  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Readiness · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Ready, approval, and issue are separate actions. This checklist is re-evaluated from current governed records.</p></section>`;
+  const list = document.createElement("ol");
+  list.className = "code-memo-readiness-list";
+  context.readiness.checks.forEach((check) => {
+    const item = document.createElement("li");
+    item.className = check.ready ? "is-ready" : "is-blocked";
+    item.innerHTML = `<strong>${check.ready ? "Ready" : "Blocked"} · ${escapeHTML(check.label)}</strong><p>${escapeHTML(check.message)}</p>`;
+    list.appendChild(item);
+  });
+  wrap.appendChild(list);
+  const ready = document.createElement("button");
+  ready.type = "button";
+  ready.textContent = "Mark ready for approval";
+  ready.disabled = !context.draft || !context.readiness.ready || state !== "draft";
+  ready.addEventListener("click", () => {
+    try {
+      const result = markCodeMemoReady(getIssueForQuestion(context.qid), context.draft.id, context.readiness, { actor: context.actor });
+      saveIssueForQuestion(context.qid, result.workspace);
+      refreshCodeMemoPanes(context.qid);
+    } catch (error) {
+      void showWebNotice("Code Memo not ready", error.message);
+    }
+  });
+  wrap.appendChild(ready);
+
+  const approval = document.createElement("form");
+  approval.className = "code-memo-approval-form";
+  const basis = document.createElement("textarea");
+  basis.rows = 4;
+  basis.maxLength = 4_000;
+  basis.required = true;
+  basis.setAttribute("aria-label", "Code Memo approval basis");
+  basis.placeholder = "Record the exact review and approval basis…";
+  const approve = document.createElement("button");
+  approve.type = "submit";
+  approve.textContent = "Approve Code Memo";
+  approve.disabled = !context.draft || state !== "ready-for-approval";
+  approval.append(basis, approve);
+  approval.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const result = approveCodeMemo(getIssueForQuestion(context.qid), context.draft.id, { basis: basis.value, actor: context.actor });
+      saveIssueForQuestion(context.qid, result.workspace);
+      refreshCodeMemoPanes(context.qid);
+    } catch (error) {
+      void showWebNotice("Code Memo not approved", error.message);
+    }
+  });
+  wrap.appendChild(approval);
+  if (context.issue.lastFailure) {
+    const failure = document.createElement("section");
+    failure.className = "code-memo-recovery";
+    failure.innerHTML = `<strong>Approved — not issued</strong><p>${escapeHTML(context.issue.lastFailure.message)} The same approved draft may be retried safely.</p>`;
+    wrap.appendChild(failure);
+  }
+  return wrap;
+}
+
+function updateQuestionIssuedVersion(questionID, issueVersion) {
+  const projectID = activeProjectIDForCodeQuestions();
+  const cq = codeQuestionWorkspaceState();
+  const questions = (cq.questionsByProjectID?.[projectID] || []).map((question) =>
+    question.id === questionID
+      ? {
+          ...question,
+          latestIssuedVersion: issueVersion,
+          revisionInProgress: false,
+          listLabel: `Issued v${issueVersion}`,
+          lastActivityAt: new Date().toISOString()
+        }
+      : question
+  );
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    questionsByProjectID: { ...(cq.questionsByProjectID || {}), [projectID]: questions }
+  });
+}
+
+function downloadCodeMemoBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
+}
+
+function simpleCodeMemoPDF(manifest) {
+  const plain = [
+    manifest.title,
+    `Permitext Issued Record v${manifest.issueLineage.issueVersion}`,
+    manifest.project.name,
+    manifest.project.address,
+    "Question presented",
+    manifest.questionSnapshot.questionText,
+    "Professional conclusion",
+    manifest.conclusion?.conclusionText || "",
+    ...manifest.disclaimers
+  ].join("\n").normalize("NFKD").replace(/[^\x20-\x7e\n]/g, "?");
+  const lines = plain.split("\n").flatMap((line) => line.match(/.{1,85}(?:\s|$)|.{1,85}/g) || [""]);
+  const escaped = lines.slice(0, 52).map((line) => String(line).replace(/([\\()])/g, "\\$1"));
+  const stream = `BT /F1 11 Tf 54 742 Td 14 TL ${escaped.map((line, index) => `${index ? "T* " : ""}(${line}) Tj`).join(" ")} ET`;
+  const objects = [
+    "<< /Type /Catalog /Pages 2 0 R >>",
+    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
+    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
+    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
+    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
+    `<< /Title (${escaped[0] || "Permitext Code Memo"}) /Author (Permitext) /Subject (Issued professional work product) >>`
+  ];
+  let pdf = "%PDF-1.4\n";
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xref = pdf.length;
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  offsets.slice(1).forEach((offset) => { pdf += `${String(offset).padStart(10, "0")} 00000 n \n`; });
+  pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([pdf], { type: "application/pdf" });
+}
+
+function renderCodeMemoVersionsBody(project, questionID) {
+  const context = codeMemoContext(project, questionID);
+  const wrap = document.createElement("div");
+  wrap.className = "code-memo-versions";
+  const state = codeMemoDerivedState(context);
+  wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Issued Records · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Issuance creates an immutable Manifest v3 and exact PDF, HTML, and structured outputs. It is not agency approval or a compliance certificate.</p></section>`;
+  const issueButton = document.createElement("button");
+  issueButton.type = "button";
+  issueButton.textContent = context.issue.lastFailure ? "Retry approved issuance" : "Issue Code Memo";
+  issueButton.disabled = !context.draft || state !== "approved" || !context.readiness.ready;
+  issueButton.addEventListener("click", () => {
+    let pending = null;
+    try {
+      const priorFailed = getIssueForQuestion(context.qid).pendingIssuance.slice().reverse().find((item) =>
+        item.draftID === context.draft.id && item.sagaStatus === "failed"
+      );
+      const idempotencyKey = priorFailed?.idempotencyKey || `issue-${context.qid}-${context.draft.draftHash}`;
+      const begun = beginCodeMemoIssuance(getIssueForQuestion(context.qid), context.draft.id, context.readiness, {
+        idempotencyKey,
+        actor: context.actor
+      });
+      pending = begun.pending;
+      let issuingWorkspace = begun.workspace;
+      if (begun.replayed && pending.sagaStatus === "failed") {
+        issuingWorkspace = {
+          ...issuingWorkspace,
+          pendingIssuance: issuingWorkspace.pendingIssuance.map((item) => item.id === pending.id
+            ? { ...item, state: "issuing", sagaStatus: "reserved", error: null }
+            : item),
+          lastFailure: null
+        };
+      }
+      saveIssueForQuestion(context.qid, issuingWorkspace);
+      refreshCodeMemoPanes(context.qid);
+      window.setTimeout(() => {
+        try {
+          const completed = completeCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, {
+            displayID: context.question.displayID || "Q",
+            questionTitle: context.question.title || context.definition?.title || "Code Question",
+            supersessionReason: "Corrected and reissued through the professional review workflow."
+          });
+          saveIssueForQuestion(context.qid, completed.workspace);
+          updateQuestionIssuedVersion(context.qid, completed.issuedRecord.issueVersion);
+          refreshCodeMemoPanes(context.qid);
+        } catch (error) {
+          const failed = failCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, { error: error.message });
+          saveIssueForQuestion(context.qid, failed.workspace);
+          refreshCodeMemoPanes(context.qid);
+        }
+      }, 120);
+    } catch (error) {
+      if (pending) {
+        const failed = failCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, { error: error.message });
+        saveIssueForQuestion(context.qid, failed.workspace);
+        refreshCodeMemoPanes(context.qid);
+      } else {
+        void showWebNotice("Code Memo not issued", error.message);
+      }
+    }
+  });
+  wrap.appendChild(issueButton);
+  const list = document.createElement("ol");
+  list.className = "code-memo-version-list";
+  context.issue.issuedRecords.slice().reverse().forEach((record) => {
+    const status = issuedRecordStatus(context.issue, record.id);
+    const item = document.createElement("li");
+    item.className = `is-${status.state}`;
+    item.innerHTML = `<strong>Issued Record v${escapeHTML(String(record.issueVersion))} · ${escapeHTML(status.state)}</strong><p>${escapeHTML(record.issuedAt)} · ${escapeHTML(record.manifestHash)}</p>${status.successorID ? `<p>Superseded by ${escapeHTML(status.successorID)} · ${escapeHTML(status.reason)}</p>` : ""}`;
+    const downloads = document.createElement("div");
+    downloads.className = "code-memo-downloads";
+    const safe = `Permitext-Code-Memo-${context.question.displayID || context.qid}-v${record.issueVersion}`.replace(/[^a-z0-9-]+/gi, "-");
+    const json = document.createElement("button");
+    json.type = "button";
+    json.textContent = "Download structured manifest";
+    json.addEventListener("click", () => downloadCodeMemoBlob(new Blob([codeMemoStructuredJSON(record.manifest)], { type: "application/json" }), `${safe}.json`));
+    const html = document.createElement("button");
+    html.type = "button";
+    html.textContent = "Download HTML";
+    html.addEventListener("click", () => downloadCodeMemoBlob(new Blob([codeMemoHTML(record.manifest)], { type: "text/html" }), `${safe}.html`));
+    const pdf = document.createElement("button");
+    pdf.type = "button";
+    pdf.textContent = "Download PDF";
+    pdf.addEventListener("click", () => downloadCodeMemoBlob(simpleCodeMemoPDF(record.manifest), `${safe}.pdf`));
+    downloads.append(json, html, pdf);
+    item.appendChild(downloads);
+    if (status.state === "issued") {
+      const correction = document.createElement("button");
+      correction.type = "button";
+      correction.textContent = "Prepare correction";
+      correction.addEventListener("click", () => {
+        try {
+          const result = prepareCodeMemoDraft(getIssueForQuestion(context.qid), {
+            project: { id: activeProjectIDForCodeQuestions(), name: project?.name || "Project", address: project?.address || "" },
+            definition: { ...context.definition, displayID: context.question.displayID || "Q" },
+            evidence: context.evidence, analysis: context.analysis, review: context.review,
+            title: `${context.draft?.title || context.question.title || "Code Memo"} · Correction`,
+            narrative: context.draft?.sections?.authoredNarrative || "",
+            includeAnalysis: context.draft?.includeAnalysis !== false,
+            correctionOfIssuedRecordID: record.id,
+            actor: context.actor,
+            definitionHash: context.binding?.definitionHash || "unavailable",
+            inputSetHash: context.binding?.inputSetHash || "unavailable",
+            currentDependencyHash: context.binding?.dependencyHash || "unavailable"
+          });
+          saveIssueForQuestion(context.qid, result.workspace);
+          refreshCodeMemoPanes(context.qid);
+        } catch (error) {
+          void showWebNotice("Correction not prepared", error.message);
+        }
+      });
+      item.appendChild(correction);
+    }
+    list.appendChild(item);
+  });
+  if (!list.childElementCount) {
+    const empty = document.createElement("li");
+    empty.textContent = "No Issued Records yet.";
     list.appendChild(empty);
   }
   wrap.appendChild(list);

@@ -220,7 +220,7 @@ export function normalizeReportDraftPayloadV2({
   if (normalizedRecordType === codeDecisionMemoRecordType && !questionID) {
     throw new Error("Code Decision Memo drafts require a questionID.");
   }
-  return {
+  const normalized = {
     ...base,
     schemaVersion: reportDraftSchemaVersionV2,
     recordType: normalizedRecordType,
@@ -245,9 +245,22 @@ export function normalizeReportDraftPayloadV2({
           analysisRunID: codeMemo.analysisRunID
             ? requiredText(codeMemo.analysisRunID, "analysis run ID", 256)
             : null,
-          readinessState: optionalText(codeMemo.readinessState, 64) || null
+          readinessState: optionalText(codeMemo.readinessState, 64) || null,
+          includeAnalysis: codeMemo.includeAnalysis !== false,
+          definitionHash: optionalText(codeMemo.definitionHash, 256) || null,
+          inputSetHash: optionalText(codeMemo.inputSetHash, 256) || null,
+          evidenceSetID: optionalText(codeMemo.evidenceSetID, 256) || null,
+          evidenceSetHash: optionalText(codeMemo.evidenceSetHash, 256) || null,
+          conclusionID: optionalText(codeMemo.conclusionID, 256) || null,
+          conclusionHash: optionalText(codeMemo.conclusionHash, 256) || null,
+          conclusionApprovalID: optionalText(codeMemo.conclusionApprovalID, 256) || null,
+          correctionOfIssuedRecordID: optionalText(codeMemo.correctionOfIssuedRecordID, 256) || null
         }
       : null
+  };
+  return {
+    ...normalized,
+    contentHash: createHash("sha256").update(stableReportJSON(normalized)).digest("hex")
   };
 }
 
@@ -468,7 +481,11 @@ export function immutableReportManifestV3({
   conclusionRevision = null,
   approval = null,
   issueLineage = null,
-  evidenceRoles = null
+  evidenceRoles = null,
+  inputSnapshots = null,
+  analysisIdentity = null,
+  conclusionIdentity = null,
+  memoApproval = null
 }) {
   const base = immutableReportManifest({
     id,
@@ -544,6 +561,38 @@ export function immutableReportManifestV3({
           qualification: optionalText(entry.qualification, 2_000),
           projectApplicabilityNote: optionalText(entry.projectApplicabilityNote, 2_000)
         }))
+      : null,
+    inputSnapshots: Array.isArray(inputSnapshots)
+      ? inputSnapshots.map((input) => ({
+          id: requiredText(input.id, "question input ID", 256),
+          inputKind: requiredText(input.inputKind, "question input kind", 64),
+          state: requiredText(input.state, "question input state", 64),
+          statement: requiredText(input.statement, "question input statement", 4_000),
+          revision: positiveInteger(input.revision, "question input revision")
+        }))
+      : null,
+    analysisIdentity: analysisIdentity
+      ? {
+          analysisRunID: requiredText(analysisIdentity.analysisRunID, "analysis run ID", 256),
+          dependencyHash: requiredText(analysisIdentity.dependencyHash, "analysis dependency hash", 256),
+          researchAnswerID: requiredText(analysisIdentity.researchAnswerID, "Research answer ID", 256)
+        }
+      : null,
+    conclusionIdentity: conclusionIdentity
+      ? {
+          conclusionID: requiredText(conclusionIdentity.conclusionID, "conclusion ID", 256),
+          revision: positiveInteger(conclusionIdentity.revision, "conclusion revision"),
+          contentHash: requiredText(conclusionIdentity.contentHash, "conclusion hash", 256)
+        }
+      : null,
+    memoApproval: memoApproval
+      ? {
+          approvalID: requiredText(memoApproval.approvalID, "Code Memo approval ID", 256),
+          actorUserID: requiredText(memoApproval.actorUserID, "Code Memo approval actor", 256),
+          approvedAt: requiredISO(memoApproval.approvedAt, "Code Memo approval date"),
+          basis: requiredText(memoApproval.basis, "Code Memo approval basis", 4_000),
+          draftHash: requiredText(memoApproval.draftHash, "Code Memo Draft hash", 256)
+        }
       : null
   };
   return {

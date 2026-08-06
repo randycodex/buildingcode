@@ -100,6 +100,8 @@ export function emptyCodeQuestionWorkspaceState() {
     analysisByQuestionID: {},
     /** Phase 6: Review Requests, immutable comments/history, and approvals. */
     reviewByQuestionID: {},
+    /** Phase 7: typed Code Memo drafts, readiness, approvals, issuance, and lineage. */
+    issueByQuestionID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -280,6 +282,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
   if (source.reviewByQuestionID && typeof source.reviewByQuestionID === "object") {
     state.reviewByQuestionID = Object.fromEntries(
       Object.entries(source.reviewByQuestionID)
+        .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
+        .map(([questionID, record]) => [questionID, copy(record)])
+    );
+  }
+  if (source.issueByQuestionID && typeof source.issueByQuestionID === "object") {
+    state.issueByQuestionID = Object.fromEntries(
+      Object.entries(source.issueByQuestionID)
         .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
         .map(([questionID, record]) => [questionID, copy(record)])
     );

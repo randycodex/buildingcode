@@ -45,6 +45,8 @@ export const artifactTypes = Object.freeze([
   "questionAnalysis",
   "professionalConclusion",
   "conclusionApproval",
+  "codeMemoReadiness",
+  "codeMemoApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -74,6 +76,8 @@ export const projectTargetKinds = Object.freeze([
   "questionAnalysis",
   "professionalConclusion",
   "conclusionApproval",
+  "codeMemoReadiness",
+  "codeMemoApproval",
   "issuedDecisionRecord"
 ]);
 
@@ -103,6 +107,8 @@ export const projectMembershipRules = Object.freeze({
   questionAnalysis: { maximumProjects: 1, relationship: "owner" },
   professionalConclusion: { maximumProjects: 1, relationship: "owner" },
   conclusionApproval: { maximumProjects: 1, relationship: "owner" },
+  codeMemoReadiness: { maximumProjects: 1, relationship: "owner" },
+  codeMemoApproval: { maximumProjects: 1, relationship: "owner" },
   issuedDecisionRecord: { maximumProjects: 1, relationship: "owner" }
 });
 
@@ -133,6 +139,8 @@ export const conflictPolicies = Object.freeze({
   questionAnalysis: "immutable",
   professionalConclusion: "immutable",
   conclusionApproval: "immutable",
+  codeMemoReadiness: "immutable",
+  codeMemoApproval: "immutable",
   issuedDecisionRecord: "immutable"
 });
 
@@ -176,6 +184,9 @@ export const activityActions = Object.freeze([
   "code-question.analysis.stale",
   "code-question.conclusion.revised",
   "code-question.conclusion.approved",
+  "code-question.memo.prepared",
+  "code-question.memo.ready",
+  "code-question.memo.approved",
   "code-question.review.opened",
   "code-question.review.assigned",
   "code-question.review.resolved",

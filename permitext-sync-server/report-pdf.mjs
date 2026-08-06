@@ -415,11 +415,16 @@ export async function renderReportPDF(manifest, { projectMaterialBySourceID = ne
     margins: { top: 54, right: 54, bottom: 54, left: 54 },
     bufferPages: true,
     autoFirstPage: true,
+    tagged: true,
+    displayTitle: true,
+    lang: "en-US",
     info: {
       Title: manifest.title,
       Author: manifest.author?.displayName || "Permitext user",
       Subject: `${manifest.project?.name || "Project"} code research report`,
-      Creator: manifest.generatorVersion || "Permitext"
+      Creator: manifest.generatorVersion || "Permitext",
+      CreationDate: new Date(manifest.createdAt),
+      ModDate: new Date(manifest.createdAt)
     }
   });
   const chunks = [];

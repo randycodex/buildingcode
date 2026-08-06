@@ -19,6 +19,8 @@ import {
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled,
   normalizeCodeQuestionPayload,
+  normalizeCodeMemoApprovalPayload,
+  normalizeCodeMemoReadinessPayload,
   normalizeConclusionApprovalPayload,
   normalizeEvidenceSnapshotV2,
   normalizeIssuedDecisionRecordPayload,
@@ -46,6 +48,9 @@ export const codeQuestionCommandKinds = Object.freeze([
   "codeQuestion.conclusion.publish",
   "codeQuestion.conclusion.approve",
   "codeQuestion.review.manage",
+  "codeQuestion.memo.prepare",
+  "codeQuestion.memo.ready",
+  "codeQuestion.memo.approve",
   "codeQuestion.issue.start",
   "codeQuestion.issue.complete",
   "codeQuestion.issue.fail",
@@ -199,6 +204,12 @@ export function createPendingIssuanceRecord({
   idempotencyKey,
   actorUserID,
   stagedObjectKey = null,
+  draftID = null,
+  draftHash = null,
+  memoApprovalID = null,
+  predecessorID = null,
+  manifestID = null,
+  issuedRecordID = null,
   status = "reserved",
   createdAt = new Date().toISOString(),
   error = null
@@ -213,6 +224,12 @@ export function createPendingIssuanceRecord({
     idempotencyKey: String(idempotencyKey),
     actorUserID: String(actorUserID),
     stagedObjectKey,
+    draftID: draftID ? String(draftID) : null,
+    draftHash: draftHash ? String(draftHash) : null,
+    memoApprovalID: memoApprovalID ? String(memoApprovalID) : null,
+    predecessorID: predecessorID ? String(predecessorID) : null,
+    manifestID: manifestID ? String(manifestID) : null,
+    issuedRecordID: issuedRecordID ? String(issuedRecordID) : null,
     status,
     createdAt,
     updatedAt: createdAt,
@@ -618,6 +635,80 @@ export function createConclusionApprovalArtifact({
   };
 }
 
+export function createCodeMemoApprovalArtifact({
+  userID,
+  questionID,
+  draftID,
+  draftRevision,
+  draftHash,
+  conclusionID,
+  conclusionRevision,
+  conclusionHash,
+  approvalBasis,
+  id = randomUUID(),
+  approvedAt = new Date().toISOString()
+}) {
+  assertValidTransition("codeMemo", "ready-for-approval", "approved");
+  const payload = normalizeCodeMemoApprovalPayload({
+    id,
+    questionID,
+    draftID,
+    draftRevision,
+    draftHash,
+    conclusionID,
+    conclusionRevision,
+    conclusionHash,
+    approvalBasis,
+    approvedByUserID: userID,
+    approvedAt
+  });
+  return {
+    envelope: artifactEnvelope({
+      id,
+      type: "codeMemoApproval",
+      owner: ownerScope(userID),
+      createdAt: approvedAt,
+      updatedAt: approvedAt,
+      version: 1
+    }),
+    payload
+  };
+}
+
+export function createCodeMemoReadinessArtifact({
+  userID,
+  questionID,
+  draftID,
+  draftRevision,
+  draftHash,
+  checks,
+  id = randomUUID(),
+  markedAt = new Date().toISOString()
+}) {
+  assertValidTransition("codeMemo", "draft", "ready-for-approval");
+  const payload = normalizeCodeMemoReadinessPayload({
+    id,
+    questionID,
+    draftID,
+    draftRevision,
+    draftHash,
+    checks,
+    markedByUserID: userID,
+    markedAt
+  });
+  return {
+    envelope: artifactEnvelope({
+      id,
+      type: "codeMemoReadiness",
+      owner: ownerScope(userID),
+      createdAt: markedAt,
+      updatedAt: markedAt,
+      version: 1
+    }),
+    payload
+  };
+}
+
 export function createIssuedRecordArtifact({
   userID,
   questionID,
@@ -773,6 +864,11 @@ export function permissionForCommand(commandKind) {
       return organizationPermissions.codeQuestionConclusionApprove;
     case "codeQuestion.review.manage":
       return organizationPermissions.codeQuestionReview;
+    case "codeQuestion.memo.prepare":
+    case "codeQuestion.memo.ready":
+      return organizationPermissions.codeQuestionEdit;
+    case "codeQuestion.memo.approve":
+      return organizationPermissions.codeQuestionConclusionApprove;
     case "codeQuestion.issue.start":
     case "codeQuestion.issue.complete":
     case "codeQuestion.issue.fail":

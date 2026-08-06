@@ -25,6 +25,7 @@ const shellURLs = [
   "/web/offline-storage.js?v=20260803-code-question-review-v1",
   "/web/workspace-state.js?v=20260803-code-question-analyze-v3",
   "/web/code-question-workspace.js?v=20260803-code-question-review-v1",
+  "/web/code-question-issue.js?v=20260803-code-question-issue-v1",
   "/web/code-question-define.js?v=20260803-code-question-analyze-v3",
   "/web/code-question-evidence.js?v=20260803-code-question-analyze-v3",
   "/web/code-question-analysis.js?v=20260803-code-question-analyze-v3",

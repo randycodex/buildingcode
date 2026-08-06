@@ -198,6 +198,7 @@ await installCompletion;
 assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260803-code-question-review-v1"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260803-code-question-review-v1"));
+assert(shellPrecacheURLs.includes("/web/code-question-issue.js?v=20260803-code-question-issue-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-define.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-evidence.js?v=20260803-code-question-analyze-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-analysis.js?v=20260803-code-question-analyze-v3"));
