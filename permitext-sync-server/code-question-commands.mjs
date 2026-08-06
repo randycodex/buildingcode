@@ -6,7 +6,7 @@
  * issuance, and outbox. Capability gating is the caller's responsibility.
  */
 
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   activityEvent,
   artifactEnvelope,
@@ -16,11 +16,13 @@ import {
 import {
   assertValidTransition,
   computeDependencyHash,
+  deterministicCodeQuestionPromotionID,
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled,
   normalizeCodeQuestionPayload,
   normalizeCodeMemoApprovalPayload,
   normalizeCodeMemoReadinessPayload,
+  normalizeCodeQuestionPromotionPayload,
   normalizeConclusionApprovalPayload,
   normalizeEvidenceSnapshotV2,
   normalizeIssuedDecisionRecordPayload,
@@ -55,7 +57,9 @@ export const codeQuestionCommandKinds = Object.freeze([
   "codeQuestion.issue.complete",
   "codeQuestion.issue.fail",
   "codeQuestion.issue.supersede",
-  "codeQuestion.migration.run"
+  "codeQuestion.migration.run",
+  "codeQuestion.legacy.promote",
+  "codeQuestion.legacy.unlink"
 ]);
 
 export class CodeQuestionCommandError extends Error {
@@ -748,6 +752,89 @@ export function createIssuedRecordArtifact({
   };
 }
 
+export function deterministicPromotedQuestionID({
+  userID,
+  projectID,
+  sourceKind,
+  sourceID,
+  idempotencyKey
+}) {
+  const digest = createHash("sha256")
+    .update([userID, projectID, sourceKind, sourceID, idempotencyKey].map(String).join("\u001f"))
+    .digest("hex")
+    .slice(0, 40);
+  return `cq-promoted-${digest}`;
+}
+
+export function upsertCodeQuestionPromotionArtifact(existing, {
+  userID,
+  projectID,
+  questionID,
+  sourceKind,
+  sourceID,
+  sourceVersion = null,
+  sourceLabel = "",
+  sourceProjectID = null,
+  action = "link-existing",
+  status = "linked",
+  idempotencyKey,
+  now = new Date().toISOString()
+}) {
+  const id = deterministicCodeQuestionPromotionID({
+    ownerID: userID,
+    projectID,
+    questionID,
+    sourceKind,
+    sourceID
+  });
+  if (existing && existing.envelope?.id !== id) {
+    throw new CodeQuestionCommandError("Promotion identity does not match its source relationship.", {
+      code: "CODE_QUESTION_PROMOTION_IDENTITY_MISMATCH",
+      status: 409
+    });
+  }
+  const previousStatus = existing?.payload?.status || "nonexistent";
+  if (previousStatus === status && existing?.payload?.questionID === questionID) {
+    return { artifact: existing, replayed: true, recovered: false };
+  }
+  assertValidTransition("legacyPromotion", previousStatus, status);
+  const recovered = previousStatus === "unlinked" && status === "linked";
+  const payload = normalizeCodeQuestionPromotionPayload({
+    id,
+    projectID,
+    questionID,
+    sourceKind,
+    sourceID,
+    sourceVersion,
+    sourceLabel,
+    sourceProjectID,
+    action: existing?.payload?.action || action,
+    status,
+    idempotencyKey: existing?.payload?.idempotencyKey || idempotencyKey,
+    createdByUserID: existing?.payload?.createdByUserID || userID,
+    createdAt: existing?.payload?.createdAt || now,
+    updatedByUserID: userID,
+    updatedAt: now,
+    unlinkedAt: status === "unlinked" ? now : null,
+    recoveryCount: Number(existing?.payload?.recoveryCount || 0) + (recovered ? 1 : 0)
+  });
+  return {
+    replayed: false,
+    recovered,
+    artifact: {
+      envelope: artifactEnvelope({
+        id,
+        type: "codeQuestionPromotion",
+        owner: ownerScope(userID),
+        createdAt: existing?.envelope?.createdAt || now,
+        updatedAt: now,
+        version: Number(existing?.envelope?.version || 0) + 1
+      }),
+      payload
+    }
+  };
+}
+
 export function linkForArtifact({
   userID,
   projectID,
@@ -876,6 +963,8 @@ export function permissionForCommand(commandKind) {
     case "codeQuestion.issue.supersede":
       return organizationPermissions.codeQuestionSupersede;
     case "codeQuestion.migration.run":
+    case "codeQuestion.legacy.promote":
+    case "codeQuestion.legacy.unlink":
       return organizationPermissions.codeQuestionEdit;
     default:
       return organizationPermissions.codeQuestionEdit;

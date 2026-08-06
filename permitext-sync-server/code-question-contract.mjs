@@ -46,7 +46,8 @@ export const codeQuestionArtifactKinds = Object.freeze([
   "conclusionApproval",
   "codeMemoReadiness",
   "codeMemoApproval",
-  "issuedDecisionRecord"
+  "issuedDecisionRecord",
+  "codeQuestionPromotion"
 ]);
 
 export const codeQuestionWorkflowStages = Object.freeze([
@@ -97,6 +98,20 @@ export const codeMemoIssueStates = Object.freeze([
   "issuing",
   "issued",
   "superseded"
+]);
+
+export const codeQuestionPromotionSourceKinds = Object.freeze([
+  "notebookCard",
+  "savedItem",
+  "researchAnswer",
+  "reportDraft",
+  "reviewThread",
+  "workboard"
+]);
+
+export const codeQuestionPromotionStates = Object.freeze([
+  "linked",
+  "unlinked"
 ]);
 
 export const reviewRequestTypes = Object.freeze([
@@ -281,6 +296,27 @@ export const codeQuestionTransitions = Object.freeze([
     to: "superseded",
     authorized: ["server"],
     effect: "link-successor-preserve-prior"
+  },
+  {
+    record: "legacyPromotion",
+    from: "nonexistent",
+    to: "linked",
+    authorized: ["owner", "editor"],
+    effect: "preserve-source-create-explicit-question-relationship"
+  },
+  {
+    record: "legacyPromotion",
+    from: "linked",
+    to: "unlinked",
+    authorized: ["owner", "editor"],
+    effect: "remove-relationship-preserve-source-and-question"
+  },
+  {
+    record: "legacyPromotion",
+    from: "unlinked",
+    to: "linked",
+    authorized: ["owner", "editor"],
+    effect: "recover-explicit-relationship"
   }
 ]);
 
@@ -292,6 +328,8 @@ const evidenceRoleSet = new Set(evidenceRoles);
 const evidenceProposalStateSet = new Set(evidenceProposalStates);
 const questionStateSet = new Set(questionRecordStates);
 const issueStateSet = new Set(codeMemoIssueStates);
+const promotionSourceKindSet = new Set(codeQuestionPromotionSourceKinds);
+const promotionStateSet = new Set(codeQuestionPromotionStates);
 
 function requiredText(value, label, maximum = 500) {
   const normalized = String(value || "").trim();
@@ -829,6 +867,82 @@ export function normalizeIssuedDecisionRecordPayload({
       : null,
     supersessionReason: optionalText(supersessionReason, 2_000),
     issuedAt: requiredISO(issuedAt, "issued date")
+  };
+}
+
+export function deterministicCodeQuestionPromotionID({
+  ownerID,
+  projectID,
+  questionID,
+  sourceKind,
+  sourceID
+}) {
+  const kind = String(sourceKind || "").trim();
+  if (!promotionSourceKindSet.has(kind)) throw new Error("Invalid promotion source kind.");
+  return `cq-promotion-${contentHash({
+    ownerID: requiredText(ownerID, "promotion owner", 256),
+    projectID: requiredText(projectID, "Project ID", 256),
+    questionID: requiredText(questionID, "question ID", 256),
+    sourceKind: kind,
+    sourceID: requiredText(sourceID, "promotion source ID", 512)
+  }).slice(0, 40)}`;
+}
+
+export function normalizeCodeQuestionPromotionPayload({
+  id,
+  projectID,
+  questionID,
+  sourceKind,
+  sourceID,
+  sourceVersion = null,
+  sourceLabel = "",
+  sourceProjectID = null,
+  action = "link-existing",
+  status = "linked",
+  idempotencyKey,
+  createdByUserID,
+  createdAt,
+  updatedByUserID = null,
+  updatedAt = null,
+  unlinkedAt = null,
+  recoveryCount = 0
+}) {
+  const kind = String(sourceKind || "").trim();
+  if (!promotionSourceKindSet.has(kind)) throw new Error("Invalid promotion source kind.");
+  const normalizedStatus = String(status || "linked").trim().toLowerCase();
+  if (!promotionStateSet.has(normalizedStatus)) throw new Error("Invalid promotion state.");
+  const normalizedAction = String(action || "link-existing").trim();
+  if (!["link-existing", "create-question"].includes(normalizedAction)) {
+    throw new Error("Invalid promotion action.");
+  }
+  const created = requiredISO(createdAt, "promotion created date");
+  const updated = requiredISO(updatedAt || createdAt, "promotion updated date");
+  const unlinkTime = optionalISO(unlinkedAt, "promotion unlink date");
+  if (normalizedStatus === "unlinked" && !unlinkTime) {
+    throw new Error("Unlinked promotion requires an unlink date.");
+  }
+  return {
+    schemaVersion: codeQuestionContractSchemaVersion,
+    kind: "codeQuestionPromotion",
+    id: requiredText(id, "promotion ID", 256),
+    projectID: requiredText(projectID, "Project ID", 256),
+    questionID: requiredText(questionID, "question ID", 256),
+    sourceKind: kind,
+    sourceID: requiredText(sourceID, "promotion source ID", 512),
+    sourceVersion: sourceVersion == null ? null : positiveInteger(sourceVersion, "promotion source version"),
+    sourceLabel: optionalText(sourceLabel, 500),
+    sourceProjectID: sourceProjectID
+      ? requiredText(sourceProjectID, "promotion source Project ID", 256)
+      : null,
+    action: normalizedAction,
+    status: normalizedStatus,
+    idempotencyKey: requiredText(idempotencyKey, "promotion idempotency key", 256),
+    createdByUserID: requiredText(createdByUserID, "promotion creator", 256),
+    createdAt: created,
+    updatedByUserID: requiredText(updatedByUserID || createdByUserID, "promotion updater", 256),
+    updatedAt: updated,
+    unlinkedAt: normalizedStatus === "unlinked" ? unlinkTime : null,
+    recoveryCount: nonNegativeInteger(recoveryCount, "promotion recovery count")
   };
 }
 

@@ -102,6 +102,8 @@ export function emptyCodeQuestionWorkspaceState() {
     reviewByQuestionID: {},
     /** Phase 7: typed Code Memo drafts, readiness, approvals, issuance, and lineage. */
     issueByQuestionID: {},
+    /** Phase 8: explicit legacy/source promotions and recovery, keyed by Project ID. */
+    legacyByProjectID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -291,6 +293,13 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
       Object.entries(source.issueByQuestionID)
         .filter(([questionID, record]) => typeof questionID === "string" && record && typeof record === "object")
         .map(([questionID, record]) => [questionID, copy(record)])
+    );
+  }
+  if (source.legacyByProjectID && typeof source.legacyByProjectID === "object") {
+    state.legacyByProjectID = Object.fromEntries(
+      Object.entries(source.legacyByProjectID)
+        .filter(([projectID, record]) => typeof projectID === "string" && record && typeof record === "object")
+        .map(([projectID, record]) => [projectID, copy(record)])
     );
   }
 

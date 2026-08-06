@@ -73,6 +73,7 @@ import {
   assertCodeQuestionWorkspaceEnabled,
   blockingReviewRequestIDs,
   CodeQuestionCommandError,
+  codeQuestionMigrationVersion,
   codeQuestionMigrationCheckpointName,
   codeQuestionWorkspaceFeatureEnabled,
   compareAndSwapFoundationArtifact,
@@ -88,16 +89,20 @@ import {
   createPendingIssuanceRecord,
   createQuestionInputArtifact,
   createQuestionOutboxEntry,
+  deterministicPromotedQuestionID,
   linkForArtifact,
   activityFor,
   permissionForCommand,
   restoreCodeQuestionArtifact,
   runCodeQuestionBootstrapMigration,
-  advanceIssuanceSaga
+  advanceIssuanceSaga,
+  upsertCodeQuestionPromotionArtifact
 } from "./code-question-commands.mjs";
 import {
+  codeQuestionPromotionSourceKinds,
   computeDependencyHash,
   contentHash as codeQuestionContentHash,
+  deterministicCodeQuestionPromotionID,
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled
 } from "./code-question-contract.mjs";
@@ -16484,6 +16489,456 @@ async function requireCodeQuestionContext(request, response, { permission = null
   return context;
 }
 
+const codeQuestionLegacySourceLabels = Object.freeze({
+  notebookCard: "Working Notes",
+  savedItem: "Saved passage",
+  researchAnswer: "Research answer",
+  reportDraft: "Advanced Report Draft",
+  reviewThread: "Coordination thread",
+  workboard: "Workboard"
+});
+
+function codeQuestionPromotionForClient(artifact) {
+  if (!artifact || artifact.envelope?.type !== "codeQuestionPromotion") return null;
+  return {
+    id: artifact.envelope.id,
+    version: artifact.envelope.version,
+    ...artifact.payload
+  };
+}
+
+function legacySourceProjectIDs(activeLinks, sourceKind, sourceID, aliases = []) {
+  const targetIDs = new Set([sourceID, ...aliases].filter(Boolean).map(String));
+  return new Set(activeLinks
+    .filter((link) => {
+      if (!targetIDs.has(String(link.targetID || ""))) return false;
+      if (sourceKind === "savedItem") {
+        return link.targetKind === "savedItem" || link.targetKind === "canonicalSection";
+      }
+      return link.targetKind === sourceKind;
+    })
+    .map((link) => String(link.projectID || ""))
+    .filter(Boolean));
+}
+
+function legacyInventoryItem({
+  projectID,
+  sourceKind,
+  sourceID,
+  sourceVersion = null,
+  title,
+  summary = "",
+  updatedAt = null,
+  assignedProjectIDs = new Set(),
+  promotions = []
+}) {
+  const assignments = new Set(Array.from(assignedProjectIDs || []).map(String).filter(Boolean));
+  const assignedHere = assignments.has(projectID);
+  if (!assignedHere && assignments.size) return null;
+  const sourcePromotions = promotions.filter((promotion) =>
+    promotion.sourceKind === sourceKind && String(promotion.sourceID) === String(sourceID)
+  );
+  const linked = sourcePromotions.filter((promotion) => promotion.status === "linked");
+  const recoverable = !linked.length && sourcePromotions.some((promotion) => promotion.status === "unlinked");
+  return {
+    id: `${sourceKind}:${sourceID}`,
+    sourceKind,
+    sourceID: String(sourceID),
+    sourceVersion: sourceVersion == null ? null : Number(sourceVersion),
+    typeLabel: codeQuestionLegacySourceLabels[sourceKind] || sourceKind,
+    title: String(title || codeQuestionLegacySourceLabels[sourceKind] || "Legacy item").trim(),
+    summary: String(summary || "").trim().slice(0, 1_000),
+    updatedAt,
+    assignment: assignedHere ? "project" : "unassigned",
+    promotionState: linked.length ? "linked" : recoverable ? "recovery" : "unassigned",
+    questionIDs: linked.map((promotion) => promotion.questionID),
+    promotions: sourcePromotions
+  };
+}
+
+async function codeQuestionLegacyInventory(userID, projectID) {
+  const [artifacts, links, answers, mutations, bootstrap] = await Promise.all([
+    listStoredFoundationArtifacts(userID),
+    listStoredProjectLinks(userID),
+    listStoredResearchAnswers(userID),
+    userContentMutations(userID),
+    storedMigrationCheckpoint(userID, codeQuestionMigrationCheckpointName)
+  ]);
+  const activeLinks = links.filter((link) => !link.deletedAt);
+  const promotions = artifacts
+    .filter((artifact) => artifact.envelope?.type === "codeQuestionPromotion" &&
+      artifact.payload?.projectID === projectID)
+    .map(codeQuestionPromotionForClient)
+    .filter(Boolean);
+  const questions = artifacts
+    .filter((artifact) => artifact.envelope?.type === "codeQuestion" &&
+      artifact.payload?.projectID === projectID && !artifact.envelope?.deletedAt)
+    .map((artifact) => ({ id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }));
+  const items = [];
+  const pushItem = (item) => { if (item) items.push(item); };
+
+  artifacts.filter((artifact) => !artifact.envelope?.deletedAt).forEach((artifact) => {
+    const type = artifact.envelope?.type;
+    if (!["notebookCard", "reportDraft", "reviewThread"].includes(type)) return;
+    const payload = artifact.payload || {};
+    const assignedProjectIDs = legacySourceProjectIDs(activeLinks, type, artifact.envelope.id);
+    pushItem(legacyInventoryItem({
+      projectID,
+      sourceKind: type,
+      sourceID: artifact.envelope.id,
+      sourceVersion: artifact.envelope.version,
+      title: payload.title || (type === "reviewThread" ? payload.subject : "") || codeQuestionLegacySourceLabels[type],
+      summary: payload.plainText || payload.introduction || payload.description || payload.body || "",
+      updatedAt: artifact.envelope.updatedAt,
+      assignedProjectIDs,
+      promotions
+    }));
+  });
+
+  answers.forEach((answer) => {
+    const assignedProjectIDs = legacySourceProjectIDs(activeLinks, "researchAnswer", answer.id);
+    if (answer.projectID) assignedProjectIDs.add(String(answer.projectID));
+    pushItem(legacyInventoryItem({
+      projectID,
+      sourceKind: "researchAnswer",
+      sourceID: answer.id,
+      title: answer.question || "Historical Research answer",
+      summary: answer.answer?.conclusion || "",
+      updatedAt: answer.createdAt,
+      assignedProjectIDs,
+      promotions
+    }));
+  });
+
+  const projectSectionAssignments = new Map();
+  mutations.forEach((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (kind !== "projectSection" || !record || Number.isFinite(Date.parse(record.deletedAt || ""))) return;
+    const sectionID = String(record.sectionID || "").trim();
+    const assignedProjectID = syncProjectIdentity(record.folderClientID, userID) ||
+      (record.localFolderID == null ? "" : `legacy-project-${record.localFolderID}`);
+    if (!sectionID || !assignedProjectID) return;
+    const assignments = projectSectionAssignments.get(sectionID) || new Set();
+    assignments.add(assignedProjectID);
+    projectSectionAssignments.set(sectionID, assignments);
+  });
+  mutations.forEach((mutation) => {
+    const { kind, record } = mutationKindAndRecord(mutation);
+    if (!record || Number.isFinite(Date.parse(record.deletedAt || ""))) return;
+    if (kind === "savedItem") {
+      const sourceID = String(record.id || normalizedMutationRecordID(mutation) || "").trim();
+      if (!sourceID) return;
+      const sectionID = String(record.sectionID || "").trim();
+      const assignedProjectIDs = legacySourceProjectIDs(activeLinks, "savedItem", sourceID, [sectionID]);
+      for (const assigned of projectSectionAssignments.get(sectionID) || []) assignedProjectIDs.add(assigned);
+      pushItem(legacyInventoryItem({
+        projectID,
+        sourceKind: "savedItem",
+        sourceID,
+        title: [record.codePrefix, record.sectionNumber, record.title].filter(Boolean).join(" ") || "Saved passage",
+        summary: record.noteBody || "Saved legal source. It is not approved question evidence until explicitly reviewed.",
+        updatedAt: record.updatedAt,
+        assignedProjectIDs,
+        promotions
+      }));
+    }
+    if (kind === "workboard") {
+      const sourceID = String(record.id || normalizedMutationRecordID(mutation) || "").trim();
+      if (!sourceID) return;
+      const assignedProjectID = String(syncProjectIdentity(record.projectID, userID) || record.projectID || "").trim();
+      pushItem(legacyInventoryItem({
+        projectID,
+        sourceKind: "workboard",
+        sourceID,
+        title: "Project Workboard",
+        summary: "Project-owned diagram. Linking does not change its Project ownership or drawing data.",
+        updatedAt: record.updatedAt,
+        assignedProjectIDs: new Set(assignedProjectID ? [assignedProjectID] : []),
+        promotions
+      }));
+    }
+  });
+
+  items.sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")) ||
+    left.title.localeCompare(right.title));
+  const counts = {
+    total: items.length,
+    unassigned: items.filter((item) => item.promotionState === "unassigned").length,
+    linked: items.filter((item) => item.promotionState === "linked").length,
+    recovery: items.filter((item) => item.promotionState === "recovery").length,
+    projectOwned: items.filter((item) => item.assignment === "project").length,
+    accountUnassigned: items.filter((item) => item.assignment === "unassigned").length
+  };
+  return {
+    schemaVersion: 1,
+    projectID,
+    items,
+    questions,
+    promotions,
+    counts,
+    migration: {
+      migrationVersion: bootstrap?.migrationVersion || codeQuestionMigrationVersion,
+      status: bootstrap?.status || "not-run",
+      migratedCount: counts.linked,
+      alreadyCurrentCount: promotions.filter((item) => item.status === "linked").length,
+      skippedCount: counts.unassigned,
+      ambiguousCount: counts.accountUnassigned,
+      failedCount: 0,
+      recoverableCount: counts.recovery,
+      lastSuccessfulCheckpoint: bootstrap?.lastSuccessfulCheckpoint || bootstrap?.completedAt || null,
+      note: "Unassigned material requires an explicit professional choice; no source was silently converted."
+    }
+  };
+}
+
+async function codeQuestionForProject(userID, projectID, questionID) {
+  const artifacts = await listStoredFoundationArtifacts(userID);
+  return artifacts.find((artifact) => artifact.envelope?.type === "codeQuestion" &&
+    artifact.envelope.id === questionID && artifact.payload?.projectID === projectID &&
+    !artifact.envelope?.deletedAt) || null;
+}
+
+async function handleCodeQuestionLegacyList(request, response) {
+  const context = await requireCodeQuestionContext(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+  sendJSON(response, 200, await codeQuestionLegacyInventory(context.userID, projectID));
+}
+
+async function handleCodeQuestionLegacyPromote(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.legacy.promote")
+  });
+  if (!context) return;
+  try {
+    const projectID = String(context.body.projectID || "").trim();
+    const sourceKind = String(context.body.sourceKind || "").trim();
+    const sourceID = String(context.body.sourceID || "").trim();
+    if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+      sendError(response, 404, "Project not found.");
+      return;
+    }
+    if (!codeQuestionPromotionSourceKinds.includes(sourceKind) || !sourceID) {
+      sendError(response, 400, "Select a supported legacy source.");
+      return;
+    }
+    const inventory = await codeQuestionLegacyInventory(context.userID, projectID);
+    const source = inventory.items.find((item) => item.sourceKind === sourceKind && item.sourceID === sourceID);
+    if (!source) {
+      sendError(response, 404, "Legacy source is unavailable for this Project.");
+      return;
+    }
+    const idempotencyKey = String(context.body.idempotencyKey ||
+      `link:${projectID}:${sourceKind}:${sourceID}:${context.body.questionID || "new"}`).trim();
+    let question = null;
+    let questionCreated = false;
+    let action = "link-existing";
+    const requestedQuestionID = String(context.body.questionID || "").trim();
+    if (requestedQuestionID) {
+      question = await codeQuestionForProject(context.userID, projectID, requestedQuestionID);
+      if (!question) {
+        sendError(response, 404, "Code Question not found for this Project.");
+        return;
+      }
+    } else {
+      action = "create-question";
+      const createQuestion = context.body.createQuestion && typeof context.body.createQuestion === "object"
+        ? context.body.createQuestion
+        : {};
+      if (!String(createQuestion.questionText || "").trim()) {
+        sendJSON(response, 400, {
+          error: "Creating a Code Question from legacy work requires an explicit question statement.",
+          code: "CODE_QUESTION_PROMOTION_CONFIRMATION_REQUIRED"
+        });
+        return;
+      }
+      const deterministicQuestionID = deterministicPromotedQuestionID({
+        userID: context.userID,
+        projectID,
+        sourceKind,
+        sourceID,
+        idempotencyKey
+      });
+      question = await codeQuestionForProject(context.userID, projectID, deterministicQuestionID);
+      if (!question) {
+        const allocated = await allocateStoredCodeQuestionCounter(context.userID, "questionNumber", projectID);
+        const now = new Date().toISOString();
+        question = createCodeQuestionArtifact({
+          userID: context.userID,
+          projectID,
+          title: createQuestion.title || source.title,
+          questionText: createQuestion.questionText,
+          scope: createQuestion.scope,
+          desiredOutput: createQuestion.desiredOutput,
+          jurisdiction: createQuestion.jurisdiction,
+          asOfDate: createQuestion.asOfDate,
+          questionNumber: allocated.value,
+          createdAt: now,
+          id: deterministicQuestionID
+        });
+        await saveStoredFoundationArtifactCompareAndSwap(context.userID, question, 0);
+        await saveStoredProjectLink(context.userID, linkForArtifact({
+          userID: context.userID,
+          projectID,
+          targetKind: "codeQuestion",
+          targetID: question.envelope.id,
+          createdAt: now
+        }));
+        await saveStoredActivityEvent(context.userID, activityFor({
+          userID: context.userID,
+          projectID,
+          action: "code-question.created",
+          objectKind: "codeQuestion",
+          objectID: question.envelope.id,
+          newStatus: "active",
+          createdAt: now,
+          metadata: { promotedFrom: { sourceKind, sourceID } }
+        }));
+        questionCreated = true;
+      }
+    }
+    const questionID = question.envelope?.id || question.id;
+    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const promotionID = deterministicCodeQuestionPromotionID({
+      ownerID: context.userID,
+      projectID,
+      questionID,
+      sourceKind,
+      sourceID
+    });
+    const existing = artifacts.find((artifact) => artifact.envelope?.id === promotionID) || null;
+    const now = new Date().toISOString();
+    const result = upsertCodeQuestionPromotionArtifact(existing, {
+      userID: context.userID,
+      projectID,
+      questionID,
+      sourceKind,
+      sourceID,
+      sourceVersion: source.sourceVersion,
+      sourceLabel: source.title,
+      sourceProjectID: source.assignment === "project" ? projectID : null,
+      action,
+      status: "linked",
+      idempotencyKey,
+      now
+    });
+    if (!result.replayed) {
+      await saveStoredFoundationArtifactCompareAndSwap(
+        context.userID,
+        result.artifact,
+        Number(existing?.envelope?.version || 0)
+      );
+      await saveStoredProjectLink(context.userID, linkForArtifact({
+        userID: context.userID,
+        projectID,
+        targetKind: "codeQuestionPromotion",
+        targetID: result.artifact.envelope.id,
+        createdAt: existing?.envelope?.createdAt || now,
+        metadata: { questionID, sourceKind, sourceID }
+      }));
+      await saveStoredActivityEvent(context.userID, activityFor({
+        userID: context.userID,
+        projectID,
+        action: result.recovered ? "code-question.migration.recovered" : "code-question.migration.promoted",
+        objectKind: "codeQuestionPromotion",
+        objectID: result.artifact.envelope.id,
+        previousStatus: existing?.payload?.status || null,
+        newStatus: "linked",
+        createdAt: now,
+        metadata: { questionID, sourceKind, sourceID, sourcePreserved: true, questionCreated }
+      }));
+    }
+    const clientQuestion = question.envelope
+      ? { id: question.envelope.id, version: question.envelope.version, ...question.payload }
+      : question;
+    sendJSON(response, result.replayed ? 200 : 201, {
+      question: clientQuestion,
+      questionCreated,
+      promotion: codeQuestionPromotionForClient(result.artifact),
+      replayed: result.replayed,
+      recovered: result.recovered,
+      sourcePreserved: true
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    sendJSON(response, 400, {
+      error: error?.message || "Legacy promotion failed.",
+      code: "CODE_QUESTION_PROMOTION_FAILED"
+    });
+  }
+}
+
+async function handleCodeQuestionLegacyUnlink(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.legacy.unlink")
+  });
+  if (!context) return;
+  try {
+    const projectID = String(context.body.projectID || "").trim();
+    const promotionID = String(context.body.promotionID || "").trim();
+    const existing = (await listStoredFoundationArtifacts(context.userID)).find((artifact) =>
+      artifact.envelope?.type === "codeQuestionPromotion" &&
+      artifact.envelope.id === promotionID && artifact.payload?.projectID === projectID
+    );
+    if (!existing) {
+      sendError(response, 404, "Active promotion relationship not found.");
+      return;
+    }
+    const result = upsertCodeQuestionPromotionArtifact(existing, {
+      userID: context.userID,
+      projectID,
+      questionID: existing.payload.questionID,
+      sourceKind: existing.payload.sourceKind,
+      sourceID: existing.payload.sourceID,
+      sourceVersion: existing.payload.sourceVersion,
+      sourceLabel: existing.payload.sourceLabel,
+      sourceProjectID: existing.payload.sourceProjectID,
+      action: existing.payload.action,
+      status: "unlinked",
+      idempotencyKey: existing.payload.idempotencyKey
+    });
+    if (!result.replayed) {
+      await saveStoredFoundationArtifactCompareAndSwap(
+        context.userID,
+        result.artifact,
+        existing.envelope.version
+      );
+      await saveStoredActivityEvent(context.userID, activityFor({
+        userID: context.userID,
+        projectID,
+        action: "code-question.migration.unlinked",
+        objectKind: "codeQuestionPromotion",
+        objectID: result.artifact.envelope.id,
+        previousStatus: "linked",
+        newStatus: "unlinked",
+        metadata: {
+          questionID: existing.payload.questionID,
+          sourceKind: existing.payload.sourceKind,
+          sourceID: existing.payload.sourceID,
+          sourcePreserved: true,
+          questionPreserved: true
+        }
+      }));
+    }
+    sendJSON(response, 200, {
+      promotion: codeQuestionPromotionForClient(result.artifact),
+      replayed: result.replayed,
+      sourcePreserved: true,
+      questionPreserved: true
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    sendJSON(response, 400, {
+      error: error?.message || "Promotion relationship could not be unlinked.",
+      code: "CODE_QUESTION_PROMOTION_UNLINK_FAILED"
+    });
+  }
+}
+
 async function handleCodeQuestionList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
@@ -18183,6 +18638,9 @@ const handlers = {
   "projects/foundation/unlink": handleProjectFoundationUnlink,
   // Code Question routes (Phase 1): gated by permitext:codeQuestionWorkspace (default off).
   "projects/code-questions/list": handleCodeQuestionList,
+  "projects/code-questions/legacy/list": handleCodeQuestionLegacyList,
+  "projects/code-questions/legacy/promote": handleCodeQuestionLegacyPromote,
+  "projects/code-questions/legacy/unlink": handleCodeQuestionLegacyUnlink,
   "projects/code-questions/create": handleCodeQuestionCreate,
   "projects/code-questions/archive": handleCodeQuestionArchive,
   "projects/code-questions/restore": handleCodeQuestionRestore,

@@ -78,6 +78,12 @@ const reviewState = normalizeCodeQuestionWorkspaceState({
   }
 });
 assert.equal(reviewState.reviewByQuestionID["cq-1"].requests[0].id, "request-1");
+const legacyState = normalizeCodeQuestionWorkspaceState({
+  legacyByProjectID: {
+    "project-1": { projectID: "project-1", promotions: [{ id: "promotion-1" }] }
+  }
+});
+assert.equal(legacyState.legacyByProjectID["project-1"].promotions[0].id, "promotion-1");
 
 // Stage arrangement is workspace-only (does not invent approval state)
 const arranged = applyStageArrangement(emptyCodeQuestionWorkspaceState(), {
@@ -193,6 +199,10 @@ const withCQ = normalizeWorkspaceLayout({
     activeQuestionID: "cq-1",
     activeStage: "evidence",
     questionIndexOpen: true,
+    analysisByQuestionID: { "cq-1": { questionID: "cq-1", runs: [{ id: "analysis-1" }] } },
+    reviewByQuestionID: { "cq-1": { questionID: "cq-1", requests: [{ id: "review-1" }] } },
+    issueByQuestionID: { "cq-1": { questionID: "cq-1", issuedRecords: [{ id: "issued-1" }] } },
+    legacyByProjectID: { "project-1": { projectID: "project-1", promotions: [{ id: "promotion-1" }] } },
     openPanes: [
       {
         projectID: "project-1",
@@ -221,6 +231,10 @@ assert.equal(
 assert.ok(withCQ.paneOrder.includes("cq:project-1:cq-1:reader"));
 assert.equal(withCQ.paneOrder.includes("cq:project-9:cq-9:reader"), false);
 assert.equal(workspaceLayoutHasVisiblePanes(withCQ), true);
+assert.equal(withCQ.codeQuestionWorkspace.analysisByQuestionID["cq-1"].runs[0].id, "analysis-1");
+assert.equal(withCQ.codeQuestionWorkspace.reviewByQuestionID["cq-1"].requests[0].id, "review-1");
+assert.equal(withCQ.codeQuestionWorkspace.issueByQuestionID["cq-1"].issuedRecords[0].id, "issued-1");
+assert.equal(withCQ.codeQuestionWorkspace.legacyByProjectID["project-1"].promotions[0].id, "promotion-1");
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
 
 // IDs from state

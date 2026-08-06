@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260803-code-question-review-v1";
+} from "./offline-storage.js?v=20260806-code-question-legacy-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260803-code-question-analyze-v3";
+} from "./workspace-state.js?v=20260806-code-question-legacy-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -80,7 +80,7 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260803-code-question-review-v1";
+} from "./code-question-workspace.js?v=20260806-code-question-legacy-v1";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -158,6 +158,19 @@ import {
   normalizeIssueWorkspace,
   prepareCodeMemoDraft
 } from "./code-question-issue.js?v=20260803-code-question-issue-v1";
+import {
+  emptyLegacyWorkspace,
+  filterLegacyItems,
+  legacyCounts,
+  legacyFingerprint,
+  legacyGuidanceForSource,
+  legacySourceKinds,
+  legacySourceLabels,
+  mergeLegacyInventory,
+  normalizeLegacyWorkspace,
+  promoteLegacyItem,
+  unlinkLegacyPromotion
+} from "./code-question-legacy.js?v=20260806-code-question-legacy-v1";
 
 const permitextSyncSchemaVersion = 2;
 const permitextClientCapabilities = Object.freeze([
@@ -363,6 +376,7 @@ let notebookStylesPromise = null;
 const notebookMounts = new Map();
 const notebookCardMenuOpenByProject = new Map();
 const reportDraftMounts = new Map();
+const legacyHydrationByProject = new Map();
 const coordinationComposerDraftByProject = new Map();
 let projectStudioFolderReconcilePromise = null;
 let projectStudioTransitionGeneration = 0;
@@ -5091,6 +5105,35 @@ function saveIssueForQuestion(questionID, issue) {
     }
   });
   return normalized;
+}
+
+function getLegacyForProject(projectID = activeProjectIDForCodeQuestions()) {
+  const id = String(projectID || "").trim();
+  if (!id) return emptyLegacyWorkspace();
+  const existing = codeQuestionWorkspaceState().legacyByProjectID?.[id];
+  return normalizeLegacyWorkspace(existing || emptyLegacyWorkspace(id), id);
+}
+
+function saveLegacyForProject(projectID, legacy) {
+  const id = String(projectID || "").trim();
+  if (!id) return null;
+  const normalized = normalizeLegacyWorkspace(legacy, id);
+  const cq = codeQuestionWorkspaceState();
+  setCodeQuestionWorkspaceState({
+    ...cq,
+    legacyByProjectID: {
+      ...(cq.legacyByProjectID || {}),
+      [id]: normalized
+    }
+  });
+  return normalized;
+}
+
+function postCodeQuestion(path, values = {}) {
+  return postResearch(path, {
+    ...values,
+    codeQuestionWorkspaceEnabled: codeQuestionWorkspaceEnabled()
+  });
 }
 
 function ensureEvidenceSeedCandidates(questionID) {
@@ -22879,6 +22922,462 @@ function renderCodeQuestionStageControl(project) {
   return bar;
 }
 
+function localLegacyInventory(project) {
+  const identity = projectIdentity(project || {});
+  const projectID = String(projectDetailKey(identity) || activeProjectIDForCodeQuestions() || "").trim();
+  const current = getLegacyForProject(projectID);
+  const summary = currentContentSummary();
+  const existingItems = new Map(current.items.map((item) => [item.id, item]));
+  const projectSections = summary.projectSections || [];
+  (summary.savedItems || []).forEach((item) => {
+    const sourceID = String(item.id || item.sectionID || "").trim();
+    if (!sourceID) return;
+    const matchingSections = projectSections.filter((section) =>
+      String(section.sectionID || section.savedSectionID || section.itemID || "") === String(item.sectionID || "")
+    );
+    const assignedHere = matchingSections.some((section) => projectSectionBelongsToProject(section, identity));
+    if (!assignedHere && matchingSections.length) return;
+    existingItems.set(`savedItem:${sourceID}`, {
+      id: `savedItem:${sourceID}`,
+      sourceKind: "savedItem",
+      sourceID,
+      typeLabel: legacySourceLabels.savedItem,
+      title: [item.codePrefix, item.sectionNumber, item.title].filter(Boolean).join(" ") || "Saved passage",
+      summary: item.noteBody || "Saved legal source. Review it explicitly before adding it as Evidence.",
+      updatedAt: item.updatedAt || null,
+      assignment: assignedHere ? "project" : "unassigned",
+      promotions: current.promotions
+    });
+  });
+  (summary.workboards || []).forEach((record) => {
+    const workboardID = String(record.id || "").trim();
+    const recordProjectID = String(syncProjectIdentity(record.projectID) || record.projectID || "").trim();
+    if (!workboardID || recordProjectID !== projectID) return;
+    existingItems.set(`workboard:${workboardID}`, {
+      id: `workboard:${workboardID}`,
+      sourceKind: "workboard",
+      sourceID: workboardID,
+      typeLabel: legacySourceLabels.workboard,
+      title: "Project Workboard",
+      summary: "Project-owned diagram. Its ownership and drawing data remain unchanged when linked.",
+      updatedAt: record.updatedAt || null,
+      assignment: "project",
+      promotions: current.promotions
+    });
+  });
+  return {
+    projectID,
+    items: Array.from(existingItems.values()),
+    promotions: current.promotions,
+    migration: current.migration
+  };
+}
+
+async function hydrateCodeQuestionLegacy(project, target = null, options = {}) {
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  if (!projectID) return getLegacyForProject(projectID);
+  let next = mergeLegacyInventory(getLegacyForProject(projectID), localLegacyInventory(project), projectID);
+  saveLegacyForProject(projectID, next);
+  if (!activeAccount()) return next;
+  if (!legacyHydrationByProject.has(projectID)) {
+    const request = postCodeQuestion("/projects/code-questions/legacy/list", { projectID })
+      .then((inventory) => {
+        const merged = mergeLegacyInventory(getLegacyForProject(projectID), inventory, projectID);
+        saveLegacyForProject(projectID, merged);
+        return merged;
+      })
+      .catch((error) => {
+        const failed = normalizeLegacyWorkspace({
+          ...getLegacyForProject(projectID),
+          loading: false,
+          error: error.message || "Legacy inventory is temporarily unavailable."
+        }, projectID);
+        saveLegacyForProject(projectID, failed);
+        return failed;
+      })
+      .finally(() => legacyHydrationByProject.delete(projectID));
+    legacyHydrationByProject.set(projectID, request);
+  }
+  next = await legacyHydrationByProject.get(projectID);
+  if (target?.isConnected && options.refresh !== false) {
+    target.replaceWith(renderCodeQuestionLegacyBody(project, options));
+  }
+  return next;
+}
+
+function refreshCodeQuestionLegacyPanes(projectID = activeProjectIDForCodeQuestions()) {
+  const safeProjectID = String(projectID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  track?.querySelectorAll?.(`.code-question-panel[data-project-id="${safeProjectID}"]`).forEach((pane) => {
+    const role = pane.dataset.cqRole;
+    if (!["legacy", "working-notes", "workboard", "report-draft"].includes(role)) return;
+    const body = pane.querySelector(".code-question-panel-body");
+    const project = openProjectDetails().find((detail) => projectDetailKey(detail) === projectID) || openProjectDetails()[0];
+    const sourceKindFilter = role === "working-notes" ? "notebookCard"
+      : role === "workboard" ? "workboard"
+        : role === "report-draft" ? "reportDraft"
+          : "all";
+    if (body) body.replaceChildren(renderCodeQuestionLegacyBody(project, { sourceKindFilter, hydrate: false }));
+  });
+  saveWorkspaceState();
+}
+
+function upsertLocalQuestionFromPromotion(project, questionPayload, questionText, source) {
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  const existing = questionsForActiveProject();
+  const id = String(questionPayload.id || "").trim();
+  const current = existing.find((question) => question.id === id);
+  const nextNumber = existing.reduce((maximum, question) => {
+    const value = Number(String(question.displayID || "").replace(/\D/g, "")) || 0;
+    return Math.max(maximum, value);
+  }, 0) + 1;
+  const question = {
+    ...(current || {}),
+    id,
+    displayID: questionPayload.displayID || current?.displayID || `Q-${String(nextNumber).padStart(3, "0")}`,
+    title: questionPayload.title || source.title || "Promoted Code Question",
+    recordState: questionPayload.recordState === "archived" ? "archived" : "active",
+    responsibleDisplayName: current?.responsibleDisplayName || codeQuestionActor().displayName,
+    reviewState: current?.reviewState || "",
+    lastActivityAt: questionPayload.updatedAt || new Date().toISOString(),
+    latestIssuedVersion: current?.latestIssuedVersion || null,
+    revisionInProgress: false,
+    listLabel: current?.listLabel || "Active"
+  };
+  setQuestionsForActiveProject(current
+    ? existing.map((candidate) => candidate.id === id ? question : candidate)
+    : [...existing, question]);
+  let definition = getDefinitionForQuestion(id) || emptyDefinitionRecord(id, {
+    title: question.title,
+    createdBy: codeQuestionActor().userID
+  });
+  if (!String(definition.questionText || "").trim()) {
+    definition = updateDefinitionFields(definition, {
+      title: question.title,
+      questionText
+    }, {
+      expectedVersion: definition.expectedVersion,
+      actorUserID: codeQuestionActor().userID
+    });
+    saveDefinitionForQuestion(id, definition);
+  }
+  setCodeQuestionWorkspaceState(
+    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID: id,
+      stage: "define"
+    }),
+    { activeProjectID: projectID, syncDeepLink: true }
+  );
+  return question;
+}
+
+async function linkLegacySourceToQuestion(project, source, questionID, options = {}) {
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  const useServer = Boolean(activeAccount()) && !String(questionID || "").startsWith("local-cq-");
+  try {
+    if (useServer) {
+      const payload = await postCodeQuestion("/projects/code-questions/legacy/promote", {
+        projectID,
+        questionID,
+        sourceKind: source.sourceKind,
+        sourceID: source.sourceID,
+        idempotencyKey: options.idempotencyKey || `link:${projectID}:${source.sourceKind}:${source.sourceID}:${questionID}`
+      });
+      const current = getLegacyForProject(projectID);
+      saveLegacyForProject(projectID, mergeLegacyInventory(current, {
+        items: current.items,
+        promotions: [...current.promotions.filter((item) => item.id !== payload.promotion.id), payload.promotion]
+      }, projectID));
+    } else {
+      const result = promoteLegacyItem(getLegacyForProject(projectID), source, questionID, {
+        projectID,
+        actorUserID: codeQuestionActor().userID,
+        action: options.action,
+        idempotencyKey: options.idempotencyKey
+      });
+      saveLegacyForProject(projectID, result.workspace);
+    }
+    refreshCodeQuestionLegacyPanes(projectID);
+    await showWebNotice(
+      options.recovery ? "Question link restored" : "Linked to Code Question",
+      `${source.title} remains unchanged. The link records provenance only; it does not make the source a governed fact or approved evidence.`
+    );
+  } catch (error) {
+    await showWebNotice("Could not link legacy work", error.message || "The explicit link was not saved.");
+  }
+}
+
+async function createQuestionFromLegacySource(project, source) {
+  const questionText = await openWebTextPrompt({
+    title: "Create Code Question from legacy work",
+    message: `${legacyGuidanceForSource(source.sourceKind)} Enter the precise question; Permitext will not infer it from the source.`,
+    label: "Precise question",
+    required: true,
+    multiline: true,
+    confirmLabel: "Continue"
+  });
+  if (!questionText) return;
+  const title = await openWebTextPrompt({
+    title: "Question title",
+    message: "Use a concise professional title. The original source remains separately available.",
+    label: "Title",
+    required: true,
+    defaultValue: source.title || "Promoted Code Question",
+    confirmLabel: "Create and link"
+  });
+  if (!title) return;
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  const idempotencyKey = `promote:${projectID}:${source.sourceKind}:${source.sourceID}:${legacyFingerprint(questionText)}`;
+  try {
+    let questionPayload;
+    if (activeAccount()) {
+      const payload = await postCodeQuestion("/projects/code-questions/legacy/promote", {
+        projectID,
+        sourceKind: source.sourceKind,
+        sourceID: source.sourceID,
+        idempotencyKey,
+        createQuestion: { title, questionText }
+      });
+      questionPayload = payload.question;
+      const current = getLegacyForProject(projectID);
+      saveLegacyForProject(projectID, mergeLegacyInventory(current, {
+        items: current.items,
+        promotions: [...current.promotions.filter((item) => item.id !== payload.promotion.id), payload.promotion]
+      }, projectID));
+    } else {
+      const id = `local-cq-promoted-${legacyFingerprint({ projectID, sourceKind: source.sourceKind, sourceID: source.sourceID, questionText })}`;
+      questionPayload = { id, title, questionText, recordState: "active", updatedAt: new Date().toISOString() };
+      const result = promoteLegacyItem(getLegacyForProject(projectID), source, id, {
+        projectID,
+        actorUserID: codeQuestionActor().userID,
+        action: "create-question",
+        idempotencyKey
+      });
+      saveLegacyForProject(projectID, result.workspace);
+    }
+    upsertLocalQuestionFromPromotion(project, questionPayload, questionText, source);
+    await renderWorkspace();
+    await showWebNotice(
+      "Code Question created",
+      `${source.title} remains available in Legacy / Unassigned and is linked as provenance. Its content was not silently promoted into facts, evidence, analysis, or the Code Memo.`
+    );
+  } catch (error) {
+    await showWebNotice("Question was not created", error.message || "Legacy promotion failed safely.");
+  }
+}
+
+async function unlinkLegacySourcePromotion(project, promotion) {
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  try {
+    if (activeAccount() && String(promotion.id).startsWith("cq-promotion-")) {
+      const payload = await postCodeQuestion("/projects/code-questions/legacy/unlink", {
+        projectID,
+        promotionID: promotion.id
+      });
+      const current = getLegacyForProject(projectID);
+      saveLegacyForProject(projectID, mergeLegacyInventory(current, {
+        items: current.items,
+        promotions: [...current.promotions.filter((item) => item.id !== payload.promotion.id), payload.promotion]
+      }, projectID));
+    } else {
+      const result = unlinkLegacyPromotion(getLegacyForProject(projectID), promotion.id, {
+        actorUserID: codeQuestionActor().userID
+      });
+      saveLegacyForProject(projectID, result.workspace);
+    }
+    refreshCodeQuestionLegacyPanes(projectID);
+    await showWebNotice(
+      "Question link removed",
+      "Only the relationship was removed. The legacy source and the Code Question remain unchanged and reachable; Restore link is available."
+    );
+  } catch (error) {
+    await showWebNotice("Could not unlink", error.message || "The relationship remains unchanged.");
+  }
+}
+
+function openQuestionFromLegacy(questionID) {
+  const projectID = activeProjectIDForCodeQuestions();
+  if (!questionsForActiveProject().some((question) => question.id === questionID)) {
+    void showWebNotice("Question not in this local view", "Reload the signed-in Project to retrieve this linked Code Question.");
+    return;
+  }
+  setCodeQuestionWorkspaceState(
+    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID,
+      stage: codeQuestionWorkspaceState().activeStage || "define"
+    }),
+    { activeProjectID: projectID, syncDeepLink: true }
+  );
+  void renderWorkspace();
+}
+
+function renderCodeQuestionLegacyBody(project, options = {}) {
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  const localInventory = localLegacyInventory(project);
+  let legacy = mergeLegacyInventory(getLegacyForProject(projectID), localInventory, projectID);
+  const forcedSourceKind = options.sourceKindFilter || "all";
+  if (forcedSourceKind !== "all") legacy = { ...legacy, sourceKindFilter: forcedSourceKind };
+  const wrap = document.createElement("div");
+  wrap.className = "code-question-legacy";
+  wrap.dataset.projectId = projectID;
+
+  const boundary = document.createElement("section");
+  boundary.className = "code-question-legacy-boundary";
+  boundary.innerHTML = `
+    <p class="code-question-pane-status">Explicit promotion only</p>
+    <p>Legacy work stays reachable and unchanged. A link records provenance; it never silently turns notes, diagrams, old answers, or draft prose into governed inputs or approved evidence.</p>
+  `;
+  wrap.appendChild(boundary);
+
+  const counts = legacyCounts(legacy.items);
+  const countBar = document.createElement("div");
+  countBar.className = "code-question-legacy-counts";
+  [
+    ["all", "All", counts.total],
+    ["unassigned", "Unassigned", counts.unassigned],
+    ["linked", "Linked", counts.linked],
+    ["recovery", "Recovery", counts.recovery]
+  ].forEach(([filter, label, count]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-question-legacy-count";
+    if (legacy.filter === filter) button.classList.add("is-active");
+    button.setAttribute("aria-pressed", legacy.filter === filter ? "true" : "false");
+    button.textContent = `${label} ${count}`;
+    button.addEventListener("click", () => {
+      saveLegacyForProject(projectID, { ...getLegacyForProject(projectID), filter });
+      refreshCodeQuestionLegacyPanes(projectID);
+    });
+    countBar.appendChild(button);
+  });
+  wrap.appendChild(countBar);
+
+  const filters = document.createElement("div");
+  filters.className = "code-question-legacy-filters";
+  const search = document.createElement("input");
+  search.type = "search";
+  search.placeholder = "Search legacy work";
+  search.setAttribute("aria-label", "Search legacy and unassigned work");
+  search.value = legacy.query || "";
+  search.addEventListener("change", () => {
+    saveLegacyForProject(projectID, { ...getLegacyForProject(projectID), query: search.value });
+    refreshCodeQuestionLegacyPanes(projectID);
+  });
+  const kind = document.createElement("select");
+  kind.setAttribute("aria-label", "Filter legacy work by type");
+  [["all", "All types"], ...legacySourceKinds.map((value) => [value, legacySourceLabels[value]])]
+    .forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      kind.appendChild(option);
+    });
+  kind.value = forcedSourceKind !== "all" ? forcedSourceKind : legacy.sourceKindFilter;
+  kind.disabled = forcedSourceKind !== "all";
+  kind.addEventListener("change", () => {
+    saveLegacyForProject(projectID, { ...getLegacyForProject(projectID), sourceKindFilter: kind.value });
+    refreshCodeQuestionLegacyPanes(projectID);
+  });
+  filters.append(search, kind);
+  wrap.appendChild(filters);
+
+  if (legacy.error) {
+    const error = document.createElement("p");
+    error.className = "code-question-legacy-error";
+    error.textContent = `${legacy.error} Local preserved records remain visible below.`;
+    wrap.appendChild(error);
+  }
+
+  const list = document.createElement("div");
+  list.className = "code-question-legacy-list";
+  const visible = filterLegacyItems(legacy, {
+    filter: legacy.filter,
+    sourceKindFilter: forcedSourceKind !== "all" ? forcedSourceKind : legacy.sourceKindFilter,
+    query: legacy.query || ""
+  });
+  visible.forEach((source) => {
+    const card = document.createElement("article");
+    card.className = `code-question-legacy-item is-${source.promotionState}`;
+    card.dataset.sourceKind = source.sourceKind;
+    card.dataset.sourceId = source.sourceID;
+    const heading = document.createElement("div");
+    heading.className = "code-question-legacy-item-heading";
+    heading.innerHTML = `
+      <span class="code-question-legacy-kind">${escapeHTML(source.typeLabel)}</span>
+      <span class="code-question-legacy-state">${escapeHTML(source.promotionState)}</span>
+      <h3>${escapeHTML(source.title)}</h3>
+      <p>${escapeHTML(source.summary || legacyGuidanceForSource(source.sourceKind))}</p>
+      <small>${escapeHTML(source.assignment === "project" ? "Project-owned" : "Account unassigned")} · Source ${escapeHTML(source.sourceID)}</small>
+    `;
+    card.appendChild(heading);
+    const guidance = document.createElement("p");
+    guidance.className = "code-question-legacy-guidance";
+    guidance.textContent = legacyGuidanceForSource(source.sourceKind);
+    card.appendChild(guidance);
+    const actions = document.createElement("div");
+    actions.className = "code-question-legacy-actions";
+    const activeQuestionID = codeQuestionWorkspaceState().activeQuestionID;
+    const linkedToActive = source.promotions.find((promotion) =>
+      promotion.questionID === activeQuestionID && promotion.status === "linked"
+    );
+    const recoverActive = source.promotions.find((promotion) =>
+      promotion.questionID === activeQuestionID && promotion.status === "unlinked"
+    );
+    const link = document.createElement("button");
+    link.type = "button";
+    link.textContent = recoverActive ? "Restore link" : linkedToActive ? "Linked to current question" : "Link to current question";
+    link.disabled = !activeQuestionID || Boolean(linkedToActive);
+    link.addEventListener("click", () => void linkLegacySourceToQuestion(project, source, activeQuestionID, {
+      recovery: Boolean(recoverActive)
+    }));
+    const create = document.createElement("button");
+    create.type = "button";
+    create.textContent = "Create Code Question…";
+    create.addEventListener("click", () => void createQuestionFromLegacySource(project, source));
+    actions.append(link, create);
+    source.promotions.filter((promotion) => promotion.status === "linked").forEach((promotion) => {
+      const open = document.createElement("button");
+      open.type = "button";
+      const question = questionsForActiveProject().find((item) => item.id === promotion.questionID);
+      open.textContent = `Open ${question?.displayID || "linked question"}`;
+      open.addEventListener("click", () => openQuestionFromLegacy(promotion.questionID));
+      const unlink = document.createElement("button");
+      unlink.type = "button";
+      unlink.textContent = "Unlink";
+      unlink.addEventListener("click", () => void unlinkLegacySourcePromotion(project, promotion));
+      actions.append(open, unlink);
+    });
+    card.appendChild(actions);
+    list.appendChild(card);
+  });
+  if (!visible.length) {
+    const empty = document.createElement("p");
+    empty.className = "code-question-legacy-empty";
+    empty.textContent = "No records match this filter. Nothing was deleted or automatically promoted.";
+    list.appendChild(empty);
+  }
+  wrap.appendChild(list);
+
+  const migration = document.createElement("details");
+  migration.className = "code-question-legacy-migration";
+  migration.innerHTML = `
+    <summary>Migration summary and recovery</summary>
+    <dl>
+      <div><dt>Linked</dt><dd>${escapeHTML(String(counts.linked))}</dd></div>
+      <div><dt>Awaiting explicit choice</dt><dd>${escapeHTML(String(counts.unassigned))}</dd></div>
+      <div><dt>Recoverable links</dt><dd>${escapeHTML(String(counts.recovery))}</dd></div>
+      <div><dt>Failed</dt><dd>${escapeHTML(String(legacy.migration?.failedCount || 0))}</dd></div>
+    </dl>
+    <p>${escapeHTML(legacy.migration?.note || "No legacy record was silently converted.")}</p>
+    <p>Recovery action: choose <strong>Recovery</strong>, then restore the exact source-to-question relationship. Original records and Questions are retained.</p>
+  `;
+  wrap.appendChild(migration);
+
+  if (options.hydrate !== false) void hydrateCodeQuestionLegacy(project, wrap, { ...options, refresh: true });
+  return wrap;
+}
+
 function renderCodeQuestionPane(paneDescriptor) {
   const parsed = typeof paneDescriptor === "string"
     ? parseQuestionPaneKey(paneDescriptor)
@@ -22953,6 +23452,12 @@ function renderCodeQuestionPane(paneDescriptor) {
     body.appendChild(renderCodeMemoReadinessBody(project, parsed.questionID));
   } else if (parsed.paneRole === "versions") {
     body.appendChild(renderCodeMemoVersionsBody(project, parsed.questionID));
+  } else if (["legacy", "working-notes", "workboard", "report-draft"].includes(parsed.paneRole)) {
+    const sourceKindFilter = parsed.paneRole === "working-notes" ? "notebookCard"
+      : parsed.paneRole === "workboard" ? "workboard"
+        : parsed.paneRole === "report-draft" ? "reportDraft"
+          : "all";
+    body.appendChild(renderCodeQuestionLegacyBody(project, { sourceKindFilter }));
   } else {
     const placeholder = document.createElement("div");
     placeholder.className = "code-question-pane-placeholder";
@@ -23011,10 +23516,26 @@ function renderCodeQuestionIndexBody(project) {
   wrap.appendChild(renderCodeQuestionIndexList(project));
   const legacy = document.createElement("div");
   legacy.className = "code-question-legacy-path";
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
+  const legacyState = mergeLegacyInventory(getLegacyForProject(projectID), localLegacyInventory(project), projectID);
+  const counts = legacyCounts(legacyState.items);
   legacy.innerHTML = `
     <h3>Legacy / Unassigned</h3>
-    <p>Notebook, Workboard, Coordination, Saved evidence, and advanced Report Drafts remain available under <strong>Add column</strong> and the existing Projects tools. Nothing is deleted during migration.</p>
+    <p><strong>${escapeHTML(String(counts.unassigned))}</strong> awaiting an explicit choice · <strong>${escapeHTML(String(counts.linked))}</strong> linked · <strong>${escapeHTML(String(counts.recovery))}</strong> recoverable.</p>
+    <p>Working Notes, Workboard, Coordination, Saved sources, Research answers, and advanced Report Drafts remain in their original tools.</p>
   `;
+  const openLegacy = document.createElement("button");
+  openLegacy.type = "button";
+  openLegacy.textContent = "Review legacy work";
+  openLegacy.addEventListener("click", async () => {
+    setCodeQuestionWorkspaceState(openSupportingTool(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID: codeQuestionWorkspaceState().activeQuestionID || "_",
+      paneRole: "legacy"
+    }), { activeProjectID: projectID });
+    await renderWorkspace();
+  });
+  legacy.appendChild(openLegacy);
   wrap.appendChild(legacy);
   return wrap;
 }

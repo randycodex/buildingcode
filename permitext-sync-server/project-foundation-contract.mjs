@@ -47,7 +47,8 @@ export const artifactTypes = Object.freeze([
   "conclusionApproval",
   "codeMemoReadiness",
   "codeMemoApproval",
-  "issuedDecisionRecord"
+  "issuedDecisionRecord",
+  "codeQuestionPromotion"
 ]);
 
 export const projectTargetKinds = Object.freeze([
@@ -78,7 +79,8 @@ export const projectTargetKinds = Object.freeze([
   "conclusionApproval",
   "codeMemoReadiness",
   "codeMemoApproval",
-  "issuedDecisionRecord"
+  "issuedDecisionRecord",
+  "codeQuestionPromotion"
 ]);
 
 export const projectMembershipRules = Object.freeze({
@@ -109,7 +111,8 @@ export const projectMembershipRules = Object.freeze({
   conclusionApproval: { maximumProjects: 1, relationship: "owner" },
   codeMemoReadiness: { maximumProjects: 1, relationship: "owner" },
   codeMemoApproval: { maximumProjects: 1, relationship: "owner" },
-  issuedDecisionRecord: { maximumProjects: 1, relationship: "owner" }
+  issuedDecisionRecord: { maximumProjects: 1, relationship: "owner" },
+  codeQuestionPromotion: { maximumProjects: 1, relationship: "owner" }
 });
 
 export const conflictPolicies = Object.freeze({
@@ -141,7 +144,8 @@ export const conflictPolicies = Object.freeze({
   conclusionApproval: "immutable",
   codeMemoReadiness: "immutable",
   codeMemoApproval: "immutable",
-  issuedDecisionRecord: "immutable"
+  issuedDecisionRecord: "immutable",
+  codeQuestionPromotion: "explicit-revision"
 });
 
 export const activityActions = Object.freeze([
@@ -193,7 +197,9 @@ export const activityActions = Object.freeze([
   "code-question.review.reopened",
   "code-question.record.issued",
   "code-question.record.superseded",
-  "code-question.migration.promoted"
+  "code-question.migration.promoted",
+  "code-question.migration.unlinked",
+  "code-question.migration.recovered"
 ]);
 
 const artifactTypeSet = new Set(artifactTypes);

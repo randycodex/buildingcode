@@ -42,7 +42,7 @@
     "verify:production:identity": "node tests/production-identity-restore.mjs",
     "verify:preview:routing": "node tests/preview-routing.mjs",
     "inventory:nyc-legal": "node scripts/inventory-nyc-legal-expansion.mjs",
-    "test:code-question": "node --check code-question-contract.mjs && node --check code-question-commands.mjs && node tests/code-question-contract.mjs && node tests/code-question-phase1-contract.mjs && node tests/code-question-workspace-contract.mjs && node tests/code-question-define-contract.mjs && node tests/code-question-evidence-contract.mjs && node tests/code-question-analysis-contract.mjs && node tests/code-question-review-contract.mjs && node tests/code-question-issue-contract.mjs"
+    "test:code-question": "node --check code-question-contract.mjs && node --check code-question-commands.mjs && node --check public/code-question-legacy.js && node tests/code-question-contract.mjs && node tests/code-question-phase1-contract.mjs && node tests/code-question-workspace-contract.mjs && node tests/code-question-define-contract.mjs && node tests/code-question-evidence-contract.mjs && node tests/code-question-analysis-contract.mjs && node tests/code-question-review-contract.mjs && node tests/code-question-issue-contract.mjs && node tests/code-question-legacy-contract.mjs"
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",

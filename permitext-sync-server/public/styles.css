@@ -13133,3 +13133,144 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 }
 .code-memo-version-list li.is-superseded { opacity: 0.82; box-shadow: inset 3px 0 0 color-mix(in srgb, var(--text) 38%, transparent); }
 .code-memo-downloads { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.7rem; }
+
+/* Code Question Phase 8 — explicit legacy promotion and supporting links. */
+.code-question-legacy {
+  display: grid;
+  gap: 1rem;
+  align-content: start;
+}
+
+.code-question-legacy-boundary,
+.code-question-legacy-migration {
+  padding: 0.95rem 1rem;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--project-color, #315c52) 7%, var(--surface-raised));
+  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--project-color, #315c52) 72%, transparent);
+}
+
+.code-question-legacy-boundary p,
+.code-question-legacy-migration p { margin: 0.35rem 0 0; }
+
+.code-question-legacy-counts,
+.code-question-legacy-actions,
+.code-question-legacy-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  align-items: center;
+}
+
+.code-question-legacy-count,
+.code-question-legacy-actions button,
+.code-question-legacy-path button {
+  min-height: 44px;
+  padding: 0.55rem 0.8rem;
+  border: 0;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--project-color, #315c52) 12%, var(--surface-raised));
+  color: inherit;
+  font: inherit;
+  font-weight: 680;
+  cursor: pointer;
+}
+
+.code-question-legacy-count.is-active,
+.code-question-legacy-actions button:first-child:not(:disabled) {
+  background: var(--project-color, #315c52);
+  color: #fff;
+}
+
+.code-question-legacy-count:disabled,
+.code-question-legacy-actions button:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.code-question-legacy-filters input,
+.code-question-legacy-filters select {
+  min-height: 44px;
+  box-sizing: border-box;
+  border: 0;
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+  background: var(--surface-raised);
+  color: inherit;
+  font: inherit;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 16%, transparent);
+}
+
+.code-question-legacy-filters input { flex: 1 1 13rem; min-width: 0; }
+.code-question-legacy-filters select { flex: 0 1 13rem; }
+
+.code-question-legacy-list { display: grid; gap: 0.8rem; }
+
+.code-question-legacy-item {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: var(--surface-raised);
+  box-shadow: inset 4px 0 0 color-mix(in srgb, var(--text) 24%, transparent);
+}
+
+.code-question-legacy-item.is-linked {
+  box-shadow: inset 4px 0 0 color-mix(in srgb, #2d7d46 74%, transparent);
+}
+
+.code-question-legacy-item.is-recovery {
+  background: color-mix(in srgb, #b97a19 7%, var(--surface-raised));
+  box-shadow: inset 4px 0 0 color-mix(in srgb, #b97a19 78%, transparent);
+}
+
+.code-question-legacy-item-heading {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.65rem;
+  align-items: center;
+}
+
+.code-question-legacy-kind,
+.code-question-legacy-state {
+  width: fit-content;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--project-color, #315c52) 11%, transparent);
+  font-size: 0.76rem;
+  font-weight: 760;
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+
+.code-question-legacy-state { justify-self: end; }
+.code-question-legacy-item h3,
+.code-question-legacy-item p,
+.code-question-legacy-item small { grid-column: 1 / -1; margin: 0; }
+.code-question-legacy-item small,
+.code-question-legacy-guidance { color: var(--text-muted); }
+.code-question-legacy-guidance { font-size: 0.88rem; }
+.code-question-legacy-error { color: #8f341f; font-weight: 680; }
+.code-question-legacy-empty { padding: 1rem; color: var(--text-muted); }
+
+.code-question-legacy-migration dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.code-question-legacy-migration dl div {
+  padding: 0.6rem;
+  border-radius: 8px;
+  background: var(--surface-raised);
+}
+
+.code-question-legacy-migration dt { font-size: 0.78rem; color: var(--text-muted); }
+.code-question-legacy-migration dd { margin: 0.15rem 0 0; font-weight: 760; }
+
+@media (max-width: 767px) {
+  .code-question-legacy-counts,
+  .code-question-legacy-actions,
+  .code-question-legacy-filters { align-items: stretch; }
+  .code-question-legacy-count,
+  .code-question-legacy-actions button,
+  .code-question-legacy-filters input,
+  .code-question-legacy-filters select { flex: 1 1 100%; }
+  .code-question-legacy-migration dl { grid-template-columns: 1fr; }
+}

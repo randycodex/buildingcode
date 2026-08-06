@@ -82,6 +82,10 @@ function emptyCodeQuestionWorkspaceLayout() {
     questionsByProjectID: {},
     definitionsByQuestionID: {},
     evidenceByQuestionID: {},
+    analysisByQuestionID: {},
+    reviewByQuestionID: {},
+    issueByQuestionID: {},
+    legacyByProjectID: {},
     questionFilters: {
       query: "",
       recordState: "active",
@@ -152,6 +156,18 @@ function normalizeCodeQuestionWorkspaceLayout(value = {}, activeProject = null) 
   }
   if (source.evidenceByQuestionID && typeof source.evidenceByQuestionID === "object") {
     layout.evidenceByQuestionID = copy(source.evidenceByQuestionID);
+  }
+  if (source.analysisByQuestionID && typeof source.analysisByQuestionID === "object") {
+    layout.analysisByQuestionID = copy(source.analysisByQuestionID);
+  }
+  if (source.reviewByQuestionID && typeof source.reviewByQuestionID === "object") {
+    layout.reviewByQuestionID = copy(source.reviewByQuestionID);
+  }
+  if (source.issueByQuestionID && typeof source.issueByQuestionID === "object") {
+    layout.issueByQuestionID = copy(source.issueByQuestionID);
+  }
+  if (source.legacyByProjectID && typeof source.legacyByProjectID === "object") {
+    layout.legacyByProjectID = copy(source.legacyByProjectID);
   }
   if (source.deepLink && typeof source.deepLink === "object") {
     layout.deepLink = {
