@@ -571,7 +571,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             CodeEyebrow(text: "Web Workspace", accent: settingsChromeColor)
 
-            Text("Research conversations and editable Workboards are available on the web today. iOS recognizes their account records but does not edit them yet.")
+            Text("iPhone provides adapted, read-only Project Hub access to Code Questions, Research records, issued reports, and flattened Workboard previews. Governed edits, Research conversations, and Workboard editing remain on the web until secure mobile mutation recovery is enabled.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

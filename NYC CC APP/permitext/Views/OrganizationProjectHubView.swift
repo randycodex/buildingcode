@@ -57,6 +57,13 @@ struct OrganizationProjectHubView: View {
             .sorted { $0.envelope.updatedAt > $1.envelope.updatedAt }
     }
 
+    private var codeQuestions: [ProjectCodeQuestionRecord] {
+        ProjectCodeQuestionRecord.records(
+            artifacts: foundation?.artifacts ?? [],
+            researchAnswers: foundation?.researchAnswers ?? []
+        )
+    }
+
     private var savedEvidenceCount: Int {
         (foundation?.links ?? []).filter {
             $0.targetKind == "canonicalSection" && $0.deletedAt == nil
@@ -104,6 +111,7 @@ struct OrganizationProjectHubView: View {
                     projectMetrics
                     firmStandardsSection
                     projectNotesSection
+                    codeQuestionSection
                     notebookSection
                     researchSection
                     evidenceReviewSection
@@ -190,6 +198,7 @@ struct OrganizationProjectHubView: View {
         return LazyVGrid(columns: columns, spacing: 10) {
             metric(value: "\(savedEvidenceCount)", label: "Saved evidence")
             metric(value: "\(projectNotes.count)", label: "Project notes")
+            metric(value: "\(codeQuestions.count)", label: "Code Questions")
             metric(value: "\(notebookCards.count)", label: "Notebook cards")
             metric(value: "\(foundation?.researchAnswers.count ?? 0)", label: "Research answers")
             metric(
@@ -197,6 +206,19 @@ struct OrganizationProjectHubView: View {
                 label: "Active coordination"
             )
             metric(value: "\(reportFiles.count)", label: "Report exports")
+        }
+    }
+
+    @ViewBuilder
+    private var codeQuestionSection: some View {
+        projectSection(title: "Code Questions", systemImage: "questionmark.bubble") {
+            CodeQuestionProjectHubList(
+                records: codeQuestions,
+                accent: projectAccent,
+                onOpenReport: { manifestID in
+                    openIssuedReport(manifestID: manifestID)
+                }
+            )
         }
     }
 
@@ -628,6 +650,14 @@ struct OrganizationProjectHubView: View {
                 errorMessage = error.localizedDescription
             }
         }
+    }
+
+    private func openIssuedReport(manifestID: String) {
+        guard let file = reportFiles.first(where: { $0.manifestID == manifestID }) else {
+            errorMessage = "The issued manifest is preserved, but its downloadable PDF is not available in this snapshot."
+            return
+        }
+        downloadReport(file)
     }
 
     private func loadSnapshot() async {

@@ -164,6 +164,7 @@ final class CodeLibraryViewModel: ObservableObject {
     private let entitlementService: EntitlementService
     private let lifetimeGrantLookupClient: LifetimeGrantLookupClient
     private let accountBackendClient: AccountBackendClient
+    private let projectHubOfflineCache = ProjectHubOfflineCache()
     private let storeKitSubscriptionService = StoreKitSubscriptionService()
     private let startupBeganAt = ProcessInfo.processInfo.systemUptime
     private let startupSignpostID = OSSignpostID(log: AppSignpost.startup)
@@ -1937,10 +1938,29 @@ final class CodeLibraryViewModel: ObservableObject {
             folder.clientID,
             userID: signedInAccount.appUserID
         ) ?? folder.clientID
-        return try await accountBackendClient.projectHub(
-            account: signedInAccount,
-            projectID: projectID
-        )
+        do {
+            let snapshot = try await accountBackendClient.projectHub(
+                account: signedInAccount,
+                projectID: projectID
+            )
+            try? projectHubOfflineCache.store(
+                snapshot,
+                accountID: signedInAccount.appUserID,
+                projectID: projectID,
+                scope: "personal"
+            )
+            return snapshot
+        } catch {
+            if let cached = try? projectHubOfflineCache.load(
+                ProjectHubSnapshot.self,
+                accountID: signedInAccount.appUserID,
+                projectID: projectID,
+                scope: "personal"
+            ) {
+                return cached.value.cachedCopy(at: cached.cachedAt)
+            }
+            throw error
+        }
     }
 
     func refreshOrganizations() async {
@@ -1991,10 +2011,29 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let signedInAccount else {
             throw ProjectHubLoadError.signInRequired
         }
-        return try await accountBackendClient.organizationProjectSnapshot(
-            account: signedInAccount,
-            projectID: projectID
-        )
+        do {
+            let snapshot = try await accountBackendClient.organizationProjectSnapshot(
+                account: signedInAccount,
+                projectID: projectID
+            )
+            try? projectHubOfflineCache.store(
+                snapshot,
+                accountID: signedInAccount.appUserID,
+                projectID: projectID,
+                scope: "organization"
+            )
+            return snapshot
+        } catch {
+            if let cached = try? projectHubOfflineCache.load(
+                BackendOrganizationProjectSnapshotResponse.self,
+                accountID: signedInAccount.appUserID,
+                projectID: projectID,
+                scope: "organization"
+            ) {
+                return cached.value
+            }
+            throw error
+        }
     }
 
     func organizationProjectReportURL(

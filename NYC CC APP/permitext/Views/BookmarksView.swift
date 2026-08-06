@@ -1120,6 +1120,13 @@ struct ProjectView: View {
         Color(uiColor: PlatformColor(hex: folder?.colorHex ?? CodeFolder.defaultColorHex) ?? library.accentColor())
     }
 
+    private var projectCodeQuestions: [ProjectCodeQuestionRecord] {
+        ProjectCodeQuestionRecord.records(
+            artifacts: projectHubSnapshot?.foundationArtifacts ?? [],
+            researchAnswers: projectHubSnapshot?.researchAnswers ?? []
+        )
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
@@ -1231,10 +1238,25 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: 12) {
             CodeEyebrow(text: "Project Hub", accent: accentColor)
 
-            Text("Notebook and Research are read-only on iPhone. Evidence assembly and Workboard editing remain available on the web.")
+            Text("Code Questions, Notebook, Research, Working Notes, issued records, and Workboard previews are adapted for secure review on iPhone. Governed workflow changes remain on the web.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+
+            if let snapshot = projectHubSnapshot, snapshot.loadedFromCache {
+                Label(
+                    "Offline snapshot from \(projectHubDate(snapshot.cachedAt ?? "")) — IDs, citations, hashes, and version lineage are preserved.",
+                    systemImage: "icloud.slash"
+                )
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.secondary.opacity(0.10))
+                )
+            }
 
             projectHubMetrics
 
@@ -1260,6 +1282,7 @@ struct ProjectView: View {
                     )
             }
 
+            projectCodeQuestionSummary
             projectNotebookSummary
             projectResearchSummary
             projectReportSummary
@@ -1276,9 +1299,23 @@ struct ProjectView: View {
             spacing: 8
         ) {
             projectHubMetric(value: "\(projectBookmarks.count)", label: "Saved")
+            projectHubMetric(value: "\(projectCodeQuestions.count)", label: "Questions")
             projectHubMetric(value: "\(projectHubSnapshot?.notebookCards.count ?? 0)", label: "Notebook")
             projectHubMetric(value: "\(projectHubSnapshot?.researchAnswers.count ?? 0)", label: "Research")
             projectHubMetric(value: "\(projectHubSnapshot?.reports.count ?? 0)", label: "Reports")
+        }
+    }
+
+    @ViewBuilder
+    private var projectCodeQuestionSummary: some View {
+        projectHubSection(title: "Code Questions", systemImage: "questionmark.bubble") {
+            CodeQuestionProjectHubList(
+                records: projectCodeQuestions,
+                accent: accentColor,
+                onOpenReport: { manifestID in
+                    buildProjectCodeMemoPDF(manifestID: manifestID)
+                }
+            )
         }
     }
 
@@ -1575,6 +1612,21 @@ struct ProjectView: View {
         Task {
             do {
                 projectReportShareURL = try await library.projectReportPDF(manifestID: report.id)
+                await loadProjectHub()
+            } catch {
+                projectReportBuildError = error.localizedDescription
+            }
+            isProjectReportBuilding = false
+        }
+    }
+
+    private func buildProjectCodeMemoPDF(manifestID: String) {
+        guard !isProjectReportBuilding else { return }
+        isProjectReportBuilding = true
+        projectReportBuildError = nil
+        Task {
+            do {
+                projectReportShareURL = try await library.projectReportPDF(manifestID: manifestID)
                 await loadProjectHub()
             } catch {
                 projectReportBuildError = error.localizedDescription

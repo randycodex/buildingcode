@@ -246,7 +246,8 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
             researchAnswers: foundationResponse.researchAnswers,
             activity: foundationResponse.activity,
             reports: reportResponse.reports,
-            workboardPreview: foundationResponse.workboardPreview
+            workboardPreview: foundationResponse.workboardPreview,
+            foundationArtifacts: foundationResponse.artifacts ?? []
         )
     }
 

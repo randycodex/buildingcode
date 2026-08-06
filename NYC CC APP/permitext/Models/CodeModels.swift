@@ -1649,7 +1649,7 @@ struct BackendProjectWorkboardPreviewRequest: Codable, Hashable, Sendable {
     let previewID: String
 }
 
-struct ProjectHubSnapshot: Hashable, Sendable {
+struct ProjectHubSnapshot: Codable, Hashable, Sendable {
     let projectID: String
     let notebookCards: [ProjectNotebookCardSummary]
     let researchConversations: [ProjectResearchConversationSummary]
@@ -1657,6 +1657,9 @@ struct ProjectHubSnapshot: Hashable, Sendable {
     let activity: [ProjectActivitySummary]
     let reports: [ProjectReportSummary]
     let workboardPreview: ProjectWorkboardPreviewSummary?
+    var foundationArtifacts: [ProjectFoundationArtifact] = []
+    var loadedFromCache: Bool = false
+    var cachedAt: String? = nil
 
     static func empty(projectID: String) -> ProjectHubSnapshot {
         ProjectHubSnapshot(
@@ -1666,8 +1669,16 @@ struct ProjectHubSnapshot: Hashable, Sendable {
             researchAnswers: [],
             activity: [],
             reports: [],
-            workboardPreview: nil
+            workboardPreview: nil,
+            foundationArtifacts: []
         )
+    }
+
+    func cachedCopy(at timestamp: String) -> ProjectHubSnapshot {
+        var copy = self
+        copy.loadedFromCache = true
+        copy.cachedAt = timestamp
+        return copy
     }
 }
 
@@ -1853,7 +1864,28 @@ struct ProjectFoundationArtifactFile: Codable, Hashable, Sendable {
     let createdAt: String
 }
 
+struct ProjectCodeQuestionEvidenceEntry: Codable, Hashable, Sendable {
+    let snapshotID: String
+    let role: String
+    let analysisEligible: Bool
+    let qualification: String?
+    let professionalNote: String?
+    let approvalActor: String?
+    let approvalAt: String?
+    let sourceVerificationState: String?
+    let projectApplicabilityNote: String?
+}
+
+struct ProjectCodeQuestionReadinessCheck: Codable, Hashable, Identifiable, Sendable {
+    let id: String
+    let label: String
+    let ready: Bool
+    let message: String
+}
+
 struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
+    let schemaVersion: Int?
+    let id: String?
     let projectID: String?
     let cardType: String?
     let title: String?
@@ -1899,6 +1931,79 @@ struct ProjectFoundationArtifactPayload: Codable, Hashable, Sendable {
     let reportManifestID: String?
     let inputKind: String?
     let statement: String?
+    let scope: String?
+    let desiredOutput: String?
+    let jurisdiction: String?
+    let asOfDate: String?
+    let responsibleUserID: String?
+    let assigneeUserID: String?
+    let reviewerUserID: String?
+    let currentEvidenceSetVersion: Int?
+    let currentAnalysisID: String?
+    let currentConclusionRevision: Int?
+    let latestIssuedRecordID: String?
+    let archivedAt: String?
+    let state: String?
+    let basis: String?
+    let revision: Int?
+    let priorInputID: String?
+    let sourceIdentity: String?
+    let passageLocator: String?
+    let quotedText: String?
+    let textHash: String?
+    let sourceVersion: StringOrNumber?
+    let entries: [ProjectCodeQuestionEvidenceEntry]?
+    let contentHash: String?
+    let definitionHash: String?
+    let inputSnapshotIDs: [String]?
+    let inputSetHash: String?
+    let evidenceSetID: String?
+    let evidenceSetVersion: Int?
+    let evidenceSetHash: String?
+    let dependencyHash: String?
+    let researchAnswerID: String?
+    let modelID: String?
+    let analysisPolicyID: String?
+    let promptTemplateVersion: String?
+    let requestedBy: String?
+    let requestID: String?
+    let citationValidation: String?
+    let analysisRunID: String?
+    let analysisDependencyHash: String?
+    let conclusionText: String?
+    let reasoning: String?
+    let citations: [String]?
+    let assumptions: [String]?
+    let unknowns: [String]?
+    let aiAssistanceDisclosure: String?
+    let predecessorRevisionID: String?
+    let authorUserID: String?
+    let conclusionID: String?
+    let conclusionRevision: Int?
+    let approvalBasis: String?
+    let approvedByUserID: String?
+    let approvedAt: String?
+    let draftID: String?
+    let draftRevision: Int?
+    let draftHash: String?
+    let conclusionHash: String?
+    let checks: [ProjectCodeQuestionReadinessCheck]?
+    let markedByUserID: String?
+    let markedAt: String?
+    let componentVersions: [String: StringOrNumber]?
+    let componentHashes: [String: String]?
+    let issuingActor: String?
+    let predecessorID: String?
+    let successorID: String?
+    let supersessionReason: String?
+    let issuedAt: String?
+    let sourceKind: String?
+    let sourceID: String?
+    let sourceLabel: String?
+    let sourceProjectID: String?
+    let action: String?
+    let unlinkedAt: String?
+    let recoveryCount: Int?
 }
 
 struct ProjectFoundationArtifact: Codable, Hashable, Identifiable, Sendable {
@@ -1944,6 +2049,160 @@ struct ProjectFoundationArtifact: Codable, Hashable, Identifiable, Sendable {
             contentHash: file.contentHash,
             createdAt: payload.createdAt ?? file.createdAt
         )
+    }
+}
+
+enum ProjectCodeQuestionStage: String, Codable, Hashable, Sendable {
+    case define
+    case evidence
+    case analyze
+    case review
+    case issue
+
+    var label: String { rawValue.capitalized }
+}
+
+struct ProjectCodeQuestionRecord: Hashable, Identifiable, Sendable {
+    let question: ProjectFoundationArtifact
+    let inputs: [ProjectFoundationArtifact]
+    let evidenceSets: [ProjectFoundationArtifact]
+    let evidenceSnapshots: [ProjectFoundationArtifact]
+    let analyses: [ProjectFoundationArtifact]
+    let conclusions: [ProjectFoundationArtifact]
+    let conclusionApprovals: [ProjectFoundationArtifact]
+    let reviewRequests: [ProjectFoundationArtifact]
+    let memoReadiness: [ProjectFoundationArtifact]
+    let memoApprovals: [ProjectFoundationArtifact]
+    let issuedRecords: [ProjectFoundationArtifact]
+    let promotions: [ProjectFoundationArtifact]
+    let researchAnswer: ProjectResearchAnswerSummary?
+
+    var id: String { question.id }
+    var displayID: String { question.payload.displayID ?? "Question" }
+    var title: String { question.payload.title ?? "Code Question" }
+    var questionText: String { question.payload.questionText ?? "" }
+    var definitionRevision: Int { question.payload.definitionRevision ?? 1 }
+
+    var latestEvidenceSet: ProjectFoundationArtifact? {
+        evidenceSets.max {
+            ($0.payload.evidenceSetVersion ?? $0.payload.revision ?? 0) <
+                ($1.payload.evidenceSetVersion ?? $1.payload.revision ?? 0)
+        }
+    }
+
+    var latestAnalysis: ProjectFoundationArtifact? {
+        if let currentID = question.payload.currentAnalysisID,
+           let current = analyses.first(where: { $0.id == currentID }) {
+            return current
+        }
+        return analyses.max { $0.envelope.createdAt < $1.envelope.createdAt }
+    }
+
+    var latestConclusion: ProjectFoundationArtifact? {
+        conclusions.max { ($0.payload.revision ?? 0) < ($1.payload.revision ?? 0) }
+    }
+
+    var latestIssuedRecord: ProjectFoundationArtifact? {
+        if let currentID = question.payload.latestIssuedRecordID,
+           let current = issuedRecords.first(where: { $0.id == currentID }) {
+            return current
+        }
+        return issuedRecords.max { ($0.payload.issueVersion ?? 0) < ($1.payload.issueVersion ?? 0) }
+    }
+
+    var openReviewCount: Int {
+        reviewRequests.filter { ["open", "waiting"].contains($0.payload.status ?? "open") }.count
+    }
+
+    var stage: ProjectCodeQuestionStage {
+        if !issuedRecords.isEmpty || !memoApprovals.isEmpty || !memoReadiness.isEmpty { return .issue }
+        if !conclusions.isEmpty || !conclusionApprovals.isEmpty || !reviewRequests.isEmpty { return .review }
+        if !analyses.isEmpty { return .analyze }
+        if !evidenceSets.isEmpty { return .evidence }
+        return .define
+    }
+
+    var stateLabel: String {
+        if let issued = latestIssuedRecord {
+            return issued.payload.status == "superseded"
+                ? "Superseded v\(issued.payload.issueVersion ?? 1)"
+                : "Issued v\(issued.payload.issueVersion ?? 1)"
+        }
+        if openReviewCount > 0 { return "\(openReviewCount) open review" + (openReviewCount == 1 ? "" : "s") }
+        return stage.label
+    }
+
+    var analysisIsStale: Bool {
+        guard let analysis = latestAnalysis else { return false }
+        if analysis.payload.definitionRevision != definitionRevision { return true }
+        if let currentEvidenceVersion = question.payload.currentEvidenceSetVersion,
+           analysis.payload.evidenceSetVersion != currentEvidenceVersion {
+            return true
+        }
+        return false
+    }
+
+    static func records(
+        artifacts: [ProjectFoundationArtifact],
+        researchAnswers: [ProjectResearchAnswerSummary]
+    ) -> [ProjectCodeQuestionRecord] {
+        let current = artifacts.filter { $0.envelope.deletedAt == nil }
+        let snapshotsByID = Dictionary(
+            uniqueKeysWithValues: current
+                .filter { $0.envelope.type == "evidenceSnapshotV2" }
+                .map { ($0.id, $0) }
+        )
+        return current
+            .filter { $0.envelope.type == "codeQuestion" }
+            .map { question in
+                let questionID = question.id
+                let related: (String) -> [ProjectFoundationArtifact] = { type in
+                    current.filter {
+                        $0.envelope.type == type && $0.payload.questionID == questionID
+                    }
+                }
+                let evidenceSets = related("questionEvidenceSet")
+                let snapshotIDs = Set(
+                    evidenceSets.flatMap { ($0.payload.entries ?? []).map(\.snapshotID) }
+                )
+                let analyses = related("questionAnalysis")
+                let answerID = question.payload.currentAnalysisID
+                    .flatMap { currentID in analyses.first { $0.id == currentID }?.payload.researchAnswerID }
+                    ?? analyses.max { $0.envelope.createdAt < $1.envelope.createdAt }?.payload.researchAnswerID
+                return ProjectCodeQuestionRecord(
+                    question: question,
+                    inputs: related("questionInput").sorted { $0.envelope.createdAt < $1.envelope.createdAt },
+                    evidenceSets: evidenceSets.sorted {
+                        ($0.payload.evidenceSetVersion ?? 0) < ($1.payload.evidenceSetVersion ?? 0)
+                    },
+                    evidenceSnapshots: snapshotIDs.compactMap { snapshotsByID[$0] }.sorted {
+                        ($0.payload.passageLocator ?? $0.id) < ($1.payload.passageLocator ?? $1.id)
+                    },
+                    analyses: analyses.sorted { $0.envelope.createdAt < $1.envelope.createdAt },
+                    conclusions: related("professionalConclusion").sorted {
+                        ($0.payload.revision ?? 0) < ($1.payload.revision ?? 0)
+                    },
+                    conclusionApprovals: related("conclusionApproval"),
+                    reviewRequests: current.filter {
+                        $0.envelope.type == "reviewThread" && $0.payload.questionID == questionID
+                    }.sorted { $0.envelope.updatedAt > $1.envelope.updatedAt },
+                    memoReadiness: related("codeMemoReadiness"),
+                    memoApprovals: related("codeMemoApproval"),
+                    issuedRecords: related("issuedDecisionRecord").sorted {
+                        ($0.payload.issueVersion ?? 0) < ($1.payload.issueVersion ?? 0)
+                    },
+                    promotions: related("codeQuestionPromotion").sorted {
+                        ($0.payload.sourceLabel ?? $0.payload.sourceID ?? "") <
+                            ($1.payload.sourceLabel ?? $1.payload.sourceID ?? "")
+                    },
+                    researchAnswer: answerID.flatMap { id in researchAnswers.first { $0.id == id } }
+                )
+            }
+            .sorted {
+                let lhsNumber = $0.question.payload.questionNumber ?? Int.max
+                let rhsNumber = $1.question.payload.questionNumber ?? Int.max
+                return lhsNumber == rhsNumber ? $0.title < $1.title : lhsNumber < rhsNumber
+            }
     }
 }
 

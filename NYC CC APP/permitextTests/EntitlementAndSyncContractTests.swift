@@ -1278,4 +1278,329 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(review.payload.questionID, "cq-1")
         XCTAssertEqual(review.payload.reviewRound, 1)
     }
+
+    func testProjectHubDerivesCompleteCodeQuestionLifecycleWithoutChangingSemanticIdentity() throws {
+        func artifact(_ id: String, _ type: String, _ payload: String, version: Int = 1) -> String {
+            """
+            {
+              "envelope": {
+                "id": "\(id)",
+                "type": "\(type)",
+                "createdAt": "2026-08-06T12:00:00.000Z",
+                "updatedAt": "2026-08-06T12:00:00.000Z",
+                "deletedAt": null,
+                "version": \(version)
+              },
+              "payload": \(payload)
+            }
+            """
+        }
+
+        let artifacts = [
+            artifact("cq-9", "codeQuestion", """
+            {
+              "schemaVersion": 1,
+              "projectID": "project-1",
+              "displayID": "Q-009",
+              "questionNumber": 9,
+              "title": "Exit enclosure continuity",
+              "questionText": "Does the proposed enclosure maintain the required continuity?",
+              "scope": "Synthetic filing review",
+              "jurisdiction": "New York City",
+              "recordState": "active",
+              "definitionRevision": 3,
+              "currentEvidenceSetVersion": 2,
+              "currentAnalysisID": "analysis-2",
+              "currentConclusionRevision": 2,
+              "latestIssuedRecordID": "issued-2",
+              "futureField": { "preserveDecode": true }
+            }
+            """),
+            artifact("input-1", "questionInput", """
+            {
+              "id": "input-1",
+              "questionID": "cq-9",
+              "inputKind": "confirmedFact",
+              "statement": "The enclosure serves three stories.",
+              "state": "confirmed",
+              "revision": 1
+            }
+            """),
+            artifact("snapshot-b", "evidenceSnapshotV2", """
+            {
+              "id": "snapshot-b",
+              "sourceIdentity": "Building Code 2022",
+              "passageLocator": "BC 1023.5",
+              "quotedText": "Openings and penetrations shall be protected.",
+              "textHash": "hash-text-b",
+              "sourceVersion": "2022"
+            }
+            """),
+            artifact("snapshot-a", "evidenceSnapshotV2", """
+            {
+              "id": "snapshot-a",
+              "sourceIdentity": "Building Code 2022",
+              "passageLocator": "BC 1023.1",
+              "quotedText": "Interior exit stairways shall be enclosed.",
+              "textHash": "hash-text-a",
+              "sourceVersion": 2022
+            }
+            """),
+            artifact("set-2", "questionEvidenceSet", """
+            {
+              "id": "set-2",
+              "questionID": "cq-9",
+              "version": 2,
+              "entries": [
+                { "snapshotID": "snapshot-b", "role": "supporting", "analysisEligible": true },
+                { "snapshotID": "snapshot-a", "role": "governing", "analysisEligible": true }
+              ],
+              "contentHash": "hash-evidence-set-2"
+            }
+            """),
+            artifact("analysis-2", "questionAnalysis", """
+            {
+              "id": "analysis-2",
+              "questionID": "cq-9",
+              "definitionRevision": 3,
+              "definitionHash": "hash-definition-3",
+              "inputSnapshotIDs": ["input-1"],
+              "inputSetHash": "hash-inputs",
+              "evidenceSetID": "set-2",
+              "evidenceSetVersion": 2,
+              "evidenceSetHash": "hash-evidence-set-2",
+              "dependencyHash": "hash-dependency",
+              "researchAnswerID": "answer-1",
+              "analysisPolicyID": "selected-evidence-only-v1",
+              "citationValidation": "valid"
+            }
+            """),
+            artifact("conclusion-2", "professionalConclusion", """
+            {
+              "id": "conclusion-2",
+              "questionID": "cq-9",
+              "revision": 2,
+              "definitionRevision": 3,
+              "evidenceSetID": "set-2",
+              "evidenceSetVersion": 2,
+              "evidenceSetHash": "hash-evidence-set-2",
+              "conclusionText": "The proposed detail requires revision.",
+              "reasoning": "The selected evidence requires protected continuity.",
+              "citations": ["snapshot-a", "snapshot-b"],
+              "assumptions": ["Submitted detail is current."],
+              "unknowns": [],
+              "aiAssistanceDisclosure": "AI assisted with organization; the professional authored the conclusion."
+            }
+            """),
+            artifact("approval-2", "conclusionApproval", """
+            {
+              "id": "approval-2",
+              "questionID": "cq-9",
+              "conclusionID": "conclusion-2",
+              "conclusionRevision": 2,
+              "dependencyHash": "hash-dependency",
+              "reviewRound": 2,
+              "approvalBasis": "Reviewed against the approved evidence.",
+              "approvedByUserID": "reviewer-1",
+              "approvedAt": "2026-08-06T13:00:00.000Z"
+            }
+            """),
+            artifact("review-9", "reviewThread", """
+            {
+              "questionID": "cq-9",
+              "requestType": "interpretation-review",
+              "reviewRound": 2,
+              "status": "resolved",
+              "title": "Confirm continuity interpretation",
+              "body": "Reviewed and resolved."
+            }
+            """),
+            artifact("ready-2", "codeMemoReadiness", """
+            {
+              "id": "ready-2",
+              "questionID": "cq-9",
+              "draftID": "memo-draft-2",
+              "draftRevision": 2,
+              "draftHash": "hash-draft-2",
+              "checks": [{ "id": "citations", "label": "Citations", "ready": true, "message": "Validated" }]
+            }
+            """),
+            artifact("memo-approval-2", "codeMemoApproval", """
+            {
+              "id": "memo-approval-2",
+              "questionID": "cq-9",
+              "draftID": "memo-draft-2",
+              "draftRevision": 2,
+              "draftHash": "hash-draft-2",
+              "conclusionID": "conclusion-2",
+              "conclusionRevision": 2,
+              "conclusionHash": "hash-conclusion-2",
+              "approvalBasis": "Approved for issue."
+            }
+            """),
+            artifact("issued-1", "issuedDecisionRecord", """
+            {
+              "id": "issued-1",
+              "questionID": "cq-9",
+              "issueVersion": 1,
+              "status": "superseded",
+              "reportManifestID": "manifest-1",
+              "componentVersions": { "definition": 2, "client": "web" },
+              "componentHashes": { "memo": "hash-memo-1" },
+              "successorID": "issued-2",
+              "supersessionReason": "Definition revision 3 approved.",
+              "issuedAt": "2026-08-05T12:00:00.000Z"
+            }
+            """),
+            artifact("issued-2", "issuedDecisionRecord", """
+            {
+              "id": "issued-2",
+              "questionID": "cq-9",
+              "issueVersion": 2,
+              "status": "issued",
+              "reportManifestID": "manifest-2",
+              "componentVersions": { "definition": 3, "evidenceSet": 2 },
+              "componentHashes": { "memo": "hash-memo-2", "evidenceSet": "hash-evidence-set-2" },
+              "predecessorID": "issued-1",
+              "issuedAt": "2026-08-06T14:00:00.000Z"
+            }
+            """),
+            artifact("promotion-1", "codeQuestionPromotion", """
+            {
+              "id": "promotion-1",
+              "projectID": "project-1",
+              "questionID": "cq-9",
+              "sourceKind": "workboard",
+              "sourceID": "workboard-1",
+              "sourceLabel": "Project Workboard",
+              "status": "linked",
+              "recoveryCount": 1
+            }
+            """)
+        ]
+        let json = """
+        {
+          "schemaVersion": 1,
+          "projects": [],
+          "links": [],
+          "artifacts": [\(artifacts.joined(separator: ","))],
+          "researchConversations": [],
+          "researchAnswers": [{
+            "id": "answer-1",
+            "conversationID": "conversation-1",
+            "projectID": "project-1",
+            "question": "Does continuity comply?",
+            "conclusion": "The selected evidence identifies a continuity gap.",
+            "evidenceCount": 2,
+            "reviewStatus": "reviewed",
+            "createdAt": "2026-08-06T12:30:00.000Z"
+          }],
+          "activity": [],
+          "workboardPreview": null
+        }
+        """
+        let foundation = try JSONDecoder().decode(
+            BackendProjectFoundationResponse.self,
+            from: Data(json.utf8)
+        )
+        let records = ProjectCodeQuestionRecord.records(
+            artifacts: try XCTUnwrap(foundation.artifacts),
+            researchAnswers: foundation.researchAnswers
+        )
+        let record = try XCTUnwrap(records.first)
+
+        XCTAssertEqual(records.count, 1)
+        XCTAssertEqual(record.displayID, "Q-009")
+        XCTAssertEqual(record.stage, .issue)
+        XCTAssertEqual(record.stateLabel, "Issued v2")
+        XCTAssertEqual(record.inputs.first?.payload.statement, "The enclosure serves three stories.")
+        XCTAssertEqual(record.latestEvidenceSet?.payload.contentHash, "hash-evidence-set-2")
+        XCTAssertEqual(record.evidenceSnapshots.map(\.id), ["snapshot-a", "snapshot-b"])
+        XCTAssertEqual(record.evidenceSnapshots.map(\.payload.textHash), ["hash-text-a", "hash-text-b"])
+        XCTAssertEqual(record.latestAnalysis?.payload.dependencyHash, "hash-dependency")
+        XCTAssertFalse(record.analysisIsStale)
+        XCTAssertEqual(record.researchAnswer?.id, "answer-1")
+        XCTAssertEqual(record.latestConclusion?.payload.citations, ["snapshot-a", "snapshot-b"])
+        XCTAssertEqual(record.latestIssuedRecord?.payload.reportManifestID, "manifest-2")
+        XCTAssertEqual(record.issuedRecords.map { $0.payload.issueVersion }, [1, 2])
+        XCTAssertEqual(record.issuedRecords.first?.payload.successorID, "issued-2")
+        XCTAssertEqual(record.promotions.first?.payload.sourceLabel, "Project Workboard")
+        XCTAssertEqual(record.memoReadiness.first?.payload.checks?.first?.id, "citations")
+    }
+
+    func testProjectHubOfflineCacheIsAccountScopedAndPreservesCodeQuestionArtifacts() throws {
+        let directory = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString, isDirectory: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+        let cache = ProjectHubOfflineCache(directoryURL: directory)
+        let data = Data(
+            """
+            {
+              "schemaVersion": 1,
+              "projects": [],
+              "links": [],
+              "artifacts": [{
+                "envelope": {
+                  "id": "cq-cache",
+                  "type": "codeQuestion",
+                  "createdAt": "2026-08-06T12:00:00.000Z",
+                  "updatedAt": "2026-08-06T12:00:00.000Z",
+                  "deletedAt": null,
+                  "version": 1
+                },
+                "payload": {
+                  "projectID": "project-cache",
+                  "displayID": "Q-001",
+                  "questionNumber": 1,
+                  "title": "Cached question",
+                  "questionText": "Does the cached record preserve identity?",
+                  "definitionRevision": 1,
+                  "recordState": "active"
+                }
+              }],
+              "researchConversations": [],
+              "researchAnswers": [],
+              "activity": [],
+              "workboardPreview": null
+            }
+            """.utf8
+        )
+        let foundation = try JSONDecoder().decode(BackendProjectFoundationResponse.self, from: data)
+        let snapshot = ProjectHubSnapshot(
+            projectID: "project-cache",
+            notebookCards: [],
+            researchConversations: [],
+            researchAnswers: [],
+            activity: [],
+            reports: [],
+            workboardPreview: nil,
+            foundationArtifacts: try XCTUnwrap(foundation.artifacts)
+        )
+
+        try cache.store(snapshot, accountID: "account-a", projectID: snapshot.projectID, scope: "personal")
+        let loaded = try XCTUnwrap(
+            cache.load(
+                ProjectHubSnapshot.self,
+                accountID: "account-a",
+                projectID: snapshot.projectID,
+                scope: "personal"
+            )
+        )
+        XCTAssertEqual(loaded.value.foundationArtifacts.first?.id, "cq-cache")
+        XCTAssertEqual(
+            ProjectCodeQuestionRecord.records(
+                artifacts: loaded.value.foundationArtifacts,
+                researchAnswers: loaded.value.researchAnswers
+            ).first?.displayID,
+            "Q-001"
+        )
+        XCTAssertNil(
+            try cache.load(
+                ProjectHubSnapshot.self,
+                accountID: "account-b",
+                projectID: snapshot.projectID,
+                scope: "personal"
+            )
+        )
+    }
 }

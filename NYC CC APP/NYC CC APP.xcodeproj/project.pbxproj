@@ -44,6 +44,8 @@
 		A10000000000000000000028 /* ChapterSearchSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A20000000000000000000028 /* ChapterSearchSheet.swift */; };
 		A1000000000000000000002B /* OrganizationProjectHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002B /* OrganizationProjectHubView.swift */; };
 		A1000000000000000000002C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002C /* PrivacyInfo.xcprivacy */; };
+		A1000000000000000000002D /* ProjectHubOfflineCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002D /* ProjectHubOfflineCache.swift */; };
+		A1000000000000000000002E /* CodeQuestionProjectHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000000000000000000002E /* CodeQuestionProjectHubView.swift */; };
 		B10000000000000000000001 /* EntitlementAndSyncContractTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -102,6 +104,8 @@
 		A2000000000000000000002A /* permitext.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = permitext.entitlements; sourceTree = "<group>"; };
 		A2000000000000000000002B /* OrganizationProjectHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrganizationProjectHubView.swift; sourceTree = "<group>"; };
 		A2000000000000000000002C /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		A2000000000000000000002D /* ProjectHubOfflineCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectHubOfflineCache.swift; sourceTree = "<group>"; };
+		A2000000000000000000002E /* CodeQuestionProjectHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeQuestionProjectHubView.swift; sourceTree = "<group>"; };
 		B20000000000000000000000 /* permitextTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = permitextTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B20000000000000000000001 /* EntitlementAndSyncContractTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntitlementAndSyncContractTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -181,6 +185,7 @@
 				A20000000000000000000014 /* ReaderThemeStore.swift */,
 				A20000000000000000000007 /* CodeReferenceResolver.swift */,
 				A20000000000000000000024 /* BookmarkExportBuilder.swift */,
+				A2000000000000000000002D /* ProjectHubOfflineCache.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -209,6 +214,7 @@
 				A2000000000000000000000C /* BookmarksView.swift */,
 				A2000000000000000000000D /* SettingsView.swift */,
 				A2000000000000000000002B /* OrganizationProjectHubView.swift */,
+				A2000000000000000000002E /* CodeQuestionProjectHubView.swift */,
 				A2000000000000000000000E /* ReaderView.swift */,
 				A20000000000000000000015 /* ChapterReaderView.swift */,
 				A20000000000000000000028 /* ChapterSearchSheet.swift */,
@@ -362,6 +368,7 @@
 				A10000000000000000000006 /* UserDataStore.swift in Sources */,
 				A10000000000000000000013 /* ReaderThemeStore.swift in Sources */,
 				A10000000000000000000007 /* CodeReferenceResolver.swift in Sources */,
+				A1000000000000000000002D /* ProjectHubOfflineCache.swift in Sources */,
 				A10000000000000000000008 /* FormattingEngine.swift in Sources */,
 				A10000000000000000000009 /* CodeLibraryViewModel.swift in Sources */,
 				A1000000000000000000000A /* BrowseView.swift in Sources */,
@@ -369,6 +376,7 @@
 				A1000000000000000000000C /* BookmarksView.swift in Sources */,
 				A1000000000000000000000D /* SettingsView.swift in Sources */,
 				A1000000000000000000002B /* OrganizationProjectHubView.swift in Sources */,
+				A1000000000000000000002E /* CodeQuestionProjectHubView.swift in Sources */,
 				A1000000000000000000000E /* ReaderView.swift in Sources */,
 				A10000000000000000000015 /* ChapterReaderView.swift in Sources */,
 				A10000000000000000000028 /* ChapterSearchSheet.swift in Sources */,
