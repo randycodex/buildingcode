@@ -75,7 +75,6 @@ import {
   CodeQuestionCommandError,
   codeQuestionMigrationVersion,
   codeQuestionMigrationCheckpointName,
-  codeQuestionWorkspaceFeatureEnabled,
   compareAndSwapFoundationArtifact,
   createAnalysisArtifact,
   createCodeQuestionArtifact,
@@ -106,6 +105,7 @@ import {
   formatQuestionDisplayID,
   isCodeQuestionWorkspaceEnabled
 } from "./code-question-contract.mjs";
+import { codeQuestionRolloutAccess } from "./code-question-rollout.mjs";
 import {
   notebookCardTypes,
   normalizeNotebookCardPayload
@@ -15241,6 +15241,7 @@ async function handleWorkboardAssetDelete(request, response) {
 
 async function syncResponseContract(userID, entitlement, body, contentMapVersion) {
   const organizationCapabilities = await organizationCapabilityAccess(userID);
+  const codeQuestionAccess = codeQuestionRolloutAccess({ userID });
   return syncContract({
     entitlement,
     clientSchemaVersion: body.syncSchemaVersion ?? body.batch?.syncSchemaVersion,
@@ -15248,7 +15249,7 @@ async function syncResponseContract(userID, entitlement, body, contentMapVersion
     contentMapVersion,
     researchMonthlyLimit: monthlyResearchRequestLimit(),
     evidenceDiscoveryEnabled: evidenceDiscoveryFeatureEnabled(),
-    codeQuestionWorkspaceEnabled: codeQuestionWorkspaceFeatureEnabled(),
+    codeQuestionWorkspaceEnabled: codeQuestionAccess.enabled,
     ...organizationCapabilities,
     migrationCheckpoint: await storedMigrationCheckpoint(
       userID,
@@ -16456,11 +16457,24 @@ function sendCodeQuestionError(response, error) {
   return false;
 }
 
-function codeQuestionEnabledForRequest(body = {}) {
-  return isCodeQuestionWorkspaceEnabled({
-    codeQuestionWorkspaceEnabled: codeQuestionWorkspaceFeatureEnabled() ||
-      body.codeQuestionWorkspaceEnabled === true
+function isLoopbackCodeQuestionRequest(request) {
+  const remoteAddress = String(request?.socket?.remoteAddress || "").trim().toLowerCase();
+  const hostHeader = String(request?.headers?.host || "").trim().toLowerCase();
+  const hostname = hostHeader.startsWith("[")
+    ? hostHeader.slice(0, hostHeader.indexOf("]") + 1)
+    : hostHeader.split(":")[0];
+  const loopbackAddress = remoteAddress === "::1" || remoteAddress === "127.0.0.1" ||
+    remoteAddress === "::ffff:127.0.0.1";
+  return loopbackAddress && ["localhost", "127.0.0.1", "[::1]"].includes(hostname);
+}
+
+function codeQuestionEnabledForRequest(request, body = {}, userID = "") {
+  const access = codeQuestionRolloutAccess({
+    userID,
+    requestOverride: body.codeQuestionWorkspaceEnabled === true,
+    isLoopback: isLoopbackCodeQuestionRequest(request)
   });
+  return isCodeQuestionWorkspaceEnabled({ codeQuestionWorkspaceEnabled: access.enabled });
 }
 
 async function requireCodeQuestionContext(request, response, { permission = null, role = "owner" } = {}) {
@@ -16468,7 +16482,7 @@ async function requireCodeQuestionContext(request, response, { permission = null
   if (!context) return null;
   try {
     assertCodeQuestionWorkspaceEnabled({
-      codeQuestionWorkspaceEnabled: codeQuestionEnabledForRequest(context.body)
+      codeQuestionWorkspaceEnabled: codeQuestionEnabledForRequest(request, context.body, context.userID)
     });
     if (permission) {
       // Personal Projects act as owner; organization role may be supplied by body for tests.

@@ -212,7 +212,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v435"));
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v436"));
 
 function navigationResponse(path) {
   let response;
