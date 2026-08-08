@@ -9,8 +9,8 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v469";
-const shellAssetVersion = "20260808-project-column-stability-v1";
+const shellCacheName = "permitext-pro-shell-v470";
+const shellAssetVersion = "20260808-neutral-pane-dividers-v1";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const defaultCodeVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
@@ -19,15 +19,15 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260808-project-column-stability-v1",
+  "/web/styles.css?v=20260808-neutral-pane-dividers-v1",
   "/web/fonts/inter-latin-wght-normal.woff2",
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
-  "/web/app.js?v=20260808-project-column-stability-v1",
+  "/web/app.js?v=20260808-neutral-pane-dividers-v1",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260808-project-column-stability-v1",
-  "/web/sync-conflict-resolution.js?v=20260808-project-column-stability-v1",
+  "/web/offline-storage.js?v=20260808-neutral-pane-dividers-v1",
+  "/web/sync-conflict-resolution.js?v=20260808-neutral-pane-dividers-v1",
   "/web/workspace-state.js?v=20260808-generic-workboard-v2",
   "/web/code-question-workspace.js?v=20260808-generic-workboard-v2",
   "/web/code-question-client-state.js?v=20260808-generic-workboard-v3",

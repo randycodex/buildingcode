@@ -12447,7 +12447,6 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .code-question-panel {
   min-width: 288px;
-  border-left: 3px solid var(--project-color, transparent);
 }
 
 .code-question-panel-body {
