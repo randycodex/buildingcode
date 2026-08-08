@@ -3518,9 +3518,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func clearAllBookmarks() {
-        guard let selectedVersion, let userContentRepository else { return }
+        guard let userContentRepository else { return }
         do {
-            try userContentRepository.clearBookmarks(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearAllBookmarks()
             refreshBookmarks()
             scheduleUserContentAutoSync()
         } catch {

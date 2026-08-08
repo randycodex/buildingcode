@@ -445,6 +445,13 @@ enum UserContentSyncCodeVersion {
         "CodeContent/authored/new-york-city/2025-specialty-codes/bundle.json#1"
     static let localNYC2025Specialty =
         "2025 NYC Energy Conservation and Electrical Codes"
+    static let allCanonicalNYC = [
+        canonicalNYC2022,
+        canonicalNYCZoning,
+        canonicalNYCExistingBuilding,
+        canonicalNYCEnactedAdministrative,
+        canonicalNYC2025Specialty
+    ]
 
     private static let nyc2022Aliases = [
         "nyc-2022",

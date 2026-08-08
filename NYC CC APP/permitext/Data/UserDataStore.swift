@@ -26,6 +26,7 @@ protocol UserContentRepository {
     func tagUsageCounts(codeVersion: String) throws -> [(tag: String, count: Int)]
     func clearTags(sectionID: Int64, codeVersion: String) throws
     func clearBookmarks(codeVersion: String) throws
+    func clearAllBookmarks() throws
     func clearNotes(codeVersion: String) throws
     func clearAllTags(codeVersion: String) throws
     func queueContinuityContext(codeVersion: String, values: [String: String]) throws
@@ -1748,6 +1749,35 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "bookmarks"]
             )
         )
+    }
+
+    /// Removes saved sections and their Project memberships across every code
+    /// represented in the account. One canonical bulk-clear mutation is queued
+    /// per code so another device cannot restore records from a different code
+    /// after the local clear.
+    func clearAllBookmarks() throws {
+        let statement = try connection.prepare(
+            """
+            SELECT code_version FROM bookmarks
+            UNION
+            SELECT code_version FROM folder_sections
+            ORDER BY code_version ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+
+        // Include every code the app can sync even when this device has not
+        // hydrated that code yet; otherwise a server-only bookmark could
+        // survive and reappear after the next pull.
+        var canonicalVersions = Set(UserContentSyncCodeVersion.allCanonicalNYC)
+        while try connection.step(statement) == SQLITE_ROW {
+            canonicalVersions.insert(
+                UserContentSyncCodeVersion.server(connection.string(at: 0, in: statement))
+            )
+        }
+        for codeVersion in canonicalVersions.sorted() {
+            try clearBookmarks(codeVersion: codeVersion)
+        }
     }
 
     func clearNotes(codeVersion: String) throws {

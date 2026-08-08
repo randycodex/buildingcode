@@ -555,6 +555,49 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testClearAllBookmarksRemovesEvidenceAcrossEveryCodeVersion() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-clear-account-bookmarks-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let projectVersion = UserContentSyncCodeVersion.localNYC2022
+        let otherVersion = UserContentSyncCodeVersion.localNYCEnactedAdministrative
+        let projectID = try store.createFolder(
+            name: "Cross-code evidence",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: projectVersion
+        )
+        try store.saveSection(101, toFolderIDs: [projectID], codeVersion: projectVersion)
+        try store.saveSection(202, toFolderIDs: [projectID], codeVersion: otherVersion)
+
+        XCTAssertEqual(try store.totalBookmarkCount(), 2)
+        XCTAssertEqual(try store.evidenceReferences(inFolder: projectID).count, 2)
+
+        try store.clearAllBookmarks()
+
+        XCTAssertEqual(try store.totalBookmarkCount(), 0)
+        XCTAssertTrue(try store.evidenceReferences(inFolder: projectID).isEmpty)
+        XCTAssertEqual(try store.allFolders().map(\.id), [projectID])
+
+        let clearMutations = try store.pendingSyncQueueItems(limit: 50).filter {
+            $0.entityType == .codeVersionUserData
+                && $0.operationType == .delete
+                && $0.payload.values["scope"] == "bookmarks"
+        }
+        XCTAssertEqual(
+            Set(clearMutations.map { UserContentSyncCodeVersion.server($0.payload.codeVersion) }),
+            Set(UserContentSyncCodeVersion.allCanonicalNYC)
+        )
+    }
+
     func testLegacyFoldersMigrateAsProjects() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-type-migration-\(UUID().uuidString).sqlite")

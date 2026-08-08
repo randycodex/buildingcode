@@ -1232,7 +1232,7 @@ private enum ClearSettingsAction: Identifiable, Equatable {
         case .clearSearches:
             return "This removes the recent-search list for this device."
         case .clearBookmarks:
-            return "This removes every bookmark saved for the current code version."
+            return "This removes every bookmark and saved Project evidence item across all code versions. Projects and notes are not affected."
         case .clearNotes:
             return "This removes every note saved for the current code version."
         case .clearTags:
