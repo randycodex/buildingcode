@@ -177,6 +177,28 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(distinct.nonRepeatingPreviewText, "The inspection must occur before backfill.")
     }
 
+    func testSavedEvidenceExcerptMatchesWebHierarchyWithoutRepeatingHeading() {
+        let officialText = "101.1 Title. This code shall be known and may be cited as the New York City Building Code."
+        XCTAssertEqual(
+            officialText.evidenceExcerpt(sectionNumber: "101.1", title: "101.1 Title."),
+            "This code shall be known and may be cited as the New York City Building Code."
+        )
+
+        let annotation = BookmarkedSection(
+            id: 1,
+            annotationBlockID: "paragraph-1",
+            annotationLabel: "Paragraph annotation",
+            codeVersion: UserContentSyncCodeVersion.localNYC2022,
+            chapterNumber: "1",
+            chapterTitle: "Building Code",
+            sectionNumber: "101.1",
+            title: "101.1 Title.",
+            previewText: "This code shall be known and may be cited as the New York City Building Code."
+        )
+        XCTAssertEqual(annotation.evidenceDisplayTitle, "Title.")
+        XCTAssertFalse(annotation.evidenceDisplayTitle.localizedCaseInsensitiveContains("paragraph"))
+    }
+
     func testBundledProjectEvidenceMatchesSevenWebEvidenceRowsAndCodeGroups() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()
         let constructionVersion = try XCTUnwrap(versions.first {

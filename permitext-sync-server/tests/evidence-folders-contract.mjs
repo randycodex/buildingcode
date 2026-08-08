@@ -90,6 +90,11 @@ assert.match(
   /function retryRejectedDeletionConflictsOnce\(account\)[\s\S]*?\["savedItem", "projectSection"\][\s\S]*?codeVersionClear[\s\S]*?SYNC_MUTATION_REJECTED[\s\S]*?enqueueSyncMutation/,
   "The web client must retry deletions rejected by the former Postgres acceptance defect."
 );
+assert.match(
+  appSource,
+  /async function persistSectionFolderSelection\([\s\S]*?saveWorkspaceState\(\);[\s\S]*?await refreshProjectMembershipPanes\([\s\S]*?await pushMutationBatch\(mutations\)/,
+  "Saving evidence to a Project must update open Project columns before the network round-trip."
+);
 assert.match(appSource, /function renderUnassignedEvidenceNotice\([\s\S]*?Nothing is moved or deleted automatically\./);
 assert(!appSource.includes("No archived folders."), "An empty archive should not render a redundant placeholder row.");
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");

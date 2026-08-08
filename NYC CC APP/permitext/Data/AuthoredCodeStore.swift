@@ -1345,6 +1345,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
             let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[id] ?? []
             let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[id] ?? ""
+            let evidenceExcerpt = officialText(for: indexed).evidenceExcerpt(
+                sectionNumber: indexed.section.sectionNumber,
+                title: indexed.section.title
+            )
             var rows: [BookmarkedSection] = []
 
             let hasSectionLevelEvidence = bookmarkedSectionIDs.contains(id) ||
@@ -1360,7 +1364,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                     chapterTitle: indexed.chapter.title,
                     sectionNumber: indexed.section.sectionNumber,
                     title: indexed.section.title,
-                    previewText: previewText(for: indexed.section.id, fallbackOfficialText: indexed.section.officialText),
+                    previewText: evidenceExcerpt,
                     kind: indexed.section.kind,
                     isBookmarked: bookmarkedSectionIDs.contains(id),
                     noteBody: sectionNote,
@@ -1383,7 +1387,7 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                         chapterTitle: indexed.chapter.title,
                         sectionNumber: indexed.section.sectionNumber,
                         title: indexed.section.title,
-                        previewText: sectionLabel(for: indexed.section),
+                        previewText: evidenceExcerpt,
                         kind: indexed.section.kind,
                         isBookmarked: bookmarkedSectionIDs.contains(id),
                         noteBody: annotation.noteBody,

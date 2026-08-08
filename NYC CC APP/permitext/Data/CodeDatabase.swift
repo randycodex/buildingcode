@@ -303,6 +303,11 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
             let sectionID = connection.int64(at: 0, in: statement)
             let sectionNumber = connection.string(at: 3, in: statement)
             let title = connection.string(at: 4, in: statement)
+            let officialText = connection.string(at: 5, in: statement)
+            let evidenceExcerpt = officialText.evidenceExcerpt(
+                sectionNumber: sectionNumber,
+                title: title
+            )
             let sectionAnnotations = annotationsBySectionID[sectionID] ?? []
             let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
             let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[sectionID] ?? []
@@ -319,7 +324,7 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
                         chapterTitle: connection.string(at: 2, in: statement),
                         sectionNumber: sectionNumber,
                         title: title,
-                        previewText: connection.string(at: 5, in: statement).titleThroughFirstPeriod,
+                        previewText: evidenceExcerpt,
                         isBookmarked: bookmarkedSectionIDs.contains(sectionID),
                         noteBody: sectionNote,
                         tags: sectionTags,
@@ -340,7 +345,7 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
                         chapterTitle: connection.string(at: 2, in: statement),
                         sectionNumber: sectionNumber,
                         title: title,
-                        previewText: "\(sectionNumber) \(title.displayTitle(for: sectionNumber))",
+                        previewText: evidenceExcerpt,
                         isBookmarked: bookmarkedSectionIDs.contains(sectionID),
                         noteBody: annotation.noteBody,
                         tags: annotation.tags,

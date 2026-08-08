@@ -8247,6 +8247,10 @@ async function persistSectionFolderSelection(sectionPayload, selectedFolders, vi
     mutations.push(deletion);
   });
   saveWorkspaceState();
+  // Reflect the local membership overlay in every open Project/Saved column
+  // before waiting for the network round-trip. The authoritative hydration
+  // below will reconcile the same rows after sync completes.
+  await refreshProjectMembershipPanes(selectedFolders[0] || null);
 
   let queued = false;
   if (activeAccount() && mutations.length) {

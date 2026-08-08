@@ -3479,6 +3479,10 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         return kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
     }
 
+    var evidenceDisplayTitle: String {
+        kind == .textBlock ? title : title.displayTitle(for: sectionNumber)
+    }
+
     var hasNote: Bool {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
@@ -3486,7 +3490,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     var nonRepeatingPreviewText: String {
         let preview = previewText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !preview.isEmpty else { return "" }
-        return Self.normalizedEvidenceText(preview) == Self.normalizedEvidenceText(displayTitle)
+        return Self.normalizedEvidenceText(preview) == Self.normalizedEvidenceText(evidenceDisplayTitle)
             ? ""
             : preview
     }
@@ -4827,6 +4831,32 @@ struct ResolvedCodeReference: Identifiable, Hashable, Sendable {
 }
 
 extension String {
+    func evidenceExcerpt(sectionNumber: String, title: String, limit: Int = 240) -> String {
+        var excerpt = replacingOccurrences(of: #"\s+"#, with: " ", options: .regularExpression)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !excerpt.isEmpty else { return "" }
+
+        let normalizedSectionNumber = sectionNumber.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !normalizedSectionNumber.isEmpty,
+           excerpt.range(of: normalizedSectionNumber, options: [.anchored, .caseInsensitive]) != nil {
+            excerpt.removeFirst(normalizedSectionNumber.count)
+            excerpt = excerpt.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        let displayTitle = title.displayTitle(for: normalizedSectionNumber)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        if !displayTitle.isEmpty,
+           excerpt.range(of: displayTitle, options: [.anchored, .caseInsensitive]) != nil {
+            excerpt.removeFirst(displayTitle.count)
+            excerpt = excerpt.trimmingCharacters(in: .whitespacesAndNewlines)
+        }
+
+        guard !excerpt.isEmpty else { return "" }
+        guard excerpt.count > limit else { return excerpt }
+        let end = excerpt.index(excerpt.startIndex, offsetBy: limit)
+        return String(excerpt[..<end]).trimmingCharacters(in: .whitespacesAndNewlines) + "…"
+    }
+
     func displayTitle(for sectionNumber: String) -> String {
         let trimmed = trimmingCharacters(in: .whitespacesAndNewlines)
         let normalized = trimmed

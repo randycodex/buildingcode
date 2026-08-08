@@ -852,15 +852,9 @@ private var filteredSavedEmptyState: some View {
         return HStack(alignment: .top, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    if bookmark.isBlockAnnotation {
-                        CodeMetaBadge(text: "Paragraph", accent: bookmarkAccent)
-                    } else if bookmark.kind == .textBlock {
-                        CodeMetaBadge(text: "Text Block", accent: bookmarkAccent)
-                    } else {
-                        Text(bookmark.sectionNumber)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(bookmarkAccent)
-                    }
+                    Text(bookmark.sectionNumber)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.secondary)
 
                     if bookmark.hasNote {
                         Image(systemName: "note.text")
@@ -870,22 +864,16 @@ private var filteredSavedEmptyState: some View {
                             .accessibilityLabel("Has note")
                     }
 
-                    if bookmark.isBookmarked {
-                        Image(systemName: "bookmark.fill")
-                            .font(.caption2.weight(.semibold))
-                            .foregroundStyle(bookmarkAccent)
-                            .frame(width: 16, height: 16)
-                    }
                 }
 
-                Text(bookmark.displayTitle)
-                    .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
+                Text(bookmark.evidenceDisplayTitle)
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
 
                 if !bookmark.nonRepeatingPreviewText.isEmpty {
                     Text(bookmark.nonRepeatingPreviewText)
-                        .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                        .font(.body)
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
                         .lineLimit(3)
@@ -1965,13 +1953,9 @@ struct ProjectView: View {
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
-                        if bookmark.isBlockAnnotation {
-                            CodeMetaBadge(text: "Paragraph", accent: bookmarkAccent)
-                        } else {
-                            Text(bookmark.sectionNumber)
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(bookmarkAccent)
-                        }
+                        Text(bookmark.sectionNumber)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(.secondary)
 
                         if bookmark.hasNote {
                             Image(systemName: "note.text")
@@ -1979,21 +1963,16 @@ struct ProjectView: View {
                                 .foregroundStyle(.secondary)
                         }
 
-                        if bookmark.isBookmarked {
-                            Image(systemName: "bookmark.fill")
-                                .font(.caption2.weight(.semibold))
-                                .foregroundStyle(bookmarkAccent)
-                        }
                     }
 
-                    Text(bookmark.displayTitle)
-                        .font(library.readerTheme.swiftUIFont(size: library.readerTheme.fontSize + 1, emphasized: true))
+                    Text(bookmark.evidenceDisplayTitle)
+                        .font(.body.weight(.semibold))
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
 
                     if !bookmark.nonRepeatingPreviewText.isEmpty {
                         Text(bookmark.nonRepeatingPreviewText)
-                            .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
+                            .font(.body)
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.leading)
                             .lineLimit(3)
