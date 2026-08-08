@@ -69,7 +69,6 @@ import {
   allocateQuestionNumber,
   allocateScopedVersion,
   archiveCodeQuestionArtifact,
-  assertCodeQuestionPermission,
   assertCodeQuestionWorkspaceEnabled,
   blockingReviewRequestIDs,
   CodeQuestionCommandError,
@@ -92,9 +91,11 @@ import {
   linkForArtifact,
   activityFor,
   permissionForCommand,
+  reviseQuestionInputArtifact,
   restoreCodeQuestionArtifact,
   runCodeQuestionBootstrapMigration,
   advanceIssuanceSaga,
+  updateCodeQuestionDefinitionArtifact,
   upsertCodeQuestionPromotionArtifact
 } from "./code-question-commands.mjs";
 import {
@@ -8185,7 +8186,7 @@ async function handleProjectCollaborationThreadSave(request, response) {
     return;
   }
   if (requestedQuestionID && (
-    !codeQuestionEnabledForRequest(context.body) ||
+    !codeQuestionEnabledForRequest(request, context.body, context.userID) ||
     !viewAccess.permissions.includes(organizationPermissions.codeQuestionReview)
   )) {
     sendJSON(response, 403, {
@@ -16477,18 +16478,16 @@ function codeQuestionEnabledForRequest(request, body = {}, userID = "") {
   return isCodeQuestionWorkspaceEnabled({ codeQuestionWorkspaceEnabled: access.enabled });
 }
 
-async function requireCodeQuestionContext(request, response, { permission = null, role = "owner" } = {}) {
+async function requireCodeQuestionContext(request, response, {
+  permission = null,
+  projectRequired = true
+} = {}) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return null;
   try {
     assertCodeQuestionWorkspaceEnabled({
       codeQuestionWorkspaceEnabled: codeQuestionEnabledForRequest(request, context.body, context.userID)
     });
-    if (permission) {
-      // Personal Projects act as owner; organization role may be supplied by body for tests.
-      const effectiveRole = String(context.body.organizationRole || role || "owner").trim().toLowerCase();
-      assertCodeQuestionPermission(effectiveRole, permission);
-    }
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return null;
     throw error;
@@ -16500,7 +16499,141 @@ async function requireCodeQuestionContext(request, response, { permission = null
     });
     return null;
   }
-  return context;
+  const projectID = String(
+    context.body.projectID || context.body.payload?.projectID || ""
+  ).trim();
+  if (!projectID) {
+    if (!projectRequired) return context;
+    sendJSON(response, 400, {
+      error: "Code Question requests require a Project ID.",
+      code: "CODE_QUESTION_PROJECT_REQUIRED"
+    });
+    return null;
+  }
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    permission || organizationPermissions.projectView
+  );
+  if (!access) return null;
+  return {
+    ...context,
+    actorUserID: context.userID,
+    projectID: access.projectID,
+    projectAccess: access,
+    storageOwnerUserID: access.storageOwnerUserID,
+    owner: access.owner
+  };
+}
+
+function codeQuestionArtifactForAccess(context, artifact) {
+  return {
+    ...artifact,
+    envelope: {
+      ...artifact.envelope,
+      owner: context.owner
+    }
+  };
+}
+
+function codeQuestionIdempotencyConflict(message, details = null) {
+  throw new CodeQuestionCommandError(message, {
+    code: "CODE_QUESTION_IDEMPOTENCY_CONFLICT",
+    status: 409,
+    details
+  });
+}
+
+function codeQuestionIntentMatches(actual, requested, keys) {
+  return codeQuestionContentHash(Object.fromEntries(keys.map((key) => [key, actual?.[key] ?? null]))) ===
+    codeQuestionContentHash(Object.fromEntries(keys.map((key) => [key, requested?.[key] ?? null])));
+}
+
+function normalizedEvidenceEntryIntent(entry = {}) {
+  return {
+    snapshotID: String(entry.snapshotID || "").trim(),
+    role: String(entry.role || "supporting").trim(),
+    analysisEligible: entry.analysisEligible === true,
+    qualification: String(entry.qualification || "").trim(),
+    professionalNote: String(entry.professionalNote || "").trim(),
+    sourceVerificationState: String(entry.sourceVerificationState || "verified").trim(),
+    projectApplicabilityNote: String(entry.projectApplicabilityNote || "").trim()
+  };
+}
+
+function codeQuestionEvidenceSetIntentMatches(existing, questionID, entries) {
+  return existing?.envelope?.type === "questionEvidenceSet" &&
+    existing.payload?.questionID === questionID &&
+    codeQuestionContentHash((existing.payload?.entries || []).map(normalizedEvidenceEntryIntent)) ===
+      codeQuestionContentHash((Array.isArray(entries) ? entries : []).map(normalizedEvidenceEntryIntent));
+}
+
+function codeQuestionDefinitionIntentMatches(payload, body) {
+  const textKeys = ["title", "questionText", "scope", "desiredOutput", "jurisdiction"];
+  if (!textKeys.every((key) => body[key] === undefined ||
+    String(body[key] || "").trim() === String(payload?.[key] || "").trim())) return false;
+  if (body.asOfDate === undefined) return true;
+  if (body.asOfDate === null || body.asOfDate === "") return payload?.asOfDate == null;
+  const parsed = Date.parse(body.asOfDate);
+  return Number.isFinite(parsed) && new Date(parsed).toISOString() === payload?.asOfDate;
+}
+
+function codeQuestionCreateIntentMatches(payload, body) {
+  const requested = {
+    title: String(body.title || "").trim(),
+    questionText: String(body.questionText || "").trim(),
+    scope: String(body.scope || "").trim(),
+    desiredOutput: String(body.desiredOutput || "").trim(),
+    jurisdiction: String(body.jurisdiction || "").trim(),
+    asOfDate: body.asOfDate === null || body.asOfDate === undefined || body.asOfDate === ""
+      ? null
+      : Number.isFinite(Date.parse(body.asOfDate))
+        ? new Date(Date.parse(body.asOfDate)).toISOString()
+        : "invalid"
+  };
+  return codeQuestionIntentMatches(payload, requested, Object.keys(requested));
+}
+
+function questionInputIntentMatches(payload, body, { creating = false } = {}) {
+  if (creating) {
+    return codeQuestionIntentMatches(payload, {
+      inputKind: String(body.kind || body.inputKind || "").trim(),
+      statement: String(body.statement || "").trim(),
+      state: String(body.state || "proposed").trim(),
+      basis: String(body.basis || "").trim(),
+      responsibleUserID: null
+    }, ["inputKind", "statement", "state", "basis", "responsibleUserID"]);
+  }
+  const supplied = [
+    ["statement", body.statement, (value) => String(value || "").trim()],
+    ["state", body.state, (value) => String(value || "proposed").trim()],
+    ["basis", body.basis, (value) => String(value || "").trim()],
+    ["responsibleUserID", body.responsibleUserID, (value) => String(value || "").trim() || null]
+  ];
+  return supplied.every(([key, value, normalize]) =>
+    value === undefined || normalize(value) === (payload?.[key] ?? null)
+  );
+}
+
+function codeQuestionLinkForAccess(context, values) {
+  return {
+    ...linkForArtifact({
+      ...values,
+      userID: context.storageOwnerUserID
+    }),
+    owner: context.owner
+  };
+}
+
+function codeQuestionActivityForAccess(context, values) {
+  return {
+    ...activityFor({
+      ...values,
+      userID: context.actorUserID
+    }),
+    owner: context.owner
+  };
 }
 
 const codeQuestionLegacySourceLabels = Object.freeze({
@@ -16570,13 +16703,13 @@ function legacyInventoryItem({
   };
 }
 
-async function codeQuestionLegacyInventory(userID, projectID) {
+async function codeQuestionLegacyInventory(userID, projectID, { includeAccountUnassigned = false } = {}) {
   const [artifacts, links, answers, mutations, bootstrap] = await Promise.all([
     listStoredFoundationArtifacts(userID),
     listStoredProjectLinks(userID),
     listStoredResearchAnswers(userID),
     userContentMutations(userID),
-    storedMigrationCheckpoint(userID, codeQuestionMigrationCheckpointName)
+    storedMigrationCheckpoint(userID, `${codeQuestionMigrationCheckpointName}:${projectID}`)
   ]);
   const activeLinks = links.filter((link) => !link.deletedAt);
   const promotions = artifacts
@@ -16673,20 +16806,23 @@ async function codeQuestionLegacyInventory(userID, projectID) {
     }
   });
 
-  items.sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")) ||
+  const visibleItems = includeAccountUnassigned
+    ? items
+    : items.filter((item) => item.assignment === "project");
+  visibleItems.sort((left, right) => String(right.updatedAt || "").localeCompare(String(left.updatedAt || "")) ||
     left.title.localeCompare(right.title));
   const counts = {
-    total: items.length,
-    unassigned: items.filter((item) => item.promotionState === "unassigned").length,
-    linked: items.filter((item) => item.promotionState === "linked").length,
-    recovery: items.filter((item) => item.promotionState === "recovery").length,
-    projectOwned: items.filter((item) => item.assignment === "project").length,
-    accountUnassigned: items.filter((item) => item.assignment === "unassigned").length
+    total: visibleItems.length,
+    unassigned: visibleItems.filter((item) => item.promotionState === "unassigned").length,
+    linked: visibleItems.filter((item) => item.promotionState === "linked").length,
+    recovery: visibleItems.filter((item) => item.promotionState === "recovery").length,
+    projectOwned: visibleItems.filter((item) => item.assignment === "project").length,
+    accountUnassigned: visibleItems.filter((item) => item.assignment === "unassigned").length
   };
   return {
     schemaVersion: 1,
     projectID,
-    items,
+    items: visibleItems,
     questions,
     promotions,
     counts,
@@ -16716,11 +16852,13 @@ async function handleCodeQuestionLegacyList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
   const projectID = String(context.body.projectID || "").trim();
-  if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+  if (!projectID || !await ownedProjectRecord(context.storageOwnerUserID, projectID)) {
     sendError(response, 404, "Project not found.");
     return;
   }
-  sendJSON(response, 200, await codeQuestionLegacyInventory(context.userID, projectID));
+  sendJSON(response, 200, await codeQuestionLegacyInventory(context.storageOwnerUserID, projectID, {
+    includeAccountUnassigned: context.actorUserID === context.storageOwnerUserID
+  }));
 }
 
 async function handleCodeQuestionLegacyPromote(request, response) {
@@ -16732,7 +16870,7 @@ async function handleCodeQuestionLegacyPromote(request, response) {
     const projectID = String(context.body.projectID || "").trim();
     const sourceKind = String(context.body.sourceKind || "").trim();
     const sourceID = String(context.body.sourceID || "").trim();
-    if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
+    if (!projectID || !await ownedProjectRecord(context.storageOwnerUserID, projectID)) {
       sendError(response, 404, "Project not found.");
       return;
     }
@@ -16740,7 +16878,9 @@ async function handleCodeQuestionLegacyPromote(request, response) {
       sendError(response, 400, "Select a supported legacy source.");
       return;
     }
-    const inventory = await codeQuestionLegacyInventory(context.userID, projectID);
+    const inventory = await codeQuestionLegacyInventory(context.storageOwnerUserID, projectID, {
+      includeAccountUnassigned: context.actorUserID === context.storageOwnerUserID
+    });
     const source = inventory.items.find((item) => item.sourceKind === sourceKind && item.sourceID === sourceID);
     if (!source) {
       sendError(response, 404, "Legacy source is unavailable for this Project.");
@@ -16753,7 +16893,7 @@ async function handleCodeQuestionLegacyPromote(request, response) {
     let action = "link-existing";
     const requestedQuestionID = String(context.body.questionID || "").trim();
     if (requestedQuestionID) {
-      question = await codeQuestionForProject(context.userID, projectID, requestedQuestionID);
+      question = await codeQuestionForProject(context.storageOwnerUserID, projectID, requestedQuestionID);
       if (!question) {
         sendError(response, 404, "Code Question not found for this Project.");
         return;
@@ -16771,18 +16911,18 @@ async function handleCodeQuestionLegacyPromote(request, response) {
         return;
       }
       const deterministicQuestionID = deterministicPromotedQuestionID({
-        userID: context.userID,
+        userID: context.storageOwnerUserID,
         projectID,
         sourceKind,
         sourceID,
         idempotencyKey
       });
-      question = await codeQuestionForProject(context.userID, projectID, deterministicQuestionID);
+      question = await codeQuestionForProject(context.storageOwnerUserID, projectID, deterministicQuestionID);
       if (!question) {
-        const allocated = await allocateStoredCodeQuestionCounter(context.userID, "questionNumber", projectID);
+        const allocated = await allocateStoredCodeQuestionCounter(context.storageOwnerUserID, "questionNumber", projectID);
         const now = new Date().toISOString();
-        question = createCodeQuestionArtifact({
-          userID: context.userID,
+        question = codeQuestionArtifactForAccess(context, createCodeQuestionArtifact({
+          userID: context.actorUserID,
           projectID,
           title: createQuestion.title || source.title,
           questionText: createQuestion.questionText,
@@ -16793,17 +16933,15 @@ async function handleCodeQuestionLegacyPromote(request, response) {
           questionNumber: allocated.value,
           createdAt: now,
           id: deterministicQuestionID
-        });
-        await saveStoredFoundationArtifactCompareAndSwap(context.userID, question, 0);
-        await saveStoredProjectLink(context.userID, linkForArtifact({
-          userID: context.userID,
+        }));
+        await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, question, 0);
+        await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
           projectID,
           targetKind: "codeQuestion",
           targetID: question.envelope.id,
           createdAt: now
         }));
-        await saveStoredActivityEvent(context.userID, activityFor({
-          userID: context.userID,
+        await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
           projectID,
           action: "code-question.created",
           objectKind: "codeQuestion",
@@ -16816,9 +16954,9 @@ async function handleCodeQuestionLegacyPromote(request, response) {
       }
     }
     const questionID = question.envelope?.id || question.id;
-    const artifacts = await listStoredFoundationArtifacts(context.userID);
+    const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
     const promotionID = deterministicCodeQuestionPromotionID({
-      ownerID: context.userID,
+      ownerID: context.storageOwnerUserID,
       projectID,
       questionID,
       sourceKind,
@@ -16827,7 +16965,7 @@ async function handleCodeQuestionLegacyPromote(request, response) {
     const existing = artifacts.find((artifact) => artifact.envelope?.id === promotionID) || null;
     const now = new Date().toISOString();
     const result = upsertCodeQuestionPromotionArtifact(existing, {
-      userID: context.userID,
+      userID: context.actorUserID,
       projectID,
       questionID,
       sourceKind,
@@ -16842,20 +16980,18 @@ async function handleCodeQuestionLegacyPromote(request, response) {
     });
     if (!result.replayed) {
       await saveStoredFoundationArtifactCompareAndSwap(
-        context.userID,
-        result.artifact,
+        context.storageOwnerUserID,
+        codeQuestionArtifactForAccess(context, result.artifact),
         Number(existing?.envelope?.version || 0)
       );
-      await saveStoredProjectLink(context.userID, linkForArtifact({
-        userID: context.userID,
+      await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
         projectID,
         targetKind: "codeQuestionPromotion",
         targetID: result.artifact.envelope.id,
         createdAt: existing?.envelope?.createdAt || now,
         metadata: { questionID, sourceKind, sourceID }
       }));
-      await saveStoredActivityEvent(context.userID, activityFor({
-        userID: context.userID,
+      await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
         projectID,
         action: result.recovered ? "code-question.migration.recovered" : "code-question.migration.promoted",
         objectKind: "codeQuestionPromotion",
@@ -16894,7 +17030,7 @@ async function handleCodeQuestionLegacyUnlink(request, response) {
   try {
     const projectID = String(context.body.projectID || "").trim();
     const promotionID = String(context.body.promotionID || "").trim();
-    const existing = (await listStoredFoundationArtifacts(context.userID)).find((artifact) =>
+    const existing = (await listStoredFoundationArtifacts(context.storageOwnerUserID)).find((artifact) =>
       artifact.envelope?.type === "codeQuestionPromotion" &&
       artifact.envelope.id === promotionID && artifact.payload?.projectID === projectID
     );
@@ -16903,7 +17039,7 @@ async function handleCodeQuestionLegacyUnlink(request, response) {
       return;
     }
     const result = upsertCodeQuestionPromotionArtifact(existing, {
-      userID: context.userID,
+      userID: context.actorUserID,
       projectID,
       questionID: existing.payload.questionID,
       sourceKind: existing.payload.sourceKind,
@@ -16917,12 +17053,11 @@ async function handleCodeQuestionLegacyUnlink(request, response) {
     });
     if (!result.replayed) {
       await saveStoredFoundationArtifactCompareAndSwap(
-        context.userID,
-        result.artifact,
+        context.storageOwnerUserID,
+        codeQuestionArtifactForAccess(context, result.artifact),
         existing.envelope.version
       );
-      await saveStoredActivityEvent(context.userID, activityFor({
-        userID: context.userID,
+      await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
         projectID,
         action: "code-question.migration.unlinked",
         objectKind: "codeQuestionPromotion",
@@ -16956,14 +17091,10 @@ async function handleCodeQuestionLegacyUnlink(request, response) {
 async function handleCodeQuestionList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
-  const projectID = String(context.body.projectID || "").trim();
-  if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
-    sendError(response, 404, "Project not found.");
-    return;
-  }
-  const links = (await listStoredProjectLinks(context.userID))
+  const projectID = context.projectID;
+  const links = (await listStoredProjectLinks(context.storageOwnerUserID))
     .filter((link) => !link.deletedAt && link.projectID === projectID && link.targetKind === "codeQuestion");
-  const artifacts = await listStoredFoundationArtifacts(context.userID);
+  const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
   const questions = links.map((link) => {
     const artifact = artifacts.find((item) => item.envelope?.id === link.targetID);
     return artifact
@@ -16974,7 +17105,173 @@ async function handleCodeQuestionList(request, response) {
         }
       : null;
   }).filter(Boolean);
-  sendJSON(response, 200, { projectID, questions });
+  sendJSON(response, 200, {
+    projectID,
+    access: { role: context.projectAccess.role, permissions: context.projectAccess.permissions },
+    questions
+  });
+}
+
+async function handleCodeQuestionState(request, response) {
+  const context = await requireCodeQuestionContext(request, response);
+  if (!context) return;
+  const questionID = String(context.body.questionID || "").trim();
+  const question = await codeQuestionForProject(context.storageOwnerUserID, context.projectID, questionID);
+  if (!question) {
+    sendError(response, 404, "Code Question not found for this Project.");
+    return;
+  }
+  const [allArtifacts, links, activities, pendingIssuance, researchAnswers] = await Promise.all([
+    listStoredFoundationArtifacts(context.storageOwnerUserID),
+    listStoredProjectLinks(context.storageOwnerUserID),
+    listStoredActivityEvents(context.storageOwnerUserID),
+    listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID),
+    listStoredResearchAnswers(context.storageOwnerUserID)
+  ]);
+  const projectLinks = links.filter((link) => !link.deletedAt && link.projectID === context.projectID);
+  const linksByTargetID = new Map(projectLinks.map((link) => [link.targetID, link]));
+  const directArtifacts = allArtifacts.filter((artifact) => {
+    if (artifact.envelope?.id === questionID) return true;
+    const link = linksByTargetID.get(artifact.envelope?.id);
+    if (!link) return false;
+    return artifact.payload?.questionID === questionID ||
+      artifact.payload?.codeMemo?.questionID === questionID ||
+      artifact.payload?.metadata?.questionID === questionID ||
+      link.metadata?.questionID === questionID;
+  });
+  const reviewThreadIDs = new Set(directArtifacts
+    .filter((artifact) => artifact.envelope?.type === "reviewThread")
+    .map((artifact) => artifact.envelope.id));
+  const reviewComments = allArtifacts.filter((artifact) =>
+    artifact.envelope?.type === "reviewComment" &&
+    reviewThreadIDs.has(artifact.payload?.threadID) &&
+    linksByTargetID.has(artifact.envelope.id)
+  );
+  const artifacts = [...directArtifacts, ...reviewComments];
+  const artifactIDs = new Set(artifacts.map((artifact) => artifact.envelope.id));
+  const answerIDs = new Set(artifacts
+    .filter((artifact) => artifact.envelope?.type === "questionAnalysis")
+    .map((artifact) => artifact.payload?.researchAnswerID)
+    .filter(Boolean));
+  const activeInputs = allArtifacts
+    .filter((artifact) => artifact.envelope?.type === "questionInput" &&
+      artifact.payload?.questionID === questionID && artifact.payload?.state !== "retired")
+    .sort((left, right) => String(left.envelope.id).localeCompare(String(right.envelope.id)));
+  const evidenceSet = allArtifacts
+    .filter((artifact) => artifact.envelope?.type === "questionEvidenceSet" &&
+      artifact.payload?.questionID === questionID)
+    .sort((left, right) => Number(right.payload?.version || 0) - Number(left.payload?.version || 0))[0] || null;
+  const definitionHash = codeQuestionContentHash({
+    questionText: question.payload.questionText,
+    scope: question.payload.scope || "",
+    jurisdiction: question.payload.jurisdiction || "",
+    asOfDate: question.payload.asOfDate || null,
+    definitionRevision: question.payload.definitionRevision
+  });
+  const inputSetHash = codeQuestionContentHash(activeInputs.map((artifact) => ({
+    id: artifact.payload.id,
+    inputKind: artifact.payload.inputKind,
+    state: artifact.payload.state,
+    statement: artifact.payload.statement,
+    revision: artifact.payload.revision
+  })));
+  const analysisBinding = evidenceSet ? {
+    questionID,
+    definitionRevision: question.payload.definitionRevision,
+    definitionHash,
+    inputSnapshotIDs: activeInputs.map((artifact) => artifact.payload.id),
+    inputSetHash,
+    evidenceSetID: evidenceSet.envelope.id,
+    evidenceSetVersion: evidenceSet.payload.version,
+    evidenceSetHash: evidenceSet.payload.contentHash,
+    dependencyHash: computeDependencyHash({
+      questionText: question.payload.questionText,
+      scope: question.payload.scope || "",
+      jurisdiction: question.payload.jurisdiction || "",
+      asOfDate: question.payload.asOfDate || null,
+      inputs: activeInputs.map((artifact) => artifact.payload),
+      evidenceSet: evidenceSet.payload
+    })
+  } : null;
+  sendJSON(response, 200, {
+    projectID: context.projectID,
+    questionID,
+    access: {
+      role: context.projectAccess.role,
+      permissions: context.projectAccess.permissions
+    },
+    question: { envelope: question.envelope, payload: question.payload },
+    artifacts: artifacts.map((artifact) => ({ envelope: artifact.envelope, payload: artifact.payload })),
+    links: projectLinks.filter((link) => artifactIDs.has(link.targetID)),
+    activity: activities.filter((event) => event.projectID === context.projectID && (
+      event.objectID === questionID || event.metadata?.questionID === questionID
+    )),
+    pendingIssuance: pendingIssuance.filter((item) => item.questionID === questionID),
+    researchAnswers: researchAnswers.filter((answer) => answerIDs.has(answer.id)),
+    analysisBinding
+  });
+}
+
+async function handleCodeQuestionDefinitionSave(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.update")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const existing = await codeQuestionForProject(context.storageOwnerUserID, context.projectID, questionID);
+    if (!existing) {
+      sendError(response, 404, "Code Question not found for this Project.");
+      return;
+    }
+    const expectedVersion = Number(context.body.expectedVersion);
+    if (expectedVersion !== Number(existing.envelope.version)) {
+      if (Number.isSafeInteger(expectedVersion) &&
+        Number(existing.envelope.version) === expectedVersion + 1 &&
+        codeQuestionDefinitionIntentMatches(existing.payload, context.body)) {
+        sendJSON(response, 200, {
+          question: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          replayed: true
+        });
+        return;
+      }
+      throw new CodeQuestionCommandError("This Code Question record changed after you opened it.", {
+        code: "CODE_QUESTION_VERSION_CONFLICT",
+        status: 409,
+        details: { expectedVersion, currentVersion: existing.envelope.version }
+      });
+    }
+    const artifact = codeQuestionArtifactForAccess(context, updateCodeQuestionDefinitionArtifact(existing, {
+      userID: context.actorUserID,
+      expectedVersion,
+      title: context.body.title,
+      questionText: context.body.questionText,
+      scope: context.body.scope,
+      desiredOutput: context.body.desiredOutput,
+      jurisdiction: context.body.jurisdiction,
+      asOfDate: context.body.asOfDate
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(
+      context.storageOwnerUserID,
+      artifact,
+      expectedVersion
+    );
+    await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
+      projectID: context.projectID,
+      action: "code-question.definition.revised",
+      objectKind: "codeQuestion",
+      objectID: questionID,
+      previousStatus: `version-${existing.envelope.version}`,
+      newStatus: `version-${artifact.envelope.version}`,
+      metadata: { questionID, definitionRevision: artifact.payload.definitionRevision }
+    }));
+    sendJSON(response, 200, {
+      question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
 }
 
 async function handleCodeQuestionCreate(request, response) {
@@ -16983,19 +17280,44 @@ async function handleCodeQuestionCreate(request, response) {
   });
   if (!context) return;
   try {
-    const projectID = String(context.body.projectID || "").trim();
-    if (!projectID || !await ownedProjectRecord(context.userID, projectID)) {
-      sendError(response, 404, "Project not found.");
-      return;
+    const projectID = context.projectID;
+    const requestedID = String(context.body.id || "").trim();
+    if (requestedID) {
+      const existing = (await listStoredFoundationArtifacts(context.storageOwnerUserID))
+        .find((item) => item.envelope?.id === requestedID) || null;
+      if (existing) {
+        const sameIntent = existing.envelope?.type === "codeQuestion" &&
+          existing.payload?.projectID === projectID &&
+          codeQuestionCreateIntentMatches(existing.payload, context.body);
+        if (!sameIntent) {
+          codeQuestionIdempotencyConflict("This Code Question ID was already used for different content.", {
+            id: requestedID
+          });
+        }
+        const link = codeQuestionLinkForAccess(context, {
+          projectID,
+          targetKind: "codeQuestion",
+          targetID: existing.envelope.id,
+          createdAt: existing.envelope.createdAt
+        });
+        await saveStoredProjectLink(context.storageOwnerUserID, link);
+        sendJSON(response, 200, {
+          question: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          link,
+          displayID: existing.payload.displayID,
+          replayed: true
+        });
+        return;
+      }
     }
     const allocated = await allocateStoredCodeQuestionCounter(
-      context.userID,
+      context.storageOwnerUserID,
       "questionNumber",
       projectID
     );
     const now = new Date().toISOString();
-    const artifact = createCodeQuestionArtifact({
-      userID: context.userID,
+    const artifact = codeQuestionArtifactForAccess(context, createCodeQuestionArtifact({
+      userID: context.actorUserID,
       projectID,
       title: context.body.title,
       questionText: context.body.questionText,
@@ -17005,19 +17327,17 @@ async function handleCodeQuestionCreate(request, response) {
       asOfDate: context.body.asOfDate,
       questionNumber: allocated.value,
       createdAt: now,
-      id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
-    const link = linkForArtifact({
-      userID: context.userID,
+      id: requestedID || randomUUID()
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, artifact, 0);
+    const link = codeQuestionLinkForAccess(context, {
       projectID,
       targetKind: "codeQuestion",
       targetID: artifact.envelope.id,
       createdAt: now
     });
-    await saveStoredProjectLink(context.userID, link);
-    const event = activityFor({
-      userID: context.userID,
+    await saveStoredProjectLink(context.storageOwnerUserID, link);
+    const event = codeQuestionActivityForAccess(context, {
       projectID,
       action: "code-question.created",
       objectKind: "codeQuestion",
@@ -17025,7 +17345,7 @@ async function handleCodeQuestionCreate(request, response) {
       newStatus: "active",
       createdAt: now
     });
-    await saveStoredActivityEvent(context.userID, event);
+    await saveStoredActivityEvent(context.storageOwnerUserID, event);
     sendJSON(response, 201, {
       question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
       link,
@@ -17045,23 +17365,25 @@ async function handleCodeQuestionArchive(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
-    const existing = (await listStoredFoundationArtifacts(context.userID))
-      .find((item) => item.envelope?.id === questionID && item.envelope?.type === "codeQuestion");
+    const existing = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
+    );
     if (!existing) {
       sendError(response, 404, "Code Question not found.");
       return;
     }
-    const artifact = archiveCodeQuestionArtifact(existing, {
-      userID: context.userID,
+    const artifact = codeQuestionArtifactForAccess(context, archiveCodeQuestionArtifact(existing, {
+      userID: context.actorUserID,
       expectedVersion: Number(context.body.expectedVersion)
-    });
+    }));
     await saveStoredFoundationArtifactCompareAndSwap(
-      context.userID,
+      context.storageOwnerUserID,
       artifact,
       Number(context.body.expectedVersion)
     );
-    const event = activityFor({
-      userID: context.userID,
+    const event = codeQuestionActivityForAccess(context, {
       projectID: artifact.payload.projectID,
       action: "code-question.archived",
       objectKind: "codeQuestion",
@@ -17069,7 +17391,7 @@ async function handleCodeQuestionArchive(request, response) {
       previousStatus: "active",
       newStatus: "archived"
     });
-    await saveStoredActivityEvent(context.userID, event);
+    await saveStoredActivityEvent(context.storageOwnerUserID, event);
     sendJSON(response, 200, {
       question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
       activity: event
@@ -17087,23 +17409,25 @@ async function handleCodeQuestionRestore(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
-    const existing = (await listStoredFoundationArtifacts(context.userID))
-      .find((item) => item.envelope?.id === questionID && item.envelope?.type === "codeQuestion");
+    const existing = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
+    );
     if (!existing) {
       sendError(response, 404, "Code Question not found.");
       return;
     }
-    const artifact = restoreCodeQuestionArtifact(existing, {
-      userID: context.userID,
+    const artifact = codeQuestionArtifactForAccess(context, restoreCodeQuestionArtifact(existing, {
+      userID: context.actorUserID,
       expectedVersion: Number(context.body.expectedVersion)
-    });
+    }));
     await saveStoredFoundationArtifactCompareAndSwap(
-      context.userID,
+      context.storageOwnerUserID,
       artifact,
       Number(context.body.expectedVersion)
     );
-    const event = activityFor({
-      userID: context.userID,
+    const event = codeQuestionActivityForAccess(context, {
       projectID: artifact.payload.projectID,
       action: "code-question.restored",
       objectKind: "codeQuestion",
@@ -17111,7 +17435,7 @@ async function handleCodeQuestionRestore(request, response) {
       previousStatus: "archived",
       newStatus: "active"
     });
-    await saveStoredActivityEvent(context.userID, event);
+    await saveStoredActivityEvent(context.storageOwnerUserID, event);
     sendJSON(response, 200, {
       question: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload },
       activity: event
@@ -17128,38 +17452,99 @@ async function handleCodeQuestionInputSave(request, response) {
   });
   if (!context) return;
   try {
-    const artifact = createQuestionInputArtifact({
-      userID: context.userID,
-      questionID: context.body.questionID,
-      kind: context.body.kind || context.body.inputKind,
-      statement: context.body.statement,
-      state: context.body.state,
-      basis: context.body.basis,
-      id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
-    const question = (await listStoredFoundationArtifacts(context.userID))
-      .find((item) => item.envelope?.id === artifact.payload.questionID);
-    const projectID = question?.payload?.projectID || context.body.projectID;
-    if (projectID) {
-      await saveStoredProjectLink(context.userID, linkForArtifact({
-        userID: context.userID,
-        projectID,
+    const questionID = String(context.body.questionID || "").trim();
+    const question = await codeQuestionForProject(context.storageOwnerUserID, context.projectID, questionID);
+    if (!question) {
+      sendError(response, 404, "Code Question not found for this Project.");
+      return;
+    }
+    const requestedID = String(context.body.id || "").trim();
+    const artifactWithRequestedID = requestedID
+      ? (await listStoredFoundationArtifacts(context.storageOwnerUserID))
+          .find((item) => item.envelope?.id === requestedID) || null
+      : null;
+    if (artifactWithRequestedID && (artifactWithRequestedID.envelope?.type !== "questionInput" ||
+      artifactWithRequestedID.payload?.questionID !== questionID)) {
+      codeQuestionIdempotencyConflict("This Question Input ID was already used for a different artifact.", {
+        id: requestedID
+      });
+    }
+    const existing = artifactWithRequestedID;
+    const suppliedExpectedVersion = Number(context.body.expectedVersion);
+    if (existing && !Number.isSafeInteger(suppliedExpectedVersion)) {
+      if (Number(existing.envelope.version) === 1 &&
+        questionInputIntentMatches(existing.payload, context.body, { creating: true })) {
+        await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+          projectID: context.projectID,
+          targetKind: "questionInput",
+          targetID: existing.envelope.id,
+          createdAt: existing.envelope.createdAt
+        }));
+        sendJSON(response, 200, {
+          input: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          replayed: true
+        });
+        return;
+      }
+      codeQuestionIdempotencyConflict("This Question Input ID was already used for different content.", {
+        id: requestedID
+      });
+    }
+    if (existing && suppliedExpectedVersion !== Number(existing.envelope.version)) {
+      if (Number(existing.envelope.version) === suppliedExpectedVersion + 1 &&
+        questionInputIntentMatches(existing.payload, context.body)) {
+        sendJSON(response, 200, {
+          input: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          replayed: true
+        });
+        return;
+      }
+      throw new CodeQuestionCommandError("This Code Question record changed after you opened it.", {
+        code: "CODE_QUESTION_VERSION_CONFLICT",
+        status: 409,
+        details: { expectedVersion: suppliedExpectedVersion, currentVersion: existing.envelope.version }
+      });
+    }
+    const artifact = codeQuestionArtifactForAccess(context, existing
+      ? reviseQuestionInputArtifact(existing, {
+          userID: context.actorUserID,
+          expectedVersion: suppliedExpectedVersion,
+          statement: context.body.statement,
+          state: context.body.state,
+          basis: context.body.basis,
+          responsibleUserID: context.body.responsibleUserID
+        })
+      : createQuestionInputArtifact({
+          userID: context.actorUserID,
+          questionID,
+          kind: context.body.kind || context.body.inputKind,
+          statement: context.body.statement,
+          state: context.body.state,
+          basis: context.body.basis,
+          id: requestedID || randomUUID()
+        }));
+    const expectedVersion = existing ? suppliedExpectedVersion : 0;
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, artifact, expectedVersion);
+    if (!existing) {
+      await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+        projectID: context.projectID,
         targetKind: "questionInput",
         targetID: artifact.envelope.id
       }));
-      await saveStoredActivityEvent(context.userID, activityFor({
-        userID: context.userID,
-        projectID,
-        action: artifact.payload.inputKind === "confirmedFact"
-          ? "code-question.input.confirmed"
-          : "code-question.input.revised",
-        objectKind: "questionInput",
-        objectID: artifact.envelope.id,
-        newStatus: artifact.payload.state
-      }));
     }
-    sendJSON(response, 201, {
+    await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
+      projectID: context.projectID,
+      action: existing ? "code-question.input.revised" :
+        artifact.payload.inputKind === "confirmedFact"
+          ? "code-question.input.confirmed"
+          : "code-question.input.created",
+      objectKind: "questionInput",
+      objectID: artifact.envelope.id,
+      previousStatus: existing?.payload?.state || null,
+      newStatus: artifact.payload.state,
+      metadata: { questionID, inputRevision: artifact.payload.revision }
+    }));
+    sendJSON(response, existing ? 200 : 201, {
       input: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
     });
   } catch (error) {
@@ -17174,16 +17559,76 @@ async function handleCodeQuestionEvidenceSnapshot(request, response) {
   });
   if (!context) return;
   try {
-    const artifact = createEvidenceSnapshotArtifact({
-      userID: context.userID,
+    const questionID = String(context.body.questionID || "").trim();
+    const question = await codeQuestionForProject(context.storageOwnerUserID, context.projectID, questionID);
+    if (!question) {
+      sendError(response, 404, "Code Question not found for this Project.");
+      return;
+    }
+    const requestedID = String(context.body.id || "").trim();
+    if (requestedID) {
+      const [existing, links] = await Promise.all([
+        listStoredFoundationArtifacts(context.storageOwnerUserID).then((items) =>
+          items.find((item) => item.envelope?.id === requestedID) || null
+        ),
+        listStoredProjectLinks(context.storageOwnerUserID)
+      ]);
+      if (existing) {
+        const requested = createEvidenceSnapshotArtifact({
+          userID: context.actorUserID,
+          sourceIdentity: context.body.sourceIdentity,
+          passageLocator: context.body.passageLocator,
+          quotedText: context.body.quotedText,
+          sourceVersion: context.body.sourceVersion,
+          structuredMaterial: context.body.structuredMaterial,
+          id: requestedID,
+          createdAt: existing.envelope.createdAt
+        });
+        const keys = [
+          "id", "sourceIdentity", "passageLocator", "quotedText", "textHash",
+          "structuredMaterial", "sourceVersion"
+        ];
+        const existingQuestionLinks = links.filter((link) => !link.deletedAt &&
+          link.targetKind === "evidenceSnapshotV2" && link.targetID === requestedID);
+        const sameQuestion = !existingQuestionLinks.length || existingQuestionLinks.some((link) =>
+          link.projectID === context.projectID && link.metadata?.questionID === questionID
+        );
+        if (existing.envelope?.type !== "evidenceSnapshotV2" ||
+          !codeQuestionIntentMatches(existing.payload, requested.payload, keys) || !sameQuestion) {
+          codeQuestionIdempotencyConflict("This evidence snapshot ID was already used for different content.", {
+            id: requestedID
+          });
+        }
+        await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+          projectID: context.projectID,
+          targetKind: "evidenceSnapshotV2",
+          targetID: existing.envelope.id,
+          createdAt: existing.envelope.createdAt,
+          metadata: { questionID }
+        }));
+        sendJSON(response, 200, {
+          snapshot: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          replayed: true
+        });
+        return;
+      }
+    }
+    const artifact = codeQuestionArtifactForAccess(context, createEvidenceSnapshotArtifact({
+      userID: context.actorUserID,
       sourceIdentity: context.body.sourceIdentity,
       passageLocator: context.body.passageLocator,
       quotedText: context.body.quotedText,
       sourceVersion: context.body.sourceVersion,
       structuredMaterial: context.body.structuredMaterial,
-      id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+      id: requestedID || randomUUID()
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, artifact, 0);
+    await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+      projectID: context.projectID,
+      targetKind: "evidenceSnapshotV2",
+      targetID: artifact.envelope.id,
+      metadata: { questionID }
+    }));
     sendJSON(response, 201, {
       snapshot: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
     });
@@ -17200,32 +17645,84 @@ async function handleCodeQuestionEvidenceSetCreate(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
+    const question = await codeQuestionForProject(context.storageOwnerUserID, context.projectID, questionID);
+    if (!question) {
+      sendError(response, 404, "Code Question not found for this Project.");
+      return;
+    }
+    const requestedID = String(context.body.id || "").trim();
+    const requestedEntries = Array.isArray(context.body.entries) ? context.body.entries : [];
+    if (requestedID) {
+      const existing = (await listStoredFoundationArtifacts(context.storageOwnerUserID))
+        .find((item) => item.envelope?.id === requestedID) || null;
+      if (existing) {
+        if (!codeQuestionEvidenceSetIntentMatches(existing, questionID, requestedEntries)) {
+          codeQuestionIdempotencyConflict("This Evidence Set ID was already used for different content.", {
+            id: requestedID
+          });
+        }
+        await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+          projectID: context.projectID,
+          targetKind: "questionEvidenceSet",
+          targetID: existing.envelope.id,
+          createdAt: existing.envelope.createdAt
+        }));
+        sendJSON(response, 200, {
+          evidenceSet: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
+          replayed: true
+        });
+        return;
+      }
+    }
+    const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
+    const links = await listStoredProjectLinks(context.storageOwnerUserID);
+    const projectSnapshotIDs = new Set(links
+      .filter((link) => !link.deletedAt && link.projectID === context.projectID &&
+        link.targetKind === "evidenceSnapshotV2")
+      .map((link) => link.targetID));
+    const entryIDs = requestedEntries
+      .map((entry) => String(entry?.snapshotID || "").trim())
+      .filter(Boolean);
+    const invalidSnapshotID = entryIDs.find((snapshotID) =>
+      !projectSnapshotIDs.has(snapshotID) || !artifacts.some((artifact) =>
+        artifact.envelope?.id === snapshotID && artifact.envelope?.type === "evidenceSnapshotV2"
+      )
+    );
+    if (invalidSnapshotID) {
+      sendJSON(response, 409, {
+        error: "Every approved evidence entry must resolve to a snapshot in this Project.",
+        code: "CODE_QUESTION_EVIDENCE_SNAPSHOT_INVALID",
+        snapshotID: invalidSnapshotID
+      });
+      return;
+    }
     const allocated = await allocateStoredCodeQuestionCounter(
-      context.userID,
+      context.storageOwnerUserID,
       "evidenceSetVersion",
       questionID
     );
-    const artifact = createEvidenceSetArtifact({
-      userID: context.userID,
+    const approvedAt = new Date().toISOString();
+    const serverApprovedEntries = requestedEntries.map((entry) => ({
+      ...entry,
+      approvalActor: context.actorUserID,
+      approvalAt: approvedAt
+    }));
+    const artifact = codeQuestionArtifactForAccess(context, createEvidenceSetArtifact({
+      userID: context.actorUserID,
       questionID,
       version: allocated.value,
-      entries: context.body.entries,
-      id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
-    const question = (await listStoredFoundationArtifacts(context.userID))
-      .find((item) => item.envelope?.id === questionID);
-    const projectID = question?.payload?.projectID || context.body.projectID;
-    if (projectID) {
-      await saveStoredProjectLink(context.userID, linkForArtifact({
-        userID: context.userID,
-        projectID,
+      entries: serverApprovedEntries,
+      id: requestedID || randomUUID()
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, artifact, 0);
+    {
+      await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
+        projectID: context.projectID,
         targetKind: "questionEvidenceSet",
         targetID: artifact.envelope.id
       }));
-      await saveStoredActivityEvent(context.userID, activityFor({
-        userID: context.userID,
-        projectID,
+      await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
+        projectID: context.projectID,
         action: "code-question.evidence.approved",
         objectKind: "questionEvidenceSet",
         objectID: artifact.envelope.id,
@@ -17242,6 +17739,28 @@ async function handleCodeQuestionEvidenceSetCreate(request, response) {
 }
 
 const codeQuestionAnalysisInFlight = new Map();
+
+const codeQuestionAnalysisBindingKeys = Object.freeze([
+  "definitionRevision", "definitionHash", "inputSnapshotIDs", "inputSetHash",
+  "evidenceSetID", "evidenceSetVersion", "evidenceSetHash", "dependencyHash"
+]);
+
+function codeQuestionAnalysisBindingIntent(binding) {
+  return {
+    definitionRevision: binding.question.payload.definitionRevision,
+    definitionHash: binding.definitionHash,
+    inputSnapshotIDs: binding.inputs.map((input) => input.id),
+    inputSetHash: binding.inputSetHash,
+    evidenceSetID: binding.evidenceSet.envelope.id,
+    evidenceSetVersion: binding.evidenceSet.payload.version,
+    evidenceSetHash: binding.evidenceSetHash,
+    dependencyHash: binding.dependencyHash
+  };
+}
+
+function codeQuestionAnalysisBindingHash(binding) {
+  return codeQuestionContentHash(codeQuestionAnalysisBindingIntent(binding));
+}
 
 function codeQuestionResearchEvidence(snapshotArtifact, entry) {
   const snapshot = snapshotArtifact.payload;
@@ -17284,7 +17803,9 @@ async function resolveCodeQuestionAnalysisBinding(userID, body) {
   const question = artifacts.find((item) =>
     item.envelope?.id === questionID && item.envelope?.type === "codeQuestion"
   );
-  if (!question) throw new CodeQuestionCommandError("Code Question not found.", { status: 404 });
+  if (!question || question.payload?.projectID !== String(body.projectID || "").trim()) {
+    throw new CodeQuestionCommandError("Code Question not found for this Project.", { status: 404 });
+  }
   const evidenceSetID = String(body.evidenceSetID || "").trim();
   const evidenceSet = artifacts.find((item) =>
     item.envelope?.id === evidenceSetID && item.envelope?.type === "questionEvidenceSet"
@@ -17366,19 +17887,35 @@ async function resolveCodeQuestionAnalysisBinding(userID, body) {
 async function generateCodeQuestionAnalysis(context, binding, requestID) {
   const { question, evidenceSet, approvedEvidence } = binding;
   const questionID = question.envelope.id;
-  const existingArtifacts = await listStoredFoundationArtifacts(context.userID);
+  const storageUserID = context.storageOwnerUserID;
+  const actorUserID = context.actorUserID;
+  const existingArtifacts = await listStoredFoundationArtifacts(storageUserID);
   const replay = existingArtifacts.find((item) =>
     item.envelope?.type === "questionAnalysis" &&
     item.payload?.questionID === questionID &&
     item.payload?.requestID === requestID
   );
   if (replay) {
-    const answer = (await listStoredResearchAnswers(context.userID))
+    const requestedBinding = codeQuestionAnalysisBindingIntent(binding);
+    if (!codeQuestionIntentMatches(replay.payload, requestedBinding, codeQuestionAnalysisBindingKeys)) {
+      codeQuestionIdempotencyConflict(
+        "This analysis request ID was already used with a different dependency binding.",
+        { requestID, analysisID: replay.envelope.id }
+      );
+    }
+    const answer = (await listStoredResearchAnswers(storageUserID))
       .find((item) => item.id === replay.payload.researchAnswerID) || null;
     return { analysis: { id: replay.envelope.id, ...replay.payload }, answer, replayed: true };
   }
   const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
-  const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
+  const mockDelayMilliseconds = Math.min(1_000, Math.max(
+    0,
+    Number(process.env.PERMITEXT_RESEARCH_MOCK_DELAY_MS || 0) || 0
+  ));
+  if (mockMode && mockDelayMilliseconds) {
+    await new Promise((resolve) => setTimeout(resolve, mockDelayMilliseconds));
+  }
+  const usageEntries = mockMode ? [] : await researchUsageSince(actorUserID, currentMonthStart());
   const requestLimit = monthlyResearchRequestLimit();
   if (!mockMode && usageEntries.length >= requestLimit) {
     throw new CodeQuestionCommandError("This account reached its monthly AI research limit.", {
@@ -17387,13 +17924,13 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
     });
   }
   const reservationID = `cq-analysis-${createHash("sha256")
-    .update(`${context.userID}:${questionID}:${requestID}`)
+    .update(`${actorUserID}:${questionID}:${requestID}`)
     .digest("hex")}`;
   let reserved = false;
   let completedReservation = false;
   try {
     if (!mockMode) {
-      reserved = await reserveResearchUsage(context.userID, {
+      reserved = await reserveResearchUsage(actorUserID, {
         id: reservationID,
         since: currentMonthStart(),
         limit: requestLimit,
@@ -17419,7 +17956,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
           configuration: researchModelConfiguration(),
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
-      : await openAIResearchInterpretation(question.payload.questionText, evidence, context.userID, {
+      : await openAIResearchInterpretation(question.payload.questionText, evidence, actorUserID, {
           projectContextFacts: projectFacts,
           messages: []
         });
@@ -17449,7 +17986,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
     }));
     const answer = immutableResearchAnswer({
       id: answerID,
-      owner: ownerScope(context.userID),
+      owner: context.owner,
       conversationID: `code-question:${questionID}`,
       projectID: question.payload.projectID,
       question: question.payload.questionText,
@@ -17460,10 +17997,10 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       researchSystemVersion: [answerPayload.promptVersion, answerPayload.evidenceVersion].filter(Boolean).join(":"),
       createdAt
     });
-    await saveStoredResearchAnswer(context.userID, answer);
+    await saveStoredResearchAnswer(storageUserID, answer);
     const analysisID = `qa-${createHash("sha256").update(`${questionID}:${requestID}`).digest("hex")}`;
-    const artifact = createAnalysisArtifact({
-      userID: context.userID,
+    const artifact = codeQuestionArtifactForAccess(context, createAnalysisArtifact({
+      userID: actorUserID,
       questionID,
       definitionRevision: question.payload.definitionRevision,
       definitionHash: binding.definitionHash,
@@ -17481,10 +18018,10 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       analysisPolicyID: "selected-evidence-only-v1",
       promptTemplateVersion: result.configuration.promptVersion,
       citationValidation: "approved-evidence-only"
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(storageUserID, artifact, 0);
     if (!mockMode) {
-      await completeResearchUsageReservation(context.userID, reservationID, {
+      await completeResearchUsageReservation(actorUserID, reservationID, {
         model: result.model,
         requestedModel: result.requestedModel || result.model,
         mode: "openai-code-question",
@@ -17497,14 +18034,12 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       });
       completedReservation = true;
     }
-    await saveStoredProjectLink(context.userID, linkForArtifact({
-      userID: context.userID,
+    await saveStoredProjectLink(storageUserID, codeQuestionLinkForAccess(context, {
       projectID: question.payload.projectID,
       targetKind: "questionAnalysis",
       targetID: artifact.envelope.id
     }));
-    await saveStoredActivityEvent(context.userID, activityFor({
-      userID: context.userID,
+    await saveStoredActivityEvent(storageUserID, codeQuestionActivityForAccess(context, {
       projectID: question.payload.projectID,
       action: "code-question.analysis.generated",
       objectKind: "questionAnalysis",
@@ -17514,7 +18049,7 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
     }));
     return { analysis: { id: artifact.envelope.id, ...artifact.payload }, answer, replayed: false };
   } catch (error) {
-    if (reserved && !completedReservation) await releaseResearchUsageReservation(context.userID, reservationID);
+    if (reserved && !completedReservation) await releaseResearchUsageReservation(actorUserID, reservationID);
     throw error;
   }
 }
@@ -17531,15 +18066,23 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
   try {
     const requestID = String(context.body.requestID || context.body.idempotencyKey || "").trim();
     if (!requestID) throw new CodeQuestionCommandError("Analysis requires an idempotent request ID.");
-    const binding = await resolveCodeQuestionAnalysisBinding(context.userID, context.body);
-    const key = `${context.userID}:${binding.question.envelope.id}:${requestID}`;
-    let task = codeQuestionAnalysisInFlight.get(key);
-    if (!task) {
-      task = generateCodeQuestionAnalysis(context, binding, requestID)
-        .finally(() => codeQuestionAnalysisInFlight.delete(key));
-      codeQuestionAnalysisInFlight.set(key, task);
+    const binding = await resolveCodeQuestionAnalysisBinding(context.storageOwnerUserID, context.body);
+    const key = `${context.storageOwnerUserID}:${binding.question.envelope.id}:${requestID}`;
+    const bindingHash = codeQuestionAnalysisBindingHash(binding);
+    let inFlight = codeQuestionAnalysisInFlight.get(key);
+    if (inFlight && inFlight.bindingHash !== bindingHash) {
+      codeQuestionIdempotencyConflict(
+        "This analysis request ID is already running with a different dependency binding.",
+        { requestID }
+      );
     }
-    const result = await task;
+    if (!inFlight) {
+      const task = generateCodeQuestionAnalysis(context, binding, requestID)
+        .finally(() => codeQuestionAnalysisInFlight.delete(key));
+      inFlight = { bindingHash, task };
+      codeQuestionAnalysisInFlight.set(key, inFlight);
+    }
+    const result = await inFlight.task;
     sendJSON(response, result.replayed ? 200 : 201, result);
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -17562,9 +18105,11 @@ async function handleCodeQuestionConclusionPublish(request, response) {
   if (!context) return;
   try {
     const questionID = String(context.body.questionID || "").trim();
-    const artifacts = await listStoredFoundationArtifacts(context.userID);
-    const question = artifacts.find((item) =>
-      item.envelope?.id === questionID && item.envelope?.type === "codeQuestion"
+    const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
+    const question = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
     );
     const evidenceSet = artifacts.find((item) =>
       item.envelope?.id === String(context.body.evidenceSetID || "") &&
@@ -17577,6 +18122,35 @@ async function handleCodeQuestionConclusionPublish(request, response) {
         status: 409
       });
     }
+    const activeInputs = artifacts
+      .filter((item) => item.envelope?.type === "questionInput" &&
+        item.payload?.questionID === questionID && item.payload?.state !== "retired")
+      .sort((left, right) => String(left.envelope.id).localeCompare(String(right.envelope.id)));
+    const definitionHash = codeQuestionContentHash({
+      questionText: question.payload.questionText,
+      scope: question.payload.scope || "",
+      jurisdiction: question.payload.jurisdiction || "",
+      asOfDate: question.payload.asOfDate || null,
+      definitionRevision: question.payload.definitionRevision
+    });
+    const inputSetHash = codeQuestionContentHash(activeInputs.map((item) => ({
+      id: item.payload.id,
+      inputKind: item.payload.inputKind,
+      state: item.payload.state,
+      statement: item.payload.statement,
+      revision: item.payload.revision
+    })));
+    const dependencyHash = computeDependencyHash({
+      questionText: question.payload.questionText,
+      scope: question.payload.scope || "",
+      jurisdiction: question.payload.jurisdiction || "",
+      asOfDate: question.payload.asOfDate || null,
+      inputs: activeInputs.map((item) => item.payload),
+      evidenceSet: evidenceSet.payload
+    });
+    assertCodeQuestionBindingField(question.payload.definitionRevision, context.body.definitionRevision, "Definition revision");
+    assertCodeQuestionBindingField(definitionHash, context.body.definitionHash, "Definition hash");
+    assertCodeQuestionBindingField(inputSetHash, context.body.inputSetHash, "Question Input hash");
     assertCodeQuestionBindingField(evidenceSet.payload.version, context.body.evidenceSetVersion, "Evidence Set version");
     assertCodeQuestionBindingField(evidenceSet.payload.contentHash, context.body.evidenceSetHash, "Evidence Set hash");
     const approvedSnapshotIDs = new Set((evidenceSet.payload.entries || []).map((entry) => entry.snapshotID));
@@ -17593,7 +18167,8 @@ async function handleCodeQuestionConclusionPublish(request, response) {
         item.envelope?.type === "questionAnalysis" &&
         item.payload?.questionID === questionID
       );
-      if (!analysis || analysis.payload.dependencyHash !== context.body.analysisDependencyHash) {
+      if (!analysis || analysis.payload.dependencyHash !== dependencyHash ||
+        analysis.payload.dependencyHash !== context.body.analysisDependencyHash) {
         throw new CodeQuestionCommandError("The selected analysis is stale or could not be resolved.", {
           code: "CODE_QUESTION_VERSION_CONFLICT",
           status: 409
@@ -17601,12 +18176,12 @@ async function handleCodeQuestionConclusionPublish(request, response) {
       }
     }
     const allocated = await allocateStoredCodeQuestionCounter(
-      context.userID,
+      context.storageOwnerUserID,
       "conclusionRevision",
       questionID
     );
-    const artifact = createConclusionArtifact({
-      userID: context.userID,
+    const artifact = codeQuestionArtifactForAccess(context, createConclusionArtifact({
+      userID: context.actorUserID,
       questionID,
       revision: allocated.value,
       definitionRevision: context.body.definitionRevision,
@@ -17625,16 +18200,14 @@ async function handleCodeQuestionConclusionPublish(request, response) {
       aiAssistanceDisclosure: context.body.aiAssistanceDisclosure,
       predecessorRevisionID: context.body.predecessorRevisionID,
       id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, artifact, 0);
-    await saveStoredProjectLink(context.userID, linkForArtifact({
-      userID: context.userID,
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, artifact, 0);
+    await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
       projectID: question.payload.projectID,
       targetKind: "professionalConclusion",
       targetID: artifact.envelope.id
     }));
-    await saveStoredActivityEvent(context.userID, activityFor({
-      userID: context.userID,
+    await saveStoredActivityEvent(context.storageOwnerUserID, codeQuestionActivityForAccess(context, {
       projectID: question.payload.projectID,
       action: "code-question.conclusion.revised",
       objectKind: "professionalConclusion",
@@ -17658,9 +18231,11 @@ async function handleCodeQuestionConclusionApprove(request, response) {
   try {
     const questionID = String(context.body.questionID || "").trim();
     const conclusionID = String(context.body.conclusionID || "").trim();
-    const artifacts = await listStoredFoundationArtifacts(context.userID);
-    const question = artifacts.find((item) =>
-      item.envelope?.type === "codeQuestion" && item.envelope.id === questionID
+    const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
+    const question = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
     );
     const conclusion = artifacts.find((item) =>
       item.envelope?.type === "professionalConclusion" &&
@@ -17669,6 +18244,41 @@ async function handleCodeQuestionConclusionApprove(request, response) {
     );
     if (!question || !conclusion) {
       sendError(response, 404, "Code Question or professional conclusion not found.");
+      return;
+    }
+    const currentEvidenceSet = artifacts
+      .filter((item) => item.envelope?.type === "questionEvidenceSet" &&
+        item.payload?.questionID === questionID)
+      .sort((left, right) => Number(right.payload?.version || 0) - Number(left.payload?.version || 0))[0] || null;
+    const currentInputs = artifacts
+      .filter((item) => item.envelope?.type === "questionInput" &&
+        item.payload?.questionID === questionID && item.payload?.state !== "retired")
+      .sort((left, right) => String(left.envelope.id).localeCompare(String(right.envelope.id)));
+    const currentDefinitionHash = codeQuestionContentHash({
+      questionText: question.payload.questionText,
+      scope: question.payload.scope || "",
+      jurisdiction: question.payload.jurisdiction || "",
+      asOfDate: question.payload.asOfDate || null,
+      definitionRevision: question.payload.definitionRevision
+    });
+    const currentInputSetHash = codeQuestionContentHash(currentInputs.map((item) => ({
+      id: item.payload.id,
+      inputKind: item.payload.inputKind,
+      state: item.payload.state,
+      statement: item.payload.statement,
+      revision: item.payload.revision
+    })));
+    if (!currentEvidenceSet ||
+      Number(conclusion.payload.definitionRevision) !== Number(question.payload.definitionRevision) ||
+      conclusion.payload.definitionHash !== currentDefinitionHash ||
+      conclusion.payload.inputSetHash !== currentInputSetHash ||
+      conclusion.payload.evidenceSetID !== currentEvidenceSet.envelope.id ||
+      Number(conclusion.payload.evidenceSetVersion) !== Number(currentEvidenceSet.payload.version) ||
+      conclusion.payload.evidenceSetHash !== currentEvidenceSet.payload.contentHash) {
+      sendJSON(response, 409, {
+        error: "The professional conclusion is stale because its Definition, inputs, or Evidence Set changed.",
+        code: "CODE_QUESTION_VERSION_CONFLICT"
+      });
       return;
     }
     const openBlockingIDs = blockingReviewRequestIDs(artifacts, questionID);
@@ -17681,7 +18291,7 @@ async function handleCodeQuestionConclusionApprove(request, response) {
       return;
     }
     const allocated = await allocateStoredCodeQuestionCounter(
-      context.userID,
+      context.storageOwnerUserID,
       "conclusionApprovalRound",
       questionID
     );
@@ -17693,8 +18303,8 @@ async function handleCodeQuestionConclusionApprove(request, response) {
       evidenceSetVersion: conclusion.payload.evidenceSetVersion,
       evidenceSetHash: conclusion.payload.evidenceSetHash
     });
-    const approval = createConclusionApprovalArtifact({
-      userID: context.userID,
+    const approval = codeQuestionArtifactForAccess(context, createConclusionApprovalArtifact({
+      userID: context.actorUserID,
       questionID,
       conclusionID,
       conclusionRevision: conclusion.payload.revision,
@@ -17702,17 +18312,15 @@ async function handleCodeQuestionConclusionApprove(request, response) {
       reviewRound: allocated.value,
       approvalBasis: context.body.approvalBasis,
       id: context.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(context.userID, approval, 0);
-    await saveStoredProjectLink(context.userID, linkForArtifact({
-      userID: context.userID,
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(context.storageOwnerUserID, approval, 0);
+    await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
       projectID: question.payload.projectID,
       targetKind: "conclusionApproval",
       targetID: approval.envelope.id,
       metadata: { questionID, conclusionID }
     }));
-    const activity = activityFor({
-      userID: context.userID,
+    const activity = codeQuestionActivityForAccess(context, {
       projectID: question.payload.projectID,
       action: "code-question.conclusion.approved",
       objectKind: "conclusionApproval",
@@ -17720,7 +18328,7 @@ async function handleCodeQuestionConclusionApprove(request, response) {
       newStatus: "approved",
       metadata: { questionID, conclusionID, reviewRound: allocated.value }
     });
-    await saveStoredActivityEvent(context.userID, activity);
+    await saveStoredActivityEvent(context.storageOwnerUserID, activity);
     sendJSON(response, 201, {
       approval: { id: approval.envelope.id, version: approval.envelope.version, ...approval.payload },
       activity
@@ -17740,12 +18348,15 @@ function latestCodeQuestionArtifact(artifacts, type, questionID, field = "revisi
     .sort((left, right) => Number(right.payload?.[field] || 0) - Number(left.payload?.[field] || 0))[0] || null;
 }
 
-async function resolveServerCodeMemoContext(userID, questionID, draftID = null) {
+async function resolveServerCodeMemoContext(userID, questionID, draftID = null, projectID = null) {
   const artifacts = await listStoredFoundationArtifacts(userID);
   const question = artifacts.find((item) =>
     item.envelope?.type === "codeQuestion" && item.envelope.id === questionID
   ) || null;
   if (!question) throw new CodeQuestionCommandError("Code Question not found.", { status: 404 });
+  if (projectID && question.payload?.projectID !== projectID) {
+    throw new CodeQuestionCommandError("Code Question not found in this Project.", { status: 404 });
+  }
   const inputs = artifacts
     .filter((item) => item.envelope?.type === "questionInput" && item.payload?.questionID === questionID)
     .map((item) => item.payload)
@@ -17829,7 +18440,15 @@ function serverCodeMemoReadiness(context) {
   );
   add("analysis", "Current selected analysis", analysisCurrent,
     !includeAnalysis ? "The memo does not rely on AI analysis." : analysisCurrent ? "Selected analysis is current." : "Selected analysis is missing or stale.");
-  const conclusionCurrent = Boolean(context.conclusion && context.draft &&
+  const conclusionBoundToCurrentInputs = Boolean(context.conclusion && context.evidenceSet &&
+    Number(context.conclusion.payload.definitionRevision) === Number(context.question.payload.definitionRevision) &&
+    context.conclusion.payload.definitionHash === context.definitionHash &&
+    context.conclusion.payload.inputSetHash === context.inputSetHash &&
+    context.conclusion.payload.evidenceSetID === context.evidenceSet.envelope.id &&
+    Number(context.conclusion.payload.evidenceSetVersion) === Number(context.evidenceSet.payload.version) &&
+    context.conclusion.payload.evidenceSetHash === context.evidenceSet.payload.contentHash
+  );
+  const conclusionCurrent = Boolean(conclusionBoundToCurrentInputs && context.draft &&
     context.draft.payload.codeMemo?.conclusionID === context.conclusion.envelope.id &&
     Number(context.draft.payload.codeMemo?.conclusionRevision) === Number(context.conclusion.payload.revision) &&
     context.draft.payload.codeMemo?.conclusionHash === context.conclusionHash
@@ -17922,18 +18541,34 @@ async function handleCodeQuestionMemoPrepare(request, response) {
   if (!requestContext) return;
   try {
     const questionID = String(requestContext.body.questionID || "").trim();
-    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID);
+    const context = await resolveServerCodeMemoContext(
+      requestContext.storageOwnerUserID,
+      questionID,
+      null,
+      requestContext.projectID
+    );
     if (!context.evidenceSet || !context.conclusion) {
       throw new CodeQuestionCommandError("Prepare approved evidence and a professional conclusion before the Code Memo.", { status: 409 });
     }
+    if (Number(context.conclusion.payload.definitionRevision) !== Number(context.question.payload.definitionRevision) ||
+      context.conclusion.payload.definitionHash !== context.definitionHash ||
+      context.conclusion.payload.inputSetHash !== context.inputSetHash ||
+      context.conclusion.payload.evidenceSetID !== context.evidenceSet.envelope.id ||
+      Number(context.conclusion.payload.evidenceSetVersion) !== Number(context.evidenceSet.payload.version) ||
+      context.conclusion.payload.evidenceSetHash !== context.evidenceSet.payload.contentHash) {
+      throw new CodeQuestionCommandError(
+        "Publish a new professional conclusion for the current Definition, inputs, and Evidence Set.",
+        { code: "CODE_QUESTION_VERSION_CONFLICT", status: 409 }
+      );
+    }
     const includeAnalysis = requestContext.body.includeAnalysis !== false;
     const researchAnswer = includeAnalysis && context.analysis
-      ? (await listStoredResearchAnswers(requestContext.userID)).find((item) => item.id === context.analysis.payload.researchAnswerID) || null
+      ? (await listStoredResearchAnswers(requestContext.storageOwnerUserID)).find((item) => item.id === context.analysis.payload.researchAnswerID) || null
       : null;
     if (includeAnalysis && context.analysis && !researchAnswer) {
       throw new CodeQuestionCommandError("The selected immutable Research answer is unavailable.", { status: 409 });
     }
-    const allocated = await allocateStoredCodeQuestionCounter(requestContext.userID, "codeMemoDraftRevision", questionID);
+    const allocated = await allocateStoredCodeQuestionCounter(requestContext.storageOwnerUserID, "codeMemoDraftRevision", questionID);
     const now = new Date().toISOString();
     const draftID = String(requestContext.body.draftID || randomUUID());
     const payload = normalizeReportDraftPayloadV2({
@@ -17941,8 +18576,8 @@ async function handleCodeQuestionMemoPrepare(request, response) {
       reportDate: now,
       introduction: String(requestContext.body.narrative || "").trim(),
       blocks: codeMemoDraftBlocks(context, requestContext.body.narrative, includeAnalysis, researchAnswer),
-      createdBy: requestContext.userID,
-      updatedBy: requestContext.userID,
+      createdBy: requestContext.actorUserID,
+      updatedBy: requestContext.actorUserID,
       questionID,
       projectID: context.question.payload.projectID,
       draftRevision: allocated.value,
@@ -17965,21 +18600,19 @@ async function handleCodeQuestionMemoPrepare(request, response) {
     });
     const artifact = {
       envelope: artifactEnvelope({
-        id: draftID, type: "reportDraft", owner: ownerScope(requestContext.userID),
+        id: draftID, type: "reportDraft", owner: requestContext.owner,
         createdAt: now, updatedAt: now, version: 1
       }),
       payload
     };
-    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
-    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
-      userID: requestContext.userID,
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.storageOwnerUserID, artifact, 0);
+    await saveStoredProjectLink(requestContext.storageOwnerUserID, codeQuestionLinkForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       targetKind: "reportDraft",
       targetID: draftID,
       metadata: { questionID, recordType: "codeDecisionMemo", draftRevision: allocated.value }
     }));
-    const activity = activityFor({
-      userID: requestContext.userID,
+    const activity = codeQuestionActivityForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       action: "code-question.memo.prepared",
       objectKind: "reportDraft",
@@ -17987,7 +18620,7 @@ async function handleCodeQuestionMemoPrepare(request, response) {
       newStatus: "draft",
       metadata: { questionID, draftRevision: allocated.value, draftHash: payload.contentHash }
     });
-    await saveStoredActivityEvent(requestContext.userID, activity);
+    await saveStoredActivityEvent(requestContext.storageOwnerUserID, activity);
     sendJSON(response, 201, { draft: reportDraftForClient(artifact, [context.question.payload.projectID]), activity });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -18003,32 +18636,35 @@ async function handleCodeQuestionMemoReady(request, response) {
   try {
     const questionID = String(requestContext.body.questionID || "").trim();
     const draftID = String(requestContext.body.draftID || "").trim();
-    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID, draftID);
+    const context = await resolveServerCodeMemoContext(
+      requestContext.storageOwnerUserID,
+      questionID,
+      draftID,
+      requestContext.projectID
+    );
     if (!context.draft) throw new CodeQuestionCommandError("Code Memo Draft not found.", { status: 404 });
     const readiness = serverCodeMemoReadiness(context);
     if (!readiness.ready) {
       sendJSON(response, 409, { error: "Code Memo readiness has blockers.", code: "CODE_MEMO_NOT_READY", readiness });
       return;
     }
-    const artifact = createCodeMemoReadinessArtifact({
-      userID: requestContext.userID,
+    const artifact = codeQuestionArtifactForAccess(requestContext, createCodeMemoReadinessArtifact({
+      userID: requestContext.actorUserID,
       questionID,
       draftID,
       draftRevision: context.draft.payload.draftRevision,
       draftHash: context.draft.payload.contentHash,
       checks: readiness.checks,
       id: requestContext.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
-    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
-      userID: requestContext.userID,
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.storageOwnerUserID, artifact, 0);
+    await saveStoredProjectLink(requestContext.storageOwnerUserID, codeQuestionLinkForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       targetKind: "codeMemoReadiness",
       targetID: artifact.envelope.id,
       metadata: { questionID, draftID }
     }));
-    await saveStoredActivityEvent(requestContext.userID, activityFor({
-      userID: requestContext.userID,
+    await saveStoredActivityEvent(requestContext.storageOwnerUserID, codeQuestionActivityForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       action: "code-question.memo.ready",
       objectKind: "codeMemoReadiness",
@@ -18051,15 +18687,20 @@ async function handleCodeQuestionMemoApprove(request, response) {
   try {
     const questionID = String(requestContext.body.questionID || "").trim();
     const draftID = String(requestContext.body.draftID || "").trim();
-    const context = await resolveServerCodeMemoContext(requestContext.userID, questionID, draftID);
+    const context = await resolveServerCodeMemoContext(
+      requestContext.storageOwnerUserID,
+      questionID,
+      draftID,
+      requestContext.projectID
+    );
     const readiness = serverCodeMemoReadiness(context);
     if (!context.draft || !context.readiness ||
       context.readiness.payload.draftHash !== context.draft.payload.contentHash || !readiness.ready) {
       sendJSON(response, 409, { error: "Mark the current Code Memo Draft ready before approval.", code: "CODE_MEMO_NOT_READY", readiness });
       return;
     }
-    const artifact = createCodeMemoApprovalArtifact({
-      userID: requestContext.userID,
+    const artifact = codeQuestionArtifactForAccess(requestContext, createCodeMemoApprovalArtifact({
+      userID: requestContext.actorUserID,
       questionID,
       draftID,
       draftRevision: context.draft.payload.draftRevision,
@@ -18069,17 +18710,15 @@ async function handleCodeQuestionMemoApprove(request, response) {
       conclusionHash: context.conclusionHash,
       approvalBasis: requestContext.body.approvalBasis,
       id: requestContext.body.id || randomUUID()
-    });
-    await saveStoredFoundationArtifactCompareAndSwap(requestContext.userID, artifact, 0);
-    await saveStoredProjectLink(requestContext.userID, linkForArtifact({
-      userID: requestContext.userID,
+    }));
+    await saveStoredFoundationArtifactCompareAndSwap(requestContext.storageOwnerUserID, artifact, 0);
+    await saveStoredProjectLink(requestContext.storageOwnerUserID, codeQuestionLinkForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       targetKind: "codeMemoApproval",
       targetID: artifact.envelope.id,
       metadata: { questionID, draftID }
     }));
-    await saveStoredActivityEvent(requestContext.userID, activityFor({
-      userID: requestContext.userID,
+    await saveStoredActivityEvent(requestContext.storageOwnerUserID, codeQuestionActivityForAccess(requestContext, {
       projectID: context.question.payload.projectID,
       action: "code-question.memo.approved",
       objectKind: "codeMemoApproval",
@@ -18107,7 +18746,12 @@ async function handleCodeQuestionIssueStart(request, response) {
       sendError(response, 400, "Issuance requires a Code Memo Draft and idempotency key.");
       return;
     }
-    const memoContext = await resolveServerCodeMemoContext(context.userID, questionID, draftID);
+    const memoContext = await resolveServerCodeMemoContext(
+      context.storageOwnerUserID,
+      questionID,
+      draftID,
+      context.projectID
+    );
     const readiness = serverCodeMemoReadiness(memoContext);
     if (!readiness.ready) {
       sendJSON(response, 409, {
@@ -18126,26 +18770,42 @@ async function handleCodeQuestionIssueStart(request, response) {
       });
       return;
     }
-    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID);
     const existing = pendingList.find((item) =>
       item.idempotencyKey === idempotencyKey && item.questionID === questionID
     );
     if (existing) {
+      const issuanceIntent = {
+        questionID,
+        draftID,
+        draftHash: memoContext.draft.payload.contentHash,
+        memoApprovalID: memoContext.memoApproval.envelope.id,
+        predecessorID: memoContext.draft.payload.codeMemo?.correctionOfIssuedRecordID || null
+      };
+      const issuanceIntentKeys = [
+        "questionID", "draftID", "draftHash", "memoApprovalID", "predecessorID"
+      ];
+      if (!codeQuestionIntentMatches(existing, issuanceIntent, issuanceIntentKeys)) {
+        codeQuestionIdempotencyConflict(
+          "This issuance idempotency key was already used for a different approved draft.",
+          { idempotencyKey, pendingID: existing.id }
+        );
+      }
       const recovered = existing.status === "failed"
         ? advanceIssuanceSaga(existing, "reserved", { error: null })
         : existing;
-      if (recovered !== existing) await saveStoredCodeQuestionPendingIssuance(context.userID, recovered);
+      if (recovered !== existing) await saveStoredCodeQuestionPendingIssuance(context.storageOwnerUserID, recovered);
       sendJSON(response, 200, { pending: recovered, replayed: true, recovered: recovered !== existing });
       return;
     }
     const deterministicHash = createHash("sha256")
-      .update(`${context.userID}:${questionID}:${idempotencyKey}`)
+      .update(`${context.storageOwnerUserID}:${questionID}:${idempotencyKey}`)
       .digest("hex");
-    const reservation = await reserveStoredCodeQuestionIssuance(context.userID, {
+    const reservation = await reserveStoredCodeQuestionIssuance(context.storageOwnerUserID, {
       id: `cq-pending-${deterministicHash}`,
       questionID,
       idempotencyKey,
-      actorUserID: context.userID,
+      actorUserID: context.actorUserID,
       stagedPrefix: `staged/code-question/${safeWorkboardPathHash(questionID)}/`,
       deterministicHash,
       draftID,
@@ -18196,7 +18856,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
   let pendingForFailure = null;
   try {
     const pendingID = String(context.body.pendingID || "").trim();
-    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID);
     const pending = pendingList.find((item) => item.id === pendingID);
     if (!pending) {
       sendError(response, 404, "Pending issuance not found.");
@@ -18204,7 +18864,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
     }
     pendingForFailure = pending;
     if (pending.status === "issued") {
-      const replay = (await listStoredFoundationArtifacts(context.userID)).find((item) =>
+      const replay = (await listStoredFoundationArtifacts(context.storageOwnerUserID)).find((item) =>
         item.envelope?.type === "issuedDecisionRecord" && item.envelope.id === pending.issuedRecordID
       );
       sendJSON(response, 200, {
@@ -18223,9 +18883,10 @@ async function handleCodeQuestionIssueComplete(request, response) {
       return;
     }
     const memoContext = await resolveServerCodeMemoContext(
-      context.userID,
+      context.storageOwnerUserID,
       pending.questionID,
-      pending.draftID
+      pending.draftID,
+      context.projectID
     );
     const readiness = serverCodeMemoReadiness(memoContext);
     if (!readiness.ready ||
@@ -18256,8 +18917,8 @@ async function handleCodeQuestionIssueComplete(request, response) {
     let advanced = advanceIssuanceSaga(pending, "staged", {
       stagedObjectKey: pending.stagedObjectKey
     });
-    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
-    const project = await ownedProjectRecord(context.userID, memoContext.question.payload.projectID);
+    await saveStoredCodeQuestionPendingIssuance(context.storageOwnerUserID, advanced);
+    const project = await ownedProjectRecord(context.storageOwnerUserID, memoContext.question.payload.projectID);
     if (!project) throw new CodeQuestionCommandError("Project not found.", { status: 404 });
     const now = pending.createdAt;
     const manifestID = pending.manifestID;
@@ -18273,7 +18934,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
       title: memoContext.draft.payload.title,
       reportDate: now,
       author: {
-        userID: context.userID,
+        userID: context.actorUserID,
         displayName: context.authContext.account?.displayName ||
           context.authContext.account?.publicUsername || "Permitext professional"
       },
@@ -18375,9 +19036,9 @@ async function handleCodeQuestionIssueComplete(request, response) {
       });
     }
     advanced = advanceIssuanceSaga(advanced, "committing");
-    await saveStoredCodeQuestionPendingIssuance(context.userID, advanced);
-    const issued = createIssuedRecordArtifact({
-      userID: context.userID,
+    await saveStoredCodeQuestionPendingIssuance(context.storageOwnerUserID, advanced);
+    const issued = codeQuestionArtifactForAccess(context, createIssuedRecordArtifact({
+      userID: context.actorUserID,
       questionID: pending.questionID,
       issueVersion: pending.issueVersion,
       reportManifestID: manifestID,
@@ -18402,12 +19063,12 @@ async function handleCodeQuestionIssueComplete(request, response) {
       predecessorID: pending.predecessorID || null,
       id: pending.issuedRecordID,
       issuedAt: now
-    });
+    }));
     const manifestArtifact = {
       envelope: artifactEnvelope({
         id: manifestID,
         type: "reportManifest",
-        owner: ownerScope(context.userID),
+        owner: context.owner,
         createdAt: now,
         updatedAt: now,
         version: 1
@@ -18419,7 +19080,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
       envelope: artifactEnvelope({
         id: generatedReportID,
         type: "generatedReport",
-        owner: ownerScope(context.userID),
+        owner: context.owner,
         createdAt: now,
         updatedAt: now,
         version: 1
@@ -18432,7 +19093,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
         contentHash: manifest.contentHash,
         generatorVersion: manifest.generatorVersion,
         files: outputs,
-        createdBy: context.userID,
+        createdBy: context.actorUserID,
         createdAt: now
       }
     };
@@ -18440,15 +19101,13 @@ async function handleCodeQuestionIssueComplete(request, response) {
       ["reportManifest", manifestID, { questionID: pending.questionID, issueVersion: pending.issueVersion }],
       ["generatedReport", generatedReportID, { questionID: pending.questionID, manifestID }],
       ["issuedDecisionRecord", issued.envelope.id, { questionID: pending.questionID, manifestID }]
-    ].map(([targetKind, targetID, metadata]) => linkForArtifact({
-        userID: context.userID,
+    ].map(([targetKind, targetID, metadata]) => codeQuestionLinkForAccess(context, {
         projectID: memoContext.question.payload.projectID,
         targetKind,
         targetID,
         metadata
       }));
-    const events = [activityFor({
-      userID: context.userID,
+    const events = [codeQuestionActivityForAccess(context, {
       projectID: memoContext.question.payload.projectID,
       action: "code-question.record.issued",
       objectKind: "issuedDecisionRecord",
@@ -18457,8 +19116,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
       metadata: { manifestID, issueVersion: pending.issueVersion, outputHashes: issued.payload.componentHashes.outputs }
     })];
     if (pending.predecessorID) {
-      events.push(activityFor({
-        userID: context.userID,
+      events.push(codeQuestionActivityForAccess(context, {
         projectID: memoContext.question.payload.projectID,
         action: "code-question.record.superseded",
         objectKind: "issuedDecisionRecord",
@@ -18472,7 +19130,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
       }));
     }
     advanced = advanceIssuanceSaga(advanced, "issued");
-    await commitStoredCodeQuestionIssuance(context.userID, {
+    await commitStoredCodeQuestionIssuance(context.storageOwnerUserID, {
       artifacts: [manifestArtifact, generatedReportArtifact, issued],
       links,
       events,
@@ -18487,10 +19145,10 @@ async function handleCodeQuestionIssueComplete(request, response) {
   } catch (error) {
     if (pendingForFailure && ["reserved", "staged", "committing"].includes(pendingForFailure.status)) {
       try {
-        const currentPending = (await listStoredCodeQuestionPendingIssuance(context.userID))
+        const currentPending = (await listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID))
           .find((item) => item.id === pendingForFailure.id) || pendingForFailure;
         if (["reserved", "staged", "committing"].includes(currentPending.status)) {
-          await saveStoredCodeQuestionPendingIssuance(context.userID, advanceIssuanceSaga(currentPending, "failed", {
+          await saveStoredCodeQuestionPendingIssuance(context.storageOwnerUserID, advanceIssuanceSaga(currentPending, "failed", {
             error: String(error?.message || "Issuance failed.")
           }));
         }
@@ -18515,7 +19173,7 @@ async function handleCodeQuestionIssuedFileRead(request, response) {
     sendError(response, 400, "Missing or invalid Issued Record output identity.");
     return;
   }
-  const artifacts = await listStoredFoundationArtifacts(context.userID);
+  const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
   const issued = artifacts.find((item) =>
     item.envelope?.type === "issuedDecisionRecord" && item.envelope.id === issuedRecordID
   );
@@ -18527,7 +19185,7 @@ async function handleCodeQuestionIssuedFileRead(request, response) {
     item.payload?.manifestID === issued?.payload?.reportManifestID
   );
   const file = generated?.payload?.files?.find((item) => item.format === format);
-  if (!issued || !question || !file?.pathname ||
+  if (!issued || !question || question.payload?.projectID !== context.projectID || !file?.pathname ||
     !file.pathname.startsWith(reportFilePrefix(question.payload.projectID))) {
     sendError(response, 404, "Issued Record output not found.");
     return;
@@ -18561,7 +19219,7 @@ async function handleCodeQuestionIssueFail(request, response) {
   if (!context) return;
   try {
     const pendingID = String(context.body.pendingID || "").trim();
-    const pendingList = await listStoredCodeQuestionPendingIssuance(context.userID);
+    const pendingList = await listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID);
     const pending = pendingList.find((item) => item.id === pendingID);
     if (!pending) {
       sendError(response, 404, "Pending issuance not found.");
@@ -18570,7 +19228,7 @@ async function handleCodeQuestionIssueFail(request, response) {
     const failed = advanceIssuanceSaga(pending, "failed", {
       error: String(context.body.error || "Issuance failed.")
     });
-    await saveStoredCodeQuestionPendingIssuance(context.userID, failed);
+    await saveStoredCodeQuestionPendingIssuance(context.storageOwnerUserID, failed);
     sendJSON(response, 200, { pending: failed });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -18589,7 +19247,7 @@ async function handleCodeQuestionOutboxEnqueue(request, response) {
       payload: context.body.payload,
       idempotencyKey: context.body.idempotencyKey
     });
-    await saveStoredCodeQuestionOutboxEntry(context.userID, entry);
+    await saveStoredCodeQuestionOutboxEntry(context.storageOwnerUserID, entry);
     sendJSON(response, 201, { entry });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -18603,12 +19261,13 @@ async function handleCodeQuestionMigrationRun(request, response) {
   });
   if (!context) return;
   try {
+    const checkpointName = `${codeQuestionMigrationCheckpointName}:${context.projectID}`;
     const previous = await storedMigrationCheckpoint(
-      context.userID,
-      codeQuestionMigrationCheckpointName
+      context.storageOwnerUserID,
+      checkpointName
     );
     const result = runCodeQuestionBootstrapMigration({ previousCheckpoint: previous });
-    await saveStoredMigrationCheckpoint(context.userID, codeQuestionMigrationCheckpointName, result);
+    await saveStoredMigrationCheckpoint(context.storageOwnerUserID, checkpointName, result);
     sendJSON(response, 200, { migration: result });
   } catch (error) {
     if (sendCodeQuestionError(response, error)) return;
@@ -18651,11 +19310,13 @@ const handlers = {
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
   // Code Question routes (Phase 1): gated by permitext:codeQuestionWorkspace (default off).
+  "projects/code-questions/state": handleCodeQuestionState,
   "projects/code-questions/list": handleCodeQuestionList,
   "projects/code-questions/legacy/list": handleCodeQuestionLegacyList,
   "projects/code-questions/legacy/promote": handleCodeQuestionLegacyPromote,
   "projects/code-questions/legacy/unlink": handleCodeQuestionLegacyUnlink,
   "projects/code-questions/create": handleCodeQuestionCreate,
+  "projects/code-questions/definition/save": handleCodeQuestionDefinitionSave,
   "projects/code-questions/archive": handleCodeQuestionArchive,
   "projects/code-questions/restore": handleCodeQuestionRestore,
   "projects/code-questions/inputs/save": handleCodeQuestionInputSave,
@@ -18853,6 +19514,11 @@ async function handleRequestUnlocked(request, response) {
 
 function requestMutatesFileStore(request) {
   if (databaseURL) return false;
+  if (process.env.PERMITEXT_TEST_CONCURRENT_CODE_QUESTION_ANALYSIS === "1" &&
+    request.method === "POST" &&
+    normalizePath(request.url) === "projects/code-questions/analysis/create") {
+    return false;
+  }
   if (request.method === "POST" || request.method === "DELETE") return true;
   const path = normalizePath(request.url);
   return request.method === "GET" && path === "account/apple/callback";

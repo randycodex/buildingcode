@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v436";
+const shellCacheName = "permitext-pro-shell-v441";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -8,15 +8,17 @@ const shellURLs = [
   "/web/icons/permitext-512.png",
   "/web/styles.css?v=20260806-code-question-rollout-v1",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260806-code-question-legacy-v1",
+  "/web/app.js?v=20260807-code-question-phase5a-v5",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260806-code-question-legacy-v1",
+  "/web/offline-storage.js?v=20260807-code-question-phase5a-v5",
   "/web/workspace-state.js?v=20260806-code-question-legacy-v1",
   "/web/code-question-workspace.js?v=20260806-code-question-legacy-v1",
+  "/web/code-question-client-state.js?v=20260807-code-question-account-v2",
+  "/web/code-question-server.js?v=20260807-code-question-server-v1",
   "/web/code-question-legacy.js?v=20260806-code-question-legacy-v1",
   "/web/code-question-issue.js?v=20260803-code-question-issue-v1",
   "/web/code-question-define.js?v=20260803-code-question-analyze-v3",
-  "/web/code-question-evidence.js?v=20260803-code-question-analyze-v3",
+  "/web/code-question-evidence.js?v=20260807-code-question-phase5a-v1",
   "/web/code-question-analysis.js?v=20260803-code-question-analyze-v3",
   "/web/code-question-review.js?v=20260803-code-question-review-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",

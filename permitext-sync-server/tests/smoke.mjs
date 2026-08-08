@@ -1244,7 +1244,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260806-code-question-legacy-v1'),
+        webRoot.text.includes('/web/app.js?v=20260807-code-question-phase5a-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1846,7 +1846,7 @@ async function main() {
       workspaceScript.text.includes("function captureReaderScrollPositions()") &&
         workspaceScript.text.includes("function restoreReaderScrollPositions(positions)") &&
         workspaceScript.text.includes("panel.dataset.readerContentKey = readerContentScrollKey(reader);") &&
-        workspaceScript.text.match(/async function renderWorkspace\(\) \{[\s\S]*?const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
+        workspaceScript.text.match(/async function renderWorkspace\(options = \{\}\) \{[\s\S]*?const readerScrollPositions = suppressReaderScrollRestore \? new Map\(\) : captureReaderScrollPositions\(\);/) &&
         workspaceScript.text.match(/appendPaneSequence\(panes\);\s+restoreReaderScrollPositions\(readerScrollPositions\);/) &&
         workspaceScript.text.includes("panel.dataset.readerContentKey !== position.contentKey"),
       "Full workspace refreshes no longer preserve independent Reader scroll positions for unchanged content."

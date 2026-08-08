@@ -393,6 +393,52 @@ export function restoreCodeQuestionArtifact(existing, { userID, expectedVersion,
   };
 }
 
+export function updateCodeQuestionDefinitionArtifact(existing, {
+  userID,
+  expectedVersion,
+  title,
+  questionText,
+  scope,
+  desiredOutput,
+  jurisdiction,
+  asOfDate,
+  updatedAt = new Date().toISOString()
+}) {
+  if (!existing || existing.envelope?.type !== "codeQuestion") {
+    throw new CodeQuestionCommandError("Code Question not found.", { status: 404 });
+  }
+  compareAndSwapFoundationArtifact(existing, existing, expectedVersion);
+  const changed = [
+    ["title", title],
+    ["questionText", questionText],
+    ["scope", scope],
+    ["desiredOutput", desiredOutput],
+    ["jurisdiction", jurisdiction],
+    ["asOfDate", asOfDate]
+  ].some(([key, value]) => value !== undefined && value !== existing.payload[key]);
+  const payload = normalizeCodeQuestionPayload({
+    ...existing.payload,
+    ...(title !== undefined ? { title } : {}),
+    ...(questionText !== undefined ? { questionText } : {}),
+    ...(scope !== undefined ? { scope } : {}),
+    ...(desiredOutput !== undefined ? { desiredOutput } : {}),
+    ...(jurisdiction !== undefined ? { jurisdiction } : {}),
+    ...(asOfDate !== undefined ? { asOfDate: asOfDate || null } : {}),
+    definitionRevision: Number(existing.payload.definitionRevision || 1) + (changed ? 1 : 0),
+    updatedBy: userID,
+    updatedAt,
+    expectedVersion: Number(existing.envelope.version) + 1
+  });
+  return {
+    envelope: artifactEnvelope({
+      ...existing.envelope,
+      updatedAt,
+      version: Number(existing.envelope.version) + 1
+    }),
+    payload
+  };
+}
+
 export function createQuestionInputArtifact({
   userID,
   questionID,
@@ -424,6 +470,43 @@ export function createQuestionInputArtifact({
       createdAt,
       updatedAt: createdAt,
       version: 1
+    }),
+    payload
+  };
+}
+
+export function reviseQuestionInputArtifact(existing, {
+  userID,
+  expectedVersion,
+  statement,
+  state,
+  basis,
+  responsibleUserID,
+  updatedAt = new Date().toISOString()
+}) {
+  if (!existing || existing.envelope?.type !== "questionInput") {
+    throw new CodeQuestionCommandError("Question Input not found.", { status: 404 });
+  }
+  compareAndSwapFoundationArtifact(existing, existing, expectedVersion);
+  const payload = normalizeQuestionInputPayload({
+    ...existing.payload,
+    kind: existing.payload.inputKind,
+    statement: statement !== undefined ? statement : existing.payload.statement,
+    state: state !== undefined ? state : existing.payload.state,
+    basis: basis !== undefined ? basis : existing.payload.basis,
+    responsibleUserID: responsibleUserID !== undefined
+      ? responsibleUserID || null
+      : existing.payload.responsibleUserID,
+    revision: Number(existing.payload.revision || 1) + 1,
+    priorInputID: existing.payload.id,
+    updatedBy: userID,
+    updatedAt
+  });
+  return {
+    envelope: artifactEnvelope({
+      ...existing.envelope,
+      updatedAt,
+      version: Number(existing.envelope.version) + 1
     }),
     payload
   };

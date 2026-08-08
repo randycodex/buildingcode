@@ -1,12 +1,13 @@
 # Permitext Code Question Workspace Implementation Plan
 
-- **Plan version:** 1.0
+- **Plan version:** 1.1
 - **Prepared:** August 3, 2026
+- **Status updated:** August 7, 2026
 - **Repository:** `/Users/randy/Documents/X_CODING/Building Code`
-- **Implementation status:** **PHASE 0 IN PROGRESS / COMPLETED ON BRANCH** (see progress ledger)
+- **Implementation status:** **PHASE 5A COMPLETE ON BRANCH; PHASE 9/10 EXTERNAL GATES REMAIN OPEN** (see progress ledger)
 - **Purpose:** Product, architecture, migration, verification, and continuation plan
 
-> Phase 0 scaffolding may proceed on an authorized implementation branch. Product UI reorganization and Phases 1–10 remain gated by their exit criteria. Do not enable the Code Question workspace capability in production until rollout stages allow.
+> Phases 0–10 produced substantial branch-only UI, domain-contract, and local-hardening work. Phase 5A has now closed the server-authority, account-isolation, cross-session, and lifecycle-integration gap on the consolidated branch. Keep the capability default-disabled; do not begin a professional pilot or enable it in production until the remaining Phase 9/10 device, policy, accessibility, deployment, Production, and rollback gates are proven with the evidence stated below.
 
 ---
 
@@ -919,6 +920,15 @@ Rollback disables the new UI and creation commands, pauses new-client outbox rep
 
 The phases below are sequential gates, not calendar estimates. Several test-writing and visual-design tasks can run in parallel after their governing contracts are stable.
 
+### 14.0 Status terminology used by this ledger
+
+To prevent rendered prototype evidence from being mistaken for production-system evidence, the progress ledger uses these distinct states:
+
+- **UI/domain prototype complete** means the branch contains the intended interface, pure domain contracts, fixtures, adapters, or local render behavior and the cited tests passed for that scope.
+- **Server integration complete** means the visible workflow hydrates from and mutates the authoritative server record, authenticated Project access determines role and storage ownership, offline replay uses the same commands, and a clean session reconstructs the same record.
+- **Exit gate passed** means every requirement listed in that phase's exit gate has current evidence, including authorization, persistence, isolation, concurrency, cross-client, accessibility, recovery, or deployment evidence where applicable.
+- **Pilot-ready** is reserved for the later Phase 10 decision after Phase 5A, all applicable exit gates, policy reviews, real permissioned lifecycle verification, and rollback rehearsal pass. No current branch status carries that claim.
+
 ### Phase 0 — Baseline, safety rails, and executable specification
 
 **Goal:** Establish a trusted pre-change baseline and make the target behavior testable.
@@ -1078,6 +1088,39 @@ Exit gate:
 - insufficient evidence produces a bounded limitation, not invented certainty;
 - professional conclusion remains authored, revisioned, and separately attributable;
 - paid generation is idempotent and concurrent requests cannot silently lose an answer.
+
+### Phase 5A — Server integration and data authority (corrective gate)
+
+**Status:** Complete on `codex/code-question-workspace` after server-authority implementation, integrated HTTP/check/smoke verification, rendered localhost verification, and a clean final no-P1 architecture audit. The capability remains default-disabled and is not pilot-ready.
+
+**Goal:** Replace browser-owned lifecycle authority with authenticated, Project-authorized server persistence while retaining the existing UI/domain adapters and established Research, collaboration, Report Manifest v3, and issuance-saga foundations.
+
+Checklist:
+
+- [x] Document the discrepancy between the earlier completion wording and the current browser-local/server-authority boundary.
+- [x] Derive Project access, organization role, storage owner, and owner scope on the server from the authenticated user and Project membership; reject client-supplied authority claims.
+- [x] Make Code Question create/read/update/archive/restore and lifecycle artifact commands verify that every target belongs to the authorized Project.
+- [x] Hydrate the visible Code Question list and lifecycle from server artifacts instead of treating workspace state as the professional system of record.
+- [x] Route Definition, Question Input, Evidence Set, bounded analysis, Professional Conclusion, Review, approval, memo, issuance, supersession, and recovery mutations through their authoritative server commands.
+- [x] Keep immutable snapshots, Research answers, approvals, manifests, and Issued Records immutable; use compare-and-swap and idempotency for mutable or retryable commands.
+- [x] Isolate Code Question caches by authenticated account and unload them on sign-out/account switch.
+- [x] Replay offline mutations with stable request IDs through the same authorization and conflict paths; preserve queued intent safely across interruption.
+- [x] Add HTTP integration coverage for persistence, account and organization isolation, role enforcement, approved-evidence-only analysis, blocking Review gates, issuance idempotency, and recovery.
+- [x] Prove a clean second browser/session reconstructs the same IDs, versions, citations, hashes, review state, and issued lineage from the server.
+- [x] Wire focused Phase 5A checks into the normal verification scripts and record their exact results in the progress ledger.
+- [x] Perform a final architecture review and resolve every P1 server-authority or authorization bypass.
+
+Exit gate:
+
+- the server is the authoritative professional record for the visible lifecycle;
+- authenticated Project access controls every read and mutation, with cross-account and cross-organization isolation proven over HTTP;
+- approved-evidence-only analysis, review/approval blocking, immutable issuance, idempotent retry, and conflict recovery pass end to end;
+- offline replay and a clean second session reconstruct the same authoritative record;
+- the normal check/smoke suites include the new integration tests and pass from a clean run;
+- the final architecture audit reports no unresolved P1 bypass;
+- the capability remains default-disabled and no professional pilot begins as part of this phase.
+
+Detailed corrective notes are maintained in `docs/code-question/PHASE5A_SERVER_INTEGRATION.md`.
 
 ### Phase 6 — Review
 
@@ -1566,35 +1609,37 @@ The first implementation handoff should produce:
 
 Update this table as implementation proceeds. Include commit IDs and verification evidence; do not mark a phase complete based only on code being written.
 
+**Status correction (August 7, 2026):** Earlier entries used “Complete (branch)” for locally rendered UI/domain milestones before the visible workflow was server-authoritative. Phase 5A has now closed that integration gap on the branch with authenticated Project authority, account isolation, authoritative hydration and mutation paths, offline replay/conflict handling, expanded HTTP integration coverage, full check/smoke verification, rendered localhost proof, and a clean final no-P1 audit. The historical commits remain evidence for their UI/domain scope; the consolidated uncommitted Phase 5A work supplies the server-integration evidence. This branch remains default-disabled and is not pilot-ready. Phase 9 device/mutation gates and Phase 10 external, policy, deployment, Production, accessibility, and rollback gates remain open.
+
 | Phase | Status | Commit(s) | Verification | Notes / blockers |
 | --- | --- | --- | --- | --- |
 | Plan creation | Complete | `468f7e306` docs: plan Code Question workspace reorganization | Repository/roadmap/architecture/Stitch audits; Markdown checks | Plan only |
 | 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; `f5a4db822` feat scaffolding; `67476772f` ledger commit ID | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
-| 1 — Contracts, storage, permissions, migration | Complete (branch) | `4523703ff` | `npm run check` / `smoke` / `test:code-question` (includes phase1); CAS/counters/issuance saga/migration/adapters/permissions covered | Domain + handlers gated by disabled flag; no primary UI change; iOS decode preserves new optional fields |
-| 2 — Project and Question workspace shell | Complete (branch) | `a56e51079` | `npm run check` / `smoke`; `code-question-workspace-contract`; workspace-state normalization | Flag-gated shell: question index, stage control, Add column/More, deep links, project/question switch isolation |
-| 3 — Define | Complete (branch) | `fcac63182` | `npm run check` / `smoke`; `code-question-define-contract` | Definition column: fields, facts/assumptions/unknowns, revisions, fact requests, readiness, offline queue conflicts, viewer read-only |
-| 4 — Evidence | Complete (branch) | `8608305a8` | `npm run check` / `smoke`; `code-question-evidence-contract` | Candidates→Reader→Tray; propose/approve; versioned sets; verification≠applicability; reconstructable snapshots |
-| 5 — Analyze and Professional Conclusion | Complete (branch) | `11e129cb8` | `check`; `test:code-question`; offline contract; production client builds; full `smoke`; rendered local Analyze workflow | Approved-evidence-only server binding; immutable analysis; stale dependency detection; idempotent generation; separately authored conclusion; capability remains default-disabled |
-| 6 — Review | Complete (branch) | `000ae77c7` | `check`; `test:code-question`; offline contract; production client builds; full `smoke`; rendered local blocking/reopen/approval lifecycle | Existing Coordination compatibility; immutable comments; anchored requests; actor/time history; blocking approval + issuance gates; separate immutable conclusion approval; optional global inbox deferred |
-| 7 — Issue | Complete (branch) | `9aed1741a` | `check`; `test:code-question`; production client builds; full `smoke`; rendered local approval-to-issuance, supersession, and recovery workflow | Immutable memo/revision/manifest lineage; idempotent issuance; audit/history visibility; capability remains default-disabled |
-| 8 — Legacy promotion and supporting tools | Complete (branch) | `1909a3473` | `check`; `test:code-question` including legacy contract; offline contract; production client builds; full `smoke`; rendered local create/link/unlink/recovery flow; browser console clean | Explicit promotion only; deterministic provenance links; source and Code Question survive unlink; generic Report Draft and Project tools preserved; capability remains default-disabled |
-| 9 — Adapted iPhone/iOS Project Hub | Complete (branch; read-only gate) | `95628625f` | Release + Debug iPhone 17 Pro simulator builds; 38 iOS contract tests; `check`; `test:code-question`; Release launch | Personal and organization Project Hubs decode and preserve complete lifecycle semantics; account-scoped offline read cache; issued-report lineage/download; accessibility and honest product copy. Mutations, review responses, and Workboard editing remain disabled until the separate authorization/outbox/conflict/recovery gate passes; physical-device proof remains part of release hardening. |
-| 10 — Pilot, hardening, and rollout | Local hardening complete; external rollout gates pending | `3884d72d0` | `check`; `test:code-question`; offline + deploy-content contracts; production client build + `smoke`; 20/20 canonical evidence preflight; rendered current-tab desktop/mobile workflow and clean console | Default remains disabled. Server-owned pilot allowlist, privacy-safe measurement contract, non-destructive rollback, migration guide, and rollout runbook are ready. Professional pilot, final policy/rights/retention/accessibility sign-off, push/deploy/Production client, real lifecycle, and deployed rollback rehearsal remain pending. |
+| 1 — Contracts, storage, permissions, migration | Contract and server integration complete (branch) | `4523703ff` + uncommitted Phase 5A work | Original phase contract suites plus Phase 5A HTTP suite; full `test:code-question`, `check`, and `smoke` | Server-derived Project authority, role/isolation enforcement, CAS, counters, issuance saga, migration, adapters, and permissions are integrated behind the default-disabled capability. |
+| 2 — Project and Question workspace shell | UI/domain and server integration complete (branch) | `a56e51079` + uncommitted Phase 5A work | Workspace/client-state/server-adapter contracts; full suites; rendered server-hydrated localhost workflow | Question list and lifecycle hydrate authoritatively; Project/question switch isolation and account-scoped cache behavior are covered. This is branch-only evidence. |
+| 3 — Define | UI/domain and server integration complete (branch) | `fcac63182` + uncommitted Phase 5A work | Define/client-state/HTTP contracts; full suites; rendered server-hydrated Definition `r1`/`v1` | Authoritative persistence, role enforcement, stable-ID/CAS replay and conflict preservation are proven for the branch. |
+| 4 — Evidence | UI/domain and server integration complete (branch) | `8608305a8` + uncommitted Phase 5A work | Evidence/client-state/HTTP contracts; full suites; rendered active-Project Saved candidate import | Approval, immutable snapshots/sets, Project isolation, and real Project Saved candidate import are integrated. Separate release accessibility/policy gates remain outside Phase 5A. |
+| 5 — Analyze and Professional Conclusion | UI/domain and server integration complete (branch) | `11e129cb8` + uncommitted Phase 5A work | Analysis/server-adapter/HTTP contracts; full suites; rendered Analyze gating | Exact server binding, approved-evidence-only context, concurrent request collision handling, idempotency, citations, attribution, staleness, and separate professional conclusion are covered. |
+| 5A — Server integration and data authority | **Complete on branch; external rollout not included** | Uncommitted Phase 5A work | `npm run test:code-question`, `npm run check`, and `npm run smoke` pass; expanded HTTP persistence/isolation/roles/analysis/Review/issuance/recovery/replay suite; rendered server-hydrated localhost workflow, real active-Project Saved candidate import, correct Analyze/Review/Issue gating, clean console; final no-P1 audits clean | Server authority, authenticated Project access, account isolation, authoritative hydration/commands, stable-ID offline replay/CAS, exact clean-session reconstruction, immutable/idempotent issuance, and hostile replay protections proven locally. Default disabled; no commit, pilot, deployment, or Production claim. |
+| 6 — Review | UI/domain and server integration complete (branch) | `000ae77c7` + uncommitted Phase 5A work | Review/HTTP contracts; full suites; rendered Review gating | Existing Coordination compatibility, blocking approval denial/resolution, forged attribution rejection, immutable comments, anchored requests, and actor/time history are integrated. Optional global inbox remains deferred. |
+| 7 — Issue | UI/domain and server integration complete (branch) | `9aed1741a` + uncommitted Phase 5A work | Issue/HTTP contracts; full suites; rendered Issue gating | Server-derived authority, immutable lineage, failure recovery, idempotent retry, hostile different-draft key reuse rejection, and clean-session issued reconstruction are covered. Final deployment, policy, privacy, accessibility, and visual-output review remain Phase 10 gates. |
+| 8 — Legacy promotion and supporting tools | UI/domain and server integration complete (branch) | `1909a3473` + uncommitted Phase 5A work | Legacy/HTTP contracts; full suites; rendered real active-Project Saved candidate import | Explicit promotion/link semantics, provenance, authoritative Project ownership/isolation, unlink/recovery, and generic-tool preservation are integrated behind the disabled capability. |
+| 9 — Adapted iPhone/iOS Project Hub | Read-only UI/decoder prototype complete; full exit gate open | `95628625f` | Release + Debug iPhone 17 Pro simulator builds; 38 iOS contract tests; `check`; `test:code-question`; Release launch | Decoder/read-cache work is valid for its scope. Server-authoritative cross-device reconstruction, mutation gate, physical-device proof, and mixed-client recovery remain open. |
+| 10 — Pilot, hardening, and rollout | Prototype hardening complete; **pilot gate not passed** | `3884d72d0` | `check`; `test:code-question`; offline + deploy-content contracts; production client build + `smoke`; 20/20 canonical evidence preflight; rendered current-tab desktop/mobile workflow and clean console | Rollout controls, local prototype hardening, and Phase 5A server integration are complete on the branch. Professional pilot evidence, policy/rights/retention/accessibility sign-off, push/deploy/Production verification, real signed-in Production lifecycle, and deployed rollback rehearsal remain pending. |
 
 ### Current handoff state
 
 - Branch: `codex/code-question-workspace` (from `468f7e306` on `codex/project-state-flicker-fixes`).
+- Phase 5A corrective server integration is complete on the consolidated worktree: authenticated Project authority, Project-owned storage, account isolation, authoritative hydration and lifecycle commands, offline replay/CAS conflict handling, exact clean-session reconstruction, immutable/idempotent issuance, hostile replay protection, and final no-P1 audits are covered. The work is not yet committed.
 - Phase 0 delivered: disabled capability flag, pure contracts, fixtures, ADRs, baseline tests.
-- Phase 1 delivered: foundation artifact kinds/targets/activity; organization CQ permissions; collaboration `requestType` adapters; Report Draft v2 / Manifest v3 adapters; `code-question-commands.mjs` (CAS, counters, issuance saga, outbox, migration); gated server routes under `projects/code-questions/*`; file + Postgres storage ports; iOS optional payload fields + decode test; phase1 contract tests. Capability remains **default disabled** (`PERMITEXT_CODE_QUESTION_WORKSPACE=1` to enable).
+- Phase 1 contract/server integration delivered: foundation artifact kinds/targets/activity; organization CQ permissions; collaboration `requestType` adapters; Report Draft v2 / Manifest v3 adapters; `code-question-commands.mjs` (CAS, counters, issuance saga, outbox, migration); authenticated gated routes under `projects/code-questions/*`; file + Postgres storage ports; iOS optional payload fields + decode test; and integrated HTTP role/isolation verification. Capability remains **default disabled** (`PERMITEXT_CODE_QUESTION_WORKSPACE=1` to enable).
 - No tool deletion and no production deploy; the Code Question workspace remains default-disabled outside explicit rollout opt-in.
 - Unrelated untracked `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` must remain unstaged.
-- Phase 2 delivered: `public/code-question-workspace.js` shell helpers; workspace-state CQ layout fields; flag-gated question index / stage control / Add column / deep links; project and question switch clear foreign panes; legacy tools remain under More and existing Project tools.
-- Phase 3 delivered: `public/code-question-define.js` + Definition column UI (title/question/scope/jurisdiction/as-of/desired output; structured facts/assumptions/unknowns; revision history; Fact Requests; readiness without advancing issue state; dependency fingerprint staleness; offline queue conflict handling; Viewer/Reviewer read-only).
-- Phase 4 delivered: `public/code-question-evidence.js` + Candidates/Reader/Evidence Tray UI (candidates ≠ evidence; Editor propose / Reviewer-Owner approve; immutable snapshots; versioned sets; source verification separate from Project applicability; unassigned Saved outside tray; reconstructable hashes).
-- Phase 5 delivered: question-bound server analysis over approved immutable evidence only; structured limitations/citations/assumptions/missing facts/conflicts; immutable Research answer + analysis descriptor; stale dependency detection; explicit starting-point/citation transfer; separately revisioned professional conclusion with AI disclosure and a no-AI path.
-- Phase 6 delivered: existing Project Coordination records presented as typed Review Requests; exact anchors across question inputs/evidence/analysis/conclusion; Open/Waiting/Resolved/Dismissed plus auditable reopen rounds; immutable comments; passive History; unresolved blocking requests stop approval and issuance; professional conclusion approval remains a separate immutable action. Due/priority were not introduced because current Coordination policy does not define them; the optional global Reviews inbox is deferred.
-- Phase 7 delivered: immutable Code Memo generation from the approved conclusion and approved evidence set; issuance saga with revision and manifest lineage; idempotent retries; audit/history visibility; supersession and recovery without silent overwrites.
-- Phase 8 delivered: a visible Legacy / Unassigned inventory with type and status filters; explicit create/link choices for Working Notes, Saved passages, Research answers, advanced Report Drafts, Coordination threads, and Workboard; deterministic provenance relationships; unlink and recovery that preserve both the original source and Code Question; existing generic Report Draft and Project-owned tools remain available.
-- Phase 9 delivered: adapted personal and organization iPhone Project Hub Code Question list/detail views; complete read-only lifecycle decoding and derived state; account-scoped offline snapshots preserving IDs, citations, hashes, and version lineage; Evidence Set, analysis, conclusion, review, Issued Record, report, Working Notes, and flattened Workboard context; accessibility labels and accurate mobile capability copy. Mobile mutation remains deliberately closed until its separate authorization/outbox/conflict/interruption/mixed-client gate passes.
-- Phase 10 local hardening delivered: two synthetic lifecycle paths including no-AI; one existing knowledgeable-human-approved content reconstruction; stale/review/issue/legacy recovery coverage; server-owned local/private-pilot/broad rollout channels; private-pilot account allowlisting; privacy-safe coarse metrics; non-destructive rollback contract and runbook; user migration/terminology guidance; and a cache-safe desktop/mobile stage-navigation repair found during rendered accessibility review.
-- No implementation phase follows Phase 10. The phase remains open for external evidence: permissioned professional pilots, final policy/rights/retention/full-accessibility sign-off, deliberate push and deployment, active Production client/cache, real signed-in lifecycle verification, and rollback rehearsal against the deployed pilot. Capability remains default-disabled.
+- Phase 2–4 UI/domain and server integration delivered: the workspace shell, Define model/UI, and Evidence model/UI now hydrate from and mutate the authenticated Project record; account isolation, role enforcement, stable-ID/CAS replay, immutable evidence approval, and the real active-Project Saved candidate import are verified on localhost.
+- Phase 5 UI/domain and server integration delivered: bounded analysis and conclusion use exact server-owned versions, approved evidence, structured limitations/citations/assumptions/missing facts/conflicts, collision-safe idempotency, staleness, attribution, and the no-AI path.
+- Phase 6 UI/domain and server integration delivered: typed and anchored Review Requests, status/reopen history, immutable comments, blocking approval denial/resolution, forged-attribution rejection, and separate approval behavior operate against the authoritative record. Due/priority were not introduced because current Coordination policy does not define them; the optional global Reviews inbox is deferred.
+- Phase 7 UI/domain and server integration delivered: memo/manifest lineage, audit, supersession, failure recovery, idempotent retry, hostile different-draft key reuse rejection, and clean-session issued reconstruction are proven locally. Phase 10 deployment, policy, privacy, accessibility, and visual-output review remain open.
+- Phase 8 UI/domain and server integration delivered: visible Legacy / Unassigned inventory, explicit promotion/link choices, provenance relationships, authoritative Project ownership/isolation, unlink/recovery, and preservation of generic Project tools are integrated.
+- Phase 9 read-only UI/decoder prototype delivered: adapted Project Hub views, lifecycle decoding, offline read cache, issued lineage/download, accessibility labels, and bounded product copy. Cross-device server reconstruction, mutations, physical-device proof, and mixed-client recovery remain open.
+- Phase 10 local prototype hardening delivered: synthetic lifecycle paths, approved content reconstruction, recovery coverage, rollout controls, coarse metrics, rollback documentation, terminology guidance, and rendered accessibility review. This is not professional-pilot evidence.
+- Phase 5A is complete on the branch. The remaining Phase 9 device/mutation gates and Phase 10 external gates still require permissioned professional pilots, final policy/rights/retention/full-accessibility sign-off, deliberate commit/push and deployment, active Production client/cache verification, a real signed-in Production lifecycle, and deployed rollback rehearsal. Capability remains default-disabled.

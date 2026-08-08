@@ -119,7 +119,7 @@ export function normalizeEvidenceWorkspace(value = {}, questionID = "") {
       }
     : null;
   base.unassignedSaved = (Array.isArray(source.unassignedSaved) ? source.unassignedSaved : [])
-    .filter((item) => item && typeof item === "object")
+    .filter((item) => item && typeof item === "object" && item.id !== "saved-unassigned-1")
     .map((item) => ({
       id: String(item.id || ""),
       label: String(item.label || item.title || "Saved item"),

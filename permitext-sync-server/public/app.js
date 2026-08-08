@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260806-code-question-legacy-v1";
+} from "./offline-storage.js?v=20260807-code-question-phase5a-v5";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -82,19 +82,37 @@ import {
   switchActiveQuestion as switchCodeQuestionQuestion
 } from "./code-question-workspace.js?v=20260806-code-question-legacy-v1";
 import {
+  acknowledgeCodeQuestionMutation,
+  codeQuestionAccountCacheKey,
+  codeQuestionAccountCacheKeyPrefix,
+  codeQuestionMutationIsOfflineSafe,
+  codeQuestionWorkspaceSnapshot,
+  conflictCodeQuestionMutation,
+  createCodeQuestionOfflineMutation,
+  emptyCodeQuestionAccountState,
+  enqueueCodeQuestionOfflineMutation as enqueueAccountCodeQuestionMutation,
+  evictCodeQuestionProject,
+  migrateCodeQuestionAccountState,
+  readCodeQuestionAccountState,
+  updateCodeQuestionWorkspaceSnapshot,
+  workspaceLayoutWithoutCodeQuestionData,
+  writeCodeQuestionAccountState
+} from "./code-question-client-state.js?v=20260807-code-question-account-v2";
+import {
+  codeQuestionListFromServer,
+  codeQuestionViewModelsFromServer
+} from "./code-question-server.js?v=20260807-code-question-server-v1";
+import {
   assertInputPresentationSeparation,
   createQuestionInput,
   deriveDefineReadiness,
   emptyDefinitionRecord,
-  enqueueDefinitionOfflineMutation,
   groupInputsByKind,
   inputKindCssClass,
   inputKindLabel,
   inputRevisionHistory,
   normalizeDefinitionRecord,
   openFactRequest,
-  replayDefinitionOfflineQueue,
-  resolveFactRequest,
   reviseQuestionInput,
   updateDefinitionFields
 } from "./code-question-define.js?v=20260803-code-question-analyze-v3";
@@ -118,17 +136,15 @@ import {
   setSelectedPassage,
   sourceVerificationLabel,
   trayModel
-} from "./code-question-evidence.js?v=20260803-code-question-analyze-v3";
+} from "./code-question-evidence.js?v=20260807-code-question-phase5a-v1";
 import {
   analysisRunIsStale,
   beginAnalysisRequest,
   buildAnalysisBinding,
-  completeAnalysisRequest,
   emptyAnalysisWorkspace,
   latestAnalysisRun,
   normalizeAnalysisWorkspace,
   publishProfessionalConclusion,
-  syntheticBoundedInterpretation,
   transferAnalysisCitations,
   updateConclusionDraft,
   useAnalysisAsStartingPoint
@@ -145,18 +161,10 @@ import {
   unresolvedBlockingRequests
 } from "./code-question-review.js?v=20260803-code-question-review-v1";
 import {
-  approveCodeMemo,
-  beginCodeMemoIssuance,
-  codeMemoHTML,
   codeMemoReadiness,
-  codeMemoStructuredJSON,
-  completeCodeMemoIssuance,
   emptyIssueWorkspace,
-  failCodeMemoIssuance,
   issuedRecordStatus,
-  markCodeMemoReady,
-  normalizeIssueWorkspace,
-  prepareCodeMemoDraft
+  normalizeIssueWorkspace
 } from "./code-question-issue.js?v=20260803-code-question-issue-v1";
 import {
   emptyLegacyWorkspace,
@@ -341,7 +349,15 @@ let draggedWorkspaceID = "";
 let draggedToolbarButtonID = "";
 let workspaceContextMenu = null;
 let workspaceLongPressTimer = null;
+const codeQuestionListHydrationByProject = new Map();
+const codeQuestionStateHydrationByQuestion = new Map();
+const codeQuestionAccessByProject = new Map();
+const codeQuestionDeniedProjectIDs = new Set();
+let codeQuestionAccountGeneration = 0;
+let codeQuestionUnauthorizedAccountUserID = "";
 let state = loadWorkspaceState();
+loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
+purgeLegacyCodeQuestionWorkspaceSnapshots();
 if (absorbBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
 if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
@@ -438,7 +454,10 @@ function loadWorkspaceState() {
           ? captureWorkspaceLayout(legacySaved)
           : emptyWorkspaceLayout();
         localStorage.setItem(workspaceRegistryKey, JSON.stringify(workspaceRegistry));
-        localStorage.setItem(`${workspaceStateKeyPrefix}${activeWorkspaceID}`, JSON.stringify(storedLayout));
+        localStorage.setItem(
+          `${workspaceStateKeyPrefix}${activeWorkspaceID}`,
+          JSON.stringify(workspaceLayoutWithoutCodeQuestionData(storedLayout))
+        );
       }
       const activeLayout = normalizeWorkspaceLayout(storedLayout || emptyWorkspaceLayout());
       saved = { ...sharedState, ...activeLayout };
@@ -542,11 +561,11 @@ function loadWorkspaceState() {
         : {},
       detachedWorkboards: normalizeProjectIdentities(saved.detachedWorkboards),
       trackScrollLeft: Number.isFinite(Number(saved.trackScrollLeft)) ? Math.max(0, Number(saved.trackScrollLeft)) : 0,
-      codeQuestionWorkspace: normalizeCodeQuestionWorkspaceState(saved.codeQuestionWorkspace, {
-        activeProjectID: activeProjectDetail
-          ? String(activeProjectDetail.id || activeProjectDetail.clientID || activeProjectDetail.localFolderID || "")
-          : ""
-      })
+      // Professional Code Question records are restored only from the
+      // authenticated account-scoped cache after the general layout loads.
+      codeQuestionWorkspace: emptyCodeQuestionWorkspaceState(),
+      codeQuestionOutbox: [],
+      codeQuestionConflicts: []
     };
   } catch {
     if (!detachedProjectWindow) {
@@ -607,7 +626,9 @@ function loadWorkspaceState() {
       coordinationFilters: {},
       detachedWorkboards: [],
       trackScrollLeft: 0,
-      codeQuestionWorkspace: emptyCodeQuestionWorkspaceState()
+      codeQuestionWorkspace: emptyCodeQuestionWorkspaceState(),
+      codeQuestionOutbox: [],
+      codeQuestionConflicts: []
     };
   }
 }
@@ -636,6 +657,105 @@ function persistAccountSession(account = state?.account || null) {
     return;
   }
   localStorage.removeItem(accountSessionKey);
+}
+
+function codeQuestionAccountStateFromRuntime(accountUserID = state?.account?.userID || "") {
+  const id = String(accountUserID || "").trim();
+  if (!id) return emptyCodeQuestionAccountState();
+  const cached = readCodeQuestionAccountState(localStorage, id);
+  const withWorkspace = updateCodeQuestionWorkspaceSnapshot(cached, activeWorkspaceID, {
+    workspace: state.codeQuestionWorkspace || emptyCodeQuestionWorkspaceState(),
+    paneOrder: (state.paneOrder || []).filter((paneID) => String(paneID).startsWith("cq:")),
+    paneWeights: Object.fromEntries(
+      Object.entries(state.paneWeights || {}).filter(([paneID]) => String(paneID).startsWith("cq:"))
+    )
+  });
+  return {
+    ...withWorkspace,
+    accessByProjectID: Object.fromEntries(codeQuestionAccessByProject),
+    outbox: Array.isArray(state.codeQuestionOutbox) ? state.codeQuestionOutbox : [],
+    conflicts: Array.isArray(state.codeQuestionConflicts) ? state.codeQuestionConflicts : []
+  };
+}
+
+function persistCodeQuestionAccountState(accountUserID = state?.account?.userID || "") {
+  const id = String(accountUserID || "").trim();
+  if (!id || detachedProjectWindow) return null;
+  return writeCodeQuestionAccountState(localStorage, codeQuestionAccountStateFromRuntime(id), id);
+}
+
+function unloadCodeQuestionAccountState(options = {}) {
+  codeQuestionAccountGeneration += 1;
+  codeQuestionListHydrationByProject.clear();
+  codeQuestionStateHydrationByQuestion.clear();
+  codeQuestionAccessByProject.clear();
+  codeQuestionDeniedProjectIDs.clear();
+  state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
+  state.codeQuestionOutbox = [];
+  state.codeQuestionConflicts = [];
+  state.paneOrder = (state.paneOrder || []).filter((paneID) => !String(paneID).startsWith("cq:"));
+  state.paneWeights = Object.fromEntries(
+    Object.entries(state.paneWeights || {}).filter(([paneID]) => !String(paneID).startsWith("cq:"))
+  );
+  if (options.clearDeepLink !== false && String(location.hash || "").startsWith("#cq/") && history.replaceState) {
+    history.replaceState(null, "", `${location.pathname}${location.search}`);
+  }
+}
+
+function loadCodeQuestionAccountStateIntoWorkspace(accountUserID = state?.account?.userID || "") {
+  const id = String(accountUserID || "").trim();
+  unloadCodeQuestionAccountState({ clearDeepLink: !id });
+  if (!id || detachedProjectWindow) return null;
+  const cached = readCodeQuestionAccountState(localStorage, id);
+  const activeProject = state.projectDetails?.[0] || state.projectDetail || null;
+  const snapshot = codeQuestionWorkspaceSnapshot(cached, activeWorkspaceID, {
+    activeProjectID: activeProject
+      ? String(activeProject.id || activeProject.clientID || activeProject.localFolderID || "")
+      : ""
+  });
+  state.codeQuestionWorkspace = snapshot.workspace;
+  state.codeQuestionOutbox = cached.outbox;
+  state.codeQuestionConflicts = cached.conflicts;
+  Object.entries(cached.accessByProjectID || {}).forEach(([projectID, access]) => {
+    codeQuestionAccessByProject.set(projectID, access);
+  });
+  state.paneOrder = [
+    ...(state.paneOrder || []).filter((paneID) => !String(paneID).startsWith("cq:")),
+    ...snapshot.paneOrder
+  ];
+  state.paneWeights = {
+    ...Object.fromEntries(
+      Object.entries(state.paneWeights || {}).filter(([paneID]) => !String(paneID).startsWith("cq:"))
+    ),
+    ...snapshot.paneWeights
+  };
+  return cached;
+}
+
+function purgeLegacyCodeQuestionWorkspaceSnapshots() {
+  if (detachedProjectWindow) return;
+  try {
+    Object.keys(localStorage)
+      .filter((key) =>
+        key === baseWorkspaceKey ||
+        key.startsWith(workspaceStateKeyPrefix) ||
+        key.startsWith(`${baseWorkspaceKey}:detached:`)
+      )
+      .filter((key) => !key.startsWith(codeQuestionAccountCacheKeyPrefix))
+      .forEach((key) => {
+        const raw = localStorage.getItem(key);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        const hasCodeQuestionData = Object.prototype.hasOwnProperty.call(parsed || {}, "codeQuestionWorkspace") ||
+          (Array.isArray(parsed?.paneOrder) && parsed.paneOrder.some((paneID) => String(paneID).startsWith("cq:"))) ||
+          Object.keys(parsed?.paneWeights || {}).some((paneID) => String(paneID).startsWith("cq:"));
+        if (hasCodeQuestionData) {
+          localStorage.setItem(key, JSON.stringify(workspaceLayoutWithoutCodeQuestionData(parsed)));
+        }
+      });
+  } catch {
+    // A malformed legacy snapshot must not prevent the authenticated cache from loading.
+  }
 }
 
 function newUtilityInstance(key, overrides = {}) {
@@ -722,7 +842,9 @@ function persistWorkspaceRegistry() {
 function loadWorkspaceSnapshot(workspaceID) {
   try {
     return normalizeWorkspaceLayout(
-      JSON.parse(localStorage.getItem(workspaceSnapshotKey(workspaceID)) || "null") || emptyWorkspaceLayout()
+      workspaceLayoutWithoutCodeQuestionData(
+        JSON.parse(localStorage.getItem(workspaceSnapshotKey(workspaceID)) || "null") || emptyWorkspaceLayout()
+      )
     );
   } catch {
     return emptyWorkspaceLayout();
@@ -731,11 +853,15 @@ function loadWorkspaceSnapshot(workspaceID) {
 
 function saveWorkspaceState() {
   if (!detachedProjectWindow) {
+    persistCodeQuestionAccountState();
     const layout = captureWorkspaceLayout(state, {
       trackScrollLeft: track?.scrollLeft ?? state.trackScrollLeft ?? 0
     });
     state.trackScrollLeft = layout.trackScrollLeft;
-    localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(layout));
+    localStorage.setItem(
+      workspaceSnapshotKey(activeWorkspaceID),
+      JSON.stringify(workspaceLayoutWithoutCodeQuestionData(layout))
+    );
     if (workspaceRegistry) {
       const now = new Date().toISOString();
       workspaceRegistry = {
@@ -765,8 +891,17 @@ function saveWorkspaceState() {
       Object.entries(state.paneWeights || {}).filter(([paneID]) => !paneID.startsWith("section:detail:"))
     )
   };
-  const { account: _account, ...persistableWorkspaceState } = persistableState;
-  localStorage.setItem(workspaceKey, JSON.stringify(persistableWorkspaceState));
+  const {
+    account: _account,
+    codeQuestionWorkspace: _codeQuestionWorkspace,
+    codeQuestionOutbox: _codeQuestionOutbox,
+    codeQuestionConflicts: _codeQuestionConflicts,
+    ...persistableWorkspaceState
+  } = persistableState;
+  localStorage.setItem(
+    workspaceKey,
+    JSON.stringify(workspaceLayoutWithoutCodeQuestionData(persistableWorkspaceState))
+  );
   updateConnectionStatus();
   try {
     const shared = JSON.parse(localStorage.getItem(baseWorkspaceKey) || "{}");
@@ -877,7 +1012,8 @@ function waitForWorkspaceTransitionPaint() {
 
 function applyStoredWorkspaceLayout(layout) {
   projectStudioTransitionGeneration += 1;
-  applyWorkspaceLayout(state, layout);
+  applyWorkspaceLayout(state, workspaceLayoutWithoutCodeQuestionData(layout));
+  loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
   state.utilityInstances = normalizeUtilityInstances(state);
   setOpenProjectDetails(state.projectDetails);
   state.workboards = normalizeProjectIdentities(state.workboards);
@@ -927,7 +1063,10 @@ async function createNewWorkspace() {
   const creation = createWorkspace(workspaceRegistry);
   workspaceRegistry = creation.registry;
   activeWorkspaceID = creation.workspace.id;
-  localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(creation.layout));
+  localStorage.setItem(
+    workspaceSnapshotKey(activeWorkspaceID),
+    JSON.stringify(workspaceLayoutWithoutCodeQuestionData(creation.layout))
+  );
   applyStoredWorkspaceLayout(creation.layout);
   persistWorkspaceRegistry();
   suppressReaderScrollRestore = true;
@@ -989,7 +1128,10 @@ async function duplicateNamedWorkspace(workspaceID) {
   if (!duplication) return;
   workspaceRegistry = duplication.registry;
   activeWorkspaceID = duplication.workspace.id;
-  localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(duplication.layout));
+  localStorage.setItem(
+    workspaceSnapshotKey(activeWorkspaceID),
+    JSON.stringify(workspaceLayoutWithoutCodeQuestionData(duplication.layout))
+  );
   applyStoredWorkspaceLayout(duplication.layout);
   persistWorkspaceRegistry();
   suppressReaderScrollRestore = true;
@@ -1026,7 +1168,10 @@ async function removeNamedWorkspace(workspaceID) {
   activeWorkspaceID = workspaceRegistry.activeWorkspaceID;
   const nextLayout = removal.replacementLayout || loadWorkspaceSnapshot(activeWorkspaceID);
   if (removal.replacementLayout) {
-    localStorage.setItem(workspaceSnapshotKey(activeWorkspaceID), JSON.stringify(nextLayout));
+    localStorage.setItem(
+      workspaceSnapshotKey(activeWorkspaceID),
+      JSON.stringify(workspaceLayoutWithoutCodeQuestionData(nextLayout))
+    );
   }
   applyStoredWorkspaceLayout(nextLayout);
   persistWorkspaceRegistry();
@@ -4834,7 +4979,12 @@ function hasCapability(capabilityID) {
 }
 
 function codeQuestionWorkspaceEnabled() {
-  return hasCapability("code-question-workspace");
+  const account = activeAccount();
+  return Boolean(
+    account &&
+    account.userID !== codeQuestionUnauthorizedAccountUserID &&
+    hasCapability("code-question-workspace")
+  );
 }
 
 function codeQuestionWorkspaceState() {
@@ -4950,9 +5100,8 @@ function setQuestionsForActiveProject(questions) {
 }
 
 function codeQuestionDefineRole() {
-  // Personal Projects act as owner; organization role may appear on project access later.
   if (!isProAccount()) return "viewer";
-  return "owner";
+  return codeQuestionAccessByProject.get(activeProjectIDForCodeQuestions())?.role || "viewer";
 }
 
 function getDefinitionForQuestion(questionID) {
@@ -5014,16 +5163,7 @@ function getEvidenceForQuestion(questionID) {
   const cq = codeQuestionWorkspaceState();
   const existing = cq.evidenceByQuestionID?.[id];
   if (existing) return normalizeEvidenceWorkspace(existing, id);
-  // Seed with clearly synthetic demo candidates only when empty (flag-on shell).
-  return normalizeEvidenceWorkspace(emptyEvidenceWorkspace(id, {
-    unassignedSaved: [
-      {
-        id: "saved-unassigned-1",
-        label: "Unassigned saved passage (not question evidence)",
-        note: "Preserved outside the question tray until explicitly proposed."
-      }
-    ]
-  }), id);
+  return normalizeEvidenceWorkspace(emptyEvidenceWorkspace(id), id);
 }
 
 function saveEvidenceForQuestion(questionID, evidence) {
@@ -5136,39 +5276,389 @@ function postCodeQuestion(path, values = {}) {
   });
 }
 
-function ensureEvidenceSeedCandidates(questionID) {
-  let evidence = getEvidenceForQuestion(questionID);
-  if (evidence.candidates.length) return evidence;
-  evidence = addCandidates(evidence, [
-    {
-      id: "cand-syn-10-1",
-      label: "SYNTHETIC-CODE §TEST-10.1 Minimum corridor width",
-      sourceIdentity: "synthetic-source:TEST-CODE:edition-fixture-1",
-      passageLocator: "SYNTHETIC-CODE §TEST-10.1",
-      previewText: "[SYNTHETIC TEST PASSAGE — NOT LAW] The minimum clear width of exit access corridors shall be not less than 44 inches (1118 mm).",
-      sourceFamily: "Synthetic test code",
-      edition: "fixture-edition-1",
-      effectiveDate: "2026-01-01T00:00:00.000Z",
-      sourceStatus: "synthetic-fixture",
-      completeness: "complete-for-fixture",
-      researchEligible: true,
-      note: "Search candidate only — not approved evidence."
-    },
-    {
-      id: "cand-syn-10-2",
-      label: "SYNTHETIC-CODE §TEST-10.2 Handrails (not selected)",
-      sourceIdentity: "synthetic-source:TEST-CODE:edition-fixture-1",
-      passageLocator: "SYNTHETIC-CODE §TEST-10.2",
-      previewText: "[SYNTHETIC TEST PASSAGE — NOT LAW] Handrail requirements for the synthetic fixture stair.",
-      sourceFamily: "Synthetic test code",
-      edition: "fixture-edition-1",
-      sourceStatus: "verification-required",
-      completeness: "partial",
-      researchEligible: false,
-      note: "Candidate excluded from default approval path."
+function enqueueCodeQuestionOfflineCommand(path, values = {}, options = {}) {
+  const account = activeAccount();
+  if (!account) {
+    const error = new Error("Sign in before saving Code Question work offline.");
+    error.code = "CODE_QUESTION_SIGN_IN_REQUIRED";
+    throw error;
+  }
+  const mutation = createCodeQuestionOfflineMutation({
+    accountUserID: account.userID,
+    projectID: options.projectID || values.projectID || activeProjectIDForCodeQuestions(),
+    questionID: options.questionID || values.questionID || null,
+    clientMutationID: options.clientMutationID,
+    commandKind: options.commandKind,
+    expectedVersion: options.expectedVersion,
+    path,
+    payload: values
+  });
+  const current = {
+    ...readCodeQuestionAccountState(localStorage, account.userID),
+    outbox: state.codeQuestionOutbox || [],
+    conflicts: state.codeQuestionConflicts || []
+  };
+  const next = enqueueAccountCodeQuestionMutation(current, mutation);
+  state.codeQuestionOutbox = next.outbox;
+  state.codeQuestionConflicts = next.conflicts;
+  persistCodeQuestionAccountState(account.userID);
+  return mutation;
+}
+
+function acknowledgeCodeQuestionOfflineCommand(clientMutationID) {
+  const account = activeAccount();
+  if (!account) return false;
+  const next = acknowledgeCodeQuestionMutation({
+    ...readCodeQuestionAccountState(localStorage, account.userID),
+    outbox: state.codeQuestionOutbox || [],
+    conflicts: state.codeQuestionConflicts || []
+  }, clientMutationID);
+  state.codeQuestionOutbox = next.outbox;
+  state.codeQuestionConflicts = next.conflicts;
+  persistCodeQuestionAccountState(account.userID);
+  return true;
+}
+
+function markCodeQuestionOfflineCommandConflict(clientMutationID, details = {}) {
+  const account = activeAccount();
+  if (!account) return false;
+  const next = conflictCodeQuestionMutation({
+    ...readCodeQuestionAccountState(localStorage, account.userID),
+    outbox: state.codeQuestionOutbox || [],
+    conflicts: state.codeQuestionConflicts || []
+  }, clientMutationID, details);
+  state.codeQuestionOutbox = next.outbox;
+  state.codeQuestionConflicts = next.conflicts;
+  persistCodeQuestionAccountState(account.userID);
+  return true;
+}
+
+function codeQuestionIsOnline() {
+  return navigator.onLine !== false && serverReachable;
+}
+
+function codeQuestionRequestContext(projectID = "", options = {}) {
+  const account = activeAccount();
+  return {
+    accountUserID: account?.userID || "",
+    sessionToken: account?.sessionToken || "",
+    generation: codeQuestionAccountGeneration,
+    projectID: String(projectID || "").trim(),
+    trackProject: options.trackProject === true || Boolean(String(projectID || "").trim()),
+    workspaceEnabled: codeQuestionWorkspaceEnabled()
+  };
+}
+
+function codeQuestionRequestContextIsCurrent(context) {
+  const account = activeAccount();
+  return Boolean(
+    context?.accountUserID &&
+    context.accountUserID === account?.userID &&
+    context.sessionToken === account?.sessionToken &&
+    context.generation === codeQuestionAccountGeneration &&
+    (!context.trackProject || context.projectID === activeProjectIDForCodeQuestions())
+  );
+}
+
+function codeQuestionContextChangedError() {
+  const error = new Error("The signed-in account or active Project changed before this Code Question action completed.");
+  error.code = "CODE_QUESTION_REQUEST_CONTEXT_CHANGED";
+  return error;
+}
+
+function assertCodeQuestionRequestContext(context) {
+  if (!codeQuestionRequestContextIsCurrent(context)) throw codeQuestionContextChangedError();
+}
+
+function postCodeQuestionForContext(context, path, values = {}) {
+  assertCodeQuestionRequestContext(context);
+  return postJSON(path, {
+    ...values,
+    auth: { accountUserID: context.accountUserID },
+    codeQuestionWorkspaceEnabled: context.workspaceEnabled
+  }, { token: context.sessionToken });
+}
+
+function invalidateCodeQuestionListHydration(projectID) {
+  const suffix = `:${String(projectID || "").trim()}`;
+  for (const key of codeQuestionListHydrationByProject.keys()) {
+    if (key.endsWith(suffix)) codeQuestionListHydrationByProject.delete(key);
+  }
+}
+
+function evictDeniedCodeQuestionCache(error, projectID, questionID = "", options = {}) {
+  if (![401, 403, 404].includes(Number(error?.status))) return false;
+  const account = activeAccount();
+  if (!account) return false;
+  if (Number(error.status) === 401) {
+    codeQuestionUnauthorizedAccountUserID = account.userID;
+    localStorage.removeItem(codeQuestionAccountCacheKey(account.userID));
+    unloadCodeQuestionAccountState();
+    return true;
+  }
+  persistCodeQuestionAccountState(account.userID);
+  const cached = readCodeQuestionAccountState(localStorage, account.userID);
+  const evicted = evictCodeQuestionProject(cached, projectID, {
+    questionID: Number(error.status) === 404 && options.questionScoped ? questionID : "",
+    conflictCode: error.payload?.code || (Number(error.status) === 403
+      ? "CODE_QUESTION_ACCESS_REVOKED"
+      : "CODE_QUESTION_RECORD_NOT_FOUND"),
+    message: error.message
+  });
+  writeCodeQuestionAccountState(localStorage, evicted, account.userID);
+  loadCodeQuestionAccountStateIntoWorkspace(account.userID);
+  if (Number(error.status) === 403 || !options.questionScoped) {
+    codeQuestionDeniedProjectIDs.add(projectID);
+  }
+  return true;
+}
+
+async function hydrateCodeQuestionList(projectID = activeProjectIDForCodeQuestions(), options = {}) {
+  const id = String(projectID || "").trim();
+  if (
+    !id || !activeAccount() || !codeQuestionWorkspaceEnabled() || !codeQuestionIsOnline() ||
+    codeQuestionDeniedProjectIDs.has(id)
+  ) return null;
+  const requestContext = codeQuestionRequestContext(id);
+  const hydrationKey = `${requestContext.accountUserID}:${requestContext.generation}:${id}`;
+  if (options.force) invalidateCodeQuestionListHydration(id);
+  if (!codeQuestionListHydrationByProject.has(hydrationKey)) {
+    const task = postCodeQuestion("/projects/code-questions/list", { projectID: id })
+      .then(async (payload) => {
+        if (!codeQuestionRequestContextIsCurrent(requestContext)) return null;
+        const questions = codeQuestionListFromServer(payload);
+        codeQuestionDeniedProjectIDs.delete(id);
+        if (payload.access) codeQuestionAccessByProject.set(id, payload.access);
+        const cq = codeQuestionWorkspaceState();
+        setCodeQuestionWorkspaceState({
+          ...cq,
+          questionsByProjectID: {
+            ...(cq.questionsByProjectID || {}),
+            [id]: questions.map((question) => ({
+              ...question,
+              listLabel: deriveQuestionListLabel(question)
+            }))
+          }
+        }, { activeProjectID: id });
+        saveWorkspaceState();
+        if (options.render !== false) await renderWorkspace();
+        return questions;
+      })
+      .catch((error) => {
+        codeQuestionListHydrationByProject.delete(hydrationKey);
+        if (!codeQuestionRequestContextIsCurrent(requestContext)) return null;
+        if (evictDeniedCodeQuestionCache(error, id)) {
+          if (options.render !== false) void renderWorkspace();
+          return null;
+        }
+        if (error?.status !== 401 && error?.status !== 403 && error?.status !== 404) {
+          console.warn("Code Question list hydration failed.", error);
+        }
+        return null;
+      });
+    codeQuestionListHydrationByProject.set(hydrationKey, task);
+  }
+  return codeQuestionListHydrationByProject.get(hydrationKey);
+}
+
+async function hydrateCodeQuestionState(projectID, questionID, options = {}) {
+  const pid = String(projectID || activeProjectIDForCodeQuestions() || "").trim();
+  const qid = String(questionID || "").trim();
+  if (
+    !pid || !qid || !activeAccount() || !codeQuestionWorkspaceEnabled() || !codeQuestionIsOnline() ||
+    codeQuestionDeniedProjectIDs.has(pid)
+  ) return null;
+  const requestContext = codeQuestionRequestContext(pid);
+  const key = `${requestContext.accountUserID}:${requestContext.generation}:${pid}:${qid}`;
+  if (options.force) codeQuestionStateHydrationByQuestion.delete(key);
+  if (!codeQuestionStateHydrationByQuestion.has(key)) {
+    const task = postCodeQuestion("/projects/code-questions/state", { projectID: pid, questionID: qid })
+      .then(async (payload) => {
+        if (!codeQuestionRequestContextIsCurrent(requestContext)) return null;
+        codeQuestionDeniedProjectIDs.delete(pid);
+        const local = {
+          definition: getDefinitionForQuestion(qid),
+          evidence: getEvidenceForQuestion(qid),
+          analysis: getAnalysisForQuestion(qid),
+          review: getReviewForQuestion(qid),
+          issue: getIssueForQuestion(qid)
+        };
+        const models = codeQuestionViewModelsFromServer(payload, local);
+        const cq = codeQuestionWorkspaceState();
+        const currentQuestions = cq.questionsByProjectID?.[pid] || [];
+        const questions = currentQuestions.map((question) =>
+          question.id === qid
+            ? { ...question, ...models.question, listLabel: deriveQuestionListLabel(models.question) }
+            : question
+        );
+        if (!questions.some((question) => question.id === qid)) {
+          questions.push({ ...models.question, listLabel: deriveQuestionListLabel(models.question) });
+        }
+        codeQuestionAccessByProject.set(pid, models.access);
+        setCodeQuestionWorkspaceState({
+          ...cq,
+          questionsByProjectID: { ...(cq.questionsByProjectID || {}), [pid]: questions },
+          definitionsByQuestionID: { ...(cq.definitionsByQuestionID || {}), [qid]: models.definition },
+          evidenceByQuestionID: { ...(cq.evidenceByQuestionID || {}), [qid]: models.evidence },
+          analysisByQuestionID: { ...(cq.analysisByQuestionID || {}), [qid]: models.analysis },
+          reviewByQuestionID: { ...(cq.reviewByQuestionID || {}), [qid]: models.review },
+          issueByQuestionID: { ...(cq.issueByQuestionID || {}), [qid]: models.issue }
+        }, { activeProjectID: pid });
+        saveWorkspaceState();
+        if (options.render !== false) await renderWorkspace();
+        return models;
+      })
+      .catch((error) => {
+        codeQuestionStateHydrationByQuestion.delete(key);
+        if (!codeQuestionRequestContextIsCurrent(requestContext)) return null;
+        if (evictDeniedCodeQuestionCache(error, pid, qid, { questionScoped: true })) {
+          if (options.render !== false) void renderWorkspace();
+          return null;
+        }
+        if (error?.status !== 401 && error?.status !== 403 && error?.status !== 404) {
+          console.warn("Code Question state hydration failed.", error);
+        }
+        return null;
+      });
+    codeQuestionStateHydrationByQuestion.set(key, task);
+  }
+  return codeQuestionStateHydrationByQuestion.get(key);
+}
+
+async function executeCodeQuestionMutation(path, values, options = {}) {
+  const clientMutationID = options.clientMutationID || globalThis.crypto?.randomUUID?.() || `cq-${Date.now()}`;
+  const projectID = String(options.projectID || values.projectID || activeProjectIDForCodeQuestions() || "").trim();
+  const questionID = String(options.questionID || values.questionID || "").trim();
+  const requestContext = codeQuestionRequestContext(projectID);
+  assertCodeQuestionRequestContext(requestContext);
+  if (!codeQuestionIsOnline()) {
+    const queued = enqueueCodeQuestionOfflineCommand(path, values, {
+      ...options,
+      projectID,
+      questionID: questionID || null,
+      clientMutationID
+    });
+    options.applyOptimistic?.(queued);
+    saveWorkspaceState();
+    return { queued: true, clientMutationID };
+  }
+  try {
+    const payload = await postCodeQuestionForContext(requestContext, path, { ...values, clientMutationID });
+    assertCodeQuestionRequestContext(requestContext);
+    acknowledgeCodeQuestionOfflineCommand(clientMutationID);
+    if (options.hydrate !== false && questionID) {
+      await hydrateCodeQuestionState(projectID, questionID, { force: true, render: false });
+      assertCodeQuestionRequestContext(requestContext);
     }
-  ]);
-  return saveEvidenceForQuestion(questionID, evidence);
+    return payload;
+  } catch (error) {
+    if (!codeQuestionRequestContextIsCurrent(requestContext)) {
+      throw codeQuestionContextChangedError();
+    }
+    if (!error.status) {
+      const queued = enqueueCodeQuestionOfflineCommand(path, values, {
+        ...options,
+        projectID,
+        questionID: questionID || null,
+        clientMutationID
+      });
+      options.applyOptimistic?.(queued);
+      saveWorkspaceState();
+      return { queued: true, clientMutationID };
+    }
+    if (evictDeniedCodeQuestionCache(error, projectID, questionID, {
+      questionScoped: Boolean(questionID)
+    })) {
+      await renderWorkspace();
+      throw error;
+    }
+    if (error.status === 409) {
+      // Preserve the rejected local intent before converting it to a visible
+      // conflict record. Direct online mutations are not otherwise in outbox.
+      if (codeQuestionMutationIsOfflineSafe({ commandKind: options.commandKind, path })) {
+        enqueueCodeQuestionOfflineCommand(path, values, { ...options, clientMutationID });
+        markCodeQuestionOfflineCommandConflict(clientMutationID, {
+          conflictCode: error.payload?.code,
+          serverVersion: error.payload?.serverVersion || error.payload?.artifact?.version || null,
+          lastError: error.message
+        });
+      }
+    }
+    throw error;
+  }
+}
+
+async function flushCodeQuestionOutbox() {
+  if (!activeAccount() || !codeQuestionIsOnline() || !(state.codeQuestionOutbox || []).length) return;
+  const requestContext = codeQuestionRequestContext(activeProjectIDForCodeQuestions(), { trackProject: true });
+  assertCodeQuestionRequestContext(requestContext);
+  const affected = new Map();
+  const blockedScopes = new Set();
+  const mutationScope = (mutation) => `${mutation.projectID}:${mutation.questionID || "_project"}`;
+  const queuedMutations = [...state.codeQuestionOutbox].filter((mutation) =>
+    mutation.accountUserID === requestContext.accountUserID
+  );
+  for (const mutation of queuedMutations) {
+    if (!codeQuestionRequestContextIsCurrent(requestContext)) return;
+    const scope = mutationScope(mutation);
+    if (blockedScopes.has(scope)) {
+      markCodeQuestionOfflineCommandConflict(mutation.id, {
+        conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT",
+        lastError: "A prior queued change for this Code Question conflicted. This dependent change was quarantined without replay."
+      });
+      continue;
+    }
+    try {
+      await postCodeQuestionForContext(requestContext, mutation.path, {
+        ...mutation.payload,
+        clientMutationID: mutation.clientMutationID,
+        idempotencyKey: mutation.payload?.idempotencyKey || mutation.clientMutationID
+      });
+      assertCodeQuestionRequestContext(requestContext);
+      acknowledgeCodeQuestionOfflineCommand(mutation.id);
+      if (mutation.questionID) {
+        affected.set(mutation.id, {
+          projectID: mutation.projectID,
+          questionID: mutation.questionID
+        });
+      }
+      else invalidateCodeQuestionListHydration(mutation.projectID);
+    } catch (error) {
+      if (!codeQuestionRequestContextIsCurrent(requestContext)) return;
+      if (evictDeniedCodeQuestionCache(error, mutation.projectID, mutation.questionID || "", {
+        questionScoped: Boolean(mutation.questionID)
+      })) {
+        await renderWorkspace();
+        return;
+      }
+      if (error.status === 409) {
+        markCodeQuestionOfflineCommandConflict(mutation.id, {
+          conflictCode: error.payload?.code,
+          serverVersion: error.payload?.serverVersion || error.payload?.artifact?.version || null,
+          lastError: error.message
+        });
+        blockedScopes.add(scope);
+        continue;
+      }
+      if (!error.status || error.status >= 500) break;
+      markCodeQuestionOfflineCommandConflict(mutation.id, {
+        conflictCode: error.payload?.code || "CODE_QUESTION_COMMAND_REJECTED",
+        lastError: error.message
+      });
+    }
+  }
+  for (const { projectID, questionID } of affected.values()) {
+    if (!codeQuestionRequestContextIsCurrent(requestContext)) return;
+    await hydrateCodeQuestionState(projectID, questionID, { force: true, render: false });
+    if (!codeQuestionRequestContextIsCurrent(requestContext)) return;
+  }
+  if (!codeQuestionRequestContextIsCurrent(requestContext)) return;
+  saveWorkspaceState();
+  await renderWorkspace();
+}
+
+function ensureCodeQuestionEvidenceWorkspace(questionID) {
+  return getEvidenceForQuestion(questionID);
 }
 
 function ensureCodeQuestionShellForProject(project) {
@@ -5479,9 +5969,12 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   if (!account?.appUserID || !account?.backendSessionToken) {
     throw new Error("Sign in did not return a backend session.");
   }
+  codeQuestionUnauthorizedAccountUserID = "";
   const previousUserID = state.account?.userID;
+  if (previousUserID) persistCodeQuestionAccountState(previousUserID);
   if (payload.mergedAccount?.sourceUserID === previousUserID) {
     retargetSyncOutbox(previousUserID, account.appUserID);
+    migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID);
   }
   state.account = {
     userID: account.appUserID,
@@ -5491,12 +5984,14 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
     publicUsername: account.publicUsername || null,
     entitlement: payload.entitlement || null
   };
+  loadCodeQuestionAccountStateIntoWorkspace(account.appUserID);
   persistAccountSession();
   syncedContent = null;
   saveWorkspaceState();
   void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
   loadSyncedContent({ force: true })
     .then(() => flushSyncOutbox({ refresh: true }))
+    .then(() => flushCodeQuestionOutbox())
     .then(() => renderWorkspace())
     .catch(() => renderWorkspace());
   return state.account;
@@ -21792,8 +22287,10 @@ function renderSettings() {
   signOutButton.addEventListener("click", async () => {
     const account = activeAccount();
     if (account) {
-      const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length;
-      const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length;
+      const pending = (state.syncOutbox || []).filter((item) => item.accountUserID === account.userID).length +
+        (state.codeQuestionOutbox || []).filter((item) => item.accountUserID === account.userID).length;
+      const conflicts = (state.syncConflicts || []).filter((item) => item.accountUserID === account.userID).length +
+        (state.codeQuestionConflicts || []).filter((item) => item.accountUserID === account.userID).length;
       if (pending > 0 || conflicts > 0) {
         const details = [
           pending > 0 ? `${pending} ${pending === 1 ? "change is" : "changes are"} waiting to sync` : "",
@@ -21816,6 +22313,8 @@ function renderSettings() {
       // Clear the local session even if the network is unavailable.
     } finally {
       await disableOfflineFeature().catch(() => {});
+      if (account) persistCodeQuestionAccountState(account.userID);
+      unloadCodeQuestionAccountState();
       state.account = null;
       organizationWorkspace = null;
       organizationLoadPromise = null;
@@ -21901,6 +22400,8 @@ function renderSettings() {
       researchConversationList = [];
       activeResearchConversation = null;
       researchUsage = null;
+      unloadCodeQuestionAccountState();
+      localStorage.removeItem(codeQuestionAccountCacheKey(account.userID));
       persistAccountSession(null);
       stopForegroundSyncLoop();
       Object.keys(localStorage)
@@ -23386,6 +23887,9 @@ function renderCodeQuestionPane(paneDescriptor) {
   const project = openProjectDetails().find((detail) =>
     String(detail.id || detail.clientID || detail.localFolderID || "") === parsed.projectID
   ) || openProjectDetails()[0] || null;
+  if (parsed.questionID && parsed.questionID !== "_") {
+    void hydrateCodeQuestionState(parsed.projectID, parsed.questionID);
+  }
   const article = document.createElement("article");
   article.className = "workspace-panel code-question-panel";
   article.dataset.paneId = parsed.paneID;
@@ -23477,6 +23981,7 @@ function renderCodeQuestionPane(paneDescriptor) {
 function renderCodeQuestionIndexBody(project) {
   const wrap = document.createElement("div");
   wrap.className = "code-question-index";
+  void hydrateCodeQuestionList(String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || ""));
   const cq = codeQuestionWorkspaceState();
   const filters = cq.questionFilters || {};
   const toolbar = document.createElement("div");
@@ -23502,6 +24007,7 @@ function renderCodeQuestionIndexBody(project) {
   createButton.type = "button";
   createButton.className = "code-question-create-button";
   createButton.textContent = "New question";
+  createButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
   createButton.addEventListener("click", async () => {
     await createLocalCodeQuestionDraft(project);
   });
@@ -23584,10 +24090,15 @@ function renderCodeQuestionIndexList(project) {
     const archiveButton = document.createElement("button");
     archiveButton.type = "button";
     archiveButton.textContent = question.recordState === "archived" ? "Restore" : "Archive";
+    archiveButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
     archiveButton.addEventListener("click", async (event) => {
       event.stopPropagation();
-      toggleLocalCodeQuestionArchive(question.id);
-      await renderWorkspace();
+      try {
+        await toggleLocalCodeQuestionArchive(question.id);
+        await renderWorkspace();
+      } catch (error) {
+        await showWebNotice("Question status unchanged", error.message);
+      }
     });
     actions.appendChild(archiveButton);
     item.appendChild(actions);
@@ -23608,13 +24119,22 @@ async function createLocalCodeQuestionDraft(project) {
   if (!codeQuestionWorkspaceEnabled()) return;
   const projectID = project ? String(projectDetailKey(project) || "").trim() : "";
   if (!projectID) return;
+  const questionText = await openWebTextPrompt({
+    title: "New Code Question",
+    message: "State the precise professional code question. The server will create the authoritative Project record.",
+    label: "Question",
+    required: true,
+    multiline: true,
+    confirmLabel: "Create question"
+  });
+  if (!questionText) return;
   const existing = questionsForActiveProject();
   const nextNumber = existing.reduce((max, item) => {
     const n = Number(String(item.displayID || "").replace(/\D/g, "")) || 0;
     return Math.max(max, n);
   }, 0) + 1;
   const displayID = `Q-${String(nextNumber).padStart(3, "0")}`;
-  const id = `local-cq-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
+  const id = globalThis.crypto?.randomUUID?.() || `local-cq-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
   const actor = codeQuestionActor();
   const question = {
     id,
@@ -23628,19 +24148,52 @@ async function createLocalCodeQuestionDraft(project) {
     revisionInProgress: false,
     listLabel: "Active"
   };
-  setQuestionsForActiveProject([...existing, question]);
-  saveDefinitionForQuestion(id, emptyDefinitionRecord(id, {
-    title: "New Code Question",
-    createdBy: actor.userID
-  }));
+  const applyOptimistic = () => {
+    setQuestionsForActiveProject([...existing, question]);
+    saveDefinitionForQuestion(id, emptyDefinitionRecord(id, {
+      title: "New Code Question",
+      questionText,
+      createdBy: actor.userID
+    }));
+  };
+  let createdQuestion = null;
+  try {
+    const payload = await executeCodeQuestionMutation("/projects/code-questions/create", {
+      projectID,
+      id,
+      title: "New Code Question",
+      questionText
+    }, {
+      commandKind: "codeQuestion.create",
+      projectID,
+      hydrate: false,
+      applyOptimistic
+    });
+    if (payload.queued) {
+      createdQuestion = question;
+    } else {
+      createdQuestion = payload.question;
+      setQuestionsForActiveProject([...existing, {
+        ...payload.question,
+        listLabel: deriveQuestionListLabel(payload.question)
+      }]);
+      invalidateCodeQuestionListHydration(projectID);
+    }
+  } catch (error) {
+    await showWebNotice("Could not create Code Question", error.message || "Creation failed.");
+    return;
+  }
   setCodeQuestionWorkspaceState(
     switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
       projectID,
-      questionID: id,
+      questionID: createdQuestion?.id || id,
       stage: "define"
     }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
+  if (codeQuestionIsOnline()) {
+    await hydrateCodeQuestionState(projectID, createdQuestion?.id || id, { force: true, render: false });
+  }
   await renderWorkspace();
 }
 
@@ -23737,28 +24290,6 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
     if (field.max) input.maxLength = field.max;
     if (field.required) input.required = true;
     input.disabled = readOnly;
-    input.addEventListener("change", () => {
-      if (readOnly) return;
-      const actor = codeQuestionActor();
-      try {
-        const patch = { [field.key]: input.value };
-        if (field.key === "asOfDate") {
-          patch.asOfDate = input.value ? new Date(`${input.value}T00:00:00.000Z`).toISOString() : null;
-        }
-        const next = updateDefinitionFields(definition, patch, {
-          expectedVersion: definition.expectedVersion,
-          actorUserID: actor.userID
-        });
-        saveDefinitionForQuestion(qid, next);
-        refreshCodeQuestionDefinitionPane(qid);
-      } catch (error) {
-        if (error.code === "CODE_QUESTION_VERSION_CONFLICT") {
-          void showWebNotice("Definition conflict", "This definition changed elsewhere. Reload the pane and try again.");
-        } else {
-          void showWebNotice("Could not update definition", error.message || "Could not update definition.");
-        }
-      }
-    });
     group.append(label, input);
     form.appendChild(group);
   });
@@ -23767,7 +24298,7 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
     saveDefinition.type = "button";
     saveDefinition.className = "code-question-define-add-input";
     saveDefinition.textContent = "Save definition";
-    saveDefinition.addEventListener("click", () => {
+    saveDefinition.addEventListener("click", async () => {
       try {
         const values = Object.fromEntries(fields.map((field) => {
           const input = form.elements.namedItem(field.key);
@@ -23777,11 +24308,22 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
           ? new Date(`${values.asOfDate}T00:00:00.000Z`).toISOString()
           : null;
         const current = getDefinitionForQuestion(qid);
-        const next = updateDefinitionFields(current, values, {
+        await executeCodeQuestionMutation("/projects/code-questions/definition/save", {
+          projectID: activeProjectIDForCodeQuestions(),
+          questionID: qid,
           expectedVersion: current.expectedVersion,
-          actorUserID: codeQuestionActor().userID
+          ...values
+        }, {
+          commandKind: "codeQuestion.update",
+          expectedVersion: current.expectedVersion,
+          applyOptimistic: () => {
+            const next = updateDefinitionFields(current, values, {
+              expectedVersion: current.expectedVersion,
+              actorUserID: codeQuestionActor().userID
+            });
+            saveDefinitionForQuestion(qid, next);
+          }
         });
-        saveDefinitionForQuestion(qid, next);
         refreshCodeQuestionDefinitionPane(qid);
       } catch (error) {
         void showWebNotice("Could not save definition", error.message || "Definition save failed.");
@@ -23844,12 +24386,17 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
         const resolveBtn = document.createElement("button");
         resolveBtn.type = "button";
         resolveBtn.textContent = "Resolve";
-        resolveBtn.addEventListener("click", () => {
-          const next = resolveFactRequest(getDefinitionForQuestion(qid), request.id, {
-            actorUserID: codeQuestionActor().userID
-          });
-          saveDefinitionForQuestion(qid, next);
-          refreshCodeQuestionDefinitionPane(qid);
+        resolveBtn.addEventListener("click", async () => {
+          try {
+            await executeCodeQuestionMutation("/projects/collaboration/threads/save", {
+              projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+              threadID: request.id, expectedVersion: request.version,
+              status: "resolved", resolution: "Fact Request resolved from the Define stage."
+            }, { commandKind: "codeQuestion.review.manage", expectedVersion: request.version });
+            refreshCodeQuestionDefinitionPane(qid);
+          } catch (error) {
+            void showWebNotice("Fact Request not resolved", error.message);
+          }
         });
         li.appendChild(resolveBtn);
       }
@@ -23889,14 +24436,24 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
       });
       if (anchor === null) return;
       try {
-        const next = openFactRequest(getDefinitionForQuestion(qid), {
-          title,
-          body: body || "",
-          inputID: anchor || null,
-          actorUserID: codeQuestionActor().userID,
-          actorDisplayName: codeQuestionActor().displayName
+        const input = getDefinitionForQuestion(qid).inputs.find((item) => item.id === anchor);
+        await executeCodeQuestionMutation("/projects/collaboration/threads/save", {
+          projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+          requestType: "fact-request", kind: "fact-request",
+          targetKind: input ? "questionInput" : "codeQuestion",
+          targetID: input?.id || qid,
+          targetAnchor: input
+            ? { anchorKind: "input", anchorID: input.id, label: input.statement }
+            : { anchorKind: "question", anchorID: qid, label: "Question definition" },
+          blocking: true, title, body: body || "", status: "open"
+        }, {
+          commandKind: "codeQuestion.review.manage",
+          applyOptimistic: () => saveDefinitionForQuestion(qid, openFactRequest(getDefinitionForQuestion(qid), {
+            title, body: body || "", inputID: input?.id || null,
+            actorUserID: codeQuestionActor().userID,
+            actorDisplayName: codeQuestionActor().displayName
+          }))
         });
-        saveDefinitionForQuestion(qid, next);
         refreshCodeQuestionDefinitionPane(qid);
       } catch (error) {
         void showWebNotice("Could not open Fact Request", error.message || "Could not open Fact Request.");
@@ -23906,45 +24463,39 @@ function renderCodeQuestionDefinitionBody(project, questionID) {
   }
   wrap.appendChild(factSection);
 
-  // Offline queue controls (proves conflict-aware queue behavior)
+  // Offline queue status and explicit replay control.
   const offline = document.createElement("section");
   offline.className = "code-question-define-offline";
+  const queuedMutations = (state.codeQuestionOutbox || []).filter((item) => item.questionID === qid);
+  const queuedConflicts = (state.codeQuestionConflicts || []).filter((item) => item.questionID === qid);
   offline.innerHTML = `<h3>Offline queue</h3>
     <p class="code-question-define-muted">Queued definition mutations wait for reconnect. Conflicts are reported; edits are not silently dropped.</p>
-    <p>Queued: <strong>${definition.offlineQueue?.length || 0}</strong></p>`;
-  if (!readOnly) {
-    const queueBtn = document.createElement("button");
-    queueBtn.type = "button";
-    queueBtn.className = "code-question-define-secondary";
-    queueBtn.textContent = "Queue sample offline save";
-    queueBtn.addEventListener("click", () => {
-      const current = getDefinitionForQuestion(qid);
-      const next = enqueueDefinitionOfflineMutation(current, {
-        commandKind: "codeQuestion.definition.update",
-        payload: {
-          title: current.title,
-          actorUserID: codeQuestionActor().userID
-        }
-      });
-      saveDefinitionForQuestion(qid, next);
-      refreshCodeQuestionDefinitionPane(qid);
+    <p>Queued: <strong>${queuedMutations.length}</strong> · Conflicts: <strong>${queuedConflicts.length}</strong></p>`;
+  if (queuedConflicts.length) {
+    const conflictList = document.createElement("ul");
+    conflictList.className = "code-question-define-blockers";
+    queuedConflicts.forEach((conflict) => {
+      const item = document.createElement("li");
+      item.textContent = `${conflict.conflictCode || "Conflict"}: ${conflict.lastError || "Review the server version before retrying."}`;
+      conflictList.appendChild(item);
     });
+    offline.appendChild(conflictList);
+  }
+  if (!readOnly) {
     const replayBtn = document.createElement("button");
     replayBtn.type = "button";
     replayBtn.className = "code-question-define-secondary";
     replayBtn.textContent = "Replay queue";
-    replayBtn.addEventListener("click", () => {
-      const current = getDefinitionForQuestion(qid);
-      const { definition: next, results } = replayDefinitionOfflineQueue(current, {
-        serverVersion: current.expectedVersion,
-        strictConflict: false
-      });
-      saveDefinitionForQuestion(qid, next);
-      const conflicts = results.filter((item) => item.status === "conflict").length;
-      void showWebNotice("Offline queue replay", `Replay complete: ${results.length - conflicts} applied, ${conflicts} conflict(s).`);
+    replayBtn.addEventListener("click", async () => {
+      if (!codeQuestionIsOnline()) {
+        await showWebNotice("Offline queue", "Reconnect before replaying queued Code Question commands.");
+        return;
+      }
+      await flushCodeQuestionOutbox();
       refreshCodeQuestionDefinitionPane(qid);
     });
-    offline.append(queueBtn, replayBtn);
+    replayBtn.hidden = queuedMutations.length === 0;
+    offline.appendChild(replayBtn);
   }
   wrap.appendChild(offline);
 
@@ -24034,13 +24585,18 @@ function renderDefineInputSection({ questionID, title, kind, items, readOnly, em
           });
           if (stateValue == null) return;
           try {
-            const next = reviseQuestionInput(
-              getDefinitionForQuestion(questionID),
-              item.id,
-              { statement, state: stateValue },
-              { actorUserID: codeQuestionActor().userID }
-            );
-            saveDefinitionForQuestion(questionID, next);
+            await executeCodeQuestionMutation("/projects/code-questions/inputs/save", {
+              projectID: activeProjectIDForCodeQuestions(), questionID,
+              id: item.id, expectedVersion: item.expectedVersion,
+              statement, state: stateValue, basis: item.basis || ""
+            }, {
+              commandKind: "codeQuestion.input.save",
+              expectedVersion: item.expectedVersion,
+              applyOptimistic: () => saveDefinitionForQuestion(questionID, reviseQuestionInput(
+                getDefinitionForQuestion(questionID), item.id, { statement, state: stateValue },
+                { actorUserID: codeQuestionActor().userID }
+              ))
+            });
             refreshCodeQuestionDefinitionPane(questionID);
           } catch (error) {
             void showWebNotice("Could not revise input", error.message || "Could not revise input.");
@@ -24051,15 +24607,20 @@ function renderDefineInputSection({ questionID, title, kind, items, readOnly, em
           const resolve = document.createElement("button");
           resolve.type = "button";
           resolve.textContent = "Mark resolved";
-          resolve.addEventListener("click", () => {
+          resolve.addEventListener("click", async () => {
             try {
-              const next = reviseQuestionInput(
-                getDefinitionForQuestion(questionID),
-                item.id,
-                { state: "resolved" },
-                { actorUserID: codeQuestionActor().userID }
-              );
-              saveDefinitionForQuestion(questionID, next);
+              await executeCodeQuestionMutation("/projects/code-questions/inputs/save", {
+                projectID: activeProjectIDForCodeQuestions(), questionID,
+                id: item.id, expectedVersion: item.expectedVersion,
+                statement: item.statement, state: "resolved", basis: item.basis || ""
+              }, {
+                commandKind: "codeQuestion.input.save",
+                expectedVersion: item.expectedVersion,
+                applyOptimistic: () => saveDefinitionForQuestion(questionID, reviseQuestionInput(
+                  getDefinitionForQuestion(questionID), item.id, { state: "resolved" },
+                  { actorUserID: codeQuestionActor().userID }
+                ))
+              });
               refreshCodeQuestionDefinitionPane(questionID);
             } catch (error) {
               void showWebNotice("Could not resolve unknown", error.message || "Could not resolve unknown.");
@@ -24098,14 +24659,20 @@ function renderDefineInputSection({ questionID, title, kind, items, readOnly, em
       if (basis === null) return;
       try {
         const actor = codeQuestionActor();
-        const next = createQuestionInput(getDefinitionForQuestion(questionID), {
-          inputKind: kind,
-          statement,
-          basis: basis || "",
-          actorUserID: actor.userID,
-          responsibleDisplayName: actor.displayName
+        const inputID = globalThis.crypto?.randomUUID?.() || `input-${Date.now()}`;
+        await executeCodeQuestionMutation("/projects/code-questions/inputs/save", {
+          projectID: activeProjectIDForCodeQuestions(), questionID,
+          id: inputID, kind, statement, basis: basis || "",
+          state: kind === "confirmedFact" ? "confirmed" : "proposed"
+        }, {
+          commandKind: "codeQuestion.input.save",
+          applyOptimistic: () => saveDefinitionForQuestion(questionID, createQuestionInput(
+            getDefinitionForQuestion(questionID), {
+              id: inputID, inputKind: kind, statement, basis: basis || "",
+              actorUserID: actor.userID, responsibleDisplayName: actor.displayName
+            }
+          ))
         });
-        saveDefinitionForQuestion(questionID, next);
         refreshCodeQuestionDefinitionPane(questionID);
       } catch (error) {
         void showWebNotice("Could not add input", error.message || "Could not add input.");
@@ -24161,7 +24728,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
     wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to search candidates for its Evidence stage.</p>`;
     return wrap;
   }
-  let evidence = ensureEvidenceSeedCandidates(qid);
+  let evidence = ensureCodeQuestionEvidenceWorkspace(qid);
   const role = codeQuestionDefineRole();
   const notice = document.createElement("p");
   notice.className = "code-question-evidence-banner";
@@ -24174,33 +24741,57 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
   search.className = "code-question-index-search";
   search.placeholder = "Filter candidates for this question";
   search.setAttribute("aria-label", "Filter evidence candidates");
-  const addDemo = document.createElement("button");
-  addDemo.type = "button";
-  addDemo.className = "code-question-define-secondary";
-  addDemo.textContent = "Add scoped candidate";
-  addDemo.disabled = !canProposeEvidence(role) && role === "viewer";
-  addDemo.addEventListener("click", async () => {
-    const label = await openWebTextPrompt({
-      title: "Scoped candidate",
-      message: "Adds a question-scoped search candidate. It is not approved evidence.",
-      label: "Candidate label",
-      required: true,
-      confirmLabel: "Add candidate"
-    });
-    if (!label) return;
-    evidence = addCandidates(getEvidenceForQuestion(qid), [{
-      id: `cand-local-${Date.now().toString(16)}`,
-      label,
-      sourceIdentity: "user-scoped-search",
-      passageLocator: "User-scoped locator",
-      previewText: `[CANDIDATE — NOT EVIDENCE] ${label}`,
-      sourceStatus: "verification-required",
-      researchEligible: false
-    }]);
-    saveEvidenceForQuestion(qid, evidence);
-    refreshCodeQuestionEvidencePanes(qid);
+  const loadSaved = document.createElement("button");
+  loadSaved.type = "button";
+  loadSaved.className = "code-question-define-secondary";
+  loadSaved.textContent = "Load Project Saved";
+  loadSaved.disabled = !canProposeEvidence(role) && role === "viewer";
+  loadSaved.addEventListener("click", async () => {
+    loadSaved.disabled = true;
+    loadSaved.textContent = "Loading…";
+    try {
+      const projectSections = (currentContentSummary().projectSections || [])
+        .filter((item) => projectSectionBelongsToProject(item, project));
+      const savedItems = await hydrateSavedColumnItems(projectSections);
+      const candidates = savedItems
+        .filter((item) => String(item.savedContentComparisonText || item.previewText || "").trim())
+        .map((item) => {
+          const codeVersion = syncCodeVersion(item.codeVersion);
+          const isCurrentPermitextCode = codeVersion === defaultSyncCodeVersion;
+          const sectionID = String(item.sectionID || item.savedSectionID || item.itemID || "");
+          const blockID = normalizeAnnotationBlockID(item.blockID || item.anchorID || item.contentBlockID);
+          return {
+            id: `saved:${codeVersion}:${sectionID}:${blockID || "section"}`,
+            label: [item.codePrefix || "Code", item.sectionNumber, item.title]
+              .filter(Boolean).join(" "),
+            sourceIdentity: `permitext-code:${codeVersion}:${item.codePrefix || "code"}:${sectionID}`,
+            passageLocator: [item.codePrefix, item.sectionNumber, blockID].filter(Boolean).join(" · "),
+            previewText: item.savedContentComparisonText || item.previewText,
+            sourceFamily: item.codePrefix || "code",
+            edition: codeVersion,
+            sourceStatus: isCurrentPermitextCode ? "verified" : "verification-required",
+            completeness: blockID ? "saved-passage" : "saved-section",
+            researchEligible: isCurrentPermitextCode,
+            note: "Imported from this Project's existing Saved evidence."
+          };
+        });
+      evidence = addCandidates(getEvidenceForQuestion(qid), candidates);
+      saveEvidenceForQuestion(qid, evidence);
+      refreshCodeQuestionEvidencePanes(qid);
+      if (!candidates.length) {
+        void showWebNotice(
+          "No Project Saved candidates",
+          "Save an exact code passage to this Project first, then load it here for professional proposal and approval."
+        );
+      }
+    } catch (error) {
+      void showWebNotice("Could not load Project Saved evidence", error.message || "Saved evidence could not be loaded.");
+    } finally {
+      loadSaved.disabled = false;
+      loadSaved.textContent = "Load Project Saved";
+    }
   });
-  toolbar.append(search, addDemo);
+  toolbar.append(search, loadSaved);
   wrap.appendChild(toolbar);
   const list = document.createElement("ul");
   list.className = "code-question-candidate-list";
@@ -24215,7 +24806,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
     if (!items.length) {
       const empty = document.createElement("li");
       empty.className = "code-question-define-empty-item";
-      empty.textContent = "No candidates. Use Search outside this tray or add a scoped candidate.";
+      empty.textContent = "No candidates. Save an exact passage to this Project, then load Project Saved.";
       list.appendChild(empty);
       return;
     }
@@ -24239,7 +24830,7 @@ function renderCodeQuestionCandidatesBody(project, questionID) {
           candidateID: candidate.id,
           passageLocator: candidate.passageLocator,
           quotedText: candidate.previewText,
-          surroundingContext: "Surrounding synthetic context for fixture review."
+          surroundingContext: candidate.previewText
         });
         saveEvidenceForQuestion(qid, evidence);
         refreshCodeQuestionEvidencePanes(qid);
@@ -24262,7 +24853,7 @@ function renderCodeQuestionEvidenceReaderBody(project, questionID) {
     wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to inspect candidate passages.</p>`;
     return wrap;
   }
-  const evidence = ensureEvidenceSeedCandidates(qid);
+  const evidence = ensureCodeQuestionEvidenceWorkspace(qid);
   const candidate = evidence.candidates.find((item) => item.id === evidence.selectedCandidateID);
   const passage = evidence.selectedPassage;
   const role = codeQuestionDefineRole();
@@ -24332,15 +24923,30 @@ function renderCodeQuestionEvidenceReaderBody(project, questionID) {
     });
     if (applicability === null) return;
     try {
-      let next = proposeEvidence(getEvidenceForQuestion(qid), {
+      const snapshotID = globalThis.crypto?.randomUUID?.() || `esnap-${Date.now()}`;
+      const proposalOptions = {
         actorRole: role,
         actorUserID: codeQuestionActor().userID,
+        snapshotID,
         role: evidenceRole,
-        analysisEligible: true,
+        analysisEligible: candidate.researchEligible === true,
+        forceVerificationBlock: candidate.sourceStatus !== "verified",
         projectApplicabilityNote: applicability || "",
         professionalNote: "Proposed from Candidates reader.",
         incompleteContext: !String(passage?.surroundingContext || "").trim()
+      };
+      await executeCodeQuestionMutation("/projects/code-questions/evidence/snapshot", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: qid, id: snapshotID,
+        sourceIdentity: candidate.sourceIdentity,
+        passageLocator: passage?.passageLocator || candidate.passageLocator,
+        quotedText: passage?.quotedText || candidate.previewText,
+        sourceVersion: candidate.edition || "",
+        structuredMaterial: passage?.structuredMaterial || null
+      }, {
+        commandKind: "codeQuestion.evidence.propose",
+        hydrate: false
       });
+      let next = proposeEvidence(getEvidenceForQuestion(qid), proposalOptions);
       // Solo owner explicit combined propose+approve
       if (role === "owner") {
         const combined = await confirmWebWarning(
@@ -24355,6 +24961,15 @@ function renderCodeQuestionEvidenceReaderBody(project, questionID) {
             actorUserID: codeQuestionActor().userID,
             combined: true
           });
+          const set = currentEvidenceSet(next);
+          const approved = await executeCodeQuestionMutation("/projects/code-questions/evidence/approve-set", {
+            projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+            id: globalThis.crypto?.randomUUID?.(),
+            entries: set.entries
+          }, { commandKind: "codeQuestion.evidence.approve" });
+          if (!approved.queued) {
+            next = { ...getEvidenceForQuestion(qid), proposals: next.proposals };
+          }
         }
       }
       saveEvidenceForQuestion(qid, next);
@@ -24383,7 +24998,7 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
     wrap.innerHTML = `<p class="code-question-define-empty">Open a Code Question to manage its Evidence Tray.</p>`;
     return wrap;
   }
-  const evidence = ensureEvidenceSeedCandidates(qid);
+  const evidence = ensureCodeQuestionEvidenceWorkspace(qid);
   const model = trayModel(evidence);
   const role = codeQuestionDefineRole();
   const head = document.createElement("div");
@@ -24441,11 +25056,17 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
         approve.textContent = "Approve";
         approve.addEventListener("click", async () => {
           try {
-            const next = approveEvidenceProposal(getEvidenceForQuestion(qid), proposal.id, {
+            let next = approveEvidenceProposal(getEvidenceForQuestion(qid), proposal.id, {
               actorRole: role,
               actorUserID: codeQuestionActor().userID,
               overrideVerification: proposal.state === "verification-blocked"
             });
+            const set = currentEvidenceSet(next);
+            const approved = await executeCodeQuestionMutation("/projects/code-questions/evidence/approve-set", {
+              projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+              id: globalThis.crypto?.randomUUID?.(), entries: set.entries
+            }, { commandKind: "codeQuestion.evidence.approve" });
+            if (!approved.queued) next = { ...getEvidenceForQuestion(qid), proposals: next.proposals };
             saveEvidenceForQuestion(qid, next);
             assertNoCandidatesInAnalysisInput(next);
             refreshCodeQuestionEvidencePanes(qid);
@@ -24516,10 +25137,16 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
           );
           if (!ok) return;
           try {
-            const next = removeEvidenceEntry(getEvidenceForQuestion(qid), entry.snapshotID, {
+            let next = removeEvidenceEntry(getEvidenceForQuestion(qid), entry.snapshotID, {
               actorRole: role,
               actorUserID: codeQuestionActor().userID
             });
+            const set = currentEvidenceSet(next);
+            const removed = await executeCodeQuestionMutation("/projects/code-questions/evidence/approve-set", {
+              projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+              id: globalThis.crypto?.randomUUID?.(), entries: set.entries
+            }, { commandKind: "codeQuestion.evidence.approve" });
+            if (!removed.queued) next = { ...getEvidenceForQuestion(qid), proposals: next.proposals };
             saveEvidenceForQuestion(qid, next);
             refreshCodeQuestionEvidencePanes(qid);
           } catch (error) {
@@ -24580,10 +25207,12 @@ function renderCodeQuestionEvidenceTrayBody(project, questionID) {
 }
 
 function codeQuestionAnalysisBinding(questionID) {
-  return buildAnalysisBinding(
+  const local = buildAnalysisBinding(
     getDefinitionForQuestion(questionID),
     getEvidenceForQuestion(questionID)
   );
+  const server = getAnalysisForQuestion(questionID)?.serverBinding;
+  return server ? { ...local, ...server } : local;
 }
 
 function renderCodeQuestionApprovedEvidenceBody(_project, questionID) {
@@ -24661,29 +25290,28 @@ function renderCodeQuestionBoundedAnalysisBody(_project, questionID) {
   runButton.addEventListener("click", async () => {
     runButton.disabled = true;
     const requestID = globalThis.crypto?.randomUUID?.() || `request-${Date.now()}`;
+    const before = getAnalysisForQuestion(qid);
     try {
-      const started = beginAnalysisRequest(getAnalysisForQuestion(qid), binding, {
+      const started = beginAnalysisRequest(before, binding, {
         requestID,
         requestedBy: codeQuestionActor().userID
       });
       saveAnalysisForQuestion(qid, started.workspace);
-      // The production command uses the existing server Research generator. The
-      // local flag-gated shell uses a deterministic bounded fixture until the
-      // locally-created Question/Evidence records are hydrated from the server.
-      const completed = completeAnalysisRequest(
-        getAnalysisForQuestion(qid),
-        binding,
-        syntheticBoundedInterpretation(binding),
-        {
-          requestID,
-          researchAnswerID: `local-research-${requestID}`,
-          requestedBy: codeQuestionActor().userID,
-          modelID: "permitext-bounded-fixture"
-        }
-      );
-      saveAnalysisForQuestion(qid, completed.workspace);
+      await executeCodeQuestionMutation("/projects/code-questions/analysis/create", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+        requestID, idempotencyKey: requestID,
+        definitionRevision: binding.definitionRevision,
+        definitionHash: binding.definitionHash,
+        inputSnapshotIDs: binding.inputSnapshotIDs,
+        inputSetHash: binding.inputSetHash,
+        evidenceSetID: binding.evidenceSetID,
+        evidenceSetVersion: binding.evidenceSetVersion,
+        evidenceSetHash: binding.evidenceSetHash,
+        dependencyHash: binding.dependencyHash
+      }, { commandKind: "codeQuestion.analysis.create" });
       refreshCodeQuestionAnalysisPanes(qid);
     } catch (error) {
+      saveAnalysisForQuestion(qid, before);
       void showWebNotice("Could not run bounded analysis", error.message || "Analysis failed.");
       runButton.disabled = false;
     }
@@ -24837,13 +25465,37 @@ function renderCodeQuestionProfessionalConclusionBody(_project, questionID) {
   publish.type = "button";
   publish.className = "code-question-conclusion-publish";
   publish.textContent = "Publish conclusion revision";
-  publish.addEventListener("click", () => {
+  publish.addEventListener("click", async () => {
     try {
       saveDraft();
-      const result = publishProfessionalConclusion(getAnalysisForQuestion(qid), binding, {
-        authorUserID: codeQuestionActor().userID
+      const current = getAnalysisForQuestion(qid);
+      const conclusionDraft = current.conclusionDraft;
+      await executeCodeQuestionMutation("/projects/code-questions/conclusions/publish", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+        definitionRevision: binding.definitionRevision,
+        definitionHash: binding.definitionHash,
+        inputSetHash: binding.inputSetHash,
+        evidenceSetID: binding.evidenceSetID,
+        evidenceSetVersion: binding.evidenceSetVersion,
+        evidenceSetHash: binding.evidenceSetHash,
+        conclusionText: conclusionDraft.conclusionText,
+        reasoning: conclusionDraft.reasoning,
+        citations: conclusionDraft.citations,
+        assumptions: conclusionDraft.assumptions,
+        unknowns: conclusionDraft.unknowns,
+        analysisRunID: conclusionDraft.analysisRunID || null,
+        analysisDependencyHash: conclusionDraft.analysisRunID ? binding.dependencyHash : null,
+        aiAssistanceDisclosure: conclusionDraft.aiAssistanceDisclosure,
+        predecessorRevisionID: current.conclusionRevisions.at(-1)?.id || null
+      }, {
+        commandKind: "codeQuestion.conclusion.publish",
+        applyOptimistic: () => {
+          const result = publishProfessionalConclusion(getAnalysisForQuestion(qid), binding, {
+            authorUserID: codeQuestionActor().userID
+          });
+          saveAnalysisForQuestion(qid, result.workspace);
+        }
       });
-      saveAnalysisForQuestion(qid, result.workspace);
       refreshCodeQuestionAnalysisPanes(qid);
     } catch (error) {
       void showWebNotice("Could not publish conclusion", error.message || "Conclusion failed.");
@@ -24962,13 +25614,21 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
   approve.type = "button";
   approve.textContent = latestConclusion ? `Approve conclusion r${latestConclusion.revision}` : "Publish a conclusion before approval";
   approve.disabled = !latestConclusion || blockers.length > 0;
-  approve.addEventListener("click", () => {
+  approve.addEventListener("click", async () => {
     try {
-      const result = approveProfessionalConclusion(getReviewForQuestion(qid), latestConclusion, {
-        basis: basis.value,
-        actor
+      await executeCodeQuestionMutation("/projects/code-questions/conclusions/approve", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+        conclusionID: latestConclusion.id,
+        approvalBasis: basis.value
+      }, {
+        commandKind: "codeQuestion.conclusion.approve",
+        applyOptimistic: () => {
+          const result = approveProfessionalConclusion(getReviewForQuestion(qid), latestConclusion, {
+            basis: basis.value, actor
+          });
+          saveReviewForQuestion(qid, result.workspace);
+        }
       });
-      saveReviewForQuestion(qid, result.workspace);
       refreshCodeQuestionReviewPanes(qid);
     } catch (error) {
       void showWebNotice("Conclusion not approved", error.message);
@@ -25015,23 +25675,28 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
   open.type = "submit";
   open.textContent = "Open Review Request";
   composer.append(type, target, blocking, title, body, open);
-  composer.addEventListener("submit", (event) => {
+  composer.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
       const selected = targets[Number(target.value)] || targets[0];
-      const result = createReviewRequest(getReviewForQuestion(qid), {
-        questionID: qid,
+      await executeCodeQuestionMutation("/projects/collaboration/threads/save", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: qid,
         requestType: type.value,
-        targetKind: selected.kind,
-        targetID: selected.id,
-        targetLabel: selected.label,
-        targetAnchor: selected.anchor,
-        blocking: blockingInput.checked,
-        title: title.value,
-        body: body.value,
-        actor
+        targetKind: selected.kind, targetID: selected.id,
+        targetAnchor: selected.anchor, blocking: blockingInput.checked,
+        title: title.value, body: body.value, status: "open"
+      }, {
+        commandKind: "codeQuestion.review.manage",
+        applyOptimistic: () => {
+          const result = createReviewRequest(getReviewForQuestion(qid), {
+            questionID: qid, requestType: type.value,
+            targetKind: selected.kind, targetID: selected.id,
+            targetLabel: selected.label, targetAnchor: selected.anchor,
+            blocking: blockingInput.checked, title: title.value, body: body.value, actor
+          });
+          saveReviewForQuestion(qid, result.workspace);
+        }
       });
-      saveReviewForQuestion(qid, result.workspace);
       refreshCodeQuestionReviewPanes(qid);
     } catch (error) {
       void showWebNotice("Review Request not opened", error.message);
@@ -25065,10 +25730,20 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
       <p class="code-question-define-muted">${request.blocking ? "Blocking" : "Advisory"} · Round ${escapeHTML(String(request.reviewRound))} · ${escapeHTML(request.targetLabel)} · ${escapeHTML(request.updatedAt)}</p>`;
     const actions = document.createElement("div");
     actions.className = "code-question-review-request-actions";
-    const transition = (status, resolution = "") => {
+    const transition = async (status, resolution = "") => {
       try {
-        const result = transitionReviewRequest(getReviewForQuestion(qid), request.id, status, { resolution, actor });
-        saveReviewForQuestion(qid, result.workspace);
+        await executeCodeQuestionMutation("/projects/collaboration/threads/save", {
+          projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+          threadID: request.id, expectedVersion: request.version,
+          status, resolution
+        }, {
+          commandKind: "codeQuestion.review.manage",
+          expectedVersion: request.version,
+          applyOptimistic: () => {
+            const result = transitionReviewRequest(getReviewForQuestion(qid), request.id, status, { resolution, actor });
+            saveReviewForQuestion(qid, result.workspace);
+          }
+        });
         refreshCodeQuestionReviewPanes(qid);
       } catch (error) {
         void showWebNotice("Review status not changed", error.message);
@@ -25078,17 +25753,17 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
       const reopen = document.createElement("button");
       reopen.type = "button";
       reopen.textContent = "Reopen";
-      reopen.addEventListener("click", () => transition("open"));
+      reopen.addEventListener("click", () => void transition("open"));
       actions.append(reopen);
     } else {
       const waiting = document.createElement("button");
       waiting.type = "button";
       waiting.textContent = request.status === "waiting" ? "Mark open" : "Mark waiting";
-      waiting.addEventListener("click", () => transition(request.status === "waiting" ? "open" : "waiting"));
+      waiting.addEventListener("click", () => void transition(request.status === "waiting" ? "open" : "waiting"));
       const dismiss = document.createElement("button");
       dismiss.type = "button";
       dismiss.textContent = "Dismiss";
-      dismiss.addEventListener("click", () => transition("dismissed"));
+      dismiss.addEventListener("click", () => void transition("dismissed"));
       actions.append(waiting, dismiss);
       const resolution = document.createElement("form");
       resolution.className = "code-question-review-resolution";
@@ -25103,7 +25778,7 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
       resolution.append(resolutionText, resolve);
       resolution.addEventListener("submit", (event) => {
         event.preventDefault();
-        transition("resolved", resolutionText.value);
+        void transition("resolved", resolutionText.value);
       });
       actions.append(resolution);
       const commentForm = document.createElement("form");
@@ -25117,11 +25792,19 @@ function renderCodeQuestionReviewRequestsBody(project, questionID) {
       post.type = "submit";
       post.textContent = "Post";
       commentForm.append(comment, post);
-      commentForm.addEventListener("submit", (event) => {
+      commentForm.addEventListener("submit", async (event) => {
         event.preventDefault();
         try {
-          const result = appendReviewComment(getReviewForQuestion(qid), request.id, { body: comment.value, actor });
-          saveReviewForQuestion(qid, result.workspace);
+          await executeCodeQuestionMutation("/projects/collaboration/comments/save", {
+            projectID: activeProjectIDForCodeQuestions(), questionID: qid,
+            threadID: request.id, body: comment.value
+          }, {
+            commandKind: "codeQuestion.review.manage",
+            applyOptimistic: () => {
+              const result = appendReviewComment(getReviewForQuestion(qid), request.id, { body: comment.value, actor });
+              saveReviewForQuestion(qid, result.workspace);
+            }
+          });
           refreshCodeQuestionReviewPanes(qid);
         } catch (error) {
           void showWebNotice("Response not posted", error.message);
@@ -25219,7 +25902,7 @@ function codeMemoContext(project, questionID) {
     // Readiness reports the missing dependency in its own bounded checklist.
   }
   const draft = issue.draftRevisions.at(-1) || null;
-  const actor = { ...codeQuestionActor(), role: "owner" };
+  const actor = { ...codeQuestionActor(), role: codeQuestionDefineRole() };
   const readiness = codeMemoReadiness({
     definition, evidence, analysis, review, draft, actor,
     currentDependencyHash: binding?.dependencyHash || null
@@ -25285,28 +25968,14 @@ function renderCodeMemoDraftBody(project, questionID) {
   prepare.type = "submit";
   prepare.textContent = context.draft ? "Prepare new draft revision" : "Prepare Code Memo Draft";
   form.append(title, narrative, include, prepare);
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      const result = prepareCodeMemoDraft(getIssueForQuestion(context.qid), {
-        project: {
-          id: activeProjectIDForCodeQuestions(),
-          name: project?.name || "Project",
-          address: project?.address || ""
-        },
-        definition: { ...context.definition, displayID: context.question.displayID || "Q" },
-        evidence: context.evidence,
-        analysis: context.analysis,
-        review: context.review,
-        title: title.value,
-        narrative: narrative.value,
-        includeAnalysis: includeInput.checked,
-        actor: context.actor,
-        definitionHash: context.binding?.definitionHash || "unavailable",
-        inputSetHash: context.binding?.inputSetHash || "unavailable",
-        currentDependencyHash: context.binding?.dependencyHash || "unavailable"
-      });
-      saveIssueForQuestion(context.qid, result.workspace);
+      await executeCodeQuestionMutation("/projects/code-questions/memos/prepare", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: context.qid,
+        title: title.value, narrative: narrative.value,
+        includeAnalysis: includeInput.checked
+      }, { commandKind: "codeQuestion.memo.prepare" });
       refreshCodeMemoPanes(context.qid);
     } catch (error) {
       void showWebNotice("Code Memo Draft not prepared", error.message);
@@ -25318,14 +25987,23 @@ function renderCodeMemoDraftBody(project, questionID) {
     const preview = document.createElement("article");
     preview.className = "code-memo-preview";
     preview.setAttribute("aria-label", `Code Memo Draft revision ${context.draft.draftRevision}`);
+    const projectInputs = Array.isArray(context.draft.sections?.projectInputs)
+      ? context.draft.sections.projectInputs
+      : [];
+    const evidenceItems = Array.isArray(context.draft.sections?.evidence)
+      ? context.draft.sections.evidence
+      : [];
+    const questionPresented = context.draft.sections?.questionPresented || context.definition?.questionText || "";
+    const professionalConclusion = context.draft.sections?.professionalConclusion?.conclusionText ||
+      context.analysis?.conclusionRevisions?.at(-1)?.conclusionText || "Not published";
     preview.innerHTML = `
       <header><p>Draft r${escapeHTML(String(context.draft.draftRevision))} · ${escapeHTML(context.draft.draftHash)}</p><h3>${escapeHTML(context.draft.title)}</h3></header>
-      <section><h4>Question presented</h4><p>${escapeHTML(context.draft.sections.questionPresented)}</p></section>
-      <section><h4>Project inputs</h4><ul>${context.draft.sections.projectInputs.map((item) => `<li><strong>${escapeHTML(item.inputKind)}</strong>: ${escapeHTML(item.statement)}</li>`).join("")}</ul></section>
-      <section><h4>Approved evidence</h4><ol>${context.draft.sections.evidence.map((item) => `<li>${escapeHTML(item.snapshot?.passageLocator || item.snapshotID)} · ${escapeHTML(item.role)}</li>`).join("")}</ol></section>
-      ${context.draft.sections.analysisSummary ? `<section><h4>Bounded analysis summary</h4><p>${escapeHTML(context.draft.sections.analysisSummary.conclusion)}</p></section>` : ""}
-      <section><h4>Professional conclusion</h4><p>${escapeHTML(context.draft.sections.professionalConclusion?.conclusionText || "Not published")}</p></section>
-      <section><h4>Authored narrative</h4><p>${escapeHTML(context.draft.sections.authoredNarrative || "No additional narrative.")}</p></section>`;
+      <section><h4>Question presented</h4><p>${escapeHTML(questionPresented)}</p></section>
+      <section><h4>Project inputs</h4><ul>${projectInputs.map((item) => `<li><strong>${escapeHTML(item.inputKind)}</strong>: ${escapeHTML(item.statement)}</li>`).join("")}</ul></section>
+      <section><h4>Approved evidence</h4><ol>${evidenceItems.map((item) => `<li>${escapeHTML(item.snapshot?.passageLocator || item.snapshotID)} · ${escapeHTML(item.role)}</li>`).join("")}</ol></section>
+      ${context.draft.sections?.analysisSummary ? `<section><h4>Bounded analysis summary</h4><p>${escapeHTML(context.draft.sections.analysisSummary.conclusion)}</p></section>` : ""}
+      <section><h4>Professional conclusion</h4><p>${escapeHTML(professionalConclusion)}</p></section>
+      <section><h4>Authored narrative</h4><p>${escapeHTML(context.draft.sections?.authoredNarrative || context.draft.introduction || "No additional narrative.")}</p></section>`;
     wrap.appendChild(preview);
   }
   return wrap;
@@ -25350,10 +26028,12 @@ function renderCodeMemoReadinessBody(project, questionID) {
   ready.type = "button";
   ready.textContent = "Mark ready for approval";
   ready.disabled = !context.draft || !context.readiness.ready || state !== "draft";
-  ready.addEventListener("click", () => {
+  ready.addEventListener("click", async () => {
     try {
-      const result = markCodeMemoReady(getIssueForQuestion(context.qid), context.draft.id, context.readiness, { actor: context.actor });
-      saveIssueForQuestion(context.qid, result.workspace);
+      await executeCodeQuestionMutation("/projects/code-questions/memos/ready", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: context.qid,
+        draftID: context.draft.id
+      }, { commandKind: "codeQuestion.memo.ready" });
       refreshCodeMemoPanes(context.qid);
     } catch (error) {
       void showWebNotice("Code Memo not ready", error.message);
@@ -25374,11 +26054,13 @@ function renderCodeMemoReadinessBody(project, questionID) {
   approve.textContent = "Approve Code Memo";
   approve.disabled = !context.draft || state !== "ready-for-approval";
   approval.append(basis, approve);
-  approval.addEventListener("submit", (event) => {
+  approval.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
-      const result = approveCodeMemo(getIssueForQuestion(context.qid), context.draft.id, { basis: basis.value, actor: context.actor });
-      saveIssueForQuestion(context.qid, result.workspace);
+      await executeCodeQuestionMutation("/projects/code-questions/memos/approve", {
+        projectID: activeProjectIDForCodeQuestions(), questionID: context.qid,
+        draftID: context.draft.id, approvalBasis: basis.value
+      }, { commandKind: "codeQuestion.memo.approve" });
       refreshCodeMemoPanes(context.qid);
     } catch (error) {
       void showWebNotice("Code Memo not approved", error.message);
@@ -25423,40 +26105,29 @@ function downloadCodeMemoBlob(blob, filename) {
   window.setTimeout(() => URL.revokeObjectURL(url), 2_000);
 }
 
-function simpleCodeMemoPDF(manifest) {
-  const plain = [
-    manifest.title,
-    `Permitext Issued Record v${manifest.issueLineage.issueVersion}`,
-    manifest.project.name,
-    manifest.project.address,
-    "Question presented",
-    manifest.questionSnapshot.questionText,
-    "Professional conclusion",
-    manifest.conclusion?.conclusionText || "",
-    ...manifest.disclaimers
-  ].join("\n").normalize("NFKD").replace(/[^\x20-\x7e\n]/g, "?");
-  const lines = plain.split("\n").flatMap((line) => line.match(/.{1,85}(?:\s|$)|.{1,85}/g) || [""]);
-  const escaped = lines.slice(0, 52).map((line) => String(line).replace(/([\\()])/g, "\\$1"));
-  const stream = `BT /F1 11 Tf 54 742 Td 14 TL ${escaped.map((line, index) => `${index ? "T* " : ""}(${line}) Tj`).join(" ")} ET`;
-  const objects = [
-    "<< /Type /Catalog /Pages 2 0 R >>",
-    "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-    "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>",
-    "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-    `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
-    `<< /Title (${escaped[0] || "Permitext Code Memo"}) /Author (Permitext) /Subject (Issued professional work product) >>`
-  ];
-  let pdf = "%PDF-1.4\n";
-  const offsets = [0];
-  objects.forEach((object, index) => {
-    offsets.push(pdf.length);
-    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+async function downloadIssuedCodeMemoFile(record, format, filename) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in to download this Issued Record.");
+  const response = await fetch("/projects/code-questions/records/file", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${account.sessionToken}`
+    },
+    body: JSON.stringify({
+      auth: { accountUserID: account.userID },
+      codeQuestionWorkspaceEnabled: codeQuestionWorkspaceEnabled(),
+      projectID: activeProjectIDForCodeQuestions(),
+      questionID: record.questionID,
+      issuedRecordID: record.id,
+      format
+    })
   });
-  const xref = pdf.length;
-  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-  offsets.slice(1).forEach((offset) => { pdf += `${String(offset).padStart(10, "0")} 00000 n \n`; });
-  pdf += `trailer << /Size ${objects.length + 1} /Root 1 0 R /Info 6 0 R >>\nstartxref\n${xref}\n%%EOF`;
-  return new Blob([pdf], { type: "application/pdf" });
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
+    throw new Error(payload.error || `Download failed: ${response.status}`);
+  }
+  downloadCodeMemoBlob(await response.blob(), filename);
 }
 
 function renderCodeMemoVersionsBody(project, questionID) {
@@ -25464,59 +26135,59 @@ function renderCodeMemoVersionsBody(project, questionID) {
   const wrap = document.createElement("div");
   wrap.className = "code-memo-versions";
   const state = codeMemoDerivedState(context);
+  const issuanceOnline = navigator.onLine !== false && serverReachable;
   wrap.innerHTML = `<section class="code-memo-boundary"><p class="code-question-pane-status">Issued Records · ${escapeHTML(state.replaceAll("-", " "))}</p><p>Issuance creates an immutable Manifest v3 and exact PDF, HTML, and structured outputs. It is not agency approval or a compliance certificate.</p></section>`;
+  if (!issuanceOnline) {
+    const offlineBoundary = document.createElement("p");
+    offlineBoundary.className = "code-question-define-stale";
+    offlineBoundary.textContent = "Issuance requires an online server transaction. Draft work remains available, but Issue cannot be queued offline.";
+    wrap.appendChild(offlineBoundary);
+  }
   const issueButton = document.createElement("button");
   issueButton.type = "button";
   issueButton.textContent = context.issue.lastFailure ? "Retry approved issuance" : "Issue Code Memo";
-  issueButton.disabled = !context.draft || state !== "approved" || !context.readiness.ready;
-  issueButton.addEventListener("click", () => {
-    let pending = null;
+  issueButton.disabled = !issuanceOnline || !context.draft || state !== "approved" || !context.readiness.ready;
+  issueButton.addEventListener("click", async () => {
+    if (navigator.onLine === false || !serverReachable) {
+      void showWebNotice(
+        "Code Memo not issued",
+        "Issuance requires an online server transaction and cannot be queued offline."
+      );
+      return;
+    }
+    const projectID = activeProjectIDForCodeQuestions();
+    const requestContext = codeQuestionRequestContext(projectID);
     try {
+      assertCodeQuestionRequestContext(requestContext);
       const priorFailed = getIssueForQuestion(context.qid).pendingIssuance.slice().reverse().find((item) =>
         item.draftID === context.draft.id && item.sagaStatus === "failed"
       );
       const idempotencyKey = priorFailed?.idempotencyKey || `issue-${context.qid}-${context.draft.draftHash}`;
-      const begun = beginCodeMemoIssuance(getIssueForQuestion(context.qid), context.draft.id, context.readiness, {
-        idempotencyKey,
-        actor: context.actor
+      issueButton.disabled = true;
+      const begun = await postCodeQuestionForContext(requestContext, "/projects/code-questions/issue/start", {
+        projectID, questionID: context.qid,
+        draftID: context.draft.id, idempotencyKey
       });
-      pending = begun.pending;
-      let issuingWorkspace = begun.workspace;
-      if (begun.replayed && pending.sagaStatus === "failed") {
-        issuingWorkspace = {
-          ...issuingWorkspace,
-          pendingIssuance: issuingWorkspace.pendingIssuance.map((item) => item.id === pending.id
-            ? { ...item, state: "issuing", sagaStatus: "reserved", error: null }
-            : item),
-          lastFailure: null
-        };
-      }
-      saveIssueForQuestion(context.qid, issuingWorkspace);
+      assertCodeQuestionRequestContext(requestContext);
+      const completed = await postCodeQuestionForContext(requestContext, "/projects/code-questions/issue/complete", {
+        projectID, questionID: context.qid,
+        pendingID: begun.pending.id,
+        supersessionReason: "Corrected and reissued through the professional review workflow."
+      });
+      assertCodeQuestionRequestContext(requestContext);
+      await hydrateCodeQuestionState(projectID, context.qid, { force: true, render: false });
+      assertCodeQuestionRequestContext(requestContext);
+      updateQuestionIssuedVersion(context.qid, completed.issuedRecord.issueVersion);
       refreshCodeMemoPanes(context.qid);
-      window.setTimeout(() => {
-        try {
-          const completed = completeCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, {
-            displayID: context.question.displayID || "Q",
-            questionTitle: context.question.title || context.definition?.title || "Code Question",
-            supersessionReason: "Corrected and reissued through the professional review workflow."
-          });
-          saveIssueForQuestion(context.qid, completed.workspace);
-          updateQuestionIssuedVersion(context.qid, completed.issuedRecord.issueVersion);
-          refreshCodeMemoPanes(context.qid);
-        } catch (error) {
-          const failed = failCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, { error: error.message });
-          saveIssueForQuestion(context.qid, failed.workspace);
-          refreshCodeMemoPanes(context.qid);
-        }
-      }, 120);
     } catch (error) {
-      if (pending) {
-        const failed = failCodeMemoIssuance(getIssueForQuestion(context.qid), pending.id, { error: error.message });
-        saveIssueForQuestion(context.qid, failed.workspace);
-        refreshCodeMemoPanes(context.qid);
-      } else {
-        void showWebNotice("Code Memo not issued", error.message);
+      if (
+        codeQuestionRequestContextIsCurrent(requestContext) &&
+        evictDeniedCodeQuestionCache(error, projectID, context.qid, { questionScoped: true })
+      ) {
+        await renderWorkspace();
       }
+      issueButton.disabled = false;
+      void showWebNotice("Code Memo not issued", error.message);
     }
   });
   wrap.appendChild(issueButton);
@@ -25533,37 +26204,33 @@ function renderCodeMemoVersionsBody(project, questionID) {
     const json = document.createElement("button");
     json.type = "button";
     json.textContent = "Download structured manifest";
-    json.addEventListener("click", () => downloadCodeMemoBlob(new Blob([codeMemoStructuredJSON(record.manifest)], { type: "application/json" }), `${safe}.json`));
+    json.addEventListener("click", () => void downloadIssuedCodeMemoFile(record, "structured", `${safe}.json`)
+      .catch((error) => showWebNotice("Download failed", error.message)));
     const html = document.createElement("button");
     html.type = "button";
     html.textContent = "Download HTML";
-    html.addEventListener("click", () => downloadCodeMemoBlob(new Blob([codeMemoHTML(record.manifest)], { type: "text/html" }), `${safe}.html`));
+    html.addEventListener("click", () => void downloadIssuedCodeMemoFile(record, "html", `${safe}.html`)
+      .catch((error) => showWebNotice("Download failed", error.message)));
     const pdf = document.createElement("button");
     pdf.type = "button";
     pdf.textContent = "Download PDF";
-    pdf.addEventListener("click", () => downloadCodeMemoBlob(simpleCodeMemoPDF(record.manifest), `${safe}.pdf`));
+    pdf.addEventListener("click", () => void downloadIssuedCodeMemoFile(record, "pdf", `${safe}.pdf`)
+      .catch((error) => showWebNotice("Download failed", error.message)));
     downloads.append(json, html, pdf);
     item.appendChild(downloads);
     if (status.state === "issued") {
       const correction = document.createElement("button");
       correction.type = "button";
       correction.textContent = "Prepare correction";
-      correction.addEventListener("click", () => {
+      correction.addEventListener("click", async () => {
         try {
-          const result = prepareCodeMemoDraft(getIssueForQuestion(context.qid), {
-            project: { id: activeProjectIDForCodeQuestions(), name: project?.name || "Project", address: project?.address || "" },
-            definition: { ...context.definition, displayID: context.question.displayID || "Q" },
-            evidence: context.evidence, analysis: context.analysis, review: context.review,
+          await executeCodeQuestionMutation("/projects/code-questions/memos/prepare", {
+            projectID: activeProjectIDForCodeQuestions(), questionID: context.qid,
             title: `${context.draft?.title || context.question.title || "Code Memo"} · Correction`,
             narrative: context.draft?.sections?.authoredNarrative || "",
             includeAnalysis: context.draft?.includeAnalysis !== false,
-            correctionOfIssuedRecordID: record.id,
-            actor: context.actor,
-            definitionHash: context.binding?.definitionHash || "unavailable",
-            inputSetHash: context.binding?.inputSetHash || "unavailable",
-            currentDependencyHash: context.binding?.dependencyHash || "unavailable"
-          });
-          saveIssueForQuestion(context.qid, result.workspace);
+            correctionOfIssuedRecordID: record.id
+          }, { commandKind: "codeQuestion.memo.prepare" });
           refreshCodeMemoPanes(context.qid);
         } catch (error) {
           void showWebNotice("Correction not prepared", error.message);
@@ -25595,10 +26262,12 @@ function refreshCodeQuestionAnalysisPanes(questionID) {
   saveWorkspaceState();
 }
 
-function toggleLocalCodeQuestionArchive(questionID) {
-  const next = questionsForActiveProject().map((item) => {
+async function toggleLocalCodeQuestionArchive(questionID) {
+  const question = questionsForActiveProject().find((item) => item.id === questionID);
+  if (!question) return;
+  const archived = question.recordState !== "archived";
+  const applyOptimistic = () => setQuestionsForActiveProject(questionsForActiveProject().map((item) => {
     if (item.id !== questionID) return item;
-    const archived = item.recordState !== "archived";
     return {
       ...item,
       recordState: archived ? "archived" : "active",
@@ -25607,8 +26276,20 @@ function toggleLocalCodeQuestionArchive(questionID) {
         recordState: archived ? "archived" : "active"
       })
     };
-  });
-  setQuestionsForActiveProject(next);
+  }));
+  await executeCodeQuestionMutation(
+    `/projects/code-questions/${archived ? "archive" : "restore"}`,
+    {
+      projectID: activeProjectIDForCodeQuestions(), questionID,
+      expectedVersion: question.version || getDefinitionForQuestion(questionID)?.expectedVersion
+    },
+    {
+      commandKind: archived ? "codeQuestion.archive" : "codeQuestion.restore",
+      expectedVersion: question.version,
+      applyOptimistic
+    }
+  );
+  invalidateCodeQuestionListHydration(activeProjectIDForCodeQuestions());
 }
 
 function renderCodeQuestionShellChrome() {
@@ -25636,7 +26317,7 @@ function renderCodeQuestionShellChrome() {
   }
 }
 
-async function renderWorkspace() {
+async function renderWorkspace(options = {}) {
   const renderGeneration = ++workspaceRenderGeneration;
   const readerScrollPositions = suppressReaderScrollRestore ? new Map() : captureReaderScrollPositions();
   await ensureSyncedContentForRender();
@@ -25656,7 +26337,7 @@ async function renderWorkspace() {
     appendPaneSequence(panes);
     syncAllCommentBoxHeights();
     bindAllReaderCommentScroll();
-    saveWorkspaceState();
+    if (options.persist !== false) saveWorkspaceState();
     return true;
   }
   for (const detail of openProjectDetails()) {
@@ -25701,7 +26382,7 @@ async function renderWorkspace() {
   syncAllCommentBoxHeights();
   bindAllReaderCommentScroll();
   enhanceReaderSelects();
-  saveWorkspaceState();
+  if (options.persist !== false) saveWorkspaceState();
   return true;
 }
 
@@ -26153,11 +26834,15 @@ async function start() {
   bindResearchTextSelection();
   window.addEventListener("storage", (event) => {
     if (event.key === accountSessionKey) {
+      const previousUserID = state.account?.userID || "";
+      if (previousUserID) persistCodeQuestionAccountState(previousUserID);
       try {
         state.account = event.newValue ? JSON.parse(event.newValue) : null;
       } catch {
         state.account = null;
       }
+      codeQuestionUnauthorizedAccountUserID = "";
+      loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
       syncedContent = null;
       if (activeAccount()) {
         startForegroundSyncLoop({ immediate: true });
@@ -26165,6 +26850,14 @@ async function start() {
         stopForegroundSyncLoop();
       }
       void renderWorkspace();
+      return;
+    }
+    if (
+      state.account?.userID &&
+      event.key === codeQuestionAccountCacheKey(state.account.userID)
+    ) {
+      loadCodeQuestionAccountStateIntoWorkspace(state.account.userID);
+      void renderWorkspace({ persist: false });
       return;
     }
     if (event.key === baseWorkspaceKey) applySharedWorkspaceState(event.newValue);
@@ -26197,6 +26890,7 @@ async function start() {
     serverReachable = true;
     updateConnectionStatus();
     startForegroundSyncLoop({ immediate: true });
+    void flushCodeQuestionOutbox();
     void flushPendingNotebookImages();
   });
   window.addEventListener("offline", () => {
@@ -26356,6 +27050,7 @@ async function start() {
     }
   }
   void flushPendingSyncAndRender().catch(() => {});
+  void flushCodeQuestionOutbox().catch(() => {});
   startForegroundSyncLoop();
   refreshEntitlementAfterCheckoutReturn();
 }
