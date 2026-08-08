@@ -808,6 +808,69 @@ try {
   });
   assert(expiredSessionPull.response.status === 401, "Expired session remained usable.");
 
+  const deletionUpdatedAt = new Date().toISOString();
+  const deleteExistingSavedItem = await request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: {
+        user: { id: userID },
+        mutations: [{
+          savedItem: {
+            ...savedItem.savedItem,
+            updatedAt: deletionUpdatedAt,
+            deletedAt: deletionUpdatedAt
+          }
+        }]
+      }
+    }
+  });
+  assert(
+    deleteExistingSavedItem.response.ok &&
+      deleteExistingSavedItem.json.acceptedMutationIDs.includes(savedItem.savedItem.id),
+    "Postgres rejected a deletion update for an existing non-Project sync record."
+  );
+
+  const clearMutation = {
+    codeVersionClear: {
+      userID,
+      codeVersion,
+      values: { scope: "bookmarks" },
+      updatedAt: new Date(Date.now() + 1).toISOString()
+    }
+  };
+  const firstClearPush = await request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: { user: { id: userID }, mutations: [clearMutation] }
+    }
+  });
+  assert(
+    firstClearPush.response.ok && firstClearPush.json.acceptedMutationIDs.length >= 1,
+    "Initial Postgres bulk clear failed."
+  );
+  const replayedClear = {
+    codeVersionClear: {
+      ...clearMutation.codeVersionClear,
+      updatedAt: new Date(Date.now() + 2).toISOString()
+    }
+  };
+  const secondClearPush = await request("/sync/push", {
+    method: "POST",
+    token,
+    body: {
+      auth: { accountUserID: userID },
+      batch: { user: { id: userID }, mutations: [replayedClear] }
+    }
+  });
+  assert(
+    secondClearPush.response.ok && secondClearPush.json.acceptedMutationIDs.length >= 1,
+    "Postgres rejected a newer bulk-clear marker for an existing non-Project sync record."
+  );
+
   const finalSummary = await request("/admin/storage/summary", { token: adminToken });
   assert(finalSummary.response.ok, "Final storage summary failed.");
   assert(finalSummary.json.tables.savedItems >= 1, "Storage summary did not include saved item count.");

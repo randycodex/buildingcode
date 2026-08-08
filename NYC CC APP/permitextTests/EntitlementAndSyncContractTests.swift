@@ -153,6 +153,30 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(try XCTUnwrap(consolidatedParagraph.first).isBlockAnnotation)
     }
 
+    func testSavedEvidenceSuppressesPreviewThatRepeatsItsTitle() {
+        let repeated = BookmarkedSection(
+            id: 1,
+            codeVersion: UserContentSyncCodeVersion.localNYC2022,
+            chapterNumber: "1",
+            chapterTitle: "Fuel Gas",
+            sectionNumber: "1.1",
+            title: "Underground inspection and/or testing of installed piping.",
+            previewText: "underground inspection and/or testing of installed piping"
+        )
+        XCTAssertEqual(repeated.nonRepeatingPreviewText, "")
+
+        let distinct = BookmarkedSection(
+            id: 2,
+            codeVersion: UserContentSyncCodeVersion.localNYC2022,
+            chapterNumber: "1",
+            chapterTitle: "Fuel Gas",
+            sectionNumber: "1.2",
+            title: "Required inspection.",
+            previewText: "The inspection must occur before backfill."
+        )
+        XCTAssertEqual(distinct.nonRepeatingPreviewText, "The inspection must occur before backfill.")
+    }
+
     func testBundledProjectEvidenceMatchesSevenWebEvidenceRowsAndCodeGroups() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()
         let constructionVersion = try XCTUnwrap(versions.first {

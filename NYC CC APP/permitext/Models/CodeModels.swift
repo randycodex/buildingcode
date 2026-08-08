@@ -3483,6 +3483,14 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         !noteBody.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    var nonRepeatingPreviewText: String {
+        let preview = previewText.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !preview.isEmpty else { return "" }
+        return Self.normalizedEvidenceText(preview) == Self.normalizedEvidenceText(displayTitle)
+            ? ""
+            : preview
+    }
+
     var rowID: String {
         let versionIdentity = UserContentSyncCodeVersion.server(codeVersion)
         return annotationBlockID.isEmpty
@@ -3492,6 +3500,16 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
 
     var isBlockAnnotation: Bool {
         !annotationBlockID.isEmpty
+    }
+
+    private static func normalizedEvidenceText(_ value: String) -> String {
+        value
+            .folding(options: [.caseInsensitive, .diacriticInsensitive], locale: .current)
+            .components(separatedBy: .punctuationCharacters)
+            .joined(separator: " ")
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+            .lowercased()
     }
 }
 

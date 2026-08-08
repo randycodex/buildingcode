@@ -252,7 +252,8 @@ export function createPostgresSyncRepository(sql) {
         server_version = permitext_user_content_records.server_version + 1
       WHERE permitext_user_content_records.user_id = EXCLUDED.user_id
         AND NOT (
-          permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'
+          EXCLUDED.entity_kind = 'project'
+          AND permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'
           AND NOT (EXCLUDED.mutation->'project' ? 'folderType')
         )
         AND (

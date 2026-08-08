@@ -976,7 +976,9 @@ async function main() {
         workspaceScript.text.includes("PDF export requires Pro") &&
         workspaceScript.text.includes("Workboards require Pro") &&
         serverSource.includes("Workboard image uploads require Pro.") &&
-        syncRepositorySource.includes("lower(plan) = 'pro'"),
+        syncRepositorySource.includes("lower(plan) = 'pro'") &&
+        syncRepositorySource.includes("EXCLUDED.entity_kind = 'project'") &&
+        syncRepositorySource.includes("permitext_user_content_records.mutation->'project'->>'folderType' = 'reference'"),
       "Free and Pro capabilities are no longer enforced consistently by the web UI and server."
     );
     assert(

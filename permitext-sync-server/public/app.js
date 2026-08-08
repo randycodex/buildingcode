@@ -377,6 +377,7 @@ let syncLoadPromise = null;
 let organizationWorkspace = null;
 let organizationLoadPromise = null;
 let syncFlushPromise = null;
+let rejectedDeletionRecoveryAttempted = false;
 let syncRetryTimer = null;
 let foregroundSyncTimer = null;
 let foregroundSyncPromise = null;
@@ -6163,6 +6164,14 @@ function absorbBulkClearConflicts() {
     if (kind !== "codeVersionClear") {
       return true;
     }
+    if (
+      entry.rejectionCode === "SYNC_MUTATION_REJECTED" ||
+      String(entry.lastError || "").includes("server could not accept this change")
+    ) {
+      // Keep generic server rejections so the upgraded client can retry the
+      // clear after the server-side acceptance defect is repaired.
+      return true;
+    }
     const key = bulkClearKey(record);
     const existing = key ? latestLocalClears.get(key) : null;
     if (key && (!existing || Date.parse(record.updatedAt || 0) >= Date.parse(existing.updatedAt || 0))) {
@@ -6173,6 +6182,37 @@ function absorbBulkClearConflicts() {
   });
   if (changed) state.localBulkClears = Array.from(latestLocalClears.values());
   return changed;
+}
+
+function retryRejectedDeletionConflictsOnce(account) {
+  if (rejectedDeletionRecoveryAttempted) return false;
+  rejectedDeletionRecoveryAttempted = true;
+  const recoverable = (state.syncConflicts || []).filter((entry) => {
+    if (entry.accountUserID !== account.userID) return false;
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    const isDeletion = Boolean(record?.deletedAt) && ["savedItem", "projectSection"].includes(kind);
+    const isBulkClear = kind === "codeVersionClear";
+    const genericRejection = entry.rejectionCode === "SYNC_MUTATION_REJECTED" ||
+      String(entry.lastError || "").includes("server could not accept this change");
+    return genericRejection && (isDeletion || isBulkClear);
+  });
+  if (!recoverable.length) return false;
+
+  const operationGroupID = crypto.randomUUID();
+  const baseTimestamp = Date.now();
+  recoverable.forEach((entry, index) => {
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    const updatedAt = new Date(baseTimestamp + index).toISOString();
+    enqueueSyncMutation({
+      [kind]: {
+        ...record,
+        userID: account.userID,
+        updatedAt,
+        ...(record.deletedAt ? { deletedAt: updatedAt } : {})
+      }
+    }, account, { operationGroupID });
+  });
+  return true;
 }
 
 function summarizeMutations(mutations = []) {
@@ -7313,6 +7353,7 @@ async function flushSyncOutbox(options = {}) {
   }
 
   syncFlushPromise = (async () => {
+    retryRejectedDeletionConflictsOnce(account);
     prepareSyncOutboxForFlush(account);
     const acceptedMutationIDs = [];
     const rejectedMutationIDs = [];

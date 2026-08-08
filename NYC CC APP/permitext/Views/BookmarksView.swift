@@ -883,8 +883,8 @@ private var filteredSavedEmptyState: some View {
                     .foregroundStyle(.primary)
                     .multilineTextAlignment(.leading)
 
-                if !bookmark.previewText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                    Text(bookmark.previewText)
+                if !bookmark.nonRepeatingPreviewText.isEmpty {
+                    Text(bookmark.nonRepeatingPreviewText)
                         .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
                         .foregroundStyle(.secondary)
                         .multilineTextAlignment(.leading)
@@ -1991,8 +1991,8 @@ struct ProjectView: View {
                         .foregroundStyle(.primary)
                         .multilineTextAlignment(.leading)
 
-                    if !bookmark.previewText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                        Text(bookmark.previewText)
+                    if !bookmark.nonRepeatingPreviewText.isEmpty {
+                        Text(bookmark.nonRepeatingPreviewText)
                             .font(library.readerTheme.swiftUIFont(size: max(library.readerTheme.fontSize - 1, ReaderTheme.minimumFontSize)))
                             .foregroundStyle(.secondary)
                             .multilineTextAlignment(.leading)
