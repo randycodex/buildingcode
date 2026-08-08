@@ -2733,7 +2733,7 @@ final class CodeLibraryViewModel: ObservableObject {
         // Reconcile once from the complete server state after the project and
         // bulk-clear tombstone repairs. Older event cursors could otherwise
         // remain ahead of those repaired records and preserve stale local data.
-        let key = "permitext.sync.full-state-reconciliation.v6.\(account.appUserID)"
+        let key = "permitext.sync.full-state-reconciliation.v7.\(account.appUserID)"
         guard !UserDefaults.standard.bool(forKey: key) else { return }
         syncEngine.resetCheckpoint(account: account)
         UserDefaults.standard.set(true, forKey: key)

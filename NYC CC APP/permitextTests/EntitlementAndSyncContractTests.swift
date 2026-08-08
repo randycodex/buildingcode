@@ -586,20 +586,23 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.allFolders().first?.codeVersion, projectVersion)
         XCTAssertTrue(try store.folders(codeVersion: evidenceVersion).isEmpty)
 
-        try store.saveSection(9_900, toFolderIDs: [projectID], codeVersion: projectVersion)
-        try store.saveSection(9_901, toFolderIDs: [projectID], codeVersion: evidenceVersion)
+        // Section identifiers are only unique inside a code version. Preserve
+        // both memberships when two code books reuse the same numeric ID.
+        let reusedSectionID: Int64 = 9_900
+        try store.saveSection(reusedSectionID, toFolderIDs: [projectID], codeVersion: projectVersion)
+        try store.saveSection(reusedSectionID, toFolderIDs: [projectID], codeVersion: evidenceVersion)
 
         XCTAssertEqual(
-            Set(try store.folderMembership(codeVersion: evidenceVersion)[9_901] ?? []),
+            Set(try store.folderMembership(codeVersion: evidenceVersion)[reusedSectionID] ?? []),
             [projectID]
         )
         let accountWideEvidence = try store.evidenceReferences(inFolder: projectID)
         XCTAssertEqual(accountWideEvidence.count, 2)
         XCTAssertTrue(accountWideEvidence.contains {
-            $0.sectionID == 9_900 && $0.codeVersion == projectVersion
+            $0.sectionID == reusedSectionID && $0.codeVersion == projectVersion
         })
         XCTAssertTrue(accountWideEvidence.contains {
-            $0.sectionID == 9_901 && $0.codeVersion == evidenceVersion
+            $0.sectionID == reusedSectionID && $0.codeVersion == evidenceVersion
         })
         let queuedMembership = try XCTUnwrap(
             store.pendingSyncQueueItems(limit: 20).first {
@@ -619,7 +622,56 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                     $0.payload.codeVersion == evidenceVersion
             }
         )
-        XCTAssertEqual(queuedCrossCodeDelete.payload.sectionID, 9_901)
+        XCTAssertEqual(queuedCrossCodeDelete.payload.sectionID, reusedSectionID)
+    }
+
+    func testLegacyProjectEvidenceSchemaMigratesToCodeVersionAwareIdentity() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-project-evidence-migration-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        do {
+            let legacyConnection = try SQLiteConnection(path: databaseURL.path, readOnly: false)
+            try legacyConnection.execute(
+                """
+                CREATE TABLE folder_sections (
+                    client_id TEXT NOT NULL DEFAULT '',
+                    owner_id TEXT NOT NULL DEFAULT 'local',
+                    visibility TEXT NOT NULL DEFAULT 'personal',
+                    sync_state TEXT NOT NULL DEFAULT 'localOnly',
+                    folder_id INTEGER NOT NULL,
+                    code_version TEXT NOT NULL,
+                    section_id INTEGER NOT NULL,
+                    added_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT '',
+                    deleted_at TEXT,
+                    PRIMARY KEY(folder_id, section_id)
+                );
+                """
+            )
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let projectVersion = UserContentSyncCodeVersion.localNYC2022
+        let evidenceVersion = UserContentSyncCodeVersion.localNYCZoning
+        let projectID = try store.createFolder(
+            name: "Migrated Project",
+            address: "",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: projectVersion
+        )
+        let reusedSectionID: Int64 = 4_321
+
+        try store.saveSection(reusedSectionID, toFolderIDs: [projectID], codeVersion: projectVersion)
+        try store.saveSection(reusedSectionID, toFolderIDs: [projectID], codeVersion: evidenceVersion)
+
+        XCTAssertEqual(try store.evidenceReferences(inFolder: projectID).count, 2)
     }
 
     func testReaderCodeMenuGroupsConstructionCodesByEditionYear() {

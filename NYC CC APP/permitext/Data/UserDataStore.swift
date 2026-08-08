@@ -677,7 +677,7 @@ final class UserDataStore: UserContentRepository {
                 added_at TEXT NOT NULL,
                 updated_at TEXT NOT NULL DEFAULT '',
                 deleted_at TEXT,
-                PRIMARY KEY(folder_id, section_id)
+                PRIMARY KEY(folder_id, code_version, section_id)
             );
 
             CREATE INDEX IF NOT EXISTS idx_folder_sections_section
@@ -751,6 +751,7 @@ final class UserDataStore: UserContentRepository {
         try addColumnIfMissing(table: "folder_sections", column: "sync_state", definition: "TEXT NOT NULL DEFAULT 'localOnly'")
         try addColumnIfMissing(table: "folder_sections", column: "updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try addColumnIfMissing(table: "folder_sections", column: "deleted_at", definition: "TEXT")
+        try migrateFolderSectionsCodeVersionConstraintIfNeeded()
         try addColumnIfMissing(table: "sync_queue", column: "mutation_updated_at", definition: "TEXT NOT NULL DEFAULT ''")
         try backfillSyncColumns()
     }
@@ -847,6 +848,58 @@ final class UserDataStore: UserContentRepository {
                 """
             )
             try connection.execute("DROP TABLE bookmark_tags_legacy;")
+        }
+    }
+
+    private func migrateFolderSectionsCodeVersionConstraintIfNeeded() throws {
+        guard try !hasPrimaryKey(table: "folder_sections", columns: ["folder_id", "code_version", "section_id"]) else {
+            return
+        }
+
+        try performTransaction {
+            try connection.execute("ALTER TABLE folder_sections RENAME TO folder_sections_legacy;")
+            try connection.execute(
+                """
+                CREATE TABLE folder_sections (
+                    client_id TEXT NOT NULL DEFAULT '',
+                    owner_id TEXT NOT NULL DEFAULT 'local',
+                    visibility TEXT NOT NULL DEFAULT 'personal',
+                    sync_state TEXT NOT NULL DEFAULT 'localOnly',
+                    folder_id INTEGER NOT NULL,
+                    code_version TEXT NOT NULL,
+                    section_id INTEGER NOT NULL,
+                    added_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL DEFAULT '',
+                    deleted_at TEXT,
+                    PRIMARY KEY(folder_id, code_version, section_id)
+                );
+                """
+            )
+            try connection.execute(
+                """
+                INSERT INTO folder_sections (
+                    client_id, owner_id, visibility, sync_state, folder_id,
+                    code_version, section_id, added_at, updated_at, deleted_at
+                )
+                SELECT
+                    client_id, owner_id, visibility, sync_state, folder_id,
+                    code_version, section_id, added_at, updated_at, deleted_at
+                FROM folder_sections_legacy;
+                """
+            )
+            try connection.execute("DROP TABLE folder_sections_legacy;")
+            try connection.execute(
+                "CREATE INDEX idx_folder_sections_section ON folder_sections(section_id, code_version);"
+            )
+            try connection.execute(
+                "CREATE INDEX idx_folder_sections_folder ON folder_sections(folder_id);"
+            )
+            try connection.execute(
+                "CREATE INDEX idx_folder_sections_version_section ON folder_sections(code_version, section_id);"
+            )
+            try connection.execute(
+                "CREATE INDEX idx_folder_sections_folder_version_added ON folder_sections(folder_id, code_version, added_at);"
+            )
         }
     }
 

@@ -3474,7 +3474,10 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     }
 
     var rowID: String {
-        annotationBlockID.isEmpty ? "section:\(id)" : "section:\(id):block:\(annotationBlockID)"
+        let versionIdentity = UserContentSyncCodeVersion.server(codeVersion)
+        return annotationBlockID.isEmpty
+            ? "version:\(versionIdentity):section:\(id)"
+            : "version:\(versionIdentity):section:\(id):block:\(annotationBlockID)"
     }
 
     var isBlockAnnotation: Bool {
