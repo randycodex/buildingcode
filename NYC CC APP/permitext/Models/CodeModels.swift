@@ -3398,6 +3398,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     let annotationLabel: String?
     let codeVersion: String
     let codeSectionID: Int64?
+    let codeSectionName: String
     let clientID: String?
     let ownerID: String
     let visibility: UserContentVisibility
@@ -3421,6 +3422,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         annotationLabel: String? = nil,
         codeVersion: String,
         codeSectionID: Int64? = nil,
+        codeSectionName: String = "",
         clientID: String? = nil,
         ownerID: String = UserDataDefaults.localOwnerID,
         visibility: UserContentVisibility = .personal,
@@ -3443,6 +3445,7 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
         self.annotationLabel = annotationLabel
         self.codeVersion = codeVersion
         self.codeSectionID = codeSectionID
+        self.codeSectionName = codeSectionName
         self.clientID = clientID
         self.ownerID = ownerID
         self.visibility = visibility
@@ -3523,6 +3526,7 @@ enum ProjectEvidenceConsolidator {
                 annotationLabel: preferred.annotationLabel,
                 codeVersion: preferred.codeVersion,
                 codeSectionID: preferred.codeSectionID,
+                codeSectionName: preferred.codeSectionName,
                 clientID: preferred.clientID,
                 ownerID: preferred.ownerID,
                 visibility: preferred.visibility,
@@ -3541,6 +3545,164 @@ enum ProjectEvidenceConsolidator {
                 bookmarkedAt: group.compactMap(\.bookmarkedAt).max()
             )
         }
+    }
+}
+
+struct ProjectEvidenceChapterGroup: Identifiable, Hashable, Sendable {
+    let id: String
+    let chapterNumber: String
+    let chapterTitle: String
+    let items: [BookmarkedSection]
+
+    var displayTitle: String {
+        let chapter = CodeChapter(
+            id: 0,
+            codeSectionID: nil,
+            chapterNumber: chapterNumber,
+            title: chapterTitle
+        )
+        let label = chapter.displayLabel
+        let normalizedTitle = chapterTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalizedTitle.isEmpty,
+              normalizedTitle.caseInsensitiveCompare(label) != .orderedSame,
+              normalizedTitle.caseInsensitiveCompare("Administration") != .orderedSame
+        else {
+            return label
+        }
+        return "\(label)  \(normalizedTitle)"
+    }
+}
+
+struct ProjectEvidenceCodeGroup: Identifiable, Hashable, Sendable {
+    let id: String
+    let codeVersion: String
+    let codeSectionName: String
+    let displayTitle: String
+    let chapters: [ProjectEvidenceChapterGroup]
+
+    var items: [BookmarkedSection] {
+        chapters.flatMap(\.items)
+    }
+}
+
+enum ProjectEvidenceOrganizer {
+    static func codeGroups(_ items: [BookmarkedSection]) -> [ProjectEvidenceCodeGroup] {
+        var grouped: [String: [BookmarkedSection]] = [:]
+        var metadata: [String: (codeVersion: String, codeSectionName: String)] = [:]
+
+        for item in items {
+            let codeSectionName = resolvedCodeSectionName(for: item)
+            let key = "\(UserContentSyncCodeVersion.server(item.codeVersion)):\(codeSectionName.uppercased())"
+            grouped[key, default: []].append(item)
+            metadata[key] = (item.codeVersion, codeSectionName)
+        }
+
+        return grouped.compactMap { key, groupItems -> ProjectEvidenceCodeGroup? in
+            guard let groupMetadata = metadata[key] else { return nil }
+            let chapterGroups = Dictionary(grouping: groupItems) { item in
+                "\(item.chapterNumber.uppercased()):\(item.chapterTitle.uppercased())"
+            }
+            .map { chapterKey, chapterItems in
+                let first = chapterItems[0]
+                return ProjectEvidenceChapterGroup(
+                    id: "\(key):\(chapterKey)",
+                    chapterNumber: first.chapterNumber,
+                    chapterTitle: first.chapterTitle,
+                    items: chapterItems.sorted(by: compareSectionOrder)
+                )
+            }
+            .sorted(by: compareChapterOrder)
+
+            return ProjectEvidenceCodeGroup(
+                id: key,
+                codeVersion: groupMetadata.codeVersion,
+                codeSectionName: groupMetadata.codeSectionName,
+                displayTitle: displayTitle(
+                    codeVersion: groupMetadata.codeVersion,
+                    codeSectionName: groupMetadata.codeSectionName
+                ),
+                chapters: chapterGroups
+            )
+        }
+        .sorted(by: compareCodeGroupOrder)
+    }
+
+    static func displayTitle(codeVersion: String, codeSectionName: String) -> String {
+        let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
+        let normalizedName = codeSectionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        let uppercaseName = normalizedName.uppercased()
+
+        if canonicalVersion == UserContentSyncCodeVersion.canonicalNYC2022,
+           uppercaseName.contains("GENERAL ADMINISTRATIVE") {
+            return "General Administrative Code (2022 Edition)"
+        }
+        if canonicalVersion == UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative {
+            if uppercaseName.contains("1968 BUILDING") {
+                return "1968 Building Code (Historical)"
+            }
+            if uppercaseName.contains("TITLE 28") {
+                return "Administrative Code Title 28 — Current Consolidation"
+            }
+            if uppercaseName.contains("CONSTRUCTION-RELATED LOCAL LAWS") {
+                return "Construction-Related Local Laws"
+            }
+        }
+
+        return normalizedName == normalizedName.uppercased()
+            ? normalizedName.localizedCapitalized
+            : normalizedName
+    }
+
+    private static func resolvedCodeSectionName(for item: BookmarkedSection) -> String {
+        let name = item.codeSectionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? "Saved Evidence" : name
+    }
+
+    private static func compareCodeGroupOrder(
+        _ lhs: ProjectEvidenceCodeGroup,
+        _ rhs: ProjectEvidenceCodeGroup
+    ) -> Bool {
+        let lhsVersionRank = versionRank(lhs.codeVersion)
+        let rhsVersionRank = versionRank(rhs.codeVersion)
+        if lhsVersionRank != rhsVersionRank { return lhsVersionRank < rhsVersionRank }
+
+        let lhsSectionRank = codeSectionRank(lhs.codeSectionName)
+        let rhsSectionRank = codeSectionRank(rhs.codeSectionName)
+        if lhsSectionRank != rhsSectionRank { return lhsSectionRank < rhsSectionRank }
+        return lhs.displayTitle.localizedStandardCompare(rhs.displayTitle) == .orderedAscending
+    }
+
+    private static func versionRank(_ codeVersion: String) -> Int {
+        switch UserContentSyncCodeVersion.server(codeVersion) {
+        case UserContentSyncCodeVersion.canonicalNYC2022: return 0
+        case UserContentSyncCodeVersion.canonicalNYC2025Specialty: return 1
+        case UserContentSyncCodeVersion.canonicalNYCExistingBuilding: return 2
+        case UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative: return 3
+        case UserContentSyncCodeVersion.canonicalNYCZoning: return 4
+        default: return 5
+        }
+    }
+
+    private static func codeSectionRank(_ name: String) -> Int {
+        let uppercaseName = name.uppercased()
+        let orderedKeywords = [
+            "BUILDING CODE", "GENERAL ADMINISTRATIVE", "FUEL GAS", "MECHANICAL",
+            "PLUMBING", "ENERGY", "ELECTRICAL", "FIRE CODE", "1968 BUILDING",
+            "HOUSING MAINTENANCE", "TITLE 24", "TITLE 25", "TITLE 26", "TITLE 28",
+            "LOCAL LAWS"
+        ]
+        return orderedKeywords.firstIndex(where: uppercaseName.contains) ?? Int.max
+    }
+
+    private static func compareChapterOrder(
+        _ lhs: ProjectEvidenceChapterGroup,
+        _ rhs: ProjectEvidenceChapterGroup
+    ) -> Bool {
+        lhs.chapterNumber.compare(rhs.chapterNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
+    }
+
+    private static func compareSectionOrder(_ lhs: BookmarkedSection, _ rhs: BookmarkedSection) -> Bool {
+        lhs.sectionNumber.compare(rhs.sectionNumber, options: [.numeric, .caseInsensitive]) == .orderedAscending
     }
 }
 
@@ -4549,8 +4711,8 @@ enum BookmarkSorter {
                 if lhsDate != rhsDate { return lhsDate > rhsDate }
                 return compareCodeOrder(lhs, rhs, codeSectionName: codeSectionName)
             case .codeBook:
-                let lhsName = codeSectionName(lhs.codeSectionID)
-                let rhsName = codeSectionName(rhs.codeSectionID)
+                let lhsName = resolvedCodeSectionName(lhs, fallback: codeSectionName)
+                let rhsName = resolvedCodeSectionName(rhs, fallback: codeSectionName)
                 if lhsName != rhsName {
                     return lhsName.localizedStandardCompare(rhsName) == .orderedAscending
                 }
@@ -4577,8 +4739,8 @@ enum BookmarkSorter {
         _ rhs: BookmarkedSection,
         codeSectionName: (Int64?) -> String
     ) -> Bool {
-        let lhsCode = codeSectionName(lhs.codeSectionID)
-        let rhsCode = codeSectionName(rhs.codeSectionID)
+        let lhsCode = resolvedCodeSectionName(lhs, fallback: codeSectionName)
+        let rhsCode = resolvedCodeSectionName(rhs, fallback: codeSectionName)
         if lhsCode != rhsCode {
             return lhsCode.localizedStandardCompare(rhsCode) == .orderedAscending
         }
@@ -4593,6 +4755,14 @@ enum BookmarkSorter {
             return lhs.annotationBlockID.isEmpty
         }
         return lhs.rowID.localizedStandardCompare(rhs.rowID) == .orderedAscending
+    }
+
+    private static func resolvedCodeSectionName(
+        _ bookmark: BookmarkedSection,
+        fallback: (Int64?) -> String
+    ) -> String {
+        let name = bookmark.codeSectionName.trimmingCharacters(in: .whitespacesAndNewlines)
+        return name.isEmpty ? fallback(bookmark.codeSectionID) : name
     }
 }
 

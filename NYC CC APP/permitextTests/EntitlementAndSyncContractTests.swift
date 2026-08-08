@@ -153,6 +153,98 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(try XCTUnwrap(consolidatedParagraph.first).isBlockAnnotation)
     }
 
+    func testBundledProjectEvidenceMatchesSixUniqueWebSectionsAndCodeGroups() throws {
+        let versions = BundleDatabaseLocator().availableCodeVersions()
+        let constructionVersion = try XCTUnwrap(versions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
+        })
+        let enactedVersion = try XCTUnwrap(versions.first {
+            UserContentSyncCodeVersion.server($0.codeVersion) ==
+                UserContentSyncCodeVersion.canonicalNYCEnactedAdministrative
+        })
+        let constructionStore = try AuthoredCodeStore(
+            jsonURL: constructionVersion.fileURL,
+            codeID: try XCTUnwrap(constructionVersion.authoredCodeID),
+            jurisdictionID: try XCTUnwrap(constructionVersion.jurisdictionID)
+        )
+        let enactedStore = try AuthoredCodeStore(
+            jsonURL: enactedVersion.fileURL,
+            codeID: try XCTUnwrap(enactedVersion.authoredCodeID),
+            jurisdictionID: try XCTUnwrap(enactedVersion.jurisdictionID)
+        )
+
+        let constructionSections = constructionStore.codeSections()
+        let buildingID = try XCTUnwrap(constructionSections.first { $0.name == "BUILDING CODE" }?.id)
+        let generalAdminID = try XCTUnwrap(
+            constructionSections.first { $0.name.contains("GENERAL ADMINISTRATIVE") }?.id
+        )
+        let mechanicalID = try XCTUnwrap(constructionSections.first { $0.name == "MECHANICAL CODE" }?.id)
+        let building1062 = try XCTUnwrap(
+            constructionStore.sectionSummary(sectionNumber: "106.2", codeSectionID: buildingID)
+        )
+        let building1063 = try XCTUnwrap(
+            constructionStore.sectionSummary(sectionNumber: "106.3", codeSectionID: buildingID)
+        )
+        let administrative284061 = try XCTUnwrap(
+            constructionStore.sectionSummary(sectionNumber: "28-406.1", codeSectionID: generalAdminID)
+        )
+        let mechanical11 = try XCTUnwrap(
+            constructionStore.sectionSummary(sectionNumber: "1.1.", codeSectionID: mechanicalID)
+                ?? constructionStore.sectionSummary(sectionNumber: "1.1", codeSectionID: mechanicalID)
+        )
+
+        let constructionRows = constructionStore.savedSections(
+            ids: [building1062.id, building1063.id, administrative284061.id, mechanical11.id],
+            codeVersion: UserContentSyncCodeVersion.localNYC2022,
+            bookmarkedSectionIDs: [building1062.id, administrative284061.id],
+            notesBySectionID: [:],
+            annotationEntries: [
+                UserAnnotationEntry(
+                    sectionID: building1062.id,
+                    blockID: "paragraph-106.2",
+                    noteBody: "Commenting commenting"
+                ),
+                UserAnnotationEntry(sectionID: mechanical11.id, blockID: "paragraph-1.1")
+            ],
+            includeProjectOnlySections: true
+        )
+
+        let enactedSections = enactedStore.codeSections()
+        let historicalID = try XCTUnwrap(enactedSections.first { $0.name.contains("1968 BUILDING") }?.id)
+        let title28ID = try XCTUnwrap(enactedSections.first { $0.name.contains("TITLE 28") }?.id)
+        let historical27867 = try XCTUnwrap(
+            enactedStore.sectionSummary(sectionNumber: "27-867", codeSectionID: historicalID)
+        )
+        let current284061 = try XCTUnwrap(
+            enactedStore.sectionSummary(sectionNumber: "28-406.1", codeSectionID: title28ID)
+        )
+        let enactedRows = enactedStore.savedSections(
+            ids: [historical27867.id, current284061.id],
+            codeVersion: UserContentSyncCodeVersion.localNYCEnactedAdministrative,
+            bookmarkedSectionIDs: [],
+            notesBySectionID: [:],
+            includeProjectOnlySections: true
+        )
+
+        XCTAssertEqual(constructionRows.count + enactedRows.count, 7)
+        let consolidated = ProjectEvidenceConsolidator.consolidated(constructionRows + enactedRows)
+        let groups = ProjectEvidenceOrganizer.codeGroups(consolidated)
+
+        XCTAssertEqual(consolidated.count, 6)
+        XCTAssertEqual(groups.flatMap(\.items).count, 6)
+        XCTAssertEqual(
+            groups.map(\.displayTitle),
+            [
+                "Building Code",
+                "General Administrative Code (2022 Edition)",
+                "Mechanical Code",
+                "1968 Building Code (Historical)",
+                "Administrative Code Title 28 — Current Consolidation"
+            ]
+        )
+        XCTAssertEqual(groups.first?.items.map(\.sectionNumber), ["106.2", "106.3"])
+    }
+
     @MainActor
     func testDeepLinksResolveTheirCodeVersionFromBundledSectionMetadata() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()

@@ -1099,7 +1099,10 @@ struct ProjectView: View {
     @State private var projectReportShareURL: URL?
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
-    @State private var isSavedEvidenceExpanded = true
+    @State private var collapsedEvidenceGroupIDs: Set<String> = []
+    @State private var selectedEvidenceTag: String?
+    @State private var evidenceSearchQuery = ""
+    @State private var isEvidenceSearchPresented = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1113,6 +1116,36 @@ struct ProjectView: View {
             mode: sortMode,
             codeSectionName: { library.codeSectionName(id: $0) }
         )
+    }
+
+    private var availableEvidenceTags: [String] {
+        Array(Set(projectBookmarks.flatMap(\.tags))).sorted {
+            $0.localizedStandardCompare($1) == .orderedAscending
+        }
+    }
+
+    private var visibleProjectBookmarks: [BookmarkedSection] {
+        let query = evidenceSearchQuery.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        return projectBookmarks.filter { bookmark in
+            let matchesTag = selectedEvidenceTag.map { selectedTag in
+                bookmark.tags.contains { $0.caseInsensitiveCompare(selectedTag) == .orderedSame }
+            } ?? true
+            guard matchesTag else { return false }
+            guard !query.isEmpty else { return true }
+            return [
+                bookmark.sectionNumber,
+                bookmark.displayTitle,
+                bookmark.previewText,
+                bookmark.noteBody,
+                bookmark.chapterTitle,
+                bookmark.codeSectionName,
+                bookmark.tags.joined(separator: " ")
+            ].contains { $0.lowercased().contains(query) }
+        }
+    }
+
+    private var projectEvidenceGroups: [ProjectEvidenceCodeGroup] {
+        ProjectEvidenceOrganizer.codeGroups(visibleProjectBookmarks)
     }
 
     private var accentColor: Color {
@@ -1137,37 +1170,25 @@ struct ProjectView: View {
                     .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
                 if !projectBookmarks.isEmpty {
-                    Button {
-                        withAnimation(.easeInOut(duration: 0.2)) {
-                            isSavedEvidenceExpanded.toggle()
-                        }
-                    } label: {
-                        HStack(spacing: 12) {
-                            CodeEyebrow(text: "Saved Evidence", accent: accentColor)
-                            Spacer(minLength: 12)
-                            Image(systemName: "chevron.down")
-                                .font(.caption.weight(.bold))
-                                .foregroundStyle(accentColor)
-                                .rotationEffect(.degrees(isSavedEvidenceExpanded ? 0 : -90))
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel("Saved Evidence")
-                    .accessibilityValue(isSavedEvidenceExpanded ? "Expanded" : "Collapsed")
-                    .accessibilityHint(isSavedEvidenceExpanded ? "Collapses saved evidence" : "Expands saved evidence")
+                    savedEvidenceHeader
                         .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
-                    if isSavedEvidenceExpanded {
+                    evidenceTagMenu
+
+                    if visibleProjectBookmarks.isEmpty {
+                        ContentUnavailableView(
+                            "No matching evidence",
+                            systemImage: "bookmark.slash",
+                            description: Text("Choose another tag or change the search.")
+                        )
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 28)
+                    } else {
                         LazyVStack(alignment: .leading, spacing: 0) {
-                            ForEach(projectBookmarks, id: \.rowID) { bookmark in
-                                projectBookmarkRow(bookmark)
-                                CodeHairline()
+                            ForEach(projectEvidenceGroups) { group in
+                                projectEvidenceGroup(group)
                             }
                         }
-                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
-                        .transition(.opacity.combined(with: .move(edge: .top)))
                     }
                 }
             }
@@ -1179,11 +1200,15 @@ struct ProjectView: View {
         .background(CodeAppBackdrop(accent: accentColor).ignoresSafeArea())
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .searchable(
+            text: $evidenceSearchQuery,
+            isPresented: $isEvidenceSearchPresented,
+            prompt: "Search saved evidence"
+        )
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
                 sortMenu
                 exportButton
-                selectionButton
             }
         }
         .sheet(item: $folderEditorTarget) { target in
@@ -1237,6 +1262,18 @@ struct ProjectView: View {
         }
         .onChange(of: projectBookmarks) { _, _ in
             selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(projectBookmarks.map(\.rowID)))
+            if selectedBookmarkRowIDs.isEmpty {
+                isSelecting = false
+            }
+            if let selectedEvidenceTag,
+               availableEvidenceTags.contains(where: {
+                   $0.caseInsensitiveCompare(selectedEvidenceTag) == .orderedSame
+               }) == false {
+                self.selectedEvidenceTag = nil
+            }
+        }
+        .onChange(of: visibleProjectBookmarks) { _, visibleBookmarks in
+            selectedBookmarkRowIDs = selectedBookmarkRowIDs.intersection(Set(visibleBookmarks.map(\.rowID)))
             if selectedBookmarkRowIDs.isEmpty {
                 isSelecting = false
             }
@@ -1718,18 +1755,120 @@ struct ProjectView: View {
         .accessibilityLabel("Export project")
     }
 
-    private var selectionButton: some View {
+    private var savedEvidenceSelectionButton: some View {
         Button {
             toggleSelectionMode()
         } label: {
             Image(systemName: isSelecting ? "checkmark.circle.fill" : "checklist")
-                .font(.system(size: CodeScreenMetrics.toolbarIconPointSize, weight: .semibold))
-                .foregroundStyle(Color.appChrome)
-                .frame(width: CodeScreenMetrics.toolbarButtonSize, height: CodeScreenMetrics.toolbarButtonSize)
+                .font(.body.weight(.semibold))
+                .foregroundStyle(accentColor)
+                .frame(width: 36, height: 36)
         }
         .buttonStyle(.plain)
         .disabled(projectBookmarks.isEmpty)
         .accessibilityLabel(isSelecting ? "Finish selecting" : "Select sections")
+    }
+
+    private var savedEvidenceHeader: some View {
+        HStack(spacing: 4) {
+            CodeEyebrow(text: "Saved Evidence", accent: accentColor)
+            Spacer(minLength: 12)
+            Button {
+                isEvidenceSearchPresented = true
+            } label: {
+                Image(systemName: "magnifyingglass")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(accentColor)
+                    .frame(width: 36, height: 36)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Search saved evidence")
+
+            savedEvidenceSelectionButton
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var evidenceTagMenu: some View {
+        Menu {
+            Button("All Tags") { selectedEvidenceTag = nil }
+            ForEach(availableEvidenceTags, id: \.self) { tag in
+                Button(tag) { selectedEvidenceTag = tag }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Text(selectedEvidenceTag ?? "All Tags")
+                    .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 12)
+                Image(systemName: "chevron.down")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(.secondary)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 11)
+            .background(Color(uiColor: .secondarySystemGroupedBackground), in: Capsule(style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .disabled(availableEvidenceTags.isEmpty)
+        .accessibilityLabel("Filter saved evidence by tag")
+        .accessibilityValue(selectedEvidenceTag ?? "All Tags")
+    }
+
+    @ViewBuilder
+    private func projectEvidenceGroup(_ group: ProjectEvidenceCodeGroup) -> some View {
+        let groupAccent = Color(uiColor: CodeSectionThemeProfile(codeSectionName: group.codeSectionName).accentColor)
+        let isCollapsed = collapsedEvidenceGroupIDs.contains(group.id)
+
+        VStack(alignment: .leading, spacing: 0) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isCollapsed {
+                        collapsedEvidenceGroupIDs.remove(group.id)
+                    } else {
+                        collapsedEvidenceGroupIDs.insert(group.id)
+                    }
+                }
+            } label: {
+                HStack(alignment: .firstTextBaseline, spacing: 12) {
+                    Text(group.displayTitle)
+                        .font(CodeTypography.sectionLabel)
+                        .foregroundStyle(groupAccent)
+                        .textCase(.uppercase)
+                        .tracking(0.2)
+                        .multilineTextAlignment(.leading)
+                    Spacer(minLength: 12)
+                    Image(systemName: "chevron.down")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(groupAccent)
+                        .rotationEffect(.degrees(isCollapsed ? -90 : 0))
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(group.displayTitle)
+            .accessibilityValue(isCollapsed ? "Collapsed" : "Expanded")
+
+            if !isCollapsed {
+                ForEach(group.chapters) { chapter in
+                    Text(chapter.displayTitle)
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(groupAccent)
+                        .textCase(.uppercase)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 24)
+                        .padding(.bottom, 8)
+
+                    ForEach(chapter.items, id: \.rowID) { bookmark in
+                        projectBookmarkRow(bookmark)
+                        CodeHairline()
+                    }
+                }
+                .transition(.opacity.combined(with: .move(edge: .top)))
+            }
+        }
+        .padding(.top, 28)
     }
 
     @ViewBuilder
@@ -1802,7 +1941,9 @@ struct ProjectView: View {
     }
 
     private func projectBookmarkRow(_ bookmark: BookmarkedSection) -> some View {
-        let bookmarkAccent = Color(uiColor: library.accentColor(for: bookmark.codeSectionID))
+        let bookmarkAccent = bookmark.codeSectionName.isEmpty
+            ? Color(uiColor: library.accentColor(for: bookmark.codeSectionID))
+            : Color(uiColor: CodeSectionThemeProfile(codeSectionName: bookmark.codeSectionName).accentColor)
         let isSelected = selectedBookmarkRowIDs.contains(bookmark.rowID)
 
         return HStack(alignment: .top, spacing: 12) {
