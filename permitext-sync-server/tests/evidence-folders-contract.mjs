@@ -104,7 +104,7 @@ assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?title: "Blocknotes"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
 [
   "openProjectNotebook",
   "closeProjectNotebook",
@@ -143,6 +143,16 @@ assert.match(functionSource(appSource, "reconcileProjectStudioWithSavedFolders")
 assert.match(savedFolderContextSource, /await loadProjectCoordinationFoundation[\s\S]*?previousContext\.replaceWith\(context\)/);
 assert.doesNotMatch(savedFolderContextSource, /previousContext\?\.remove\(\)[\s\S]*?const folder/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /addButton\.onclick[\s\S]*?projectsMenuToggle\.onclick[\s\S]*?archiveButton\.onclick/);
+assert.match(indexSource, /saved-projects-select-button[\s\S]*?saved-projects-add-button/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.onclick = \(\) => setSelecting\(!selecting\)/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.onclick[\s\S]*?await archiveProjects\(selectedProjects\)/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /showingArchived[\s\S]*?await deleteArchivedProjects\(selectedProjects\)[\s\S]*?await archiveProjects\(selectedProjects\)/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.textContent = `\$\{showingArchived \? "Delete" : "Archive"\} \$\{selectedCount\}`/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /actions\.append\(archiveProjectButton, editButton\)/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /selectionSquareIconSVG\(selected\)/);
+assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-edit-action\.is-selection-control \{[\s\S]*?color: #c7ccd3;/);
+assert.match(stylesSource, /\.saved-projects-bulk-bar \{[\s\S]*?margin: var\(--space-2\);[\s\S]*?border-radius: var\(--saved-projects-card-radius\);[\s\S]*?background: var\(--menu-subtle-surface\);/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /project\.sharedOnly[\s\S]*?return/);
 assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);
 assert.match(functionSource(appSource, "closeUtilityInstance"), /successorFolder[\s\S]*?activateProjectStudio\(successorFolder/);
 assert.match(functionSource(appSource, "renderWorkspace"), /renderGeneration = \+\+workspaceRenderGeneration[\s\S]*?renderGeneration !== workspaceRenderGeneration[\s\S]*?appendPaneSequence/);

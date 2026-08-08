@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-typography-v8";
+} from "./offline-storage.js?v=20260808-reader-notes-borderless-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -201,7 +201,6 @@ const workspaceRegistryKey = "permitext:webWorkspaces:v2";
 const toolbarOrderKey = "permitext:webToolbarOrder:v1";
 const defaultToolbarButtonIDs = Object.freeze([
   "add-reader",
-  "add-zoning-reader",
   "toggle-search",
   "toggle-saved",
   "toggle-analysis",
@@ -235,7 +234,6 @@ const workspaceKey = detachedProjectWindow
 const track = document.querySelector("#panel-track");
 const topbarActions = document.querySelector(".topbar-actions");
 const addReaderButton = document.querySelector("#add-reader");
-const addZoningReaderButton = document.querySelector("#add-zoning-reader");
 const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
@@ -263,28 +261,28 @@ const settingsTemplate = document.querySelector("#settings-template");
 if (detachedWorkboardRoute) document.body.classList.add("is-detached-workboard-window");
 
 const codeOptions = [
-  { prefix: "BC", label: "Building Code", theme: "building", group: "Construction Codes" },
-  { prefix: "AC", label: "General Administrative Code (2022 edition)", theme: "administrative", group: "Construction Codes" },
-  { prefix: "PC", label: "Plumbing Code", theme: "plumbing", group: "Construction Codes" },
-  { prefix: "MC", label: "Mechanical Code", theme: "mechanical", group: "Construction Codes" },
-  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas", group: "Construction Codes" },
-  { prefix: "ECC", label: "Energy Conservation Code (2025)", theme: "energy", group: "Construction Codes" },
-  { prefix: "EC", label: "Electrical Code — NYC amendments (2025)", theme: "electrical", group: "Construction Codes" },
+  { prefix: "BC", label: "Building Code", theme: "building", group: "2022 Construction Codes" },
+  { prefix: "AC", label: "General Administrative Code (2022 edition)", theme: "administrative", group: "2022 Construction Codes" },
+  { prefix: "PC", label: "Plumbing Code", theme: "plumbing", group: "2022 Construction Codes" },
+  { prefix: "MC", label: "Mechanical Code", theme: "mechanical", group: "2022 Construction Codes" },
+  { prefix: "FGC", label: "Fuel Gas Code", theme: "fuel-gas", group: "2022 Construction Codes" },
+  { prefix: "ECC", label: "Energy Conservation Code (2025)", theme: "energy", group: "2025 Codes" },
+  { prefix: "EC", label: "Electrical Code — NYC amendments (2025)", theme: "electrical", group: "2025 Codes" },
   {
     prefix: "EBC",
     label: "Existing Building Code (effective July 17, 2027)",
     theme: "existing-building",
-    group: "Construction Codes"
+    group: "Existing and Historical Building Codes"
   },
-  { prefix: "FC", label: "Fire Code", theme: "fire", group: "Construction Codes" },
-  { prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical", group: "Historical and Housing Codes" },
-  { prefix: "HMC", label: "Housing Maintenance Code", theme: "housing", group: "Historical and Housing Codes" },
-  { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "environmental", group: "Administrative Code Titles" },
-  { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "land-use", group: "Administrative Code Titles" },
-  { prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "housing-buildings", group: "Administrative Code Titles" },
-  { prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "current-consolidation", group: "Administrative Code Titles" },
-  { prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law", group: "Local Laws and Transitions" },
-  { prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use" }
+  { prefix: "BC68", label: "1968 Building Code (historical)", theme: "historical", group: "Existing and Historical Building Codes" },
+  { prefix: "FC", label: "Fire Code", theme: "fire", group: "Fire and Housing" },
+  { prefix: "HMC", label: "Housing Maintenance Code", theme: "housing", group: "Fire and Housing" },
+  { prefix: "T24", label: "Administrative Code Title 24 — Environmental Protection", theme: "environmental", group: "Administrative Code" },
+  { prefix: "T25", label: "Administrative Code Title 25 — Land Use", theme: "land-use", group: "Administrative Code" },
+  { prefix: "T26", label: "Administrative Code Title 26 — Housing and Buildings", theme: "housing-buildings", group: "Administrative Code" },
+  { prefix: "T28", label: "Administrative Code Title 28 — Current Consolidation", theme: "current-consolidation", group: "Administrative Code" },
+  { prefix: "LL", label: "Construction-Related Local Laws", theme: "local-law", group: "Local Laws" },
+  { prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use and Zoning" }
 ];
 const zoningCodePrefix = "ZR";
 const existingBuildingCodePrefix = "EBC";
@@ -3545,10 +3543,6 @@ function setUtilityButtonStates() {
   const activeRepeatableKeys = new Set((state.utilityInstances || []).map((instance) => instance.key));
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
-  addZoningReaderButton?.setAttribute(
-    "aria-pressed",
-    String((state.readers || []).some((reader) => reader.codePrefix === zoningCodePrefix))
-  );
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
@@ -4627,32 +4621,23 @@ function populateCodeSelect(panel, reader) {
   if (!codeSelect) return;
   clear(codeSelect);
   reader.codePrefix = reader.codePrefix || "BC";
-  const zoningReader = reader.codePrefix === zoningCodePrefix;
-  codeSelect.disabled = zoningReader;
-  if (zoningReader) {
-    const zoningOption = document.createElement("option");
-    zoningOption.value = zoningCodePrefix;
-    zoningOption.textContent = "Zoning Resolution";
-    codeSelect.append(zoningOption);
-  } else {
-    const optionsByGroup = new Map();
-    codeOptions.filter((code) => code.prefix !== zoningCodePrefix).forEach((code) => {
-      const group = code.group || "Other Enacted Codes";
-      if (!optionsByGroup.has(group)) optionsByGroup.set(group, []);
-      optionsByGroup.get(group).push(code);
+  const optionsByGroup = new Map();
+  codeOptions.forEach((code) => {
+    const group = code.group || "Other Enacted Codes";
+    if (!optionsByGroup.has(group)) optionsByGroup.set(group, []);
+    optionsByGroup.get(group).push(code);
+  });
+  optionsByGroup.forEach((codes, groupLabel) => {
+    const group = document.createElement("optgroup");
+    group.label = groupLabel;
+    codes.forEach((code) => {
+      const option = document.createElement("option");
+      option.value = code.prefix;
+      option.textContent = code.label;
+      group.append(option);
     });
-    optionsByGroup.forEach((codes, groupLabel) => {
-      const group = document.createElement("optgroup");
-      group.label = groupLabel;
-      codes.forEach((code) => {
-        const option = document.createElement("option");
-        option.value = code.prefix;
-        option.textContent = code.label;
-        group.append(option);
-      });
-      codeSelect.append(group);
-    });
-  }
+    codeSelect.append(group);
+  });
   codeSelect.value = reader.codePrefix;
   codeSelect.setAttribute("aria-label", "Code section");
   codeSelect.title = codeLabel(reader.codePrefix);
@@ -4930,7 +4915,6 @@ function isProAccount() {
 
 function updateReaderPlanControls() {
   addReaderButton.hidden = !isProAccount() && state.readers.length >= 2;
-  if (addZoningReaderButton) addZoningReaderButton.hidden = false;
   collapseReadersButton.hidden = false;
   updateWorkspaceLayoutControls();
 }
@@ -10003,12 +9987,13 @@ function bindReaderNotesResize(resizer, sheet, panel) {
     const inputBounds = input.getBoundingClientRect();
     const cssMinHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-min-height")) || 320;
     const minInputHeight = parseFloat(sheetStyles.getPropertyValue("--reader-notes-input-min-height")) || 64;
-    const maxHeight = Math.max(cssMinHeight, panelBounds.height - (parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0));
+    const readerTrackTop = parseFloat(getComputedStyle(panel).getPropertyValue("--reader-scrollbar-track-top")) || 0;
+    const maxHeight = Math.max(cssMinHeight, sheetBounds.bottom - panelBounds.top - readerTrackTop);
     const nonInputContentHeight = Math.max(0, sheet.scrollHeight - input.offsetHeight);
     const minHeight = Math.min(maxHeight, Math.max(cssMinHeight, nonInputContentHeight + minInputHeight));
 
     const resize = (moveEvent) => {
-      const height = panelBounds.bottom - moveEvent.clientY;
+      const height = sheetBounds.bottom - moveEvent.clientY;
       const clampedHeight = Math.min(maxHeight, Math.max(minHeight, height));
       const inputHeight = Math.max(minInputHeight, inputBounds.height + clampedHeight - sheetBounds.height);
       sheet.style.setProperty("--reader-notes-height", `${clampedHeight}px`);
@@ -11933,6 +11918,15 @@ function selectionIndicatorIconSVG() {
     <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="9"></circle>
       <path class="project-selection-checkmark" d="m8 12 3 3 5-6"></path>
+    </svg>
+  `;
+}
+
+function selectionSquareIconSVG(selected = false) {
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+      ${selected ? '<path d="m8 12 3 3 5-6"></path>' : ""}
     </svg>
   `;
 }
@@ -19738,6 +19732,17 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       controls.append(button);
     });
     context.append(controls);
+
+    const savedSection = document.createElement("section");
+    savedSection.className = "project-studio-section saved-project-evidence-section";
+    savedSection.append(
+      createSavedEvidenceHeading(),
+      inlineFilters,
+      planUsage,
+      savedContent
+    );
+    context.append(savedSection);
+
     const { foundation, error } = await loadProjectCoordinationFoundation(identity);
     if (!panel.isConnected) return folder;
     if (activeAccount()) {
@@ -19763,15 +19768,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       context.append(warning);
     }
 
-    const savedSection = document.createElement("section");
-    savedSection.className = "project-studio-section saved-project-evidence-section";
-    savedSection.append(
-      createSavedEvidenceHeading(),
-      inlineFilters,
-      planUsage,
-      savedContent
-    );
-    context.append(savedSection);
     appendProjectResearchHistory(context, identity, foundation);
     appendProjectActivity(context, foundation, {
       title: "Recent Activities",
@@ -20184,10 +20180,33 @@ async function renderSaved(instance) {
 
 function renderSavedProjects(panel, instance, paneID, projects, projectSections) {
   const list = panel.querySelector(".saved-project-list");
+  const section = panel.querySelector(".saved-projects-section");
+  const selectButton = panel.querySelector(".saved-projects-select-button");
   const addButton = panel.querySelector(".saved-projects-add-button");
   const archiveButton = panel.querySelector(".saved-projects-archive-button");
   let showingArchived = Boolean(instance.projectsArchiveMode);
+  let selecting = false;
+  let selectionBusy = false;
+  const selectedProjectIDs = new Set();
   let switchCleanupTimer = null;
+  const bulkBar = document.createElement("section");
+  bulkBar.className = "saved-projects-bulk-bar";
+  bulkBar.hidden = true;
+  bulkBar.setAttribute("aria-label", "Folder selection");
+  const selectionCount = document.createElement("span");
+  selectionCount.className = "saved-projects-bulk-count";
+  const selectAllButton = document.createElement("button");
+  selectAllButton.type = "button";
+  selectAllButton.className = "saved-projects-bulk-link";
+  const archiveSelectedButton = document.createElement("button");
+  archiveSelectedButton.type = "button";
+  archiveSelectedButton.className = "saved-projects-bulk-archive";
+  const cancelSelectionButton = document.createElement("button");
+  cancelSelectionButton.type = "button";
+  cancelSelectionButton.className = "saved-projects-bulk-link";
+  cancelSelectionButton.textContent = "Cancel";
+  bulkBar.append(selectionCount, selectAllButton, archiveSelectedButton, cancelSelectionButton);
+  section.append(bulkBar);
   const projectsMenuLabel = (savedInstance) => {
     if (savedInstance.projectsMenuOpen) return "";
     if (savedInstance.projectsArchiveMode) return "Archived Projects";
@@ -20219,6 +20238,67 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     archiveButton.innerHTML = showingArchived ? activeProjectsIconSVG() : archiveIconSVG();
     addButton.hidden = showingArchived;
     addButton.disabled = showingArchived;
+    selectButton.hidden = false;
+    selectButton.disabled = selectionBusy;
+  };
+
+  const selectableProjects = () => (showingArchived
+    ? archivedProjectRecords(projects)
+    : activeFolderRecords(projects)
+  ).filter((project) => !project.sharedOnly);
+  const updateSelectionControls = () => {
+    const selectableIDs = selectableProjects().map(projectRecordID).filter(Boolean);
+    selectedProjectIDs.forEach((id) => {
+      if (!selectableIDs.includes(id)) selectedProjectIDs.delete(id);
+    });
+    section.classList.toggle("is-selecting", selecting);
+    selectButton.setAttribute("aria-pressed", String(selecting));
+    selectButton.title = selecting ? "Cancel folder selection" : "Select folders";
+    selectButton.setAttribute("aria-label", selectButton.title);
+    bulkBar.hidden = !selecting;
+    const selectedCount = selectedProjectIDs.size;
+    selectionCount.textContent = `${selectedCount} selected`;
+    selectAllButton.textContent = selectableIDs.length > 0 && selectedCount === selectableIDs.length
+      ? "Clear all"
+      : "Select all";
+    archiveSelectedButton.textContent = `${showingArchived ? "Delete" : "Archive"} ${selectedCount}`;
+    archiveSelectedButton.classList.toggle("is-delete", showingArchived);
+    archiveSelectedButton.disabled = selectedCount === 0 || selectionBusy;
+    selectAllButton.disabled = selectionBusy;
+    cancelSelectionButton.disabled = selectionBusy;
+    addButton.disabled = showingArchived || selecting || selectionBusy;
+    archiveButton.disabled = selecting || selectionBusy;
+    list.querySelectorAll(".saved-project-tile").forEach((tile) => {
+      const id = tile.dataset.projectId || "";
+      const eligible = tile.dataset.bulkSelectable === "true";
+      const selected = selectedProjectIDs.has(id);
+      tile.classList.toggle("is-bulk-selected", selected);
+      if (selecting && eligible) {
+        tile.setAttribute("aria-pressed", String(selected));
+        tile.setAttribute("aria-label", `${selected ? "Deselect" : "Select"} ${tile.dataset.projectName || "folder"}`);
+      } else {
+        tile.removeAttribute("aria-pressed");
+        tile.setAttribute("aria-label", tile.dataset.defaultAriaLabel || "Open folder");
+      }
+      const editAction = tile.querySelector(".saved-project-edit-action");
+      const archiveAction = tile.querySelector(".saved-project-archive-action");
+      if (editAction) {
+        editAction.innerHTML = selecting
+          ? selectionSquareIconSVG(selected)
+          : (showingArchived ? archiveRestoreIconSVG() : pencilIconSVG());
+        editAction.classList.toggle("is-selection-control", selecting);
+        editAction.tabIndex = selecting ? -1 : 0;
+        editAction.setAttribute("aria-hidden", String(selecting));
+      }
+      archiveAction?.classList.toggle("is-selection-hidden", selecting);
+    });
+  };
+
+  const setSelecting = (nextSelecting) => {
+    selecting = Boolean(nextSelecting);
+    selectedProjectIDs.clear();
+    renderProjectCards();
+    updateSelectionControls();
   };
 
   const renderProjectCards = () => {
@@ -20274,6 +20354,9 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       tile.setAttribute("role", "button");
       tile.setAttribute("aria-label", `Open ${project.name || project.title || "folder"}`);
       tile.dataset.projectId = projectRecordID(project);
+      tile.dataset.projectName = project.name || project.title || "folder";
+      tile.dataset.defaultAriaLabel = tile.getAttribute("aria-label");
+      tile.dataset.bulkSelectable = String(!project.sharedOnly);
       const selected = !showingArchived && projectRecordID(project) === String(instance.selectedFolderID || "");
       tile.classList.toggle("is-selected", selected);
       if (selected) tile.setAttribute("aria-current", "true");
@@ -20298,6 +20381,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       actions.className = "saved-project-tile-actions";
       const editButton = document.createElement("button");
       editButton.type = "button";
+      editButton.className = "saved-project-edit-action";
       editButton.title = showingArchived ? "Restore folder" : "Edit folder";
       editButton.setAttribute("aria-label", `${editButton.title}: ${heading.textContent}`);
       editButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : pencilIconSVG();
@@ -20308,6 +20392,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       const archiveProjectButton = document.createElement("button");
       archiveProjectButton.type = "button";
+      archiveProjectButton.className = "saved-project-archive-action";
       archiveProjectButton.title = showingArchived ? "Delete folder" : "Archive folder";
       archiveProjectButton.setAttribute("aria-label", `${archiveProjectButton.title}: ${heading.textContent}`);
       archiveProjectButton.innerHTML = showingArchived ? trashIconSVG() : archiveIconSVG();
@@ -20316,9 +20401,17 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         if (showingArchived) void deleteArchivedProject(project);
         else void archiveProject(project);
       });
-      if (!project.sharedOnly) actions.append(editButton, archiveProjectButton);
+      if (!project.sharedOnly) actions.append(archiveProjectButton, editButton);
       tile.append(heading, typeBadge, countLabel, actions);
       const open = async () => {
+        if (selecting) {
+          const id = projectRecordID(project);
+          if (!id || project.sharedOnly || selectionBusy) return;
+          if (selectedProjectIDs.has(id)) selectedProjectIDs.delete(id);
+          else selectedProjectIDs.add(id);
+          updateSelectionControls();
+          return;
+        }
         if (panel.dataset.folderTransition === "true") return;
         panel.dataset.folderTransition = "true";
         tile.dataset.opening = "true";
@@ -20395,7 +20488,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         open();
       });
       tile.addEventListener("dragstart", (event) => {
-        if (showingArchived || project.sharedOnly || event.target.closest(".saved-project-tile-actions")) {
+        if (selecting || showingArchived || project.sharedOnly || event.target.closest(".saved-project-tile-actions")) {
           event.preventDefault();
           return;
         }
@@ -20443,6 +20536,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       });
       list.append(tile);
     });
+    updateSelectionControls();
     updateCodeFilterMenu(list, instance, {
       stateKey: "projectsMenuOpen",
       menuName: "projects",
@@ -20482,6 +20576,28 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     list.classList.add("is-mode-switching");
     list.addEventListener("animationend", finishSwitch, { once: true });
     switchCleanupTimer = window.setTimeout(finishSwitch, 240);
+  };
+
+  selectButton.onclick = () => setSelecting(!selecting);
+  selectAllButton.onclick = () => {
+    const ids = selectableProjects().map(projectRecordID).filter(Boolean);
+    if (selectedProjectIDs.size === ids.length) selectedProjectIDs.clear();
+    else ids.forEach((id) => selectedProjectIDs.add(id));
+    updateSelectionControls();
+  };
+  cancelSelectionButton.onclick = () => setSelecting(false);
+  archiveSelectedButton.onclick = async () => {
+    const selectedProjects = selectableProjects().filter((project) => selectedProjectIDs.has(projectRecordID(project)));
+    if (!selectedProjects.length) return;
+    selectionBusy = true;
+    updateSelectionControls();
+    const completed = showingArchived
+      ? await deleteArchivedProjects(selectedProjects)
+      : await archiveProjects(selectedProjects);
+    if (!completed) {
+      selectionBusy = false;
+      updateSelectionControls();
+    }
   };
 
   syncProjectModeControls();
@@ -22153,11 +22269,6 @@ function renderSettings() {
   const panel = renderTemplate(settingsTemplate);
   applyPaneWeight(panel, "utility:settings");
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
-  wireSettingsSelectControl(panel, ".settings-jurisdiction-select", "Jurisdiction");
-  wireSettingsSelectControl(panel, ".settings-version-select", "Version");
-
-  const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
-  const versionSelect = panel.querySelector(".settings-version-select");
   const accountCopy = panel.querySelector(".account-status-copy");
   const planRows = Array.from(panel.querySelectorAll("[data-plan-option]"));
   const planUsage = panel.querySelector(".settings-plan-usage");
@@ -22261,8 +22372,6 @@ function renderSettings() {
   updateProjectSelection();
   void renderFirmWorkspaceSettings(panel, settingsProjects, setStatus);
 
-  jurisdictionSelect.value = "jurisdiction-1";
-  versionSelect.value = zoningSyncCodeVersion;
   const renderOfflineState = async () => {
     const pro = hasCapability("offline-access");
     const account = activeAccount();
@@ -22729,65 +22838,6 @@ function renderSettings() {
     });
   });
   return panel;
-}
-
-function setSettingsInlineControlOpen(toggle, options, open, label) {
-  const optionsInner = options.querySelector(".settings-inline-select-options-inner");
-  if (optionsInner) {
-    options.style.setProperty("--settings-inline-options-height", `${optionsInner.scrollHeight}px`);
-  }
-  options.classList.toggle("is-open", open);
-  options.setAttribute("aria-hidden", String(!open));
-  toggle.setAttribute("aria-expanded", String(open));
-  toggle.setAttribute("aria-label", `${open ? "Collapse" : "Expand"} ${label}`);
-  options.querySelectorAll('button[role="option"]').forEach((button) => {
-    button.tabIndex = open ? 0 : -1;
-  });
-}
-
-function wireSettingsSelectControl(panel, selector, label) {
-  const select = panel.querySelector(selector);
-  const control = select?.closest(".settings-inline-select-control");
-  const toggle = control?.querySelector(".settings-inline-select-toggle");
-  const valueLabel = control?.querySelector(".settings-inline-select-value");
-  const options = control?.querySelector(".settings-inline-select-options");
-  const optionsInner = options?.querySelector(".settings-inline-select-options-inner");
-  if (!select || !toggle || !valueLabel || !options || !optionsInner) return;
-
-  const close = () => setSettingsInlineControlOpen(toggle, options, false, label);
-  const syncControl = () => {
-    const selectedOption = select.options[select.selectedIndex];
-    valueLabel.textContent = selectedOption?.textContent || "";
-    optionsInner.querySelectorAll('button[role="option"]').forEach((button) => {
-      button.setAttribute("aria-selected", String(button.dataset.value === select.value));
-    });
-  };
-  const renderOptions = () => {
-    optionsInner.replaceChildren();
-    Array.from(select.options).forEach((option) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.setAttribute("role", "option");
-      button.dataset.value = option.value;
-      button.textContent = option.textContent;
-      button.addEventListener("click", () => {
-        select.value = option.value;
-        select.dispatchEvent(new Event("change", { bubbles: true }));
-        syncControl();
-        close();
-        toggle.focus();
-      });
-      optionsInner.append(button);
-    });
-    syncControl();
-    close();
-  };
-
-  toggle.addEventListener("click", () => {
-    setSettingsInlineControlOpen(toggle, options, !options.classList.contains("is-open"), label);
-  });
-  select.addEventListener("change", syncControl);
-  renderOptions();
 }
 
 function createDivider(previousPaneID, nextPaneID) {
@@ -26715,7 +26765,6 @@ function workspaceCommandDefinitions() {
     ...(isProAccount() || state.readers.length < 2
       ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
-    { label: "Open ZR Reader", hint: "Open the dedicated Zoning Resolution column", run: () => addZoningReaderButton.click() },
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
     { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
@@ -27030,48 +27079,6 @@ async function start() {
       return;
     }
     const reader = newReaderState({ chapterID: await firstChapterIDForCode("BC") });
-    state.readers.push(reader);
-    saveWorkspaceState();
-    await transitionWorkspace("utility");
-    scrollPaneIntoView(paneIDForReader(reader));
-  });
-  addZoningReaderButton.addEventListener("click", async () => {
-    const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);
-    if (existingReader) {
-      scrollPaneIntoView(paneIDForReader(existingReader));
-      return;
-    }
-    const chapterID = await firstChapterIDForCode(zoningCodePrefix);
-    if (!isProAccount() && state.readers.length >= 2) {
-      const replacementReader = state.readers[state.readers.length - 1];
-      Object.entries(searchLinkedReadersBySearch()).forEach(([searchID, readerID]) => {
-        if (readerID === replacementReader.id) delete state.searchLinkedReaders[searchID];
-      });
-      delete replacementReader.projectSavedSourceKey;
-      Object.assign(replacementReader, {
-        codePrefix: zoningCodePrefix,
-        codeVersion: zoningSyncCodeVersion,
-        chapterID,
-        sectionID: "",
-        sectionNumber: "",
-        title: "Reader",
-        commentsOpen: false,
-        internalSearchQuery: "",
-        activeNotesSectionID: "",
-        shouldSmoothScrollToSection: false
-      });
-      saveWorkspaceState();
-      await transitionWorkspace("utility", {
-        refreshPaneIDs: [paneIDForReader(replacementReader)]
-      });
-      scrollPaneIntoView(paneIDForReader(replacementReader));
-      return;
-    }
-    const reader = newReaderState({
-      codePrefix: zoningCodePrefix,
-      codeVersion: zoningSyncCodeVersion,
-      chapterID
-    });
     state.readers.push(reader);
     saveWorkspaceState();
     await transitionWorkspace("utility");

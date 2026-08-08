@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260808-typography-v2">
+    <link rel="stylesheet" href="/web/styles.css?v=20260808-reader-notes-borderless-v1">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68">
   </head>
   <body>
@@ -19,7 +19,6 @@
           <button class="toolbar-button" id="add-reader" type="button" aria-label="Add reader" title="Add reader">
             <span>Reader</span>
           </button>
-          <button class="toolbar-button" id="add-zoning-reader" type="button" aria-label="Open Zoning Resolution reader" title="Open Zoning Resolution reader" aria-pressed="false">ZR</button>
           <button class="toolbar-button" id="toggle-search" type="button" aria-label="Search" title="Search" aria-pressed="false">Search</button>
           <button class="toolbar-button" id="toggle-saved" type="button" aria-label="Projects" title="Projects" aria-pressed="false">Projects</button>
           <button class="toolbar-button" id="toggle-analysis" type="button" aria-label="AI-assisted research" title="AI-assisted research" aria-pressed="false">Research</button>
@@ -339,6 +338,9 @@
                 </span>
               </button>
               <div class="saved-projects-actions">
+                <button class="saved-projects-select-button" type="button" title="Select folders" aria-label="Select folders" aria-pressed="false">
+                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"></rect><path d="m8 12 3 3 5-6"></path></svg>
+                </button>
                 <button class="saved-projects-add-button" type="button" title="Add folder" aria-label="Add Project or Reference folder">
                   <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
                 </button>
@@ -443,37 +445,6 @@
             </button>
           </div>
         </header>
-        <section class="settings-card settings-list settings-library-card settings-preferences-card" aria-labelledby="settings-code-preferences-title">
-          <h3 id="settings-code-preferences-title" class="section-label settings-section-title">Code Preferences</h3>
-          <div class="settings-row">
-            <span>Jurisdiction</span>
-            <div class="settings-inline-select-control">
-              <select class="settings-jurisdiction-select settings-inline-select-native" aria-label="Jurisdiction">
-                <option value="jurisdiction-1">New York City</option>
-              </select>
-              <button class="settings-inline-select-toggle" type="button" aria-label="Expand Jurisdiction" aria-expanded="false">
-                <span class="settings-inline-select-value">New York City</span>
-              </button>
-              <div class="settings-inline-select-options" role="listbox" aria-label="Jurisdiction" aria-hidden="true">
-                <div class="settings-inline-select-options-inner"></div>
-              </div>
-            </div>
-          </div>
-          <div class="settings-row">
-            <span>Version</span>
-            <div class="settings-inline-select-control">
-              <select class="settings-version-select settings-inline-select-native" aria-label="Version">
-                <option value="CodeContent/authored/new-york-city/2026-zoning-resolution/bundle.json#1">NYC Zoning Resolution</option>
-              </select>
-              <button class="settings-inline-select-toggle" type="button" aria-label="Expand Version" aria-expanded="false">
-                <span class="settings-inline-select-value">NYC Zoning Resolution</span>
-              </button>
-              <div class="settings-inline-select-options" role="listbox" aria-label="Version" aria-hidden="true">
-                <div class="settings-inline-select-options-inner"></div>
-              </div>
-            </div>
-          </div>
-        </section>
         <section class="settings-card settings-plan-card" aria-labelledby="settings-plan-title">
           <h3 id="settings-plan-title" class="section-label settings-section-title">Plan</h3>
           <div class="settings-plan-features" aria-label="Plan comparison">
@@ -555,6 +526,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260808-typography-v8" type="module"></script>
+    <script src="/web/app.js?v=20260808-reader-notes-borderless-v1" type="module"></script>
   </body>
 </html>

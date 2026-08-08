@@ -348,7 +348,6 @@ async function main() {
       webRoot.text.indexOf('<script src="/web/app.js')
     );
     const settingsSectionOrder = [
-      '>Code Preferences</h3>',
       '>Plan</h3>',
       '>Account</h3>',
       '>Firm &amp; Collaboration</h3>',
@@ -403,11 +402,12 @@ async function main() {
       "Settings lost the consolidated Pro and optional Research description or restored a separate Research row."
     );
     assert(
-      settingsTemplateSource.includes('>NYC Zoning Resolution</option>') &&
-        !settingsTemplateSource.includes('>2022 Construction Codes</option>') &&
+      !settingsTemplateSource.includes('>Code Preferences</h3>') &&
+        !settingsTemplateSource.includes('settings-jurisdiction-select') &&
+        !settingsTemplateSource.includes('settings-version-select') &&
         !iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
         !iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'),
-      "Web Settings should remain zoning-only while iOS omits jurisdiction and version pickers."
+      "Settings should omit jurisdiction and version pickers; code selection belongs in the Reader."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -421,12 +421,7 @@ async function main() {
         !settingsTemplateSource.includes("Line Spacing"),
       "Web Settings still includes the retired Reader Preview sliders."
     );
-    assert(
-      settingsTemplateSource.includes("settings-jurisdiction-select settings-inline-select-native") &&
-        settingsTemplateSource.includes("settings-version-select settings-inline-select-native") &&
-        !settingsTemplateSource.includes('class="preview-font-family-select"'),
-      "Jurisdiction and version should retain the existing inline Settings controls."
-    );
+    assert(!settingsTemplateSource.includes('class="preview-font-family-select"'));
     assert(
       webRoot.text.includes('class="reader-spacing-controls"') &&
         webRoot.text.includes('class="reader-typography-toggle"') &&
@@ -525,7 +520,7 @@ async function main() {
         workspaceStyles.text.match(/\.workspace-tab\s*\{[^}]*font-size:\s*14px;/) &&
         workspaceStyles.text.match(/\.topbar \.toolbar-button\s*\{[^}]*font-size:\s*14px !important;/) &&
         workspaceStyles.text.match(/\.workspace-tab:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
-        workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*0;[^}]*box-shadow:\s*none;/) &&
+        workspaceStyles.text.match(/\.topbar \.toolbar-button:focus-visible\s*\{[^}]*outline:\s*2px solid[^}]*box-shadow:\s*none;/) &&
         workspaceStyles.text.includes(".workspace-empty-state {") &&
         workspaceStyles.text.includes(".pane-edge-resizer {") &&
         workspaceStyles.text.includes(".workspace-switch-placeholder {") &&
@@ -587,14 +582,15 @@ async function main() {
       "Web Settings no longer distinguishes active Free and Pro plan actions."
     );
     assert(
-      webRoot.text.includes('id="add-zoning-reader"') &&
-        webRoot.text.includes('>ZR</button>') &&
+      !webRoot.text.includes('id="add-zoning-reader"') &&
+        !webRoot.text.includes('>ZR</button>') &&
         workspaceScript.text.includes('const optionsByGroup = new Map();') &&
         workspaceScript.text.includes('group.label = groupLabel;') &&
-        workspaceScript.text.includes("codeOptions.filter((code) => code.prefix !== zoningCodePrefix)") &&
+        workspaceScript.text.includes("codeOptions.forEach((code) => {") &&
+        !workspaceScript.text.includes("codeOptions.filter((code) => code.prefix !== zoningCodePrefix)") &&
         workspaceScript.text.includes("const staticSelect = select.disabled;") &&
-        workspaceScript.text.includes("const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);") &&
-        workspaceScript.text.includes("const replacementReader = state.readers[state.readers.length - 1];") &&
+        !workspaceScript.text.includes("const addZoningReaderButton") &&
+        !workspaceScript.text.includes('label: "Open ZR Reader"') &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
         iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
         iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.codes2025)') &&
@@ -602,14 +598,14 @@ async function main() {
         iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
-      "Web Reader pickers should organize enacted code collections while ZR opens a dedicated reader column."
+      "Web Reader pickers should organize all enacted code collections, including Zoning Resolution."
     );
     assert(
       workspaceScript.response.headers.get("content-type")?.includes("javascript"),
       "Web workspace script returned the wrong content type."
     );
     assert(
-      workspaceScript.text.includes('{ prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use" }') &&
+      workspaceScript.text.includes('{ prefix: "ZR", label: "Zoning Resolution", theme: "zoning", group: "Land Use and Zoning" }') &&
         workspaceScript.text.includes("syncCodeVersionForPrefix") &&
         workspaceScript.text.includes('toUpperCase() === "ZR"'),
       "Web workspace omitted the Zoning Resolution library or its Research exclusion."
@@ -1166,6 +1162,7 @@ async function main() {
       webRoot.text.includes('id="workspace-issue"') &&
         webRoot.text.includes('class="saved-plan-usage"') &&
         webRoot.text.includes('class="settings-plan-usage"') &&
+        workspaceStyles.text.match(/\.settings-plan-usage \{[\s\S]*?background: transparent;/) &&
         workspaceScript.text.includes("function renderPlanUsageRows") &&
         workspaceScript.text.includes("function refreshVisiblePlanUsage") &&
         workspaceScript.text.includes("scheduleAnnotationPush(record);\n  refreshVisiblePlanUsage();") &&
@@ -1272,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-typography-v8'),
+        webRoot.text.includes('/web/app.js?v=20260808-reader-notes-borderless-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1414,7 +1411,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-typography-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260808-reader-notes-borderless-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1448,8 +1445,13 @@ async function main() {
       ["ECC", "EC", "FC", "BC68", "HMC", "T24", "T25", "T26", "T28", "LL"].every((prefix) =>
         workspaceScript.text.includes(`prefix: "${prefix}"`)
       ) &&
-        workspaceScript.text.includes('group: "Administrative Code Titles"') &&
-        workspaceScript.text.includes('group: "Historical and Housing Codes"') &&
+        workspaceScript.text.includes('group: "2022 Construction Codes"') &&
+        workspaceScript.text.includes('group: "2025 Codes"') &&
+        workspaceScript.text.includes('group: "Existing and Historical Building Codes"') &&
+        workspaceScript.text.includes('group: "Fire and Housing"') &&
+        workspaceScript.text.includes('group: "Administrative Code"') &&
+        workspaceScript.text.includes('group: "Local Laws"') &&
+        workspaceScript.text.includes('group: "Land Use and Zoning"') &&
         !workspaceScript.text.includes("The adopted 2020 NFPA 70 text is referenced but is not reproduced.") &&
         !workspaceScript.text.includes("Historical enacted text. Applicability depends on the project date") &&
         !workspaceScript.text.includes("Construction-related unconsolidated enactments, including transition"),
@@ -1623,7 +1625,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-typography-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260808-reader-notes-borderless-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1879,6 +1881,12 @@ async function main() {
         workspaceScript.text.match(/overlay\.remove\(\);\s+await transitionWorkspace\("utility", \{\s+refreshPaneIDs: projectOverviewRefreshPaneIDs\(/) &&
         workspaceScript.text.match(/refreshPaneIDs: projectOverviewRefreshPaneIDs\([\s\S]*?\);\s+refreshOpenAnnotationProjectEditors\(\);/),
       "Creating or editing a Project should refresh Project pills in open Reader notes and Search details."
+    );
+    assert(
+      workspaceStyles.text.match(/\.reader-notes-sheet \{[\s\S]*?right: calc\(var\(--panel-padding\) \+ var\(--reader-scrollbar-rail-width\) - var\(--divider-width\)\);[\s\S]*?bottom: calc\(var\(--panel-padding\) \+ var\(--space-2\)\);[\s\S]*?left: calc\(var\(--panel-padding\) - var\(--divider-width\)\);[\s\S]*?border: 0;[\s\S]*?border-radius: clamp\(22px, 4vw, 30px\);/) &&
+        workspaceScript.text.includes("const maxHeight = Math.max(cssMinHeight, sheetBounds.bottom - panelBounds.top - readerTrackTop);") &&
+        workspaceScript.text.includes("const height = sheetBounds.bottom - moveEvent.clientY;"),
+      "Reader paragraph notes must remain an inset rounded bottom card while preserving bounded vertical expansion."
     );
     assert(
       workspaceScript.text.includes("function captureReaderScrollPositions()") &&
@@ -2190,15 +2198,9 @@ async function main() {
       "Each enacted code collection should retain its own reader accent theme."
     );
     assert(
-      workspaceScript.text.includes("function wireSettingsSelectControl(panel, selector, label)") &&
-        workspaceScript.text.includes('options.classList.toggle("is-open", open)') &&
-        workspaceScript.text.includes("button.dataset.value === select.value") &&
-        workspaceStyles.text.match(/\.settings-inline-select-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
-        workspaceStyles.text.match(/\.settings-inline-select-toggle:hover,[\s\S]*?\.settings-inline-select-toggle:focus-visible \{[\s\S]*?text-decoration: none;/) &&
-        workspaceStyles.text.match(/\.settings-inline-select-options \{[\s\S]*?max-height: 0;[\s\S]*?transition:/) &&
-        workspaceStyles.text.match(/\.settings-inline-select-options\.is-open \{[\s\S]*?max-height: var\(--settings-inline-options-height, 240px\);/) &&
-        workspaceScript.text.includes('"--settings-inline-options-height"'),
-      "Code Preferences should expand smoothly inline without pill-shaped triggers or underlined values."
+      !workspaceScript.text.includes("function wireSettingsSelectControl(panel, selector, label)") &&
+        !workspaceScript.text.includes("function setSettingsInlineControlOpen(toggle, options, open, label)"),
+      "Retired Code Preferences controls should not leave unused Settings handlers."
     );
     assert(
       !workspaceStyles.text.includes(".search-all-codes"),
