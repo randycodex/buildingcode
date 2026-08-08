@@ -15,6 +15,7 @@ const canonicalRoot = join(
   "new-york-city",
   "2022-construction-codes"
 );
+const authoredRoot = dirname(canonicalRoot);
 const canonicalPreparedRoot = join(canonicalRoot, "prepared");
 const chapterRoot = join(canonicalPreparedRoot, "chapters");
 const canonicalSectionRoot = join(canonicalPreparedRoot, "sections");
@@ -104,6 +105,27 @@ async function pngDimensions(path) {
 }
 
 async function main() {
+  const authoredBundleDirectories = await readdir(authoredRoot, { withFileTypes: true });
+  for (const directory of authoredBundleDirectories.filter((entry) => entry.isDirectory())) {
+    const bundleRoot = join(authoredRoot, directory.name);
+    const chapterCatalogPath = join(bundleRoot, "prepared", "chapterCatalog.json");
+    if (!await exists(chapterCatalogPath)) continue;
+    const authoredBundle = await readJSON(join(bundleRoot, "bundle.json"));
+    const chapterCatalog = await readJSON(chapterCatalogPath);
+    assert(
+      authoredBundle.chapterStructureSchemaVersion === 2,
+      `${directory.name} ships an external chapter catalog but does not enable chapter structure schema 2.`
+    );
+    const catalogMatchesBundle = chapterCatalog.chapters.length === authoredBundle.chapters.length;
+    const hasPerChapterFallback = (await Promise.all(authoredBundle.chapters.map((chapter) =>
+      exists(join(bundleRoot, "prepared", "chapters", `${chapter.id}.json`))
+    ))).every(Boolean);
+    assert(
+      catalogMatchesBundle || hasPerChapterFallback,
+      `${directory.name} has neither a matching chapter catalog nor complete per-chapter structures.`
+    );
+  }
+
   const [bundle, manifest, canonicalMap, searchIndex, chapterFiles, canonicalSectionFiles, structuralCatalog, xcodeProject] = await Promise.all([
     readJSON(join(canonicalRoot, "bundle.json")),
     readJSON(join(canonicalPreparedRoot, "manifest.json")),

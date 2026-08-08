@@ -860,6 +860,27 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(tableBlock.html?.localizedCaseInsensitiveContains("<table") == true)
     }
 
+    func testConstructionRelatedLocalLawsLoadPreparedChapterSections() throws {
+        let version = try XCTUnwrap(
+            BundleDatabaseLocator().availableCodeVersions().first {
+                $0.fileURL.path.contains("2026-enacted-administrative-code")
+            }
+        )
+        let store = try AuthoredCodeStore(
+            jsonURL: version.fileURL,
+            codeID: version.authoredCodeID,
+            jurisdictionID: version.jurisdictionID
+        )
+        let localLaws = try XCTUnwrap(store.codeSections().first {
+            $0.name.localizedCaseInsensitiveContains("construction-related local laws")
+        })
+        let chapters = store.chapters(codeSectionID: localLaws.id)
+        let firstChapter = try XCTUnwrap(chapters.first)
+
+        XCTAssertEqual(chapters.count, 39)
+        XCTAssertFalse(store.sections(chapterID: firstChapter.id).isEmpty)
+    }
+
     func testSyncDeclaresVersionedCrossPlatformCapabilities() throws {
         let request = BackendUserContentPullRequest(
             auth: BackendAuthContext(accountUserID: "test-user", bearerToken: nil),

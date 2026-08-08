@@ -6100,9 +6100,20 @@ function shouldAutomaticallyUseServerCopy(entry) {
     (message.includes("changed in two places") && message.includes("sync conflict"));
 }
 
+function syncedMutationSupersedesConflict(entry) {
+  const recordID = entry?.recordID || syncMutationRecordID(entry?.mutation);
+  if (!recordID) return false;
+  const serverMutation = (syncedContent?.mutations || [])
+    .filter((mutation) => syncMutationRecordID(mutation) === recordID)
+    .sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left))[0];
+  if (!serverMutation) return false;
+  return mutationUpdatedAt(serverMutation) >= mutationUpdatedAt(entry.mutation);
+}
+
 async function convergeServerNewerSyncConflicts(account) {
   const convergent = (state.syncConflicts || []).filter((entry) =>
-    entry.accountUserID === account.userID && shouldAutomaticallyUseServerCopy(entry)
+    entry.accountUserID === account.userID &&
+      (shouldAutomaticallyUseServerCopy(entry) || syncedMutationSupersedesConflict(entry))
   );
   if (!convergent.length || syncedContent?.status !== "connected") return false;
 
@@ -7555,6 +7566,13 @@ function savedEvidenceKey(value, codeVersion = "") {
   const sectionID = String(record.sectionID || record.savedSectionID || record.itemID || "");
   const version = syncCodeVersion(record.codeVersion || codeVersion || defaultSyncCodeVersion);
   return `${version}:${sectionID}`;
+}
+
+function projectEvidenceCount(projectSections, project) {
+  return new Set((projectSections || [])
+    .filter((item) => projectSectionBelongsToProject(item, project))
+    .map((item) => savedEvidenceKey(item))
+    .filter(Boolean)).size;
 }
 
 function projectSectionRecordForSection(project, sectionPayload) {
@@ -19101,11 +19119,7 @@ function renderProjectRows(content, projects, projectSections, options = {}) {
   const mode = options.mode || "projects";
   const selectionController = options.selectionController || null;
   projects.slice(0, 24).forEach((project) => {
-    const count = projectSections.filter((item) =>
-      item.folderClientID === project.clientID ||
-      item.folderClientID === project.id ||
-      item.localFolderID === project.localFolderID
-    ).length;
+    const count = projectEvidenceCount(projectSections, project);
     const card = document.createElement("article");
     card.className = "project-card project-row";
     const isOpenProject = openProjectDetails().some((detail) => projectDetailMatches(project, detail));
@@ -20053,7 +20067,7 @@ async function performSavedPanelHydration(panel, savedInstance, paneID) {
       const folder = workspaceProjects.find((candidate) => projectRecordID(candidate) === tile.dataset.projectId);
       const countLabel = tile.querySelector(".saved-project-count");
       if (!folder || !countLabel) return;
-      const count = summary.projectSections.filter((item) => projectSectionBelongsToProject(item, folder)).length;
+      const count = projectEvidenceCount(summary.projectSections, folder);
       countLabel.textContent = String(count);
       countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
       countLabel.setAttribute("aria-label", countLabel.title);
@@ -20229,7 +20243,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       const typeBadge = document.createElement("small");
       typeBadge.className = "saved-folder-type";
       typeBadge.textContent = folderTypeLabel(project);
-      const count = projectSections.filter((item) => projectSectionBelongsToProject(item, project)).length;
+      const count = projectEvidenceCount(projectSections, project);
       const countLabel = document.createElement("span");
       countLabel.className = "saved-project-count";
       countLabel.textContent = String(count);

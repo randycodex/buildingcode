@@ -316,7 +316,7 @@ def build_package(pdf_path: Path, output: Path) -> dict:
 
     bundle = {
         "schemaVersion": 5,
-        "chapterStructureSchemaVersion": 1,
+        "chapterStructureSchemaVersion": 2,
         "sectionContentSchemaVersion": 2,
         "jurisdictions": [{"id": 1, "name": "New York City"}],
         "codes": [{"id": 1, "jurisdictionID": 1, "name": CODE_VERSION}],

@@ -605,7 +605,7 @@ def build_package(xml_dir: Path, archive: Path, output: Path) -> dict:
 
     bundle = {
         "schemaVersion": 5,
-        "chapterStructureSchemaVersion": 1,
+        "chapterStructureSchemaVersion": 2,
         "sectionContentSchemaVersion": 2,
         "jurisdictions": [{"id": 1, "name": "New York City"}],
         "codes": [{"id": code_id, "jurisdictionID": 1, "name": CODE_VERSION}],

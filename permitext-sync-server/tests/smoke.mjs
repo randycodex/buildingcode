@@ -1857,7 +1857,9 @@ async function main() {
     assert(
       workspaceScript.text.includes('"SERVER_NEWER",\n  "EQUAL_TIMESTAMP_CONFLICT"') &&
         workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
+        workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
+        workspaceScript.text.includes("function projectEvidenceCount(projectSections, project)") &&
         workspaceScript.text.includes("discardLocalMutationOverlay(entry.mutation)") &&
         workspaceScript.text.includes("await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID))"),
       "Web sync must automatically converge server-newer records while retaining non-version rejection failures."
