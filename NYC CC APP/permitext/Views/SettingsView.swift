@@ -31,6 +31,12 @@ struct SettingsView: View {
         Color(uiColor: .secondaryLabel)
     }
 
+    private var appVersionLabel: String {
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
+        let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? "—"
+        return "Permitext \(version) (Build \(build))"
+    }
+
     private var collapseProgress: CGFloat {
         min(max(-scrollOffset / 64, 0), 1)
     }
@@ -115,6 +121,12 @@ struct SettingsView: View {
                             .foregroundStyle(.secondary)
                             .padding(.horizontal, 6)
                     }
+
+                    Text(appVersionLabel)
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.top, 4)
 
                 }
                 .padding(.horizontal, CodeScreenMetrics.screenHorizontalPadding)
