@@ -8064,7 +8064,7 @@ body.is-resizing-research-evidence * {
 
 .saved-folder-context.is-project .saved-project-tool-controls {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   width: 100%;
   padding-top: var(--space-3);
 }

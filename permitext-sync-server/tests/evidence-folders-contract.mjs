@@ -202,7 +202,7 @@ assert.match(stylesSource, /\.project-section-motion > \.project-section-motion-
 assert.match(stylesSource, /\.saved-project-summary-field > \.section-label \{[\s\S]*?text-transform: none;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-blocknote \.section-label \{[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research \.project-section-toggle-label \{[\s\S]*?font-size: inherit !important;[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
-assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
+assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
 assert.match(stylesSource, /\.saved-evidence-collapse-toggle\[aria-expanded="true"\] \.research-chevron-up,[\s\S]*?\.saved-evidence-collapse-toggle\[aria-expanded="false"\] \.research-chevron-down \{[\s\S]*?display: block;/);
 const projectToolControlsRule = stylesSource.match(/\.saved-folder-context\.is-project \.saved-project-tool-controls \{([\s\S]*?)\n\}/)?.[1] || "";
