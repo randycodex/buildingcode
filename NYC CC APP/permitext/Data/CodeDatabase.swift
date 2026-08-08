@@ -278,7 +278,8 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
         notesBySectionID: [Int64: String],
         tagsBySectionID: [Int64: [String]] = [:],
         annotationEntries: [UserAnnotationEntry] = [],
-        bookmarkCreatedAtBySectionID: [Int64: Date] = [:]
+        bookmarkCreatedAtBySectionID: [Int64: Date] = [:],
+        includeProjectOnlySections: Bool = false
     ) throws -> [BookmarkedSection] {
         guard !ids.isEmpty else { return [] }
         let annotationsBySectionID = Dictionary(grouping: annotationEntries, by: \.sectionID)
@@ -306,9 +307,10 @@ final class CodeDatabase: CodeReferenceLookup, @unchecked Sendable {
             let sectionLevelAnnotation = sectionAnnotations.first { $0.blockID.isEmpty }
             let sectionTags = sectionLevelAnnotation?.tags ?? tagsBySectionID[sectionID] ?? []
             let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[sectionID] ?? ""
-            if bookmarkedSectionIDs.contains(sectionID) ||
+            let hasSectionLevelEvidence = bookmarkedSectionIDs.contains(sectionID) ||
                 !sectionNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
-                !sectionTags.isEmpty {
+                !sectionTags.isEmpty
+            if hasSectionLevelEvidence || (includeProjectOnlySections && sectionAnnotations.isEmpty) {
                 items.append(
                     BookmarkedSection(
                         id: sectionID,

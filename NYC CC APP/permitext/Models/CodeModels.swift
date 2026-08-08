@@ -3485,6 +3485,65 @@ struct BookmarkedSection: Identifiable, Hashable, Sendable {
     }
 }
 
+enum ProjectEvidenceConsolidator {
+    /// Project membership is section-level on both web and native. Present one
+    /// row per code-version/section pair while retaining any paragraph note or
+    /// tags that make that section useful as evidence.
+    static func consolidated(_ items: [BookmarkedSection]) -> [BookmarkedSection] {
+        var orderedKeys: [String] = []
+        var groups: [String: [BookmarkedSection]] = [:]
+
+        for item in items {
+            let key = "\(UserContentSyncCodeVersion.server(item.codeVersion)):\(item.id)"
+            if groups[key] == nil {
+                orderedKeys.append(key)
+            }
+            groups[key, default: []].append(item)
+        }
+
+        return orderedKeys.compactMap { key in
+            guard let group = groups[key], let first = group.first else { return nil }
+            let preferred = group.first(where: { !$0.isBlockAnnotation }) ?? first
+
+            var seenNotes = Set<String>()
+            let notes = group.compactMap { item -> String? in
+                let note = item.noteBody.trimmingCharacters(in: .whitespacesAndNewlines)
+                guard !note.isEmpty, seenNotes.insert(note).inserted else { return nil }
+                return note
+            }
+            var seenTags = Set<String>()
+            let tags = group.flatMap(\.tags).filter { tag in
+                let normalized = tag.trimmingCharacters(in: .whitespacesAndNewlines)
+                return !normalized.isEmpty && seenTags.insert(normalized).inserted
+            }
+
+            return BookmarkedSection(
+                id: preferred.id,
+                annotationBlockID: preferred.annotationBlockID,
+                annotationLabel: preferred.annotationLabel,
+                codeVersion: preferred.codeVersion,
+                codeSectionID: preferred.codeSectionID,
+                clientID: preferred.clientID,
+                ownerID: preferred.ownerID,
+                visibility: preferred.visibility,
+                syncState: preferred.syncState,
+                updatedAt: group.compactMap(\.updatedAt).max(),
+                deletedAt: preferred.deletedAt,
+                chapterNumber: preferred.chapterNumber,
+                chapterTitle: preferred.chapterTitle,
+                sectionNumber: preferred.sectionNumber,
+                title: preferred.title,
+                previewText: preferred.previewText,
+                kind: preferred.kind,
+                isBookmarked: group.contains(where: \.isBookmarked),
+                noteBody: notes.joined(separator: "\n\n"),
+                tags: tags,
+                bookmarkedAt: group.compactMap(\.bookmarkedAt).max()
+            )
+        }
+    }
+}
+
 struct UserAnnotationEntry: Hashable, Sendable {
     let sectionID: Int64
     let blockID: String

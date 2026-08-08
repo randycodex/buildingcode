@@ -1255,7 +1255,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
         notesBySectionID: [Int64: String],
         tagsBySectionID: [Int64: [String]] = [:],
         annotationEntries: [UserAnnotationEntry] = [],
-        bookmarkCreatedAtBySectionID: [Int64: Date] = [:]
+        bookmarkCreatedAtBySectionID: [Int64: Date] = [:],
+        includeProjectOnlySections: Bool = false
     ) -> [BookmarkedSection] {
         let annotationsBySectionID = Dictionary(grouping: annotationEntries, by: \.sectionID)
         return ids.flatMap { id -> [BookmarkedSection] in
@@ -1266,7 +1267,10 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             let sectionNote = sectionLevelAnnotation?.noteBody ?? notesBySectionID[id] ?? ""
             var rows: [BookmarkedSection] = []
 
-            if bookmarkedSectionIDs.contains(id) || !sectionNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !sectionTags.isEmpty {
+            let hasSectionLevelEvidence = bookmarkedSectionIDs.contains(id) ||
+                !sectionNote.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ||
+                !sectionTags.isEmpty
+            if hasSectionLevelEvidence || (includeProjectOnlySections && sectionAnnotations.isEmpty) {
                 rows.append(BookmarkedSection(
                     id: indexed.section.id,
                     codeVersion: codeVersion,

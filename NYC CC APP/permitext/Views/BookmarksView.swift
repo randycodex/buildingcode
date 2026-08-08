@@ -828,7 +828,7 @@ private var filteredSavedEmptyState: some View {
         // Bookmarks open the single-section reader (notes screen) directly so
         // tapping a bookmarked subsection goes straight to its notes view
         // rather than landing inside the full chapter reader.
-        ReaderView(sectionID: bookmark.id)
+        ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion)
     }
 
     private func resolvedChapter(for bookmark: BookmarkedSection) -> CodeChapter? {
@@ -1099,6 +1099,7 @@ struct ProjectView: View {
     @State private var projectReportShareURL: URL?
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
+    @State private var isSavedEvidenceExpanded = true
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1136,16 +1137,38 @@ struct ProjectView: View {
                     .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
                 if !projectBookmarks.isEmpty {
-                    CodeEyebrow(text: "Saved Evidence", accent: accentColor)
+                    Button {
+                        withAnimation(.easeInOut(duration: 0.2)) {
+                            isSavedEvidenceExpanded.toggle()
+                        }
+                    } label: {
+                        HStack(spacing: 12) {
+                            CodeEyebrow(text: "Saved Evidence", accent: accentColor)
+                            Spacer(minLength: 12)
+                            Image(systemName: "chevron.down")
+                                .font(.caption.weight(.bold))
+                                .foregroundStyle(accentColor)
+                                .rotationEffect(.degrees(isSavedEvidenceExpanded ? 0 : -90))
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("Saved Evidence")
+                    .accessibilityValue(isSavedEvidenceExpanded ? "Expanded" : "Collapsed")
+                    .accessibilityHint(isSavedEvidenceExpanded ? "Collapses saved evidence" : "Expands saved evidence")
                         .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
 
-                    LazyVStack(alignment: .leading, spacing: 0) {
-                        ForEach(projectBookmarks, id: \.rowID) { bookmark in
-                            projectBookmarkRow(bookmark)
-                            CodeHairline()
+                    if isSavedEvidenceExpanded {
+                        LazyVStack(alignment: .leading, spacing: 0) {
+                            ForEach(projectBookmarks, id: \.rowID) { bookmark in
+                                projectBookmarkRow(bookmark)
+                                CodeHairline()
+                            }
                         }
+                        .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
+                        .transition(.opacity.combined(with: .move(edge: .top)))
                     }
-                    .padding(.top, CodeScreenMetrics.sectionSpacingBelowEyebrow)
                 }
             }
             .frame(maxWidth: .infinity, alignment: .topLeading)
@@ -1754,7 +1777,7 @@ struct ProjectView: View {
                 )
             }
             Button("Remove selected from project", role: .destructive) {
-                library.removeSections(Set(selectedBookmarks.map(\.id)), fromFolder: folderID)
+                library.removeSections(selectedBookmarks, fromFolder: folderID)
                 selectedBookmarkRowIDs.removeAll()
                 isSelecting = false
             }
@@ -1797,7 +1820,7 @@ struct ProjectView: View {
             }
 
             NavigationLink {
-                ReaderView(sectionID: bookmark.id)
+                ReaderView(sectionID: bookmark.id, codeVersion: bookmark.codeVersion)
             } label: {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(spacing: 8) {
@@ -1871,7 +1894,7 @@ struct ProjectView: View {
         }
         .swipeActions(edge: .trailing, allowsFullSwipe: false) {
             Button(role: .destructive) {
-                library.removeSection(bookmark.id, fromFolder: folderID)
+                library.removeSection(bookmark.id, fromFolder: folderID, codeVersion: bookmark.codeVersion)
             } label: {
                 Label("Remove", systemImage: "minus.circle")
             }

@@ -3,6 +3,12 @@ import UIKit
 
 struct ReaderView: View {
     let sectionID: Int64
+    let codeVersion: String?
+
+    init(sectionID: Int64, codeVersion: String? = nil) {
+        self.sectionID = sectionID
+        self.codeVersion = codeVersion
+    }
 
     @EnvironmentObject private var library: CodeLibraryViewModel
     @State private var detail: ReaderSectionDetail?
@@ -151,7 +157,12 @@ struct ReaderView: View {
                 ZoomableImageViewer(image: expandedInlineImage)
             }
         }
-        .task(id: sectionID) {
+        .task(id: "\(codeVersion ?? "selected"):\(sectionID)") {
+            if let codeVersion,
+               await library.prepareCodeVersionForEvidence(codeVersion) == false {
+                loadState = .missing
+                return
+            }
             await loadContent()
         }
         .onDisappear {

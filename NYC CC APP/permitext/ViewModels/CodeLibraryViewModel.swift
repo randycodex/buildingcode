@@ -443,6 +443,23 @@ final class CodeLibraryViewModel: ObservableObject {
         openSelectedContent()
     }
 
+    func prepareCodeVersionForEvidence(_ codeVersion: String) async -> Bool {
+        let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
+        guard let version = availableVersions.first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
+        }) else {
+            statusMessage = "The code book for this saved evidence is not installed."
+            return false
+        }
+
+        if selectedVersionFileName != version.fileName {
+            updateSelectedVersion(fileName: version.fileName)
+        }
+        await contentLoadTask?.value
+        return UserContentSyncCodeVersion.server(selectedVersion?.codeVersion ?? "") == canonicalVersion &&
+            isInitialContentLoaded
+    }
+
     // MARK: - Idle preload of last-opened chapter
 
     func noteChapterOpened(chapter: CodeChapter) {
@@ -1791,8 +1808,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
                 resolved.append(contentsOf: items)
             }
-            var seenRowIDs = Set<String>()
-            result[folder.id] = resolved.filter { seenRowIDs.insert($0.rowID).inserted }
+            result[folder.id] = ProjectEvidenceConsolidator.consolidated(resolved)
         }
         return result
     }
@@ -1838,7 +1854,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 notesBySectionID: notesBySectionID,
                 tagsBySectionID: tagsBySectionID,
                 annotationEntries: annotationEntries,
-                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID
+                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID,
+                includeProjectOnlySections: true
             )
         case .sqlite:
             let database: CodeDatabase
@@ -1860,7 +1877,8 @@ final class CodeLibraryViewModel: ObservableObject {
                 notesBySectionID: notesBySectionID,
                 tagsBySectionID: tagsBySectionID,
                 annotationEntries: annotationEntries,
-                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID
+                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID,
+                includeProjectOnlySections: true
             )
         }
     }
@@ -2010,10 +2028,16 @@ final class CodeLibraryViewModel: ObservableObject {
         return saveSection(sectionID: sectionID, toFolderIDs: folderIDs)
     }
 
-    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64) {
-        guard let selectedVersion, let userContentRepository else { return }
+    func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String? = nil) {
+        guard let userContentRepository else { return }
+        let targetCodeVersion = codeVersion ?? selectedVersion?.codeVersion
+        guard let targetCodeVersion else { return }
         do {
-            try userContentRepository.removeSection(sectionID, fromFolder: folderID, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.removeSection(
+                sectionID,
+                fromFolder: folderID,
+                codeVersion: targetCodeVersion
+            )
             refreshFolders()
             scheduleUserContentAutoSync()
         } catch {
@@ -3190,10 +3214,10 @@ final class CodeLibraryViewModel: ObservableObject {
         try userContentRepository?.totalFolderCount() ?? folders.count
     }
 
-    func removeSections(_ sectionIDs: Set<Int64>, fromFolder folderID: Int64) {
-        guard !sectionIDs.isEmpty else { return }
-        sectionIDs.forEach { sectionID in
-            removeSection(sectionID, fromFolder: folderID)
+    func removeSections(_ sections: [BookmarkedSection], fromFolder folderID: Int64) {
+        guard !sections.isEmpty else { return }
+        sections.forEach { section in
+            removeSection(section.id, fromFolder: folderID, codeVersion: section.codeVersion)
         }
     }
 

@@ -99,6 +99,60 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(CodeDatabase.literalFTSQuery(for: "\""), "\"\"\"\"")
     }
 
+    func testProjectEvidenceIncludesProjectOnlySectionsAndConsolidatesAnnotations() throws {
+        let databaseURL = try temporaryLegacySearchDatabase()
+        defer { try? FileManager.default.removeItem(at: databaseURL) }
+        let database = try CodeDatabase(databaseURL: databaseURL, locator: BundleDatabaseLocator())
+        let codeVersion = UserContentSyncCodeVersion.localNYC2022
+
+        let projectOnly = try database.savedSections(
+            ids: [1],
+            codeVersion: codeVersion,
+            bookmarkedSectionIDs: [],
+            notesBySectionID: [:],
+            includeProjectOnlySections: true
+        )
+        XCTAssertEqual(projectOnly.count, 1)
+        XCTAssertFalse(try XCTUnwrap(projectOnly.first).isBookmarked)
+
+        let baseAndAnnotation = try database.savedSections(
+            ids: [1],
+            codeVersion: codeVersion,
+            bookmarkedSectionIDs: [1],
+            notesBySectionID: [:],
+            annotationEntries: [
+                UserAnnotationEntry(
+                    sectionID: 1,
+                    blockID: "paragraph-1",
+                    noteBody: "Commenting commenting",
+                    tags: ["Field note"]
+                )
+            ],
+            includeProjectOnlySections: true
+        )
+        let consolidated = ProjectEvidenceConsolidator.consolidated(baseAndAnnotation)
+        XCTAssertEqual(baseAndAnnotation.count, 2)
+        XCTAssertEqual(consolidated.count, 1)
+        XCTAssertFalse(try XCTUnwrap(consolidated.first).isBlockAnnotation)
+        XCTAssertEqual(consolidated.first?.noteBody, "Commenting commenting")
+        XCTAssertEqual(consolidated.first?.tags, ["Field note"])
+
+        let paragraphOnly = try database.savedSections(
+            ids: [2],
+            codeVersion: codeVersion,
+            bookmarkedSectionIDs: [],
+            notesBySectionID: [:],
+            annotationEntries: [
+                UserAnnotationEntry(sectionID: 2, blockID: "paragraph-2", noteBody: "Paragraph note")
+            ],
+            includeProjectOnlySections: true
+        )
+        let consolidatedParagraph = ProjectEvidenceConsolidator.consolidated(paragraphOnly)
+        XCTAssertEqual(paragraphOnly.count, 1)
+        XCTAssertEqual(consolidatedParagraph.count, 1)
+        XCTAssertTrue(try XCTUnwrap(consolidatedParagraph.first).isBlockAnnotation)
+    }
+
     @MainActor
     func testDeepLinksResolveTheirCodeVersionFromBundledSectionMetadata() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()
