@@ -41,8 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-sync-conflict-review-v4";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-sync-conflict-review-v4";
+} from "./offline-storage.js?v=20260808-project-column-stability-v1";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-project-column-stability-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -784,6 +784,11 @@ function newUtilityInstance(key, overrides = {}) {
       ? true
       : Boolean(overrides.projectsMenuOpen);
     instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode);
+    instance.collapsedEvidenceFolderIDs = Array.from(new Set(
+      (Array.isArray(overrides.collapsedEvidenceFolderIDs) ? overrides.collapsedEvidenceFolderIDs : [])
+        .map((folderID) => String(folderID || "").trim())
+        .filter(Boolean)
+    ));
     instance.codeFilterMenuOpen = Boolean(overrides.codeFilterMenuOpen);
     instance.tagsMenuOpen = Boolean(overrides.tagsMenuOpen);
     instance.selectedFolderID = String(overrides.selectedFolderID || "");
@@ -812,6 +817,7 @@ function normalizeUtilityInstances(saved = {}) {
       sortMode: pane?.sortMode,
       projectsMenuOpen: pane?.projectsMenuOpen,
       projectsArchiveMode: pane?.projectsArchiveMode,
+      collapsedEvidenceFolderIDs: pane?.collapsedEvidenceFolderIDs,
       codeFilterMenuOpen: pane?.codeFilterMenuOpen,
       tagsMenuOpen: pane?.tagsMenuOpen,
       selectedFolderID: pane?.selectedFolderID,
@@ -2198,6 +2204,7 @@ function normalizeSavedInstance(instance) {
       tagFilter: "",
       sortMode: "codeOrder",
       projectsMenuOpen: false,
+      collapsedEvidenceFolderIDs: [],
       codeFilterMenuOpen: false,
       tagsMenuOpen: false,
       selectedFolderID: "",
@@ -2212,6 +2219,11 @@ function normalizeSavedInstance(instance) {
   instance.tagFilter = typeof instance.tagFilter === "string" ? instance.tagFilter.trim() : "";
   instance.sortMode = normalizeSavedSortMode(instance.sortMode);
   instance.projectsMenuOpen = Boolean(instance.projectsMenuOpen);
+  instance.collapsedEvidenceFolderIDs = Array.from(new Set(
+    (Array.isArray(instance.collapsedEvidenceFolderIDs) ? instance.collapsedEvidenceFolderIDs : [])
+      .map((folderID) => String(folderID || "").trim())
+      .filter(Boolean)
+  ));
   instance.codeFilterMenuOpen = Boolean(instance.codeFilterMenuOpen);
   instance.tagsMenuOpen = Boolean(instance.tagsMenuOpen);
   instance.selectedFolderID = String(instance.selectedFolderID || "");
@@ -16701,7 +16713,22 @@ async function archiveProject(project) {
   return archiveProjects([project]);
 }
 
-async function archiveProjects(projects) {
+async function refreshProjectOverviewPreservingSavedPanes(...additionalPaneIDs) {
+  const savedIDs = savedPaneIDs();
+  const results = await Promise.all(savedIDs.map(async (paneID) => ({
+    paneID,
+    refreshed: await refreshSavedPanelInPlace(paneID)
+  })));
+  const failedSavedIDs = new Set(
+    results.filter((result) => !result.refreshed).map((result) => result.paneID)
+  );
+  const refreshPaneIDs = projectOverviewRefreshPaneIDs(...additionalPaneIDs).filter((paneID) =>
+    !savedIDs.includes(paneID) || failedSavedIDs.has(paneID)
+  );
+  await transitionWorkspace("utility", { refreshPaneIDs });
+}
+
+async function archiveProjects(projects, options = {}) {
   const archived = archivedProjectIDSet();
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
@@ -16738,9 +16765,13 @@ async function archiveProjects(projects) {
     }
     saveWorkspaceState();
   }
-  await transitionWorkspace("utility", {
-    refreshPaneIDs: projectOverviewRefreshPaneIDs(...(state.utilities.archive ? ["utility:archive"] : []))
-  });
+  if (options.preserveSavedPanes) {
+    await refreshProjectOverviewPreservingSavedPanes(...(state.utilities.archive ? ["utility:archive"] : []));
+  } else {
+    await transitionWorkspace("utility", {
+      refreshPaneIDs: projectOverviewRefreshPaneIDs(...(state.utilities.archive ? ["utility:archive"] : []))
+    });
+  }
   track.scrollLeft = currentLeft;
   return true;
 }
@@ -16798,7 +16829,7 @@ async function deleteArchivedProject(project) {
   track.scrollLeft = currentLeft;
 }
 
-async function deleteArchivedProjects(projects) {
+async function deleteArchivedProjects(projects, options = {}) {
   const eligibleProjects = projects.filter((project) => projectRecordID(project));
   if (!eligibleProjects.length) return false;
   const count = eligibleProjects.length;
@@ -16828,7 +16859,11 @@ async function deleteArchivedProjects(projects) {
   state.localProjects = (state.localProjects || []).filter((item) => !deletedIDs.has(projectRecordID(item)));
   state.archivedProjectIDs = Array.from(archivedProjectIDSet()).filter((id) => !deletedIDs.has(id));
   saveWorkspaceState();
-  await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
+  if (options.preserveSavedPanes) {
+    await refreshProjectOverviewPreservingSavedPanes("utility:archive");
+  } else {
+    await transitionWorkspace("utility", { refreshPaneIDs: projectOverviewRefreshPaneIDs("utility:archive") });
+  }
   track.scrollLeft = currentLeft;
   return deletedCount > 0;
 }
@@ -19606,10 +19641,12 @@ function renderSavedFilters(panel, instance, allItems, onChange) {
 
 function createSavedEvidenceHeading() {
   const heading = document.createElement("div");
-  heading.className = "saved-evidence-heading";
-  const title = document.createElement("p");
-  title.className = "section-label";
+  heading.className = "saved-evidence-heading project-studio-section-heading";
+  const title = document.createElement("button");
+  title.type = "button";
+  title.className = "saved-evidence-section-toggle section-label";
   title.textContent = "Saved Evidence";
+  title.setAttribute("aria-expanded", "true");
   const search = document.createElement("button");
   search.type = "button";
   search.className = "saved-evidence-search-toggle";
@@ -19639,9 +19676,48 @@ function createSavedEvidenceHeading() {
   cancel.className = "saved-evidence-cancel-selection";
   cancel.textContent = "Cancel";
   cancel.hidden = true;
-  actions.append(search, select, remove, cancel);
+  const toggle = document.createElement("button");
+  toggle.type = "button";
+  toggle.className = "project-section-toggle-chevron saved-evidence-collapse-toggle";
+  toggle.setAttribute("aria-label", "Collapse Saved evidence");
+  toggle.setAttribute("aria-expanded", "true");
+  toggle.innerHTML = researchChevronIconsSVG();
+  actions.append(search, select, remove, cancel, toggle);
   heading.append(title, actions);
-  return heading;
+  return { heading, title, toggle, search, select };
+}
+
+function populateSavedEvidenceSection(section, savedInstance, folderID, ...children) {
+  const { heading, title, toggle, search, select } = createSavedEvidenceHeading();
+  const body = document.createElement("div");
+  body.className = "saved-project-evidence-body";
+  body.id = `saved-evidence-${safeAnnotationIDPart(folderID)}-${safeAnnotationIDPart(savedInstance.id)}`;
+  title.setAttribute("aria-controls", body.id);
+  toggle.setAttribute("aria-controls", body.id);
+  body.append(...children);
+  section.append(heading, body);
+  const collapsedFolderIDs = new Set(savedInstance.collapsedEvidenceFolderIDs);
+  const recordExpandedState = (expanded) => {
+    if (expanded) collapsedFolderIDs.delete(folderID);
+    else collapsedFolderIDs.add(folderID);
+    savedInstance.collapsedEvidenceFolderIDs = Array.from(collapsedFolderIDs);
+    saveWorkspaceState();
+  };
+  const setExpanded = wireProjectSectionMotion(
+    section,
+    body,
+    [title, toggle],
+    "Saved evidence",
+    !collapsedFolderIDs.has(folderID),
+    {
+      onChange: recordExpandedState
+    }
+  );
+  [search, select].forEach((control) => control.addEventListener("click", () => {
+    if (!collapsedFolderIDs.has(folderID)) return;
+    setExpanded(true);
+    recordExpandedState(true);
+  }, { capture: true }));
 }
 
 function appendSavedProjectSummaryField(container, label, value, options = {}) {
@@ -19731,8 +19807,10 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
 
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
-    savedSection.append(
-      createSavedEvidenceHeading(),
+    populateSavedEvidenceSection(
+      savedSection,
+      savedInstance,
+      projectRecordID(folder),
       inlineFilters,
       planUsage,
       savedContent
@@ -19807,8 +19885,10 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
 
     const savedSection = document.createElement("section");
     savedSection.className = "project-studio-section saved-project-evidence-section";
-    savedSection.append(
-      createSavedEvidenceHeading(),
+    populateSavedEvidenceSection(
+      savedSection,
+      savedInstance,
+      projectRecordID(folder),
       inlineFilters,
       planUsage,
       savedContent
@@ -20184,7 +20264,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   let selecting = false;
   let selectionBusy = false;
   const selectedProjectIDs = new Set();
-  let switchCleanupTimer = null;
   const bulkBar = document.createElement("section");
   bulkBar.className = "saved-projects-bulk-bar";
   bulkBar.hidden = true;
@@ -20293,7 +20372,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   const setSelecting = (nextSelecting) => {
     selecting = Boolean(nextSelecting);
     selectedProjectIDs.clear();
-    renderProjectCards();
     updateSelectionControls();
   };
 
@@ -20541,37 +20619,11 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
   };
 
   archiveButton.onclick = () => {
-    if (switchCleanupTimer !== null) return;
-    const previousHeight = list.getBoundingClientRect().height;
-    archiveButton.disabled = true;
     showingArchived = !showingArchived;
     instance.projectsArchiveMode = showingArchived;
     syncProjectModeControls();
     renderProjectCards();
     saveWorkspaceState();
-
-    const finishSwitch = () => {
-      if (switchCleanupTimer !== null) window.clearTimeout(switchCleanupTimer);
-      list.classList.remove("is-mode-switching");
-      list.style.removeProperty("--saved-project-list-from-height");
-      list.style.removeProperty("--saved-project-list-to-height");
-      list.style.removeProperty("--saved-project-list-entry-offset");
-      archiveButton.disabled = false;
-      switchCleanupTimer = null;
-    };
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      finishSwitch();
-      return;
-    }
-
-    const nextHeight = list.getBoundingClientRect().height;
-    const entryOffset = showingArchived ? "6px" : "-6px";
-    list.style.setProperty("--saved-project-list-from-height", `${previousHeight}px`);
-    list.style.setProperty("--saved-project-list-to-height", `${nextHeight}px`);
-    list.style.setProperty("--saved-project-list-entry-offset", entryOffset);
-    list.classList.add("is-mode-switching");
-    list.addEventListener("animationend", finishSwitch, { once: true });
-    switchCleanupTimer = window.setTimeout(finishSwitch, 240);
   };
 
   selectButton.onclick = () => setSelecting(!selecting);
@@ -20587,9 +20639,15 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
     if (!selectedProjects.length) return;
     selectionBusy = true;
     updateSelectionControls();
-    const completed = showingArchived
-      ? await deleteArchivedProjects(selectedProjects)
-      : await archiveProjects(selectedProjects);
+    const operation = showingArchived
+      ? deleteArchivedProjects(selectedProjects, { preserveSavedPanes: true })
+      : archiveProjects(selectedProjects, { preserveSavedPanes: true });
+    if (!showingArchived) {
+      selecting = false;
+      selectedProjectIDs.clear();
+      renderProjectCards();
+    }
+    const completed = await operation;
     if (!completed) {
       selectionBusy = false;
       updateSelectionControls();

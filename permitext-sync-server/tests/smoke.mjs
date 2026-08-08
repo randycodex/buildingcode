@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-sync-conflict-review-v4'),
+        webRoot.text.includes('/web/app.js?v=20260808-project-column-stability-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1283,14 +1283,14 @@ async function main() {
       workspaceScript.text.includes("instance.projectsArchiveMode = Boolean(overrides.projectsArchiveMode)") &&
         workspaceScript.text.includes('const projectsMenuLabel = (savedInstance) => {') &&
         workspaceScript.text.includes('return selectedFolder?.name || selectedFolder?.title || "Projects"') &&
-        workspaceScript.text.includes('list.classList.add("is-mode-switching")') &&
+        !workspaceScript.text.includes('list.classList.add("is-mode-switching")') &&
         workspaceScript.text.includes("showingArchived = !showingArchived") &&
         workspaceScript.text.includes("archivedProjectRecords(projects)") &&
         !workspaceScript.text.includes('archiveButton.addEventListener("click", toggleArchiveAfterProjectsStack);\n  wireCodeFilterMenu(list, instance') &&
         webRoot.text.indexOf('class="saved-projects-add-button"') <
           webRoot.text.indexOf('class="saved-projects-archive-button"') &&
-        workspaceStyles.text.includes("animation: saved-project-mode-enter 170ms cubic-bezier(0.2, 0.8, 0.2, 1);") &&
-        workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
+        !workspaceStyles.text.includes("saved-project-mode-enter") &&
+        workspaceStyles.text.includes("@container (min-width: 580px) {\n  .saved-project-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-code-filter-menu-toggle[aria-expanded="true"]:hover') &&
         workspaceStyles.text.includes('.saved-tag-filter-menu-toggle[aria-expanded="true"]:hover') &&
@@ -1395,12 +1395,12 @@ async function main() {
         workspaceStyles.text.includes("border-radius: 0;\n  background: transparent;") &&
         !workspaceScript.text.includes("notebookCardTypeLabel") &&
         !workspaceScript.text.includes('preview.textContent = card.plainText || "Empty card";') &&
-        workspaceScript.text.includes('list.addEventListener("animationend", finishSwitch, { once: true })') &&
-        workspaceScript.text.includes('const entryOffset = showingArchived ? "6px" : "-6px";') &&
+        !workspaceScript.text.includes('list.addEventListener("animationend", finishSwitch, { once: true })') &&
+        !workspaceScript.text.includes('const entryOffset = showingArchived ? "6px" : "-6px";') &&
         workspaceScript.text.includes('filterRail.classList.contains("saved-project-list")') &&
         workspaceScript.text.includes("? filterGap * 2") &&
-        workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
-        workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
+        !workspaceStyles.text.includes(".saved-project-list.is-mode-switching {") &&
+        !workspaceStyles.text.includes("@keyframes saved-project-mode-enter {") &&
         !workspaceStyles.text.includes(".saved-project-list.is-switching {") &&
         workspaceStyles.text.includes('.saved-projects-menu-toggle[aria-expanded="true"],\n.saved-projects-menu-toggle[aria-expanded="true"]:hover {\n  background: transparent;') &&
         workspaceStyles.text.includes(".saved-projects-menu.is-open .saved-project-list {\n  padding: var(--space-2);") &&
@@ -1411,7 +1411,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-sync-conflict-review-v4'),
+        webRoot.text.includes('/web/styles.css?v=20260808-project-column-stability-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1598,6 +1598,10 @@ async function main() {
     );
     assert(
       workspaceScript.text.includes("function createSavedEvidenceHeading()") &&
+        workspaceScript.text.includes("function populateSavedEvidenceSection(") &&
+        workspaceScript.text.includes("collapsedEvidenceFolderIDs") &&
+        workspaceScript.text.includes("wireProjectSectionMotion(") &&
+        workspaceScript.text.includes('toggle.className = "project-section-toggle-chevron saved-evidence-collapse-toggle"') &&
         workspaceScript.text.includes('search.className = "saved-evidence-search-toggle"') &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("instance.evidenceSearchOpen = true") &&
@@ -1606,7 +1610,7 @@ async function main() {
         workspaceStyles.text.includes(".saved-evidence-search-input {") &&
         workspaceStyles.text.match(/\.saved-evidence-search-input \{[\s\S]*?height: 42px;[\s\S]*?min-height: 42px;[\s\S]*?border-radius: var\(--radius-pill\);/) &&
         workspaceStyles.text.includes(".saved-evidence-search[hidden]") &&
-        workspaceStyles.text.includes('.saved-project-evidence-section > .saved-inline-filters:not(:has(> :not([hidden])))') &&
+        workspaceStyles.text.includes('.saved-project-evidence-body > .saved-inline-filters:not(:has(> :not([hidden])))') &&
         workspaceStyles.text.includes(".saved-tag-filter-menu.is-open .saved-tag-filter-actions") &&
         webRoot.text.includes('class="saved-tag-filter-clear"') &&
         workspaceScript.text.includes('const tagClearButton = panel.querySelector(".saved-tag-filter-clear")') &&
@@ -1641,7 +1645,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-sync-conflict-review-v4'),
+        webRoot.text.includes('/web/styles.css?v=20260808-project-column-stability-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1877,7 +1881,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
-        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-sync-conflict-review-v4"') &&
+        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-project-column-stability-v1"') &&
         workspaceScript.text.includes("syncConflictRecordsMatch(local.record, server.record)") &&
         workspaceScript.text.includes("entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
@@ -2316,7 +2320,9 @@ async function main() {
     );
     assert(
       workspaceStyles.text.match(/\.saved-column-scroll \{[\s\S]*?overflow-y: auto;/) &&
-        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(150px, 1fr\)\);/) &&
+        workspaceStyles.text.match(/\.saved-project-list \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: minmax\(0, 1fr\);/) &&
+        workspaceStyles.text.includes("@container (min-width: 320px) {\n  .saved-project-list {\n    grid-template-columns: repeat(2, minmax(0, 1fr));") &&
+        workspaceStyles.text.includes("@container (min-width: 580px) {\n  .saved-project-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
         workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?background-image: none;/) &&
         workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?grid-template-rows: auto 1fr;/) &&
         workspaceStyles.text.match(/\.saved-project-count \{[\s\S]*?grid-column: 2;[\s\S]*?grid-row: 1;/) &&
@@ -2330,7 +2336,7 @@ async function main() {
         workspaceScript.text.includes("tile.draggable = true") &&
         workspaceScript.text.includes('tile.addEventListener("dragstart"') &&
         !workspaceStyles.text.includes(".saved-project-page-dots"),
-      "Saved Projects should remain a vertically scrollable, reorderable two-column card grid."
+      "Saved Projects should remain a vertically scrollable, reorderable width-stable card grid."
     );
     assert(
       workspaceStyles.text.includes(".custom-select-group-label") &&

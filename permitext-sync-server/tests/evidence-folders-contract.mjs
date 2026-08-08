@@ -104,7 +104,13 @@ assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?title: "Blocknotes"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection[\s\S]*?title: "Blocknotes"[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
+const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
+const savedEvidenceSectionSource = functionSource(appSource, "populateSavedEvidenceSection");
+assert.match(savedEvidenceHeadingSource, /saved-evidence-section-toggle section-label[\s\S]*?project-section-toggle-chevron saved-evidence-collapse-toggle/);
+assert.match(savedEvidenceSectionSource, /aria-controls[\s\S]*?collapsedEvidenceFolderIDs[\s\S]*?wireProjectSectionMotion[\s\S]*?onChange: recordExpandedState/);
+assert.match(savedEvidenceSectionSource, /\[search, select\][\s\S]*?setExpanded\(true\)[\s\S]*?recordExpandedState\(true\)/);
+assert.match(appSource, /instance\.collapsedEvidenceFolderIDs = Array\.from\(new Set/);
 [
   "openProjectNotebook",
   "closeProjectNotebook",
@@ -145,8 +151,11 @@ assert.doesNotMatch(savedFolderContextSource, /previousContext\?\.remove\(\)[\s\
 assert.match(functionSource(appSource, "renderSavedProjects"), /addButton\.onclick[\s\S]*?projectsMenuToggle\.onclick[\s\S]*?archiveButton\.onclick/);
 assert.match(indexSource, /saved-projects-select-button[\s\S]*?saved-projects-add-button/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /selectButton\.onclick = \(\) => setSelecting\(!selecting\)/);
-assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.onclick[\s\S]*?await archiveProjects\(selectedProjects\)/);
-assert.match(functionSource(appSource, "renderSavedProjects"), /showingArchived[\s\S]*?await deleteArchivedProjects\(selectedProjects\)[\s\S]*?await archiveProjects\(selectedProjects\)/);
+const savedProjectsSource = functionSource(appSource, "renderSavedProjects");
+assert.match(savedProjectsSource, /archiveSelectedButton\.onclick[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
+assert.match(savedProjectsSource, /showingArchived[\s\S]*?deleteArchivedProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)[\s\S]*?archiveProjects\(selectedProjects, \{ preserveSavedPanes: true \}\)/);
+assert.match(savedProjectsSource, /const setSelecting = \(nextSelecting\) => \{[\s\S]*?selectedProjectIDs\.clear\(\);\n    updateSelectionControls\(\);\n  \};/);
+assert.match(functionSource(appSource, "refreshProjectOverviewPreservingSavedPanes"), /savedPaneIDs\(\)[\s\S]*?refreshSavedPanelInPlace[\s\S]*?failedSavedIDs[\s\S]*?transitionWorkspace/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.textContent = `\$\{showingArchived \? "Delete" : "Archive"\} \$\{selectedCount\}`/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /actions\.append\(archiveProjectButton, editButton\)/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /selectionSquareIconSVG\(selected\)/);
@@ -194,6 +203,11 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-b
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research \.project-section-toggle-label \{[\s\S]*?font-size: inherit !important;[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;/);
+assert.match(stylesSource, /\.saved-evidence-collapse-toggle\[aria-expanded="true"\] \.research-chevron-up,[\s\S]*?\.saved-evidence-collapse-toggle\[aria-expanded="false"\] \.research-chevron-down \{[\s\S]*?display: block;/);
+const projectToolControlsRule = stylesSource.match(/\.saved-folder-context\.is-project \.saved-project-tool-controls \{([\s\S]*?)\n\}/)?.[1] || "";
+const projectSectionRule = stylesSource.match(/\.saved-folder-context\.is-project > \.project-studio-section,\n\.saved-folder-context\.is-project > \.saved-project-overview-warning \{([\s\S]*?)\n\}/)?.[1] || "";
+assert.doesNotMatch(projectToolControlsRule, /border-top/);
+assert.doesNotMatch(projectSectionRule, /border-top/);
 assert.match(stylesSource, /\.project-folder-type button \{[\s\S]*?background: var\(--menu-subtle-surface\);[\s\S]*?color: var\(--text-primary\);[\s\S]*?box-shadow: none;/);
 assert.match(stylesSource, /\.project-folder-type button\[aria-pressed="true"\] \{[\s\S]*?background: var\(--surface-raised\);[\s\S]*?color: var\(--text-primary\);[\s\S]*?box-shadow: var\(--shadow-panel\);/);
 assert.match(stylesSource, /\.saved-panel \.saved-code-group\.is-collapsed \.saved-code-toggle \{[\s\S]*?padding-block: var\(--space-1\);/);
