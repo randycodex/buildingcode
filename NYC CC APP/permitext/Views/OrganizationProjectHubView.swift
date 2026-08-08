@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct OrganizationProjectHubView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
@@ -7,7 +6,6 @@ struct OrganizationProjectHubView: View {
     let project: PermitextOrganizationProject
 
     @State private var snapshot: BackendOrganizationProjectSnapshotResponse?
-    @State private var workboardImage: UIImage?
     @State private var isLoading = false
     @State private var errorMessage: String?
     @State private var reportShareURL: URL?
@@ -117,7 +115,6 @@ struct OrganizationProjectHubView: View {
                     evidenceReviewSection
                     reviewCoordinationSection
                     reportSection
-                    workboardSection
                     activitySection
                 }
             }
@@ -482,31 +479,6 @@ struct OrganizationProjectHubView: View {
     }
 
     @ViewBuilder
-    private var workboardSection: some View {
-        if let preview = foundation?.workboardPreview {
-            projectSection(title: "Workboard preview", systemImage: "rectangle.3.group") {
-                if let workboardImage {
-                    Image(uiImage: workboardImage)
-                        .resizable()
-                        .scaledToFit()
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .accessibilityLabel("Latest read-only Workboard preview")
-                } else {
-                    HStack(spacing: 10) {
-                        ProgressView()
-                        Text("Loading preview…")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Text("\(preview.elementCount) elements · Editing remains on Permitext Web")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
-    }
-
-    @ViewBuilder
     private var activitySection: some View {
         let activity = foundation?.activity ?? []
         if !activity.isEmpty {
@@ -668,17 +640,6 @@ struct OrganizationProjectHubView: View {
         do {
             let response = try await library.organizationProjectSnapshot(projectID: project.id)
             snapshot = response
-            workboardImage = nil
-            if let preview = response.project.workboardPreview {
-                let data = try? await library.projectWorkboardPreviewData(
-                    projectID: project.id,
-                    previewID: preview.id,
-                    expectedContentHash: preview.contentHash
-                )
-                if let data {
-                    workboardImage = UIImage(data: data)
-                }
-            }
         } catch {
             errorMessage = error.localizedDescription
         }

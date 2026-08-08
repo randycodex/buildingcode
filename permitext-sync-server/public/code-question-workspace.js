@@ -27,7 +27,6 @@ export const codeQuestionPaneRoles = Object.freeze([
   "readiness",
   "versions",
   "working-notes",
-  "workboard",
   "report-draft",
   "legacy"
 ]);
@@ -35,7 +34,6 @@ export const codeQuestionPaneRoles = Object.freeze([
 /** Supporting tools shown under Add column / More, not primary lifecycle. */
 export const codeQuestionMoreTools = Object.freeze([
   { role: "working-notes", label: "Working Notes", legacyTool: "notebook" },
-  { role: "workboard", label: "Workboard", legacyTool: "workboard" },
   { role: "report-draft", label: "Advanced Report Draft", legacyTool: "reportDraft" },
   { role: "legacy", label: "Legacy / Unassigned", legacyTool: "legacy" }
 ]);

@@ -81,6 +81,14 @@ assert.deepEqual(orphanProjectTools.coordinations, []);
 assert.deepEqual(orphanProjectTools.coordinationThreads, []);
 assert.equal(workspaceLayoutHasVisiblePanes(orphanProjectTools), false);
 
+const genericWorkboard = normalizeWorkspaceLayout({
+  workboards: [{ id: "permitext-generic-workboard", name: "Workboard" }],
+  paneOrder: ["project:workboard:permitext-generic-workboard"],
+  paneWeights: { "project:workboard:permitext-generic-workboard": 750 }
+});
+assert.equal(genericWorkboard.workboards[0].id, "permitext-generic-workboard");
+assert.equal(workspaceLayoutHasVisiblePanes(genericWorkboard), true);
+
 const conflictingProjectTools = normalizeWorkspaceLayout({
   projectDetails: [{ id: "project-2", name: "Project 2", color: "#3f6f9f" }],
   notebooks: [{ id: "project-1", name: "Project 1" }],
@@ -89,8 +97,7 @@ const conflictingProjectTools = normalizeWorkspaceLayout({
   coordinationThreads: [{ id: "project-1", name: "Project 1", threadID: "thread-1" }]
 });
 assert.deepEqual(conflictingProjectTools.notebooks, []);
-assert.equal(conflictingProjectTools.workboards[0].id, "project-2");
-assert.equal(conflictingProjectTools.workboards[0].name, "Project 2");
+assert.deepEqual(conflictingProjectTools.workboards, []);
 assert.equal(conflictingProjectTools.coordinations[0].id, "project-2");
 assert.deepEqual(conflictingProjectTools.coordinationThreads, []);
 

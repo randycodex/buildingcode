@@ -586,12 +586,21 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(try store.allFolders().first?.codeVersion, projectVersion)
         XCTAssertTrue(try store.folders(codeVersion: evidenceVersion).isEmpty)
 
+        try store.saveSection(9_900, toFolderIDs: [projectID], codeVersion: projectVersion)
         try store.saveSection(9_901, toFolderIDs: [projectID], codeVersion: evidenceVersion)
 
         XCTAssertEqual(
             Set(try store.folderMembership(codeVersion: evidenceVersion)[9_901] ?? []),
             [projectID]
         )
+        let accountWideEvidence = try store.evidenceReferences(inFolder: projectID)
+        XCTAssertEqual(accountWideEvidence.count, 2)
+        XCTAssertTrue(accountWideEvidence.contains {
+            $0.sectionID == 9_900 && $0.codeVersion == projectVersion
+        })
+        XCTAssertTrue(accountWideEvidence.contains {
+            $0.sectionID == 9_901 && $0.codeVersion == evidenceVersion
+        })
         let queuedMembership = try XCTUnwrap(
             store.pendingSyncQueueItems(limit: 20).first {
                 $0.entityType == .folderSection && $0.payload.codeVersion == evidenceVersion

@@ -56,6 +56,16 @@ function activeProjectToolState(records, activeProject) {
     : [];
 }
 
+function genericWorkboardState(records) {
+  if (!Array.isArray(records)) return [];
+  const workboard = records.find((record) =>
+    record &&
+    typeof record === "object" &&
+    projectIdentityValues(record).includes("permitext-generic-workboard")
+  );
+  return workboard ? [copy(workboard)] : [];
+}
+
 function cleanWorkspaceName(value, fallback = defaultWorkspaceName) {
   const name = String(value || "").replace(/\s+/g, " ").trim();
   return (name || fallback).slice(0, maximumWorkspaceNameLength);
@@ -261,7 +271,7 @@ export function normalizeWorkspaceLayout(value = {}) {
     ? source.researchConversationID
     : "";
   const activeProject = layout.projectDetails[0] || null;
-  layout.workboards = activeProjectToolState(source.workboards, activeProject);
+  layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = activeProjectToolState(source.notebooks, activeProject);
   layout.reportDrafts = activeProjectToolState(source.reportDrafts, activeProject);
   layout.coordinations = activeProjectToolState(source.coordinations, activeProject);

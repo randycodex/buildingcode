@@ -91,7 +91,8 @@ const savedFolderContextSource = functionSource(appSource, "renderSavedFolderCon
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
 assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
-assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Workboard"[\s\S]*?"Coordination"/);
+assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
+assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
 assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?createSavedEvidenceHeading\(\)[\s\S]*?appendProjectResearchHistory[\s\S]*?title: "Recent Activities"/);
 [
@@ -99,8 +100,6 @@ assert.match(savedFolderContextSource, /title: "Blocknotes"[\s\S]*?createSavedEv
   "closeProjectNotebook",
   "openProjectReportDraft",
   "closeProjectReportDraft",
-  "openProjectWorkboard",
-  "closeProjectWorkboard",
   "openProjectCoordination",
   "closeProjectCoordination"
 ].forEach((name) => {

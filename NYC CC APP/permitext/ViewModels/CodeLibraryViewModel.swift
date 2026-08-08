@@ -91,6 +91,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var recentlyViewedSections: [RecentlyViewedEntry] = []
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
+    @Published private(set) var projectBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var activeProjectID: Int64?
@@ -175,6 +176,8 @@ final class CodeLibraryViewModel: ObservableObject {
     private var codeDatabase: CodeDatabase?
     private var sqliteChapterLoader: SQLiteChapterLoader?
     private var authoredCodeStore: AuthoredCodeStore?
+    private var projectAuthoredStoresByCodeVersion: [String: AuthoredCodeStore] = [:]
+    private var projectDatabasesByCodeVersion: [String: CodeDatabase] = [:]
     private let selectedVersionDefaultsKey = "selectedCodeVersionFileName"
     private let selectedJurisdictionDefaultsKey = "selectedJurisdictionKey"
     private let selectedCodeSectionDefaultsKey = "selectedCodeSectionID"
@@ -1710,6 +1713,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userContentRepository else {
             folders = []
             folderMembership = [:]
+            projectBookmarksByFolderID = [:]
             clearActiveProject()
             return
         }
@@ -1736,6 +1740,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
             }
             folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
+            projectBookmarksByFolderID = try accountWideProjectBookmarks(
+                folders: folders,
+                repository: userContentRepository
+            )
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 clearActiveProject(ifMatches: activeProjectID)
             }
@@ -1743,7 +1751,117 @@ final class CodeLibraryViewModel: ObservableObject {
             statusMessage = error.localizedDescription
             folders = []
             folderMembership = [:]
+            projectBookmarksByFolderID = [:]
             clearActiveProject()
+        }
+    }
+
+    private func accountWideProjectBookmarks(
+        folders: [CodeFolder],
+        repository: UserContentRepository
+    ) throws -> [Int64: [BookmarkedSection]] {
+        var result: [Int64: [BookmarkedSection]] = [:]
+        for folder in folders {
+            let references = try repository.evidenceReferences(inFolder: folder.id)
+            var codeVersions: [String] = []
+            var referencesByVersion: [String: [Int64]] = [:]
+            for reference in references {
+                if referencesByVersion[reference.codeVersion] == nil {
+                    codeVersions.append(reference.codeVersion)
+                }
+                referencesByVersion[reference.codeVersion, default: []].append(reference.sectionID)
+            }
+            var resolved: [BookmarkedSection] = []
+            for codeVersion in codeVersions {
+                let sectionIDs = Array(Set(referencesByVersion[codeVersion] ?? [])).sorted()
+                guard !sectionIDs.isEmpty else { continue }
+                let bookmarkedIDs = Set(try repository.bookmarkedSectionIDs(codeVersion: codeVersion))
+                let noteEntries = try repository.noteEntries(codeVersion: codeVersion)
+                let tagEntries = try repository.tagsBySectionID(codeVersion: codeVersion)
+                let annotations = try repository.annotationEntries(codeVersion: codeVersion)
+                let bookmarkDates = try repository.bookmarkCreatedAtBySectionID(codeVersion: codeVersion)
+                let items = try projectEvidenceItems(
+                    sectionIDs: sectionIDs,
+                    codeVersion: codeVersion,
+                    bookmarkedSectionIDs: bookmarkedIDs,
+                    notesBySectionID: noteEntries,
+                    tagsBySectionID: tagEntries,
+                    annotationEntries: annotations,
+                    bookmarkCreatedAtBySectionID: bookmarkDates
+                )
+                resolved.append(contentsOf: items)
+            }
+            var seenRowIDs = Set<String>()
+            result[folder.id] = resolved.filter { seenRowIDs.insert($0.rowID).inserted }
+        }
+        return result
+    }
+
+    private func projectEvidenceItems(
+        sectionIDs: [Int64],
+        codeVersion: String,
+        bookmarkedSectionIDs: Set<Int64>,
+        notesBySectionID: [Int64: String],
+        tagsBySectionID: [Int64: [String]],
+        annotationEntries: [UserAnnotationEntry],
+        bookmarkCreatedAtBySectionID: [Int64: Date]
+    ) throws -> [BookmarkedSection] {
+        let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
+        guard let bundledVersion = availableVersions.first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
+        }) else {
+            return []
+        }
+
+        switch bundledVersion.contentKind {
+        case .authored:
+            let store: AuthoredCodeStore
+            if let selectedVersion,
+               UserContentSyncCodeVersion.server(selectedVersion.codeVersion) == canonicalVersion,
+               let authoredCodeStore {
+                store = authoredCodeStore
+            } else if let cached = projectAuthoredStoresByCodeVersion[canonicalVersion] {
+                store = cached
+            } else {
+                let loaded = try AuthoredCodeStore(
+                    jsonURL: bundledVersion.fileURL,
+                    codeID: bundledVersion.authoredCodeID,
+                    jurisdictionID: bundledVersion.jurisdictionID
+                )
+                projectAuthoredStoresByCodeVersion[canonicalVersion] = loaded
+                store = loaded
+            }
+            return store.savedSections(
+                ids: sectionIDs,
+                codeVersion: codeVersion,
+                bookmarkedSectionIDs: bookmarkedSectionIDs,
+                notesBySectionID: notesBySectionID,
+                tagsBySectionID: tagsBySectionID,
+                annotationEntries: annotationEntries,
+                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID
+            )
+        case .sqlite:
+            let database: CodeDatabase
+            if let selectedVersion,
+               UserContentSyncCodeVersion.server(selectedVersion.codeVersion) == canonicalVersion,
+               let codeDatabase {
+                database = codeDatabase
+            } else if let cached = projectDatabasesByCodeVersion[canonicalVersion] {
+                database = cached
+            } else {
+                let loaded = try CodeDatabase(databaseURL: bundledVersion.fileURL, locator: locator)
+                projectDatabasesByCodeVersion[canonicalVersion] = loaded
+                database = loaded
+            }
+            return try database.savedSections(
+                ids: sectionIDs,
+                codeVersion: codeVersion,
+                bookmarkedSectionIDs: bookmarkedSectionIDs,
+                notesBySectionID: notesBySectionID,
+                tagsBySectionID: tagsBySectionID,
+                annotationEntries: annotationEntries,
+                bookmarkCreatedAtBySectionID: bookmarkCreatedAtBySectionID
+            )
         }
     }
 
@@ -1920,9 +2038,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func bookmarks(inFolder folderID: Int64) -> [BookmarkedSection] {
-        bookmarks.filter { bookmark in
-            Set(folderMembership[bookmark.id] ?? []).contains(folderID)
-        }
+        projectBookmarksByFolderID[folderID] ?? []
     }
 
     func bookmarkCount(inFolder folderID: Int64) -> Int {

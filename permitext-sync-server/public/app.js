@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-auto-sync-convergence-v6";
+} from "./offline-storage.js?v=20260808-generic-workboard-v7";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -59,7 +59,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260806-code-question-legacy-v1";
+} from "./workspace-state.js?v=20260808-generic-workboard-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -80,7 +80,7 @@ import {
   stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260806-code-question-legacy-v1";
+} from "./code-question-workspace.js?v=20260808-generic-workboard-v2";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountCacheKey,
@@ -97,7 +97,7 @@ import {
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260807-code-question-account-v2";
+} from "./code-question-client-state.js?v=20260808-generic-workboard-v3";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer
@@ -205,6 +205,7 @@ const defaultToolbarButtonIDs = Object.freeze([
   "toggle-search",
   "toggle-saved",
   "toggle-analysis",
+  "toggle-workboard",
   "toggle-settings",
   "fit-columns",
   "collapse-readers"
@@ -214,6 +215,12 @@ const activeWorkspaceSessionKey = "permitext:webWorkspaceActive:v2";
 const detachedWorkboardPath = "/detached-workboard";
 const detachedWindowNamePrefix = "permitext-workboard-";
 const detachedWindowSessionStorageKey = "permitext:detachedWorkboardSession:v1";
+const genericWorkboardIdentity = Object.freeze({
+  id: "permitext-generic-workboard",
+  clientID: "permitext-generic-workboard",
+  name: "Workboard",
+  color: "#c96410"
+});
 const internalSectionHistoryStateKey = "permitextInternalSectionNavigation";
 const workboardClientVersion = "20260801-workboard-control-align-v31";
 const notebookClientVersion = "20260801-notebook-toolbar-order-v11";
@@ -233,6 +240,7 @@ const toggleArchiveButton = document.querySelector("#toggle-archive");
 const toggleSearchButton = document.querySelector("#toggle-search");
 const toggleSavedButton = document.querySelector("#toggle-saved");
 const toggleAnalysisButton = document.querySelector("#toggle-analysis");
+const toggleWorkboardButton = document.querySelector("#toggle-workboard");
 const toggleSettingsButton = document.querySelector("#toggle-settings");
 const fitColumnsButton = document.querySelector("#fit-columns");
 const collapseReadersButton = document.querySelector("#collapse-readers");
@@ -358,6 +366,7 @@ let codeQuestionUnauthorizedAccountUserID = "";
 let state = loadWorkspaceState();
 loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
 purgeLegacyCodeQuestionWorkspaceSnapshots();
+retireProjectWorkboardSyncState();
 if (absorbBulkClearConflicts()) saveWorkspaceState();
 const detachedProject = detachedProjectFromSession();
 if (detachedProjectWindow && detachedProject) initializeDetachedProjectState(detachedProject);
@@ -538,8 +547,8 @@ function loadWorkspaceState() {
               .map(([conversationID, ratio]) => [conversationID, normalizeResearchEvidenceSplitRatio(ratio)])
           )
         : {},
-      workboards: activeProjectDetail && savedWorkboards.some((item) => projectDetailMatches(activeProjectDetail, item))
-        ? [projectIdentity(activeProjectDetail)]
+      workboards: savedWorkboards.some((item) => projectDetailMatches(genericWorkboardIdentity, item))
+        ? [genericWorkboardIdentity]
         : [],
       notebooks: activeProjectDetail && savedNotebooks.some((item) => projectDetailMatches(activeProjectDetail, item))
         ? [projectIdentity(activeProjectDetail)]
@@ -1487,6 +1496,35 @@ function workboardProjectID(project) {
   return String(project?.clientID || project?.id || project?.localFolderID || projectDetailKey(project) || "");
 }
 
+function genericWorkboardIsOpen() {
+  return projectHasOpenWorkboard(genericWorkboardIdentity);
+}
+
+async function openGenericWorkboard() {
+  const paneID = paneIDForProjectWorkboard(genericWorkboardIdentity);
+  state.workboards = [genericWorkboardIdentity];
+  state.paneWeights[paneID] ||= defaultWorkboardPaneWidth;
+  state.paneOrder = [...(state.paneOrder || []).filter((id) => id !== paneID), paneID];
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  scrollPaneIntoView(paneID);
+  return true;
+}
+
+async function closeGenericWorkboard() {
+  const paneID = paneIDForProjectWorkboard(genericWorkboardIdentity);
+  state.workboards = [];
+  delete state.paneWeights[paneID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  return true;
+}
+
+async function toggleGenericWorkboard() {
+  return genericWorkboardIsOpen() ? closeGenericWorkboard() : openGenericWorkboard();
+}
+
 function detachedProjectSessionFromWindow() {
   try {
     const stored = JSON.parse(window.sessionStorage.getItem(detachedWindowSessionStorageKey) || "null");
@@ -1918,22 +1956,25 @@ function renderProjectWorkboard(project) {
   mounted.panel.dataset.paneId = paneID;
   mounted.panel.style.setProperty("--project-color", identity.color || "#c96410");
   applyPaneWeight(mounted.panel, paneID);
-  const remoteRevision = syncedWorkboardForProject(projectID)?.updatedAt || "";
-  const syncEnabled = Boolean(activeAccount());
-  const projectName = identity.name || identity.title || "Project";
+  const isGeneric = projectDetailMatches(identity, genericWorkboardIdentity);
+  const remoteRevision = isGeneric ? "" : syncedWorkboardForProject(projectID)?.updatedAt || "";
+  const syncEnabled = !isGeneric && Boolean(activeAccount());
+  const projectName = isGeneric ? "Permitext" : identity.name || identity.title || "Project";
   const renderKey = JSON.stringify([projectID, projectName, syncEnabled, remoteRevision, detachedProjectWindow]);
   scheduleProjectWorkboardMount(mounted, {
     projectID,
     projectName,
-    onClose: detachedProjectWindow ? () => window.close() : () => closeProjectWorkboard(identity),
-    onDetach: detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
+    onClose: detachedProjectWindow ? () => window.close() : isGeneric
+      ? closeGenericWorkboard
+      : () => closeProjectWorkboard(identity),
+    onDetach: isGeneric ? null : detachedProjectWindow ? reattachDetachedProject : () => detachProjectWorkboard(identity),
     detachLabel: detachedProjectWindow ? "Reattach Workboard" : "Detach Workboard",
     syncEnabled,
-    loadSyncedBoard: loadSyncedWorkboard,
-    saveSyncedBoard: saveSyncedWorkboard,
-    savePreview: (blob, metadata) => saveWorkboardPreview(projectID, blob, metadata),
-    uploadAsset: mounted.uploadAsset,
-    loadAsset: loadWorkboardAsset,
+    loadSyncedBoard: isGeneric ? null : loadSyncedWorkboard,
+    saveSyncedBoard: isGeneric ? null : saveSyncedWorkboard,
+    savePreview: isGeneric ? null : (blob, metadata) => saveWorkboardPreview(projectID, blob, metadata),
+    uploadAsset: isGeneric ? null : mounted.uploadAsset,
+    loadAsset: isGeneric ? null : loadWorkboardAsset,
     remoteRevision
   }, renderKey);
   return mounted.panel;
@@ -2588,8 +2629,9 @@ function setOpenProjectDetails(details) {
 
 function reconcileOpenProjectToolState() {
   const current = openProjectDetails()[0] || null;
+  const keepGenericWorkboard = genericWorkboardIsOpen();
   if (!current) {
-    state.workboards = [];
+    state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
     state.notebooks = [];
     state.reportDrafts = [];
     state.coordinations = [];
@@ -2597,7 +2639,7 @@ function reconcileOpenProjectToolState() {
     return;
   }
   const identity = projectIdentity(current);
-  state.workboards = openWorkboards().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
+  state.workboards = keepGenericWorkboard ? [genericWorkboardIdentity] : [];
   state.notebooks = openNotebooks().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
   state.reportDrafts = openReportDrafts().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
   state.coordinations = openCoordinations().some((item) => projectDetailMatches(current, item)) ? [identity] : [];
@@ -2728,7 +2770,7 @@ async function activateProjectStudio(project, options = {}) {
   }
 
   const keepNotebookOpen = current ? projectHasOpenNotebook(current) : Boolean(options.openNotebook);
-  const keepWorkboardOpen = current ? projectHasOpenWorkboard(current) : Boolean(options.openWorkboard);
+  const keepGenericWorkboardOpen = genericWorkboardIsOpen();
   const keepReportDraftOpen = current
     ? projectHasOpenReportDraft(current)
     : Boolean(options.openReportDraft);
@@ -2738,14 +2780,12 @@ async function activateProjectStudio(project, options = {}) {
   const currentCoordinationThread = current ? openCoordinationThreadForProject(current) : null;
   const currentDetailID = current ? paneIDForProjectDetail(current) : "";
   const currentNotebookID = current ? paneIDForProjectNotebook(current) : "";
-  const currentWorkboardID = current ? paneIDForProjectWorkboard(current) : "";
   const currentReportDraftID = current ? paneIDForProjectReportDraft(current) : "";
   const currentCoordinationID = current ? paneIDForProjectCoordination(current) : "";
   const currentCoordinationThreadID = currentCoordinationThread
     ? paneIDForProjectCoordinationThread(current, currentCoordinationThread.threadID)
     : "";
   const notebookWidth = currentNotebookID ? state.paneWeights[currentNotebookID] : null;
-  const workboardWidth = currentWorkboardID ? state.paneWeights[currentWorkboardID] : null;
   const reportDraftWidth = currentReportDraftID ? state.paneWeights[currentReportDraftID] : null;
   const coordinationWidth = currentCoordinationID ? state.paneWeights[currentCoordinationID] : null;
 
@@ -2755,7 +2795,6 @@ async function activateProjectStudio(project, options = {}) {
     [
       currentDetailID,
       currentNotebookID,
-      currentWorkboardID,
       currentReportDraftID,
       currentCoordinationID,
       currentCoordinationThreadID
@@ -2765,7 +2804,6 @@ async function activateProjectStudio(project, options = {}) {
     state.paneOrder = (state.paneOrder || []).filter((paneID) =>
       paneID !== currentDetailID &&
       paneID !== currentNotebookID &&
-      paneID !== currentWorkboardID &&
       paneID !== currentReportDraftID &&
       paneID !== currentCoordinationID &&
       paneID !== currentCoordinationThreadID
@@ -2774,7 +2812,7 @@ async function activateProjectStudio(project, options = {}) {
 
   setOpenProjectDetails([identity]);
   state.notebooks = keepNotebookOpen ? [identity] : [];
-  state.workboards = keepWorkboardOpen ? [identity] : [];
+  state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : [];
   state.reportDrafts = keepReportDraftOpen ? [identity] : [];
   state.coordinations = keepCoordinationOpen ? [identity] : [];
   state.coordinationThreads = [];
@@ -2785,14 +2823,10 @@ async function activateProjectStudio(project, options = {}) {
     state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
   }
   const notebookID = paneIDForProjectNotebook(identity);
-  const workboardID = paneIDForProjectWorkboard(identity);
   const reportDraftID = paneIDForProjectReportDraft(identity);
   const coordinationID = paneIDForProjectCoordination(identity);
   if (keepNotebookOpen) {
     state.paneWeights[notebookID] = Number(notebookWidth) > 40 ? notebookWidth : defaultNotebookPaneWidth;
-  }
-  if (keepWorkboardOpen) {
-    state.paneWeights[workboardID] = Number(workboardWidth) > 40 ? workboardWidth : defaultWorkboardPaneWidth;
   }
   if (keepReportDraftOpen) {
     state.paneWeights[reportDraftID] = Number(reportDraftWidth) > 40
@@ -2955,6 +2989,7 @@ function defaultActivePaneIDs() {
     return [paneIDForProjectWorkboard(detachedProject)];
   }
   const ids = [];
+  if (genericWorkboardIsOpen()) ids.push(paneIDForProjectWorkboard(genericWorkboardIdentity));
   openProjectDetails().forEach((detail) => {
     if (projectHasOpenNotebook(detail)) ids.push(paneIDForProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) ids.push(paneIDForProjectReportDraft(detail));
@@ -2963,7 +2998,6 @@ function defaultActivePaneIDs() {
       const thread = openCoordinationThreadForProject(detail);
       if (thread) ids.push(paneIDForProjectCoordinationThread(detail, thread.threadID));
     }
-    if (projectHasOpenWorkboard(detail)) ids.push(paneIDForProjectWorkboard(detail));
   });
   if (state.utilities.archive) ids.push("utility:archive");
   (state.utilityInstances || []).forEach((instance) => {
@@ -2987,8 +3021,7 @@ function projectWorkspacePaneIDs(detail) {
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
-      : []),
-    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+      : [])
   ];
   const active = new Set(activeIDs);
   const ordered = (state.paneOrder || []).filter((id) => active.has(id));
@@ -3005,8 +3038,7 @@ function projectToolPaneIDs(detail) {
     paneIDForProjectCoordination(detail),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
-      : []),
-    paneIDForProjectWorkboard(detail)
+      : [])
   ];
 }
 
@@ -3307,7 +3339,6 @@ function syncProjectToolButtonStates(project) {
   const buttonStates = [
     [".project-notebook-button", projectHasOpenNotebook(project)],
     [".project-report-draft-button", projectHasOpenReportDraft(project)],
-    [".project-workboard-button", projectHasOpenWorkboard(project)],
     [".project-coordination-button", projectHasOpenCoordination(project)]
   ];
   track.querySelectorAll(".saved-folder-context.is-project[data-project-id]").forEach((context) => {
@@ -3328,8 +3359,7 @@ function refreshOpenProjectPaneTheme(project) {
     paneIDForProjectCoordination(identity),
     ...(openCoordinationThreadForProject(identity)
       ? [paneIDForProjectCoordinationThread(identity, openCoordinationThreadForProject(identity).threadID)]
-      : []),
-    paneIDForProjectWorkboard(identity)
+      : [])
   ].forEach((paneID) => {
     track
       .querySelectorAll(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`)
@@ -3384,8 +3414,7 @@ function placeArchiveAfterProjectsStack() {
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
-      : []),
-    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+      : [])
   ]);
   const detailIndex = Math.max(...projectStackIDs.map((id) => ordered.indexOf(id)).filter((index) => index !== -1), -1);
   const insertIndex = detailIndex === -1
@@ -3403,8 +3432,7 @@ function restoreProjectsStackOrder(sourcePaneID = "") {
     ...(projectHasOpenCoordination(detail) ? [paneIDForProjectCoordination(detail)] : []),
     ...(openCoordinationThreadForProject(detail)
       ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
-      : []),
-    ...(projectHasOpenWorkboard(detail) ? [paneIDForProjectWorkboard(detail)] : [])
+      : [])
   ]);
   const archiveID = "utility:archive";
   const activeIDs = defaultActivePaneIDs();
@@ -3528,6 +3556,7 @@ function setUtilityButtonStates() {
   );
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
   toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
+  toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
 
@@ -6045,6 +6074,21 @@ function mutationUpdatedAt(mutation) {
   const record = Object.values(mutation || {})[0] || {};
   const timestamp = Date.parse(record.updatedAt || 0);
   return Number.isFinite(timestamp) ? timestamp : 0;
+}
+
+function retireProjectWorkboardSyncState() {
+  const withoutWorkboards = (entries = []) => entries.filter((entry) =>
+    mutationKindAndRecord(entry?.mutation).kind !== "workboard"
+  );
+  const nextOutbox = withoutWorkboards(state.syncOutbox);
+  const nextConflicts = withoutWorkboards(state.syncConflicts);
+  const changed = nextOutbox.length !== (state.syncOutbox || []).length ||
+    nextConflicts.length !== (state.syncConflicts || []).length;
+  if (!changed) return false;
+  state.syncOutbox = nextOutbox;
+  state.syncConflicts = nextConflicts;
+  saveWorkspaceState();
+  return true;
 }
 
 const automaticallyConvergentSyncRejectionCodes = new Set([
@@ -14582,7 +14626,7 @@ async function renderProjects() {
   const addButton = panel.querySelector(".projects-add-button");
   const archiveButton = panel.querySelector(".projects-archive-button");
   clear(content);
-  appendWorkspaceColumnIntro(content, "Projects organize saved sections, notes, and Workboards around a specific job or research topic.");
+  appendWorkspaceColumnIntro(content, "Projects organize saved sections and notes around a specific job or research topic.");
   addButton?.addEventListener("click", () => showProjectCreateSheet(panel));
   archiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   archiveButton?.addEventListener("click", toggleArchiveAfterProjectsStack);
@@ -18535,30 +18579,6 @@ async function renderProjectDetail(detail) {
       if (opened) reportDraftButton.setAttribute("aria-pressed", "true");
     }
   });
-  const workboardButton = document.createElement("button");
-  workboardButton.className = "project-workboard-button";
-  workboardButton.type = "button";
-  workboardButton.textContent = "Workboard";
-  workboardButton.setAttribute("aria-pressed", String(projectHasOpenWorkboard(identity)));
-  workboardButton.hidden = detachedProjectWindow;
-  if (identity.sharedOnly) {
-    workboardButton.disabled = true;
-    workboardButton.title = "Shared Workboard editing is intentionally scheduled after authored collaboration.";
-  }
-  const preloadWorkboard = () => {
-    void loadWorkboardModule().catch(() => {});
-  };
-  workboardButton.addEventListener("pointerenter", preloadWorkboard, { once: true });
-  workboardButton.addEventListener("focus", preloadWorkboard, { once: true });
-  workboardButton.addEventListener("click", () => {
-    if (projectHasOpenWorkboard(identity)) {
-      void closeProjectWorkboard(identity);
-      workboardButton.setAttribute("aria-pressed", "false");
-    } else {
-      void openProjectWorkboard(identity);
-      workboardButton.setAttribute("aria-pressed", "true");
-    }
-  });
   const coordinationButton = document.createElement("button");
   coordinationButton.className = "project-coordination-button";
   coordinationButton.type = "button";
@@ -18580,7 +18600,7 @@ async function renderProjectDetail(detail) {
     className: "project-detail-back",
     svg: circleXIconSVG()
   });
-  actions.prepend(notebookButton, reportDraftButton, workboardButton, coordinationButton);
+  actions.prepend(notebookButton, reportDraftButton, coordinationButton);
   const headingGroup = document.createElement("div");
   headingGroup.className = "project-detail-heading";
   const title = document.createElement("h2");
@@ -19639,7 +19659,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     [
       ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
       ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
-      ["Workboard", "project-workboard-button", projectHasOpenWorkboard, openProjectWorkboard, closeProjectWorkboard],
       ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]
     ].forEach(([label, className, isOpen, openTool, closeTool]) => {
       const button = document.createElement("button");
@@ -19647,7 +19666,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
       button.className = className;
       button.textContent = label;
       button.setAttribute("aria-pressed", String(isOpen(identity)));
-      if (identity.sharedOnly && (label === "Report Draft" || label === "Workboard")) {
+      if (identity.sharedOnly && label === "Report Draft") {
         button.disabled = true;
         button.title = `${label} editing is unavailable for shared-only Projects.`;
       }
@@ -19723,7 +19742,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     convert.addEventListener("click", async () => {
       const confirmed = await openWebWarning({
         title: "Convert to Project?",
-        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report Draft, Workboard, Coordination, and Project history.",
+        message: "This keeps every saved section, note, tag, and folder association, then adds Notebook, Report Draft, Coordination, and Project history.",
         confirmLabel: "Convert",
         container: panel
       });
@@ -19836,14 +19855,13 @@ async function reconcileProjectStudioWithSavedFolders(folders) {
       }
     } else if (!current) {
       const hadOrphanTools = [
-        ...openWorkboards(),
         ...openNotebooks(),
         ...openReportDrafts(),
         ...openCoordinations(),
         ...openCoordinationThreads()
       ].length > 0;
       if (hadOrphanTools) {
-        state.workboards = [];
+        state.workboards = genericWorkboardIsOpen() ? [genericWorkboardIdentity] : [];
         state.notebooks = [];
         state.reportDrafts = [];
         state.coordinations = [];
@@ -23450,8 +23468,6 @@ function renderCodeQuestionStageControl(project) {
         const detail = openProjectDetails()[0];
         if (detail && tool.legacyTool === "notebook" && !projectHasOpenNotebook(detail)) {
           await openProjectNotebook(detail);
-        } else if (detail && tool.legacyTool === "workboard" && !projectHasOpenWorkboard(detail)) {
-          await openProjectWorkboard(detail);
         } else if (detail && tool.legacyTool === "reportDraft" && !projectHasOpenReportDraft(detail)) {
           await openProjectReportDraft(detail);
         }
@@ -26383,6 +26399,7 @@ async function renderWorkspace(options = {}) {
     if (options.persist !== false) saveWorkspaceState();
     return true;
   }
+  if (genericWorkboardIsOpen()) panes.push(await renderProjectWorkboard(genericWorkboardIdentity));
   for (const detail of openProjectDetails()) {
     if (projectHasOpenNotebook(detail)) panes.push(await renderProjectNotebook(detail));
     if (projectHasOpenReportDraft(detail)) panes.push(await renderProjectReportDraft(detail));
@@ -26391,7 +26408,6 @@ async function renderWorkspace(options = {}) {
       const thread = openCoordinationThreadForProject(detail);
       if (thread) panes.push(await renderProjectCoordinationThread(detail, thread.threadID));
     }
-    if (projectHasOpenWorkboard(detail)) panes.push(await renderProjectWorkboard(detail));
   }
   // Code Question shell panes (flag-gated; empty when capability is off).
   for (const paneID of openCodeQuestionPaneIDs()) {
@@ -26455,6 +26471,10 @@ async function renderUtilityWorkspace(options = {}) {
   setUtilityButtonStates();
 
   const panes = [];
+  if (genericWorkboardIsOpen()) {
+    const workboardID = paneIDForProjectWorkboard(genericWorkboardIdentity);
+    panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity)));
+  }
   for (const detail of openProjectDetails()) {
     if (projectHasOpenNotebook(detail)) {
       const notebookID = paneIDForProjectNotebook(detail);
@@ -26475,10 +26495,6 @@ async function renderUtilityWorkspace(options = {}) {
           () => renderProjectCoordinationThread(detail, thread.threadID)
         ));
       }
-    }
-    if (projectHasOpenWorkboard(detail)) {
-      const workboardID = paneIDForProjectWorkboard(detail);
-      panes.push(await reuseOrRenderPane(workboardID, () => renderProjectWorkboard(detail)));
     }
   }
   for (const paneID of openCodeQuestionPaneIDs()) {
@@ -26601,7 +26617,7 @@ async function toggleUtilityPane(key) {
       !isProjectReportDraftPaneID(id) &&
       !isProjectCoordinationPaneID(id) &&
       !isProjectCoordinationThreadPaneID(id) &&
-      !isProjectWorkboardPaneID(id) &&
+      (!isProjectWorkboardPaneID(id) || id === paneIDForProjectWorkboard(genericWorkboardIdentity)) &&
       id !== "utility:archive"
     );
   } else if (key === "archive") {
@@ -26828,6 +26844,12 @@ function bindImmediateUtilityControls() {
     toggleSearchButton.addEventListener("click", () => {
       void focusUtility("search", ".search-input");
     });
+  }
+  if (toggleWorkboardButton?.dataset.coldStartBound !== "true") {
+    toggleWorkboardButton.dataset.coldStartBound = "true";
+    toggleWorkboardButton.addEventListener("pointerenter", () => void loadWorkboardModule().catch(() => {}), { once: true });
+    toggleWorkboardButton.addEventListener("focus", () => void loadWorkboardModule().catch(() => {}), { once: true });
+    toggleWorkboardButton.addEventListener("click", () => void toggleGenericWorkboard());
   }
   if (toggleSavedButton.dataset.coldStartBound === "true") return;
   toggleSavedButton.dataset.coldStartBound = "true";

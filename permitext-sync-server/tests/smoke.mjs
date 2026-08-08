@@ -728,7 +728,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function activateProjectStudio(project, options = {})") &&
         workspaceScript.text.includes("state.notebooks = keepNotebookOpen ? [identity] : []") &&
-        workspaceScript.text.includes("state.workboards = keepWorkboardOpen ? [identity] : []") &&
+        workspaceScript.text.includes("state.workboards = keepGenericWorkboardOpen ? [genericWorkboardIdentity] : []") &&
         workspaceScript.text.includes("state.reportDrafts = keepReportDraftOpen ? [identity] : []") &&
         workspaceScript.text.includes("confirmDiscardIfNeeded()") &&
         workspaceScript.text.includes("Discard unsaved Report Draft changes?") &&
@@ -824,7 +824,7 @@ async function main() {
         !workspaceStyles.text.includes(".notebook-eyebrow") &&
         workspaceStyles.text.includes(".notebook-header {\n  display: flex;\n  min-height: var(--panel-title-row-height);\n  align-items: flex-start;\n  justify-content: flex-end;") &&
         workspaceScript.text.includes("cardType: cardAtStart.cardType"),
-      "Web Project Studio no longer switches its Project overview, Notebook, Research history, Report Draft, and Workboard as one guarded workspace."
+      "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report Draft as one guarded workspace."
     );
     assert(
       iosSyncEngineSource.includes("async let foundation = transport.projectFoundation") &&
@@ -835,14 +835,14 @@ async function main() {
         iosCodeModelsSource.includes('post("reports/history/list"') &&
         iosCodeModelsSource.includes('post("reports/manifests/get"') &&
         iosCodeModelsSource.includes('appendingPathComponent("reports/files/upload")') &&
-        iosCodeModelsSource.includes('appendingPathComponent("workboards/previews/read")') &&
         iosSyncEngineSource.includes("func saveProjectReportPDF") &&
-        iosSyncEngineSource.includes("func projectWorkboardPreview(") &&
         iosLibraryViewModelSource.includes("func projectHubSnapshot(folderID: Int64)") &&
         iosLibraryViewModelSource.includes("func projectReportPDF(manifestID: String)") &&
-        iosLibraryViewModelSource.includes("func projectWorkboardPreviewData(") &&
-        iosLibraryViewModelSource.includes("SHA256.hash(data: data)") &&
         iosLibraryViewModelSource.includes("saveProjectReportPDF") &&
+        iosLibraryViewModelSource.includes("projectBookmarksByFolderID") &&
+        iosLibraryViewModelSource.includes("accountWideProjectBookmarks(") &&
+        iosLibraryViewModelSource.includes("repository.evidenceReferences(inFolder: folder.id)") &&
+        iosUserDataStoreSource.includes("func evidenceReferences(inFolder folderID: Int64)") &&
         iosBookmarksSource.includes('CodeEyebrow(text: "Project Hub"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Notebook"') &&
         iosBookmarksSource.includes('projectHubSection(title: "Research History"') &&
@@ -856,10 +856,9 @@ async function main() {
         iosOrganizationProjectHubSource.includes("assignedFirmTags") &&
         iosExportBuilderSource.includes("manifest.contentHash") &&
         iosBookmarksSource.includes("Create & Save iOS PDF") &&
-        iosBookmarksSource.includes('"Read-only preview"') &&
-        iosBookmarksSource.includes("Flattened Project Workboard preview") &&
-        iosBookmarksSource.includes("Workboard editing stays on the web."),
-      "iOS Project Hub no longer provides its read-only Notebook, immutable Research, native Report export, and web-first Workboard contract."
+        !iosBookmarksSource.includes("Flattened Project Workboard preview") &&
+        !iosOrganizationProjectHubSource.includes("Workboard preview"),
+      "iOS Project Hub must show account-wide Project evidence without exposing the web-only Workboard."
     );
     assert(
       iosLibraryViewModelSource.includes("private var startupWarmupTask: Task<Void, Never>?") &&
@@ -1248,7 +1247,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-auto-sync-convergence-v6'),
+        webRoot.text.includes('/web/app.js?v=20260808-generic-workboard-v7'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -2637,13 +2636,15 @@ async function main() {
       "Workboard no longer follows live system appearance changes."
     );
     assert(
-        !workboardSource.includes("<p>Project Workboard</p>") &&
-        !workboardSource.includes("<h2>{projectName}</h2>") &&
-        workboardStyleSource.includes("justify-content: flex-end;") &&
-        workboardStyleSource.includes("border-bottom: 0;") &&
-        workspaceScript.text.includes("function projectWorkspacePaneIDs(detail)") &&
-        workspaceScript.text.includes("...openProjectDetails().flatMap(projectWorkspacePaneIDs)"),
-      "Workboard should use the Project name only and move with the Project workspace panes."
+      webRoot.text.includes('id="toggle-workboard"') &&
+        workspaceScript.text.includes('id: "permitext-generic-workboard"') &&
+        workspaceScript.text.includes("const syncEnabled = !isGeneric && Boolean(activeAccount())") &&
+        workspaceScript.text.includes("saveSyncedBoard: isGeneric ? null : saveSyncedWorkboard") &&
+        workspaceScript.text.includes("function retireProjectWorkboardSyncState()") &&
+        !workspaceScript.text.includes('workboardButton.textContent = "Workboard"') &&
+        !iosBookmarksSource.includes("Workboard editing stays on the web") &&
+        !iosOrganizationProjectHubSource.includes("Workboard preview"),
+      "Workboard must be a local-only web toolbar tool, outside Projects and iOS."
     );
     assert(
       workspaceScript.text.includes("function placeProjectToolPaneLast(detail, paneID)") &&

@@ -1,7 +1,7 @@
 import {
   emptyCodeQuestionWorkspaceState,
   normalizeCodeQuestionWorkspaceState
-} from "./code-question-workspace.js?v=20260806-code-question-legacy-v1";
+} from "./code-question-workspace.js?v=20260808-generic-workboard-v2";
 
 export const codeQuestionAccountCacheVersion = 1;
 export const codeQuestionAccountCacheKeyPrefix = "permitext:codeQuestionAccount:v1:";

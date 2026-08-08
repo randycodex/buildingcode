@@ -35,6 +35,7 @@ protocol UserContentRepository {
     func totalFolderCount() throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
+    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)]
     func createFolder(name: String, address: String, description: String, colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
     func updateFolder(id: Int64, name: String, address: String, description: String, colorHex: String, folderType: CodeFolderType, codeVersion: String) throws
     func deleteFolder(id: Int64, codeVersion: String) throws
@@ -2051,7 +2052,7 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
-    private func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)] {
+    func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)] {
         let statement = try connection.prepare(
             """
             SELECT section_id, code_version

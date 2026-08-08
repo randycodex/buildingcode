@@ -347,7 +347,7 @@ private struct CodeQuestionProjectHubDetail: View {
                     .codeQuestionMobileRow(accent: accent)
                 }
             }
-            Text("Working Notes and the flattened Workboard preview remain in the Project Hub; linked content is not silently promoted into facts or evidence.")
+            Text("Working Notes remain in the Project Hub; linked content is not silently promoted into facts or evidence.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)

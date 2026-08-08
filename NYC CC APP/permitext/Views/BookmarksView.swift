@@ -1099,8 +1099,6 @@ struct ProjectView: View {
     @State private var projectReportShareURL: URL?
     @State private var isProjectReportBuilding = false
     @State private var projectReportBuildError: String?
-    @State private var projectWorkboardPreviewImage: UIImage?
-    @State private var isProjectWorkboardPreviewLoading = false
 
     private let contentHorizontalInset: CGFloat = CodeScreenMetrics.screenHorizontalPadding
 
@@ -1238,7 +1236,7 @@ struct ProjectView: View {
         VStack(alignment: .leading, spacing: 12) {
             CodeEyebrow(text: "Project Hub", accent: accentColor)
 
-            Text("Code Questions, Notebook, Research, Working Notes, issued records, and Workboard previews are adapted for secure review on iPhone. Governed workflow changes remain on the web.")
+            Text("Code Questions, Notebook, Research, Working Notes, and issued records are adapted for secure review on iPhone. Governed workflow changes remain on the web.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
@@ -1286,7 +1284,6 @@ struct ProjectView: View {
             projectNotebookSummary
             projectResearchSummary
             projectReportSummary
-            projectWorkboardSummary
         }
     }
 
@@ -1419,64 +1416,6 @@ struct ProjectView: View {
                     )
                 }
             }
-        }
-    }
-
-    private var projectWorkboardSummary: some View {
-        projectHubSection(title: "Workboard", systemImage: "scribble.variable") {
-            VStack(alignment: .leading, spacing: 8) {
-                Text(projectHubSnapshot?.workboardPreview == nil ? "Web workspace" : "Read-only preview")
-                    .font(.caption2.weight(.bold))
-                    .foregroundStyle(accentColor)
-                if let projectWorkboardPreviewImage {
-                    Image(uiImage: projectWorkboardPreviewImage)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(maxWidth: .infinity)
-                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                        .accessibilityLabel("Flattened Project Workboard preview")
-                } else if isProjectWorkboardPreviewLoading {
-                    HStack(spacing: 8) {
-                        ProgressView()
-                        Text("Loading flattened Workboard preview…")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Text(
-                    projectHubSnapshot?.workboardPreview == nil
-                        ? "Workboard editing stays on the web. A flattened preview will appear here after a meaningful web revision is saved."
-                        : "This flattened snapshot is for mobile review. Workboard editing stays on the web."
-                )
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                if let preview = projectHubSnapshot?.workboardPreview {
-                    Text("\(preview.elementCount) \(preview.elementCount == 1 ? "element" : "elements") · \(projectHubDate(preview.workboardUpdatedAt))")
-                        .font(.caption2.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                }
-                if let webURL = permitextWebURL {
-                    Link(destination: webURL) {
-                        Label("Open Permitext Web", systemImage: "arrow.up.right.square")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(accentColor)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(accentColor.opacity(0.14))
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(12)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(accentColor.opacity(0.08))
-            )
         }
     }
 
@@ -1644,21 +1583,6 @@ struct ProjectView: View {
             let snapshot = try await library.projectHubSnapshot(folderID: folderID)
             projectHubSnapshot = snapshot
             projectHubError = nil
-            projectWorkboardPreviewImage = nil
-            if let preview = snapshot.workboardPreview {
-                isProjectWorkboardPreviewLoading = true
-                do {
-                    let data = try await library.projectWorkboardPreviewData(
-                        projectID: preview.projectID,
-                        previewID: preview.id,
-                        expectedContentHash: preview.contentHash
-                    )
-                    projectWorkboardPreviewImage = UIImage(data: data)
-                } catch {
-                    projectWorkboardPreviewImage = nil
-                }
-                isProjectWorkboardPreviewLoading = false
-            }
         } catch {
             projectHubError = error.localizedDescription
         }
