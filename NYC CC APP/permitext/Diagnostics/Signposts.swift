@@ -64,6 +64,50 @@ struct UserContentSyncConflict: Identifiable, Hashable, Sendable {
     let message: String
 
     var id: String { recordID }
+
+    var displayTitle: String {
+        switch entityKind {
+        case .savedItem:
+            return "Saved section"
+        case .annotation:
+            return "Note or tags"
+        case .project:
+            return "Project"
+        case .projectSection:
+            return "Project evidence"
+        case .workboard:
+            return "Workboard"
+        case .continuity:
+            return "Reading position"
+        case .codeVersionClear:
+            return "Cleared saved data"
+        }
+    }
+
+    var systemImage: String {
+        switch entityKind {
+        case .savedItem:
+            return "bookmark"
+        case .annotation:
+            return "note.text"
+        case .project:
+            return "folder"
+        case .projectSection:
+            return "folder.badge.plus"
+        case .workboard:
+            return "rectangle.3.group"
+        case .continuity:
+            return "clock.arrow.circlepath"
+        case .codeVersionClear:
+            return "trash.slash"
+        }
+    }
+
+    var recordReference: String {
+        let trimmed = recordID.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard trimmed.count > 20 else { return trimmed }
+        return "…\(trimmed.suffix(16))"
+    }
 }
 
 protocol UserContentSyncBackend {

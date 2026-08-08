@@ -222,6 +222,36 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         )
     }
 
+    func testSyncConflictPresentationIdentifiesEverySupportedRecordKind() {
+        let expected: [(ServerUserContentEntityKind, String, String)] = [
+            (.savedItem, "Saved section", "bookmark"),
+            (.annotation, "Note or tags", "note.text"),
+            (.project, "Project", "folder"),
+            (.projectSection, "Project evidence", "folder.badge.plus"),
+            (.workboard, "Workboard", "rectangle.3.group"),
+            (.continuity, "Reading position", "clock.arrow.circlepath"),
+            (.codeVersionClear, "Cleared saved data", "trash.slash")
+        ]
+
+        for (kind, title, systemImage) in expected {
+            let conflict = UserContentSyncConflict(
+                recordID: "record-with-a-very-long-identifier-1234567890",
+                entityKind: kind,
+                message: "Changed in two places."
+            )
+            XCTAssertEqual(conflict.displayTitle, title)
+            XCTAssertEqual(conflict.systemImage, systemImage)
+            XCTAssertEqual(conflict.recordReference, "…ifier-1234567890")
+        }
+
+        let shortReference = UserContentSyncConflict(
+            recordID: "short-record",
+            entityKind: .savedItem,
+            message: "Server copy is newer."
+        )
+        XCTAssertEqual(shortReference.recordReference, "short-record")
+    }
+
     func testStoreKitTransactionPolicyTracksInactiveOwnedProducts() {
         let now = Date(timeIntervalSince1970: 2_000_000)
         XCTAssertTrue(StoreKitTransactionPolicy.isKnownProductID(StoreKitProductID.proMonthly))

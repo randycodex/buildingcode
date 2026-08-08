@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var showsProjectDeleteWarning = false
     @State private var showsAccountDeleteWarning = false
     @State private var showsSignOutWarning = false
+    @State private var pendingSyncConflictResolution: PendingSyncConflictResolution?
     private let tabBarClearance: CGFloat = CodeScreenMetrics.tabBarClearance
     private let subscriptionManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
     private let webWorkspaceURL = URL(string: "https://permitext.com")!
@@ -352,6 +353,10 @@ struct SettingsView: View {
 
             } else {
                 VStack(spacing: 10) {
+                    if !library.userContentSyncConflicts.isEmpty {
+                        syncConflictReviewCard
+                    }
+
                     Button {
                         if library.requiresSignOutConfirmation {
                             showsSignOutWarning = true
@@ -1013,6 +1018,13 @@ struct SettingsView: View {
                 .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
 
+            if conflictCount > 0 {
+                Button("Review Conflicts") {
+                    showsSignOutWarning = false
+                }
+                .buttonStyle(.borderedProminent)
+            }
+
             Button("Sign Out Anyway", role: .destructive) {
                 showsSignOutWarning = false
                 library.signOut()
@@ -1022,6 +1034,142 @@ struct SettingsView: View {
 
             Button("Cancel", role: .cancel) {
                 showsSignOutWarning = false
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(width: 320, alignment: .leading)
+        .padding(24)
+    }
+
+    private var syncConflictReviewCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                Label("Sync Conflicts", systemImage: "arrow.triangle.2.circlepath")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.orange)
+
+                Spacer(minLength: 0)
+
+                Text("\(library.userContentSyncConflicts.count)")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(.orange.opacity(0.14), in: Capsule(style: .continuous))
+            }
+
+            Text("Choose which copy to keep for each item before signing out. Resolve important work one item at a time.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(spacing: 0) {
+                ForEach(Array(library.userContentSyncConflicts.enumerated()), id: \.element.id) { index, conflict in
+                    syncConflictRow(conflict)
+
+                    if index < library.userContentSyncConflicts.count - 1 {
+                        CodeHairline()
+                    }
+                }
+            }
+
+            if library.isAccountBusy {
+                HStack(spacing: 8) {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("Resolving conflict…")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(.orange.opacity(colorScheme == .dark ? 0.12 : 0.08), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .popover(item: $pendingSyncConflictResolution, attachmentAnchor: .rect(.bounds), arrowEdge: .bottom) { request in
+            syncConflictResolutionPopover(request)
+                .presentationCompactAdaptation(.popover)
+        }
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Sync conflicts requiring review")
+    }
+
+    private func syncConflictRow(_ conflict: UserContentSyncConflict) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(conflict.displayTitle)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(.primary)
+
+                    Text("Record \(conflict.recordReference)")
+                        .font(.caption.monospaced())
+                        .foregroundStyle(.secondary)
+                        .lineLimit(1)
+                }
+            } icon: {
+                Image(systemName: conflict.systemImage)
+                    .foregroundStyle(.orange)
+            }
+
+            Text(conflict.message)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 8) {
+                    syncConflictChoiceButtons(conflict)
+                }
+
+                VStack(spacing: 8) {
+                    syncConflictChoiceButtons(conflict)
+                }
+            }
+        }
+        .padding(.vertical, 10)
+    }
+
+    @ViewBuilder
+    private func syncConflictChoiceButtons(_ conflict: UserContentSyncConflict) -> some View {
+        Button("Keep This iPhone") {
+            pendingSyncConflictResolution = PendingSyncConflictResolution(conflict: conflict, keepLocal: true)
+        }
+        .buttonStyle(.borderedProminent)
+        .disabled(library.isAccountBusy)
+
+        Button("Use Server Copy") {
+            pendingSyncConflictResolution = PendingSyncConflictResolution(conflict: conflict, keepLocal: false)
+        }
+        .buttonStyle(.bordered)
+        .disabled(library.isAccountBusy)
+    }
+
+    private func syncConflictResolutionPopover(_ request: PendingSyncConflictResolution) -> some View {
+        VStack(alignment: .leading, spacing: 18) {
+            Text(request.keepLocal ? "Keep this iPhone’s copy?" : "Use the server copy?")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(.primary)
+
+            Text(request.keepLocal
+                ? "Permitext will retry this iPhone’s \(request.conflict.displayTitle.lowercased()) and replace the server copy if the server accepts it."
+                : "Permitext will discard this iPhone’s conflicting change and apply the current server copy. This local change cannot be recovered afterward."
+            )
+            .font(.body)
+            .foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
+
+            Button(request.keepLocal ? "Keep This iPhone" : "Use Server Copy", role: request.keepLocal ? nil : .destructive) {
+                pendingSyncConflictResolution = nil
+                Task {
+                    await library.resolveUserContentSyncConflict(request.conflict, keepLocal: request.keepLocal)
+                }
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(request.keepLocal ? Color.appChrome : .red)
+
+            Button("Cancel", role: .cancel) {
+                pendingSyncConflictResolution = nil
             }
             .buttonStyle(.plain)
         }
@@ -1147,6 +1295,15 @@ struct SettingsView: View {
             library.clearAllTags()
         }
         pendingClearAction = nil
+    }
+}
+
+private struct PendingSyncConflictResolution: Identifiable, Equatable {
+    let conflict: UserContentSyncConflict
+    let keepLocal: Bool
+
+    var id: String {
+        "\(conflict.id):\(keepLocal ? "local" : "server")"
     }
 }
 
