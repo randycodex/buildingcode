@@ -203,7 +203,11 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             id = try container.decode(Int64.self)
             sectionNumber = try container.decode(String.self)
             title = try container.decode(String.self)
-            kind = try container.decode(CodeSectionKind.self)
+            let rawKind = try container.decode(String.self)
+            // Enacted-code prepared catalogs use the semantic value
+            // "section" for ordinary titled sections. Native's display model
+            // calls the same shape `title`.
+            kind = rawKind == "section" ? .title : CodeSectionKind(rawValue: rawKind) ?? .title
         }
 
         var expanded: Section {
@@ -214,6 +218,25 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
                 kind: kind
             )
         }
+    }
+
+    /// Flat authored-section metadata shipped alongside the prepared chapter
+    /// files. This is also an integrity fallback: a section that is present in
+    /// the bundle must remain directly addressable even if a large chapter
+    /// catalog or one per-chapter structure omits it during decoding.
+    private struct PreparedSectionCatalog: Decodable {
+        let sections: [PreparedSectionCatalogEntry]
+    }
+
+    private struct PreparedSectionCatalogEntry: Decodable {
+        let id: Int64
+        let chapterID: Int64
+        let codeSectionID: Int64?
+        let chapterNumber: String
+        let sectionNumber: String
+        let title: String
+        let headerLine: String
+        let headingLine: String?
     }
 
     private struct CodeSection: Decodable {
@@ -275,7 +298,8 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             title = try container.decode(String.self, forKey: .title)
             officialText = try container.decodeIfPresent(String.self, forKey: .officialText) ?? ""
             richTextOverrideData = try container.decodeIfPresent(Data.self, forKey: .richTextOverrideData)
-            kind = try container.decodeIfPresent(CodeSectionKind.self, forKey: .kind) ?? .title
+            let rawKind = try container.decodeIfPresent(String.self, forKey: .kind)
+            kind = rawKind == "section" ? .title : rawKind.flatMap(CodeSectionKind.init(rawValue:)) ?? .title
             contentBlocks = try container.decodeIfPresent([CodeContentBlock].self, forKey: .contentBlocks) ?? []
         }
     }
@@ -543,6 +567,50 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             sectionsByChapterIDIndex[chapter.id] = chapterSectionList
         }
 
+        if bundleUsesExternalChapterStructure,
+           let catalogEntries = Self.preparedSectionCatalog(
+               preparedRootURL: preparedChaptersURL.deletingLastPathComponent()
+           ) {
+            let chapterByID = Dictionary(uniqueKeysWithValues: chapters.map { ($0.id, $0) })
+            for entry in catalogEntries where sectionIndex[entry.id] == nil {
+                guard let chapter = chapterByID[entry.chapterID] else { continue }
+                let section = Section(
+                    id: entry.id,
+                    sectionNumber: entry.sectionNumber,
+                    title: entry.title,
+                    kind: .title
+                )
+                let summary = CodeSectionSummary(
+                    id: entry.id,
+                    chapterNumber: entry.chapterNumber,
+                    sectionNumber: entry.sectionNumber,
+                    title: entry.title,
+                    kind: .title
+                )
+                let indexed = IndexedSection(
+                    chapter: chapter,
+                    group: CodeSectionGroup(
+                        id: "prepared-section-catalog:\(entry.chapterID):\(entry.headerLine):\(entry.headingLine ?? "")",
+                        headerLine: entry.headerLine,
+                        headingLine: entry.headingLine,
+                        sections: []
+                    ),
+                    section: section
+                )
+
+                sectionIndex[entry.id] = indexed
+                indexedSections.append(indexed)
+                let codeSectionID = chapter.codeSectionID ?? entry.codeSectionID
+                if let codeSectionID {
+                    indexedSectionsByCodeSectionID[codeSectionID, default: []].append(indexed)
+                    sectionNumberByCodeSectionIndex[
+                        Self.scopedSectionNumberKey(entry.sectionNumber, codeSectionID: codeSectionID)
+                    ] = summary
+                }
+                sectionNumberIndex[entry.sectionNumber.uppercased()] = summary
+            }
+        }
+
         self.codeSectionsCache = codeSections
         self.chaptersCache = chapters
         self.groupsByChapterID = groupsByChapterID
@@ -666,6 +734,18 @@ final class AuthoredCodeStore: CodeReferenceLookup, @unchecked Sendable {
             groupsByChapterID[chapter.chapterID] = chapter.expandedGroups
         }
         return groupsByChapterID
+    }
+
+    private static func preparedSectionCatalog(
+        preparedRootURL: URL
+    ) -> [PreparedSectionCatalogEntry]? {
+        let url = preparedRootURL.appendingPathComponent("sectionCatalog.json", isDirectory: false)
+        guard let data = try? Data(contentsOf: url),
+              let catalog = try? JSONDecoder().decode(PreparedSectionCatalog.self, from: data)
+        else {
+            return nil
+        }
+        return catalog.sections
     }
 
     private func preparedSectionData(sectionID: Int64) -> PreparedSectionData? {

@@ -153,7 +153,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertTrue(try XCTUnwrap(consolidatedParagraph.first).isBlockAnnotation)
     }
 
-    func testBundledProjectEvidenceMatchesSixUniqueWebSectionsAndCodeGroups() throws {
+    func testBundledProjectEvidenceMatchesSevenWebEvidenceRowsAndCodeGroups() throws {
         let versions = BundleDatabaseLocator().availableCodeVersions()
         let constructionVersion = try XCTUnwrap(versions.first {
             UserContentSyncCodeVersion.server($0.codeVersion) == UserContentSyncCodeVersion.canonicalNYC2022
@@ -212,24 +212,29 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let enactedSections = enactedStore.codeSections()
         let historicalID = try XCTUnwrap(enactedSections.first { $0.name.contains("1968 BUILDING") }?.id)
         let title28ID = try XCTUnwrap(enactedSections.first { $0.name.contains("TITLE 28") }?.id)
-        let historical27867 = try XCTUnwrap(
-            enactedStore.sectionSummary(sectionNumber: "27-867", codeSectionID: historicalID)
-        )
-        let current284061 = try XCTUnwrap(
-            enactedStore.sectionSummary(sectionNumber: "28-406.1", codeSectionID: title28ID)
-        )
+        XCTAssertEqual(historicalID, 4)
+        XCTAssertEqual(title28ID, 6)
+        let historical27867ID: Int64 = 31_001_660
+        let current284061ID: Int64 = 31_003_026
+        XCTAssertTrue(enactedStore.sections(chapterID: 30_000_072).contains { $0.id == historical27867ID })
+        XCTAssertTrue(enactedStore.sections(chapterID: 30_000_085).contains { $0.id == current284061ID })
         let enactedRows = enactedStore.savedSections(
-            ids: [historical27867.id, current284061.id],
+            ids: [historical27867ID, current284061ID],
             codeVersion: UserContentSyncCodeVersion.localNYCEnactedAdministrative,
             bookmarkedSectionIDs: [],
             notesBySectionID: [:],
             includeProjectOnlySections: true
         )
 
-        XCTAssertEqual(constructionRows.count + enactedRows.count, 7)
-        let consolidated = ProjectEvidenceConsolidator.consolidated(constructionRows + enactedRows)
-        let groups = ProjectEvidenceOrganizer.codeGroups(consolidated)
+        let projectRows = constructionRows + enactedRows
+        XCTAssertEqual(projectRows.count, 7)
+        XCTAssertEqual(projectRows.filter(\.isBlockAnnotation).count, 2)
+        XCTAssertTrue(projectRows.contains {
+            $0.sectionNumber == "106.2" && $0.annotationBlockID == "paragraph-106.2"
+        })
 
+        let consolidated = ProjectEvidenceConsolidator.consolidated(projectRows)
+        let groups = ProjectEvidenceOrganizer.codeGroups(consolidated)
         XCTAssertEqual(consolidated.count, 6)
         XCTAssertEqual(groups.flatMap(\.items).count, 6)
         XCTAssertEqual(
@@ -243,6 +248,8 @@ final class EntitlementAndSyncContractTests: XCTestCase {
             ]
         )
         XCTAssertEqual(groups.first?.items.map(\.sectionNumber), ["106.2", "106.3"])
+        XCTAssertEqual(groups.first?.items.map(\.isBlockAnnotation), [false, false])
+        XCTAssertEqual(groups.first?.items.first?.noteBody, "Commenting commenting")
     }
 
     @MainActor

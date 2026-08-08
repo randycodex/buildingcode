@@ -92,6 +92,7 @@ final class CodeLibraryViewModel: ObservableObject {
     @Published private(set) var searchTabRetapCount = 0
     @Published private(set) var bookmarks: [BookmarkedSection] = []
     @Published private(set) var projectBookmarksByFolderID: [Int64: [BookmarkedSection]] = [:]
+    @Published private(set) var projectEvidenceRecordCountByFolderID: [Int64: Int] = [:]
     @Published private(set) var exportState: BookmarkExportState = .idle
     @Published private(set) var folders: [CodeFolder] = []
     @Published private(set) var activeProjectID: Int64?
@@ -1731,6 +1732,7 @@ final class CodeLibraryViewModel: ObservableObject {
             folders = []
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
+            projectEvidenceRecordCountByFolderID = [:]
             clearActiveProject()
             return
         }
@@ -1757,10 +1759,12 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
             }
             folderMembership = (try? userContentRepository.folderMembership(codeVersion: selectedVersion.codeVersion)) ?? [:]
-            projectBookmarksByFolderID = try accountWideProjectBookmarks(
+            let projectEvidence = try accountWideProjectBookmarks(
                 folders: folders,
                 repository: userContentRepository
             )
+            projectBookmarksByFolderID = projectEvidence.rowsByFolderID
+            projectEvidenceRecordCountByFolderID = projectEvidence.recordCountByFolderID
             if let activeProjectID, folders.contains(where: { $0.id == activeProjectID }) == false {
                 clearActiveProject(ifMatches: activeProjectID)
             }
@@ -1769,6 +1773,7 @@ final class CodeLibraryViewModel: ObservableObject {
             folders = []
             folderMembership = [:]
             projectBookmarksByFolderID = [:]
+            projectEvidenceRecordCountByFolderID = [:]
             clearActiveProject()
         }
     }
@@ -1776,8 +1781,12 @@ final class CodeLibraryViewModel: ObservableObject {
     private func accountWideProjectBookmarks(
         folders: [CodeFolder],
         repository: UserContentRepository
-    ) throws -> [Int64: [BookmarkedSection]] {
-        var result: [Int64: [BookmarkedSection]] = [:]
+    ) throws -> (
+        rowsByFolderID: [Int64: [BookmarkedSection]],
+        recordCountByFolderID: [Int64: Int]
+    ) {
+        var rowsByFolderID: [Int64: [BookmarkedSection]] = [:]
+        var recordCountByFolderID: [Int64: Int] = [:]
         for folder in folders {
             let references = try repository.evidenceReferences(inFolder: folder.id)
             var codeVersions: [String] = []
@@ -1808,9 +1817,15 @@ final class CodeLibraryViewModel: ObservableObject {
                 )
                 resolved.append(contentsOf: items)
             }
-            result[folder.id] = ProjectEvidenceConsolidator.consolidated(resolved)
+            // The web Project tile counts evidence records, but its expanded
+            // list presents one section card with any paragraph annotations
+            // folded into that card. Preserve both semantics on iOS.
+            var seenRowIDs = Set<String>()
+            let evidenceRecords = resolved.filter { seenRowIDs.insert($0.rowID).inserted }
+            recordCountByFolderID[folder.id] = evidenceRecords.count
+            rowsByFolderID[folder.id] = ProjectEvidenceConsolidator.consolidated(evidenceRecords)
         }
-        return result
+        return (rowsByFolderID, recordCountByFolderID)
     }
 
     private func projectEvidenceItems(
@@ -1823,9 +1838,16 @@ final class CodeLibraryViewModel: ObservableObject {
         bookmarkCreatedAtBySectionID: [Int64: Date]
     ) throws -> [BookmarkedSection] {
         let canonicalVersion = UserContentSyncCodeVersion.server(codeVersion)
-        guard let bundledVersion = availableVersions.first(where: {
+        // Project evidence is account-wide and must not depend on which reader
+        // version happened to be selected or cached when sync completed.
+        // Re-scan the bundled catalog as a fallback so evidence from another
+        // installed NYC code (for example enacted Title 28) still resolves.
+        let bundledVersion = availableVersions.first(where: {
             UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
-        }) else {
+        }) ?? locator.availableCodeVersions().first(where: {
+            UserContentSyncCodeVersion.server($0.codeVersion) == canonicalVersion
+        })
+        guard let bundledVersion else {
             return []
         }
 
@@ -2066,7 +2088,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func bookmarkCount(inFolder folderID: Int64) -> Int {
-        bookmarks(inFolder: folderID).count
+        projectEvidenceRecordCountByFolderID[folderID] ?? bookmarks(inFolder: folderID).count
     }
 
     func projectHubSnapshot(folderID: Int64) async throws -> ProjectHubSnapshot {
