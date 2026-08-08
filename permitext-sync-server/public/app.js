@@ -41,8 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-neutral-pane-dividers-v1";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-neutral-pane-dividers-v1";
+} from "./offline-storage.js?v=20260808-project-column-no-activity-v1";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-project-column-no-activity-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -19843,10 +19843,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     }
 
     appendProjectResearchHistory(context, identity, foundation);
-    appendProjectActivity(context, foundation, {
-      title: "Recent Activities",
-      showEmpty: true
-    });
   } else {
     const controls = document.createElement("div");
     controls.className = "saved-folder-controls";
