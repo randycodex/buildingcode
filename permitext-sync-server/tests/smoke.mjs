@@ -369,10 +369,10 @@ async function main() {
       "Web Settings restored the redundant destructive-actions heading or helper copy."
     );
     assert(
-      settingsTemplateSource.includes('>Reader Font</span>') &&
-        settingsTemplateSource.indexOf('class="preview-font-family-select"') < settingsTemplateSource.indexOf('>Plan</h3>') &&
+      !settingsTemplateSource.includes('>Reader Font</span>') &&
+        !settingsTemplateSource.includes('data-reader-font-family=') &&
         !settingsTemplateSource.includes('class="reader-preview-card settings-card"'),
-      "Web Settings no longer keeps Reader Font with the top preferences or restored the redundant preview card."
+      "Web Settings should use the fixed published-source typeface without restoring a competing font picker."
     );
     assert(
       !settingsTemplateSource.includes("Public username") &&
@@ -422,13 +422,10 @@ async function main() {
       "Web Settings still includes the retired Reader Preview sliders."
     );
     assert(
-      settingsTemplateSource.includes("settings-font-family-toggle") &&
-        settingsTemplateSource.includes("settings-font-family-options") &&
-        settingsTemplateSource.includes("settings-jurisdiction-select settings-inline-select-native") &&
+      settingsTemplateSource.includes("settings-jurisdiction-select settings-inline-select-native") &&
         settingsTemplateSource.includes("settings-version-select settings-inline-select-native") &&
-        settingsTemplateSource.includes('data-reader-font-family="monospaced"') &&
         !settingsTemplateSource.includes('class="preview-font-family-select"'),
-      "Every Code Preferences choice should expand inline in Settings instead of using a dropdown."
+      "Jurisdiction and version should retain the existing inline Settings controls."
     );
     assert(
       webRoot.text.includes('class="reader-spacing-controls"') &&
@@ -459,12 +456,38 @@ async function main() {
 
     const workspaceScript = await request("/web/app.js");
     const workspaceStyles = await request("/web/styles.css");
+    const interFont = await requestBinary("/web/fonts/inter-latin-wght-normal.woff2?v=20260808-typography-v1");
+    const sourceSerifFont = await requestBinary("/web/fonts/source-serif-4-latin-wght-normal.woff2?v=20260808-typography-v1");
     const workspaceStateScript = await request("/web/workspace-state.js");
     const workspaceStartupSource = workspaceScript.text.slice(
       workspaceScript.text.indexOf("async function start()"),
       workspaceScript.text.indexOf("start().catch")
     );
     assert(workspaceStyles.response.ok, "Web workspace stylesheet did not load.");
+    assert(
+      interFont.response.ok && sourceSerifFont.response.ok &&
+        interFont.body.length > 40_000 && sourceSerifFont.body.length > 40_000 &&
+        interFont.response.headers.get("content-type")?.includes("font/woff2") &&
+        sourceSerifFont.response.headers.get("content-type")?.includes("font/woff2") &&
+        interFont.response.headers.get("cache-control")?.includes("immutable") &&
+        sourceSerifFont.response.headers.get("cache-control")?.includes("immutable"),
+      "Self-hosted Permitext typography assets were missing, empty, or not immutable."
+    );
+    assert(
+      workspaceStyles.text.includes('font-family: "Inter Variable";') &&
+        workspaceStyles.text.includes('font-family: "Source Serif 4 Variable";') &&
+        workspaceStyles.text.includes('--ui-font-family: "Inter Variable"') &&
+        workspaceStyles.text.includes('--source-font-family: "Source Serif 4 Variable"') &&
+        workspaceStyles.text.includes('--reader-font-size: 16.5px;') &&
+        workspaceStyles.text.includes('--reader-line-height: 1.6;') &&
+        workspaceStyles.text.includes('.chapter-section h3 {') &&
+        workspaceStyles.text.includes('.section-block {') &&
+        workspaceStyles.text.match(/\.code-table \{[\s\S]*?font-family: var\(--reader-font-family\);/) &&
+        workspaceStyles.text.includes('font-family: var(--ui-font-family);') &&
+        workspaceScript.text.includes('fontFamily: "source-serif-4"') &&
+        !workspaceScript.text.includes('data-reader-font-family'),
+      "The two-font Permitext typography contract is incomplete."
+    );
     assert(workspaceStateScript.response.ok, "Named workspace state module did not load.");
     assert(
       webRoot.text.includes('id="workspace-tabs"') &&
@@ -651,7 +674,7 @@ async function main() {
         !workspaceScript.text.includes("readerLineHeightValue") &&
         !workspaceScript.text.includes("readerSettings.fontSize") &&
         !workspaceScript.text.includes("readerSettings.lineSpacing") &&
-        workspaceScript.text.includes("function wireReaderFontFamilyControl"),
+        !workspaceScript.text.includes("function wireReaderFontFamilyControl"),
       "Web workspace still includes retired Reader Preview slider behavior."
     );
     assert(
@@ -1247,7 +1270,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-generic-workboard-v7'),
+        webRoot.text.includes('/web/app.js?v=20260808-typography-v8'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1389,7 +1412,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260806-code-question-rollout-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-typography-v2'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1598,7 +1621,7 @@ async function main() {
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260806-code-question-rollout-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-typography-v2'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2165,7 +2188,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("function wireSettingsSelectControl(panel, selector, label)") &&
         workspaceScript.text.includes('options.classList.toggle("is-open", open)') &&
-        workspaceScript.text.includes('button.dataset.readerFontFamily || "system"') &&
+        workspaceScript.text.includes("button.dataset.value === select.value") &&
         workspaceStyles.text.match(/\.settings-inline-select-toggle \{[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/) &&
         workspaceStyles.text.match(/\.settings-inline-select-toggle:hover,[\s\S]*?\.settings-inline-select-toggle:focus-visible \{[\s\S]*?text-decoration: none;/) &&
         workspaceStyles.text.match(/\.settings-inline-select-options \{[\s\S]*?max-height: 0;[\s\S]*?transition:/) &&

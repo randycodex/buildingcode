@@ -1,4 +1,5 @@
 .permitext-workboard {
+  font-family: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   width: 100%;
@@ -77,6 +78,7 @@
 }
 
 .permitext-workboard-canvas .excalidraw {
+  --ui-font: var(--ui-font-family, "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
   --color-primary: var(--project-color, #c96410);
   --color-primary-darker: color-mix(in srgb, var(--project-color, #c96410) 82%, #000);
   --color-primary-darkest: color-mix(in srgb, var(--project-color, #c96410) 68%, #000);

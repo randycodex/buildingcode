@@ -50403,6 +50403,7 @@ function VX({ options: e, controllerRef: t }) {
 		!t || t === a.current || (a.current = t, i.replaceBlocks(i.document, EX(t)));
 	}, [i, e.document]), _.createElement(hX, {
 		editor: i,
+		className: "permitext-notebook-editor",
 		editable: e.editable !== !1,
 		theme: n,
 		formattingToolbar: !1,

@@ -7,7 +7,9 @@
     <title>permitext workspace</title>
     <link rel="manifest" href="/web/manifest.webmanifest?v=20260725-visual-inventory-v13">
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
-    <link rel="stylesheet" href="/web/styles.css?v=20260806-code-question-rollout-v1">
+    <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="stylesheet" href="/web/styles.css?v=20260808-typography-v2">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68">
   </head>
   <body>
@@ -471,22 +473,6 @@
               </div>
             </div>
           </div>
-          <div class="settings-row settings-font-row">
-            <span>Reader Font</span>
-            <div class="settings-inline-select-control settings-font-family-control">
-              <button class="settings-inline-select-toggle settings-font-family-toggle" type="button" aria-label="Expand Reader Font" aria-expanded="false">
-                <span class="settings-inline-select-value settings-font-family-value">System</span>
-              </button>
-              <div class="settings-inline-select-options settings-font-family-options" role="listbox" aria-label="Reader Font" aria-hidden="true">
-                <div class="settings-inline-select-options-inner">
-                  <button type="button" role="option" data-reader-font-family="system">System</button>
-                  <button type="button" role="option" data-reader-font-family="rounded">Rounded</button>
-                  <button type="button" role="option" data-reader-font-family="serif">Serif</button>
-                  <button type="button" role="option" data-reader-font-family="monospaced">Monospaced</button>
-                </div>
-              </div>
-            </div>
-          </div>
         </section>
         <section class="settings-card settings-plan-card" aria-labelledby="settings-plan-title">
           <h3 id="settings-plan-title" class="section-label settings-section-title">Plan</h3>
@@ -569,6 +555,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260808-generic-workboard-v7" type="module"></script>
+    <script src="/web/app.js?v=20260808-typography-v8" type="module"></script>
   </body>
 </html>

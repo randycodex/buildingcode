@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-generic-workboard-v7";
+} from "./offline-storage.js?v=20260808-typography-v8";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -345,7 +345,7 @@ const globalWorkspaceStateKeys = [
 ];
 
 const defaultReaderSettings = {
-  fontFamily: "system"
+  fontFamily: "source-serif-4"
 };
 
 let chapters = [];
@@ -2139,10 +2139,7 @@ function clampNumber(value, min, max, fallback) {
 }
 
 function normalizeReaderSettings(settings = {}) {
-  const fontFamily = settings.fontFamily === "helvetica" ? "system" : String(settings.fontFamily || "system");
-  return {
-    fontFamily: ["system", "rounded", "serif", "monospaced"].includes(fontFamily) ? fontFamily : "system"
-  };
+  return { fontFamily: "source-serif-4" };
 }
 
 function normalizeSearchCodeFilters(value) {
@@ -2238,10 +2235,7 @@ function normalizeSearchInstance(instance) {
 }
 
 function readerFontFamilyValue() {
-  if (state.readerSettings.fontFamily === "rounded") return "ui-rounded, -apple-system, BlinkMacSystemFont, sans-serif";
-  if (state.readerSettings.fontFamily === "serif") return "New York, Iowan Old Style, Georgia, serif";
-  if (state.readerSettings.fontFamily === "monospaced") return "SFMono-Regular, Menlo, Monaco, monospace";
-  return "-apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif";
+  return '"Source Serif 4 Variable", "Source Serif 4", Iowan Old Style, Georgia, serif';
 }
 
 function applyReaderSettings() {
@@ -2250,7 +2244,7 @@ function applyReaderSettings() {
 }
 
 function readerTextSizeValue(reader) {
-  return clampNumber(reader?.textSize, 10, 26, 10);
+  return clampNumber(reader?.textSize, 14, 26, 16.5);
 }
 
 function syncReaderTextSizeControls(panel, reader) {
@@ -2258,18 +2252,18 @@ function syncReaderTextSizeControls(panel, reader) {
   const decreaseButton = panel.querySelector(".reader-text-decrease");
   const increaseButton = panel.querySelector(".reader-text-increase");
   if (decreaseButton) {
-    decreaseButton.disabled = size <= 10;
-    decreaseButton.title = `Decrease Reader text size (${size} pt)`;
+    decreaseButton.disabled = size <= 14;
+    decreaseButton.title = `Decrease Reader text size (${size} px)`;
   }
   if (increaseButton) {
     increaseButton.disabled = size >= 26;
-    increaseButton.title = `Increase Reader text size (${size} pt)`;
+    increaseButton.title = `Increase Reader text size (${size} px)`;
   }
 }
 
 function applyReaderTextSize(panel, reader) {
   if (Number.isFinite(Number(reader?.textSize))) {
-    panel.style.setProperty("--reader-font-size", `${readerTextSizeValue(reader)}pt`);
+    panel.style.setProperty("--reader-font-size", `${readerTextSizeValue(reader)}px`);
   } else {
     panel.style.removeProperty("--reader-font-size");
   }
@@ -2277,7 +2271,7 @@ function applyReaderTextSize(panel, reader) {
 }
 
 function changeReaderTextSize(panel, reader, delta) {
-  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 10, 26, 10);
+  const nextSize = clampNumber(readerTextSizeValue(reader) + delta, 14, 26, 16.5);
   (state.readers || []).forEach((openReader) => {
     openReader.textSize = nextSize;
     const openPanel = track.querySelector(
@@ -22102,7 +22096,6 @@ function renderSettings() {
   panel.querySelector(".settings-close-button")?.addEventListener("click", () => toggleUtilityPane("settings"));
   wireSettingsSelectControl(panel, ".settings-jurisdiction-select", "Jurisdiction");
   wireSettingsSelectControl(panel, ".settings-version-select", "Version");
-  wireReaderFontFamilyControl(panel);
 
   const jurisdictionSelect = panel.querySelector(".settings-jurisdiction-select");
   const versionSelect = panel.querySelector(".settings-version-select");
@@ -22736,50 +22729,6 @@ function wireSettingsSelectControl(panel, selector, label) {
   });
   select.addEventListener("change", syncControl);
   renderOptions();
-}
-
-function wireReaderFontFamilyControl(panel) {
-  const toggle = panel.querySelector(".settings-font-family-toggle");
-  const valueLabel = panel.querySelector(".settings-font-family-value");
-  const options = panel.querySelector(".settings-font-family-options");
-  const optionButtons = Array.from(panel.querySelectorAll("[data-reader-font-family]"));
-
-  const syncControl = () => {
-    state.readerSettings = normalizeReaderSettings(state.readerSettings);
-    const selectedButton = optionButtons.find(
-      (button) => button.dataset.readerFontFamily === state.readerSettings.fontFamily
-    );
-    if (valueLabel) valueLabel.textContent = selectedButton?.textContent || "System";
-    optionButtons.forEach((button) => {
-      button.setAttribute(
-        "aria-selected",
-        String(button.dataset.readerFontFamily === state.readerSettings.fontFamily)
-      );
-    });
-    applyReaderSettings();
-  };
-
-  syncControl();
-  setSettingsInlineControlOpen(toggle, options, false, "Reader Font");
-
-  toggle?.addEventListener("click", () => {
-    setSettingsInlineControlOpen(
-      toggle,
-      options,
-      !options.classList.contains("is-open"),
-      "Reader Font"
-    );
-  });
-
-  optionButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      state.readerSettings.fontFamily = button.dataset.readerFontFamily || "system";
-      syncControl();
-      saveWorkspaceState();
-      setSettingsInlineControlOpen(toggle, options, false, "Reader Font");
-      toggle?.focus();
-    });
-  });
 }
 
 function createDivider(previousPaneID, nextPaneID) {

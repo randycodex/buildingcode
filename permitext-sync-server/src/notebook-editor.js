@@ -8,6 +8,7 @@ import {
 } from "@blocknote/core";
 import { BlockNoteView } from "@blocknote/mantine";
 import "@blocknote/mantine/style.css";
+import "./notebook.css";
 import {
   createReactInlineContentSpec,
   createReactStyleSpec,
@@ -280,6 +281,7 @@ function PermitextNotebookEditor({ options, controllerRef }) {
     BlockNoteView,
     {
       editor,
+      className: "permitext-notebook-editor",
       editable: options.editable !== false,
       theme,
       formattingToolbar: false,

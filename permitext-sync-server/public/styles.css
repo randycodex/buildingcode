@@ -1,3 +1,35 @@
+@font-face {
+  font-family: "Inter Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/web/fonts/inter-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Inter Variable";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url("/web/fonts/inter-latin-wght-italic.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Source Serif 4 Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url("/web/fonts/source-serif-4-latin-wght-normal.woff2") format("woff2-variations");
+}
+
+@font-face {
+  font-family: "Source Serif 4 Variable";
+  font-style: italic;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url("/web/fonts/source-serif-4-latin-wght-italic.woff2") format("woff2-variations");
+}
+
 :root {
   color-scheme: light;
   --background: #f2f2f6;
@@ -62,15 +94,18 @@
   --card-stack-gap: var(--space-4);
   --header-height: 52px;
   --divider-width: 1px;
-  --reader-font-family: Helvetica, Arial, sans-serif;
-  --reader-font-size: 10pt;
-  --reader-line-height: 1.2;
+  --ui-font-family: "Inter Variable", Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --source-font-family: "Source Serif 4 Variable", "Source Serif 4", Iowan Old Style, Georgia, serif;
+  --chrome-font-family: var(--ui-font-family);
+  --reader-font-family: var(--source-font-family);
+  --reader-font-size: 16.5px;
+  --reader-line-height: 1.6;
   --chrome-font-size: 11pt;
   --code-title-scale: 1;
   --chapter-picker-scale: 0.8;
   --section-label-scale: 1;
   --subsection-title-scale: 1.05;
-  --body-text-scale: 1.05;
+  --body-text-scale: 1;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -147,7 +182,8 @@ body {
   background: var(--background);
   color: var(--text-primary);
   font-size: var(--chrome-font-size);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font-family);
+  font-weight: 400;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -1520,7 +1556,7 @@ body.is-detached-workboard-window .detached-workboard-error p {
   border-radius: 0;
   background: transparent;
   color: var(--text-secondary);
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: calc(var(--chrome-font-size) * 0.78) !important;
   font-weight: 600;
   line-height: 1;
@@ -2042,7 +2078,7 @@ label {
   min-width: 0;
   width: 100%;
   color: var(--text-primary);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font-family);
   font-size: var(--chrome-font-size) !important;
   line-height: 1.1;
 }
@@ -2550,7 +2586,7 @@ select option:checked {
 .section-detail-notes h3 {
   margin: 0;
   color: var(--text-secondary);
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   font-weight: 600;
 }
@@ -2558,7 +2594,7 @@ select option:checked {
 .section-detail-note-state {
   margin-left: auto;
   color: var(--text-secondary);
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: var(--reader-font-size) !important;
   font-weight: 600;
 }
@@ -2576,7 +2612,7 @@ select option:checked {
   border-radius: 18px;
   background: var(--surface);
   color: var(--text-primary);
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
   line-height: var(--reader-line-height);
   outline: 0;
@@ -2615,7 +2651,7 @@ select option:checked {
 .reader-internal-result strong {
   display: block;
   margin: 0 0 var(--space-1);
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: var(--reader-font-size) !important;
   line-height: 1.25;
   font-weight: 600;
@@ -2624,7 +2660,7 @@ select option:checked {
 .reader-internal-result p {
   margin: 0;
   color: color-mix(in srgb, var(--text-primary) 82%, var(--text-secondary));
-  font-family: var(--reader-font-family);
+  font-family: var(--ui-font-family);
   font-size: var(--reader-font-size) !important;
   line-height: var(--reader-line-height);
 }
@@ -3119,8 +3155,8 @@ select option:checked {
   border-radius: var(--radius-card);
   background: var(--reader-notes-input-surface);
   color: var(--text-primary);
-  font-family: var(--reader-font-family);
-  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  font-family: var(--ui-font-family);
+  font-size: var(--chrome-font-size) !important;
   font-weight: 400;
   line-height: var(--reader-line-height);
   box-shadow: none;
@@ -3527,6 +3563,7 @@ select option:checked {
   color: var(--text-primary);
   font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--subsection-title-scale)) !important;
+  font-weight: 600;
   line-height: 1.25;
   overflow-wrap: break-word;
   word-break: normal;
@@ -3686,7 +3723,7 @@ select option:checked {
   border-bottom: 0;
   color: var(--code-accent) !important;
   -webkit-text-fill-color: var(--code-accent);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--section-label-scale)) !important;
   font-weight: 600;
   line-height: 1.2;
@@ -3699,6 +3736,9 @@ select option:checked {
   min-width: 0;
   max-width: 100%;
   margin: var(--space-3) 0 var(--space-5);
+  font-family: var(--reader-font-family);
+  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  line-height: var(--reader-line-height);
   overflow-x: auto;
 }
 
@@ -4090,9 +4130,9 @@ select option:checked {
 .search-results {
   overflow-y: auto;
   padding: var(--space-2) var(--space-1) var(--space-5) 0;
-  font-family: var(--reader-font-family);
-  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
-  line-height: var(--reader-line-height);
+  font-family: var(--ui-font-family);
+  font-size: var(--chrome-font-size) !important;
+  line-height: 1.45;
   scrollbar-gutter: stable;
   scrollbar-color: color-mix(in srgb, var(--text-tertiary) 58%, transparent) transparent;
   scrollbar-width: thin;
@@ -4150,8 +4190,8 @@ select option:checked {
   margin: var(--space-5) 0 var(--space-2);
   color: var(--code-accent) !important;
   -webkit-text-fill-color: var(--code-accent);
-  font-family: var(--reader-font-family);
-  font-size: calc(var(--reader-font-size) * var(--section-label-scale)) !important;
+  font-family: var(--ui-font-family);
+  font-size: calc(var(--chrome-font-size) * 0.82) !important;
   font-weight: 600;
   line-height: 1.2;
 }
@@ -4189,9 +4229,9 @@ select option:checked {
   column-gap: var(--space-1);
   margin-bottom: var(--space-1);
   color: var(--text-primary);
-  font-family: var(--reader-font-family);
-  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
-  line-height: var(--reader-line-height);
+  font-family: var(--ui-font-family);
+  font-size: var(--chrome-font-size) !important;
+  line-height: 1.4;
 }
 
 .result-number {
@@ -4204,9 +4244,9 @@ select option:checked {
   display: block;
   margin: 0 0 var(--space-1);
   color: var(--text-secondary);
-  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
+  font-size: calc(var(--chrome-font-size) * 0.88) !important;
   font-weight: 500;
-  line-height: var(--reader-line-height);
+  line-height: 1.4;
 }
 
 .result-title {
@@ -4224,9 +4264,9 @@ select option:checked {
   margin: 0;
   overflow: hidden;
   color: var(--text-secondary);
-  font-family: var(--reader-font-family);
-  font-size: calc(var(--reader-font-size) * var(--body-text-scale)) !important;
-  line-height: var(--reader-line-height);
+  font-family: var(--ui-font-family);
+  font-size: calc(var(--chrome-font-size) * 0.94) !important;
+  line-height: 1.48;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
@@ -9926,7 +9966,7 @@ body.is-resizing-research-evidence * {
 .preview-code-title {
   margin: 0;
   color: var(--text-primary);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--reader-font-family);
   font-size: calc(var(--reader-font-size) * var(--section-label-scale)) !important;
   font-weight: 500;
   line-height: 1.2;
@@ -10092,7 +10132,7 @@ body.is-resizing-research-evidence * {
   width: 100%;
   margin: 0;
   color: var(--text-secondary);
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font-family);
   font-size: 9pt !important;
   font-weight: 650;
   line-height: 1.2;
@@ -10110,7 +10150,7 @@ body.is-resizing-research-evidence * {
   border-radius: var(--radius-pill);
   background: transparent;
   color: var(--text-secondary) !important;
-  font-family: Helvetica, Arial, sans-serif;
+  font-family: var(--ui-font-family);
   font-size: 9pt !important;
   font-weight: 650 !important;
   line-height: 1.2 !important;

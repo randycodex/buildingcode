@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v443";
+const shellCacheName = "permitext-pro-shell-v445";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,11 +6,15 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260806-code-question-rollout-v1",
+  "/web/styles.css?v=20260808-typography-v2",
+  "/web/fonts/inter-latin-wght-normal.woff2",
+  "/web/fonts/inter-latin-wght-italic.woff2",
+  "/web/fonts/source-serif-4-latin-wght-normal.woff2",
+  "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260808-generic-workboard-v7",
+  "/web/app.js?v=20260808-typography-v8",
   "/web/client-reliability.js?v=20260731-debug-audit-v1",
-  "/web/offline-storage.js?v=20260808-generic-workboard-v7",
+  "/web/offline-storage.js?v=20260808-typography-v8",
   "/web/workspace-state.js?v=20260808-generic-workboard-v2",
   "/web/code-question-workspace.js?v=20260808-generic-workboard-v2",
   "/web/code-question-client-state.js?v=20260808-generic-workboard-v3",
