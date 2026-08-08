@@ -9,7 +9,7 @@
     <link rel="apple-touch-icon" href="/web/icons/permitext-192.png">
     <link rel="preload" href="/web/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="/web/fonts/source-serif-4-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="/web/styles.css?v=20260808-reader-notes-borderless-v1">
+    <link rel="stylesheet" href="/web/styles.css?v=20260808-sync-conflict-review-v4">
     <link rel="stylesheet" href="/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68">
   </head>
   <body>
@@ -469,6 +469,11 @@
           <button class="settings-secondary-button settings-destructive-secondary account-clear" type="button">Sign Out</button>
           <button class="settings-secondary-button settings-destructive-secondary account-delete" type="button">Delete Account</button>
         </section>
+        <section class="settings-card settings-sync-conflicts-card" aria-labelledby="settings-sync-conflicts-title" hidden>
+          <h3 id="settings-sync-conflicts-title" class="section-label settings-section-title">Sync Conflicts</h3>
+          <p class="settings-card-copy settings-sync-conflicts-summary" role="status"></p>
+          <div class="settings-sync-conflicts-list" role="list"></div>
+        </section>
         <section class="settings-card settings-firm-card" aria-labelledby="settings-firm-title">
           <div class="settings-card-heading">
             <h3 id="settings-firm-title" class="section-label settings-section-title">Firm &amp; Collaboration</h3>
@@ -526,6 +531,6 @@
       </article>
     </template>
 
-    <script src="/web/app.js?v=20260808-reader-notes-borderless-v1" type="module"></script>
+    <script src="/web/app.js?v=20260808-sync-conflict-review-v4" type="module"></script>
   </body>
 </html>

@@ -10294,6 +10294,54 @@ body.is-resizing-research-evidence * {
   line-height: 1.35;
 }
 
+.settings-sync-conflicts-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.settings-sync-conflicts-card[hidden] {
+  display: none;
+}
+
+.settings-conflict-row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3);
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, #f79009 9%, transparent);
+}
+
+.settings-conflict-row > span {
+  color: var(--text-secondary);
+  font-size: 9.5pt !important;
+  line-height: 1.35;
+}
+
+.settings-conflict-row > .settings-conflict-kind {
+  color: var(--text-primary);
+  font-size: 8.5pt !important;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.settings-conflict-row > .settings-conflict-guidance {
+  color: var(--text-tertiary);
+  font-size: 8.75pt !important;
+}
+
+.settings-panel .settings-conflict-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: var(--space-1);
+}
+
+.settings-panel .settings-conflict-actions .settings-mini-button {
+  width: 100%;
+  min-width: 0;
+}
+
 .settings-panel .settings-plan-features {
   gap: var(--space-1);
 }

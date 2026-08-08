@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260808-reader-notes-borderless-v1"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260808-sync-conflict-review-v4"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260808-generic-workboard-v2"));
 assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260808-generic-workboard-v2"));
 assert(shellPrecacheURLs.includes("/web/code-question-client-state.js?v=20260808-generic-workboard-v3"));
@@ -218,7 +218,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v463"));
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v467"));
 
 function navigationResponse(path) {
   let response;

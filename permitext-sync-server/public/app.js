@@ -41,7 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-reader-notes-borderless-v1";
+} from "./offline-storage.js?v=20260808-sync-conflict-review-v4";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-sync-conflict-review-v4";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -4861,9 +4862,16 @@ function updateConnectionStatus() {
   updateTopbarPlanBadge();
 }
 
-function openConnectionStatusConflictReview() {
+async function openConnectionStatusConflictReview() {
   if (connectionStatus?.dataset.state !== "conflict") return;
-  void focusUtility("settings");
+  collapsedSettingsCardIDs.delete("settings-sync-conflicts-title");
+  await focusUtility("settings", ".settings-sync-conflicts-card .settings-card-toggle");
+  requestAnimationFrame(() => {
+    const card = track.querySelector(
+      '.workspace-panel[data-pane-id="utility:settings"] .settings-sync-conflicts-card'
+    );
+    card?.scrollIntoView({ block: "center", behavior: "smooth" });
+  });
 }
 
 connectionStatus?.addEventListener("click", openConnectionStatusConflictReview);
@@ -6070,21 +6078,6 @@ function retireProjectWorkboardSyncState() {
   return true;
 }
 
-const automaticallyConvergentSyncRejectionCodes = new Set([
-  "SERVER_NEWER",
-  "EQUAL_TIMESTAMP_CONFLICT"
-]);
-
-function shouldAutomaticallyUseServerCopy(entry) {
-  if (automaticallyConvergentSyncRejectionCodes.has(String(entry?.rejectionCode || ""))) {
-    return true;
-  }
-  const message = String(entry?.lastError || "").toLowerCase();
-  return message.includes("server has newer data") ||
-    (message.includes("newer version") && message.includes("server")) ||
-    (message.includes("changed in two places") && message.includes("sync conflict"));
-}
-
 function syncedMutationSupersedesConflict(entry) {
   const recordID = entry?.recordID || syncMutationRecordID(entry?.mutation);
   if (!recordID) return false;
@@ -6092,13 +6085,16 @@ function syncedMutationSupersedesConflict(entry) {
     .filter((mutation) => syncMutationRecordID(mutation) === recordID)
     .sort((left, right) => mutationUpdatedAt(right) - mutationUpdatedAt(left))[0];
   if (!serverMutation) return false;
-  return mutationUpdatedAt(serverMutation) >= mutationUpdatedAt(entry.mutation);
+  const local = mutationKindAndRecord(entry.mutation);
+  const server = mutationKindAndRecord(serverMutation);
+  return mutationUpdatedAt(serverMutation) >= mutationUpdatedAt(entry.mutation) &&
+    local.kind === server.kind &&
+    syncConflictRecordsMatch(local.record, server.record);
 }
 
 async function convergeServerNewerSyncConflicts(account) {
   const convergent = (state.syncConflicts || []).filter((entry) =>
-    entry.accountUserID === account.userID &&
-      (shouldAutomaticallyUseServerCopy(entry) || syncedMutationSupersedesConflict(entry))
+    entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)
   );
   if (!convergent.length || syncedContent?.status !== "connected") return false;
 
@@ -22275,6 +22271,9 @@ function renderSettings() {
   const signInButton = panel.querySelector(".account-sign-in");
   const signOutButton = panel.querySelector(".account-clear");
   const deleteAccountButton = panel.querySelector(".account-delete");
+  const syncConflictsCard = panel.querySelector(".settings-sync-conflicts-card");
+  const syncConflictsSummary = panel.querySelector(".settings-sync-conflicts-summary");
+  const syncConflictsList = panel.querySelector(".settings-sync-conflicts-list");
   const checkoutButton = panel.querySelector(".account-checkout");
   const researchCheckoutButton = panel.querySelector(".account-research-checkout");
   const planSecondaryButton = panel.querySelector(".account-plan-secondary");
@@ -22292,6 +22291,71 @@ function renderSettings() {
   const setStatus = (message, isError = false) => {
     status.textContent = message || "";
     status.classList.toggle("has-error", isError);
+  };
+
+  const renderSyncConflictReview = () => {
+    const account = activeAccount();
+    const conflicts = account
+      ? (state.syncConflicts || []).filter((entry) => entry.accountUserID === account.userID)
+      : [];
+    syncConflictsCard.hidden = conflicts.length === 0;
+    syncConflictsSummary.textContent = conflicts.length
+      ? `Permitext resolved every safe match automatically. ${conflicts.length} ${conflicts.length === 1 ? "change may" : "changes may"} contain unique edits and ${conflicts.length === 1 ? "needs" : "need"} your decision.`
+      : "";
+    syncConflictsList.replaceChildren();
+
+    const kindLabels = {
+      annotation: "Note",
+      codeVersionClear: "Saved evidence removal",
+      continuity: "Recent activity",
+      project: "Project",
+      projectSection: "Project evidence",
+      savedItem: "Saved evidence",
+      workboard: "Workboard"
+    };
+    conflicts.forEach((entry) => {
+      const { kind, record } = mutationKindAndRecord(entry.mutation);
+      const row = document.createElement("article");
+      row.className = "settings-conflict-row";
+      row.setAttribute("role", "listitem");
+      const heading = document.createElement("strong");
+      heading.textContent = record?.title || record?.name || record?.sectionNumber || kindLabels[kind] || "Saved change";
+      const type = document.createElement("span");
+      type.className = "settings-conflict-kind";
+      type.textContent = kindLabels[kind] || "Synced data";
+      const message = document.createElement("span");
+      message.textContent = entry.lastError || "This change could not be reconciled automatically.";
+      const guidance = document.createElement("span");
+      guidance.className = "settings-conflict-guidance";
+      guidance.textContent = "Use server keeps the latest synced copy. Keep mine uploads this device's copy as the newest version.";
+      const actions = document.createElement("div");
+      actions.className = "connector-actions settings-conflict-actions";
+      [
+        ["Use server", false],
+        ["Keep mine", true]
+      ].forEach(([label, keepLocal]) => {
+        const button = document.createElement("button");
+        button.className = "settings-mini-button";
+        button.type = "button";
+        button.textContent = label;
+        button.addEventListener("click", async () => {
+          actions.querySelectorAll("button").forEach((candidate) => {
+            candidate.disabled = true;
+          });
+          try {
+            await resolveSyncConflict(entry, keepLocal);
+          } catch (error) {
+            setStatus(error.message || "Could not resolve this sync conflict.", true);
+            actions.querySelectorAll("button").forEach((candidate) => {
+              candidate.disabled = false;
+            });
+          }
+        });
+        actions.append(button);
+      });
+      row.append(heading, type, message, guidance, actions);
+      syncConflictsList.append(row);
+    });
   };
 
   const settingsProjects = visibleProjectRecords(currentContentSummary().projects || [])
@@ -22454,6 +22518,7 @@ function renderSettings() {
     signInButton.hidden = Boolean(account) && !canLinkApple;
     signInButton.textContent = canLinkApple ? "Link Apple" : "Sign in";
     accountCopy.textContent = "Sign in to sync saved sections, notes, and Projects across your devices.";
+    renderSyncConflictReview();
     renderPlanUsageRows(planUsage);
     void renderOfflineState();
   };

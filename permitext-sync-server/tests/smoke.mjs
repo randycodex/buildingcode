@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-reader-notes-borderless-v1'),
+        webRoot.text.includes('/web/app.js?v=20260808-sync-conflict-review-v4'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1411,7 +1411,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-reader-notes-borderless-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-sync-conflict-review-v4'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1621,11 +1621,27 @@ async function main() {
         webRoot.text.includes("Unlimited saved sections and notes, Projects, Notebook, Report Draft, professional exports, tags, and web offline access."),
       "Plan details should live in the Free and Pro descriptions instead of a redundant summary."
     );
-    assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant sync card");
+    assert(!webRoot.text.includes("account-sync-card"), "settings should not render a redundant manual sync card");
     assert(!webRoot.text.includes("account-sync-now"), "settings should not render a redundant manual sync control");
     assert(
+      webRoot.text.includes('class="settings-card settings-sync-conflicts-card"') &&
+        webRoot.text.includes('class="settings-sync-conflicts-list" role="list"') &&
+        workspaceScript.text.includes("const renderSyncConflictReview = () => {") &&
+        workspaceScript.text.includes('["Use server", false]') &&
+        workspaceScript.text.includes('["Keep mine", true]') &&
+        workspaceScript.text.includes("Permitext resolved every safe match automatically.") &&
+        workspaceScript.text.includes("Use server keeps the latest synced copy. Keep mine uploads this device's copy as the newest version.") &&
+        workspaceScript.text.includes('collapsedSettingsCardIDs.delete("settings-sync-conflicts-title")') &&
+        workspaceScript.text.includes('card?.scrollIntoView({ block: "center", behavior: "smooth" });') &&
+        workspaceStyles.text.includes(".settings-sync-conflicts-list {") &&
+        workspaceStyles.text.includes(".settings-sync-conflicts-card[hidden] {") &&
+        workspaceStyles.text.includes(".settings-conflict-row {") &&
+        !webRoot.text.includes("Sync Now"),
+      "unresolved sync conflicts should remain reviewable without restoring manual sync"
+    );
+    assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-reader-notes-borderless-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-sync-conflict-review-v4'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1854,19 +1870,21 @@ async function main() {
         workspaceScript.text.includes('connectionStatus?.addEventListener("click", openConnectionStatusConflictReview)') &&
         workspaceScript.text.includes('connectionStatus?.addEventListener("keydown"') &&
         workspaceScript.text.includes('if (connectionStatus?.dataset.state !== "conflict") return;') &&
-        workspaceScript.text.includes('void focusUtility("settings")') &&
+        workspaceScript.text.includes('await focusUtility("settings", ".settings-sync-conflicts-card .settings-card-toggle")') &&
         webRoot.text.includes('id="connection-status" role="status" aria-live="polite"'),
       "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
     );
     assert(
-      workspaceScript.text.includes('"SERVER_NEWER",\n  "EQUAL_TIMESTAMP_CONFLICT"') &&
-        workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
+      workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
+        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-sync-conflict-review-v4"') &&
+        workspaceScript.text.includes("syncConflictRecordsMatch(local.record, server.record)") &&
+        workspaceScript.text.includes("entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function projectEvidenceCount(projectSections, project)") &&
         workspaceScript.text.includes("discardLocalMutationOverlay(entry.mutation)") &&
         workspaceScript.text.includes("await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID))"),
-      "Web sync must automatically converge server-newer records while retaining non-version rejection failures."
+      "Web sync must only auto-converge server records that contain no unique local edits."
     );
     assert(
       workspaceScript.text.includes('if (value === "project" && !hasCapability("projects"))') &&
