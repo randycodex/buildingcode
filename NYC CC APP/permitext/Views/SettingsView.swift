@@ -2,11 +2,6 @@ import AuthenticationServices
 import SwiftUI
 import UIKit
 
-private enum SettingsRowTypography {
-    static let label = Font.body.weight(.medium)
-    static let value = Font.body
-}
-
 struct SettingsView: View {
     @EnvironmentObject private var library: CodeLibraryViewModel
     @Environment(\.colorScheme) private var colorScheme
@@ -53,14 +48,6 @@ struct SettingsView: View {
 
                 VStack(alignment: .leading, spacing: CodeScreenMetrics.contentSpacingBelowTitle) {
                     CodeScreenTitle(title: "Settings", collapseProgress: collapseProgress)
-
-                    CodeSurface(accent: settingsChromeColor, padding: 0, showsBorder: false) {
-                        VStack(spacing: 0) {
-                            jurisdictionPicker
-                            Divider()
-                            versionPicker
-                        }
-                    }
 
                     CodeSurface(accent: settingsChromeColor, showsBorder: false) {
                         planCard
@@ -149,64 +136,6 @@ struct SettingsView: View {
         }
         .task(id: library.signedInAccount?.appUserID) {
             await library.refreshOrganizations()
-        }
-    }
-
-    private var jurisdictionPicker: some View {
-        Group {
-            if library.availableJurisdictions.isEmpty {
-                HStack {
-                    Text("No jurisdiction-specific bundles detected.")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .padding(CodeScreenMetrics.cardPadding)
-            } else {
-                settingsMenuRow(label: "Jurisdiction") {
-                    Text(selectedJurisdictionName)
-                        .font(SettingsRowTypography.value)
-                        .foregroundStyle(.primary)
-                } content: {
-                    ForEach(library.availableJurisdictions) { jurisdiction in
-                        Button {
-                            library.updateSelectedJurisdiction(key: jurisdiction.id)
-                        } label: {
-                            Label(jurisdiction.name, systemImage: jurisdiction.id == library.selectedJurisdictionKey ? "checkmark" : "")
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private var versionPicker: some View {
-        Group {
-            if settingsVersionOptions.isEmpty {
-                HStack {
-                    Text("No bundled code content detected.")
-                        .foregroundStyle(.secondary)
-                    Spacer()
-                }
-                .padding(CodeScreenMetrics.cardPadding)
-            } else {
-                settingsMenuRow(label: "Version") {
-                    Text("NYC Zoning Resolution")
-                        .font(SettingsRowTypography.value)
-                        .foregroundStyle(.primary)
-                        .multilineTextAlignment(.trailing)
-                } content: {
-                    ForEach(settingsVersionOptions) { version in
-                        Button {
-                            library.updateSelectedVersion(fileName: version.fileName)
-                        } label: {
-                            Label(
-                                versionOptionTitle(for: version),
-                                systemImage: version.fileName == library.selectedVersionFileName ? "checkmark" : ""
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 
@@ -1179,49 +1108,6 @@ struct SettingsView: View {
 
     private var previewFontSize: CGFloat {
         CGFloat(library.readerTheme.fontSize)
-    }
-
-    private var selectedJurisdictionName: String {
-        library.availableJurisdictions.first(where: { $0.id == library.selectedJurisdictionKey })?.name ?? "Not Selected"
-    }
-
-    private var settingsVersionOptions: [BundledCodeVersion] {
-        library.filteredVersions.filter { version in
-            version.codeVersion.localizedCaseInsensitiveContains("zoning")
-        }
-    }
-
-    private func versionOptionTitle(for version: BundledCodeVersion) -> String {
-        CodeLibraryViewModel.displayName(forLibraryName: version.codeVersion)
-    }
-
-    private func settingsMenuRow<Value: View, Content: View>(
-        label: String,
-        @ViewBuilder value: () -> Value,
-        @ViewBuilder content: () -> Content
-    ) -> some View {
-        Menu {
-            content()
-        } label: {
-            HStack(alignment: .center, spacing: 12) {
-                Text(label)
-                    .font(SettingsRowTypography.label)
-                    .foregroundStyle(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Spacer(minLength: 0)
-
-                value()
-
-                Image(systemName: "chevron.down")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.tertiary)
-            }
-            .padding(.horizontal, CodeScreenMetrics.settingsPickerRowHorizontalPadding)
-            .padding(.vertical, CodeScreenMetrics.settingsPickerRowVerticalPadding)
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
     }
 
     private func settingsDangerButton(

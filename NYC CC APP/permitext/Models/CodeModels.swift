@@ -3029,6 +3029,7 @@ struct CodeFolder: Identifiable, Hashable, Sendable {
     let visibility: UserContentVisibility
     let syncState: UserContentSyncState
     let deletedAt: Date?
+    let codeVersion: String
     let name: String
     let address: String
     let description: String

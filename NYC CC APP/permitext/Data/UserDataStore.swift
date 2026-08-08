@@ -30,7 +30,9 @@ protocol UserContentRepository {
     func clearAllTags(codeVersion: String) throws
     func queueContinuityContext(codeVersion: String, values: [String: String]) throws
     func folders(codeVersion: String) throws -> [FolderRecord]
+    func allFolders() throws -> [FolderRecord]
     func folderCount(codeVersion: String) throws -> Int
+    func totalFolderCount() throws -> Int
     func folderMembership(codeVersion: String) throws -> [Int64: [Int64]]
     func sections(inFolder folderID: Int64, codeVersion: String) throws -> [Int64]
     func createFolder(name: String, address: String, description: String, colorHex: String, folderType: CodeFolderType, codeVersion: String) throws -> Int64
@@ -40,6 +42,7 @@ protocol UserContentRepository {
     func removeSection(_ sectionID: Int64, fromFolder folderID: Int64, codeVersion: String) throws
     func removeSectionFromAllFolders(sectionID: Int64, codeVersion: String) throws
     func clearAllFolders(codeVersion: String) throws
+    func clearAllFolders() throws
     func pendingSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func failedSyncQueueItems(limit: Int) throws -> [SyncQueueItem]
     func prepareSyncQueueForProcessing(now: Date) throws
@@ -1728,7 +1731,7 @@ final class UserDataStore: UserContentRepository {
     func folders(codeVersion: String) throws -> [FolderRecord] {
         let statement = try connection.prepare(
             """
-            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at
             FROM folders
             WHERE code_version = ? AND archived_at IS NULL
             ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
@@ -1747,14 +1750,53 @@ final class UserDataStore: UserContentRepository {
                     visibility: connection.string(at: 3, in: statement),
                     syncState: connection.string(at: 4, in: statement),
                     deletedAt: connection.stringOrNil(at: 5, in: statement),
-                    name: connection.string(at: 6, in: statement),
-                    address: connection.string(at: 7, in: statement),
-                    description: connection.string(at: 8, in: statement),
-                    colorHex: connection.string(at: 9, in: statement),
-                    folderType: connection.string(at: 10, in: statement),
-                    sortOrder: Int(connection.int64(at: 11, in: statement)),
-                    createdAt: connection.string(at: 12, in: statement),
-                    updatedAt: connection.string(at: 13, in: statement)
+                    codeVersion: connection.string(at: 6, in: statement),
+                    name: connection.string(at: 7, in: statement),
+                    address: connection.string(at: 8, in: statement),
+                    description: connection.string(at: 9, in: statement),
+                    colorHex: connection.string(at: 10, in: statement),
+                    folderType: connection.string(at: 11, in: statement),
+                    sortOrder: Int(connection.int64(at: 12, in: statement)),
+                    createdAt: connection.string(at: 13, in: statement),
+                    updatedAt: connection.string(at: 14, in: statement)
+                )
+            )
+        }
+        return results
+    }
+
+    /// Projects and reference folders are account-wide. Their evidence remains
+    /// versioned independently in `folder_sections`.
+    func allFolders() throws -> [FolderRecord] {
+        let statement = try connection.prepare(
+            """
+            SELECT id, client_id, owner_id, visibility, sync_state, deleted_at, code_version, name, address, description, color_hex, folder_type, sort_order, created_at, updated_at
+            FROM folders
+            WHERE archived_at IS NULL
+            ORDER BY sort_order ASC, name COLLATE NOCASE ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+
+        var results: [FolderRecord] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            results.append(
+                FolderRecord(
+                    id: connection.int64(at: 0, in: statement),
+                    clientID: connection.string(at: 1, in: statement),
+                    ownerID: connection.string(at: 2, in: statement),
+                    visibility: connection.string(at: 3, in: statement),
+                    syncState: connection.string(at: 4, in: statement),
+                    deletedAt: connection.stringOrNil(at: 5, in: statement),
+                    codeVersion: connection.string(at: 6, in: statement),
+                    name: connection.string(at: 7, in: statement),
+                    address: connection.string(at: 8, in: statement),
+                    description: connection.string(at: 9, in: statement),
+                    colorHex: connection.string(at: 10, in: statement),
+                    folderType: connection.string(at: 11, in: statement),
+                    sortOrder: Int(connection.int64(at: 12, in: statement)),
+                    createdAt: connection.string(at: 13, in: statement),
+                    updatedAt: connection.string(at: 14, in: statement)
                 )
             )
         }
@@ -1765,6 +1807,12 @@ final class UserDataStore: UserContentRepository {
         try countRows(
             sql: "SELECT COUNT(*) FROM folders WHERE code_version = ? AND archived_at IS NULL;",
             codeVersion: codeVersion
+        )
+    }
+
+    func totalFolderCount() throws -> Int {
+        try countRows(
+            sql: "SELECT COUNT(*) FROM folders WHERE archived_at IS NULL AND folder_type = 'project';"
         )
     }
 
@@ -1950,7 +1998,7 @@ final class UserDataStore: UserContentRepository {
     func deleteFolder(id: Int64, codeVersion: String) throws {
         let clientID = try folderClientID(id: id, codeVersion: codeVersion)
         let folderType = try folderType(id: id, codeVersion: codeVersion)
-        let sectionIDs = try sectionIDs(inFolder: id, codeVersion: codeVersion)
+        let evidenceReferences = try evidenceReferences(inFolder: id)
         try performTransaction {
             // Manual cascade — folder_sections doesn't have a FK constraint, so
             // we wipe membership rows first.
@@ -1975,15 +2023,18 @@ final class UserDataStore: UserContentRepository {
             try connection.bind(text: codeVersion, index: 2, to: statement)
             _ = try connection.step(statement)
 
-            for sectionID in sectionIDs {
+            for reference in evidenceReferences {
                 try enqueueSyncOperation(
                     entityType: .folderSection,
                     operationType: .delete,
                     payload: SyncQueuePayload(
-                        codeVersion: codeVersion,
-                        sectionID: sectionID,
+                        codeVersion: reference.codeVersion,
+                        sectionID: reference.sectionID,
                         folderID: id,
-                        values: ["folderClientID": clientID]
+                        values: [
+                            "folderClientID": clientID,
+                            "folderType": folderType.rawValue
+                        ]
                     )
                 )
             }
@@ -2000,37 +2051,38 @@ final class UserDataStore: UserContentRepository {
         }
     }
 
-    private func sectionIDs(inFolder folderID: Int64, codeVersion: String) throws -> [Int64] {
+    private func evidenceReferences(inFolder folderID: Int64) throws -> [(sectionID: Int64, codeVersion: String)] {
         let statement = try connection.prepare(
             """
-            SELECT section_id
+            SELECT section_id, code_version
             FROM folder_sections
-            WHERE folder_id = ? AND code_version = ?;
+            WHERE folder_id = ?;
             """
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, folderID)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
 
-        var sectionIDs: [Int64] = []
+        var references: [(sectionID: Int64, codeVersion: String)] = []
         while try connection.step(statement) == SQLITE_ROW {
-            sectionIDs.append(connection.int64(at: 0, in: statement))
+            references.append((
+                sectionID: connection.int64(at: 0, in: statement),
+                codeVersion: connection.string(at: 1, in: statement)
+            ))
         }
-        return sectionIDs
+        return references
     }
 
-    private func folderClientID(id: Int64, codeVersion: String) throws -> String {
+    private func folderClientID(id: Int64, codeVersion _: String) throws -> String {
         let statement = try connection.prepare(
             """
             SELECT client_id
             FROM folders
-            WHERE id = ? AND code_version = ?
+            WHERE id = ?
             LIMIT 1;
             """
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, id)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
         guard try connection.step(statement) == SQLITE_ROW else {
             throw NSError(
                 domain: "UserDataStore",
@@ -2041,13 +2093,12 @@ final class UserDataStore: UserContentRepository {
         return connection.string(at: 0, in: statement)
     }
 
-    private func folderType(id: Int64, codeVersion: String) throws -> CodeFolderType {
+    private func folderType(id: Int64, codeVersion _: String) throws -> CodeFolderType {
         let statement = try connection.prepare(
-            "SELECT folder_type FROM folders WHERE id = ? AND code_version = ? LIMIT 1;"
+            "SELECT folder_type FROM folders WHERE id = ? LIMIT 1;"
         )
         defer { connection.finalize(statement) }
         sqlite3_bind_int64(statement, 1, id)
-        try connection.bind(text: codeVersion, index: 2, to: statement)
         guard try connection.step(statement) == SQLITE_ROW else {
             throw NSError(
                 domain: "UserDataStore",
@@ -2058,18 +2109,16 @@ final class UserDataStore: UserContentRepository {
         return CodeFolderType(serverValue: connection.stringOrNil(at: 0, in: statement))
     }
 
-    private func localFolderIDs(clientID: String?, codeVersion: String) throws -> [Int64] {
+    private func localFolderIDs(clientID: String?, codeVersion _: String) throws -> [Int64] {
         guard let identity = UserContentProjectIdentity.stable(clientID) else { return [] }
         let statement = try connection.prepare(
             """
             SELECT id, client_id, owner_id
             FROM folders
-            WHERE code_version = ?
             ORDER BY id ASC;
             """
         )
         defer { connection.finalize(statement) }
-        try connection.bind(text: codeVersion, index: 1, to: statement)
 
         var matches: [Int64] = []
         while try connection.step(statement) == SQLITE_ROW {
@@ -2203,7 +2252,7 @@ final class UserDataStore: UserContentRepository {
             SELECT fs.folder_id, f.client_id, f.folder_type
             FROM folder_sections AS fs
             INNER JOIN folders AS f
-                ON f.id = fs.folder_id AND f.code_version = fs.code_version
+                ON f.id = fs.folder_id
             WHERE fs.section_id = ? AND fs.code_version = ?;
             """
         )
@@ -2257,6 +2306,25 @@ final class UserDataStore: UserContentRepository {
                 values: ["scope": "folders"]
             )
         )
+    }
+
+    func clearAllFolders() throws {
+        let statement = try connection.prepare(
+            """
+            SELECT code_version FROM folders
+            UNION
+            SELECT code_version FROM folder_sections
+            ORDER BY code_version ASC;
+            """
+        )
+        defer { connection.finalize(statement) }
+        var codeVersions: [String] = []
+        while try connection.step(statement) == SQLITE_ROW {
+            codeVersions.append(connection.string(at: 0, in: statement))
+        }
+        for codeVersion in codeVersions {
+            try clearAllFolders(codeVersion: codeVersion)
+        }
     }
 
     func localMergeCandidates(
@@ -3177,6 +3245,7 @@ struct FolderRecord: Sendable {
     let visibility: String
     let syncState: String
     let deletedAt: String?
+    let codeVersion: String
     let name: String
     let address: String
     let description: String

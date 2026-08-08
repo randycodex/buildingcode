@@ -550,6 +550,66 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         XCTAssertEqual(deletedRecord.folderType, .reference)
     }
 
+    func testProjectsRemainAccountWideWhileEvidenceKeepsItsOwnCodeVersion() throws {
+        let databaseURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("permitext-account-wide-project-\(UUID().uuidString).sqlite")
+        defer {
+            for suffix in ["", "-shm", "-wal"] {
+                try? FileManager.default.removeItem(atPath: databaseURL.path + suffix)
+            }
+        }
+
+        let store = try UserDataStore(databaseURL: databaseURL)
+        let projectVersion = UserContentSyncCodeVersion.localNYC2022
+        let evidenceVersion = UserContentSyncCodeVersion.localNYCZoning
+        let projectID = try store.createFolder(
+            name: "Broadway renovation",
+            address: "100 Broadway",
+            description: "",
+            colorHex: CodeFolder.defaultColorHex,
+            folderType: .project,
+            codeVersion: projectVersion
+        )
+
+        XCTAssertEqual(try store.totalFolderCount(), 1)
+        XCTAssertEqual(try store.allFolders().map(\.id), [projectID])
+        XCTAssertEqual(try store.allFolders().first?.codeVersion, projectVersion)
+        XCTAssertTrue(try store.folders(codeVersion: evidenceVersion).isEmpty)
+
+        try store.saveSection(9_901, toFolderIDs: [projectID], codeVersion: evidenceVersion)
+
+        XCTAssertEqual(
+            Set(try store.folderMembership(codeVersion: evidenceVersion)[9_901] ?? []),
+            [projectID]
+        )
+        let queuedMembership = try XCTUnwrap(
+            store.pendingSyncQueueItems(limit: 20).first {
+                $0.entityType == .folderSection && $0.payload.codeVersion == evidenceVersion
+            }
+        )
+        XCTAssertEqual(queuedMembership.payload.folderID, projectID)
+        XCTAssertNotNil(queuedMembership.payload.values["folderClientID"])
+
+        try store.deleteFolder(id: projectID, codeVersion: projectVersion)
+        XCTAssertTrue(try store.allFolders().isEmpty)
+        XCTAssertTrue(try store.folderMembership(codeVersion: evidenceVersion).isEmpty)
+        let queuedCrossCodeDelete = try XCTUnwrap(
+            store.pendingSyncQueueItems(limit: 50).first {
+                $0.entityType == .folderSection &&
+                    $0.operationType == .delete &&
+                    $0.payload.codeVersion == evidenceVersion
+            }
+        )
+        XCTAssertEqual(queuedCrossCodeDelete.payload.sectionID, 9_901)
+    }
+
+    func testReaderCodeMenuGroupsConstructionCodesByEditionYear() {
+        XCTAssertEqual(ReaderCodeMenuSectionTitle.construction2022, "2022 Construction Codes")
+        XCTAssertEqual(ReaderCodeMenuSectionTitle.codes2025, "2025 Codes")
+        XCTAssertEqual(ReaderCodeMenuSectionTitle.existingAndHistorical, "Existing and Historical Building Codes")
+        XCTAssertEqual(ReaderCodeMenuSectionTitle.landUseAndZoning, "Land Use and Zoning")
+    }
+
     func testSavingEvidenceRequiresDestinationAndAtomicallyCreatesOneBookmarkWithManyMemberships() throws {
         let databaseURL = FileManager.default.temporaryDirectory
             .appendingPathComponent("permitext-folder-save-\(UUID().uuidString).sqlite")

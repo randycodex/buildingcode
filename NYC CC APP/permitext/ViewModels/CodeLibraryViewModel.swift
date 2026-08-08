@@ -1715,7 +1715,7 @@ final class CodeLibraryViewModel: ObservableObject {
         }
 
         do {
-            let records = try userContentRepository.folders(codeVersion: selectedVersion.codeVersion)
+            let records = try userContentRepository.allFolders()
             folders = records.map { record in
                 CodeFolder(
                     id: record.id,
@@ -1724,6 +1724,7 @@ final class CodeLibraryViewModel: ObservableObject {
                     visibility: UserContentVisibility(rawValue: record.visibility) ?? .personal,
                     syncState: UserContentSyncState(rawValue: record.syncState) ?? .localOnly,
                     deletedAt: record.deletedAt.flatMap { ISO8601DateFormatter().date(from: $0) },
+                    codeVersion: record.codeVersion,
                     name: record.name,
                     address: record.address,
                     description: record.description,
@@ -1757,7 +1758,7 @@ final class CodeLibraryViewModel: ObservableObject {
         guard let selectedVersion, let userContentRepository else { return nil }
         do {
             if folderType == .project {
-                let folderCount = try folderCountForEntitlements(codeVersion: selectedVersion.codeVersion)
+                let folderCount = try folderCountForEntitlements()
                 guard !denyIfNeeded(entitlementService.canCreateProject(currentCount: folderCount)) else {
                     return nil
                 }
@@ -1780,7 +1781,7 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func updateFolder(_ folder: CodeFolder, name: String, address: String, description: String, colorHex: String) {
-        guard let selectedVersion, let userContentRepository else { return }
+        guard let userContentRepository else { return }
         do {
             try userContentRepository.updateFolder(
                 id: folder.id,
@@ -1789,7 +1790,7 @@ final class CodeLibraryViewModel: ObservableObject {
                 description: description,
                 colorHex: colorHex,
                 folderType: folder.folderType,
-                codeVersion: selectedVersion.codeVersion
+                codeVersion: folder.codeVersion
             )
             refreshFolders()
             scheduleUserContentAutoSync()
@@ -1799,9 +1800,9 @@ final class CodeLibraryViewModel: ObservableObject {
     }
 
     func deleteFolder(id: Int64) {
-        guard let selectedVersion, let userContentRepository else { return }
+        guard let folder = folder(id: id), let userContentRepository else { return }
         do {
-            try userContentRepository.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.deleteFolder(id: id, codeVersion: folder.codeVersion)
             refreshFolders()
             scheduleUserContentAutoSync()
         } catch {
@@ -1811,12 +1812,13 @@ final class CodeLibraryViewModel: ObservableObject {
 
     @discardableResult
     func deleteFolders(ids: Set<Int64>) -> Set<Int64> {
-        guard !ids.isEmpty, let selectedVersion, let userContentRepository else { return [] }
+        guard !ids.isEmpty, let userContentRepository else { return [] }
         var deletedIDs = Set<Int64>()
         var firstError: Error?
         for id in ids.sorted() {
             do {
-                try userContentRepository.deleteFolder(id: id, codeVersion: selectedVersion.codeVersion)
+                guard let folder = folder(id: id) else { continue }
+                try userContentRepository.deleteFolder(id: id, codeVersion: folder.codeVersion)
                 deletedIDs.insert(id)
             } catch {
                 if firstError == nil { firstError = error }
@@ -3068,8 +3070,8 @@ final class CodeLibraryViewModel: ObservableObject {
         try userContentRepository?.totalNoteCount() ?? bookmarks.filter(\.hasNote).count
     }
 
-    private func folderCountForEntitlements(codeVersion: String) throws -> Int {
-        try userContentRepository?.folderCount(codeVersion: codeVersion) ?? folders.count
+    private func folderCountForEntitlements() throws -> Int {
+        try userContentRepository?.totalFolderCount() ?? folders.count
     }
 
     func removeSections(_ sectionIDs: Set<Int64>, fromFolder folderID: Int64) {
@@ -3183,9 +3185,9 @@ final class CodeLibraryViewModel: ObservableObject {
     /// clear-data flow so users can reset their organization without losing
     /// the underlying bookmarks.
     func clearAllFolders() {
-        guard let selectedVersion, let userContentRepository else { return }
+        guard let userContentRepository else { return }
         do {
-            try userContentRepository.clearAllFolders(codeVersion: selectedVersion.codeVersion)
+            try userContentRepository.clearAllFolders()
             refreshFolders()
             scheduleUserContentAutoSync()
         } catch {

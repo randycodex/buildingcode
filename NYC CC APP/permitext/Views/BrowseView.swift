@@ -1,6 +1,16 @@
 import SwiftUI
 import UIKit
 
+enum ReaderCodeMenuSectionTitle {
+    static let construction2022 = "2022 Construction Codes"
+    static let codes2025 = "2025 Codes"
+    static let existingAndHistorical = "Existing and Historical Building Codes"
+    static let fireAndHousing = "Fire and Housing"
+    static let administrative = "Administrative Code"
+    static let localLaws = "Local Laws"
+    static let landUseAndZoning = "Land Use and Zoning"
+}
+
 struct BrowseView: View {
     var browserContext: BrowserContextID = .primary
 
@@ -216,13 +226,16 @@ struct BrowseView: View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top, spacing: 12) {
                 Menu {
-                    Section("Construction Codes") {
+                    Section(ReaderCodeMenuSectionTitle.construction2022) {
                         ForEach(constructionCodeSectionNames, id: \.self) { codeSectionName in
                             readerCodePickerButton(
                                 version: constructionCodeVersion,
                                 codeSectionName: codeSectionName
                             )
                         }
+                    }
+
+                    Section(ReaderCodeMenuSectionTitle.codes2025) {
                         readerCodePickerButton(
                             version: specialtyCodeVersion,
                             codeSectionName: "2025 Energy Conservation Code"
@@ -231,20 +244,23 @@ struct BrowseView: View {
                             version: specialtyCodeVersion,
                             codeSectionName: "2025 Electrical Code — NYC Amendments"
                         )
+                    }
+
+                    Section(ReaderCodeMenuSectionTitle.existingAndHistorical) {
                         readerCodePickerButton(
                             version: existingBuildingCodeVersion,
                             codeSectionName: "Existing Building Code"
                         )
                         readerCodePickerButton(
                             version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "Fire Code"
+                            codeSectionName: "1968 Building Code"
                         )
                     }
 
-                    Section("Historical and Housing Codes") {
+                    Section(ReaderCodeMenuSectionTitle.fireAndHousing) {
                         readerCodePickerButton(
                             version: enactedAdministrativeCodeVersion,
-                            codeSectionName: "1968 Building Code"
+                            codeSectionName: "Fire Code"
                         )
                         readerCodePickerButton(
                             version: enactedAdministrativeCodeVersion,
@@ -252,7 +268,7 @@ struct BrowseView: View {
                         )
                     }
 
-                    Section("Administrative Code Titles") {
+                    Section(ReaderCodeMenuSectionTitle.administrative) {
                         ForEach(enactedAdministrativeCodeSectionNames, id: \.self) { codeSectionName in
                             readerCodePickerButton(
                                 version: enactedAdministrativeCodeVersion,
@@ -261,14 +277,14 @@ struct BrowseView: View {
                         }
                     }
 
-                    Section("Local Laws and Transitions") {
+                    Section(ReaderCodeMenuSectionTitle.localLaws) {
                         readerCodePickerButton(
                             version: enactedAdministrativeCodeVersion,
                             codeSectionName: "Construction-Related Local Laws"
                         )
                     }
 
-                    Section("Land Use") {
+                    Section(ReaderCodeMenuSectionTitle.landUseAndZoning) {
                         readerCodePickerButton(
                             version: zoningResolutionVersion,
                             codeSectionName: "Zoning Resolution"
