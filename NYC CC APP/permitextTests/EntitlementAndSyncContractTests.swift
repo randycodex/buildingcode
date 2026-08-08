@@ -220,6 +220,16 @@ final class EntitlementAndSyncContractTests: XCTestCase {
                 from: "[PRO_REQUIRED_PROJECTS] Projects require Pro."
             )
         )
+        XCTAssertTrue(UserContentSyncConflictError.shouldAutomaticallyUseServerCopy(serverNewer))
+        XCTAssertTrue(UserContentSyncConflictError.shouldAutomaticallyUseServerCopy(equalTimestamp))
+        XCTAssertFalse(
+            UserContentSyncConflictError.shouldAutomaticallyUseServerCopy(
+                BackendUserContentRejection(
+                    code: "PRO_REQUIRED_PROJECTS",
+                    message: "Projects require Pro."
+                )
+            )
+        )
     }
 
     func testSyncConflictPresentationIdentifiesEverySupportedRecordKind() {

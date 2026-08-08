@@ -195,7 +195,7 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260807-code-question-phase5a-v5"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260808-auto-sync-convergence-v6"));
 assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260806-code-question-legacy-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260806-code-question-legacy-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-client-state.js?v=20260807-code-question-account-v2"));

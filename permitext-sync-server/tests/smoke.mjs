@@ -405,9 +405,9 @@ async function main() {
     assert(
       settingsTemplateSource.includes('>NYC Zoning Resolution</option>') &&
         !settingsTemplateSource.includes('>2022 Construction Codes</option>') &&
-        iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
-        iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'),
-      "Settings should expose only NYC Zoning Resolution in its version picker."
+        !iosSettingsSource.includes('Text("NYC Zoning Resolution")') &&
+        !iosSettingsSource.includes('localizedCaseInsensitiveContains("zoning")'),
+      "Web Settings should remain zoning-only while iOS omits jurisdiction and version pickers."
     );
     assert(
       !settingsTemplateSource.includes("Comparison Mode") &&
@@ -573,7 +573,9 @@ async function main() {
         workspaceScript.text.includes("const existingReader = state.readers.find((reader) => reader.codePrefix === zoningCodePrefix);") &&
         workspaceScript.text.includes("const replacementReader = state.readers[state.readers.length - 1];") &&
         workspaceScript.text.includes('item.classList.toggle("is-indented", indented)') &&
-        iosBrowseSource.includes('Section("Construction Codes")') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.construction2022)') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.codes2025)') &&
+        iosBrowseSource.includes('Section(ReaderCodeMenuSectionTitle.existingAndHistorical)') &&
         iosBrowseSource.includes('codeSectionName: "Zoning Resolution"') &&
         iosBrowserContextSource.includes("storedVersionFileName") &&
         iosBrowserContextSource.includes("persistVersionFileName"),
@@ -1018,7 +1020,9 @@ async function main() {
       iosUserDataStoreSource.includes("private func folderSectionSyncTargets") &&
         iosUserDataStoreSource.includes('"folderClientID": target.folderClientID') &&
         iosUserDataStoreSource.includes('"folderType": target.folderType.rawValue') &&
-        iosUserDataStoreSource.includes("let sectionIDs = try sectionIDs(inFolder: id, codeVersion: codeVersion)") &&
+        iosUserDataStoreSource.includes("let evidenceReferences = try evidenceReferences(inFolder: id)") &&
+        iosUserDataStoreSource.includes("for reference in evidenceReferences") &&
+        iosUserDataStoreSource.includes("codeVersion: reference.codeVersion") &&
         !iosUserDataStoreSource.includes('values: ["scope": "allFolders"]'),
       "iOS project membership removals are no longer durable project-specific tombstones."
     );
@@ -1244,7 +1248,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260807-code-question-phase5a-v5'),
+        webRoot.text.includes('/web/app.js?v=20260808-auto-sync-convergence-v6'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1827,6 +1831,14 @@ async function main() {
         workspaceScript.text.includes('void focusUtility("settings")') &&
         webRoot.text.includes('id="connection-status" role="status" aria-live="polite"'),
       "Exceptional sync states no longer provide a clear live signal with conflict-only Settings access."
+    );
+    assert(
+      workspaceScript.text.includes('"SERVER_NEWER",\n  "EQUAL_TIMESTAMP_CONFLICT"') &&
+        workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
+        workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
+        workspaceScript.text.includes("discardLocalMutationOverlay(entry.mutation)") &&
+        workspaceScript.text.includes("await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID))"),
+      "Web sync must automatically converge server-newer records while retaining non-version rejection failures."
     );
     assert(
       workspaceScript.text.includes('if (value === "project" && !hasCapability("projects"))') &&

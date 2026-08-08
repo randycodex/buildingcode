@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260807-code-question-phase5a-v5";
+} from "./offline-storage.js?v=20260808-auto-sync-convergence-v6";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -6047,6 +6047,48 @@ function mutationUpdatedAt(mutation) {
   return Number.isFinite(timestamp) ? timestamp : 0;
 }
 
+const automaticallyConvergentSyncRejectionCodes = new Set([
+  "SERVER_NEWER",
+  "EQUAL_TIMESTAMP_CONFLICT"
+]);
+
+function shouldAutomaticallyUseServerCopy(entry) {
+  if (automaticallyConvergentSyncRejectionCodes.has(String(entry?.rejectionCode || ""))) {
+    return true;
+  }
+  const message = String(entry?.lastError || "").toLowerCase();
+  return message.includes("server has newer data") ||
+    (message.includes("newer version") && message.includes("server")) ||
+    (message.includes("changed in two places") && message.includes("sync conflict"));
+}
+
+async function convergeServerNewerSyncConflicts(account) {
+  const convergent = (state.syncConflicts || []).filter((entry) =>
+    entry.accountUserID === account.userID && shouldAutomaticallyUseServerCopy(entry)
+  );
+  if (!convergent.length || syncedContent?.status !== "connected") return false;
+
+  const resolvedIDs = new Set();
+  for (const entry of convergent) {
+    const { kind, record } = mutationKindAndRecord(entry.mutation);
+    try {
+      if (kind === "workboard") {
+        const projectID = String(record?.projectID || "");
+        await replaceLocalWorkboard(projectID, syncedWorkboardForProject(projectID));
+      } else {
+        discardLocalMutationOverlay(entry.mutation);
+      }
+      resolvedIDs.add(entry.id);
+    } catch {
+      // Keep the conflict visible if applying the authoritative server copy fails.
+    }
+  }
+  if (!resolvedIDs.size) return false;
+  state.syncConflicts = (state.syncConflicts || []).filter((entry) => !resolvedIDs.has(entry.id));
+  saveWorkspaceState();
+  return true;
+}
+
 function currentBulkClearRecords() {
   return [
     ...(syncedContent?.summary?.codeVersionClears || []),
@@ -6251,6 +6293,7 @@ async function loadSyncedContent(options = {}) {
         mutations,
         summary: summarizeMutations(mutations)
       };
+      await convergeServerNewerSyncConflicts(account);
       await applyRemoteContinuityIfNewer();
       await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
       storeAccountEntitlement(entitlement);

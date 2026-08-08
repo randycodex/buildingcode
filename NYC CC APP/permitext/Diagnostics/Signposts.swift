@@ -655,10 +655,18 @@ struct UserContentSyncEngine {
                     if acceptedIDs.contains(mutation.recordID) {
                         try markCompleted(item)
                     } else if rejectedIDs.contains(mutation.recordID) {
-                        let message = report.rejectionReasons[mutation.recordID]
-                            .map(UserContentSyncConflictError.persistedDescription) ??
-                            "Server has newer data for this record. Pull latest changes before retrying."
-                        try? markFailed(item, error: UserContentSyncError.rejectedByServer(message))
+                        if let rejection = report.rejectionReasons[mutation.recordID],
+                           UserContentSyncConflictError.shouldAutomaticallyUseServerCopy(rejection) {
+                            // The automatic sync sequence pulls immediately after pushing. Removing
+                            // this superseded queue item lets that pull apply the authoritative server
+                            // record instead of leaving a device-local conflict that cannot converge.
+                            try markCompleted(item)
+                        } else {
+                            let message = report.rejectionReasons[mutation.recordID]
+                                .map(UserContentSyncConflictError.persistedDescription) ??
+                                "Server could not accept this record. Review the sync status before retrying."
+                            try? markFailed(item, error: UserContentSyncError.rejectedByServer(message))
+                        }
                     } else {
                         try? markFailed(item, error: UserContentSyncError.rejectedByServer("Server did not accept this sync item."))
                     }
@@ -805,6 +813,10 @@ struct UserContentSyncEngine {
 
 enum UserContentSyncConflictError {
     private static let conflictCodes = ["SERVER_NEWER", "EQUAL_TIMESTAMP_CONFLICT"]
+
+    static func shouldAutomaticallyUseServerCopy(_ rejection: BackendUserContentRejection) -> Bool {
+        conflictCodes.contains(rejection.code)
+    }
 
     static func persistedDescription(for rejection: BackendUserContentRejection) -> String {
         "[\(rejection.code)] \(rejection.message)"
