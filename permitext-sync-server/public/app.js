@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-decision-meta-v1";
+} from "./sync-state.js?v=20260809-decision-index-width-v5";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-decision-meta-v1";
+} from "./offline-storage.js?v=20260809-decision-index-width-v5";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-decision-meta-v1";
+} from "./workspace-state.js?v=20260809-decision-index-width-v5";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -86,7 +86,7 @@ import {
   questionPaneKey,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260809-context-bar-visibility-v3";
+} from "./code-question-workspace.js?v=20260809-decision-index-width-v1";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountDomainState,
@@ -2980,6 +2980,9 @@ function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
   if (isCodeQuestionPaneID(paneID)) {
     const parsed = parseQuestionPaneKey(paneID);
+    if (parsed?.paneRole === "question-index") {
+      return minimumWidthForPaneRole("question-index") || 300;
+    }
     return Math.max(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole(parsed?.paneRole) || 0);
   }
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
@@ -3020,6 +3023,7 @@ function migrateLegacyPaneWidth(paneID, value) {
 
 function isFixedWidthPaneID(paneID) {
   return paneID?.startsWith("utility:") ||
+    (isCodeQuestionPaneID(paneID) && parseQuestionPaneKey(paneID)?.paneRole === "question-index") ||
     isProjectDetailPaneID(paneID) ||
     isProjectWorkboardPaneID(paneID) ||
     isProjectNotebookPaneID(paneID) ||
@@ -3639,14 +3643,20 @@ async function closeArchiveColumn() {
 function normalizePaneWeights(ids) {
   const current = state.paneWeights || {};
   const hasManyColumns = ids.length >= 4;
+  const migrateQuestionIndexWidth = Number(state.paneWidthDefaultsVersion || 0) < 3;
   state.paneWeights = ids.reduce((weights, id) => {
     const value = migrateLegacyPaneWidth(id, Number(current[id]));
     const defaultWidth = defaultPaneWidthForID(id);
-    weights[id] = Number.isFinite(value) && value > 40
+    const isQuestionIndex = isCodeQuestionPaneID(id) &&
+      parseQuestionPaneKey(id)?.paneRole === "question-index";
+    weights[id] = migrateQuestionIndexWidth && isQuestionIndex
+      ? defaultWidth
+      : Number.isFinite(value) && value > 40
       ? (hasManyColumns ? Math.max(value, defaultWidth) : value)
       : defaultWidth;
     return weights;
   }, {});
+  state.paneWidthDefaultsVersion = 3;
 }
 
 function applyPaneWeight(panel, paneID) {

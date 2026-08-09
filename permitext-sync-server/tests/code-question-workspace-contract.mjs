@@ -42,6 +42,7 @@ assert.deepEqual([...codeQuestionWorkflowStages], [
 assert.ok(codeQuestionStageArrangements.evidence.includes("reader"));
 assert.ok(codeQuestionStageArrangements.analyze.includes("professional-conclusion"));
 assert.deepEqual([...codeDecisionPrimaryArrangement], ["decision-record"]);
+assert.equal(minimumWidthForPaneRole("question-index"), 300);
 assert.equal(recommendedVisibleColumnCount(1500), 3);
 assert.equal(recommendedVisibleColumnCount(1200), 2);
 assert.equal(recommendedVisibleColumnCount(900), 1);

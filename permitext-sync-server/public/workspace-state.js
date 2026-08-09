@@ -14,6 +14,7 @@ export const workspaceLayoutStateKeys = Object.freeze([
   "projectHostPaneID",
   "utilityInstances",
   "utilities",
+  "paneWidthDefaultsVersion",
   "paneWeights",
   "paneOrder",
   "researchConversationID",
@@ -204,6 +205,7 @@ export function emptyWorkspaceLayout() {
     projectHostPaneID: "",
     utilityInstances: [],
     utilities: utilityState(),
+    paneWidthDefaultsVersion: 3,
     paneWeights: {},
     paneOrder: [],
     researchConversationID: "",
@@ -252,6 +254,8 @@ export function normalizeWorkspaceLayout(value = {}) {
     ? source.projectHostPaneID
     : "";
   layout.utilities = utilityState(source.utilities);
+  const priorPaneWidthDefaultsVersion = Number(source.paneWidthDefaultsVersion || 0);
+  layout.paneWidthDefaultsVersion = 3;
   layout.paneWeights = source.paneWeights && typeof source.paneWeights === "object"
     ? Object.fromEntries(
         Object.entries(source.paneWeights)
@@ -264,6 +268,13 @@ export function normalizeWorkspaceLayout(value = {}) {
           .map(([paneID, width]) => [paneID, Number(width)])
       )
     : {};
+  if (priorPaneWidthDefaultsVersion < 3) {
+    Object.keys(layout.paneWeights)
+      .filter((paneID) => paneID.startsWith("cq:") && paneID.endsWith(":question-index"))
+      .forEach((paneID) => {
+        layout.paneWeights[paneID] = 300;
+      });
+  }
   layout.paneOrder = Array.isArray(source.paneOrder)
     ? source.paneOrder.filter((paneID) => typeof paneID === "string" && !paneID.startsWith("section:detail:"))
     : [];

@@ -61,7 +61,7 @@ export const codeDecisionPrimaryArrangement = Object.freeze([
 ]);
 
 export const codeQuestionPaneMinimumWidths = Object.freeze({
-  "question-index": 288,
+  "question-index": 300,
   research: 520,
   "decision-record": 420,
   candidates: 288,

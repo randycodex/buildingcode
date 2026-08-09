@@ -12595,7 +12595,7 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 }
 
 .code-question-panel[data-cq-role="question-index"] {
-  min-width: 600px;
+  min-width: 300px;
 }
 
 .code-question-panel-body {

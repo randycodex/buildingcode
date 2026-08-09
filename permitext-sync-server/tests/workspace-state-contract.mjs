@@ -29,7 +29,45 @@ assert.equal(blankRegistry.workspaces[0].name, "Main");
 assert.equal(blankRegistry.activeWorkspaceID, blankRegistry.workspaces[0].id);
 assert.deepEqual(emptyWorkspaceLayout().readers, []);
 assert.equal(emptyWorkspaceLayout().projectHostPaneID, "");
+assert.equal(emptyWorkspaceLayout().paneWidthDefaultsVersion, 3);
 assert.equal(workspaceLayoutHasVisiblePanes(emptyWorkspaceLayout()), false);
+
+const migratedQuestionIndexWidth = normalizeWorkspaceLayout({
+  paneWeights: {
+    "cq:project-1:_:question-index": 600,
+    "cq:project-1:question-1:decision-record": 720
+  },
+  codeQuestionWorkspace: {
+    activeQuestionID: "question-1",
+    questionIndexOpen: true,
+    openPanes: [
+      {
+        projectID: "project-1",
+        questionID: "_",
+        paneRole: "question-index",
+        paneID: "cq:project-1:_:question-index"
+      },
+      {
+        projectID: "project-1",
+        questionID: "question-1",
+        paneRole: "decision-record",
+        paneID: "cq:project-1:question-1:decision-record"
+      }
+    ]
+  },
+  projectDetails: [{ id: "project-1", name: "Project 1" }]
+});
+assert.equal(migratedQuestionIndexWidth.paneWeights["cq:project-1:_:question-index"], 300);
+assert.equal(migratedQuestionIndexWidth.paneWeights["cq:project-1:question-1:decision-record"], 720);
+assert.equal(migratedQuestionIndexWidth.paneWidthDefaultsVersion, 3);
+const preservedResizedQuestionIndex = normalizeWorkspaceLayout({
+  ...migratedQuestionIndexWidth,
+  paneWeights: {
+    ...migratedQuestionIndexWidth.paneWeights,
+    "cq:project-1:_:question-index": 440
+  }
+});
+assert.equal(preservedResizedQuestionIndex.paneWeights["cq:project-1:_:question-index"], 440);
 
 const legacyLayout = normalizeWorkspaceLayout({
   readers: [{ id: "reader-1", codePrefix: "BC" }, { id: "comparison", comparisonManaged: true }],

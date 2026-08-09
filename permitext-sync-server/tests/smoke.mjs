@@ -1266,7 +1266,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260809-decision-meta-v1') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260809-decision-index-width-v5') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1297,7 +1297,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('"Based only on selected Research evidence"') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260809-decision-meta-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-decision-index-width-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1439,7 +1439,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-decision-meta-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-decision-index-width-v5'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1687,7 +1687,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-decision-meta-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-decision-index-width-v5'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
