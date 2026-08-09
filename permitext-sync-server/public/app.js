@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-inline-status-v2";
+} from "./offline-storage.js?v=20260809-code-decision-index-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25343,29 +25343,6 @@ function renderCodeQuestionIndexBody(project) {
     : "Select a Project";
   wrap.appendChild(meta);
   wrap.appendChild(renderCodeQuestionIndexList(project));
-  const legacy = document.createElement("div");
-  legacy.className = "code-question-legacy-path";
-  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "").trim();
-  const legacyState = mergeLegacyInventory(getLegacyForProject(projectID), localLegacyInventory(project), projectID);
-  const counts = legacyCounts(legacyState.items);
-  legacy.innerHTML = `
-    <h3>Legacy / Unassigned</h3>
-    <p><strong>${escapeHTML(String(counts.unassigned))}</strong> awaiting an explicit choice · <strong>${escapeHTML(String(counts.linked))}</strong> linked · <strong>${escapeHTML(String(counts.recovery))}</strong> recoverable.</p>
-    <p>Working Notes, Workboard, Coordination, Saved sources, Research answers, and advanced Report Drafts remain in their original tools.</p>
-  `;
-  const openLegacy = document.createElement("button");
-  openLegacy.type = "button";
-  openLegacy.textContent = "Review legacy work";
-  openLegacy.addEventListener("click", async () => {
-    setCodeQuestionWorkspaceState(openSupportingTool(codeQuestionWorkspaceState(), {
-      projectID,
-      questionID: codeQuestionWorkspaceState().activeQuestionID || "_",
-      paneRole: "legacy"
-    }), { activeProjectID: projectID });
-    await renderWorkspace();
-  });
-  legacy.appendChild(openLegacy);
-  wrap.appendChild(legacy);
   return wrap;
 }
 
