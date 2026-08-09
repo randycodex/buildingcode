@@ -6040,15 +6040,17 @@ body.is-resizing-research-evidence * {
 .research-sources-toggle {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  min-height: 1.5rem;
   padding: 0;
   border: 0;
   background: transparent;
   cursor: pointer;
   color: var(--text-secondary);
   font: inherit;
+  text-align: left;
 }
 
 .research-source-list {

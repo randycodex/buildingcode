@@ -1268,7 +1268,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-research-source-dedupe-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-research-source-label-layout-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1410,7 +1410,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-research-source-dedupe-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-research-source-label-layout-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1518,6 +1518,10 @@ async function main() {
         workspaceStyles.text.includes("border-top: 1px solid var(--border);") &&
         workspaceStyles.text.includes("background: transparent;"),
       "Research source passages should remain flat and separated by thin dividers."
+    );
+    assert(
+      workspaceStyles.text.match(/\.research-sources-toggle \{[\s\S]*?justify-content: flex-start;[\s\S]*?width: 100%;[\s\S]*?text-align: left;/),
+      "The Research evidence disclosure label should use the available column width without overlapping its sources."
     );
     assert(
       workspaceScript.text.includes('toggle.className = "research-source-toggle"') &&
@@ -1649,7 +1653,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-research-source-dedupe-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-research-source-label-layout-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
