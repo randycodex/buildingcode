@@ -8135,6 +8135,7 @@ body.is-resizing-research-evidence * {
 .saved-folder-context.is-project .saved-project-tool-controls button {
   width: 100%;
   min-width: 0;
+  font-weight: 400;
 }
 
 .saved-folder-context.is-project > .project-studio-section,

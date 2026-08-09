@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-evidence-discovery-simplify-v1";
+} from "./offline-storage.js?v=20260809-project-research-label-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -20577,7 +20577,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     controls.className = "saved-folder-controls saved-project-tool-controls";
     controls.setAttribute("aria-label", `${identity.name} tools`);
     [
-      ["Code Decisions", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions],
+      ["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions],
       ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
       ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
       ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]

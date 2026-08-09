@@ -319,9 +319,9 @@ assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/
 assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-evidence-discovery-simplify-v2/);
-assert.match(serviceWorker, /permitext-pro-shell-v501/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-evidence-discovery-simplify-v2/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-project-tools-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v502/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-project-tools-v1/);
 assert.match(workspaceStyles, /\.evidence-discovery \{\s*display: grid;\s*gap: var\(--space-3\);\s*margin-top: var\(--space-4\);\s*\}/);
 assert.match(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
