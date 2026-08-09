@@ -122,10 +122,10 @@ Signed-in web readers also publish the shared `continuity` record after chapter 
 
 The web `Research` pane stores conversations built from enacted passages selected by the user. Users can attach additional passages and ask for plain-language interpretations grounded only in those exact passages. Related sections remain disclosed suggestions and are not sent to the model as verified authority. The server re-resolves canonical bodies, excludes private notes, rejects changed selections, verifies every cited section and passage ID, and returns separate supported conclusions, missing facts, evidence limitations, and additional evidence needs. Interpretations are research assistance, not official code determinations.
 
-Run the interpretation flow locally without calling an external model:
+Automated tests can exercise the interpretation contract without calling an external model. Mock Research is accepted only when `NODE_ENV=test`; it is never available to the normal localhost, Preview, or Production app:
 
 ```sh
-PERMITEXT_RESEARCH_MOCK=1 node server.mjs
+NODE_ENV=test PERMITEXT_TEST_RESEARCH_MOCK=1 node server.mjs
 ```
 
 Enable live OpenAI Responses API calls with a server-only key:
@@ -136,6 +136,14 @@ PERMITEXT_RESEARCH_MODEL=gpt-5.6-terra \
 PERMITEXT_RESEARCH_REASONING_EFFORT=medium \
 node server.mjs
 ```
+
+For persistent localhost Research on macOS, store the server-only key in the login Keychain with service name `permitext-openai-api-key`, then run:
+
+```sh
+npm run start:local-research
+```
+
+That command fails closed when the Keychain entry is missing or invalid, always defaults to `gpt-5.6-terra`, and never enables test mock generation.
 
 `OPENAI_API_KEY` must never be exposed to the browser. The server disables response storage, uses a privacy-preserving hashed safety identifier, requests strict structured output, validates citations before returning an answer, and records versioned model/token usage without logging the question or code text. The Research list shows requests used versus the monthly allowance and reset date; token totals are secondary, and estimated cost appears only when explicit versioned pricing is configured. The OpenAI account that owns the API key is responsible for model usage charges.
 

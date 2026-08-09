@@ -11336,6 +11336,11 @@ function monthlyResearchRequestLimit() {
   return Number.isSafeInteger(configured) && configured >= 1 && configured <= 100_000 ? configured : 100;
 }
 
+function researchMockMode() {
+  return process.env.NODE_ENV === "test" &&
+    process.env.PERMITEXT_TEST_RESEARCH_MOCK === "1";
+}
+
 function nextMonthStart() {
   const now = new Date();
   return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1)).toISOString();
@@ -11366,7 +11371,7 @@ function researchUsageSummary(entries, options = {}) {
 async function handleResearchUsage(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
-  const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+  const mockMode = researchMockMode();
   const entries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
   sendJSON(response, 200, {
     usage: researchUsageSummary(entries, {
@@ -11876,7 +11881,7 @@ async function handleResearchConversationMessage(request, response) {
       });
       return;
     }
-    const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+    const mockMode = researchMockMode();
     const usageEntries = mockMode ? [] : await researchUsageSince(context.userID, currentMonthStart());
     const requestLimit = monthlyResearchRequestLimit();
     if (!mockMode) {
@@ -19266,10 +19271,10 @@ async function generateCodeQuestionAnalysis(context, binding, requestID) {
       .find((item) => item.id === replay.payload.researchAnswerID) || null;
     return { analysis: { id: replay.envelope.id, ...replay.payload }, answer, replayed: true };
   }
-  const mockMode = process.env.PERMITEXT_RESEARCH_MOCK === "1";
+  const mockMode = researchMockMode();
   const mockDelayMilliseconds = Math.min(1_000, Math.max(
     0,
-    Number(process.env.PERMITEXT_RESEARCH_MOCK_DELAY_MS || 0) || 0
+    Number(process.env.PERMITEXT_TEST_RESEARCH_MOCK_DELAY_MS || 0) || 0
   ));
   if (mockMode && mockDelayMilliseconds) {
     await new Promise((resolve) => setTimeout(resolve, mockDelayMilliseconds));
@@ -19418,7 +19423,7 @@ async function handleCodeQuestionAnalysisCreate(request, response) {
     permission: permissionForCommand("codeQuestion.analysis.create")
   });
   if (!context) return;
-  if (!hasActiveResearchEntitlement(context.authContext.entitlement) && process.env.PERMITEXT_RESEARCH_MOCK !== "1") {
+  if (!hasActiveResearchEntitlement(context.authContext.entitlement) && !researchMockMode()) {
     sendJSON(response, 403, { error: "Research Add-On required for bounded analysis.", code: "RESEARCH_REQUIRED" });
     return;
   }

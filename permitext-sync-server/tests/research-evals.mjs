@@ -2827,7 +2827,8 @@ async function main() {
     process.env.VERCEL_ENV = "";
     process.env.PERMITEXT_ALLOW_WEB_BROWSER_SIGN_IN = "1";
     process.env.PERMITEXT_SYNC_GRANT_ADMIN_TOKEN = "research-eval-local-grant";
-    process.env.PERMITEXT_RESEARCH_MOCK = liveMode ? "" : "1";
+    process.env.NODE_ENV = liveMode ? (originalEnvironment.NODE_ENV || "") : "test";
+    process.env.PERMITEXT_TEST_RESEARCH_MOCK = liveMode ? "" : "1";
     process.env.PERMITEXT_RESEARCH_MONTHLY_REQUEST_LIMIT = String(
       selectedCases.length * repeat + (liveMode ? 0 : 1)
     );

@@ -214,6 +214,22 @@ async function main() {
   const syncRepositorySource = await readFile(new URL("../postgres-sync-repository.mjs", import.meta.url), "utf8");
   const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
   const researchConfigSource = await readFile(new URL("../research-config.mjs", import.meta.url), "utf8");
+  const localResearchStartSource = await readFile(
+    new URL("../scripts/start-local-research.zsh", import.meta.url),
+    "utf8"
+  );
+  assert(
+    serverSource.includes('process.env.NODE_ENV === "test"') &&
+      serverSource.includes('process.env.PERMITEXT_TEST_RESEARCH_MOCK === "1"') &&
+      !serverSource.includes('process.env.PERMITEXT_RESEARCH_MOCK === "1"'),
+    "Research mock mode was not restricted to explicit automated-test execution."
+  );
+  assert(
+    localResearchStartSource.includes('security find-generic-password') &&
+      localResearchStartSource.includes('gpt-5.6-terra') &&
+      localResearchStartSource.includes('unset PERMITEXT_TEST_RESEARCH_MOCK'),
+    "The Keychain-backed localhost Research launcher can enable mock answers."
+  );
   const server = spawn(process.execPath, ["server.mjs"], {
     cwd: new URL("..", import.meta.url),
     env: {
@@ -240,7 +256,8 @@ async function main() {
       APPLE_BUNDLE_ID: "com.randycodex.permitext",
       APPLE_SERVICE_ID: "com.randycodex.permitext.web",
       PERMITEXT_PUBLIC_BASE_URL: baseURL,
-      PERMITEXT_RESEARCH_MOCK: "1",
+      NODE_ENV: "test",
+      PERMITEXT_TEST_RESEARCH_MOCK: "1",
       PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
       STRIPE_WEBHOOK_SECRET: stripeWebhookSecret
     },

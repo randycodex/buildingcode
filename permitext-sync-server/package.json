@@ -6,6 +6,7 @@
   "scripts": {
     "prestart": "npm run build:clients",
     "start": "node server.mjs",
+    "start:local-research": "zsh scripts/start-local-research.zsh",
     "build:clients": "npm run build:workboard && npm run build:notebook",
     "build:workboard": "vite build --config vite.workboard.config.js && node scripts/copy-excalidraw-assets.mjs",
     "build:notebook": "vite build --config vite.notebook.config.js",
