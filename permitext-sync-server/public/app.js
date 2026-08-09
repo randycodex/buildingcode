@@ -41,13 +41,14 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-v5";
+} from "./offline-storage.js?v=20260809-session-stability-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
+  clientValuesMatch,
   resolveNotebookVersionConflict,
   shouldUseOfflineFallback
-} from "./client-reliability.js?v=20260731-debug-audit-v1";
+} from "./client-reliability.js?v=20260809-session-stability-v1";
 import {
   applyWorkspaceLayout,
   captureWorkspaceLayout,
@@ -84,6 +85,7 @@ import {
 } from "./code-question-workspace.js?v=20260809-code-decision-v5";
 import {
   acknowledgeCodeQuestionMutation,
+  codeQuestionAccountDomainState,
   codeQuestionAccountCacheKey,
   codeQuestionAccountCacheKeyPrefix,
   codeQuestionMutationIsOfflineSafe,
@@ -94,11 +96,14 @@ import {
   enqueueCodeQuestionOfflineMutation as enqueueAccountCodeQuestionMutation,
   evictCodeQuestionProject,
   migrateCodeQuestionAccountState,
+  mergeCodeQuestionWorkspaceDomainState,
+  normalizeCodeQuestionAccountState,
   readCodeQuestionAccountState,
+  removeCodeQuestionAccountState,
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260809-code-decision-v5";
+} from "./code-question-client-state.js?v=20260809-session-stability-v2";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer
@@ -663,11 +668,22 @@ function loadPersistedAccount(legacyAccount = null) {
 }
 
 function persistAccountSession(account = state?.account || null) {
+  const raw = localStorage.getItem(accountSessionKey);
+  if (raw) {
+    try {
+      if (clientValuesMatch(JSON.parse(raw), account)) return false;
+    } catch {
+      // Replace malformed persisted state with the current authoritative session.
+    }
+  } else if (!account) {
+    return false;
+  }
   if (account && typeof account === "object") {
     localStorage.setItem(accountSessionKey, JSON.stringify(account));
-    return;
+    return true;
   }
   localStorage.removeItem(accountSessionKey);
+  return true;
 }
 
 function codeQuestionAccountStateFromRuntime(accountUserID = state?.account?.userID || "") {
@@ -713,18 +729,27 @@ function unloadCodeQuestionAccountState(options = {}) {
   }
 }
 
-function loadCodeQuestionAccountStateIntoWorkspace(accountUserID = state?.account?.userID || "") {
+function loadCodeQuestionAccountStateIntoWorkspace(accountUserID = state?.account?.userID || "", options = {}) {
   const id = String(accountUserID || "").trim();
+  const localWorkspace = state.codeQuestionWorkspace || emptyCodeQuestionWorkspaceState();
+  const localPaneOrder = (state.paneOrder || []).filter((paneID) => String(paneID).startsWith("cq:"));
+  const localPaneWeights = Object.fromEntries(
+    Object.entries(state.paneWeights || {}).filter(([paneID]) => String(paneID).startsWith("cq:"))
+  );
   unloadCodeQuestionAccountState({ clearDeepLink: !id });
   if (!id || detachedProjectWindow) return null;
-  const cached = readCodeQuestionAccountState(localStorage, id);
+  const cached = options.accountState
+    ? normalizeCodeQuestionAccountState(options.accountState, { accountUserID: id })
+    : readCodeQuestionAccountState(localStorage, id);
   const activeProject = state.projectDetails?.[0] || state.projectDetail || null;
   const snapshot = codeQuestionWorkspaceSnapshot(cached, activeWorkspaceID, {
     activeProjectID: activeProject
       ? String(activeProject.id || activeProject.clientID || activeProject.localFolderID || "")
       : ""
   });
-  state.codeQuestionWorkspace = snapshot.workspace;
+  state.codeQuestionWorkspace = options.preservePresentation
+    ? mergeCodeQuestionWorkspaceDomainState(localWorkspace, snapshot.workspace)
+    : snapshot.workspace;
   state.codeQuestionOutbox = cached.outbox;
   state.codeQuestionConflicts = cached.conflicts;
   Object.entries(cached.accessByProjectID || {}).forEach(([projectID, access]) => {
@@ -732,13 +757,13 @@ function loadCodeQuestionAccountStateIntoWorkspace(accountUserID = state?.accoun
   });
   state.paneOrder = [
     ...(state.paneOrder || []).filter((paneID) => !String(paneID).startsWith("cq:")),
-    ...snapshot.paneOrder
+    ...(options.preservePresentation ? localPaneOrder : snapshot.paneOrder)
   ];
   state.paneWeights = {
     ...Object.fromEntries(
       Object.entries(state.paneWeights || {}).filter(([paneID]) => !String(paneID).startsWith("cq:"))
     ),
-    ...snapshot.paneWeights
+    ...(options.preservePresentation ? localPaneWeights : snapshot.paneWeights)
   };
   return cached;
 }
@@ -5683,7 +5708,7 @@ function evictDeniedCodeQuestionCache(error, projectID, questionID = "", options
   if (!account) return false;
   if (Number(error.status) === 401) {
     codeQuestionUnauthorizedAccountUserID = account.userID;
-    localStorage.removeItem(codeQuestionAccountCacheKey(account.userID));
+    removeCodeQuestionAccountState(localStorage, account.userID);
     unloadCodeQuestionAccountState();
     return true;
   }
@@ -6118,17 +6143,23 @@ function entitlementSourceLabel(entitlement = currentEntitlement()) {
 
 function storeAccountEntitlement(entitlement) {
   if (!state.account) return;
-  state.account = { ...state.account, entitlement: entitlement || null };
+  const nextEntitlement = entitlement || null;
+  if (clientValuesMatch(state.account.entitlement || null, nextEntitlement)) {
+    void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
+    return false;
+  }
+  state.account = { ...state.account, entitlement: nextEntitlement };
   if (syncedContent && syncedContent.userID === state.account.userID) {
     syncedContent = {
       ...syncedContent,
-      entitlement: entitlement || null,
+      entitlement: nextEntitlement,
       capabilityContract: null
     };
   }
   persistAccountSession();
   saveWorkspaceState();
   void reconcileOfflineFeatureAccess(hasCapability("offline-access")).catch(() => {});
+  return true;
 }
 
 function delay(milliseconds) {
@@ -23469,7 +23500,7 @@ function renderSettings() {
       organizationWorkspace = null;
       organizationLoadPromise = null;
       unloadCodeQuestionAccountState();
-      localStorage.removeItem(codeQuestionAccountCacheKey(account.userID));
+      removeCodeQuestionAccountState(localStorage, account.userID);
       persistAccountSession(null);
       stopForegroundSyncLoop();
       Object.keys(localStorage)
@@ -28055,13 +28086,16 @@ async function start() {
   bindResearchTextSelection();
   window.addEventListener("storage", (event) => {
     if (event.key === accountSessionKey) {
+      let nextAccount = null;
+      try {
+        nextAccount = event.newValue ? JSON.parse(event.newValue) : null;
+      } catch {
+        nextAccount = null;
+      }
+      if (clientValuesMatch(state.account || null, nextAccount)) return;
       const previousUserID = state.account?.userID || "";
       if (previousUserID) persistCodeQuestionAccountState(previousUserID);
-      try {
-        state.account = event.newValue ? JSON.parse(event.newValue) : null;
-      } catch {
-        state.account = null;
-      }
+      state.account = nextAccount;
       if (previousUserID !== (state.account?.userID || "")) clearResearchAccountRuntime();
       codeQuestionUnauthorizedAccountUserID = "";
       loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
@@ -28078,7 +28112,30 @@ async function start() {
       state.account?.userID &&
       event.key === codeQuestionAccountCacheKey(state.account.userID)
     ) {
-      loadCodeQuestionAccountStateIntoWorkspace(state.account.userID);
+      let incomingAccountState;
+      try {
+        incomingAccountState = normalizeCodeQuestionAccountState(
+          event.newValue ? JSON.parse(event.newValue) : {},
+          { accountUserID: state.account.userID }
+        );
+      } catch {
+        return;
+      }
+      const currentAccountState = {
+        ...emptyCodeQuestionAccountState(state.account.userID),
+        accessByProjectID: Object.fromEntries(codeQuestionAccessByProject),
+        outbox: state.codeQuestionOutbox || [],
+        conflicts: state.codeQuestionConflicts || []
+      };
+      const incomingDomain = codeQuestionAccountDomainState(incomingAccountState, activeWorkspaceID);
+      const currentDomain = codeQuestionAccountDomainState(currentAccountState, activeWorkspaceID, {
+        workspace: state.codeQuestionWorkspace || emptyCodeQuestionWorkspaceState()
+      });
+      if (clientValuesMatch(incomingDomain, currentDomain)) return;
+      loadCodeQuestionAccountStateIntoWorkspace(state.account.userID, {
+        accountState: incomingAccountState,
+        preservePresentation: true
+      });
       void renderWorkspace({ persist: false });
       return;
     }

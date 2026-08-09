@@ -3,8 +3,9 @@ import {
   normalizeCodeQuestionWorkspaceState
 } from "./code-question-workspace.js?v=20260809-code-decision-v5";
 
-export const codeQuestionAccountCacheVersion = 1;
-export const codeQuestionAccountCacheKeyPrefix = "permitext:codeQuestionAccount:v1:";
+export const codeQuestionAccountCacheVersion = 2;
+export const codeQuestionAccountCacheKeyPrefix = "permitext:codeQuestionAccount:v2:";
+const legacyCodeQuestionAccountCacheKeyPrefix = "permitext:codeQuestionAccount:v1:";
 
 const queuedStatusSet = new Set(["queued", "retrying"]);
 const offlineSafeCommandKinds = new Set([
@@ -15,6 +16,16 @@ const offlineSafeCommandKinds = new Set([
   "codeQuestion.input.revise",
   "codeQuestion.evidence.propose"
 ]);
+
+const codeQuestionWorkspaceDomainKeys = [
+  "questionsByProjectID",
+  "definitionsByQuestionID",
+  "evidenceByQuestionID",
+  "analysisByQuestionID",
+  "reviewByQuestionID",
+  "issueByQuestionID",
+  "legacyByProjectID"
+];
 
 function copy(value) {
   return value == null ? value : JSON.parse(JSON.stringify(value));
@@ -35,6 +46,12 @@ function mutationID(options = {}) {
 
 export function codeQuestionAccountCacheKey(accountUserID) {
   return `${codeQuestionAccountCacheKeyPrefix}${encodeURIComponent(requiredText(accountUserID, "account user ID"))}`;
+}
+
+export function removeCodeQuestionAccountState(storage, accountUserID) {
+  const encodedAccountUserID = encodeURIComponent(requiredText(accountUserID, "account user ID"));
+  storage?.removeItem?.(`${codeQuestionAccountCacheKeyPrefix}${encodedAccountUserID}`);
+  storage?.removeItem?.(`${legacyCodeQuestionAccountCacheKeyPrefix}${encodedAccountUserID}`);
 }
 
 export function emptyCodeQuestionAccountState(accountUserID = "") {
@@ -194,10 +211,47 @@ export function normalizeCodeQuestionAccountState(value = {}, options = {}) {
   };
 }
 
+export function codeQuestionWorkspaceDomainState(value = {}) {
+  const workspace = normalizeCodeQuestionWorkspaceState(value);
+  return Object.fromEntries(
+    codeQuestionWorkspaceDomainKeys.map((key) => [key, copy(workspace[key] || {})])
+  );
+}
+
+export function mergeCodeQuestionWorkspaceDomainState(localValue = {}, incomingValue = {}) {
+  const local = normalizeCodeQuestionWorkspaceState(localValue);
+  return normalizeCodeQuestionWorkspaceState({
+    ...local,
+    ...codeQuestionWorkspaceDomainState(incomingValue)
+  });
+}
+
+export function codeQuestionAccountDomainState(value = {}, workspaceID = "", options = {}) {
+  const account = normalizeCodeQuestionAccountState(value, {
+    accountUserID: options.accountUserID || value?.accountUserID
+  });
+  const snapshot = codeQuestionWorkspaceSnapshot(account, workspaceID);
+  const workspace = options.workspace
+    ? normalizeCodeQuestionWorkspaceState(options.workspace)
+    : snapshot.workspace;
+  return {
+    workspace: codeQuestionWorkspaceDomainState(workspace),
+    accessByProjectID: Object.fromEntries(
+      Object.entries(account.accessByProjectID || {}).map(([projectID, access]) => [projectID, {
+        ...access,
+        cachedAt: null
+      }])
+    ),
+    outbox: copy(account.outbox || []),
+    conflicts: copy(account.conflicts || [])
+  };
+}
+
 export function readCodeQuestionAccountState(storage, accountUserID) {
   if (!accountUserID) return emptyCodeQuestionAccountState();
   try {
-    const raw = storage?.getItem?.(codeQuestionAccountCacheKey(accountUserID));
+    const raw = storage?.getItem?.(codeQuestionAccountCacheKey(accountUserID)) ||
+      storage?.getItem?.(`${legacyCodeQuestionAccountCacheKeyPrefix}${encodeURIComponent(accountUserID)}`);
     return normalizeCodeQuestionAccountState(raw ? JSON.parse(raw) : {}, { accountUserID });
   } catch {
     return emptyCodeQuestionAccountState(accountUserID);
@@ -206,6 +260,8 @@ export function readCodeQuestionAccountState(storage, accountUserID) {
 
 export function writeCodeQuestionAccountState(storage, value, accountUserID = value?.accountUserID) {
   const normalized = normalizeCodeQuestionAccountState(value, { accountUserID });
+  const currentKey = codeQuestionAccountCacheKey(normalized.accountUserID);
+  const currentRaw = storage?.getItem?.(currentKey);
   const existing = readCodeQuestionAccountState(storage, normalized.accountUserID);
   const semantic = (state) => JSON.stringify({
     ...state,
@@ -223,9 +279,9 @@ export function writeCodeQuestionAccountState(storage, value, accountUserID = va
       }])
     )
   });
-  if (semantic(existing) === semantic(normalized)) return existing;
+  if (currentRaw && semantic(existing) === semantic(normalized)) return existing;
   const stored = { ...normalized, updatedAt: new Date().toISOString() };
-  storage?.setItem?.(codeQuestionAccountCacheKey(normalized.accountUserID), JSON.stringify(stored));
+  storage?.setItem?.(currentKey, JSON.stringify(stored));
   return stored;
 }
 
@@ -337,7 +393,7 @@ export function migrateCodeQuestionAccountState(storage, sourceUserID, targetUse
     conflicts: [...target.conflicts, ...source.conflicts.map(retargetMutation)]
   }, { accountUserID: targetID });
   const stored = writeCodeQuestionAccountState(storage, merged, targetID);
-  storage?.removeItem?.(codeQuestionAccountCacheKey(sourceID));
+  removeCodeQuestionAccountState(storage, sourceID);
   return stored;
 }
 

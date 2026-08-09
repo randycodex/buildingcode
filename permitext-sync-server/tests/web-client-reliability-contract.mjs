@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import {
   cacheRetryablePromise,
+  clientValuesMatch,
   resolveNotebookVersionConflict,
+  stableClientValue,
   shouldUseOfflineFallback
 } from "../public/client-reliability.js";
 
@@ -36,6 +38,27 @@ assert.equal(conflict.dirty, true);
 assert.equal(shouldUseOfflineFallback(503), true);
 assert.equal(shouldUseOfflineFallback(429), false);
 assert.equal(shouldUseOfflineFallback(404), false);
+
+assert.deepEqual(stableClientValue({ z: 1, a: { y: 2, x: 3 } }), {
+  a: { x: 3, y: 2 },
+  z: 1
+});
+assert.equal(clientValuesMatch(
+  { userID: "user-1", entitlement: { plan: "pro", addOns: { research: true } } },
+  { entitlement: { addOns: { research: true }, plan: "pro" }, userID: "user-1" }
+), true, "Equivalent account sessions must not trigger another render because object key order changed.");
+assert.equal(clientValuesMatch(
+  { userID: "user-1", sessionToken: "session-a" },
+  { userID: "user-1", sessionToken: "session-b" }
+), false, "A changed authenticated session must still propagate across browser contexts.");
+
+const workspaceApp = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
+assert(
+  workspaceApp.includes("if (clientValuesMatch(JSON.parse(raw), account)) return false;") &&
+    workspaceApp.includes("if (clientValuesMatch(state.account.entitlement || null, nextEntitlement))") &&
+    workspaceApp.includes("if (clientValuesMatch(state.account || null, nextAccount)) return;"),
+  "No-op account and entitlement writes must not restart sync or rebuild the entire workspace."
+);
 
 const offlineStorage = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
 const searchCursorImplementation = offlineStorage.slice(

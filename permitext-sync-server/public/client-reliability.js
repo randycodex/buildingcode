@@ -14,6 +14,18 @@ export function shouldUseOfflineFallback(status) {
   return Number.isFinite(status) && status >= 500;
 }
 
+export function stableClientValue(value) {
+  if (Array.isArray(value)) return value.map(stableClientValue);
+  if (!value || typeof value !== "object") return value;
+  return Object.fromEntries(
+    Object.keys(value).sort().map((key) => [key, stableClientValue(value[key])])
+  );
+}
+
+export function clientValuesMatch(left, right) {
+  return JSON.stringify(stableClientValue(left)) === JSON.stringify(stableClientValue(right));
+}
+
 export function resolveNotebookVersionConflict(localCard, localDocument, remoteCard) {
   return {
     activeCard: {

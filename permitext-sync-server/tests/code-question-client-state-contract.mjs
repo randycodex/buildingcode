@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 
 import {
   acknowledgeCodeQuestionMutation,
+  codeQuestionAccountDomainState,
   codeQuestionAccountCacheKey,
   codeQuestionMutationIsOfflineSafe,
   conflictCodeQuestionMutation,
@@ -11,7 +12,9 @@ import {
   enqueueCodeQuestionOfflineMutation,
   evictCodeQuestionProject,
   migrateCodeQuestionAccountState,
+  mergeCodeQuestionWorkspaceDomainState,
   readCodeQuestionAccountState,
+  removeCodeQuestionAccountState,
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
@@ -114,9 +117,80 @@ const writeCount = storage.setCount;
 writeCodeQuestionAccountState(storage, loadedA, accountA);
 assert.equal(storage.setCount, writeCount, "Semantically unchanged account state must not emit another storage write.");
 
+const alternatePresentation = updateCodeQuestionWorkspaceSnapshot(loadedA, "workspace-main", {
+  workspace: {
+    ...loadedA.workspaceSnapshots["workspace-main"].workspace,
+    activeQuestionID: "",
+    activeStage: "issue",
+    openPanes: [],
+    questionIndexOpen: false,
+    moreMenuOpen: true
+  },
+  paneOrder: [],
+  paneWeights: {}
+});
+assert.deepEqual(
+  codeQuestionAccountDomainState(alternatePresentation, "workspace-main"),
+  codeQuestionAccountDomainState(loadedA, "workspace-main"),
+  "Tab-specific pane presentation must not look like a shared Code Decision data change."
+);
+const changedDomain = updateCodeQuestionWorkspaceSnapshot(alternatePresentation, "workspace-main", {
+  ...alternatePresentation.workspaceSnapshots["workspace-main"],
+  workspace: {
+    ...alternatePresentation.workspaceSnapshots["workspace-main"].workspace,
+    questionsByProjectID: {
+      "project-a": [{ id: "cq-a-2", title: "A newer server decision" }]
+    }
+  }
+});
+assert.notDeepEqual(
+  codeQuestionAccountDomainState(changedDomain, "workspace-main"),
+  codeQuestionAccountDomainState(loadedA, "workspace-main"),
+  "A changed Code Decision record must still be recognized as shared data."
+);
+const mergedWorkspace = mergeCodeQuestionWorkspaceDomainState(
+  loadedA.workspaceSnapshots["workspace-main"].workspace,
+  changedDomain.workspaceSnapshots["workspace-main"].workspace
+);
+assert.equal(mergedWorkspace.activeQuestionID, "cq-a-1", "Incoming data must preserve this tab's active decision.");
+assert.deepEqual(
+  mergedWorkspace.openPanes.map((pane) => pane.paneRole),
+  ["research", "decision-record"],
+  "Incoming data must preserve this tab's open Code Decision panes."
+);
+assert.equal(
+  mergedWorkspace.questionsByProjectID["project-a"][0].id,
+  "cq-a-2",
+  "Incoming governed data must replace the local domain projection."
+);
+
 const loadedB = readCodeQuestionAccountState(storage, accountB);
 assert.deepEqual(loadedB.workspaceSnapshots, {}, "Account B must not inherit Account A's workspace cache.");
 assert.deepEqual(loadedB.outbox, [], "Account B must not inherit Account A's outbox.");
+
+const legacyStorage = new MemoryStorage();
+legacyStorage.setItem(`permitext:codeQuestionAccount:v1:${encodeURIComponent(accountA)}`, JSON.stringify({
+  ...loadedA,
+  schemaVersion: 1
+}));
+const legacyLoaded = readCodeQuestionAccountState(legacyStorage, accountA);
+assert.equal(
+  legacyLoaded.workspaceSnapshots["workspace-main"].workspace.activeQuestionID,
+  "cq-a-1",
+  "The isolated v2 cache must retain existing v1 Code Decision data during migration."
+);
+writeCodeQuestionAccountState(legacyStorage, legacyLoaded, accountA);
+assert.ok(
+  legacyStorage.getItem(codeQuestionAccountCacheKey(accountA)),
+  "The first v2 save must materialize the isolated cache even when migrated data is semantically unchanged."
+);
+removeCodeQuestionAccountState(legacyStorage, accountA);
+assert.equal(readCodeQuestionAccountState(legacyStorage, accountA).accountUserID, accountA);
+assert.deepEqual(
+  readCodeQuestionAccountState(legacyStorage, accountA).workspaceSnapshots,
+  {},
+  "Account removal must clear both v2 and legacy fallback data."
+);
 
 const conflicted = conflictCodeQuestionMutation(loadedA, queued.id, {
   conflictCode: "CODE_QUESTION_VERSION_CONFLICT",
@@ -223,6 +297,8 @@ const appSource = await readFile(new URL("../public/app.js", import.meta.url), "
 assert.equal(appSource.includes("Queue sample offline save"), false, "Production UI must not expose a synthetic queue mutation.");
 assert.ok(appSource.includes("codeQuestionRequestContextIsCurrent(requestContext)"));
 assert.ok(appSource.includes('renderWorkspace({ persist: false })'));
+assert.ok(appSource.includes("if (clientValuesMatch(incomingDomain, currentDomain)) return;"));
+assert.ok(appSource.includes("preservePresentation: true"));
 assert.ok(appSource.includes('conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT"'));
 assert.ok(appSource.includes("migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID)"));
 assert.ok(
