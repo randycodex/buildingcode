@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-session-stability-v2";
+} from "./offline-storage.js?v=20260809-session-stability-v4";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -103,7 +103,7 @@ import {
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260809-session-stability-v2";
+} from "./code-question-client-state.js?v=20260809-session-stability-v3";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer

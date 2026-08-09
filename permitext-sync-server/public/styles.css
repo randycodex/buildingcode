@@ -962,7 +962,7 @@ body.code-question-workspace-enabled .workspace-shell {
   flex: 1 1 0;
   min-width: max(var(--pane-default-min-width), min(var(--pane-min-width), var(--pane-resized-min-width)));
   min-height: 0;
-  height: calc(100% + var(--space-3));
+  height: 100%;
   max-height: none;
   padding: var(--panel-padding);
   overflow: hidden;

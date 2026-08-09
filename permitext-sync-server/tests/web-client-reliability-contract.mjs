@@ -60,6 +60,18 @@ assert(
   "No-op account and entitlement writes must not restart sync or rebuild the entire workspace."
 );
 
+const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
+const workspacePanelRule = workspaceStyles.slice(
+  workspaceStyles.indexOf(".workspace-panel {"),
+  workspaceStyles.indexOf(".settings-panel,")
+);
+assert.match(workspacePanelRule, /height:\s*100%;/);
+assert.doesNotMatch(
+  workspacePanelRule,
+  /height:\s*calc\(100%\s*\+\s*var\(--space-3\)\)/,
+  "Columns and their vertical dividers must terminate at the same track edge, including empty states."
+);
+
 const offlineStorage = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
 const searchCursorImplementation = offlineStorage.slice(
   offlineStorage.indexOf("async function matchingOfflineSearchResults"),
