@@ -215,19 +215,40 @@ assert.equal(broadReadiness.status, "broad-ready");
 assert.equal(broadReadiness.defaultEnabled, true);
 
 const serverSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
+const workspaceScript = await readFile(new URL("../public/app.js", import.meta.url), "utf8");
 assert.match(serverSource, /isLoopbackCodeQuestionRequest/);
 assert.match(serverSource, /codeQuestionRolloutAccess\(\{/);
 assert.doesNotMatch(serverSource, /codeQuestionWorkspaceFeatureEnabled\(\) \|\|\s*body\.codeQuestionWorkspaceEnabled/);
+assert.match(workspaceScript, /function renderCodeDecisionResearchBody/);
+assert.match(workspaceScript, /function renderCodeDecisionRecordBody/);
+assert.match(workspaceScript, /Object\.values\(evidence\.snapshots \|\| \{\}\)/);
+assert.match(workspaceScript, /openCodeDecisionWorkspace/);
+assert.match(workspaceScript, /state\.utilities\.analysis = true/);
+assert.match(workspaceScript, /state\.researchConversationID = ""/);
+assert.match(workspaceScript, /Never imply one by carrying a previously active conversation/);
+assert.match(workspaceScript, /grouped\.confirmedFacts\.filter\(\(item\) => item\.state === "confirmed"\)/);
+assert.match(workspaceScript, /input\.inputKind === "confirmedFact" && input\.state !== "confirmed"/);
+assert.match(workspaceScript, /const presentation = codeDecisionPresentation\(question\.id\)/);
+assert.match(workspaceScript, /Create Code Memo/);
+assert.doesNotMatch(workspaceScript, /function renderCodeQuestionStageControl/);
 
 const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
 const workspaceHTML = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
 const serviceWorker = await readFile(new URL("../public/service-worker.js", import.meta.url), "utf8");
+const offlineStorage = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");
+const clientState = await readFile(new URL("../public/code-question-client-state.js", import.meta.url), "utf8");
 assert.match(workspaceStyles, /body\.code-question-workspace-enabled \.workspace-shell \{\s*grid-template-rows: var\(--header-height\) auto minmax\(0, 1fr\)/);
 assert.match(workspaceStyles, /grid-template-rows: minmax\(0, 1fr\) auto var\(--header-height\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/);
+assert.match(workspaceStyles, /\.code-decision-context-bar/);
+assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260808-code-question-scroll-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v473/);
-assert.match(serviceWorker, /styles\.css\?v=20260808-code-question-scroll-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-code-decision-v3/);
+assert.match(serviceWorker, /permitext-pro-shell-v476/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-code-decision-v3/);
+for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
+  assert.match(source, /code-question-client-state\.js\?v=20260809-code-decision-v3/);
+}
+assert.match(clientState, /code-question-workspace\.js\?v=20260809-code-decision-v3/);
 
 console.log("code-question-rollout-contract: all assertions passed");

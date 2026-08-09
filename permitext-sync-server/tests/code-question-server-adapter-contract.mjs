@@ -8,10 +8,22 @@ const at = "2026-08-07T12:00:00.000Z";
 const envelope = (id, type, version = 1) => ({ id, type, version, createdAt: at, updatedAt: at });
 
 const list = codeQuestionListFromServer({ questions: [{
-  id: "cq-1", displayID: "Q-001", title: "Egress", updatedAt: at
+  id: "cq-1", displayID: "Q-001", title: "Egress", updatedAt: at,
+  summary: {
+    missingInformationCount: 2,
+    blockingReviewCount: 1,
+    conclusionCount: 3,
+    latestIssuedVersion: 2,
+    revisionInProgress: true
+  }
 }] });
 assert.equal(list[0].id, "cq-1");
 assert.equal(list[0].lastActivityAt, at);
+assert.equal(list[0].missingInformationCount, 2);
+assert.equal(list[0].blockingReviewCount, 1);
+assert.equal(list[0].conclusionCount, 3);
+assert.equal(list[0].latestIssuedVersion, 2);
+assert.equal(list[0].revisionInProgress, true);
 
 const state = {
   questionID: "cq-1",

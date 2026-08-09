@@ -12355,8 +12355,8 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   font-size: 14px !important;
 }
 
-/* Code Question workspace shell (Phase 2) — visible only when capability is enabled */
-.code-question-stage-control {
+/* Research + Code Decision shell — visible only when capability is enabled */
+.code-decision-context-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -12366,16 +12366,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   background: color-mix(in srgb, var(--project-color, #6678d4) 8%, var(--surface, #fff));
 }
 
-.code-question-stage-list {
+.code-decision-context-primary {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.code-question-stage-button {
+  align-items: center;
+  gap: 10px;
   min-height: 36px;
   padding: 6px 12px;
   border: 0;
@@ -12384,17 +12378,18 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   color: inherit;
   cursor: pointer;
   font: inherit;
+  text-align: left;
 }
 
-.code-question-stage-button:hover,
-.code-question-stage-button:focus-visible {
+.code-decision-context-primary:hover,
+.code-decision-context-primary:focus-visible {
   background: var(--toolbar-active, rgba(20, 20, 24, 0.08));
 }
 
-.code-question-stage-button.is-current,
-.code-question-stage-button[aria-current="step"] {
+.code-decision-context-primary strong {
+  padding: 3px 8px;
+  border-radius: 999px;
   background: color-mix(in srgb, var(--project-color, #6678d4) 16%, transparent);
-  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--project-color, #6678d4) 72%, var(--text-primary));
   font-weight: 600;
 }
 
@@ -12581,6 +12576,142 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .code-question-pane-status {
   font-weight: 600;
   color: inherit;
+}
+
+.code-decision-research,
+.code-decision-record {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.code-decision-research-intro,
+.code-decision-research-boundary {
+  margin: 0;
+  color: var(--muted, #555);
+  line-height: 1.45;
+}
+
+.code-decision-research-intro p {
+  margin: 0 0 6px;
+}
+
+.code-decision-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.code-decision-message {
+  max-width: 92%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  line-height: 1.45;
+}
+
+.code-decision-message p {
+  margin: 0 0 6px;
+}
+
+.code-decision-message p:last-child {
+  margin-bottom: 0;
+}
+
+.code-decision-message.is-user {
+  align-self: flex-end;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 18%, var(--surface, #fff));
+}
+
+.code-decision-message.is-assistant {
+  align-self: flex-start;
+  background: color-mix(in srgb, var(--surface, #fff) 88%, var(--text-primary, #111));
+}
+
+.code-decision-message-role {
+  font-weight: 700;
+}
+
+.code-decision-research-actions,
+.code-decision-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.code-decision-research-actions button,
+.code-decision-record-actions button {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 12%, var(--surface, #fff));
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.code-decision-record-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.code-decision-record-header p,
+.code-decision-record-header h3 {
+  margin: 0;
+}
+
+.code-decision-state {
+  flex: 0 0 auto;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 16%, transparent);
+}
+
+.code-decision-state.is-changed,
+.code-decision-state.is-missing-information,
+.code-decision-state.is-needs-review,
+.code-decision-changed-warning {
+  color: #6b4300;
+  background: color-mix(in srgb, #d89a20 20%, transparent);
+}
+
+.code-decision-record-section {
+  padding-top: 12px;
+  border-top: 1px solid var(--border, rgba(0, 0, 0, 0.09));
+}
+
+.code-decision-record-section h4,
+.code-decision-record-section p,
+.code-decision-record-section ul {
+  margin-top: 0;
+}
+
+.code-decision-record-section ul {
+  padding-left: 1.2rem;
+}
+
+.code-decision-record-section.is-professional {
+  padding: 12px;
+  border: 0;
+  background: color-mix(in srgb, var(--project-color, #6678d4) 8%, transparent);
+}
+
+.code-decision-changed-warning {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.code-decision-record-actions .code-decision-create-memo {
+  background: color-mix(in srgb, var(--project-color, #6678d4) 85%, #000);
+  color: #fff;
+}
+
+.code-decision-record-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 /* Phase 3 — Define column */

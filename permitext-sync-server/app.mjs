@@ -17088,6 +17088,81 @@ async function handleCodeQuestionLegacyUnlink(request, response) {
   }
 }
 
+function codeQuestionListSummary(questionArtifact, artifacts = []) {
+  const questionID = String(questionArtifact?.envelope?.id || "").trim();
+  const question = questionArtifact?.payload || {};
+  const related = artifacts.filter((artifact) => artifact?.payload?.questionID === questionID);
+  const inputs = related.filter((artifact) =>
+    artifact.envelope?.type === "questionInput" && artifact.payload?.state !== "retired"
+  ).sort((left, right) => String(left.envelope?.id || "").localeCompare(String(right.envelope?.id || "")));
+  const missingInformationCount = inputs.filter((artifact) => {
+    const input = artifact.payload || {};
+    return !["resolved", "retired"].includes(input.state) && (
+      input.inputKind === "unknown" ||
+      (input.inputKind === "confirmedFact" && input.state !== "confirmed")
+    );
+  }).length;
+  const blockingReviewCount = related.filter((artifact) =>
+    artifact.envelope?.type === "reviewThread" &&
+    artifact.payload?.blocking !== false &&
+    ["open", "waiting"].includes(artifact.payload?.status)
+  ).length;
+  const conclusions = related
+    .filter((artifact) => artifact.envelope?.type === "professionalConclusion")
+    .sort((left, right) => Number(left.payload?.revision || 0) - Number(right.payload?.revision || 0));
+  const issuedRecords = related.filter((artifact) => artifact.envelope?.type === "issuedDecisionRecord");
+  const latestIssuedVersion = issuedRecords.reduce(
+    (latest, artifact) => Math.max(latest, Number(artifact.payload?.issueVersion || 0)),
+    0
+  ) || null;
+  const evidenceSet = related
+    .filter((artifact) => artifact.envelope?.type === "questionEvidenceSet")
+    .sort((left, right) => Number(right.payload?.version || 0) - Number(left.payload?.version || 0))[0] || null;
+  const definitionHash = codeQuestionContentHash({
+    questionText: question.questionText,
+    scope: question.scope || "",
+    jurisdiction: question.jurisdiction || "",
+    asOfDate: question.asOfDate || null,
+    definitionRevision: question.definitionRevision
+  });
+  const inputSetHash = codeQuestionContentHash(inputs.map((artifact) => ({
+    id: artifact.payload.id,
+    inputKind: artifact.payload.inputKind,
+    state: artifact.payload.state,
+    statement: artifact.payload.statement,
+    revision: artifact.payload.revision
+  })));
+  const dependencyHash = evidenceSet ? computeDependencyHash({
+    questionText: question.questionText,
+    scope: question.scope || "",
+    jurisdiction: question.jurisdiction || "",
+    asOfDate: question.asOfDate || null,
+    inputs: inputs.map((artifact) => artifact.payload),
+    evidenceSet: evidenceSet.payload
+  }) : null;
+  const latestAnalysis = related
+    .filter((artifact) => artifact.envelope?.type === "questionAnalysis")
+    .sort((left, right) => String(left.envelope?.createdAt || "").localeCompare(String(right.envelope?.createdAt || "")))
+    .at(-1) || null;
+  const latestConclusion = conclusions.at(-1) || null;
+  const analysisChanged = Boolean(latestAnalysis && latestAnalysis.payload?.dependencyHash !== dependencyHash);
+  const conclusionChanged = Boolean(latestConclusion && (
+    Number(latestConclusion.payload?.definitionRevision) !== Number(question.definitionRevision) ||
+    latestConclusion.payload?.definitionHash !== definitionHash ||
+    latestConclusion.payload?.inputSetHash !== inputSetHash ||
+    latestConclusion.payload?.evidenceSetID !== evidenceSet?.envelope?.id ||
+    Number(latestConclusion.payload?.evidenceSetVersion) !== Number(evidenceSet?.payload?.version || 0) ||
+    latestConclusion.payload?.evidenceSetHash !== evidenceSet?.payload?.contentHash
+  ));
+  return {
+    missingInformationCount,
+    blockingReviewCount,
+    conclusionCount: conclusions.length,
+    latestIssuedVersion,
+    revisionInProgress: analysisChanged || conclusionChanged
+  };
+}
+
 async function handleCodeQuestionList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
@@ -17101,7 +17176,8 @@ async function handleCodeQuestionList(request, response) {
       ? {
           id: artifact.envelope.id,
           version: artifact.envelope.version,
-          ...artifact.payload
+          ...artifact.payload,
+          summary: codeQuestionListSummary(artifact, artifacts)
         }
       : null;
   }).filter(Boolean);

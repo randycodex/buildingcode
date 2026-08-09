@@ -41,8 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-code-question-scroll-v1";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-code-question-scroll-v1";
+} from "./offline-storage.js?v=20260809-code-decision-v3";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v3";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -74,14 +74,14 @@ import {
   isCodeQuestionPaneID,
   minimumWidthForPaneRole,
   normalizeCodeQuestionWorkspaceState,
+  openCodeDecisionWorkspace,
   openSupportingTool,
   parseCodeQuestionDeepLink,
   parseQuestionPaneKey,
   questionPaneKey,
-  stageControlModel,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260808-generic-workboard-v2";
+} from "./code-question-workspace.js?v=20260809-code-decision-v3";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountCacheKey,
@@ -98,7 +98,7 @@ import {
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260808-generic-workboard-v3";
+} from "./code-question-client-state.js?v=20260809-code-decision-v3";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer
@@ -3087,14 +3087,26 @@ function activePaneIDs() {
       paired.splice(projectAnchorIndex + 1, 0, ...detailIDs);
     }
   }
-  // Code Question shell panes (flag-gated) follow the Projects/Saved anchor.
+  // Code Decisions follow Projects/Saved; the existing persisted Research
+  // workspace remains the primary working surface between the index and record.
   const cqIDs = openCodeQuestionPaneIDs();
   if (cqIDs.length) {
-    const anchor = primarySavedPaneID();
-    const anchorIndex = paired.indexOf(anchor);
-    const insertAt = anchorIndex === -1 ? paired.length : anchorIndex + 1;
-    cqIDs.forEach((id, offset) => {
-      if (!paired.includes(id)) paired.splice(insertAt + offset, 0, id);
+    const indexIDs = cqIDs.filter((id) => parseQuestionPaneKey(id)?.paneRole === "question-index");
+    const recordIDs = cqIDs.filter((id) => parseQuestionPaneKey(id)?.paneRole !== "question-index");
+    const savedAnchorIndex = paired.indexOf(primarySavedPaneID());
+    const indexInsertAt = savedAnchorIndex === -1 ? paired.length : savedAnchorIndex + 1;
+    indexIDs.forEach((id, offset) => {
+      if (!paired.includes(id)) paired.splice(indexInsertAt + offset, 0, id);
+    });
+    const researchAnchor = state.researchConversationID
+      ? paneIDForResearchConversation(state.researchConversationID)
+      : state.utilities.analysis
+        ? "utility:analysis"
+        : indexIDs.at(-1) || primarySavedPaneID();
+    const researchAnchorIndex = paired.indexOf(researchAnchor);
+    const recordInsertAt = researchAnchorIndex === -1 ? paired.length : researchAnchorIndex + 1;
+    recordIDs.forEach((id, offset) => {
+      if (!paired.includes(id)) paired.splice(recordInsertAt + offset, 0, id);
     });
   }
   (state.utilityInstances || []).forEach((instance) => {
@@ -5022,6 +5034,25 @@ function codeQuestionWorkspaceState() {
   return state.codeQuestionWorkspace;
 }
 
+function openCodeDecisionSurface(cqState, options = {}) {
+  const questionText = String(options.questionText || "").trim();
+  if (questionText) researchQuestionDraft = questionText;
+  // A durable Research Conversation ↔ Code Decision link is not implemented
+  // yet. Never imply one by carrying a previously active conversation beside
+  // a newly opened decision; keep the persisted Research list and start from
+  // the decision question instead.
+  if (state.researchConversationID) {
+    const priorConversationPaneID = paneIDForResearchConversation(state.researchConversationID);
+    state.researchConversationID = "";
+    activeResearchConversation = null;
+    delete state.paneWeights[priorConversationPaneID];
+    state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== priorConversationPaneID);
+  }
+  state.utilities.analysis = true;
+  state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
+  return openCodeDecisionWorkspace(cqState, options);
+}
+
 function activeProjectIDForCodeQuestions() {
   const detail = openProjectDetails()[0] || null;
   return detail ? String(projectDetailKey(detail) || "").trim() : "";
@@ -5057,8 +5088,7 @@ function syncCodeQuestionDeepLink() {
   }
   const hash = buildCodeQuestionDeepLink({
     projectID,
-    questionID: cq.activeQuestionID || null,
-    stage: cq.activeQuestionID ? cq.activeStage : null
+    questionID: cq.activeQuestionID || null
   });
   if (hash && location.hash !== hash) {
     history.replaceState(null, "", `${location.pathname}${location.search}${hash}`);
@@ -5077,11 +5107,16 @@ function applyCodeQuestionDeepLinkFromLocation() {
   }
   if (parsed.questionID) {
     setCodeQuestionWorkspaceState(
-      switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
-        projectID: parsed.projectID,
-        questionID: parsed.questionID,
-        stage: parsed.stage || "define"
-      }),
+      parsed.stage
+        ? switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+            projectID: parsed.projectID,
+            questionID: parsed.questionID,
+            stage: parsed.stage
+          })
+        : openCodeDecisionSurface(codeQuestionWorkspaceState(), {
+            projectID: parsed.projectID,
+            questionID: parsed.questionID
+          }),
       { activeProjectID: parsed.projectID }
     );
   } else {
@@ -5140,7 +5175,7 @@ function getDefinitionForQuestion(questionID) {
   if (existing) return normalizeDefinitionRecord(existing, id);
   const listItem = questionsForActiveProject().find((item) => item.id === id);
   return normalizeDefinitionRecord(emptyDefinitionRecord(id, {
-    title: listItem?.title || "New Code Question",
+    title: listItem?.title || "New Code Decision",
     createdBy: state.account?.userID || "local-user"
   }), id);
 }
@@ -5532,6 +5567,9 @@ async function hydrateCodeQuestionState(projectID, questionID, options = {}) {
           reviewByQuestionID: { ...(cq.reviewByQuestionID || {}), [qid]: models.review },
           issueByQuestionID: { ...(cq.issueByQuestionID || {}), [qid]: models.issue }
         }, { activeProjectID: pid });
+        if (codeQuestionWorkspaceState().activeQuestionID === qid && !researchQuestionDraft.trim()) {
+          researchQuestionDraft = models.definition.questionText || "";
+        }
         saveWorkspaceState();
         if (options.render !== false) await renderWorkspace();
         return models;
@@ -5698,6 +5736,21 @@ function ensureCodeQuestionShellForProject(project) {
   if (!currentProjectPanes.length || (cq.openPanes || []).some((pane) => pane.projectID !== projectID)) {
     setCodeQuestionWorkspaceState(
       switchCodeQuestionProject(cq, projectID),
+      { activeProjectID: projectID, syncDeepLink: true }
+    );
+  } else if (
+    cq.activeQuestionID &&
+    (
+      currentProjectPanes.some((pane) => pane.paneRole === "research") ||
+      !currentProjectPanes.some((pane) => pane.paneRole === "decision-record")
+    )
+  ) {
+    setCodeQuestionWorkspaceState(
+      openCodeDecisionSurface(cq, {
+        projectID,
+        questionID: cq.activeQuestionID,
+        questionText: getDefinitionForQuestion(cq.activeQuestionID)?.questionText
+      }),
       { activeProjectID: projectID, syncDeepLink: true }
     );
   }
@@ -12908,7 +12961,13 @@ function renderEvidenceDiscovery(container) {
   question.rows = 4;
   question.maxLength = 2_000;
   question.placeholder = "Example: Can a six-story R-2 building use one exit stair?";
-  question.value = activeEvidenceDiscovery?.question || researchQuestionDraft;
+  const activeDecisionQuestionID = codeQuestionWorkspaceState().activeQuestionID;
+  const activeDecisionQuestion = activeDecisionQuestionID
+    ? getDefinitionForQuestion(activeDecisionQuestionID)?.questionText ||
+      questionsForActiveProject().find((item) => item.id === activeDecisionQuestionID)?.title ||
+      ""
+    : "";
+  question.value = activeEvidenceDiscovery?.question || researchQuestionDraft || activeDecisionQuestion;
   questionLabel.append(questionLabelText, question);
   const controls = document.createElement("div");
   controls.className = "evidence-discovery-form-controls";
@@ -23539,7 +23598,9 @@ function restoreReaderScrollPositions(positions) {
 
 function codeQuestionPaneTitle(paneRole) {
   const labels = {
-    "question-index": "Code Questions",
+    "question-index": "Code Decisions",
+    research: "Research",
+    "decision-record": "Code Decision",
     definition: "Definition",
     candidates: "Candidates",
     reader: "Evidence Reader",
@@ -23565,46 +23626,77 @@ function projectColorStyle(project) {
   return color ? `--project-color: ${color};` : "";
 }
 
-function renderCodeQuestionStageControl(project) {
+function codeDecisionPresentation(questionID) {
+  const qid = String(questionID || "").trim();
+  const question = questionsForActiveProject().find((item) => item.id === qid) || {};
+  const cq = codeQuestionWorkspaceState();
+  const hasDefinitionDetail = Boolean(cq.definitionsByQuestionID?.[qid]);
+  const hasReviewDetail = Boolean(cq.reviewByQuestionID?.[qid]);
+  const hasAnalysisDetail = Boolean(cq.analysisByQuestionID?.[qid]);
+  const hasIssueDetail = Boolean(cq.issueByQuestionID?.[qid]);
+  const definition = getDefinitionForQuestion(qid);
+  const review = getReviewForQuestion(qid);
+  const issue = getIssueForQuestion(qid);
+  const blockingReviewCount = hasReviewDetail
+    ? unresolvedBlockingRequests(review).length
+    : Number(question.blockingReviewCount || 0);
+  const missingInformationCount = hasDefinitionDetail
+    ? (definition?.inputs || []).filter((input) =>
+        !["resolved", "retired"].includes(input.state) && (
+          input.inputKind === "unknown" ||
+          (input.inputKind === "confirmedFact" && input.state !== "confirmed")
+        )
+      ).length
+    : Number(question.missingInformationCount || 0);
+  const conclusionCount = hasAnalysisDetail
+    ? getAnalysisForQuestion(qid).conclusionRevisions.length
+    : Number(question.conclusionCount || 0);
+  let state = "Working";
+  if (question.recordState === "archived") {
+    state = "Archived";
+  } else if (question.revisionInProgress || definition?.dependentsStale?.analysis || definition?.dependentsStale?.conclusion) {
+    state = "Changed";
+  } else if (blockingReviewCount) {
+    state = "Needs Review";
+  } else if (missingInformationCount) {
+    state = "Missing Information";
+  } else if ((hasIssueDetail && issue.issuedRecords.length) || question.latestIssuedVersion != null) {
+    state = "Issued";
+  } else if (conclusionCount) {
+    state = "Final";
+  }
+  return { state, blockingReviewCount, missingInformationCount, conclusionCount };
+}
+
+function renderCodeDecisionContextBar(project) {
   if (!codeQuestionWorkspaceEnabled() || !project) return null;
   const cq = codeQuestionWorkspaceState();
   if (!cq.activeQuestionID) return null;
+  const question = questionsForActiveProject().find((item) => item.id === cq.activeQuestionID);
+  const presentation = codeDecisionPresentation(cq.activeQuestionID);
   const bar = document.createElement("div");
-  bar.className = "code-question-stage-control";
+  bar.className = "code-decision-context-bar";
   bar.setAttribute("role", "navigation");
-  bar.setAttribute("aria-label", "Code Question workflow stages");
+  bar.setAttribute("aria-label", "Code Decision workspace");
   bar.style.cssText = projectColorStyle(project);
-  const steps = document.createElement("ol");
-  steps.className = "code-question-stage-list";
-  stageControlModel(cq.activeStage).forEach((step) => {
-    const item = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "code-question-stage-button";
-    button.textContent = step.label;
-    button.dataset.stage = step.stage;
-    if (step.current) {
-      button.setAttribute("aria-current", "step");
-      button.classList.add("is-current");
-    }
-    button.addEventListener("click", async () => {
-      // Stage control never mutates facts/approval/issue — only open panes + stage context.
-      const projectID = activeProjectIDForCodeQuestions();
-      setCodeQuestionWorkspaceState(
-        applyStageArrangement(codeQuestionWorkspaceState(), {
-          projectID,
-          questionID: codeQuestionWorkspaceState().activeQuestionID,
-          stage: step.stage,
-          keepIndex: true
-        }),
-        { activeProjectID: projectID, syncDeepLink: true }
-      );
-      await renderWorkspace();
-    });
-    item.appendChild(button);
-    steps.appendChild(item);
+  const identity = document.createElement("button");
+  identity.type = "button";
+  identity.className = "code-decision-context-primary";
+  identity.innerHTML = `
+    <span>${escapeHTML(question?.displayID || "Decision")} · ${escapeHTML(question?.title || "Untitled")}</span>
+    <strong>${escapeHTML(presentation.state)}</strong>`;
+  identity.setAttribute("aria-label", `Open Research and Code Decision. Status: ${presentation.state}.`);
+  identity.addEventListener("click", async () => {
+    const projectID = activeProjectIDForCodeQuestions();
+    setCodeQuestionWorkspaceState(openCodeDecisionSurface(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID: cq.activeQuestionID,
+      questionText: getDefinitionForQuestion(cq.activeQuestionID)?.questionText,
+      keepIndex: true
+    }), { activeProjectID: projectID, syncDeepLink: true });
+    await renderWorkspace();
   });
-  bar.appendChild(steps);
+  bar.appendChild(identity);
   const addColumn = document.createElement("div");
   addColumn.className = "code-question-add-column";
   const addButton = document.createElement("button");
@@ -23771,14 +23863,14 @@ function upsertLocalQuestionFromPromotion(project, questionPayload, questionText
     ...(current || {}),
     id,
     displayID: questionPayload.displayID || current?.displayID || `Q-${String(nextNumber).padStart(3, "0")}`,
-    title: questionPayload.title || source.title || "Promoted Code Question",
+    title: questionPayload.title || source.title || "Promoted Code Decision",
     recordState: questionPayload.recordState === "archived" ? "archived" : "active",
     responsibleDisplayName: current?.responsibleDisplayName || codeQuestionActor().displayName,
     reviewState: current?.reviewState || "",
     lastActivityAt: questionPayload.updatedAt || new Date().toISOString(),
     latestIssuedVersion: current?.latestIssuedVersion || null,
     revisionInProgress: false,
-    listLabel: current?.listLabel || "Active"
+    listLabel: current?.listLabel || "Working"
   };
   setQuestionsForActiveProject(current
     ? existing.map((candidate) => candidate.id === id ? question : candidate)
@@ -23798,11 +23890,7 @@ function upsertLocalQuestionFromPromotion(project, questionPayload, questionText
     saveDefinitionForQuestion(id, definition);
   }
   setCodeQuestionWorkspaceState(
-    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
-      projectID,
-      questionID: id,
-      stage: "define"
-    }),
+    openCodeDecisionSurface(codeQuestionWorkspaceState(), { projectID, questionID: id, questionText }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
   return question;
@@ -23836,7 +23924,7 @@ async function linkLegacySourceToQuestion(project, source, questionID, options =
     }
     refreshCodeQuestionLegacyPanes(projectID);
     await showWebNotice(
-      options.recovery ? "Question link restored" : "Linked to Code Question",
+      options.recovery ? "Decision link restored" : "Linked to Code Decision",
       `${source.title} remains unchanged. The link records provenance only; it does not make the source a governed fact or approved evidence.`
     );
   } catch (error) {
@@ -23846,7 +23934,7 @@ async function linkLegacySourceToQuestion(project, source, questionID, options =
 
 async function createQuestionFromLegacySource(project, source) {
   const questionText = await openWebTextPrompt({
-    title: "Create Code Question from legacy work",
+    title: "Create Code Decision from legacy work",
     message: `${legacyGuidanceForSource(source.sourceKind)} Enter the precise question; Permitext will not infer it from the source.`,
     label: "Precise question",
     required: true,
@@ -23859,7 +23947,7 @@ async function createQuestionFromLegacySource(project, source) {
     message: "Use a concise professional title. The original source remains separately available.",
     label: "Title",
     required: true,
-    defaultValue: source.title || "Promoted Code Question",
+    defaultValue: source.title || "Promoted Code Decision",
     confirmLabel: "Create and link"
   });
   if (!title) return;
@@ -23895,7 +23983,7 @@ async function createQuestionFromLegacySource(project, source) {
     upsertLocalQuestionFromPromotion(project, questionPayload, questionText, source);
     await renderWorkspace();
     await showWebNotice(
-      "Code Question created",
+      "Code Decision created",
       `${source.title} remains available in Legacy / Unassigned and is linked as provenance. Its content was not silently promoted into facts, evidence, analysis, or the Code Memo.`
     );
   } catch (error) {
@@ -23935,14 +24023,14 @@ async function unlinkLegacySourcePromotion(project, promotion) {
 function openQuestionFromLegacy(questionID) {
   const projectID = activeProjectIDForCodeQuestions();
   if (!questionsForActiveProject().some((question) => question.id === questionID)) {
-    void showWebNotice("Question not in this local view", "Reload the signed-in Project to retrieve this linked Code Question.");
+    void showWebNotice("Decision not in this local view", "Reload the signed-in Project to retrieve this linked Code Decision.");
     return;
   }
   setCodeQuestionWorkspaceState(
-    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+    openCodeDecisionSurface(codeQuestionWorkspaceState(), {
       projectID,
       questionID,
-      stage: codeQuestionWorkspaceState().activeStage || "define"
+      questionText: getDefinitionForQuestion(questionID)?.questionText
     }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
@@ -24168,6 +24256,10 @@ function renderCodeQuestionPane(paneDescriptor) {
   body.className = "panel-body code-question-panel-body";
   if (parsed.paneRole === "question-index") {
     body.appendChild(renderCodeQuestionIndexBody(project));
+  } else if (parsed.paneRole === "research") {
+    body.appendChild(renderCodeDecisionResearchBody(project, parsed.questionID));
+  } else if (parsed.paneRole === "decision-record") {
+    body.appendChild(renderCodeDecisionRecordBody(project, parsed.questionID));
   } else if (parsed.paneRole === "definition") {
     body.appendChild(renderCodeQuestionDefinitionBody(project, parsed.questionID));
   } else if (parsed.paneRole === "candidates") {
@@ -24214,6 +24306,173 @@ function renderCodeQuestionPane(paneDescriptor) {
   return article;
 }
 
+async function openCodeDecisionDetailPanes(questionID, paneRoles = []) {
+  const projectID = activeProjectIDForCodeQuestions();
+  let next = codeQuestionWorkspaceState();
+  paneRoles.forEach((paneRole) => {
+    next = openSupportingTool(next, { projectID, questionID, paneRole });
+  });
+  setCodeQuestionWorkspaceState(next, { activeProjectID: projectID, syncDeepLink: true });
+  await renderWorkspace();
+}
+
+function renderCodeDecisionResearchBody(_project, questionID) {
+  const qid = String(questionID || "").trim();
+  const wrap = document.createElement("div");
+  wrap.className = "code-decision-research";
+  const definition = getDefinitionForQuestion(qid);
+  const intro = document.createElement("section");
+  intro.className = "code-decision-research-intro";
+  intro.innerHTML = `
+    <p class="code-question-pane-status">Research workspace updated</p>
+    <p>This compatibility column has been replaced by Permitext’s existing persisted Research workspace so conversations, evidence discovery, history, and Project assignment remain one system.</p>`;
+  wrap.appendChild(intro);
+  const actions = document.createElement("div");
+  actions.className = "code-decision-research-actions";
+  const open = document.createElement("button");
+  open.type = "button";
+  open.textContent = "Open Research";
+  open.addEventListener("click", async () => {
+    researchQuestionDraft = definition?.questionText || "";
+    await focusUtility("analysis");
+  });
+  actions.appendChild(open);
+  wrap.appendChild(actions);
+  return wrap;
+}
+
+function appendCodeDecisionRecordList(section, values, emptyLabel) {
+  const list = document.createElement("ul");
+  if (!values.length) {
+    const item = document.createElement("li");
+    item.className = "code-question-define-muted";
+    item.textContent = emptyLabel;
+    list.appendChild(item);
+  } else {
+    values.forEach((value) => {
+      const item = document.createElement("li");
+      item.textContent = value;
+      list.appendChild(item);
+    });
+  }
+  section.appendChild(list);
+}
+
+function renderCodeDecisionRecordBody(project, questionID) {
+  const qid = String(questionID || "").trim();
+  const wrap = document.createElement("div");
+  wrap.className = "code-decision-record";
+  if (!qid) return wrap;
+  const question = questionsForActiveProject().find((item) => item.id === qid) || {};
+  const definition = getDefinitionForQuestion(qid);
+  const grouped = groupInputsByKind(definition?.inputs || []);
+  const evidence = getEvidenceForQuestion(qid);
+  const approvedSet = currentEvidenceSet(evidence);
+  const snapshotByID = new Map(
+    Object.values(evidence.snapshots || {}).map((snapshot) => [snapshot.id, snapshot])
+  );
+  const analysis = getAnalysisForQuestion(qid);
+  const run = latestAnalysisRun(analysis);
+  const conclusion = analysis.conclusionRevisions.at(-1) || null;
+  const review = getReviewForQuestion(qid);
+  const issue = getIssueForQuestion(qid);
+  const presentation = codeDecisionPresentation(qid);
+
+  const header = document.createElement("section");
+  header.className = "code-decision-record-header";
+  header.innerHTML = `
+    <div><p>${escapeHTML(question.displayID || "Decision")}</p><h3>${escapeHTML(question.title || definition?.title || "Untitled decision")}</h3></div>
+    <strong class="code-decision-state is-${escapeHTML(presentation.state.toLowerCase().replaceAll(" ", "-"))}">${escapeHTML(presentation.state)}</strong>`;
+  wrap.appendChild(header);
+
+  const unresolvedInputs = [
+    ...grouped.unknowns
+      .filter((item) => !["resolved", "retired"].includes(item.state))
+      .map((item) => item.statement),
+    ...grouped.confirmedFacts
+      .filter((item) => item.state !== "confirmed")
+      .map((item) => `${item.state === "disputed" ? "Disputed" : "Proposed"} fact — ${item.statement}`)
+  ];
+  const sections = [
+    ["Question", [definition?.questionText || "Question not recorded."], "Question not recorded."],
+    ["Project Facts", grouped.confirmedFacts.filter((item) => item.state === "confirmed").map((item) => item.statement), "No confirmed Project Facts yet."],
+    ["Assumptions", grouped.assumptions.map((item) => item.statement), "No assumptions recorded."],
+    ["Missing Information", unresolvedInputs, "No unresolved information recorded."]
+  ];
+  sections.forEach(([title, values, emptyLabel]) => {
+    const section = document.createElement("section");
+    section.className = "code-decision-record-section";
+    section.innerHTML = `<h4>${escapeHTML(title)}</h4>`;
+    appendCodeDecisionRecordList(section, values, emptyLabel);
+    wrap.appendChild(section);
+  });
+
+  const approved = document.createElement("section");
+  approved.className = "code-decision-record-section";
+  approved.innerHTML = `<h4>Approved Evidence</h4><p class="code-question-define-muted">${approvedSet ? `Evidence Set v${escapeHTML(String(approvedSet.version))} · governed underneath` : "Candidate evidence is not included here."}</p>`;
+  appendCodeDecisionRecordList(approved, (approvedSet?.entries || []).map((entry) => {
+    const snapshot = snapshotByID.get(entry.snapshotID);
+    return `${snapshot?.passageLocator || entry.snapshotID} · ${entry.role}`;
+  }), "No professionally approved evidence yet.");
+  wrap.appendChild(approved);
+
+  const bounded = document.createElement("section");
+  bounded.className = "code-decision-record-section";
+  bounded.innerHTML = `<h4>Evidence-bounded Analysis</h4><p>${escapeHTML(run?.answer?.conclusion || "No bounded analysis selected.")}</p>`;
+  if (presentation.state === "Changed" && run) {
+    const changed = document.createElement("strong");
+    changed.className = "code-decision-changed-warning";
+    changed.textContent = "Changed — Re-evaluate";
+    bounded.appendChild(changed);
+  }
+  wrap.appendChild(bounded);
+
+  const professional = document.createElement("section");
+  professional.className = "code-decision-record-section is-professional";
+  professional.innerHTML = `<h4>Professional Conclusion</h4><p>${escapeHTML(conclusion?.conclusionText || "Not finalized.")}</p><p class="code-question-define-muted">${conclusion ? `Revision ${escapeHTML(String(conclusion.revision))} · ${escapeHTML(conclusion.authorUserID)}` : "AI analysis never becomes the Professional Conclusion automatically."}</p>`;
+  wrap.appendChild(professional);
+
+  if (review.requests.length || presentation.state === "Needs Review") {
+    const reviewSection = document.createElement("section");
+    reviewSection.className = "code-decision-record-section";
+    reviewSection.innerHTML = `<h4>Review</h4><p>${escapeHTML(String(presentation.blockingReviewCount))} blocking request${presentation.blockingReviewCount === 1 ? "" : "s"} · ${escapeHTML(String(review.approvals.length))} approval record${review.approvals.length === 1 ? "" : "s"}.</p>`;
+    wrap.appendChild(reviewSection);
+  }
+
+  const actions = document.createElement("div");
+  actions.className = "code-decision-record-actions";
+  const details = document.createElement("button");
+  details.type = "button";
+  details.textContent = "Decision details";
+  details.addEventListener("click", () => void openCodeDecisionDetailPanes(qid, ["definition", "evidence-tray", "history"]));
+  const memo = document.createElement("button");
+  memo.type = "button";
+  memo.className = "code-decision-create-memo";
+  memo.textContent = issue.issuedRecords.length ? "Open Code Memo" : "Create Code Memo";
+  memo.disabled = !conclusion;
+  memo.title = conclusion ? "Prepare or open the governed Code Memo" : "Finalize a Professional Conclusion first";
+  memo.addEventListener("click", async () => {
+    try {
+      const context = codeMemoContext(project, qid);
+      if (!context.draft) {
+        await executeCodeQuestionMutation("/projects/code-questions/memos/prepare", {
+          projectID: activeProjectIDForCodeQuestions(),
+          questionID: qid,
+          title: `${question.displayID || "Code Decision"} · ${question.title || definition?.title || "Code Memo"}`,
+          narrative: "",
+          includeAnalysis: Boolean(run)
+        }, { commandKind: "codeQuestion.memo.prepare" });
+      }
+      await openCodeDecisionDetailPanes(qid, ["code-memo-draft", "readiness", "versions"]);
+    } catch (error) {
+      void showWebNotice("Code Memo not created", error.message || "The governed draft was not prepared.");
+    }
+  });
+  actions.append(details, memo);
+  wrap.appendChild(actions);
+  return wrap;
+}
+
 function renderCodeQuestionIndexBody(project) {
   const wrap = document.createElement("div");
   wrap.className = "code-question-index";
@@ -24225,8 +24484,8 @@ function renderCodeQuestionIndexBody(project) {
   const search = document.createElement("input");
   search.type = "search";
   search.className = "code-question-index-search";
-  search.placeholder = "Search questions";
-  search.setAttribute("aria-label", "Search Code Questions");
+  search.placeholder = "Search decisions";
+  search.setAttribute("aria-label", "Search Code Decisions");
   search.value = filters.query || "";
   search.addEventListener("input", () => {
     setCodeQuestionWorkspaceState({
@@ -24242,7 +24501,7 @@ function renderCodeQuestionIndexBody(project) {
   const createButton = document.createElement("button");
   createButton.type = "button";
   createButton.className = "code-question-create-button";
-  createButton.textContent = "New question";
+  createButton.textContent = "Start research";
   createButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
   createButton.addEventListener("click", async () => {
     await createLocalCodeQuestionDraft(project);
@@ -24291,7 +24550,7 @@ function renderCodeQuestionIndexList(project) {
   if (!questions.length) {
     const empty = document.createElement("li");
     empty.className = "code-question-index-empty";
-    empty.textContent = "No Code Questions yet. Create one to start Define → Evidence → Analyze → Review → Issue.";
+    empty.textContent = "No Code Decisions yet. Start Research with a professional question.";
     list.appendChild(empty);
     return list;
   }
@@ -24302,19 +24561,20 @@ function renderCodeQuestionIndexList(project) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "code-question-index-open";
+    const presentation = codeDecisionPresentation(question.id);
     button.innerHTML = `
       <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
-      <span class="code-question-index-title">${escapeHTML(question.title || "Untitled question")}</span>
-      <span class="code-question-index-state">${escapeHTML(question.listLabel || deriveQuestionListLabel(question))}</span>
+      <span class="code-question-index-title">${escapeHTML(question.title || "Untitled decision")}</span>
+      <span class="code-question-index-state">${escapeHTML(presentation.state)}</span>
       <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
     `;
     button.addEventListener("click", async () => {
       const projectID = activeProjectIDForCodeQuestions();
       setCodeQuestionWorkspaceState(
-        switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+        openCodeDecisionSurface(codeQuestionWorkspaceState(), {
           projectID,
           questionID: question.id,
-          stage: codeQuestionWorkspaceState().activeStage || "define"
+          questionText: getDefinitionForQuestion(question.id)?.questionText || question.title
         }),
         { activeProjectID: projectID, syncDeepLink: true }
       );
@@ -24356,12 +24616,12 @@ async function createLocalCodeQuestionDraft(project) {
   const projectID = project ? String(projectDetailKey(project) || "").trim() : "";
   if (!projectID) return;
   const questionText = await openWebTextPrompt({
-    title: "New Code Question",
-    message: "State the precise professional code question. The server will create the authoritative Project record.",
-    label: "Question",
+    title: "Start Research",
+    message: "Ask the professional question naturally. Permitext will build the governed Code Decision alongside the investigation.",
+    label: "What do you need to decide?",
     required: true,
     multiline: true,
-    confirmLabel: "Create question"
+    confirmLabel: "Start Research"
   });
   if (!questionText) return;
   const existing = questionsForActiveProject();
@@ -24372,22 +24632,27 @@ async function createLocalCodeQuestionDraft(project) {
   const displayID = `Q-${String(nextNumber).padStart(3, "0")}`;
   const id = globalThis.crypto?.randomUUID?.() || `local-cq-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`;
   const actor = codeQuestionActor();
+  const generatedTitle = String(questionText)
+    .replace(/\s+/g, " ")
+    .replace(/[?.!]+$/, "")
+    .trim()
+    .slice(0, 96) || "Untitled decision";
   const question = {
     id,
     displayID,
-    title: "New Code Question",
+    title: generatedTitle,
     recordState: "active",
     responsibleDisplayName: actor.displayName || "",
     reviewState: "",
     lastActivityAt: new Date().toISOString(),
     latestIssuedVersion: null,
     revisionInProgress: false,
-    listLabel: "Active"
+    listLabel: "Working"
   };
   const applyOptimistic = () => {
     setQuestionsForActiveProject([...existing, question]);
     saveDefinitionForQuestion(id, emptyDefinitionRecord(id, {
-      title: "New Code Question",
+      title: generatedTitle,
       questionText,
       createdBy: actor.userID
     }));
@@ -24397,7 +24662,7 @@ async function createLocalCodeQuestionDraft(project) {
     const payload = await executeCodeQuestionMutation("/projects/code-questions/create", {
       projectID,
       id,
-      title: "New Code Question",
+      title: generatedTitle,
       questionText
     }, {
       commandKind: "codeQuestion.create",
@@ -24416,14 +24681,14 @@ async function createLocalCodeQuestionDraft(project) {
       invalidateCodeQuestionListHydration(projectID);
     }
   } catch (error) {
-    await showWebNotice("Could not create Code Question", error.message || "Creation failed.");
+    await showWebNotice("Could not start Research", error.message || "Creation failed.");
     return;
   }
   setCodeQuestionWorkspaceState(
-    switchCodeQuestionQuestion(codeQuestionWorkspaceState(), {
+    openCodeDecisionSurface(codeQuestionWorkspaceState(), {
       projectID,
       questionID: createdQuestion?.id || id,
-      stage: "define"
+      questionText
     }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
@@ -24925,6 +25190,18 @@ function questionInputStatesForKind(kind) {
   return ["proposed", "confirmed", "disputed", "retired"];
 }
 
+function refreshCodeDecisionPrimaryPanes(questionID) {
+  const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const project = openProjectDetails()[0] || null;
+  track?.querySelectorAll?.(`.code-question-panel[data-question-id="${safeID}"]`).forEach((pane) => {
+    const body = pane.querySelector(".code-question-panel-body");
+    if (!body) return;
+    if (pane.dataset.cqRole === "research") body.replaceChildren(renderCodeDecisionResearchBody(project, questionID));
+    if (pane.dataset.cqRole === "decision-record") body.replaceChildren(renderCodeDecisionRecordBody(project, questionID));
+  });
+  renderCodeQuestionShellChrome();
+}
+
 function refreshCodeQuestionDefinitionPane(questionID) {
   const safeID = String(questionID || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"');
   const pane = track?.querySelector?.(
@@ -24936,6 +25213,7 @@ function refreshCodeQuestionDefinitionPane(questionID) {
   }
   const project = openProjectDetails()[0] || null;
   pane.replaceChildren(renderCodeQuestionDefinitionBody(project, questionID));
+  refreshCodeDecisionPrimaryPanes(questionID);
 }
 
 function refreshCodeQuestionEvidencePanes(questionID) {
@@ -24954,6 +25232,7 @@ function refreshCodeQuestionEvidencePanes(questionID) {
     else pane.replaceChildren(renderCodeQuestionEvidenceTrayBody(project, questionID));
   }
   if (!refreshed) void renderWorkspace();
+  else refreshCodeDecisionPrimaryPanes(questionID);
 }
 
 function renderCodeQuestionCandidatesBody(project, questionID) {
@@ -25814,6 +26093,7 @@ function refreshCodeQuestionReviewPanes(questionID) {
     if (pane.dataset.cqRole === "review-requests") body.replaceChildren(renderCodeQuestionReviewRequestsBody(project, questionID));
     if (pane.dataset.cqRole === "history") body.replaceChildren(renderCodeQuestionReviewHistoryBody(project, questionID));
   });
+  refreshCodeDecisionPrimaryPanes(questionID);
   saveWorkspaceState();
 }
 
@@ -26168,6 +26448,7 @@ function refreshCodeMemoPanes(questionID) {
     if (pane.dataset.cqRole === "readiness") body.replaceChildren(renderCodeMemoReadinessBody(project, questionID));
     if (pane.dataset.cqRole === "versions") body.replaceChildren(renderCodeMemoVersionsBody(project, questionID));
   });
+  refreshCodeDecisionPrimaryPanes(questionID);
   saveWorkspaceState();
 }
 
@@ -26321,7 +26602,7 @@ function updateQuestionIssuedVersion(questionID, issueVersion) {
           ...question,
           latestIssuedVersion: issueVersion,
           revisionInProgress: false,
-          listLabel: `Issued v${issueVersion}`,
+          listLabel: "Issued",
           lastActivityAt: new Date().toISOString()
         }
       : question
@@ -26495,6 +26776,7 @@ function refreshCodeQuestionAnalysisPanes(questionID) {
     if (role === "bounded-analysis") body.replaceChildren(renderCodeQuestionBoundedAnalysisBody(null, questionID));
     if (role === "professional-conclusion") body.replaceChildren(renderCodeQuestionProfessionalConclusionBody(null, questionID));
   });
+  refreshCodeDecisionPrimaryPanes(questionID);
   saveWorkspaceState();
 }
 
@@ -26530,6 +26812,7 @@ async function toggleLocalCodeQuestionArchive(questionID) {
 
 function renderCodeQuestionShellChrome() {
   if (!codeQuestionWorkspaceEnabled()) {
+    document.querySelector(".code-decision-context-bar")?.remove();
     document.querySelector(".code-question-stage-control")?.remove();
     document.body.classList.remove("code-question-workspace-enabled");
     return;
@@ -26537,8 +26820,8 @@ function renderCodeQuestionShellChrome() {
   document.body.classList.add("code-question-workspace-enabled");
   const project = openProjectDetails()[0] || null;
   if (project) ensureCodeQuestionShellForProject(project);
-  const existing = document.querySelector(".code-question-stage-control");
-  const next = renderCodeQuestionStageControl(project);
+  const existing = document.querySelector(".code-decision-context-bar, .code-question-stage-control");
+  const next = renderCodeDecisionContextBar(project);
   if (existing && next) existing.replaceWith(next);
   else if (existing && !next) existing.remove();
   else if (!existing && next) {

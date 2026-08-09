@@ -14,6 +14,8 @@ export const codeQuestionWorkflowStages = Object.freeze([
 
 export const codeQuestionPaneRoles = Object.freeze([
   "question-index",
+  "research",
+  "decision-record",
   "definition",
   "candidates",
   "reader",
@@ -49,8 +51,19 @@ export const codeQuestionStageArrangements = Object.freeze({
   issue: Object.freeze(["code-memo-draft", "readiness", "versions"])
 });
 
+/**
+ * Code Question panes in the authoritative conversational default. The actual
+ * persisted Research pane remains the existing utility:analysis workspace and
+ * is orchestrated by app.js; it is not duplicated in Code Question state.
+ */
+export const codeDecisionPrimaryArrangement = Object.freeze([
+  "decision-record"
+]);
+
 export const codeQuestionPaneMinimumWidths = Object.freeze({
   "question-index": 288,
+  research: 520,
+  "decision-record": 420,
   candidates: 288,
   definition: 340,
   "evidence-tray": 340,
@@ -360,6 +373,40 @@ export function applyStageArrangement(cqState, {
 }
 
 /**
+ * Open the Research + Code Decision surface without mutating governed state.
+ */
+export function openCodeDecisionWorkspace(cqState, {
+  projectID,
+  questionID,
+  keepIndex = true
+} = {}) {
+  const project = requiredText(projectID, "project ID");
+  const question = requiredText(questionID, "question ID");
+  return normalizeCodeQuestionWorkspaceState({
+    ...cqState,
+    activeQuestionID: question,
+    questionIndexOpen: keepIndex,
+    moreMenuOpen: false,
+    openPanes: [
+      ...(keepIndex
+        ? [{
+            projectID: project,
+            questionID: "_",
+            paneRole: "question-index",
+            paneID: questionPaneKey({ projectID: project, questionID: "_", paneRole: "question-index" })
+          }]
+        : []),
+      ...codeDecisionPrimaryArrangement.map((paneRole) => ({
+        projectID: project,
+        questionID: question,
+        paneRole,
+        paneID: questionPaneKey({ projectID: project, questionID: question, paneRole })
+      }))
+    ]
+  }, { activeProjectID: project });
+}
+
+/**
  * Project switch: drop all question panes and question selection for other projects.
  */
 export function switchActiveProject(cqState, nextProjectID) {
@@ -447,15 +494,14 @@ export function filterQuestions(questions = [], filters = {}) {
 }
 
 export function deriveQuestionListLabel(question = {}) {
-  const parts = [];
-  if (question.latestIssuedVersion != null && Number.isFinite(Number(question.latestIssuedVersion))) {
-    parts.push(`Issued v${Number(question.latestIssuedVersion)}`);
-  }
-  if (question.revisionInProgress) parts.push("Revision in progress");
-  if (parts.length) return parts.join(" · ");
   if (question.recordState === "archived") return "Archived";
-  if (question.reviewState) return String(question.reviewState);
-  return "Active";
+  if (question.revisionInProgress || question.changed === true) return "Changed";
+  const reviewState = String(question.reviewState || "").trim().toLowerCase();
+  if (["needs review", "needs-review", "open", "waiting"].includes(reviewState)) return "Needs Review";
+  if (question.missingInformation === true || reviewState === "missing information") return "Missing Information";
+  if (question.latestIssuedVersion != null && Number.isFinite(Number(question.latestIssuedVersion))) return "Issued";
+  if (question.final === true || question.currentConclusionRevision != null) return "Final";
+  return "Working";
 }
 
 /**

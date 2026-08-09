@@ -782,6 +782,17 @@ async function main() {
     assert.equal(issued.issuedRecord.questionID, question.id);
     assert.equal(issued.outputs.length, 3);
     assert.ok(issued.outputs.every((output) => output.contentHash));
+    const issuedList = await expectStatus(
+      await postAs(owner, "/projects/code-questions/list", { projectID }),
+      200,
+      "Listing server-derived Code Decision summaries after issuance"
+    );
+    const issuedSummary = issuedList.questions.find((item) => item.id === question.id)?.summary;
+    assert.equal(issuedSummary.latestIssuedVersion, 1);
+    assert.equal(issuedSummary.conclusionCount, 1);
+    assert.equal(issuedSummary.missingInformationCount, 0);
+    assert.equal(issuedSummary.blockingReviewCount, 0);
+    assert.equal(issuedSummary.revisionInProgress, false);
 
     const replayedIssueComplete = await postAs(owner, "/projects/code-questions/issue/complete", {
       projectID,

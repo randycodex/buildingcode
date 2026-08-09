@@ -1071,20 +1071,16 @@ export function deriveQuestionReadiness({
   };
 }
 
-/**
- * Derived list label for mixed issued + in-progress work. Not canonical storage.
- */
+/** Simplified user-facing Code Decision label. Not canonical storage. */
 export function deriveQuestionListLabel({ question, latestIssuedVersion = null, revisionInProgress = false }) {
-  const parts = [];
+  if (question?.recordState === "archived") return "Archived";
+  if (revisionInProgress) return "Changed";
   if (latestIssuedVersion != null) {
-    parts.push(`Issued v${positiveInteger(latestIssuedVersion, "issued version")}`);
+    positiveInteger(latestIssuedVersion, "issued version");
+    return "Issued";
   }
-  if (revisionInProgress) parts.push("Revision in progress");
-  if (parts.length === 0) {
-    if (question?.recordState === "archived") return "Archived";
-    return "Active";
-  }
-  return parts.join(" · ");
+  if (question?.currentConclusionRevision != null) return "Final";
+  return "Working";
 }
 
 /**

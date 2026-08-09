@@ -7,6 +7,7 @@ import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
   closeCodeQuestionPane,
+  codeDecisionPrimaryArrangement,
   codeQuestionPaneIDsFromState,
   codeQuestionStageArrangements,
   codeQuestionWorkflowStages,
@@ -17,6 +18,7 @@ import {
   isCodeQuestionPaneID,
   minimumWidthForPaneRole,
   normalizeCodeQuestionWorkspaceState,
+  openCodeDecisionWorkspace,
   openSupportingTool,
   parseCodeQuestionDeepLink,
   parseQuestionPaneKey,
@@ -38,10 +40,12 @@ assert.deepEqual([...codeQuestionWorkflowStages], [
 ]);
 assert.ok(codeQuestionStageArrangements.evidence.includes("reader"));
 assert.ok(codeQuestionStageArrangements.analyze.includes("professional-conclusion"));
+assert.deepEqual([...codeDecisionPrimaryArrangement], ["decision-record"]);
 assert.equal(recommendedVisibleColumnCount(1500), 3);
 assert.equal(recommendedVisibleColumnCount(1200), 2);
 assert.equal(recommendedVisibleColumnCount(900), 1);
 assert.ok(minimumWidthForPaneRole("reader") >= 480);
+assert.ok(minimumWidthForPaneRole("research") >= 520);
 
 // Pane keys
 const key = questionPaneKey({
@@ -118,6 +122,17 @@ assert.ok(afterQuestion.openPanes.every((pane) =>
   pane.questionID === "_" || pane.questionID === "cq-22"
 ));
 
+// Conversational Research + Code Decision is the authoritative primary arrangement.
+const decisionSurface = openCodeDecisionWorkspace(afterProjectSwitch, {
+  projectID: "project-2",
+  questionID: "cq-22"
+});
+assert.deepEqual(
+  decisionSurface.openPanes.filter((pane) => pane.questionID === "cq-22").map((pane) => pane.paneRole),
+  ["decision-record"]
+);
+assert.equal(decisionSurface.activeQuestionID, "cq-22");
+
 // Add column / More supporting tool
 const withNotes = openSupportingTool(afterQuestion, {
   projectID: "project-2",
@@ -151,8 +166,11 @@ assert.equal(filtered.length, 1);
 assert.equal(filtered[0].id, "1");
 assert.equal(
   deriveQuestionListLabel({ latestIssuedVersion: 1, revisionInProgress: true }),
-  "Issued v1 · Revision in progress"
+  "Changed"
 );
+assert.equal(deriveQuestionListLabel({ latestIssuedVersion: 1 }), "Issued");
+assert.equal(deriveQuestionListLabel({ currentConclusionRevision: 2 }), "Final");
+assert.equal(deriveQuestionListLabel({ recordState: "active" }), "Working");
 assert.equal(deriveQuestionListLabel({ recordState: "archived" }), "Archived");
 
 // Deep links do not encode pane widths

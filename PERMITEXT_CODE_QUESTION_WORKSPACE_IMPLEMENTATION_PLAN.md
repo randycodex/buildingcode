@@ -1,38 +1,46 @@
-# Permitext Code Question Workspace Implementation Plan
+# Permitext Research and Code Decision Workspace Implementation Plan
 
-- **Plan version:** 1.1
+- **Plan version:** 1.2
 - **Prepared:** August 3, 2026
-- **Status updated:** August 7, 2026
+- **Status updated:** August 9, 2026
 - **Repository:** `/Users/randy/Documents/X_CODING/Building Code`
-- **Implementation status:** **PHASE 5A COMPLETE ON BRANCH; PHASE 9/10 EXTERNAL GATES REMAIN OPEN** (see progress ledger)
+- **Implementation status:** **PHASE 5 CONVERSATIONAL MIGRATION IN PROGRESS; PHASE 5A TRUST LAYER COMPLETE; LATER-PHASE GATES REMAIN OPEN** (see progress ledger)
 - **Purpose:** Product, architecture, migration, verification, and continuation plan
 
-> Phases 0–10 produced substantial branch-only UI, domain-contract, and local-hardening work. Phase 5A has now closed the server-authority, account-isolation, cross-session, and lifecycle-integration gap on the consolidated branch. Keep the capability default-disabled; do not begin a professional pilot or enable it in production until the remaining Phase 9/10 device, policy, accessibility, deployment, Production, and rollback gates are proven with the evidence stated below.
+> Phases 0–10 produced substantial branch-only UI, domain-contract, and local-hardening work. Phase 5A closed the server-authority, account-isolation, cross-session, and lifecycle-integration gap for the underlying governed record. On August 9, 2026, the primary user experience was redesigned: the five-stage interface is superseded by conversational Research that progressively builds a structured Code Decision. The trust architecture remains; the amount of manual workflow the professional must perform is reduced. Keep the capability default-disabled; do not begin a professional pilot or enable it in production until the remaining conversational-UX migration and Phase 9/10 device, policy, accessibility, deployment, Production, and rollback gates are proven with the evidence stated below.
 
 ---
 
 ## 1. Executive decision
 
-Permitext should be reorganized around one first-class, Project-owned unit of professional work: the **Code Question**.
+Permitext should be organized around one first-class Project-owned unit of professional work, presented to users as a **Code Decision**. The existing internal `CodeQuestion` model may remain where a risky rename would endanger compatibility.
 
-The product should express one continuous and traceable lifecycle:
+The trust layer must preserve one continuous and traceable lifecycle:
 
-> **Official code text → approved evidence → Project facts → bounded analysis → professional conclusion → review → immutable issued record**
+> **Official code text → approved evidence + Project facts → bounded analysis → professional conclusion → optional/contextual review when applicable → immutable issued record**
 
-In the interface, that lifecycle becomes:
+The primary interface must not require the professional to operate that lifecycle as five visible stages. The authoritative experience is:
 
-> **Define → Evidence → Analyze → Review → Issue**
+> **Conversation on the surface. Structure underneath.**
 
-This is a reorganization and integration of systems Permitext already has. It is not a greenfield rebuild. The existing multi-column workspace, Reader, Search, saved passages, selected-evidence Research, Notebook, Coordination, Report Draft, immutable Report Manifest, Workboard, local-first storage, sync, permissions, and activity contracts are valuable foundations. They should be reused and connected to Code Questions.
+The natural progression of a Research conversation is:
+
+> **Ask → Investigate → Decide**
+
+These are conceptual moments, not required tabs or gates. A professional opens a Project, opens Research, asks naturally, investigates candidate provisions, confirms evidence with lightweight actions, and arrives at a professional decision. Permitext progressively builds the governed record alongside the conversation.
+
+This is a reorganization and integration of systems Permitext already has. It is not a greenfield rebuild and must not create a parallel Research/decision system. The existing multi-column workspace, Reader, Search, saved passages, selected-evidence Research, Code Question contracts, Notebook, Coordination, Report Draft, immutable Report Manifest, Workboard, local-first storage, sync, permissions, and activity contracts are valuable foundations. They should be reused behind one connected Research-to-Code-Decision experience.
 
 The central product change is this:
 
-- Today, several Project tools appear as neighboring destinations with roughly equal weight.
-- In the target product, a professional opens a Project, chooses a Code Question, and moves that same record through a connected evidence-to-issuance workflow.
+- Today, several Project tools appear as neighboring destinations with roughly equal weight, and the Phase 2–7 prototype exposes five workflow stages.
+- In the target product, a professional opens a Project and enters Research as the primary working surface.
+- A Research conversation may be exploratory and messy: it can contain follow-up questions, tentative ideas, rejected provisions, and unresolved information.
+- Permitext progressively extracts and updates one structured Code Decision containing the Question, Project Facts, Assumptions, Missing Information, Approved Evidence, Evidence-bounded Analysis, Professional Conclusion, applicable Review information, and any issued Code Memo.
+- Candidate evidence remains distinct from approved evidence. The intended discovery path is **Question → suggested evidence → professional confirmation → bounded analysis**.
 - Notebook and Workboard remain available as supporting tools.
-- Research becomes the bounded analysis engine inside a Code Question.
-- Coordination becomes structured Review Requests.
-- Report Draft becomes an advanced supporting tool; the normal output is a question-specific Code Memo Draft followed by an immutable Issued Record.
+- Coordination continues underneath as structured Review Requests, surfaced only when review is applicable.
+- Report Draft remains an advanced supporting tool; **Create Code Memo** is the main issuance action for a finalized Code Decision.
 
 Nothing should be deleted during the initial reorganization. Tools that are not part of the default path should move under **Add column** or **More** until real usage and migration evidence justify removal.
 
@@ -44,8 +52,9 @@ Nothing should be deleted during the initial reorganization. Tools that are not 
 
 This plan governs:
 
-- the Code Question information architecture;
-- the Define → Evidence → Analyze → Review → Issue lifecycle;
+- the user-facing Research and Code Decision information architecture;
+- the Ask → Investigate → Decide conversational progression;
+- the internal Code Question governance lifecycle that continues underneath the interface;
 - the user-facing purpose and placement of existing Permitext tools;
 - the web multi-column workspace arrangements;
 - the additive data-contract and server changes needed to support Code Questions;
@@ -61,6 +70,10 @@ For this scope, this plan supersedes:
 - Notebook, Research, Workboard, Report Draft, and Coordination appearing as equally important Project entry points;
 - generic Report Draft being the normal starting point for a project-specific code decision;
 - the older default flow of `Project → saved evidence → Notebook → Research → Report`;
+- `Define → Evidence → Analyze → Review → Issue` as the primary visible workflow, stage selector, or required sequence of user-operated screens;
+- treating Research as only an Analyze-stage output or as a product separate from Code Questions;
+- requiring professionals to understand or manually operate definition revisions, Evidence Set versions, dependency bindings, governed-artifact names, approval objects, or issuance manifests during ordinary work;
+- mandatory review for every decision regardless of role, policy, risk, or Project context;
 - prior immediate-sprint ordering where it conflicts with establishing the Code Question workflow;
 - any interpretation of the Stitch export as production-ready code.
 
@@ -78,6 +91,26 @@ This plan does **not** supersede:
 - immutable historical Research answers, evidence snapshots, reports, and activity;
 - lawful deletion, retention, privacy, billing, production, and App Store gates;
 - the rule that production deployment and production verification are separate from local code completion.
+
+### 2.4 Phase 5 redesign disposition
+
+The August 9 redesign changes presentation and orchestration, not the trust model:
+
+| Previous Phase 5 requirement | Disposition | Authoritative direction |
+| --- | --- | --- |
+| Immutable question/definition revisions and Question Inputs | Preserved internally | Research captures and updates the Question, Project Facts, Assumptions, and Missing Information; revision mechanics remain underneath. |
+| Project ownership and immutable Project-input snapshots | Preserved internally | Every Code Decision remains Project-owned; analysis, conclusion, review, and issuance continue to bind exact controlled input snapshots. |
+| Candidate/approved distinction and immutable Evidence Set versions | Preserved internally; simplified presentation | Research suggests candidate provisions. Lightweight professional accept/reject actions create governed evidence proposals/approvals and immutable sets. |
+| Evidence eligibility, exact code/source-version binding, citation validation, and dependency/staleness detection | Preserved internally | Only eligible, professionally approved evidence enters analysis; exact source versions and validated citations remain bound, and later changes surface as **Changed — Re-evaluate**. |
+| Approved Evidence → Bounded Analysis → Professional Conclusion columns | Consolidated into Research and Code Decision | Research shows conversational investigation and bounded analysis; Code Decision keeps AI analysis visibly separate from the professional-authored conclusion. |
+| Define → Evidence → Analyze → Review → Issue stage selector | Superseded | No five-stage primary navigation. Contextual actions and the Code Decision record reveal the next useful step. |
+| Review as a required visible stage | Made optional/contextual | Existing Review Requests and approval rules surface when policy, role, or risk requires them; blocking requests still block approval/issuance. |
+| Issue as a required visible stage | Changed in presentation | **Create Code Memo** is the main action. Readiness, approval, idempotent issuance, manifests, and immutable records remain server enforced. |
+| Permissions, audit history, optimistic concurrency, idempotency, server validation, and offline safety | Preserved internally | Conversational actions must invoke the same authorized, validated, replay-safe commands and expose conflicts or blocked actions in plain language. |
+| Code Memo manifests, immutable issued records, and HTML/PDF generation | Preserved internally; simplified presentation | **Create Code Memo** prepares and issues through the existing manifest/file pipeline; issued records remain immutable and versioned. |
+| Separate Research and Code Question products | Superseded | Research is the working surface; Code Decision is the governed record produced from it. |
+| Code Question user-facing name | Changed in presentation | Prefer **Code Decision** and **Code Decisions**. Retain internal `CodeQuestion` names and stored kinds unless a separately planned safe migration is justified. |
+| Detailed versions, hashes, and dependency bindings in normal UI | Preserved internally; progressively disclosed | Show plain warnings such as **Changed — Re-evaluate** by default; expose technical lineage in History, audit, or advanced details. |
 
 If an older document conflicts with this plan on navigation or tool hierarchy, this plan controls that limited subject. If an older specialized contract is stricter about evidence, AI, permissions, privacy, sync, or legal content, the stricter contract controls until deliberately revised.
 
@@ -163,6 +196,8 @@ Permitext should help an architect, engineer, code consultant, or reviewer answe
 - what reviewers requested, changed, and approved;
 - what was issued, by whom, when, and from which versions.
 
+The ordinary experience should feel like professional Research, not records administration. Permitext should do the clerical work of structuring the decision while the professional asks questions, confirms Project facts, evaluates suggested evidence, and authors or finalizes the conclusion. The user should be able to **research messily but issue cleanly**.
+
 ### 4.2 Product boundary
 
 Permitext is a professional research and decision-record workspace. It is not:
@@ -176,7 +211,7 @@ Permitext is a professional research and decision-record workspace. It is not:
 - a system that silently converts search results into evidence;
 - a system that treats model confidence as legal reliability.
 
-Search may find candidate material. Only an explicit professional action may approve a passage into a Code Question’s Evidence Set. Analysis may use only the approved evidence and the versioned Project inputs attached to the question. The professional conclusion remains visibly separate from AI-generated analysis.
+Search or AI-assisted discovery may find candidate material. Only an explicit professional action may approve a passage into a Code Decision’s governed Evidence Set. Analysis may use only the approved evidence and the versioned Project inputs attached to the decision. The professional conclusion remains visibly separate from AI-generated analysis even when both appear in the same conversational workspace.
 
 ### 4.3 Primary success condition
 
@@ -196,18 +231,20 @@ Every Issued Record must preserve or resolve to immutable snapshots of:
 
 ## 5. Product principles
 
-1. **Evidence before answer.** Search results are candidates; approved immutable passages are evidence.
-2. **One question, one traceable chain.** Define, Evidence, Analyze, Review, and Issue must operate on the same Code Question and versions.
-3. **Professional judgment remains explicit.** AI analysis never silently becomes the professional conclusion.
-4. **Uncertainty is first-class.** Assumptions, unknowns, conflicts, missing facts, and insufficient evidence remain visible.
-5. **Source verification is not Project applicability.** A source can be authentic and still not govern a particular project condition.
-6. **Issued means internally issued, not agency approved.** The interface must not imply official government status.
-7. **History is additive.** Corrections create new revisions or superseding records; they do not rewrite history.
-8. **Link, do not duplicate.** A Code Question links existing canonical, authored, Research, visual, and generated artifacts.
-9. **Local-first remains real.** Offline editing, reload, queueing, reconnection, conflict handling, and recovery are separate requirements.
-10. **Columns are the workspace.** Preserve resizable, reorderable, independently scrollable panes and their state.
-11. **Progressive disclosure reduces clutter.** Supporting tools remain available without competing with the core lifecycle.
-12. **Web and iOS share meaning, not identical layouts.** Web is the full creation environment; iPhone is an adapted Project Hub.
+1. **Conversation on the surface; structure underneath.** Research is the ordinary working surface; governed records are progressively built without making the professional operate internal objects.
+2. **Evidence before governed answer.** Search and AI suggestions are candidates; approved immutable passages are evidence.
+3. **One decision, one traceable chain.** Conversation, inputs, approved evidence, bounded analysis, professional conclusion, contextual review, and issuance must resolve to the same Project-owned record and immutable versions.
+4. **Professional judgment remains explicit.** AI analysis never silently becomes the professional conclusion.
+5. **Uncertainty is first-class.** Assumptions, unknowns, conflicts, missing facts, and insufficient evidence remain visible.
+6. **Source verification is not Project applicability.** A source can be authentic and still not govern a particular project condition.
+7. **Issued means internally issued, not agency approved.** The interface must not imply official government status.
+8. **History is additive.** Corrections create new revisions or superseding records; they do not rewrite history.
+9. **Link, do not duplicate.** A Code Decision links existing canonical, authored, Research, visual, and generated artifacts.
+10. **Reduce effort, not trust.** Automation may propose, extract, classify, and prefill; consequential acceptance, conclusion, review, approval, and issuance rules remain explicit and enforced.
+11. **Local-first remains real.** Offline editing, reload, queueing, reconnection, conflict handling, and recovery are separate requirements.
+12. **Columns are the workspace.** Preserve resizable, reorderable, independently scrollable panes and their state without forcing each governance object into its own column.
+13. **Progressive disclosure reduces clutter.** Supporting tools and technical lineage remain available without competing with Research.
+14. **Web and iOS share meaning, not identical layouts.** Web is the full creation environment; iPhone is an adapted Project Hub.
 
 ---
 
@@ -217,7 +254,7 @@ Use the existing organization roles as the starting point: Owner, Editor, Review
 
 | Capability | Owner | Editor | Reviewer | Viewer |
 | --- | --- | --- | --- | --- |
-| Create/edit Code Questions | Yes | Yes | Comment/request only by default | No |
+| Create/edit Code Decisions (internal Code Questions) | Yes | Yes | Comment/request only by default | No |
 | Add or edit Project inputs | Yes | Yes | Request changes | No |
 | Propose evidence | Yes | Yes | Request/add review feedback | No |
 | Approve or reject evidence | Yes | No | Yes when assigned/authorized | No |
@@ -239,13 +276,14 @@ These defaults preserve the current split: Editors propose evidence and Reviewer
 
 The normal global navigation should become:
 
-- **Home** — recent Projects, assigned reviews, drafts needing attention, and recently issued records;
-- **Code Library** — source families, Search, and Reader outside a Project;
-- **Projects** — direct Project and Code Question access;
-- **Reviews** — shown when collaboration/role capabilities make a cross-Project inbox useful;
+- **Home** — recent Projects, decisions needing attention, assigned reviews, and recently issued Code Memos;
+- **Code Library** — Reader and Search for finding and reading code outside a specific investigation;
+- **Saved** — useful provisions preserved for later Project or Research use;
+- **Projects** — direct Project access, including Research and Code Decisions;
+- **Reviews** — optional and shown only when collaboration/role capabilities make a cross-Project inbox useful;
 - **Settings** — account, organization, subscription, source, offline, and application settings.
 
-Reader, Search, Zoning Resolution, Research, and other current top-level buttons should no longer compete as equal destinations. Search and Reader live primarily inside Code Library and Evidence. Zoning Resolution becomes a source-family scope within Code Library, with its own trust and eligibility rules.
+Within a Project, **Research** is the primary working surface. Reader/Search and Saved retain distinct jobs: Reader/Search find and read code; Saved preserves useful provisions; Research investigates a professional question; Code Decision is the structured record produced from that research; Code Memo is the issued/documented representation of the decision. Zoning Resolution remains a source-family scope within Code Library, with its own trust and eligibility rules.
 
 Layout operations such as Reset, Close All, saved arrangements, and workspace management should move into a compact layout menu. They remain available but should not dominate the product header.
 
@@ -257,55 +295,73 @@ Opening a Project should show:
 - address and bounded Project context;
 - role/access status;
 - sync/offline/conflict status;
-- a Question index with derived state, responsible professional, review state, and last activity;
-- Issued Records;
+- a **Code Decisions** index with a compact derived state, responsible professional when useful, and last activity;
+- Research as the primary action and working surface;
+- issued Code Memos/records;
 - a **More** area for Working Notes, Workboard, attachments, advanced Report Drafts, and legacy material.
 
-The Project is the container. The Code Question is the normal unit of work.
+The Project is the container. Research is the working surface. A Code Decision is the governed professional record progressively produced from a Research conversation.
 
-### 7.3 Continuous lifecycle, not disconnected screens
+The visible list should use simple, meaningful labels such as:
 
-Define, Evidence, Analyze, Review, and Issue are workflow stages and saved column arrangements—not five unrelated pages.
+- `Q-001 · Occupancy Classification — Final`
+- `Q-002 · Corridor Rating — Needs Review`
+- `Q-003 · Accessible Units — Working`
+- `Q-004 · Rooftop Generator — Changed`
+
+Primary states are **Working**, **Final**, and **Issued**. Contextual states are **Needs Review**, **Changed**, and **Missing Information**. These are derived presentation labels, not replacements for canonical revision, approval, review, staleness, and issuance state.
+
+**Final** means the current Professional Conclusion has been finalized against the current governed dependencies and is eligible to proceed under applicable policy. It is not an issued, locked, immutable, or agency-approved record. **Issued** is reserved for a server-confirmed immutable Code Memo record.
+
+### 7.3 Conversational Research with a governed companion record
+
+The old five-stage selector and its mandatory arrangements are superseded. The ordinary workspace should open a Research conversation beside, or with easy access to, its progressively assembled Code Decision.
 
 The user can:
 
-- keep multiple columns visible;
-- open another stage beside the current one;
+- ask and refine a natural-language question without first completing a definition form;
+- inspect suggested provisions in Reader and accept or reject them with lightweight actions;
+- confirm a conversational statement as a Project Fact or retain it as an explicit Assumption;
+- see Missing Information collected without reconstructing it manually;
+- run bounded analysis once professionally approved evidence and controlled inputs are ready;
+- author and finalize a Professional Conclusion that stays distinct from AI analysis;
+- request review when applicable or respond to an existing blocking review;
+- select **Create Code Memo** when the decision is ready for issuance;
+- keep the Research conversation and Code Decision visible together at useful widths;
 - resize, reorder, close, or restore a column;
-- return to prior work without losing selection, scroll position, filters, or drafts;
-- use a stage control to open the recommended arrangement for that stage;
-- use **Add column** to compose a custom desk.
+- return to prior work without losing selection, conversation position, accepted/rejected evidence state, or drafts;
+- use **Add column** or contextual links for Reader, evidence details, History, Review, and advanced tools.
 
-The stage selector must never mutate facts or advance shared review/approval/issue state merely because it was clicked. Readiness and approval gates control consequential transitions.
+Conversation alone must never silently approve evidence, convert an assumption into a fact, publish a Professional Conclusion, resolve a Review Request, or issue a memo. Those consequential actions remain explicit and server validated.
 
-### 7.4 Recommended arrangements
+### 7.4 Recommended conversational arrangements
 
-| Arrangement | Default columns | Purpose |
+| Context | Default columns | Purpose |
 | --- | --- | --- |
-| Define | Questions, Definition | Frame the question and govern facts, assumptions, and unknowns |
-| Evidence | Candidates, Reader, Evidence Tray | Discover, inspect, and explicitly approve exact passages |
-| Analyze | Approved Evidence, Bounded Analysis, Professional Conclusion | Generate constrained analysis and author the human conclusion separately |
-| Review | Conclusion, Review Requests, History | Resolve evidence, fact, interpretation, and revision requests |
-| Issue | Code Memo Draft, Readiness, Versions | Approve, issue, download, and inspect lineage |
+| Project opened | Code Decisions, Research | Start or resume an investigation without choosing a workflow stage |
+| Investigating a decision | Research, Code Decision | Converse on the left; see Question, inputs, approved evidence, analysis, and conclusion assemble on the right |
+| Inspecting a suggestion | Research, Reader, Code Decision | Read exact candidate text and accept/reject it without losing conversational context |
+| Contextual review | Code Decision, Review Requests, History | Resolve only the review work that applies; do not make Review a universal step |
+| Issuance | Code Decision, Code Memo preview/version details | Use Create Code Memo; progressively disclose readiness, approval, immutable lineage, and downloads |
 
-These are defaults, not rigid screen boundaries. At 1440px and wider, three primary columns should be comfortably usable. At intermediate widths, the same horizontal workspace may show one or two columns at a time while preserving the rest. Tablet behavior may use a focused column with a drawer or tab switcher. iPhone uses the adapted Project Hub described later.
+These are defaults, not rigid screen boundaries. At 1440px and wider, Research and Code Decision should be comfortably usable together, with Reader as a contextual third pane. At intermediate widths, preserve both open surfaces and focus one or two at a time. Tablet behavior may use a focused pane with a named switcher. iPhone uses the adapted Project Hub described later.
 
 Use this responsive behavior as the implementation contract unless Phase 0 rendered testing proves that a small adjustment is necessary:
 
 | Workspace width | Visible working model | Required behavior |
 | --- | --- | --- |
-| 1440px and wider | Up to three primary panes, plus collapsible Project/question context | Keep the active arrangement visible where role-specific minimum widths permit; overflow horizontally rather than compress legal text below its minimum |
-| 1180–1439px | Two primary panes at useful reading widths | Keep remaining open panes in the same horizontal track; use `overflow-x: auto` and scroll the newly focused pane fully into view |
+| 1440px and wider | Research + Code Decision, with contextual Reader as a third pane | Keep conversation and governed record visible where minimum widths permit; overflow horizontally rather than compress legal text below its minimum |
+| 1180–1439px | Research + Code Decision at useful widths | Keep contextual panes in the same horizontal track; use `overflow-x: auto` and scroll the newly focused pane fully into view |
 | 768–1179px | One focused pane plus a named pane switcher/drawer | Preserve every open pane and its state; switching visibility must not close panes or overwrite saved desktop width/order |
 | Below 768px | One focused web pane or the adapted native Project Hub | Preserve the lifecycle and records; do not squeeze the desktop three-pane arrangement into an unusable miniature |
 
-Initial role-specific minimums should be tested at approximately 288px for indexes/candidates, 340px for Definition/Evidence Tray/Review/Readiness, and 480px for Reader/Analysis/Conclusion/Memo panes. Phase 0 must reconcile these values with the active pane contract and long-form legal-text fixtures before they become CSS constants.
+Initial role-specific minimums should be tested at approximately 288px for the Code Decisions index/candidate list, 420px for the structured Code Decision, and 520px for Research/Reader/Memo content. Existing internal Definition, Evidence, Analysis, Review, and Issuance panes may retain their tested widths while they remain available as advanced or migration surfaces.
 
 The outer workspace owns horizontal overflow. Each pane owns its normal vertical scroll. Reader tables or code grids may use a bounded inner horizontal scroller, but keyboard and touch users must be able to enter and leave it without a scroll trap. Sticky headers must not obscure focused content at browser zoom. Responsive visibility changes must never mutate the saved arrangement.
 
 ### 7.5 Column behavior requirements
 
-Every lifecycle column must:
+Every Project-owned Research/Code Decision column must:
 
 - use a stable pane identity scoped to Project and Code Question where applicable;
 - preserve width, order, selection, filter, scroll position, and unsaved draft state;
@@ -313,13 +369,13 @@ Every lifecycle column must:
 - support keyboard focus and named controls;
 - expose loading, empty, offline, stale, conflict, permission, and error states;
 - inherit the active Project color for Project-owned context;
-- keep genuinely unassigned or not-yet-linked Research/Saved material visually neutral until it is attached to a Project;
-- never show stale content from a previously selected Project or Code Question;
+- keep genuinely unassigned or not-yet-linked Research/Saved material visually neutral until it is attached to a Project or Code Decision;
+- never show stale content from a previously selected Project or Code Decision;
 - open, close, resize, reorder, and switch Project without flashing the full workspace empty;
 - use existing focus-visible outlines while avoiding a dense field of thin outline borders;
 - work without remote runtime fonts, icon CDNs, avatars, or Tailwind CDN dependencies.
 
-Every arrangement must use one shared application shell: the same rail, product header, Project/Question context, workflow stage control, pane-header actions, and sync/offline state. An arrangement may change the open columns, not create a separate imitation of the application.
+Every arrangement must use one shared application shell: the same rail, product header, Project/Code Decision context, pane-header actions, and sync/offline state. Do not add a second Research implementation or a separate imitation of the application. The five-stage control is obsolete in the primary experience and should be removed or retained only behind a temporary migration/debug path while the conversational surface reaches parity.
 
 Pane mechanics must include a non-drag alternative:
 
@@ -330,7 +386,7 @@ Pane mechanics must include a non-drag alternative:
 - a polite live announcement after open, close, resize, reorder, Project switch, and Question switch;
 - a single-pointer and keyboard alternative for every drag gesture.
 
-The latest Stitch export is a visual reference only. Its strongest concepts are the Candidates → Reader → Evidence Tray and Approved Evidence → Analysis → Professional Conclusion arrangements. Its independent static pages, fictional legal examples, confidence percentages, remote dependencies, and nonfunctional controls must not enter production.
+The latest Stitch export is a historical visual reference only. Its candidate/Reader/evidence relationships and clear separation of analysis from Professional Conclusion remain useful underneath the conversational model. Its five-stage composition no longer governs the product surface. Its independent static pages, fictional legal examples, confidence percentages, remote dependencies, and nonfunctional controls must not enter production.
 
 ---
 
@@ -340,20 +396,21 @@ No current user data or tool should be deleted in the first release.
 
 | Current tool or concept | Target disposition | Default visibility |
 | --- | --- | --- |
-| Projects | Promote to direct global navigation and Project/Question index | Primary |
-| Search | Rename/contextualize as Evidence Candidates inside Code Library and a Code Question | Primary in Evidence |
-| Reader | Keep as the authoritative Evidence Reader | Primary in Evidence |
-| Saved evidence | Reorganize as a question-specific Evidence Tray, while preserving Project and unassigned Saved views | Primary in Evidence |
-| Research | Present as Bounded Analysis; reuse the existing selected-evidence engine and immutable answers | Primary in Analyze |
-| Coordination | Present as Review Requests and optional cross-Project Reviews inbox; reuse existing threads/comments | Primary in Review |
-| Report Draft | Use internally for the question-specific Code Memo Draft; keep generic/advanced Report Draft under More | Primary only through Code Memo |
-| Reports | Present as Issued Records and Versions | Primary in Issue/Project |
-| Notebook | Rename or describe as Working Notes; link cards to Code Questions when useful | Add column / More |
+| Projects | Promote to direct global navigation and Project/Code Decisions index | Primary |
+| Search | Keep as code discovery; surface results as candidate evidence in Research when question-scoped | Primary in Code Library; contextual in Research |
+| Reader | Keep as the authoritative source-reading and candidate-inspection surface | Primary in Code Library; contextual in Research |
+| Saved evidence | Preserve as Saved; allow lightweight suggestion/proposal into a Code Decision while preserving Project and unassigned views | Primary as Saved; contextual in Research |
+| Research | Make the primary conversational Project working surface; orchestrate the existing selected-evidence engine and governed Code Decision commands | Primary |
+| Internal Code Question workspace | Repurpose as the Code Decision trust layer and advanced detail surfaces; do not duplicate it | Under Research / progressively disclosed |
+| Coordination | Present as contextual Review Requests and an optional cross-Project Reviews inbox; reuse existing threads/comments | Contextual / optional |
+| Report Draft | Use internally for the question-specific Code Memo Draft; keep generic/advanced Report Draft under More | Primary only through Create Code Memo |
+| Reports | Present as issued Code Memos/records and Versions | Project / Code Decision |
+| Notebook | Rename or describe as Working Notes; link cards to Code Decisions when useful | Add column / More |
 | Workboard | Keep as an optional Project Diagram/Workboard; never make it the main Project surface | Add column / More |
-| Activity | Present as passive History/Audit, not a task-management replacement | Review / More |
+| Activity | Present as passive History/Audit, not a task-management replacement | Code Decision details / More |
 | Zoning Resolution button | Move into Code Library source-family navigation and filters | Contextual |
 | Reset / Close All / saved layouts | Consolidate in Layout menu | Secondary |
-| Legacy unassigned Research/Saved/Reports | Preserve in a discoverable Legacy or Unassigned view | Secondary during migration |
+| Legacy unassigned Research/Saved/Reports | Preserve in a discoverable Legacy or Unassigned view and allow explicit linking to a Code Decision | Secondary during migration |
 
 Deletion may be considered only after migration telemetry, user interviews, export coverage, and at least one stable release prove that a tool is redundant. Hiding is reversible; destructive deletion is not.
 
@@ -365,24 +422,30 @@ Deletion may be considered only after migration telemetry, user interviews, expo
 
 ```mermaid
 flowchart LR
-    P["Project"] --> Q["Code Question"]
+    P["Project"] --> S["Research Conversation"]
+    S --> Q["Code Decision (internal Code Question)"]
     Q --> I["Question Inputs"]
     Q --> E["Versioned Evidence Set"]
     E --> A["Immutable Analysis Run"]
     I --> A
     A --> C["Professional Conclusion"]
     E --> C
-    C --> R["Review Requests and Approval"]
-    R --> D["Code Memo Draft"]
-    D --> X["Immutable Issued Record"]
+    C -. "optional/contextual" .-> R["Review Requests"]
+    R -. "blocking requests gate approval or issuance" .-> G
+    C --> G{"Separate conclusion approval required by policy?"}
+    G -->|"yes"| CA["Conclusion Approval"]
+    CA --> D["Code Memo Draft"]
+    G -->|"no"| D
+    D --> MA["Readiness and Code Memo Approval"]
+    MA --> X["Immutable Issued Record"]
     X --> X2["Superseding Issued Version"]
-    N["Working Notes"] -. link .-> Q
+    N["Working Notes"] -. link .-> S
     W["Workboard"] -. link .-> Q
 ```
 
-### 9.2 Code Question
+### 9.2 Code Decision and internal Code Question
 
-Add a first-class Project Foundation artifact named `codeQuestion`.
+Use **Code Decision** in the user interface. Preserve the first-class Project Foundation artifact named `codeQuestion` and related internal names where they are already integrated. A backend rename is not required for the UX redesign and must not be attempted without a separate compatibility/migration plan.
 
 Minimum fields:
 
@@ -407,9 +470,25 @@ Minimum fields:
 
 Project membership and authorization remain Project-level. Responsible-person, assignee, and reviewer references do not create a Question-level access-control list.
 
-The selected Define/Evidence/Analyze/Review/Issue stage is per-user workspace state, not shared professional state on the Code Question. Shared readiness, review, approval, and issuance states belong to their respective versioned records and are derived for display. A question may legitimately have Issued Record v1 while a new working revision is in progress; do not force both facts into one status value. A list may show a derived label such as “Issued v1 · Revision in progress,” but that label is not canonical storage.
+The prior selected Define/Evidence/Analyze/Review/Issue stage may remain readable as legacy per-user workspace state during migration, but it no longer governs the primary UI. Shared readiness, review, approval, and issuance states belong to their respective versioned records and are derived for display. A decision may legitimately have Issued Record v1 while a new working revision is in progress; do not force both facts into one canonical status value. Derive simple visible labels—Working, Final, Issued, Needs Review, Changed, and Missing Information—from the underlying records.
 
 Allocate `Q-001`-style display IDs transactionally and enforce uniqueness within a Project. Never derive them by reading the current maximum and writing the next value without a lock or unique retry.
+
+### 9.2.1 Research conversation projection
+
+Research conversations and Code Decisions must not become parallel systems of record. A Project Research session may link to one current Code Decision and may contain exploratory messages that never enter the governed record. Permitext should progressively propose structured updates from the conversation:
+
+- question/title refinements;
+- Project Fact candidates;
+- explicit Assumptions;
+- Missing Information/unknowns;
+- candidate evidence suggestions;
+- analysis requests and immutable Research answers;
+- draft Professional Conclusion content.
+
+Each proposal must have a defined disposition. Low-risk clerical extraction may prefill a draft; professional claims and trust transitions require the applicable confirmation or server command. Rejected evidence and discarded exploratory ideas remain available in conversation/audit history but do not enter approved model context or issued output.
+
+The Code Decision is a governed projection assembled from canonical artifacts and links, not a mutable summary blob that can overwrite them. Conversation messages may reference artifact IDs and immutable versions. Issuance resolves the canonical artifacts, never the latest prose visible in a chat bubble.
 
 ### 9.3 Question inputs
 
@@ -464,7 +543,7 @@ Rules:
 
 ### 9.5 Analysis Run
 
-Do not build a second AI system. Reuse the current selected-evidence Research pipeline and immutable Research answer, but invoke it through a new question-bound server command. That command must resolve the exact question revision, selected Question Input snapshots, and Evidence Set on the server, then atomically create the Research answer and analysis descriptor. It must not rely on mutable conversation selections or live general Project context after validation.
+Do not build a second AI system. Reuse the current selected-evidence Research pipeline, conversation infrastructure, and immutable Research answer, but invoke governed analysis through the question-bound server command. That command must resolve the exact question revision, selected Question Input snapshots, and Evidence Set on the server, then atomically create the Research answer and analysis descriptor. It must not rely on mutable conversation selections or live general Project context after validation.
 
 Add `questionAnalysis` as a lightweight immutable descriptor/link containing:
 
@@ -521,6 +600,8 @@ The UI must keep **AI Analysis** and **Professional Conclusion** visually and se
 
 Evolve `reviewThread` and `reviewComment`; do not create a parallel collaboration store.
 
+Review is optional/contextual in presentation, never optional when an applicable policy or unresolved blocking request requires it. A user who does not need a separate reviewer should not be forced through a Review tab. The server must still enforce role, approval, and blocking-request rules for every consequential action.
+
 User-facing request types:
 
 - Fact Request;
@@ -550,7 +631,7 @@ Preserve stored statuses `open`, `waiting`, `resolved`, and legacy `dismissed`, 
 
 Reuse `reportDraft`, `reportManifest`, generated Report files, exact source materialization, and hashing.
 
-The ordinary output path should be a constrained question-specific **Code Memo Draft** with:
+The ordinary output path begins with a single visible **Create Code Memo** action on a sufficiently complete Code Decision. Underneath, that action prepares a constrained question-specific **Code Memo Draft** with:
 
 - Project and question identity;
 - prepared date and draft revision;
@@ -598,11 +679,13 @@ Keep version scopes explicit and separately constrained:
 - question-scoped issued version: `(questionID, issueVersion)`;
 - predecessor/successor identity for supersession, independent from the Project report sequence.
 
-The Issue UI state model is:
+The internal issuance state model remains:
 
 > **Draft → Ready for approval → Approved → Issuing → Issued → Superseded**
 
-“Final,” “record locked,” or immutable styling must not appear before the server confirms successful issuance. A failed issue command returns to a clearly unissued Approved state with a durable error and safe retry; it must not leave a half-issued visual or orphaned version.
+The user-facing **Final** state may appear before issuance when the current Professional Conclusion is finalized against current dependencies. **Record locked**, immutable styling, and **Issued** must not appear before the server confirms successful issuance. A failed issue command returns to a clearly unissued Final/Approved state with a durable error and safe retry; it must not leave a half-issued visual or orphaned version.
+
+The ordinary UI should translate that machinery into plain, contextual messages such as **Ready to create Code Memo**, **Needs review before memo**, **Approved — issuance failed; retry**, and **Issued**. Advanced readiness and lineage details remain available without making the professional manually navigate every internal state.
 
 ### 9.9 Activity and audit
 
@@ -759,7 +842,9 @@ Do not claim offline support merely because generic Foundation JSON exists local
 
 Add question-oriented handlers using the repository’s established authentication, organization, Project Foundation, error, and sync conventions. The exact route names may follow the active server style, but the capabilities must cover:
 
-- list/create/read/update/archive Code Questions;
+- list/create/read/update/archive internal Code Questions exposed as Code Decisions;
+- link/unlink a Project Research conversation and its Code Decision without duplicating either record;
+- propose structured Question/Input/evidence updates extracted from conversation, with explicit disposition and idempotency;
 - create/update/confirm/dispute Question Inputs;
 - approve/remove evidence and create Evidence Set versions;
 - generate/list/select question-bound analyses;
@@ -769,7 +854,7 @@ Add question-oriented handlers using the repository’s established authenticati
 - migrate/promote legacy artifacts;
 - retrieve full immutable lineage.
 
-Do not add parallel endpoints that reproduce current Research, Notebook, report, or collaboration storage. Question handlers should call those existing subsystems and create explicit links.
+Do not add parallel endpoints that reproduce current Research, Notebook, report, or collaboration storage. Research and question handlers should call the existing subsystems and create explicit links. Governed analysis must continue through the question-bound server command even when initiated from a conversation.
 
 ### 11.5 Web client modules
 
@@ -779,23 +864,24 @@ Suggested modules:
 
 - `public/code-question-state.js`;
 - `public/code-question-contract.js` or a browser-compatible shared build;
-- `public/question-workspace.js`;
+- `public/question-workspace.js` (internal Code Decision orchestration);
+- `public/research-code-decision.js` (conversation-to-governed-record adapter, not a second store);
 - `public/question-evidence.js`;
 - `public/question-review.js`;
 - `public/question-issue.js`.
 
-Module names are recommendations, not requirements. Avoid a broad refactor unrelated to the feature. Preserve current startup, offline shell, service-worker cache, and versioned-client behavior.
+Module names are recommendations, not requirements. Avoid a broad refactor unrelated to the feature. Prefer incremental migration of the existing five-stage implementation: retain its tested domain helpers and server commands, repurpose its panes as Code Decision sections or advanced details, and remove obsolete stage chrome only after the Research surface reaches equivalent access. Preserve current startup, offline shell, service-worker cache, and versioned-client behavior.
 
 ### 11.6 Accessibility and responsive behavior
 
 At minimum:
 
 - meet WCAG 2.2 AA for the authenticated web application and generated HTML/PDF output;
-- identify the active workflow stage with `aria-current="step"` or an equivalent semantic state;
+- identify the active Code Decision and contextual status without requiring step semantics; any temporary legacy stage control must remain accessible while it exists;
 - give navigation and all icon-only controls accessible names, while hiding decorative icon glyphs from assistive technology;
 - give all inputs associated programmatic labels, semantic field groups, inline error associations, and an error summary for failed submission;
 - pane headings and landmarks need coherent semantics;
-- stage, active pane, review status, and selected evidence need non-color state;
+- active decision, active pane, review status, changed state, missing information, and selected evidence need non-color state;
 - hover-only actions must also work by keyboard and touch;
 - focus must be restored when a pane opens/closes or a dialog completes;
 - dialogs and drawers must trap focus appropriately and make the obscured background inert;
@@ -816,10 +902,10 @@ Do not reproduce the full desktop column editor on iPhone.
 
 The iPhone experience should be an adapted Project Hub with:
 
-- Project and Code Question lists;
-- derived question state, responsible professional, and review state;
-- read-only Define, Evidence, Analysis, conclusion, and Issued Record continuity in the first compatibility slice;
-- limited Define edits only in a later mutation slice and only where role/capability permits;
+- Project and Code Decision lists;
+- derived Working/Final/Issued plus contextual Needs Review/Changed/Missing Information state;
+- read-only Research conversation and Code Decision continuity in the first compatibility slice;
+- limited conversational fact/assumption/missing-information confirmation only in a later mutation slice and only where role/capability permits;
 - approved Evidence Set reading and source trust cues;
 - read-only Analysis summaries;
 - professional conclusion review and comments;
@@ -838,6 +924,8 @@ Web and iOS must share:
 - Report Manifest and Issued Record lineage;
 - permission results;
 - source verification and uncertainty cues.
+
+The iOS future phase must not be built around reproducing five stage tabs. It should follow the same Research → Code Decision → Code Memo hierarchy, with role-appropriate compact views and progressively disclosed record sections.
 
 Split iOS delivery into two gates:
 
@@ -908,7 +996,7 @@ Rollout sequence:
 1. Contracts and storage available, UI off.
 2. Internal accounts and synthetic fixtures.
 3. Selected real Projects with explicit opt-in and eligible client versions.
-4. New Projects default to Code Questions; legacy tools remain available.
+4. New Projects default to Research and Code Decisions; legacy tools remain available.
 5. Existing Projects receive guided promotion tools.
 6. Default navigation changes only after parity and recovery are proven.
 
@@ -939,9 +1027,9 @@ Tasks:
 - Inventory current Project, Saved, Research, Notebook, Coordination, Report, Workboard, sync, permission, and iOS behaviors.
 - Reverify old defect reports against current HEAD; do not assume historical findings remain current.
 - Add the feature/capability flag with no visible behavior change.
-- Define versioned synthetic fixtures for one complete Code Question lifecycle. Every rendered Define, Evidence, Analyze, Review, and Issue view must use the same Code Question ID and coherent version chain rather than unrelated hard-coded examples.
+- Define versioned synthetic fixtures for one complete Research-to-Code-Decision lifecycle. Every rendered conversation, Code Decision section, contextual Review, and Code Memo view must use the same internal Code Question ID and coherent version chain rather than unrelated hard-coded examples.
 - Define a separately verified legal-content fixture for rendered acceptance tests; do not use Stitch’s fictional provisions as authority.
-- Create a Stitch visual-adoption matrix with explicit Keep, Adapt, and Reject decisions. Keep the two useful pane arrangements; reject direct import of its duplicated shells, palette, radii, border-heavy styling, Tailwind tokens, AI Reader highlighting, avatars, remote assets, reliability percentages, and fictional legal content. Reconcile every adopted visual token with the active Permitext CSS before Phase 2.
+- Create a Stitch visual-adoption matrix with explicit Keep, Adapt, and Reject decisions. Preserve only useful pane relationships as contextual Research/Code Decision arrangements, not as retained stage layouts; reject direct import of its duplicated shells, palette, radii, border-heavy styling, Tailwind tokens, AI Reader highlighting, avatars, remote assets, reliability percentages, and fictional legal content. Reconcile every adopted visual token with the active Permitext CSS before Phase 2.
 - Capture baseline workspace, offline, sync, Research, report, and Project-switch tests.
 - Freeze representative released-web and released-iOS decode/round-trip fixtures for mixed-client testing.
 - Write architectural decision records for artifact granularity, dedicated counters/uniqueness, atomic `expectedVersion` compare-and-swap, offline Question transport/outbox, the issuance saga and staged-file recovery, Report Draft v2/Manifest v3 adapters, permission mapping, and URL/pane identity.
@@ -989,19 +1077,20 @@ Exit gate:
 - no legacy artifact is modified or deleted;
 - disabled UI behaves exactly as before.
 
-### Phase 2 — Project and Question workspace shell
+### Phase 2 — Project, Research, and Code Decision workspace shell
 
-**Goal:** Make the Project → Code Question hierarchy clear while preserving column mechanics.
+**Goal:** Make Project → Research → Code Decision clear while preserving column mechanics and the existing governed record.
 
 Tasks:
 
 - Promote Projects to direct navigation.
-- Add Project Question index with search, filter, derived state, responsible professional, and recent activity.
-- Add create, rename, archive, restore, and open actions subject to permission. Defer duplication until explicit copy semantics are separately approved.
-- Add lifecycle stage control and Add column menu.
-- Use one shared shell for all arrangements; lifecycle presets may only change open/focused panes and stage context.
+- Add Project **Code Decisions** index with search, filter, simplified derived state, responsible professional, and recent activity.
+- Add create/start Research, rename, archive, restore, and open actions subject to permission. Defer duplication until explicit copy semantics are separately approved.
+- Make Research the primary open action and show the structured Code Decision as its governed companion record.
+- Supersede the five-stage selector. Use contextual actions and Add column/More for Reader, review, history, lineage, and supporting tools.
+- Use one shared shell for all arrangements; opening contextual panes may only change view state, never shared professional state.
 - Add question-scoped pane identities and workspace-state normalization.
-- Add stable Project/question deep links and browser-history restoration without duplicating pane state.
+- Add stable Project/decision/research deep links and browser-history restoration without duplicating pane state.
 - Preserve active Project color across all Project/question panes.
 - Move Notebook, Workboard, advanced Report Draft, attachments, and legacy content into More/Add column.
 - Keep a clear Legacy/Unassigned path during migration.
@@ -1012,17 +1101,18 @@ Exit gate:
 - existing saved layouts still load or normalize safely;
 - open/close/reorder/resize/scroll state survives reload;
 - switching Projects replaces all Project-owned context;
-- switching questions replaces all question-owned context;
+- switching decisions replaces all decision-owned Research and governed context;
 - there is one visible Workboard for the selected Project;
 - no old record becomes undiscoverable.
 
-### Phase 3 — Define
+### Phase 3 — Governed Question and Project Inputs
 
-**Goal:** Make the question and Project inputs precise, governed, and reviewable.
+**Goal:** Keep the question and Project inputs precise, governed, and reviewable underneath conversational Research.
 
 Tasks:
 
-- Build Definition column.
+- Retain the tested Definition/Input contracts and repurpose the Definition column as a progressively disclosed Code Decision section or advanced editor.
+- Allow Research to propose question refinements, Project Facts, Assumptions, and Missing Information without silently changing classifications.
 - Add concise title, precise question, scope, jurisdiction/as-of context, and desired output.
 - Add structured Confirmed Facts, Assumptions, and Unknowns.
 - Add stable input IDs, revision history, state, responsible person, and basis.
@@ -1036,18 +1126,18 @@ Exit gate:
 - revisions and actors are reconstructable;
 - conflict and offline queue behavior is proven;
 - unresolved required unknowns block approval/issuance according to policy;
-- Definition renders read-only correctly for Viewer/Reviewer roles.
+- the Code Decision renders these inputs read-only correctly for Viewer/Reviewer roles without requiring them to open a Define stage.
 
-### Phase 4 — Evidence
+### Phase 4 — Conversational evidence discovery and approval
 
-**Goal:** Deliver the product’s strongest and most trustworthy workspace.
+**Goal:** Deliver Question → suggested evidence → professional confirmation → bounded analysis with the existing evidence trust model intact.
 
 Tasks:
 
-- Build the Candidates → Reader → Evidence Tray arrangement inside the existing pane engine.
-- Scope Search to the question without treating results as evidence.
+- Surface candidate suggestions inside Research and open Reader contextually for exact-text inspection; retain the tested Candidates/Reader/Evidence Tray surfaces as advanced details during migration.
+- Scope Search and AI-assisted discovery to the question without treating results as evidence.
 - Show authority, edition, effective date, source status, completeness, and research eligibility in Reader.
-- Implement role-aware **Add as Evidence**: Editors create proposals; Reviewer/Owner approval creates/reuses evidence-snapshot v2 and versions the approved Evidence Set.
+- Implement lightweight **Accept evidence** / **Reject** presentation: Editors create proposals; Reviewer/Owner approval creates/reuses evidence-snapshot v2 and versions the approved Evidence Set. An authorized solo Owner may complete the combined explicit action.
 - Support exact passage selection, structured tables/grids, and needed surrounding context.
 - Add governing/supporting/conflicting roles, proposal disposition, analysis eligibility, qualification, and rationale.
 - Surface source drift, changed editions, incomplete context, and Project-applicability notes.
@@ -1063,44 +1153,59 @@ Exit gate:
 - evidence works offline after a cold reload when expected content was cached;
 - all evidence actions are keyboard and screen-reader operable.
 
-### Phase 5 — Analyze and Professional Conclusion
+### Phase 5 — Conversational Research and structured Code Decision
 
-**Goal:** Connect bounded Research to a human-authored conclusion without blurring responsibility.
+**Goal:** Make Research the primary conversational surface while the existing Code Question architecture automatically and safely builds the structured Code Decision underneath.
 
 Tasks:
 
-- Build Approved Evidence → Bounded Analysis → Professional Conclusion arrangement.
-- Reuse the existing Research answer/generation system through the new question-bound server command; do not submit mutable conversation selection as the authority.
+- Replace the primary five-stage chrome and arrangements with Research + Code Decision, using the existing pane engine and internal Code Question identity.
+- Link one Project Research conversation to the current Code Decision; do not create a second conversation, evidence, conclusion, or issuance store.
+- Let the professional begin with a natural-language question. Create or refine the underlying question/definition revision through the existing authoritative command path.
+- Progressively propose structured Question, Project Fact, Assumption, Missing Information, and candidate-evidence updates from the conversation. Make classification and consequential acceptance clear; never silently promote conversational prose into governed context.
+- Show suggested evidence as candidates and provide lightweight accept/reject actions. Only the existing approved-evidence command may place an item in an immutable Evidence Set.
+- Present the Code Decision alongside Research with sections for Question, Project Facts, Assumptions, Missing Information, Approved Evidence, Evidence-bounded Analysis, Professional Conclusion, contextual Review, and Code Memo state.
+- Reuse the existing Research answer/generation system through the question-bound server command; do not submit mutable conversation selection as the authority.
 - Resolve and bind each run on the server to exact question, selected Question Input, and Evidence Set versions/hashes.
 - Enforce approved-evidence-only context at the server.
 - Return structured citations, assumptions, missing facts, limitations, conflicts, and additional-evidence requests.
 - Store immutable Research answer plus question-analysis descriptor.
-- Add explicit “Use as starting point” or citation-transfer actions into the conclusion.
-- Implement stale-analysis indicators and controlled rerun.
-- Keep analysis and professional conclusion in different visual regions and artifact types.
+- Add explicit “Use as starting point” or citation-transfer actions into the Professional Conclusion, even when both appear in one conversation/decision workspace.
+- Implement controlled rerun and translate dependency changes into a simple primary warning such as **Changed — Re-evaluate**, with technical hashes/version details progressively disclosed.
+- Keep AI Analysis and Professional Conclusion in different visual regions and artifact types.
 - Allow the professional to skip AI entirely and author the conclusion from approved evidence.
+- Add a clear save/finalize action for the Code Decision. Finalization binds an immutable Professional Conclusion revision and current governed dependencies; it does not erase the exploratory conversation.
+- Make Review contextual. Surface **Needs Review** only when requested or required by policy; preserve all existing blocking-review behavior.
+- Make **Create Code Memo** the main issuance action from a sufficiently complete/final decision. Keep readiness, approval, issuance saga, manifests, files, and immutable issued records underneath.
+- Retain old stage panes temporarily as advanced/migration surfaces until Research + Code Decision provides equivalent access, then remove obsolete stage-only chrome and shortcuts without deleting the underlying components or data.
 
 Exit gate:
 
+- a professional can start in Project Research and reach a saved/final Code Decision without manually navigating five stages or understanding internal version objects;
+- the conversation may contain rejected/exploratory material while the Code Decision contains only governed accepted content;
+- every conversation-derived governed update records its source/disposition and uses the existing authoritative command, permission, concurrency, idempotency, offline, and audit paths;
 - adversarial tests prove the model cannot cite unapproved candidates or hidden corpus text;
 - every cited claim resolves to approved evidence;
 - every canonical dependency-hash change marks prior runs stale;
+- the ordinary UI translates that state to **Changed — Re-evaluate** without hiding lineage;
 - insufficient evidence produces a bounded limitation, not invented certainty;
 - professional conclusion remains authored, revisioned, and separately attributable;
-- paid generation is idempotent and concurrent requests cannot silently lose an answer.
+- paid generation is idempotent and concurrent requests cannot silently lose an answer;
+- Review can be absent when policy permits, but applicable blocking requests still prevent final approval/issuance;
+- Create Code Memo invokes the existing validated issuance architecture rather than a parallel document path.
 
 ### Phase 5A — Server integration and data authority (corrective gate)
 
-**Status:** Complete on `codex/code-question-workspace` after server-authority implementation, integrated HTTP/check/smoke verification, rendered localhost verification, and a clean final no-P1 architecture audit. The capability remains default-disabled and is not pilot-ready.
+**Status:** Complete in current history (`4bca8b2a7`, now reachable from `main`) after server-authority implementation, integrated HTTP/check/smoke verification, rendered localhost verification, and a clean final no-P1 architecture audit. The capability remains default-disabled and is not pilot-ready.
 
-**Goal:** Replace browser-owned lifecycle authority with authenticated, Project-authorized server persistence while retaining the existing UI/domain adapters and established Research, collaboration, Report Manifest v3, and issuance-saga foundations.
+**Goal:** Preserve authenticated, Project-authorized server persistence as the trust layer while the conversational UI is migrated, retaining the existing domain adapters and established Research, collaboration, Report Manifest v3, and issuance-saga foundations.
 
 Checklist:
 
 - [x] Document the discrepancy between the earlier completion wording and the current browser-local/server-authority boundary.
 - [x] Derive Project access, organization role, storage owner, and owner scope on the server from the authenticated user and Project membership; reject client-supplied authority claims.
 - [x] Make Code Question create/read/update/archive/restore and lifecycle artifact commands verify that every target belongs to the authorized Project.
-- [x] Hydrate the visible Code Question list and lifecycle from server artifacts instead of treating workspace state as the professional system of record.
+- [x] Hydrate the visible Code Decisions list and lifecycle from server artifacts instead of treating workspace state as the professional system of record.
 - [x] Route Definition, Question Input, Evidence Set, bounded analysis, Professional Conclusion, Review, approval, memo, issuance, supersession, and recovery mutations through their authoritative server commands.
 - [x] Keep immutable snapshots, Research answers, approvals, manifests, and Issued Records immutable; use compare-and-swap and idempotency for mutable or retryable commands.
 - [x] Isolate Code Question caches by authenticated account and unload them on sign-out/account switch.
@@ -1122,19 +1227,19 @@ Exit gate:
 
 Detailed corrective notes are maintained in `docs/code-question/PHASE5A_SERVER_INTEGRATION.md`.
 
-### Phase 6 — Review
+### Phase 6 — Contextual Review
 
-**Goal:** Make professional review an auditable workflow rather than loose comments.
+**Goal:** Make professional review auditable when applicable without forcing every decision through a visible Review stage.
 
 Tasks:
 
-- Present existing collaboration artifacts as Review Requests.
+- Present existing collaboration artifacts as contextual Review Requests in the Code Decision/Research surface.
 - Add Fact Request, Evidence Review, Interpretation Review, and Revision Request labels through versioned `requestType` while retaining compatible legacy `kind` values.
 - Add anchored targets for inputs, evidence, analysis, conclusion, and draft sections.
 - Add assignee, due/priority only if existing product policy supports them, and clear Open/Waiting/Resolved/Dismissed status; Reopen is an action back to Open.
 - Add approval action separate from resolving individual requests.
 - Show passive History alongside active requests without merging them.
-- Add optional global Reviews inbox for users with relevant organization capabilities.
+- Add an optional global Reviews inbox for users with relevant organization capabilities; it is not part of every user's default path.
 
 Exit gate:
 
@@ -1145,17 +1250,18 @@ Exit gate:
 - reopen and second review round preserve prior history;
 - server permissions reject unauthorized review, approval, and resolution actions.
 
-### Phase 7 — Issue
+### Phase 7 — Create Code Memo and issue
 
-**Goal:** Generate a constrained, reviewable Code Memo and issue an immutable versioned record.
+**Goal:** Let the professional create a clean memo from the structured decision while preserving every approval and immutable issuance safeguard underneath.
 
 Tasks:
 
-- Generate a question-specific typed Code Memo Draft from selected versions.
+- Make **Create Code Memo** the primary issuance action on the Code Decision.
+- Generate a question-specific typed Code Memo Draft from selected versions through the existing server path.
 - Allow bounded authored narrative without becoming a desktop-publishing editor.
 - Add readiness checks for evidence, unresolved inputs, stale analysis, citations, conclusion, review, permissions, and source status.
 - Add approval and issue actions as separate, server-authorized commands.
-- Implement Draft → Ready for approval → Approved → Issuing → Issued → Superseded UI states, including durable recovery to clearly unissued Approved after a failed issue attempt.
+- Preserve Draft → Ready for approval → Approved → Issuing → Issued → Superseded as internal/advanced state, while presenting plain contextual readiness and recovery messages in the ordinary flow.
 - Create immutable Report Manifest v3 and `issuedDecisionRecord` through the idempotent issuance saga, with database transactions around reservation and commit plus deterministic staged-file recovery.
 - Add PDF/HTML/structured manifest output.
 - Add version history, correction, and supersession flow.
@@ -1170,15 +1276,27 @@ Exit gate:
 - deletion/retention policies still work lawfully;
 - downloaded output passes content, accessibility, privacy, and visual review.
 
+### Later-phase dependency rule
+
+Phases 6–10 depend on the Phase 5 conversational model, not on the superseded five-stage interface:
+
+- Legacy promotion must open or enrich Research/Code Decision context, not send users into a Define stage.
+- Review must remain contextual and optional when policy permits, while applicable approval and blocking-request rules remain server enforced.
+- **Create Code Memo** must remain the ordinary issuance surface; readiness, manifests, immutable records, and file generation remain underneath it.
+- iOS must use Research → Code Decision → Code Memo semantics and simplified derived states, while preserving shared IDs, versions, citations, permissions, and lineage.
+- Pilot scripts, accessibility review, analytics, support material, rollback checks, and Production verification must exercise the conversational flow.
+- A later phase may reuse internal stage components for advanced details, but it may not restore stage tabs as the ordinary path without an explicit product-direction change.
+- No later phase may weaken evidence approval, bounded-analysis, professional-conclusion, review, issuance, concurrency, audit, or offline rules to compensate for missing conversational orchestration.
+
 ### Phase 8 — Legacy promotion and supporting tools
 
-**Goal:** Make existing work useful in the new system without forced conversion.
+**Goal:** Make existing work useful in Research and Code Decisions without forced conversion.
 
 Tasks:
 
-- Add guided promotion/linking flows for Notebook cards, Saved passages, Research answers, Report Drafts, and Coordination threads.
+- Add guided linking flows for Notebook cards, Saved passages, prior Research answers, Report Drafts, and Coordination threads into the current Research/Code Decision context.
 - Add Legacy/Unassigned counts and filters.
-- Let Working Notes and Workboard link to a Code Question without changing Project ownership.
+- Let Working Notes and Workboard link to a Code Decision without changing Project ownership.
 - Preserve generic advanced Report Drafts.
 - Add migration summaries and recovery actions.
 - Observe actual use before considering any removal.
@@ -1193,13 +1311,13 @@ Exit gate:
 
 ### Phase 9 — Adapted iPhone/iOS Project Hub
 
-**Goal:** Provide semantic continuity, review, and secure record access on iPhone.
+**Goal:** Provide Research/Code Decision semantic continuity, contextual review, and secure record access on iPhone.
 
 Tasks:
 
-- Add Code Question list/detail and derived state.
+- Add Code Decision list/detail and simplified derived state.
 - Complete decoder/local-schema/read-only compatibility before enabling any mutations.
-- Add limited, role-appropriate Define edits and offline queueing only after the separate mutation gate passes.
+- Add limited, role-appropriate fact/assumption/missing-information confirmation and offline queueing only after the separate mutation gate passes.
 - Add Evidence Set, analysis summary, conclusion, review, and Issued Record views.
 - Add Review Request response/resolution only after authorization, atomic outbox, conflict, and recovery gates pass.
 - Add Report download and version lineage.
@@ -1216,7 +1334,7 @@ Exit gate:
 
 ### Phase 10 — Pilot, hardening, and rollout
 
-**Goal:** Prove the complete professional workflow before changing defaults broadly.
+**Goal:** Prove the complete conversational professional workflow and its unchanged trust guarantees before changing defaults broadly.
 
 Tasks:
 
@@ -1233,7 +1351,7 @@ Exit gate:
 - all Definition of Done conditions in Section 20 pass;
 - no severity-one integrity, authorization, sync, or issuance defect remains;
 - users can find all legacy work;
-- production serves the intended version and the real lifecycle is verified;
+- production serves the intended version and the real Research → Code Decision → Code Memo flow is verified;
 - rollback has been rehearsed without data deletion.
 
 ---
@@ -1246,7 +1364,9 @@ Cover:
 
 - normalization and migration of every new artifact;
 - stable IDs and display IDs;
-- per-user stage versus shared readiness/review/approval/issue separation;
+- legacy per-user stage state remains non-authoritative while shared readiness/review/approval/issue separation is preserved;
+- Research-to-Code-Decision links and proposal dispositions never duplicate or overwrite canonical artifacts;
+- simplified Working/Final/Issued and contextual Needs Review/Changed/Missing Information derivation;
 - valid and invalid lifecycle transitions;
 - input revision/staleness propagation;
 - Evidence Set versioning and snapshot hashes;
@@ -1281,8 +1401,9 @@ Cover:
 
 - pane open, close, focus, reorder, resize, and divider reset;
 - stored widths/order/scroll/filter/selection after reload;
-- stage presets without destructive state changes;
-- Project switch and question switch without stale leakage or full-workspace blink;
+- Research + Code Decision default arrangement without destructive state changes;
+- temporary legacy stage presets remain non-authoritative during migration;
+- Project switch and decision switch without stale conversation/record leakage or full-workspace blink;
 - active Project color inheritance;
 - one visible Workboard per Project;
 - old layout normalization;
@@ -1332,7 +1453,7 @@ Pass conditions:
 
 Verify rendered behavior, not source inspection alone:
 
-- keyboard-only complete lifecycle;
+- keyboard-only complete Research → Code Decision → Code Memo flow;
 - screen-reader labels, headings, landmarks, live status, and error messages;
 - focus order/restoration;
 - contrast and non-color state;
@@ -1382,26 +1503,27 @@ Also run focused new contract/migration tests, iOS tests, and real browser verif
 
 ## 16. Product acceptance scenarios
 
-### Scenario A — New Code Question
+### Scenario A — Conversational Research to Code Decision
 
-1. User opens a Project and creates a precise Code Question.
-2. User records confirmed facts, an assumption, and an unknown.
-3. User finds candidate sections, reads exact text, and approves two passages.
-4. Permitext creates Evidence Set v1.
-5. User runs bounded analysis; it flags the unknown and cites only those passages.
-6. User resolves the unknown, producing a new input revision; the analysis becomes stale.
-7. User approves another passage, producing Evidence Set v2, then reruns analysis.
-8. User authors a separate professional conclusion.
-9. Reviewer opens an Interpretation Review, user revises, reviewer resolves and approves.
-10. User issues Code Memo v1.
-11. Later evidence changes; v1 remains immutable and a new approved draft may become v2, superseding v1 without deleting it.
+1. User opens a Project, opens Research, and asks a natural-language professional question.
+2. Permitext creates or links the underlying Code Decision without exposing a five-stage setup flow.
+3. During the conversation, Permitext proposes a Project Fact, an Assumption, and Missing Information; the user confirms or corrects their classifications with lightweight actions.
+4. Permitext suggests candidate provisions. The user opens exact text in Reader and accepts two; rejected suggestions remain outside approved evidence.
+5. Underneath, Permitext creates immutable evidence snapshots and Evidence Set v1 through existing permission/approval rules.
+6. User requests bounded analysis; it flags the missing information and cites only approved passages.
+7. The Research conversation may continue messily, while the adjacent Code Decision contains only the governed Question, inputs, approved evidence, analysis, and draft Professional Conclusion.
+8. User resolves the missing information, producing a new input revision. The ordinary UI shows **Changed — Re-evaluate**; the prior analysis remains immutable and technically traceable.
+9. User reruns analysis and authors/finalizes a separate Professional Conclusion.
+10. If policy or the user requires review, a contextual Interpretation Review is opened, resolved, and approved. If review is not required, no Review stage is imposed.
+11. User selects **Create Code Memo**. Readiness, approval, idempotent issuance, Manifest v3, and file generation operate underneath and produce Code Memo v1.
+12. Later evidence changes; v1 remains immutable and a new approved draft may become v2, superseding v1 without deleting it.
 
 ### Scenario B — Existing Project material
 
 1. User opens a pre-feature Project.
 2. All Saved, Notebook, Research, Workboard, Report, and Coordination records remain discoverable.
-3. User chooses “Create Code Question from this note.”
-4. Permitext creates a question and links the original note without changing it.
+3. User chooses to investigate the material in Research or link it to a Code Decision.
+4. Permitext creates/links the underlying question record and preserves the original note without changing it.
 5. User explicitly promotes selected passages into an Evidence Set.
 6. Unrelated legacy content remains unassigned and visible.
 
@@ -1428,6 +1550,14 @@ Also run focused new contract/migration tests, iOS tests, and real browser verif
 5. The Code Memo visibly preserves the unknown, classification, condition/limitation, rationale, and reviewer approval.
 6. The authorized issue action succeeds, proving that “unresolved” is not silently hidden and that optional AI is not a prerequisite.
 
+### Scenario F — Messy research, clean issuance
+
+1. A long Research conversation includes exploratory interpretations, rejected provisions, follow-up questions, and a superseded assumption.
+2. Conversation history remains intact and attributable.
+3. The Code Decision contains only the current governed Question, classified inputs, professionally approved evidence, selected bounded analysis, Professional Conclusion, and applicable review disposition.
+4. Create Code Memo resolves only those governed artifacts; exploratory/rejected chat content cannot leak into the memo or model context.
+5. A reviewer can reconstruct the issued chain without treating the entire conversation as an approved professional record.
+
 ---
 
 ## 17. Metrics and privacy-safe instrumentation
@@ -1436,8 +1566,10 @@ Measure workflow events, not confidential legal text.
 
 Recommended metrics:
 
-- percentage of active Projects with at least one Code Question;
-- time from question creation to first approved evidence;
+- percentage of active Projects with at least one Code Decision;
+- time from first Research question to first approved evidence;
+- percentage of Research sessions that produce a saved/final Code Decision without opening legacy stage navigation;
+- number of explicit confirmations required per accepted Project Fact, Assumption, Missing Information item, and evidence item;
 - percentage of analyses with complete resolvable citations;
 - rate of stale analyses detected before review/issue;
 - number and resolution time of Review Requests by type;
@@ -1456,6 +1588,8 @@ Do not send question text, Project facts, evidence passages, conclusions, review
 | Risk | Consequence | Mitigation |
 | --- | --- | --- |
 | Rebuilding from Stitch HTML | Loses real behavior, offline support, accessibility, and current architecture | Rebuild concepts inside the existing pane engine and contracts |
+| Building a parallel conversational decision store | Conversation and issued record diverge; trust chain becomes ambiguous | Link Research to existing Code Question artifacts and route governed updates through existing authoritative commands |
+| Treating conversation text as governed fact/evidence | Exploratory statements enter analysis or issuance without consent | Use explicit proposal/disposition rules and resolve only canonical artifacts for analysis/memos |
 | Treating Saved as evidence | Analysis uses unapproved or incomplete text | Require immutable snapshot plus explicit Evidence Set approval |
 | Facts remain loose notes | Conclusions cannot be reconstructed or reviewed | First-class granular Question Inputs with revisions |
 | Analysis becomes stale silently | Professional relies on obsolete reasoning | Dependency hashes and explicit stale state |
@@ -1469,7 +1603,8 @@ Do not send question text, Project facts, evidence passages, conclusions, review
 | Source verification implies applicability | Misleading legal conclusion | Separate provenance from Project-applicability determination |
 | Confidence percentages imply authority | False precision and liability | Use provenance, limitations, and verification status instead |
 | Offline local data is mistaken for offline reload | Workspace fails in the field | Test cold shell reload, content, outbox, reconnect separately |
-| Too many default columns | Dense and intimidating UI | Lifecycle arrangements plus Add column/More |
+| Too many default columns | Dense and intimidating UI | Default to Research + Code Decision; open Reader/review/history contextually |
+| Five-stage implementation keeps governing UX | Professionals perform records administration instead of research | Remove stage chrome after parity, repurpose stage components as Code Decision sections/advanced details |
 | Hiding legacy tools too early | Users believe work was lost | Legacy/Unassigned views and staged rollout |
 | “Immutable” conflicts with lawful deletion | Privacy/retention violation | Preserve record integrity within account and legal lifecycle |
 | Local success reported as Production | False release confidence | Separate test, commit, push, deploy, alias, cache, and live verification evidence |
@@ -1478,7 +1613,7 @@ Do not send question text, Project facts, evidence passages, conclusions, review
 
 ## 19. Deferred scope
 
-The following should remain outside the initial Code Question release unless separately approved:
+The following should remain outside the initial conversational Code Decision release unless separately approved:
 
 - deleting Notebook, Workboard, generic Report Draft, or legacy views;
 - real-time shared Workboard editing, presence, or object-level merge;
@@ -1501,9 +1636,12 @@ The reorganization is complete only when all of the following are true:
 
 ### Product and workflow
 
-- A Project clearly contains Code Questions and Issued Records.
-- One question moves through Define → Evidence → Analyze → Review → Issue without changing identity.
-- Supporting tools remain discoverable but do not compete with the primary lifecycle.
+- A Project clearly contains Research and Code Decisions, with issued Code Memos/records.
+- A professional can start with a natural-language Research question and reach a saved/final Code Decision without manually operating five workflow stages.
+- Research and Code Decision behave as one connected product and resolve to one internal record identity; no parallel implementation exists.
+- The conversation may remain exploratory while the structured decision and issued memo contain only governed accepted content.
+- Supporting tools and advanced trust details remain discoverable but do not compete with Research as the primary surface.
+- Primary status uses Working, Final, and Issued, with contextual Needs Review, Changed, and Missing Information where applicable.
 - Every state—empty, loading, offline, stale, conflict, blocked, locked, unauthorized, and failed—is understandable and recoverable.
 
 ### Evidence and AI integrity
@@ -1518,7 +1656,9 @@ The reorganization is complete only when all of the following are true:
 ### Review and issue integrity
 
 - Review Requests preserve target, type, actors, comments, transitions, and resolution.
+- Review is optional in presentation but mandatory whenever policy or blocking requests require it.
 - Approval is permissioned and separate from AI generation.
+- Create Code Memo uses the existing validated draft/readiness/approval/issuance path.
 - Issue is transactional and idempotent.
 - Issued Records preserve exact snapshots, hashes, lineage, author, reviewer, and time.
 - Supersession never overwrites an earlier record.
@@ -1547,17 +1687,20 @@ The reorganization is complete only when all of the following are true:
 
 ## 21. Decisions with recommended defaults
 
-These do not block Phase 0. Use the recommended default unless the product owner explicitly changes it.
+These govern the remaining conversational migration. Use the recommended default unless the product owner explicitly changes it.
 
 | Decision | Recommended default |
 | --- | --- |
-| Primary user-facing unit | Code Question |
-| Lifecycle labels | Define, Evidence, Analyze, Review, Issue |
-| Final output label | Issued Record; document subtype Code Memo |
+| Primary working surface | Research conversation |
+| Primary user-facing record | Code Decision; retain internal `CodeQuestion` names for compatibility |
+| Conversational progression | Ask → Investigate → Decide; not required tabs |
+| Visible record states | Working, Final, Issued; contextual Needs Review, Changed, Missing Information |
+| Five-stage labels | Superseded as primary UX; temporary advanced/migration surfaces only |
+| Final output label | Code Memo; backed by an immutable Issued Record |
 | Meaning of Issued | Internally issued professional record, not agency approval |
-| Default wide layout | Up to three primary working columns plus collapsible Project/question context |
+| Default wide layout | Research + Code Decision, with contextual Reader as an optional third pane |
 | Supporting tools | Add column / More, not deleted |
-| AI product label | Bounded Analysis, with current Research retained internally for compatibility |
+| AI product label | Evidence-bounded Analysis inside Research; separate from Professional Conclusion |
 | Review storage | Existing review threads/comments with new labels and targets |
 | Report storage | Existing draft/manifest system plus immutable issued wrapper |
 | Legacy migration | Explicit promotion unless association is provably unambiguous |
@@ -1581,18 +1724,19 @@ Items requiring explicit policy before broad rollout include who may issue, whet
 6. Read the governing contract/docs relevant to the phase; do not treat Stitch as authority.
 7. Update the progress ledger below before and after meaningful work.
 
-### 22.2 First authorized implementation task
+### 22.2 Next authorized implementation task
 
-Start with **Phase 0 only** unless the product owner authorizes a larger batch.
+Phases 0–5A already established the underlying trust architecture. Continue with the **Phase 5 conversational migration** unless the product owner narrows the batch.
 
-The first implementation handoff should produce:
+The next implementation handoff should:
 
-- a current baseline report;
-- a disabled feature/capability flag;
-- synthetic lifecycle fixtures;
-- architectural decisions for artifact granularity and the idempotent issuance saga;
-- focused failing tests that express Phase 1 contract requirements;
-- no visible product reorganization yet.
+- audit the existing five-stage implementation into **Keep unchanged**, **Repurpose**, and **Obsolete UI** categories;
+- keep existing server commands, immutable artifacts, permissions, evidence rules, staleness, review, issuance, offline, and audit behavior;
+- make Research the primary Project working surface and Code Decisions the visible Project record list;
+- link the conversational surface to the existing internal Code Question identity rather than creating parallel state;
+- implement one coherent vertical slice—starting/resuming Research, seeing the governed Code Decision, accepting/rejecting candidate evidence, or creating the Code Memo—using existing authoritative commands;
+- add/update focused contract tests for the new default arrangement and simplified states;
+- retain the capability flag and leave external rollout gates closed.
 
 ### 22.3 Work discipline
 
@@ -1609,32 +1753,36 @@ The first implementation handoff should produce:
 
 Update this table as implementation proceeds. Include commit IDs and verification evidence; do not mark a phase complete based only on code being written.
 
-**Status correction (August 7, 2026):** Earlier entries used “Complete (branch)” for locally rendered UI/domain milestones before the visible workflow was server-authoritative. Phase 5A has now closed that integration gap on the branch with authenticated Project authority, account isolation, authoritative hydration and mutation paths, offline replay/conflict handling, expanded HTTP integration coverage, full check/smoke verification, rendered localhost proof, and a clean final no-P1 audit. The historical commits remain evidence for their UI/domain scope; the consolidated uncommitted Phase 5A work supplies the server-integration evidence. This branch remains default-disabled and is not pilot-ready. Phase 9 device/mutation gates and Phase 10 external, policy, deployment, Production, accessibility, and rollback gates remain open.
+**Status correction (August 7, 2026; current-history note August 9):** Earlier entries used “Complete (branch)” for locally rendered UI/domain milestones before the visible workflow was server-authoritative. Phase 5A closed that integration gap with authenticated Project authority, account isolation, authoritative hydration and mutation paths, offline replay/conflict handling, expanded HTTP integration coverage, full check/smoke verification, rendered localhost proof, and a clean final no-P1 audit. That consolidated work is now recorded in `4bca8b2a7` and is reachable from the current `main` history. The capability remains default-disabled and is not pilot-ready. The Phase 5 conversational migration, Phase 9 device/mutation gates, and Phase 10 external, policy, deployment, Production, accessibility, and rollback gates remain open.
+
+**Direction correction (August 9, 2026):** The server-authoritative lifecycle remains valid, but the visible five-stage workflow is superseded. Phase 2–7 UI work is now implementation inventory: its domain/server behavior is preserved; its stage selector, stage-first defaults, and terminology must be repurposed or removed incrementally. Research + Code Decision is the authoritative UX. No prior local or rendered proof establishes completion of this redesign.
+
+**First incremental migration slice (August 9, 2026):** The current worktree removes the stage control from the ordinary path, relabels the index as Code Decisions, opens Permitext's existing persisted Research workspace as the primary surface, places a derived Code Decision record beside it, simplifies visible states, and makes **Create Code Memo** the primary issuance action. It deliberately reuses the existing Research and internal Code Question stores. Contract/check/smoke suites and a signed-in rendered localhost flow pass for this slice. Automatic conversation-to-governed-record extraction, an explicit durable Research Conversation ↔ Code Decision link, lightweight in-conversation acceptance, and the save/finalize interaction remain open; this slice does not complete Phase 5.
 
 | Phase | Status | Commit(s) | Verification | Notes / blockers |
 | --- | --- | --- | --- | --- |
 | Plan creation | Complete | `468f7e306` docs: plan Code Question workspace reorganization | Repository/roadmap/architecture/Stitch audits; Markdown checks | Plan only |
 | 0 — Baseline and safety rails | Complete (branch) | Branch `codex/code-question-workspace`; `f5a4db822` feat scaffolding; `67476772f` ledger commit ID | `npm run check` exit 0; `npm run smoke` exit 0; `npm run test:code-question` exit 0; flag default disabled; fixtures + 8 ADRs | Inert capability flag; pure contract scaffolding; no UI reorganization; `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` left untracked |
-| 1 — Contracts, storage, permissions, migration | Contract and server integration complete (branch) | `4523703ff` + uncommitted Phase 5A work | Original phase contract suites plus Phase 5A HTTP suite; full `test:code-question`, `check`, and `smoke` | Server-derived Project authority, role/isolation enforcement, CAS, counters, issuance saga, migration, adapters, and permissions are integrated behind the default-disabled capability. |
-| 2 — Project and Question workspace shell | UI/domain and server integration complete (branch) | `a56e51079` + uncommitted Phase 5A work | Workspace/client-state/server-adapter contracts; full suites; rendered server-hydrated localhost workflow | Question list and lifecycle hydrate authoritatively; Project/question switch isolation and account-scoped cache behavior are covered. This is branch-only evidence. |
-| 3 — Define | UI/domain and server integration complete (branch) | `fcac63182` + uncommitted Phase 5A work | Define/client-state/HTTP contracts; full suites; rendered server-hydrated Definition `r1`/`v1` | Authoritative persistence, role enforcement, stable-ID/CAS replay and conflict preservation are proven for the branch. |
-| 4 — Evidence | UI/domain and server integration complete (branch) | `8608305a8` + uncommitted Phase 5A work | Evidence/client-state/HTTP contracts; full suites; rendered active-Project Saved candidate import | Approval, immutable snapshots/sets, Project isolation, and real Project Saved candidate import are integrated. Separate release accessibility/policy gates remain outside Phase 5A. |
-| 5 — Analyze and Professional Conclusion | UI/domain and server integration complete (branch) | `11e129cb8` + uncommitted Phase 5A work | Analysis/server-adapter/HTTP contracts; full suites; rendered Analyze gating | Exact server binding, approved-evidence-only context, concurrent request collision handling, idempotency, citations, attribution, staleness, and separate professional conclusion are covered. |
-| 5A — Server integration and data authority | **Complete on branch; external rollout not included** | Uncommitted Phase 5A work | `npm run test:code-question`, `npm run check`, and `npm run smoke` pass; expanded HTTP persistence/isolation/roles/analysis/Review/issuance/recovery/replay suite; rendered server-hydrated localhost workflow, real active-Project Saved candidate import, correct Analyze/Review/Issue gating, clean console; final no-P1 audits clean | Server authority, authenticated Project access, account isolation, authoritative hydration/commands, stable-ID offline replay/CAS, exact clean-session reconstruction, immutable/idempotent issuance, and hostile replay protections proven locally. Default disabled; no commit, pilot, deployment, or Production claim. |
-| 6 — Review | UI/domain and server integration complete (branch) | `000ae77c7` + uncommitted Phase 5A work | Review/HTTP contracts; full suites; rendered Review gating | Existing Coordination compatibility, blocking approval denial/resolution, forged attribution rejection, immutable comments, anchored requests, and actor/time history are integrated. Optional global inbox remains deferred. |
-| 7 — Issue | UI/domain and server integration complete (branch) | `9aed1741a` + uncommitted Phase 5A work | Issue/HTTP contracts; full suites; rendered Issue gating | Server-derived authority, immutable lineage, failure recovery, idempotent retry, hostile different-draft key reuse rejection, and clean-session issued reconstruction are covered. Final deployment, policy, privacy, accessibility, and visual-output review remain Phase 10 gates. |
-| 8 — Legacy promotion and supporting tools | UI/domain and server integration complete (branch) | `1909a3473` + uncommitted Phase 5A work | Legacy/HTTP contracts; full suites; rendered real active-Project Saved candidate import | Explicit promotion/link semantics, provenance, authoritative Project ownership/isolation, unlink/recovery, and generic-tool preservation are integrated behind the disabled capability. |
+| 1 — Contracts, storage, permissions, migration | Contract and server integration complete | `4523703ff` + `4bca8b2a7` | Original phase contract suites plus Phase 5A HTTP suite; full `test:code-question`, `check`, and `smoke` | Server-derived Project authority, role/isolation enforcement, CAS, counters, issuance saga, migration, adapters, and permissions are integrated behind the default-disabled capability. |
+| 2 — Project, Research, and Code Decision shell | First conversational migration slice implemented; further integration open | `a56e51079` + Phase 5A integration + current worktree | `test:code-question`, `check`, and `smoke` pass; signed-in localhost renders Code Decisions → existing Research → Code Decision with no stage control or console/overlay errors | Pane identity, Project/decision isolation, hydration, and account-scoped cache behavior remain valid. Old stage helpers remain only for migration/deep-link compatibility. |
+| 3 — Governed Question and Project Inputs | Trust layer complete; Research extraction/presentation open | `fcac63182` + Phase 5A integration | Define/client-state/HTTP contracts; full suites; prior rendered Definition `r1`/`v1` | Persistence, classification, role enforcement, CAS replay, and conflicts remain valid. Manual Define-stage presentation must be repurposed into the Code Decision. |
+| 4 — Conversational evidence discovery and approval | Trust layer complete; conversational suggestion/confirmation presentation open | `8608305a8` + Phase 5A integration | Evidence/client-state/HTTP contracts; full suites; prior active-Project Saved candidate import | Approval, immutable snapshots/sets, and isolation remain valid. Candidate/Reader/tray stage arrangement becomes contextual Research UI. |
+| 5 — Conversational Research and Code Decision | **Redesign in progress; first UX slice verified; trust layer complete** | `11e129cb8` + `4bca8b2a7` + current worktree | Existing analysis/server-adapter/HTTP contracts prove bounded analysis; current full suites and signed-in localhost prove the first Research-primary/Code Decision presentation slice | Existing persisted Research is now the primary surface; Code Decision sections, simplified derived states, contextual details, and Create Code Memo are present. Durable conversation/decision linking, automatic governed extraction, lightweight in-conversation acceptance, and explicit save/finalize remain open. |
+| 5A — Server integration and data authority | **Complete in current history; external rollout not included** | `4bca8b2a7` | `npm run test:code-question`, `npm run check`, and `npm run smoke` pass; expanded HTTP persistence/isolation/roles/analysis/Review/issuance/recovery/replay suite; rendered server-hydrated localhost workflow, real active-Project Saved candidate import, correct Analyze/Review/Issue gating, clean console; final no-P1 audits clean | Server authority, authenticated Project access, account isolation, authoritative hydration/commands, stable-ID offline replay/CAS, exact clean-session reconstruction, immutable/idempotent issuance, and hostile replay protections proven locally. Default disabled; no pilot, deployment, or Production claim. |
+| 6 — Contextual Review | Trust layer complete; optional/contextual presentation open | `000ae77c7` + Phase 5A integration | Review/HTTP contracts; full suites; prior rendered Review gating | Coordination compatibility, blocking rules, immutable comments, targets, attribution, and history remain. Mandatory Review-stage presentation is obsolete. |
+| 7 — Create Code Memo and issue | Trust layer complete; first simplified issuance presentation implemented | `9aed1741a` + `4bca8b2a7` + current worktree | Issue/HTTP contracts and full suites pass; signed-in localhost renders Create Code Memo from the Code Decision | Immutable lineage, recovery, idempotency, hostile-key rejection, and clean-session reconstruction remain. Advanced readiness/version panes stay contextual; end-to-end memo creation from a finalized redesigned decision still requires later Phase 5 completion evidence. |
+| 8 — Legacy promotion and supporting tools | UI/domain and server integration complete | `1909a3473` + `4bca8b2a7` | Legacy/HTTP contracts; full suites; rendered real active-Project Saved candidate import | Explicit promotion/link semantics, provenance, authoritative Project ownership/isolation, unlink/recovery, and generic-tool preservation are integrated behind the disabled capability. |
 | 9 — Adapted iPhone/iOS Project Hub | Read-only UI/decoder prototype complete; full exit gate open | `95628625f` | Release + Debug iPhone 17 Pro simulator builds; 38 iOS contract tests; `check`; `test:code-question`; Release launch | Decoder/read-cache work is valid for its scope. Server-authoritative cross-device reconstruction, mutation gate, physical-device proof, and mixed-client recovery remain open. |
-| 10 — Pilot, hardening, and rollout | Prototype hardening complete; **pilot gate not passed** | `3884d72d0` | `check`; `test:code-question`; offline + deploy-content contracts; production client build + `smoke`; 20/20 canonical evidence preflight; rendered current-tab desktop/mobile workflow and clean console | Rollout controls, local prototype hardening, and Phase 5A server integration are complete on the branch. Professional pilot evidence, policy/rights/retention/accessibility sign-off, push/deploy/Production verification, real signed-in Production lifecycle, and deployed rollback rehearsal remain pending. |
+| 10 — Pilot, hardening, and rollout | Prototype hardening complete; **pilot gate not passed** | `3884d72d0` | `check`; `test:code-question`; offline + deploy-content contracts; production client build + `smoke`; 20/20 canonical evidence preflight; rendered current-tab desktop/mobile workflow and clean console | Rollout controls, local prototype hardening, and Phase 5A server integration are present in current history. Phase 5 conversational completion, professional pilot evidence, policy/rights/retention/accessibility sign-off, push/deploy/Production verification, real signed-in Production lifecycle, and deployed rollback rehearsal remain pending. |
 
 ### Current handoff state
 
-- Branch: `codex/code-question-workspace` (from `468f7e306` on `codex/project-state-flicker-fixes`).
-- Phase 5A corrective server integration is complete on the consolidated worktree: authenticated Project authority, Project-owned storage, account isolation, authoritative hydration and lifecycle commands, offline replay/CAS conflict handling, exact clean-session reconstruction, immutable/idempotent issuance, hostile replay protection, and final no-P1 audits are covered. The work is not yet committed.
+- Current working branch: `main`; the baseline before the August 9 conversational migration slice was `b9b8aa1fa7`, four commits ahead of `origin/main`.
+- Phase 5A corrective server integration is committed in `4bca8b2a7`: authenticated Project authority, Project-owned storage, account isolation, authoritative hydration and lifecycle commands, offline replay/CAS conflict handling, exact clean-session reconstruction, immutable/idempotent issuance, hostile replay protection, and final no-P1 audits are covered.
+- The August 9 conversational Code Decision migration is active in the current worktree. It must be verified and committed incrementally without creating a second Research or governed-record store.
 - Phase 0 delivered: disabled capability flag, pure contracts, fixtures, ADRs, baseline tests.
 - Phase 1 contract/server integration delivered: foundation artifact kinds/targets/activity; organization CQ permissions; collaboration `requestType` adapters; Report Draft v2 / Manifest v3 adapters; `code-question-commands.mjs` (CAS, counters, issuance saga, outbox, migration); authenticated gated routes under `projects/code-questions/*`; file + Postgres storage ports; iOS optional payload fields + decode test; and integrated HTTP role/isolation verification. Capability remains **default disabled** (`PERMITEXT_CODE_QUESTION_WORKSPACE=1` to enable).
 - No tool deletion and no production deploy; the Code Question workspace remains default-disabled outside explicit rollout opt-in.
-- Unrelated untracked `CODEX_NEW_CHANGES_INSPECTION_REPORT.md` must remain unstaged.
 - Phase 2–4 UI/domain and server integration delivered: the workspace shell, Define model/UI, and Evidence model/UI now hydrate from and mutate the authenticated Project record; account isolation, role enforcement, stable-ID/CAS replay, immutable evidence approval, and the real active-Project Saved candidate import are verified on localhost.
 - Phase 5 UI/domain and server integration delivered: bounded analysis and conclusion use exact server-owned versions, approved evidence, structured limitations/citations/assumptions/missing facts/conflicts, collision-safe idempotency, staleness, attribution, and the no-AI path.
 - Phase 6 UI/domain and server integration delivered: typed and anchored Review Requests, status/reopen history, immutable comments, blocking approval denial/resolution, forged-attribution rejection, and separate approval behavior operate against the authoritative record. Due/priority were not introduced because current Coordination policy does not define them; the optional global Reviews inbox is deferred.
@@ -1642,4 +1790,5 @@ Update this table as implementation proceeds. Include commit IDs and verificatio
 - Phase 8 UI/domain and server integration delivered: visible Legacy / Unassigned inventory, explicit promotion/link choices, provenance relationships, authoritative Project ownership/isolation, unlink/recovery, and preservation of generic Project tools are integrated.
 - Phase 9 read-only UI/decoder prototype delivered: adapted Project Hub views, lifecycle decoding, offline read cache, issued lineage/download, accessibility labels, and bounded product copy. Cross-device server reconstruction, mutations, physical-device proof, and mixed-client recovery remain open.
 - Phase 10 local prototype hardening delivered: synthetic lifecycle paths, approved content reconstruction, recovery coverage, rollout controls, coarse metrics, rollback documentation, terminology guidance, and rendered accessibility review. This is not professional-pilot evidence.
-- Phase 5A is complete on the branch. The remaining Phase 9 device/mutation gates and Phase 10 external gates still require permissioned professional pilots, final policy/rights/retention/full-accessibility sign-off, deliberate commit/push and deployment, active Production client/cache verification, a real signed-in Production lifecycle, and deployed rollback rehearsal. Capability remains default-disabled.
+- Phase 5A is complete in current history. Phase 5 conversational extraction/linking/finalization remains open; Phase 9 device/mutation gates and Phase 10 external gates still require permissioned professional pilots, final policy/rights/retention/full-accessibility sign-off, deliberate push and deployment, active Production client/cache verification, a real signed-in Production lifecycle, and deployed rollback rehearsal. Capability remains default-disabled.
+- August 9 redesign audit: keep the `codeQuestion`/Question Input/Evidence Set/analysis/conclusion/review/issue contracts, server commands, hydration, permissions, concurrency, idempotency, offline, and audit code. Repurpose the Question index as Code Decisions; Definition/Evidence/Analysis/Conclusion panes as sections/actions within Research + Code Decision; Review and issuance panes as contextual/advanced details. Treat the five-stage selector, stage-first deep links/default arrangements, mandatory Review presentation, and separate Research-versus-Code-Question mental model as obsolete UI. Incremental migration is required; no parallel store or destructive backend rename is authorized.

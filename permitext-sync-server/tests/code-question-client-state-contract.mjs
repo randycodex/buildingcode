@@ -54,14 +54,23 @@ let stateA = updateCodeQuestionWorkspaceSnapshot(
     workspace: {
       activeQuestionID: "cq-a-1",
       activeStage: "define",
+      openPanes: [
+        { projectID: "project-a", questionID: "cq-a-1", paneRole: "research" },
+        { projectID: "project-a", questionID: "cq-a-1", paneRole: "decision-record" }
+      ],
       questionsByProjectID: {
         "project-a": [{ id: "cq-a-1", title: "Account A question" }]
       }
     },
-    paneOrder: ["utility:settings", "cq:project-a:cq-a-1:definition"],
+    paneOrder: [
+      "utility:settings",
+      "cq:project-a:cq-a-1:research",
+      "cq:project-a:cq-a-1:decision-record"
+    ],
     paneWeights: {
       "utility:settings": 400,
-      "cq:project-a:cq-a-1:definition": 520
+      "cq:project-a:cq-a-1:research": 520,
+      "cq:project-a:cq-a-1:decision-record": 420
     }
   }
 );
@@ -85,9 +94,17 @@ writeCodeQuestionAccountState(storage, stateA, accountA);
 
 const loadedA = readCodeQuestionAccountState(storage, accountA);
 assert.equal(loadedA.workspaceSnapshots["workspace-main"].workspace.activeQuestionID, "cq-a-1");
-assert.deepEqual(loadedA.workspaceSnapshots["workspace-main"].paneOrder, ["cq:project-a:cq-a-1:definition"]);
+assert.deepEqual(
+  loadedA.workspaceSnapshots["workspace-main"].workspace.openPanes.map((pane) => pane.paneRole),
+  ["research", "decision-record"]
+);
+assert.deepEqual(loadedA.workspaceSnapshots["workspace-main"].paneOrder, [
+  "cq:project-a:cq-a-1:research",
+  "cq:project-a:cq-a-1:decision-record"
+]);
 assert.deepEqual(loadedA.workspaceSnapshots["workspace-main"].paneWeights, {
-  "cq:project-a:cq-a-1:definition": 520
+  "cq:project-a:cq-a-1:research": 520,
+  "cq:project-a:cq-a-1:decision-record": 420
 });
 assert.equal(loadedA.outbox[0].id, "offline-definition-a-1", "Mutation identity must survive reload/retry.");
 assert.equal(loadedA.outbox[0].expectedVersion, 3);

@@ -49,8 +49,11 @@ export function codeQuestionListFromServer(payload = {}) {
     responsibleDisplayName: question.responsibleDisplayName || "",
     reviewState: question.reviewState || "",
     lastActivityAt: question.updatedAt || question.createdAt || "",
-    latestIssuedVersion: question.latestIssuedVersion || null,
-    revisionInProgress: false
+    missingInformationCount: Number(question.summary?.missingInformationCount || 0),
+    blockingReviewCount: Number(question.summary?.blockingReviewCount || 0),
+    conclusionCount: Number(question.summary?.conclusionCount || 0),
+    latestIssuedVersion: question.summary?.latestIssuedVersion || question.latestIssuedVersion || null,
+    revisionInProgress: question.summary?.revisionInProgress === true
   }));
 }
 

@@ -306,9 +306,10 @@ assert.equal(
 
 assert.equal(
   deriveQuestionListLabel({ latestIssuedVersion: 1, revisionInProgress: true }),
-  "Issued v1 · Revision in progress"
+  "Changed"
 );
-assert.equal(deriveQuestionListLabel({ question: { recordState: "active" } }), "Active");
+assert.equal(deriveQuestionListLabel({ latestIssuedVersion: 1 }), "Issued");
+assert.equal(deriveQuestionListLabel({ question: { recordState: "active" } }), "Working");
 
 // Invalid evidence role rejected
 assert.throws(
