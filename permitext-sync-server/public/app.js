@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-candidate-controls-v1";
+} from "./offline-storage.js?v=20260809-evidence-action-cleanup-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14004,10 +14004,6 @@ function renderEvidenceDiscovery(container) {
     const linkedConversationID = discovery.projectID === activeProjectIDForCodeQuestions()
       ? linkedResearchConversationIDForQuestion(activeDecisionID)
       : "";
-    const prepareCopy = document.createElement("p");
-    prepareCopy.textContent = approved.length
-      ? `${approved.length} selected ${approved.length === 1 ? "passage is" : "passages are"} ready to add. ${linkedConversationID ? "They will be added to this Code Decision’s linked Research conversation." : activeDecisionID ? "Permitext will start this Code Decision’s linked Research conversation first." : "Permitext will start a Research conversation."} Analyze remains a separate action.`
-      : "Select at least one passage to add to Research.";
     const prepareButton = document.createElement("button");
     prepareButton.type = "button";
     prepareButton.className = "evidence-discovery-prepare-button";
@@ -14067,7 +14063,7 @@ function renderEvidenceDiscovery(container) {
         prepareButton.disabled = false;
       }
     });
-    prepare.append(prepareCopy, prepareButton, prepareStatus);
+    prepare.append(prepareButton, prepareStatus);
     results.append(prepare);
   };
 
