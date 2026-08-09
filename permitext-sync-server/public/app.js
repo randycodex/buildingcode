@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-conversational-answer-v1";
+} from "./sync-state.js?v=20260809-decision-meta-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-conversational-answer-v1";
+} from "./offline-storage.js?v=20260809-decision-meta-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-conversational-answer-v1";
+} from "./workspace-state.js?v=20260809-decision-meta-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -25040,7 +25040,7 @@ function codeDecisionPresentation(questionID, options = {}) {
   const localDependenciesStale = hasDefinitionDetail && Boolean(
     definition?.dependentsStale?.analysis || definition?.dependentsStale?.conclusion
   );
-  let state = "Working";
+  let state = "In Progress";
   if (question.recordState === "archived") {
     state = "Archived";
   } else if (question.revisionInProgress || localDependenciesStale) {
@@ -25856,8 +25856,11 @@ function renderCodeQuestionIndexList(project) {
     button.innerHTML = `
       <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
       <span class="code-question-index-title">${escapeHTML(question.title || "Untitled decision")}</span>
-      <span class="code-question-index-state">${escapeHTML(presentation.state)}</span>
-      <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
+      <span class="code-question-index-meta-row">
+        <span class="code-question-index-state">${escapeHTML(presentation.state)}</span>
+        <span class="code-question-index-meta-separator" aria-hidden="true">/</span>
+        <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
+      </span>
     `;
     button.addEventListener("click", async () => {
       await selectCodeDecisionFromIndex(question);

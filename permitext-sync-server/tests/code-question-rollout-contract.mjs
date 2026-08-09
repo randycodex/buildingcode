@@ -303,6 +303,14 @@ assert.doesNotMatch(codeDecisionIndexSource, /code-question-index-meta|No Code D
 assert.match(codeDecisionIndexSource, /Ask a professional code question, then press Enter/);
 assert.match(codeDecisionIndexSource, /createLocalCodeQuestionDraft\(project, \{ questionText \}\)/);
 assert.doesNotMatch(codeDecisionIndexSource, /Search decisions|Search Code Decisions|code-question-create-button/);
+const codeDecisionIndexListSource = workspaceScript.slice(
+  workspaceScript.indexOf("function renderCodeQuestionIndexList"),
+  workspaceScript.indexOf("async function createLocalCodeQuestionDraft")
+);
+assert.match(codeDecisionIndexListSource, /code-question-index-meta-row/);
+assert.match(codeDecisionIndexListSource, /code-question-index-meta-separator/);
+assert.match(workspaceScript, /let state = "In Progress"/);
+assert.doesNotMatch(workspaceScript, /let state = "Working"/);
 assert.match(workspaceScript, /close\.className = "icon-button utility-close code-question-pane-close"/);
 assert.match(workspaceScript, /close\.innerHTML = circleXIconSVG\(\)/);
 const ensureShellSource = workspaceScript.slice(
@@ -337,14 +345,15 @@ const clientState = await readFile(new URL("../public/code-question-client-state
 assert.match(workspaceStyles, /grid-template-rows: minmax\(0, 1fr\) var\(--header-height\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/);
 assert.doesNotMatch(workspaceStyles, /\.code-decision-context-bar/);
+assert.match(workspaceStyles, /\.code-question-index-open \{[\s\S]*?"id title"[\s\S]*?"id meta"/);
 assert.doesNotMatch(workspaceStyles, /body\.code-question-workspace-enabled \.workspace-shell/);
 assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-conversational-answer-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v533/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-conversational-answer-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-meta-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v534/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-decision-meta-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
