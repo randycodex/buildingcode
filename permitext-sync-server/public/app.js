@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-project-summary-removal-v1";
+} from "./offline-storage.js?v=20260809-research-source-dedupe-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14713,6 +14713,35 @@ function renderResearchSource(source) {
   return card;
 }
 
+function researchDisplaySources(sources = []) {
+  const displayed = [];
+  const comparableText = (value) => String(value || "")
+    .normalize("NFKD")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+  sources.forEach((source) => {
+    const sourceText = comparableText(source.selectedText);
+    const redundantIndex = displayed.findIndex((current) => {
+      if (String(current.sectionID || "") !== String(source.sectionID || "")) return false;
+      const currentText = comparableText(current.selectedText);
+      return Boolean(sourceText && currentText) &&
+        (sourceText.includes(currentText) || currentText.includes(sourceText));
+    });
+    if (redundantIndex < 0) {
+      displayed.push(source);
+      return;
+    }
+    const current = displayed[redundantIndex];
+    const currentText = comparableText(current.selectedText);
+    if (
+      sourceText.length > currentText.length ||
+      (source.richSourceID && !current.richSourceID)
+    ) displayed[redundantIndex] = source;
+  });
+  return displayed;
+}
+
 function appendHistoricalResearchList(container, title, items = []) {
   if (!items.length) return;
   const heading = document.createElement("strong");
@@ -15164,6 +15193,7 @@ async function renderResearchConversation(conversationID) {
   applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID);
   panelTitle.textContent = conversation.title;
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
+  const displayedSources = researchDisplaySources(selectedSources);
   const evidencePane = document.createElement("section");
   evidencePane.className = "research-evidence-pane";
   const evidenceScroll = document.createElement("section");
@@ -15200,7 +15230,7 @@ async function renderResearchConversation(conversationID) {
   sourceToggle.append(sourceDisclosure, sourceLabel);
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
-  selectedSources.forEach((source) => sourceList.append(renderResearchSource(source)));
+  displayedSources.forEach((source) => sourceList.append(renderResearchSource(source)));
   sources.append(sourceToggle, sourceList);
   projectContextSection.prepend(sources);
   sourceList.querySelectorAll(".research-source-card").forEach((card) =>
