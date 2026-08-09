@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-session-stability-v5";
+} from "./offline-storage.js?v=20260809-project-decision-entry-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -82,7 +82,7 @@ import {
   questionPaneKey,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260809-code-decision-v5";
+} from "./code-question-workspace.js?v=20260809-project-decision-entry-v1";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountDomainState,
@@ -1777,6 +1777,51 @@ async function openProjectWorkboard(project) {
   return true;
 }
 
+function projectHasOpenCodeDecisions(project) {
+  const projectID = String(projectDetailKey(project) || "").trim();
+  return Boolean(projectID && (codeQuestionWorkspaceState().openPanes || []).some((pane) =>
+    pane.projectID === projectID && pane.paneRole === "question-index"
+  ));
+}
+
+async function closeProjectCodeDecisions(project) {
+  const projectID = String(projectDetailKey(project) || "").trim();
+  if (!projectID) return false;
+  const paneID = questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" });
+  setCodeQuestionWorkspaceState(
+    closeCodeQuestionPane(codeQuestionWorkspaceState(), paneID, projectID),
+    { activeProjectID: projectID }
+  );
+  delete state.paneWeights[paneID];
+  state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  return true;
+}
+
+async function openProjectCodeDecisions(project) {
+  const identity = projectIdentity(project);
+  const projectID = String(projectDetailKey(identity) || "").trim();
+  if (!projectID || !codeQuestionWorkspaceEnabled()) return false;
+  if (!openProjectDetails().some((detail) => projectDetailMatches(identity, detail))) {
+    const activated = await activateProjectStudio(identity, { transition: false });
+    if (!activated) return false;
+  }
+  const paneID = questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" });
+  const next = openSupportingTool(codeQuestionWorkspaceState(), {
+    projectID,
+    questionID: "_",
+    paneRole: "question-index"
+  });
+  next.questionIndexOpen = true;
+  setCodeQuestionWorkspaceState(next, { activeProjectID: projectID, syncDeepLink: true });
+  state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  scrollPaneIntoView(paneID);
+  return true;
+}
+
 async function closeProjectNotebook(project) {
   if (!(await confirmNotebookDiscard(project))) return false;
   const notebookID = paneIDForProjectNotebook(project);
@@ -2785,6 +2830,13 @@ async function activateProjectStudio(project, options = {}) {
   const expectedWorkspaceID = activeWorkspaceID;
   const transitionGeneration = ++projectStudioTransitionGeneration;
   if (current && projectDetailMatches(current, identity)) {
+    if (options.showOverview && codeQuestionWorkspaceEnabled()) {
+      clearProjectSpecificResearch(current);
+      setCodeQuestionWorkspaceState(
+        switchCodeQuestionProject(codeQuestionWorkspaceState(), projectDetailKey(identity), { openIndex: false }),
+        { activeProjectID: projectDetailKey(identity), syncDeepLink: true }
+      );
+    }
     if (options.transition !== false) await transitionWorkspace("utility");
     if (options.focusSaved !== false) scrollPaneIntoView(primarySavedPaneID());
     if (options.outcome) options.outcome.value = "applied";
@@ -5986,7 +6038,7 @@ function ensureCodeQuestionEvidenceWorkspace(questionID) {
   return getEvidenceForQuestion(questionID);
 }
 
-function ensureCodeQuestionShellForProject(project) {
+function ensureCodeQuestionShellForProject(project, options = {}) {
   if (!codeQuestionWorkspaceEnabled() || !project) return;
   const projectID = String(projectDetailKey(project) || "").trim();
   if (!projectID) return;
@@ -5994,7 +6046,7 @@ function ensureCodeQuestionShellForProject(project) {
   const currentProjectPanes = (cq.openPanes || []).filter((pane) => pane.projectID === projectID);
   if (!currentProjectPanes.length || (cq.openPanes || []).some((pane) => pane.projectID !== projectID)) {
     setCodeQuestionWorkspaceState(
-      switchCodeQuestionProject(cq, projectID),
+      switchCodeQuestionProject(cq, projectID, { openIndex: options.openIndex === true }),
       { activeProjectID: projectID, syncDeepLink: true }
     );
   } else if (
@@ -13870,10 +13922,6 @@ async function renderResearch(paneID = "utility:analysis") {
     decisionResearch.className = "analysis-card code-decision-research-entry";
     const decisionHeading = document.createElement("strong");
     decisionHeading.textContent = `${activeQuestion.displayID || "Decision"} · ${activeQuestion.title || "Code Decision"}`;
-    const decisionCopy = document.createElement("p");
-    decisionCopy.textContent = linkedConversationID
-      ? "This private Research conversation is linked to the structured Code Decision beside it. Exploratory messages remain outside governed analysis until you explicitly capture them or accept evidence through the governed workflow."
-      : "Start a private Research conversation for this Code Decision. Permitext will keep exploratory discussion separate while building the governed record from your explicit choices.";
     const decisionAction = document.createElement("button");
     decisionAction.type = "button";
     decisionAction.className = "ghost-button";
@@ -13905,7 +13953,7 @@ async function renderResearch(paneID = "utility:analysis") {
         decisionAction.disabled = false;
       }
     });
-    decisionResearch.append(decisionHeading, decisionCopy, decisionAction, decisionStatus);
+    decisionResearch.append(decisionHeading, decisionAction, decisionStatus);
     content.append(decisionResearch);
   }
 
@@ -15627,6 +15675,7 @@ async function openProjectDetail(project, options = {}) {
     ...options,
     sourcePaneID,
     focusSaved: false,
+    showOverview: true,
     transition: false
   });
   if (!activated) return;
@@ -20535,6 +20584,7 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     controls.className = "saved-folder-controls saved-project-tool-controls";
     controls.setAttribute("aria-label", `${identity.name} tools`);
     [
+      ["Code Decisions", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions],
       ["Notebook", "project-notebook-button", projectHasOpenNotebook, openProjectNotebook, closeProjectNotebook],
       ["Report Draft", "project-report-draft-button", projectHasOpenReportDraft, openProjectReportDraft, closeProjectReportDraft],
       ["Coordination", "project-coordination-button", projectHasOpenCoordination, openProjectCoordination, closeProjectCoordination]

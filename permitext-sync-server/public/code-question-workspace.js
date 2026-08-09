@@ -415,14 +415,15 @@ export function openCodeDecisionWorkspace(cqState, {
 /**
  * Project switch: drop all question panes and question selection for other projects.
  */
-export function switchActiveProject(cqState, nextProjectID) {
+export function switchActiveProject(cqState, nextProjectID, options = {}) {
   const projectID = String(nextProjectID || "").trim();
+  const openIndex = options.openIndex !== false;
   return normalizeCodeQuestionWorkspaceState({
     ...cqState,
     activeQuestionID: "",
     activeStage: "define",
     moreMenuOpen: false,
-    openPanes: projectID
+    openPanes: projectID && openIndex
       ? [{
           projectID,
           questionID: "_",
@@ -430,7 +431,7 @@ export function switchActiveProject(cqState, nextProjectID) {
           paneID: questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" })
         }]
       : [],
-    questionIndexOpen: Boolean(projectID),
+    questionIndexOpen: Boolean(projectID && openIndex),
     deepLink: null
   }, { activeProjectID: projectID });
 }

@@ -129,6 +129,11 @@ assert.equal(afterProjectSwitch.openPanes.length, 1);
 assert.equal(afterProjectSwitch.openPanes[0].projectID, "project-2");
 assert.equal(afterProjectSwitch.openPanes[0].paneRole, "question-index");
 
+const projectOverview = switchActiveProject(arranged, "project-2", { openIndex: false });
+assert.equal(projectOverview.activeQuestionID, "");
+assert.equal(projectOverview.questionIndexOpen, false);
+assert.deepEqual(projectOverview.openPanes, [], "Opening a Project folder alone must not force Code Decisions open.");
+
 // Question switch applies stage arrangement for that question
 const afterQuestion = switchActiveQuestion(afterProjectSwitch, {
   projectID: "project-2",
