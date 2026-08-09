@@ -158,6 +158,29 @@ assert.deepEqual(
   ["decision-record"]
 );
 assert.equal(decisionSurface.activeQuestionID, "cq-22");
+
+const expandedDecisionSurface = normalizeCodeQuestionWorkspaceState({
+  ...decisionSurface,
+  openPanes: [
+    ...decisionSurface.openPanes,
+    ...["definition", "evidence-tray", "history"].map((paneRole) => ({
+      projectID: "project-2",
+      questionID: "cq-22",
+      paneRole,
+      paneID: questionPaneKey({ projectID: "project-2", questionID: "cq-22", paneRole })
+    }))
+  ]
+}, { activeProjectID: "project-2" });
+const retargetedDecisionSurface = openCodeDecisionWorkspace(expandedDecisionSurface, {
+  projectID: "project-2",
+  questionID: "cq-23",
+  preserveOpenRoles: true
+});
+assert.deepEqual(
+  retargetedDecisionSurface.openPanes.filter((pane) => pane.questionID === "cq-23").map((pane) => pane.paneRole),
+  ["decision-record", "definition", "evidence-tray", "history"]
+);
+assert.ok(retargetedDecisionSurface.openPanes.every((pane) => pane.questionID === "_" || pane.questionID === "cq-23"));
 assert.equal(codeDecisionContextIsVisible(decisionSurface, {
   projectID: "project-2"
 }), true, "An open Code Decision record should show its context bar.");

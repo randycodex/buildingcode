@@ -421,10 +421,19 @@ export function applyStageArrangement(cqState, {
 export function openCodeDecisionWorkspace(cqState, {
   projectID,
   questionID,
-  keepIndex = true
+  keepIndex = true,
+  preserveOpenRoles = false
 } = {}) {
   const project = requiredText(projectID, "project ID");
   const question = requiredText(questionID, "question ID");
+  const priorQuestionID = String(cqState?.activeQuestionID || "").trim();
+  const priorRoles = preserveOpenRoles && priorQuestionID
+    ? (cqState?.openPanes || [])
+      .filter((pane) => pane.projectID === project && pane.questionID === priorQuestionID && pane.paneRole !== "question-index")
+      .map((pane) => pane.paneRole)
+      .filter((role, index, roles) => roles.indexOf(role) === index)
+    : [];
+  const nextRoles = priorRoles.length ? priorRoles : [...codeDecisionPrimaryArrangement];
   return normalizeCodeQuestionWorkspaceState({
     ...cqState,
     activeQuestionID: question,
@@ -439,7 +448,7 @@ export function openCodeDecisionWorkspace(cqState, {
             paneID: questionPaneKey({ projectID: project, questionID: "_", paneRole: "question-index" })
           }]
         : []),
-      ...codeDecisionPrimaryArrangement.map((paneRole) => ({
+      ...nextRoles.map((paneRole) => ({
         projectID: project,
         questionID: question,
         paneRole,

@@ -5288,6 +5288,83 @@ function openCodeDecisionSurface(cqState, options = {}) {
   return openCodeDecisionWorkspace(cqState, options);
 }
 
+async function selectCodeDecisionFromIndex(question) {
+  const projectID = activeProjectIDForCodeQuestions();
+  const questionID = String(question?.id || "").trim();
+  if (!projectID || !questionID) return false;
+  const priorWorkspace = codeQuestionWorkspaceState();
+  const previousQuestionID = String(priorWorkspace.activeQuestionID || "").trim();
+  const priorConversationID = String(state.researchConversationID || "").trim();
+  const presentationSnapshot = {
+    paneOrder: [...(state.paneOrder || [])],
+    paneWeights: { ...(state.paneWeights || {}) },
+    questionPanes: (priorWorkspace.openPanes || []).filter((pane) => pane.questionID === previousQuestionID),
+    conversationPaneID: priorConversationID ? paneIDForResearchConversation(priorConversationID) : ""
+  };
+  if (previousQuestionID && previousQuestionID !== questionID) {
+    // Candidate retrieval is exploratory working state for one question. Do not
+    // carry its results or pending selection into the next Code Decision.
+    activeEvidenceDiscovery = null;
+    pendingResearchSelection = null;
+    researchSelectionMenuInteracting = false;
+    researchSelectionMenuPinned = false;
+  }
+  const hydration = hydrateCodeQuestionState(projectID, questionID, { force: true, render: false });
+  const nextWorkspace = openCodeDecisionSurface(priorWorkspace, {
+    projectID,
+    questionID,
+    questionText: getDefinitionForQuestion(questionID)?.questionText || question.title,
+    resumeResearch: true,
+    preserveOpenRoles: true
+  });
+  setCodeQuestionWorkspaceState(nextWorkspace, { activeProjectID: projectID, syncDeepLink: true });
+
+  const replacementPaneIDs = new Map();
+  presentationSnapshot.questionPanes.forEach((priorPane) => {
+    const nextPane = (nextWorkspace.openPanes || []).find((pane) =>
+      pane.questionID === questionID && pane.paneRole === priorPane.paneRole
+    );
+    if (nextPane) replacementPaneIDs.set(priorPane.paneID, nextPane.paneID);
+  });
+  const nextConversationPaneID = state.researchConversationID ? paneIDForResearchConversation() : "";
+  if (presentationSnapshot.conversationPaneID && nextConversationPaneID) {
+    replacementPaneIDs.set(presentationSnapshot.conversationPaneID, nextConversationPaneID);
+  }
+  const retiredPaneIDs = new Set([
+    ...presentationSnapshot.questionPanes.map((pane) => pane.paneID),
+    presentationSnapshot.conversationPaneID
+  ].filter(Boolean));
+  const nextOrder = presentationSnapshot.paneOrder
+    .map((paneID) => replacementPaneIDs.get(paneID) || (retiredPaneIDs.has(paneID) ? "" : paneID))
+    .filter(Boolean);
+  (state.paneOrder || []).forEach((paneID) => {
+    if (!retiredPaneIDs.has(paneID) && !nextOrder.includes(paneID)) nextOrder.push(paneID);
+  });
+  state.paneOrder = nextOrder.filter((paneID, index) => nextOrder.indexOf(paneID) === index);
+  retiredPaneIDs.forEach((paneID) => delete state.paneWeights[paneID]);
+  replacementPaneIDs.forEach((nextPaneID, priorPaneID) => {
+    const priorWeight = presentationSnapshot.paneWeights[priorPaneID];
+    if (Number.isFinite(priorWeight)) state.paneWeights[nextPaneID] = priorWeight;
+  });
+
+  const currentRefreshPaneIDs = () => [
+    questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" }),
+    "utility:analysis",
+    ...(state.researchConversationID ? [paneIDForResearchConversation()] : []),
+    ...(codeQuestionWorkspaceState().openPanes || [])
+      .filter((pane) => pane.questionID === questionID)
+      .map((pane) => pane.paneID)
+  ];
+  await transitionWorkspace("utility", { refreshPaneIDs: currentRefreshPaneIDs() });
+  await hydration;
+  if (
+    activeProjectIDForCodeQuestions() !== projectID ||
+    codeQuestionWorkspaceState().activeQuestionID !== questionID
+  ) return false;
+  await transitionWorkspace("utility", { refreshPaneIDs: currentRefreshPaneIDs() });
+  return true;
+}
+
 async function startLinkedResearchForCodeDecision(questionID, options = {}) {
   const projectID = activeProjectIDForCodeQuestions();
   const qid = String(questionID || "").trim();
@@ -25433,17 +25510,7 @@ function renderCodeQuestionIndexList(project) {
       <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
     `;
     button.addEventListener("click", async () => {
-      const projectID = activeProjectIDForCodeQuestions();
-      setCodeQuestionWorkspaceState(
-        openCodeDecisionSurface(codeQuestionWorkspaceState(), {
-          projectID,
-          questionID: question.id,
-          questionText: getDefinitionForQuestion(question.id)?.questionText || question.title,
-          resumeResearch: true
-        }),
-        { activeProjectID: projectID, syncDeepLink: true }
-      );
-      await renderWorkspace();
+      await selectCodeDecisionFromIndex(question);
     });
     item.appendChild(button);
     const actions = document.createElement("div");
