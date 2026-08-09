@@ -311,7 +311,7 @@ async function main() {
       "The privacy policy or its web/iOS links no longer identify the operator and contact."
     );
     assert(!webRoot.text.includes("reader-share"), "Web reader unexpectedly included its retired section share control.");
-    assert(webRoot.text.includes('aria-label="AI-assisted research"'), "Web workspace omitted its research tool or trust label.");
+    assert(!webRoot.text.includes('id="toggle-analysis"'), "Web workspace still exposes global Research outside a Project.");
     assert(!webRoot.text.includes('id="workboard-dock"'), "Web workspace still included the retired fixed Workboard dock.");
     assert(
       webRoot.text.includes("20260725-visual-inventory-v13"),
@@ -330,7 +330,6 @@ async function main() {
       'id="add-reader"',
       'id="toggle-search"',
       'id="toggle-saved"',
-      'id="toggle-analysis"',
       'id="fit-columns"',
       'class="topbar-workspaces"',
       'class="topbar-brand"'
@@ -1269,7 +1268,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-project-research-label-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-project-research-entry-v3'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1949,10 +1948,18 @@ async function main() {
     assert(
       workspaceScript.text.includes('trustHeading.textContent = "AI-assisted research — not an official interpretation"') &&
         workspaceScript.text.includes('trustNotice.className = "research-trust-notice"') &&
-        workspaceScript.text.includes("const appendTrustNotice = () => content.append(trustNotice);") &&
+        workspaceScript.text.includes("if (!projectScopedResearch) content.append(trustNotice);") &&
         !workspaceScript.text.includes('trustBanner.className = "research-trust-banner"') &&
         !workspaceScript.text.includes('noteLabel.textContent = "Private note · not code text"'),
       "Research trust labeling should remain as a compact footer notice rather than a banner card."
+    );
+    assert(
+      workspaceScript.text.includes('findButton.textContent = "Search"') &&
+        workspaceScript.text.includes("includeUnassigned: !scopedProjectID") &&
+        workspaceScript.text.includes("if (!scopedProjectID) controls.append(projectSelect)") &&
+        workspaceScript.text.includes('await focusUtility("analysis", ".evidence-discovery textarea")') &&
+        !workspaceScript.text.includes('{ label: "Open AI-assisted Research"'),
+      "Project Research no longer owns a scoped Search entry point."
     );
     assert(
       workspaceScript.text.includes("function bindResearchTextSelection") &&

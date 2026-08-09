@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-research-label-v1";
+} from "./offline-storage.js?v=20260809-project-research-entry-v3";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -211,7 +211,6 @@ const defaultToolbarButtonIDs = Object.freeze([
   "add-reader",
   "toggle-search",
   "toggle-saved",
-  "toggle-analysis",
   "toggle-workboard",
   "toggle-settings",
   "fit-columns",
@@ -1784,9 +1783,15 @@ async function openProjectWorkboard(project) {
 
 function projectHasOpenCodeDecisions(project) {
   const projectID = String(projectDetailKey(project) || "").trim();
-  return Boolean(projectID && (codeQuestionWorkspaceState().openPanes || []).some((pane) =>
+  const indexIsOpen = Boolean(projectID && (codeQuestionWorkspaceState().openPanes || []).some((pane) =>
     pane.projectID === projectID && pane.paneRole === "question-index"
   ));
+  const scopedResearchIsOpen = Boolean(
+    projectID &&
+    state.utilities.analysis &&
+    activeProjectIDForCodeQuestions() === projectID
+  );
+  return indexIsOpen && scopedResearchIsOpen;
 }
 
 async function closeProjectCodeDecisions(project) {
@@ -1800,6 +1805,9 @@ async function closeProjectCodeDecisions(project) {
   delete state.paneWeights[paneID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
   saveWorkspaceState();
+  if (state.utilities.analysis && preferredResearchProjectID() === projectID) {
+    await closeResearchWorkspace();
+  }
   await transitionWorkspace("utility");
   return true;
 }
@@ -1823,7 +1831,12 @@ async function openProjectCodeDecisions(project) {
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   saveWorkspaceState();
   await transitionWorkspace("utility");
-  scrollPaneIntoView(paneID);
+  await focusUtility("analysis", ".evidence-discovery textarea");
+  placePaneAfter(primarySavedPaneID(), paneID);
+  placePaneAfter(paneID, "utility:analysis");
+  saveWorkspaceState();
+  await transitionWorkspace("utility");
+  scrollPaneIntoView("utility:analysis");
   return true;
 }
 
@@ -3202,6 +3215,19 @@ function activePaneIDs() {
     indexIDs.forEach((id, offset) => {
       if (!paired.includes(id)) paired.splice(indexInsertAt + offset, 0, id);
     });
+    const researchSurfaceIDs = [
+      ...(state.utilities.analysis ? ["utility:analysis"] : []),
+      ...(state.researchConversationID ? [paneIDForResearchConversation(state.researchConversationID)] : [])
+    ];
+    researchSurfaceIDs.forEach((id) => {
+      const currentIndex = paired.indexOf(id);
+      if (currentIndex !== -1) paired.splice(currentIndex, 1);
+    });
+    const lastIndexID = indexIDs.at(-1);
+    const lastIndexPosition = paired.indexOf(lastIndexID);
+    if (researchSurfaceIDs.length) {
+      paired.splice(lastIndexPosition === -1 ? paired.length : lastIndexPosition + 1, 0, ...researchSurfaceIDs);
+    }
     const researchAnchor = state.researchConversationID
       ? paneIDForResearchConversation(state.researchConversationID)
       : state.utilities.analysis
@@ -3673,7 +3699,7 @@ function setUtilityButtonStates() {
   toggleArchiveButton?.setAttribute("aria-pressed", String(state.utilities.archive));
   toggleSearchButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("search")));
   toggleSavedButton.setAttribute("aria-pressed", String(activeRepeatableKeys.has("saved")));
-  toggleAnalysisButton.setAttribute("aria-pressed", String(state.utilities.analysis));
+  toggleAnalysisButton?.setAttribute("aria-pressed", String(state.utilities.analysis));
   toggleWorkboardButton?.setAttribute("aria-pressed", String(genericWorkboardIsOpen()));
   toggleSettingsButton.setAttribute("aria-pressed", String(state.utilities.settings));
 }
@@ -13428,17 +13454,20 @@ function renderEvidenceDiscovery(container) {
   questionLabel.append(question);
   const controls = document.createElement("div");
   controls.className = "evidence-discovery-form-controls";
+  const scopedProjectID = String(activeProjectIDForCodeQuestions() || "").trim();
   const projectSelect = createResearchProjectSelect({
-    value: activeEvidenceDiscovery?.projectID || preferredResearchProjectID(),
+    value: scopedProjectID || activeEvidenceDiscovery?.projectID || preferredResearchProjectID(),
+    includeUnassigned: !scopedProjectID,
     unassignedLabel: "Unassigned — no Project context",
     ariaLabel: "Project for candidate evidence"
   });
   const findButton = document.createElement("button");
   findButton.className = "evidence-discovery-find";
   findButton.type = "submit";
-  findButton.textContent = "Find Candidate Evidence";
+  findButton.textContent = "Search";
   findButton.disabled = question.value.trim().length < 3;
-  controls.append(projectSelect, findButton);
+  if (!scopedProjectID) controls.append(projectSelect);
+  controls.append(findButton);
   projectSelect.addEventListener("change", () => {
     if (activeEvidenceDiscovery) {
       activeEvidenceDiscovery.projectID = projectSelect.value;
@@ -13834,6 +13863,8 @@ function renderEvidenceDiscovery(container) {
 async function renderResearch(paneID = "utility:analysis") {
   const panel = renderUtility(analysisTemplate, paneID);
   panel.classList.add("analysis-panel", "research-list-panel");
+  const projectScopedResearch = Boolean(activeProjectIDForCodeQuestions());
+  panel.classList.toggle("is-project-scoped", projectScopedResearch);
   applyProjectDerivedPaneTheme(panel, preferredResearchProjectID());
   panel.querySelector(".utility-close")?.addEventListener("click", closeResearchWorkspace);
   const content = panel.querySelector(".analysis-content");
@@ -13846,7 +13877,9 @@ async function renderResearch(paneID = "utility:analysis") {
   const trustCopy = document.createElement("p");
   trustCopy.textContent = "Select enacted text, then choose Start Research. No AI request is made until you ask a question and choose Analyze; private notes are excluded.";
   trustNotice.append(trustHeading, trustCopy);
-  const appendTrustNotice = () => content.append(trustNotice);
+  const appendTrustNotice = () => {
+    if (!projectScopedResearch) content.append(trustNotice);
+  };
 
   if (!activeAccount()) {
     const empty = document.createElement("article");
@@ -13899,7 +13932,7 @@ async function renderResearch(paneID = "utility:analysis") {
   const activeDecisionID = codeQuestionWorkspaceEnabled()
     ? String(codeQuestionWorkspaceState().activeQuestionID || "").trim()
     : "";
-  if (activeDecisionID) {
+  if (activeDecisionID && !projectScopedResearch) {
     const linkedConversationID = linkedResearchConversationIDForQuestion(activeDecisionID);
     const linkedConversation = researchConversationList.find((item) => item.id === linkedConversationID) || null;
     const decisionResearch = document.createElement("article");
@@ -13967,7 +14000,7 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(decisionResearch);
   }
 
-  if (researchUsage && researchEnabled) {
+  if (researchUsage && researchEnabled && !projectScopedResearch) {
     const usage = document.createElement("section");
     usage.className = "research-usage";
     const primary = document.createElement("strong");
@@ -27921,7 +27954,6 @@ function workspaceCommandDefinitions() {
       ? [{ label: "Add Reader", hint: "Open another code column", run: () => addReaderButton.click() }]
       : []),
     { label: "Open Saved and Projects", hint: "Review saved work and organize projects", run: () => focusUtility("saved") },
-    { label: "Open AI-assisted Research", hint: "Analyze the active official sections", run: () => focusUtility("analysis") },
     { label: "Open Settings", hint: "Code library, account, sync, and privacy", run: () => focusUtility("settings") },
     { label: "Reset Columns", hint: "Restore the current workspace order and widths", run: () => fitVisibleColumns() },
     ...(defaultActivePaneIDs().length
@@ -28268,9 +28300,6 @@ async function start() {
   });
   toggleArchiveButton?.addEventListener("click", () => {
     toggleUtilityPane("archive");
-  });
-  toggleAnalysisButton.addEventListener("click", () => {
-    focusUtility("analysis");
   });
   toggleSettingsButton.addEventListener("click", () => {
     focusUtility("settings");

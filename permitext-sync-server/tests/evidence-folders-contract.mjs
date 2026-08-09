@@ -204,6 +204,8 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-b
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research \.project-section-toggle-label \{[\s\S]*?font-size: inherit !important;[\s\S]*?font-weight: 500;[\s\S]*?letter-spacing: 0\.12em;[\s\S]*?text-transform: uppercase;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
 assert.match(appSource, /\["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions\]/);
+assert.match(appSource, /async function openProjectCodeDecisions[\s\S]*?await focusUtility\("analysis", "\.evidence-discovery textarea"\);/);
+assert.match(appSource, /function projectHasOpenCodeDecisions[\s\S]*?return indexIsOpen && scopedResearchIsOpen;/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?font-weight: 400;/);
 assert.match(stylesSource, /\.saved-evidence-collapse-toggle\[aria-expanded="true"\] \.research-chevron-up,[\s\S]*?\.saved-evidence-collapse-toggle\[aria-expanded="false"\] \.research-chevron-down \{[\s\S]*?display: block;/);
 const projectToolControlsRule = stylesSource.match(/\.saved-folder-context\.is-project \.saved-project-tool-controls \{([\s\S]*?)\n\}/)?.[1] || "";
