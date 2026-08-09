@@ -6351,12 +6351,6 @@ body.is-resizing-research-evidence * {
   margin: 0;
 }
 
-.research-message.is-user.is-starter small {
-  display: block;
-  margin-bottom: var(--space-2);
-  opacity: 0.72;
-}
-
 .research-message-capture {
   display: grid;
   gap: var(--space-2);

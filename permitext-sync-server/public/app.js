@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-source-label-layout-v1";
+} from "./offline-storage.js?v=20260809-research-starter-bubble-removal-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15285,16 +15285,6 @@ async function renderResearchConversation(conversationID) {
   thread.className = "research-message-thread";
   thread.id = `research-dialogue-${conversation.id}`;
   divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`);
-  if (!conversation.messages.length && conversation.starterQuestion) {
-    const starter = document.createElement("article");
-    starter.className = "research-message is-user is-starter";
-    const starterLabel = document.createElement("small");
-    starterLabel.textContent = "Question captured for this Code Decision";
-    const starterText = document.createElement("p");
-    starterText.textContent = conversation.starterQuestion;
-    starter.append(starterLabel, starterText);
-    thread.append(starter);
-  }
   conversation.messages.forEach((message) => {
     if (message.role === "user") {
       const bubble = document.createElement("article");
