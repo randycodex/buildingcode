@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-research-dedupe-v3";
+} from "./offline-storage.js?v=20260809-evidence-discovery-simplify-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13410,25 +13410,13 @@ function renderEvidenceDiscovery(container) {
 
   const section = document.createElement("section");
   section.className = "evidence-discovery";
-  const header = document.createElement("header");
-  header.className = "evidence-discovery-header";
-  const eyebrow = document.createElement("p");
-  eyebrow.className = "section-label";
-  eyebrow.textContent = "Private beta · candidate retrieval";
-  const heading = document.createElement("h3");
-  heading.textContent = "Find Relevant Evidence";
-  const copy = document.createElement("p");
-  copy.textContent = "Describe the project question. Permitext searches the enacted library and proposes passages for your review; it does not generate an answer or approve evidence.";
-  header.append(eyebrow, heading, copy);
-
   const form = document.createElement("form");
   form.className = "evidence-discovery-form";
   const questionLabel = document.createElement("label");
-  const questionLabelText = document.createElement("span");
-  questionLabelText.textContent = "Project question";
   const question = document.createElement("textarea");
   question.rows = 4;
   question.maxLength = 2_000;
+  question.setAttribute("aria-label", "Project question");
   question.placeholder = "Example: Can a six-story R-2 building use one exit stair?";
   const activeDecisionQuestionID = codeQuestionWorkspaceState().activeQuestionID;
   const activeDecisionQuestion = activeDecisionQuestionID
@@ -13437,7 +13425,7 @@ function renderEvidenceDiscovery(container) {
       ""
     : "";
   question.value = activeEvidenceDiscovery?.question || researchQuestionDraft || activeDecisionQuestion;
-  questionLabel.append(questionLabelText, question);
+  questionLabel.append(question);
   const controls = document.createElement("div");
   controls.className = "evidence-discovery-form-controls";
   const projectSelect = createResearchProjectSelect({
@@ -13480,25 +13468,8 @@ function renderEvidenceDiscovery(container) {
     summary.className = "evidence-discovery-summary";
     const summaryText = document.createElement("strong");
     summaryText.textContent = `${candidates.length} review ${candidates.length === 1 ? "candidate" : "candidates"}`;
-    const searched = document.createElement("span");
-    searched.textContent = `${Number(response.searchedSectionCount || 0).toLocaleString()} enacted sections searched`;
-    summary.append(summaryText, searched);
+    summary.append(summaryText);
     results.append(summary);
-
-    if (response.coverageLimitations?.length) {
-      const limitations = document.createElement("aside");
-      limitations.className = "evidence-discovery-limitations";
-      const limitationsHeading = document.createElement("strong");
-      limitationsHeading.textContent = "Review boundary";
-      const list = document.createElement("ul");
-      response.coverageLimitations.forEach((limitation) => {
-        const item = document.createElement("li");
-        item.textContent = limitation.text;
-        list.append(item);
-      });
-      limitations.append(limitationsHeading, list);
-      results.append(limitations);
-    }
 
     if (response.outsideCurrentLibrary?.length) {
       const outside = document.createElement("aside");
@@ -13558,11 +13529,9 @@ function renderEvidenceDiscovery(container) {
               ? "Selected for Research"
               : reviewState === "rejected"
                 ? "Rejected"
-                : "Candidate · not selected";
-      cardHeader.append(rank, citationWrap, stateBadge);
-      const why = document.createElement("p");
-      why.className = "evidence-candidate-why";
-      why.textContent = candidate.whyRelevant;
+                : "";
+      cardHeader.append(rank, citationWrap);
+      if (stateBadge.textContent) cardHeader.append(stateBadge);
       const quote = document.createElement("blockquote");
       quote.textContent = candidate.selectedText;
       const sourceRequirements = document.createElement("div");
@@ -13685,20 +13654,6 @@ function renderEvidenceDiscovery(container) {
           visualSourcesDetails
         );
       }
-      const signals = document.createElement("p");
-      signals.className = "evidence-candidate-signals";
-      const signalParts = [
-        candidate.relevance ? `${candidate.relevance} lexical relevance` : "",
-        candidate.signals?.topicRoutes?.length ? "curated topic route" : "",
-        candidate.signals?.containsVisualSource ? "map or visual present" : "",
-        candidate.signals?.includesStructuredTable ? "complete structured table included" : "",
-        candidate.signals?.referencesTable && !candidate.signals?.includesStructuredTable
-          ? "complete table needed"
-          : "",
-        candidate.signals?.containsException ? "exception language" : "",
-        candidate.signals?.containsCrossReference ? "cross-reference present" : ""
-      ].filter(Boolean);
-      signals.textContent = signalParts.join(" · ");
       const actions = document.createElement("div");
       actions.className = "evidence-candidate-actions";
       const approveButton = document.createElement("button");
@@ -13734,7 +13689,7 @@ function renderEvidenceDiscovery(container) {
         anchorPaneID: "utility:analysis"
       }));
       actions.append(approveButton, rejectButton, openButton);
-      card.append(cardHeader, why, quote);
+      card.append(cardHeader, quote);
       if (candidate.sourceReviewRequirements?.length) {
         card.append(sourceRequirements);
       }
@@ -13744,7 +13699,7 @@ function renderEvidenceDiscovery(container) {
       if (candidate.visualSources?.length) {
         card.append(visualSources);
       }
-      card.append(signals, actions);
+      card.append(actions);
       tray.append(card);
     });
     results.append(tray);
@@ -13858,7 +13813,7 @@ function renderEvidenceDiscovery(container) {
         }
       };
       formStatus.textContent = response.candidates?.length
-        ? "Candidates found. Review each passage before selecting it for Research."
+        ? ""
         : "No candidates were found. Refine the question or identify a code section.";
       renderResults();
     } catch (error) {
@@ -13871,7 +13826,7 @@ function renderEvidenceDiscovery(container) {
     }
   });
 
-  section.append(header, form, results);
+  section.append(form, results);
   container.append(section);
   renderResults();
 }

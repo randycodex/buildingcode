@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-code-decision-research-dedupe-v3'),
+        webRoot.text.includes('/web/app.js?v=20260809-evidence-discovery-simplify-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1741,7 +1741,10 @@ async function main() {
     );
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
-      evidenceDiscoveryClientSource.includes("Candidate · not selected") &&
+      !evidenceDiscoveryClientSource.includes("Candidate · not selected") &&
+        !evidenceDiscoveryClientSource.includes("evidence-candidate-why") &&
+        !evidenceDiscoveryClientSource.includes("evidence-candidate-signals") &&
+        !evidenceDiscoveryClientSource.includes("Review boundary") &&
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
         evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
         evidenceDiscoveryClientSource.includes("Complete structured source included") &&

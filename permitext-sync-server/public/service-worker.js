@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v499";
+const shellCacheName = "permitext-pro-shell-v500";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -12,9 +12,9 @@ const shellURLs = [
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260809-code-decision-research-dedupe-v3",
+  "/web/app.js?v=20260809-evidence-discovery-simplify-v1",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260809-code-decision-research-dedupe-v3",
+  "/web/offline-storage.js?v=20260809-evidence-discovery-simplify-v1",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260808-generic-workboard-v2",
   "/web/code-question-workspace.js?v=20260809-context-bar-visibility-v3",
