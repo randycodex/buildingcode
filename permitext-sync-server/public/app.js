@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-context-bar-visibility-v3";
+} from "./offline-storage.js?v=20260809-code-decision-pane-width-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -301,6 +301,7 @@ const legacyReaderPaneWidth = 520;
 const defaultReaderPaneWidth = 600;
 const legacySourceLinkedReaderPaneWidth = 400;
 const defaultSourceLinkedReaderPaneWidth = 600;
+const legacyCoordinationPaneWidth = 430;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
 const defaultSavedPaneWidth = 600;
@@ -308,10 +309,11 @@ const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
 const defaultNotebookPaneWidth = 600;
 const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth;
-const legacyCoordinationPaneWidth = 430;
 const defaultCoordinationPaneWidth = 600;
 const defaultCoordinationThreadPaneWidth = 520;
 const defaultSettingsPaneWidth = defaultNonReaderPaneWidth;
+const defaultResearchPaneWidth = 600;
+const defaultCodeDecisionPaneWidth = 600;
 const readerSearchFlashDurationMS = 2000;
 const readerInternalSearchDelayMS = 180;
 const readerInitialSectionWindowSize = 5;
@@ -2959,7 +2961,7 @@ function defaultPaneWidthForID(paneID) {
   if (!paneID) return defaultReaderPaneWidth;
   if (isCodeQuestionPaneID(paneID)) {
     const parsed = parseQuestionPaneKey(paneID);
-    return minimumWidthForPaneRole(parsed?.paneRole) || defaultDetailPaneWidth;
+    return Math.max(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole(parsed?.paneRole) || 0);
   }
   if (isProjectWorkboardPaneID(paneID)) return defaultWorkboardPaneWidth;
   if (isProjectNotebookPaneID(paneID)) return defaultNotebookPaneWidth;
@@ -2968,7 +2970,8 @@ function defaultPaneWidthForID(paneID) {
   if (isProjectCoordinationPaneID(paneID)) return defaultCoordinationPaneWidth;
   if (isProjectDetailPaneID(paneID) || paneID.startsWith("section:detail:")) return defaultDetailPaneWidth;
   if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth;
-  if (paneID === "utility:settings" || paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultSettingsPaneWidth;
+  if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultResearchPaneWidth;
+  if (paneID === "utility:settings") return defaultSettingsPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
   if (paneID.startsWith("reader:")) {
     const readerID = paneID.replace("reader:", "");

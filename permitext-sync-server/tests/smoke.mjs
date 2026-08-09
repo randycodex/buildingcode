@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-context-bar-visibility-v3'),
+        webRoot.text.includes('/web/app.js?v=20260809-code-decision-pane-width-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1851,8 +1851,10 @@ async function main() {
         workspaceScript.text.includes("const defaultNotebookPaneWidth = 600") &&
         workspaceScript.text.includes("const defaultReportDraftPaneWidth = defaultNonReaderPaneWidth") &&
         workspaceScript.text.includes("const defaultSettingsPaneWidth = defaultNonReaderPaneWidth") &&
+        workspaceScript.text.includes("const defaultResearchPaneWidth = 600") &&
+        workspaceScript.text.includes("const defaultCodeDecisionPaneWidth = 600") &&
         workspaceScript.text.includes("return defaultNonReaderPaneWidth"),
-      "Non-Reader columns no longer preserve their intended default widths."
+      "Code Decision workflow columns no longer preserve their intended defaults."
     );
     assert(
       workspaceStyles.text.includes("--project-pane-band-height: calc(var(--panel-padding) + var(--panel-title-row-height) + var(--space-3))") &&
