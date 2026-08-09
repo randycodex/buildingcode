@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 
 export const evidenceDiscoveryVersion = "20260725-hybrid-candidates-v10";
+export const evidenceCandidateDisplayVersion = "20260809-structured-candidate-v1";
 export const evidenceDiscoveryMaximumCandidates = 12;
 export const evidenceDiscoveryMaximumVisualSelections = 4;
 
@@ -550,6 +551,20 @@ function bestPassage(body, terms, bigrams) {
   return ranked[0] || null;
 }
 
+function candidateDisplayBlock(body, passage) {
+  const block = (body?.blocks || []).find((item) =>
+    String(item?.id || "") === String(passage?.blockID || "")
+  );
+  if (!block) return null;
+  const html = String(block.html || "").trim();
+  if (!html) return null;
+  return {
+    kind: String(block.kind || "html"),
+    html,
+    plainText: String(block.plainText || passage.text || "")
+  };
+}
+
 function candidateExplanation({ matchedTerms, section, passage, exactReference, matchedRoutes }) {
   const reasons = [];
   if (exactReference) reasons.push(`The question names ${section.codePrefix} ${section.sectionNumber}.`);
@@ -700,6 +715,7 @@ export async function discoverRelevantEvidence({
         comparableTableReference(source.reference) === comparableTableReference(reference)
       )
     );
+    const displayBlock = candidateDisplayBlock(body, passage);
     const finalScore = entry.score +
       coverage * 12 +
       titleMatches * 2.6 +
@@ -718,7 +734,8 @@ export async function discoverRelevantEvidence({
       matchedTerms: Array.from(new Set([...matchedTerms, ...originalMatches])),
       sourceReviewRequirements: reviewRequirements,
       richSources: applicableRichSources,
-      visualSources
+      visualSources,
+      displayBlock
     });
   }
 
@@ -761,6 +778,7 @@ export async function discoverRelevantEvidence({
       sectionNumber: String(item.section.sectionNumber || ""),
       title: String(item.section.title || "Section"),
       selectedText: item.passage.text,
+      displayBlock: item.displayBlock,
       blockID: item.passage.blockID || null,
       preparationEligible: item.sourceReviewRequirements.length === 0,
       sourceReviewRequirements: item.sourceReviewRequirements,
@@ -851,6 +869,7 @@ export async function discoverRelevantEvidence({
   return {
     schemaVersion: 2,
     retrievalVersion: evidenceDiscoveryVersion,
+    candidateDisplayVersion: evidenceCandidateDisplayVersion,
     question: normalizedQuestion,
     candidateState: "unreviewed",
     candidates,

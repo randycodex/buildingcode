@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-cascade-v1";
+} from "./offline-storage.js?v=20260809-candidate-format-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13439,6 +13439,83 @@ function evidenceCandidatePreparationReady(candidate) {
   );
 }
 
+function comparableCandidateExcerptCharacter(value) {
+  return String(value || "")
+    .normalize("NFKC")
+    .replace(/[\u00AD\u200B-\u200D\uFEFF]/g, "")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"');
+}
+
+function candidateExcerptTextMap(root) {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  const positions = [];
+  let text = "";
+  let node = walker.nextNode();
+  while (node) {
+    const value = String(node.nodeValue || "");
+    if (text && !text.endsWith(" ") && value && !/^\s/.test(value)) {
+      text += " ";
+      positions.push({ node, start: 0, end: 0 });
+    }
+    for (let offset = 0; offset < value.length; offset += 1) {
+      const character = comparableCandidateExcerptCharacter(value[offset]);
+      for (const normalizedCharacter of character) {
+        if (/\s/.test(normalizedCharacter)) {
+          if (!text || text.endsWith(" ")) continue;
+          text += " ";
+        } else {
+          text += normalizedCharacter;
+        }
+        positions.push({ node, start: offset, end: offset + 1 });
+      }
+    }
+    node = walker.nextNode();
+  }
+  return { text: text.trim(), positions };
+}
+
+function formattedCandidatePlainText(value) {
+  return String(value || "")
+    .replace(/\s+(?=["“']?\([A-Za-z0-9]+\)\s)/g, "\n")
+    .trim();
+}
+
+function renderEvidenceCandidateExcerpt(candidate) {
+  const quote = document.createElement("blockquote");
+  quote.className = "evidence-candidate-excerpt";
+  if (!candidate.displayBlock?.html) {
+    quote.textContent = formattedCandidatePlainText(candidate.selectedText);
+    return quote;
+  }
+  const source = renderCodeBlock(candidate.displayBlock);
+  const mapped = candidateExcerptTextMap(source);
+  const target = comparableCandidateExcerptCharacter(candidate.selectedText)
+    .replace(/\s+/g, " ")
+    .trim();
+  const start = mapped.text.indexOf(target);
+  const startPosition = start >= 0 ? mapped.positions[start] : null;
+  const endPosition = start >= 0 ? mapped.positions[start + target.length - 1] : null;
+  if (!startPosition || !endPosition) {
+    quote.textContent = formattedCandidatePlainText(candidate.selectedText);
+    return quote;
+  }
+  const range = document.createRange();
+  // Preserve the Reader's canonical markup without expanding the governed
+  // candidate beyond its exact selectedText passage.
+  range.setStart(startPosition.node, startPosition.start);
+  range.setEnd(endPosition.node, endPosition.end);
+  const content = document.createElement("div");
+  content.className = "section-block section-html evidence-candidate-structured-excerpt";
+  content.append(range.cloneContents());
+  if (!content.querySelector("p, ul, ol, li, table, div, blockquote, br")) {
+    quote.textContent = formattedCandidatePlainText(candidate.selectedText);
+    return quote;
+  }
+  quote.append(content);
+  return quote;
+}
+
 function renderEvidenceDiscovery(container) {
   if (
     !hasCapability("evidence-discovery") &&
@@ -13578,8 +13655,7 @@ function renderEvidenceDiscovery(container) {
                 : "";
       cardHeader.append(rank, citationWrap);
       if (stateBadge.textContent) cardHeader.append(stateBadge);
-      const quote = document.createElement("blockquote");
-      quote.textContent = candidate.selectedText;
+      const quote = renderEvidenceCandidateExcerpt(candidate);
       const sourceRequirements = document.createElement("div");
       sourceRequirements.className = "evidence-candidate-source-requirements";
       if (candidate.sourceReviewRequirements?.length) {

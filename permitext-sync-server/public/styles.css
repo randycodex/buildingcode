@@ -5569,6 +5569,20 @@ mark {
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.8) !important;
   line-height: 1.5;
+  white-space: pre-line;
+}
+
+.evidence-candidate-card blockquote .section-block {
+  margin: 0;
+  white-space: normal;
+}
+
+.evidence-candidate-card blockquote .section-html > :first-child {
+  margin-top: 0;
+}
+
+.evidence-candidate-card blockquote .section-html > :last-child {
+  margin-bottom: 0;
 }
 
 .evidence-candidate-actions {

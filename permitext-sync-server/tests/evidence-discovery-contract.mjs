@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import {
   discoverRelevantEvidence,
+  evidenceCandidateDisplayVersion,
   evidenceDiscoveryFeatureEnabled,
   evidenceDiscoveryMaximumCandidates,
   evidenceDiscoveryVersion,
@@ -68,7 +69,8 @@ const bodies = new Map([
   ["1", {
     blocks: [{
       id: "scissor-rule",
-      plainText: "Stairways that share a scissor stair assembly shall be counted as one exit stairway. Exception: In Group R-2 occupancies the stairs may be treated as separate exits where the specified enclosure and separation conditions are satisfied."
+      plainText: "Stairways that share a scissor stair assembly shall be counted as one exit stairway. Exception: In Group R-2 occupancies the stairs may be treated as separate exits where the specified enclosure and separation conditions are satisfied.",
+      html: "<p>Stairways that share a scissor stair assembly shall be counted as one exit stairway.</p><ol><li>Exception: In Group R-2 occupancies the stairs may be treated as separate exits where the specified enclosure and separation conditions are satisfied.</li></ol>"
     }]
   }],
   ["2", {
@@ -115,11 +117,13 @@ const discovery = await discoverRelevantEvidence({
 
 assert.equal(discovery.schemaVersion, 2);
 assert.equal(discovery.retrievalVersion, evidenceDiscoveryVersion);
+assert.equal(discovery.candidateDisplayVersion, evidenceCandidateDisplayVersion);
 assert.equal(discovery.candidateState, "unreviewed");
 assert.equal(discovery.candidates[0].sectionID, "1");
 assert.equal(discovery.candidates[0].candidateState, "candidate");
 assert.equal(discovery.candidates[0].signals.containsException, true);
 assert.match(discovery.candidates[0].selectedText, /scissor stair assembly/);
+assert.match(discovery.candidates[0].displayBlock.html, /<ol><li>Exception:/);
 assert.equal(discovery.generatedAnswer, undefined);
 assert(discovery.candidates.length <= evidenceDiscoveryMaximumCandidates);
 assert(

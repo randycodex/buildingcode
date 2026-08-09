@@ -319,9 +319,9 @@ assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/
 assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-search-width-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v510/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-search-width-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-candidate-format-v2/);
+assert.match(serviceWorker, /permitext-pro-shell-v512/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-candidate-format-v2/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
@@ -332,6 +332,8 @@ assert.match(workspaceScript, /const researchSurfaceIDs = \[[\s\S]*?"utility:ana
 assert.match(workspaceScript, /function closeCodeQuestionDownstreamPanes[\s\S]*?pane\.paneRole === "question-index"[\s\S]*?activeQuestionID: ""/);
 assert.match(workspaceScript, /parsed\.paneRole === "question-index"[\s\S]*?closeProjectCodeDecisions\(project \|\| \{ id: parsed\.projectID \}\)/);
 assert.match(workspaceScript, /async function closeProjectCodeDecisions[\s\S]*?if \(state\.utilities\.analysis\) \{[\s\S]*?await closeResearchWorkspace\(\);[\s\S]*?return true/);
+assert.match(workspaceScript, /function renderEvidenceCandidateExcerpt[\s\S]*?candidateExcerptTextMap\(source\)[\s\S]*?range\.cloneContents\(\)/);
+assert.match(workspaceStyles, /\.evidence-candidate-card blockquote \.section-block \{[\s\S]*?white-space: normal;/);
 assert.match(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);
