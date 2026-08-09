@@ -5337,24 +5337,25 @@ mark {
 
 .evidence-candidate-tray {
   display: grid;
-  gap: var(--space-3);
+  gap: 0;
 }
 
 .evidence-candidate-card {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-3);
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-primary) 7%, var(--surface));
+  padding: var(--space-3) 0;
+  border-top: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
 }
 
 .evidence-candidate-card.is-approved {
-  background: color-mix(in srgb, #12b76a 13%, var(--surface));
+  background: transparent;
 }
 
 .evidence-candidate-card.is-rejected {
   opacity: 0.68;
-  background: color-mix(in srgb, var(--text-primary) 4%, var(--surface));
+  background: transparent;
 }
 
 .evidence-candidate-heading {
