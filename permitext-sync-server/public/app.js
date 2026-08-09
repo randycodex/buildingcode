@@ -12727,6 +12727,16 @@ async function closeResearchConversation() {
 }
 
 async function openResearchConversation(conversationID, options = {}) {
+  const codeQuestionProjectID = activeProjectIDForCodeQuestions();
+  if (codeQuestionWorkspaceEnabled() && codeQuestionProjectID && codeQuestionWorkspaceState().activeQuestionID) {
+    // Persisted Research conversations do not yet carry a governed Code
+    // Decision link. Clear the active decision instead of implying that an
+    // arbitrarily selected conversation belongs to the record beside it.
+    setCodeQuestionWorkspaceState(
+      switchCodeQuestionProject(codeQuestionWorkspaceState(), codeQuestionProjectID),
+      { activeProjectID: codeQuestionProjectID, syncDeepLink: true }
+    );
+  }
   state.utilities.analysis = true;
   state.researchConversationID = conversationID;
   const paneID = paneIDForResearchConversation(conversationID);
@@ -23626,14 +23636,15 @@ function projectColorStyle(project) {
   return color ? `--project-color: ${color};` : "";
 }
 
-function codeDecisionPresentation(questionID) {
+function codeDecisionPresentation(questionID, options = {}) {
   const qid = String(questionID || "").trim();
   const question = questionsForActiveProject().find((item) => item.id === qid) || {};
   const cq = codeQuestionWorkspaceState();
-  const hasDefinitionDetail = Boolean(cq.definitionsByQuestionID?.[qid]);
-  const hasReviewDetail = Boolean(cq.reviewByQuestionID?.[qid]);
-  const hasAnalysisDetail = Boolean(cq.analysisByQuestionID?.[qid]);
-  const hasIssueDetail = Boolean(cq.issueByQuestionID?.[qid]);
+  const preferSummary = options.preferSummary === true;
+  const hasDefinitionDetail = !preferSummary && Boolean(cq.definitionsByQuestionID?.[qid]);
+  const hasReviewDetail = !preferSummary && Boolean(cq.reviewByQuestionID?.[qid]);
+  const hasAnalysisDetail = !preferSummary && Boolean(cq.analysisByQuestionID?.[qid]);
+  const hasIssueDetail = !preferSummary && Boolean(cq.issueByQuestionID?.[qid]);
   const definition = getDefinitionForQuestion(qid);
   const review = getReviewForQuestion(qid);
   const issue = getIssueForQuestion(qid);
@@ -23651,10 +23662,13 @@ function codeDecisionPresentation(questionID) {
   const conclusionCount = hasAnalysisDetail
     ? getAnalysisForQuestion(qid).conclusionRevisions.length
     : Number(question.conclusionCount || 0);
+  const localDependenciesStale = hasDefinitionDetail && Boolean(
+    definition?.dependentsStale?.analysis || definition?.dependentsStale?.conclusion
+  );
   let state = "Working";
   if (question.recordState === "archived") {
     state = "Archived";
-  } else if (question.revisionInProgress || definition?.dependentsStale?.analysis || definition?.dependentsStale?.conclusion) {
+  } else if (question.revisionInProgress || localDependenciesStale) {
     state = "Changed";
   } else if (blockingReviewCount) {
     state = "Needs Review";
@@ -24561,7 +24575,10 @@ function renderCodeQuestionIndexList(project) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "code-question-index-open";
-    const presentation = codeDecisionPresentation(question.id);
+    // The list response is the current server view across every decision.
+    // Detail caches may be older for records that have not been opened in
+    // this session, so list cards must prefer the server-derived summary.
+    const presentation = codeDecisionPresentation(question.id, { preferSummary: true });
     button.innerHTML = `
       <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
       <span class="code-question-index-title">${escapeHTML(question.title || "Untitled decision")}</span>

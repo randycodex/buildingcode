@@ -226,9 +226,11 @@ assert.match(workspaceScript, /openCodeDecisionWorkspace/);
 assert.match(workspaceScript, /state\.utilities\.analysis = true/);
 assert.match(workspaceScript, /state\.researchConversationID = ""/);
 assert.match(workspaceScript, /Never imply one by carrying a previously active conversation/);
+assert.match(workspaceScript, /Persisted Research conversations do not yet carry a governed Code/);
 assert.match(workspaceScript, /grouped\.confirmedFacts\.filter\(\(item\) => item\.state === "confirmed"\)/);
 assert.match(workspaceScript, /input\.inputKind === "confirmedFact" && input\.state !== "confirmed"/);
-assert.match(workspaceScript, /const presentation = codeDecisionPresentation\(question\.id\)/);
+assert.match(workspaceScript, /codeDecisionPresentation\(question\.id, \{ preferSummary: true \}\)/);
+assert.match(workspaceScript, /const localDependenciesStale = hasDefinitionDetail && Boolean/);
 assert.match(workspaceScript, /Create Code Memo/);
 assert.doesNotMatch(workspaceScript, /function renderCodeQuestionStageControl/);
 
