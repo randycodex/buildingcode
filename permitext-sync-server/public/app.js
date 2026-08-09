@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-candidate-queue-v1";
+} from "./offline-storage.js?v=20260809-project-column-cleanup-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -20918,32 +20918,6 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     );
     context.append(savedSection);
 
-    const { foundation, error } = await loadProjectCoordinationFoundation(identity);
-    if (!panel.isConnected) return folder;
-    if (activeAccount()) {
-      appendProjectNotes(context, identity, foundation, {
-        title: "Blocknotes",
-        className: "saved-project-blocknote"
-      });
-    } else {
-      const unavailable = document.createElement("section");
-      unavailable.className = "project-studio-section saved-project-blocknote";
-      const title = document.createElement("p");
-      title.className = "section-label";
-      title.textContent = "Blocknotes";
-      const copy = document.createElement("p");
-      copy.textContent = "Sign in to load and edit Blocknotes.";
-      unavailable.append(title, copy);
-      context.append(unavailable);
-    }
-    if (error && activeAccount()) {
-      const warning = document.createElement("p");
-      warning.className = "project-studio-warning saved-project-overview-warning";
-      warning.textContent = error;
-      context.append(warning);
-    }
-
-    appendProjectResearchHistory(context, identity, foundation);
   } else {
     const controls = document.createElement("div");
     controls.className = "saved-folder-controls";
