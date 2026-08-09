@@ -225,8 +225,9 @@ const serviceWorker = await readFile(new URL("../public/service-worker.js", impo
 assert.match(workspaceStyles, /body\.code-question-workspace-enabled \.workspace-shell \{\s*grid-template-rows: var\(--header-height\) auto minmax\(0, 1fr\)/);
 assert.match(workspaceStyles, /grid-template-rows: minmax\(0, 1fr\) auto var\(--header-height\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/);
-assert.match(workspaceHTML, /styles\.css\?v=20260808-project-tools-equal-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v472/);
-assert.match(serviceWorker, /styles\.css\?v=20260808-project-tools-equal-v1/);
+assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
+assert.match(workspaceHTML, /styles\.css\?v=20260808-code-question-scroll-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v473/);
+assert.match(serviceWorker, /styles\.css\?v=20260808-code-question-scroll-v1/);
 
 console.log("code-question-rollout-contract: all assertions passed");

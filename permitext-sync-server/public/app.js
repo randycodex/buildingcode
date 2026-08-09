@@ -41,8 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260808-project-tools-equal-v1";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-project-tools-equal-v1";
+} from "./offline-storage.js?v=20260808-code-question-scroll-v1";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-code-question-scroll-v1";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,

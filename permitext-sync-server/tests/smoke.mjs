@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260808-project-tools-equal-v1'),
+        webRoot.text.includes('/web/app.js?v=20260808-code-question-scroll-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1411,7 +1411,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-project-tools-equal-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-code-question-scroll-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1645,7 +1645,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260808-project-tools-equal-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260808-code-question-scroll-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1881,7 +1881,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
-        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-project-tools-equal-v1"') &&
+        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260808-code-question-scroll-v1"') &&
         workspaceScript.text.includes("syncConflictRecordsMatch(local.record, server.record)") &&
         workspaceScript.text.includes("entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&
