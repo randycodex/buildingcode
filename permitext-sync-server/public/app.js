@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-research-dedupe-v2";
+} from "./offline-storage.js?v=20260809-code-decision-research-dedupe-v3";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13945,13 +13945,10 @@ async function renderResearch(paneID = "utility:analysis") {
     ? String(codeQuestionWorkspaceState().activeQuestionID || "").trim()
     : "";
   if (activeDecisionID) {
-    const activeQuestion = questionsForActiveProject().find((item) => item.id === activeDecisionID) || {};
     const linkedConversationID = linkedResearchConversationIDForQuestion(activeDecisionID);
     const linkedConversation = researchConversationList.find((item) => item.id === linkedConversationID) || null;
     const decisionResearch = document.createElement("article");
     decisionResearch.className = "analysis-card code-decision-research-entry";
-    const decisionHeading = document.createElement("strong");
-    decisionHeading.textContent = `${activeQuestion.displayID || "Decision"} · ${activeQuestion.title || "Code Decision"}`;
     const decisionAction = document.createElement("button");
     decisionAction.type = "button";
     decisionAction.className = "ghost-button";
@@ -14011,7 +14008,6 @@ async function renderResearch(paneID = "utility:analysis") {
         decisionAction.disabled = false;
       }
     });
-    decisionResearch.prepend(decisionHeading);
     decisionResearch.append(decisionAction, decisionStatus);
     content.append(decisionResearch);
   }
