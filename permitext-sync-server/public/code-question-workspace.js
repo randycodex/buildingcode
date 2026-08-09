@@ -265,6 +265,12 @@ export function normalizeCodeQuestionWorkspaceState(value = {}, options = {}) {
               latestIssuedVersion: item.latestIssuedVersion == null
                 ? null
                 : Number(item.latestIssuedVersion),
+              researchConversationID: item.researchConversationID
+                ? String(item.researchConversationID)
+                : null,
+              researchConversationUpdatedAt: item.researchConversationUpdatedAt
+                ? String(item.researchConversationUpdatedAt)
+                : null,
               revisionInProgress: item.revisionInProgress === true,
               listLabel: String(item.listLabel || "")
             }))

@@ -9,6 +9,8 @@ const envelope = (id, type, version = 1) => ({ id, type, version, createdAt: at,
 
 const list = codeQuestionListFromServer({ questions: [{
   id: "cq-1", displayID: "Q-001", title: "Egress", updatedAt: at,
+  researchConversationID: "research-1",
+  researchConversationUpdatedAt: at,
   summary: {
     missingInformationCount: 2,
     blockingReviewCount: 1,
@@ -24,9 +26,11 @@ assert.equal(list[0].blockingReviewCount, 1);
 assert.equal(list[0].conclusionCount, 3);
 assert.equal(list[0].latestIssuedVersion, 2);
 assert.equal(list[0].revisionInProgress, true);
+assert.equal(list[0].researchConversationID, "research-1");
 
 const state = {
   questionID: "cq-1",
+  researchConversationID: "research-1",
   access: { role: "editor", permissions: ["code-question.edit"] },
   question: {
     envelope: envelope("cq-1", "codeQuestion", 2),
@@ -89,5 +93,6 @@ assert.equal(models.analysis.serverBinding.dependencyHash, "dependency-hash");
 assert.equal(models.analysis.conclusionRevisions[0].immutable, true);
 assert.equal(models.issue.issuedRecords[0].manifestHash, "manifest-hash");
 assert.equal(models.access.role, "editor");
+assert.equal(models.question.researchConversationID, "research-1");
 
 console.log("code-question-server-adapter-contract: all assertions passed");

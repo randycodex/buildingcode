@@ -276,7 +276,12 @@ export function codeQuestionViewModelsFromServer(state = {}, local = {}) {
   };
 
   return {
-    question: { id: questionID, version: questionArtifact?.envelope?.version || 1, ...copy(question) },
+    question: {
+      id: questionID,
+      version: questionArtifact?.envelope?.version || 1,
+      ...copy(question),
+      researchConversationID: state.researchConversationID || null
+    },
     definition,
     evidence,
     analysis,

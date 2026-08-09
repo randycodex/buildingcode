@@ -88,6 +88,25 @@ const legacyState = normalizeCodeQuestionWorkspaceState({
   }
 });
 assert.equal(legacyState.legacyByProjectID["project-1"].promotions[0].id, "promotion-1");
+const linkedResearchState = normalizeCodeQuestionWorkspaceState({
+  questionsByProjectID: {
+    "project-1": [{
+      id: "cq-1",
+      displayID: "Q-001",
+      title: "Egress",
+      researchConversationID: "research-1",
+      researchConversationUpdatedAt: "2026-08-09T12:00:00.000Z"
+    }]
+  }
+});
+assert.equal(
+  linkedResearchState.questionsByProjectID["project-1"][0].researchConversationID,
+  "research-1"
+);
+assert.equal(
+  linkedResearchState.questionsByProjectID["project-1"][0].researchConversationUpdatedAt,
+  "2026-08-09T12:00:00.000Z"
+);
 
 // Stage arrangement is workspace-only (does not invent approval state)
 const arranged = applyStageArrangement(emptyCodeQuestionWorkspaceState(), {

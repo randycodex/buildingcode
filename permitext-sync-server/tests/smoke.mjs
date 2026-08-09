@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-code-decision-v3'),
+        webRoot.text.includes('/web/app.js?v=20260809-code-decision-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1411,7 +1411,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-code-decision-v3'),
+        webRoot.text.includes('/web/styles.css?v=20260809-code-decision-v5'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1645,7 +1645,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-code-decision-v3'),
+        webRoot.text.includes('/web/styles.css?v=20260809-code-decision-v5'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1741,7 +1741,7 @@ async function main() {
     );
     assert(
       evidenceDiscoveryClientSource.includes('postResearch("/research/evidence/discover"') &&
-      evidenceDiscoveryClientSource.includes("Candidate · not approved") &&
+      evidenceDiscoveryClientSource.includes("Candidate · not selected") &&
         evidenceDiscoveryClientSource.includes("Additional source review required") &&
         evidenceDiscoveryClientSource.includes("Cannot prepare from text alone") &&
         evidenceDiscoveryClientSource.includes("Complete structured source included") &&
@@ -1754,11 +1754,13 @@ async function main() {
         evidenceDiscoveryClientSource.includes("Outside Construction Code Research") &&
         evidenceDiscoveryClientSource.includes("outsideItem.sourceURL") &&
         evidenceDiscoveryClientSource.includes("visualSourceIDs: candidate.selectedVisualSourceIDs || []") &&
-        evidenceDiscoveryClientSource.includes("Approve") &&
+        evidenceDiscoveryClientSource.includes("Use in Research") &&
+        evidenceDiscoveryClientSource.includes("Selected for Research") &&
         evidenceDiscoveryClientSource.includes("Reject") &&
-        evidenceDiscoveryClientSource.includes("Prepare Approved Evidence") &&
-        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/create"') &&
-        evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/evidence"') &&
+        evidenceDiscoveryClientSource.includes("Add Selected Evidence") &&
+        evidenceDiscoveryClientSource.includes('targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create"') &&
+        evidenceDiscoveryClientSource.includes("{ conversationID: targetConversationID, selections: selectedPassages }") &&
+        !evidenceDiscoveryClientSource.includes("const existingPassages = new Set") &&
         !evidenceDiscoveryClientSource.includes('postResearch("/research/conversations/message"'),
       "The Evidence Tray no longer preserves explicit candidate review before Research analysis."
     );
@@ -1881,7 +1883,7 @@ async function main() {
     assert(
       workspaceScript.text.includes("async function convergeServerNewerSyncConflicts(account)") &&
         workspaceScript.text.includes("function syncedMutationSupersedesConflict(entry)") &&
-        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v3"') &&
+        workspaceScript.text.includes('import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5"') &&
         workspaceScript.text.includes("syncConflictRecordsMatch(local.record, server.record)") &&
         workspaceScript.text.includes("entry.accountUserID === account.userID && syncedMutationSupersedesConflict(entry)") &&
         workspaceScript.text.includes("await convergeServerNewerSyncConflicts(account)") &&

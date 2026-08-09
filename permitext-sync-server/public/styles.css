@@ -6263,6 +6263,58 @@ body.is-resizing-research-evidence * {
   line-height: 1.45;
 }
 
+.research-message.is-user > p {
+  margin: 0;
+}
+
+.research-message.is-user.is-starter small {
+  display: block;
+  margin-bottom: var(--space-2);
+  opacity: 0.72;
+}
+
+.research-message-capture {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  font-size: calc(var(--chrome-font-size) * 0.8);
+}
+
+.research-message-capture > span {
+  font-weight: 700;
+}
+
+.research-message-capture-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.research-message-capture-actions button {
+  min-height: 42px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, currentColor 35%, transparent);
+  border-radius: var(--radius-control);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  color: var(--text-primary);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.research-message-capture-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.research-message-capture-status {
+  min-height: 1.2em;
+  margin: 0;
+  opacity: 0.78;
+}
+
 .research-message.is-assistant .research-result-card {
   padding: var(--space-4);
   border: 1px solid var(--border);

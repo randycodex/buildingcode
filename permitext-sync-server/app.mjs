@@ -783,6 +783,40 @@ function createFileStoreAdapter() {
       await this.write(store);
       return link;
     },
+    async replaceResearchCodeDecisionLinks(userID, {
+      link,
+      clearedLinks = [],
+      expectedLink = null,
+      expectedClearedLinks = []
+    }) {
+      const store = await this.read();
+      store.projectLinksByUserID ||= {};
+      const entries = store.projectLinksByUserID[userID] || [];
+      const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
+      const guardedLinks = [
+        ...clearedLinks.map((nextLink) => ({ nextLink, expected: expectedByID.get(nextLink.id) })),
+        { nextLink: link, expected: expectedLink }
+      ];
+      if (
+        expectedClearedLinks.length !== clearedLinks.length ||
+        guardedLinks.some(({ nextLink, expected }) =>
+          !researchProjectLinkCASMatches(
+            entries.find((item) => item.id === nextLink.id) || null,
+            expected || null
+          )
+        )
+      ) {
+        throw researchCodeDecisionLinkConflict();
+      }
+      for (const nextLink of [...clearedLinks, link]) {
+        const index = entries.findIndex((item) => item.id === nextLink.id);
+        if (index === -1) entries.push(nextLink);
+        else entries[index] = nextLink;
+      }
+      store.projectLinksByUserID[userID] = entries;
+      await this.write(store);
+      return { link, clearedLinks };
+    },
     async listResearchAnswers(userID) {
       const store = await this.read();
       return (store.researchAnswersByUserID?.[userID] || []).slice();
@@ -1643,6 +1677,18 @@ async function createPostgresStoreAdapter() {
     await sql`
       CREATE INDEX IF NOT EXISTS permitext_project_links_target_idx
       ON permitext_project_links (user_id, target_kind, target_id)
+    `;
+    await sql`
+      CREATE UNIQUE INDEX IF NOT EXISTS permitext_project_links_research_decision_unique_idx
+      ON permitext_project_links (
+        user_id,
+        project_id,
+        ((link->'metadata'->>'codeDecisionID'))
+      )
+      WHERE deleted_at IS NULL
+        AND target_kind = 'researchConversation'
+        AND relationship = 'primary'
+        AND COALESCE(link->'metadata'->>'codeDecisionID', '') <> ''
     `;
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_research_answers (
@@ -2968,6 +3014,74 @@ async function createPostgresStoreAdapter() {
       `;
       return link;
     },
+    async replaceResearchCodeDecisionLinks(userID, {
+      link,
+      clearedLinks = [],
+      expectedLink = null,
+      expectedClearedLinks = []
+    }) {
+      await ensureSchema();
+      const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
+      if (expectedClearedLinks.length !== clearedLinks.length) {
+        throw researchCodeDecisionLinkConflict();
+      }
+      const guardedReplace = (nextLink, expected) => expected ? sql`
+        WITH changed AS (
+          UPDATE permitext_project_links
+          SET project_id = ${nextLink.projectID},
+              target_kind = ${nextLink.targetKind},
+              target_id = ${nextLink.targetID},
+              relationship = ${nextLink.relationship},
+              link = ${JSON.stringify(nextLink)}::jsonb,
+              updated_at = ${nextLink.updatedAt}::timestamptz,
+              deleted_at = ${nextLink.deletedAt}::timestamptz
+          WHERE id = ${nextLink.id}
+            AND user_id = ${userID}
+            AND project_id = ${expected.projectID}
+            AND target_kind = ${expected.targetKind}
+            AND target_id = ${expected.targetID}
+            AND relationship = ${expected.relationship}
+            AND (link->>'version')::bigint = ${Number(expected.version || 0)}
+            AND deleted_at IS NOT DISTINCT FROM ${expected.deletedAt || null}::timestamptz
+            AND COALESCE(link->'metadata'->>'codeDecisionID', '') = ${String(expected.metadata?.codeDecisionID || "")}
+          RETURNING id
+        )
+        SELECT 1 / COUNT(*)::int AS mutation_guard FROM changed
+      ` : sql`
+        WITH changed AS (
+          INSERT INTO permitext_project_links (
+            id, user_id, project_id, target_kind, target_id, relationship,
+            link, created_at, updated_at, deleted_at
+          )
+          VALUES (
+            ${nextLink.id}, ${userID}, ${nextLink.projectID}, ${nextLink.targetKind}, ${nextLink.targetID},
+            ${nextLink.relationship}, ${JSON.stringify(nextLink)}::jsonb,
+            ${nextLink.createdAt}::timestamptz, ${nextLink.updatedAt}::timestamptz,
+            ${nextLink.deletedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+          RETURNING id
+        )
+        SELECT 1 / COUNT(*)::int AS mutation_guard FROM changed
+      `;
+      try {
+        await sql.transaction(
+          [
+            ...clearedLinks.map((nextLink) =>
+              guardedReplace(nextLink, expectedByID.get(nextLink.id) || null)
+            ),
+            guardedReplace(link, expectedLink)
+          ],
+          { isolationLevel: "Serializable" }
+        );
+      } catch (error) {
+        if (["22012", "23505", "40001"].includes(String(error?.code || ""))) {
+          throw researchCodeDecisionLinkConflict();
+        }
+        throw error;
+      }
+      return { link, clearedLinks };
+    },
     async listResearchAnswers(userID) {
       await ensureSchema();
       const rows = await sql`
@@ -3566,6 +3680,17 @@ async function listStoredProjectLinks(userID) {
 async function saveStoredProjectLink(userID, link) {
   const adapter = await storeAdapter();
   return adapter.saveProjectLink(userID, link);
+}
+
+async function replaceStoredResearchCodeDecisionLinks(userID, replacement) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.replaceResearchCodeDecisionLinks !== "function") {
+    throw new CodeQuestionCommandError("Research link storage is unavailable.", {
+      code: "CODE_QUESTION_STORAGE_UNAVAILABLE",
+      status: 503
+    });
+  }
+  return adapter.replaceResearchCodeDecisionLinks(userID, replacement);
 }
 
 async function listStoredResearchAnswers(userID) {
@@ -5423,7 +5548,45 @@ async function handleResearchInterpretation(request, response) {
   });
 }
 
-function researchConversationSummary(conversation) {
+function researchCodeDecisionLink(link) {
+  const questionID = String(link?.metadata?.codeDecisionID || "").trim();
+  if (
+    !questionID || link?.deletedAt ||
+    link?.targetKind !== "researchConversation" ||
+    link?.relationship !== "primary"
+  ) return null;
+  return {
+    questionID,
+    linkVersion: Number(link.version || 1),
+    linkedAt: link.metadata?.codeDecisionLinkedAt || link.updatedAt || link.createdAt || null,
+    linkedByUserID: link.metadata?.codeDecisionLinkedByUserID || null
+  };
+}
+
+function researchProjectLinkCASMatches(current, expected) {
+  if (!expected) return !current;
+  return Boolean(
+    current &&
+    current.id === expected.id &&
+    current.projectID === expected.projectID &&
+    current.targetKind === expected.targetKind &&
+    current.targetID === expected.targetID &&
+    current.relationship === expected.relationship &&
+    Number(current.version || 0) === Number(expected.version || 0) &&
+    (current.deletedAt || null) === (expected.deletedAt || null) &&
+    String(current.metadata?.codeDecisionID || "") === String(expected.metadata?.codeDecisionID || "")
+  );
+}
+
+function researchCodeDecisionLinkConflict() {
+  return new CodeQuestionCommandError(
+    "Another Research conversation became current for this Code Decision. Refresh before changing the link.",
+    { code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT", status: 409 }
+  );
+}
+
+function researchConversationSummary(conversation, projectLink = null) {
+  const decisionLink = researchCodeDecisionLink(projectLink);
   return {
     id: conversation.id,
     title: conversation.title,
@@ -5438,6 +5601,9 @@ function researchConversationSummary(conversation) {
     )),
     messageCount: conversation.messages?.length || 0,
     primaryProjectID: conversation.primaryProjectID || null,
+    linkedCodeDecisionID: decisionLink?.questionID || null,
+    codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null,
+    starterQuestion: String(conversation.starterQuestion || "").trim() || null,
     projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
     sourceStatus: conversation.sourceStatus || "current"
   };
@@ -5679,7 +5845,7 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
       relationship: requestedVisualSources.length
         ? `${requestedVisualSources.length} official visual ${requestedVisualSources.length === 1 ? "source" : "sources"} reviewed and selected by you`
         : exactRichSource
-        ? `Structured official ${exactRichSource.reference} approved by you`
+        ? `Structured official ${exactRichSource.reference} selected by you`
         : "Passage selected by you",
       selectedText: canonicalSelection,
       richSource: exactRichSource,
@@ -5691,7 +5857,7 @@ async function researchSourcesForSelection(sectionID, selectedText, options = {}
     if (richSource.id === exactRichSource?.id) continue;
     selectionSources.push(researchSourceFromEvidence(primary, {
       kind: "selection",
-      relationship: `Structured official ${richSource.reference} approved by you`,
+      relationship: `Structured official ${richSource.reference} selected by you`,
       selectedText: richSource.text,
       richSource
     }));
@@ -5776,9 +5942,27 @@ async function researchSourcesForSelections(selections, existingSources = []) {
     ));
   }
   const existingSelections = existingSources.filter((source) => source.kind === "selection");
-  const addedSelections = resolvedBatches.flatMap((sources) =>
-    sources.filter((source) => source.kind === "selection")
-  );
+  const selectionIdentity = (source) => canonicalJSONString({
+    sectionID: String(source.sectionID || ""),
+    selectedTextHash: String(source.selectedTextHash || ""),
+    richSourceID: String(source.richSourceID || ""),
+    richSourceContentHash: String(source.richSourceContentHash || ""),
+    visualSources: (source.visualSources || [])
+      .map((visual) => ({ id: String(visual.id || ""), contentHash: String(visual.contentHash || "") }))
+      .sort((left, right) => left.id.localeCompare(right.id)),
+    codeVersion: String(source.codeVersion || ""),
+    codeEdition: String(source.codeEdition || "")
+  });
+  const selectionIdentities = new Set(existingSelections.map(selectionIdentity));
+  const addedSelections = [];
+  for (const source of resolvedBatches.flatMap((sources) =>
+    sources.filter((item) => item.kind === "selection")
+  )) {
+    const identity = selectionIdentity(source);
+    if (selectionIdentities.has(identity)) continue;
+    selectionIdentities.add(identity);
+    addedSelections.push(source);
+  }
   const selectedSectionIDs = new Set(
     [...existingSelections, ...addedSelections].map((source) => source.sectionID)
   );
@@ -5993,7 +6177,15 @@ async function researchConversationForClient(conversation, options = {}) {
       )
     };
   }
-  return clientConversation;
+  const projectLink = options.projectLink || (options.userID
+    ? await researchConversationProjectLink(options.userID, conversation)
+    : null);
+  const decisionLink = researchCodeDecisionLink(projectLink);
+  return {
+    ...clientConversation,
+    linkedCodeDecisionID: decisionLink?.questionID || null,
+    codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null
+  };
 }
 
 async function authenticatedResearchBody(request, response, options = {}) {
@@ -6065,8 +6257,8 @@ function researchProjectInformation(projectID, project) {
 async function currentResearchProjectInformation(userID, projectID) {
   const normalizedProjectID = String(projectID || "").trim();
   if (!normalizedProjectID) return null;
-  const project = await ownedProjectRecord(userID, normalizedProjectID);
-  return researchProjectInformation(normalizedProjectID, project);
+  const access = await projectAccessForUser(userID, normalizedProjectID);
+  return access ? researchProjectInformation(access.projectID, access.project) : null;
 }
 
 function combinedResearchProjectFacts(projectInformation, manualFacts) {
@@ -8537,6 +8729,13 @@ async function handleProjectFoundationLink(request, response) {
   const projectID = String(context.body.projectID || "").trim();
   const targetKind = String(context.body.targetKind || "").trim();
   const targetID = String(context.body.targetID || "").trim();
+  if (targetKind === "researchConversation") {
+    sendJSON(response, 409, {
+      error: "Use the Research Project-assignment workflow to move or link a Research conversation.",
+      code: "RESEARCH_PROJECT_LIFECYCLE_REQUIRED"
+    });
+    return;
+  }
   if (!await ownedProjectRecord(context.userID, projectID)) {
     sendError(response, 404, "Project not found.");
     return;
@@ -8562,6 +8761,26 @@ async function handleProjectFoundationLink(request, response) {
   const now = new Date().toISOString();
   const linkID = deterministicFoundationLinkID(context.userID, projectID, targetKind, targetID);
   const existing = links.find((link) => link.id === linkID);
+  const metadata = context.body.metadata && typeof context.body.metadata === "object" &&
+    !Array.isArray(context.body.metadata)
+    ? { ...context.body.metadata }
+    : {};
+  if (targetKind === "researchConversation") {
+    // Research ↔ Code Decision association is server-owned. Generic Project
+    // membership must never manufacture or resurrect that governed relation.
+    delete metadata.codeDecisionID;
+    delete metadata.codeDecisionLinkedAt;
+    delete metadata.codeDecisionLinkedByUserID;
+    if (!existing?.deletedAt) {
+      for (const key of [
+        "codeDecisionID",
+        "codeDecisionLinkedAt",
+        "codeDecisionLinkedByUserID"
+      ]) {
+        if (existing?.metadata?.[key] != null) metadata[key] = existing.metadata[key];
+      }
+    }
+  }
   const link = projectLinkRecord({
     id: linkID,
     owner: ownerScope(context.userID),
@@ -8572,7 +8791,7 @@ async function handleProjectFoundationLink(request, response) {
     createdAt: existing?.createdAt || now,
     updatedAt: now,
     version: Number(existing?.version || 0) + 1,
-    metadata: context.body.metadata
+    metadata
   });
   await saveStoredProjectLink(context.userID, link);
   if (targetKind === "researchConversation") {
@@ -8602,6 +8821,13 @@ async function handleProjectFoundationUnlink(request, response) {
   const projectID = String(context.body.projectID || "").trim();
   const targetKind = String(context.body.targetKind || "").trim();
   const targetID = String(context.body.targetID || "").trim();
+  if (targetKind === "researchConversation") {
+    sendJSON(response, 409, {
+      error: "Use the Research Project-assignment workflow to move or unlink a Research conversation.",
+      code: "RESEARCH_PROJECT_LIFECYCLE_REQUIRED"
+    });
+    return;
+  }
   const links = await listStoredProjectLinks(context.userID);
   const existing = links.find((link) =>
     !link.deletedAt &&
@@ -10213,14 +10439,23 @@ async function requiredResearchConversation(response, userID, conversationID) {
 async function handleResearchConversationList(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
-  const conversations = await listStoredResearchConversations(context.userID);
+  const [conversations, links] = await Promise.all([
+    listStoredResearchConversations(context.userID),
+    listStoredProjectLinks(context.userID)
+  ]);
+  const linkByConversationID = new Map(links
+    .filter((link) => !link.deletedAt && link.targetKind === "researchConversation")
+    .map((link) => [link.targetID, link]));
   sendJSON(response, 200, {
     conversations: conversations
       .sort((left, right) =>
         String(right.createdAt).localeCompare(String(left.createdAt)) ||
         String(left.id).localeCompare(String(right.id))
       )
-      .map(researchConversationSummary)
+      .map((conversation) => researchConversationSummary(
+        conversation,
+        linkByConversationID.get(conversation.id)
+      ))
   });
 }
 
@@ -10229,12 +10464,14 @@ async function handleResearchConversationGet(request, response) {
   if (!context) return;
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
+  const projectLink = await researchConversationProjectLink(context.userID, conversation);
   const feedbackByAnswerID = new Map(
     (await listStoredResearchFeedback(context.userID)).map((feedback) => [feedback.answerID, feedback])
   );
   const clientConversation = await researchConversationForClient(conversation, {
     checkSources: true,
-    userID: context.userID
+    userID: context.userID,
+    projectLink
   });
   sendJSON(response, 200, {
     conversation: {
@@ -10358,22 +10595,28 @@ async function requireResearchProject(context, response, projectID) {
     });
     return null;
   }
-  const project = await ownedProjectRecord(context.userID, projectID);
-  if (!project) {
-    sendError(response, 404, "Project not found.");
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) {
     return null;
   }
-  return project;
+  return access.project;
 }
 
-async function setResearchConversationProjectLink(userID, conversationID, projectID, now) {
-  const links = await listStoredProjectLinks(userID);
-  const existing = links.find((link) =>
-    link.projectID === projectID &&
-    link.targetKind === "researchConversation" &&
-    link.targetID === conversationID
-  );
-  const link = projectLinkRecord({
+function researchConversationProjectLinkRecord(userID, conversationID, projectID, now, existing, options = {}) {
+  const metadata = options.replaceMetadata === true || existing?.deletedAt
+    ? { ...(options.metadata || {}) }
+    : { ...(existing?.metadata || {}), ...(options.metadata || {}) };
+  if (metadata.codeDecisionID) {
+    delete metadata.codeDecisionLastID;
+    delete metadata.codeDecisionUnlinkedAt;
+    delete metadata.codeDecisionUnlinkedByUserID;
+  }
+  return projectLinkRecord({
     id: deterministicFoundationLinkID(userID, projectID, "researchConversation", conversationID),
     owner: ownerScope(userID),
     projectID,
@@ -10382,34 +10625,125 @@ async function setResearchConversationProjectLink(userID, conversationID, projec
     relationship: "primary",
     createdAt: existing?.createdAt || now,
     updatedAt: now,
-    version: Number(existing?.version || 0) + 1
+    version: Number(existing?.version || 0) + 1,
+    metadata
   });
-  await saveStoredProjectLink(userID, link);
-  return link;
 }
 
-async function removeResearchConversationProjectLink(userID, conversationID, projectID, now) {
-  const existing = (await listStoredProjectLinks(userID)).find((link) =>
-    !link.deletedAt &&
+async function setResearchConversationProjectLink(userID, conversationID, projectID, now, options = {}) {
+  const links = await listStoredProjectLinks(userID);
+  const existing = links.find((link) =>
     link.projectID === projectID &&
     link.targetKind === "researchConversation" &&
     link.targetID === conversationID
   );
-  if (!existing) return null;
-  const link = projectLinkRecord({
-    ...existing,
-    owner: ownerScope(userID),
-    updatedAt: now,
-    deletedAt: now,
-    version: Number(existing.version || 1) + 1
-  });
+  const link = researchConversationProjectLinkRecord(
+    userID,
+    conversationID,
+    projectID,
+    now,
+    existing,
+    options
+  );
   await saveStoredProjectLink(userID, link);
   return link;
 }
 
-async function recordResearchProjectLinkActivity(userID, projectID, conversationID, action, now) {
-  return saveStoredActivityEvent(userID, activityEvent({
+async function researchConversationProjectLink(userID, conversation) {
+  if (!conversation?.id || !conversation.primaryProjectID) return null;
+  return (await listStoredProjectLinks(userID)).find((link) =>
+    !link.deletedAt &&
+    link.projectID === conversation.primaryProjectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversation.id
+  ) || null;
+}
+
+async function researchConversationLinksForCodeDecisions(userID, projectID) {
+  const [conversations, links] = await Promise.all([
+    listStoredResearchConversations(userID),
+    listStoredProjectLinks(userID)
+  ]);
+  const conversationsByID = new Map(conversations
+    .filter((conversation) => conversation.primaryProjectID === projectID)
+    .map((conversation) => [conversation.id, conversation]));
+  const byQuestionID = new Map();
+  for (const link of links) {
+    if (link.deletedAt || link.projectID !== projectID || !conversationsByID.has(link.targetID)) continue;
+    const decisionLink = researchCodeDecisionLink(link);
+    if (!decisionLink) continue;
+    const current = byQuestionID.get(decisionLink.questionID);
+    if (!current || Number(link.version || 0) > Number(current.link.version || 0)) {
+      byQuestionID.set(decisionLink.questionID, {
+        conversation: conversationsByID.get(link.targetID),
+        link
+      });
+    }
+  }
+  return byQuestionID;
+}
+
+function clearedResearchCodeDecisionLinkRecord(existing, now, actorUserID = "") {
+  const decisionLink = researchCodeDecisionLink(existing);
+  const metadata = { ...(existing.metadata || {}) };
+  delete metadata.codeDecisionID;
+  delete metadata.codeDecisionLinkedAt;
+  delete metadata.codeDecisionLinkedByUserID;
+  delete metadata.codeDecisionPreviousQuestionID;
+  delete metadata.codeDecisionReplacedConversationID;
+  if (decisionLink?.questionID) {
+    metadata.codeDecisionLastID = decisionLink.questionID;
+    metadata.codeDecisionUnlinkedAt = now;
+    metadata.codeDecisionUnlinkedByUserID = actorUserID || decisionLink.linkedByUserID || null;
+  }
+  return projectLinkRecord({
+    ...existing,
+    updatedAt: now,
+    version: Number(existing.version || 1) + 1,
+    metadata
+  });
+}
+
+async function clearResearchCodeDecisionLink(userID, existing, now) {
+  if (!researchCodeDecisionLink(existing)) return existing;
+  const link = clearedResearchCodeDecisionLinkRecord(existing, now, userID);
+  await replaceStoredResearchCodeDecisionLinks(userID, {
+    link,
+    expectedLink: existing
+  });
+  return link;
+}
+
+async function removeResearchConversationProjectLink(userID, conversationID, projectID, now) {
+  const matchingLinks = (await listStoredProjectLinks(userID)).filter((link) =>
+    link.projectID === projectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversationID
+  ).sort((left, right) => Number(right.version || 0) - Number(left.version || 0));
+  const existing = matchingLinks.find((link) => !link.deletedAt);
+  if (!existing) {
+    return matchingLinks.find((link) =>
+      link.deletedAt && String(link.metadata?.codeDecisionLastID || "").trim()
+    ) || null;
+  }
+  const cleared = clearedResearchCodeDecisionLinkRecord(existing, now, userID);
+  const link = projectLinkRecord({
+    ...cleared,
     owner: ownerScope(userID),
+    deletedAt: now
+  });
+  await replaceStoredResearchCodeDecisionLinks(userID, {
+    link,
+    expectedLink: existing
+  });
+  return link;
+}
+
+async function recordResearchProjectLinkActivity(userID, projectID, conversationID, action, now) {
+  const access = await projectAccessForUser(userID, projectID);
+  const storageOwnerUserID = access?.storageOwnerUserID || userID;
+  return saveStoredActivityEvent(storageOwnerUserID, activityEvent({
+    owner: access?.owner || ownerScope(userID),
     projectID,
     actorUserID: userID,
     action,
@@ -10419,6 +10753,26 @@ async function recordResearchProjectLinkActivity(userID, projectID, conversation
     newStatus: action === "item.unlinked" ? "unlinked" : "linked",
     createdAt: now
   }));
+}
+
+async function recordResearchConversationRemovalActivity(userID, projectID, removedLink, now) {
+  const questionID = String(removedLink?.metadata?.codeDecisionLastID || "").trim();
+  if (!questionID) {
+    return recordResearchProjectLinkActivity(
+      userID,
+      projectID,
+      removedLink.targetID,
+      "item.unlinked",
+      now
+    );
+  }
+  const access = await projectAccessForUser(userID, projectID);
+  return saveResearchCodeDecisionUnlinkActivity({
+    actorUserID: userID,
+    projectID,
+    storageOwnerUserID: access?.storageOwnerUserID || userID,
+    owner: access?.owner || ownerScope(userID)
+  }, removedLink, questionID);
 }
 
 async function handleResearchConversationAssignProject(request, response) {
@@ -10434,7 +10788,10 @@ async function handleResearchConversationAssignProject(request, response) {
   const currentProjectID = conversation.primaryProjectID || null;
   const requiresContextReview = Boolean(currentProjectID || (conversation.messages || []).length > 0);
   if (targetProjectID === currentProjectID) {
-    sendJSON(response, 200, { conversation, moved: false });
+    sendJSON(response, 200, {
+      conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+      moved: false
+    });
     return;
   }
   if (requiresContextReview && context.body.confirmMove !== true) {
@@ -10451,19 +10808,26 @@ async function handleResearchConversationAssignProject(request, response) {
   if (targetProjectID && !await requireResearchProject(context, response, targetProjectID)) return;
   const now = new Date().toISOString();
   if (currentProjectID) {
-    await removeResearchConversationProjectLink(
-      context.userID,
-      conversation.id,
-      currentProjectID,
-      now
-    );
-    await recordResearchProjectLinkActivity(
-      context.userID,
-      currentProjectID,
-      conversation.id,
-      "item.unlinked",
-      now
-    );
+    let removedLink;
+    try {
+      removedLink = await removeResearchConversationProjectLink(
+        context.userID,
+        conversation.id,
+        currentProjectID,
+        now
+      );
+    } catch (error) {
+      if (sendCodeQuestionError(response, error)) return;
+      throw error;
+    }
+    if (removedLink) {
+      await recordResearchConversationRemovalActivity(
+        context.userID,
+        currentProjectID,
+        removedLink,
+        now
+      );
+    }
   }
   if (targetProjectID) {
     await setResearchConversationProjectLink(
@@ -10493,7 +10857,7 @@ async function handleResearchConversationAssignProject(request, response) {
   conversation.updatedAt = now;
   await saveStoredResearchConversation(context.userID, conversation);
   sendJSON(response, 200, {
-    conversation,
+    conversation: await researchConversationForClient(conversation, { userID: context.userID }),
     moved: true,
     contextReviewRequired: conversation.projectContextReviewRequired
   });
@@ -10593,7 +10957,7 @@ async function handleResearchConversationReuseEvidence(request, response) {
         if (source.kind === "selection") {
           sources.push({
             ...source,
-            relationship: "Reused approved evidence from a historical Research answer",
+            relationship: "Reused cited Research evidence from a historical answer",
             reusedFromAnswerID: answer.id,
             reusedFromEvidenceSnapshotID: snapshot.id
           });
@@ -10620,7 +10984,7 @@ async function handleResearchConversationReuseEvidence(request, response) {
     throw error;
   }
   if (!sources.some((source) => source.kind === "selection")) {
-    sendError(response, 422, "The historical answer has no reusable approved evidence.");
+    sendError(response, 422, "The historical answer has no reusable selected Research evidence.");
     return;
   }
   const now = new Date().toISOString();
@@ -10754,10 +11118,6 @@ async function handleResearchConversationEvidence(request, response) {
   const conversation = await requiredResearchConversation(response, context.userID, context.body.conversationID);
   if (!conversation) return;
   try {
-    if ((conversation.sources || []).filter((source) => source.kind === "selection").length >= 24) {
-      sendError(response, 409, "This conversation already has the maximum of 24 selected passages.");
-      return;
-    }
     const selections = requestedResearchSelections(context.body);
     await validateResearchSavedSelections(context.userID, selections);
     const resolved = await researchSourcesForSelections(
@@ -10771,13 +11131,25 @@ async function handleResearchConversationEvidence(request, response) {
       sendError(response, 409, "Adding this evidence would exceed the maximum of 24 selected passages.");
       return;
     }
+    if (addedSelectionCount === 0) {
+      sendJSON(response, 200, {
+        conversation: await researchConversationForClient(conversation, { userID: context.userID }),
+        replayed: true,
+        addedSelectionCount: 0
+      });
+      return;
+    }
     assertResearchConversationVisualLimits(resolved.sources);
     conversation.sources = resolved.sources;
     conversation.evidenceSetVersion = Number(conversation.evidenceSetVersion || 1) + 1;
     conversation.updatedAt = new Date().toISOString();
     conversation.sourceStatus = "current";
     await saveStoredResearchConversation(context.userID, conversation);
-    sendJSON(response, 200, { conversation });
+    sendJSON(response, 200, {
+      conversation,
+      replayed: false,
+      addedSelectionCount
+    });
   } catch (error) {
     if ([
       "INVALID_RESEARCH_SELECTION",
@@ -11377,6 +11749,13 @@ async function handleResearchConversationMessage(request, response) {
     });
     return;
   }
+  if (!(conversation.sources || []).some((source) => source.kind === "selection")) {
+    sendJSON(response, 422, {
+      error: "Select at least one enacted-code passage before asking Permitext to analyze it.",
+      code: "RESEARCH_EVIDENCE_REQUIRED"
+    });
+    return;
+  }
   let researchReservationID = null;
   let researchReservationCreatedAt = null;
   let researchReservationCompleted = false;
@@ -11427,6 +11806,34 @@ async function handleResearchConversationMessage(request, response) {
       manualProjectFacts
     );
     const projectContextCapturedAt = new Date().toISOString();
+    let decisionContextSnapshot = null;
+    const projectLink = await researchConversationProjectLink(context.userID, conversation);
+    const decisionLink = researchCodeDecisionLink(projectLink);
+    if (decisionLink && conversation.primaryProjectID) {
+      const projectAccess = await projectAccessForUser(context.userID, conversation.primaryProjectID);
+      const linkedQuestion = projectAccess
+        ? await codeQuestionForProject(
+            projectAccess.storageOwnerUserID,
+            conversation.primaryProjectID,
+            decisionLink.questionID
+          )
+        : null;
+      if (linkedQuestion) {
+        decisionContextSnapshot = {
+          projectID: conversation.primaryProjectID,
+          questionID: linkedQuestion.envelope.id,
+          definitionRevision: linkedQuestion.payload.definitionRevision,
+          definitionHash: codeQuestionContentHash({
+            questionText: linkedQuestion.payload.questionText,
+            scope: linkedQuestion.payload.scope || "",
+            jurisdiction: linkedQuestion.payload.jurisdiction || "",
+            asOfDate: linkedQuestion.payload.asOfDate || null,
+            definitionRevision: linkedQuestion.payload.definitionRevision
+          }),
+          capturedAt: projectContextCapturedAt
+        };
+      }
+    }
     const result = mockMode
       ? {
           interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence), selectedEvidence),
@@ -11507,7 +11914,8 @@ async function handleResearchConversationMessage(request, response) {
         manualFacts: [...manualProjectFacts],
         combinedFacts: combinedProjectFacts,
         capturedAt: projectContextCapturedAt
-      }
+      },
+      ...(decisionContextSnapshot ? { decisionContextSnapshot } : {})
     };
     await saveStoredResearchAnswer(context.userID, answerRecord);
     conversation.messages.push(userMessage, assistantMessage);
@@ -11594,9 +12002,38 @@ async function handleResearchConversationMessage(request, response) {
 async function handleResearchConversationDelete(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
-  const deleted = await deleteStoredResearchConversation(context.userID, String(context.body.conversationID || "").trim());
-  if (!deleted) {
+  const conversationID = String(context.body.conversationID || "").trim();
+  const conversation = await storedResearchConversation(context.userID, conversationID);
+  if (!conversation) {
     sendError(response, 404, "Research conversation not found.");
+    return;
+  }
+  if (conversation?.primaryProjectID) {
+    const now = new Date().toISOString();
+    let removedLink;
+    try {
+      removedLink = await removeResearchConversationProjectLink(
+        context.userID,
+        conversation.id,
+        conversation.primaryProjectID,
+        now
+      );
+    } catch (error) {
+      if (sendCodeQuestionError(response, error)) return;
+      throw error;
+    }
+    if (removedLink) {
+      await recordResearchConversationRemovalActivity(
+        context.userID,
+        conversation.primaryProjectID,
+        removedLink,
+        now
+      );
+    }
+  }
+  const deleted = await deleteStoredResearchConversation(context.userID, conversationID);
+  if (!deleted) {
+    sendError(response, 409, "Research conversation changed before it could be deleted. Refresh and try again.");
     return;
   }
   sendJSON(response, 200, { deleted: true });
@@ -16848,6 +17285,473 @@ async function codeQuestionForProject(userID, projectID, questionID) {
     !artifact.envelope?.deletedAt) || null;
 }
 
+function researchConversationIDForCodeDecision(actorUserID, projectID, questionID) {
+  return `code-decision-research-${createHash("sha256")
+    .update(`${actorUserID}:${projectID}:${questionID}`)
+    .digest("hex")}`;
+}
+
+function researchCodeDecisionActivityID(action, actorUserID, projectID, questionID, conversationID, linkVersion) {
+  return `research-code-decision-${createHash("sha256")
+    .update([action, actorUserID, projectID, questionID, conversationID, linkVersion].join(":"))
+    .digest("hex")}`;
+}
+
+async function saveResearchCodeDecisionLinkActivity(context, link) {
+  const decisionLink = researchCodeDecisionLink(link);
+  if (!decisionLink) return null;
+  const previousQuestionID = String(link.metadata?.codeDecisionPreviousQuestionID || "").trim() || null;
+  const replacedConversationID = String(link.metadata?.codeDecisionReplacedConversationID || "").trim() || null;
+  const event = activityEvent({
+    id: researchCodeDecisionActivityID(
+      "item.linked",
+      context.actorUserID,
+      context.projectID,
+      decisionLink.questionID,
+      link.targetID,
+      link.version
+    ),
+    owner: context.owner,
+    actorUserID: context.actorUserID,
+    projectID: context.projectID,
+    action: "item.linked",
+    objectKind: "researchConversation",
+    objectID: link.targetID,
+    previousStatus: previousQuestionID ? "linked-to-other-decision" : "project-linked",
+    newStatus: "linked-to-code-decision",
+    createdAt: decisionLink.linkedAt,
+    metadata: {
+      questionID: decisionLink.questionID,
+      relationship: "code-decision",
+      previousQuestionID,
+      replacedConversationID
+    }
+  });
+  await saveStoredActivityEvent(context.storageOwnerUserID, event);
+  return event;
+}
+
+async function saveResearchCodeDecisionUnlinkActivity(context, link, questionID) {
+  const unlinkedAt = link?.metadata?.codeDecisionUnlinkedAt || link?.updatedAt;
+  if (!link || !questionID || !unlinkedAt) return null;
+  const event = activityEvent({
+    id: researchCodeDecisionActivityID(
+      "item.unlinked",
+      context.actorUserID,
+      context.projectID,
+      questionID,
+      link.targetID,
+      link.version
+    ),
+    owner: context.owner,
+    actorUserID: context.actorUserID,
+    projectID: context.projectID,
+    action: "item.unlinked",
+    objectKind: "researchConversation",
+    objectID: link.targetID,
+    previousStatus: "linked-to-code-decision",
+    newStatus: link.deletedAt ? "unlinked" : "project-linked",
+    createdAt: unlinkedAt,
+    metadata: { questionID, relationship: "code-decision" }
+  });
+  await saveStoredActivityEvent(context.storageOwnerUserID, event);
+  return event;
+}
+
+async function linkResearchConversationToCodeDecision(context, conversation, question, options = {}) {
+  const questionID = question.envelope.id;
+  const now = options.now || new Date().toISOString();
+  if (conversation.primaryProjectID !== context.projectID) {
+    throw new CodeQuestionCommandError(
+      "Assign this Research conversation to the Code Decision's Project before linking it.",
+      { code: "CODE_QUESTION_RESEARCH_PROJECT_MISMATCH", status: 409 }
+    );
+  }
+  const actorLinks = await listStoredProjectLinks(context.actorUserID);
+  const storedConversationLink = actorLinks.find((link) =>
+    link.projectID === context.projectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversation.id
+  ) || null;
+  let conversationLink = actorLinks.find((link) =>
+    !link.deletedAt &&
+    link.projectID === context.projectID &&
+    link.targetKind === "researchConversation" &&
+    link.targetID === conversation.id
+  ) || null;
+  const currentDecisionLink = researchCodeDecisionLink(conversationLink);
+  const suppliedLinkVersion = options.expectedLinkVersion == null || options.expectedLinkVersion === ""
+    ? null
+    : Number(options.expectedLinkVersion);
+  if (suppliedLinkVersion != null && (!Number.isSafeInteger(suppliedLinkVersion) || suppliedLinkVersion < 0)) {
+    throw new CodeQuestionCommandError("Research link version must be a non-negative whole number.", {
+      code: "CODE_QUESTION_RESEARCH_LINK_VERSION_INVALID",
+      status: 400
+    });
+  }
+  if (currentDecisionLink?.questionID === questionID) {
+    await saveResearchCodeDecisionLinkActivity(context, conversationLink);
+    return { link: conversationLink, replayed: true, replacedConversationID: null };
+  }
+  if (options.requireExpectedLinkVersion === true && conversationLink && suppliedLinkVersion == null) {
+    throw new CodeQuestionCommandError("Refresh this Research conversation before changing its Code Decision link.", {
+      code: "CODE_QUESTION_RESEARCH_LINK_VERSION_REQUIRED",
+      status: 400
+    });
+  }
+  if (
+    suppliedLinkVersion != null &&
+    suppliedLinkVersion !== Number(conversationLink?.version || 0)
+  ) {
+    throw new CodeQuestionCommandError("This Research link changed after you opened it.", {
+      code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT",
+      status: 409,
+      details: {
+        expectedLinkVersion: suppliedLinkVersion,
+        currentLinkVersion: Number(conversationLink?.version || 0)
+      }
+    });
+  }
+  const displacedLinks = actorLinks.filter((priorLink) =>
+    !priorLink.deletedAt &&
+    priorLink.projectID === context.projectID &&
+    priorLink.targetKind === "researchConversation" &&
+    priorLink.targetID !== conversation.id &&
+    researchCodeDecisionLink(priorLink)?.questionID === questionID
+  );
+  if (currentDecisionLink && options.confirmRelink !== true) {
+    throw new CodeQuestionCommandError(
+      "Linking this Research conversation to a different Code Decision requires confirmation.",
+      {
+        code: "CODE_QUESTION_RESEARCH_RELINK_CONFIRMATION_REQUIRED",
+        status: 409,
+        details: {
+          currentQuestionID: currentDecisionLink?.questionID || questionID,
+          nextQuestionID: questionID,
+          currentConversationID: displacedLinks[0]?.targetID || conversation.id,
+          nextConversationID: conversation.id
+        }
+      }
+    );
+  }
+  if (displacedLinks.length > 1) {
+    throw new CodeQuestionCommandError(
+      "Multiple current Research conversations were found for this Code Decision. Refresh before repairing the link.",
+      {
+        code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT",
+        status: 409,
+        details: { currentConversationIDs: displacedLinks.map((link) => link.targetID) }
+      }
+    );
+  }
+  if (displacedLinks.length === 1) {
+    const expectedTargetConversationID = String(options.expectedTargetConversationID || "").trim();
+    if (options.confirmReplaceDecisionConversation !== true) {
+      throw new CodeQuestionCommandError(
+        "Replacing the current Research conversation for this Code Decision requires confirmation.",
+        {
+          code: "CODE_QUESTION_RESEARCH_REPLACE_CONFIRMATION_REQUIRED",
+          status: 409,
+          details: {
+            currentConversationID: displacedLinks[0].targetID,
+            nextConversationID: conversation.id
+          }
+        }
+      );
+    }
+    if (!expectedTargetConversationID || expectedTargetConversationID !== displacedLinks[0].targetID) {
+      throw new CodeQuestionCommandError(
+        "The current Research conversation for this Code Decision changed after you opened it.",
+        {
+          code: "CODE_QUESTION_RESEARCH_TARGET_CONFLICT",
+          status: 409,
+          details: {
+            expectedTargetConversationID: expectedTargetConversationID || null,
+            currentConversationID: displacedLinks[0].targetID,
+            nextConversationID: conversation.id
+          }
+        }
+      );
+    }
+  }
+
+  const replacedConversationID = displacedLinks[0]?.targetID || null;
+  const clearedLinks = displacedLinks.map((priorLink) =>
+    clearedResearchCodeDecisionLinkRecord(priorLink, now, context.actorUserID)
+  );
+  conversationLink = researchConversationProjectLinkRecord(
+    context.actorUserID,
+    conversation.id,
+    context.projectID,
+    now,
+    storedConversationLink,
+    {
+      metadata: {
+        codeDecisionID: questionID,
+        codeDecisionLinkedAt: now,
+        codeDecisionLinkedByUserID: context.actorUserID,
+        codeDecisionPreviousQuestionID: currentDecisionLink?.questionID || null,
+        codeDecisionReplacedConversationID: replacedConversationID
+      }
+    }
+  );
+  await replaceStoredResearchCodeDecisionLinks(context.actorUserID, {
+    link: conversationLink,
+    clearedLinks,
+    expectedLink: storedConversationLink,
+    expectedClearedLinks: displacedLinks
+  });
+  await saveResearchCodeDecisionLinkActivity(context, conversationLink);
+  return { link: conversationLink, replayed: false, replacedConversationID };
+}
+
+async function handleCodeQuestionResearchStart(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.update")
+  });
+  if (!context) return;
+  if (!hasActiveResearchEntitlement(context.authContext.entitlement)) {
+    sendJSON(response, 402, {
+      error: "Research requires an active Pro plan and the Research Add-On.",
+      code: "RESEARCH_ADDON_REQUIRED"
+    });
+    return;
+  }
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const question = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
+    );
+    if (!question) {
+      sendError(response, 404, "Code Decision not found for this Project.");
+      return;
+    }
+    if (question.payload.recordState !== "active") {
+      sendJSON(response, 409, {
+        error: "Restore this Code Decision before starting new Research.",
+        code: "CODE_QUESTION_ARCHIVED"
+      });
+      return;
+    }
+    const [conversations, links] = await Promise.all([
+      listStoredResearchConversations(context.actorUserID),
+      listStoredProjectLinks(context.actorUserID)
+    ]);
+    const existingLink = links.find((link) =>
+      !link.deletedAt &&
+      link.projectID === context.projectID &&
+      link.targetKind === "researchConversation" &&
+      researchCodeDecisionLink(link)?.questionID === questionID &&
+      conversations.some((conversation) => conversation.id === link.targetID)
+    );
+    if (existingLink) {
+      const conversation = conversations.find((item) => item.id === existingLink.targetID);
+      await saveResearchCodeDecisionLinkActivity(context, existingLink);
+      sendJSON(response, 200, {
+        conversation: await researchConversationForClient(conversation, {
+          userID: context.actorUserID,
+          projectLink: existingLink
+        }),
+        questionID,
+        replayed: true
+      });
+      return;
+    }
+    const requestedConversationID = String(context.body.conversationID || "").trim() ||
+      researchConversationIDForCodeDecision(context.actorUserID, context.projectID, questionID);
+    const existingConversation = conversations.find((item) => item.id === requestedConversationID) || null;
+    if (existingConversation) {
+      const sameIntent = existingConversation.primaryProjectID === context.projectID &&
+        existingConversation.origin?.kind === "codeDecision" &&
+        existingConversation.origin?.questionID === questionID;
+      if (!sameIntent) {
+        throw new CodeQuestionCommandError(
+          "This Research conversation ID was already used for different content.",
+          { code: "CODE_QUESTION_IDEMPOTENCY_CONFLICT", status: 409 }
+        );
+      }
+      const linked = await linkResearchConversationToCodeDecision(
+        context,
+        existingConversation,
+        question
+      );
+      sendJSON(response, 200, {
+        conversation: await researchConversationForClient(existingConversation, {
+          userID: context.actorUserID,
+          projectLink: linked.link
+        }),
+        questionID,
+        replayed: true
+      });
+      return;
+    }
+    if (conversations.length >= 200) {
+      sendError(response, 409, "Delete an older research conversation before starting another.");
+      return;
+    }
+    const now = new Date().toISOString();
+    const conversation = {
+      id: requestedConversationID,
+      title: question.payload.title,
+      starterQuestion: question.payload.questionText,
+      createdAt: now,
+      updatedAt: now,
+      codeVersion: defaultSyncCodeVersion,
+      evidenceSetVersion: 1,
+      primaryProjectID: context.projectID,
+      projectContext: {
+        projectID: context.projectID,
+        facts: [],
+        source: "code-decision",
+        updatedAt: now
+      },
+      projectContextReviewRequired: false,
+      origin: { kind: "codeDecision", questionID },
+      sourceStatus: "current",
+      sources: [],
+      messages: []
+    };
+    await saveStoredResearchConversation(context.actorUserID, conversation);
+    const linked = await linkResearchConversationToCodeDecision(
+      context,
+      conversation,
+      question,
+      { now }
+    );
+    sendJSON(response, 201, {
+      conversation: await researchConversationForClient(conversation, {
+        userID: context.actorUserID,
+        projectLink: linked.link
+      }),
+      questionID,
+      replayed: false
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
+async function handleCodeQuestionResearchLink(request, response) {
+  const context = await requireCodeQuestionContext(request, response, {
+    permission: permissionForCommand("codeQuestion.update")
+  });
+  if (!context) return;
+  try {
+    const questionID = String(context.body.questionID || "").trim();
+    const conversation = await storedResearchConversation(
+      context.actorUserID,
+      String(context.body.conversationID || "").trim()
+    );
+    if (!conversation) {
+      sendError(response, 404, "Research conversation not found.");
+      return;
+    }
+    if (conversation.primaryProjectID !== context.projectID) {
+      throw new CodeQuestionCommandError(
+        "Assign this Research conversation to the Code Decision's Project before changing its link.",
+        { code: "CODE_QUESTION_RESEARCH_PROJECT_MISMATCH", status: 409 }
+      );
+    }
+    if (context.body.unlink === true) {
+      const existing = await researchConversationProjectLink(context.actorUserID, conversation);
+      const current = researchCodeDecisionLink(existing);
+      const lastQuestionID = String(existing?.metadata?.codeDecisionLastID || "").trim() || null;
+      if (current?.questionID && current.questionID !== questionID) {
+        throw new CodeQuestionCommandError("This Research conversation is linked to a different Code Decision.", {
+          code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT",
+          status: 409
+        });
+      }
+      if (!current && lastQuestionID && lastQuestionID !== questionID) {
+        throw new CodeQuestionCommandError("This Research conversation was unlinked from a different Code Decision.", {
+          code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT",
+          status: 409
+        });
+      }
+      const suppliedLinkVersion = context.body.expectedLinkVersion == null ||
+        context.body.expectedLinkVersion === ""
+        ? null
+        : Number(context.body.expectedLinkVersion);
+      if (suppliedLinkVersion != null && (!Number.isSafeInteger(suppliedLinkVersion) || suppliedLinkVersion < 0)) {
+        throw new CodeQuestionCommandError("Research link version must be a non-negative whole number.", {
+          code: "CODE_QUESTION_RESEARCH_LINK_VERSION_INVALID",
+          status: 400
+        });
+      }
+      if (current && suppliedLinkVersion == null) {
+        throw new CodeQuestionCommandError("Refresh this Research conversation before unlinking it.", {
+          code: "CODE_QUESTION_RESEARCH_LINK_VERSION_REQUIRED",
+          status: 400
+        });
+      }
+      if (current && suppliedLinkVersion !== Number(existing?.version || 0)) {
+        throw new CodeQuestionCommandError("This Research link changed after you opened it.", {
+          code: "CODE_QUESTION_RESEARCH_LINK_CONFLICT",
+          status: 409,
+          details: {
+            expectedLinkVersion: suppliedLinkVersion,
+            currentLinkVersion: Number(existing?.version || 0)
+          }
+        });
+      }
+      const now = new Date().toISOString();
+      const link = current
+        ? await clearResearchCodeDecisionLink(context.actorUserID, existing, now)
+        : existing;
+      if (current || lastQuestionID === questionID) {
+        await saveResearchCodeDecisionUnlinkActivity(context, link, questionID);
+      }
+      sendJSON(response, 200, {
+        conversation: await researchConversationForClient(conversation, {
+          userID: context.actorUserID,
+          projectLink: link
+        }),
+        unlinked: Boolean(current),
+        replayed: !current && lastQuestionID === questionID,
+        questionID
+      });
+      return;
+    }
+    const question = await codeQuestionForProject(
+      context.storageOwnerUserID,
+      context.projectID,
+      questionID
+    );
+    if (!question) {
+      sendError(response, 404, "Code Decision not found for this Project.");
+      return;
+    }
+    if (question.payload.recordState !== "active") {
+      throw new CodeQuestionCommandError("Restore this Code Decision before linking new Research.", {
+        code: "CODE_QUESTION_ARCHIVED",
+        status: 409
+      });
+    }
+    const linked = await linkResearchConversationToCodeDecision(context, conversation, question, {
+      expectedLinkVersion: context.body.expectedLinkVersion,
+      requireExpectedLinkVersion: true,
+      confirmRelink: context.body.confirmRelink === true,
+      confirmReplaceDecisionConversation: context.body.confirmReplaceDecisionConversation === true,
+      expectedTargetConversationID: context.body.expectedTargetConversationID
+    });
+    sendJSON(response, linked.replayed ? 200 : 201, {
+      conversation: await researchConversationForClient(conversation, {
+        userID: context.actorUserID,
+        projectLink: linked.link
+      }),
+      questionID,
+      replayed: linked.replayed,
+      replacedConversationID: linked.replacedConversationID
+    });
+  } catch (error) {
+    if (sendCodeQuestionError(response, error)) return;
+    throw error;
+  }
+}
+
 async function handleCodeQuestionLegacyList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
@@ -17167,16 +18071,23 @@ async function handleCodeQuestionList(request, response) {
   const context = await requireCodeQuestionContext(request, response);
   if (!context) return;
   const projectID = context.projectID;
-  const links = (await listStoredProjectLinks(context.storageOwnerUserID))
+  const [links, artifacts, researchLinksByQuestionID] = await Promise.all([
+    listStoredProjectLinks(context.storageOwnerUserID),
+    listStoredFoundationArtifacts(context.storageOwnerUserID),
+    researchConversationLinksForCodeDecisions(context.actorUserID, projectID)
+  ]);
+  const questionLinks = links
     .filter((link) => !link.deletedAt && link.projectID === projectID && link.targetKind === "codeQuestion");
-  const artifacts = await listStoredFoundationArtifacts(context.storageOwnerUserID);
-  const questions = links.map((link) => {
+  const questions = questionLinks.map((link) => {
     const artifact = artifacts.find((item) => item.envelope?.id === link.targetID);
+    const research = researchLinksByQuestionID.get(artifact?.envelope?.id);
     return artifact
       ? {
           id: artifact.envelope.id,
           version: artifact.envelope.version,
           ...artifact.payload,
+          researchConversationID: research?.conversation?.id || null,
+          researchConversationUpdatedAt: research?.conversation?.updatedAt || null,
           summary: codeQuestionListSummary(artifact, artifacts)
         }
       : null;
@@ -17197,13 +18108,15 @@ async function handleCodeQuestionState(request, response) {
     sendError(response, 404, "Code Question not found for this Project.");
     return;
   }
-  const [allArtifacts, links, activities, pendingIssuance, researchAnswers] = await Promise.all([
+  const [allArtifacts, links, activities, pendingIssuance, researchAnswers, researchLinksByQuestionID] = await Promise.all([
     listStoredFoundationArtifacts(context.storageOwnerUserID),
     listStoredProjectLinks(context.storageOwnerUserID),
     listStoredActivityEvents(context.storageOwnerUserID),
     listStoredCodeQuestionPendingIssuance(context.storageOwnerUserID),
-    listStoredResearchAnswers(context.storageOwnerUserID)
+    listStoredResearchAnswers(context.storageOwnerUserID),
+    researchConversationLinksForCodeDecisions(context.actorUserID, context.projectID)
   ]);
+  const linkedResearch = researchLinksByQuestionID.get(questionID) || null;
   const projectLinks = links.filter((link) => !link.deletedAt && link.projectID === context.projectID);
   const linksByTargetID = new Map(projectLinks.map((link) => [link.targetID, link]));
   const directArtifacts = allArtifacts.filter((artifact) => {
@@ -17277,6 +18190,7 @@ async function handleCodeQuestionState(request, response) {
       permissions: context.projectAccess.permissions
     },
     question: { envelope: question.envelope, payload: question.payload },
+    researchConversationID: linkedResearch?.conversation?.id || null,
     artifacts: artifacts.map((artifact) => ({ envelope: artifact.envelope, payload: artifact.payload })),
     links: projectLinks.filter((link) => artifactIDs.has(link.targetID)),
     activity: activities.filter((event) => event.projectID === context.projectID && (
@@ -17522,6 +18436,75 @@ async function handleCodeQuestionRestore(request, response) {
   }
 }
 
+async function validatedResearchInputCapture(context, questionID, body) {
+  const source = body.researchSource;
+  if (!source || typeof source !== "object" || Array.isArray(source)) return null;
+  const conversationID = String(source.conversationID || "").trim();
+  const messageID = String(source.messageID || "").trim();
+  if (!conversationID || !messageID) {
+    throw new CodeQuestionCommandError("Choose a linked Research message to capture.", {
+      code: "CODE_QUESTION_RESEARCH_SOURCE_INVALID",
+      status: 400
+    });
+  }
+  const conversation = await storedResearchConversation(context.actorUserID, conversationID);
+  if (!conversation || conversation.primaryProjectID !== context.projectID) {
+    throw new CodeQuestionCommandError("The linked Research message is unavailable for this Project.", {
+      code: "CODE_QUESTION_RESEARCH_SOURCE_NOT_FOUND",
+      status: 404
+    });
+  }
+  const link = await researchConversationProjectLink(context.actorUserID, conversation);
+  if (researchCodeDecisionLink(link)?.questionID !== questionID) {
+    throw new CodeQuestionCommandError("Link this Research conversation to the Code Decision before capturing it.", {
+      code: "CODE_QUESTION_RESEARCH_LINK_REQUIRED",
+      status: 409
+    });
+  }
+  const message = (conversation.messages || []).find((item) =>
+    item.id === messageID && item.role === "user"
+  );
+  if (!message || normalizedResearchText(message.question, 2_000) !== normalizedResearchText(body.statement, 2_000)) {
+    throw new CodeQuestionCommandError("The captured statement must match its Research message.", {
+      code: "CODE_QUESTION_RESEARCH_SOURCE_CHANGED",
+      status: 409
+    });
+  }
+  const inputKind = String(body.kind || body.inputKind || "").trim();
+  const inputState = String(body.state || "").trim();
+  const dispositionByKindAndState = new Map([
+    ["confirmedFact:confirmed", "project-fact"],
+    ["assumption:proposed", "assumption"],
+    ["unknown:proposed", "missing-information"]
+  ]);
+  const disposition = dispositionByKindAndState.get(`${inputKind}:${inputState}`);
+  if (!disposition) {
+    throw new CodeQuestionCommandError(
+      "Research capture must use the canonical fact, assumption, or missing-information state.",
+      { code: "CODE_QUESTION_RESEARCH_SOURCE_DISPOSITION_INVALID", status: 400 }
+    );
+  }
+  const suppliedDisposition = String(source.disposition || "").trim();
+  if (suppliedDisposition && suppliedDisposition !== disposition) {
+    throw new CodeQuestionCommandError("Research capture disposition does not match the governed input kind.", {
+      code: "CODE_QUESTION_RESEARCH_SOURCE_DISPOSITION_MISMATCH",
+      status: 409
+    });
+  }
+  const basis = `Captured from Research ${conversationID} message ${messageID}`;
+  const suppliedBasis = normalizedResearchText(body.basis, 500);
+  if (suppliedBasis && suppliedBasis !== basis) {
+    throw new CodeQuestionCommandError("Research capture basis does not match its immutable message provenance.", {
+      code: "CODE_QUESTION_RESEARCH_SOURCE_BASIS_MISMATCH",
+      status: 409
+    });
+  }
+  return {
+    researchSource: { conversationID, messageID, disposition },
+    basis
+  };
+}
+
 async function handleCodeQuestionInputSave(request, response) {
   const context = await requireCodeQuestionContext(request, response, {
     permission: permissionForCommand("codeQuestion.input.save")
@@ -17534,7 +18517,16 @@ async function handleCodeQuestionInputSave(request, response) {
       sendError(response, 404, "Code Question not found for this Project.");
       return;
     }
-    const requestedID = String(context.body.id || "").trim();
+    const researchCapture = await validatedResearchInputCapture(context, questionID, context.body);
+    const commandBody = researchCapture
+      ? {
+          ...context.body,
+          basis: researchCapture.basis,
+          researchSource: researchCapture.researchSource
+        }
+      : context.body;
+    const researchSource = researchCapture?.researchSource || null;
+    const requestedID = String(commandBody.id || "").trim();
     const artifactWithRequestedID = requestedID
       ? (await listStoredFoundationArtifacts(context.storageOwnerUserID))
           .find((item) => item.envelope?.id === requestedID) || null
@@ -17549,7 +18541,7 @@ async function handleCodeQuestionInputSave(request, response) {
     const suppliedExpectedVersion = Number(context.body.expectedVersion);
     if (existing && !Number.isSafeInteger(suppliedExpectedVersion)) {
       if (Number(existing.envelope.version) === 1 &&
-        questionInputIntentMatches(existing.payload, context.body, { creating: true })) {
+        questionInputIntentMatches(existing.payload, commandBody, { creating: true })) {
         await saveStoredProjectLink(context.storageOwnerUserID, codeQuestionLinkForAccess(context, {
           projectID: context.projectID,
           targetKind: "questionInput",
@@ -17568,7 +18560,7 @@ async function handleCodeQuestionInputSave(request, response) {
     }
     if (existing && suppliedExpectedVersion !== Number(existing.envelope.version)) {
       if (Number(existing.envelope.version) === suppliedExpectedVersion + 1 &&
-        questionInputIntentMatches(existing.payload, context.body)) {
+        questionInputIntentMatches(existing.payload, commandBody)) {
         sendJSON(response, 200, {
           input: { id: existing.envelope.id, version: existing.envelope.version, ...existing.payload },
           replayed: true
@@ -17585,18 +18577,18 @@ async function handleCodeQuestionInputSave(request, response) {
       ? reviseQuestionInputArtifact(existing, {
           userID: context.actorUserID,
           expectedVersion: suppliedExpectedVersion,
-          statement: context.body.statement,
-          state: context.body.state,
-          basis: context.body.basis,
-          responsibleUserID: context.body.responsibleUserID
+          statement: commandBody.statement,
+          state: commandBody.state,
+          basis: commandBody.basis,
+          responsibleUserID: commandBody.responsibleUserID
         })
       : createQuestionInputArtifact({
           userID: context.actorUserID,
           questionID,
-          kind: context.body.kind || context.body.inputKind,
-          statement: context.body.statement,
-          state: context.body.state,
-          basis: context.body.basis,
+          kind: commandBody.kind || commandBody.inputKind,
+          statement: commandBody.statement,
+          state: commandBody.state,
+          basis: commandBody.basis,
           id: requestedID || randomUUID()
         }));
     const expectedVersion = existing ? suppliedExpectedVersion : 0;
@@ -17618,7 +18610,11 @@ async function handleCodeQuestionInputSave(request, response) {
       objectID: artifact.envelope.id,
       previousStatus: existing?.payload?.state || null,
       newStatus: artifact.payload.state,
-      metadata: { questionID, inputRevision: artifact.payload.revision }
+      metadata: {
+        questionID,
+        inputRevision: artifact.payload.revision,
+        ...(researchSource ? { researchSource } : {})
+      }
     }));
     sendJSON(response, existing ? 200 : 201, {
       input: { id: artifact.envelope.id, version: artifact.envelope.version, ...artifact.payload }
@@ -19392,6 +20388,8 @@ const handlers = {
   "projects/code-questions/legacy/promote": handleCodeQuestionLegacyPromote,
   "projects/code-questions/legacy/unlink": handleCodeQuestionLegacyUnlink,
   "projects/code-questions/create": handleCodeQuestionCreate,
+  "projects/code-questions/research/start": handleCodeQuestionResearchStart,
+  "projects/code-questions/research/link": handleCodeQuestionResearchLink,
   "projects/code-questions/definition/save": handleCodeQuestionDefinitionSave,
   "projects/code-questions/archive": handleCodeQuestionArchive,
   "projects/code-questions/restore": handleCodeQuestionRestore,

@@ -273,6 +273,27 @@ async function main() {
     });
     await expectStatus(projectPush, 200, "Creating the Project through sync");
 
+    const ownerSecondaryProjectID = `cq-http-owner-secondary-${Date.now()}`;
+    await expectStatus(await postAs(owner, "/sync/push", {
+      batch: {
+        user: { id: owner.userID },
+        mutations: [{
+          project: {
+            id: `cq-http-owner-secondary-record-${Date.now()}`,
+            userID: owner.userID,
+            codeVersion: defaultSyncCodeVersion,
+            clientID: ownerSecondaryProjectID,
+            name: "Code Question Secondary Project",
+            address: "300 Authorization Boundary Place",
+            description: "Separate owner Project used to verify Research link authorization boundaries.",
+            colorHex: "#7d6b9d",
+            sortOrder: 1,
+            updatedAt: new Date().toISOString()
+          }
+        }]
+      }
+    }), 200, "Creating the owner's secondary Project");
+
     const organizationResult = await postAs(owner, "/organizations/create", {
       name: "Code Question HTTP Studio"
     });
@@ -393,6 +414,702 @@ async function main() {
     });
     assert.equal(hostileCreate.response.status, 409);
     assert.equal(hostileCreate.json.code, "CODE_QUESTION_IDEMPOTENCY_CONFLICT");
+
+    // Research remains actor-private while a durable, validated relation lets
+    // the exact conversation and shared Code Decision reopen together.
+    const researchStart = await postAs(editor, "/projects/code-questions/research/start", {
+      projectID,
+      questionID: question.id,
+      conversationID: "cq-http-research-1"
+    });
+    const startedResearch = await expectStatus(
+      researchStart,
+      201,
+      "Starting linked Research for a Code Decision"
+    );
+    assert.equal(startedResearch.conversation.id, "cq-http-research-1");
+    assert.equal(startedResearch.conversation.primaryProjectID, projectID);
+    assert.equal(startedResearch.conversation.starterQuestion, question.questionText);
+    assert.equal(startedResearch.conversation.linkedCodeDecisionID, question.id);
+    assert.ok(startedResearch.conversation.codeDecisionLinkVersion >= 1);
+    assert.deepEqual(startedResearch.conversation.sources, []);
+    assert.deepEqual(startedResearch.conversation.messages, []);
+
+    const researchStartReplay = await postAs(editor, "/projects/code-questions/research/start", {
+      projectID,
+      questionID: question.id,
+      conversationID: "cq-http-research-1"
+    });
+    const replayedResearch = await expectStatus(
+      researchStartReplay,
+      200,
+      "Replaying linked Research start"
+    );
+    assert.equal(replayedResearch.replayed, true);
+    assert.equal(replayedResearch.conversation.id, startedResearch.conversation.id);
+    assert.equal(
+      replayedResearch.conversation.codeDecisionLinkVersion,
+      startedResearch.conversation.codeDecisionLinkVersion
+    );
+
+    const editorResearchList = await expectStatus(
+      await postAs(editor, "/research/conversations/list", {}),
+      200,
+      "Listing the editor's private Research"
+    );
+    const editorResearchSummary = editorResearchList.conversations.find((item) =>
+      item.id === startedResearch.conversation.id
+    );
+    assert.equal(editorResearchSummary.linkedCodeDecisionID, question.id);
+    assert.equal(editorResearchSummary.starterQuestion, question.questionText);
+    assert.equal(
+      editorResearchList.conversations.filter((item) => item.id === startedResearch.conversation.id).length,
+      1
+    );
+    const editorDecisionList = await expectStatus(
+      await postAs(editor, "/projects/code-questions/list", { projectID }),
+      200,
+      "Listing the editor's linked Code Decision"
+    );
+    assert.equal(
+      editorDecisionList.questions.find((item) => item.id === question.id).researchConversationID,
+      startedResearch.conversation.id
+    );
+    const editorDecisionState = await expectStatus(
+      await postAs(editor, "/projects/code-questions/state", { projectID, questionID: question.id }),
+      200,
+      "Hydrating the editor's linked Code Decision"
+    );
+    assert.equal(editorDecisionState.researchConversationID, startedResearch.conversation.id);
+
+    const evidenceFreeMessage = await postAs(editor, "/research/conversations/message", {
+      conversationID: startedResearch.conversation.id,
+      question: question.questionText
+    });
+    assert.equal(evidenceFreeMessage.response.status, 422);
+    assert.equal(evidenceFreeMessage.json.code, "RESEARCH_EVIDENCE_REQUIRED");
+    const unchangedResearch = await expectStatus(
+      await postAs(editor, "/research/conversations/get", {
+        conversationID: startedResearch.conversation.id
+      }),
+      200,
+      "Reading evidence-free starter Research"
+    );
+    assert.deepEqual(unchangedResearch.conversation.messages, []);
+
+    const canonicalResearchText = 'This code shall be known and may be cited as the "New York City Building Code," "NYCBC" or "BC". All section numbers in this code shall be deemed to be preceded by the designation "BC".';
+    const researchEvidenceAdded = await expectStatus(
+      await postAs(editor, "/research/conversations/evidence", {
+        conversationID: startedResearch.conversation.id,
+        selections: [
+          { sectionID: "1", selectedText: canonicalResearchText },
+          { sectionID: "1", selectedText: canonicalResearchText }
+        ]
+      }),
+      200,
+      "Adding professionally selected ordinary Research evidence"
+    );
+    assert.equal(researchEvidenceAdded.addedSelectionCount, 1);
+    assert.equal(
+      researchEvidenceAdded.conversation.sources.filter((source) => source.kind === "selection").length,
+      1
+    );
+    const researchEvidenceVersion = researchEvidenceAdded.conversation.evidenceSetVersion;
+    const researchEvidenceReplay = await expectStatus(
+      await postAs(editor, "/research/conversations/evidence", {
+        conversationID: startedResearch.conversation.id,
+        selections: [{ sectionID: "1", selectedText: canonicalResearchText }]
+      }),
+      200,
+      "Replaying an exact ordinary Research evidence selection"
+    );
+    assert.equal(researchEvidenceReplay.replayed, true);
+    assert.equal(researchEvidenceReplay.addedSelectionCount, 0);
+    assert.equal(researchEvidenceReplay.conversation.evidenceSetVersion, researchEvidenceVersion);
+    const capturedStatement = "The corridor is on the second floor of the project.";
+    const researchMessage = await expectStatus(
+      await postAs(editor, "/research/conversations/message", {
+        conversationID: startedResearch.conversation.id,
+        question: capturedStatement
+      }),
+      200,
+      "Asking ordinary Research after attaching selected evidence"
+    );
+    const capturedMessage = researchMessage.conversation.messages.find((item) => item.role === "user");
+    const firstResearchAnswerMessage = researchMessage.conversation.messages.find((item) => item.role === "assistant");
+    assert.ok(capturedMessage?.id);
+    assert.ok(firstResearchAnswerMessage?.id);
+    const firstResearchAnswer = await expectStatus(
+      await postAs(editor, "/research/answers/get", { answerID: firstResearchAnswerMessage.id }),
+      200,
+      "Reading immutable Research decision context"
+    );
+    assert.deepEqual(firstResearchAnswer.answer.decisionContextSnapshot, {
+      projectID,
+      questionID: question.id,
+      definitionRevision: question.definitionRevision,
+      definitionHash: definitionHash(question),
+      capturedAt: firstResearchAnswer.answer.decisionContextSnapshot.capturedAt
+    });
+    assert.ok(Number.isFinite(Date.parse(firstResearchAnswer.answer.decisionContextSnapshot.capturedAt)));
+    const decisionAfterOrdinaryResearch = await expectStatus(
+      await postAs(editor, "/projects/code-questions/state", { projectID, questionID: question.id }),
+      200,
+      "Verifying ordinary Research remains outside governed Evidence Sets and analysis"
+    );
+    assert.ok(!decisionAfterOrdinaryResearch.artifacts.some((artifact) =>
+      ["questionEvidenceSet", "questionAnalysis"].includes(artifact.envelope?.type)
+    ));
+    const captureBasis = `Captured from Research ${startedResearch.conversation.id} message ${capturedMessage.id}`;
+    const capturePayload = {
+      projectID,
+      questionID: question.id,
+      id: `research-message:${startedResearch.conversation.id}:${capturedMessage.id}`,
+      kind: "confirmedFact",
+      state: "confirmed",
+      statement: capturedStatement,
+      basis: captureBasis,
+      researchSource: {
+        conversationID: startedResearch.conversation.id,
+        messageID: capturedMessage.id,
+        disposition: "project-fact"
+      }
+    };
+    const capturedInput = await expectStatus(
+      await postAs(editor, "/projects/code-questions/inputs/save", capturePayload),
+      201,
+      "Capturing a Research message as a governed Project Fact"
+    );
+    assert.equal(capturedInput.input.inputKind, "confirmedFact");
+    assert.equal(capturedInput.input.state, "confirmed");
+    const capturedInputReplay = await expectStatus(
+      await postAs(editor, "/projects/code-questions/inputs/save", capturePayload),
+      200,
+      "Replaying a stable Research capture"
+    );
+    assert.equal(capturedInputReplay.replayed, true);
+    const serverDerivedCaptureReplay = await expectStatus(
+      await postAs(editor, "/projects/code-questions/inputs/save", {
+        ...capturePayload,
+        basis: "",
+        researchSource: {
+          conversationID: startedResearch.conversation.id,
+          messageID: capturedMessage.id
+        }
+      }),
+      200,
+      "Deriving canonical Research capture provenance server-side"
+    );
+    assert.equal(serverDerivedCaptureReplay.replayed, true);
+    assert.equal(serverDerivedCaptureReplay.input.basis, captureBasis);
+    const mismatchedResearchCapture = await postAs(editor, "/projects/code-questions/inputs/save", {
+      ...capturePayload,
+      id: `${capturePayload.id}:mismatch`,
+      statement: "A different statement than the linked Research message."
+    });
+    assert.equal(mismatchedResearchCapture.response.status, 409);
+    assert.equal(mismatchedResearchCapture.json.code, "CODE_QUESTION_RESEARCH_SOURCE_CHANGED");
+    const hostileDispositionCapture = await postAs(editor, "/projects/code-questions/inputs/save", {
+      ...capturePayload,
+      id: `${capturePayload.id}:hostile-disposition`,
+      researchSource: { ...capturePayload.researchSource, disposition: "assumption" }
+    });
+    assert.equal(hostileDispositionCapture.response.status, 409);
+    assert.equal(
+      hostileDispositionCapture.json.code,
+      "CODE_QUESTION_RESEARCH_SOURCE_DISPOSITION_MISMATCH"
+    );
+    const hostileBasisCapture = await postAs(editor, "/projects/code-questions/inputs/save", {
+      ...capturePayload,
+      id: `${capturePayload.id}:hostile-basis`,
+      basis: "Client-authored provenance must not be accepted."
+    });
+    assert.equal(hostileBasisCapture.response.status, 409);
+    assert.equal(hostileBasisCapture.json.code, "CODE_QUESTION_RESEARCH_SOURCE_BASIS_MISMATCH");
+
+    const privateOwnerResearchList = await expectStatus(
+      await postAs(owner, "/research/conversations/list", {}),
+      200,
+      "Checking per-actor Research privacy"
+    );
+    assert.ok(!privateOwnerResearchList.conversations.some((item) =>
+      item.id === startedResearch.conversation.id
+    ));
+    const ownerResearchStart = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/start", {
+        projectID,
+        questionID: question.id,
+        conversationID: "cq-http-owner-research-1"
+      }),
+      201,
+      "Starting separate owner-private Research"
+    );
+    assert.notEqual(ownerResearchStart.conversation.id, startedResearch.conversation.id);
+    const ownerDecisionState = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", { projectID, questionID: question.id }),
+      200,
+      "Hydrating the owner's actor-private Research link"
+    );
+    assert.equal(ownerDecisionState.researchConversationID, ownerResearchStart.conversation.id);
+
+    const forgedFoundationLink = await postAs(owner, "/projects/foundation/link", {
+      projectID,
+      targetKind: "researchConversation",
+      targetID: ownerResearchStart.conversation.id,
+      relationship: "primary",
+      metadata: { codeDecisionID: "forged-code-decision" }
+    });
+    assert.equal(forgedFoundationLink.response.status, 409);
+    assert.equal(forgedFoundationLink.json.code, "RESEARCH_PROJECT_LIFECYCLE_REQUIRED");
+    const forgedFoundationUnlink = await postAs(owner, "/projects/foundation/unlink", {
+      projectID,
+      targetKind: "researchConversation",
+      targetID: ownerResearchStart.conversation.id
+    });
+    assert.equal(forgedFoundationUnlink.response.status, 409);
+    assert.equal(forgedFoundationUnlink.json.code, "RESEARCH_PROJECT_LIFECYCLE_REQUIRED");
+    const ownerResearchAfterForge = await expectStatus(
+      await postAs(owner, "/research/conversations/get", {
+        conversationID: ownerResearchStart.conversation.id
+      }),
+      200,
+      "Rechecking the governed Research link"
+    );
+    assert.equal(ownerResearchAfterForge.conversation.linkedCodeDecisionID, question.id);
+    const ownerUnlink = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: ownerResearchStart.conversation.id,
+        expectedLinkVersion: ownerResearchAfterForge.conversation.codeDecisionLinkVersion,
+        unlink: true
+      }),
+      200,
+      "Unlinking private Research without deleting either record"
+    );
+    assert.equal(ownerUnlink.conversation.linkedCodeDecisionID, null);
+    assert.equal(ownerUnlink.conversation.primaryProjectID, projectID);
+    const ownerUnlinkReplay = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: ownerResearchStart.conversation.id,
+        expectedLinkVersion: ownerResearchAfterForge.conversation.codeDecisionLinkVersion,
+        unlink: true
+      }),
+      200,
+      "Replaying the completed private Research unlink"
+    );
+    assert.equal(ownerUnlinkReplay.replayed, true);
+    const ownerDecisionAfterUnlinkReplay = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", { projectID, questionID: question.id }),
+      200,
+      "Checking deterministic private Research unlink history"
+    );
+    assert.equal(ownerDecisionAfterUnlinkReplay.activity.filter((event) =>
+      event.action === "item.unlinked" &&
+      event.objectID === ownerResearchStart.conversation.id &&
+      event.metadata?.questionID === question.id
+    ).length, 1);
+    const ownerResearchRelink = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/start", {
+        projectID,
+        questionID: question.id,
+        conversationID: ownerResearchStart.conversation.id
+      }),
+      200,
+      "Recovering an unlinked deterministic Research start"
+    );
+    assert.equal(ownerResearchRelink.conversation.linkedCodeDecisionID, question.id);
+
+    await expectStatus(await postAs(owner, "/research/conversations/evidence", {
+      conversationID: ownerResearchRelink.conversation.id,
+      selections: [{ sectionID: "1", selectedText: canonicalResearchText }]
+    }), 200, "Selecting ordinary Research evidence for immutable decision-context history");
+    const ownerQuestionOneResearch = await expectStatus(
+      await postAs(owner, "/research/conversations/message", {
+        conversationID: ownerResearchRelink.conversation.id,
+        question: "Record the first linked decision context."
+      }),
+      200,
+      "Generating ordinary Research while linked to the first decision"
+    );
+    const ownerQuestionOneAnswerID = ownerQuestionOneResearch.conversation.messages
+      .findLast((message) => message.role === "assistant")?.id;
+    const ownerQuestionOneAnswer = await expectStatus(
+      await postAs(owner, "/research/answers/get", { answerID: ownerQuestionOneAnswerID }),
+      200,
+      "Reading first immutable linked Research answer"
+    );
+    assert.equal(ownerQuestionOneAnswer.answer.decisionContextSnapshot.questionID, question.id);
+
+    const secondQuestion = (await expectStatus(
+      await postAs(owner, "/projects/code-questions/create", {
+        projectID,
+        id: "cq-http-question-2",
+        title: "Second decision context",
+        questionText: "What decision context applies after an explicit Research relink?",
+        scope: "Research provenance history",
+        desiredOutput: "Professional conclusion",
+        jurisdiction: "New York City",
+        asOfDate: "2026-08-09T00:00:00.000Z"
+      }),
+      201,
+      "Creating a second Code Decision for immutable Research history"
+    )).question;
+    const ownerRelinkToSecond = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: secondQuestion.id,
+        conversationID: ownerResearchRelink.conversation.id,
+        expectedLinkVersion: ownerResearchRelink.conversation.codeDecisionLinkVersion,
+        confirmRelink: true
+      }),
+      201,
+      "Explicitly relinking ordinary Research to the second decision"
+    );
+    const ownerQuestionTwoResearch = await expectStatus(
+      await postAs(owner, "/research/conversations/message", {
+        conversationID: ownerRelinkToSecond.conversation.id,
+        question: "Record the second linked decision context."
+      }),
+      200,
+      "Generating ordinary Research while linked to the second decision"
+    );
+    const ownerQuestionTwoAnswerID = ownerQuestionTwoResearch.conversation.messages
+      .findLast((message) => message.role === "assistant")?.id;
+    const [ownerQuestionOneAnswerAfterRelink, ownerQuestionTwoAnswer] = await Promise.all([
+      postAs(owner, "/research/answers/get", { answerID: ownerQuestionOneAnswerID })
+        .then((result) => expectStatus(result, 200, "Re-reading first immutable Research answer")),
+      postAs(owner, "/research/answers/get", { answerID: ownerQuestionTwoAnswerID })
+        .then((result) => expectStatus(result, 200, "Reading second immutable Research answer"))
+    ]);
+    assert.equal(ownerQuestionOneAnswerAfterRelink.answer.decisionContextSnapshot.questionID, question.id);
+    assert.equal(ownerQuestionTwoAnswer.answer.decisionContextSnapshot.questionID, secondQuestion.id);
+    assert.notEqual(
+      ownerQuestionOneAnswerAfterRelink.answer.decisionContextSnapshot.definitionHash,
+      ownerQuestionTwoAnswer.answer.decisionContextSnapshot.definitionHash
+    );
+    const secondDecisionAfterOrdinaryResearch = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", { projectID, questionID: secondQuestion.id }),
+      200,
+      "Verifying ordinary Research did not create governed second-decision artifacts"
+    );
+    assert.ok(!secondDecisionAfterOrdinaryResearch.artifacts.some((artifact) =>
+      ["questionEvidenceSet", "questionAnalysis"].includes(artifact.envelope?.type)
+    ));
+
+    const createOwnerOrdinaryResearch = async (label) => {
+      const createdConversation = await expectStatus(
+        await postAs(owner, "/research/conversations/create", {
+          projectID,
+          selections: [{ sectionID: "1", selectedText: canonicalResearchText }]
+        }),
+        201,
+        `Creating ${label}`
+      );
+      return (await expectStatus(
+        await postAs(owner, "/research/conversations/get", {
+          conversationID: createdConversation.conversation.id
+        }),
+        200,
+        `Reading ${label}`
+      )).conversation;
+    };
+
+    const ordinaryLinked = await createOwnerOrdinaryResearch("ordinary unlinked Research for versioned linking");
+    assert.equal(ordinaryLinked.linkedCodeDecisionID, null);
+    assert.ok(ordinaryLinked.codeDecisionLinkVersion >= 1);
+    const ordinaryLinkResult = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: ordinaryLinked.id,
+        expectedLinkVersion: ordinaryLinked.codeDecisionLinkVersion
+      }),
+      201,
+      "Linking ordinary Research with its Project-link version"
+    );
+    assert.equal(ordinaryLinkResult.conversation.linkedCodeDecisionID, question.id);
+
+    const crossProjectUnlink = await postAs(owner, "/projects/code-questions/research/link", {
+      projectID: ownerSecondaryProjectID,
+      questionID: question.id,
+      conversationID: ordinaryLinked.id,
+      expectedLinkVersion: ordinaryLinkResult.conversation.codeDecisionLinkVersion,
+      unlink: true
+    });
+    assert.equal(crossProjectUnlink.response.status, 409);
+    assert.equal(crossProjectUnlink.json.code, "CODE_QUESTION_RESEARCH_PROJECT_MISMATCH");
+
+    const replacementResearch = await createOwnerOrdinaryResearch("replacement ordinary Research");
+    const unconfirmedReplacement = await postAs(owner, "/projects/code-questions/research/link", {
+      projectID,
+      questionID: question.id,
+      conversationID: replacementResearch.id,
+      expectedLinkVersion: replacementResearch.codeDecisionLinkVersion
+    });
+    assert.equal(unconfirmedReplacement.response.status, 409);
+    assert.equal(
+      unconfirmedReplacement.json.code,
+      "CODE_QUESTION_RESEARCH_REPLACE_CONFIRMATION_REQUIRED"
+    );
+    const staleTargetReplacement = await postAs(owner, "/projects/code-questions/research/link", {
+      projectID,
+      questionID: question.id,
+      conversationID: replacementResearch.id,
+      expectedLinkVersion: replacementResearch.codeDecisionLinkVersion,
+      confirmReplaceDecisionConversation: true,
+      expectedTargetConversationID: "stale-target"
+    });
+    assert.equal(staleTargetReplacement.response.status, 409);
+    assert.equal(staleTargetReplacement.json.code, "CODE_QUESTION_RESEARCH_TARGET_CONFLICT");
+    const confirmedReplacement = await expectStatus(
+      await postAs(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: replacementResearch.id,
+        expectedLinkVersion: replacementResearch.codeDecisionLinkVersion,
+        confirmReplaceDecisionConversation: true,
+        expectedTargetConversationID: ordinaryLinked.id
+      }),
+      201,
+      "Replacing the current Research conversation with exact target confirmation"
+    );
+    assert.equal(confirmedReplacement.replacedConversationID, ordinaryLinked.id);
+
+    const concurrentResearchA = await createOwnerOrdinaryResearch("concurrent Research A");
+    const concurrentResearchB = await createOwnerOrdinaryResearch("concurrent Research B");
+    const concurrentReplacementResults = await Promise.all([
+      postAsIsolated(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: concurrentResearchA.id,
+        expectedLinkVersion: concurrentResearchA.codeDecisionLinkVersion,
+        confirmReplaceDecisionConversation: true,
+        expectedTargetConversationID: replacementResearch.id
+      }),
+      postAsIsolated(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: question.id,
+        conversationID: concurrentResearchB.id,
+        expectedLinkVersion: concurrentResearchB.codeDecisionLinkVersion,
+        confirmReplaceDecisionConversation: true,
+        expectedTargetConversationID: replacementResearch.id
+      })
+    ]);
+    assert.deepEqual(
+      concurrentReplacementResults.map((result) => result.response.status).sort((left, right) => left - right),
+      [201, 409]
+    );
+    const successfulConcurrentConversationID = concurrentReplacementResults
+      .find((result) => result.response.status === 201)?.json?.conversation?.id;
+    const ownerResearchAfterConcurrentReplacement = await expectStatus(
+      await postAs(owner, "/research/conversations/list", {}),
+      200,
+      "Checking serialized one-current Research replacement"
+    );
+    const currentOwnerQuestionOneResearch = ownerResearchAfterConcurrentReplacement.conversations
+      .filter((conversation) => conversation.linkedCodeDecisionID === question.id);
+    assert.equal(currentOwnerQuestionOneResearch.length, 1);
+    assert.equal(currentOwnerQuestionOneResearch[0].id, successfulConcurrentConversationID);
+
+    const createLifecycleDecision = async (id, title) => (await expectStatus(
+      await postAs(owner, "/projects/code-questions/create", {
+        projectID,
+        id,
+        title,
+        questionText: `What governed history applies when ${title.toLowerCase()}?`,
+        scope: "Research conversation lifecycle audit",
+        desiredOutput: "Professional conclusion",
+        jurisdiction: "New York City",
+        asOfDate: "2026-08-09T00:00:00.000Z"
+      }),
+      201,
+      `Creating ${title}`
+    )).question;
+    const linkLifecycleResearch = async (decision, label) => {
+      const conversation = await createOwnerOrdinaryResearch(label);
+      const linked = await expectStatus(
+        await postAs(owner, "/projects/code-questions/research/link", {
+          projectID,
+          questionID: decision.id,
+          conversationID: conversation.id,
+          expectedLinkVersion: conversation.codeDecisionLinkVersion
+        }),
+        201,
+        `Linking ${label}`
+      );
+      return linked.conversation;
+    };
+    const decisionUnlinkEvents = (state, decisionID, conversationID) => state.activity.filter((event) =>
+      event.action === "item.unlinked" &&
+      event.objectKind === "researchConversation" &&
+      event.objectID === conversationID &&
+      event.metadata?.questionID === decisionID
+    );
+
+    const unlinkRaceSourceDecision = await createLifecycleDecision(
+      "cq-http-question-research-unlink-race-source",
+      "Racing a Research unlink"
+    );
+    const unlinkRaceTargetDecision = await createLifecycleDecision(
+      "cq-http-question-research-unlink-race-target",
+      "Racing a Research relink"
+    );
+    const unlinkRaceConversation = await linkLifecycleResearch(
+      unlinkRaceSourceDecision,
+      "Research used for an unlink and relink race"
+    );
+    const unlinkRaceResults = await Promise.all([
+      postAsIsolated(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: unlinkRaceSourceDecision.id,
+        conversationID: unlinkRaceConversation.id,
+        expectedLinkVersion: unlinkRaceConversation.codeDecisionLinkVersion,
+        unlink: true
+      }),
+      postAsIsolated(owner, "/projects/code-questions/research/link", {
+        projectID,
+        questionID: unlinkRaceTargetDecision.id,
+        conversationID: unlinkRaceConversation.id,
+        expectedLinkVersion: unlinkRaceConversation.codeDecisionLinkVersion,
+        confirmRelink: true
+      })
+    ]);
+    assert.equal(unlinkRaceResults.filter((result) => result.response.ok).length, 1);
+    assert.equal(unlinkRaceResults.filter((result) => result.response.status === 409).length, 1);
+    assert.equal(
+      unlinkRaceResults.find((result) => result.response.status === 409).json.code,
+      "CODE_QUESTION_RESEARCH_LINK_CONFLICT"
+    );
+    const unlinkRaceConversationAfter = await expectStatus(
+      await postAs(owner, "/research/conversations/get", {
+        conversationID: unlinkRaceConversation.id
+      }),
+      200,
+      "Reading Research after the unlink and relink race"
+    );
+    assert.ok([
+      null,
+      unlinkRaceTargetDecision.id
+    ].includes(unlinkRaceConversationAfter.conversation.linkedCodeDecisionID));
+
+    const moveDecision = await createLifecycleDecision(
+      "cq-http-question-research-move",
+      "Moving linked Research"
+    );
+    const moveConversation = await linkLifecycleResearch(moveDecision, "Research moved between Projects");
+    await expectStatus(
+      await postAs(owner, "/research/conversations/assign-project", {
+        conversationID: moveConversation.id,
+        projectID: ownerSecondaryProjectID,
+        confirmMove: true
+      }),
+      200,
+      "Moving linked Research to another Project"
+    );
+    await expectStatus(
+      await postAs(owner, "/research/conversations/assign-project", {
+        conversationID: moveConversation.id,
+        projectID: ownerSecondaryProjectID,
+        confirmMove: true
+      }),
+      200,
+      "Replaying the completed Research Project move"
+    );
+    const moveDecisionState = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", {
+        projectID,
+        questionID: moveDecision.id
+      }),
+      200,
+      "Reading decision history after moving linked Research"
+    );
+    assert.equal(moveDecisionState.researchConversationID, null);
+    assert.equal(decisionUnlinkEvents(moveDecisionState, moveDecision.id, moveConversation.id).length, 1);
+    assert.equal(
+      decisionUnlinkEvents(moveDecisionState, moveDecision.id, moveConversation.id)[0].newStatus,
+      "unlinked"
+    );
+
+    const unassignDecision = await createLifecycleDecision(
+      "cq-http-question-research-unassign",
+      "Unassigning linked Research"
+    );
+    const unassignConversation = await linkLifecycleResearch(
+      unassignDecision,
+      "Research unassigned from its Project"
+    );
+    await expectStatus(
+      await postAs(owner, "/research/conversations/assign-project", {
+        conversationID: unassignConversation.id,
+        projectID: "",
+        confirmMove: true
+      }),
+      200,
+      "Unassigning linked Research from its Project"
+    );
+    const unassignDecisionState = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", {
+        projectID,
+        questionID: unassignDecision.id
+      }),
+      200,
+      "Reading decision history after unassigning linked Research"
+    );
+    assert.equal(
+      decisionUnlinkEvents(unassignDecisionState, unassignDecision.id, unassignConversation.id).length,
+      1
+    );
+
+    const deleteDecision = await createLifecycleDecision(
+      "cq-http-question-research-delete",
+      "Deleting linked Research"
+    );
+    const deleteConversation = await linkLifecycleResearch(deleteDecision, "Research deleted after linking");
+    await expectStatus(
+      await postAs(owner, "/research/conversations/delete", {
+        conversationID: deleteConversation.id
+      }),
+      200,
+      "Deleting linked Research after recording its decision unlink"
+    );
+    const deleteDecisionState = await expectStatus(
+      await postAs(owner, "/projects/code-questions/state", {
+        projectID,
+        questionID: deleteDecision.id
+      }),
+      200,
+      "Reading decision history after deleting linked Research"
+    );
+    assert.equal(deleteDecisionState.researchConversationID, null);
+    assert.equal(
+      decisionUnlinkEvents(deleteDecisionState, deleteDecision.id, deleteConversation.id).length,
+      1
+    );
+
+    const viewerResearchStart = await postAs(viewer, "/projects/code-questions/research/start", {
+      projectID,
+      questionID: question.id,
+      conversationID: "cq-http-viewer-research"
+    });
+    assert.equal(viewerResearchStart.response.status, 403);
+    assert.equal(viewerResearchStart.json.code, "PROJECT_PERMISSION_REQUIRED");
+    const outsiderResearchStart = await postAs(outsider, "/projects/code-questions/research/start", {
+      projectID,
+      questionID: question.id,
+      conversationID: "cq-http-outsider-research"
+    });
+    assert.equal(outsiderResearchStart.response.status, 404);
+
+    const otherActorLink = await postAs(owner, "/projects/code-questions/research/link", {
+      projectID,
+      questionID: question.id,
+      conversationID: startedResearch.conversation.id,
+      expectedLinkVersion: startedResearch.conversation.codeDecisionLinkVersion
+    });
+    assert.equal(otherActorLink.response.status, 404);
 
     const definitionPayload = {
       projectID,
@@ -550,7 +1267,7 @@ async function main() {
     assert.equal(hostileEvidenceSet.response.status, 409);
     assert.equal(hostileEvidenceSet.json.code, "CODE_QUESTION_IDEMPOTENCY_CONFLICT");
 
-    const inputs = [input];
+    const inputs = [input, capturedInput.input];
     const binding = {
       definitionRevision: question.definitionRevision,
       definitionHash: definitionHash(question),
@@ -580,7 +1297,7 @@ async function main() {
     assert.equal(analysis.evidenceSetVersion, evidenceSet.version);
     assert.equal(analysis.evidenceSetHash, evidenceSet.contentHash);
     assert.equal(analysis.dependencyHash, binding.dependencyHash);
-    assert.deepEqual(analysis.inputSnapshotIDs, [input.id]);
+    assert.deepEqual(analysis.inputSnapshotIDs, inputs.map((item) => item.id));
     assert.deepEqual(
       analysisPayload.answer.evidence.map((item) => item.sourceID),
       [snapshot.id],

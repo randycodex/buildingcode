@@ -225,6 +225,10 @@ assert.ok(appSource.includes("codeQuestionRequestContextIsCurrent(requestContext
 assert.ok(appSource.includes('renderWorkspace({ persist: false })'));
 assert.ok(appSource.includes('conflictCode: "CODE_QUESTION_DEPENDENCY_CONFLICT"'));
 assert.ok(appSource.includes("migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID)"));
+assert.ok(
+  appSource.includes("if (previousUserID && payload.mergedAccount?.sourceUserID === previousUserID)"),
+  "Fresh sign-in must not run account-merge migration without a source account."
+);
 assert.ok(appSource.includes("evictDeniedCodeQuestionCache(error"));
 assert.ok(appSource.includes("context.sessionToken === account?.sessionToken"));
 assert.ok(appSource.includes("(!context.trackProject || context.projectID === activeProjectIDForCodeQuestions())"));

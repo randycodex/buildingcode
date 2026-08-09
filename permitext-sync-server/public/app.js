@@ -41,8 +41,8 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-v3";
-import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v3";
+} from "./offline-storage.js?v=20260809-code-decision-v5";
+import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
   resolveNotebookVersionConflict,
@@ -81,7 +81,7 @@ import {
   questionPaneKey,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260809-code-decision-v3";
+} from "./code-question-workspace.js?v=20260809-code-decision-v5";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountCacheKey,
@@ -98,11 +98,11 @@ import {
   updateCodeQuestionWorkspaceSnapshot,
   workspaceLayoutWithoutCodeQuestionData,
   writeCodeQuestionAccountState
-} from "./code-question-client-state.js?v=20260809-code-decision-v3";
+} from "./code-question-client-state.js?v=20260809-code-decision-v5";
 import {
   codeQuestionListFromServer,
   codeQuestionViewModelsFromServer
-} from "./code-question-server.js?v=20260807-code-question-server-v1";
+} from "./code-question-server.js?v=20260809-code-decision-v2";
 import {
   assertInputPresentationSeparation,
   createQuestionInput,
@@ -411,10 +411,12 @@ const pendingReportDraftByProject = new Map();
 const reportDraftFocusResultByProject = new Map();
 let researchConversationList = [];
 let activeResearchConversation = null;
+let researchOpenGeneration = 0;
 let researchUsage = null;
 let researchQuestionDraft = "";
 let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
+const dismissedLinkedResearchDecisionKeys = new Set();
 let researchSelectionMenuInteracting = false;
 let researchSelectionMenuPinned = false;
 let activeWebWarningClose = null;
@@ -954,6 +956,7 @@ function applySharedWorkspaceState(serializedState) {
 }
 
 function clearWorkspaceTransientRuntime() {
+  researchOpenGeneration += 1;
   searchTimers.forEach((timer) => clearTimeout(timer));
   readerSearchTimers.forEach((timer) => clearTimeout(timer));
   searchTimers.clear();
@@ -2681,8 +2684,24 @@ function clearProjectSpecificReaders(project) {
 }
 
 function clearProjectSpecificResearch(project) {
-  if (activeResearchConversation?.primaryProjectID !== projectDetailKey(project)) return;
-  const conversationPaneID = paneIDForResearchConversation();
+  const projectID = projectDetailKey(project);
+  researchOpenGeneration += 1;
+  researchQuestionDraft = "";
+  if (
+    !activeEvidenceDiscovery?.projectID ||
+    activeEvidenceDiscovery.projectID === projectID
+  ) activeEvidenceDiscovery = null;
+  pendingResearchSelection = null;
+  const conversationID = String(state.researchConversationID || "").trim();
+  if (!conversationID) return;
+  const conversation = activeResearchConversation?.id === conversationID
+    ? activeResearchConversation
+    : researchConversationList.find((item) => item.id === conversationID) || null;
+  // An unresolved conversation cannot safely follow the user into another
+  // Project. Keep a known conversation only when it is known to belong
+  // elsewhere; otherwise close the prior Project's Research surface.
+  if (conversation?.primaryProjectID && conversation.primaryProjectID !== projectID) return;
+  const conversationPaneID = paneIDForResearchConversation(conversationID);
   state.researchConversationID = "";
   activeResearchConversation = null;
   if (conversationPaneID) {
@@ -2729,7 +2748,7 @@ async function deactivateProjectStudio(project = openProjectDetails()[0] || null
   syncProjectToolButtonStates(current);
   if (options.transition !== false && options.persist !== false) saveWorkspaceState();
   if (options.transition !== false) {
-    await transitionWorkspace("utility");
+    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
   }
   if (options.outcome) options.outcome.value = "applied";
   return true;
@@ -2849,7 +2868,9 @@ async function activateProjectStudio(project, options = {}) {
   if (current) syncProjectToolButtonStates(current);
   syncProjectToolButtonStates(identity);
   if (options.transition !== false && options.persist !== false) saveWorkspaceState();
-  if (options.transition !== false) await transitionWorkspace("utility");
+  if (options.transition !== false) {
+    await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
+  }
   if (options.focusSaved !== false) scrollPaneIntoView(primarySavedPaneID());
   if (options.outcome) options.outcome.value = "applied";
   return true;
@@ -4911,6 +4932,7 @@ function isSessionAuthenticationError(error) {
 
 function clearExpiredAccountSession() {
   if (!activeAccount()) return;
+  clearResearchAccountRuntime();
   state.account = null;
   persistAccountSession(null);
   syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
@@ -4919,6 +4941,7 @@ function clearExpiredAccountSession() {
   stopForegroundSyncLoop();
   saveWorkspaceState();
   void disableOfflineFeature().catch(() => {});
+  void renderWorkspace({ persist: false });
 }
 
 function currentEntitlement() {
@@ -5034,23 +5057,227 @@ function codeQuestionWorkspaceState() {
   return state.codeQuestionWorkspace;
 }
 
-function openCodeDecisionSurface(cqState, options = {}) {
-  const questionText = String(options.questionText || "").trim();
-  if (questionText) researchQuestionDraft = questionText;
-  // A durable Research Conversation ↔ Code Decision link is not implemented
-  // yet. Never imply one by carrying a previously active conversation beside
-  // a newly opened decision; keep the persisted Research list and start from
-  // the decision question instead.
-  if (state.researchConversationID) {
-    const priorConversationPaneID = paneIDForResearchConversation(state.researchConversationID);
-    state.researchConversationID = "";
-    activeResearchConversation = null;
+function clearActiveResearchConversation() {
+  const priorConversationID = String(state.researchConversationID || "").trim();
+  const priorConversationPaneID = priorConversationID
+    ? paneIDForResearchConversation(priorConversationID)
+    : "";
+  state.researchConversationID = "";
+  activeResearchConversation = null;
+  if (priorConversationPaneID) {
     delete state.paneWeights[priorConversationPaneID];
     state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== priorConversationPaneID);
   }
+}
+
+function linkedResearchDecisionDismissalKey(questionID, projectID = activeProjectIDForCodeQuestions()) {
+  return [activeAccount()?.userID || "", projectID || "", String(questionID || "").trim()].join(":");
+}
+
+function clearResearchAccountRuntime() {
+  researchOpenGeneration += 1;
+  clearActiveResearchConversation();
+  researchConversationList = [];
+  researchUsage = null;
+  researchQuestionDraft = "";
+  activeEvidenceDiscovery = null;
+  pendingResearchSelection = null;
+  researchSelectionMenuInteracting = false;
+  researchSelectionMenuPinned = false;
+  dismissedLinkedResearchDecisionKeys.clear();
+  state.utilities.analysis = false;
+  delete state.paneWeights["utility:analysis"];
+  Object.keys(state.paneWeights || {})
+    .filter((paneID) => paneID.startsWith("research:conversation:"))
+    .forEach((paneID) => delete state.paneWeights[paneID]);
+  state.paneOrder = (state.paneOrder || []).filter((paneID) =>
+    paneID !== "utility:analysis" && !paneID.startsWith("research:conversation:")
+  );
+  track?.querySelectorAll(
+    '.workspace-panel[data-pane-id="utility:analysis"], .workspace-panel[data-pane-id^="research:conversation:"]'
+  ).forEach((pane) => pane.remove());
+}
+
+function alignResearchConversationWithCodeDecision(questionID, conversationID = null, options = {}) {
+  const qid = String(questionID || "").trim();
+  const linkedConversationID = String(conversationID || "").trim();
+  if (!qid || !linkedConversationID) {
+    clearActiveResearchConversation();
+    return null;
+  }
+  const dismissalKey = linkedResearchDecisionDismissalKey(qid);
+  if (options.resume === true) dismissedLinkedResearchDecisionKeys.delete(dismissalKey);
+  if (dismissedLinkedResearchDecisionKeys.has(dismissalKey)) return null;
+  if (state.researchConversationID && state.researchConversationID !== linkedConversationID) {
+    clearActiveResearchConversation();
+  }
+  state.researchConversationID = linkedConversationID;
+  state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
+  const conversationPaneID = paneIDForResearchConversation(linkedConversationID);
+  state.paneWeights[conversationPaneID] ||= defaultPaneWidthForID(conversationPaneID);
+  placePaneAfter("utility:analysis", conversationPaneID);
+  return linkedConversationID;
+}
+
+function linkedResearchConversationIDForQuestion(questionID) {
+  const qid = String(questionID || "").trim();
+  if (!qid) return "";
+  const question = questionsForActiveProject().find((item) => item.id === qid);
+  if (question?.researchConversationID) return String(question.researchConversationID);
+  const summary = researchConversationList.find((conversation) =>
+    conversation.linkedCodeDecisionID === qid &&
+    conversation.primaryProjectID === activeProjectIDForCodeQuestions()
+  );
+  if (summary?.id) return String(summary.id);
+  if (
+    activeResearchConversation?.linkedCodeDecisionID === qid &&
+    activeResearchConversation?.primaryProjectID === activeProjectIDForCodeQuestions()
+  ) return String(activeResearchConversation.id || "");
+  return "";
+}
+
+function openCodeDecisionSurface(cqState, options = {}) {
+  if (options.resumeResearch === true && options.preserveResearchIntent !== true) {
+    researchOpenGeneration += 1;
+  }
+  const questionText = String(options.questionText || "").trim();
+  if (questionText) researchQuestionDraft = questionText;
+  const questionID = String(options.questionID || "").trim();
+  const linkedConversationID = options.researchConversationID === undefined
+    ? linkedResearchConversationIDForQuestion(questionID)
+    : String(options.researchConversationID || "").trim();
+  alignResearchConversationWithCodeDecision(questionID, linkedConversationID, {
+    resume: options.resumeResearch === true
+  });
   state.utilities.analysis = true;
   state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
   return openCodeDecisionWorkspace(cqState, options);
+}
+
+async function startLinkedResearchForCodeDecision(questionID, options = {}) {
+  const projectID = activeProjectIDForCodeQuestions();
+  const qid = String(questionID || "").trim();
+  if (!projectID || !qid) throw new Error("Open a Project Code Decision before starting Research.");
+  if (!codeQuestionIsOnline()) {
+    const error = new Error("Reconnect to create or restore the private Research conversation. The Code Decision remains available offline.");
+    error.code = "CODE_QUESTION_RESEARCH_ONLINE_REQUIRED";
+    throw error;
+  }
+  if (!hasCapability("research")) {
+    const error = new Error("Research requires an active Pro plan and the Research Add-On.");
+    error.code = "RESEARCH_ADDON_REQUIRED";
+    throw error;
+  }
+  const openingAccount = activeAccount();
+  const openingContext = {
+    generation: researchOpenGeneration,
+    accountUserID: openingAccount?.userID || "",
+    sessionToken: openingAccount?.sessionToken || "",
+    projectID,
+    conversationID: ""
+  };
+  const requestContext = codeQuestionRequestContext(projectID);
+  const payload = await postCodeQuestionForContext(
+    requestContext,
+    "/projects/code-questions/research/start",
+    { projectID, questionID: qid }
+  );
+  assertCodeQuestionRequestContext(requestContext);
+  if (!researchOpenContextIsCurrent(openingContext)) throw codeQuestionContextChangedError();
+  const conversation = payload.conversation;
+  const questions = questionsForActiveProject().map((question) =>
+    question.id === qid
+      ? {
+          ...question,
+          researchConversationID: conversation.id,
+          researchConversationUpdatedAt: conversation.updatedAt || null
+        }
+      : question
+  );
+  setQuestionsForActiveProject(questions);
+  activeResearchConversation = conversation;
+  await refreshResearchConversationList();
+  assertCodeQuestionRequestContext(requestContext);
+  if (!researchOpenContextIsCurrent(openingContext)) throw codeQuestionContextChangedError();
+  await hydrateCodeQuestionState(projectID, qid, { force: true, render: false });
+  assertCodeQuestionRequestContext(requestContext);
+  if (!researchOpenContextIsCurrent(openingContext)) throw codeQuestionContextChangedError();
+  if (options.open !== false) {
+    await openResearchConversation(conversation.id, { refreshList: true });
+  }
+  return conversation;
+}
+
+async function linkResearchConversationToActiveCodeDecision(conversation) {
+  const projectID = activeProjectIDForCodeQuestions();
+  const questionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!projectID || !questionID || conversation?.primaryProjectID !== projectID) {
+    throw new Error("Assign this Research conversation to the active Code Decision’s Project first.");
+  }
+  if (!codeQuestionIsOnline()) {
+    throw new Error("Reconnect before changing a Research ↔ Code Decision link.");
+  }
+  const linkingAccount = activeAccount();
+  const linkingContext = {
+    generation: researchOpenGeneration,
+    accountUserID: linkingAccount?.userID || "",
+    sessionToken: linkingAccount?.sessionToken || "",
+    projectID,
+    conversationID: ""
+  };
+  const priorQuestionID = String(conversation.linkedCodeDecisionID || "").trim();
+  const activeLinkedConversationID = linkedResearchConversationIDForQuestion(questionID);
+  const sourceRelinkRequired = Boolean(priorQuestionID && priorQuestionID !== questionID);
+  const targetReplacementRequired = Boolean(
+    activeLinkedConversationID && activeLinkedConversationID !== conversation.id
+  );
+  if (priorQuestionID === questionID && activeLinkedConversationID === conversation.id) {
+    await openResearchConversation(conversation.id, {
+      conversation,
+      linkedQuestionID: questionID,
+      refreshList: true
+    });
+    return conversation;
+  }
+  if (sourceRelinkRequired || targetReplacementRequired) {
+    const relationshipChanges = [
+      sourceRelinkRequired ? "this Research conversation will leave its current Code Decision" : "",
+      targetReplacementRequired ? "the active Code Decision’s current Research conversation will be replaced" : ""
+    ].filter(Boolean).join(" and ");
+    const confirmed = await confirmWebWarning(
+      "Change the linked Research conversation?",
+      `If you continue, ${relationshipChanges}. The conversations and Code Decisions will be preserved. Governed evidence, analysis, and conclusions are not copied.`,
+      { confirmLabel: "Change link" }
+    );
+    if (!confirmed) return null;
+    if (!researchOpenContextIsCurrent(linkingContext)) throw codeQuestionContextChangedError();
+  }
+  const requestContext = codeQuestionRequestContext(projectID);
+  const payload = await postCodeQuestionForContext(
+    requestContext,
+    "/projects/code-questions/research/link",
+    {
+      projectID,
+      questionID,
+      conversationID: conversation.id,
+      expectedLinkVersion: conversation.codeDecisionLinkVersion,
+      expectedTargetConversationID: activeLinkedConversationID || null,
+      confirmRelink: sourceRelinkRequired,
+      confirmReplaceDecisionConversation: targetReplacementRequired
+    }
+  );
+  assertCodeQuestionRequestContext(requestContext);
+  if (!researchOpenContextIsCurrent(linkingContext)) throw codeQuestionContextChangedError();
+  activeResearchConversation = payload.conversation;
+  await Promise.all([
+    refreshResearchConversationList(),
+    hydrateCodeQuestionList(projectID, { force: true, render: false }),
+    hydrateCodeQuestionState(projectID, questionID, { force: true, render: false })
+  ]);
+  assertCodeQuestionRequestContext(requestContext);
+  if (!researchOpenContextIsCurrent(linkingContext)) throw codeQuestionContextChangedError();
+  await openResearchConversation(payload.conversation.id, { refreshList: true });
+  return payload.conversation;
 }
 
 function activeProjectIDForCodeQuestions() {
@@ -5115,7 +5342,8 @@ function applyCodeQuestionDeepLinkFromLocation() {
           })
         : openCodeDecisionSurface(codeQuestionWorkspaceState(), {
             projectID: parsed.projectID,
-            questionID: parsed.questionID
+            questionID: parsed.questionID,
+            resumeResearch: true
           }),
       { activeProjectID: parsed.projectID }
     );
@@ -5567,6 +5795,12 @@ async function hydrateCodeQuestionState(projectID, questionID, options = {}) {
           reviewByQuestionID: { ...(cq.reviewByQuestionID || {}), [qid]: models.review },
           issueByQuestionID: { ...(cq.issueByQuestionID || {}), [qid]: models.issue }
         }, { activeProjectID: pid });
+        if (
+          codeQuestionWorkspaceState().activeQuestionID === qid &&
+          state.researchConversationID === models.question.researchConversationID
+        ) {
+          alignResearchConversationWithCodeDecision(qid, models.question.researchConversationID);
+        }
         if (codeQuestionWorkspaceState().activeQuestionID === qid && !researchQuestionDraft.trim()) {
           researchQuestionDraft = models.definition.questionText || "";
         }
@@ -6053,7 +6287,8 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   codeQuestionUnauthorizedAccountUserID = "";
   const previousUserID = state.account?.userID;
   if (previousUserID) persistCodeQuestionAccountState(previousUserID);
-  if (payload.mergedAccount?.sourceUserID === previousUserID) {
+  if (previousUserID !== account.appUserID) clearResearchAccountRuntime();
+  if (previousUserID && payload.mergedAccount?.sourceUserID === previousUserID) {
     retargetSyncOutbox(previousUserID, account.appUserID);
     migrateCodeQuestionAccountState(localStorage, previousUserID, account.appUserID);
   }
@@ -12590,6 +12825,31 @@ async function postResearch(path, values = {}) {
   return postJSON(path, researchRequestBody(values), { token: account.sessionToken });
 }
 
+async function fetchAuthoritativeResearchConversation(conversationID) {
+  const account = activeAccount();
+  if (!account) throw new Error("Sign in from Settings to open private Research conversations.");
+  const payload = await postJSON("/research/conversations/get", {
+    auth: { accountUserID: account.userID },
+    conversationID: String(conversationID || "").trim()
+  }, { token: account.sessionToken });
+  const current = activeAccount();
+  if (current?.userID !== account.userID || current?.sessionToken !== account.sessionToken) {
+    throw codeQuestionContextChangedError();
+  }
+  return payload.conversation;
+}
+
+function researchOpenContextIsCurrent(context, options = {}) {
+  const account = activeAccount();
+  return Boolean(
+    context?.generation === researchOpenGeneration &&
+    context.accountUserID === (account?.userID || "") &&
+    context.sessionToken === (account?.sessionToken || "") &&
+    context.projectID === activeProjectIDForCodeQuestions() &&
+    (!options.requireConversationID || state.researchConversationID === context.conversationID)
+  );
+}
+
 async function loadOrganizationWorkspace(options = {}) {
   const account = activeAccount();
   if (!account) {
@@ -12685,7 +12945,8 @@ async function downloadProjectReportFile(projectID, file, title = "Permitext Pro
 }
 
 async function refreshResearchConversationList() {
-  if (!activeAccount()) {
+  const account = activeAccount();
+  if (!account) {
     researchConversationList = [];
     activeResearchConversation = null;
     researchUsage = null;
@@ -12695,6 +12956,10 @@ async function refreshResearchConversationList() {
     postResearch("/research/conversations/list"),
     postResearch("/research/usage")
   ]);
+  const current = activeAccount();
+  if (current?.userID !== account.userID || current?.sessionToken !== account.sessionToken) {
+    throw codeQuestionContextChangedError();
+  }
   researchConversationList = (payload.conversations || []).slice().sort((left, right) =>
     String(right.createdAt || "").localeCompare(String(left.createdAt || "")) ||
     String(left.id || "").localeCompare(String(right.id || ""))
@@ -12704,6 +12969,7 @@ async function refreshResearchConversationList() {
 }
 
 async function closeResearchWorkspace() {
+  researchOpenGeneration += 1;
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.utilities.analysis = false;
   state.researchConversationID = "";
@@ -12716,7 +12982,20 @@ async function closeResearchWorkspace() {
 }
 
 async function closeResearchConversation() {
-  const paneID = paneIDForResearchConversation();
+  researchOpenGeneration += 1;
+  const conversationID = String(state.researchConversationID || "").trim();
+  const conversation = activeResearchConversation?.id === conversationID
+    ? activeResearchConversation
+    : researchConversationList.find((item) => item.id === conversationID) || null;
+  if (
+    conversation?.linkedCodeDecisionID &&
+    conversation.primaryProjectID === activeProjectIDForCodeQuestions()
+  ) {
+    dismissedLinkedResearchDecisionKeys.add(
+      linkedResearchDecisionDismissalKey(conversation.linkedCodeDecisionID, conversation.primaryProjectID)
+    );
+  }
+  const paneID = paneIDForResearchConversation(conversationID);
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.researchConversationID = "";
   activeResearchConversation = null;
@@ -12727,19 +13006,67 @@ async function closeResearchConversation() {
 }
 
 async function openResearchConversation(conversationID, options = {}) {
-  const codeQuestionProjectID = activeProjectIDForCodeQuestions();
-  if (codeQuestionWorkspaceEnabled() && codeQuestionProjectID && codeQuestionWorkspaceState().activeQuestionID) {
-    // Persisted Research conversations do not yet carry a governed Code
-    // Decision link. Clear the active decision instead of implying that an
-    // arbitrarily selected conversation belongs to the record beside it.
-    setCodeQuestionWorkspaceState(
-      switchCodeQuestionProject(codeQuestionWorkspaceState(), codeQuestionProjectID),
-      { activeProjectID: codeQuestionProjectID, syncDeepLink: true }
-    );
+  const normalizedConversationID = String(conversationID || "").trim();
+  if (!normalizedConversationID) return null;
+  const openingAccount = activeAccount();
+  const openingContext = {
+    generation: ++researchOpenGeneration,
+    accountUserID: openingAccount?.userID || "",
+    sessionToken: openingAccount?.sessionToken || "",
+    projectID: activeProjectIDForCodeQuestions(),
+    conversationID: normalizedConversationID
+  };
+  let conversation = null;
+  try {
+    conversation = await fetchAuthoritativeResearchConversation(normalizedConversationID);
+  } catch (error) {
+    if (!researchOpenContextIsCurrent(openingContext)) return null;
+    await showWebNotice("Could not open Research", error.message || "The conversation could not be loaded.");
+    return null;
+  }
+  if (!researchOpenContextIsCurrent(openingContext)) return null;
+  activeResearchConversation = conversation;
+  const codeQuestionProjectID = openingContext.projectID;
+  const linkedQuestionID = String(conversation.linkedCodeDecisionID || "").trim();
+  const sameProject = Boolean(
+    codeQuestionProjectID && conversation.primaryProjectID === codeQuestionProjectID
+  );
+  if (codeQuestionWorkspaceEnabled() && linkedQuestionID && sameProject) {
+    await hydrateCodeQuestionList(codeQuestionProjectID, { force: true, render: false });
+    if (!researchOpenContextIsCurrent(openingContext)) return null;
+  }
+  const linkedQuestion = questionsForActiveProject().find((item) => item.id === linkedQuestionID);
+  const exactLinkedDecision = Boolean(
+    linkedQuestionID && sameProject && linkedQuestion?.researchConversationID === normalizedConversationID
+  );
+  if (codeQuestionWorkspaceEnabled() && codeQuestionProjectID) {
+    if (exactLinkedDecision) {
+      dismissedLinkedResearchDecisionKeys.delete(
+        linkedResearchDecisionDismissalKey(linkedQuestionID, codeQuestionProjectID)
+      );
+      setCodeQuestionWorkspaceState(
+        openCodeDecisionSurface(codeQuestionWorkspaceState(), {
+          projectID: codeQuestionProjectID,
+          questionID: linkedQuestionID,
+          questionText: conversation.starterQuestion || "",
+          researchConversationID: normalizedConversationID,
+          resumeResearch: true,
+          preserveResearchIntent: true
+        }),
+        { activeProjectID: codeQuestionProjectID, syncDeepLink: true }
+      );
+    } else if (codeQuestionWorkspaceState().activeQuestionID) {
+      // An unlinked or other-Project conversation may still be opened, but it
+      // must not appear to belong to the Code Decision currently on screen.
+      setCodeQuestionWorkspaceState(
+        switchCodeQuestionProject(codeQuestionWorkspaceState(), codeQuestionProjectID),
+        { activeProjectID: codeQuestionProjectID, syncDeepLink: true }
+      );
+    }
   }
   state.utilities.analysis = true;
-  state.researchConversationID = conversationID;
-  const paneID = paneIDForResearchConversation(conversationID);
+  state.researchConversationID = normalizedConversationID;
+  const paneID = paneIDForResearchConversation(normalizedConversationID);
   state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
   state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
   placePaneAfter("utility:analysis", paneID);
@@ -12750,7 +13077,15 @@ async function openResearchConversation(conversationID, options = {}) {
       ? ["utility:analysis", paneID, ...projectPaneIDs]
       : [paneID, ...projectPaneIDs]
   });
+  if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
   scrollPaneIntoView(paneID);
+  requestAnimationFrame(() => {
+    if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return;
+    const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    const focusTarget = pane?.querySelector(".research-question-input:not(:disabled), .panel-title");
+    focusTarget?.focus({ preventScroll: true });
+  });
+  return conversation;
 }
 
 function researchRelativeDate(value) {
@@ -12882,7 +13217,7 @@ async function assignResearchConversationProject(conversation, targetProjectID, 
 async function deleteResearchConversationFromList(conversation, button) {
   const confirmed = await confirmWebWarning(
     "Delete research conversation?",
-    `“${conversation.title}” and its private message history will be permanently deleted.`,
+    `“${conversation.title}” and its private message history will be permanently deleted. ${conversation.linkedCodeDecisionID ? "The linked Code Decision, governed evidence, analysis, and conclusions will be preserved." : ""}`,
     { confirmLabel: "Delete" }
   );
   if (!confirmed) return;
@@ -12890,6 +13225,7 @@ async function deleteResearchConversationFromList(conversation, button) {
   try {
     await postResearch("/research/conversations/delete", { conversationID: conversation.id });
     if (state.researchConversationID === conversation.id) {
+      researchOpenGeneration += 1;
       state.researchConversationID = "";
       activeResearchConversation = null;
     }
@@ -12897,6 +13233,16 @@ async function deleteResearchConversationFromList(conversation, button) {
       delete state.researchEvidenceSplitRatios[conversation.id];
     }
     await refreshResearchConversationList();
+    if (conversation.linkedCodeDecisionID && conversation.primaryProjectID) {
+      await Promise.all([
+        hydrateCodeQuestionList(conversation.primaryProjectID, { force: true, render: false }),
+        hydrateCodeQuestionState(
+          conversation.primaryProjectID,
+          conversation.linkedCodeDecisionID,
+          { force: true, render: false }
+        )
+      ]);
+    }
     saveWorkspaceState();
     await transitionWorkspace("utility", { refreshPaneIDs: ["utility:analysis"] });
   } catch (error) {
@@ -13020,7 +13366,7 @@ function renderEvidenceDiscovery(container) {
     const summary = document.createElement("div");
     summary.className = "evidence-discovery-summary";
     const summaryText = document.createElement("strong");
-    summaryText.textContent = `${candidates.length} unapproved ${candidates.length === 1 ? "candidate" : "candidates"}`;
+    summaryText.textContent = `${candidates.length} review ${candidates.length === 1 ? "candidate" : "candidates"}`;
     const searched = document.createElement("span");
     searched.textContent = `${Number(response.searchedSectionCount || 0).toLocaleString()} enacted sections searched`;
     summary.append(summaryText, searched);
@@ -13089,17 +13435,17 @@ function renderEvidenceDiscovery(container) {
       const preparationReady = evidenceCandidatePreparationReady(candidate);
       stateBadge.textContent = visualRequirement && preparationReady
         ? reviewState === "approved"
-          ? "Visual evidence reviewed · approved"
-          : "Visual evidence reviewed · ready for approval"
+          ? "Visual evidence reviewed · selected"
+          : "Visual evidence reviewed · ready to select"
         : visualRequirement
           ? "Select and confirm applicable visual evidence"
           : candidate.preparationEligible === false
             ? "Additional source review required"
             : reviewState === "approved"
-              ? "Approved for this Research"
+              ? "Selected for Research"
               : reviewState === "rejected"
                 ? "Rejected"
-                : "Candidate · not approved";
+                : "Candidate · not selected";
       cardHeader.append(rank, citationWrap, stateBadge);
       const why = document.createElement("p");
       why.className = "evidence-candidate-why";
@@ -13245,7 +13591,7 @@ function renderEvidenceDiscovery(container) {
       const approveButton = document.createElement("button");
       approveButton.type = "button";
       approveButton.className = "evidence-candidate-approve";
-      approveButton.textContent = reviewState === "approved" ? "Approved" : "Approve";
+      approveButton.textContent = reviewState === "approved" ? "Selected for Research" : "Use in Research";
       approveButton.setAttribute("aria-pressed", String(reviewState === "approved"));
       approveButton.disabled = !preparationReady;
       if (!preparationReady) {
@@ -13292,46 +13638,67 @@ function renderEvidenceDiscovery(container) {
 
     const prepare = document.createElement("section");
     prepare.className = "evidence-discovery-prepare";
+    const activeDecisionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
+    const linkedConversationID = discovery.projectID === activeProjectIDForCodeQuestions()
+      ? linkedResearchConversationIDForQuestion(activeDecisionID)
+      : "";
     const prepareCopy = document.createElement("p");
     prepareCopy.textContent = approved.length
-      ? `${approved.length} approved ${approved.length === 1 ? "passage is" : "passages are"} ready to attach. Preparing evidence creates an empty Research conversation; Analyze remains a separate action.`
-      : "Approve at least one passage to prepare a Research conversation.";
+      ? `${approved.length} selected ${approved.length === 1 ? "passage is" : "passages are"} ready to add. ${linkedConversationID ? "They will be added to this Code Decision’s linked Research conversation." : activeDecisionID ? "Permitext will start this Code Decision’s linked Research conversation first." : "Permitext will start a Research conversation."} Analyze remains a separate action.`
+      : "Select at least one passage to add to Research.";
     const prepareButton = document.createElement("button");
     prepareButton.type = "button";
     prepareButton.className = "evidence-discovery-prepare-button";
-    prepareButton.textContent = `Prepare Approved Evidence${approved.length ? ` (${approved.length})` : ""}`;
+    prepareButton.textContent = `Add Selected Evidence${approved.length ? ` (${approved.length})` : ""}`;
     prepareButton.disabled = approved.length === 0;
     const prepareStatus = document.createElement("p");
     prepareStatus.className = "evidence-discovery-status";
     prepareButton.addEventListener("click", async () => {
       if (!approved.length) return;
+      const prepareAccount = activeAccount();
+      const prepareContext = {
+        generation: researchOpenGeneration,
+        accountUserID: prepareAccount?.userID || "",
+        sessionToken: prepareAccount?.sessionToken || "",
+        projectID: activeProjectIDForCodeQuestions(),
+        conversationID: ""
+      };
       prepareButton.disabled = true;
-      prepareStatus.textContent = "Attaching only the passages you approved…";
+      prepareStatus.textContent = "Adding only the passages you selected…";
       let payload = null;
       try {
-        for (const [index, candidate] of approved.entries()) {
-          payload = index === 0
-            ? await postResearch("/research/conversations/create", {
-                sectionID: candidate.sectionID,
-                selectedText: candidate.selectedText,
-                richSourceIDs: candidate.richSourceIDs || [],
-                visualSourceIDs: candidate.selectedVisualSourceIDs || [],
-                visualReviewConfirmed: candidate.visualReviewConfirmed === true,
-                projectID: discovery.projectID || ""
-              })
-            : await postResearch("/research/conversations/evidence", {
-                conversationID: payload.conversation.id,
-                sectionID: candidate.sectionID,
-                selectedText: candidate.selectedText,
-                richSourceIDs: candidate.richSourceIDs || [],
-                visualSourceIDs: candidate.selectedVisualSourceIDs || [],
-                visualReviewConfirmed: candidate.visualReviewConfirmed === true
-              });
+        const decisionRequiresLinkedResearch = Boolean(
+          activeDecisionID && discovery.projectID === activeProjectIDForCodeQuestions()
+        );
+        let targetConversationID = linkedConversationID;
+        if (decisionRequiresLinkedResearch && !targetConversationID) {
+          const linkedConversation = await startLinkedResearchForCodeDecision(activeDecisionID, { open: false });
+          if (!researchOpenContextIsCurrent(prepareContext)) return;
+          targetConversationID = String(linkedConversation?.id || "").trim();
+          if (!targetConversationID) {
+            throw new Error("Permitext could not start the Code Decision’s linked Research conversation.");
+          }
         }
+        const selectedPassages = approved.map((candidate) => ({
+          sectionID: candidate.sectionID,
+          selectedText: candidate.selectedText,
+          richSourceIDs: candidate.richSourceIDs || [],
+          visualSourceIDs: candidate.selectedVisualSourceIDs || [],
+          visualReviewConfirmed: candidate.visualReviewConfirmed === true
+        }));
+        payload = await postResearch(
+          targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create",
+          targetConversationID
+            ? { conversationID: targetConversationID, selections: selectedPassages }
+            : { projectID: discovery.projectID || "", selections: selectedPassages }
+        );
+        if (!researchOpenContextIsCurrent(prepareContext)) return;
+        if (!payload.conversation) throw new Error("Research did not return the updated conversation.");
         activeResearchConversation = payload.conversation;
         researchQuestionDraft = discovery.question;
         activeEvidenceDiscovery = null;
         await refreshResearchConversationList();
+        if (!researchOpenContextIsCurrent(prepareContext)) return;
         await openResearchConversation(payload.conversation.id, { refreshList: true });
       } catch (error) {
         prepareStatus.textContent = error.message;
@@ -13346,6 +13713,14 @@ function renderEvidenceDiscovery(container) {
     event.preventDefault();
     const normalizedQuestion = question.value.replace(/\s+/g, " ").trim();
     if (normalizedQuestion.length < 3) return;
+    const discoveryAccount = activeAccount();
+    const discoveryContext = {
+      generation: researchOpenGeneration,
+      accountUserID: discoveryAccount?.userID || "",
+      sessionToken: discoveryAccount?.sessionToken || "",
+      projectID: activeProjectIDForCodeQuestions(),
+      conversationID: ""
+    };
     question.disabled = true;
     projectSelect.disabled = true;
     findButton.disabled = true;
@@ -13356,6 +13731,7 @@ function renderEvidenceDiscovery(container) {
         projectID: projectSelect.value,
         limit: 12
       });
+      if (!researchOpenContextIsCurrent(discoveryContext)) return;
       activeEvidenceDiscovery = {
         accountUserID: activeAccount()?.userID || "",
         question: normalizedQuestion,
@@ -13369,12 +13745,13 @@ function renderEvidenceDiscovery(container) {
         }
       };
       formStatus.textContent = response.candidates?.length
-        ? "Candidates found. Review each passage before approval."
+        ? "Candidates found. Review each passage before selecting it for Research."
         : "No candidates were found. Refine the question or identify a code section.";
       renderResults();
     } catch (error) {
-      formStatus.textContent = error.message;
+      if (researchOpenContextIsCurrent(discoveryContext)) formStatus.textContent = error.message;
     } finally {
+      if (!researchOpenContextIsCurrent(discoveryContext)) return;
       question.disabled = false;
       projectSelect.disabled = false;
       findButton.disabled = question.value.trim().length < 3;
@@ -13451,15 +13828,69 @@ async function renderResearch(paneID = "utility:analysis") {
     content.append(upgrade);
   }
 
+  const activeDecisionID = codeQuestionWorkspaceEnabled()
+    ? String(codeQuestionWorkspaceState().activeQuestionID || "").trim()
+    : "";
+  if (activeDecisionID) {
+    const activeQuestion = questionsForActiveProject().find((item) => item.id === activeDecisionID) || {};
+    const linkedConversationID = linkedResearchConversationIDForQuestion(activeDecisionID);
+    const linkedConversation = researchConversationList.find((item) => item.id === linkedConversationID) || null;
+    const decisionResearch = document.createElement("article");
+    decisionResearch.className = "analysis-card code-decision-research-entry";
+    const decisionHeading = document.createElement("strong");
+    decisionHeading.textContent = `${activeQuestion.displayID || "Decision"} · ${activeQuestion.title || "Code Decision"}`;
+    const decisionCopy = document.createElement("p");
+    decisionCopy.textContent = linkedConversationID
+      ? "This private Research conversation is linked to the structured Code Decision beside it. Exploratory messages remain outside governed analysis until you explicitly capture them or accept evidence through the governed workflow."
+      : "Start a private Research conversation for this Code Decision. Permitext will keep exploratory discussion separate while building the governed record from your explicit choices.";
+    const decisionAction = document.createElement("button");
+    decisionAction.type = "button";
+    decisionAction.className = "ghost-button";
+    decisionAction.textContent = linkedConversationID ? "Resume linked Research" : "Start Research for this decision";
+    const canEditDecision = ["owner", "editor"].includes(codeQuestionDefineRole());
+    decisionAction.disabled = !researchEnabled || (!linkedConversationID && (!canEditDecision || !codeQuestionIsOnline()));
+    if (!researchEnabled) decisionAction.title = "Research Add-On required";
+    else if (!linkedConversationID && !canEditDecision) decisionAction.title = "An Owner or Editor must start linked Research";
+    else if (!linkedConversationID && !codeQuestionIsOnline()) decisionAction.title = "Reconnect to start linked Research";
+    const decisionStatus = document.createElement("p");
+    decisionStatus.className = "research-list-status";
+    decisionStatus.setAttribute("role", "status");
+    decisionStatus.setAttribute("aria-live", "polite");
+    decisionAction.addEventListener("click", async () => {
+      decisionAction.disabled = true;
+      decisionStatus.textContent = linkedConversationID ? "Opening linked Research…" : "Starting linked Research…";
+      try {
+        if (linkedConversationID) {
+          await openResearchConversation(linkedConversationID, {
+            conversation: linkedConversation,
+            linkedQuestionID: activeDecisionID,
+            refreshList: true
+          });
+        } else {
+          await startLinkedResearchForCodeDecision(activeDecisionID);
+        }
+      } catch (error) {
+        decisionStatus.textContent = error.message || "Research could not be opened.";
+        decisionAction.disabled = false;
+      }
+    });
+    decisionResearch.append(decisionHeading, decisionCopy, decisionAction, decisionStatus);
+    content.append(decisionResearch);
+  }
+
   if (researchQuestionDraft) {
     const carriedDraft = document.createElement("article");
     carriedDraft.className = "analysis-card notebook-research-draft";
     const draftHeading = document.createElement("strong");
-    draftHeading.textContent = "Question ready from Notebook";
+    draftHeading.textContent = activeDecisionID
+      ? "Question ready from Code Decision"
+      : "Question ready from Notebook";
     const draftText = document.createElement("p");
     draftText.textContent = researchQuestionDraft;
     const draftInstruction = document.createElement("small");
-    draftInstruction.textContent = "Now highlight the enacted code text you want Permitext to use. The Notebook card is context, not cited authority.";
+    draftInstruction.textContent = activeDecisionID
+      ? "Find suggested evidence below, review the source, and select only the passages you want attached to this Research conversation."
+      : "Now highlight the enacted code text you want Permitext to use. The Notebook card is context, not cited authority.";
     carriedDraft.append(draftHeading, draftText, draftInstruction);
     content.append(carriedDraft);
   }
@@ -13501,7 +13932,15 @@ async function renderResearch(paneID = "utility:analysis") {
       const title = document.createElement("strong");
       title.textContent = conversation.title;
       const meta = document.createElement("span");
-      meta.textContent = `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"} · ${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"} · ${researchRelativeDate(conversation.updatedAt)}`;
+      const linkedQuestion = questionsForActiveProject().find((item) =>
+        item.id === conversation.linkedCodeDecisionID
+      );
+      meta.textContent = [
+        `${conversation.messageCount / 2 || 0} ${conversation.messageCount === 2 ? "exchange" : "exchanges"}`,
+        `${conversation.sourceCount} ${conversation.sourceCount === 1 ? "passage" : "passages"}`,
+        linkedQuestion ? `Linked to ${linkedQuestion.displayID || "Code Decision"}` : "",
+        researchRelativeDate(conversation.updatedAt)
+      ].filter(Boolean).join(" · ");
       openButton.append(title, meta);
       openButton.addEventListener("click", () => openResearchConversation(conversation.id));
 
@@ -13559,6 +13998,7 @@ async function renderResearch(paneID = "utility:analysis") {
         optionButton.setAttribute("aria-pressed", String(choice.value === (conversation.primaryProjectID || "")));
         optionButton.addEventListener("click", async () => {
           const previousProjectID = conversation.primaryProjectID || "";
+          const previousLinkedQuestionID = conversation.linkedCodeDecisionID || "";
           const targetProjectID = choice.value;
           if (targetProjectID === previousProjectID) {
             projectMenuState.projectMenuOpen = false;
@@ -13594,6 +14034,21 @@ async function renderResearch(paneID = "utility:analysis") {
                 ...payload.conversation
               };
             }
+            if (
+              previousLinkedQuestionID &&
+              codeQuestionWorkspaceState().activeQuestionID === previousLinkedQuestionID
+            ) {
+              setCodeQuestionWorkspaceState(
+                switchCodeQuestionProject(
+                  codeQuestionWorkspaceState(),
+                  activeProjectIDForCodeQuestions()
+                ),
+                { activeProjectID: activeProjectIDForCodeQuestions(), syncDeepLink: true }
+              );
+            }
+            if (previousProjectID) {
+              await hydrateCodeQuestionList(previousProjectID, { force: true, render: false });
+            }
             const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
             await transitionWorkspace("utility", {
               refreshPaneIDs: [
@@ -13619,6 +14074,30 @@ async function renderResearch(paneID = "utility:analysis") {
         menuName: `Projects for ${conversation.title}`,
         label: () => researchProjectName(conversation.primaryProjectID || "")
       });
+      if (
+        activeDecisionID &&
+        conversation.primaryProjectID === activeProjectIDForCodeQuestions() &&
+        conversation.linkedCodeDecisionID !== activeDecisionID
+      ) {
+        const linkDecisionButton = document.createElement("button");
+        linkDecisionButton.className = "research-conversation-link-decision";
+        linkDecisionButton.type = "button";
+        linkDecisionButton.textContent = "Use for active decision";
+        linkDecisionButton.disabled = !researchEnabled ||
+          !codeQuestionIsOnline() ||
+          !["owner", "editor"].includes(codeQuestionDefineRole());
+        linkDecisionButton.title = "Link this private Research history without copying exploratory content into the governed record";
+        linkDecisionButton.addEventListener("click", async () => {
+          linkDecisionButton.disabled = true;
+          try {
+            await linkResearchConversationToActiveCodeDecision(conversation);
+          } catch (error) {
+            await showWebNotice("Research link unchanged", error.message || "The conversation could not be linked.");
+            linkDecisionButton.disabled = false;
+          }
+        });
+        actions.append(linkDecisionButton);
+      }
       if (researchEnabled) {
         const renameButton = document.createElement("button");
         renameButton.className = "research-conversation-rename";
@@ -13906,7 +14385,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   renderResearchInterpretation(exactAnswer, answerRecord.answer);
 
   const evidenceHeading = document.createElement("strong");
-  evidenceHeading.textContent = "Approved evidence snapshots";
+  evidenceHeading.textContent = "Cited evidence snapshots";
   const evidenceList = document.createElement("section");
   evidenceList.className = "research-historical-evidence";
   (answerRecord.evidence || []).forEach((evidence) => {
@@ -13941,7 +14420,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
           : `Source ${snapshotID}`;
       })
     ));
-    return `${sourceLabels.join(", ")}: ${snapshotCount} approved ${snapshotCount === 1 ? "snapshot" : "snapshots"} — ${item.relevance || "Cited support"}`;
+    return `${sourceLabels.join(", ")}: ${snapshotCount} cited ${snapshotCount === 1 ? "snapshot" : "snapshots"} — ${item.relevance || "Cited support"}`;
   });
   const mappingWrap = document.createElement("section");
   mappingWrap.className = "research-historical-mapping";
@@ -13950,7 +14429,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
   const reuse = document.createElement("section");
   reuse.className = "research-historical-reuse";
   const reuseHeading = document.createElement("strong");
-  reuseHeading.textContent = "Start fresh from this approved evidence";
+  reuseHeading.textContent = "Start fresh from this cited evidence";
   const reuseCopy = document.createElement("p");
   reuseCopy.textContent = "This creates a new, empty Research conversation. It rechecks the passage against the current enacted library and does not copy the old question, answer, assumptions, or additional Research facts.";
   const reuseControls = document.createElement("div");
@@ -13976,7 +14455,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
     if (!projectSelect.value) return;
     reuseButton.disabled = true;
     projectSelect.disabled = true;
-    reuseStatus.textContent = "Rechecking the approved evidence…";
+    reuseStatus.textContent = "Rechecking the cited evidence…";
     try {
       const payload = await postResearch("/research/conversations/reuse-evidence", {
         answerID: answerRecord.id,
@@ -14065,6 +14544,108 @@ function researchEvidenceSplitRatio(conversationID) {
   return normalizeResearchEvidenceSplitRatio(state.researchEvidenceSplitRatios?.[conversationID]);
 }
 
+function researchMessageCaptureBasis(conversationID, messageID) {
+  return `Captured from Research ${conversationID} message ${messageID}`;
+}
+
+function renderResearchMessageCapture(conversation, message) {
+  const questionID = String(conversation.linkedCodeDecisionID || "").trim();
+  const activeQuestionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (
+    !questionID || questionID !== activeQuestionID ||
+    conversation.primaryProjectID !== activeProjectIDForCodeQuestions()
+  ) return null;
+  const basis = researchMessageCaptureBasis(conversation.id, message.id);
+  const existing = (getDefinitionForQuestion(questionID)?.inputs || [])
+    .find((input) => input.basis === basis);
+  const region = document.createElement("div");
+  region.className = "research-message-capture";
+  const status = document.createElement("p");
+  status.className = "research-message-capture-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  if (existing) {
+    status.textContent = existing.inputKind === "confirmedFact"
+      ? "Captured as a confirmed Project Fact."
+      : existing.inputKind === "assumption"
+        ? "Captured as an assumption."
+        : "Captured as missing information.";
+    region.append(status);
+    return region;
+  }
+  const canCapture = ["owner", "editor"].includes(codeQuestionDefineRole());
+  const label = document.createElement("span");
+  label.textContent = "Capture in Code Decision";
+  const actions = document.createElement("div");
+  actions.className = "research-message-capture-actions";
+  const choices = [
+    { label: "Confirm fact", kind: "confirmedFact", state: "confirmed", disposition: "project-fact" },
+    { label: "Keep as assumption", kind: "assumption", state: "proposed", disposition: "assumption" },
+    { label: "Track missing", kind: "unknown", state: "proposed", disposition: "missing-information" }
+  ];
+  const buttons = choices.map((choice) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = choice.label;
+    button.disabled = !canCapture;
+    if (!canCapture) button.title = "An Owner or Editor can capture governed Code Decision inputs";
+    button.addEventListener("click", async () => {
+      buttons.forEach((item) => { item.disabled = true; });
+      status.textContent = "Capturing in the governed Code Decision…";
+      const inputID = `research-message:${conversation.id}:${message.id}`;
+      const actor = codeQuestionActor();
+      try {
+        const result = await executeCodeQuestionMutation("/projects/code-questions/inputs/save", {
+          projectID: conversation.primaryProjectID,
+          questionID,
+          id: inputID,
+          kind: choice.kind,
+          state: choice.state,
+          statement: message.question,
+          basis,
+          researchSource: {
+            conversationID: conversation.id,
+            messageID: message.id,
+            disposition: choice.disposition
+          }
+        }, {
+          commandKind: "codeQuestion.input.save",
+          projectID: conversation.primaryProjectID,
+          questionID,
+          clientMutationID: `capture:${inputID}`,
+          applyOptimistic: () => saveDefinitionForQuestion(questionID, createQuestionInput(
+            getDefinitionForQuestion(questionID),
+            {
+              id: inputID,
+              inputKind: choice.kind,
+              state: choice.state,
+              statement: message.question,
+              basis,
+              actorUserID: actor.userID,
+              responsibleDisplayName: actor.displayName
+            }
+          ))
+        });
+        status.textContent = result.queued
+          ? "Capture queued. It will be validated against the linked Research message after reconnecting."
+          : choice.kind === "confirmedFact"
+            ? "Captured as a confirmed Project Fact."
+            : choice.kind === "assumption"
+              ? "Captured as an assumption."
+              : "Captured as missing information.";
+        refreshCodeDecisionPrimaryPanes(questionID);
+      } catch (error) {
+        status.textContent = error.message || "This message could not be captured.";
+        buttons.forEach((item) => { item.disabled = !canCapture; });
+      }
+    });
+    return button;
+  });
+  actions.append(...buttons);
+  region.append(label, actions, status);
+  return region;
+}
+
 function bindResearchEvidenceDivider(layout, divider, conversationID) {
   const applyRatio = (value) => {
     const desiredRatio = normalizeResearchEvidenceSplitRatio(value);
@@ -14142,6 +14723,14 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
 
 async function renderResearchConversation(conversationID) {
   const paneID = paneIDForResearchConversation(conversationID);
+  const renderingAccount = activeAccount();
+  const renderingContext = {
+    generation: researchOpenGeneration,
+    accountUserID: renderingAccount?.userID || "",
+    sessionToken: renderingAccount?.sessionToken || "",
+    projectID: activeProjectIDForCodeQuestions(),
+    conversationID
+  };
   const panel = document.createElement("article");
   panel.className = "workspace-panel utility-panel research-conversation-panel";
   applyPaneWeight(panel, paneID);
@@ -14153,6 +14742,7 @@ async function renderResearchConversation(conversationID) {
   eyebrow.textContent = "Research conversation";
   const panelTitle = document.createElement("h2");
   panelTitle.className = "panel-title";
+  panelTitle.tabIndex = -1;
   panelTitle.textContent = "Loading…";
   headingWrap.append(eyebrow, panelTitle);
   const closeButton = document.createElement("button");
@@ -14170,9 +14760,14 @@ async function renderResearchConversation(conversationID) {
   content.className = "research-conversation-content";
   panel.append(header, content);
 
+  let conversation = null;
   try {
-    const payload = await postResearch("/research/conversations/get", { conversationID });
-    activeResearchConversation = payload.conversation;
+    const alreadyLoaded = activeResearchConversation?.id === conversationID &&
+      Array.isArray(activeResearchConversation.messages) &&
+      Array.isArray(activeResearchConversation.sources);
+    conversation = alreadyLoaded
+      ? activeResearchConversation
+      : await fetchAuthoritativeResearchConversation(conversationID);
   } catch (error) {
     const status = document.createElement("p");
     status.className = "research-list-status is-error";
@@ -14180,8 +14775,47 @@ async function renderResearchConversation(conversationID) {
     content.append(status);
     return panel;
   }
+  if (!researchOpenContextIsCurrent(renderingContext, { requireConversationID: true })) return panel;
+  activeResearchConversation = conversation;
 
-  const conversation = activeResearchConversation;
+  const activeCodeQuestionProjectID = activeProjectIDForCodeQuestions();
+  const linkedQuestion = questionsForActiveProject().find((item) =>
+    item.id === conversation.linkedCodeDecisionID
+  );
+  const exactLinkedDecision = Boolean(
+    conversation.linkedCodeDecisionID &&
+    conversation.primaryProjectID === activeCodeQuestionProjectID &&
+    linkedQuestion?.researchConversationID === conversation.id
+  );
+  if (codeQuestionWorkspaceEnabled() && activeCodeQuestionProjectID) {
+    if (exactLinkedDecision) {
+      const cq = codeQuestionWorkspaceState();
+      if (cq.activeQuestionID !== conversation.linkedCodeDecisionID) {
+        setCodeQuestionWorkspaceState(
+          openCodeDecisionSurface(cq, {
+            projectID: conversation.primaryProjectID,
+            questionID: conversation.linkedCodeDecisionID,
+            questionText: conversation.starterQuestion || "",
+            researchConversationID: conversation.id
+          }),
+          { activeProjectID: conversation.primaryProjectID, syncDeepLink: true }
+        );
+        requestAnimationFrame(() => {
+          if (state.researchConversationID === conversation.id) void renderWorkspace({ persist: false });
+        });
+      } else {
+        alignResearchConversationWithCodeDecision(conversation.linkedCodeDecisionID, conversation.id);
+      }
+    } else if (codeQuestionWorkspaceState().activeQuestionID) {
+      setCodeQuestionWorkspaceState(
+        switchCodeQuestionProject(codeQuestionWorkspaceState(), activeCodeQuestionProjectID),
+        { activeProjectID: activeCodeQuestionProjectID, syncDeepLink: true }
+      );
+      requestAnimationFrame(() => {
+        if (state.researchConversationID === conversation.id) void renderWorkspace({ persist: false });
+      });
+    }
+  }
   applyProjectDerivedPaneTheme(panel, conversation.primaryProjectID);
   panelTitle.textContent = conversation.title;
   const selectedSources = conversation.sources.filter((source) => source.kind === "selection");
@@ -14214,7 +14848,11 @@ async function renderResearchConversation(conversationID) {
   sourceDisclosure.className = "research-source-disclosure";
   sourceDisclosure.setAttribute("aria-hidden", "true");
   sourceDisclosure.innerHTML = researchChevronIconsSVG();
-  sourceToggle.append(sourceDisclosure);
+  const sourceLabel = document.createElement("span");
+  sourceLabel.textContent = conversation.linkedCodeDecisionID
+    ? "Research evidence · not yet approved for the Code Decision"
+    : "Research evidence";
+  sourceToggle.append(sourceDisclosure, sourceLabel);
   const sourceList = document.createElement("section");
   sourceList.className = "research-source-list";
   selectedSources.forEach((source) => sourceList.append(renderResearchSource(source)));
@@ -14272,11 +14910,25 @@ async function renderResearchConversation(conversationID) {
   thread.className = "research-message-thread";
   thread.id = `research-dialogue-${conversation.id}`;
   divider.setAttribute("aria-controls", `${evidenceScroll.id} ${thread.id}`);
+  if (!conversation.messages.length && conversation.starterQuestion) {
+    const starter = document.createElement("article");
+    starter.className = "research-message is-user is-starter";
+    const starterLabel = document.createElement("small");
+    starterLabel.textContent = "Question captured for this Code Decision";
+    const starterText = document.createElement("p");
+    starterText.textContent = conversation.starterQuestion;
+    starter.append(starterLabel, starterText);
+    thread.append(starter);
+  }
   conversation.messages.forEach((message) => {
     if (message.role === "user") {
       const bubble = document.createElement("article");
       bubble.className = "research-message is-user";
-      bubble.textContent = message.question;
+      const messageText = document.createElement("p");
+      messageText.textContent = message.question;
+      bubble.append(messageText);
+      const capture = renderResearchMessageCapture(conversation, message);
+      if (capture) bubble.append(capture);
       thread.append(bubble);
       return;
     }
@@ -14294,7 +14946,9 @@ async function renderResearchConversation(conversationID) {
   input.rows = 3;
   input.maxLength = 2000;
   input.placeholder = "Ask about the attached enacted text…";
-  input.value = researchQuestionDraft;
+  input.value = researchQuestionDraft || (
+    conversation.messages.length === 0 ? conversation.starterQuestion || "" : ""
+  );
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
@@ -14302,10 +14956,12 @@ async function renderResearchConversation(conversationID) {
   const composerBox = document.createElement("div");
   composerBox.className = "research-composer-box";
   const projectContextBlocked = Boolean(conversation.projectContextReviewRequired);
+  const evidenceRequired = selectedSources.length === 0;
   const researchEnabled = hasCapability("research");
   sendButton.disabled = !researchEnabled ||
     conversation.sourceStatus === "changed" ||
     projectContextBlocked ||
+    evidenceRequired ||
     input.value.trim().length < 3;
   if (!researchEnabled) {
     input.disabled = true;
@@ -14315,12 +14971,15 @@ async function renderResearchConversation(conversationID) {
   status.className = "research-composer-status";
   if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
+  } else if (evidenceRequired) {
+    status.textContent = "Find and select at least one enacted-code passage before bounded Research analysis.";
   }
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
     sendButton.disabled = !researchEnabled ||
       conversation.sourceStatus === "changed" ||
       projectContextBlocked ||
+      evidenceRequired ||
       input.value.trim().length < 3;
   });
   composer.addEventListener("submit", async (event) => {
@@ -22725,6 +23384,7 @@ function renderSettings() {
       await disableOfflineFeature().catch(() => {});
       if (account) persistCodeQuestionAccountState(account.userID);
       unloadCodeQuestionAccountState();
+      clearResearchAccountRuntime();
       state.account = null;
       organizationWorkspace = null;
       organizationLoadPromise = null;
@@ -22784,6 +23444,7 @@ function renderSettings() {
         await deleteLocalWorkboard(projectID).catch(() => {});
       }
       await disableOfflineFeature().catch(() => {});
+      clearResearchAccountRuntime();
       state.account = null;
       state.localProjects = [];
       state.localSavedItems = [];
@@ -22807,9 +23468,6 @@ function renderSettings() {
       syncedContent = null;
       organizationWorkspace = null;
       organizationLoadPromise = null;
-      researchConversationList = [];
-      activeResearchConversation = null;
-      researchUsage = null;
       unloadCodeQuestionAccountState();
       localStorage.removeItem(codeQuestionAccountCacheKey(account.userID));
       persistAccountSession(null);
@@ -23706,7 +24364,8 @@ function renderCodeDecisionContextBar(project) {
       projectID,
       questionID: cq.activeQuestionID,
       questionText: getDefinitionForQuestion(cq.activeQuestionID)?.questionText,
-      keepIndex: true
+      keepIndex: true,
+      resumeResearch: true
     }), { activeProjectID: projectID, syncDeepLink: true });
     await renderWorkspace();
   });
@@ -23904,7 +24563,12 @@ function upsertLocalQuestionFromPromotion(project, questionPayload, questionText
     saveDefinitionForQuestion(id, definition);
   }
   setCodeQuestionWorkspaceState(
-    openCodeDecisionSurface(codeQuestionWorkspaceState(), { projectID, questionID: id, questionText }),
+    openCodeDecisionSurface(codeQuestionWorkspaceState(), {
+      projectID,
+      questionID: id,
+      questionText,
+      resumeResearch: true
+    }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
   return question;
@@ -24044,7 +24708,8 @@ function openQuestionFromLegacy(questionID) {
     openCodeDecisionSurface(codeQuestionWorkspaceState(), {
       projectID,
       questionID,
-      questionText: getDefinitionForQuestion(questionID)?.questionText
+      questionText: getDefinitionForQuestion(questionID)?.questionText,
+      resumeResearch: true
     }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
@@ -24591,7 +25256,8 @@ function renderCodeQuestionIndexList(project) {
         openCodeDecisionSurface(codeQuestionWorkspaceState(), {
           projectID,
           questionID: question.id,
-          questionText: getDefinitionForQuestion(question.id)?.questionText || question.title
+          questionText: getDefinitionForQuestion(question.id)?.questionText || question.title,
+          resumeResearch: true
         }),
         { activeProjectID: projectID, syncDeepLink: true }
       );
@@ -24705,12 +25371,24 @@ async function createLocalCodeQuestionDraft(project) {
     openCodeDecisionSurface(codeQuestionWorkspaceState(), {
       projectID,
       questionID: createdQuestion?.id || id,
-      questionText
+      questionText,
+      resumeResearch: true
     }),
     { activeProjectID: projectID, syncDeepLink: true }
   );
   if (codeQuestionIsOnline()) {
     await hydrateCodeQuestionState(projectID, createdQuestion?.id || id, { force: true, render: false });
+    try {
+      await startLinkedResearchForCodeDecision(createdQuestion?.id || id);
+      return;
+    } catch (error) {
+      await renderWorkspace();
+      await showWebNotice(
+        "Code Decision created",
+        `${error.message || "Linked Research could not be started."} The Working Code Decision was preserved.`
+      );
+      return;
+    }
   }
   await renderWorkspace();
 }
@@ -27100,6 +27778,7 @@ async function toggleUtilityPane(key) {
   } else if (key === "archive") {
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:archive");
   } else if (key === "analysis" && !willOpen) {
+    researchOpenGeneration += 1;
     state.researchConversationID = "";
     activeResearchConversation = null;
     state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID && !id.startsWith("research:conversation:"));
@@ -27128,6 +27807,7 @@ async function fitVisibleColumns() {
 async function closeAllColumns() {
   if (!(await confirmWorkspaceTransition())) return false;
   projectStudioTransitionGeneration += 1;
+  researchOpenGeneration += 1;
   state.readers = [];
   state.searchResultReader = null;
   state.sectionDetail = null;
@@ -27382,6 +28062,7 @@ async function start() {
       } catch {
         state.account = null;
       }
+      if (previousUserID !== (state.account?.userID || "")) clearResearchAccountRuntime();
       codeQuestionUnauthorizedAccountUserID = "";
       loadCodeQuestionAccountStateIntoWorkspace(state.account?.userID || "");
       syncedContent = null;
