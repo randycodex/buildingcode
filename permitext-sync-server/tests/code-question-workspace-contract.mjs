@@ -180,6 +180,15 @@ assert.equal(codeDecisionContextIsVisible(decisionSelectionWithoutSurface, {
   linkedResearchConversationID: "research-22"
 }), false, "An unrelated Research conversation must not expose stale decision context.");
 
+const closedDecisionPane = closeCodeQuestionPane(
+  decisionSurface,
+  questionPaneKey({ projectID: "project-2", questionID: "cq-22", paneRole: "decision-record" }),
+  "project-2"
+);
+assert.equal(closedDecisionPane.activeQuestionID, "cq-22");
+assert.equal(closedDecisionPane.openPanes.some((pane) => pane.paneRole === "decision-record"), false,
+  "Closing the visible decision record must preserve the selection without reopening the pane.");
+
 const closedDecisionContext = closeCodeDecisionContext(decisionSurface);
 assert.equal(closedDecisionContext.activeQuestionID, "");
 assert.equal(closedDecisionContext.questionIndexOpen, false);

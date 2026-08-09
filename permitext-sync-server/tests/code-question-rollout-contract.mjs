@@ -299,6 +299,11 @@ assert.match(codeDecisionIndexSource, /createLocalCodeQuestionDraft\(project, \{
 assert.doesNotMatch(codeDecisionIndexSource, /Search decisions|Search Code Decisions|code-question-create-button/);
 assert.match(workspaceScript, /close\.className = "icon-button utility-close code-question-pane-close"/);
 assert.match(workspaceScript, /close\.innerHTML = circleXIconSVG\(\)/);
+const ensureShellSource = workspaceScript.slice(
+  workspaceScript.indexOf("function ensureCodeQuestionShellForProject"),
+  workspaceScript.indexOf("const webFreePlanLimits")
+);
+assert.doesNotMatch(ensureShellSource, /!currentProjectPanes\.some\(\(pane\) => pane\.paneRole === "decision-record"\)/);
 
 const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
 const workspaceHTML = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
@@ -312,7 +317,7 @@ assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
 assert.match(workspaceHTML, /styles\.css\?v=20260809-project-decision-entry-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v494/);
+assert.match(serviceWorker, /permitext-pro-shell-v495/);
 assert.match(serviceWorker, /styles\.css\?v=20260809-project-decision-entry-v1/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-question-entry-v1";
+} from "./offline-storage.js?v=20260809-code-decision-close-intent-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -6084,10 +6084,7 @@ function ensureCodeQuestionShellForProject(project, options = {}) {
     );
   } else if (
     cq.activeQuestionID &&
-    (
-      currentProjectPanes.some((pane) => pane.paneRole === "research") ||
-      !currentProjectPanes.some((pane) => pane.paneRole === "decision-record")
-    )
+    currentProjectPanes.some((pane) => pane.paneRole === "research")
   ) {
     setCodeQuestionWorkspaceState(
       openCodeDecisionSurface(cq, {
