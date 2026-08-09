@@ -230,7 +230,7 @@ assert.match(workspaceScript, /researchConversationID: conversation\.id/);
 assert.match(workspaceScript, /\/projects\/code-questions\/research\/start/);
 assert.match(workspaceScript, /\/projects\/code-questions\/research\/link/);
 assert.match(workspaceScript, /function clearResearchAccountRuntime\(\)/);
-assert.match(workspaceScript, /if \(conversation\?\.primaryProjectID && conversation\.primaryProjectID !== projectID\) return/);
+assert.match(workspaceScript, /function clearProjectSpecificResearch[\s\S]*?state\.utilities\.analysis = false;[\s\S]*?state\.researchConversationID = ""/);
 assert.match(workspaceScript, /if \(previousUserID !== account\.appUserID\) clearResearchAccountRuntime\(\)/);
 assert.match(workspaceScript, /if \(previousUserID !== \(state\.account\?\.userID \|\| ""\)\) clearResearchAccountRuntime\(\)/);
 assert.match(workspaceScript, /async function fetchAuthoritativeResearchConversation\(conversationID\)/);
@@ -320,7 +320,7 @@ assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
 assert.match(workspaceHTML, /styles\.css\?v=20260809-search-width-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v509/);
+assert.match(serviceWorker, /permitext-pro-shell-v510/);
 assert.match(serviceWorker, /styles\.css\?v=20260809-search-width-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
@@ -329,6 +329,9 @@ assert.match(workspaceStyles, /\.evidence-candidate-card \{[\s\S]*?border-bottom
 assert.match(workspaceStyles, /\.evidence-candidate-card blockquote \{[\s\S]*?padding: 0;[\s\S]*?background: transparent;[\s\S]*?color: var\(--text-secondary\);/);
 assert.match(workspaceStyles, /\.evidence-discovery \{\s*display: grid;\s*gap: var\(--space-3\);\s*margin-top: var\(--space-4\);\s*\}/);
 assert.match(workspaceScript, /const researchSurfaceIDs = \[[\s\S]*?"utility:analysis"[\s\S]*?paneIDForResearchConversation[\s\S]*?paired\.splice/);
+assert.match(workspaceScript, /function closeCodeQuestionDownstreamPanes[\s\S]*?pane\.paneRole === "question-index"[\s\S]*?activeQuestionID: ""/);
+assert.match(workspaceScript, /parsed\.paneRole === "question-index"[\s\S]*?closeProjectCodeDecisions\(project \|\| \{ id: parsed\.projectID \}\)/);
+assert.match(workspaceScript, /async function closeProjectCodeDecisions[\s\S]*?if \(state\.utilities\.analysis\) \{[\s\S]*?await closeResearchWorkspace\(\);[\s\S]*?return true/);
 assert.match(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);

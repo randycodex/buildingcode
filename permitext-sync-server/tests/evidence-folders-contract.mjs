@@ -206,6 +206,7 @@ assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-t
 assert.match(appSource, /\["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions\]/);
 assert.match(appSource, /async function openProjectCodeDecisions[\s\S]*?await focusUtility\("analysis", "\.evidence-discovery textarea"\);/);
 assert.match(appSource, /function projectHasOpenCodeDecisions[\s\S]*?return indexIsOpen && scopedResearchIsOpen;/);
+assert.match(appSource, /function clearProjectSpecificResearch[\s\S]*?state\.utilities\.analysis = false;[\s\S]*?id !== "utility:analysis"/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls button \{[\s\S]*?width: 100%;[\s\S]*?min-width: 0;[\s\S]*?font-weight: 400;/);
 assert.match(stylesSource, /\.saved-evidence-collapse-toggle\[aria-expanded="true"\] \.research-chevron-up,[\s\S]*?\.saved-evidence-collapse-toggle\[aria-expanded="false"\] \.research-chevron-down \{[\s\S]*?display: block;/);
 const projectToolControlsRule = stylesSource.match(/\.saved-folder-context\.is-project \.saved-project-tool-controls \{([\s\S]*?)\n\}/)?.[1] || "";

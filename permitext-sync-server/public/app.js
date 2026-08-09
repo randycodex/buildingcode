@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-search-width-v1";
+} from "./offline-storage.js?v=20260809-research-cascade-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -1800,14 +1800,15 @@ async function closeProjectCodeDecisions(project) {
   if (!projectID) return false;
   const paneID = questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" });
   setCodeQuestionWorkspaceState(
-    closeCodeQuestionPane(codeQuestionWorkspaceState(), paneID, projectID),
+    closeCodeDecisionContext(codeQuestionWorkspaceState()),
     { activeProjectID: projectID }
   );
   delete state.paneWeights[paneID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
   saveWorkspaceState();
-  if (state.utilities.analysis && preferredResearchProjectID() === projectID) {
+  if (state.utilities.analysis) {
     await closeResearchWorkspace();
+    return true;
   }
   await transitionWorkspace("utility");
   return true;
@@ -2782,21 +2783,17 @@ function clearProjectSpecificResearch(project) {
   ) activeEvidenceDiscovery = null;
   pendingResearchSelection = null;
   const conversationID = String(state.researchConversationID || "").trim();
-  if (!conversationID) return;
-  const conversation = activeResearchConversation?.id === conversationID
-    ? activeResearchConversation
-    : researchConversationList.find((item) => item.id === conversationID) || null;
-  // An unresolved conversation cannot safely follow the user into another
-  // Project. Keep a known conversation only when it is known to belong
-  // elsewhere; otherwise close the prior Project's Research surface.
-  if (conversation?.primaryProjectID && conversation.primaryProjectID !== projectID) return;
   const conversationPaneID = paneIDForResearchConversation(conversationID);
+  state.utilities.analysis = false;
   state.researchConversationID = "";
   activeResearchConversation = null;
+  delete state.paneWeights["utility:analysis"];
   if (conversationPaneID) {
     delete state.paneWeights[conversationPaneID];
-    state.paneOrder = (state.paneOrder || []).filter((id) => id !== conversationPaneID);
   }
+  state.paneOrder = (state.paneOrder || []).filter((id) =>
+    id !== "utility:analysis" && id !== conversationPaneID && !id.startsWith("research:conversation:")
+  );
 }
 
 async function deactivateProjectStudio(project = openProjectDetails()[0] || null, options = {}) {
@@ -13109,12 +13106,29 @@ async function refreshResearchConversationList() {
   return researchConversationList;
 }
 
+function closeCodeQuestionDownstreamPanes({ clearSelection = false } = {}) {
+  if (!codeQuestionWorkspaceEnabled()) return;
+  const current = codeQuestionWorkspaceState();
+  const openPanes = (current.openPanes || []).filter((pane) => pane.paneRole === "question-index");
+  setCodeQuestionWorkspaceState({
+    ...current,
+    openPanes,
+    questionIndexOpen: openPanes.length > 0,
+    moreMenuOpen: false,
+    ...(clearSelection ? { activeQuestionID: "", deepLink: null } : {})
+  }, {
+    activeProjectID: activeProjectIDForCodeQuestions(),
+    syncDeepLink: true
+  });
+}
+
 async function closeResearchWorkspace() {
   researchOpenGeneration += 1;
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.utilities.analysis = false;
   state.researchConversationID = "";
   activeResearchConversation = null;
+  closeCodeQuestionDownstreamPanes({ clearSelection: true });
   delete state.paneWeights["utility:analysis"];
   Object.keys(state.paneWeights).filter((id) => id.startsWith("research:conversation:")).forEach((id) => delete state.paneWeights[id]);
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== "utility:analysis" && !id.startsWith("research:conversation:"));
@@ -13140,6 +13154,7 @@ async function closeResearchConversation() {
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   state.researchConversationID = "";
   activeResearchConversation = null;
+  closeCodeQuestionDownstreamPanes({ clearSelection: true });
   if (paneID) delete state.paneWeights[paneID];
   state.paneOrder = (state.paneOrder || []).filter((id) => id !== paneID);
   saveWorkspaceState();
@@ -25035,12 +25050,22 @@ function renderCodeQuestionPane(paneDescriptor) {
   close.setAttribute("aria-label", `Close ${codeQuestionPaneTitle(parsed.paneRole)}`);
   close.innerHTML = circleXIconSVG();
   close.addEventListener("click", async () => {
+    if (parsed.paneRole === "question-index") {
+      await closeProjectCodeDecisions(project || { id: parsed.projectID });
+      return;
+    }
+    const current = codeQuestionWorkspaceState();
+    const next = parsed.paneRole === "decision-record"
+      ? {
+          ...current,
+          openPanes: (current.openPanes || []).filter((pane) =>
+            pane.paneRole === "question-index" || pane.questionID !== parsed.questionID
+          ),
+          moreMenuOpen: false
+        }
+      : closeCodeQuestionPane(current, parsed.paneID, activeProjectIDForCodeQuestions());
     setCodeQuestionWorkspaceState(
-      closeCodeQuestionPane(
-        codeQuestionWorkspaceState(),
-        parsed.paneID,
-        activeProjectIDForCodeQuestions()
-      ),
+      next,
       { syncDeepLink: true }
     );
     await renderWorkspace();
