@@ -9,7 +9,7 @@ const notebookImagesStoreName = "notebook-images";
 const notebookDraftsStoreName = "notebook-drafts";
 const notebookProjectsStoreName = "notebook-projects";
 const activeLibraryKey = "active-library";
-const shellCacheName = "permitext-pro-shell-v500";
+const shellCacheName = "permitext-pro-shell-v501";
 const shellAssetVersion = "20260809-evidence-discovery-simplify-v1";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
@@ -19,7 +19,7 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260809-hide-research-history-v1",
+  "/web/styles.css?v=20260809-evidence-discovery-simplify-v2",
   "/web/fonts/inter-latin-wght-normal.woff2",
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",

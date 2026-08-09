@@ -5151,9 +5151,6 @@ mark {
   display: grid;
   gap: var(--space-3);
   margin-top: var(--space-4);
-  padding: var(--space-4);
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--ios-accent-building) 8%, var(--surface-muted));
 }
 
 .evidence-discovery-header {
