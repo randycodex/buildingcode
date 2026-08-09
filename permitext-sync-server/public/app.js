@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-candidate-format-v2";
+} from "./offline-storage.js?v=20260809-context-bar-removal-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -67,8 +67,6 @@ import {
   buildCodeQuestionDeepLink,
   closeCodeDecisionContext,
   closeCodeQuestionPane,
-  codeDecisionContextIsVisible,
-  codeQuestionMoreTools,
   codeQuestionPaneIDsFromState,
   deriveQuestionListLabel,
   emptyCodeQuestionWorkspaceState,
@@ -24617,96 +24615,6 @@ function codeDecisionPresentation(questionID, options = {}) {
   return { state, blockingReviewCount, missingInformationCount, conclusionCount };
 }
 
-function renderCodeDecisionContextBar(project) {
-  if (!codeQuestionWorkspaceEnabled() || !project) return null;
-  const cq = codeQuestionWorkspaceState();
-  if (!cq.activeQuestionID) return null;
-  const linkedResearchConversationID = linkedResearchConversationIDForQuestion(cq.activeQuestionID);
-  if (!codeDecisionContextIsVisible(cq, {
-    projectID: activeProjectIDForCodeQuestions(),
-    researchConversationID: state.utilities.analysis ? state.researchConversationID : "",
-    linkedResearchConversationID
-  })) return null;
-  const question = questionsForActiveProject().find((item) => item.id === cq.activeQuestionID);
-  const presentation = codeDecisionPresentation(cq.activeQuestionID);
-  const bar = document.createElement("div");
-  bar.className = "code-decision-context-bar";
-  bar.setAttribute("role", "navigation");
-  bar.setAttribute("aria-label", "Code Decision workspace");
-  bar.style.cssText = projectColorStyle(project);
-  const identity = document.createElement("button");
-  identity.type = "button";
-  identity.className = "code-decision-context-primary";
-  identity.innerHTML = `
-    <span>${escapeHTML(question?.displayID || "Decision")} · ${escapeHTML(question?.title || "Untitled")}</span>
-    <strong>${escapeHTML(presentation.state)}</strong>`;
-  identity.setAttribute("aria-label", `Open Research and Code Decision. Status: ${presentation.state}.`);
-  identity.addEventListener("click", async () => {
-    const projectID = activeProjectIDForCodeQuestions();
-    setCodeQuestionWorkspaceState(openCodeDecisionSurface(codeQuestionWorkspaceState(), {
-      projectID,
-      questionID: cq.activeQuestionID,
-      questionText: getDefinitionForQuestion(cq.activeQuestionID)?.questionText,
-      keepIndex: true,
-      resumeResearch: true
-    }), { activeProjectID: projectID, syncDeepLink: true });
-    await renderWorkspace();
-  });
-  bar.appendChild(identity);
-  const addColumn = document.createElement("div");
-  addColumn.className = "code-question-add-column";
-  const addButton = document.createElement("button");
-  addButton.type = "button";
-  addButton.className = "code-question-add-column-button";
-  addButton.setAttribute("aria-haspopup", "menu");
-  addButton.setAttribute("aria-expanded", cq.moreMenuOpen ? "true" : "false");
-  addButton.textContent = "Add column";
-  addButton.addEventListener("click", async () => {
-    setCodeQuestionWorkspaceState({
-      ...codeQuestionWorkspaceState(),
-      moreMenuOpen: !codeQuestionWorkspaceState().moreMenuOpen
-    });
-    await renderWorkspace();
-  });
-  addColumn.appendChild(addButton);
-  if (cq.moreMenuOpen) {
-    const menu = document.createElement("ul");
-    menu.className = "code-question-more-menu";
-    menu.setAttribute("role", "menu");
-    codeQuestionMoreTools.forEach((tool) => {
-      const item = document.createElement("li");
-      const option = document.createElement("button");
-      option.type = "button";
-      option.setAttribute("role", "menuitem");
-      option.textContent = tool.label;
-      option.addEventListener("click", async () => {
-        const projectID = activeProjectIDForCodeQuestions();
-        setCodeQuestionWorkspaceState(
-          openSupportingTool(codeQuestionWorkspaceState(), {
-            projectID,
-            questionID: codeQuestionWorkspaceState().activeQuestionID || "_",
-            paneRole: tool.role
-          }),
-          { activeProjectID: projectID }
-        );
-        // Bridge More tools to existing Project tool surfaces when present.
-        const detail = openProjectDetails()[0];
-        if (detail && tool.legacyTool === "notebook" && !projectHasOpenNotebook(detail)) {
-          await openProjectNotebook(detail);
-        } else if (detail && tool.legacyTool === "reportDraft" && !projectHasOpenReportDraft(detail)) {
-          await openProjectReportDraft(detail);
-        }
-        await renderWorkspace();
-      });
-      item.appendChild(option);
-      menu.appendChild(item);
-    });
-    addColumn.appendChild(menu);
-  }
-  bar.appendChild(addColumn);
-  return bar;
-}
-
 function localLegacyInventory(project) {
   const identity = projectIdentity(project || {});
   const projectID = String(projectDetailKey(identity) || activeProjectIDForCodeQuestions() || "").trim();
@@ -27769,15 +27677,8 @@ function renderCodeQuestionShellChrome() {
   document.body.classList.add("code-question-workspace-enabled");
   const project = openProjectDetails()[0] || null;
   if (project) ensureCodeQuestionShellForProject(project);
-  const existing = document.querySelector(".code-decision-context-bar, .code-question-stage-control");
-  const next = renderCodeDecisionContextBar(project);
-  if (existing && next) existing.replaceWith(next);
-  else if (existing && !next) existing.remove();
-  else if (!existing && next) {
-    const shell = document.querySelector(".workspace-shell");
-    const trackEl = document.querySelector("#panel-track");
-    if (shell && trackEl) shell.insertBefore(next, trackEl);
-  }
+  document.querySelector(".code-decision-context-bar")?.remove();
+  document.querySelector(".code-question-stage-control")?.remove();
   // Promote Projects button labeling when CQ shell is on (Projects remain primary).
   if (toggleSavedButton) {
     toggleSavedButton.setAttribute("aria-label", "Projects");

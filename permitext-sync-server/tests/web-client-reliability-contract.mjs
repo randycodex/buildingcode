@@ -71,10 +71,10 @@ assert.doesNotMatch(
   /height:\s*calc\(100%\s*\+\s*var\(--space-3\)\)/,
   "Columns and their vertical dividers must terminate at the same track edge, including empty states."
 );
-assert.match(
+assert.doesNotMatch(
   workspaceStyles,
-  /body\.code-question-workspace-enabled \.panel-track \{\s*grid-row:\s*3;\s*\}/,
-  "Without an active Code Decision context bar, the workspace must still occupy the final fill row."
+  /body\.code-question-workspace-enabled \.panel-track/,
+  "Code Decision mode must use the standard two-row shell without reserving space for a removed context bar."
 );
 
 const offlineStorage = await readFile(new URL("../public/offline-storage.js", import.meta.url), "utf8");

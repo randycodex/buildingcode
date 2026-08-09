@@ -8,7 +8,6 @@ import {
   buildCodeQuestionDeepLink,
   closeCodeDecisionContext,
   closeCodeQuestionPane,
-  codeDecisionContextIsVisible,
   codeDecisionPrimaryArrangement,
   codeQuestionPaneIDsFromState,
   codeQuestionStageArrangements,
@@ -181,28 +180,6 @@ assert.deepEqual(
   ["decision-record", "definition", "evidence-tray", "history"]
 );
 assert.ok(retargetedDecisionSurface.openPanes.every((pane) => pane.questionID === "_" || pane.questionID === "cq-23"));
-assert.equal(codeDecisionContextIsVisible(decisionSurface, {
-  projectID: "project-2"
-}), true, "An open Code Decision record should show its context bar.");
-
-const decisionSelectionWithoutSurface = {
-  ...decisionSurface,
-  openPanes: []
-};
-assert.equal(codeDecisionContextIsVisible(decisionSelectionWithoutSurface, {
-  projectID: "project-2"
-}), false, "A saved decision selection alone must not leave a bar in an empty workspace.");
-assert.equal(codeDecisionContextIsVisible(decisionSelectionWithoutSurface, {
-  projectID: "project-2",
-  researchConversationID: "research-22",
-  linkedResearchConversationID: "research-22"
-}), true, "The exact linked Research surface keeps the decision context visible.");
-assert.equal(codeDecisionContextIsVisible(decisionSelectionWithoutSurface, {
-  projectID: "project-2",
-  researchConversationID: "research-other",
-  linkedResearchConversationID: "research-22"
-}), false, "An unrelated Research conversation must not expose stale decision context.");
-
 const closedDecisionPane = closeCodeQuestionPane(
   decisionSurface,
   questionPaneKey({ projectID: "project-2", questionID: "cq-22", paneRole: "decision-record" }),
