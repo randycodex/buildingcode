@@ -1268,7 +1268,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-candidate-controls-background-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-research-project-summary-removal-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1410,7 +1410,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-candidate-controls-background-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-research-project-summary-removal-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1576,8 +1576,10 @@ async function main() {
     );
     assert(
       !workspaceScript.text.includes("Assign this conversation when its research belongs to a specific Project.") &&
-        !workspaceScript.text.includes("research-project-context-unassigned"),
-      "Unassigned Research conversations should not show redundant Project-assignment helper copy."
+        !workspaceScript.text.includes("research-project-context-unassigned") &&
+        !workspaceScript.text.includes("From the Project folder") &&
+        !workspaceScript.text.includes("research-project-information"),
+      "Research conversations should not repeat Project-folder summaries or assignment helper copy."
     );
     assert(
       !workspaceScript.text.includes("recentlyViewedSearchID: instance.id") &&
@@ -1644,7 +1646,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-candidate-controls-background-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-research-project-summary-removal-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(

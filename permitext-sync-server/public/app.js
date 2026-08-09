@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-candidate-controls-background-v1";
+} from "./offline-storage.js?v=20260809-research-project-summary-removal-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14881,29 +14881,6 @@ function renderHistoricalResearchControl(container, message) {
 function renderResearchProjectContext(container, conversation) {
   const section = document.createElement("section");
   section.className = "research-project-context";
-
-  if (conversation.primaryProjectID) {
-    const projectInformation = conversation.projectInformation || {};
-    const automaticFacts = Array.isArray(projectInformation.facts)
-      ? projectInformation.facts
-      : [];
-    if (automaticFacts.length) {
-      const projectInfo = document.createElement("section");
-      projectInfo.className = "research-project-information";
-      const projectInfoHeading = document.createElement("strong");
-      projectInfoHeading.textContent = "From the Project folder";
-      const projectInfoList = document.createElement("ul");
-      automaticFacts.forEach((fact) => {
-        const row = document.createElement("li");
-        row.textContent = fact;
-        projectInfoList.append(row);
-      });
-      const projectInfoCopy = document.createElement("p");
-      projectInfoCopy.textContent = "Permitext uses this current Project information automatically. Edit the Project folder to change it.";
-      projectInfo.append(projectInfoHeading, projectInfoList, projectInfoCopy);
-      section.append(projectInfo);
-    }
-  }
   container.append(section);
   return section;
 }
