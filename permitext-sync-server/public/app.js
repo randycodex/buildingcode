@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-research-dedupe-v1";
+} from "./offline-storage.js?v=20260809-code-decision-research-dedupe-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -14014,19 +14014,6 @@ async function renderResearch(paneID = "utility:analysis") {
     decisionResearch.prepend(decisionHeading);
     decisionResearch.append(decisionAction, decisionStatus);
     content.append(decisionResearch);
-  }
-
-  if (researchQuestionDraft && !activeDecisionID) {
-    const carriedDraft = document.createElement("article");
-    carriedDraft.className = "analysis-card notebook-research-draft";
-    const draftHeading = document.createElement("strong");
-    draftHeading.textContent = "Question ready from Notebook";
-    const draftText = document.createElement("p");
-    draftText.textContent = researchQuestionDraft;
-    const draftInstruction = document.createElement("small");
-    draftInstruction.textContent = "Now highlight the enacted code text you want Permitext to use. The Notebook card is context, not cited authority.";
-    carriedDraft.append(draftHeading, draftText, draftInstruction);
-    content.append(carriedDraft);
   }
 
   if (researchUsage && researchEnabled) {
