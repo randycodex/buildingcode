@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-pane-width-v1";
+} from "./offline-storage.js?v=20260809-code-decision-inline-status-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -426,6 +426,7 @@ let researchQuestionDraft = "";
 let activeEvidenceDiscovery = null;
 let pendingResearchSelection = null;
 const dismissedLinkedResearchDecisionKeys = new Set();
+const codeDecisionResearchNoticesByQuestion = new Map();
 let researchSelectionMenuInteracting = false;
 let researchSelectionMenuPinned = false;
 let activeWebWarningClose = null;
@@ -5167,6 +5168,7 @@ function clearResearchAccountRuntime() {
   researchSelectionMenuInteracting = false;
   researchSelectionMenuPinned = false;
   dismissedLinkedResearchDecisionKeys.clear();
+  codeDecisionResearchNoticesByQuestion.clear();
   state.utilities.analysis = false;
   delete state.paneWeights["utility:analysis"];
   Object.keys(state.paneWeights || {})
@@ -5216,6 +5218,31 @@ function linkedResearchConversationIDForQuestion(questionID) {
     activeResearchConversation?.primaryProjectID === activeProjectIDForCodeQuestions()
   ) return String(activeResearchConversation.id || "");
   return "";
+}
+
+function codeDecisionResearchNoticeKey(projectID, questionID) {
+  const pid = String(projectID || "").trim();
+  const qid = String(questionID || "").trim();
+  return pid && qid ? `${pid}:${qid}` : "";
+}
+
+function setCodeDecisionResearchNotice(projectID, questionID, message) {
+  const key = codeDecisionResearchNoticeKey(projectID, questionID);
+  if (!key) return;
+  codeDecisionResearchNoticesByQuestion.set(key, {
+    title: "Code Decision saved",
+    message: String(message || "Linked Research did not finish opening. The Working Code Decision was preserved.")
+  });
+}
+
+function clearCodeDecisionResearchNotice(projectID, questionID) {
+  const key = codeDecisionResearchNoticeKey(projectID, questionID);
+  if (key) codeDecisionResearchNoticesByQuestion.delete(key);
+}
+
+function codeDecisionResearchNotice(projectID, questionID) {
+  const key = codeDecisionResearchNoticeKey(projectID, questionID);
+  return key ? codeDecisionResearchNoticesByQuestion.get(key) || null : null;
 }
 
 function openCodeDecisionSurface(cqState, options = {}) {
@@ -5284,6 +5311,7 @@ async function startLinkedResearchForCodeDecision(questionID, options = {}) {
   await hydrateCodeQuestionState(projectID, qid, { force: true, render: false });
   assertCodeQuestionRequestContext(requestContext);
   if (!researchOpenContextIsCurrent(openingContext)) throw codeQuestionContextChangedError();
+  clearCodeDecisionResearchNotice(projectID, qid);
   if (options.open !== false) {
     await openResearchConversation(conversation.id, { refreshList: true });
   }
@@ -13940,11 +13968,39 @@ async function renderResearch(paneID = "utility:analysis") {
     decisionStatus.className = "research-list-status";
     decisionStatus.setAttribute("role", "status");
     decisionStatus.setAttribute("aria-live", "polite");
+    const decisionProjectID = activeProjectIDForCodeQuestions();
+    const pendingNotice = codeDecisionResearchNotice(decisionProjectID, activeDecisionID);
+    if (pendingNotice) {
+      const notice = document.createElement("aside");
+      notice.className = "analysis-card code-decision-research-status";
+      notice.setAttribute("role", "status");
+      notice.setAttribute("aria-live", "polite");
+      const noticeHeading = document.createElement("strong");
+      noticeHeading.textContent = pendingNotice.title;
+      const noticeCopy = document.createElement("p");
+      noticeCopy.className = "research-list-status";
+      noticeCopy.textContent = pendingNotice.message;
+      const noticeActions = document.createElement("div");
+      noticeActions.className = "research-summary-actions";
+      const dismissButton = document.createElement("button");
+      dismissButton.type = "button";
+      dismissButton.className = "ghost-button";
+      dismissButton.textContent = "Dismiss";
+      dismissButton.addEventListener("click", () => {
+        clearCodeDecisionResearchNotice(decisionProjectID, activeDecisionID);
+        notice.remove();
+        decisionAction.focus({ preventScroll: true });
+      });
+      noticeActions.append(dismissButton);
+      notice.append(noticeHeading, noticeCopy, noticeActions);
+      decisionResearch.append(notice);
+    }
     decisionAction.addEventListener("click", async () => {
       decisionAction.disabled = true;
       decisionStatus.textContent = linkedConversationID ? "Opening linked Research…" : "Starting linked Research…";
       try {
         if (linkedConversationID) {
+          clearCodeDecisionResearchNotice(decisionProjectID, activeDecisionID);
           await openResearchConversation(linkedConversationID, {
             conversation: linkedConversation,
             linkedQuestionID: activeDecisionID,
@@ -13958,7 +14014,8 @@ async function renderResearch(paneID = "utility:analysis") {
         decisionAction.disabled = false;
       }
     });
-    decisionResearch.append(decisionHeading, decisionAction, decisionStatus);
+    decisionResearch.prepend(decisionHeading);
+    decisionResearch.append(decisionAction, decisionStatus);
     content.append(decisionResearch);
   }
 
@@ -25474,11 +25531,12 @@ async function createLocalCodeQuestionDraft(project) {
       await startLinkedResearchForCodeDecision(createdQuestion?.id || id);
       return;
     } catch (error) {
-      await renderWorkspace();
-      await showWebNotice(
-        "Code Decision created",
-        `${error.message || "Linked Research could not be started."} The Working Code Decision was preserved.`
+      setCodeDecisionResearchNotice(
+        projectID,
+        createdQuestion?.id || id,
+        "Linked Research did not finish opening. The Working Code Decision was preserved. Use the Research action below when you are ready."
       );
+      await renderWorkspace();
       return;
     }
   }
