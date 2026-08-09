@@ -294,6 +294,9 @@ const codeDecisionIndexSource = workspaceScript.slice(
 );
 assert.doesNotMatch(codeDecisionIndexSource, /Legacy \/ Unassigned|Review legacy work|code-question-legacy-path/);
 assert.doesNotMatch(codeDecisionIndexSource, /code-question-index-meta|No Code Decisions yet/);
+assert.match(codeDecisionIndexSource, /Ask a professional code question, then press Enter/);
+assert.match(codeDecisionIndexSource, /createLocalCodeQuestionDraft\(project, \{ questionText \}\)/);
+assert.doesNotMatch(codeDecisionIndexSource, /Search decisions|Search Code Decisions|code-question-create-button/);
 assert.match(workspaceScript, /close\.className = "icon-button utility-close code-question-pane-close"/);
 assert.match(workspaceScript, /close\.innerHTML = circleXIconSVG\(\)/);
 
@@ -309,7 +312,7 @@ assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
 assert.match(workspaceHTML, /styles\.css\?v=20260809-project-decision-entry-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v493/);
+assert.match(serviceWorker, /permitext-pro-shell-v494/);
 assert.match(serviceWorker, /styles\.css\?v=20260809-project-decision-entry-v1/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);

@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-index-cleanup-v1";
+} from "./offline-storage.js?v=20260809-code-decision-question-entry-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25309,36 +25309,30 @@ function renderCodeQuestionIndexBody(project) {
   const wrap = document.createElement("div");
   wrap.className = "code-question-index";
   void hydrateCodeQuestionList(String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || ""));
-  const cq = codeQuestionWorkspaceState();
-  const filters = cq.questionFilters || {};
-  const toolbar = document.createElement("div");
+  const toolbar = document.createElement("form");
   toolbar.className = "code-question-index-toolbar";
-  const search = document.createElement("input");
-  search.type = "search";
-  search.className = "code-question-index-search";
-  search.placeholder = "Search decisions";
-  search.setAttribute("aria-label", "Search Code Decisions");
-  search.value = filters.query || "";
-  search.addEventListener("input", () => {
-    setCodeQuestionWorkspaceState({
-      ...codeQuestionWorkspaceState(),
-      questionFilters: {
-        ...codeQuestionWorkspaceState().questionFilters,
-        query: search.value
-      }
-    });
-    const list = wrap.querySelector(".code-question-index-list");
-    if (list) list.replaceWith(renderCodeQuestionIndexList(project));
+  const questionEntry = document.createElement("input");
+  questionEntry.type = "text";
+  questionEntry.className = "code-question-index-search";
+  questionEntry.placeholder = "Ask a professional code question, then press Enter";
+  questionEntry.setAttribute("aria-label", "Ask a professional code question");
+  questionEntry.autocomplete = "off";
+  questionEntry.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
+  if (questionEntry.disabled) questionEntry.title = "An Owner or Editor must start Research";
+  toolbar.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const questionText = questionEntry.value.replace(/\s+/g, " ").trim();
+    if (!questionText || questionEntry.disabled) return;
+    questionEntry.disabled = true;
+    questionEntry.setAttribute("aria-busy", "true");
+    const created = await createLocalCodeQuestionDraft(project, { questionText });
+    if (!created && questionEntry.isConnected) {
+      questionEntry.disabled = false;
+      questionEntry.removeAttribute("aria-busy");
+      questionEntry.focus({ preventScroll: true });
+    }
   });
-  const createButton = document.createElement("button");
-  createButton.type = "button";
-  createButton.className = "code-question-create-button";
-  createButton.textContent = "Start research";
-  createButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
-  createButton.addEventListener("click", async () => {
-    await createLocalCodeQuestionDraft(project);
-  });
-  toolbar.append(search, createButton);
+  toolbar.append(questionEntry);
   wrap.appendChild(toolbar);
   wrap.appendChild(renderCodeQuestionIndexList(project));
   return wrap;
@@ -25349,7 +25343,10 @@ function renderCodeQuestionIndexList(project) {
   list.className = "code-question-index-list";
   list.setAttribute("role", "list");
   const cq = codeQuestionWorkspaceState();
-  const questions = filterQuestions(questionsForActiveProject(), cq.questionFilters);
+  const questions = filterQuestions(questionsForActiveProject(), {
+    ...cq.questionFilters,
+    query: ""
+  });
   if (!questions.length) return list;
   questions.forEach((question) => {
     const item = document.createElement("li");
@@ -25412,19 +25409,22 @@ function escapeHTML(value) {
     .replaceAll('"', "&quot;");
 }
 
-async function createLocalCodeQuestionDraft(project) {
-  if (!codeQuestionWorkspaceEnabled()) return;
+async function createLocalCodeQuestionDraft(project, options = {}) {
+  if (!codeQuestionWorkspaceEnabled()) return null;
   const projectID = project ? String(projectDetailKey(project) || "").trim() : "";
-  if (!projectID) return;
-  const questionText = await openWebTextPrompt({
-    title: "Start Research",
-    message: "Ask the professional question naturally. Permitext will build the governed Code Decision alongside the investigation.",
-    label: "What do you need to decide?",
-    required: true,
-    multiline: true,
-    confirmLabel: "Start Research"
-  });
-  if (!questionText) return;
+  if (!projectID) return null;
+  let questionText = String(options.questionText || "").replace(/\s+/g, " ").trim();
+  if (!questionText) {
+    questionText = await openWebTextPrompt({
+      title: "Start Research",
+      message: "Ask the professional question naturally. Permitext will build the governed Code Decision alongside the investigation.",
+      label: "What do you need to decide?",
+      required: true,
+      multiline: true,
+      confirmLabel: "Start Research"
+    });
+  }
+  if (!questionText) return null;
   const existing = questionsForActiveProject();
   const nextNumber = existing.reduce((max, item) => {
     const n = Number(String(item.displayID || "").replace(/\D/g, "")) || 0;
@@ -25483,7 +25483,7 @@ async function createLocalCodeQuestionDraft(project) {
     }
   } catch (error) {
     await showWebNotice("Could not start Research", error.message || "Creation failed.");
-    return;
+    return null;
   }
   setCodeQuestionWorkspaceState(
     openCodeDecisionSurface(codeQuestionWorkspaceState(), {
@@ -25498,7 +25498,7 @@ async function createLocalCodeQuestionDraft(project) {
     await hydrateCodeQuestionState(projectID, createdQuestion?.id || id, { force: true, render: false });
     try {
       await startLinkedResearchForCodeDecision(createdQuestion?.id || id);
-      return;
+      return createdQuestion;
     } catch (error) {
       setCodeDecisionResearchNotice(
         projectID,
@@ -25506,10 +25506,11 @@ async function createLocalCodeQuestionDraft(project) {
         "Linked Research did not finish opening. The Working Code Decision was preserved. Use the Research action below when you are ready."
       );
       await renderWorkspace();
-      return;
+      return createdQuestion;
     }
   }
   await renderWorkspace();
+  return createdQuestion;
 }
 
 function renderCodeQuestionDefinitionBody(project, questionID) {
