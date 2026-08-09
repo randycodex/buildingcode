@@ -291,6 +291,7 @@ const emptyStore = () => ({
   sessions: {},
   passkeyCredentials: {},
   mutationsByUserID: {},
+  syncRevisionsByUserID: {},
   foundationArtifactsByUserID: {},
   projectLinksByUserID: {},
   researchAnswersByUserID: {},
@@ -501,6 +502,10 @@ function createFileStoreAdapter() {
     async write(store) {
       await writeJSONFileAtomically(dataPath, store);
     },
+    async latestEventID(userID) {
+      const store = await this.read();
+      return Number(store.syncRevisionsByUserID?.[userID] || 0);
+    },
     async accountExists(userID) {
       const store = await this.read();
       return Boolean(store.users?.[userID]);
@@ -528,6 +533,7 @@ function createFileStoreAdapter() {
       delete store.entitlements[userID];
       delete store.sessions[userID];
       delete store.mutationsByUserID[userID];
+      delete store.syncRevisionsByUserID[userID];
       delete store.foundationArtifactsByUserID[userID];
       delete store.projectLinksByUserID[userID];
       delete store.researchAnswersByUserID[userID];
@@ -15996,6 +16002,9 @@ async function handlePush(request, response) {
   );
   const merge = mergeMutations(existing, planEnforcement.acceptedMutations);
   store.mutationsByUserID[userID] = merge.mutations;
+  if (merge.acceptedMutationIDs.length > 0) {
+    store.syncRevisionsByUserID[userID] = Number(store.syncRevisionsByUserID[userID] || 0) + 1;
+  }
   await writeStore(store);
   await recordMeaningfulSyncActivity(
     userID,
@@ -16032,6 +16041,7 @@ async function handlePush(request, response) {
 }
 
 async function handlePull(request, response) {
+  const telemetryStartedAt = performance.now();
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID;
   if (!userID) {
@@ -16053,6 +16063,14 @@ async function handlePull(request, response) {
     const result = await adapter.pullUserContent(userID, { since, sinceEventID });
     const expanded = expandPullMutationsWithDependencies(result.mutations, result.allMutations);
     const mutations = await canonicalizeMutations(expanded);
+    const responseContract = await syncResponseContract(userID, result.entitlement, body, contentMapVersion);
+    logSyncTelemetry({
+      mode: "full-pull",
+      userID,
+      changed: mutations.length > 0,
+      mutationCount: mutations.length,
+      durationMs: performance.now() - telemetryStartedAt
+    });
     sendJSON(response, 200, {
       userID,
       pulledAt: new Date().toISOString(),
@@ -16060,8 +16078,9 @@ async function handlePull(request, response) {
       syncRevision: result.latestEventID,
       contentMapVersion,
       entitlement: result.entitlement,
+      entitlementFingerprint: syncEntitlementFingerprint(result.entitlement),
       mutations,
-      ...await syncResponseContract(userID, result.entitlement, body, contentMapVersion)
+      ...responseContract
     });
     return;
   }
@@ -16076,20 +16095,79 @@ async function handlePull(request, response) {
   const filteredMutations = Number.isFinite(since) ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since) : allMutations;
   const mutations = await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations));
   const latestEventID = await latestSyncEventID(userID);
+  const entitlement = store.entitlements[userID] || null;
+  const responseContract = await syncResponseContract(userID, entitlement, body, contentMapVersion);
+  logSyncTelemetry({
+    mode: "full-pull",
+    userID,
+    changed: mutations.length > 0,
+    mutationCount: mutations.length,
+    durationMs: performance.now() - telemetryStartedAt
+  });
   sendJSON(response, 200, {
     userID,
     pulledAt: new Date().toISOString(),
     latestEventID,
     syncRevision: latestEventID,
     contentMapVersion,
-    entitlement: store.entitlements[userID] || null,
+    entitlement,
+    entitlementFingerprint: syncEntitlementFingerprint(entitlement),
     mutations,
-    ...await syncResponseContract(
-      userID,
-      store.entitlements[userID] || null,
-      body,
-      contentMapVersion
-    )
+    ...responseContract
+  });
+}
+
+function syncEntitlementFingerprint(entitlement) {
+  return createHash("sha256")
+    .update(JSON.stringify(entitlement || null))
+    .digest("hex")
+    .slice(0, 24);
+}
+
+function logSyncTelemetry({ mode, userID, changed, mutationCount = 0, durationMs }) {
+  console.info(JSON.stringify({
+    event: "permitext.sync",
+    mode,
+    principal: createHash("sha256").update(String(userID || "")).digest("hex").slice(0, 12),
+    changed: Boolean(changed),
+    mutationCount: Number(mutationCount || 0),
+    durationMs: Math.round(Number(durationMs || 0)),
+    observedAt: new Date().toISOString()
+  }));
+}
+
+async function handleSyncCheckpoint(request, response) {
+  const telemetryStartedAt = performance.now();
+  const body = await readJSON(request);
+  const userID = body.auth?.accountUserID;
+  if (!userID) {
+    sendError(response, 400, "Missing user ID.");
+    return;
+  }
+  const context = await authenticatedUserContext(request, response, userID);
+  if (!context) return;
+
+  const latestEventID = await latestSyncEventID(userID);
+  const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
+  const entitlementFingerprint = syncEntitlementFingerprint(context.entitlement);
+  const changed =
+    Number(body.sinceEventID || 0) !== latestEventID ||
+    Number(body.contentMapVersion || 0) !== contentMapVersion ||
+    String(body.entitlementFingerprint || "") !== entitlementFingerprint;
+  logSyncTelemetry({
+    mode: "checkpoint",
+    userID,
+    changed,
+    durationMs: performance.now() - telemetryStartedAt
+  });
+  sendJSON(response, 200, {
+    userID,
+    checkedAt: new Date().toISOString(),
+    changed,
+    latestEventID,
+    syncRevision: latestEventID,
+    contentMapVersion,
+    entitlementFingerprint
   });
 }
 
@@ -20637,6 +20715,7 @@ const handlers = {
   "workboards/previews/read": handleWorkboardPreviewRead,
   "workboards/previews/clear": handleWorkboardPreviewClear,
   "sync/push": handlePush,
+  "sync/checkpoint": handleSyncCheckpoint,
   "sync/pull": handlePull,
   "admin/lifetime-grants/grant": handleLifetimeGrant,
   "admin/lifetime-grants/revoke": handleLifetimeGrantDelete,
@@ -20788,6 +20867,7 @@ function requestTelemetryRoute(path) {
   const segments = path.split("/").filter(Boolean);
   if (segments[0] === "code" && segments[1]) return `code/${segments[1]}`;
   if (segments[0] === "research" && segments[1]) return `research/${segments[1]}`;
+  if (segments[0] === "sync" && segments[1]) return `sync/${segments[1]}`;
   return segments[0] || "unknown";
 }
 

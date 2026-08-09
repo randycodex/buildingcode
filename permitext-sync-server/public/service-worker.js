@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v531";
+const shellCacheName = "permitext-pro-shell-v532";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -12,9 +12,9 @@ const shellURLs = [
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260809-unified-research-v5",
+  "/web/app.js?v=20260809-adaptive-sync-v1",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260809-unified-research-v5",
+  "/web/offline-storage.js?v=20260809-adaptive-sync-v1",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
   "/web/workspace-state.js?v=20260809-unified-research-v5",
   "/web/code-question-workspace.js?v=20260809-context-bar-visibility-v3",
@@ -28,7 +28,7 @@ const shellURLs = [
   "/web/code-question-review.js?v=20260803-code-question-review-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
-  "/web/sync-state.js?v=20260721-causal-clear-v4"
+  "/web/sync-state.js?v=20260809-adaptive-sync-v1"
 ];
 
 self.addEventListener("install", (event) => {

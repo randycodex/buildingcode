@@ -14,9 +14,13 @@ import {
   annotationAfterBulkClears,
   bulkClearKey,
   bulkClearTimestamp,
+  foregroundSyncDelay,
+  foregroundSyncSchedule,
   mergeNewestRecord,
-  recordSurvivesBulkClear
-} from "./sync-state.js?v=20260721-causal-clear-v4";
+  recordSurvivesBulkClear,
+  syncCheckpointRequiresFullPull,
+  syncLeaderLeaseIsAvailable
+} from "./sync-state.js?v=20260809-adaptive-sync-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -41,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-unified-research-v5";
+} from "./offline-storage.js?v=20260809-adaptive-sync-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -386,10 +390,15 @@ let syncFlushPromise = null;
 let rejectedDeletionRecoveryAttempted = false;
 let syncRetryTimer = null;
 let foregroundSyncTimer = null;
+let foregroundSyncLeaderTimer = null;
 let foregroundSyncPromise = null;
 let serverReachable = navigator.onLine !== false;
-const foregroundSyncIntervalMilliseconds = 30_000;
-const foregroundSyncJitterMilliseconds = 3_000;
+let foregroundSyncLastActivityAt = Date.now();
+let foregroundSyncLastFullPullAt = 0;
+const foregroundSyncTabID = crypto.randomUUID?.() || `${Date.now()}-${Math.random()}`;
+const foregroundSyncLeaseKeyPrefix = "permitext:sync-leader:";
+const foregroundSyncSignalKey = "permitext:sync-signal";
+let foregroundSyncChannel = null;
 let continuityPushTimer = null;
 let draggedPaneID = "";
 let dragPreviewOrder = [];
@@ -4151,7 +4160,7 @@ async function postJSON(path, body, options = {}) {
       headers,
       body: JSON.stringify(body)
     });
-    serverReachable = true;
+    serverReachable = response.status < 500;
   } catch (error) {
     serverReachable = false;
     updateConnectionStatus();
@@ -4976,7 +4985,7 @@ function updateConnectionStatus() {
       ? "offline"
       : pending > 0
         ? "pending"
-        : syncFlushPromise
+        : syncFlushPromise || foregroundSyncPromise
           ? "syncing"
           : "clean";
   connectionStatus.classList.toggle("is-offline", offline);
@@ -4988,8 +4997,8 @@ function updateConnectionStatus() {
       : pending > 0 ? `Offline · ${pendingLabel}`
         : "Offline"
     : conflicts > 0 ? conflictLabel
-      : syncFlushPromise ? "Syncing"
-        : pending > 0 ? pendingLabel
+      : syncFlushPromise || foregroundSyncPromise ? "Syncing"
+        : pending > 0 ? `Changes pending · ${pending}`
           : account ? "Synced" : "Online";
   const conflictActionAvailable = statusKind === "conflict";
   connectionStatus.classList.toggle("is-actionable", conflictActionAvailable);
@@ -5031,13 +5040,13 @@ function isSessionAuthenticationError(error) {
 
 function clearExpiredAccountSession() {
   if (!activeAccount()) return;
+  stopForegroundSyncLoop();
   clearResearchAccountRuntime();
   state.account = null;
   persistAccountSession(null);
   syncedContent = { status: "disconnected", mutations: [], summary: summarizeMutations([]) };
   clearTimeout(syncRetryTimer);
   syncRetryTimer = null;
-  stopForegroundSyncLoop();
   saveWorkspaceState();
   void disableOfflineFeature().catch(() => {});
   void renderWorkspace({ persist: false });
@@ -6473,6 +6482,7 @@ function storeSignedInAccount(payload, fallbackDisplayName = "Web browser") {
   }
   codeQuestionUnauthorizedAccountUserID = "";
   const previousUserID = state.account?.userID;
+  if (previousUserID && previousUserID !== account.appUserID) stopForegroundSyncLoop();
   if (previousUserID) persistCodeQuestionAccountState(previousUserID);
   if (previousUserID !== account.appUserID) clearResearchAccountRuntime();
   if (previousUserID && payload.mergedAccount?.sourceUserID === previousUserID) {
@@ -6846,12 +6856,20 @@ async function loadSyncedContent(options = {}) {
         syncSchemaVersion: Number(payload.syncSchemaVersion || permitextSyncSchemaVersion),
         capabilityContract: payload.capabilityContract || null,
         entitlement,
+        entitlementFingerprint: payload.entitlementFingerprint || "",
         mutations,
         summary: summarizeMutations(mutations)
       };
       await convergeServerNewerSyncConflicts(account);
       await applyRemoteContinuityIfNewer();
       await saveOfflineSyncSnapshot(account.userID, syncedContent).catch(() => {});
+      foregroundSyncLastFullPullAt = Date.now();
+      broadcastForegroundSyncSignal("sync-complete", {
+        latestEventID: syncedContent.latestEventID,
+        pulledAt: syncedContent.pulledAt,
+        contentMapVersion: syncedContent.contentMapVersion,
+        entitlementFingerprint: syncedContent.entitlementFingerprint
+      });
       storeAccountEntitlement(entitlement);
       return syncedContent;
     })
@@ -7606,6 +7624,7 @@ function enqueueSyncMutation(mutation, account, options = {}) {
   ];
   state.syncConflicts = (state.syncConflicts || []).filter((item) => item.id !== entry.id);
   saveWorkspaceState();
+  markForegroundSyncActivity();
   return entry;
 }
 
@@ -7911,6 +7930,12 @@ async function flushSyncOutbox(options = {}) {
     if (options.refresh !== false && latestPayload) {
       await loadSyncedContent({ force: true, skipOutbox: true });
     }
+    if (acceptedMutationIDs.length > 0 && latestPayload) {
+      markForegroundSyncActivity();
+      broadcastForegroundSyncSignal("sync-invalidated", {
+        latestEventID: latestPayload.latestEventID
+      });
+    }
     return { acceptedMutationIDs, rejectedMutationIDs, payload: latestPayload };
   })().finally(() => {
     syncFlushPromise = null;
@@ -7942,12 +7967,138 @@ function canRunForegroundSync() {
   );
 }
 
-function stopForegroundSyncLoop() {
-  clearTimeout(foregroundSyncTimer);
-  foregroundSyncTimer = null;
+function markForegroundSyncActivity() {
+  foregroundSyncLastActivityAt = Date.now();
 }
 
-async function performForegroundSync() {
+function foregroundSyncLeaseKey(accountUserID = activeAccount()?.userID || "") {
+  return `${foregroundSyncLeaseKeyPrefix}${accountUserID}`;
+}
+
+function readForegroundSyncLease(accountUserID = activeAccount()?.userID || "") {
+  if (!accountUserID) return null;
+  try {
+    return JSON.parse(localStorage.getItem(foregroundSyncLeaseKey(accountUserID)) || "null");
+  } catch {
+    return null;
+  }
+}
+
+function claimForegroundSyncLeadership() {
+  const accountUserID = activeAccount()?.userID || "";
+  if (!accountUserID || !canRunForegroundSync()) return false;
+  const now = Date.now();
+  const existing = readForegroundSyncLease(accountUserID);
+  if (!syncLeaderLeaseIsAvailable(existing, { accountUserID, tabID: foregroundSyncTabID, now })) {
+    return false;
+  }
+  const lease = {
+    accountUserID,
+    tabID: foregroundSyncTabID,
+    expiresAt: now + foregroundSyncSchedule.leaderLeaseMs
+  };
+  localStorage.setItem(foregroundSyncLeaseKey(accountUserID), JSON.stringify(lease));
+  return readForegroundSyncLease(accountUserID)?.tabID === foregroundSyncTabID;
+}
+
+function isForegroundSyncLeader() {
+  const accountUserID = activeAccount()?.userID || "";
+  const lease = readForegroundSyncLease(accountUserID);
+  return Boolean(
+    accountUserID &&
+    lease?.accountUserID === accountUserID &&
+    lease?.tabID === foregroundSyncTabID &&
+    Number(lease.expiresAt || 0) > Date.now()
+  );
+}
+
+function releaseForegroundSyncLeadership() {
+  const accountUserID = activeAccount()?.userID || "";
+  if (!accountUserID) return;
+  const key = foregroundSyncLeaseKey(accountUserID);
+  if (readForegroundSyncLease(accountUserID)?.tabID === foregroundSyncTabID) {
+    localStorage.removeItem(key);
+    broadcastForegroundSyncSignal("leader-released");
+  }
+}
+
+function broadcastForegroundSyncSignal(type, details = {}) {
+  const accountUserID = activeAccount()?.userID || "";
+  if (!accountUserID) return;
+  const message = {
+    type,
+    accountUserID,
+    sourceTabID: foregroundSyncTabID,
+    sentAt: Date.now(),
+    ...details
+  };
+  foregroundSyncChannel?.postMessage(message);
+  try {
+    localStorage.setItem(foregroundSyncSignalKey, JSON.stringify(message));
+  } catch {
+    // BroadcastChannel remains the primary signal when storage is unavailable.
+  }
+}
+
+async function handleForegroundSyncSignal(message) {
+  const accountUserID = activeAccount()?.userID || "";
+  if (
+    !message ||
+    message.accountUserID !== accountUserID ||
+    message.sourceTabID === foregroundSyncTabID
+  ) return;
+  if (["leader-released", "sync-invalidated"].includes(message.type)) {
+    startForegroundSyncLoop({
+      immediate: true,
+      forceFull: message.type === "sync-invalidated"
+    });
+    return;
+  }
+  if (message.type !== "sync-complete" || isForegroundSyncLeader()) return;
+  const currentEventID = Number(syncedContent?.latestEventID || 0);
+  const checkpointChanged =
+    Number(message.latestEventID || 0) !== currentEventID ||
+    Number(message.contentMapVersion || 0) !== Number(syncedContent?.contentMapVersion || 0) ||
+    String(message.entitlementFingerprint || "") !== String(syncedContent?.entitlementFingerprint || "");
+  if (!checkpointChanged) return;
+  const snapshot = await loadOfflineSyncSnapshot(accountUserID).catch(() => null);
+  if (
+    activeAccount()?.userID !== accountUserID ||
+    Number(snapshot?.latestEventID || 0) < Number(message.latestEventID || 0)
+  ) return;
+  syncedContent = snapshot;
+  foregroundSyncLastFullPullAt = Date.parse(snapshot.pulledAt || "") || Date.now();
+  await renderWorkspace();
+}
+
+function ensureForegroundSyncChannel() {
+  if (foregroundSyncChannel || typeof BroadcastChannel !== "function") return;
+  foregroundSyncChannel = new BroadcastChannel("permitext-sync");
+  foregroundSyncChannel.addEventListener("message", (event) => {
+    void handleForegroundSyncSignal(event.data);
+  });
+}
+
+function scheduleForegroundSyncLeaderHeartbeat() {
+  clearTimeout(foregroundSyncLeaderTimer);
+  foregroundSyncLeaderTimer = window.setTimeout(() => {
+    if (!canRunForegroundSync() || !claimForegroundSyncLeadership()) {
+      startForegroundSyncLoop();
+      return;
+    }
+    scheduleForegroundSyncLeaderHeartbeat();
+  }, foregroundSyncSchedule.leaderHeartbeatMs);
+}
+
+function stopForegroundSyncLoop() {
+  clearTimeout(foregroundSyncTimer);
+  clearTimeout(foregroundSyncLeaderTimer);
+  foregroundSyncTimer = null;
+  foregroundSyncLeaderTimer = null;
+  releaseForegroundSyncLeadership();
+}
+
+async function performForegroundSync(options = {}) {
   if (!canRunForegroundSync()) return null;
   if (foregroundSyncPromise) return foregroundSyncPromise;
 
@@ -7964,7 +8115,32 @@ async function performForegroundSync() {
     if (!canRunForegroundSync()) return null;
 
     if (syncLoadPromise) await syncLoadPromise;
-    let content = await loadSyncedContent({ force: true, skipOutbox: true });
+    let content = syncedContent;
+    const forceFull = Boolean(
+      options.forceFull ||
+      syncResultChangesWorkspace(pushResult) ||
+      !content ||
+      Date.now() - foregroundSyncLastFullPullAt >= foregroundSyncSchedule.maximumStalenessMs
+    );
+    let checkpoint = null;
+    if (!forceFull) {
+      const account = activeAccount();
+      checkpoint = await postJSON("/sync/checkpoint", {
+        auth: { accountUserID },
+        sinceEventID: Number(content?.latestEventID || 0),
+        contentMapVersion: Number(content?.contentMapVersion || 0),
+        entitlementFingerprint: content?.entitlementFingerprint || ""
+      }, { token: account.sessionToken });
+    }
+    if (forceFull || syncCheckpointRequiresFullPull({
+      checkpoint,
+      latestEventID: content?.latestEventID,
+      contentMapVersion: content?.contentMapVersion,
+      entitlementFingerprint: content?.entitlementFingerprint,
+      lastFullPullAt: foregroundSyncLastFullPullAt
+    })) {
+      content = await loadSyncedContent({ force: true, skipOutbox: true });
+    }
     if (activeAccount()?.userID !== accountUserID) {
       await renderWorkspace();
       return content;
@@ -7985,26 +8161,36 @@ async function performForegroundSync() {
     return content;
   })().finally(() => {
     foregroundSyncPromise = null;
+    updateConnectionStatus();
   });
+  updateConnectionStatus();
   return foregroundSyncPromise;
 }
 
 function startForegroundSyncLoop(options = {}) {
-  stopForegroundSyncLoop();
+  clearTimeout(foregroundSyncTimer);
+  clearTimeout(foregroundSyncLeaderTimer);
+  foregroundSyncTimer = null;
+  foregroundSyncLeaderTimer = null;
   if (!canRunForegroundSync()) return;
+  ensureForegroundSyncChannel();
+  if (!claimForegroundSyncLeadership()) {
+    foregroundSyncLeaderTimer = window.setTimeout(
+      () => startForegroundSyncLoop(options),
+      foregroundSyncSchedule.leaderHeartbeatMs
+    );
+    return;
+  }
+  scheduleForegroundSyncLeaderHeartbeat();
   foregroundSyncTimer = window.setTimeout(async () => {
     try {
-      await performForegroundSync();
+      await performForegroundSync({ forceFull: options.forceFull });
     } catch {
       // The durable outbox and its exponential retry retain pending local changes.
     } finally {
       startForegroundSyncLoop();
     }
-  }, options.immediate ? 0 : Math.max(
-    500,
-    foregroundSyncIntervalMilliseconds +
-      Math.round((Math.random() * 2 - 1) * foregroundSyncJitterMilliseconds)
-  ));
+  }, options.immediate ? 0 : foregroundSyncDelay({ lastActivityAt: foregroundSyncLastActivityAt }));
 }
 
 async function pushMutation(mutation) {
@@ -23886,6 +24072,7 @@ function renderSettings() {
     } finally {
       await disableOfflineFeature().catch(() => {});
       if (account) persistCodeQuestionAccountState(account.userID);
+      stopForegroundSyncLoop();
       unloadCodeQuestionAccountState();
       clearResearchAccountRuntime();
       state.account = null;
@@ -23893,7 +24080,6 @@ function renderSettings() {
       organizationLoadPromise = null;
       persistAccountSession(null);
       syncedContent = null;
-      stopForegroundSyncLoop();
       saveWorkspaceState();
       await renderWorkspace();
     }
@@ -23947,6 +24133,7 @@ function renderSettings() {
         await deleteLocalWorkboard(projectID).catch(() => {});
       }
       await disableOfflineFeature().catch(() => {});
+      stopForegroundSyncLoop();
       clearResearchAccountRuntime();
       state.account = null;
       state.localProjects = [];
@@ -23974,7 +24161,6 @@ function renderSettings() {
       unloadCodeQuestionAccountState();
       removeCodeQuestionAccountState(localStorage, account.userID);
       persistAccountSession(null);
-      stopForegroundSyncLoop();
       Object.keys(localStorage)
         .filter((key) =>
           key.startsWith(`${baseWorkspaceKey}:detached:`) ||
@@ -28440,6 +28626,14 @@ async function start() {
   bindWorkspaceKeyboardNavigation();
   bindResearchTextSelection();
   window.addEventListener("storage", (event) => {
+    if (event.key === foregroundSyncSignalKey && event.newValue) {
+      try {
+        void handleForegroundSyncSignal(JSON.parse(event.newValue));
+      } catch {
+        // Ignore malformed cross-tab sync signals.
+      }
+      return;
+    }
     if (event.key === accountSessionKey) {
       let nextAccount = null;
       try {
@@ -28450,6 +28644,7 @@ async function start() {
       if (clientValuesMatch(state.account || null, nextAccount)) return;
       const previousUserID = state.account?.userID || "";
       if (previousUserID) persistCodeQuestionAccountState(previousUserID);
+      if (previousUserID !== (nextAccount?.userID || "")) stopForegroundSyncLoop();
       state.account = nextAccount;
       if (previousUserID !== (state.account?.userID || "")) clearResearchAccountRuntime();
       codeQuestionUnauthorizedAccountUserID = "";
@@ -28539,6 +28734,7 @@ async function start() {
       stopForegroundSyncLoop();
     }
   });
+  window.addEventListener("pagehide", stopForegroundSyncLoop);
   track.addEventListener("scroll", repositionActiveCustomSelect, { passive: true });
   track.addEventListener("scroll", scheduleVisibleReaderScrollIndicatorUpdates, { passive: true });
   bindHorizontalWheelScroll(track);

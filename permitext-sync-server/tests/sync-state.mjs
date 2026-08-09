@@ -3,9 +3,70 @@ import {
   bulkClearEventID,
   annotationAfterBulkClears,
   bulkClearTimestamp,
+  foregroundSyncDelay,
+  foregroundSyncSchedule,
   mergeNewestRecord,
-  recordSurvivesBulkClear
+  recordSurvivesBulkClear,
+  syncCheckpointRequiresFullPull,
+  syncLeaderLeaseIsAvailable
 } from "../public/sync-state.js";
+
+assert.equal(
+  foregroundSyncDelay({ now: 60_000, lastActivityAt: 0, random: 0.5 }),
+  foregroundSyncSchedule.activeIntervalMs,
+  "Recently active clients did not use the active checkpoint interval."
+);
+assert.equal(
+  foregroundSyncDelay({ now: 10 * 60_000, lastActivityAt: 0, random: 0.5 }),
+  foregroundSyncSchedule.recentlyActiveIntervalMs,
+  "Recently idle clients did not back off their checkpoint interval."
+);
+assert.equal(
+  foregroundSyncDelay({ now: 30 * 60_000, lastActivityAt: 0, random: 0.5 }),
+  foregroundSyncSchedule.idleIntervalMs,
+  "Idle clients did not use the longest checkpoint interval."
+);
+
+const unchangedCheckpoint = {
+  changed: false,
+  latestEventID: 12,
+  contentMapVersion: 2,
+  entitlementFingerprint: "entitlement-a"
+};
+assert.equal(syncCheckpointRequiresFullPull({
+  checkpoint: unchangedCheckpoint,
+  latestEventID: 12,
+  contentMapVersion: 2,
+  entitlementFingerprint: "entitlement-a",
+  lastFullPullAt: 10 * 60_000,
+  now: 20 * 60_000
+}), false, "An unchanged fresh checkpoint triggered a full pull.");
+assert.equal(syncCheckpointRequiresFullPull({
+  checkpoint: { ...unchangedCheckpoint, latestEventID: 13 },
+  latestEventID: 12,
+  contentMapVersion: 2,
+  entitlementFingerprint: "entitlement-a",
+  lastFullPullAt: 10 * 60_000,
+  now: 20 * 60_000
+}), true, "A remote-device event did not force a full pull.");
+assert.equal(syncCheckpointRequiresFullPull({
+  checkpoint: unchangedCheckpoint,
+  latestEventID: 12,
+  contentMapVersion: 2,
+  entitlementFingerprint: "entitlement-a",
+  lastFullPullAt: 0,
+  now: foregroundSyncSchedule.maximumStalenessMs
+}), true, "Maximum staleness did not force reconciliation.");
+
+assert.equal(syncLeaderLeaseIsAvailable(null, { accountUserID: "u1", tabID: "tab-2" }), true);
+assert.equal(syncLeaderLeaseIsAvailable({
+  accountUserID: "u1", tabID: "tab-1", expiresAt: 100
+}, { accountUserID: "u1", tabID: "tab-2", now: 50 }), false,
+"A follower stole an active leader lease.");
+assert.equal(syncLeaderLeaseIsAvailable({
+  accountUserID: "u1", tabID: "tab-1", expiresAt: 100
+}, { accountUserID: "u1", tabID: "tab-2", now: 101 }), true,
+"A crashed leader lease did not expire.");
 
 const canonicalVersion = "CodeContent/authored/new-york-city/2022-construction-codes/bundle.json#1";
 const clearRecords = [{

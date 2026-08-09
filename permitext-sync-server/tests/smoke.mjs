@@ -951,15 +951,20 @@ async function main() {
       "Divider resizing is no longer coalesced to animation frames."
     );
     assert(
-      workspaceScript.text.includes("const foregroundSyncIntervalMilliseconds = 30_000") &&
+      workspaceScript.text.includes('postJSON("/sync/checkpoint"') &&
+        workspaceScript.text.includes("syncCheckpointRequiresFullPull({") &&
+        workspaceScript.text.includes("foregroundSyncSchedule.maximumStalenessMs") &&
+        workspaceScript.text.includes("claimForegroundSyncLeadership()") &&
+        workspaceScript.text.includes('new BroadcastChannel("permitext-sync")') &&
+        workspaceScript.text.includes('broadcastForegroundSyncSignal("sync-invalidated"') &&
         workspaceScript.text.includes("function canRunForegroundSync()") &&
         workspaceScript.text.includes('document.visibilityState === "visible"') &&
         workspaceScript.text.includes("navigator.onLine") &&
-        workspaceScript.text.includes("async function performForegroundSync()") &&
+        workspaceScript.text.includes("async function performForegroundSync(options = {})") &&
         workspaceScript.text.includes("await loadSyncedContent({ force: true, skipOutbox: true })") &&
         workspaceScript.text.includes('window.addEventListener("offline"') &&
         workspaceScript.text.includes("startForegroundSyncLoop({ immediate: true })"),
-      "Visible web tabs no longer perform incremental foreground sync every 30 seconds."
+      "Visible web tabs no longer use adaptive, leader-elected checkpoint synchronization."
     );
     assert(
       workspaceScript.text.includes("const webFreePlanLimits = Object.freeze({ savedItems: 25, notes: 10 })") &&
@@ -1244,7 +1249,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260721-causal-clear-v4') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260809-adaptive-sync-v1') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1268,7 +1273,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-unified-research-v5'),
+        webRoot.text.includes('/web/app.js?v=20260809-adaptive-sync-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1804,8 +1809,9 @@ async function main() {
       "Cached remote data can bypass durable cross-device clears."
     );
     assert(
-      workspaceScript.text.includes("const foregroundSyncJitterMilliseconds = 3_000;") &&
-        workspaceScript.text.includes("Math.round((Math.random() * 2 - 1) * foregroundSyncJitterMilliseconds)") &&
+      workspaceScript.text.includes("foregroundSyncDelay({ lastActivityAt: foregroundSyncLastActivityAt })") &&
+        syncStateScript.text.includes("idleIntervalMs: 5 * 60_000") &&
+        syncStateScript.text.includes("maximumStalenessMs: 15 * 60_000") &&
         syncRepositorySource.includes("AND records.entity_kind = 'project'") &&
         syncRepositorySource.includes("allMutations: [...filteredRows, ...dependencyRows]") &&
         serverSource.includes("permitext_sync_events_user_record_event_idx"),
@@ -7092,6 +7098,58 @@ async function main() {
     assert(
       pull.json.mutations.some((item) => item.savedItem?.sectionID === 900001),
       "Pull did not return the pushed mutation."
+    );
+    assert(pull.json.entitlementFingerprint, "Full pull omitted its entitlement checkpoint fingerprint.");
+
+    const unchangedCheckpoint = await request("/sync/checkpoint", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        sinceEventID: pull.json.latestEventID,
+        contentMapVersion: pull.json.contentMapVersion,
+        entitlementFingerprint: pull.json.entitlementFingerprint
+      }
+    });
+    assert(unchangedCheckpoint.response.ok, "Unchanged sync checkpoint failed.");
+    assert(unchangedCheckpoint.json.changed === false, "An unchanged checkpoint requested a full pull.");
+
+    const checkpointMutation = {
+      annotation: {
+        id: `${userID}:annotation:${defaultSyncCodeVersion}:900001`,
+        userID,
+        codeVersion: defaultSyncCodeVersion,
+        sectionID: 900001,
+        noteBody: "Checkpoint mutation",
+        tags: [],
+        updatedAt: "2026-06-04T00:05:00Z"
+      }
+    };
+    const checkpointPush = await request("/sync/push", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        batch: { user: { id: userID }, mutations: [checkpointMutation] }
+      }
+    });
+    assert(checkpointPush.response.ok, "Checkpoint setup mutation failed.");
+
+    const changedCheckpoint = await request("/sync/checkpoint", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        sinceEventID: pull.json.latestEventID,
+        contentMapVersion: pull.json.contentMapVersion,
+        entitlementFingerprint: pull.json.entitlementFingerprint
+      }
+    });
+    assert(changedCheckpoint.response.ok, "Changed sync checkpoint failed.");
+    assert(changedCheckpoint.json.changed === true, "A remote-device event did not invalidate the checkpoint.");
+    assert(
+      changedCheckpoint.json.latestEventID > pull.json.latestEventID,
+      "Checkpoint did not expose the newer sync event."
     );
 
     const invalidInlineWorkboardPush = await request("/sync/push", {

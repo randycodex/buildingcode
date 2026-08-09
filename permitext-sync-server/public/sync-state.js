@@ -1,5 +1,61 @@
 import { syncCodeVersion } from "./sync-identity.js";
 
+export const foregroundSyncSchedule = Object.freeze({
+  activeWindowMs: 5 * 60_000,
+  recentlyActiveWindowMs: 15 * 60_000,
+  activeIntervalMs: 60_000,
+  recentlyActiveIntervalMs: 2 * 60_000,
+  idleIntervalMs: 5 * 60_000,
+  maximumStalenessMs: 15 * 60_000,
+  jitterMs: 5_000,
+  leaderLeaseMs: 45_000,
+  leaderHeartbeatMs: 15_000
+});
+
+export function foregroundSyncDelay({
+  now = Date.now(),
+  lastActivityAt = 0,
+  random = Math.random(),
+  schedule = foregroundSyncSchedule
+} = {}) {
+  const idleFor = Math.max(0, Number(now) - Number(lastActivityAt || 0));
+  const interval = idleFor < schedule.activeWindowMs
+    ? schedule.activeIntervalMs
+    : idleFor < schedule.recentlyActiveWindowMs
+      ? schedule.recentlyActiveIntervalMs
+      : schedule.idleIntervalMs;
+  const boundedRandom = Math.min(1, Math.max(0, Number(random) || 0));
+  const jitter = Math.round((boundedRandom * 2 - 1) * schedule.jitterMs);
+  return Math.max(500, interval + jitter);
+}
+
+export function syncCheckpointRequiresFullPull({
+  checkpoint,
+  latestEventID = 0,
+  contentMapVersion = 0,
+  entitlementFingerprint = "",
+  lastFullPullAt = 0,
+  now = Date.now(),
+  maximumStalenessMs = foregroundSyncSchedule.maximumStalenessMs
+} = {}) {
+  if (!checkpoint || checkpoint.changed === true) return true;
+  if (Number(checkpoint.latestEventID || 0) !== Number(latestEventID || 0)) return true;
+  if (Number(checkpoint.contentMapVersion || 0) !== Number(contentMapVersion || 0)) return true;
+  if (String(checkpoint.entitlementFingerprint || "") !== String(entitlementFingerprint || "")) return true;
+  return Number(now) - Number(lastFullPullAt || 0) >= maximumStalenessMs;
+}
+
+export function syncLeaderLeaseIsAvailable(lease, {
+  accountUserID = "",
+  tabID = "",
+  now = Date.now()
+} = {}) {
+  if (!lease || typeof lease !== "object") return true;
+  if (String(lease.accountUserID || "") !== String(accountUserID || "")) return true;
+  if (String(lease.tabID || "") === String(tabID || "")) return true;
+  return Number(lease.expiresAt || 0) <= Number(now);
+}
+
 export function bulkClearScope(record) {
   return String(record?.values?.scope || "").trim();
 }

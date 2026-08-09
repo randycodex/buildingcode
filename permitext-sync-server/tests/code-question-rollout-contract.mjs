@@ -328,7 +328,7 @@ assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ens
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
 assert.match(workspaceHTML, /styles\.css\?v=20260809-unified-research-v5/);
-assert.match(serviceWorker, /permitext-pro-shell-v531/);
+assert.match(serviceWorker, /permitext-pro-shell-v532/);
 assert.match(serviceWorker, /styles\.css\?v=20260809-unified-research-v5/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
