@@ -162,6 +162,43 @@ export function isCodeQuestionPaneID(paneID) {
   return Boolean(parseQuestionPaneKey(paneID));
 }
 
+/**
+ * The compact Code Decision context bar belongs to an open decision surface,
+ * not merely to a question that remains selected in saved workspace state.
+ */
+export function codeDecisionContextIsVisible(value = {}, options = {}) {
+  const activeQuestionID = String(value?.activeQuestionID || "").trim();
+  const projectID = String(options.projectID || "").trim();
+  if (!activeQuestionID || !projectID) return false;
+
+  const hasOpenDecisionPane = (Array.isArray(value?.openPanes) ? value.openPanes : [])
+    .map(normalizeOpenQuestionPane)
+    .filter(Boolean)
+    .some((pane) =>
+      pane.projectID === projectID && pane.questionID === activeQuestionID
+    );
+  if (hasOpenDecisionPane) return true;
+
+  const researchConversationID = String(options.researchConversationID || "").trim();
+  const linkedResearchConversationID = String(options.linkedResearchConversationID || "").trim();
+  return Boolean(
+    researchConversationID &&
+    linkedResearchConversationID &&
+    researchConversationID === linkedResearchConversationID
+  );
+}
+
+export function closeCodeDecisionContext(value = {}) {
+  return {
+    ...(value && typeof value === "object" ? copy(value) : emptyCodeQuestionWorkspaceState()),
+    activeQuestionID: "",
+    openPanes: [],
+    questionIndexOpen: false,
+    moreMenuOpen: false,
+    deepLink: null
+  };
+}
+
 export function normalizeOpenQuestionPane(value) {
   if (!value || typeof value !== "object") return null;
   const projectID = String(value.projectID || "").trim();

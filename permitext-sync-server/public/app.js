@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-decision-entry-v1";
+} from "./offline-storage.js?v=20260809-context-bar-visibility-v3";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,9 @@ import {
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
+  closeCodeDecisionContext,
   closeCodeQuestionPane,
+  codeDecisionContextIsVisible,
   codeQuestionMoreTools,
   codeQuestionPaneIDsFromState,
   deriveQuestionListLabel,
@@ -82,7 +84,7 @@ import {
   questionPaneKey,
   switchActiveProject as switchCodeQuestionProject,
   switchActiveQuestion as switchCodeQuestionQuestion
-} from "./code-question-workspace.js?v=20260809-project-decision-entry-v1";
+} from "./code-question-workspace.js?v=20260809-context-bar-visibility-v3";
 import {
   acknowledgeCodeQuestionMutation,
   codeQuestionAccountDomainState,
@@ -24425,6 +24427,12 @@ function renderCodeDecisionContextBar(project) {
   if (!codeQuestionWorkspaceEnabled() || !project) return null;
   const cq = codeQuestionWorkspaceState();
   if (!cq.activeQuestionID) return null;
+  const linkedResearchConversationID = linkedResearchConversationIDForQuestion(cq.activeQuestionID);
+  if (!codeDecisionContextIsVisible(cq, {
+    projectID: activeProjectIDForCodeQuestions(),
+    researchConversationID: state.utilities.analysis ? state.researchConversationID : "",
+    linkedResearchConversationID
+  })) return null;
   const question = questionsForActiveProject().find((item) => item.id === cq.activeQuestionID);
   const presentation = codeDecisionPresentation(cq.activeQuestionID);
   const bar = document.createElement("div");
@@ -27908,6 +27916,11 @@ async function closeAllColumns() {
   state.utilityInstances = [];
   state.researchConversationID = "";
   activeResearchConversation = null;
+  setCodeQuestionWorkspaceState(
+    closeCodeDecisionContext(codeQuestionWorkspaceState()),
+    { activeProjectID: "", syncDeepLink: true }
+  );
+  document.querySelector(".code-decision-context-bar")?.remove();
   state.paneOrder = [];
   state.paneWeights = {};
   state.trackScrollLeft = 0;

@@ -1269,7 +1269,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-project-decision-entry-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-context-bar-visibility-v3'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
