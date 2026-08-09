@@ -5256,7 +5256,9 @@ mark {
 
 .evidence-discovery-summary {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 2px;
+  align-items: center;
   padding-top: var(--space-2);
 }
 
@@ -5266,8 +5268,62 @@ mark {
 }
 
 .evidence-discovery-summary span {
+  grid-column: 1;
   color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.72) !important;
+}
+
+.evidence-candidate-view-all {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.evidence-candidate-navigator {
+  display: grid;
+  border-top: 1px solid var(--border);
+}
+
+.evidence-candidate-navigator-item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  min-height: 42px;
+  padding: 7px 0;
+  border: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.evidence-candidate-navigator-item strong {
+  overflow: hidden;
+  color: var(--text-primary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.evidence-candidate-navigator-item small {
+  color: var(--text-secondary);
+}
+
+.evidence-candidate-navigator-item.is-active {
+  color: var(--code-accent);
+}
+
+.evidence-candidate-navigator-item.is-selected small {
+  color: #12b76a;
+}
+
+.evidence-candidate-navigator-item.is-rejected small {
+  color: #d92d20;
 }
 
 .evidence-discovery-limitations,
@@ -5343,7 +5399,6 @@ mark {
 }
 
 .evidence-candidate-card.is-rejected {
-  opacity: 0.68;
   background: transparent;
 }
 
@@ -5573,6 +5628,11 @@ mark {
   margin-bottom: 0;
 }
 
+.evidence-candidate-card.is-active-review blockquote {
+  max-height: none;
+  overflow: visible;
+}
+
 .evidence-candidate-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5591,6 +5651,34 @@ mark {
 .evidence-candidate-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.52;
+}
+
+.evidence-candidate-navigation {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.evidence-candidate-navigation span {
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.68) !important;
+  text-align: center;
+}
+
+.evidence-candidate-navigation button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-primary);
+}
+
+.evidence-candidate-navigation button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .evidence-candidate-approve[aria-pressed="true"] {

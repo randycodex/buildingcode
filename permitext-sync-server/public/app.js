@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-context-bar-removal-v1";
+} from "./offline-storage.js?v=20260809-candidate-queue-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13662,11 +13662,47 @@ function renderEvidenceDiscovery(container) {
       candidate.reviewState === "approved" &&
       evidenceCandidatePreparationReady(candidate)
     );
+    const rejectedCount = candidates.filter((candidate) => candidate.reviewState === "rejected").length;
+    const notReviewedCount = candidates.length - approved.length - rejectedCount;
+    const requestedCandidateIndex = candidates.findIndex((candidate) => candidate.id === discovery.activeCandidateID);
+    const candidateIndex = requestedCandidateIndex === -1 ? 0 : requestedCandidateIndex;
+    discovery.activeCandidateID = candidates[candidateIndex]?.id || "";
+    const showCandidate = (nextIndex, options = {}) => {
+      if (!candidates.length) return;
+      const boundedIndex = Math.min(Math.max(0, nextIndex), candidates.length - 1);
+      discovery.activeCandidateID = candidates[boundedIndex].id;
+      renderResults();
+      if (options.focus !== false) {
+        requestAnimationFrame(() => results.querySelector(".evidence-candidate-card")?.focus({ preventScroll: true }));
+      }
+    };
+    const advanceAfterDisposition = () => {
+      const nextUnreviewedIndex = candidates.findIndex((candidate, index) =>
+        index > candidateIndex && !["approved", "rejected"].includes(candidate.reviewState)
+      );
+      showCandidate(nextUnreviewedIndex === -1 ? Math.min(candidateIndex + 1, candidates.length - 1) : nextUnreviewedIndex);
+    };
     const summary = document.createElement("div");
     summary.className = "evidence-discovery-summary";
     const summaryText = document.createElement("strong");
-    summaryText.textContent = `${candidates.length} review ${candidates.length === 1 ? "candidate" : "candidates"}`;
-    summary.append(summaryText);
+    summaryText.textContent = candidates.length
+      ? `Candidate ${candidateIndex + 1} of ${candidates.length}`
+      : "No review candidates";
+    const progress = document.createElement("span");
+    progress.setAttribute("role", "status");
+    progress.setAttribute("aria-live", "polite");
+    progress.textContent = `${approved.length} selected · ${rejectedCount} rejected · ${notReviewedCount} not reviewed`;
+    const viewAll = document.createElement("button");
+    viewAll.type = "button";
+    viewAll.className = "evidence-candidate-view-all";
+    viewAll.textContent = discovery.candidateNavigatorOpen ? "Hide list" : "View all";
+    viewAll.setAttribute("aria-expanded", String(discovery.candidateNavigatorOpen === true));
+    viewAll.disabled = candidates.length === 0;
+    viewAll.addEventListener("click", () => {
+      discovery.candidateNavigatorOpen = discovery.candidateNavigatorOpen !== true;
+      renderResults();
+    });
+    summary.append(summaryText, progress, viewAll);
     results.append(summary);
 
     if (response.outsideCurrentLibrary?.length) {
@@ -13694,12 +13730,44 @@ function renderEvidenceDiscovery(container) {
       results.append(outside);
     }
 
+    if (discovery.candidateNavigatorOpen && candidates.length) {
+      const navigator = document.createElement("nav");
+      navigator.className = "evidence-candidate-navigator";
+      navigator.setAttribute("aria-label", "Review candidates");
+      candidates.forEach((candidate, index) => {
+        const option = document.createElement("button");
+        option.type = "button";
+        option.className = "evidence-candidate-navigator-item";
+        option.classList.toggle("is-active", index === candidateIndex);
+        option.classList.toggle("is-selected", candidate.reviewState === "approved");
+        option.classList.toggle("is-rejected", candidate.reviewState === "rejected");
+        option.setAttribute("aria-current", index === candidateIndex ? "true" : "false");
+        option.innerHTML = `
+          <span>${index + 1}</span>
+          <strong>${escapeHTML(evidenceCandidateCitation(candidate))}</strong>
+          <small>${escapeHTML(candidate.reviewState === "approved" ? "Selected" : candidate.reviewState === "rejected" ? "Rejected" : "Not reviewed")}</small>`;
+        option.addEventListener("click", () => {
+          discovery.candidateNavigatorOpen = false;
+          showCandidate(index);
+        });
+        navigator.append(option);
+      });
+      results.append(navigator);
+    }
+
     const tray = document.createElement("section");
     tray.className = "evidence-candidate-tray";
-    candidates.forEach((candidate) => {
+    const candidate = candidates[candidateIndex];
+    if (candidate) {
       const reviewState = candidate.reviewState || "candidate";
       const card = document.createElement("article");
-      card.className = `evidence-candidate-card is-${reviewState}`;
+      card.className = `evidence-candidate-card is-active-review is-${reviewState}`;
+      card.tabIndex = -1;
+      card.addEventListener("keydown", (event) => {
+        if (event.target !== card || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+        event.preventDefault();
+        showCandidate(candidateIndex + (event.key === "ArrowRight" ? 1 : -1));
+      });
       const cardHeader = document.createElement("div");
       cardHeader.className = "evidence-candidate-heading";
       const citationWrap = document.createElement("div");
@@ -13707,7 +13775,9 @@ function renderEvidenceDiscovery(container) {
       rank.className = "evidence-candidate-rank";
       rank.textContent = `#${candidate.rank}`;
       const citation = document.createElement("strong");
+      citation.id = `evidence-candidate-${candidate.id}`;
       citation.textContent = evidenceCandidateCitation(candidate);
+      card.setAttribute("aria-labelledby", citation.id);
       const title = document.createElement("p");
       title.textContent = candidate.title || "Enacted section";
       citationWrap.append(citation, title);
@@ -13866,8 +13936,13 @@ function renderEvidenceDiscovery(container) {
       }
       approveButton.addEventListener("click", () => {
         if (!evidenceCandidatePreparationReady(candidate)) return;
-        candidate.reviewState = reviewState === "approved" ? "candidate" : "approved";
-        renderResults();
+        if (reviewState === "approved") {
+          candidate.reviewState = "candidate";
+          renderResults();
+          return;
+        }
+        candidate.reviewState = "approved";
+        advanceAfterDisposition();
       });
       const rejectButton = document.createElement("button");
       rejectButton.type = "button";
@@ -13875,8 +13950,13 @@ function renderEvidenceDiscovery(container) {
       rejectButton.textContent = reviewState === "rejected" ? "Rejected" : "Reject";
       rejectButton.setAttribute("aria-pressed", String(reviewState === "rejected"));
       rejectButton.addEventListener("click", () => {
-        candidate.reviewState = reviewState === "rejected" ? "candidate" : "rejected";
-        renderResults();
+        if (reviewState === "rejected") {
+          candidate.reviewState = "candidate";
+          renderResults();
+          return;
+        }
+        candidate.reviewState = "rejected";
+        advanceAfterDisposition();
       });
       const openButton = document.createElement("button");
       openButton.type = "button";
@@ -13898,7 +13978,23 @@ function renderEvidenceDiscovery(container) {
       }
       card.append(actions);
       tray.append(card);
-    });
+      const navigation = document.createElement("div");
+      navigation.className = "evidence-candidate-navigation";
+      const previous = document.createElement("button");
+      previous.type = "button";
+      previous.textContent = "Previous";
+      previous.disabled = candidateIndex === 0;
+      previous.addEventListener("click", () => showCandidate(candidateIndex - 1));
+      const next = document.createElement("button");
+      next.type = "button";
+      next.textContent = "Next";
+      next.disabled = candidateIndex >= candidates.length - 1;
+      next.addEventListener("click", () => showCandidate(candidateIndex + 1));
+      const hint = document.createElement("span");
+      hint.textContent = "Next skips this candidate without rejecting it.";
+      navigation.append(previous, hint, next);
+      tray.append(navigation);
+    }
     results.append(tray);
 
     const prepare = document.createElement("section");
@@ -14001,6 +14097,8 @@ function renderEvidenceDiscovery(container) {
         accountUserID: activeAccount()?.userID || "",
         question: normalizedQuestion,
         projectID: projectSelect.value,
+        activeCandidateID: response.candidates?.[0]?.id || "",
+        candidateNavigatorOpen: false,
         response: {
           ...response,
           candidates: (response.candidates || []).map((candidate) => ({
