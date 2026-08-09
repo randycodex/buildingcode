@@ -5342,9 +5342,9 @@ mark {
 
 .evidence-candidate-card {
   display: grid;
-  gap: var(--space-2);
-  padding: var(--space-3) 0;
-  border-top: 1px solid var(--border);
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
   border-radius: 0;
   background: transparent;
 }
@@ -5361,8 +5361,8 @@ mark {
 .evidence-candidate-heading {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-2);
-  align-items: start;
+  gap: var(--space-1);
+  align-items: baseline;
 }
 
 .evidence-candidate-heading > div {
@@ -5377,48 +5377,45 @@ mark {
 }
 
 .evidence-candidate-heading strong {
-  color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 0.86) !important;
+  color: var(--code-accent);
+  font-size: calc(var(--chrome-font-size) * 0.77) !important;
+  font-weight: 650;
+  line-height: 1.2;
 }
 
 .evidence-candidate-heading p {
-  overflow: hidden;
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.74) !important;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--text-primary);
+  font-size: calc(var(--chrome-font-size) * 0.946) !important;
+  font-weight: 650;
+  line-height: 1.25;
 }
 
 .evidence-candidate-rank {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--ios-accent-building) 20%, var(--surface));
-  color: var(--text-primary);
-  font-size: calc(var(--chrome-font-size) * 0.7) !important;
-  font-weight: 700;
+  color: var(--code-accent);
+  font-size: calc(var(--chrome-font-size) * 0.77) !important;
+  font-weight: 650;
+  line-height: 1.2;
 }
 
 .evidence-candidate-state {
   grid-column: 1 / -1;
   width: fit-content;
-  padding: 5px 8px;
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--text-primary) 9%, var(--surface));
-  color: var(--text-secondary);
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--code-accent);
   font-size: calc(var(--chrome-font-size) * 0.68) !important;
   font-weight: 650;
 }
 
 .is-approved .evidence-candidate-state {
-  background: color-mix(in srgb, #12b76a 24%, var(--surface));
-  color: var(--text-primary);
+  background: transparent;
+  color: #12b76a;
 }
 
 .is-rejected .evidence-candidate-state {
-  background: color-mix(in srgb, #d92d20 14%, var(--surface));
+  background: transparent;
+  color: #d92d20;
 }
 
 .evidence-candidate-why,
@@ -5563,12 +5560,12 @@ mark {
 .evidence-candidate-card blockquote {
   max-height: 180px;
   margin: 0;
-  padding: var(--space-3);
+  padding: 0;
   overflow: auto;
   border: 0;
-  border-radius: var(--radius-card);
-  background: color-mix(in srgb, var(--text-primary) 5%, var(--surface));
-  color: var(--text-primary);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
   font-size: calc(var(--chrome-font-size) * 0.8) !important;
   line-height: 1.5;
 }
@@ -5577,12 +5574,14 @@ mark {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
+  margin-top: var(--space-1);
 }
 
 .evidence-candidate-actions button {
   min-width: 0;
   padding: 0 7px;
-  background: color-mix(in srgb, var(--text-primary) 10%, var(--surface));
+  border: 1px solid var(--border);
+  background: transparent;
   color: var(--text-primary);
 }
 
