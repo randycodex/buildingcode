@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-starter-bubble-removal-v1";
+} from "./offline-storage.js?v=20260809-research-composer-clean-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -15310,10 +15310,15 @@ async function renderResearchConversation(conversationID) {
   input.className = "research-question-input";
   input.rows = 3;
   input.maxLength = 2000;
-  input.placeholder = "Ask about the attached enacted text…";
-  input.value = researchQuestionDraft || (
-    conversation.messages.length === 0 ? conversation.starterQuestion || "" : ""
-  );
+  const starterAnalysisQuestion = conversation.messages.length === 0
+    ? conversation.starterQuestion || ""
+    : "";
+  input.placeholder = starterAnalysisQuestion
+    ? "Ask a follow-up, or analyze the Research question…"
+    : "Ask about the attached enacted text…";
+  input.value = researchQuestionDraft && researchQuestionDraft !== starterAnalysisQuestion
+    ? researchQuestionDraft
+    : "";
   const sendButton = document.createElement("button");
   sendButton.className = "ghost-button research-send-button";
   sendButton.type = "submit";
@@ -15327,7 +15332,7 @@ async function renderResearchConversation(conversationID) {
     conversation.sourceStatus === "changed" ||
     projectContextBlocked ||
     evidenceRequired ||
-    input.value.trim().length < 3;
+    (input.value.trim() || starterAnalysisQuestion).length < 3;
   if (!researchEnabled) {
     input.disabled = true;
     input.placeholder = "Research Add-On required to continue this conversation…";
@@ -15345,11 +15350,11 @@ async function renderResearchConversation(conversationID) {
       conversation.sourceStatus === "changed" ||
       projectContextBlocked ||
       evidenceRequired ||
-      input.value.trim().length < 3;
+      (input.value.trim() || starterAnalysisQuestion).length < 3;
   });
   composer.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const question = input.value.trim();
+    const question = input.value.trim() || starterAnalysisQuestion;
     if (question.length < 3 || sendButton.disabled) return;
     input.disabled = true;
     sendButton.disabled = true;
