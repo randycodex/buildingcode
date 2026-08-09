@@ -496,6 +496,14 @@ body.code-question-workspace-enabled .workspace-shell {
   grid-template-rows: var(--header-height) auto minmax(0, 1fr);
 }
 
+body.code-question-workspace-enabled .code-decision-context-bar {
+  grid-row: 2;
+}
+
+body.code-question-workspace-enabled .panel-track {
+  grid-row: 3;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -10799,7 +10807,8 @@ body.is-resizing-research-evidence * {
     width: 38px;
   }
 
-  .panel-track {
+  .panel-track,
+  body.code-question-workspace-enabled .panel-track {
     grid-row: 1;
     width: 100%;
     overflow-x: auto;
