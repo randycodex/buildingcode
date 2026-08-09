@@ -12509,6 +12509,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   min-width: 288px;
 }
 
+.code-question-panel[data-cq-role="question-index"] {
+  min-width: 600px;
+}
+
 .code-question-panel-body {
   min-height: 0;
   padding: 12px 16px 20px;
