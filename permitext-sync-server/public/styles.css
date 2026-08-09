@@ -5641,7 +5641,7 @@ mark {
   gap: var(--space-1);
   padding: var(--space-2) 0;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--research-conversation-background);
 }
 
 .evidence-candidate-actions {
