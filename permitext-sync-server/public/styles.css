@@ -4944,15 +4944,56 @@ mark {
   color: var(--text-primary);
 }
 
-.research-result-answer,
-.research-result-application {
+.research-answer-primary,
+.research-answer-explanation {
   margin: 0;
   color: var(--text-primary);
-  line-height: 1.55;
+  line-height: 1.6;
+  white-space: pre-line;
 }
 
-.research-result-answer {
-  font-weight: 500;
+.research-answer-primary {
+  font-size: 1.02rem;
+  font-weight: 650;
+}
+
+.research-answer-explanation {
+  font-weight: 400;
+}
+
+.research-answer-boundary {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: calc(var(--chrome-font-size) * 0.8) !important;
+  line-height: 1.4;
+}
+
+.research-answer-details {
+  border-top: 1px solid var(--border);
+}
+
+.research-answer-details > summary {
+  cursor: pointer;
+  padding: var(--space-3) 0;
+  color: var(--text-secondary);
+  font-weight: 650;
+}
+
+.research-answer-details > summary:focus-visible {
+  outline: 2px solid var(--code-accent, var(--text-primary));
+  outline-offset: 3px;
+  border-radius: var(--radius-control);
+}
+
+.research-answer-details-body {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0 0 var(--space-3);
+}
+
+.research-answer-details-body .research-result-subheading {
+  margin: 0;
+  font-size: calc(var(--chrome-font-size) * 0.9) !important;
 }
 
 .research-supported-points {
@@ -6479,8 +6520,8 @@ body.is-resizing-research-evidence * {
 
 .research-message.is-assistant .research-result-card {
   padding: var(--space-4);
-  border: 1px solid var(--border);
-  background: var(--surface-muted);
+  border: 0;
+  background: transparent;
 }
 
 .research-message.is-assistant {

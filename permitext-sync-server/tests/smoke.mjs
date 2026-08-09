@@ -1249,7 +1249,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260809-adaptive-sync-v1') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260809-conversational-answer-v1') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1273,7 +1273,14 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-adaptive-sync-v1'),
+        workspaceScript.text.includes('answer.className = "research-answer-primary"') &&
+        workspaceScript.text.includes('explanation.className = "research-answer-explanation"') &&
+        workspaceScript.text.includes('summary.textContent = "Review evidence, assumptions, and limits"') &&
+        workspaceScript.text.includes('details.open = Boolean(options.detailsOpen)') &&
+        workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
+        workspaceScript.text.includes('"Based only on selected Research evidence"') &&
+        workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
+        webRoot.text.includes('/web/app.js?v=20260809-conversational-answer-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1415,7 +1422,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-unified-research-v5'),
+        webRoot.text.includes('/web/styles.css?v=20260809-conversational-answer-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1663,7 +1670,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-unified-research-v5'),
+        webRoot.text.includes('/web/styles.css?v=20260809-conversational-answer-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -3951,6 +3958,8 @@ async function main() {
     assert(
       conversationMessage.json.conversation.messages.length === 2 &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints.length === 1 &&
+        conversationMessage.json.conversation.messages[1].answer.promptVersion.endsWith(":conversational-v1") &&
+        conversationMessage.json.conversation.messages[1].answer.conclusion.startsWith("The selected provisions provide a conditional answer") &&
         conversationMessage.json.conversation.messages[1].answer.supportedPoints[0].sourceIDs[0] ===
           conversationMessage.json.conversation.messages[1].answer.citations[0].sourceIDs[0] &&
         conversationMessage.json.conversation.messages[1].answer.citations[0].sectionID === "8881" &&

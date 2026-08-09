@@ -313,6 +313,21 @@ assert.doesNotMatch(ensureShellSource, /!currentProjectPanes\.some\(\(pane\) => 
 assert.doesNotMatch(workspaceScript, /Question ready from Code Decision/);
 assert.doesNotMatch(workspaceScript, /Question ready from Notebook|notebook-research-draft/);
 assert.doesNotMatch(workspaceScript, /decisionHeading\.textContent/);
+const researchInterpretationSource = workspaceScript.slice(
+  workspaceScript.indexOf("function renderResearchInterpretation"),
+  workspaceScript.indexOf("async function renderUtilityInstance")
+);
+assert.match(researchInterpretationSource, /research-answer-primary/);
+assert.match(researchInterpretationSource, /research-answer-explanation/);
+assert.match(researchInterpretationSource, /Review evidence, assumptions, and limits/);
+assert.match(researchInterpretationSource, /appendResearchSupportedPoints\(detailsBody/);
+assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Assumptions used"/);
+assert.match(researchInterpretationSource, /appendResearchUnresolved\(detailsBody/);
+assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Related evidence to add"/);
+assert.match(researchInterpretationSource, /Based only on selected Research evidence/);
+assert.match(researchInterpretationSource, /card\.append\(details\)[\s\S]*?card\.append\(disclaimer\)/);
+assert.doesNotMatch(researchInterpretationSource, /answerHeading|Practical application/);
+assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true \}\)/);
 
 const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
 const workspaceHTML = await readFile(new URL("../public/index.html", import.meta.url), "utf8");
@@ -327,9 +342,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-unified-research-v5/);
-assert.match(serviceWorker, /permitext-pro-shell-v532/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-unified-research-v5/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-conversational-answer-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v533/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-conversational-answer-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
@@ -339,6 +354,8 @@ assert.match(workspaceStyles, /\.evidence-candidate-card\.is-active-review block
 assert.match(workspaceStyles, /\.evidence-candidate-navigator-item \{[\s\S]*?border-bottom: 1px solid var\(--border\);/);
 assert.match(workspaceStyles, /\.evidence-candidate-navigation \{[\s\S]*?grid-template-columns: auto minmax\(0, 1fr\) auto;/);
 assert.match(workspaceStyles, /\.evidence-candidate-controls \{[\s\S]*?position: sticky;[\s\S]*?top: 0;[\s\S]*?z-index: 4;[\s\S]*?background: var\(--research-conversation-background\);/);
+assert.match(workspaceStyles, /\.research-message\.is-assistant \.research-result-card \{[\s\S]*?border: 0;[\s\S]*?background: transparent;/);
+assert.match(workspaceStyles, /\.research-answer-details > summary:focus-visible/);
 assert.match(workspaceScript, /visibleCandidateCount: Math\.min\(3, rankedCandidates\.length\)/);
 assert.match(workspaceScript, /const candidate = visibleCandidates\[candidateIndex\]/);
 assert.match(workspaceScript, /Candidate \$\{candidateIndex \+ 1\} of \$\{visibleCandidates\.length\}/);

@@ -645,6 +645,8 @@ async function main() {
     const firstResearchAnswerMessage = researchMessage.conversation.messages.find((item) => item.role === "assistant");
     assert.ok(capturedMessage?.id);
     assert.ok(firstResearchAnswerMessage?.id);
+    assert.ok(firstResearchAnswerMessage.answer.promptVersion.endsWith(":conversational-v1"));
+    assert.match(firstResearchAnswerMessage.answer.conclusion, /^(?:Potentially, yes|The selected provisions provide a conditional answer)/);
     const firstResearchAnswer = await expectStatus(
       await postAs(editor, "/research/answers/get", { answerID: firstResearchAnswerMessage.id }),
       200,
@@ -658,6 +660,10 @@ async function main() {
       capturedAt: firstResearchAnswer.answer.decisionContextSnapshot.capturedAt
     });
     assert.ok(Number.isFinite(Date.parse(firstResearchAnswer.answer.decisionContextSnapshot.capturedAt)));
+    assert.equal(
+      firstResearchAnswer.answer.answer.promptVersion,
+      firstResearchAnswerMessage.answer.promptVersion
+    );
     const decisionAfterOrdinaryResearch = await expectStatus(
       await postAs(editor, "/projects/code-questions/state", { projectID, questionID: question.id }),
       200,
@@ -1408,6 +1414,10 @@ async function main() {
       analysisPayload.answer.evidence.map((item) => item.sourceID),
       [snapshot.id],
       "Analysis used evidence outside the approved set."
+    );
+    assert.ok(
+      !analysisPayload.answer.answer.promptVersion.endsWith(":conversational-v1"),
+      "Governed Code Decision analysis must retain its formal prompt provenance."
     );
     const analysisReplay = await postAs(editor, "/projects/code-questions/analysis/create", {
       projectID,

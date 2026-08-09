@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-adaptive-sync-v1";
+} from "./sync-state.js?v=20260809-conversational-answer-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-adaptive-sync-v1";
+} from "./offline-storage.js?v=20260809-conversational-answer-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-unified-research-v5";
+} from "./workspace-state.js?v=20260809-conversational-answer-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12957,7 +12957,7 @@ function wireUtilityInstanceActions(panel, instance) {
 
 function appendResearchList(container, title, items) {
   if (!items?.length) return;
-  const heading = document.createElement("strong");
+  const heading = document.createElement("h4");
   heading.className = "research-result-subheading";
   heading.textContent = title;
   const list = document.createElement("ul");
@@ -12985,7 +12985,7 @@ function researchDisplayList(values) {
 
 function appendResearchSupportedPoints(container, points) {
   if (!points?.length) return;
-  const heading = document.createElement("strong");
+  const heading = document.createElement("h4");
   heading.className = "research-result-subheading";
   heading.textContent = "What the selected evidence establishes";
   const list = document.createElement("ol");
@@ -13009,7 +13009,7 @@ function appendResearchUnresolved(container, result) {
   ].filter(([, items]) => items?.length);
   if (!groups.length) return;
 
-  const heading = document.createElement("strong");
+  const heading = document.createElement("h4");
   heading.className = "research-result-subheading";
   heading.textContent = "What remains unresolved";
   const section = document.createElement("section");
@@ -13141,26 +13141,54 @@ function renderResearchInterpretation(container, result, options = {}) {
 
   const card = document.createElement("article");
   card.className = "analysis-card research-result-card";
-  const answerHeading = document.createElement("strong");
-  answerHeading.className = "research-result-subheading";
-  answerHeading.textContent = "Answer";
   const answer = document.createElement("p");
-  answer.className = "research-result-answer";
+  answer.className = "research-answer-primary";
   answer.textContent = researchDisplayText(result.conclusion);
   const explanation = document.createElement("p");
-  explanation.className = "research-result-application";
+  explanation.className = "research-answer-explanation";
   explanation.textContent = researchDisplayText(result.explanation);
-  card.append(answerHeading, answer);
-  appendResearchSupportedPoints(card, result.supportedPoints);
-  const explanationHeading = document.createElement("strong");
-  explanationHeading.className = "research-result-subheading";
-  explanationHeading.textContent = result.supportedPoints?.length
-    ? "Practical application"
-    : "Explanation";
-  card.append(explanationHeading, explanation);
-  appendResearchList(card, "Assumptions used", result.assumptions);
-  appendResearchUnresolved(card, result);
-  appendResearchList(card, "Related evidence to add", result.additionalEvidenceNeeded);
+  card.append(answer, explanation);
+
+  const missingFactCount = result.missingFacts?.length || 0;
+  const evidenceLimitCount = result.evidenceLimitations?.length || 0;
+  const boundary = document.createElement("p");
+  boundary.className = "research-answer-boundary";
+  boundary.textContent = [
+    "Based only on selected Research evidence",
+    missingFactCount ? `${missingFactCount} project ${missingFactCount === 1 ? "fact remains" : "facts remain"} unresolved` : "No unresolved project facts identified",
+    evidenceLimitCount ? `${evidenceLimitCount} evidence ${evidenceLimitCount === 1 ? "limit" : "limits"}` : "No additional evidence limits identified"
+  ].join(" · ");
+  card.append(boundary);
+
+  const details = document.createElement("details");
+  details.className = "research-answer-details";
+  details.open = Boolean(options.detailsOpen);
+  const summary = document.createElement("summary");
+  summary.textContent = "Review evidence, assumptions, and limits";
+  const detailsBody = document.createElement("section");
+  detailsBody.className = "research-answer-details-body";
+  appendResearchSupportedPoints(detailsBody, result.supportedPoints);
+  appendResearchList(detailsBody, "Assumptions used", result.assumptions);
+  appendResearchUnresolved(detailsBody, result);
+  appendResearchList(detailsBody, "Related evidence to add", result.additionalEvidenceNeeded);
+  if (result.citations?.length) {
+    const citationsHeading = document.createElement("h4");
+    citationsHeading.className = "research-result-subheading";
+    citationsHeading.textContent = "Cited selected evidence";
+    const citations = document.createElement("ul");
+    citations.className = "research-result-list research-answer-citations";
+    result.citations.forEach((citation) => {
+      const row = document.createElement("li");
+      row.textContent = [
+        citation.codePrefix,
+        citation.sectionNumber ? `§ ${citation.sectionNumber}` : citation.title
+      ].filter(Boolean).join(" ");
+      citations.append(row);
+    });
+    detailsBody.append(citationsHeading, citations);
+  }
+  details.append(summary, detailsBody);
+  card.append(details);
 
   const disclaimer = document.createElement("p");
   disclaimer.className = "research-disclaimer";
@@ -15072,7 +15100,7 @@ function renderHistoricalResearchRecord(container, answerRecord) {
 
   const exactAnswer = document.createElement("section");
   exactAnswer.className = "research-historical-answer";
-  renderResearchInterpretation(exactAnswer, answerRecord.answer);
+  renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true });
 
   const evidenceHeading = document.createElement("strong");
   evidenceHeading.textContent = "Cited evidence snapshots";

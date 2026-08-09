@@ -5311,19 +5311,30 @@ export function researchInputForEvidence(question, evidence, options = {}) {
   return [{ role: "user", content }];
 }
 
-function mockResearchInterpretation(question, evidence) {
+function mockResearchInterpretation(question, evidence, options = {}) {
   const subject = evidence.length === 1
     ? `the selected provision, ${evidence[0].sectionNumber || evidence[0].title}`
     : `the ${evidence.length} selected provisions`;
+  const conversational = options.responseStyle === "conversational";
+  const acceptsConditionalYes = /^(?:can|could|does|is|are|may|must|should|will|would)\b/i
+    .test(String(question || "").trim());
   return {
-    conclusion: `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
+    conclusion: conversational
+      ? acceptsConditionalYes
+        ? "Potentially, yes—but only if the conditions in the selected provisions are satisfied by the project."
+        : "The selected provisions provide a conditional answer, but the remaining project facts must be confirmed before relying on it."
+      : `A project-specific answer to “${question}” requires reading ${subject} together with the facts of the proposed work.`,
     supportedPoints: evidence.slice(0, 8).map((section) => ({
       heading: section.title || section.sectionNumber || "Selected requirement",
-      explanation: `The selected passage from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
+      explanation: conversational
+        ? `This provision supplies one of the rules that controls the answer to “${question}”.`
+        : `The selected passage from ${section.sectionNumber || section.title} is part of the evidence authorized for this Research.`,
       sectionID: section.sectionID,
       sourceIDs: [section.sourceID || `section-${section.sectionID}`]
     })),
-    explanation: "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
+    explanation: conversational
+      ? `The selected text gives a governing starting point, but it is not a blanket approval. Read ${subject} together, then confirm the project facts that control the cited conditions before relying on the result.`
+      : "The selected code text provides the governing research starting point, but it does not by itself establish every project fact needed for an official determination.",
     assumptions: ["Only the selected 2022 New York City Construction Code provisions were considered."],
     missingFacts: ["Confirm the project scope, occupancy, location, existing conditions, and any applicable agency determinations."],
     evidenceLimitations: ["No code sections or agency documents beyond the passages selected by the user were treated as authority."],
@@ -5521,7 +5532,14 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     error.code = "RESEARCH_NOT_CONFIGURED";
     throw error;
   }
-  const configuration = researchModelConfiguration();
+  const baseConfiguration = researchModelConfiguration();
+  const conversational = options.responseStyle === "conversational";
+  const configuration = conversational
+    ? {
+        ...baseConfiguration,
+        promptVersion: `${baseConfiguration.promptVersion}:conversational-v1`
+      }
+    : baseConfiguration;
   const model = configuration.model;
   const passageEvidence = evidence.map((section) => ({
     ...section,
@@ -5544,6 +5562,9 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
         "Do not use outside knowledge as legal authority and do not invent requirements.",
         "Treat user-provided Project facts as unverified context, never as code authority or cited evidence.",
         "Write the conclusion as a concise professional answer of one to three sentences.",
+        conversational
+          ? "For this ordinary Research conversation, write conclusion and explanation so they read consecutively as one natural response. Lead with the clearest supported answer, such as Yes, No, or Potentially, then explain why in direct plain language. Avoid report boilerplate, process narration, repeated question text, and phrases such as a project-specific answer requires reading. Keep the tone professional but conversational."
+          : "Use the formal governed-analysis tone for conclusion and explanation.",
         "Do not print SECTION_ID or PASSAGE_ID markers in the conclusion, supported-point prose, or practical explanation; those identifiers belong only in the structured mapping fields.",
         "Break the material rules established by the selected evidence into ordered supportedPoints. Give each point a short plain-language heading, a complete explanation, and the exact supplied sectionID and sourceIDs that support it.",
         "Do not add an example, consequence, code category, or practical requirement unless the selected evidence or user-provided Project facts establish it. Clearly identify any illustration as hypothetical, and never use a hypothetical to introduce an unselected legal premise.",
@@ -11920,15 +11941,21 @@ async function handleResearchConversationMessage(request, response) {
     }
     const result = mockMode
       ? {
-          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence), selectedEvidence),
+          interpretation: validateResearchInterpretation(mockResearchInterpretation(question, selectedEvidence, {
+            responseStyle: "conversational"
+          }), selectedEvidence),
           model: "permitext-mock",
-          configuration: researchModelConfiguration(),
+          configuration: {
+            ...researchModelConfiguration(),
+            promptVersion: `${researchModelConfiguration().promptVersion}:conversational-v1`
+          },
           usage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
         }
         : await openAIResearchInterpretation(question, selectedEvidence, context.userID, {
           selections,
           messages: conversation.messages,
-          projectContextFacts: combinedProjectFacts
+          projectContextFacts: combinedProjectFacts,
+          responseStyle: "conversational"
         });
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
