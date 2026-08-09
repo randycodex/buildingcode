@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-code-decision-index-v1";
+} from "./offline-storage.js?v=20260809-code-decision-index-cleanup-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -25064,9 +25064,10 @@ function renderCodeQuestionPane(paneDescriptor) {
   header.appendChild(titleBlock);
   const close = document.createElement("button");
   close.type = "button";
-  close.className = "panel-close code-question-pane-close";
+  close.className = "icon-button utility-close code-question-pane-close";
+  close.title = "Close column";
   close.setAttribute("aria-label", `Close ${codeQuestionPaneTitle(parsed.paneRole)}`);
-  close.textContent = "×";
+  close.innerHTML = circleXIconSVG();
   close.addEventListener("click", async () => {
     setCodeQuestionWorkspaceState(
       closeCodeQuestionPane(
@@ -25078,7 +25079,10 @@ function renderCodeQuestionPane(paneDescriptor) {
     );
     await renderWorkspace();
   });
-  header.appendChild(close);
+  const panelActions = document.createElement("div");
+  panelActions.className = "panel-actions";
+  panelActions.appendChild(close);
+  header.appendChild(panelActions);
   article.appendChild(header);
   const body = document.createElement("div");
   body.className = "panel-body code-question-panel-body";
@@ -25336,12 +25340,6 @@ function renderCodeQuestionIndexBody(project) {
   });
   toolbar.append(search, createButton);
   wrap.appendChild(toolbar);
-  const meta = document.createElement("p");
-  meta.className = "code-question-index-meta";
-  meta.textContent = project
-    ? `${project.name || "Project"}${project.address ? ` · ${project.address}` : ""}`
-    : "Select a Project";
-  wrap.appendChild(meta);
   wrap.appendChild(renderCodeQuestionIndexList(project));
   return wrap;
 }
@@ -25352,13 +25350,7 @@ function renderCodeQuestionIndexList(project) {
   list.setAttribute("role", "list");
   const cq = codeQuestionWorkspaceState();
   const questions = filterQuestions(questionsForActiveProject(), cq.questionFilters);
-  if (!questions.length) {
-    const empty = document.createElement("li");
-    empty.className = "code-question-index-empty";
-    empty.textContent = "No Code Decisions yet. Start Research with a professional question.";
-    list.appendChild(empty);
-    return list;
-  }
+  if (!questions.length) return list;
   questions.forEach((question) => {
     const item = document.createElement("li");
     item.className = "code-question-index-item";
