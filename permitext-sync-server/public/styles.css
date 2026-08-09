@@ -5662,6 +5662,12 @@ mark {
   display: grid;
 }
 
+/* Keep account-wide saved Research history out of the active working surface. */
+.utility-panel .research-conversation-list,
+.utility-panel .research-conversation-empty {
+  display: none;
+}
+
 .research-conversation-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

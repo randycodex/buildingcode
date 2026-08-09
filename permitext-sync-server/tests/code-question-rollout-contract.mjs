@@ -319,9 +319,10 @@ assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/
 assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-project-decision-entry-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v498/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-project-decision-entry-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-hide-research-history-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v499/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-hide-research-history-v1/);
+assert.match(workspaceStyles, /\.utility-panel \.research-conversation-list,[\s\S]*?\.utility-panel \.research-conversation-empty \{\s*display: none;/);
 for (const source of [workspaceScript, serviceWorker, offlineStorage]) {
   assert.match(source, /code-question-client-state\.js\?v=20260809-session-stability-v3/);
 }
