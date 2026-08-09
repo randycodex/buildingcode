@@ -199,6 +199,7 @@ async function main() {
       PERMITEXT_CODE_QUESTION_WORKSPACE: "1",
       PERMITEXT_RESEARCH_MOCK: "1",
       PERMITEXT_RESEARCH_MOCK_DELAY_MS: "100",
+      PERMITEXT_EVIDENCE_DISCOVERY_BETA: "1",
       PERMITEXT_TEST_CONCURRENT_CODE_QUESTION_ANALYSIS: "1"
     },
     stdio: ["ignore", "pipe", "pipe"]
@@ -434,6 +435,111 @@ async function main() {
     assert.ok(startedResearch.conversation.codeDecisionLinkVersion >= 1);
     assert.deepEqual(startedResearch.conversation.sources, []);
     assert.deepEqual(startedResearch.conversation.messages, []);
+
+    const candidateDiscovery = await expectStatus(
+      await postAs(editor, "/research/evidence/discover", {
+        projectID,
+        question: question.questionText,
+        limit: 12
+      }),
+      200,
+      "Discovering private Research candidates"
+    );
+    assert.ok(candidateDiscovery.candidates.length >= 2);
+    const rejectedCandidate = candidateDiscovery.candidates[0];
+    const rejectCandidate = await expectStatus(
+      await postAs(editor, "/research/conversations/candidate-disposition", {
+        conversationID: startedResearch.conversation.id,
+        projectID,
+        questionID: question.id,
+        question: question.questionText,
+        candidateID: rejectedCandidate.id,
+        disposition: "rejected"
+      }),
+      200,
+      "Persisting a private decision-scoped candidate rejection"
+    );
+    assert.equal(rejectCandidate.disposition, "rejected");
+    assert.deepEqual(
+      rejectCandidate.conversation.candidateDispositions.map((item) => item.candidateID),
+      [rejectedCandidate.id]
+    );
+    const rejectedCandidateReload = await expectStatus(
+      await postAs(editor, "/research/conversations/get", {
+        conversationID: startedResearch.conversation.id
+      }),
+      200,
+      "Reloading the private candidate rejection"
+    );
+    assert.equal(
+      rejectedCandidateReload.conversation.candidateDispositions[0].disposition,
+      "rejected"
+    );
+    const secondRejectedCandidate = candidateDiscovery.candidates[1];
+    const concurrentCandidateRejections = await Promise.all([
+      postAs(editor, "/research/conversations/candidate-disposition", {
+        conversationID: startedResearch.conversation.id,
+        projectID,
+        questionID: question.id,
+        question: question.questionText,
+        candidateID: rejectedCandidate.id,
+        disposition: "rejected"
+      }),
+      postAs(editor, "/research/conversations/candidate-disposition", {
+        conversationID: startedResearch.conversation.id,
+        projectID,
+        questionID: question.id,
+        question: question.questionText,
+        candidateID: secondRejectedCandidate.id,
+        disposition: "rejected"
+      })
+    ]);
+    const concurrentRejectionPayloads = await Promise.all(
+      concurrentCandidateRejections.map((result, index) => expectStatus(
+        result,
+        200,
+        `Persisting concurrent private candidate rejection ${index + 1}`
+      ))
+    );
+    assert.equal(concurrentRejectionPayloads.length, 2);
+    const concurrentRejectionReload = await expectStatus(
+      await postAs(editor, "/research/conversations/get", {
+        conversationID: startedResearch.conversation.id
+      }),
+      200,
+      "Reloading concurrent private candidate rejections"
+    );
+    assert.deepEqual(
+      new Set(concurrentRejectionReload.conversation.candidateDispositions.map((item) => item.candidateID)),
+      new Set([rejectedCandidate.id, secondRejectedCandidate.id])
+    );
+    const concurrentCandidateRestores = await Promise.all(
+      [rejectedCandidate, secondRejectedCandidate].map((candidate) =>
+        postAs(editor, "/research/conversations/candidate-disposition", {
+          conversationID: startedResearch.conversation.id,
+          projectID,
+          questionID: question.id,
+          question: question.questionText,
+          candidateID: candidate.id,
+          disposition: "restored"
+        })
+      )
+    );
+    await Promise.all(
+      concurrentCandidateRestores.map((result, index) => expectStatus(
+        result,
+        200,
+        `Restoring concurrent private candidate rejection ${index + 1}`
+      ))
+    );
+    const restoredCandidateReload = await expectStatus(
+      await postAs(editor, "/research/conversations/get", {
+        conversationID: startedResearch.conversation.id
+      }),
+      200,
+      "Confirming private candidate rejections were restored"
+    );
+    assert.deepEqual(restoredCandidateReload.conversation.candidateDispositions, []);
 
     const researchStartReplay = await postAs(editor, "/projects/code-questions/research/start", {
       projectID,

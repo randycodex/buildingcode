@@ -270,6 +270,15 @@ export function normalizeWorkspaceLayout(value = {}) {
   layout.researchConversationID = typeof source.researchConversationID === "string"
     ? source.researchConversationID
     : "";
+  const legacyResearchWidth = Object.entries(layout.paneWeights)
+    .find(([paneID]) => paneID.startsWith("research:conversation:"))?.[1];
+  if (!layout.paneWeights["utility:analysis"] && Number.isFinite(legacyResearchWidth)) {
+    layout.paneWeights["utility:analysis"] = legacyResearchWidth;
+  }
+  layout.paneOrder = layout.paneOrder.filter((paneID) => !paneID.startsWith("research:conversation:"));
+  layout.paneWeights = Object.fromEntries(
+    Object.entries(layout.paneWeights).filter(([paneID]) => !paneID.startsWith("research:conversation:"))
+  );
   const activeProject = layout.projectDetails[0] || null;
   layout.workboards = genericWorkboardState(source.workboards);
   layout.notebooks = activeProjectToolState(source.notebooks, activeProject);

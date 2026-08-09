@@ -132,6 +132,7 @@ import {
 } from "./research-config.mjs";
 import {
   discoverRelevantEvidence,
+  evidenceDiscoveryVersion,
   evidenceDiscoveryFeatureEnabled,
   evidenceDiscoveryMaximumVisualSelections,
   structuredRichSources,
@@ -646,6 +647,30 @@ function createFileStoreAdapter() {
       store.researchConversationsByUserID[userID] = conversations;
       await this.write(store);
       return conversation;
+    },
+    async updateResearchCandidateDisposition(userID, conversationID, change) {
+      const store = await this.read();
+      store.researchConversationsByUserID ||= {};
+      const conversations = store.researchConversationsByUserID[userID] || [];
+      const index = conversations.findIndex((item) => item.id === conversationID);
+      if (index === -1) return null;
+      const conversation = conversations[index];
+      const existing = Array.isArray(conversation.candidateDispositions)
+        ? conversation.candidateDispositions
+        : [];
+      const withoutCandidate = existing.filter((item) => item.candidateID !== change.candidateID);
+      const candidateDispositions = change.disposition === "rejected"
+        ? [...withoutCandidate, change.record].slice(-100)
+        : withoutCandidate;
+      const updated = {
+        ...conversation,
+        candidateDispositions,
+        updatedAt: change.updatedAt
+      };
+      conversations[index] = updated;
+      store.researchConversationsByUserID[userID] = conversations;
+      await this.write(store);
+      return updated;
     },
     async deleteResearchConversation(userID, conversationID) {
       const store = await this.read();
@@ -2695,6 +2720,51 @@ async function createPostgresStoreAdapter() {
       `;
       return conversation;
     },
+    async updateResearchCandidateDisposition(userID, conversationID, change) {
+      await ensureSchema();
+      const retainedLimit = change.disposition === "rejected" ? 99 : 100;
+      const rows = await sql`
+        UPDATE permitext_research_conversations AS stored
+        SET conversation = (
+              jsonb_set(
+                stored.conversation,
+                '{candidateDispositions}',
+                CASE
+                  WHEN ${change.disposition} = 'rejected'
+                    THEN COALESCE((
+                      SELECT jsonb_agg(candidate.item ORDER BY candidate.position)
+                      FROM (
+                        SELECT entries.item, entries.position
+                        FROM jsonb_array_elements(
+                          COALESCE(stored.conversation->'candidateDispositions', '[]'::jsonb)
+                        ) WITH ORDINALITY AS entries(item, position)
+                        WHERE entries.item->>'candidateID' <> ${change.candidateID}
+                        ORDER BY entries.position DESC
+                        LIMIT ${retainedLimit}
+                      ) AS candidate
+                    ), '[]'::jsonb) || jsonb_build_array(${JSON.stringify(change.record)}::jsonb)
+                  ELSE COALESCE((
+                    SELECT jsonb_agg(candidate.item ORDER BY candidate.position)
+                    FROM (
+                      SELECT entries.item, entries.position
+                      FROM jsonb_array_elements(
+                        COALESCE(stored.conversation->'candidateDispositions', '[]'::jsonb)
+                      ) WITH ORDINALITY AS entries(item, position)
+                      WHERE entries.item->>'candidateID' <> ${change.candidateID}
+                      ORDER BY entries.position DESC
+                      LIMIT ${retainedLimit}
+                    ) AS candidate
+                  ), '[]'::jsonb)
+                END,
+                true
+              ) || jsonb_build_object('updatedAt', ${change.updatedAt})
+            ),
+            updated_at = ${change.updatedAt}::timestamptz
+        WHERE stored.id = ${conversationID} AND stored.user_id = ${userID}
+        RETURNING stored.conversation
+      `;
+      return rows.length ? safeJSON(rows[0].conversation, null) : null;
+    },
     async deleteResearchConversation(userID, conversationID) {
       await ensureSchema();
       const rows = await sql`
@@ -3577,6 +3647,14 @@ async function storedResearchConversation(userID, conversationID) {
 async function saveStoredResearchConversation(userID, conversation) {
   const adapter = await storeAdapter();
   return adapter.saveResearchConversation(userID, conversation);
+}
+
+async function updateStoredResearchCandidateDisposition(userID, conversationID, change) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.updateResearchCandidateDisposition !== "function") {
+    throw new Error("Candidate disposition storage is unavailable.");
+  }
+  return adapter.updateResearchCandidateDisposition(userID, conversationID, change);
 }
 
 async function deleteStoredResearchConversation(userID, conversationID) {
@@ -12085,6 +12163,110 @@ async function handleResearchEvidenceDiscover(request, response) {
   }
 }
 
+async function handleResearchCandidateDisposition(request, response) {
+  const context = await authenticatedResearchBody(request, response, { requireResearch: true });
+  if (!context) return;
+  if (!evidenceDiscoveryFeatureEnabled()) {
+    sendJSON(response, 403, {
+      error: "Candidate evidence discovery is not enabled for this account.",
+      code: "EVIDENCE_DISCOVERY_NOT_ENABLED"
+    });
+    return;
+  }
+  const conversation = await requiredResearchConversation(
+    response,
+    context.userID,
+    context.body.conversationID
+  );
+  if (!conversation) return;
+  const projectID = String(context.body.projectID || "").trim();
+  const questionID = String(context.body.questionID || "").trim();
+  const question = String(context.body.question || "").replace(/\s+/g, " ").trim();
+  const candidateID = String(context.body.candidateID || "").trim();
+  const disposition = String(context.body.disposition || "").trim();
+  if (!projectID || !questionID || question.length < 3 || !candidateID || !["rejected", "restored"].includes(disposition)) {
+    sendError(response, 400, "A linked Code Decision, candidate, question, and valid disposition are required.");
+    return;
+  }
+  const projectLink = await researchConversationProjectLink(context.userID, conversation);
+  const decisionLink = researchCodeDecisionLink(projectLink);
+  if (
+    conversation.primaryProjectID !== projectID ||
+    decisionLink?.questionID !== questionID
+  ) {
+    sendJSON(response, 409, {
+      error: "This candidate no longer belongs to the active Code Decision Research conversation.",
+      code: "RESEARCH_CANDIDATE_CONTEXT_CHANGED"
+    });
+    return;
+  }
+  try {
+    const discovery = await discoverRelevantEvidence({
+      question,
+      catalog: await sectionCatalog(),
+      invertedIndex: await shippedSearchIndex(),
+      readSectionBody: (section) => sectionBody(section.webSectionID || section.id, {
+        allowMissing: true,
+        canonicalSectionID: section.id
+      }),
+      resolveVisualSource: constructionVisualSourceMetadata,
+      limit: 12
+    });
+    const candidate = discovery.candidates.find((item) => item.id === candidateID);
+    if (!candidate) {
+      sendJSON(response, 409, {
+        error: "This candidate is no longer part of the current ranked results. Search again before changing it.",
+        code: "RESEARCH_CANDIDATE_CHANGED"
+      });
+      return;
+    }
+    const now = new Date().toISOString();
+    const currentProjectLink = await researchConversationProjectLink(context.userID, conversation);
+    const currentDecisionLink = researchCodeDecisionLink(currentProjectLink);
+    if (currentDecisionLink?.questionID !== questionID || currentProjectLink?.projectID !== projectID) {
+      sendJSON(response, 409, {
+        error: "This candidate no longer belongs to the active Code Decision Research conversation.",
+        code: "RESEARCH_CANDIDATE_CONTEXT_CHANGED"
+      });
+      return;
+    }
+    const record = {
+      candidateID,
+      disposition: "rejected",
+      discoveryVersion: evidenceDiscoveryVersion,
+      questionHash: createHash("sha256").update(question).digest("hex"),
+      sectionID: candidate.sectionID,
+      selectedTextHash: createHash("sha256").update(candidate.selectedText).digest("hex"),
+      updatedAt: now
+    };
+    const updatedConversation = await updateStoredResearchCandidateDisposition(
+      context.userID,
+      conversation.id,
+      { candidateID, disposition, record, updatedAt: now }
+    );
+    if (!updatedConversation) {
+      sendJSON(response, 409, {
+        error: "This Research conversation changed before the candidate review was saved.",
+        code: "RESEARCH_CANDIDATE_CONTEXT_CHANGED"
+      });
+      return;
+    }
+    sendJSON(response, 200, {
+      conversation: await researchConversationForClient(updatedConversation, {
+        userID: context.userID,
+        projectLink: currentProjectLink
+      }),
+      candidateID,
+      disposition
+    });
+  } catch (error) {
+    sendJSON(response, 400, {
+      error: error instanceof Error ? error.message : "The candidate disposition could not be saved.",
+      code: "INVALID_RESEARCH_CANDIDATE_DISPOSITION"
+    });
+  }
+}
+
 function searchSnippet(text, query) {
   const normalized = text.replace(/\s+/g, " ").trim();
   const index = normalized.toLowerCase().indexOf(query.toLowerCase());
@@ -20378,6 +20560,7 @@ const handlers = {
   "research/usage": handleResearchUsage,
   "research/feedback": handleResearchFeedback,
   "research/evidence/discover": handleResearchEvidenceDiscover,
+  "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,

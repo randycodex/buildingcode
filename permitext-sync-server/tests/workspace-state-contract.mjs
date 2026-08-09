@@ -57,6 +57,18 @@ assert.equal(legacyLayout.coordinationThreads[0].threadID, "thread-1");
 assert.deepEqual(legacyLayout.coordinationFilters, { "project-1": "waiting" });
 assert.equal(workspaceLayoutHasVisiblePanes(legacyLayout), true);
 
+const unifiedResearchLayout = normalizeWorkspaceLayout({
+  utilities: { analysis: true },
+  researchConversationID: "research-1",
+  paneOrder: ["utility:analysis", "research:conversation:research-1"],
+  paneWeights: {
+    "research:conversation:research-1": 742
+  }
+});
+assert.equal(unifiedResearchLayout.researchConversationID, "research-1");
+assert.deepEqual(unifiedResearchLayout.paneOrder, ["utility:analysis"]);
+assert.deepEqual(unifiedResearchLayout.paneWeights, { "utility:analysis": 742 });
+
 const hostedProjectLayout = normalizeWorkspaceLayout({
   utilityInstances: [{ id: "saved-1", key: "saved" }, { id: "saved-2", key: "saved" }],
   projectHostPaneID: "utility:saved:saved-2"

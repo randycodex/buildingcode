@@ -1268,7 +1268,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-research-composer-clean-v2'),
+        webRoot.text.includes('/web/app.js?v=20260809-unified-research-v5'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1410,7 +1410,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-research-composer-clean-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260809-unified-research-v5'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1658,7 +1658,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-research-composer-clean-v2'),
+        webRoot.text.includes('/web/styles.css?v=20260809-unified-research-v5'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1772,8 +1772,16 @@ async function main() {
         evidenceDiscoveryClientSource.includes("visualSourceIDs: candidate.selectedVisualSourceIDs || []") &&
         evidenceDiscoveryClientSource.includes("Use in Research") &&
         evidenceDiscoveryClientSource.includes("Selected for Research") &&
-        evidenceDiscoveryClientSource.includes("Reject") &&
-        evidenceDiscoveryClientSource.includes("Candidate ${candidateIndex + 1} of ${candidates.length}") &&
+        evidenceDiscoveryClientSource.includes("Dismiss") &&
+        evidenceDiscoveryClientSource.includes("Candidate ${candidateIndex + 1} of ${visibleCandidates.length}") &&
+        evidenceDiscoveryClientSource.includes("Find ${nextCandidateBatchSize} more") &&
+        evidenceDiscoveryClientSource.includes("Review dismissed (${rejectedCount})") &&
+        evidenceDiscoveryClientSource.includes('reviewState === "rejected" ? "Restore" : "Dismiss"') &&
+        workspaceScript.text.includes('postResearch("/research/conversations/candidate-disposition"') &&
+        workspaceScript.text.includes("Selected for exploratory Research · not approved for the Code Decision") &&
+        workspaceScript.text.includes("(embeddedEvidenceNoticeRegion || evidenceScroll).append(warning)") &&
+        workspaceScript.text.includes("research-selected-evidence-passage") &&
+        workspaceScript.text.includes("researchOpenContextIsCurrent(dispositionContext, { requireConversationID: true })") &&
         evidenceDiscoveryClientSource.includes("Previous") &&
         evidenceDiscoveryClientSource.includes("Next") &&
         evidenceDiscoveryClientSource.includes("View all") &&
@@ -2011,9 +2019,9 @@ async function main() {
         'if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:"))'
       ) &&
         workspaceScript.text.includes(
-          '["utility:analysis", paneIDForResearchConversation()]'
+          'active.has("utility:analysis") ? ["utility:analysis"] : []'
         ),
-      "Research and its open conversation no longer move as one draggable pane group."
+      "Unified Research no longer moves as one stable draggable pane."
     );
     assert(
       !workspaceScript.text.includes("if (!window.confirm(`Archive ${name}?`)) return;"),

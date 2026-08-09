@@ -19,6 +19,12 @@ import {
   rehearseNonDestructiveCodeQuestionRollback
 } from "../code-question-rollout.mjs";
 
+function functionSource(source, name) {
+  const start = source.indexOf(`function ${name}`);
+  const end = source.indexOf("\nfunction ", start + 1);
+  return start === -1 ? "" : source.slice(start, end === -1 ? source.length : end);
+}
+
 const fixture = JSON.parse(await readFile(
   new URL("./fixtures/code-question-lifecycle-v1.json", import.meta.url),
   "utf8"
@@ -321,9 +327,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-research-composer-clean-v2/);
-assert.match(serviceWorker, /permitext-pro-shell-v526/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-research-composer-clean-v2/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-unified-research-v5/);
+assert.match(serviceWorker, /permitext-pro-shell-v531/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-unified-research-v5/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
@@ -333,16 +339,35 @@ assert.match(workspaceStyles, /\.evidence-candidate-card\.is-active-review block
 assert.match(workspaceStyles, /\.evidence-candidate-navigator-item \{[\s\S]*?border-bottom: 1px solid var\(--border\);/);
 assert.match(workspaceStyles, /\.evidence-candidate-navigation \{[\s\S]*?grid-template-columns: auto minmax\(0, 1fr\) auto;/);
 assert.match(workspaceStyles, /\.evidence-candidate-controls \{[\s\S]*?position: sticky;[\s\S]*?top: 0;[\s\S]*?z-index: 4;[\s\S]*?background: var\(--research-conversation-background\);/);
-assert.match(workspaceScript, /activeCandidateID: response\.candidates\?\.\[0\]\?\.id \|\| ""/);
-assert.match(workspaceScript, /const candidate = candidates\[candidateIndex\]/);
-assert.match(workspaceScript, /Candidate \$\{candidateIndex \+ 1\} of \$\{candidates\.length\}/);
+assert.match(workspaceScript, /visibleCandidateCount: Math\.min\(3, rankedCandidates\.length\)/);
+assert.match(workspaceScript, /const candidate = visibleCandidates\[candidateIndex\]/);
+assert.match(workspaceScript, /Candidate \$\{candidateIndex \+ 1\} of \$\{visibleCandidates\.length\}/);
+assert.match(workspaceScript, /Find \$\{nextCandidateBatchSize\} more/);
+assert.match(workspaceScript, /Review dismissed \(\$\{rejectedCount\}\)/);
+assert.match(workspaceScript, /reviewState === "rejected" \? "Restore" : "Dismiss"/);
+assert.match(workspaceScript, /research\/conversations\/candidate-disposition/);
 assert.match(workspaceScript, /advanceAfterDisposition\(\)/);
-assert.match(workspaceScript, /Next skips this candidate without rejecting it/);
+assert.match(workspaceScript, /Next skips this candidate without dismissing it/);
 assert.match(workspaceScript, /candidateNavigatorOpen/);
 assert.doesNotMatch(workspaceScript, /Select at least one passage to add to Research\./);
 assert.match(workspaceScript, /reviewControls\.append\(actions, navigation\)[\s\S]*?card\.append\(cardHeader, reviewControls, quote\)/);
 assert.match(workspaceStyles, /\.evidence-discovery \{\s*display: grid;\s*gap: var\(--space-3\);\s*margin-top: var\(--space-4\);\s*\}/);
-assert.match(workspaceScript, /const researchSurfaceIDs = \[[\s\S]*?"utility:analysis"[\s\S]*?paneIDForResearchConversation[\s\S]*?paired\.splice/);
+assert.match(workspaceScript, /const researchSurfaceIDs = state\.utilities\.analysis \? \["utility:analysis"\] : \[\]/);
+assert.doesNotMatch(functionSource(workspaceScript, "defaultActivePaneIDs"), /paneIDForResearchConversation/);
+assert.match(workspaceScript, /renderResearchConversation\(state\.researchConversationID, \{ embedded: true \}\)/);
+assert.match(workspaceScript, /Selected evidence \(\$\{displayedSources\.length\}\)/);
+assert.match(workspaceScript, /Selected for exploratory Research · not approved for the Code Decision/);
+assert.match(workspaceScript, /research-selected-evidence-open/);
+assert.match(workspaceScript, /\(embeddedEvidenceNoticeRegion \|\| evidenceScroll\)\.append\(warning\)/);
+assert.match(workspaceScript, /research-selected-evidence-passage/);
+assert.match(workspaceScript, /The enacted source changed\. Refresh the selected evidence above before analyzing\./);
+assert.match(workspaceScript, /researchOpenContextIsCurrent\(dispositionContext, \{ requireConversationID: true \}\)/);
+assert.match(workspaceScript, /if \(key === "analysis" && state\.utilities\.analysis\) \{\s*await closeResearchWorkspace\(\);/);
+const postgresDispositionStart = serverSource.lastIndexOf("async updateResearchCandidateDisposition");
+const postgresDispositionEnd = serverSource.indexOf("async deleteResearchConversation", postgresDispositionStart);
+const postgresDispositionSource = serverSource.slice(postgresDispositionStart, postgresDispositionEnd);
+assert.match(postgresDispositionSource, /UPDATE permitext_research_conversations AS stored[\s\S]*?stored\.conversation->'candidateDispositions'/);
+assert.doesNotMatch(postgresDispositionSource, /WITH retained AS/);
 assert.match(workspaceScript, /async function selectCodeDecisionFromIndex\(question\)/);
 assert.match(workspaceScript, /selectCodeDecisionFromIndex[\s\S]*?activeEvidenceDiscovery = null;[\s\S]*?pendingResearchSelection = null;/);
 assert.match(workspaceScript, /hydrateCodeQuestionState\(projectID, questionID, \{ force: true, render: false \}\)/);

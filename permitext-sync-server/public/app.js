@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-composer-clean-v2";
+} from "./offline-storage.js?v=20260809-unified-research-v5";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -61,7 +61,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260808-generic-workboard-v2";
+} from "./workspace-state.js?v=20260809-unified-research-v5";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -3127,7 +3127,6 @@ function defaultActivePaneIDs() {
     }
   });
   if (state.utilities.analysis) ids.push("utility:analysis");
-  if (state.utilities.analysis && state.researchConversationID) ids.push(paneIDForResearchConversation());
   if (state.utilities.settings) ids.push("utility:settings");
   state.readers.forEach((reader) => ids.push(paneIDForReader(reader)));
   openCodeQuestionPaneIDs().forEach((id) => ids.push(id));
@@ -3212,10 +3211,7 @@ function activePaneIDs() {
     indexIDs.forEach((id, offset) => {
       if (!paired.includes(id)) paired.splice(indexInsertAt + offset, 0, id);
     });
-    const researchSurfaceIDs = [
-      ...(state.utilities.analysis ? ["utility:analysis"] : []),
-      ...(state.researchConversationID ? [paneIDForResearchConversation(state.researchConversationID)] : [])
-    ];
+    const researchSurfaceIDs = state.utilities.analysis ? ["utility:analysis"] : [];
     researchSurfaceIDs.forEach((id) => {
       const currentIndex = paired.indexOf(id);
       if (currentIndex !== -1) paired.splice(currentIndex, 1);
@@ -3225,11 +3221,9 @@ function activePaneIDs() {
     if (researchSurfaceIDs.length) {
       paired.splice(lastIndexPosition === -1 ? paired.length : lastIndexPosition + 1, 0, ...researchSurfaceIDs);
     }
-    const researchAnchor = state.researchConversationID
-      ? paneIDForResearchConversation(state.researchConversationID)
-      : state.utilities.analysis
-        ? "utility:analysis"
-        : indexIDs.at(-1) || primarySavedPaneID();
+    const researchAnchor = state.utilities.analysis
+      ? "utility:analysis"
+      : indexIDs.at(-1) || primarySavedPaneID();
     const researchAnchorIndex = paired.indexOf(researchAnchor);
     const recordInsertAt = researchAnchorIndex === -1 ? paired.length : researchAnchorIndex + 1;
     recordIDs.forEach((id, offset) => {
@@ -3468,8 +3462,7 @@ function projectHostSavedInstance(folders = []) {
 
 function projectOverviewRefreshPaneIDs(...additionalPaneIDs) {
   const researchPaneIDs = [
-    state.utilities.analysis ? "utility:analysis" : "",
-    paneIDForResearchConversation()
+    state.utilities.analysis ? "utility:analysis" : ""
   ].filter(Boolean);
   return Array.from(new Set([
     ...savedPaneIDs(),
@@ -5164,16 +5157,8 @@ function codeQuestionWorkspaceState() {
 }
 
 function clearActiveResearchConversation() {
-  const priorConversationID = String(state.researchConversationID || "").trim();
-  const priorConversationPaneID = priorConversationID
-    ? paneIDForResearchConversation(priorConversationID)
-    : "";
   state.researchConversationID = "";
   activeResearchConversation = null;
-  if (priorConversationPaneID) {
-    delete state.paneWeights[priorConversationPaneID];
-    state.paneOrder = (state.paneOrder || []).filter((paneID) => paneID !== priorConversationPaneID);
-  }
 }
 
 function linkedResearchDecisionDismissalKey(questionID, projectID = activeProjectIDForCodeQuestions()) {
@@ -5220,9 +5205,6 @@ function alignResearchConversationWithCodeDecision(questionID, conversationID = 
   }
   state.researchConversationID = linkedConversationID;
   state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
-  const conversationPaneID = paneIDForResearchConversation(linkedConversationID);
-  state.paneWeights[conversationPaneID] ||= defaultPaneWidthForID(conversationPaneID);
-  placePaneAfter("utility:analysis", conversationPaneID);
   return linkedConversationID;
 }
 
@@ -5292,12 +5274,10 @@ async function selectCodeDecisionFromIndex(question) {
   if (!projectID || !questionID) return false;
   const priorWorkspace = codeQuestionWorkspaceState();
   const previousQuestionID = String(priorWorkspace.activeQuestionID || "").trim();
-  const priorConversationID = String(state.researchConversationID || "").trim();
   const presentationSnapshot = {
     paneOrder: [...(state.paneOrder || [])],
     paneWeights: { ...(state.paneWeights || {}) },
-    questionPanes: (priorWorkspace.openPanes || []).filter((pane) => pane.questionID === previousQuestionID),
-    conversationPaneID: priorConversationID ? paneIDForResearchConversation(priorConversationID) : ""
+    questionPanes: (priorWorkspace.openPanes || []).filter((pane) => pane.questionID === previousQuestionID)
   };
   if (previousQuestionID && previousQuestionID !== questionID) {
     // Candidate retrieval is exploratory working state for one question. Do not
@@ -5324,14 +5304,9 @@ async function selectCodeDecisionFromIndex(question) {
     );
     if (nextPane) replacementPaneIDs.set(priorPane.paneID, nextPane.paneID);
   });
-  const nextConversationPaneID = state.researchConversationID ? paneIDForResearchConversation() : "";
-  if (presentationSnapshot.conversationPaneID && nextConversationPaneID) {
-    replacementPaneIDs.set(presentationSnapshot.conversationPaneID, nextConversationPaneID);
-  }
-  const retiredPaneIDs = new Set([
-    ...presentationSnapshot.questionPanes.map((pane) => pane.paneID),
-    presentationSnapshot.conversationPaneID
-  ].filter(Boolean));
+  const retiredPaneIDs = new Set(
+    presentationSnapshot.questionPanes.map((pane) => pane.paneID).filter(Boolean)
+  );
   const nextOrder = presentationSnapshot.paneOrder
     .map((paneID) => replacementPaneIDs.get(paneID) || (retiredPaneIDs.has(paneID) ? "" : paneID))
     .filter(Boolean);
@@ -5348,7 +5323,6 @@ async function selectCodeDecisionFromIndex(question) {
   const currentRefreshPaneIDs = () => [
     questionPaneKey({ projectID, questionID: "_", paneRole: "question-index" }),
     "utility:analysis",
-    ...(state.researchConversationID ? [paneIDForResearchConversation()] : []),
     ...(codeQuestionWorkspaceState().openPanes || [])
       .filter((pane) => pane.questionID === questionID)
       .map((pane) => pane.paneID)
@@ -13297,22 +13271,21 @@ async function openResearchConversation(conversationID, options = {}) {
   }
   state.utilities.analysis = true;
   state.researchConversationID = normalizedConversationID;
-  const paneID = paneIDForResearchConversation(normalizedConversationID);
   state.paneWeights["utility:analysis"] ||= defaultPaneWidthForID("utility:analysis");
-  state.paneWeights[paneID] ||= defaultPaneWidthForID(paneID);
-  placePaneAfter("utility:analysis", paneID);
+  Object.keys(state.paneWeights)
+    .filter((id) => id.startsWith("research:conversation:"))
+    .forEach((id) => delete state.paneWeights[id]);
+  state.paneOrder = (state.paneOrder || []).filter((id) => !id.startsWith("research:conversation:"));
   saveWorkspaceState();
   const projectPaneIDs = openProjectDetails().map((detail) => paneIDForProjectDetail(detail));
   await transitionWorkspace("utility", {
-    refreshPaneIDs: options.refreshList
-      ? ["utility:analysis", paneID, ...projectPaneIDs]
-      : [paneID, ...projectPaneIDs]
+    refreshPaneIDs: ["utility:analysis", ...projectPaneIDs]
   });
   if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return null;
-  scrollPaneIntoView(paneID);
+  scrollPaneIntoView("utility:analysis");
   requestAnimationFrame(() => {
     if (!researchOpenContextIsCurrent(openingContext, { requireConversationID: true })) return;
-    const pane = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    const pane = track.querySelector('.workspace-panel[data-pane-id="utility:analysis"]');
     const focusTarget = pane?.querySelector(".research-question-input:not(:disabled), .panel-title");
     focusTarget?.focus({ preventScroll: true });
   });
@@ -13591,6 +13564,54 @@ function renderEvidenceCandidateExcerpt(candidate) {
   return quote;
 }
 
+function rejectedResearchCandidateIDs(conversation = activeResearchConversation) {
+  return new Set(
+    (conversation?.candidateDispositions || [])
+      .filter((item) => item.disposition === "rejected")
+      .map((item) => String(item.candidateID || "").trim())
+      .filter(Boolean)
+  );
+}
+
+async function persistResearchCandidateDisposition(candidate, disposition, question) {
+  const projectID = activeProjectIDForCodeQuestions();
+  const questionID = String(codeQuestionWorkspaceState().activeQuestionID || "").trim();
+  if (!projectID || !questionID) {
+    throw new Error("Open a Project Code Decision before saving candidate review choices.");
+  }
+  let conversationID = String(state.researchConversationID || "").trim();
+  if (!conversationID) {
+    const conversation = await startLinkedResearchForCodeDecision(questionID, { open: false });
+    conversationID = String(conversation?.id || "").trim();
+  }
+  if (!conversationID) throw new Error("Permitext could not open the linked Research conversation.");
+  state.researchConversationID = conversationID;
+  const dispositionAccount = activeAccount();
+  const dispositionContext = {
+    generation: researchOpenGeneration,
+    accountUserID: dispositionAccount?.userID || "",
+    sessionToken: dispositionAccount?.sessionToken || "",
+    projectID,
+    conversationID
+  };
+  const payload = await postResearch("/research/conversations/candidate-disposition", {
+    conversationID,
+    projectID,
+    questionID,
+    question,
+    candidateID: candidate.id,
+    disposition
+  });
+  if (
+    !researchOpenContextIsCurrent(dispositionContext, { requireConversationID: true }) ||
+    String(codeQuestionWorkspaceState().activeQuestionID || "").trim() !== questionID
+  ) {
+    throw codeQuestionContextChangedError();
+  }
+  activeResearchConversation = payload.conversation;
+  return payload;
+}
+
 function renderEvidenceDiscovery(container) {
   if (
     !hasCapability("evidence-discovery") &&
@@ -13664,34 +13685,81 @@ function renderEvidenceDiscovery(container) {
     );
     const rejectedCount = candidates.filter((candidate) => candidate.reviewState === "rejected").length;
     const notReviewedCount = candidates.length - approved.length - rejectedCount;
-    const requestedCandidateIndex = candidates.findIndex((candidate) => candidate.id === discovery.activeCandidateID);
+    if (discovery.showRejected === true && rejectedCount === 0) discovery.showRejected = false;
+    const availableCandidates = candidates.filter((candidate) => candidate.reviewState !== "rejected");
+    const visibleCandidateCount = Math.min(
+      Math.max(Number(discovery.visibleCandidateCount) || 3, 1),
+      availableCandidates.length
+    );
+    discovery.visibleCandidateCount = visibleCandidateCount;
+    const visibleCandidates = discovery.showRejected === true
+      ? candidates.filter((candidate) => candidate.reviewState === "rejected")
+      : availableCandidates.slice(0, visibleCandidateCount);
+    const requestedCandidateIndex = visibleCandidates.findIndex((candidate) => candidate.id === discovery.activeCandidateID);
     const candidateIndex = requestedCandidateIndex === -1 ? 0 : requestedCandidateIndex;
-    discovery.activeCandidateID = candidates[candidateIndex]?.id || "";
+    discovery.activeCandidateID = visibleCandidates[candidateIndex]?.id || "";
     const showCandidate = (nextIndex, options = {}) => {
-      if (!candidates.length) return;
-      const boundedIndex = Math.min(Math.max(0, nextIndex), candidates.length - 1);
-      discovery.activeCandidateID = candidates[boundedIndex].id;
+      if (!visibleCandidates.length) return;
+      const boundedIndex = Math.min(Math.max(0, nextIndex), visibleCandidates.length - 1);
+      discovery.activeCandidateID = visibleCandidates[boundedIndex].id;
       renderResults();
       if (options.focus !== false) {
         requestAnimationFrame(() => results.querySelector(".evidence-candidate-card")?.focus({ preventScroll: true }));
       }
     };
     const advanceAfterDisposition = () => {
-      const nextUnreviewedIndex = candidates.findIndex((candidate, index) =>
+      const nextUnreviewedIndex = visibleCandidates.findIndex((candidate, index) =>
         index > candidateIndex && !["approved", "rejected"].includes(candidate.reviewState)
       );
-      showCandidate(nextUnreviewedIndex === -1 ? Math.min(candidateIndex + 1, candidates.length - 1) : nextUnreviewedIndex);
+      showCandidate(nextUnreviewedIndex === -1 ? Math.min(candidateIndex + 1, visibleCandidates.length - 1) : nextUnreviewedIndex);
     };
     const summary = document.createElement("div");
     summary.className = "evidence-discovery-summary";
     const summaryText = document.createElement("strong");
-    summaryText.textContent = candidates.length
-      ? `Candidate ${candidateIndex + 1} of ${candidates.length}`
+    summaryText.textContent = visibleCandidates.length
+      ? `Candidate ${candidateIndex + 1} of ${visibleCandidates.length}`
       : "No review candidates";
     const progress = document.createElement("span");
     progress.setAttribute("role", "status");
     progress.setAttribute("aria-live", "polite");
-    progress.textContent = `${approved.length} selected · ${rejectedCount} rejected · ${notReviewedCount} not reviewed`;
+    progress.textContent = discovery.showRejected === true
+      ? `Reviewing ${visibleCandidates.length} dismissed suggestions · ${approved.length} selected · ${notReviewedCount} not reviewed`
+      : `Showing ${visibleCandidateCount} of ${availableCandidates.length} available candidates from ${candidates.length} ranked results · ${approved.length} selected · ${rejectedCount} dismissed · ${notReviewedCount} not reviewed`;
+    const summaryActions = document.createElement("div");
+    summaryActions.className = "evidence-discovery-summary-actions";
+    const findMore = document.createElement("button");
+    findMore.type = "button";
+    findMore.className = "evidence-candidate-find-more";
+    const remainingCandidateCount = Math.max(0, availableCandidates.length - visibleCandidateCount);
+    const nextCandidateBatchSize = Math.min(3, remainingCandidateCount);
+    findMore.textContent = nextCandidateBatchSize ? `Find ${nextCandidateBatchSize} more` : "All candidates shown";
+    findMore.disabled = remainingCandidateCount === 0;
+    findMore.hidden = discovery.showRejected === true;
+    findMore.addEventListener("click", () => {
+      discovery.visibleCandidateCount = Math.min(availableCandidates.length, visibleCandidateCount + 3);
+      renderResults();
+      requestAnimationFrame(() => {
+        results.querySelector(".evidence-candidate-card")?.focus({ preventScroll: true });
+      });
+    });
+    const reviewRejected = document.createElement("button");
+    reviewRejected.type = "button";
+    reviewRejected.className = "evidence-candidate-review-rejected";
+    reviewRejected.textContent = discovery.showRejected === true ? "Hide dismissed" : `Review dismissed (${rejectedCount})`;
+    reviewRejected.hidden = rejectedCount === 0;
+    reviewRejected.setAttribute("aria-pressed", String(discovery.showRejected === true));
+    reviewRejected.addEventListener("click", () => {
+      discovery.showRejected = discovery.showRejected !== true;
+      if (discovery.showRejected) {
+        discovery.activeCandidateID = candidates.find((candidate) => candidate.reviewState === "rejected")?.id || discovery.activeCandidateID;
+      } else if (candidates.find((candidate) => candidate.id === discovery.activeCandidateID)?.reviewState === "rejected") {
+        discovery.activeCandidateID = candidates.find((candidate) => candidate.reviewState !== "rejected")?.id || "";
+      }
+      renderResults();
+      requestAnimationFrame(() => {
+        results.querySelector(".evidence-candidate-card")?.focus({ preventScroll: true });
+      });
+    });
     const viewAll = document.createElement("button");
     viewAll.type = "button";
     viewAll.className = "evidence-candidate-view-all";
@@ -13702,7 +13770,8 @@ function renderEvidenceDiscovery(container) {
       discovery.candidateNavigatorOpen = discovery.candidateNavigatorOpen !== true;
       renderResults();
     });
-    summary.append(summaryText, progress, viewAll);
+    summaryActions.append(viewAll, findMore, reviewRejected);
+    summary.append(summaryText, progress, summaryActions);
     results.append(summary);
 
     if (response.outsideCurrentLibrary?.length) {
@@ -13734,7 +13803,7 @@ function renderEvidenceDiscovery(container) {
       const navigator = document.createElement("nav");
       navigator.className = "evidence-candidate-navigator";
       navigator.setAttribute("aria-label", "Review candidates");
-      candidates.forEach((candidate, index) => {
+      visibleCandidates.forEach((candidate, index) => {
         const option = document.createElement("button");
         option.type = "button";
         option.className = "evidence-candidate-navigator-item";
@@ -13745,7 +13814,7 @@ function renderEvidenceDiscovery(container) {
         option.innerHTML = `
           <span>${index + 1}</span>
           <strong>${escapeHTML(evidenceCandidateCitation(candidate))}</strong>
-          <small>${escapeHTML(candidate.reviewState === "approved" ? "Selected" : candidate.reviewState === "rejected" ? "Rejected" : "Not reviewed")}</small>`;
+          <small>${escapeHTML(candidate.reviewState === "approved" ? "Selected" : candidate.reviewState === "rejected" ? "Dismissed" : "Not reviewed")}</small>`;
         option.addEventListener("click", () => {
           discovery.candidateNavigatorOpen = false;
           showCandidate(index);
@@ -13757,7 +13826,7 @@ function renderEvidenceDiscovery(container) {
 
     const tray = document.createElement("section");
     tray.className = "evidence-candidate-tray";
-    const candidate = candidates[candidateIndex];
+    const candidate = visibleCandidates[candidateIndex];
     if (candidate) {
       const reviewState = candidate.reviewState || "candidate";
       const card = document.createElement("article");
@@ -13796,7 +13865,7 @@ function renderEvidenceDiscovery(container) {
             : reviewState === "approved"
               ? "Selected for Research"
               : reviewState === "rejected"
-                ? "Rejected"
+                ? "Dismissed"
                 : "";
       cardHeader.append(rank, citationWrap);
       if (stateBadge.textContent) cardHeader.append(stateBadge);
@@ -13934,29 +14003,62 @@ function renderEvidenceDiscovery(container) {
           ? "Select the applicable official visual evidence and confirm your review first."
           : "Open the source and review its complete supporting material before using it as evidence.";
       }
-      approveButton.addEventListener("click", () => {
+      approveButton.addEventListener("click", async () => {
         if (!evidenceCandidatePreparationReady(candidate)) return;
         if (reviewState === "approved") {
           candidate.reviewState = "candidate";
           renderResults();
           return;
         }
-        candidate.reviewState = "approved";
-        advanceAfterDisposition();
+        approveButton.disabled = true;
+        rejectButton.disabled = true;
+        try {
+          if (reviewState === "rejected") {
+            await persistResearchCandidateDisposition(candidate, "restored", discovery.question);
+          }
+          candidate.reviewState = "approved";
+          advanceAfterDisposition();
+        } catch (error) {
+          formStatus.textContent = error.message;
+          approveButton.disabled = false;
+          rejectButton.disabled = false;
+        }
       });
       const rejectButton = document.createElement("button");
       rejectButton.type = "button";
       rejectButton.className = "evidence-candidate-reject";
-      rejectButton.textContent = reviewState === "rejected" ? "Rejected" : "Reject";
+      rejectButton.textContent = reviewState === "rejected" ? "Restore" : "Dismiss";
+      rejectButton.title = reviewState === "rejected"
+        ? "Restore this private Research suggestion"
+        : "Dismiss this suggestion from this private Research conversation";
       rejectButton.setAttribute("aria-pressed", String(reviewState === "rejected"));
-      rejectButton.addEventListener("click", () => {
-        if (reviewState === "rejected") {
-          candidate.reviewState = "candidate";
-          renderResults();
-          return;
+      const candidateDispositionEnabled = Boolean(
+        activeProjectIDForCodeQuestions() &&
+        String(codeQuestionWorkspaceState().activeQuestionID || "").trim()
+      );
+      rejectButton.disabled = !candidateDispositionEnabled;
+      if (!candidateDispositionEnabled) {
+        rejectButton.title = "Open Research from a Project Code Decision to save rejections.";
+      }
+      rejectButton.addEventListener("click", async () => {
+        approveButton.disabled = true;
+        rejectButton.disabled = true;
+        try {
+          const nextDisposition = reviewState === "rejected" ? "restored" : "rejected";
+          await persistResearchCandidateDisposition(candidate, nextDisposition, discovery.question);
+          candidate.reviewState = nextDisposition === "rejected" ? "rejected" : "candidate";
+          if (nextDisposition === "rejected") advanceAfterDisposition();
+          else {
+            renderResults();
+            requestAnimationFrame(() => {
+              results.querySelector(".evidence-candidate-card")?.focus({ preventScroll: true });
+            });
+          }
+        } catch (error) {
+          formStatus.textContent = error.message;
+          approveButton.disabled = false;
+          rejectButton.disabled = false;
         }
-        candidate.reviewState = "rejected";
-        advanceAfterDisposition();
       });
       const openButton = document.createElement("button");
       openButton.type = "button";
@@ -13976,10 +14078,10 @@ function renderEvidenceDiscovery(container) {
       const next = document.createElement("button");
       next.type = "button";
       next.textContent = "Next";
-      next.disabled = candidateIndex >= candidates.length - 1;
+      next.disabled = candidateIndex >= visibleCandidates.length - 1;
       next.addEventListener("click", () => showCandidate(candidateIndex + 1));
       const hint = document.createElement("span");
-      hint.textContent = "Next skips this candidate without rejecting it.";
+      hint.textContent = "Next skips this candidate without dismissing it.";
       navigation.append(previous, hint, next);
       const reviewControls = document.createElement("div");
       reviewControls.className = "evidence-candidate-controls";
@@ -14090,18 +14192,22 @@ function renderEvidenceDiscovery(container) {
         limit: 12
       });
       if (!researchOpenContextIsCurrent(discoveryContext)) return;
+      const rejectedCandidateIDs = rejectedResearchCandidateIDs();
+      const rankedCandidates = (response.candidates || []).map((candidate) => ({
+        ...candidate,
+        reviewState: rejectedCandidateIDs.has(candidate.id) ? "rejected" : "candidate"
+      }));
       activeEvidenceDiscovery = {
         accountUserID: activeAccount()?.userID || "",
         question: normalizedQuestion,
         projectID: projectSelect.value,
-        activeCandidateID: response.candidates?.[0]?.id || "",
+        activeCandidateID: rankedCandidates.find((candidate) => candidate.reviewState !== "rejected")?.id || "",
+        visibleCandidateCount: Math.min(3, rankedCandidates.length),
         candidateNavigatorOpen: false,
+        showRejected: false,
         response: {
           ...response,
-          candidates: (response.candidates || []).map((candidate) => ({
-            ...candidate,
-            reviewState: "candidate"
-          }))
+          candidates: rankedCandidates
         }
       };
       formStatus.textContent = response.candidates?.length
@@ -14276,6 +14382,13 @@ async function renderResearch(paneID = "utility:analysis") {
 
   renderEvidenceDiscovery(content);
 
+  if (state.researchConversationID) {
+    const conversation = await renderResearchConversation(state.researchConversationID, { embedded: true });
+    content.append(conversation);
+    appendTrustNotice();
+    return panel;
+  }
+
   if (!researchConversationList.length) {
     const empty = document.createElement("div");
     empty.className = "research-conversation-empty";
@@ -14421,9 +14534,6 @@ async function renderResearch(paneID = "utility:analysis") {
             await transitionWorkspace("utility", {
               refreshPaneIDs: [
                 "utility:analysis",
-                ...(state.researchConversationID === conversation.id
-                  ? [paneIDForResearchConversation(conversation.id)]
-                  : []),
                 ...projectPaneIDs
               ]
             });
@@ -14529,9 +14639,6 @@ async function renderResearch(paneID = "utility:analysis") {
                   ...(activeResearchConversation || {}),
                   ...payload.conversation
                 };
-                track.querySelector(
-                  `.research-conversation-panel[data-pane-id="${CSS.escape(paneIDForResearchConversation(conversation.id))}"] .panel-title`
-                )?.replaceChildren(document.createTextNode(conversation.title));
               }
               row.classList.remove("is-renaming");
               renderRow();
@@ -15095,7 +15202,8 @@ function bindResearchEvidenceDivider(layout, divider, conversationID) {
   });
 }
 
-async function renderResearchConversation(conversationID) {
+async function renderResearchConversation(conversationID, options = {}) {
+  const embedded = options.embedded === true;
   const paneID = paneIDForResearchConversation(conversationID);
   const renderingAccount = activeAccount();
   const renderingContext = {
@@ -15105,9 +15213,11 @@ async function renderResearchConversation(conversationID) {
     projectID: activeProjectIDForCodeQuestions(),
     conversationID
   };
-  const panel = document.createElement("article");
-  panel.className = "workspace-panel utility-panel research-conversation-panel";
-  applyPaneWeight(panel, paneID);
+  const panel = document.createElement(embedded ? "section" : "article");
+  panel.className = embedded
+    ? "research-conversation-embedded"
+    : "workspace-panel utility-panel research-conversation-panel";
+  if (!embedded) applyPaneWeight(panel, paneID);
   const header = document.createElement("header");
   header.className = "panel-header";
   const headingWrap = document.createElement("div");
@@ -15132,7 +15242,7 @@ async function renderResearchConversation(conversationID) {
   header.append(headingWrap, actions);
   const content = document.createElement("section");
   content.className = "research-conversation-content";
-  panel.append(header, content);
+  panel.append(...(embedded ? [content] : [header, content]));
 
   let conversation = null;
   try {
@@ -15210,7 +15320,52 @@ async function renderResearchConversation(conversationID) {
 
   const dialoguePane = document.createElement("section");
   dialoguePane.className = "research-dialogue-pane";
-  content.append(evidencePane, divider, dialoguePane);
+  let embeddedEvidenceDrawer = null;
+  let embeddedEvidenceNoticeRegion = null;
+  if (embedded) {
+    const selectedEvidence = document.createElement("details");
+    selectedEvidence.className = "research-selected-evidence-drawer";
+    const selectedEvidenceSummary = document.createElement("summary");
+    selectedEvidenceSummary.textContent = `Selected evidence (${displayedSources.length})`;
+    const selectedEvidenceBoundary = document.createElement("p");
+    selectedEvidenceBoundary.className = "research-selected-evidence-boundary";
+    selectedEvidenceBoundary.textContent = conversation.linkedCodeDecisionID
+      ? "Selected for exploratory Research · not approved for the Code Decision"
+      : "Selected for exploratory Research";
+    const selectedEvidenceNotices = document.createElement("section");
+    selectedEvidenceNotices.className = "research-selected-evidence-notices";
+    selectedEvidenceNotices.append(selectedEvidenceBoundary);
+    const selectedEvidenceList = document.createElement("ul");
+    selectedEvidenceList.className = "research-selected-evidence-list";
+    displayedSources.forEach((source) => {
+      const item = document.createElement("li");
+      const openSource = document.createElement("button");
+      openSource.type = "button";
+      openSource.className = "research-selected-evidence-open";
+      const citation = document.createElement("strong");
+      citation.textContent = `${source.codePrefix || "BC"} § ${source.sectionNumber || source.sectionID}`;
+      const title = document.createElement("span");
+      title.textContent = source.title || "Enacted provision";
+      openSource.append(citation, title);
+      openSource.addEventListener("click", () => openSectionDetailForExistingSearch(source, {
+        anchorPaneID: "utility:analysis"
+      }));
+      item.append(openSource);
+      if (source.selectedText) {
+        const selectedPassage = document.createElement("blockquote");
+        selectedPassage.className = "research-selected-evidence-passage";
+        selectedPassage.textContent = source.selectedText;
+        item.append(selectedPassage);
+      }
+      selectedEvidenceList.append(item);
+    });
+    selectedEvidence.append(selectedEvidenceSummary, selectedEvidenceList);
+    embeddedEvidenceDrawer = selectedEvidence;
+    embeddedEvidenceNoticeRegion = selectedEvidenceNotices;
+    content.append(selectedEvidenceNotices, selectedEvidence, dialoguePane);
+  } else {
+    content.append(evidencePane, divider, dialoguePane);
+  }
 
   const projectContextSection = renderResearchProjectContext(evidenceScroll, conversation);
   const sources = document.createElement("section");
@@ -15278,7 +15433,7 @@ async function renderResearchConversation(conversationID) {
       }
     });
     warning.append(warningText, refreshButton);
-    evidenceScroll.append(warning);
+    (embeddedEvidenceNoticeRegion || evidenceScroll).append(warning);
   }
 
   const thread = document.createElement("section");
@@ -15339,7 +15494,9 @@ async function renderResearchConversation(conversationID) {
   }
   const status = document.createElement("p");
   status.className = "research-composer-status";
-  if (projectContextBlocked) {
+  if (conversation.sourceStatus === "changed") {
+    status.textContent = "The enacted source changed. Refresh the selected evidence above before analyzing.";
+  } else if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
   } else if (evidenceRequired) {
     status.textContent = "Find and select at least one enacted-code passage before bounded Research analysis.";
@@ -15378,7 +15535,7 @@ async function renderResearchConversation(conversationID) {
   composerBox.append(input, sendButton);
   composer.append(composerBox, status);
   dialoguePane.append(composer);
-  bindResearchEvidenceDivider(content, divider, conversation.id);
+  if (!embedded) bindResearchEvidenceDivider(content, divider, conversation.id);
   requestAnimationFrame(() => {
     thread.scrollTop = thread.scrollHeight;
   });
@@ -18138,7 +18295,7 @@ function appendProjectResearchContextEditor(content, identity, initialConversati
       status.textContent = "Project context saved";
       if (state.researchConversationID === conversation.id) {
         await transitionWorkspace("utility", {
-          refreshPaneIDs: [paneIDForResearchConversation(conversation.id)]
+          refreshPaneIDs: ["utility:analysis"]
         });
       }
       window.setTimeout(() => {
@@ -24096,7 +24253,7 @@ function paneGroupForMove(paneID, orderedIDs = activePaneIDs()) {
   if (!paneID) return [];
   const active = new Set(orderedIDs);
   if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) {
-    return ["utility:analysis", paneIDForResearchConversation()].filter((id) => active.has(id));
+    return active.has("utility:analysis") ? ["utility:analysis"] : [];
   }
   if (
     paneID === primarySavedPaneID() ||
@@ -27808,7 +27965,6 @@ async function renderWorkspace(options = {}) {
   }
   if (state.utilities.analysis) {
     panes.push(await renderResearch());
-    if (state.researchConversationID) panes.push(await renderResearchConversation(state.researchConversationID));
   }
   if (state.utilities.settings) {
     panes.push(renderSettings());
@@ -27902,10 +28058,6 @@ async function renderUtilityWorkspace(options = {}) {
   }
   if (state.utilities.analysis) {
     panes.push(await reuseOrRenderPane("utility:analysis", renderResearch));
-    if (state.researchConversationID) {
-      const conversationPaneID = paneIDForResearchConversation();
-      panes.push(await reuseOrRenderPane(conversationPaneID, () => renderResearchConversation(state.researchConversationID)));
-    }
   }
   if (state.utilities.settings) {
     panes.push(await reuseOrRenderPane("utility:settings", renderSettings));
@@ -27950,6 +28102,10 @@ async function transitionWorkspace(mode = "default", options = {}) {
 }
 
 async function toggleUtilityPane(key) {
+  if (key === "analysis" && state.utilities.analysis) {
+    await closeResearchWorkspace();
+    return;
+  }
   if (repeatableUtilityKeys.has(key)) {
     const instance = newUtilityInstance(key);
     const paneID = paneIDForUtilityInstance(instance);
