@@ -233,6 +233,8 @@ assert.match(appSource, /const legacyReaderPaneWidth = 520;[\s\S]*?const default
 assert.match(appSource, /const legacySourceLinkedReaderPaneWidth = 400;[\s\S]*?const defaultSourceLinkedReaderPaneWidth = 600;/);
 assert.match(appSource, /const defaultResearchPaneWidth = 600;/);
 assert.match(appSource, /const defaultCodeDecisionPaneWidth = 600;/);
+assert.match(appSource, /const defaultSearchPaneWidth = 600;/);
+assert.match(appSource, /paneID === "utility:search" \|\| paneID\.startsWith\("utility:search:"\)\) return defaultSearchPaneWidth;/);
 assert.match(appSource, /return Math\.max\(defaultCodeDecisionPaneWidth, minimumWidthForPaneRole\(parsed\?\.paneRole\) \|\| 0\);/);
 assert.match(appSource, /paneID === "utility:analysis" \|\| paneID\.startsWith\("research:conversation:"\)\) return defaultResearchPaneWidth;/);
 assert.match(appSource, /paneID\?\.startsWith\("reader:"\)[\s\S]*?value === legacyReaderPaneWidth \|\| value === legacySourceLinkedReaderPaneWidth[\s\S]*?defaultPaneWidthForID\(paneID\) === defaultReaderPaneWidth[\s\S]*?return defaultReaderPaneWidth;/);

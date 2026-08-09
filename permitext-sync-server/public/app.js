@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-research-entry-v3";
+} from "./offline-storage.js?v=20260809-search-width-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -303,6 +303,7 @@ const defaultSourceLinkedReaderPaneWidth = 600;
 const legacyCoordinationPaneWidth = 430;
 const defaultNonReaderPaneWidth = 400;
 const defaultUtilityPaneWidth = defaultNonReaderPaneWidth;
+const defaultSearchPaneWidth = 600;
 const defaultSavedPaneWidth = 600;
 const defaultDetailPaneWidth = 600;
 const defaultWorkboardPaneWidth = 750;
@@ -2986,6 +2987,7 @@ function defaultPaneWidthForID(paneID) {
   if (paneID === "utility:saved" || paneID.startsWith("utility:saved:")) return defaultSavedPaneWidth;
   if (paneID === "utility:analysis" || paneID.startsWith("research:conversation:")) return defaultResearchPaneWidth;
   if (paneID === "utility:settings") return defaultSettingsPaneWidth;
+  if (paneID === "utility:search" || paneID.startsWith("utility:search:")) return defaultSearchPaneWidth;
   if (paneID.startsWith("utility:")) return defaultUtilityPaneWidth;
   if (paneID.startsWith("reader:")) {
     const readerID = paneID.replace("reader:", "");

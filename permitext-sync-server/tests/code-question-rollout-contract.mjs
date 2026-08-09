@@ -319,9 +319,10 @@ assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/
 assert.match(workspaceStyles, /\.code-decision-context-bar/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-saved-like-candidates-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v508/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-saved-like-candidates-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-search-width-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v509/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-search-width-v1/);
+assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 600px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-card \{[\s\S]*?border-bottom: 1px solid var\(--border\);[\s\S]*?border-radius: 0;[\s\S]*?background: transparent;/);

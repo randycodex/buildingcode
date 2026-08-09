@@ -3844,6 +3844,7 @@ select option:checked {
 .search-panel {
   position: relative;
   grid-template-rows: auto auto minmax(0, 1fr);
+  min-width: 600px;
   overflow: hidden;
 }
 
