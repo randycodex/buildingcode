@@ -5633,11 +5633,21 @@ mark {
   overflow: visible;
 }
 
+.evidence-candidate-controls {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
 .evidence-candidate-actions {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
-  margin-top: var(--space-1);
 }
 
 .evidence-candidate-actions button {
@@ -5658,8 +5668,7 @@ mark {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-2);
   align-items: center;
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--border);
+  padding: var(--space-1) 0 0;
 }
 
 .evidence-candidate-navigation span {

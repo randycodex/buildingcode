@@ -1268,7 +1268,7 @@ async function main() {
           workspaceScript.text.indexOf("function renderResearchInterpretation"),
           workspaceScript.text.indexOf("async function renderUtilityInstance")
         ).includes('citationsHeading.textContent = "Sources"') &&
-        webRoot.text.includes('/web/app.js?v=20260809-project-column-cleanup-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-candidate-controls-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1410,7 +1410,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-project-column-cleanup-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-candidate-controls-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1644,7 +1644,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-project-column-cleanup-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-candidate-controls-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -1765,6 +1765,7 @@ async function main() {
         evidenceDiscoveryClientSource.includes("View all") &&
         evidenceDiscoveryClientSource.includes("activeCandidateID") &&
         evidenceDiscoveryClientSource.includes("advanceAfterDisposition()") &&
+        evidenceDiscoveryClientSource.includes("card.append(cardHeader, reviewControls, quote)") &&
         evidenceDiscoveryClientSource.includes("Add Selected Evidence") &&
         evidenceDiscoveryClientSource.includes('targetConversationID ? "/research/conversations/evidence" : "/research/conversations/create"') &&
         evidenceDiscoveryClientSource.includes("{ conversationID: targetConversationID, selections: selectedPassages }") &&

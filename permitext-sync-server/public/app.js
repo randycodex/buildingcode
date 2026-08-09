@@ -41,7 +41,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-column-cleanup-v1";
+} from "./offline-storage.js?v=20260809-candidate-controls-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -13966,18 +13966,6 @@ function renderEvidenceDiscovery(container) {
         anchorPaneID: "utility:analysis"
       }));
       actions.append(approveButton, rejectButton, openButton);
-      card.append(cardHeader, quote);
-      if (candidate.sourceReviewRequirements?.length) {
-        card.append(sourceRequirements);
-      }
-      if (candidate.richSources?.length) {
-        card.append(structuredSources);
-      }
-      if (candidate.visualSources?.length) {
-        card.append(visualSources);
-      }
-      card.append(actions);
-      tray.append(card);
       const navigation = document.createElement("div");
       navigation.className = "evidence-candidate-navigation";
       const previous = document.createElement("button");
@@ -13993,7 +13981,20 @@ function renderEvidenceDiscovery(container) {
       const hint = document.createElement("span");
       hint.textContent = "Next skips this candidate without rejecting it.";
       navigation.append(previous, hint, next);
-      tray.append(navigation);
+      const reviewControls = document.createElement("div");
+      reviewControls.className = "evidence-candidate-controls";
+      reviewControls.append(actions, navigation);
+      card.append(cardHeader, reviewControls, quote);
+      if (candidate.sourceReviewRequirements?.length) {
+        card.append(sourceRequirements);
+      }
+      if (candidate.richSources?.length) {
+        card.append(structuredSources);
+      }
+      if (candidate.visualSources?.length) {
+        card.append(visualSources);
+      }
+      tray.append(card);
     }
     results.append(tray);
 
