@@ -47,7 +47,7 @@
     "test:code-question:http": "node --check tests/code-question-http-integration.mjs && node tests/code-question-http-integration.mjs"
   },
   "dependencies": {
-    "@blocknote/core": "^0.52.1",
+    "@blocknote/core": "^0.53.0",
     "@blocknote/mantine": "^0.52.1",
     "@blocknote/react": "^0.52.1",
     "@excalidraw/excalidraw": "^0.18.1",
