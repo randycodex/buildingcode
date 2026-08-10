@@ -1207,6 +1207,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
     let lastAttemptedSyncAt: Date?
     let lastErrorMessage: String?
     let latestEventID: Int64?
+    let contentMapVersion: Int?
 
     init(
         accountUserID: String,
@@ -1215,7 +1216,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         lastSuccessfulPullAt: Date? = nil,
         lastAttemptedSyncAt: Date? = nil,
         lastErrorMessage: String? = nil,
-        latestEventID: Int64? = nil
+        latestEventID: Int64? = nil,
+        contentMapVersion: Int? = nil
     ) {
         self.accountUserID = accountUserID
         self.backendName = backendName
@@ -1224,6 +1226,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         self.lastAttemptedSyncAt = lastAttemptedSyncAt
         self.lastErrorMessage = lastErrorMessage
         self.latestEventID = latestEventID
+        self.contentMapVersion = contentMapVersion
     }
 
     func markingPushSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
@@ -1234,11 +1237,16 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
             lastErrorMessage: nil,
-            latestEventID: latestEventID ?? self.latestEventID
+            latestEventID: latestEventID ?? self.latestEventID,
+            contentMapVersion: contentMapVersion
         )
     }
 
-    func markingPullSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
+    func markingPullSucceeded(
+        at date: Date,
+        latestEventID: Int64? = nil,
+        contentMapVersion: Int? = nil
+    ) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
             backendName: backendName,
@@ -1246,7 +1254,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPullAt: date,
             lastAttemptedSyncAt: date,
             lastErrorMessage: nil,
-            latestEventID: latestEventID ?? self.latestEventID
+            latestEventID: latestEventID ?? self.latestEventID,
+            contentMapVersion: contentMapVersion ?? self.contentMapVersion
         )
     }
 
@@ -1258,7 +1267,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastSuccessfulPullAt: lastSuccessfulPullAt,
             lastAttemptedSyncAt: date,
             lastErrorMessage: error.localizedDescription,
-            latestEventID: latestEventID
+            latestEventID: latestEventID,
+            contentMapVersion: contentMapVersion
         )
     }
 }
@@ -2268,7 +2278,7 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let since: Date?
     var sinceEventID: Int64? = nil
-    var contentMapVersion: Int? = 2
+    var contentMapVersion: Int? = nil
     var syncSchemaVersion: Int = 2
     var clientCapabilities: [String] = PermitextCapabilityID.allCases.map(\.rawValue)
 }

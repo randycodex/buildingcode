@@ -1254,6 +1254,9 @@ async function main() {
         searchTemplateSource.indexOf('class="panel-header"') < searchTemplateSource.indexOf('class="search-box"') &&
         searchTemplateSource.indexOf('class="search-box"') < searchTemplateSource.indexOf('class="search-code-filter"') &&
         searchTemplateSource.indexOf('class="search-code-filter"') < searchTemplateSource.indexOf('class="search-result-summary"') &&
+        workspaceScript.text.includes('const options = [{ prefix: "ALL", label: "All Codes" }]') &&
+        searchTemplateSource.includes('class="code-filter-menu-label">All Codes</span>') &&
+        !searchTemplateSource.includes("All Sections") &&
         !searchTemplateSource.includes("search-all-codes") &&
         !workspaceScript.text.includes("search-all-codes") &&
         searchTemplateSource.indexOf('class="search-result-summary"') < searchTemplateSource.indexOf('class="search-results"'),
@@ -1268,7 +1271,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260809-black-research-bubble-v1') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260810-sync-performance-v1') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1299,7 +1302,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('"Based only on selected Research evidence"') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260809-black-research-bubble-v1'),
+        webRoot.text.includes('/web/app.js?v=20260810-sync-performance-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1441,7 +1444,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-black-research-bubble-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260810-sync-performance-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1699,7 +1702,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-black-research-bubble-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260810-sync-performance-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2126,9 +2129,11 @@ async function main() {
         workspaceScript.text.includes("function mergeEquivalentSavedColumnRows") &&
         workspaceScript.text.includes("bookmark.annotationBlockID = blockID") &&
         workspaceScript.text.includes("item.annotationBlockID") &&
-        workspaceScript.text.includes("const visibleSavedItems = selectedFolder ? savedItems : savedItems.slice(0, 48)") &&
-        workspaceScript.text.includes("const visibleAnnotatedItems = selectedFolder ? annotatedItems : annotatedItems.slice(0, 48)") &&
-        workspaceScript.text.includes("const applySavedView = () =>") &&
+        workspaceScript.text.includes("const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems)") &&
+        workspaceScript.text.includes("rawCandidates.slice(0, allSavedLimit)") &&
+        !workspaceScript.text.includes("savedItems.slice(0, 48)") &&
+        workspaceScript.text.includes("const applySavedView = async () =>") &&
+        workspaceScript.text.includes('button.className = "saved-load-more-button"') &&
         workspaceScript.text.includes("function savedEvidenceMatchesQuery(item, query)") &&
         workspaceScript.text.includes("codeDisplayLabel(prefix)") &&
         workspaceScript.text.includes('const searchInput = panel.querySelector(".saved-evidence-search-input")') &&
@@ -2233,8 +2238,9 @@ async function main() {
         workspaceScript.text.includes("await refreshProjectMembershipPanes(project)") &&
         workspaceScript.text.includes('typeof panel.__refreshProjectMembership === "function"') &&
         workspaceScript.text.includes("panel.__refreshProjectMembership = () =>") &&
+        workspaceScript.text.includes("return refreshSavedPanelInPlace(paneID, {") &&
+        workspaceScript.text.includes("reconcileProjectStudio: false") &&
         workspaceScript.text.includes("const scrollTop = scrollContainer?.scrollTop || 0") &&
-        workspaceScript.text.includes("summary.projectSections = currentSummary.projectSections || []") &&
         workspaceScript.text.includes("if (scrollContainer) scrollContainer.scrollTop = scrollTop") &&
         workspaceScript.text.includes("return currentContentSummary().annotations") &&
         workspaceScript.text.includes("leftIsLocal === rightIsLocal ? 0 : leftIsLocal ? -1 : 1") &&
@@ -2760,8 +2766,9 @@ async function main() {
     assert(
       workspaceScript.text.includes('const workboardClientVersion = "20260801-workboard-control-align-v31";') &&
         workspaceScript.text.includes('link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68"') &&
-        webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68'),
-      "Web workspace omitted the cache-safe Workboard stylesheet or current preview assets."
+        workspaceScript.text.includes('link[href*="/web/workboard-assets/workboard.css"]') &&
+        !webRoot.text.includes('/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68'),
+      "Workboard styles should load once, on demand, instead of blocking every workspace load."
     );
     assert(
       workboardScript.response.headers.get("content-type")?.includes("javascript"),

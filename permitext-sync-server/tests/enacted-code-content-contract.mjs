@@ -94,8 +94,8 @@ assert.match(localLaw.sectionNumber, /^L\.L\.\s+\d{4}\/\d+/);
 assert.match(localLawBody.officialText, /take effect|effective|construction|building|housing|landmark|fire/i);
 
 const index = await enactedSearchIndex();
-assert(index.get("landmark")?.size > 0);
-assert(index.get("electrical")?.size > 0);
-assert(index.get("effective")?.size > 0);
+assert(Array.isArray(index.get("landmark")) && index.get("landmark").length > 0);
+assert(Array.isArray(index.get("electrical")) && index.get("electrical").length > 0);
+assert(Array.isArray(index.get("effective")) && index.get("effective").length > 0);
 
 console.log("permitext enacted-code content contract passed");

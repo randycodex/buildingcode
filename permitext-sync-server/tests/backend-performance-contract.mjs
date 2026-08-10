@@ -1,6 +1,17 @@
 import { readFile } from "node:fs/promises";
-import { allSectionCatalogByID, setBoundedLRUCacheValue } from "../app.mjs";
+import {
+  allSectionCatalogByID,
+  candidateSectionIDs,
+  createRetryableLazyLoader,
+  createSingleFlightInitializer,
+  setBoundedLRUCacheValue,
+  syncBatchIncludesProjectMutation
+} from "../app.mjs";
 import { createPostgresSyncRepository } from "../postgres-sync-repository.mjs";
+import {
+  intersectCandidateIDsWithPosting,
+  normalizedSortedPostingList
+} from "../search-postings.mjs";
 
 function assert(condition, message) {
   if (!condition) throw new Error(message);
@@ -85,6 +96,164 @@ assert(
   "The section-text cache does not evict the least recently used entry."
 );
 
+let schemaInitializationAttempts = 0;
+let releaseSchemaInitialization;
+const ensureSchemaOnce = createSingleFlightInitializer(() => {
+  schemaInitializationAttempts += 1;
+  return new Promise((resolve) => {
+    releaseSchemaInitialization = resolve;
+  });
+});
+const concurrentSchemaInitializations = [ensureSchemaOnce(), ensureSchemaOnce(), ensureSchemaOnce()];
+await Promise.resolve();
+assert(
+  schemaInitializationAttempts === 1,
+  "Concurrent cold requests can execute schema initialization more than once."
+);
+releaseSchemaInitialization();
+await Promise.all(concurrentSchemaInitializations);
+await ensureSchemaOnce();
+assert(
+  schemaInitializationAttempts === 1,
+  "Successful schema initialization is not retained."
+);
+
+let retryableSchemaAttempts = 0;
+const ensureRetryableSchema = createSingleFlightInitializer(async () => {
+  retryableSchemaAttempts += 1;
+  if (retryableSchemaAttempts === 1) throw new Error("temporary schema failure");
+});
+const failedSchemaInitializations = await Promise.allSettled([
+  ensureRetryableSchema(),
+  ensureRetryableSchema()
+]);
+assert(
+  retryableSchemaAttempts === 1 &&
+    failedSchemaInitializations.every(({ status }) => status === "rejected"),
+  "A failed schema initialization was not shared by concurrent callers."
+);
+await ensureRetryableSchema();
+await ensureRetryableSchema();
+assert(
+  retryableSchemaAttempts === 2,
+  "Schema initialization does not retry once after a transient failure."
+);
+
+let lazyLoadAttempts = 0;
+const retryableLazyLoader = createRetryableLazyLoader(async () => {
+  lazyLoadAttempts += 1;
+  if (lazyLoadAttempts === 1) throw new Error("temporary module failure");
+  return { renderReportPDF: () => "ready" };
+});
+const failedLazyLoads = await Promise.allSettled([
+  retryableLazyLoader(),
+  retryableLazyLoader()
+]);
+assert(
+  lazyLoadAttempts === 1 && failedLazyLoads.every(({ status }) => status === "rejected"),
+  "Concurrent lazy module loads do not share their first attempt."
+);
+const loadedModule = await retryableLazyLoader();
+assert(
+  lazyLoadAttempts === 2 &&
+    loadedModule.renderReportPDF() === "ready" &&
+    (await retryableLazyLoader()) === loadedModule,
+  "The lazy module loader did not reset after failure and cache the successful retry."
+);
+
+const arrayPostingIndex = new Map([
+  ["fire", [1, 2, 3, 4]],
+  ["rated", [2, 4]],
+  ["403.1", [5]],
+  ["403.10", [6, 7]]
+]);
+assert(
+  JSON.stringify([...candidateSectionIDs(arrayPostingIndex, ["fire", "rated"], "fire rated", "fire rated")]) ===
+    JSON.stringify([2, 4]),
+  "Array-backed posting-list intersection changed multi-token search results."
+);
+assert(
+  JSON.stringify([...candidateSectionIDs(arrayPostingIndex, ["missing"], "403.", "403.")]) ===
+    JSON.stringify([5, 6, 7]),
+  "Array-backed posting lists changed numeric or prefixed section lookup behavior."
+);
+
+const normalizedPosting = normalizedSortedPostingList([8, 2, 6, 4]);
+assert(
+  JSON.stringify(normalizedPosting) === JSON.stringify([2, 4, 6, 8]),
+  "Posting-list normalization did not preserve numeric search ordering."
+);
+const largePosting = Array.from({ length: 100_000 }, (_, index) => index * 2);
+let largePostingElementReads = 0;
+const trackedLargePosting = new Proxy(largePosting, {
+  get(target, property, receiver) {
+    if (typeof property === "string" && /^\d+$/u.test(property)) {
+      largePostingElementReads += 1;
+    }
+    return Reflect.get(target, property, receiver);
+  }
+});
+assert(
+  JSON.stringify([
+    ...intersectCandidateIDsWithPosting(new Set([2, 99_999, 199_998]), trackedLargePosting)
+  ]) === JSON.stringify([2, 199_998]),
+  "Binary posting-list intersection changed candidate parity."
+);
+assert(
+  largePostingElementReads < 100,
+  `Posting-list intersection scanned the larger posting (${largePostingElementReads} reads).`
+);
+
+const appSource = await readFile(new URL("../app.mjs", import.meta.url), "utf8");
+const postgresAdapterSource = appSource.slice(
+  appSource.indexOf("async function createPostgresStoreAdapter()"),
+  appSource.indexOf("async function storeAdapter()")
+);
+assert(
+  !/^import\s+.*["']\.\/report-pdf\.mjs["'];?$/mu.test(appSource),
+  "The main request module eagerly imports the PDF engine."
+);
+assert(
+  (appSource.match(/import\("\.\/report-pdf\.mjs"\)/gu) || []).length === 1 &&
+    appSource.includes(
+      'const loadReportPDFModule = createRetryableLazyLoader(() => import("./report-pdf.mjs"));'
+    ) &&
+    (appSource.match(/await renderReportPDFOnDemand\(/gu) || []).length === 2,
+  "PDF generation is not routed through one cached on-demand loader."
+);
+assert(
+  postgresAdapterSource.includes("const ensureSchema = createSingleFlightInitializer(async () => {") &&
+    postgresAdapterSource.includes(
+      "const migrateLegacyStateIfNeeded = createSingleFlightInitializer(async () => {"
+    ) &&
+    !postgresAdapterSource.includes("let initialized = false;") &&
+    !postgresAdapterSource.includes("let migrated = false;"),
+  "PostgreSQL schema or legacy migration initialization is not protected by retryable single-flight."
+);
+assert(
+  !appSource.includes(
+    "return rateLimitRepository.consume(input);\n      return rateLimitRepository.consume(input);"
+  ),
+  "The PostgreSQL rate-limit adapter contains an unreachable duplicate consume call."
+);
+assert(
+  appSource.includes("let cachedStoreAdapterPromise = null;") &&
+    appSource.includes("return cachedStoreAdapterPromise;"),
+  "Concurrent first requests can initialize duplicate store adapters."
+);
+assert(
+  syncBatchIncludesProjectMutation([{ project: { id: "project-1" } }]) &&
+    !syncBatchIncludesProjectMutation([{ savedItem: { id: "saved-1" } }]) &&
+    !syncBatchIncludesProjectMutation([]),
+  "The sync push optimization does not distinguish project activity from ordinary mutations."
+);
+assert(
+  appSource.includes("const includesProjectMutation = syncBatchIncludesProjectMutation(incoming);") &&
+    appSource.includes("const previousMutations = includesProjectMutation\n      ? (await readStore())") &&
+    appSource.includes("if (includesProjectMutation) {\n      await recordMeaningfulSyncActivity("),
+  "Ordinary PostgreSQL sync pushes still materialize the full store for project activity logging."
+);
+
 for (const sourceName of [
   "app.mjs",
   "postgres-account-repository.mjs",
@@ -93,6 +262,19 @@ for (const sourceName of [
 ]) {
   const source = await readFile(new URL(`../${sourceName}`, import.meta.url), "utf8");
   assert(!source.includes("isolationMode"), `${sourceName} still uses Neon's ignored isolationMode option.`);
+}
+
+for (const sourceName of [
+  "app.mjs",
+  "enacted-code-content.mjs",
+  "existing-building-content.mjs",
+  "zoning-content.mjs"
+]) {
+  const source = await readFile(new URL(`../${sourceName}`, import.meta.url), "utf8");
+  assert(
+    !source.includes("[token, new Set(ids)]") && !source.includes("[token, new Set(sectionIDs)]"),
+    `${sourceName} expands every persisted posting list into a Set.`
+  );
 }
 
 console.log("Permitext backend performance contract passed.");

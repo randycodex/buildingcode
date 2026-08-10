@@ -2,6 +2,72 @@ import XCTest
 import SQLite3
 @testable import permitext
 
+private actor SyncPullRecorder {
+    private var contentMapVersions: [Int?] = []
+
+    func record(contentMapVersion: Int?) {
+        contentMapVersions.append(contentMapVersion)
+    }
+
+    func recordedContentMapVersions() -> [Int?] {
+        contentMapVersions
+    }
+}
+
+private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
+    let name = "recording-sync"
+    let recorder: SyncPullRecorder
+    let returnedContentMapVersion: Int
+
+    func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
+        UserContentSyncPreviewReport(
+            pendingCount: items.count,
+            backendName: name,
+            sampledItemIDs: items.map(\.id)
+        )
+    }
+
+    func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport {
+        UserContentSyncPushReport(
+            attemptedCount: 0,
+            completedCount: 0,
+            backendName: name,
+            accountUserID: account.appUserID,
+            skippedReason: nil,
+            sampledItemIDs: [],
+            acceptedMutationIDs: [],
+            rejectedMutationIDs: [],
+            rejectionReasons: [:],
+            latestEventID: nil,
+            entitlement: nil,
+            capabilityContract: nil
+        )
+    }
+
+    func pull(
+        account: SignedInAccount,
+        since: Date?,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?
+    ) async throws -> ServerUserContentPullResult {
+        await recorder.record(contentMapVersion: contentMapVersion)
+        return ServerUserContentPullResult(
+            userID: account.appUserID,
+            pulledAt: Date(),
+            latestEventID: 42,
+            contentMapVersion: returnedContentMapVersion,
+            mutations: []
+        )
+    }
+
+    func previewMerge(
+        incoming: ServerUserContentPullResult,
+        localCandidates: [String: UserContentMergeCandidate]
+    ) throws -> UserContentMergePlan {
+        UserContentMergePlan(decisions: [])
+    }
+}
+
 final class EntitlementAndSyncContractTests: XCTestCase {
     private func isolatedEntitlementDefaults() -> UserDefaults {
         let suiteName = "permitext-tests-\(UUID().uuidString)"
@@ -1126,17 +1192,67 @@ final class EntitlementAndSyncContractTests: XCTestCase {
     func testSyncDeclaresVersionedCrossPlatformCapabilities() throws {
         let request = BackendUserContentPullRequest(
             auth: BackendAuthContext(accountUserID: "test-user", bearerToken: nil),
-            since: nil
+            since: nil,
+            contentMapVersion: 7
         )
         let data = try JSONEncoder().encode(request)
         let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let capabilities = try XCTUnwrap(object["clientCapabilities"] as? [String])
 
         XCTAssertEqual(object["syncSchemaVersion"] as? Int, 2)
+        XCTAssertEqual(object["contentMapVersion"] as? Int, 7)
         XCTAssertEqual(Set(capabilities), Set(PermitextCapabilityID.allCases.map(\.rawValue)))
         XCTAssertTrue(capabilities.contains("notebook"))
         XCTAssertTrue(capabilities.contains("professional-exports"))
         XCTAssertTrue(capabilities.contains("organization-administration"))
+    }
+
+    func testSyncPullPersistsAndReusesServerContentMapVersion() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
+        let account = SignedInAccount(
+            appUserID: "apple:content-map-version-test",
+            appleUserID: "content-map-version-test",
+            displayName: "Content Map Version Test",
+            signedInAt: Date()
+        )
+        checkpointStore.save(
+            UserContentSyncCheckpoint(
+                accountUserID: account.appUserID,
+                backendName: "recording-sync",
+                latestEventID: 41,
+                contentMapVersion: 6
+            )
+        )
+        let recorder = SyncPullRecorder()
+        let engine = UserContentSyncEngine(
+            repository: nil,
+            backend: RecordingUserContentSyncBackend(
+                recorder: recorder,
+                returnedContentMapVersion: 7
+            ),
+            checkpointStore: checkpointStore
+        )
+
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        XCTAssertEqual(engine.checkpoint(account: account)?.contentMapVersion, 7)
+
+        _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
+        let recordedVersions = await recorder.recordedContentMapVersions()
+        XCTAssertEqual(recordedVersions.count, 2)
+        XCTAssertEqual(recordedVersions[0], 6)
+        XCTAssertEqual(recordedVersions[1], 7)
+    }
+
+    func testLegacySyncCheckpointDecodesWithoutContentMapVersion() throws {
+        let legacyData = Data(
+            #"{"accountUserID":"apple:legacy-checkpoint","backendName":"permitext-http","latestEventID":41}"#.utf8
+        )
+
+        let checkpoint = try JSONDecoder().decode(UserContentSyncCheckpoint.self, from: legacyData)
+
+        XCTAssertEqual(checkpoint.latestEventID, 41)
+        XCTAssertNil(checkpoint.contentMapVersion)
     }
 
     func testCapabilityContractDecodesResearchPackaging() throws {

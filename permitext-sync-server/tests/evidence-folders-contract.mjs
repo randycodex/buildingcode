@@ -143,6 +143,44 @@ assert.ok(
 );
 assert.match(functionSource(appSource, "transitionProjectSelection"), /refreshSavedPanelInPlace/);
 assert.match(functionSource(appSource, "refreshSavedPanelInPlace"), /scrollTop[\s\S]*?hydrateSavedPanel[\s\S]*?scrollTop/);
+const syncedRefreshSource = functionSource(appSource, "refreshSyncedWorkspaceInPlace");
+assert.doesNotMatch(
+  syncedRefreshSource,
+  /transitionWorkspace|closeDeletedProjectDetails/,
+  "Background sync must not run the Project-deletion cleanup that can unmount active editors."
+);
+assert.match(
+  syncedRefreshSource,
+  /renderUtilityWorkspace\(\{[\s\S]*?skipDeletedProjectCleanup: true[\s\S]*?deferStateSave: true/,
+  "Background sync must selectively reconcile pane eligibility while preserving open Project editors."
+);
+assert.match(
+  functionSource(appSource, "renderUtilityWorkspace"),
+  /if \(!options\.skipDeletedProjectCleanup\) closeDeletedProjectDetails\(\)/,
+  "Only the background-sync path may bypass deleted-Project cleanup."
+);
+assert.match(
+  syncedRefreshSource,
+  /refreshSavedPanelInPlace\(paneID, \{ reconcileProjectStudio: false \}\)/,
+  "Background sync must hydrate Saved in place without steering or closing the active Project."
+);
+assert.match(
+  functionSource(appSource, "refreshVisibleSyncedDerivedState"),
+  /syncReaderNoteControls[\s\S]*?syncReaderNoteBookmarkButtons[\s\S]*?refreshOpenAnnotationProjectEditors/,
+  "Background sync must update visible notes and bookmarks without rebuilding readers or editors."
+);
+assert.match(syncedRefreshSource, /refreshBlankSearchHistoryPanes\(\)/);
+assert.match(syncedRefreshSource, /updateOpenProjectSyncWarning\(projectReconciliation\)/);
+assert.match(functionSource(appSource, "updateOpenProjectSyncWarning"), /Project archived on another device/);
+assert.match(functionSource(appSource, "handleForegroundSyncSignal"), /refreshSyncedWorkspaceInPlace/);
+assert.match(functionSource(appSource, "flushPendingSyncAndRender"), /refreshSyncedWorkspaceInPlace/);
+const foregroundSyncSource = functionSource(appSource, "performForegroundSync");
+assert.match(foregroundSyncSource, /refreshSyncedWorkspaceInPlace\(\{ accountUserID \}\)/);
+assert.equal(
+  (foregroundSyncSource.match(/renderWorkspace\(\)/g) || []).length,
+  2,
+  "Foreground sync may fully render only in its two account-identity change guards."
+);
 assert.match(functionSource(appSource, "closeAllColumns"), /state\.coordinations = \[\][\s\S]*?state\.coordinationThreads = \[\][\s\S]*?state\.projectHostPaneID = ""/);
 assert.doesNotMatch(functionSource(appSource, "closeAllColumns"), /state\.coordinationFilters = \{\}/);
 assert.match(functionSource(appSource, "primarySavedPaneID"), /state\.projectHostPaneID/);
@@ -175,6 +213,11 @@ assert.match(functionSource(appSource, "renderUtilityWorkspace"), /renderGenerat
 assert.doesNotMatch(functionSource(appSource, "projectCollaborationRefresh"), /projectOverviewRefreshPaneIDs/);
 assert.doesNotMatch(functionSource(appSource, "focusLinkedProjectRecord"), /projectOverviewRefreshPaneIDs/);
 assert.doesNotMatch(functionSource(appSource, "refreshProjectMembershipPanes"), /transitionWorkspace/);
+assert.match(
+  functionSource(appSource, "refreshProjectMembershipPanes"),
+  /await Promise\.all[\s\S]*?panel\.__refreshProjectMembership\(project\)/,
+  "Project membership refreshes should await each narrow Saved-pane hydration."
+);
 assert.ok(
   functionSource(appSource, "performSavedPanelHydration").indexOf("renderSavedFolderContext") <
     functionSource(appSource, "performSavedPanelHydration").indexOf("renderSavedProjects"),
@@ -188,10 +231,101 @@ assert.ok(
   assert.doesNotMatch(source, /projectOverviewRefreshPaneIDs/);
   assert.match(source, /syncProjectToolButtonStates/);
 });
-assert.match(appSource, /if \(!selectedFolder\) \{[\s\S]*?clear\(content\);[\s\S]*?return;/);
+const savedHydrationSource = functionSource(appSource, "performSavedPanelHydration");
+const savedEvidenceMatchesQuery = new Function(
+  "codeDisplayLabel",
+  "savedItemTags",
+  `${functionSource(appSource, "savedEvidenceMatchesQuery")}; return savedEvidenceMatchesQuery;`
+)((prefix) => prefix, (item) => item.tags || []);
+const resolveSavedSearchPage = new Function(
+  `${functionSource(appSource, "resolveSavedSearchPage")}; return resolveSavedSearchPage;`
+)();
+assert.match(
+  savedHydrationSource,
+  /if \(options\.reconcileProjectStudio !== false\) \{[\s\S]*?reconcileProjectStudioWithSavedFolders/,
+  "Ordinary Saved hydration must keep Project reconciliation while background sync can explicitly bypass it."
+);
+assert.doesNotMatch(
+  savedHydrationSource,
+  /if \(!selectedFolder\) \{[\s\S]*?panel\.__applySavedView = null;[\s\S]*?return;/,
+  "All Saved must not become an empty column merely because no Project or Reference is selected."
+);
+assert.match(
+  savedHydrationSource,
+  /const selectedFolderEvidenceKeys = selectedFolder[\s\S]*?projectSectionBelongsToProject\(link, selectedFolder\)[\s\S]*?const folderHydrationItems = selectedFolder && !savedInstance\.showAllSaved[\s\S]*?hydrateItems\(folderHydrationItems\)/,
+  "Selected Projects should hydrate only their linked evidence instead of the full Saved corpus."
+);
+assert.match(
+  savedHydrationSource,
+  /panel\.__refreshProjectMembership = \(\) => refreshSavedPanelInPlace\(paneID, \{[\s\S]*?reconcileProjectStudio: false/,
+  "Membership changes should rebuild the affected Saved pane so newly linked evidence is included."
+);
+assert.match(
+  savedHydrationSource,
+  /if \(!selectedFolder && searchActive\) \{[\s\S]*?resolveSavedSearchPage\(\{[\s\S]*?batchSize: savedItemsPageSize[\s\S]*?\} else \{[\s\S]*?rawCandidates\.slice\(0, allSavedLimit\)/,
+  "Search must scan bounded hydrated batches while the non-search view remains lazily paginated."
+);
+assert.doesNotMatch(savedHydrationSource, /savedItems\.slice\(0, 48\)|annotatedItems\.slice\(0, 48\)/);
+assert.doesNotMatch(savedHydrationSource, /allowUnhydrated|savedEvidenceNeedsHydrationForSearch/);
+assert.match(savedHydrationSource, /button\.textContent = "Show more"[\s\S]*?allSavedLimit \+= savedItemsPageSize/);
 assert.match(appSource, /collapsedCodePrefixes: searchActive \? \[\] : savedInstance\.collapsedCodePrefixes/);
 assert.match(appSource, /collapsedCodePrefixes: pane\?\.collapsedCodePrefixes/);
-assert.match(appSource, /function savedEvidenceMatchesQuery\([\s\S]*?codeDisplayLabel\(prefix\)[\s\S]*?item\.chapterTitle[\s\S]*?item\.noteBody/);
+assert.equal(
+  savedEvidenceMatchesQuery({ savedContentComparisonText: "A remote cross-device clause" }, "cross-device"),
+  true,
+  "Saved search must match the full hydrated section comparison text."
+);
+assert.equal(
+  savedEvidenceMatchesQuery({ previewText: "Hydrated smoke-control language" }, "smoke-control"),
+  true,
+  "Saved search must match hydrated preview text."
+);
+const crossDeviceCandidates = Array.from({ length: 60 }, (_, index) => ({
+  id: `ios-bookmark-${index + 1}`,
+  sectionID: index + 1
+}));
+const hydratedBatchSizes = [];
+const crossDeviceSearchPage = await resolveSavedSearchPage({
+  candidates: crossDeviceCandidates,
+  limit: 48,
+  batchSize: 48,
+  hydrateItems: async (items) => {
+    hydratedBatchSizes.push(items.length);
+    return items.map((item) => item.sectionID === 60
+      ? { ...item, savedContentComparisonText: "The obscure remote-only requirement applies." }
+      : item);
+  },
+  matchesItem: (item) => savedEvidenceMatchesQuery(item, "remote-only"),
+  normalizeMatches: (items) => items
+});
+assert.deepEqual(
+  crossDeviceSearchPage.items.map((item) => item.sectionID),
+  [60],
+  "All Saved search stopped at the first 48 ID-only iOS bookmarks and missed a later match."
+);
+assert.deepEqual(hydratedBatchSizes, [48, 12], "Saved search hydration did not stay within bounded batches.");
+assert.equal(crossDeviceSearchPage.exhausted, true);
+assert.equal(crossDeviceSearchPage.hasMore, false);
+const commonMatchBatchSizes = [];
+const commonMatchSearchPage = await resolveSavedSearchPage({
+  candidates: Array.from({ length: 120 }, (_, index) => ({ sectionID: index + 1 })),
+  limit: 48,
+  batchSize: 48,
+  hydrateItems: async (items) => {
+    commonMatchBatchSizes.push(items.length);
+    return items.map((item) => ({ ...item, previewText: "common hydrated phrase" }));
+  },
+  matchesItem: (item) => savedEvidenceMatchesQuery(item, "common hydrated"),
+  normalizeMatches: (items) => items
+});
+assert.equal(commonMatchSearchPage.items.length, 48);
+assert.equal(commonMatchSearchPage.hasMore, true);
+assert.equal(commonMatchSearchPage.exhausted, false);
+assert.deepEqual(
+  commonMatchBatchSizes,
+  [48, 48],
+  "Saved search should stop scanning once it has a visible page plus a has-more sentinel."
+);
 assert.doesNotMatch(appSource, /bookmarkIcon\.setAttribute\("aria-label", "Bookmarked"\)/);
 assert.match(appSource, /if \(status\.childElementCount\) metaLine\.append\(status\)/);
 assert.match(appSource, /if \(searchActive\) return;[\s\S]*?savedInstance\.collapsedCodePrefixes/);

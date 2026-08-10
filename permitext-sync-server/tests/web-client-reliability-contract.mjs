@@ -60,7 +60,91 @@ assert(
   "No-op account and entitlement writes must not restart sync or rebuild the entire workspace."
 );
 
+const functionSource = (name, nextName) => workspaceApp.slice(
+  workspaceApp.indexOf(name),
+  workspaceApp.indexOf(nextName, workspaceApp.indexOf(name) + name.length)
+);
+const workboardStyleLoader = functionSource(
+  "function loadWorkboardStyles()",
+  "function loadNotebookModule()"
+);
+assert(
+  workboardStyleLoader.includes('link[href*="/web/workboard-assets/workboard.css"]') &&
+    workboardStyleLoader.includes("let settled = false") &&
+    workboardStyleLoader.indexOf('link.addEventListener("load", handleLoad)') <
+      workboardStyleLoader.indexOf("if (link.sheet) settle(resolve)") &&
+    workboardStyleLoader.includes('link.removeEventListener("load", handleLoad)') &&
+    workboardStyleLoader.includes('link.removeEventListener("error", handleError)'),
+  "The lazy Workboard stylesheet loader must reuse an existing link without missing its load event or settling twice."
+);
+
+const syncReconciliation = functionSource(
+  "async function refreshSyncedWorkspaceInPlace(options = {})",
+  "function canRunForegroundSync()"
+);
+assert(
+  syncReconciliation.includes("const syncedProjects = currentContentSummary().projects || []") &&
+    syncReconciliation.includes("const accessibleProjects = openProjectDetails().length") &&
+    syncReconciliation.includes("? await projectsWithOrganizationAccess(syncedProjects)") &&
+    syncReconciliation.includes("const projectReconciliation = reconcileOpenProjectIdentityAfterSync(accessibleProjects)") &&
+    syncReconciliation.includes("renderCodeQuestionShellChrome()") &&
+    syncReconciliation.includes("await renderUtilityWorkspace({") &&
+    syncReconciliation.includes("skipDeletedProjectCleanup: true") &&
+    syncReconciliation.includes("await refreshBlankSearchHistoryPanes()") &&
+    syncReconciliation.includes("workspacePaneHasFocusedEditor(paneID)") &&
+    syncReconciliation.includes("refreshSavedPanelInPlace(paneID, { reconcileProjectStudio: false })") &&
+    syncReconciliation.includes("refreshMountedProjectChrome(projectReconciliation.detail)") &&
+    syncReconciliation.includes("updateOpenProjectSyncWarning(projectReconciliation)"),
+  "Foreground sync must reconcile safe surfaces without replacing mounted Project editors."
+);
+
+const utilityReconciliation = functionSource(
+  "async function renderUtilityWorkspace(options = {})",
+  "async function transitionWorkspace("
+);
+assert(
+    utilityReconciliation.includes("enforceReaderPlanLimit()") &&
+    utilityReconciliation.includes("if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails()") &&
+    utilityReconciliation.includes("openCodeQuestionPaneIDs()") &&
+    utilityReconciliation.includes("const existingPane = refreshPaneIDs.has(paneID) ? null : existingPanesByID.get(paneID)") &&
+    utilityReconciliation.includes("if (genericWorkboardIsOpen())") &&
+    utilityReconciliation.includes("reuseOrRenderPane(workboardID, () => renderProjectWorkboard(genericWorkboardIdentity))"),
+  "Selective sync rendering must enforce current entitlements while retaining mounted Workboard and editor panes."
+);
+
+const projectIdentityReconciliation = functionSource(
+  "function reconcileOpenProjectIdentityAfterSync(projects = currentContentSummary().projects || [])",
+  "function refreshMountedProjectChrome(project)"
+);
+assert(
+  projectIdentityReconciliation.includes("const syncedProject = visibleProjectRecords(projects)") &&
+  projectIdentityReconciliation.includes('return { detail: previous, status: "unavailable" }') &&
+    projectIdentityReconciliation.includes("state.workboards = replaceIdentity(openWorkboards())") &&
+    projectIdentityReconciliation.includes("state.notebooks = replaceIdentity(openNotebooks())") &&
+    projectIdentityReconciliation.includes("state.reportDrafts = replaceIdentity(openReportDrafts())") &&
+    projectIdentityReconciliation.includes("state.coordinations = replaceIdentity(openCoordinations())") &&
+    !projectIdentityReconciliation.includes("closeProjectDetailForProject"),
+  "Remote Project archival or deletion must retain mounted Project tools while updating current identity chrome."
+);
+
+const staleProjectWarning = functionSource(
+  "function updateOpenProjectSyncWarning(reconciliation)",
+  "async function refreshBlankSearchHistoryPanes()"
+);
+assert(
+  staleProjectWarning.includes("Project archived on another device") &&
+    staleProjectWarning.includes("Project no longer available after sync") &&
+    staleProjectWarning.includes("state.projectHostPaneID") &&
+    staleProjectWarning.includes('warning.setAttribute("aria-live", "polite")'),
+  "A remotely archived, deleted, or inaccessible open Project must remain visible with an explicit sync warning."
+);
+
 const workspaceStyles = await readFile(new URL("../public/styles.css", import.meta.url), "utf8");
+assert.match(
+  workspaceStyles,
+  /\.project-sync-stale-warning \{[\s\S]*?display: grid;[\s\S]*?gap: var\(--space-1\);[\s\S]*?\.workspace-panel\.has-stale-project-sync:not\(\.workboard-panel\) \{[\s\S]*?grid-template-rows: auto auto minmax\(0, 1fr\);[\s\S]*?\.project-sync-stale-warning p \{[\s\S]*?margin: 0;/,
+  "The cross-device stale Project warning must stay compact without paragraph default margins."
+);
 const workspacePanelRule = workspaceStyles.slice(
   workspaceStyles.indexOf(".workspace-panel {"),
   workspaceStyles.indexOf(".settings-panel,")

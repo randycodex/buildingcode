@@ -195,10 +195,11 @@ listeners.get("install")({
   }
 });
 await installCompletion;
-assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260809-black-research-bubble-v1"));
-assert(shellPrecacheURLs.includes("/web/styles.css?v=20260809-black-research-bubble-v1"));
+assert(shellPrecacheURLs.includes("/") && shellPrecacheURLs.includes("/web/app.js?v=20260810-sync-performance-v1"));
+assert(shellPrecacheURLs.includes("/web/styles.css?v=20260810-sync-performance-v1"));
 assert(shellPrecacheURLs.includes("/web/client-reliability.js?v=20260809-session-stability-v1"));
-assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260809-black-research-bubble-v1"));
+assert(shellPrecacheURLs.includes("/web/workspace-state.js?v=20260810-sync-performance-v1"));
+assert(!shellPrecacheURLs.some((url) => url.includes("/web/workboard-assets/workboard.css")));
 assert(shellPrecacheURLs.includes("/web/code-question-workspace.js?v=20260809-decision-index-width-v1"));
 assert(shellPrecacheURLs.includes("/web/code-question-client-state.js?v=20260809-session-stability-v3"));
 assert(shellPrecacheURLs.includes("/web/code-question-server.js?v=20260809-code-decision-v2"));
@@ -220,7 +221,7 @@ listeners.get("activate")({
   }
 });
 await activationCompletion;
-assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v565"));
+assert.ok(deletedCacheNames.some((name) => name.startsWith("permitext-pro-shell-") && name !== "permitext-pro-shell-v566"));
 
 function navigationResponse(path) {
   let response;

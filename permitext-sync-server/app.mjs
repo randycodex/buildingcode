@@ -19,6 +19,11 @@ import {
 import { createPostgresOrganizationRepository } from "./postgres-organization-repository.mjs";
 import { createPostgresRateLimitRepository } from "./postgres-rate-limit-repository.mjs";
 import { createPostgresSyncRepository } from "./postgres-sync-repository.mjs";
+import {
+  intersectCandidateIDsWithPosting,
+  normalizedSortedPostingList,
+  postingListSize
+} from "./search-postings.mjs";
 import { resolveContainedPrivatePath } from "./private-path-containment.mjs";
 import { createImageStorageProvider } from "./image-storage.mjs";
 import { matchesConfiguredAdminToken, timingSafeAdminTokenEqual } from "./admin-token-auth.mjs";
@@ -122,7 +127,6 @@ import {
   unavailableReportEvidenceWarning
 } from "./report-contract.mjs";
 import { codeMemoHTML, codeMemoStructuredJSON } from "./public/code-question-issue.js";
-import { renderReportPDF } from "./report-pdf.mjs";
 import { inlineCodeReferencePhrases } from "./public/code-references.js";
 import { syncProjectIdentity } from "./public/sync-identity.js";
 import {
@@ -265,6 +269,7 @@ const databaseURL =
   process.env.NEON_DATABASE_URL;
 
 let cachedStoreAdapter = null;
+let cachedStoreAdapterPromise = null;
 let cachedChapterIndex = null;
 let cachedChapterManifest = null;
 let cachedCanonicalSectionIDs = null;
@@ -283,6 +288,48 @@ const maxSearchableSectionPlainTextCacheEntries = 2_000;
 const maximumResearchVisualEvidenceBytes = 4 * 1024 * 1024;
 const maximumResearchConversationVisualSources = 8;
 const maximumResearchConversationVisualEvidenceBytes = 8 * 1024 * 1024;
+
+export function createRetryableLazyLoader(loader) {
+  let loadPromise = null;
+  return function load() {
+    if (!loadPromise) {
+      loadPromise = Promise.resolve()
+        .then(loader)
+        .catch((error) => {
+          loadPromise = null;
+          throw error;
+        });
+    }
+    return loadPromise;
+  };
+}
+
+export function createSingleFlightInitializer(initializer) {
+  let initialized = false;
+  let initializationPromise = null;
+  return async function ensureInitialized() {
+    if (initialized) return;
+    if (!initializationPromise) {
+      initializationPromise = Promise.resolve()
+        .then(initializer)
+        .then(() => {
+          initialized = true;
+        })
+        .catch((error) => {
+          initializationPromise = null;
+          throw error;
+        });
+    }
+    return initializationPromise;
+  };
+}
+
+const loadReportPDFModule = createRetryableLazyLoader(() => import("./report-pdf.mjs"));
+
+async function renderReportPDFOnDemand(...args) {
+  const module = await loadReportPDFModule();
+  return module.renderReportPDF(...args);
+}
 
 const emptyStore = () => ({
   users: {},
@@ -1390,13 +1437,8 @@ async function createPostgresStoreAdapter() {
       organizationRepository.mergeUserQueries(sourceUserID, targetUserID)
   });
   const syncRepository = createPostgresSyncRepository(sql);
-  let initialized = false;
-  let migrated = false;
 
-  async function ensureSchema() {
-    if (initialized) {
-      return;
-    }
+  const ensureSchema = createSingleFlightInitializer(async () => {
     await sql`
       CREATE TABLE IF NOT EXISTS permitext_sync_state (
         id TEXT PRIMARY KEY,
@@ -1850,8 +1892,7 @@ async function createPostgresStoreAdapter() {
     `;
     await organizationRepository.initialize();
     await rateLimitRepository.initialize();
-    initialized = true;
-  }
+  });
 
   async function readLegacyStore() {
     const rows = await sql`
@@ -2488,10 +2529,7 @@ async function createPostgresStoreAdapter() {
     return store;
   }
 
-  async function migrateLegacyStateIfNeeded() {
-    if (migrated) {
-      return;
-    }
+  const migrateLegacyStateIfNeeded = createSingleFlightInitializer(async () => {
     const [{ count }] = await sql`
       SELECT (
         (SELECT count(*) FROM permitext_users) +
@@ -2511,8 +2549,7 @@ async function createPostgresStoreAdapter() {
         await writeNormalizedStore(legacyStore, { backupLegacy: false });
       }
     }
-    migrated = true;
-  }
+  });
 
   return {
     kind: "postgres",
@@ -3582,12 +3619,21 @@ async function createPostgresStoreAdapter() {
 }
 
 async function storeAdapter() {
-  if (!cachedStoreAdapter) {
-    cachedStoreAdapter = databaseURL
-      ? await createPostgresStoreAdapter()
-      : createFileStoreAdapter();
+  if (cachedStoreAdapter) return cachedStoreAdapter;
+  if (!cachedStoreAdapterPromise) {
+    cachedStoreAdapterPromise = (async () =>
+      databaseURL ? createPostgresStoreAdapter() : createFileStoreAdapter()
+    )()
+      .then((adapter) => {
+        cachedStoreAdapter = adapter;
+        return adapter;
+      })
+      .catch((error) => {
+        cachedStoreAdapterPromise = null;
+        throw error;
+      });
   }
-  return cachedStoreAdapter;
+  return cachedStoreAdapterPromise;
 }
 
 async function readStore() {
@@ -4937,7 +4983,10 @@ async function shippedSearchIndex() {
   if (!cachedShippedSearchIndex) {
     const payload = await readJSONFile(shippedSearchIndexPath);
     cachedShippedSearchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [token, new Set(sectionIDs)])
+      Object.entries(payload.tokens || {}).map(([token, sectionIDs]) => [
+        token,
+        normalizedSortedPostingList(sectionIDs)
+      ])
     );
   }
   return cachedShippedSearchIndex;
@@ -4961,14 +5010,6 @@ function tokenizeSearchText(text) {
   }
   flush();
   return tokens;
-}
-
-function intersectSets(left, right) {
-  const intersection = new Set();
-  for (const value of left) {
-    if (right.has(value)) intersection.add(value);
-  }
-  return intersection;
 }
 
 function plainTextFromPreparedHTML(value) {
@@ -10142,7 +10183,7 @@ async function handleReportGenerate(request, response) {
       access.projectID,
       manifest
     );
-    const pdfBody = await renderReportPDF(manifest, { projectMaterialBySourceID });
+    const pdfBody = await renderReportPDFOnDemand(manifest, { projectMaterialBySourceID });
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {
       throw new Error("The generated Report PDF exceeds the supported file size.");
     }
@@ -12790,11 +12831,14 @@ export async function allSectionCatalogByID() {
   }
 }
 
-function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
-  let candidateIDs = new Set(index.get(queryTokens[0]) || []);
-  for (const token of queryTokens.slice(1)) {
-    candidateIDs = intersectSets(candidateIDs, index.get(token) || new Set());
+export function candidateSectionIDs(index, queryTokens, normalizedQuery, query) {
+  const postings = queryTokens
+    .map((token) => index.get(token) || [])
+    .sort((left, right) => postingListSize(left) - postingListSize(right));
+  let candidateIDs = new Set(postings[0] || []);
+  for (const posting of postings.slice(1)) {
     if (!candidateIDs.size) break;
+    candidateIDs = intersectCandidateIDsWithPosting(candidateIDs, posting);
   }
   if (/^[A-Za-z]?\d/.test(query)) {
     for (const [token, sectionIDs] of index) {
@@ -15947,6 +15991,10 @@ async function recordMeaningfulSyncActivity(userID, previousMutations, incomingM
   }
 }
 
+export function syncBatchIncludesProjectMutation(mutations) {
+  return (mutations || []).some((mutation) => mutationKindAndRecord(mutation).kind === "project");
+}
+
 async function handlePush(request, response) {
   const body = await readJSON(request);
   const userID = body.auth?.accountUserID || body.batch?.user?.id;
@@ -15989,14 +16037,19 @@ async function handlePush(request, response) {
     if (!context) {
       return;
     }
-    const previousMutations = (await readStore()).mutationsByUserID?.[userID] || [];
+    const includesProjectMutation = syncBatchIncludesProjectMutation(incoming);
+    const previousMutations = includesProjectMutation
+      ? (await readStore()).mutationsByUserID?.[userID] || []
+      : [];
     const result = await adapter.pushUserContent(userID, incoming);
-    await recordMeaningfulSyncActivity(
-      userID,
-      previousMutations,
-      incoming,
-      result.acceptedMutationIDs
-    );
+    if (includesProjectMutation) {
+      await recordMeaningfulSyncActivity(
+        userID,
+        previousMutations,
+        incoming,
+        result.acceptedMutationIDs
+      );
+    }
     const contentMapVersion = Number((await canonicalSectionIDs()).schemaVersion || 0);
     sendJSON(response, 200, {
       acceptedMutationIDs: includeSubmittedMutationIDAliases(
@@ -20372,7 +20425,7 @@ async function handleCodeQuestionIssueComplete(request, response) {
         draftHash: memoContext.memoApproval.payload.draftHash
       }
     });
-    const pdfBody = await renderReportPDF(manifest);
+    const pdfBody = await renderReportPDFOnDemand(manifest);
     const htmlBody = Buffer.from(codeMemoHTML(manifest), "utf8");
     const structuredBody = Buffer.from(codeMemoStructuredJSON(manifest), "utf8");
     if (!pdfBody.length || pdfBody.length > maxReportFileBytes) {

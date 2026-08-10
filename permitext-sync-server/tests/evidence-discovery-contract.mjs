@@ -47,22 +47,22 @@ const catalog = [{
 }];
 
 const invertedIndex = new Map([
-  ["scissor", new Set(["1"])],
-  ["stair", new Set(["1"])],
-  ["stairway", new Set(["1"])],
-  ["exit", new Set(["1"])],
-  ["plumbing", new Set(["2"])],
-  ["fixture", new Set(["2"])],
-  ["height", new Set(["3"])],
-  ["stories", new Set(["3"])],
-  ["fire", new Set(["4"])],
-  ["district", new Set(["4"])],
-  ["maps", new Set(["4"])],
-  ["prior", new Set(["5"])],
-  ["code", new Set(["5"])],
-  ["floor", new Set(["5"])],
-  ["surface", new Set(["5"])],
-  ["schedule", new Set(["6"])]
+  ["scissor", ["1"]],
+  ["stair", ["1"]],
+  ["stairway", ["1"]],
+  ["exit", ["1"]],
+  ["plumbing", ["2"]],
+  ["fixture", ["2"]],
+  ["height", ["3"]],
+  ["stories", ["3"]],
+  ["fire", ["4"]],
+  ["district", ["4"]],
+  ["maps", ["4"]],
+  ["prior", ["5"]],
+  ["code", ["5"]],
+  ["floor", ["5"]],
+  ["surface", ["5"]],
+  ["schedule", ["6"]]
 ]);
 
 const bodies = new Map([

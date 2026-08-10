@@ -114,7 +114,12 @@ protocol UserContentSyncBackend {
     var name: String { get }
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport
     func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport
-    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult
+    func pull(
+        account: SignedInAccount,
+        since: Date?,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?
+    ) async throws -> ServerUserContentPullResult
     func previewMerge(incoming: ServerUserContentPullResult, localCandidates: [String: UserContentMergeCandidate]) throws -> UserContentMergePlan
 }
 
@@ -147,7 +152,12 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
         )
     }
 
-    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult {
+    func pull(
+        account: SignedInAccount,
+        since: Date?,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?
+    ) async throws -> ServerUserContentPullResult {
         ServerUserContentPullResult(
             userID: account.appUserID,
             pulledAt: Date(),
@@ -386,12 +396,18 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
-    func pull(account: SignedInAccount, since: Date?, sinceEventID: Int64?) async throws -> ServerUserContentPullResult {
+    func pull(
+        account: SignedInAccount,
+        since: Date?,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?
+    ) async throws -> ServerUserContentPullResult {
         try await transport.pullUserContent(
             BackendUserContentPullRequest(
                 auth: authContext(for: account),
                 since: since,
-                sinceEventID: sinceEventID
+                sinceEventID: sinceEventID,
+                contentMapVersion: contentMapVersion
             )
         )
     }
@@ -501,7 +517,13 @@ struct UserContentSyncEngine {
             return
         }
 
-        let incoming = try await backend.pull(account: account, since: nil, sinceEventID: nil)
+        let checkpoint = checkpoint(for: account)
+        let incoming = try await backend.pull(
+            account: account,
+            since: nil,
+            sinceEventID: nil,
+            contentMapVersion: checkpoint.contentMapVersion
+        )
         guard let mutation = incoming.mutations.first(where: { $0.recordID == conflict.recordID }) else {
             throw UserContentSyncError.rejectedByServer("The server copy is no longer available. Pull again before resolving this conflict.")
         }
@@ -515,9 +537,10 @@ struct UserContentSyncEngine {
         }
         if try repository.failedSyncQueueItems(limit: 1).isEmpty {
             checkpointStore.save(
-                checkpoint(for: account).markingPullSucceeded(
+                checkpoint.markingPullSucceeded(
                     at: incoming.pulledAt,
-                    latestEventID: incoming.latestEventID ?? incoming.syncRevision
+                    latestEventID: incoming.latestEventID ?? incoming.syncRevision,
+                    contentMapVersion: incoming.contentMapVersion
                 )
             )
         }
@@ -556,7 +579,8 @@ struct UserContentSyncEngine {
             let incoming = try await backend.pull(
                 account: account,
                 since: checkpoint.latestEventID == nil ? since ?? checkpoint.lastSuccessfulPullAt : nil,
-                sinceEventID: checkpoint.latestEventID
+                sinceEventID: checkpoint.latestEventID,
+                contentMapVersion: checkpoint.contentMapVersion
             )
             let resolvedLocalCandidates = try localCandidates.isEmpty
                 ? repository?.localMergeCandidates(
@@ -575,7 +599,8 @@ struct UserContentSyncEngine {
                 checkpointStore.save(
                     checkpoint.markingPullSucceeded(
                         at: incoming.pulledAt,
-                        latestEventID: incoming.latestEventID ?? incoming.syncRevision
+                        latestEventID: incoming.latestEventID ?? incoming.syncRevision,
+                        contentMapVersion: incoming.contentMapVersion
                     )
                 )
             }

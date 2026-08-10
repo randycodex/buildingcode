@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizedSortedPostingList } from "./search-postings.mjs";
 
 const serverRoot = dirname(fileURLToPath(import.meta.url));
 const authoredRoot = join(
@@ -52,6 +53,7 @@ export const enactedCodePrefixes = new Set([
 ]);
 
 const packageCaches = new Map();
+let mergedSearchIndexPromise = null;
 
 function cacheFor(definition) {
   if (!packageCaches.has(definition.id)) {
@@ -60,7 +62,6 @@ function cacheFor(definition) {
       manifest: null,
       source: null,
       catalog: null,
-      searchIndex: null,
       chapters: new Map(),
       sections: new Map()
     });
@@ -109,14 +110,13 @@ async function packageCatalog(definition) {
 }
 
 async function packageSearchIndex(definition) {
-  const cache = cacheFor(definition);
-  if (!cache.searchIndex) {
-    const payload = await readJSON(join(definition.root, "prepared", "searchIndex.json"));
-    cache.searchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, ids]) => [token, new Set(ids)])
-    );
-  }
-  return cache.searchIndex;
+  const payload = await readJSON(join(definition.root, "prepared", "searchIndex.json"));
+  return new Map(
+    Object.entries(payload.tokens || {}).map(([token, ids]) => [
+      token,
+      normalizedSortedPostingList(ids)
+    ])
+  );
 }
 
 export function isEnactedCodeChapterID(value) {
@@ -245,13 +245,24 @@ export async function enactedSection(sectionID) {
 }
 
 export async function enactedSearchIndex() {
-  const merged = new Map();
-  for (const definition of packageDefinitions) {
-    const index = await packageSearchIndex(definition);
-    for (const [token, ids] of index) {
-      if (!merged.has(token)) merged.set(token, new Set());
-      for (const id of ids) merged.get(token).add(id);
-    }
+  if (!mergedSearchIndexPromise) {
+    mergedSearchIndexPromise = (async () => {
+      const merged = new Map();
+      for (const definition of packageDefinitions) {
+        const index = await packageSearchIndex(definition);
+        for (const [token, ids] of index) {
+          const existing = merged.get(token);
+          merged.set(token, existing ? [...existing, ...ids] : ids);
+        }
+      }
+      for (const [token, ids] of merged) {
+        merged.set(token, normalizedSortedPostingList(ids));
+      }
+      return merged;
+    })().catch((error) => {
+      mergedSearchIndexPromise = null;
+      throw error;
+    });
   }
-  return merged;
+  return mergedSearchIndexPromise;
 }

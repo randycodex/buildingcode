@@ -652,8 +652,9 @@ export async function discoverRelevantEvidence({
 
   for (const [term, weight] of terms) {
     const posting = index.get(term);
-    if (!posting?.size) continue;
-    const inverseFrequency = Math.log((sections.length + 1) / (posting.size + 1)) + 1;
+    const postingSize = Number(posting?.size ?? posting?.length ?? 0);
+    if (!postingSize) continue;
+    const inverseFrequency = Math.log((sections.length + 1) / (postingSize + 1)) + 1;
     for (const rawID of posting) {
       const id = comparableSectionID(rawID);
       if (!catalogByID.has(id)) continue;

@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizedSortedPostingList } from "./search-postings.mjs";
 
 const serverRoot = dirname(fileURLToPath(import.meta.url));
 export const existingBuildingContentRoot = join(
@@ -163,7 +164,10 @@ export async function existingBuildingSearchIndex() {
   if (!cachedSearchIndex) {
     const payload = await readJSON(join(preparedRoot, "searchIndex.json"));
     cachedSearchIndex = new Map(
-      Object.entries(payload.tokens || {}).map(([token, ids]) => [token, new Set(ids)])
+      Object.entries(payload.tokens || {}).map(([token, ids]) => [
+        token,
+        normalizedSortedPostingList(ids)
+      ])
     );
   }
   return cachedSearchIndex;

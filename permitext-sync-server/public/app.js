@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-black-research-bubble-v1";
+} from "./sync-state.js?v=20260810-sync-performance-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-black-research-bubble-v1";
+} from "./offline-storage.js?v=20260810-sync-performance-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-black-research-bubble-v1";
+} from "./workspace-state.js?v=20260810-sync-performance-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -321,6 +321,7 @@ const readerInternalSearchDelayMS = 180;
 const readerInitialSectionWindowSize = 5;
 const readerProgressiveSectionBatchSize = 12;
 const searchResultPageSize = 25;
+const savedItemsPageSize = 48;
 const recentViewLimit = 50;
 const recentSearchLimit = 50;
 const repeatableUtilityKeys = new Set(["search", "saved"]);
@@ -1706,21 +1707,32 @@ function loadWorkboardModule() {
 function loadWorkboardStyles() {
   if (workboardStylesPromise) return workboardStylesPromise;
   workboardStylesPromise = new Promise((resolve, reject) => {
-    const existing = document.querySelector('link[data-permitext-workboard-styles="true"]');
-    if (existing?.sheet) {
-      resolve();
-      return;
-    }
+    const existing = document.querySelector(
+      'link[data-permitext-workboard-styles="true"], link[href*="/web/workboard-assets/workboard.css"]'
+    );
     const link = existing || document.createElement("link");
+    let settled = false;
+    const settle = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      link.removeEventListener("load", handleLoad);
+      link.removeEventListener("error", handleError);
+      callback(value);
+    };
+    const handleLoad = () => settle(resolve);
+    const handleError = () => {
+      workboardStylesPromise = null;
+      settle(reject, new Error("Could not load Workboard styles."));
+    };
     link.rel = "stylesheet";
     link.href = "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68";
     link.dataset.permitextWorkboardStyles = "true";
-    link.addEventListener("load", resolve, { once: true });
-    link.addEventListener("error", () => {
-      workboardStylesPromise = null;
-      reject(new Error("Could not load Workboard styles."));
-    }, { once: true });
+    // Subscribe before rechecking readiness so an existing link cannot finish
+    // between the first DOM lookup and listener registration.
+    link.addEventListener("load", handleLoad);
+    link.addEventListener("error", handleError);
     if (!existing) document.head.append(link);
+    if (link.sheet) settle(resolve);
   });
   return workboardStylesPromise;
 }
@@ -3507,6 +3519,7 @@ function refreshOpenProjectPaneTheme(project) {
   const color = identity.color || projectColorOptions[0];
   [
     paneIDForProjectDetail(identity),
+    paneIDForProjectWorkboard(identity),
     paneIDForProjectNotebook(identity),
     paneIDForProjectReportDraft(identity),
     paneIDForProjectCoordination(identity),
@@ -3530,11 +3543,10 @@ function syncSavedArchiveButtonStates() {
 }
 
 async function refreshProjectMembershipPanes(project) {
-  track.querySelectorAll(".saved-panel[data-pane-id]").forEach((panel) => {
-    if (typeof panel.__refreshProjectMembership === "function") {
-      panel.__refreshProjectMembership();
-    }
-  });
+  await Promise.all(Array.from(track.querySelectorAll(".saved-panel[data-pane-id]"))
+    .map((panel) => typeof panel.__refreshProjectMembership === "function"
+      ? panel.__refreshProjectMembership(project)
+      : null));
 }
 
 function placeProjectDetailAfterProjects(detail, sourcePaneID = primarySavedPaneID()) {
@@ -3793,7 +3805,7 @@ function codeFilterLabel(option) {
 
 function searchCodeFilterOptions() {
   const dynamicPrefixes = new Set(chapters.map((chapter) => chapter.codePrefix).filter(Boolean));
-  const options = [{ prefix: "ALL", label: "All Sections" }];
+  const options = [{ prefix: "ALL", label: "All Codes" }];
   codeOptions.forEach((option) => {
     if (dynamicPrefixes.size === 0 || dynamicPrefixes.has(option.prefix)) {
       options.push({ ...option, label: codeFilterLabel(option) });
@@ -3808,11 +3820,11 @@ function searchCodeFilterOptions() {
 
 function codeFilterMenuLabel(prefixes = []) {
   const selectedPrefixes = normalizeSearchCodeFilters(prefixes);
-  if (selectedPrefixes.length === 0) return "All Sections";
+  if (selectedPrefixes.length === 0) return "All Codes";
   if (selectedPrefixes.length === 1) {
     return searchCodeFilterOptions().find((option) => option.prefix === selectedPrefixes[0])?.label || selectedPrefixes[0];
   }
-  return `${selectedPrefixes.length} Sections`;
+  return `${selectedPrefixes.length} code books`;
 }
 
 function savedCodeFilterMenuLabel(instance) {
@@ -3838,7 +3850,7 @@ function updateCodeFilterMenu(filterRail, instance, options = {}) {
   const label = toggle?.querySelector(".code-filter-menu-label");
   if (!menu || !toggle || !label) return;
   const stateKey = options.stateKey || "codeFilterMenuOpen";
-  const menuName = options.menuName || "code section filters";
+  const menuName = options.menuName || "code filters";
   const menuLabel = typeof options.label === "function"
     ? options.label(instance)
     : options.label || codeFilterMenuLabel(instance?.codeFilters);
@@ -7966,8 +7978,344 @@ function syncResultChangesWorkspace(result) {
 }
 
 async function flushPendingSyncAndRender() {
+  const accountUserID = activeAccount()?.userID || "";
   const result = await flushSyncOutbox({ refresh: true });
-  if (syncResultChangesWorkspace(result)) await renderWorkspace();
+  if (syncResultChangesWorkspace(result)) {
+    await refreshSyncedWorkspaceInPlace({ accountUserID });
+  }
+}
+
+function visibleSyncedTargetKey(target) {
+  return [
+    syncCodeVersion(target?.codeVersion || defaultSyncCodeVersion),
+    String(target?.sectionID || ""),
+    normalizeAnnotationBlockID(target?.blockID)
+  ].join(":");
+}
+
+function refreshVisibleSyncedDerivedState() {
+  const targets = new Map();
+  const addTarget = (target) => {
+    if (!target?.sectionID) return;
+    targets.set(visibleSyncedTargetKey(target), {
+      ...target,
+      codeVersion: syncCodeVersion(target.codeVersion || defaultSyncCodeVersion),
+      blockID: normalizeAnnotationBlockID(target.blockID)
+    });
+  };
+
+  track.querySelectorAll(".inline-comment[data-comment-section-id]").forEach((wrapper) => {
+    addTarget({
+      sectionID: wrapper.dataset.commentSectionId,
+      blockID: wrapper.dataset.commentBlockId,
+      codeVersion: wrapper.dataset.commentCodeVersion
+    });
+  });
+  track.querySelectorAll(".reader-notes-sheet, .section-detail-panel").forEach((element) => {
+    addTarget(element.__annotationTarget);
+  });
+  track.querySelectorAll(".section-comment-box[data-section-id]").forEach((box) => {
+    addTarget({
+      sectionID: box.dataset.sectionId,
+      blockID: box.dataset.blockId,
+      codeVersion: defaultSyncCodeVersion
+    });
+  });
+
+  const focusedElement = document.activeElement;
+  targets.forEach((target) => {
+    syncReaderNoteControls(
+      target.sectionID,
+      target.blockID,
+      noteValueForTarget(target),
+      { source: focusedElement, target }
+    );
+  });
+
+  track.querySelectorAll(".section-comment-box[data-section-id]").forEach((box) => {
+    const input = box.querySelector(".comment-input");
+    if (!input || input === focusedElement) return;
+    input.value = noteValueForTarget({
+      sectionID: box.dataset.sectionId,
+      blockID: box.dataset.blockId,
+      codeVersion: defaultSyncCodeVersion
+    });
+  });
+
+  const visibleReaderSections = new Map();
+  track.querySelectorAll(".reader-panel .chapter-section[data-section-id]").forEach((section) => {
+    const target = {
+      sectionID: section.dataset.sectionId,
+      codeVersion: section.dataset.codeVersion || defaultSyncCodeVersion
+    };
+    visibleReaderSections.set(visibleSyncedTargetKey(target), target);
+  });
+  visibleReaderSections.forEach((target) => {
+    syncReaderNoteBookmarkButtons(
+      target.sectionID,
+      isSectionSaved(target),
+      target.codeVersion
+    );
+  });
+
+  track.querySelectorAll(".section-detail-panel").forEach((panel) => {
+    const target = panel.__annotationTarget;
+    const sectionPayload = panel.__sectionPayload;
+    if (!target?.sectionID || !sectionPayload?.sectionID) return;
+    const notes = panel.querySelector(".section-detail-notes");
+    notes?.dispatchEvent(new CustomEvent("permitext-folder-save", {
+      detail: { saved: isSectionSaved(sectionPayload) }
+    }));
+    const textarea = notes?.querySelector("textarea");
+    if (textarea && textarea !== focusedElement) textarea.value = noteValueForTarget(target);
+    const tags = panel.querySelector(".section-detail-tags");
+    if (tags && !tags.contains(focusedElement)) renderAnnotationTagEditor(tags, target);
+  });
+
+  track.querySelectorAll(".reader-notes-sheet.is-open:not([hidden])").forEach((sheet) => {
+    const target = sheet.__annotationTarget;
+    const tags = sheet.querySelector(".reader-notes-tags");
+    if (target?.sectionID && tags && !tags.contains(focusedElement)) {
+      renderAnnotationTagEditor(tags, target);
+    }
+  });
+
+  openProjectDetails().forEach((detail) => {
+    const currentProject = visibleProjectRecords(currentContentSummary().projects || [])
+      .find((project) => projectDetailMatches(project, detail));
+    if (currentProject) refreshOpenProjectPaneTheme(currentProject);
+  });
+  refreshOpenAnnotationProjectEditors();
+  refreshVisiblePlanUsage();
+  updateConnectionStatus();
+}
+
+function workspacePaneHasFocusedEditor(paneID) {
+  const focusedElement = document.activeElement;
+  if (!focusedElement?.matches?.('input, textarea, select, [contenteditable="true"]')) return false;
+  return Boolean(
+    track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`)
+      ?.contains(focusedElement)
+  );
+}
+
+function reconcileOpenProjectIdentityAfterSync(projects = currentContentSummary().projects || []) {
+  const previous = openProjectDetails()[0] || null;
+  if (!previous) return { detail: null, status: "current" };
+  if (syncedContent?.status !== "connected") return { detail: previous, status: "current" };
+  const syncedProject = visibleProjectRecords(projects)
+    .find((project) => projectDetailMatches(project, previous)) || null;
+  if (!syncedProject) return { detail: previous, status: "unavailable" };
+
+  const next = { ...previous, ...projectIdentity(syncedProject) };
+  const nextIdentity = projectIdentity(next);
+  const replaceIdentity = (items = []) => items.map((item) =>
+    projectDetailMatches(item, previous) ? { ...item, ...nextIdentity } : item
+  );
+  setOpenProjectDetails([next]);
+  state.workboards = replaceIdentity(openWorkboards());
+  state.notebooks = replaceIdentity(openNotebooks());
+  state.reportDrafts = replaceIdentity(openReportDrafts());
+  state.coordinations = replaceIdentity(openCoordinations());
+  state.coordinationThreads = replaceIdentity(openCoordinationThreads());
+  state.detachedWorkboards = replaceIdentity(detachedWorkboards());
+  return {
+    detail: next,
+    status: projectIsArchived(syncedProject)
+      ? "archived"
+      : folderIsProject(syncedProject) ? "current" : "unavailable"
+  };
+}
+
+function refreshMountedProjectChrome(project) {
+  if (!project) return;
+  const identity = projectIdentity(project);
+  const projectID = projectDetailKey(identity);
+  const projectRecordIDs = new Set([
+    projectID,
+    projectRecordID(identity),
+    String(identity.id || ""),
+    String(identity.clientID || ""),
+    String(identity.localFolderID || "")
+  ].filter(Boolean));
+  const projectName = identity.name || identity.title || "Project";
+  refreshOpenProjectPaneTheme(identity);
+
+  const paneIDs = new Set([
+    paneIDForProjectDetail(identity),
+    paneIDForProjectWorkboard(identity),
+    paneIDForProjectNotebook(identity),
+    paneIDForProjectReportDraft(identity),
+    paneIDForProjectCoordination(identity),
+    ...(openCoordinationThreadForProject(identity)
+      ? [paneIDForProjectCoordinationThread(identity, openCoordinationThreadForProject(identity).threadID)]
+      : [])
+  ]);
+  const panels = new Set(
+    Array.from(track.querySelectorAll(`.workspace-panel[data-project-id="${CSS.escape(projectID)}"]`))
+  );
+  paneIDs.forEach((paneID) => {
+    const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    if (panel) panels.add(panel);
+  });
+
+  panels.forEach((panel) => {
+    panel.querySelectorAll(".project-tool-pane-drag-handle").forEach((handle) => {
+      handle.title = `Reorder ${projectName} tools`;
+      handle.setAttribute("aria-label", handle.title);
+    });
+    const reportEyebrow = panel.querySelector(".report-draft-eyebrow");
+    if (reportEyebrow) reportEyebrow.textContent = projectName;
+    const coordinationEyebrow = panel.querySelector(":scope > .coordination-header > div > span");
+    if (coordinationEyebrow) coordinationEyebrow.textContent = projectName;
+    const detailTitle = panel.querySelector(":scope > .project-detail-chrome .project-detail-heading > h2");
+    if (detailTitle) detailTitle.textContent = projectName;
+    panel.querySelectorAll(".coordination-thread-metadata dt").forEach((term) => {
+      if (term.textContent === "Project" && term.nextElementSibling) {
+        term.nextElementSibling.textContent = projectName;
+      }
+    });
+  });
+
+  track.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
+    if (!projectRecordIDs.has(String(tile.dataset.projectId || ""))) return;
+    tile.style.setProperty("--project-color", identity.color || projectColorOptions[0]);
+    tile.style.setProperty("--project-on-color", projectForegroundColor(identity.color));
+    tile.dataset.projectName = projectName;
+    tile.dataset.defaultAriaLabel = `Open ${projectName}`;
+    if (!tile.hasAttribute("aria-pressed")) tile.setAttribute("aria-label", tile.dataset.defaultAriaLabel);
+    const title = tile.querySelector("strong");
+    if (title) title.textContent = projectName;
+  });
+  (state.utilityInstances || [])
+    .filter((instance) =>
+      instance.key === "saved" && projectRecordIDs.has(String(instance.selectedFolderID || ""))
+    )
+    .forEach((instance) => {
+      const panel = track.querySelector(
+        `.saved-panel[data-pane-id="${CSS.escape(paneIDForUtilityInstance(instance))}"]`
+      );
+      if (!panel) return;
+      panel.style.setProperty("--project-color", identity.color || projectColorOptions[0]);
+      panel.querySelector(`.saved-folder-context[data-project-id="${CSS.escape(projectID)}"]`)
+        ?.style.setProperty("--project-color", identity.color || projectColorOptions[0]);
+      const menuLabel = panel.querySelector(".saved-projects-menu-toggle .code-filter-menu-label");
+      if (menuLabel && !instance.projectsMenuOpen && !instance.projectsArchiveMode) {
+        menuLabel.textContent = projectName;
+      }
+    });
+  track
+    .querySelectorAll(`.saved-folder-context.is-project[data-project-id="${CSS.escape(projectID)}"] .saved-project-tool-controls`)
+    .forEach((controls) => controls.setAttribute("aria-label", `${projectName} tools`));
+}
+
+function updateOpenProjectSyncWarning(reconciliation) {
+  track.querySelectorAll(".project-sync-stale-warning").forEach((warning) => warning.remove());
+  track.querySelectorAll(".workspace-panel.has-stale-project-sync").forEach((panel) => {
+    panel.classList.remove("has-stale-project-sync");
+  });
+  if (!reconciliation?.detail || reconciliation.status === "current") return;
+
+  const detail = reconciliation.detail;
+  const projectID = projectDetailKey(detail);
+  const paneIDs = new Set([
+    state.projectHostPaneID,
+    paneIDForProjectDetail(detail),
+    paneIDForProjectWorkboard(detail),
+    paneIDForProjectNotebook(detail),
+    paneIDForProjectReportDraft(detail),
+    paneIDForProjectCoordination(detail),
+    ...(openCoordinationThreadForProject(detail)
+      ? [paneIDForProjectCoordinationThread(detail, openCoordinationThreadForProject(detail).threadID)]
+      : [])
+  ].filter(Boolean));
+  const panels = new Set(
+    Array.from(track.querySelectorAll(`.workspace-panel[data-project-id="${CSS.escape(projectID)}"]`))
+  );
+  paneIDs.forEach((paneID) => {
+    const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+    if (panel) panels.add(panel);
+  });
+
+  const archived = reconciliation.status === "archived";
+  panels.forEach((panel) => {
+    const warning = document.createElement("aside");
+    warning.className = "project-studio-warning project-sync-stale-warning";
+    warning.dataset.projectId = projectID;
+    warning.setAttribute("role", "status");
+    warning.setAttribute("aria-live", "polite");
+    const heading = document.createElement("strong");
+    heading.textContent = archived
+      ? "Project archived on another device"
+      : "Project no longer available after sync";
+    const copy = document.createElement("p");
+    copy.textContent = archived
+      ? "This Project remains open so you can finish or copy work already in progress. Restore it before starting new Project changes."
+      : "This Project remains open so you can copy work already in progress. It may have been deleted on another device or your access may have changed.";
+    warning.append(heading, copy);
+    const header = panel.querySelector(":scope > header");
+    if (header) header.after(warning);
+    else panel.prepend(warning);
+    panel.classList.add("has-stale-project-sync");
+  });
+}
+
+async function refreshBlankSearchHistoryPanes() {
+  await Promise.all((state.utilityInstances || [])
+    .filter((instance) => instance.key === "search" && !String(instance.query || "").trim())
+    .map(async (instance) => {
+      const paneID = paneIDForUtilityInstance(instance);
+      const panel = track.querySelector(`.workspace-panel[data-pane-id="${CSS.escape(paneID)}"]`);
+      if (panel?.isConnected) await renderSearchHistory(panel, instance);
+    }));
+}
+
+async function refreshSyncedWorkspaceInPlace(options = {}) {
+  const expectedAccountUserID = options.accountUserID ?? activeAccount()?.userID ?? "";
+  if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
+    await renderWorkspace();
+    return false;
+  }
+
+  const syncedProjects = currentContentSummary().projects || [];
+  const accessibleProjects = openProjectDetails().length
+    ? await projectsWithOrganizationAccess(syncedProjects)
+    : syncedProjects;
+  if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
+    await renderWorkspace();
+    return false;
+  }
+  const projectReconciliation = reconcileOpenProjectIdentityAfterSync(accessibleProjects);
+  renderCodeQuestionShellChrome();
+  const refreshPaneIDs = [
+    ...(state.utilities.archive ? ["utility:archive"] : []),
+    ...(state.utilities.settings && !workspacePaneHasFocusedEditor("utility:settings")
+      ? ["utility:settings"]
+      : [])
+  ];
+  await renderUtilityWorkspace({
+    refreshPaneIDs,
+    skipDeletedProjectCleanup: true,
+    deferStateSave: true
+  });
+
+  if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
+    await renderWorkspace();
+    return false;
+  }
+  await refreshBlankSearchHistoryPanes();
+  await Promise.all(savedPaneIDs().map(async (paneID) => {
+    if (workspacePaneHasFocusedEditor(paneID)) return false;
+    return refreshSavedPanelInPlace(paneID, { reconcileProjectStudio: false }).catch(() => false);
+  }));
+  if ((activeAccount()?.userID || "") !== expectedAccountUserID) {
+    await renderWorkspace();
+    return false;
+  }
+  refreshVisibleSyncedDerivedState();
+  refreshMountedProjectChrome(projectReconciliation.detail);
+  updateOpenProjectSyncWarning(projectReconciliation);
+  return true;
 }
 
 function canRunForegroundSync() {
@@ -8080,7 +8428,7 @@ async function handleForegroundSyncSignal(message) {
   ) return;
   syncedContent = snapshot;
   foregroundSyncLastFullPullAt = Date.parse(snapshot.pulledAt || "") || Date.now();
-  await renderWorkspace();
+  await refreshSyncedWorkspaceInPlace({ accountUserID });
 }
 
 function ensureForegroundSyncChannel() {
@@ -8168,7 +8516,7 @@ async function performForegroundSync(options = {}) {
       content?.status !== previousStatus ||
       nextEventID !== previousEventID
     ) {
-      await renderWorkspace();
+      await refreshSyncedWorkspaceInPlace({ accountUserID });
     }
     return content;
   })().finally(() => {
@@ -21579,6 +21927,8 @@ function savedEvidenceMatchesQuery(item, query) {
     item.title,
     item.body,
     item.bodyText,
+    item.savedContentComparisonText,
+    item.previewText,
     item.text,
     item.excerpt,
     item.noteBody,
@@ -21586,25 +21936,56 @@ function savedEvidenceMatchesQuery(item, query) {
   ].some((value) => String(value || "").toLocaleLowerCase().includes(normalizedQuery));
 }
 
-async function performSavedPanelHydration(panel, savedInstance, paneID) {
+async function resolveSavedSearchPage(options = {}) {
+  const candidates = Array.isArray(options.candidates) ? options.candidates : [];
+  const limit = Math.max(0, Math.trunc(Number(options.limit) || 0));
+  const batchSize = Math.max(1, Math.trunc(Number(options.batchSize) || 1));
+  const hydrateItems = options.hydrateItems || (async (items) => items);
+  const matchesItem = options.matchesItem || (() => true);
+  const normalizeMatches = options.normalizeMatches || ((items) => items);
+  const shouldContinue = options.shouldContinue || (() => true);
+  const targetCount = limit + 1;
+  const matchingItems = [];
+  let normalizedMatches = [];
+  let scannedCount = 0;
+
+  while (scannedCount < candidates.length && normalizedMatches.length < targetCount) {
+    if (!shouldContinue()) {
+      return { items: [], hasMore: false, scannedCount, exhausted: false, cancelled: true };
+    }
+    const batch = candidates.slice(scannedCount, scannedCount + batchSize);
+    scannedCount += batch.length;
+    const hydratedBatch = await hydrateItems(batch);
+    if (!shouldContinue()) {
+      return { items: [], hasMore: false, scannedCount, exhausted: false, cancelled: true };
+    }
+    matchingItems.push(...hydratedBatch.filter(matchesItem));
+    normalizedMatches = normalizeMatches(matchingItems);
+  }
+
+  return {
+    items: normalizedMatches.slice(0, limit),
+    hasMore: normalizedMatches.length > limit,
+    scannedCount,
+    exhausted: scannedCount >= candidates.length,
+    cancelled: false
+  };
+}
+
+async function performSavedPanelHydration(panel, savedInstance, paneID, options = {}) {
   const content = panel.querySelector(".saved-content");
   const data = await loadSyncedContent();
   if (!panel.isConnected) return;
   const summary = currentContentSummary();
   const workspaceProjects = await projectsWithOrganizationAccess(summary.projects || []);
   if (!panel.isConnected) return;
-  await reconcileProjectStudioWithSavedFolders(workspaceProjects);
+  if (options.reconcileProjectStudio !== false) {
+    await reconcileProjectStudioWithSavedFolders(workspaceProjects);
+  }
   if (!panel.isConnected) return;
   const selectedFolder = await renderSavedFolderContext(panel, savedInstance, paneID, workspaceProjects);
   if (!panel.isConnected) return;
   renderSavedProjects(panel, savedInstance, paneID, workspaceProjects, summary.projectSections || []);
-  if (!selectedFolder) {
-    panel.querySelector(".saved-inline-filters").hidden = true;
-    panel.querySelector(".saved-plan-usage").hidden = true;
-    clear(content);
-    panel.__applySavedView = null;
-    return;
-  }
 
   if (data.status === "disconnected" && summary.savedItems.length === 0 && summary.annotations.length === 0) {
     clear(content);
@@ -21627,13 +22008,32 @@ async function performSavedPanelHydration(panel, savedInstance, paneID) {
     selectedFolder
   );
   const annotatedItems = consolidatedSavedAnnotations(annotations || []);
-  const visibleSavedItems = selectedFolder ? savedItems : savedItems.slice(0, 48);
-  const visibleAnnotatedItems = selectedFolder ? annotatedItems : annotatedItems.slice(0, 48);
-  const combinedItems = mergeSavedColumnItems(visibleSavedItems, visibleAnnotatedItems);
-  const resolvedItems = mergeEquivalentSavedColumnRows(await hydrateSavedColumnItems(combinedItems));
+  const combinedItems = mergeSavedColumnItems(savedItems, annotatedItems);
+  const hydratedItemPromises = new WeakMap();
+  const hydrateItems = async (items) => {
+    const missingItems = items.filter((item) => !hydratedItemPromises.has(item));
+    if (missingItems.length) {
+      const hydration = hydrateSavedColumnItems(missingItems);
+      missingItems.forEach((item, index) => {
+        hydratedItemPromises.set(item, hydration.then((resolved) => resolved[index]));
+      });
+    }
+    return Promise.all(items.map((item) => hydratedItemPromises.get(item)));
+  };
+  const selectedFolderEvidenceKeys = selectedFolder
+    ? new Set((summary.projectSections || [])
+        .filter((link) => projectSectionBelongsToProject(link, selectedFolder))
+        .map((link) => savedEvidenceKey(link)))
+    : null;
+  const folderHydrationItems = selectedFolder && !savedInstance.showAllSaved
+    ? combinedItems.filter((item) => selectedFolderEvidenceKeys.has(savedEvidenceKey(item)))
+    : combinedItems;
+  const resolvedFolderItems = selectedFolder
+    ? mergeEquivalentSavedColumnRows(await hydrateItems(folderHydrationItems))
+    : null;
   if (!panel.isConnected) return;
   const removableSavedItems = selectedFolder && !savedInstance.showAllSaved
-    ? resolvedItems.filter((item) => (summary.projectSections || []).some((link) =>
+    ? resolvedFolderItems.filter((item) => (summary.projectSections || []).some((link) =>
         savedEvidenceKey(link) === savedEvidenceKey(item) &&
         projectSectionBelongsToProject(link, selectedFolder)
       ))
@@ -21651,22 +22051,67 @@ async function performSavedPanelHydration(panel, savedInstance, paneID) {
       })
     : null;
   panel.querySelector(".saved-evidence-select-toggle").hidden = !selectionController;
-  const applySavedView = () => {
+  let allSavedLimit = savedItemsPageSize;
+  let previousViewSignature = "";
+  let viewGeneration = 0;
+  const applySavedView = async () => {
+    const generation = ++viewGeneration;
     const query = savedInstance.folderQuery.trim();
     const searchActive = Boolean(query);
-    const filteredItems = resolvedItems.filter((item) => {
+    const viewSignature = [
+      query.toLocaleLowerCase(),
+      savedInstance.tagFilter,
+      String(savedInstance.organizeUnassigned),
+      String(savedInstance.showAllSaved),
+      selectedFolder ? projectRecordID(selectedFolder) : "all"
+    ].join(":");
+    if (viewSignature !== previousViewSignature) {
+      allSavedLimit = savedItemsPageSize;
+      previousViewSignature = viewSignature;
+    }
+    const matchesView = (item, options = {}) => {
       const tagMatches = !savedInstance.tagFilter || savedItemTags(item).some((tag) => tag.localeCompare(savedInstance.tagFilter, undefined, { sensitivity: "accent" }) === 0);
       const itemSectionID = savedEvidenceKey(item);
       const folderMatches = !selectedFolder || savedInstance.showAllSaved || (summary.projectSections || []).some((link) =>
         savedEvidenceKey(link) === itemSectionID &&
         projectSectionBelongsToProject(link, selectedFolder)
       );
-      const queryMatches = savedEvidenceMatchesQuery(item, query);
+      const queryMatches = options.ignoreQuery || savedEvidenceMatchesQuery(item, query);
       const organizationMatches = !savedInstance.organizeUnassigned || unassignedSectionIDs.has(itemSectionID);
       return tagMatches && folderMatches && queryMatches && organizationMatches;
-    });
+    };
+    let resolvedItems;
+    let hasMore;
+    if (!selectedFolder && searchActive) {
+      const searchPage = await resolveSavedSearchPage({
+        candidates: combinedItems.filter((item) => matchesView(item, { ignoreQuery: true })),
+        limit: allSavedLimit,
+        batchSize: savedItemsPageSize,
+        hydrateItems,
+        matchesItem: (item) => matchesView(item),
+        normalizeMatches: mergeEquivalentSavedColumnRows,
+        shouldContinue: () => generation === viewGeneration && panel.isConnected
+      });
+      if (searchPage.cancelled) return;
+      resolvedItems = searchPage.items;
+      hasMore = searchPage.hasMore;
+    } else {
+      const rawCandidates = selectedFolder
+        ? resolvedFolderItems
+        : combinedItems.filter((item) => matchesView(item));
+      hasMore = !selectedFolder && rawCandidates.length > allSavedLimit;
+      const pageCandidates = selectedFolder
+        ? rawCandidates
+        : rawCandidates.slice(0, allSavedLimit);
+      resolvedItems = selectedFolder
+        ? pageCandidates
+        : mergeEquivalentSavedColumnRows(await hydrateItems(pageCandidates));
+    }
+    if (generation !== viewGeneration || !panel.isConnected) return;
+    const filteredItems = resolvedItems.filter((item) => matchesView(item));
     const orderedItems = sortSavedItems(filteredItems, "codeOrder");
     clear(content);
+    content.setAttribute("aria-busy", "false");
     if (orderedItems.length > 0) {
       selectionController?.beginRender();
       renderSavedItemsByCode(content, orderedItems, paneID, {
@@ -21684,41 +22129,47 @@ async function performSavedPanelHydration(panel, savedInstance, paneID) {
         removableSavedItems: Boolean(selectionController),
         selectionController
       });
-    } else if (resolvedItems.length > 0) {
+    } else if (combinedItems.length > 0) {
       appendEmptySaved(content, "No saved items match", selectedFolder
         ? "Try another search, code book, or tag filter, or add evidence to this folder."
         : "Try another code book or tag filter.");
     } else {
       appendMutedRow(content, "No saved sections", "Bookmarks, paragraph notes, and tags will appear here.");
     }
+    if (hasMore) {
+      const footer = document.createElement("section");
+      footer.className = "saved-load-more";
+      const status = document.createElement("p");
+      status.textContent = `${orderedItems.length.toLocaleString()} shown`;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "saved-load-more-button";
+      button.textContent = "Show more";
+      button.addEventListener("click", () => {
+        allSavedLimit += savedItemsPageSize;
+        content.setAttribute("aria-busy", "true");
+        void applySavedView();
+      });
+      footer.append(status, button);
+      content.append(footer);
+    }
   };
   panel.__applySavedView = applySavedView;
-  renderSavedFilters(panel, savedInstance, resolvedItems, applySavedView);
-  applySavedView();
-  panel.__refreshProjectMembership = () => {
-    const scrollContainer = panel.querySelector(".saved-column-scroll");
-    const scrollTop = scrollContainer?.scrollTop || 0;
-    const currentSummary = currentContentSummary();
-    summary.projectSections = currentSummary.projectSections || [];
-    panel.querySelectorAll(".saved-project-tile[data-project-id]").forEach((tile) => {
-      const folder = workspaceProjects.find((candidate) => projectRecordID(candidate) === tile.dataset.projectId);
-      const countLabel = tile.querySelector(".saved-project-count");
-      if (!folder || !countLabel) return;
-      const count = projectEvidenceCount(summary.projectSections, folder);
-      countLabel.textContent = String(count);
-      countLabel.title = count === 1 ? "1 saved section" : `${count} saved sections`;
-      countLabel.setAttribute("aria-label", countLabel.title);
-    });
-    applySavedView();
-    if (scrollContainer) scrollContainer.scrollTop = scrollTop;
-  };
+  renderSavedFilters(panel, savedInstance, resolvedFolderItems || combinedItems, () => {
+    content.setAttribute("aria-busy", "true");
+    void applySavedView();
+  });
+  await applySavedView();
+  panel.__refreshProjectMembership = () => refreshSavedPanelInPlace(paneID, {
+    reconcileProjectStudio: false
+  });
 }
 
-function hydrateSavedPanel(panel, savedInstance, paneID) {
+function hydrateSavedPanel(panel, savedInstance, paneID, options = {}) {
   const previousHydration = panel.__savedHydrationPromise || Promise.resolve();
   const hydration = previousHydration
     .catch(() => {})
-    .then(() => performSavedPanelHydration(panel, savedInstance, paneID));
+    .then(() => performSavedPanelHydration(panel, savedInstance, paneID, options));
   panel.__savedHydrationPromise = hydration;
   return hydration.finally(() => {
     if (panel.__savedHydrationPromise === hydration) {
@@ -21727,7 +22178,7 @@ function hydrateSavedPanel(panel, savedInstance, paneID) {
   });
 }
 
-async function refreshSavedPanelInPlace(paneID) {
+async function refreshSavedPanelInPlace(paneID, options = {}) {
   const panel = track.querySelector(
     `.saved-panel[data-pane-id="${CSS.escape(paneID)}"]`
   );
@@ -21737,7 +22188,7 @@ async function refreshSavedPanelInPlace(paneID) {
   if (!panel || !savedInstance) return false;
   const scrollContainer = panel.querySelector(".saved-column-scroll");
   const scrollTop = scrollContainer?.scrollTop || 0;
-  await hydrateSavedPanel(panel, savedInstance, paneID);
+  await hydrateSavedPanel(panel, savedInstance, paneID, options);
   if (!panel.isConnected) return false;
   if (scrollContainer) scrollContainer.scrollTop = scrollTop;
   return true;
@@ -28328,7 +28779,7 @@ async function renderUtilityWorkspace(options = {}) {
   enforceReaderPlanLimit();
   updateReaderPlanControls();
   renderWorkspaceTabs();
-  closeDeletedProjectDetails();
+  if (!options.skipDeletedProjectCleanup) closeDeletedProjectDetails();
   const existingPanesByID = new Map(
     Array.from(track.querySelectorAll(".workspace-panel"))
       .filter((pane) => pane.dataset.paneId)
