@@ -5016,12 +5016,6 @@ mark {
   font-weight: 700;
 }
 
-.research-supported-points p {
-  margin: var(--space-1) 0 0;
-  color: var(--text-secondary);
-  line-height: 1.5;
-}
-
 .research-unresolved {
   display: grid;
   gap: var(--space-3);
