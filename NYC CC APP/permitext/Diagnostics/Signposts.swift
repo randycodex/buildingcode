@@ -114,11 +114,18 @@ protocol UserContentSyncBackend {
     var name: String { get }
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport
     func push(batch: UserContentSyncBatch, account: SignedInAccount) async throws -> UserContentSyncPushReport
+    func checkpoint(
+        account: SignedInAccount,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?,
+        entitlementFingerprint: String?
+    ) async throws -> ServerUserContentCheckpointResult
     func pull(
         account: SignedInAccount,
         since: Date?,
         sinceEventID: Int64?,
-        contentMapVersion: Int?
+        contentMapVersion: Int?,
+        excludedMutationKinds: [String]
     ) async throws -> ServerUserContentPullResult
     func previewMerge(incoming: ServerUserContentPullResult, localCandidates: [String: UserContentMergeCandidate]) throws -> UserContentMergePlan
 }
@@ -152,11 +159,29 @@ struct NoOpUserContentSyncBackend: UserContentSyncBackend {
         )
     }
 
+    func checkpoint(
+        account: SignedInAccount,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?,
+        entitlementFingerprint: String?
+    ) async throws -> ServerUserContentCheckpointResult {
+        ServerUserContentCheckpointResult(
+            userID: account.appUserID,
+            checkedAt: Date(),
+            changed: false,
+            latestEventID: sinceEventID,
+            syncRevision: sinceEventID,
+            contentMapVersion: contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint
+        )
+    }
+
     func pull(
         account: SignedInAccount,
         since: Date?,
         sinceEventID: Int64?,
-        contentMapVersion: Int?
+        contentMapVersion: Int?,
+        excludedMutationKinds: [String]
     ) async throws -> ServerUserContentPullResult {
         ServerUserContentPullResult(
             userID: account.appUserID,
@@ -270,6 +295,34 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
     }
 
     func projectHub(account: SignedInAccount, projectID: String) async throws -> ProjectHubSnapshot {
+        // Prefer the consolidated bootstrap endpoint (one round-trip). Fall back to the
+        // legacy three-call assembly for older backends during staged deploy.
+        do {
+            let bootstrap = try await transport.projectHubBootstrap(
+                BackendProjectHubBootstrapRequest(
+                    auth: authContext(for: account),
+                    projectID: projectID
+                )
+            )
+            return ProjectHubSnapshot(
+                projectID: projectID,
+                notebookCards: bootstrap.notebook.cards,
+                researchConversations: bootstrap.foundation.researchConversations,
+                researchAnswers: bootstrap.foundation.researchAnswers,
+                activity: bootstrap.foundation.activity,
+                reports: bootstrap.reports.reports,
+                workboardPreview: bootstrap.foundation.workboardPreview,
+                foundationArtifacts: bootstrap.foundation.artifacts ?? []
+            )
+        } catch let error as PermitextBackendHTTPError {
+            switch error {
+            case .serverStatus(404, _), .serverStatus(405, _):
+                break
+            default:
+                throw error
+            }
+        }
+
         async let foundation = transport.projectFoundation(
             BackendProjectFoundationRequest(
                 auth: authContext(for: account),
@@ -396,18 +449,36 @@ struct PermitextBackendClient: AccountBackendClient, UserContentSyncBackend {
         )
     }
 
+    func checkpoint(
+        account: SignedInAccount,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?,
+        entitlementFingerprint: String?
+    ) async throws -> ServerUserContentCheckpointResult {
+        try await transport.checkpointUserContent(
+            BackendUserContentCheckpointRequest(
+                auth: authContext(for: account),
+                sinceEventID: sinceEventID,
+                contentMapVersion: contentMapVersion,
+                entitlementFingerprint: entitlementFingerprint
+            )
+        )
+    }
+
     func pull(
         account: SignedInAccount,
         since: Date?,
         sinceEventID: Int64?,
-        contentMapVersion: Int?
+        contentMapVersion: Int?,
+        excludedMutationKinds: [String]
     ) async throws -> ServerUserContentPullResult {
         try await transport.pullUserContent(
             BackendUserContentPullRequest(
                 auth: authContext(for: account),
                 since: since,
                 sinceEventID: sinceEventID,
-                contentMapVersion: contentMapVersion
+                contentMapVersion: contentMapVersion,
+                excludedMutationKinds: excludedMutationKinds
             )
         )
     }
@@ -522,7 +593,8 @@ struct UserContentSyncEngine {
             account: account,
             since: nil,
             sinceEventID: nil,
-            contentMapVersion: checkpoint.contentMapVersion
+            contentMapVersion: checkpoint.contentMapVersion,
+            excludedMutationKinds: UserContentSyncClientPolicy.excludedMutationKinds
         )
         guard let mutation = incoming.mutations.first(where: { $0.recordID == conflict.recordID }) else {
             throw UserContentSyncError.rejectedByServer("The server copy is no longer available. Pull again before resolving this conflict.")
@@ -540,7 +612,8 @@ struct UserContentSyncEngine {
                 checkpoint.markingPullSucceeded(
                     at: incoming.pulledAt,
                     latestEventID: incoming.latestEventID ?? incoming.syncRevision,
-                    contentMapVersion: incoming.contentMapVersion
+                    contentMapVersion: incoming.contentMapVersion,
+                    entitlementFingerprint: incoming.entitlementFingerprint
                 )
             )
         }
@@ -553,11 +626,45 @@ struct UserContentSyncEngine {
         try backend.previewMerge(incoming: incoming, localCandidates: localCandidates)
     }
 
+    /// Cheap server probe used by automatic foreground sync. Returns `true` when a full pull is needed.
+    /// Falls open to `true` on transport errors so automatic sync still converges.
+    func remoteSyncMayHaveChanges(account: SignedInAccount?) async -> Bool {
+        guard let account else { return false }
+        let localCheckpoint = checkpoint(for: account)
+        // First successful pull has not landed yet — always pull.
+        guard localCheckpoint.latestEventID != nil || localCheckpoint.lastSuccessfulPullAt != nil else {
+            return true
+        }
+        do {
+            let remote = try await backend.checkpoint(
+                account: account,
+                sinceEventID: localCheckpoint.latestEventID,
+                contentMapVersion: localCheckpoint.contentMapVersion,
+                entitlementFingerprint: localCheckpoint.entitlementFingerprint
+            )
+            if !remote.changed {
+                checkpointStore.save(
+                    localCheckpoint.markingCheckpointChecked(
+                        at: remote.checkedAt,
+                        latestEventID: remote.latestEventID ?? remote.syncRevision,
+                        contentMapVersion: remote.contentMapVersion,
+                        entitlementFingerprint: remote.entitlementFingerprint
+                    )
+                )
+            }
+            return remote.changed
+        } catch {
+            return true
+        }
+    }
+
     func pullRemoteChanges(
         account: SignedInAccount?,
         since: Date? = nil,
         localCandidates: [String: UserContentMergeCandidate] = [:],
-        applySafeChanges: Bool = false
+        applySafeChanges: Bool = false,
+        skipIfUnchanged: Bool = false,
+        excludedMutationKinds: [String] = UserContentSyncClientPolicy.excludedMutationKinds
     ) async throws -> UserContentSyncPullReport {
         guard let account else {
             return UserContentSyncPullReport(
@@ -575,12 +682,31 @@ struct UserContentSyncEngine {
         }
 
         let checkpoint = checkpoint(for: account)
+        if skipIfUnchanged {
+            let mayHaveChanges = await remoteSyncMayHaveChanges(account: account)
+            if !mayHaveChanges {
+                return UserContentSyncPullReport(
+                    pulledCount: 0,
+                    appliedCount: 0,
+                    skippedCount: 0,
+                    conflictCount: 0,
+                    backendName: backend.name,
+                    accountUserID: account.appUserID,
+                    skippedReason: "No remote changes.",
+                    mergePlan: UserContentMergePlan(decisions: []),
+                    entitlement: nil,
+                    capabilityContract: nil
+                )
+            }
+        }
+
         do {
             let incoming = try await backend.pull(
                 account: account,
                 since: checkpoint.latestEventID == nil ? since ?? checkpoint.lastSuccessfulPullAt : nil,
                 sinceEventID: checkpoint.latestEventID,
-                contentMapVersion: checkpoint.contentMapVersion
+                contentMapVersion: checkpoint.contentMapVersion,
+                excludedMutationKinds: excludedMutationKinds
             )
             let resolvedLocalCandidates = try localCandidates.isEmpty
                 ? repository?.localMergeCandidates(
@@ -600,7 +726,8 @@ struct UserContentSyncEngine {
                     checkpoint.markingPullSucceeded(
                         at: incoming.pulledAt,
                         latestEventID: incoming.latestEventID ?? incoming.syncRevision,
-                        contentMapVersion: incoming.contentMapVersion
+                        contentMapVersion: incoming.contentMapVersion,
+                        entitlementFingerprint: incoming.entitlementFingerprint
                     )
                 )
             }

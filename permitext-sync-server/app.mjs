@@ -528,6 +528,20 @@ function fileStoreOrganizationSeatState(store, organizationID) {
 
 function createFileStoreAdapter() {
   const rateLimitRepository = createLocalRateLimitRepository();
+  async function readUnlocked() {
+    try {
+      const raw = await readFile(dataPath, "utf8");
+      return { ...emptyStore(), ...JSON.parse(raw) };
+    } catch (error) {
+      if (error.code === "ENOENT") {
+        return emptyStore();
+      }
+      throw error;
+    }
+  }
+  async function writeUnlocked(store) {
+    await writeJSONFileAtomically(dataPath, store);
+  }
   return {
     kind: "file",
     schema: "json-file",
@@ -536,18 +550,20 @@ function createFileStoreAdapter() {
       return rateLimitRepository.consume(input);
     },
     async read() {
-      try {
-        const raw = await readFile(dataPath, "utf8");
-        return { ...emptyStore(), ...JSON.parse(raw) };
-      } catch (error) {
-        if (error.code === "ENOENT") {
-          return emptyStore();
-        }
-        throw error;
-      }
+      return readUnlocked();
     },
     async write(store) {
-      await writeJSONFileAtomically(dataPath, store);
+      // Serialize bare writes so concurrent request handlers cannot clobber each other
+      // when the process-wide request lock is intentionally skipped for long-running work.
+      return withFileStoreLock(dataPath, () => writeUnlocked(store));
+    },
+    async withMutation(mutator) {
+      return withFileStoreLock(dataPath, async () => {
+        const store = await readUnlocked();
+        const result = await mutator(store);
+        await writeUnlocked(store);
+        return result;
+      });
     },
     async latestEventID(userID) {
       const store = await this.read();
@@ -686,180 +702,201 @@ function createFileStoreAdapter() {
         mutationCounts: mutationCountsByKind
       };
     },
-    async listResearchConversations(userID) {
+    async listResearchConversations(userID, options = {}) {
       const store = await this.read();
-      return (store.researchConversationsByUserID?.[userID] || []).slice();
+      const projectID = String(options.projectID || "").trim();
+      let conversations = (store.researchConversationsByUserID?.[userID] || []).slice();
+      if (projectID) {
+        conversations = conversations.filter((item) => item.primaryProjectID === projectID);
+      }
+      if (options.summaryOnly) {
+        return conversations.map(projectResearchConversationForList).filter(Boolean);
+      }
+      return conversations;
     },
     async saveResearchConversation(userID, conversation) {
-      const store = await this.read();
-      store.researchConversationsByUserID ||= {};
-      const conversations = store.researchConversationsByUserID[userID] || [];
-      const index = conversations.findIndex((item) => item.id === conversation.id);
-      if (index === -1) conversations.push(conversation);
-      else conversations[index] = conversation;
-      store.researchConversationsByUserID[userID] = conversations;
-      await this.write(store);
-      return conversation;
+      return this.withMutation((store) => {
+        store.researchConversationsByUserID ||= {};
+        const conversations = store.researchConversationsByUserID[userID] || [];
+        const index = conversations.findIndex((item) => item.id === conversation.id);
+        if (index === -1) conversations.push(conversation);
+        else conversations[index] = conversation;
+        store.researchConversationsByUserID[userID] = conversations;
+        return conversation;
+      });
     },
     async updateResearchCandidateDisposition(userID, conversationID, change) {
-      const store = await this.read();
-      store.researchConversationsByUserID ||= {};
-      const conversations = store.researchConversationsByUserID[userID] || [];
-      const index = conversations.findIndex((item) => item.id === conversationID);
-      if (index === -1) return null;
-      const conversation = conversations[index];
-      const existing = Array.isArray(conversation.candidateDispositions)
-        ? conversation.candidateDispositions
-        : [];
-      const withoutCandidate = existing.filter((item) => item.candidateID !== change.candidateID);
-      const candidateDispositions = change.disposition === "rejected"
-        ? [...withoutCandidate, change.record].slice(-100)
-        : withoutCandidate;
-      const updated = {
-        ...conversation,
-        candidateDispositions,
-        updatedAt: change.updatedAt
-      };
-      conversations[index] = updated;
-      store.researchConversationsByUserID[userID] = conversations;
-      await this.write(store);
-      return updated;
+      return this.withMutation((store) => {
+        store.researchConversationsByUserID ||= {};
+        const conversations = store.researchConversationsByUserID[userID] || [];
+        const index = conversations.findIndex((item) => item.id === conversationID);
+        if (index === -1) return null;
+        const conversation = conversations[index];
+        const existing = Array.isArray(conversation.candidateDispositions)
+          ? conversation.candidateDispositions
+          : [];
+        const withoutCandidate = existing.filter((item) => item.candidateID !== change.candidateID);
+        const candidateDispositions = change.disposition === "rejected"
+          ? [...withoutCandidate, change.record].slice(-100)
+          : withoutCandidate;
+        const updated = {
+          ...conversation,
+          candidateDispositions,
+          updatedAt: change.updatedAt
+        };
+        conversations[index] = updated;
+        store.researchConversationsByUserID[userID] = conversations;
+        return updated;
+      });
     },
     async deleteResearchConversation(userID, conversationID) {
-      const store = await this.read();
-      const conversations = store.researchConversationsByUserID?.[userID] || [];
-      const remaining = conversations.filter((item) => item.id !== conversationID);
-      if (remaining.length === conversations.length) return false;
-      store.researchConversationsByUserID[userID] = remaining;
-      await this.write(store);
-      return true;
+      return this.withMutation((store) => {
+        const conversations = store.researchConversationsByUserID?.[userID] || [];
+        const remaining = conversations.filter((item) => item.id !== conversationID);
+        if (remaining.length === conversations.length) return false;
+        store.researchConversationsByUserID[userID] = remaining;
+        return true;
+      });
     },
-    async listFoundationArtifacts(userID) {
+    async listFoundationArtifacts(userID, options = {}) {
       const store = await this.read();
-      return (store.foundationArtifactsByUserID?.[userID] || []).slice();
+      const ids = Array.isArray(options.ids)
+        ? options.ids.map((value) => String(value || "").trim()).filter(Boolean)
+        : null;
+      if (ids && ids.length === 0) return [];
+      const idSet = ids ? new Set(ids) : null;
+      return (store.foundationArtifactsByUserID?.[userID] || [])
+        .filter((item) => !idSet || idSet.has(item.envelope?.id))
+        .slice();
     },
     async saveFoundationArtifact(userID, artifact) {
-      const store = await this.read();
-      store.foundationArtifactsByUserID ||= {};
-      const entries = store.foundationArtifactsByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
-      if (index === -1) entries.push(artifact);
-      else entries[index] = artifact;
-      store.foundationArtifactsByUserID[userID] = entries;
-      await this.write(store);
-      return artifact;
+      return this.withMutation((store) => {
+        store.foundationArtifactsByUserID ||= {};
+        const entries = store.foundationArtifactsByUserID[userID] || [];
+        const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
+        if (index === -1) entries.push(artifact);
+        else entries[index] = artifact;
+        store.foundationArtifactsByUserID[userID] = entries;
+        return artifact;
+      });
     },
     async saveFoundationArtifactCompareAndSwap(userID, artifact, expectedVersion) {
-      const store = await this.read();
-      store.foundationArtifactsByUserID ||= {};
-      const entries = store.foundationArtifactsByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
-      const existing = index === -1 ? null : entries[index];
-      const next = compareAndSwapFoundationArtifact(existing, artifact, expectedVersion);
-      if (existing && next === existing) {
-        return existing;
-      }
-      if (index === -1) entries.push(next);
-      else entries[index] = next;
-      store.foundationArtifactsByUserID[userID] = entries;
-      await this.write(store);
-      return next;
+      return this.withMutation((store) => {
+        store.foundationArtifactsByUserID ||= {};
+        const entries = store.foundationArtifactsByUserID[userID] || [];
+        const index = entries.findIndex((item) => item.envelope?.id === artifact.envelope?.id);
+        const existing = index === -1 ? null : entries[index];
+        const next = compareAndSwapFoundationArtifact(existing, artifact, expectedVersion);
+        if (existing && next === existing) {
+          return existing;
+        }
+        if (index === -1) entries.push(next);
+        else entries[index] = next;
+        store.foundationArtifactsByUserID[userID] = entries;
+        return next;
+      });
     },
     async allocateCodeQuestionCounter(userID, scope, scopeKey) {
-      const store = await this.read();
-      store.codeQuestionCountersByUserID ||= {};
-      const userCounters = store.codeQuestionCountersByUserID[userID] || {};
-      const scopeMap = userCounters[scope] || {};
-      let result;
-      if (scope === "questionNumber") {
-        result = allocateQuestionNumber(scopeMap, scopeKey);
-        userCounters[scope] = result.counters;
+      return this.withMutation((store) => {
+        store.codeQuestionCountersByUserID ||= {};
+        const userCounters = store.codeQuestionCountersByUserID[userID] || {};
+        const scopeMap = userCounters[scope] || {};
+        let result;
+        if (scope === "questionNumber") {
+          result = allocateQuestionNumber(scopeMap, scopeKey);
+          userCounters[scope] = result.counters;
+          store.codeQuestionCountersByUserID[userID] = userCounters;
+          return { value: result.questionNumber };
+        }
+        result = allocateScopedVersion(scopeMap, scopeKey);
+        userCounters[scope] = result.scopes;
         store.codeQuestionCountersByUserID[userID] = userCounters;
-        await this.write(store);
-        return { value: result.questionNumber };
-      }
-      result = allocateScopedVersion(scopeMap, scopeKey);
-      userCounters[scope] = result.scopes;
-      store.codeQuestionCountersByUserID[userID] = userCounters;
-      await this.write(store);
-      return { value: result.version };
+        return { value: result.version };
+      });
     },
     async listCodeQuestionPendingIssuance(userID) {
       const store = await this.read();
       return (store.codeQuestionPendingIssuanceByUserID?.[userID] || []).slice();
     },
     async saveCodeQuestionPendingIssuance(userID, record) {
-      const store = await this.read();
-      store.codeQuestionPendingIssuanceByUserID ||= {};
-      const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.id === record.id);
-      if (index === -1) entries.push(record);
-      else entries[index] = record;
-      store.codeQuestionPendingIssuanceByUserID[userID] = entries;
-      await this.write(store);
-      return record;
+      return this.withMutation((store) => {
+        store.codeQuestionPendingIssuanceByUserID ||= {};
+        const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
+        const index = entries.findIndex((item) => item.id === record.id);
+        if (index === -1) entries.push(record);
+        else entries[index] = record;
+        store.codeQuestionPendingIssuanceByUserID[userID] = entries;
+        return record;
+      });
     },
     async reserveCodeQuestionIssuance(userID, input) {
-      const store = await this.read();
-      store.codeQuestionPendingIssuanceByUserID ||= {};
-      const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
-      const existing = entries.find((item) =>
-        item.questionID === input.questionID && item.idempotencyKey === input.idempotencyKey
-      );
-      if (existing) return { pending: existing, replayed: true };
-      const active = entries.find((item) =>
-        item.questionID === input.questionID && ["reserved", "staged", "committing"].includes(item.status)
-      );
-      if (active) {
-        throw new CodeQuestionCommandError("Another issuance attempt is already active for this Code Question.", {
-          code: "CODE_QUESTION_ISSUANCE_IN_PROGRESS", status: 409, details: { pendingID: active.id }
+      return this.withMutation((store) => {
+        store.codeQuestionPendingIssuanceByUserID ||= {};
+        const entries = store.codeQuestionPendingIssuanceByUserID[userID] || [];
+        const existing = entries.find((item) =>
+          item.questionID === input.questionID && item.idempotencyKey === input.idempotencyKey
+        );
+        if (existing) return { pending: existing, replayed: true };
+        const active = entries.find((item) =>
+          item.questionID === input.questionID && ["reserved", "staged", "committing"].includes(item.status)
+        );
+        if (active) {
+          throw new CodeQuestionCommandError("Another issuance attempt is already active for this Code Question.", {
+            code: "CODE_QUESTION_ISSUANCE_IN_PROGRESS", status: 409, details: { pendingID: active.id }
+          });
+        }
+        store.codeQuestionCountersByUserID ||= {};
+        const userCounters = store.codeQuestionCountersByUserID[userID] || {};
+        const scopeMap = userCounters.issueVersion || {};
+        const allocated = allocateScopedVersion(scopeMap, input.questionID);
+        userCounters.issueVersion = allocated.scopes;
+        store.codeQuestionCountersByUserID[userID] = userCounters;
+        const pending = createPendingIssuanceRecord({
+          ...input,
+          issueVersion: allocated.version,
+          stagedObjectKey: `${input.stagedPrefix}issue-v${allocated.version}/${input.deterministicHash}`
         });
-      }
-      store.codeQuestionCountersByUserID ||= {};
-      const userCounters = store.codeQuestionCountersByUserID[userID] || {};
-      const scopeMap = userCounters.issueVersion || {};
-      const allocated = allocateScopedVersion(scopeMap, input.questionID);
-      userCounters.issueVersion = allocated.scopes;
-      store.codeQuestionCountersByUserID[userID] = userCounters;
-      const pending = createPendingIssuanceRecord({
-        ...input,
-        issueVersion: allocated.version,
-        stagedObjectKey: `${input.stagedPrefix}issue-v${allocated.version}/${input.deterministicHash}`
+        entries.push(pending);
+        store.codeQuestionPendingIssuanceByUserID[userID] = entries;
+        return { pending, replayed: false };
       });
-      entries.push(pending);
-      store.codeQuestionPendingIssuanceByUserID[userID] = entries;
-      await this.write(store);
-      return { pending, replayed: false };
     },
     async listCodeQuestionOutbox(userID) {
       const store = await this.read();
       return (store.codeQuestionOutboxByUserID?.[userID] || []).slice();
     },
     async saveCodeQuestionOutboxEntry(userID, entry) {
-      const store = await this.read();
-      store.codeQuestionOutboxByUserID ||= {};
-      const entries = store.codeQuestionOutboxByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.id === entry.id);
-      if (index === -1) entries.push(entry);
-      else entries[index] = entry;
-      store.codeQuestionOutboxByUserID[userID] = entries;
-      await this.write(store);
-      return entry;
+      return this.withMutation((store) => {
+        store.codeQuestionOutboxByUserID ||= {};
+        const entries = store.codeQuestionOutboxByUserID[userID] || [];
+        const index = entries.findIndex((item) => item.id === entry.id);
+        if (index === -1) entries.push(entry);
+        else entries[index] = entry;
+        store.codeQuestionOutboxByUserID[userID] = entries;
+        return entry;
+      });
     },
-    async listProjectLinks(userID) {
+    async listProjectLinks(userID, options = {}) {
       const store = await this.read();
-      return (store.projectLinksByUserID?.[userID] || []).slice();
+      const projectID = String(options.projectID || "").trim();
+      const targetKind = String(options.targetKind || "").trim();
+      return (store.projectLinksByUserID?.[userID] || [])
+        .filter((item) =>
+          (!projectID || item.projectID === projectID) &&
+          (!targetKind || item.targetKind === targetKind)
+        )
+        .slice();
     },
     async saveProjectLink(userID, link) {
-      const store = await this.read();
-      store.projectLinksByUserID ||= {};
-      const entries = store.projectLinksByUserID[userID] || [];
-      const index = entries.findIndex((item) => item.id === link.id);
-      if (index === -1) entries.push(link);
-      else entries[index] = link;
-      store.projectLinksByUserID[userID] = entries;
-      await this.write(store);
-      return link;
+      return this.withMutation((store) => {
+        store.projectLinksByUserID ||= {};
+        const entries = store.projectLinksByUserID[userID] || [];
+        const index = entries.findIndex((item) => item.id === link.id);
+        if (index === -1) entries.push(link);
+        else entries[index] = link;
+        store.projectLinksByUserID[userID] = entries;
+        return link;
+      });
     },
     async replaceResearchCodeDecisionLinks(userID, {
       link,
@@ -867,70 +904,76 @@ function createFileStoreAdapter() {
       expectedLink = null,
       expectedClearedLinks = []
     }) {
-      const store = await this.read();
-      store.projectLinksByUserID ||= {};
-      const entries = store.projectLinksByUserID[userID] || [];
-      const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
-      const guardedLinks = [
-        ...clearedLinks.map((nextLink) => ({ nextLink, expected: expectedByID.get(nextLink.id) })),
-        { nextLink: link, expected: expectedLink }
-      ];
-      if (
-        expectedClearedLinks.length !== clearedLinks.length ||
-        guardedLinks.some(({ nextLink, expected }) =>
-          !researchProjectLinkCASMatches(
-            entries.find((item) => item.id === nextLink.id) || null,
-            expected || null
+      return this.withMutation((store) => {
+        store.projectLinksByUserID ||= {};
+        const entries = store.projectLinksByUserID[userID] || [];
+        const expectedByID = new Map(expectedClearedLinks.map((item) => [item.id, item]));
+        const guardedLinks = [
+          ...clearedLinks.map((nextLink) => ({ nextLink, expected: expectedByID.get(nextLink.id) })),
+          { nextLink: link, expected: expectedLink }
+        ];
+        if (
+          expectedClearedLinks.length !== clearedLinks.length ||
+          guardedLinks.some(({ nextLink, expected }) =>
+            !researchProjectLinkCASMatches(
+              entries.find((item) => item.id === nextLink.id) || null,
+              expected || null
+            )
           )
-        )
-      ) {
-        throw researchCodeDecisionLinkConflict();
-      }
-      for (const nextLink of [...clearedLinks, link]) {
-        const index = entries.findIndex((item) => item.id === nextLink.id);
-        if (index === -1) entries.push(nextLink);
-        else entries[index] = nextLink;
-      }
-      store.projectLinksByUserID[userID] = entries;
-      await this.write(store);
-      return { link, clearedLinks };
+        ) {
+          throw researchCodeDecisionLinkConflict();
+        }
+        for (const nextLink of [...clearedLinks, link]) {
+          const index = entries.findIndex((item) => item.id === nextLink.id);
+          if (index === -1) entries.push(nextLink);
+          else entries[index] = nextLink;
+        }
+        store.projectLinksByUserID[userID] = entries;
+        return { link, clearedLinks };
+      });
     },
-    async listResearchAnswers(userID) {
+    async listResearchAnswers(userID, options = {}) {
       const store = await this.read();
-      return (store.researchAnswersByUserID?.[userID] || []).slice();
+      const projectID = String(options.projectID || "").trim();
+      return (store.researchAnswersByUserID?.[userID] || [])
+        .filter((item) => !projectID || item.projectID === projectID)
+        .slice();
     },
     async saveResearchAnswer(userID, answer) {
-      const store = await this.read();
-      store.researchAnswersByUserID ||= {};
-      const entries = store.researchAnswersByUserID[userID] || [];
-      const existing = entries.find((item) => item.id === answer.id);
-      if (existing && canonicalJSONString(existing) !== canonicalJSONString(answer)) {
-        throw new Error("Immutable Research answer cannot be changed.");
-      }
-      if (!existing) entries.push(answer);
-      store.researchAnswersByUserID[userID] = entries;
-      await this.write(store);
-      return existing || answer;
+      return this.withMutation((store) => {
+        store.researchAnswersByUserID ||= {};
+        const entries = store.researchAnswersByUserID[userID] || [];
+        const existing = entries.find((item) => item.id === answer.id);
+        if (existing && canonicalJSONString(existing) !== canonicalJSONString(answer)) {
+          throw new Error("Immutable Research answer cannot be changed.");
+        }
+        if (!existing) entries.push(answer);
+        store.researchAnswersByUserID[userID] = entries;
+        return existing || answer;
+      });
     },
-    async listActivityEvents(userID) {
+    async listActivityEvents(userID, options = {}) {
       const store = await this.read();
-      return (store.activityEventsByUserID?.[userID] || []).slice();
+      const projectID = String(options.projectID || "").trim();
+      return (store.activityEventsByUserID?.[userID] || [])
+        .filter((item) => !projectID || item.projectID === projectID)
+        .slice();
     },
     async saveActivityEvent(userID, event) {
-      const store = await this.read();
-      store.activityEventsByUserID ||= {};
-      const entries = store.activityEventsByUserID[userID] || [];
-      const existing = entries.find((item) => item.id === event.id);
-      if (existing && canonicalJSONString(existing) !== canonicalJSONString(event)) {
-        throw new Error("Activity events are append-only.");
-      }
-      if (!existing) entries.push(event);
-      store.activityEventsByUserID[userID] = entries;
-      await this.write(store);
-      return existing || event;
+      return this.withMutation((store) => {
+        store.activityEventsByUserID ||= {};
+        const entries = store.activityEventsByUserID[userID] || [];
+        const existing = entries.find((item) => item.id === event.id);
+        if (existing && canonicalJSONString(existing) !== canonicalJSONString(event)) {
+          throw new Error("Activity events are append-only.");
+        }
+        if (!existing) entries.push(event);
+        store.activityEventsByUserID[userID] = entries;
+        return existing || event;
+      });
     },
     async commitCodeQuestionIssuance(userID, { artifacts, links, events, pending }) {
-      const store = await this.read();
+      return this.withMutation((store) => {
       store.foundationArtifactsByUserID ||= {};
       store.projectLinksByUserID ||= {};
       store.activityEventsByUserID ||= {};
@@ -968,8 +1011,8 @@ function createFileStoreAdapter() {
       if (pendingIndex === -1) throw new Error("Pending issuance disappeared before commit.");
       pendingEntries[pendingIndex] = pending;
       store.codeQuestionPendingIssuanceByUserID[userID] = pendingEntries;
-      await this.write(store);
       return { artifacts, links, events, pending };
+      });
     },
     async organization(organizationID) {
       const store = await this.read();
@@ -1312,6 +1355,11 @@ function createFileStoreAdapter() {
         entries[index] = { ...entry, id: reservationID };
         await this.write(store);
       });
+    },
+    async commitResearchConversationMessage(userID, payload) {
+      return withResearchUsageLock(userID, async () => this.withMutation((store) =>
+        applyResearchConversationMessageCommit(store, userID, payload)
+      ));
     },
     async releaseResearchUsageReservation(userID, reservationID) {
       return withResearchUsageLock(userID, async () => {
@@ -2730,14 +2778,77 @@ async function createPostgresStoreAdapter() {
       ], { isolationLevel: "Serializable" });
       return true;
     },
-    async listResearchConversations(userID) {
+    async listResearchConversations(userID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        SELECT conversation
-        FROM permitext_research_conversations
-        WHERE user_id = ${userID}
-        ORDER BY updated_at DESC
-      `;
+      const projectID = String(options.projectID || "").trim();
+      if (options.summaryOnly) {
+        // Project only list fields so large messages/visuals never leave the database row.
+        const summaryRows = projectID
+          ? await sql`
+              SELECT jsonb_build_object(
+                'id', conversation->>'id',
+                'title', conversation->>'title',
+                'createdAt', conversation->>'createdAt',
+                'updatedAt', conversation->>'updatedAt',
+                'primaryProjectID', conversation->>'primaryProjectID',
+                'starterQuestion', conversation->>'starterQuestion',
+                'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
+                'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
+                'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
+                'sources', COALESCE((
+                  SELECT jsonb_agg(jsonb_build_object(
+                    'kind', 'selection',
+                    'sectionID', src->>'sectionID'
+                  ))
+                  FROM jsonb_array_elements(COALESCE(conversation->'sources', '[]'::jsonb)) AS src
+                  WHERE src->>'kind' = 'selection'
+                ), '[]'::jsonb)
+              ) AS conversation
+              FROM permitext_research_conversations
+              WHERE user_id = ${userID}
+                AND conversation->>'primaryProjectID' = ${projectID}
+              ORDER BY updated_at DESC
+            `
+          : await sql`
+              SELECT jsonb_build_object(
+                'id', conversation->>'id',
+                'title', conversation->>'title',
+                'createdAt', conversation->>'createdAt',
+                'updatedAt', conversation->>'updatedAt',
+                'primaryProjectID', conversation->>'primaryProjectID',
+                'starterQuestion', conversation->>'starterQuestion',
+                'projectContextReviewRequired', COALESCE((conversation->>'projectContextReviewRequired')::boolean, false),
+                'sourceStatus', COALESCE(conversation->>'sourceStatus', 'current'),
+                'messageCount', jsonb_array_length(COALESCE(conversation->'messages', '[]'::jsonb)),
+                'sources', COALESCE((
+                  SELECT jsonb_agg(jsonb_build_object(
+                    'kind', 'selection',
+                    'sectionID', src->>'sectionID'
+                  ))
+                  FROM jsonb_array_elements(COALESCE(conversation->'sources', '[]'::jsonb)) AS src
+                  WHERE src->>'kind' = 'selection'
+                ), '[]'::jsonb)
+              ) AS conversation
+              FROM permitext_research_conversations
+              WHERE user_id = ${userID}
+              ORDER BY updated_at DESC
+            `;
+        return summaryRows.map((row) => safeJSON(row.conversation, {}));
+      }
+      const rows = projectID
+        ? await sql`
+            SELECT conversation
+            FROM permitext_research_conversations
+            WHERE user_id = ${userID}
+              AND conversation->>'primaryProjectID' = ${projectID}
+            ORDER BY updated_at DESC
+          `
+        : await sql`
+            SELECT conversation
+            FROM permitext_research_conversations
+            WHERE user_id = ${userID}
+            ORDER BY updated_at DESC
+          `;
       return rows.map((row) => safeJSON(row.conversation, {}));
     },
     async saveResearchConversation(userID, conversation) {
@@ -2817,14 +2928,26 @@ async function createPostgresStoreAdapter() {
       `;
       return rows.length > 0;
     },
-    async listFoundationArtifacts(userID) {
+    async listFoundationArtifacts(userID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        SELECT envelope, payload
-        FROM permitext_foundation_artifacts
-        WHERE user_id = ${userID}
-        ORDER BY updated_at DESC
-      `;
+      const ids = Array.isArray(options.ids)
+        ? options.ids.map((value) => String(value || "").trim()).filter(Boolean)
+        : null;
+      if (ids && ids.length === 0) return [];
+      const rows = ids
+        ? await sql`
+            SELECT envelope, payload
+            FROM permitext_foundation_artifacts
+            WHERE user_id = ${userID}
+              AND id = ANY(${ids})
+            ORDER BY updated_at DESC
+          `
+        : await sql`
+            SELECT envelope, payload
+            FROM permitext_foundation_artifacts
+            WHERE user_id = ${userID}
+            ORDER BY updated_at DESC
+          `;
       return rows.map((row) => ({
         envelope: safeJSON(row.envelope, {}),
         payload: safeJSON(row.payload, {})
@@ -3091,14 +3214,41 @@ async function createPostgresStoreAdapter() {
       `;
       return entry;
     },
-    async listProjectLinks(userID) {
+    async listProjectLinks(userID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        SELECT link
-        FROM permitext_project_links
-        WHERE user_id = ${userID}
-        ORDER BY updated_at DESC
-      `;
+      const projectID = String(options.projectID || "").trim();
+      const targetKind = String(options.targetKind || "").trim();
+      const rows = projectID && targetKind
+        ? await sql`
+            SELECT link
+            FROM permitext_project_links
+            WHERE user_id = ${userID}
+              AND project_id = ${projectID}
+              AND target_kind = ${targetKind}
+            ORDER BY updated_at DESC
+          `
+        : projectID
+          ? await sql`
+              SELECT link
+              FROM permitext_project_links
+              WHERE user_id = ${userID}
+                AND project_id = ${projectID}
+              ORDER BY updated_at DESC
+            `
+          : targetKind
+            ? await sql`
+                SELECT link
+                FROM permitext_project_links
+                WHERE user_id = ${userID}
+                  AND target_kind = ${targetKind}
+                ORDER BY updated_at DESC
+              `
+            : await sql`
+                SELECT link
+                FROM permitext_project_links
+                WHERE user_id = ${userID}
+                ORDER BY updated_at DESC
+              `;
       return rows.map((row) => safeJSON(row.link, {}));
     },
     async saveProjectLink(userID, link) {
@@ -3195,14 +3345,23 @@ async function createPostgresStoreAdapter() {
       }
       return { link, clearedLinks };
     },
-    async listResearchAnswers(userID) {
+    async listResearchAnswers(userID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        SELECT answer
-        FROM permitext_research_answers
-        WHERE user_id = ${userID}
-        ORDER BY created_at ASC
-      `;
+      const projectID = String(options.projectID || "").trim();
+      const rows = projectID
+        ? await sql`
+            SELECT answer
+            FROM permitext_research_answers
+            WHERE user_id = ${userID}
+              AND project_id = ${projectID}
+            ORDER BY created_at ASC
+          `
+        : await sql`
+            SELECT answer
+            FROM permitext_research_answers
+            WHERE user_id = ${userID}
+            ORDER BY created_at ASC
+          `;
       return rows.map((row) => safeJSON(row.answer, {}));
     },
     async saveResearchAnswer(userID, answer) {
@@ -3303,14 +3462,23 @@ async function createPostgresStoreAdapter() {
       }
       return { artifacts, links, events, pending };
     },
-    async listActivityEvents(userID) {
+    async listActivityEvents(userID, options = {}) {
       await ensureSchema();
-      const rows = await sql`
-        SELECT event
-        FROM permitext_project_activity
-        WHERE user_id = ${userID}
-        ORDER BY created_at DESC
-      `;
+      const projectID = String(options.projectID || "").trim();
+      const rows = projectID
+        ? await sql`
+            SELECT event
+            FROM permitext_project_activity
+            WHERE user_id = ${userID}
+              AND project_id = ${projectID}
+            ORDER BY created_at DESC
+          `
+        : await sql`
+            SELECT event
+            FROM permitext_project_activity
+            WHERE user_id = ${userID}
+            ORDER BY created_at DESC
+          `;
       return rows.map((row) => safeJSON(row.event, {}));
     },
     async saveActivityEvent(userID, event) {
@@ -3451,6 +3619,114 @@ async function createPostgresStoreAdapter() {
       if (!rows.length) {
         throw new Error("Research usage reservation was not found.");
       }
+    },
+    async commitResearchConversationMessage(userID, {
+      reservationID = null,
+      usageEntry = null,
+      answer,
+      conversation,
+      events = []
+    }) {
+      await ensureSchema();
+      const existingAnswerRows = await sql`
+        SELECT answer
+        FROM permitext_research_answers
+        WHERE id = ${answer.id} AND user_id = ${userID}
+        LIMIT 1
+      `;
+      if (existingAnswerRows.length) {
+        const existing = safeJSON(existingAnswerRows[0].answer, null);
+        if (!existing || canonicalJSONString(existing) !== canonicalJSONString(answer)) {
+          throw new Error("Immutable Research answer cannot be changed.");
+        }
+        return { replayed: true, answer: existing, conversation };
+      }
+
+      const queries = [];
+      if (reservationID && usageEntry) {
+        queries.push(sql`
+          UPDATE permitext_research_usage
+          SET model = ${usageEntry.model},
+              mode = ${usageEntry.mode},
+              input_tokens = ${usageEntry.inputTokens},
+              cached_input_tokens = ${usageEntry.cachedInputTokens || 0},
+              output_tokens = ${usageEntry.outputTokens},
+              total_tokens = ${usageEntry.totalTokens},
+              prompt_version = ${usageEntry.promptVersion || null},
+              evidence_version = ${usageEntry.evidenceVersion || null},
+              estimated_cost_usd = ${usageEntry.estimatedCostUSD ?? null},
+              pricing_version = ${usageEntry.pricingVersion || null},
+              created_at = ${usageEntry.createdAt}::timestamptz
+          WHERE id = ${reservationID}
+            AND user_id = ${userID}
+            AND mode = 'reservation'
+          RETURNING id
+        `);
+      }
+      for (const snapshot of answer.evidence || []) {
+        queries.push(sql`
+          INSERT INTO permitext_evidence_snapshots (
+            id, user_id, answer_id, source_id, snapshot, approved_at
+          )
+          VALUES (
+            ${snapshot.id}, ${userID}, ${answer.id}, ${snapshot.sourceID},
+            ${JSON.stringify(snapshot)}::jsonb, ${snapshot.approvedAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `);
+      }
+      queries.push(sql`
+        INSERT INTO permitext_research_answers (
+          id, user_id, conversation_id, project_id, answer, created_at
+        )
+        VALUES (
+          ${answer.id}, ${userID}, ${answer.conversationID}, ${answer.projectID},
+          ${JSON.stringify(answer)}::jsonb, ${answer.createdAt}::timestamptz
+        )
+        ON CONFLICT (id) DO NOTHING
+        RETURNING id
+      `);
+      queries.push(sql`
+        INSERT INTO permitext_research_conversations (
+          id, user_id, title, conversation, created_at, updated_at
+        )
+        VALUES (
+          ${conversation.id},
+          ${userID},
+          ${conversation.title},
+          ${JSON.stringify(conversation)}::jsonb,
+          ${conversation.createdAt}::timestamptz,
+          ${conversation.updatedAt}::timestamptz
+        )
+        ON CONFLICT (id) DO UPDATE SET
+          user_id = EXCLUDED.user_id,
+          title = EXCLUDED.title,
+          conversation = EXCLUDED.conversation,
+          updated_at = EXCLUDED.updated_at
+        WHERE permitext_research_conversations.user_id = ${userID}
+      `);
+      for (const event of events) {
+        queries.push(sql`
+          INSERT INTO permitext_project_activity (
+            id, user_id, project_id, action, object_kind, object_id, event, created_at
+          )
+          VALUES (
+            ${event.id}, ${userID}, ${event.projectID}, ${event.action},
+            ${event.objectKind}, ${event.objectID}, ${JSON.stringify(event)}::jsonb,
+            ${event.createdAt}::timestamptz
+          )
+          ON CONFLICT (id) DO NOTHING
+        `);
+      }
+
+      const results = await sql.transaction(queries, { isolationLevel: "Serializable" });
+      if (reservationID && usageEntry) {
+        const usageResult = results[0];
+        if (!usageResult?.length) {
+          throw new Error("Research usage reservation was not found.");
+        }
+      }
+      return { replayed: false, answer, conversation };
     },
     async releaseResearchUsageReservation(userID, reservationID) {
       await ensureSchema();
@@ -3685,10 +3961,10 @@ async function storageSummary() {
   };
 }
 
-async function listStoredResearchConversations(userID) {
+async function listStoredResearchConversations(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listResearchConversations === "function"
-    ? adapter.listResearchConversations(userID)
+    ? adapter.listResearchConversations(userID, options)
     : [];
 }
 
@@ -3714,10 +3990,10 @@ async function deleteStoredResearchConversation(userID, conversationID) {
   return adapter.deleteResearchConversation(userID, conversationID);
 }
 
-async function listStoredFoundationArtifacts(userID) {
+async function listStoredFoundationArtifacts(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listFoundationArtifacts === "function"
-    ? adapter.listFoundationArtifacts(userID)
+    ? adapter.listFoundationArtifacts(userID, options)
     : [];
 }
 
@@ -3800,10 +4076,10 @@ async function saveStoredCodeQuestionOutboxEntry(userID, entry) {
   });
 }
 
-async function listStoredProjectLinks(userID) {
+async function listStoredProjectLinks(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listProjectLinks === "function"
-    ? adapter.listProjectLinks(userID)
+    ? adapter.listProjectLinks(userID, options)
     : [];
 }
 
@@ -3823,10 +4099,10 @@ async function replaceStoredResearchCodeDecisionLinks(userID, replacement) {
   return adapter.replaceResearchCodeDecisionLinks(userID, replacement);
 }
 
-async function listStoredResearchAnswers(userID) {
+async function listStoredResearchAnswers(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listResearchAnswers === "function"
-    ? adapter.listResearchAnswers(userID)
+    ? adapter.listResearchAnswers(userID, options)
     : [];
 }
 
@@ -3835,10 +4111,10 @@ async function saveStoredResearchAnswer(userID, answer) {
   return adapter.saveResearchAnswer(userID, answer);
 }
 
-async function listStoredActivityEvents(userID) {
+async function listStoredActivityEvents(userID, options = {}) {
   const adapter = await storeAdapter();
   return typeof adapter.listActivityEvents === "function"
-    ? adapter.listActivityEvents(userID)
+    ? adapter.listActivityEvents(userID, options)
     : [];
 }
 
@@ -4029,6 +4305,94 @@ async function completeResearchUsageReservation(userID, reservationID, entry) {
     throw new Error("Atomic Research usage reservations are unavailable.");
   }
   await adapter.completeResearchUsageReservation(userID, reservationID, entry);
+}
+
+/**
+ * In-memory file-store mutation for Research message completion.
+ * Used by the file adapter under withMutation so either all of usage+answer+
+ * conversation+events persist or none do.
+ */
+export function applyResearchConversationMessageCommit(store, userID, {
+  reservationID = null,
+  usageEntry = null,
+  answer,
+  conversation,
+  events = [],
+  testThrowAfterUsage = false
+}) {
+  store.researchAnswersByUserID ||= {};
+  store.researchConversationsByUserID ||= {};
+  store.activityEventsByUserID ||= {};
+  store.researchUsageByUserID ||= {};
+
+  const answers = store.researchAnswersByUserID[userID] || [];
+  const existingAnswer = answers.find((item) => item.id === answer.id);
+  if (existingAnswer) {
+    if (canonicalJSONString(existingAnswer) !== canonicalJSONString(answer)) {
+      throw new Error("Immutable Research answer cannot be changed.");
+    }
+    const conversations = store.researchConversationsByUserID[userID] || [];
+    const hasConversation = conversations.some((item) => item.id === conversation.id);
+    if (!hasConversation) {
+      throw new Error("Research conversation missing after answer commit.");
+    }
+    return { replayed: true, answer: existingAnswer, conversation };
+  }
+
+  if (reservationID && usageEntry) {
+    const usageEntries = store.researchUsageByUserID[userID] || [];
+    const usageIndex = usageEntries.findIndex((item) =>
+      item.id === reservationID && item.mode === "reservation"
+    );
+    if (usageIndex === -1) {
+      throw new Error("Research usage reservation was not found.");
+    }
+    usageEntries[usageIndex] = { ...usageEntry, id: reservationID };
+    store.researchUsageByUserID[userID] = usageEntries;
+  }
+
+  if (testThrowAfterUsage) {
+    throw new Error("TEST_THROW_AFTER_USAGE");
+  }
+
+  answers.push(answer);
+  store.researchAnswersByUserID[userID] = answers;
+
+  const conversations = store.researchConversationsByUserID[userID] || [];
+  const conversationIndex = conversations.findIndex((item) => item.id === conversation.id);
+  if (conversationIndex === -1) conversations.push(conversation);
+  else conversations[conversationIndex] = conversation;
+  store.researchConversationsByUserID[userID] = conversations;
+
+  const activity = store.activityEventsByUserID[userID] || [];
+  for (const event of events) {
+    const existing = activity.find((item) => item.id === event.id);
+    if (existing && canonicalJSONString(existing) !== canonicalJSONString(event)) {
+      throw new Error("Activity events are append-only.");
+    }
+    if (!existing) activity.push(event);
+  }
+  store.activityEventsByUserID[userID] = activity;
+
+  return { replayed: false, answer, conversation };
+}
+
+async function commitResearchConversationMessage(userID, payload) {
+  const adapter = await storeAdapter();
+  if (typeof adapter.commitResearchConversationMessage === "function") {
+    return adapter.commitResearchConversationMessage(userID, payload);
+  }
+  // Fallback: persist answer/conversation/events first, then mark usage complete so a
+  // crash cannot leave usage billed without durable research records.
+  await saveStoredResearchAnswer(userID, payload.answer);
+  await saveStoredResearchConversation(userID, payload.conversation);
+  for (const event of payload.events || []) {
+    await saveStoredActivityEvent(userID, event);
+  }
+  if (payload.reservationID && payload.usageEntry) {
+    await completeResearchUsageReservation(userID, payload.reservationID, payload.usageEntry);
+  }
+  return { replayed: false, answer: payload.answer, conversation: payload.conversation };
 }
 
 async function releaseResearchUsageReservation(userID, reservationID) {
@@ -5731,21 +6095,54 @@ function researchCodeDecisionLinkConflict() {
   );
 }
 
-function researchConversationSummary(conversation, projectLink = null) {
-  const decisionLink = researchCodeDecisionLink(projectLink);
+/**
+ * Strip heavy conversation payload fields (messages, visual attachments, full
+ * source bodies) so list endpoints never depend on full-body JSON.
+ */
+export function projectResearchConversationForList(conversation) {
+  if (!conversation || typeof conversation !== "object") return null;
+  const selectionSources = (Array.isArray(conversation.sources) ? conversation.sources : [])
+    .filter((source) => source?.kind === "selection")
+    .map((source) => ({
+      kind: "selection",
+      sectionID: String(source.sectionID || "").trim() || undefined
+    }));
+  const messageCount = Number.isFinite(Number(conversation.messageCount))
+    ? Number(conversation.messageCount)
+    : (Array.isArray(conversation.messages) ? conversation.messages.length : 0);
   return {
     id: conversation.id,
     title: conversation.title,
     createdAt: conversation.createdAt,
     updatedAt: conversation.updatedAt,
-    sourceCount: conversation.sources?.filter((source) => source.kind === "selection").length || 0,
+    primaryProjectID: conversation.primaryProjectID || null,
+    starterQuestion: conversation.starterQuestion || null,
+    projectContextReviewRequired: Boolean(conversation.projectContextReviewRequired),
+    sourceStatus: conversation.sourceStatus || "current",
+    sources: selectionSources,
+    messageCount
+  };
+}
+
+function researchConversationSummary(conversation, projectLink = null) {
+  const decisionLink = researchCodeDecisionLink(projectLink);
+  const selectionSources = (Array.isArray(conversation?.sources) ? conversation.sources : [])
+    .filter((source) => source?.kind === "selection");
+  const messageCount = Number.isFinite(Number(conversation?.messageCount))
+    ? Number(conversation.messageCount)
+    : (Array.isArray(conversation?.messages) ? conversation.messages.length : 0);
+  return {
+    id: conversation.id,
+    title: conversation.title,
+    createdAt: conversation.createdAt,
+    updatedAt: conversation.updatedAt,
+    sourceCount: selectionSources.length,
     sourceSectionIDs: Array.from(new Set(
-      (conversation.sources || [])
-        .filter((source) => source.kind === "selection")
+      selectionSources
         .map((source) => String(source.sectionID || "").trim())
         .filter(Boolean)
     )),
-    messageCount: conversation.messages?.length || 0,
+    messageCount,
     primaryProjectID: conversation.primaryProjectID || null,
     linkedCodeDecisionID: decisionLink?.questionID || null,
     codeDecisionLinkVersion: projectLink ? Number(projectLink.version || 1) : null,
@@ -6818,11 +7215,17 @@ async function projectFoundationStateForStorageOwner(
   const projects = projectID && options.includeAllProjects === false
     ? allProjects.filter((project) => project.id === projectID)
     : allProjects;
-  const links = (await listStoredProjectLinks(storageOwnerUserID))
-    .filter((link) => !projectID || link.projectID === projectID);
-  const linkedTargetIDs = new Set(links.filter((link) => !link.deletedAt).map((link) => link.targetID));
-  const storedArtifacts = (await listStoredFoundationArtifacts(storageOwnerUserID))
-    .filter((artifact) => !projectID || linkedTargetIDs.has(artifact.envelope?.id));
+  const scopedProjectID = String(projectID || "").trim();
+  const scopeOptions = scopedProjectID ? { projectID: scopedProjectID } : {};
+  const links = await listStoredProjectLinks(storageOwnerUserID, scopeOptions);
+  const linkedTargetIDs = Array.from(new Set(
+    links.filter((link) => !link.deletedAt).map((link) => link.targetID).filter(Boolean)
+  ));
+  const storedArtifacts = scopedProjectID
+    ? (linkedTargetIDs.length === 0
+        ? []
+        : await listStoredFoundationArtifacts(storageOwnerUserID, { ids: linkedTargetIDs }))
+    : await listStoredFoundationArtifacts(storageOwnerUserID);
   const commentsByThreadID = new Map();
   storedArtifacts
     .filter((artifact) => artifact.envelope?.type === "reviewComment")
@@ -6844,8 +7247,7 @@ async function projectFoundationStateForStorageOwner(
       envelope: { ...artifact.envelope, updatedAt }
     };
   });
-  const answers = (await listStoredResearchAnswers(storageOwnerUserID))
-    .filter((answer) => !projectID || answer.projectID === projectID)
+  const answers = (await listStoredResearchAnswers(storageOwnerUserID, scopeOptions))
     .map((answer) => ({
       id: answer.id,
       conversationID: answer.conversationID,
@@ -6861,16 +7263,17 @@ async function projectFoundationStateForStorageOwner(
       reviewStatus: answer.reviewStatus,
       createdAt: answer.createdAt
     }));
-  const researchConversations = (await listStoredResearchConversations(storageOwnerUserID))
-    .filter((conversation) => !projectID || conversation.primaryProjectID === projectID)
+  const researchConversations = (await listStoredResearchConversations(storageOwnerUserID, {
+    ...scopeOptions,
+    summaryOnly: true
+  }))
     .map(researchConversationSummary);
-  const activity = (await listStoredActivityEvents(storageOwnerUserID))
-    .filter((event) => !projectID || event.projectID === projectID);
-  const workboardPreview = projectID
-    ? workboardPreviewSummary((await projectWorkboardPreviews(storageOwnerUserID, projectID))[0])
+  const activity = await listStoredActivityEvents(storageOwnerUserID, scopeOptions);
+  const workboardPreview = scopedProjectID
+    ? workboardPreviewSummary((await projectWorkboardPreviews(storageOwnerUserID, scopedProjectID))[0])
     : null;
-  const coordinationAssignees = projectID
-    ? await coordinationAssigneesForProject(storageOwnerUserID, projectID)
+  const coordinationAssignees = scopedProjectID
+    ? await coordinationAssigneesForProject(storageOwnerUserID, scopedProjectID)
     : [];
   return {
     schemaVersion: projectFoundationSchemaVersion,
@@ -6884,6 +7287,43 @@ async function projectFoundationStateForStorageOwner(
     workboardPreview,
     migrationCheckpoint: checkpoint
   };
+}
+
+async function notebookCardSummariesForProject(storageOwnerUserID, projectID) {
+  const links = await listStoredProjectLinks(storageOwnerUserID, {
+    projectID,
+    targetKind: "notebookCard"
+  });
+  const linkedCardIDs = Array.from(new Set(
+    links.filter((link) => !link.deletedAt).map((link) => link.targetID).filter(Boolean)
+  ));
+  if (linkedCardIDs.length === 0) return [];
+  return (await listStoredFoundationArtifacts(storageOwnerUserID, { ids: linkedCardIDs }))
+    .filter((artifact) =>
+      artifact.envelope?.type === "notebookCard" &&
+      !artifact.envelope?.deletedAt
+    )
+    .map((artifact) => ({
+      id: artifact.envelope.id,
+      version: artifact.envelope.version,
+      cardType: artifact.payload.cardType,
+      title: artifact.payload.title,
+      plainText: artifact.payload.plainText,
+      referenceCount: artifact.payload.references?.length || 0,
+      sourceClassification: artifact.payload.sourceClassification,
+      createdAt: artifact.envelope.createdAt,
+      updatedAt: artifact.envelope.updatedAt
+    }))
+    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
+}
+
+async function reportHistorySummariesForProject(storageOwnerUserID, projectID) {
+  const manifests = await projectReportManifests(storageOwnerUserID, projectID);
+  const files = await reportFilesForProject(storageOwnerUserID, projectID);
+  return manifests.map((artifact) => ({
+    ...reportManifestSummary(artifact.payload),
+    files: files.filter((file) => file.manifestID === artifact.envelope.id)
+  }));
 }
 
 async function coordinationAssigneesForProject(storageOwnerUserID, projectID) {
@@ -9199,31 +9639,7 @@ async function handleNotebookCardList(request, response) {
     organizationPermissions.projectView
   );
   if (!access) return;
-  const links = (await listStoredProjectLinks(access.storageOwnerUserID))
-    .filter((link) =>
-      !link.deletedAt &&
-      link.projectID === projectID &&
-      link.targetKind === "notebookCard"
-    );
-  const linkedCardIDs = new Set(links.map((link) => link.targetID));
-  const cards = (await listStoredFoundationArtifacts(access.storageOwnerUserID))
-    .filter((artifact) =>
-      artifact.envelope?.type === "notebookCard" &&
-      !artifact.envelope?.deletedAt &&
-      linkedCardIDs.has(artifact.envelope.id)
-    )
-    .map((artifact) => ({
-      id: artifact.envelope.id,
-      version: artifact.envelope.version,
-      cardType: artifact.payload.cardType,
-      title: artifact.payload.title,
-      plainText: artifact.payload.plainText,
-      referenceCount: artifact.payload.references?.length || 0,
-      sourceClassification: artifact.payload.sourceClassification,
-      createdAt: artifact.envelope.createdAt,
-      updatedAt: artifact.envelope.updatedAt
-    }))
-    .sort((left, right) => String(right.updatedAt).localeCompare(String(left.updatedAt)));
+  const cards = await notebookCardSummariesForProject(access.storageOwnerUserID, projectID);
   sendJSON(response, 200, {
     schemaVersion: 1,
     cardTypes: notebookCardTypes,
@@ -10319,15 +10735,73 @@ async function handleReportHistoryList(request, response) {
     organizationPermissions.reportDownload
   );
   if (!access) return;
-  const manifests = await projectReportManifests(access.storageOwnerUserID, access.projectID);
-  const files = await reportFilesForProject(access.storageOwnerUserID, access.projectID);
   sendJSON(response, 200, {
     schemaVersion: 1,
     projectID: access.projectID,
-    reports: manifests.map((artifact) => ({
-      ...reportManifestSummary(artifact.payload),
-      files: files.filter((file) => file.manifestID === artifact.envelope.id)
-    }))
+    reports: await reportHistorySummariesForProject(access.storageOwnerUserID, access.projectID)
+  });
+}
+
+async function handleProjectHubBootstrap(request, response) {
+  const context = await authenticatedResearchBody(request, response);
+  if (!context) return;
+  const projectID = String(context.body.projectID || "").trim();
+  if (!projectID) {
+    sendError(response, 400, "Missing project ID.");
+    return;
+  }
+  const access = await requireProjectPermission(
+    response,
+    context.userID,
+    projectID,
+    organizationPermissions.projectView
+  );
+  if (!access) return;
+
+  const canReadNotebook = Boolean(access.organization) ||
+    hasActiveProEntitlement(context.authContext.entitlement);
+  const canDownloadReports = access.permissions.includes(organizationPermissions.reportDownload);
+
+  const [foundation, cards, reports] = await Promise.all([
+    projectFoundationStateForStorageOwner(
+      access.storageOwnerUserID,
+      access.projectID,
+      { includeAllProjects: false }
+    ),
+    canReadNotebook
+      ? notebookCardSummariesForProject(access.storageOwnerUserID, access.projectID)
+      : Promise.resolve([]),
+    canDownloadReports
+      ? reportHistorySummariesForProject(access.storageOwnerUserID, access.projectID)
+      : Promise.resolve([])
+  ]);
+  if (!foundation) {
+    sendError(response, 404, "Project not found.");
+    return;
+  }
+
+  sendJSON(response, 200, {
+    schemaVersion: 1,
+    projectID: access.projectID,
+    access: {
+      role: access.role,
+      permissions: access.permissions,
+      readOnly: !access.permissions.includes(organizationPermissions.projectEdit),
+      canReadNotebook,
+      canDownloadReports
+    },
+    foundation,
+    notebook: {
+      schemaVersion: 1,
+      cardTypes: notebookCardTypes,
+      projectID: access.projectID,
+      cards
+    },
+    reports: {
+      schemaVersion: 1,
+      projectID: access.projectID,
+      reports
+    }
   });
 }
 
@@ -10586,8 +11060,8 @@ async function handleResearchConversationList(request, response) {
   const context = await authenticatedResearchBody(request, response);
   if (!context) return;
   const [conversations, links] = await Promise.all([
-    listStoredResearchConversations(context.userID),
-    listStoredProjectLinks(context.userID)
+    listStoredResearchConversations(context.userID, { summaryOnly: true }),
+    listStoredProjectLinks(context.userID, { targetKind: "researchConversation" })
   ]);
   const linkByConversationID = new Map(links
     .filter((link) => !link.deletedAt && link.targetKind === "researchConversation")
@@ -12005,20 +12479,6 @@ async function handleResearchConversationMessage(request, response) {
         });
     const estimatedCost = estimatedResearchCost(result.usage);
     const now = new Date().toISOString();
-    if (!mockMode) {
-      await completeResearchUsageReservation(context.userID, researchReservationID, {
-        model: result.model,
-        requestedModel: result.requestedModel || result.model,
-        mode: "openai",
-        ...result.usage,
-        promptVersion: result.configuration.promptVersion,
-        evidenceVersion: result.configuration.evidenceVersion,
-        estimatedCostUSD: estimatedCost.estimatedUSD,
-        pricingVersion: estimatedCost.pricingVersion,
-        createdAt: researchReservationCreatedAt
-      });
-      researchReservationCompleted = true;
-    }
     const disclaimer = "AI-generated research assistance, not an official code determination.";
     const userMessage = { id: randomUUID(), role: "user", question, createdAt: now };
     const assistantMessage = {
@@ -12074,35 +12534,54 @@ async function handleResearchConversationMessage(request, response) {
       },
       ...(decisionContextSnapshot ? { decisionContextSnapshot } : {})
     };
-    await saveStoredResearchAnswer(context.userID, answerRecord);
     conversation.messages.push(userMessage, assistantMessage);
     conversation.updatedAt = now;
     conversation.sourceStatus = "current";
-    await saveStoredResearchConversation(context.userID, conversation);
-    if (conversation.primaryProjectID) {
-      await saveStoredActivityEvent(context.userID, activityEvent({
-        owner: ownerScope(context.userID),
-        projectID: conversation.primaryProjectID,
-        actorUserID: context.userID,
-        action: "research.question.submitted",
-        objectKind: "researchConversation",
-        objectID: conversation.id,
-        newStatus: "submitted",
-        createdAt: now,
-        metadata: { answerID: assistantMessage.id }
-      }));
-      await saveStoredActivityEvent(context.userID, activityEvent({
-        owner: ownerScope(context.userID),
-        projectID: conversation.primaryProjectID,
-        actorUserID: context.userID,
-        action: "research.answer.generated",
-        objectKind: "researchAnswer",
-        objectID: assistantMessage.id,
-        newStatus: "generated",
-        createdAt: now,
-        metadata: { conversationID: conversation.id }
-      }));
-    }
+    const activityEvents = conversation.primaryProjectID
+      ? [
+          activityEvent({
+            owner: ownerScope(context.userID),
+            projectID: conversation.primaryProjectID,
+            actorUserID: context.userID,
+            action: "research.question.submitted",
+            objectKind: "researchConversation",
+            objectID: conversation.id,
+            newStatus: "submitted",
+            createdAt: now,
+            metadata: { answerID: assistantMessage.id }
+          }),
+          activityEvent({
+            owner: ownerScope(context.userID),
+            projectID: conversation.primaryProjectID,
+            actorUserID: context.userID,
+            action: "research.answer.generated",
+            objectKind: "researchAnswer",
+            objectID: assistantMessage.id,
+            newStatus: "generated",
+            createdAt: now,
+            metadata: { conversationID: conversation.id }
+          })
+        ]
+      : [];
+    // Usage completion is part of the same durable commit as answer + conversation (+ events).
+    await commitResearchConversationMessage(context.userID, {
+      reservationID: mockMode ? null : researchReservationID,
+      usageEntry: mockMode ? null : {
+        model: result.model,
+        requestedModel: result.requestedModel || result.model,
+        mode: "openai",
+        ...result.usage,
+        promptVersion: result.configuration.promptVersion,
+        evidenceVersion: result.configuration.evidenceVersion,
+        estimatedCostUSD: estimatedCost.estimatedUSD,
+        pricingVersion: estimatedCost.pricingVersion,
+        createdAt: researchReservationCreatedAt
+      },
+      answer: answerRecord,
+      conversation,
+      events: activityEvents
+    });
+    researchReservationCompleted = !mockMode && Boolean(researchReservationID);
     console.info(JSON.stringify({
       event: "research_conversation_message",
       user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
@@ -14753,6 +15232,35 @@ function mutationKindAndRecord(mutation) {
   return { kind, record };
 }
 
+const knownSyncMutationKinds = new Set([
+  "savedItem",
+  "annotation",
+  "project",
+  "projectSection",
+  "workboard",
+  "continuity",
+  "codeVersionClear"
+]);
+
+function normalizedExcludedMutationKinds(body) {
+  const raw = Array.isArray(body?.excludedMutationKinds) ? body.excludedMutationKinds : [];
+  return new Set(
+    raw
+      .map((value) => String(value || "").trim())
+      .filter((value) => knownSyncMutationKinds.has(value))
+  );
+}
+
+function filterMutationsByExcludedKinds(mutations, excludedKinds) {
+  if (!(excludedKinds instanceof Set) || excludedKinds.size === 0) {
+    return mutations;
+  }
+  return (mutations || []).filter((mutation) => {
+    const { kind } = mutationKindAndRecord(mutation);
+    return !excludedKinds.has(kind);
+  });
+}
+
 function projectRecordMatchesSection(projectRecord, sectionRecord) {
   if (!projectRecord || !sectionRecord) {
     return false;
@@ -16139,6 +16647,7 @@ async function handlePull(request, response) {
   const sinceEventID = Number(body.contentMapVersion) === contentMapVersion
     ? normalizedSinceEventID(body)
     : null;
+  const excludedMutationKinds = normalizedExcludedMutationKinds(body);
   const adapter = await storeAdapter();
   if (typeof adapter.pullUserContent === "function") {
     const context = await authenticatedUserContext(request, response, userID);
@@ -16147,13 +16656,17 @@ async function handlePull(request, response) {
     }
     const result = await adapter.pullUserContent(userID, { since, sinceEventID });
     const expanded = expandPullMutationsWithDependencies(result.mutations, result.allMutations);
-    const mutations = await canonicalizeMutations(expanded);
+    const mutations = filterMutationsByExcludedKinds(
+      await canonicalizeMutations(expanded),
+      excludedMutationKinds
+    );
     const responseContract = await syncResponseContract(userID, result.entitlement, body, contentMapVersion);
     logSyncTelemetry({
       mode: "full-pull",
       userID,
       changed: mutations.length > 0,
       mutationCount: mutations.length,
+      excludedMutationKinds: Array.from(excludedMutationKinds),
       durationMs: performance.now() - telemetryStartedAt
     });
     sendJSON(response, 200, {
@@ -16178,7 +16691,10 @@ async function handlePull(request, response) {
   // Return the current canonical state until clients send a content-map version.
   // Otherwise old event checkpoints can hide server-side section ID repairs.
   const filteredMutations = Number.isFinite(since) ? allMutations.filter((mutation) => mutationUpdatedAt(mutation) > since) : allMutations;
-  const mutations = await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations));
+  const mutations = filterMutationsByExcludedKinds(
+    await canonicalizeMutations(expandPullMutationsWithDependencies(filteredMutations, allMutations)),
+    excludedMutationKinds
+  );
   const latestEventID = await latestSyncEventID(userID);
   const entitlement = store.entitlements[userID] || null;
   const responseContract = await syncResponseContract(userID, entitlement, body, contentMapVersion);
@@ -16187,6 +16703,7 @@ async function handlePull(request, response) {
     userID,
     changed: mutations.length > 0,
     mutationCount: mutations.length,
+    excludedMutationKinds: Array.from(excludedMutationKinds),
     durationMs: performance.now() - telemetryStartedAt
   });
   sendJSON(response, 200, {
@@ -16209,13 +16726,14 @@ function syncEntitlementFingerprint(entitlement) {
     .slice(0, 24);
 }
 
-function logSyncTelemetry({ mode, userID, changed, mutationCount = 0, durationMs }) {
+function logSyncTelemetry({ mode, userID, changed, mutationCount = 0, excludedMutationKinds = [], durationMs }) {
   console.info(JSON.stringify({
     event: "permitext.sync",
     mode,
     principal: createHash("sha256").update(String(userID || "")).digest("hex").slice(0, 12),
     changed: Boolean(changed),
     mutationCount: Number(mutationCount || 0),
+    excludedMutationKinds: Array.isArray(excludedMutationKinds) ? excludedMutationKinds : [],
     durationMs: Math.round(Number(durationMs || 0)),
     observedAt: new Date().toISOString()
   }));
@@ -20725,6 +21243,7 @@ const handlers = {
   "research/evidence/discover": handleResearchEvidenceDiscover,
   "research/conversations/candidate-disposition": handleResearchCandidateDisposition,
   "projects/foundation/state": handleProjectFoundationState,
+  "projects/hub/bootstrap": handleProjectHubBootstrap,
   "projects/foundation/link": handleProjectFoundationLink,
   "projects/foundation/unlink": handleProjectFoundationUnlink,
   // Code Question routes (Phase 1): gated by permitext:codeQuestionWorkspace (default off).
@@ -20935,13 +21454,28 @@ async function handleRequestUnlocked(request, response) {
 
 function requestMutatesFileStore(request) {
   if (databaseURL) return false;
+  const path = normalizePath(request.url);
   if (process.env.PERMITEXT_TEST_CONCURRENT_CODE_QUESTION_ANALYSIS === "1" &&
     request.method === "POST" &&
-    normalizePath(request.url) === "projects/code-questions/analysis/create") {
+    path === "projects/code-questions/analysis/create") {
+    return false;
+  }
+  // Long-running external I/O must not hold the process-wide store lock for the whole
+  // handler. Adapter-level withMutation() still serializes short JSON RMW sections.
+  if (
+    path === "research/interpret" ||
+    path === "research/conversations/message" ||
+    path === "research/conversations/refresh" ||
+    path === "research/conversations/evidence" ||
+    path === "research/evidence/discover" ||
+    path === "billing/stripe/webhook" ||
+    path === "billing/web/checkout" ||
+    path === "billing/web/portal" ||
+    path === "billing/apple/transactions/verify"
+  ) {
     return false;
   }
   if (request.method === "POST" || request.method === "DELETE") return true;
-  const path = normalizePath(request.url);
   return request.method === "GET" && path === "account/apple/callback";
 }
 

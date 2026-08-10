@@ -2564,8 +2564,9 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func syncPendingUserContentIfPossible() async {
-        guard !isAccountBusy else { return }
+    @discardableResult
+    func syncPendingUserContentIfPossible() async -> Int {
+        guard !isAccountBusy else { return 0 }
         isAccountBusy = true
         defer { isAccountBusy = false }
 
@@ -2590,16 +2591,18 @@ final class CodeLibraryViewModel: ObservableObject {
                 statusMessage = "Synced \(report.completedCount) local changes in \(Self.syncDurationText(elapsed))."
             }
             refreshPendingUserContentSyncCount()
+            return report.attemptedCount
         } catch {
             if handleBackendSessionFailureIfNeeded(error) {
                 refreshUserContentSyncCheckpoint()
                 refreshPendingUserContentSyncCount()
-                return
+                return 0
             }
             refreshUserContentSyncCheckpoint()
             statusMessage = error.localizedDescription
             refreshPendingUserContentSyncCount()
             scheduleUserContentRetry()
+            return 0
         }
     }
 
@@ -2626,9 +2629,15 @@ final class CodeLibraryViewModel: ObservableObject {
 
     private func performAutomaticUserContentSync() async {
         guard signedInAccount != nil, isNetworkAvailable else { return }
-        await pullRemoteUserContentIfPossible()
-        await syncPendingUserContentIfPossible()
-        await pullRemoteUserContentIfPossible()
+        // Prefer the cheap server checkpoint before downloading a full pull payload.
+        await pullRemoteUserContentIfPossible(skipIfUnchanged: true)
+        let pushedCount = await syncPendingUserContentIfPossible()
+        // Trailing pull is only needed after local push work (rejections / concurrent remote
+        // events). When the checkpoint already reported no remote changes and nothing was
+        // pushed, skip the second pull entirely.
+        if pushedCount > 0 {
+            await pullRemoteUserContentIfPossible(skipIfUnchanged: false)
+        }
     }
 
     func startForegroundAutomaticSync() {
@@ -2699,13 +2708,17 @@ final class CodeLibraryViewModel: ObservableObject {
         }
     }
 
-    func pullRemoteUserContentIfPossible() async {
+    func pullRemoteUserContentIfPossible(skipIfUnchanged: Bool = false) async {
         guard !isAccountBusy else { return }
         isAccountBusy = true
         defer { isAccountBusy = false }
 
         do {
-            let report = try await syncEngine.pullRemoteChanges(account: signedInAccount, applySafeChanges: true)
+            let report = try await syncEngine.pullRemoteChanges(
+                account: signedInAccount,
+                applySafeChanges: true,
+                skipIfUnchanged: skipIfUnchanged
+            )
             applyBackendEntitlement(
                 report.entitlement,
                 capabilityContract: report.capabilityContract
@@ -2717,6 +2730,10 @@ final class CodeLibraryViewModel: ObservableObject {
                 refreshBookmarks()
             }
             refreshUserContentSyncCheckpoint()
+            // Checkpoint-skipped automatic pulls are silent; only surface meaningful results.
+            if report.skippedReason == "No remote changes." {
+                return
+            }
             if let skippedReason = report.skippedReason {
                 statusMessage = skippedReason
             } else if report.appliedCount > 0 {

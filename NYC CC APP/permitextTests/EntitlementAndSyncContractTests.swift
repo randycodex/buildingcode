@@ -4,13 +4,47 @@ import SQLite3
 
 private actor SyncPullRecorder {
     private var contentMapVersions: [Int?] = []
+    private var pullCount = 0
+    private var checkpointCount = 0
+    private var excludedMutationKinds: [[String]] = []
+    private var checkpointChanged: Bool
 
-    func record(contentMapVersion: Int?) {
+    init(checkpointChanged: Bool = true) {
+        self.checkpointChanged = checkpointChanged
+    }
+
+    func setCheckpointChanged(_ changed: Bool) {
+        checkpointChanged = changed
+    }
+
+    func recordPull(contentMapVersion: Int?, excludedMutationKinds: [String]) {
+        pullCount += 1
         contentMapVersions.append(contentMapVersion)
+        self.excludedMutationKinds.append(excludedMutationKinds)
+    }
+
+    func recordCheckpoint() {
+        checkpointCount += 1
     }
 
     func recordedContentMapVersions() -> [Int?] {
         contentMapVersions
+    }
+
+    func recordedPullCount() -> Int {
+        pullCount
+    }
+
+    func recordedCheckpointCount() -> Int {
+        checkpointCount
+    }
+
+    func recordedExcludedMutationKinds() -> [[String]] {
+        excludedMutationKinds
+    }
+
+    func currentCheckpointChanged() -> Bool {
+        checkpointChanged
     }
 }
 
@@ -18,6 +52,20 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
     let name = "recording-sync"
     let recorder: SyncPullRecorder
     let returnedContentMapVersion: Int
+    let returnedEntitlementFingerprint: String
+    let returnedLatestEventID: Int64
+
+    init(
+        recorder: SyncPullRecorder,
+        returnedContentMapVersion: Int,
+        returnedEntitlementFingerprint: String = "fingerprint-v1",
+        returnedLatestEventID: Int64 = 42
+    ) {
+        self.recorder = recorder
+        self.returnedContentMapVersion = returnedContentMapVersion
+        self.returnedEntitlementFingerprint = returnedEntitlementFingerprint
+        self.returnedLatestEventID = returnedLatestEventID
+    }
 
     func preview(items: [SyncQueueItem]) throws -> UserContentSyncPreviewReport {
         UserContentSyncPreviewReport(
@@ -44,18 +92,42 @@ private struct RecordingUserContentSyncBackend: UserContentSyncBackend {
         )
     }
 
+    func checkpoint(
+        account: SignedInAccount,
+        sinceEventID: Int64?,
+        contentMapVersion: Int?,
+        entitlementFingerprint: String?
+    ) async throws -> ServerUserContentCheckpointResult {
+        await recorder.recordCheckpoint()
+        let changed = await recorder.currentCheckpointChanged()
+        return ServerUserContentCheckpointResult(
+            userID: account.appUserID,
+            checkedAt: Date(),
+            changed: changed,
+            latestEventID: returnedLatestEventID,
+            syncRevision: returnedLatestEventID,
+            contentMapVersion: returnedContentMapVersion,
+            entitlementFingerprint: returnedEntitlementFingerprint
+        )
+    }
+
     func pull(
         account: SignedInAccount,
         since: Date?,
         sinceEventID: Int64?,
-        contentMapVersion: Int?
+        contentMapVersion: Int?,
+        excludedMutationKinds: [String]
     ) async throws -> ServerUserContentPullResult {
-        await recorder.record(contentMapVersion: contentMapVersion)
+        await recorder.recordPull(
+            contentMapVersion: contentMapVersion,
+            excludedMutationKinds: excludedMutationKinds
+        )
         return ServerUserContentPullResult(
             userID: account.appUserID,
             pulledAt: Date(),
-            latestEventID: 42,
+            latestEventID: returnedLatestEventID,
             contentMapVersion: returnedContentMapVersion,
+            entitlementFingerprint: returnedEntitlementFingerprint,
             mutations: []
         )
     }
@@ -1193,14 +1265,17 @@ final class EntitlementAndSyncContractTests: XCTestCase {
         let request = BackendUserContentPullRequest(
             auth: BackendAuthContext(accountUserID: "test-user", bearerToken: nil),
             since: nil,
-            contentMapVersion: 7
+            contentMapVersion: 7,
+            excludedMutationKinds: UserContentSyncClientPolicy.excludedMutationKinds
         )
         let data = try JSONEncoder().encode(request)
         let object = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
         let capabilities = try XCTUnwrap(object["clientCapabilities"] as? [String])
+        let excluded = try XCTUnwrap(object["excludedMutationKinds"] as? [String])
 
         XCTAssertEqual(object["syncSchemaVersion"] as? Int, 2)
         XCTAssertEqual(object["contentMapVersion"] as? Int, 7)
+        XCTAssertEqual(excluded, ["workboard"])
         XCTAssertEqual(Set(capabilities), Set(PermitextCapabilityID.allCases.map(\.rawValue)))
         XCTAssertTrue(capabilities.contains("notebook"))
         XCTAssertTrue(capabilities.contains("professional-exports"))
@@ -1236,12 +1311,107 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
         XCTAssertEqual(engine.checkpoint(account: account)?.contentMapVersion, 7)
+        XCTAssertEqual(engine.checkpoint(account: account)?.entitlementFingerprint, "fingerprint-v1")
 
         _ = try await engine.pullRemoteChanges(account: account, applySafeChanges: true)
         let recordedVersions = await recorder.recordedContentMapVersions()
         XCTAssertEqual(recordedVersions.count, 2)
         XCTAssertEqual(recordedVersions[0], 6)
         XCTAssertEqual(recordedVersions[1], 7)
+        let excludedKinds = await recorder.recordedExcludedMutationKinds()
+        XCTAssertEqual(excludedKinds.count, 2)
+        XCTAssertEqual(excludedKinds[0], ["workboard"])
+        XCTAssertEqual(excludedKinds[1], ["workboard"])
+    }
+
+    func testAutomaticPullSkipsWhenServerCheckpointIsUnchanged() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
+        let account = SignedInAccount(
+            appUserID: "apple:checkpoint-skip-test",
+            appleUserID: "checkpoint-skip-test",
+            displayName: "Checkpoint Skip Test",
+            signedInAt: Date()
+        )
+        checkpointStore.save(
+            UserContentSyncCheckpoint(
+                accountUserID: account.appUserID,
+                backendName: "recording-sync",
+                lastSuccessfulPullAt: Date(timeIntervalSince1970: 1_700_000_000),
+                latestEventID: 42,
+                contentMapVersion: 7,
+                entitlementFingerprint: "fingerprint-v1"
+            )
+        )
+        let recorder = SyncPullRecorder(checkpointChanged: false)
+        let engine = UserContentSyncEngine(
+            repository: nil,
+            backend: RecordingUserContentSyncBackend(
+                recorder: recorder,
+                returnedContentMapVersion: 7,
+                returnedEntitlementFingerprint: "fingerprint-v1",
+                returnedLatestEventID: 42
+            ),
+            checkpointStore: checkpointStore
+        )
+
+        let report = try await engine.pullRemoteChanges(
+            account: account,
+            applySafeChanges: true,
+            skipIfUnchanged: true
+        )
+
+        XCTAssertEqual(report.skippedReason, "No remote changes.")
+        XCTAssertEqual(report.pulledCount, 0)
+        let pullCount = await recorder.recordedPullCount()
+        let checkpointCount = await recorder.recordedCheckpointCount()
+        XCTAssertEqual(pullCount, 0)
+        XCTAssertEqual(checkpointCount, 1)
+    }
+
+    func testAutomaticPullRunsWhenServerCheckpointIsChanged() async throws {
+        let defaults = isolatedEntitlementDefaults()
+        let checkpointStore = UserContentSyncCheckpointStore(defaults: defaults)
+        let account = SignedInAccount(
+            appUserID: "apple:checkpoint-change-test",
+            appleUserID: "checkpoint-change-test",
+            displayName: "Checkpoint Change Test",
+            signedInAt: Date()
+        )
+        checkpointStore.save(
+            UserContentSyncCheckpoint(
+                accountUserID: account.appUserID,
+                backendName: "recording-sync",
+                lastSuccessfulPullAt: Date(timeIntervalSince1970: 1_700_000_000),
+                latestEventID: 40,
+                contentMapVersion: 7,
+                entitlementFingerprint: "fingerprint-v1"
+            )
+        )
+        let recorder = SyncPullRecorder(checkpointChanged: true)
+        let engine = UserContentSyncEngine(
+            repository: nil,
+            backend: RecordingUserContentSyncBackend(
+                recorder: recorder,
+                returnedContentMapVersion: 7,
+                returnedEntitlementFingerprint: "fingerprint-v1",
+                returnedLatestEventID: 43
+            ),
+            checkpointStore: checkpointStore
+        )
+
+        let report = try await engine.pullRemoteChanges(
+            account: account,
+            applySafeChanges: true,
+            skipIfUnchanged: true
+        )
+
+        XCTAssertNil(report.skippedReason)
+        let pullCount = await recorder.recordedPullCount()
+        let checkpointCount = await recorder.recordedCheckpointCount()
+        XCTAssertEqual(pullCount, 1)
+        XCTAssertEqual(checkpointCount, 1)
+        XCTAssertEqual(engine.checkpoint(account: account)?.latestEventID, 43)
     }
 
     func testLegacySyncCheckpointDecodesWithoutContentMapVersion() throws {
@@ -1253,6 +1423,7 @@ final class EntitlementAndSyncContractTests: XCTestCase {
 
         XCTAssertEqual(checkpoint.latestEventID, 41)
         XCTAssertNil(checkpoint.contentMapVersion)
+        XCTAssertNil(checkpoint.entitlementFingerprint)
     }
 
     func testCapabilityContractDecodesResearchPackaging() throws {

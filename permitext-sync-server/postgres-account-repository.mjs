@@ -34,7 +34,18 @@ export function accountSessionTTLSeconds(environment = process.env) {
     : 60 * 60 * 24 * 30;
 }
 
+/** Minimum age of last_seen_at before authenticate rewrites it (hot-path throttle). */
+export function accountSessionLastSeenThrottleSeconds(environment = process.env) {
+  const configured = Number(environment.PERMITEXT_SESSION_LAST_SEEN_THROTTLE_SECONDS);
+  return Number.isSafeInteger(configured) && configured >= 30
+    ? configured
+    : 5 * 60;
+}
+
 export function createPostgresAccountRepository(sql, options = {}) {
+  const lastSeenThrottleSeconds = options.lastSeenThrottleSeconds ??
+    accountSessionLastSeenThrottleSeconds();
+
   async function contextForUser(userID) {
     const rows = await sql`
       SELECT users.account, entitlements.entitlement
@@ -44,6 +55,14 @@ export function createPostgresAccountRepository(sql, options = {}) {
       LIMIT 1
     `;
     const row = rows[0];
+    if (!row) return null;
+    return {
+      account: safeJSON(row.account, {}),
+      entitlement: row.entitlement ? safeJSON(row.entitlement, null) : null
+    };
+  }
+
+  function contextFromAuthRow(row) {
     if (!row) return null;
     return {
       account: safeJSON(row.account, {}),
@@ -69,23 +88,55 @@ export function createPostgresAccountRepository(sql, options = {}) {
   async function authenticate(userID, rawToken) {
     if (!userID || !rawToken) return null;
     const hash = tokenHash(rawToken);
+    // Single read joins session + account + entitlement. last_seen_at is only
+    // rewritten when older than the throttle window (not on every request).
     const rows = await sql`
-      UPDATE permitext_account_sessions
-      SET last_seen_at = now()
-      WHERE token_hash = ${hash}
-        AND user_id = ${userID}
-        AND revoked_at IS NULL
-        AND expires_at > now()
-      RETURNING user_id
+      SELECT
+        sessions.user_id,
+        sessions.last_seen_at,
+        users.account,
+        entitlements.entitlement
+      FROM permitext_account_sessions AS sessions
+      JOIN permitext_users AS users ON users.id = sessions.user_id
+      LEFT JOIN permitext_entitlements AS entitlements ON entitlements.user_id = sessions.user_id
+      WHERE sessions.token_hash = ${hash}
+        AND sessions.user_id = ${userID}
+        AND sessions.revoked_at IS NULL
+        AND sessions.expires_at > now()
+      LIMIT 1
     `;
     if (rows.length) {
-      return contextForUser(userID);
+      const row = rows[0];
+      const lastSeenMs = Date.parse(row.last_seen_at);
+      const stale =
+        !Number.isFinite(lastSeenMs) ||
+        Date.now() - lastSeenMs >= lastSeenThrottleSeconds * 1000;
+      if (stale) {
+        await sql`
+          UPDATE permitext_account_sessions
+          SET last_seen_at = now()
+          WHERE token_hash = ${hash}
+            AND user_id = ${userID}
+            AND revoked_at IS NULL
+            AND expires_at > now()
+            AND (
+              last_seen_at IS NULL OR
+              last_seen_at <= now() - (${lastSeenThrottleSeconds} * interval '1 second')
+            )
+        `;
+      }
+      return contextFromAuthRow(row);
     }
 
     const legacyRows = await sql`
-      SELECT user_id
-      FROM permitext_sessions
-      WHERE user_id = ${userID} AND session_token = ${rawToken}
+      SELECT
+        sessions.user_id,
+        users.account,
+        entitlements.entitlement
+      FROM permitext_sessions AS sessions
+      JOIN permitext_users AS users ON users.id = sessions.user_id
+      LEFT JOIN permitext_entitlements AS entitlements ON entitlements.user_id = sessions.user_id
+      WHERE sessions.user_id = ${userID} AND sessions.session_token = ${rawToken}
       LIMIT 1
     `;
     if (!legacyRows.length) return null;
@@ -106,7 +157,7 @@ export function createPostgresAccountRepository(sql, options = {}) {
       `,
       sql`DELETE FROM permitext_sessions WHERE user_id = ${userID}`
     ]);
-    return contextForUser(userID);
+    return contextFromAuthRow(legacyRows[0]);
   }
 
   async function matchingAppleAccounts(account) {

@@ -864,7 +864,10 @@ async function main() {
       "Web Project Studio no longer switches its Project overview, Notebook, Research history, and Report Draft as one guarded workspace."
     );
     assert(
-      iosSyncEngineSource.includes("async let foundation = transport.projectFoundation") &&
+      (
+        iosSyncEngineSource.includes("transport.projectHubBootstrap") ||
+        iosSyncEngineSource.includes("async let foundation = transport.projectFoundation")
+      ) &&
         iosSyncEngineSource.includes("async let notebook = transport.projectNotebookCards") &&
         iosSyncEngineSource.includes("async let reports = transport.projectReportHistory") &&
         iosCodeModelsSource.includes('post("projects/foundation/state"') &&
@@ -7267,6 +7270,24 @@ async function main() {
     assert(pulledWorkboard?.elements?.[0]?.id === "rectangle-smoke", "Workboard pull omitted drawing elements.");
     assert(!Object.values(pulledWorkboard.files || {}).some((file) => file.dataURL), "Workboard pull exposed inline image data.");
 
+    const workboardExcludedPull = await request("/sync/pull", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: {
+        auth: { accountUserID: userID },
+        excludedMutationKinds: ["workboard", "not-a-real-kind"]
+      }
+    });
+    assert(workboardExcludedPull.response.ok, "Pull with excludedMutationKinds failed.");
+    assert(
+      !workboardExcludedPull.json.mutations.some((item) => item.workboard),
+      "Pull with excludedMutationKinds still returned workboard mutations."
+    );
+    assert(
+      workboardExcludedPull.json.mutations.some((item) => item.savedItem || item.annotation || item.project),
+      "Pull with excludedMutationKinds dropped non-workboard mutations."
+    );
+
     const unauthorizedAssetUpload = await request("/workboards/assets/upload?projectID=project-client-smoke&fileID=image-smoke", {
       method: "POST",
       headers: {
@@ -7632,6 +7653,21 @@ async function main() {
         ) &&
         projectFoundationState.json.migrationCheckpoint.schemaVersion === 1,
       "The unified Project foundation did not preserve the existing Project and section membership identities."
+    );
+    const projectHubBootstrap = await request("/projects/hub/bootstrap", {
+      method: "POST",
+      token: currentSmokeUserToken,
+      body: { auth: { accountUserID: userID }, projectID: "project-client-smoke" }
+    });
+    assert(projectHubBootstrap.response.ok, "Project Hub bootstrap failed.");
+    assert(
+      projectHubBootstrap.json.projectID === "project-client-smoke" &&
+        Array.isArray(projectHubBootstrap.json.foundation?.projects) &&
+        projectHubBootstrap.json.foundation.projects.length === 1 &&
+        projectHubBootstrap.json.foundation.projects[0].id === "project-client-smoke" &&
+        Array.isArray(projectHubBootstrap.json.notebook?.cards) &&
+        Array.isArray(projectHubBootstrap.json.reports?.reports),
+      "Project Hub bootstrap did not return a single-project foundation with notebook and report sections."
     );
     const linkSavedToProject = await request("/projects/foundation/link", {
       method: "POST",
