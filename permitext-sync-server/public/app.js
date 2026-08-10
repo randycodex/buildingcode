@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-compact-research-feedback-v2";
+} from "./sync-state.js?v=20260809-numbered-decision-list-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-compact-research-feedback-v2";
+} from "./offline-storage.js?v=20260809-numbered-decision-list-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-compact-research-feedback-v2";
+} from "./workspace-state.js?v=20260809-numbered-decision-list-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -25978,15 +25978,18 @@ function renderCodeQuestionIndexList(project) {
     query: ""
   });
   if (!questions.length) return list;
-  questions.forEach((question) => {
+  questions.forEach((question, index) => {
     const item = document.createElement("li");
     item.className = "code-question-index-item";
     if (cq.activeQuestionID === question.id) item.classList.add("is-active");
     const button = document.createElement("button");
     button.type = "button";
     button.className = "code-question-index-open";
+    const displayNumber = Number(question.questionNumber)
+      || Number(String(question.displayID || "").replace(/\D/g, ""))
+      || index + 1;
     button.innerHTML = `
-      <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
+      <span class="code-question-index-id">${escapeHTML(String(displayNumber))}</span>
       <span class="code-question-index-title">${escapeHTML(question.title || "Untitled decision")}</span>
     `;
     button.addEventListener("click", async () => {
