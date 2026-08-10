@@ -343,6 +343,7 @@ assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.saved-pr
 assert.doesNotMatch(stylesSource, /\.saved-folder-context\.is-project \.project-studio-research/);
 assert.match(stylesSource, /\.saved-folder-context\.is-project \.saved-project-tool-controls \{[\s\S]*?display: grid;[\s\S]*?grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[\s\S]*?width: 100%;/);
 assert.match(appSource, /\["Research", "project-code-decisions-button", projectHasOpenCodeDecisions, openProjectCodeDecisions, closeProjectCodeDecisions\]/);
+assert.match(appSource, /\.filter\(\(\[label\]\) => label !== "Research" \|\| codeQuestionWorkspaceEnabled\(\)\)/);
 assert.match(appSource, /async function openProjectCodeDecisions[\s\S]*?await focusUtility\("analysis", "\.evidence-discovery textarea"\);/);
 assert.match(appSource, /function projectHasOpenCodeDecisions[\s\S]*?return indexIsOpen && scopedResearchIsOpen;/);
 assert.match(appSource, /function clearProjectSpecificResearch[\s\S]*?state\.utilities\.analysis = false;[\s\S]*?id !== "utility:analysis"/);
