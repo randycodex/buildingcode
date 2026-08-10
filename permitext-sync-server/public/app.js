@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-decision-entry-dock-v1";
+} from "./sync-state.js?v=20260809-decision-entry-composer-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-decision-entry-dock-v1";
+} from "./offline-storage.js?v=20260809-decision-entry-composer-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-decision-entry-dock-v1";
+} from "./workspace-state.js?v=20260809-decision-entry-composer-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -25830,30 +25830,56 @@ function renderCodeQuestionIndexBody(project) {
   void hydrateCodeQuestionList(String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || ""));
   const toolbar = document.createElement("form");
   toolbar.className = "code-question-index-toolbar";
-  const questionEntry = document.createElement("input");
-  questionEntry.type = "text";
+  const questionEntry = document.createElement("textarea");
   questionEntry.className = "code-question-index-search";
-  questionEntry.placeholder = "Ask a professional code question, then press Enter";
+  questionEntry.rows = 3;
+  questionEntry.maxLength = 2000;
+  questionEntry.placeholder = "Ask a professional code question…";
   questionEntry.setAttribute("aria-label", "Ask a professional code question");
   questionEntry.autocomplete = "off";
   questionEntry.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
   if (questionEntry.disabled) questionEntry.title = "An Owner or Editor must start Research";
+  const startButton = document.createElement("button");
+  startButton.type = "submit";
+  startButton.className = "ghost-button research-send-button code-question-start-button";
+  startButton.textContent = "Start";
+  startButton.disabled = true;
+  if (questionEntry.disabled) startButton.title = questionEntry.title;
+  const composerBox = document.createElement("div");
+  composerBox.className = "research-composer-box code-question-entry-box";
+  const resizeQuestionEntry = () => {
+    questionEntry.style.height = "auto";
+    questionEntry.style.height = `${questionEntry.scrollHeight}px`;
+  };
+  questionEntry.addEventListener("input", () => {
+    resizeQuestionEntry();
+    startButton.disabled = questionEntry.disabled || questionEntry.value.trim().length < 3;
+  });
+  questionEntry.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" || event.shiftKey || event.isComposing) return;
+    event.preventDefault();
+    toolbar.requestSubmit();
+  });
   toolbar.addEventListener("submit", async (event) => {
     event.preventDefault();
     const questionText = questionEntry.value.replace(/\s+/g, " ").trim();
-    if (!questionText || questionEntry.disabled) return;
+    if (questionText.length < 3 || questionEntry.disabled || startButton.disabled) return;
     questionEntry.disabled = true;
+    startButton.disabled = true;
     questionEntry.setAttribute("aria-busy", "true");
     const created = await createLocalCodeQuestionDraft(project, { questionText });
     if (!created && questionEntry.isConnected) {
       questionEntry.disabled = false;
+      startButton.disabled = questionEntry.value.trim().length < 3;
       questionEntry.removeAttribute("aria-busy");
       questionEntry.focus({ preventScroll: true });
     }
   });
-  toolbar.append(questionEntry);
+  composerBox.append(questionEntry, startButton);
+  toolbar.append(composerBox);
   wrap.appendChild(renderCodeQuestionIndexList(project));
   wrap.appendChild(toolbar);
+  requestAnimationFrame(resizeQuestionEntry);
   return wrap;
 }
 
