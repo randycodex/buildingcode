@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-decision-entry-composer-v2";
+} from "./sync-state.js?v=20260809-research-answer-cleanup-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-decision-entry-composer-v2";
+} from "./offline-storage.js?v=20260809-research-answer-cleanup-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-decision-entry-composer-v2";
+} from "./workspace-state.js?v=20260809-research-answer-cleanup-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13192,11 +13192,6 @@ function renderResearchInterpretation(container, result, options = {}) {
   }
   details.append(summary, detailsBody);
   card.append(details);
-
-  const disclaimer = document.createElement("p");
-  disclaimer.className = "research-disclaimer";
-  disclaimer.textContent = result.disclaimer;
-  card.append(disclaimer);
   container.append(card);
   if (options.message) renderResearchFeedback(container, options.message, options.conversationID);
 }

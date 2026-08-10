@@ -5144,12 +5144,6 @@ mark {
   font-size: calc(var(--chrome-font-size) * 0.74) !important;
 }
 
-.research-disclaimer {
-  padding-top: var(--space-2);
-  border-top: 1px solid var(--border);
-  font-size: var(--chrome-font-size) !important;
-}
-
 .research-list-panel .analysis-content {
   display: flex;
   flex-direction: column;

@@ -339,7 +339,8 @@ assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "As
 assert.match(researchInterpretationSource, /appendResearchUnresolved\(detailsBody/);
 assert.match(researchInterpretationSource, /appendResearchList\(detailsBody, "Related evidence to add"/);
 assert.match(researchInterpretationSource, /Based only on selected Research evidence/);
-assert.match(researchInterpretationSource, /card\.append\(details\)[\s\S]*?card\.append\(disclaimer\)/);
+assert.match(researchInterpretationSource, /card\.append\(details\)[\s\S]*?container\.append\(card\)/);
+assert.doesNotMatch(researchInterpretationSource, /research-disclaimer|result\.disclaimer/);
 assert.doesNotMatch(researchInterpretationSource, /answerHeading|Practical application/);
 assert.match(workspaceScript, /renderResearchInterpretation\(exactAnswer, answerRecord\.answer, \{ detailsOpen: true \}\)/);
 
@@ -361,9 +362,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-entry-composer-v2/);
-assert.match(serviceWorker, /permitext-pro-shell-v553/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-decision-entry-composer-v2/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-research-answer-cleanup-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v554/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-research-answer-cleanup-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 300px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
