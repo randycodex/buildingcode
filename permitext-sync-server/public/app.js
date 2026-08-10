@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-section-detail-type-v1";
+} from "./sync-state.js?v=20260809-research-evidence-copy-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-section-detail-type-v1";
+} from "./offline-storage.js?v=20260809-research-evidence-copy-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-section-detail-type-v1";
+} from "./workspace-state.js?v=20260809-research-evidence-copy-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15546,14 +15546,8 @@ async function renderResearchConversation(conversationID, options = {}) {
     selectedEvidence.className = "research-selected-evidence-drawer";
     const selectedEvidenceSummary = document.createElement("summary");
     selectedEvidenceSummary.textContent = `Selected evidence (${displayedSources.length})`;
-    const selectedEvidenceBoundary = document.createElement("p");
-    selectedEvidenceBoundary.className = "research-selected-evidence-boundary";
-    selectedEvidenceBoundary.textContent = conversation.linkedCodeDecisionID
-      ? "Selected for exploratory Research · not approved for the Code Decision"
-      : "Selected for exploratory Research";
     const selectedEvidenceNotices = document.createElement("section");
     selectedEvidenceNotices.className = "research-selected-evidence-notices";
-    selectedEvidenceNotices.append(selectedEvidenceBoundary);
     const selectedEvidenceList = document.createElement("ul");
     selectedEvidenceList.className = "research-selected-evidence-list";
     displayedSources.forEach((source) => {

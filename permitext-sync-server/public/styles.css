@@ -6051,12 +6051,6 @@ mark {
   font-weight: 650;
 }
 
-.research-selected-evidence-boundary {
-  margin: var(--space-2) 0 0;
-  color: var(--text-secondary);
-  font-size: calc(var(--chrome-font-size) * 0.82);
-}
-
 .research-selected-evidence-list {
   display: grid;
   gap: var(--space-2);
