@@ -12689,13 +12689,13 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 
 .code-question-index-id {
   grid-area: id;
-  font-weight: 700;
+  font-weight: 400;
   align-self: start;
 }
 
 .code-question-index-title {
   grid-area: title;
-  font-weight: 600;
+  font-weight: 400;
 }
 
 .code-question-index-actions button {
