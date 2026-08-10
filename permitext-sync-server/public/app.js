@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-pinned-answer-feedback-v1";
+} from "./sync-state.js?v=20260809-black-research-bubble-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-pinned-answer-feedback-v1";
+} from "./offline-storage.js?v=20260809-black-research-bubble-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-pinned-answer-feedback-v1";
+} from "./workspace-state.js?v=20260809-black-research-bubble-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15337,21 +15337,13 @@ function renderResearchMessageCapture(conversation, message) {
   const basis = researchMessageCaptureBasis(conversation.id, message.id);
   const existing = (getDefinitionForQuestion(questionID)?.inputs || [])
     .find((input) => input.basis === basis);
+  if (existing) return null;
   const region = document.createElement("div");
   region.className = "research-message-capture";
   const status = document.createElement("p");
   status.className = "research-message-capture-status";
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  if (existing) {
-    status.textContent = existing.inputKind === "confirmedFact"
-      ? "Captured as a confirmed Project Fact."
-      : existing.inputKind === "assumption"
-        ? "Captured as an assumption."
-        : "Captured as missing information.";
-    region.append(status);
-    return region;
-  }
   const canCapture = ["owner", "editor"].includes(codeQuestionDefineRole());
   const label = document.createElement("span");
   label.textContent = "Capture in Code Decision";
@@ -15405,14 +15397,12 @@ function renderResearchMessageCapture(conversation, message) {
             }
           ))
         });
-        status.textContent = result.queued
-          ? "Capture queued. It will be validated against the linked Research message after reconnecting."
-          : choice.kind === "confirmedFact"
-            ? "Captured as a confirmed Project Fact."
-            : choice.kind === "assumption"
-              ? "Captured as an assumption."
-              : "Captured as missing information.";
         refreshCodeDecisionPrimaryPanes(questionID);
+        if (result.queued) {
+          status.textContent = "Capture queued. It will be validated against the linked Research message after reconnecting.";
+        } else {
+          region.remove();
+        }
       } catch (error) {
         status.textContent = error.message || "This message could not be captured.";
         buttons.forEach((item) => { item.disabled = !canCapture; });
