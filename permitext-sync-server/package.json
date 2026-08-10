@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@blocknote/core": "^0.52.1",
-    "@blocknote/mantine": "^0.52.1",
+    "@blocknote/mantine": "^0.53.0",
     "@blocknote/react": "^0.52.1",
     "@excalidraw/excalidraw": "^0.18.1",
     "@mantine/core": "^9.5.0",
