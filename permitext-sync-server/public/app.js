@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-decision-archive-mode-v2";
+} from "./sync-state.js?v=20260809-decision-search-question-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-decision-archive-mode-v2";
+} from "./offline-storage.js?v=20260809-decision-search-question-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-decision-archive-mode-v2";
+} from "./workspace-state.js?v=20260809-decision-search-question-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -13857,7 +13857,8 @@ function renderEvidenceDiscovery(container) {
       questionsForActiveProject().find((item) => item.id === activeDecisionQuestionID)?.title ||
       ""
     : "";
-  question.value = activeEvidenceDiscovery?.question || researchQuestionDraft || activeDecisionQuestion;
+  const usesActiveDecisionQuestion = Boolean(activeDecisionQuestion.trim());
+  question.value = activeDecisionQuestion || activeEvidenceDiscovery?.question || researchQuestionDraft;
   questionLabel.append(question);
   const controls = document.createElement("div");
   controls.className = "evidence-discovery-form-controls";
@@ -13885,7 +13886,8 @@ function renderEvidenceDiscovery(container) {
   question.addEventListener("input", () => {
     findButton.disabled = question.value.trim().length < 3;
   });
-  form.append(questionLabel, controls, formStatus);
+  if (!usesActiveDecisionQuestion) form.append(questionLabel);
+  form.append(controls, formStatus);
 
   const results = document.createElement("section");
   results.className = "evidence-discovery-results";

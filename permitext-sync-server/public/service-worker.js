@@ -1,4 +1,4 @@
-const shellCacheName = "permitext-pro-shell-v544";
+const shellCacheName = "permitext-pro-shell-v545";
 const offlineAssetVersion = "20260725-visual-inventory-v13";
 const offlineAssetCacheName = `permitext-pro-code-assets-${offlineAssetVersion}`;
 const shellURLs = [
@@ -6,17 +6,17 @@ const shellURLs = [
   "/web/manifest.webmanifest?v=20260725-visual-inventory-v13",
   "/web/icons/permitext-192.png",
   "/web/icons/permitext-512.png",
-  "/web/styles.css?v=20260809-decision-archive-mode-v2",
+  "/web/styles.css?v=20260809-decision-search-question-v1",
   "/web/fonts/inter-latin-wght-normal.woff2",
   "/web/fonts/inter-latin-wght-italic.woff2",
   "/web/fonts/source-serif-4-latin-wght-normal.woff2",
   "/web/fonts/source-serif-4-latin-wght-italic.woff2",
   "/web/workboard-assets/workboard.css?v=20260801-workboard-control-align-v68",
-  "/web/app.js?v=20260809-decision-archive-mode-v2",
+  "/web/app.js?v=20260809-decision-search-question-v1",
   "/web/client-reliability.js?v=20260809-session-stability-v1",
-  "/web/offline-storage.js?v=20260809-decision-archive-mode-v2",
+  "/web/offline-storage.js?v=20260809-decision-search-question-v1",
   "/web/sync-conflict-resolution.js?v=20260809-code-decision-v5",
-  "/web/workspace-state.js?v=20260809-decision-archive-mode-v2",
+  "/web/workspace-state.js?v=20260809-decision-search-question-v1",
   "/web/code-question-workspace.js?v=20260809-decision-index-width-v1",
   "/web/code-question-client-state.js?v=20260809-session-stability-v3",
   "/web/code-question-server.js?v=20260809-code-decision-v2",
@@ -28,7 +28,7 @@ const shellURLs = [
   "/web/code-question-review.js?v=20260803-code-question-review-v1",
   "/web/code-references.js?v=20260720-code-reference-links-v18",
   "/web/sync-identity.js?v=20260728-enacted-code-expansion-v6",
-  "/web/sync-state.js?v=20260809-decision-archive-mode-v2"
+  "/web/sync-state.js?v=20260809-decision-search-question-v1"
 ];
 
 self.addEventListener("install", (event) => {

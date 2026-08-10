@@ -316,6 +316,8 @@ assert.match(workspaceScript, /migrateQuestionIndexWidth && isQuestionIndex/);
 assert.match(workspaceScript, /close\.className = "icon-button utility-close code-question-pane-close"/);
 assert.match(workspaceScript, /close\.innerHTML = circleXIconSVG\(\)/);
 assert.match(workspaceScript, /manage\.className = "icon-button code-question-index-select"[\s\S]*?panelActions\.appendChild\(manage\)[\s\S]*?panelActions\.appendChild\(close\)/);
+assert.match(workspaceScript, /const usesActiveDecisionQuestion = Boolean\(activeDecisionQuestion\.trim\(\)\)/);
+assert.match(workspaceScript, /if \(!usesActiveDecisionQuestion\) form\.append\(questionLabel\)/);
 const ensureShellSource = workspaceScript.slice(
   workspaceScript.indexOf("function ensureCodeQuestionShellForProject"),
   workspaceScript.indexOf("const webFreePlanLimits")
@@ -358,9 +360,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-archive-mode-v2/);
-assert.match(serviceWorker, /permitext-pro-shell-v544/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-decision-archive-mode-v2/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-search-question-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v545/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-decision-search-question-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 300px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
