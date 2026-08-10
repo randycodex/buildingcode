@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-research-evidence-copy-v1";
+} from "./sync-state.js?v=20260809-research-composer-copy-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-evidence-copy-v1";
+} from "./offline-storage.js?v=20260809-research-composer-copy-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-research-evidence-copy-v1";
+} from "./workspace-state.js?v=20260809-research-composer-copy-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -15711,8 +15711,6 @@ async function renderResearchConversation(conversationID, options = {}) {
     status.textContent = "The enacted source changed. Refresh the selected evidence above before analyzing.";
   } else if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
-  } else if (evidenceRequired) {
-    status.textContent = "Find and select at least one enacted-code passage before bounded Research analysis.";
   }
   input.addEventListener("input", () => {
     researchQuestionDraft = input.value;
