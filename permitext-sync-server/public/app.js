@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-decision-search-question-v1";
+} from "./sync-state.js?v=20260809-project-tile-label-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-decision-search-question-v1";
+} from "./offline-storage.js?v=20260809-project-tile-label-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-decision-search-question-v1";
+} from "./workspace-state.js?v=20260809-project-tile-label-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21881,9 +21881,6 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       }
       const heading = document.createElement("strong");
       heading.textContent = project.name || project.title || "Project";
-      const typeBadge = document.createElement("small");
-      typeBadge.className = "saved-folder-type";
-      typeBadge.textContent = folderTypeLabel(project);
       const count = projectEvidenceCount(projectSections, project);
       const countLabel = document.createElement("span");
       countLabel.className = "saved-project-count";
@@ -21924,7 +21921,7 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
         void deleteArchivedProject(project);
       });
       if (!project.sharedOnly) actions.append(archiveProjectButton, editButton, deleteProjectButton);
-      tile.append(heading, typeBadge, countLabel, actions);
+      tile.append(heading, countLabel, actions);
       const open = async () => {
         if (selecting) {
           const id = projectRecordID(project);

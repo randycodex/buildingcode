@@ -752,7 +752,8 @@ async function main() {
         workspaceScript.text.includes("restoreProjectsStackOrder(options.sourcePaneID)") &&
         workspaceScript.text.includes("const orderedAnchorID = firstDetailIndex > 0 ? ordered[firstDetailIndex - 1] :") &&
         workspaceScript.text.includes('sourcePaneID === "utility:projects" || savedIDs.includes(sourcePaneID)') &&
-        workspaceScript.text.includes("tile.append(heading, typeBadge, countLabel, actions)") &&
+        workspaceScript.text.includes("tile.append(heading, countLabel, actions)") &&
+        !workspaceScript.text.includes('typeBadge.className = "saved-folder-type"') &&
         !workspaceScript.text.includes("saved-project-folder-icon") &&
         !workspaceScript.text.includes("projectPages.push(visibleProjects.slice(index, index + 4))") &&
         workspaceScript.text.includes("async function renderSavedFolderContext(panel, savedInstance, paneID, folders)") &&
@@ -1266,7 +1267,7 @@ async function main() {
         workspaceScript.text.includes("placePaneAfter(paneIDForReader(sourceReader), paneIDForReader(targetReader))") &&
         workspaceScript.text.includes("inlineCodeReferencePhrases(text)") &&
         workspaceScript.text.includes('./code-references.js?v=20260720-code-reference-links-v18') &&
-        workspaceScript.text.includes('./sync-state.js?v=20260809-decision-search-question-v1') &&
+        workspaceScript.text.includes('./sync-state.js?v=20260809-project-tile-label-v1') &&
         !workspaceScript.text.includes("const savedCount = settingsProjectSections") &&
         !workspaceScript.text.includes('swatch.className = "settings-project-swatch"') &&
         workspaceScript.text.includes("name.textContent = readableProjectName(project)") &&
@@ -1297,7 +1298,7 @@ async function main() {
         workspaceScript.text.includes('renderResearchInterpretation(exactAnswer, answerRecord.answer, { detailsOpen: true })') &&
         workspaceScript.text.includes('"Based only on selected Research evidence"') &&
         workspaceStyles.text.includes(".research-answer-details > summary:focus-visible") &&
-        webRoot.text.includes('/web/app.js?v=20260809-decision-search-question-v1'),
+        webRoot.text.includes('/web/app.js?v=20260809-project-tile-label-v1'),
       "Reader citations no longer preserve range text or open in an adjacent Reader."
     );
     assert(
@@ -1439,7 +1440,7 @@ async function main() {
         workspaceStyles.text.includes("-webkit-line-clamp: 2;") &&
         workspaceStyles.text.includes("height: auto;") &&
         workspaceScript.text.includes("option.title = reference.label;") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-decision-search-question-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-project-tile-label-v1'),
       "The Saved Projects or Notebook Project notes list no longer preserve their compact menu behavior."
     );
     assert(
@@ -1687,7 +1688,7 @@ async function main() {
     );
     assert(
       webRoot.text.includes("settings-footer-links") &&
-        webRoot.text.includes('/web/styles.css?v=20260809-decision-search-question-v1'),
+        webRoot.text.includes('/web/styles.css?v=20260809-project-tile-label-v1'),
       "settings footer links should stay centered with the current stylesheet"
     );
     assert(
@@ -2398,7 +2399,7 @@ async function main() {
         workspaceStyles.text.includes("@container (min-width: 320px) {\n  .saved-project-list {\n    grid-template-columns: repeat(2, minmax(0, 1fr));") &&
         workspaceStyles.text.includes("@container (min-width: 580px) {\n  .saved-project-list {\n    grid-template-columns: repeat(3, minmax(0, 1fr));") &&
         workspaceStyles.text.match(/\.saved-code-filter \{[\s\S]*?grid-template-columns: repeat\(auto-fit, minmax\(140px, 1fr\)\);[\s\S]*?background-image: none;/) &&
-        workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?grid-template-rows: auto 1fr;/) &&
+        workspaceStyles.text.match(/\.saved-project-tile \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\) auto;[\s\S]*?grid-template-rows: auto;[\s\S]*?min-height: 42px;/) &&
         workspaceStyles.text.match(/\.saved-project-count \{[\s\S]*?grid-column: 2;[\s\S]*?grid-row: 1;/) &&
         workspaceStyles.text.match(/\.saved-project-tile-actions \{[\s\S]*?top: 4px;[\s\S]*?left: 4px;[\s\S]*?display: none;/) &&
         workspaceStyles.text.match(/\.saved-projects-section\.is-selecting \.saved-project-tile-actions \{[\s\S]*?display: flex;/) &&
