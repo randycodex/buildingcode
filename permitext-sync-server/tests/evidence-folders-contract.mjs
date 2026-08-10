@@ -160,9 +160,9 @@ assert.match(savedProjectsSource, /showingArchived[\s\S]*?deleteArchivedProjects
 assert.match(savedProjectsSource, /const setSelecting = \(nextSelecting\) => \{[\s\S]*?selectedProjectIDs\.clear\(\);\n    updateSelectionControls\(\);\n  \};/);
 assert.match(functionSource(appSource, "refreshProjectOverviewPreservingSavedPanes"), /savedPaneIDs\(\)[\s\S]*?refreshSavedPanelInPlace[\s\S]*?failedSavedIDs[\s\S]*?transitionWorkspace/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /archiveSelectedButton\.textContent = `\$\{showingArchived \? "Delete" : "Archive"\} \$\{selectedCount\}`/);
-assert.match(functionSource(appSource, "renderSavedProjects"), /actions\.append\(archiveProjectButton, editButton\)/);
-assert.match(functionSource(appSource, "renderSavedProjects"), /selectionSquareIconSVG\(selected\)/);
-assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-edit-action\.is-selection-control \{[\s\S]*?color: #c7ccd3;/);
+assert.match(stylesSource, /\.saved-project-tile-actions \{[\s\S]*?top: 4px;[\s\S]*?left: 4px;[\s\S]*?display: none;/);
+assert.match(stylesSource, /\.saved-projects-section\.is-selecting \.saved-project-tile-actions \{[\s\S]*?display: flex;/);
+assert.match(functionSource(appSource, "renderSavedProjects"), /actions\.append\(archiveProjectButton, editButton, deleteProjectButton\)/);
 assert.match(stylesSource, /\.saved-projects-bulk-bar \{[\s\S]*?margin: var\(--space-2\);[\s\S]*?border-radius: var\(--saved-projects-card-radius\);[\s\S]*?background: var\(--menu-subtle-surface\);/);
 assert.match(functionSource(appSource, "renderSavedProjects"), /project\.sharedOnly[\s\S]*?return/);
 assert.match(savedFolderContextSource, /state\.projectHostPaneID = paneID[\s\S]*?await (?:closeTool|openTool)/);

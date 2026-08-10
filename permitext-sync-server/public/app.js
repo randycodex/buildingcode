@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-question-list-v2";
+} from "./sync-state.js?v=20260809-project-management-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-question-list-v2";
+} from "./offline-storage.js?v=20260809-project-management-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-question-list-v2";
+} from "./workspace-state.js?v=20260809-project-management-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12601,15 +12601,6 @@ function selectionIndicatorIconSVG() {
   `;
 }
 
-function selectionSquareIconSVG(selected = false) {
-  return `
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-      ${selected ? '<path d="m8 12 3 3 5-6"></path>' : ""}
-    </svg>
-  `;
-}
-
 function bookmarkIconSVG(saved) {
   return saved
     ? `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4-7 4V4a1 1 0 0 1 1-1z"></path></svg>`
@@ -21808,15 +21799,8 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       }
       const editAction = tile.querySelector(".saved-project-edit-action");
       const archiveAction = tile.querySelector(".saved-project-archive-action");
-      if (editAction) {
-        editAction.innerHTML = selecting
-          ? selectionSquareIconSVG(selected)
-          : (showingArchived ? archiveRestoreIconSVG() : pencilIconSVG());
-        editAction.classList.toggle("is-selection-control", selecting);
-        editAction.tabIndex = selecting ? -1 : 0;
-        editAction.setAttribute("aria-hidden", String(selecting));
-      }
-      archiveAction?.classList.toggle("is-selection-hidden", selecting);
+      if (editAction) editAction.innerHTML = pencilIconSVG();
+      if (archiveAction) archiveAction.innerHTML = showingArchived ? archiveRestoreIconSVG() : archiveIconSVG();
     });
   };
 
@@ -21907,26 +21891,35 @@ function renderSavedProjects(panel, instance, paneID, projects, projectSections)
       const editButton = document.createElement("button");
       editButton.type = "button";
       editButton.className = "saved-project-edit-action";
-      editButton.title = showingArchived ? "Restore folder" : "Edit folder";
+      editButton.title = "Edit folder";
       editButton.setAttribute("aria-label", `${editButton.title}: ${heading.textContent}`);
-      editButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : pencilIconSVG();
+      editButton.innerHTML = pencilIconSVG();
       editButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (showingArchived) restoreArchivedProject(project);
-        else showProjectCreateSheet(panel, project);
+        showProjectCreateSheet(panel, project);
       });
       const archiveProjectButton = document.createElement("button");
       archiveProjectButton.type = "button";
       archiveProjectButton.className = "saved-project-archive-action";
-      archiveProjectButton.title = showingArchived ? "Delete folder" : "Archive folder";
+      archiveProjectButton.title = showingArchived ? "Restore folder" : "Archive folder";
       archiveProjectButton.setAttribute("aria-label", `${archiveProjectButton.title}: ${heading.textContent}`);
-      archiveProjectButton.innerHTML = showingArchived ? trashIconSVG() : archiveIconSVG();
+      archiveProjectButton.innerHTML = showingArchived ? archiveRestoreIconSVG() : archiveIconSVG();
       archiveProjectButton.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (showingArchived) void deleteArchivedProject(project);
+        if (showingArchived) void restoreArchivedProject(project);
         else void archiveProject(project);
       });
-      if (!project.sharedOnly) actions.append(archiveProjectButton, editButton);
+      const deleteProjectButton = document.createElement("button");
+      deleteProjectButton.type = "button";
+      deleteProjectButton.className = "saved-project-delete-action";
+      deleteProjectButton.title = "Delete folder";
+      deleteProjectButton.setAttribute("aria-label", `${deleteProjectButton.title}: ${heading.textContent}`);
+      deleteProjectButton.innerHTML = trashIconSVG();
+      deleteProjectButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        void deleteArchivedProject(project);
+      });
+      if (!project.sharedOnly) actions.append(archiveProjectButton, editButton, deleteProjectButton);
       tile.append(heading, typeBadge, countLabel, actions);
       const open = async () => {
         if (selecting) {

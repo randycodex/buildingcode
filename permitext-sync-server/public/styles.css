@@ -8121,18 +8121,8 @@ body.is-resizing-research-evidence * {
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--project-color) 76%, var(--text-primary));
 }
 
-.saved-projects-section.is-selecting .saved-project-archive-action.is-selection-hidden {
-  display: none;
-}
-
-.saved-projects-section.is-selecting .saved-project-edit-action.is-selection-control {
-  color: #c7ccd3;
-  opacity: 1;
-  pointer-events: none;
-}
-
-.saved-projects-section.is-selecting .saved-project-tile.is-bulk-selected .saved-project-edit-action.is-selection-control {
-  color: color-mix(in srgb, var(--project-color) 35%, #fff 65%);
+.saved-projects-section.is-selecting .saved-project-tile[data-bulk-selectable="true"] {
+  padding-top: 30px;
 }
 
 .saved-projects-bulk-bar {
@@ -8578,12 +8568,12 @@ body.is-resizing-research-evidence * {
 
 .saved-project-tile-actions {
   position: absolute;
-  right: 2px;
-  bottom: 4px;
-  display: flex;
-  opacity: 0.58;
+  top: 4px;
+  left: 4px;
+  display: none;
+  gap: 1px;
+  opacity: 1;
   pointer-events: auto;
-  transition: opacity 120ms ease;
 }
 
 .saved-project-tile .saved-project-tile-actions button,
@@ -8592,10 +8582,8 @@ body.is-resizing-research-evidence * {
   color: var(--text-primary);
 }
 
-.saved-project-tile:hover .saved-project-tile-actions,
-.saved-project-tile-actions:focus-within {
-  opacity: 1;
-  pointer-events: auto;
+.saved-projects-section.is-selecting .saved-project-tile-actions {
+  display: flex;
 }
 
 .saved-projects-empty {
