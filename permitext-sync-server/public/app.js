@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-project-selection-actions-v1";
+} from "./sync-state.js?v=20260809-project-summary-labels-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-selection-actions-v1";
+} from "./offline-storage.js?v=20260809-project-summary-labels-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-project-selection-actions-v1";
+} from "./workspace-state.js?v=20260809-project-summary-labels-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -21198,12 +21198,17 @@ function appendSavedProjectSummaryField(container, label, value, options = {}) {
   if (!normalizedValue && options.optional) return;
   const field = document.createElement("section");
   field.className = "saved-project-summary-field";
-  const heading = document.createElement("span");
-  heading.className = "section-label";
-  heading.textContent = label;
   const copy = document.createElement("p");
   copy.textContent = normalizedValue || options.emptyText || "Not provided";
-  field.append(heading, copy);
+  if (options.hideLabel) {
+    field.setAttribute("aria-label", label);
+    field.append(copy);
+  } else {
+    const heading = document.createElement("span");
+    heading.className = "section-label";
+    heading.textContent = label;
+    field.append(heading, copy);
+  }
   container.append(field);
 }
 
@@ -21238,10 +21243,12 @@ async function renderSavedFolderContext(panel, savedInstance, paneID, folders) {
     const summary = document.createElement("section");
     summary.className = "saved-project-summary";
     appendSavedProjectSummaryField(summary, "Address", folder.address || identity.address, {
-      emptyText: "No address added"
+      emptyText: "No address added",
+      hideLabel: true
     });
     appendSavedProjectSummaryField(summary, "Description", folder.description || identity.description, {
-      optional: true
+      optional: true,
+      hideLabel: true
     });
     context.append(summary);
 

@@ -100,11 +100,11 @@ assert(!appSource.includes("No archived folders."), "An empty archive should not
 const savedFolderContextSource = functionSource(appSource, "renderSavedFolderContext");
 assert.match(savedFolderContextSource, /projectsSection\.hidden = false/);
 assert.match(savedFolderContextSource, /if \(!folder\) \{[\s\S]*?return null;/);
-assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"/);
+assert.match(savedFolderContextSource, /"Address"[\s\S]*?hideLabel: true[\s\S]*?"Description"[\s\S]*?hideLabel: true/);
 assert.match(savedFolderContextSource, /"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"/);
 assert.doesNotMatch(savedFolderContextSource, /"Workboard"/);
 assert.match(savedFolderContextSource, /context\.dataset\.projectId = projectDetailKey\(identity\)/);
-assert.match(savedFolderContextSource, /"Address"[\s\S]*?"Description"[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection/);
+assert.match(savedFolderContextSource, /"Address"[\s\S]*?hideLabel: true[\s\S]*?"Description"[\s\S]*?hideLabel: true[\s\S]*?"Notebook"[\s\S]*?"Report Draft"[\s\S]*?"Coordination"[\s\S]*?context\.append\(controls\)[\s\S]*?populateSavedEvidenceSection/);
 assert.doesNotMatch(savedFolderContextSource, /Blocknotes|appendProjectNotes|appendProjectResearchHistory|loadProjectCoordinationFoundation/);
 assert.doesNotMatch(savedFolderContextSource, /appendProjectActivity|Recent Activities/);
 const savedEvidenceHeadingSource = functionSource(appSource, "createSavedEvidenceHeading");
