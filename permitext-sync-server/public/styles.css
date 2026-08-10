@@ -12649,13 +12649,11 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
 .code-question-index-open {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas:
-    "id title"
-    "id meta";
+  grid-template-areas: "id title";
   gap: 1px 8px;
   width: 100%;
   min-height: 44px;
-  padding: 5px 68px 5px 6px;
+  padding: 5px 6px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -12675,29 +12673,10 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   font-weight: 600;
 }
 
-.code-question-index-state,
-.code-question-index-owner {
-  color: var(--muted, #555);
-  font-size: 0.92em;
-}
-
-.code-question-index-meta-row {
-  grid-area: meta;
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  min-width: 0;
-}
-
-.code-question-index-meta-separator {
-  color: var(--muted, #555);
-  font-size: 0.92em;
-}
-
 .code-question-index-actions button {
-  min-height: 36px;
-  min-width: 44px;
-  padding: 6px 10px;
+  min-height: 32px;
+  min-width: 32px;
+  padding: 6px;
   border: 0;
   border-radius: 6px;
   background: transparent;
@@ -12709,6 +12688,36 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   position: absolute;
   top: 6px;
   right: 0;
+}
+
+.code-question-index-list.is-managing .code-question-index-open {
+  padding-right: 40px;
+}
+
+.code-question-index-archive svg,
+.code-question-index-select svg {
+  width: 14px;
+  height: 14px;
+}
+
+.code-question-panel .code-question-index-select {
+  width: var(--panel-title-control-size);
+  height: var(--panel-title-control-size);
+  padding: 0;
+  border-color: transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  box-shadow: none;
+}
+
+.code-question-panel .code-question-index-select:hover,
+.code-question-panel .code-question-index-select:focus-visible,
+.code-question-panel .code-question-index-select[aria-pressed="true"] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--text-primary);
+  box-shadow: none;
 }
 
 .code-question-index-empty,

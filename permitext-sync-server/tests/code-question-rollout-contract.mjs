@@ -281,7 +281,6 @@ assert.doesNotMatch(workspaceScript, /Never imply one by carrying a previously a
 assert.doesNotMatch(workspaceScript, /Persisted Research conversations do not yet carry a governed Code/);
 assert.match(workspaceScript, /grouped\.confirmedFacts\.filter\(\(item\) => item\.state === "confirmed"\)/);
 assert.match(workspaceScript, /input\.inputKind === "confirmedFact" && input\.state !== "confirmed"/);
-assert.match(workspaceScript, /codeDecisionPresentation\(question\.id, \{ preferSummary: true \}\)/);
 assert.match(workspaceScript, /const localDependenciesStale = hasDefinitionDetail && Boolean/);
 assert.match(workspaceScript, /Create Code Memo/);
 assert.doesNotMatch(workspaceScript, /function renderCodeQuestionStageControl/);
@@ -307,14 +306,16 @@ const codeDecisionIndexListSource = workspaceScript.slice(
   workspaceScript.indexOf("function renderCodeQuestionIndexList"),
   workspaceScript.indexOf("async function createLocalCodeQuestionDraft")
 );
-assert.match(codeDecisionIndexListSource, /code-question-index-meta-row/);
-assert.match(codeDecisionIndexListSource, /code-question-index-meta-separator/);
+assert.doesNotMatch(codeDecisionIndexListSource, /code-question-index-meta-row|code-question-index-meta-separator|responsibleDisplayName/);
+assert.match(codeDecisionIndexListSource, /codeQuestionIndexArchiveModeProjectIDs\.has\(projectID\)/);
+assert.match(codeDecisionIndexListSource, /if \(managing\)[\s\S]*?code-question-index-archive[\s\S]*?archiveIconSVG\(\)/);
 assert.match(workspaceScript, /let state = "In Progress"/);
 assert.doesNotMatch(workspaceScript, /let state = "Working"/);
 assert.match(workspaceScript, /const migrateQuestionIndexWidth = Number\(state\.paneWidthDefaultsVersion \|\| 0\) < 3/);
 assert.match(workspaceScript, /migrateQuestionIndexWidth && isQuestionIndex/);
 assert.match(workspaceScript, /close\.className = "icon-button utility-close code-question-pane-close"/);
 assert.match(workspaceScript, /close\.innerHTML = circleXIconSVG\(\)/);
+assert.match(workspaceScript, /manage\.className = "icon-button code-question-index-select"[\s\S]*?panelActions\.appendChild\(manage\)[\s\S]*?panelActions\.appendChild\(close\)/);
 const ensureShellSource = workspaceScript.slice(
   workspaceScript.indexOf("function ensureCodeQuestionShellForProject"),
   workspaceScript.indexOf("const webFreePlanLimits")
@@ -347,18 +348,19 @@ const clientState = await readFile(new URL("../public/code-question-client-state
 assert.match(workspaceStyles, /grid-template-rows: minmax\(0, 1fr\) var\(--header-height\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-panel \{[^}]*border-left:/);
 assert.doesNotMatch(workspaceStyles, /\.code-decision-context-bar/);
-assert.match(workspaceStyles, /\.code-question-index-open \{[\s\S]*?"id title"[\s\S]*?"id meta"/);
+assert.match(workspaceStyles, /\.code-question-index-open \{[\s\S]*?grid-template-areas: "id title";/);
 assert.match(workspaceStyles, /\.code-question-index-list \{[\s\S]*?gap: 0;/);
 assert.match(workspaceStyles, /\.code-question-index-item \{[\s\S]*?border: 0;[\s\S]*?border-bottom: 1px solid[\s\S]*?border-radius: 0;/);
 assert.match(workspaceStyles, /\.code-question-index-actions \{[\s\S]*?position: absolute;[\s\S]*?right: 0;/);
+assert.match(workspaceStyles, /\.code-question-index-list\.is-managing \.code-question-index-open \{[\s\S]*?padding-right: 40px;/);
 assert.doesNotMatch(workspaceStyles, /body\.code-question-workspace-enabled \.workspace-shell/);
 assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-project-management-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v542/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-project-management-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-archive-mode-v2/);
+assert.match(serviceWorker, /permitext-pro-shell-v544/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-decision-archive-mode-v2/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 300px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);

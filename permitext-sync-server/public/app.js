@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-project-management-v1";
+} from "./sync-state.js?v=20260809-decision-archive-mode-v2";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-management-v1";
+} from "./offline-storage.js?v=20260809-decision-archive-mode-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-project-management-v1";
+} from "./workspace-state.js?v=20260809-decision-archive-mode-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -371,6 +371,7 @@ const codeQuestionListHydrationByProject = new Map();
 const codeQuestionStateHydrationByQuestion = new Map();
 const codeQuestionAccessByProject = new Map();
 const codeQuestionDeniedProjectIDs = new Set();
+const codeQuestionIndexArchiveModeProjectIDs = new Set();
 let codeQuestionAccountGeneration = 0;
 let codeQuestionUnauthorizedAccountUserID = "";
 let state = loadWorkspaceState();
@@ -729,6 +730,7 @@ function unloadCodeQuestionAccountState(options = {}) {
   codeQuestionStateHydrationByQuestion.clear();
   codeQuestionAccessByProject.clear();
   codeQuestionDeniedProjectIDs.clear();
+  codeQuestionIndexArchiveModeProjectIDs.clear();
   state.codeQuestionWorkspace = emptyCodeQuestionWorkspaceState();
   state.codeQuestionOutbox = [];
   state.codeQuestionConflicts = [];
@@ -25557,6 +25559,7 @@ function renderCodeQuestionPane(paneDescriptor) {
   close.innerHTML = circleXIconSVG();
   close.addEventListener("click", async () => {
     if (parsed.paneRole === "question-index") {
+      codeQuestionIndexArchiveModeProjectIDs.delete(parsed.projectID);
       await closeProjectCodeDecisions(project || { id: parsed.projectID });
       return;
     }
@@ -25578,6 +25581,23 @@ function renderCodeQuestionPane(paneDescriptor) {
   });
   const panelActions = document.createElement("div");
   panelActions.className = "panel-actions";
+  if (parsed.paneRole === "question-index") {
+    const manage = document.createElement("button");
+    const managing = codeQuestionIndexArchiveModeProjectIDs.has(parsed.projectID);
+    manage.type = "button";
+    manage.className = "icon-button code-question-index-select";
+    manage.title = managing ? "Hide archive actions" : "Show archive actions";
+    manage.setAttribute("aria-label", manage.title);
+    manage.setAttribute("aria-pressed", String(managing));
+    manage.innerHTML = selectionModeIconSVG();
+    manage.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
+    manage.addEventListener("click", async () => {
+      if (managing) codeQuestionIndexArchiveModeProjectIDs.delete(parsed.projectID);
+      else codeQuestionIndexArchiveModeProjectIDs.add(parsed.projectID);
+      await renderWorkspace();
+    });
+    panelActions.appendChild(manage);
+  }
   panelActions.appendChild(close);
   header.appendChild(panelActions);
   article.appendChild(header);
@@ -25839,6 +25859,9 @@ function renderCodeQuestionIndexList(project) {
   const list = document.createElement("ul");
   list.className = "code-question-index-list";
   list.setAttribute("role", "list");
+  const projectID = String(projectDetailKey(project || {}) || activeProjectIDForCodeQuestions() || "");
+  const managing = codeQuestionIndexArchiveModeProjectIDs.has(projectID);
+  list.classList.toggle("is-managing", managing);
   const cq = codeQuestionWorkspaceState();
   const questions = filterQuestions(questionsForActiveProject(), {
     ...cq.questionFilters,
@@ -25852,40 +25875,37 @@ function renderCodeQuestionIndexList(project) {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "code-question-index-open";
-    // The list response is the current server view across every decision.
-    // Detail caches may be older for records that have not been opened in
-    // this session, so list cards must prefer the server-derived summary.
-    const presentation = codeDecisionPresentation(question.id, { preferSummary: true });
     button.innerHTML = `
       <span class="code-question-index-id">${escapeHTML(question.displayID || "Q")}</span>
       <span class="code-question-index-title">${escapeHTML(question.title || "Untitled decision")}</span>
-      <span class="code-question-index-meta-row">
-        <span class="code-question-index-state">${escapeHTML(presentation.state)}</span>
-        <span class="code-question-index-meta-separator" aria-hidden="true">/</span>
-        <span class="code-question-index-owner">${escapeHTML(question.responsibleDisplayName || "Unassigned")}</span>
-      </span>
     `;
     button.addEventListener("click", async () => {
       await selectCodeDecisionFromIndex(question);
     });
     item.appendChild(button);
-    const actions = document.createElement("div");
-    actions.className = "code-question-index-actions";
-    const archiveButton = document.createElement("button");
-    archiveButton.type = "button";
-    archiveButton.textContent = question.recordState === "archived" ? "Restore" : "Archive";
-    archiveButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
-    archiveButton.addEventListener("click", async (event) => {
-      event.stopPropagation();
-      try {
-        await toggleLocalCodeQuestionArchive(question.id);
-        await renderWorkspace();
-      } catch (error) {
-        await showWebNotice("Question status unchanged", error.message);
-      }
-    });
-    actions.appendChild(archiveButton);
-    item.appendChild(actions);
+    if (managing) {
+      const actions = document.createElement("div");
+      actions.className = "code-question-index-actions";
+      const archiveButton = document.createElement("button");
+      const restoring = question.recordState === "archived";
+      archiveButton.type = "button";
+      archiveButton.className = "icon-button code-question-index-archive";
+      archiveButton.title = restoring ? "Restore Code Decision" : "Archive Code Decision";
+      archiveButton.setAttribute("aria-label", `${archiveButton.title}: ${question.displayID || "Code Decision"}`);
+      archiveButton.innerHTML = restoring ? archiveRestoreIconSVG() : archiveIconSVG();
+      archiveButton.disabled = !["owner", "editor"].includes(codeQuestionDefineRole());
+      archiveButton.addEventListener("click", async (event) => {
+        event.stopPropagation();
+        try {
+          await toggleLocalCodeQuestionArchive(question.id);
+          await renderWorkspace();
+        } catch (error) {
+          await showWebNotice("Question status unchanged", error.message);
+        }
+      });
+      actions.appendChild(archiveButton);
+      item.appendChild(actions);
+    }
     list.appendChild(item);
   });
   return list;
