@@ -4969,14 +4969,17 @@ mark {
 }
 
 .research-answer-details {
-  border-top: 1px solid var(--border);
+  color: var(--text-secondary);
 }
 
 .research-answer-details > summary {
+  width: fit-content;
   cursor: pointer;
-  padding: var(--space-3) 0;
+  padding: var(--space-1) 0;
   color: var(--text-secondary);
-  font-weight: 650;
+  font-size: calc(var(--chrome-font-size) * 0.72) !important;
+  font-weight: 400;
+  line-height: 1.25;
 }
 
 .research-answer-details > summary:focus-visible {
