@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-research-composer-copy-v1";
+} from "./sync-state.js?v=20260809-research-composer-dock-v1";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-research-composer-copy-v1";
+} from "./offline-storage.js?v=20260809-research-composer-dock-v1";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-research-composer-copy-v1";
+} from "./workspace-state.js?v=20260809-research-composer-dock-v1";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -14604,6 +14604,11 @@ async function renderResearch(paneID = "utility:analysis") {
   if (state.researchConversationID) {
     const conversation = await renderResearchConversation(state.researchConversationID, { embedded: true });
     content.append(conversation);
+    const dockedComposer = conversation.querySelector(".research-composer");
+    if (dockedComposer) {
+      panel.classList.add("has-research-composer");
+      panel.append(dockedComposer);
+    }
     appendTrustNotice();
     return panel;
   }
@@ -15712,7 +15717,12 @@ async function renderResearchConversation(conversationID, options = {}) {
   } else if (projectContextBlocked) {
     status.textContent = "Review the Project context in the Project column before analyzing.";
   }
+  const resizeComposerInput = () => {
+    input.style.height = "auto";
+    input.style.height = `${input.scrollHeight}px`;
+  };
   input.addEventListener("input", () => {
+    resizeComposerInput();
     researchQuestionDraft = input.value;
     sendButton.disabled = !researchEnabled ||
       conversation.sourceStatus === "changed" ||
@@ -15748,6 +15758,7 @@ async function renderResearchConversation(conversationID, options = {}) {
   dialoguePane.append(composer);
   if (!embedded) bindResearchEvidenceDivider(content, divider, conversation.id);
   requestAnimationFrame(() => {
+    resizeComposerInput();
     thread.scrollTop = thread.scrollHeight;
   });
   return panel;

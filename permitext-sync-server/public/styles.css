@@ -6019,20 +6019,34 @@ mark {
 }
 
 .research-conversation-embedded {
-  min-height: 520px;
+  min-height: 0;
 }
 
 .research-conversation-embedded .research-conversation-content {
   display: grid;
-  grid-template-rows: auto auto minmax(420px, 1fr);
+  grid-template-rows: auto auto auto;
   gap: var(--space-3);
-  min-height: 520px;
+  min-height: 0;
   padding-top: var(--space-3);
   overflow: visible;
 }
 
 .research-conversation-embedded .research-dialogue-pane {
   grid-row: 3;
+  grid-template-rows: auto;
+  overflow: visible;
+}
+
+.analysis-panel.has-research-composer {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.analysis-panel.has-research-composer > .analysis-content {
+  overflow-y: auto;
+}
+
+.analysis-panel.has-research-composer > .research-composer {
+  padding: var(--space-3) 0 0;
 }
 
 .research-selected-evidence-notices {
@@ -6682,6 +6696,7 @@ body.is-resizing-research-evidence * {
   border: 0;
   border-radius: inherit;
   background: transparent;
+  overflow-y: hidden;
   outline: 0;
 }
 
