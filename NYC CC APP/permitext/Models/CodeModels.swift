@@ -1195,8 +1195,26 @@ struct ServerUserContentPullResult: Codable, Hashable, Sendable {
     var contentMapVersion: Int? = nil
     var syncSchemaVersion: Int? = nil
     var entitlement: AppEntitlement? = nil
+    var entitlementFingerprint: String? = nil
     var capabilityContract: PermitextCapabilityContract? = nil
     let mutations: [ServerUserContentMutation]
+}
+
+struct ServerUserContentCheckpointResult: Codable, Hashable, Sendable {
+    let userID: String
+    let checkedAt: Date
+    let changed: Bool
+    var latestEventID: Int64? = nil
+    var syncRevision: Int64? = nil
+    var contentMapVersion: Int? = nil
+    var entitlementFingerprint: String? = nil
+}
+
+enum UserContentSyncClientPolicy {
+    /// Mutation kinds the iPhone client never applies and should not download.
+    static let excludedMutationKinds: [String] = [
+        ServerUserContentEntityKind.workboard.rawValue
+    ]
 }
 
 struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
@@ -1208,6 +1226,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
     let lastErrorMessage: String?
     let latestEventID: Int64?
     let contentMapVersion: Int?
+    let entitlementFingerprint: String?
 
     init(
         accountUserID: String,
@@ -1217,7 +1236,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         lastAttemptedSyncAt: Date? = nil,
         lastErrorMessage: String? = nil,
         latestEventID: Int64? = nil,
-        contentMapVersion: Int? = nil
+        contentMapVersion: Int? = nil,
+        entitlementFingerprint: String? = nil
     ) {
         self.accountUserID = accountUserID
         self.backendName = backendName
@@ -1227,6 +1247,7 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
         self.lastErrorMessage = lastErrorMessage
         self.latestEventID = latestEventID
         self.contentMapVersion = contentMapVersion
+        self.entitlementFingerprint = entitlementFingerprint
     }
 
     func markingPushSucceeded(at date: Date, latestEventID: Int64? = nil) -> UserContentSyncCheckpoint {
@@ -1238,14 +1259,16 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastAttemptedSyncAt: date,
             lastErrorMessage: nil,
             latestEventID: latestEventID ?? self.latestEventID,
-            contentMapVersion: contentMapVersion
+            contentMapVersion: contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint
         )
     }
 
     func markingPullSucceeded(
         at date: Date,
         latestEventID: Int64? = nil,
-        contentMapVersion: Int? = nil
+        contentMapVersion: Int? = nil,
+        entitlementFingerprint: String? = nil
     ) -> UserContentSyncCheckpoint {
         UserContentSyncCheckpoint(
             accountUserID: accountUserID,
@@ -1255,7 +1278,27 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastAttemptedSyncAt: date,
             lastErrorMessage: nil,
             latestEventID: latestEventID ?? self.latestEventID,
-            contentMapVersion: contentMapVersion ?? self.contentMapVersion
+            contentMapVersion: contentMapVersion ?? self.contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint ?? self.entitlementFingerprint
+        )
+    }
+
+    func markingCheckpointChecked(
+        at date: Date,
+        latestEventID: Int64? = nil,
+        contentMapVersion: Int? = nil,
+        entitlementFingerprint: String? = nil
+    ) -> UserContentSyncCheckpoint {
+        UserContentSyncCheckpoint(
+            accountUserID: accountUserID,
+            backendName: backendName,
+            lastSuccessfulPushAt: lastSuccessfulPushAt,
+            lastSuccessfulPullAt: lastSuccessfulPullAt,
+            lastAttemptedSyncAt: date,
+            lastErrorMessage: nil,
+            latestEventID: latestEventID ?? self.latestEventID,
+            contentMapVersion: contentMapVersion ?? self.contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint ?? self.entitlementFingerprint
         )
     }
 
@@ -1268,7 +1311,8 @@ struct UserContentSyncCheckpoint: Codable, Hashable, Sendable {
             lastAttemptedSyncAt: date,
             lastErrorMessage: error.localizedDescription,
             latestEventID: latestEventID,
-            contentMapVersion: contentMapVersion
+            contentMapVersion: contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint
         )
     }
 }
@@ -1376,6 +1420,19 @@ struct BackendAppleTransactionVerifyResponse: Codable, Hashable, Sendable {
 struct BackendProjectFoundationRequest: Codable, Hashable, Sendable {
     let auth: BackendAuthContext
     let projectID: String
+}
+
+struct BackendProjectHubBootstrapRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    let projectID: String
+}
+
+struct BackendProjectHubBootstrapResponse: Codable, Hashable, Sendable {
+    let schemaVersion: Int
+    let projectID: String
+    let foundation: BackendProjectFoundationResponse
+    let notebook: BackendProjectNotebookCardsResponse
+    let reports: BackendProjectReportHistoryResponse
 }
 
 struct ProjectResearchConversationSummary: Codable, Hashable, Identifiable, Sendable {
@@ -2279,8 +2336,16 @@ struct BackendUserContentPullRequest: Codable, Hashable, Sendable {
     let since: Date?
     var sinceEventID: Int64? = nil
     var contentMapVersion: Int? = nil
+    var excludedMutationKinds: [String] = []
     var syncSchemaVersion: Int = 2
     var clientCapabilities: [String] = PermitextCapabilityID.allCases.map(\.rawValue)
+}
+
+struct BackendUserContentCheckpointRequest: Codable, Hashable, Sendable {
+    let auth: BackendAuthContext
+    var sinceEventID: Int64? = nil
+    var contentMapVersion: Int? = nil
+    var entitlementFingerprint: String? = nil
 }
 
 struct BackendHealthStatus: Codable, Hashable, Sendable {
@@ -2305,6 +2370,7 @@ protocol PermitextBackendTransport {
         _ request: BackendOrganizationProjectSnapshotRequest
     ) async throws -> BackendOrganizationProjectSnapshotResponse
     func projectFoundation(_ request: BackendProjectFoundationRequest) async throws -> BackendProjectFoundationResponse
+    func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse
     func projectReportHistory(_ request: BackendProjectReportHistoryRequest) async throws -> BackendProjectReportHistoryResponse
     func projectReportManifest(_ request: BackendProjectReportManifestRequest) async throws -> BackendProjectReportManifestResponse
@@ -2316,6 +2382,7 @@ protocol PermitextBackendTransport {
     func projectWorkboardPreview(_ request: BackendProjectWorkboardPreviewRequest) async throws -> Data
     func pushUserContent(_ request: BackendUserContentPushRequest) async throws -> BackendUserContentPushResponse
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult
+    func checkpointUserContent(_ request: BackendUserContentCheckpointRequest) async throws -> ServerUserContentCheckpointResult
 }
 
 enum PermitextBackendMode: String, Codable, Hashable, Sendable {
@@ -2519,6 +2586,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
         try await post("projects/foundation/state", body: request, bearerToken: request.auth.bearerToken)
     }
 
+    func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse {
+        try await post("projects/hub/bootstrap", body: request, bearerToken: request.auth.bearerToken)
+    }
+
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse {
         try await post("notebook/cards/list", body: request, bearerToken: request.auth.bearerToken)
     }
@@ -2611,6 +2682,10 @@ struct PermitextBackendHTTPTransport: PermitextBackendTransport {
 
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult {
         try await post("sync/pull", body: request, bearerToken: request.auth.bearerToken)
+    }
+
+    func checkpointUserContent(_ request: BackendUserContentCheckpointRequest) async throws -> ServerUserContentCheckpointResult {
+        try await post("sync/checkpoint", body: request, bearerToken: request.auth.bearerToken)
     }
 
     private func get<ResponseBody: Decodable>(_ path: String) async throws -> ResponseBody {
@@ -2743,6 +2818,22 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
         )
     }
 
+    func projectHubBootstrap(_ request: BackendProjectHubBootstrapRequest) async throws -> BackendProjectHubBootstrapResponse {
+        BackendProjectHubBootstrapResponse(
+            schemaVersion: 1,
+            projectID: request.projectID,
+            foundation: try await projectFoundation(
+                BackendProjectFoundationRequest(auth: request.auth, projectID: request.projectID)
+            ),
+            notebook: try await projectNotebookCards(
+                BackendProjectNotebookCardsRequest(auth: request.auth, projectID: request.projectID)
+            ),
+            reports: try await projectReportHistory(
+                BackendProjectReportHistoryRequest(auth: request.auth, projectID: request.projectID)
+            )
+        )
+    }
+
     func projectNotebookCards(_ request: BackendProjectNotebookCardsRequest) async throws -> BackendProjectNotebookCardsResponse {
         BackendProjectNotebookCardsResponse(
             schemaVersion: 1,
@@ -2789,19 +2880,47 @@ actor LocalPermitextBackendTransport: PermitextBackendTransport {
             acceptedMutationIDs: request.batch.mutations.map(\.recordID),
             rejectedMutationIDs: [],
             rejectionReasons: nil,
+            latestEventID: Int64(userContentByUserID[userID]?.count ?? 0),
             serverTime: Date()
         )
     }
 
     func pullUserContent(_ request: BackendUserContentPullRequest) async throws -> ServerUserContentPullResult {
         let allMutations = userContentByUserID[request.auth.accountUserID] ?? []
-        let mutations = request.since.map { since in
+        let excluded = Set(request.excludedMutationKinds)
+        let filtered = request.since.map { since in
             allMutations.filter { $0.updatedAt > since || ($0.deletedAt.map { $0 > since } ?? false) }
         } ?? allMutations
+        let mutations = excluded.isEmpty
+            ? filtered
+            : filtered.filter { !excluded.contains($0.entityKind.rawValue) }
         return ServerUserContentPullResult(
             userID: request.auth.accountUserID,
             pulledAt: Date(),
+            latestEventID: Int64(allMutations.count),
+            contentMapVersion: request.contentMapVersion,
+            entitlementFingerprint: "local-dev",
             mutations: mutations
+        )
+    }
+
+    func checkpointUserContent(_ request: BackendUserContentCheckpointRequest) async throws -> ServerUserContentCheckpointResult {
+        let allMutations = userContentByUserID[request.auth.accountUserID] ?? []
+        let latestEventID = Int64(allMutations.count)
+        let contentMapVersion = request.contentMapVersion ?? 0
+        let entitlementFingerprint = "local-dev"
+        let changed =
+            (request.sinceEventID ?? 0) != latestEventID ||
+            (request.contentMapVersion ?? 0) != contentMapVersion ||
+            (request.entitlementFingerprint ?? "") != entitlementFingerprint
+        return ServerUserContentCheckpointResult(
+            userID: request.auth.accountUserID,
+            checkedAt: Date(),
+            changed: changed,
+            latestEventID: latestEventID,
+            syncRevision: latestEventID,
+            contentMapVersion: contentMapVersion,
+            entitlementFingerprint: entitlementFingerprint
         )
     }
 }

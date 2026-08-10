@@ -28,6 +28,24 @@ try {
     "Concurrent local mutations lost updates."
   );
 
+  // Nested withFileStoreLock for the same path must reenter instead of deadlocking.
+  let nestedDepth = 0;
+  await withFileStoreLock(dataPath, async () => {
+    nestedDepth += 1;
+    await withFileStoreLock(dataPath, async () => {
+      nestedDepth += 1;
+      const store = await readJSONFile(dataPath, { count: 0 });
+      store.nested = true;
+      await writeJSONFileAtomically(dataPath, store);
+    });
+  });
+  assert.equal(nestedDepth, 2, "Reentrant file-store lock did not execute nested work.");
+  assert.equal(
+    JSON.parse(await readFile(dataPath, "utf8")).nested,
+    true,
+    "Reentrant file-store lock failed to write nested mutation."
+  );
+
   const privateRoot = join(root, "private");
   assert.equal(
     resolveContainedPrivatePath(privateRoot, "project-assets/a/report.pdf"),

@@ -50,6 +50,7 @@ export const rateLimitPolicies = new Map([
   ["organizations/projects/transfer", { limit: 30, windowMs: 60 * 60 * 1000 }],
   ["organizations/projects/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/projects/snapshot", { limit: 240, windowMs: 60 * 60 * 1000 }],
+  ["projects/hub/bootstrap", { limit: 240, windowMs: 60 * 60 * 1000 }],
   ["organizations/evidence/reviews/list", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["organizations/evidence/reviews/save", { limit: 120, windowMs: 60 * 60 * 1000 }],
   ["notebook/cards/list", { limit: 120, windowMs: 60 * 60 * 1000 }],

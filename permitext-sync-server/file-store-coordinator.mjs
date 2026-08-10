@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import { randomUUID } from "node:crypto";
 import {
   mkdir,
@@ -13,6 +14,7 @@ import { dirname } from "node:path";
 const defaultLockTimeoutMilliseconds = 10_000;
 const defaultLockStaleMilliseconds = 60_000;
 const defaultRetryMilliseconds = 10;
+const heldLocks = new AsyncLocalStorage();
 
 function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -31,6 +33,12 @@ async function removeStaleLock(lockPath, staleMilliseconds, now) {
 }
 
 export async function withFileStoreLock(dataPath, operation, options = {}) {
+  const held = heldLocks.getStore();
+  if (held?.has(dataPath)) {
+    // Same async context already owns this lock (outer request lock + adapter mutation).
+    return operation();
+  }
+
   const lockPath = `${dataPath}.lock`;
   const timeoutMilliseconds =
     options.timeoutMilliseconds ?? defaultLockTimeoutMilliseconds;
@@ -70,8 +78,10 @@ export async function withFileStoreLock(dataPath, operation, options = {}) {
     void utimes(lockPath, timestamp, timestamp).catch(() => {});
   }, Math.max(1_000, Math.floor(staleMilliseconds / 3)));
   heartbeat.unref();
+  const nextHeld = new Set(held || []);
+  nextHeld.add(dataPath);
   try {
-    return await operation();
+    return await heldLocks.run(nextHeld, operation);
   } finally {
     clearInterval(heartbeat);
     await handle.close();
