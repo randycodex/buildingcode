@@ -12642,20 +12642,19 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 0;
 }
 
 .code-question-index-item {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 4px;
-  border: 1px solid var(--border, rgba(0, 0, 0, 0.1));
-  border-radius: 8px;
-  padding: 2px;
+  position: relative;
+  display: block;
+  border: 0;
+  border-bottom: 1px solid var(--border, rgba(0, 0, 0, 0.1));
+  border-radius: 0;
+  padding: 2px 0;
 }
 
 .code-question-index-item.is-active {
-  border-color: color-mix(in srgb, var(--project-color, #6678d4) 55%, transparent);
   background: color-mix(in srgb, var(--project-color, #6678d4) 10%, transparent);
 }
 
@@ -12668,9 +12667,9 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   gap: 1px 8px;
   width: 100%;
   min-height: 44px;
-  padding: 5px 6px;
+  padding: 5px 68px 5px 6px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 0;
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -12716,6 +12715,12 @@ body .panel-track > article.workspace-panel:not(.reader-panel) * {
   background: transparent;
   cursor: pointer;
   font: inherit;
+}
+
+.code-question-index-actions {
+  position: absolute;
+  top: 6px;
+  right: 0;
 }
 
 .code-question-index-empty,
