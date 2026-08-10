@@ -301,6 +301,7 @@ assert.doesNotMatch(codeDecisionIndexSource, /Legacy \/ Unassigned|Review legacy
 assert.doesNotMatch(codeDecisionIndexSource, /code-question-index-meta|No Code Decisions yet/);
 assert.match(codeDecisionIndexSource, /Ask a professional code question, then press Enter/);
 assert.match(codeDecisionIndexSource, /createLocalCodeQuestionDraft\(project, \{ questionText \}\)/);
+assert.match(codeDecisionIndexSource, /wrap\.appendChild\(renderCodeQuestionIndexList\(project\)\);[\s\S]*?wrap\.appendChild\(toolbar\);/);
 assert.doesNotMatch(codeDecisionIndexSource, /Search decisions|Search Code Decisions|code-question-create-button/);
 const codeDecisionIndexListSource = workspaceScript.slice(
   workspaceScript.indexOf("function renderCodeQuestionIndexList"),
@@ -360,9 +361,9 @@ assert.doesNotMatch(workspaceScript, /function renderCodeDecisionContextBar/);
 assert.match(workspaceScript, /function renderCodeQuestionShellChrome[\s\S]*?ensureCodeQuestionShellForProject\(project\)/);
 assert.doesNotMatch(workspaceStyles, /\.code-question-stage-button/);
 assert.match(workspaceStyles, /\.code-question-panel-body \{[\s\S]*?min-height: 0;[\s\S]*?overflow-y: auto;[\s\S]*?overscroll-behavior: contain;/);
-assert.match(workspaceHTML, /styles\.css\?v=20260809-research-composer-dock-v1/);
-assert.match(serviceWorker, /permitext-pro-shell-v550/);
-assert.match(serviceWorker, /styles\.css\?v=20260809-research-composer-dock-v1/);
+assert.match(workspaceHTML, /styles\.css\?v=20260809-decision-entry-dock-v1/);
+assert.match(serviceWorker, /permitext-pro-shell-v551/);
+assert.match(serviceWorker, /styles\.css\?v=20260809-decision-entry-dock-v1/);
 assert.match(workspaceStyles, /\.search-panel \{[\s\S]*?min-width: 600px;/);
 assert.match(workspaceStyles, /\.code-question-panel\[data-cq-role="question-index"\] \{\s*min-width: 300px;\s*\}/);
 assert.match(workspaceStyles, /\.evidence-candidate-tray \{\s*display: grid;\s*gap: 0;\s*\}/);
@@ -394,6 +395,8 @@ assert.match(workspaceScript, /const dockedComposer = conversation\.querySelecto
 assert.match(workspaceScript, /const resizeComposerInput = \(\) => \{[\s\S]*?input\.style\.height = "auto";[\s\S]*?input\.style\.height = `\$\{input\.scrollHeight\}px`;/);
 assert.match(workspaceStyles, /\.analysis-panel\.has-research-composer \{[\s\S]*?grid-template-rows: auto minmax\(0, 1fr\) auto;/);
 assert.match(workspaceStyles, /\.research-composer \.research-question-input \{[\s\S]*?overflow-y: hidden;/);
+assert.match(workspaceStyles, /\.code-question-index \{[\s\S]*?grid-template-rows: minmax\(0, 1fr\) auto;[\s\S]*?height: 100%;/);
+assert.match(workspaceStyles, /\.code-question-index-list \{[\s\S]*?overflow-y: auto;/);
 assert.match(workspaceScript, /Selected evidence \(\$\{displayedSources\.length\}\)/);
 assert.doesNotMatch(workspaceScript, /Selected for exploratory Research/);
 assert.doesNotMatch(workspaceScript, /Find and select at least one enacted-code passage before bounded Research analysis\./);
