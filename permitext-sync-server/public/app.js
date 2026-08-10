@@ -20,7 +20,7 @@ import {
   recordSurvivesBulkClear,
   syncCheckpointRequiresFullPull,
   syncLeaderLeaseIsAvailable
-} from "./sync-state.js?v=20260809-project-summary-labels-v1";
+} from "./sync-state.js?v=20260809-compact-research-feedback-v2";
 import {
   disableOfflineFeature,
   deleteNotebookCardSnapshot,
@@ -45,7 +45,7 @@ import {
   saveNotebookProjectSnapshot,
   saveOfflineSyncSnapshot,
   stageNotebookImage
-} from "./offline-storage.js?v=20260809-project-summary-labels-v1";
+} from "./offline-storage.js?v=20260809-compact-research-feedback-v2";
 import { syncConflictRecordsMatch } from "./sync-conflict-resolution.js?v=20260809-code-decision-v5";
 import {
   cacheRetryablePromise,
@@ -65,7 +65,7 @@ import {
   renameWorkspace,
   reorderWorkspace,
   workspaceLayoutHasVisiblePanes
-} from "./workspace-state.js?v=20260809-project-summary-labels-v1";
+} from "./workspace-state.js?v=20260809-compact-research-feedback-v2";
 import {
   applyStageArrangement,
   buildCodeQuestionDeepLink,
@@ -12567,6 +12567,18 @@ function circleXIconSVG() {
   `;
 }
 
+function researchThumbIconSVG(direction) {
+  const transform = direction === "down" ? ' transform="rotate(180 12 12)"' : "";
+  return `
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+      <g${transform}>
+        <path d="M7 10v11"></path>
+        <path d="M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 7A2 2 0 0 1 17.5 21H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h1.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9Z"></path>
+      </g>
+    </svg>
+  `;
+}
+
 function paneDragHandleSVG() {
   return `<svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor">
     <circle cx="9" cy="6" r="1.2"></circle><circle cx="15" cy="6" r="1.2"></circle>
@@ -13038,12 +13050,35 @@ function renderResearchFeedback(container, message, conversationID) {
   if (!message?.id || !conversationID) return;
   const form = document.createElement("form");
   form.className = "research-feedback";
-  const heading = document.createElement("strong");
-  heading.textContent = "Was this answer useful?";
+  const compact = document.createElement("div");
+  compact.className = "research-feedback-compact";
+  const helpfulButton = document.createElement("button");
+  helpfulButton.type = "button";
+  helpfulButton.className = "research-feedback-icon";
+  helpfulButton.title = "Helpful";
+  helpfulButton.setAttribute("aria-label", "Mark this answer as helpful");
+  helpfulButton.innerHTML = researchThumbIconSVG("up");
+  const problemButton = document.createElement("button");
+  problemButton.type = "button";
+  problemButton.className = "research-feedback-icon";
+  problemButton.title = "Report a problem";
+  problemButton.setAttribute("aria-label", "Report a problem with this answer");
+  problemButton.innerHTML = researchThumbIconSVG("down");
+  const status = document.createElement("span");
+  status.className = "research-feedback-status";
+  status.setAttribute("role", "status");
+  status.setAttribute("aria-live", "polite");
+  compact.append(helpfulButton, problemButton, status);
+
+  const details = document.createElement("section");
+  details.className = "research-feedback-details";
+  details.id = `research-feedback-details-${String(message.id).replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+  details.hidden = true;
+  problemButton.setAttribute("aria-controls", details.id);
+  problemButton.setAttribute("aria-expanded", "false");
   const choices = document.createElement("div");
   choices.className = "research-feedback-choices";
   const categories = [
-    ["helpful", "Helpful"],
     ["incorrect_misleading", "Incorrect or misleading"],
     ["missing_information", "Missing information"],
     ["citation_problem", "Citation problem"],
@@ -13059,6 +13094,7 @@ function renderResearchFeedback(container, message, conversationID) {
     button.addEventListener("click", () => {
       selectedCategory = value;
       choices.querySelectorAll("button").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      syncCompactState();
       submit.disabled = false;
     });
     choices.append(button);
@@ -13107,35 +13143,80 @@ function renderResearchFeedback(container, message, conversationID) {
   submit.type = "submit";
   submit.className = "ghost-button";
   submit.textContent = message.feedback ? "Update feedback" : "Send feedback";
-  submit.disabled = !selectedCategory;
-  const status = document.createElement("p");
-  status.className = "research-feedback-status";
-  if (message.feedback) status.textContent = "Saved as a review candidate.";
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!selectedCategory) return;
-    submit.disabled = true;
+  submit.disabled = !selectedCategory || selectedCategory === "helpful";
+  const cancel = document.createElement("button");
+  cancel.type = "button";
+  cancel.className = "ghost-button research-feedback-cancel";
+  cancel.textContent = "Cancel";
+  const actions = document.createElement("div");
+  actions.className = "research-feedback-actions";
+  actions.append(submit, cancel);
+  const setDetailsOpen = (open) => {
+    details.hidden = !open;
+    problemButton.setAttribute("aria-expanded", String(open));
+  };
+  const syncCompactState = () => {
+    helpfulButton.setAttribute("aria-pressed", String(selectedCategory === "helpful"));
+    problemButton.setAttribute("aria-pressed", String(Boolean(selectedCategory && selectedCategory !== "helpful")));
+    status.textContent = message.feedback ? "Feedback saved" : "";
+  };
+  const setBusy = (busy) => {
+    helpfulButton.disabled = busy;
+    problemButton.disabled = busy;
+    submit.disabled = busy || !selectedCategory || selectedCategory === "helpful";
+    cancel.disabled = busy;
+  };
+  const saveFeedback = async (category, fields = {}) => {
+    setBusy(true);
     status.textContent = "Saving…";
     try {
       const payload = await postResearch("/research/feedback", {
         conversationID,
         answerID: message.id,
-        category: selectedCategory,
-        comment: comment.value,
-        professionalRole: professionalRole.value,
-        supportingReference: supportingReference.value
+        category,
+        comment: fields.comment ?? comment.value,
+        professionalRole: fields.professionalRole ?? professionalRole.value,
+        supportingReference: fields.supportingReference ?? supportingReference.value
       });
       message.feedback = payload.feedback;
+      selectedCategory = payload.feedback.category;
       submit.textContent = "Update feedback";
-      status.textContent = "Saved as a review candidate.";
+      syncCompactState();
+      setDetailsOpen(false);
     } catch (error) {
       status.textContent = error.message;
     } finally {
-      submit.disabled = !selectedCategory;
+      setBusy(false);
     }
+  };
+  helpfulButton.addEventListener("click", () => {
+    comment.value = "";
+    professionalRole.value = "";
+    supportingReference.value = "";
+    void saveFeedback("helpful", { comment: "", professionalRole: "", supportingReference: "" });
   });
-  form.append(heading, choices, optionalContext, submit, status);
-  container.append(form);
+  problemButton.addEventListener("click", () => {
+    setDetailsOpen(details.hidden);
+  });
+  cancel.addEventListener("click", () => setDetailsOpen(false));
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!selectedCategory || selectedCategory === "helpful") return;
+    await saveFeedback(selectedCategory);
+  });
+  details.append(choices, optionalContext, actions);
+  const answerDetails = container.lastElementChild?.querySelector(":scope > .research-answer-details");
+  if (answerDetails) {
+    const reviewRow = document.createElement("div");
+    reviewRow.className = "research-answer-review-row";
+    answerDetails.replaceWith(form);
+    reviewRow.append(answerDetails, compact);
+    form.append(reviewRow, details);
+  } else {
+    form.append(compact, details);
+    container.append(form);
+  }
+  syncCompactState();
 }
 
 function renderResearchInterpretation(container, result, options = {}) {
