@@ -5786,7 +5786,7 @@ const researchEvidenceAnalysisCollections = [
   "tables"
 ];
 
-function validateResearchEvidenceAnalysis(value, evidence, projectFacts = []) {
+export function validateResearchEvidenceAnalysis(value, evidence, projectFacts = []) {
   const sourceIDs = new Set(evidence.map((source) => String(source.sourceID || "")).filter(Boolean));
   const factSet = new Set(projectFacts.map((fact) => String(fact).trim()).filter(Boolean));
   if (!value || typeof value !== "object") {
@@ -5904,11 +5904,19 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
   }
   schema.properties.userPinnedEvidence.items.enum = sourceIDs;
   schema.properties.permitextDiscoveredEvidence.items.enum = sourceIDs;
+  const exactProjectFacts = (options.projectContextFacts || [])
+    .map((fact) => String(fact || "").trim())
+    .filter(Boolean);
+  if (exactProjectFacts.length) {
+    schema.properties.projectFactsUsed.items.enum = exactProjectFacts;
+  } else {
+    schema.properties.projectFactsUsed.maxItems = 0;
+  }
   const requestBody = {
     model: configuration.model,
     store: false,
     reasoning: { effort: "low" },
-    max_output_tokens: 1_600,
+    max_output_tokens: 3_000,
     safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
     instructions: [
       "Organize the supplied enacted evidence into a compact internal legal-research map before a separate model writes the user-facing answer.",
@@ -5969,6 +5977,9 @@ async function openAIResearchEvidenceAnalysis(question, evidence, userID, option
     if (error.code === "RESEARCH_REFUSAL") throw error;
     const invalid = new Error("The Research evidence-analysis model returned invalid structured output.");
     invalid.code = "INVALID_RESEARCH_EVIDENCE_ANALYSIS";
+    invalid.providerStatus = payload?.status || null;
+    invalid.incompleteReason = payload?.incomplete_details?.reason || null;
+    invalid.providerUsage = researchUsageFromProviderPayload(payload);
     throw invalid;
   }
   return {
@@ -6428,8 +6439,8 @@ async function openAIResearchInterpretation(question, evidence, userID, options 
     const requestBody = {
       model,
       store: false,
-      reasoning: { effort: configuration.reasoningEffort },
-      max_output_tokens: 1_500,
+      reasoning: { effort: conversational ? "low" : configuration.reasoningEffort },
+      max_output_tokens: conversational ? 3_000 : 1_500,
       safety_identifier: createHash("sha256").update(String(userID)).digest("hex"),
       instructions: [
         "You are a building-code research assistant, not an authority having jurisdiction.",
@@ -13502,6 +13513,19 @@ async function handleResearchConversationMessage(request, response) {
       "RESEARCH_PROVIDER_ERROR",
       "TimeoutError"
     ].includes(error.code || error.name)) {
+      console.warn(JSON.stringify({
+        event: "research_conversation_failure",
+        user: createHash("sha256").update(context.userID).digest("hex").slice(0, 16),
+        conversation: createHash("sha256").update(conversation.id).digest("hex").slice(0, 16),
+        code: error.code || error.name,
+        message: String(error.message || "").slice(0, 500),
+        verificationAttempts: Array.isArray(error.verificationAttempts)
+          ? error.verificationAttempts.map((attempt) => ({ pass: attempt.pass, issues: attempt.issues }))
+          : [],
+        providerStatus: error.providerStatus || null,
+        incompleteReason: error.incompleteReason || null,
+        providerUsage: error.providerUsage || null
+      }));
       sendError(response, 502, "The research model could not return a verified, cited answer.");
       return;
     }

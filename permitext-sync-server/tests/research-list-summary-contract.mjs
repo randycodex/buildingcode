@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { projectResearchConversationForList } from "../app.mjs";
+import {
+  projectResearchConversationForList,
+  validateResearchEvidenceAnalysis
+} from "../app.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const [appSource, clientSource, stylesSource] = await Promise.all([
@@ -107,5 +110,16 @@ assert.match(appSource, /conversation\?\.primaryProjectID[\s\S]*historyHiddenAt/
 assert.match(appSource, /filter\(\(conversation\) => !conversation\.historyHiddenAt\)/, "Hidden Project conversations still appear in the main history.");
 assert.match(clientSource, /research-back-button[\s\S]*showNewResearchChat/, "Research does not provide a Back control.");
 assert.match(clientSource, /unansweredConversations[\s\S]*No completed answer yet\./, "Empty Project conversations cannot be reopened from Project Research history.");
+
+const analysisFixture = {
+  controllingProvisions: [], generalRules: [], exceptions: [], conditions: [], limitations: [],
+  definitions: [], crossReferences: [], tables: [], userPinnedEvidence: [], permitextDiscoveredEvidence: [],
+  projectFactsUsed: [], unresolvedProjectFacts: [], evidenceLimitations: ["Bounded corpus."], highValueFollowUpQuestions: []
+};
+assert.doesNotThrow(
+  () => validateResearchEvidenceAnalysis(analysisFixture, [], []),
+  "Question facts should not be misclassified as invented Project-folder facts."
+);
+assert.match(appSource, /projectFactsUsed\.maxItems = 0/, "The evidence-analysis schema does not forbid invented Project facts when no Project facts exist.");
 
 console.log("permitext research list summary contract passed");

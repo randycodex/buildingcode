@@ -75,11 +75,30 @@ const topicRoutes = [
     targets: [{ codePrefix: "BC", sectionPrefix: "1006.3.2" }]
   },
   {
-    pattern: /\bmultipurpose\b|accessory\s+(?:assembly|occupancy)|fewer\s+than\s+75/i,
+    pattern: /\b(?:multipurpose|community)\s+(?:room|hall)\b|accessory\s+(?:assembly|occupancy)|fewer\s+than\s+75/i,
     label: "accessory-assembly classification and occupant-load provisions",
     targets: [
+      { codePrefix: "BC", sectionPrefix: "302.1" },
       { codePrefix: "BC", sectionPrefix: "303.1.3" },
+      { codePrefix: "BC", sectionPrefix: "303.4" },
       { codePrefix: "BC", sectionPrefix: "1004.1.3" }
+    ]
+  },
+  {
+    pattern: /\b(?:architect(?:ural|s)?|engineer(?:ing|s)?|professional[- ]services?)\s+office\b|\boffice\b.*\b(?:occupancy\s+group|classif(?:y|ied|ication)|professional[- ]services?)\b|\b(?:occupancy\s+group|classif(?:y|ied|ication))\b.*\boffice\b/i,
+    label: "office and professional-services occupancy classification provisions",
+    targets: [{ codePrefix: "BC", sectionPrefix: "304.1" }]
+  },
+  {
+    pattern: /\b(?:multiple|mixed)[- ]occupanc|\b(?:residential|apartments?|group\s+r)\b.*\b(?:retail|mercantile|group\s+m)\b|\baccessory\s+(?:management\s+)?office\b/i,
+    label: "multiple, mixed, and accessory occupancy provisions",
+    targets: [
+      { codePrefix: "BC", sectionPrefix: "302.1" },
+      { codePrefix: "BC", sectionPrefix: "304.1" },
+      { codePrefix: "BC", sectionPrefix: "309.1" },
+      { codePrefix: "BC", sectionPrefix: "310.1", includeDescendants: true },
+      { codePrefix: "BC", sectionPrefix: "508.1" },
+      { codePrefix: "BC", sectionPrefix: "508.2.1" }
     ]
   },
   {
